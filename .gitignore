@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+.envrc
+.envrc.local
+node_modules/
+dist/
+CLAUDE.local.md
+*.zip
+project-docs/evidence/raw/
