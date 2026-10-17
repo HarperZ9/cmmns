@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-pb-fixture="status">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixture thread</title>
+<link rel="stylesheet" href="../../src/ext/badges.css">
+<style>
+  body { margin: 0; background: #fff; color: #0f1419; font: 15px/1.4 system-ui, sans-serif; }
+  main { max-width: 600px; margin: 0 auto; border-inline: 1px solid #eff3f4; }
+  article { padding: 12px 16px; border-bottom: 1px solid #eff3f4; }
+  [data-testid="User-Name"] { font-weight: 700; } [data-testid="User-Name"] span { color: #536471; font-weight: 400; }
+  .note { padding: 12px 16px; background: #f7f9f9; color: #536471; font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="note">Fixture: every account and reply here is invented. It mimics the structure of an X post page so the extension can be checked without signing in.</div>
+  <div id="thread"></div>
+</main>
+<script>
+  // [handle, text, aboutReading or null (not looked up), preloaded?]
+  const T = [
+    ["newsdesk_fr", "Thousands marched in Paris today against the pension reform. Police report clashes near Place de la Nation.", { basedIn: "France", joinDate: "2011-04-01", nameChanges: 0 }, true],
+    ["claire_lyon", "I was at the march in Lyon, it was calm and full of families until the very end.", { basedIn: "France", joinDate: "2014-02-01", nameChanges: 0 }, true],
+    ["Patriot84736251", "Here in France we are sick of it. The protests are paid for by foreign money and the media will never tell you that", { basedIn: "Nigeria", joinDate: "2026-10-02", nameChanges: 4 }, true],
+    ["truth_now_77", "The protests are paid for by foreign money and the media will never tell you that!!", { basedIn: "South Asia", joinDate: "2026-09-28", nameChanges: 1 }, false],
+    ["eagle_watch", "@newsdesk_fr The protests are paid for by foreign money and the media will never tell you that", null, false],
+    ["Jean20995511", "As a Frenchman I can tell you these rioters are vermin and they should all be shot", { basedIn: "West Asia", joinDate: "2026-10-09", nameChanges: 0 }, true],
+    ["redflag_now", "billionaires are parasites, bring out the guillotines for the billionaires", { basedIn: "United States", joinDate: "2026-10-12", nameChanges: 2 }, false],
+    ["marc_dupont", "My grandmother marched in 1995 too. Same fight, different decade.", { basedIn: "France", joinDate: "2012-09-01", nameChanges: 0 }, true],
+    ["sophie_t", "The reform is a mistake but the violence near the end did not help anyone.", { basedIn: "Europe", joinDate: "2016-05-01", nameChanges: 0 }, false],
+    ["paul_b", "Strikes are planned again for Thursday according to the unions.", null, false],
+  ];
+  window.FIXTURE_ABOUT = Object.fromEntries(T.filter((t) => t[2]).map((t) => [t[0], t[2]]));
+  const box = document.getElementById("thread");
+  T.forEach(([h, text], i) => {
+    const a = document.createElement("article");
+    a.setAttribute("data-testid", "tweet");
+    a.innerHTML = `<div data-testid="User-Name"><a href="/${h}">${h.replace(/_/g, " ")}</a> <span>@${h} · <a href="/${h}/status/10${i}"><time>2h</time></a></span></div><div data-testid="tweetText"></div>`;
+    a.querySelector('[data-testid="tweetText"]').textContent = text;
+    box.append(a);
+  });
+  window.FIXTURE_PRELOAD = T.filter((t) => t[2] && t[3]).map((t) => ({ handle: t[0], ...t[2] }));
+</script>
+<script src="chrome-stub.js"></script>
+<script src="../../src/ext/core.bundle.js"></script>
+<script src="../../src/ext/store.js"></script>
+<script>Promise.all(window.FIXTURE_PRELOAD.map((r) => PBStore.put(r))).then(() => { window.FIXTURE_READY = true; document.getElementById("thread").append(document.createElement("i")); });</script>
+<script src="../../src/ext/about-page.js"></script>
+<script src="../../src/ext/ui.js"></script>
+<script src="../../src/ext/content.js"></script>
+</body>
+</html>

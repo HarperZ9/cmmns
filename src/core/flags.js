@@ -31,7 +31,11 @@ export function flagsFor(account, context = {}) {
   if (Number.isFinite(account.nameChanges) && account.nameChanges >= MANY_NAME_CHANGES) out.push({ id: "name-changes", evidence: `username changed ${account.nameChanges} times` });
   if (account.handle && DEFAULT_HANDLE.test(account.handle)) out.push({ id: "default-handle", evidence: `handle @${account.handle} has the sign-up pattern` });
   if (context.mismatch && context.mismatch.status === "mismatch") out.push({ id: "based-elsewhere", evidence: context.mismatch.reason });
-  if (context.cluster && context.cluster.size >= 2) out.push({ id: "same-text", evidence: `same text as ${context.cluster.size - 1} other account${context.cluster.size === 2 ? "" : "s"} in this thread` });
+  if (context.cluster && context.cluster.size >= 2) {
+    const others = (context.cluster.authors || []).filter((a) => a !== account.handle).map((a) => "@" + a);
+    const list = others.length ? `: ${others.slice(0, 8).join(", ")}${others.length > 8 ? ` and ${others.length - 8} more` : ""}` : "";
+    out.push({ id: "same-text", evidence: `same text as ${context.cluster.size - 1} other repl${context.cluster.size === 2 ? "y" : "ies"} in this thread${list}` });
+  }
   return out.map((f) => ({ ...f, doesNotProve: DOES_NOT_PROVE[f.id] }));
 }
 

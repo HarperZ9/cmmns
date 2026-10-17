@@ -39,7 +39,7 @@ test("accounts not looked up are left out and counted", () => {
   const r = threadReport(rows);
   assert.equal(r.notLookedUp, 1);
   assert.equal(r.lookedUp, 1);
-  assert.match(r.sentence, /1 replies are left out/);
+  assert.match(r.sentence, /1 reply is left out/);
 });
 
 test("equal flagged shares read as no clear difference", () => {

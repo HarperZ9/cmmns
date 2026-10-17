@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "fixture", "runtimeExecutable": "node", "runtimeArgs": ["scripts/serve.mjs", "8742"], "port": 8742 }
+  ]
+}

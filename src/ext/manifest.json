@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Provenance Badges",
+  "version": "0.1.0",
+  "description": "Evidence on replies: where an account is labelled as based, signs of coordination, and a thread report. Nothing leaves your browser.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://x.com/*", "https://twitter.com/*"],
+  "background": { "service_worker": "background.js", "scripts": ["background.js"] },
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "js": ["core.bundle.js", "store.js", "about-page.js", "ui.js", "content.js"],
+      "css": ["badges.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_specific_settings": { "gecko": { "id": "provenance-badges@local", "strict_min_version": "121.0" } }
+}

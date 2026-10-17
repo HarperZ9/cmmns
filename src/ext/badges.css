@@ -1,0 +1,38 @@
+/* Quiet chips that sit under a reply's name line. One warm mark for the mismatch; everything
+   else stays neutral so the badges inform without shouting. Follows X's light and dark themes. */
+.pb-bar { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 4px; font: 12px/1.4 system-ui, sans-serif; }
+.pb-chip {
+  font: inherit; border-radius: 999px; padding: 1px 8px; cursor: pointer;
+  border: 1px solid rgba(127, 127, 127, 0.45); background: transparent; color: rgb(113, 118, 123);
+}
+.pb-chip:hover { border-color: rgba(127, 127, 127, 0.9); }
+.pb-chip:focus-visible { outline: 2px solid rgb(29, 155, 240); outline-offset: 1px; }
+.pb-place { color: inherit; }
+.pb-warn { border-color: rgb(244, 129, 33); color: rgb(244, 129, 33); }
+.pb-quiet { opacity: 0.7; }
+.pb-look[disabled] { cursor: progress; opacity: 0.7; }
+
+.pb-pop {
+  position: absolute; z-index: 2147483000; width: 320px; padding: 10px 12px; border-radius: 10px;
+  background: #fff; color: #0f1419; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  font: 13px/1.45 system-ui, sans-serif;
+}
+.pb-pop-h { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #536471; margin-top: 8px; }
+.pb-pop-h:first-child { margin-top: 0; }
+
+.pb-panel {
+  position: fixed; right: 16px; bottom: 16px; z-index: 2147482999; width: 320px; max-height: 60vh; overflow: auto;
+  padding: 10px 12px; border-radius: 12px; background: #fff; color: #0f1419;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25); font: 13px/1.45 system-ui, sans-serif;
+}
+.pb-panel-head { all: unset; cursor: pointer; font-weight: 600; display: block; width: 100%; }
+.pb-panel p { margin: 8px 0 0; }
+.pb-sentence { font-weight: 500; }
+.pb-num { color: #536471; }
+.pb-caveat { font-size: 12px; color: #536471; border-top: 1px solid #eff3f4; padding-top: 8px; }
+.pb-panel .pb-chip { margin-top: 8px; }
+
+.pb-dark .pb-pop, .pb-dark .pb-panel { background: #16181c; color: #e7e9ea; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6); }
+.pb-dark .pb-pop-h, .pb-dark .pb-num, .pb-dark .pb-caveat { color: #8b98a5; }
+.pb-dark .pb-caveat { border-top-color: #2f3336; }
+@media (max-width: 600px) { .pb-panel { left: 8px; right: 8px; width: auto; bottom: 64px; } }
