@@ -7,7 +7,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const ORDER = ["places.js", "similarity.js", "mismatch.js", "flags.js", "lexicon.js", "rhetoric.js", "report.js", "about.js"];
+const ORDER = ["places.js", "similarity.js", "mismatch.js", "flags.js", "lexicon.js", "rhetoric.js", "report.js", "about.js", "owners.js"];
 const ident = (f) => "M_" + f.replace(/\.js$/, "");
 
 let body = "";

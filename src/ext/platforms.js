@@ -23,7 +23,10 @@
       if (!link || !idm) return null;
       const display = text(nameBox.querySelector("a span")) || null;
       return { id: idm[1], author: link.slice(1), display, posted: time.getAttribute("datetime"), url: "https://x.com" + time.parentElement.getAttribute("href"),
-        text: text(node.querySelector('[data-testid="tweetText"]')), node, anchor: nameBox };
+        text: text(node.querySelector('[data-testid="tweetText"]')), node, anchor: nameBox,
+        // X's own paid-placement label, and link domains shown in the post or its card
+        paid: [...node.querySelectorAll("span")].some((sp) => /^(Ad|Promoted)$/.test(sp.textContent.trim())),
+        domains: PB.domainsIn(node.innerText) };
     },
   };
 

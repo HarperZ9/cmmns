@@ -50,6 +50,7 @@
     const no = m.site && !m.site.hasLocation ? `${m.site.name} does not disclose this` : (m.reading ? "not shown" : "not looked up yet");
     return [
       ["Account", [m.display, "@" + m.handle].filter(Boolean).join("  ")],
+      ["Owned by", PB.ownerOfHandle(m.handle) ? `${PB.ownerOfHandle(m.handle).owner} (source: ${PB.ownerOfHandle(m.handle).source})` : null],
       ["Profile", m.profile || null],
       ["Account based in", R.basedIn || no],
       ["Joined", R.joinDate ? `${R.joinDate.slice(0, 7)} (${age} days ago)` : no],
@@ -106,6 +107,13 @@
         ["What it is", MEANING[mk.family]],
         ["What it does not prove", "Words can be quoted, ironic or reported speech. This describes the comment, not who wrote it or why."],
       ]));
+    }
+    if (model.paid) bar.append(chip("ad (X label)", "pb-flag", [["Source", "X labels this post as an ad or promoted post: someone paid for it to reach you."]]));
+    const seedNote = "Ownership written from general knowledge and not yet checked against the source; open the source to verify.";
+    for (const d of model.domains || []) {
+      const o = PB.ownerOfDomain(d);
+      if (!o || d === "x.com" || d === "twitter.com") continue;
+      bar.append(chip(`link: ${o.name}`, "pb-place", [["Outlet", `${o.name} (${d})`], ["Owned by", o.owner], ["Source", o.source], ["Note", o.seed ? seedNote : null]]));
     }
     for (const f of model.flags || []) {
       bar.append(chip(FLAG_LABEL[f.id] || f.id, f.id === "based-elsewhere" ? "pb-warn" : "pb-flag", [
