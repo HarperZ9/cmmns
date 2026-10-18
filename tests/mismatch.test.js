@@ -59,3 +59,11 @@ test("a documented hate symbol in a chosen name is flagged, ordinary names are n
   assert.ok(!flagsFor({ handle: "maria_1987", display: "Maria Lopez" }).some((f) => f.id === "hate-symbol-name"));
   assert.ok(!flagsFor({ handle: "carian", display: "Darian Price" }).some((f) => f.id === "hate-symbol-name"));
 });
+
+test("app store and name flag are compared with where the account is based", () => {
+  const ids = (a) => flagsFor(a).map((f) => f.id);
+  assert.ok(ids({ handle: "z", basedIn: "United States", connectedVia: "Nigeria App Store" }).includes("store-elsewhere"));
+  assert.ok(ids({ handle: "z", display: "Jack \u{1F1FA}\u{1F1F8}", basedIn: "Nigeria" }).includes("flag-elsewhere"));
+  assert.deepEqual(ids({ handle: "z", display: "Marc \u{1F1FA}\u{1F1F8}", basedIn: "United States", connectedVia: "United States App Store" }), []);
+  assert.deepEqual(ids({ handle: "z", basedIn: "Europe", connectedVia: "France App Store" }), []);
+});

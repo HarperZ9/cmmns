@@ -48,3 +48,13 @@ test("equal flagged shares read as no clear difference", () => {
   for (let i = 20; i < 120; i++) rows.push(reply(i, CALM, i < 40 ? flagged : clean));
   assert.equal(threadReport(rows).verdict, "no-clear-difference");
 });
+
+test("origins count where looked-up accounts are based", async () => {
+  const { origins, joinBurst } = await import("../src/core/report.js");
+  const rows = [{ author: "a", basedIn: "Nigeria", joinDate: "2026-10-01" }, { author: "b", basedIn: "Nigeria", joinDate: "2026-10-05" },
+    { author: "c", basedIn: "France", joinDate: "2014-02-01" }, { author: "d", basedIn: "Nigeria", joinDate: "2026-10-09" }];
+  assert.deepEqual(origins(rows)[0], { place: "Nigeria", n: 3 });
+  const b = joinBurst(rows);
+  assert.equal(b.n, 3);
+  assert.equal(b.from, "2026-10-01");
+});

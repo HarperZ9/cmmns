@@ -33,9 +33,32 @@ export function threadReport(replies) {
     extreme: { n: ext.length, flagged: kE, share: ext.length ? kE / ext.length : 0, ci: wilson(kE, ext.length) },
     others: { n: rest.length, flagged: kR, share: rest.length ? kR / rest.length : 0, ci: wilson(kR, rest.length) },
   };
+  out.origins = origins(known);
+  out.joinBurst = joinBurst(known);
   out.verdict = verdict(out);
   out.sentence = sentence(out);
   return out;
+}
+
+// Where the looked-up accounts are labelled as based, most common first: [{ place, n }].
+export function origins(rows) {
+  const counts = new Map();
+  for (const r of rows) if (r.basedIn) counts.set(r.basedIn, (counts.get(r.basedIn) || 0) + 1);
+  return [...counts].map(([place, n]) => ({ place, n })).sort((a, b) => b.n - a.n);
+}
+
+// The most accounts that joined within any 14-day window: { n, of, from, to }. Many accounts made
+// in the same fortnight replying to one post is a coordination sign; it is also what a news event
+// that brings new people to a platform looks like.
+export function joinBurst(rows, windowDays = 14) {
+  const t = [...new Set(rows.filter((r) => r.joinDate).map((r) => r.author + "|" + r.joinDate))]
+    .map((k) => Date.parse(k.split("|")[1])).filter(Number.isFinite).sort((a, b) => a - b);
+  let best = { n: 0, of: t.length, from: null, to: null };
+  for (let i = 0, j = 0; j < t.length; j++) {
+    while (t[j] - t[i] > windowDays * 86400000) i++;
+    if (j - i + 1 > best.n) best = { n: j - i + 1, of: t.length, from: new Date(t[i]).toISOString().slice(0, 10), to: new Date(t[j]).toISOString().slice(0, 10) };
+  }
+  return best;
 }
 
 // "skewed" only when the two intervals do not overlap; the report never goes further than that.

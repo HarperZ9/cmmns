@@ -2,6 +2,8 @@
 // A flag is a reason to look closer, never a verdict. The thresholds are starting points to be
 // calibrated against the hand-labelled threads (project-docs/EVALUATION.md).
 
+import { parseLabel } from "./places.js";
+
 export const NEW_ACCOUNT_DAYS = 30;
 export const MANY_NAME_CHANGES = 3;
 // X suggests handles like "Name12345678" at sign-up; many throwaway accounts keep them.
@@ -17,6 +19,8 @@ export const DOES_NOT_PROVE = {
   "default-handle": "Many real people never change the handle X suggested.",
   "based-elsewhere": "The label can be wrong (VPNs, travel, X's own errors), and people abroad still speak as locals of where they come from.",
   "hate-symbol-name": "The account chose this name; it can be ironic or quoted, and it says nothing about who runs the account.",
+  "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
+  "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
 };
 
@@ -25,10 +29,39 @@ export function ageDays(joinDate, now = Date.now()) {
   return Number.isFinite(t) ? Math.max(0, Math.floor((now - t) / DAY)) : null;
 }
 
-// account: { handle, joinDate, nameChanges, basedIn }
-// context: { mismatch: result of compare(), cluster: { size } | null, now }
+// The country in "Connected via France App Store" or "... Google Play", or null.
+export function storeCountry(connectedVia) {
+  const m = String(connectedVia || "").match(/^(.+?)\s+(?:app store|google play|play store)/i);
+  return m ? m[1].trim() : null;
+}
+
+// Countries shown as flag emoji in a display name: "Jack 🇺🇸" gives ["United States"].
+export function nameFlags(display) {
+  const names = typeof Intl !== "undefined" && Intl.DisplayNames ? new Intl.DisplayNames(["en"], { type: "region" }) : null;
+  const out = [];
+  for (const m of String(display || "").matchAll(/([\u{1F1E6}-\u{1F1FF}])([\u{1F1E6}-\u{1F1FF}])/gu)) {
+    const iso = String.fromCharCode(m[1].codePointAt(0) - 0x1F1E6 + 65, m[2].codePointAt(0) - 0x1F1E6 + 65);
+    out.push(names ? names.of(iso) : iso);
+  }
+  return out;
+}
+
+// Same place at country or region level. Unknown places never raise a flag.
+function samePlace(a, b) {
+  const A = parseLabel(a), B = parseLabel(b);
+  if (!A || !B) return true;
+  if (A.country && B.country) return A.country === B.country;
+  return A.region === B.region;
+}
+
+// account: { handle, display, joinDate, nameChanges, basedIn, connectedVia }
+// context: { mismatch: result of compare(), cluster: { size, authors } | null, now }
 export function flagsFor(account, context = {}) {
   const out = [];
+  const store = storeCountry(account.connectedVia);
+  if (store && account.basedIn && !samePlace(store, account.basedIn)) out.push({ id: "store-elsewhere", evidence: `installed from the ${store} app store; labelled as based in ${account.basedIn}` });
+  const shown = nameFlags(account.display).find((c) => account.basedIn && !samePlace(c, account.basedIn));
+  if (shown) out.push({ id: "flag-elsewhere", evidence: `shows the ${shown} flag in its name; labelled as based in ${account.basedIn}` });
   const age = ageDays(account.joinDate, context.now);
   if (age != null && age < NEW_ACCOUNT_DAYS) out.push({ id: "new-account", evidence: `account is ${age} day${age === 1 ? "" : "s"} old` });
   if (Number.isFinite(account.nameChanges) && account.nameChanges >= MANY_NAME_CHANGES) out.push({ id: "name-changes", evidence: `username changed ${account.nameChanges} times` });

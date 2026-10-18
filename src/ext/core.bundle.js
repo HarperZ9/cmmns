@@ -296,6 +296,8 @@ const M_flags = (() => {
 // A flag is a reason to look closer, never a verdict. The thresholds are starting points to be
 // calibrated against the hand-labelled threads (project-docs/EVALUATION.md).
 
+const { parseLabel } = M_places;
+
 const NEW_ACCOUNT_DAYS = 30;
 const MANY_NAME_CHANGES = 3;
 // X suggests handles like "Name12345678" at sign-up; many throwaway accounts keep them.
@@ -311,6 +313,8 @@ const DOES_NOT_PROVE = {
   "default-handle": "Many real people never change the handle X suggested.",
   "based-elsewhere": "The label can be wrong (VPNs, travel, X's own errors), and people abroad still speak as locals of where they come from.",
   "hate-symbol-name": "The account chose this name; it can be ironic or quoted, and it says nothing about who runs the account.",
+  "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
+  "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
 };
 
@@ -319,10 +323,39 @@ function ageDays(joinDate, now = Date.now()) {
   return Number.isFinite(t) ? Math.max(0, Math.floor((now - t) / DAY)) : null;
 }
 
-// account: { handle, joinDate, nameChanges, basedIn }
-// context: { mismatch: result of compare(), cluster: { size } | null, now }
+// The country in "Connected via France App Store" or "... Google Play", or null.
+function storeCountry(connectedVia) {
+  const m = String(connectedVia || "").match(/^(.+?)\s+(?:app store|google play|play store)/i);
+  return m ? m[1].trim() : null;
+}
+
+// Countries shown as flag emoji in a display name: "Jack 🇺🇸" gives ["United States"].
+function nameFlags(display) {
+  const names = typeof Intl !== "undefined" && Intl.DisplayNames ? new Intl.DisplayNames(["en"], { type: "region" }) : null;
+  const out = [];
+  for (const m of String(display || "").matchAll(/([\u{1F1E6}-\u{1F1FF}])([\u{1F1E6}-\u{1F1FF}])/gu)) {
+    const iso = String.fromCharCode(m[1].codePointAt(0) - 0x1F1E6 + 65, m[2].codePointAt(0) - 0x1F1E6 + 65);
+    out.push(names ? names.of(iso) : iso);
+  }
+  return out;
+}
+
+// Same place at country or region level. Unknown places never raise a flag.
+function samePlace(a, b) {
+  const A = parseLabel(a), B = parseLabel(b);
+  if (!A || !B) return true;
+  if (A.country && B.country) return A.country === B.country;
+  return A.region === B.region;
+}
+
+// account: { handle, display, joinDate, nameChanges, basedIn, connectedVia }
+// context: { mismatch: result of compare(), cluster: { size, authors } | null, now }
 function flagsFor(account, context = {}) {
   const out = [];
+  const store = storeCountry(account.connectedVia);
+  if (store && account.basedIn && !samePlace(store, account.basedIn)) out.push({ id: "store-elsewhere", evidence: `installed from the ${store} app store; labelled as based in ${account.basedIn}` });
+  const shown = nameFlags(account.display).find((c) => account.basedIn && !samePlace(c, account.basedIn));
+  if (shown) out.push({ id: "flag-elsewhere", evidence: `shows the ${shown} flag in its name; labelled as based in ${account.basedIn}` });
   const age = ageDays(account.joinDate, context.now);
   if (age != null && age < NEW_ACCOUNT_DAYS) out.push({ id: "new-account", evidence: `account is ${age} day${age === 1 ? "" : "s"} old` });
   if (Number.isFinite(account.nameChanges) && account.nameChanges >= MANY_NAME_CHANGES) out.push({ id: "name-changes", evidence: `username changed ${account.nameChanges} times` });
@@ -347,7 +380,7 @@ function isFlagged(flags) {
   return flags.some((f) => !NOT_AUTHENTICITY.has(f.id));
 }
 
-return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, DEFAULT_HANDLE, DOES_NOT_PROVE, ageDays, flagsFor, isFlagged };
+return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, DEFAULT_HANDLE, DOES_NOT_PROVE, ageDays, storeCountry, nameFlags, flagsFor, isFlagged };
 })();
 
 // ---- lexicon.js
@@ -578,9 +611,32 @@ function threadReport(replies) {
     extreme: { n: ext.length, flagged: kE, share: ext.length ? kE / ext.length : 0, ci: wilson(kE, ext.length) },
     others: { n: rest.length, flagged: kR, share: rest.length ? kR / rest.length : 0, ci: wilson(kR, rest.length) },
   };
+  out.origins = origins(known);
+  out.joinBurst = joinBurst(known);
   out.verdict = verdict(out);
   out.sentence = sentence(out);
   return out;
+}
+
+// Where the looked-up accounts are labelled as based, most common first: [{ place, n }].
+function origins(rows) {
+  const counts = new Map();
+  for (const r of rows) if (r.basedIn) counts.set(r.basedIn, (counts.get(r.basedIn) || 0) + 1);
+  return [...counts].map(([place, n]) => ({ place, n })).sort((a, b) => b.n - a.n);
+}
+
+// The most accounts that joined within any 14-day window: { n, of, from, to }. Many accounts made
+// in the same fortnight replying to one post is a coordination sign; it is also what a news event
+// that brings new people to a platform looks like.
+function joinBurst(rows, windowDays = 14) {
+  const t = [...new Set(rows.filter((r) => r.joinDate).map((r) => r.author + "|" + r.joinDate))]
+    .map((k) => Date.parse(k.split("|")[1])).filter(Number.isFinite).sort((a, b) => a - b);
+  let best = { n: 0, of: t.length, from: null, to: null };
+  for (let i = 0, j = 0; j < t.length; j++) {
+    while (t[j] - t[i] > windowDays * 86400000) i++;
+    if (j - i + 1 > best.n) best = { n: j - i + 1, of: t.length, from: new Date(t[i]).toISOString().slice(0, 10), to: new Date(t[j]).toISOString().slice(0, 10) };
+  }
+  return best;
 }
 
 // "skewed" only when the two intervals do not overlap; the report never goes further than that.
@@ -605,7 +661,7 @@ function sentence(r) {
 
 const REPORT_DOES_NOT_PROVE = "A skew can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event. It says nothing about any one reply or account.";
 
-return { MIN_EXTREME, wilson, threadReport, REPORT_DOES_NOT_PROVE };
+return { MIN_EXTREME, wilson, threadReport, origins, joinBurst, REPORT_DOES_NOT_PROVE };
 })();
 
 // ---- about.js

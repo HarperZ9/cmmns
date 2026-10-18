@@ -6,7 +6,7 @@
 
   const FLAG_LABEL = {
     "new-account": "new account", "name-changes": "renamed", "default-handle": "sign-up handle",
-    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name",
+    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country",
   };
 
   const STRONG = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
@@ -141,6 +141,12 @@
       p.append(el("p", "pb-num", `Other replies from flagged accounts: ${pct(report.others.share)} (95% interval ${ci(report.others.ci)}).`));
     }
     p.append(el("p", "pb-num", `${report.replies} repl${report.replies === 1 ? "y" : "ies"} on screen, ${report.lookedUp} account${report.lookedUp === 1 ? "" : "s"} looked up.`));
+    if (report.origins && report.origins.length) {
+      p.append(el("p", "pb-num", "Where looked-up accounts are labelled as based: " + report.origins.slice(0, 5).map((o) => `${o.place} ${o.n}`).join(", ") + (report.origins.length > 5 ? ", and others" : "") + "."));
+    }
+    if (report.joinBurst && report.joinBurst.n >= 3) {
+      p.append(el("p", "pb-num", `${report.joinBurst.n} of ${report.joinBurst.of} looked-up accounts joined within the same two weeks (${report.joinBurst.from} to ${report.joinBurst.to}).`));
+    }
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
     if (stats.site && !stats.site.hasLocation) p.append(el("p", "pb-num", `${stats.site.name} shows no account location, so this report uses coordination signs only.`));
     if (stats.pending) {
