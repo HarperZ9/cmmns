@@ -75,3 +75,19 @@ test("ordinary uses of marker words are not markers", () => {
     "the guillotine at the museum was terrifying",
   ]) assert.ok(!score(t).extreme, t);
 });
+
+// Blanket claims about every member of a group, from several directions.
+test("blanket claims about a group score the same for every target", () => {
+  const got = new Map(TARGETS.map((g) => [g, families(`all ${g} are the same`)]));
+  assert.deepEqual([...got].filter(([, f]) => f !== "essentialise"), []);
+});
+
+test("calls for people outside the law to act are markers on every side", () => {
+  for (const t of ["the locals will deal with them", "the comrades will deal with them", "time to take matters into our own hands", "send in the army against them"]) {
+    assert.equal(families(t), "vigilante", t);
+  }
+});
+
+test("slang slurs read as group terms from more than one side", () => {
+  for (const t of ["those mussie scum", "those magat scum", "those fash scum"]) assert.equal(families(t), "dehumanise", t);
+});

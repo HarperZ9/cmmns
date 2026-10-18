@@ -8,6 +8,7 @@
 .pb-chip:hover { border-color: rgba(127, 127, 127, 0.9); }
 .pb-chip:focus-visible { outline: 2px solid rgb(29, 155, 240); outline-offset: 1px; }
 .pb-place { color: inherit; }
+.pb-acct { color: inherit; font-weight: 600; }
 .pb-warn { border-color: rgb(244, 129, 33); color: rgb(244, 129, 33); }
 .pb-quiet { opacity: 0.7; }
 .pb-look[disabled] { cursor: progress; opacity: 0.7; }

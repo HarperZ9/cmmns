@@ -363,6 +363,8 @@ const GROUPS = [
   // politics
   "leftists", "liberals", "progressives", "socialists", "communists", "commies", "conservatives", "republicans", "democrats",
   "rightists", "nationalists", "fascists", "libtards", "maga", "woke", "tories", "the left", "the right",
+  // derogatory nicknames from several sides; listed so "mussie scum" reads like "muslims are scum"
+  "mussie", "mussies", "muzzie", "muzzies", "magats", "magat", "fash", "nazis", "zionists", "globalists", "leftards", "rednecks",
   // class, role, identity
   "the rich", "billionaires", "elites", "the elite", "landlords", "bankers", "politicians", "police", "cops", "protesters",
   "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "trans people", "feminists", "farmers", "unions",
@@ -388,9 +390,22 @@ const CONSPIRACY = ["they don't want you to know", "they dont want you to know",
   "soros funded", "soros-funded", "funded by the kochs", "koch funded", "koch-funded", "paid by the cia", "cia op", "psyop",
   "it's a plandemic", "plandemic", "new world order", "deep state", "shadow government"];
 
+// Calls for people outside the law (gangs, mobs, "real men", militias) to act against a group,
+// and calls to send soldiers against civilians.
+const VIGILANTE = ["will deal with them", "deal with them ourselves", "take care of them ourselves", "take matters into our own hands",
+  "take matters into their own hands", "bring in the army", "bring their armies in", "bring their armies", "send in the army", "send in the military",
+  "where's the military", "wheres the military", "where is the military", "where's the army", "where is the army", "time to arm up", "lock and load"];
+
+// Claims that a whole group behaves a given way by nature, and replacement framing.
+const ESSENTIALISE = ["import third world", "import the third world", "importing the third world", "become third world",
+  "is cultural", "it's in their blood", "its in their blood", "in their culture", "in their dna", "it's in their nature",
+  "the natives are", "defend their own country", "defend our own country", "replace us", "replacing us", "demographic replacement",
+  "cultural suicide", "acab", "all cops are bastards"];
+
 const ABSOLUTIST = ["traitors", "traitor", "enemy of the people", "enemies of the people", "enemies within", "enemy within",
   "civil war now", "civil war is coming", "time for civil war", "no middle ground", "you're either with us", "youre either with us", "real americans", "real patriots",
-  "true french", "vrais français", "real french", "race traitor", "class traitor", "purge them", "the final solution"];
+  "true french", "vrais français", "real french", "race traitor", "class traitor", "purge them", "the final solution",
+  "treason", "treasonous"];
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const alt = (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|");
@@ -404,14 +419,17 @@ const RE = {
   violenceSlogan: new RegExp(`\\b(?:${alt(VIOLENT_SLOGANS)})\\b`, "i"),
   conspiracy: new RegExp(`\\b(?:${alt(CONSPIRACY)})\\b`, "i"),
   absolutist: new RegExp(`\\b(?:${alt(ABSOLUTIST)})\\b`, "i"),
+  vigilante: new RegExp(`\\b(?:${alt(VIGILANTE)})\\b`, "i"),
+  // a fixed phrase, or "all <group> are" / "<group> are all": a claim about every member
+  essentialise: new RegExp(`\\b(?:${alt(ESSENTIALISE)})\\b|\\ball (?:the )?(?:${G}) are\\b|\\b(?:${G}) are all\\b`, "i"),
 };
 
 // "Immigrants are not animals" and "nobody should be killed" are the opposite of the marker.
 const NEGATION = /\b(?:not|never|no one|nobody|aren't|arent|isn't|isnt|shouldn't|shouldnt|don't|dont)\b/i;
 
-const WEIGHTS = { dehumanise: 2, violence: 3, conspiracy: 1, absolutist: 1 };
-// "Extreme" for the thread report: any violence marker, any dehumanising marker, or both of the
-// two weaker families together.
+const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, conspiracy: 1, absolutist: 1, essentialise: 1 };
+// "Extreme" for the thread report: any violence, vigilante or dehumanising marker, or two of the
+// weaker families together.
 const EXTREME_AT = 2;
 
 // Returns { score, markers: [{ family, match }], extreme }.
@@ -428,6 +446,8 @@ function score(text) {
   if (!hit("violence", RE.violenceGroup, true)) hit("violence", RE.violenceSlogan);
   hit("conspiracy", RE.conspiracy);
   hit("absolutist", RE.absolutist);
+  hit("vigilante", RE.vigilante);
+  hit("essentialise", RE.essentialise, true);
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };
 }
@@ -514,6 +534,8 @@ const LABELS = {
   joined: [/date joined/i, /joined/i],
   connectedVia: [/connected via/i, /downloaded (?:the app )?(?:from|via)/i],
   nameChanges: [/username changes?/i, /changed (?:their )?username/i],
+  verified: [/^verified$/i],
+  affiliate: [/^an affiliate of/i],
 };
 
 const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
@@ -554,12 +576,16 @@ function parseAbout(text, handle) {
   const joinedRaw = pick(LABELS.joined);
   const via = pick(LABELS.connectedVia);
   const changes = pick(LABELS.nameChanges);
+  const verified = pick(LABELS.verified);
+  const affiliate = pick(LABELS.affiliate);
   return {
     handle: handle || null,
     basedIn: basedIn || null,
     joinDate: parseJoined(joinedRaw),
     connectedVia: via || null,
     nameChanges: changes == null ? null : parseNameChanges(changes),
+    verifiedSince: verified ? verified.replace(/^since\s+/i, "") : null,
+    affiliateOf: affiliate || null,
     raw: { basedIn, joinedRaw, via, changes },
   };
 }

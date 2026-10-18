@@ -32,7 +32,29 @@
     return c;
   }
 
-  // model: { handle, reading, flags, mismatch, lookingUp }
+  // The account card: everything the site itself discloses about the account and the comment,
+  // plus Radar's evidence. It never shows or guesses demographics (race, religion, ethnicity,
+  // gender, age): the platforms do not disclose them, and guessing them about a person is profiling.
+  function accountRows(m) {
+    const R = m.reading || {};
+    const age = R.joinDate ? PB.ageDays(R.joinDate) : null;
+    const no = m.site && !m.site.hasLocation ? `${m.site.name} does not disclose this` : (m.reading ? "not shown" : "not looked up yet");
+    return [
+      ["Account", [m.display, "@" + m.handle].filter(Boolean).join("  ")],
+      ["Profile", m.profile || null],
+      ["Account based in", R.basedIn || no],
+      ["Joined", R.joinDate ? `${R.joinDate.slice(0, 7)} (${age} days ago)` : no],
+      ["Connected via", R.connectedVia || no],
+      ["Verified", R.verifiedSince ? `since ${R.verifiedSince}` : (m.reading ? "no" : no)],
+      ["Affiliate of", R.affiliateOf || null],
+      ["Username changes", R.nameChanges == null ? no : String(R.nameChanges)],
+      ["This comment", m.posted ? `posted ${m.posted.slice(0, 16).replace("T", " ")} UTC` : null],
+      ["Radar's flags", (m.flags || []).length ? m.flags.map((f) => f.evidence).join("; ") : "none"],
+      ["Not shown", "Demographics. Platforms do not disclose them, and Radar does not guess them."],
+    ];
+  }
+
+  // model: { handle, display, posted, profile, reading, flags, mismatch, lookingUp }
   function badge(article, model, onLookup, anchor) {
     let bar = article.querySelector(":scope .pb-bar");
     if (!bar) {
@@ -41,6 +63,7 @@
     }
     bar.replaceChildren();
     const R = model.reading;
+    bar.append(chip("Account", "pb-acct", accountRows(model)));
     if (R && R.basedIn) {
       bar.append(chip(`Based in ${R.basedIn}`, "pb-place", [
         ["Source", `X's "About this account" label for @${model.handle}, read from the page X shows you.`],

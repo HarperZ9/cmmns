@@ -8,6 +8,8 @@ const LABELS = {
   joined: [/date joined/i, /joined/i],
   connectedVia: [/connected via/i, /downloaded (?:the app )?(?:from|via)/i],
   nameChanges: [/username changes?/i, /changed (?:their )?username/i],
+  verified: [/^verified$/i],
+  affiliate: [/^an affiliate of/i],
 };
 
 const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
@@ -48,12 +50,16 @@ export function parseAbout(text, handle) {
   const joinedRaw = pick(LABELS.joined);
   const via = pick(LABELS.connectedVia);
   const changes = pick(LABELS.nameChanges);
+  const verified = pick(LABELS.verified);
+  const affiliate = pick(LABELS.affiliate);
   return {
     handle: handle || null,
     basedIn: basedIn || null,
     joinDate: parseJoined(joinedRaw),
     connectedVia: via || null,
     nameChanges: changes == null ? null : parseNameChanges(changes),
+    verifiedSince: verified ? verified.replace(/^since\s+/i, "") : null,
+    affiliateOf: affiliate || null,
     raw: { basedIn, joinedRaw, via, changes },
   };
 }

@@ -34,3 +34,11 @@ test("helpers", () => {
   assert.equal(parseNameChanges("No username changes"), 0);
   assert.equal(parseNameChanges("Changed username 2 times"), 2);
 });
+
+test("verified and affiliate lines, as X lays them out", () => {
+  const lines = ["Date joined", "May 2007", "Account based in", "United States", "Verified", "Since March 2014", "An affiliate of ", "@example", "Connected via", "United States App Store"];
+  const a = parseAbout(lines.join(String.fromCharCode(10)), "x");
+  assert.equal(a.verifiedSince, "March 2014");
+  assert.equal(a.affiliateOf, "@example");
+  assert.equal(a.connectedVia, "United States App Store");
+});

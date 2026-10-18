@@ -10,6 +10,7 @@
   const hashId = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0; return "h" + h.toString(36); };
 
   const X = {
+    profileOf: (h) => `https://x.com/${h}`,
     id: "x", name: "X", hasLocation: true,
     match: () => /(^|\.)(x|twitter)\.com$/.test(location.hostname),
     onThread: () => /^\/[A-Za-z0-9_]{1,15}\/status\/\d+/.test(location.pathname),
@@ -20,7 +21,9 @@
       const time = node.querySelector('a[href*="/status/"] time');
       const idm = time && time.parentElement.getAttribute("href").match(/\/status\/(\d+)/);
       if (!link || !idm) return null;
-      return { id: idm[1], author: link.slice(1), text: text(node.querySelector('[data-testid="tweetText"]')), node, anchor: nameBox };
+      const display = text(nameBox.querySelector("a span")) || null;
+      return { id: idm[1], author: link.slice(1), display, posted: time.getAttribute("datetime"), url: "https://x.com" + time.parentElement.getAttribute("href"),
+        text: text(node.querySelector('[data-testid="tweetText"]')), node, anchor: nameBox };
     },
   };
 
@@ -33,7 +36,8 @@
       const author = node.getAttribute("author");
       if (!author || author === "[deleted]") return null;
       const body = node.querySelector('[slot="comment"]');
-      return { id: node.getAttribute("thingid") || hashId(author + text(body)), author, text: text(body), node, anchor: body };
+      return { id: node.getAttribute("thingid") || hashId(author + text(body)), author, posted: node.getAttribute("created") || null,
+        profile: `https://www.reddit.com/user/${encodeURIComponent(author)}`, text: text(body), node, anchor: body };
     },
   };
 
@@ -46,7 +50,8 @@
       const author = text(node.querySelector("#author-text")).replace(/^@/, "");
       const body = node.querySelector("#content-text");
       if (!author || !body) return null;
-      return { id: hashId(author + "|" + text(body)), author, text: text(body), node, anchor: body };
+      const link = node.querySelector("#author-text");
+      return { id: hashId(author + "|" + text(body)), author, profile: link && link.href ? link.href : null, text: text(body), node, anchor: body };
     },
   };
 
