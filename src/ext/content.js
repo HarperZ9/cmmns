@@ -19,12 +19,26 @@
     return { mismatch, flags };
   }
 
+  // Ask the background worker for the owners of the domains and accounts on screen, once each.
+  const askedOwners = new Set(), ownerRows = [];
+  async function ensureOwners(items) {
+    const domains = [...new Set(items.flatMap((r) => r.domains || []))].filter((d) => !askedOwners.has(d));
+    const handles = items.map((r) => r.author).filter((h) => !askedOwners.has("@" + h));
+    if (!domains.length && !handles.length) return;
+    domains.forEach((d) => askedOwners.add(d)); handles.forEach((h) => askedOwners.add("@" + h));
+    try {
+      const rows = await chrome.runtime.sendMessage({ type: "pb-owners", domains, handles });
+      if (Array.isArray(rows) && rows.length) { ownerRows.push(...rows); PB.setOwnerRows(ownerRows); }
+    } catch (e) { console.error("[radar] owner lookup failed", e); }
+  }
+
   async function refresh() {
     const site = PBSites.current();
     if (!site || !site.onThread()) { const p = document.getElementById("pb-panel"); if (p) p.remove(); return; }
     const items = site.items().map((n) => site.read(n)).filter(Boolean);
     if (!items.length) return;
     const [root, replies] = site.hasLocation ? [items[0], items.slice(1)] : [null, items];
+    await ensureOwners(items);
     const cache = site.hasLocation ? await PBStore.all() : {};
     const clusters = PB.duplicateClusters(replies);
     const clusterOf = new Map();

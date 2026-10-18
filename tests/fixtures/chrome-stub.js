@@ -13,6 +13,7 @@
     runtime: {
       onMessage: { addListener: (f) => listeners.push(f) },
       sendMessage: async (msg) => {
+        if (msg.type === "pb-owners") return [];
         if (msg.type !== "pb-lookup") return;
         for (const [i, h] of msg.handles.entries()) {
           setTimeout(async () => {

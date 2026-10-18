@@ -12,7 +12,25 @@ chrome.action.onClicked.addListener((tab) => {
   if (tab && tab.id != null) chrome.tabs.sendMessage(tab.id, { type: "pb-scan" }).catch(() => {});
 });
 
-chrome.runtime.onMessage.addListener((msg, sender) => {
+// The ownership table (owners.json, about 1 MB) is loaded once here, never into pages. Content
+// scripts send the domains and handles a page shows and get back only the matching rows.
+let ownersReady = null;
+function owners() {
+  if (!ownersReady) ownersReady = fetch(chrome.runtime.getURL("owners.json")).then((r) => r.json())
+    .then((t) => { globalThis.PB_OWNER_ROWS = t.rows; return t.rows; })
+    .catch((e) => { console.error("[radar] owners.json failed to load", e); return []; });
+  return ownersReady;
+}
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg && msg.type === "pb-owners") {
+    owners().then((rows) => {
+      const want = new Set((msg.domains || []).map((d) => d.toLowerCase())), handles = new Set((msg.handles || []).map((h) => h.toLowerCase()));
+      const hit = rows.filter((r) => handles.has(r.x) || [...want].some((d) => d === r.domain || d.endsWith("." + r.domain)));
+      sendResponse(hit);
+    });
+    return true;   // answer asynchronously
+  }
   if (msg && msg.type === "pb-lookup" && sender.tab) {
     for (const h of msg.handles || []) if (!queue.some((q) => q.handle === h)) queue.push({ handle: h, replyTo: sender.tab.id });
     report(sender.tab.id);

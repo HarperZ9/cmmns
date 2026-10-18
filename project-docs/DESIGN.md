@@ -52,3 +52,12 @@ extreme rhetoric so it reads as normal for a group. A reader scrolling replies c
 - The rhetoric lexicon is English and hand-built. It needs precision and recall measured on
   labelled data before anyone relies on the report (EVALUATION.md).
 - The report sees only the replies X chose to render and the accounts that were looked up.
+
+## Ownership table
+`src/ext/owners.json` is built from Wikidata (CC0) by `scripts/owners-build.mjs`: news outlets,
+broadcasters, news websites and platforms with an official website and a current owner (P127 with
+no end date, not deprecated; owners who have died or companies that were dissolved are dropped).
+Built 2026-10-18: 7,374 domains, 3,602 with an X handle. The background worker holds it; pages ask
+only for the domains and handles they show. Known limits: Wikidata lags sales, some rows name a
+division rather than the parent company, and one domain can map to an edition rather than the
+main outlet. Rebuild with the author's approval and review the diff before committing.
