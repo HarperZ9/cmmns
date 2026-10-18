@@ -6,7 +6,7 @@
 
   const FLAG_LABEL = {
     "new-account": "new account", "name-changes": "renamed", "default-handle": "sign-up handle",
-    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere", "high-volume": "posts at a very high rate", "follow-pattern": "follows many, few follow back",
+    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere", "high-volume": "posts at a very high rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute", "follow-pattern": "follows many, few follow back",
   };
 
   const STRONG = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
@@ -70,6 +70,9 @@
       ["Affiliate of", R.affiliateOf || null],
       ["Username changes", R.nameChanges == null ? no : String(R.nameChanges)],
       ["This comment", m.posted ? `posted ${m.posted.slice(0, 16).replace("T", " ")} UTC` : null],
+      ["Seen by Radar", m.activity && m.activity.threads ? `in ${m.activity.threads} thread${m.activity.threads === 1 ? "" : "s"} you viewed since ${m.activity.firstSeen}` + (m.activity.medianDelay != null ? `; median reply ${m.activity.medianDelay} s after the post` : "") : null],
+      ["Often alongside", m.activity && m.activity.alongside.length ? m.activity.alongside.map((x) => `@${x.handle} (${x.n} threads)`).join(", ") : null],
+      ["Active hours (inferred)", m.activity && m.activity.activeHours ? `fits a UTC${m.activity.activeHours.utcOffset >= 0 ? "+" : ""}${m.activity.activeHours.utcOffset} waking day (${Math.round(m.activity.activeHours.fit * 100)}% of ${m.activity.activeHours.posts} posts)` : null],
       ["Radar's flags", (m.flags || []).length ? m.flags.map((f) => f.evidence).join("; ") : "none"],
       ["Not shown", "Demographics. Platforms do not disclose them, and Radar does not guess them."],
     ];
@@ -172,6 +175,7 @@
       p.append(el("p", "pb-num", `${report.joinBurst.n} of ${report.joinBurst.of} looked-up accounts joined within the same two weeks (${report.joinBurst.from} to ${report.joinBurst.to}).`));
     }
     if (report.machine && report.machine.n) p.append(el("p", "pb-num", `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text (a hint, not a finding).`));
+    if (report.groups && report.groups.length) p.append(el("p", "pb-num", "Seen together before, in other threads you viewed: " + report.groups.slice(0, 4).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "."));
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
     if (stats.site && !stats.site.hasLocation) p.append(el("p", "pb-num", `${stats.site.name} shows no account location, so this report uses coordination signs only.`));
     if (stats.paused) {
@@ -184,6 +188,13 @@
       b.title = "Reads each account's public profile and About page in one minimised window. Radar's toolbar button does the same.";
       b.addEventListener("click", onLookupAll);
       p.append(b);
+    }
+    if (stats.onClearHistory) {
+      const c = el("button", "pb-chip", "Clear Radar's thread history");
+      c.type = "button";
+      c.title = "Forgets which accounts Radar has seen in which threads (kept in this browser only, 30 days).";
+      c.addEventListener("click", stats.onClearHistory);
+      p.append(c);
     }
     p.append(el("p", "pb-caveat", PB.REPORT_DOES_NOT_PROVE));
   }

@@ -14,9 +14,10 @@
   function evidence(site, r, reading, c) {
     const cluster = c ? { size: c.ids.length, authors: c.authors } : null;
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
-    if (reading) return { mismatch, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation }, { mismatch, cluster }) };
+    const activity = PB.activity(netLog, r.author);
+    if (reading) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation }, { mismatch, cluster, activity }) };
     const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display }, { cluster });
-    return { mismatch, flags };
+    return { mismatch, flags, activity };
   }
 
   // Ask the background worker for the owners of the domains and accounts on screen, once each.
@@ -32,6 +33,23 @@
     } catch (e) { console.error("[radar] owner lookup failed", e); }
   }
 
+  // Local connections log (src/core/network.js): which accounts replied where, and how fast.
+  const NET_KEY = "pb.net.v1";
+  let netLog = {}, lastRecorded = "";
+  chrome.storage.local.get(NET_KEY).then((g) => { netLog = g[NET_KEY] || {}; }).catch(() => {});
+  function recordNet(threadKey, replies, root) {
+    const sig = threadKey + ":" + replies.length;
+    if (sig === lastRecorded) return;
+    lastRecorded = sig;
+    netLog = PB.recordThread(netLog, threadKey, replies.map((r) => ({ author: r.author, posted: r.posted })), root && root.posted);
+    chrome.storage.local.set({ [NET_KEY]: netLog }).catch((e) => console.error("[radar] could not save the connections log", e));
+  }
+
+  function clearNet() {
+    netLog = {}; lastRecorded = "";
+    chrome.storage.local.remove(NET_KEY).then(refresh).catch((e) => console.error("[radar] could not clear the connections log", e));
+  }
+
   async function refresh() {
     const site = PBSites.current();
     if (!site || !site.onThread()) { const p = document.getElementById("pb-panel"); if (p) p.remove(); return; }
@@ -39,6 +57,8 @@
     if (!items.length) return;
     const [root, replies] = site.hasLocation ? [items[0], items.slice(1)] : [null, items];
     await ensureOwners(items);
+    const threadKey = site.id + ":" + location.pathname;
+    if (replies.length) recordNet(threadKey, replies, root);
     const cache = site.hasLocation ? await PBStore.all() : {};
     const clusters = PB.duplicateClusters(replies);
     const clusterOf = new Map();
@@ -46,8 +66,8 @@
     const rows = [];
     for (const r of replies) {
       const reading = cache[r.author.toLowerCase()] || null;
-      const { mismatch, flags } = evidence(site, r, reading, clusterOf.get(r.id));
-      PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, markers: PB.score(r.text).markers, machine: PB.machineSigns(r.text), paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
+      const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
+      PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, markers: PB.score(r.text).markers, machine: PB.machineSigns(r.text), paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
       // Without account readings a reply's flags are complete for what the site offers.
       rows.push({ id: r.id, author: r.author, text: r.text, machine: PB.machineSigns(r.text).machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
@@ -56,7 +76,9 @@
     // Automatic: every author without About data is asked about in the page, at a steady pace.
     if (site.hasLocation && pending.length && globalThis.PBAuto) PBAuto.want(pending, schedule);
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
-    PBUI.panel(PB.threadReport(rows), clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site }, () => lookup(...pending.slice(0, SCAN_MAX)));
+    const report = PB.threadReport(rows);
+    report.groups = PB.returningGroups(netLog, threadKey, replies.map((r) => r.author));
+    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, onClearHistory: clearNet }, () => lookup(...pending.slice(0, SCAN_MAX)));
     lastPending = pending;
   }
 
