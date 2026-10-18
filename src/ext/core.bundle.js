@@ -363,7 +363,7 @@ function flagsFor(account, context = {}) {
   const sym = HATE_NAME.exec(name);
   if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
   if (account.handle && DEFAULT_HANDLE.test(account.handle)) out.push({ id: "default-handle", evidence: `handle @${account.handle} has the sign-up pattern` });
-  if (context.mismatch && context.mismatch.status === "mismatch") out.push({ id: "based-elsewhere", evidence: context.mismatch.reason });
+  if (context.mismatch && context.mismatch.status === "mismatch") out.push({ id: "based-elsewhere", evidence: context.mismatch.reason + (account.proxyNote ? " (X notes a possible VPN or proxy, so the label may be wrong)" : "") });
   if (context.cluster && context.cluster.size >= 2) {
     const others = (context.cluster.authors || []).filter((a) => a !== account.handle).map((a) => "@" + a);
     const list = others.length ? `: ${others.slice(0, 8).join(", ")}${others.length > 8 ? ` and ${others.length - 8} more` : ""}` : "";
@@ -727,6 +727,8 @@ function parseAbout(text, handle) {
     connectedVia: via || null,
     nameChanges: changes == null ? null : parseNameChanges(changes),
     verifiedSince: verified ? verified.replace(/^since\s+/i, "") : null,
+    // X adds a note when it suspects a VPN or proxy ("may not be accurate"); wording unconfirmed.
+    proxyNote: /\b(?:vpn|proxy)\b|may not be accurate/i.test(String(text || "")),
     affiliateOf: affiliate || null,
     raw: { basedIn, joinedRaw, via, changes },
   };

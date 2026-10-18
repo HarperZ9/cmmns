@@ -59,6 +59,8 @@ export function parseAbout(text, handle) {
     connectedVia: via || null,
     nameChanges: changes == null ? null : parseNameChanges(changes),
     verifiedSince: verified ? verified.replace(/^since\s+/i, "") : null,
+    // X adds a note when it suspects a VPN or proxy ("may not be accurate"); wording unconfirmed.
+    proxyNote: /\b(?:vpn|proxy)\b|may not be accurate/i.test(String(text || "")),
     affiliateOf: affiliate || null,
     raw: { basedIn, joinedRaw, via, changes },
   };

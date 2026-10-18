@@ -54,6 +54,7 @@
       ["Account based in", R.basedIn || no],
       ["Joined", R.joinDate ? `${R.joinDate.slice(0, 7)} (${age} days ago)` : no],
       ["Connected via", R.connectedVia || no],
+      ["VPN or proxy note", R.proxyNote ? "X notes the location may not be accurate (a VPN or proxy may be in use)" : null],
       ["Verified", R.verifiedSince ? `since ${R.verifiedSince}` : (m.reading ? "no" : no)],
       ["Affiliate of", R.affiliateOf || null],
       ["Username changes", R.nameChanges == null ? no : String(R.nameChanges)],

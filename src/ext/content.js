@@ -13,7 +13,7 @@
   function evidence(site, r, reading, c) {
     const cluster = c ? { size: c.ids.length, authors: c.authors } : null;
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
-    if (reading) return { mismatch, flags: PB.flagsFor({ handle: r.author, display: r.display, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia }, { mismatch, cluster }) };
+    if (reading) return { mismatch, flags: PB.flagsFor({ handle: r.author, display: r.display, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote }, { mismatch, cluster }) };
     const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display }, { cluster });
     return { mismatch, flags };
   }
