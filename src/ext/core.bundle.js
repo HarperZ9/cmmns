@@ -402,6 +402,30 @@ const ESSENTIALISE = ["import third world", "import the third world", "importing
   "the natives are", "defend their own country", "defend our own country", "replace us", "replacing us", "demographic replacement",
   "cultural suicide", "acab", "all cops are bastards"];
 
+// Coded hate: slurs, dog whistles and coined terms with a documented hateful meaning (sources:
+// ADL Hate Symbols database, GNET and ISD glossaries). Grouped by target so every target group is
+// covered; strong terms weigh 2, terms that need context to read as hate weigh 1 (CODED_SOFT).
+const CODED = [
+  // anti-Black
+  "black fatigue", "13/50", "despite being 13", "dindu", "dindu nuffin", "chimp out", "chimped out",
+  "pavement ape", "groid", "groids", "sheboon", "basketball americans", "fatherless behavior", "fatherless behaviour",
+  // antisemitic
+  "(((", ")))", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough", "oy vey shut it down", "early life section", "the noticing",
+  // anti-Muslim
+  "sand people", "goat lovers",
+  // anti-Asian
+  "kung flu", "chinese virus", "china virus",
+  // anti-Latino
+  "wetback", "wetbacks", "beaner", "beaners",
+  // anti-LGBTQ
+  "troon", "troons",
+  // anti-white and anti-men
+  "white devils", "kill all whites", "kill all men", "men are trash",
+];
+// Ambiguous on their own (a real jogger, real crackers, real grooming cases): weight 1, so they only
+// count as extreme next to another marker.
+const CODED_SOFT = ["the fatigue is real", "fatigue is real", "jogger", "joggers", "crackers", "groomers", "religion of peace", "it's always them", "its always them"];
+
 const ABSOLUTIST = ["traitors", "traitor", "enemy of the people", "enemies of the people", "enemies within", "enemy within",
   "civil war now", "civil war is coming", "time for civil war", "no middle ground", "you're either with us", "youre either with us", "real americans", "real patriots",
   "true french", "vrais français", "real french", "race traitor", "class traitor", "purge them", "the final solution",
@@ -419,6 +443,8 @@ const RE = {
   violenceSlogan: new RegExp(`\\b(?:${alt(VIOLENT_SLOGANS)})\\b`, "i"),
   conspiracy: new RegExp(`\\b(?:${alt(CONSPIRACY)})\\b`, "i"),
   absolutist: new RegExp(`\\b(?:${alt(ABSOLUTIST)})\\b`, "i"),
+  coded: new RegExp(`(?:^|[^\\w])(?:${alt(CODED)})(?:$|[^\\w])`, "i"),
+  codedSoft: new RegExp(`\\b(?:${alt(CODED_SOFT)})\\b`, "i"),
   vigilante: new RegExp(`\\b(?:${alt(VIGILANTE)})\\b`, "i"),
   // a fixed phrase, or "all <group> are" / "<group> are all": a claim about every member
   essentialise: new RegExp(`\\b(?:${alt(ESSENTIALISE)})\\b|\\ball (?:the )?(?:${G}) are\\b|\\b(?:${G}) are all\\b`, "i"),
@@ -427,7 +453,7 @@ const RE = {
 // "Immigrants are not animals" and "nobody should be killed" are the opposite of the marker.
 const NEGATION = /\b(?:not|never|no one|nobody|aren't|arent|isn't|isnt|shouldn't|shouldnt|don't|dont)\b/i;
 
-const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, conspiracy: 1, absolutist: 1, essentialise: 1 };
+const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, coded: 2, codedSoft: 1, conspiracy: 1, absolutist: 1, essentialise: 1 };
 // "Extreme" for the thread report: any violence, vigilante or dehumanising marker, or two of the
 // weaker families together.
 const EXTREME_AT = 2;
@@ -447,6 +473,7 @@ function score(text) {
   hit("conspiracy", RE.conspiracy);
   hit("absolutist", RE.absolutist);
   hit("vigilante", RE.vigilante);
+  if (!hit("coded", RE.coded)) hit("codedSoft", RE.codedSoft);
   hit("essentialise", RE.essentialise, true);
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };

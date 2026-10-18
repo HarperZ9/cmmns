@@ -91,3 +91,16 @@ test("calls for people outside the law to act are markers on every side", () => 
 test("slang slurs read as group terms from more than one side", () => {
   for (const t of ["those mussie scum", "those magat scum", "those fash scum"]) assert.equal(families(t), "dehumanise", t);
 });
+
+test("coded hate terms register for targets in every direction", () => {
+  for (const t of ["the black fatigue is everywhere", "13/50 again", "the goyim know", "kung flu strikes", "send the wetbacks home", "more troons on tv", "white devils did this", "kill all men lol"]) {
+    assert.equal(families(t), "coded", t);
+  }
+});
+
+test("ambiguous coded terms weigh less and need company to count as extreme", () => {
+  assert.equal(families("the fatigue is real"), "codedSoft");
+  assert.equal(score("the fatigue is real").extreme, false);
+  assert.equal(score("the fatigue is real, traitors all of them").extreme, true);
+  for (const t of ["I saw a jogger by the lake", "crackers and cheese for lunch", "I use jq to parse json", "41% of voters agreed"]) assert.ok(!score(t).extreme, t);
+});
