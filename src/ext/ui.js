@@ -113,6 +113,10 @@
         ["What it does not prove", "Words can be quoted, ironic or reported speech. This describes the comment, not who wrote it or why."],
       ]));
     }
+    const M = model.machine;
+    if (M && M.leak) bar.append(chip("leaked AI text", "pb-warn", [["In this comment", `"${M.leak}"`], ["What it is", "Text a chatbot writes, posted without editing: a strong sign a bot or tool wrote the reply."], ["What it does not prove", "People quote chatbots, joke, or paste a reply on purpose."]]));
+    else if (M && M.machineLike) bar.append(chip("machine-writing signs", "pb-flag", [["Signs", M.signs.join("; ")], ["How Radar decides", "Three or more independent signs in a reply of at least 25 words, using Articulate's word lists."], ["What it does not prove", "No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often. Treat this as a hint."]]));
+    if (M && M.spam) bar.append(chip("spam pattern", "pb-warn", [["In this comment", `"${M.spam}"`], ["What it is", "A pattern common in scam and spam replies: giveaways, crypto, contact bait."]]));
     if (model.xSpam) bar.append(chip("X: probable spam", "pb-warn", [["Source", "X itself filed this reply under its \"Probable spam\" heading."], ["What it does not prove", "X's spam filter makes mistakes in both directions."]]));
     if (model.writtenIn) bar.append(chip(`written in ${model.writtenIn}`, "pb-flag", [["Source", `X translated this reply from ${model.writtenIn}.`], ["Account based in", (model.reading && model.reading.basedIn) || "not known yet"], ["What it does not prove", "People write in many languages, including ones from where they grew up."]]));
     if (model.paid) bar.append(chip("ad (X label)", "pb-flag", [["Source", "X labels this post as an ad or promoted post: someone paid for it to reach you."]]));
@@ -167,6 +171,7 @@
     if (report.joinBurst && report.joinBurst.n >= 3) {
       p.append(el("p", "pb-num", `${report.joinBurst.n} of ${report.joinBurst.of} looked-up accounts joined within the same two weeks (${report.joinBurst.from} to ${report.joinBurst.to}).`));
     }
+    if (report.machine && report.machine.n) p.append(el("p", "pb-num", `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text (a hint, not a finding).`));
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
     if (stats.site && !stats.site.hasLocation) p.append(el("p", "pb-num", `${stats.site.name} shows no account location, so this report uses coordination signs only.`));
     if (stats.paused) {

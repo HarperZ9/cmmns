@@ -33,6 +33,7 @@ export function threadReport(replies) {
     extreme: { n: ext.length, flagged: kE, share: ext.length ? kE / ext.length : 0, ci: wilson(kE, ext.length) },
     others: { n: rest.length, flagged: kR, share: rest.length ? kR / rest.length : 0, ci: wilson(kR, rest.length) },
   };
+  out.machine = { n: replies.filter((r) => r.machine).length };
   out.origins = origins(known);
   out.joinBurst = joinBurst(known);
   out.verdict = verdict(out);
