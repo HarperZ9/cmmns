@@ -414,7 +414,7 @@ const GROUPS = [
   "rightists", "nationalists", "fascists", "libtards", "maga", "woke", "tories", "the left", "the right",
   // derogatory nicknames, so "mussie scum" reads like "muslims are scum"
   "mussie", "mussies", "muzzie", "muzzies", "third world", "third worlders", "magats", "magat", "fash", "nazis", "zionists",
-  "globalists", "leftards", "rednecks",
+  "globalists", "leftards", "rednecks", "leftoids", "leftoid", "rightoids", "rightoid", "commie", "libs", "conservatards",
   // class, role, identity
   "the rich", "billionaires", "elites", "the elite", "landlords", "bankers", "politicians", "police", "cops", "protesters",
   "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "lesbians", "trans people", "transgenders",
@@ -454,7 +454,7 @@ const ABSOLUTIST = ["traitors", "traitor", "enemy of the people", "enemies of th
 const ESSENTIALISE = ["import third world", "import the third world", "importing the third world", "become third world",
   "is cultural", "it's in their blood", "its in their blood", "in their culture", "in their dna", "it's in their nature",
   "the natives are", "defend their own country", "defend our own country", "replace us", "replacing us",
-  "demographic replacement", "cultural suicide", "acab", "all cops are bastards", "invaders multiply", "the invaders", "they breed",
+  "demographic replacement", "cultural suicide", "acab", "all cops are bastards", "invaders multiply", "the invaders", "foreign invaders", "they breed",
   "outbreeding us", "civilizational suicide"];
 
 // Stereotype traits: "<group> are <trait>" names a whole group by a trait.
@@ -501,7 +501,7 @@ const SLURS = [
 ];
 
 // Context-dependent: innocent in many uses (weight 1, counted only beside another marker).
-const SLURS_SOFT = ["suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
+const SLURS_SOFT = ["leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
   "religion of peace", "it's always them", "its always them", "thug", "thugs", "ghetto", "illegals", "dyke", "dykes", "thot",
   "thots", "fag", "fags", "cripple", "cripples", "white trash", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
 
@@ -543,6 +543,11 @@ const RE = {
   dehumanise: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,4}?\\W+(?:${alt(L.DEHUMANISE)})\\b|\\b(?:${alt(L.DEHUMANISE)})\\b(?:\\W+\\w+){0,3}?\\W+(?:like\\s+)?(?:these\\s+|those\\s+|the\\s+)?(?:${G})\\b`, "i"),
   violenceGroup: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,6}?\\W+(?:should|must|need to|needs to|deserve to|ought to|will)\\s+(?:all\\s+)?(?:be\\s+)?(?:${alt(L.VIOLENCE_VERBS)})\\b`, "i"),
   violenceSlogan: word(L.VIOLENT_SLOGANS),
+  // "the only good commie is a dead commie": the same word twice, any target
+  onlyGoodDead: /\bthe only good (\w+) (?:is|are) (?:a )?dead \1\b/i,
+  // "communists aren't people": denying a group is human. Matched before the negation filter,
+  // since the "not" is the marker here.
+  notHuman: new RegExp(`\\b(?:${G})\\s+(?:are not|aren't|arent|ain't)\\s+(?:even\\s+)?(?:people|human|humans|real people)\\b`, "i"),
   // "declare war on Islam", "war against the Jews"
   warOn: new RegExp(`\\b(?:declare|declaring|wage|waging|start)\\s+(?:a\\s+)?(?:holy\\s+)?war\\s+(?:on|against)\\s+(?:the\\s+)?(?:${G})\\b`, "i"),
   vigilante: word(L.VIGILANTE),
@@ -576,8 +581,8 @@ function score(text) {
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
-  hit("dehumanise", RE.dehumanise, true);
-  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.warOn, true)) hit("violence", RE.violenceSlogan);
+  if (!hit("dehumanise", RE.notHuman)) hit("dehumanise", RE.dehumanise, true);
+  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.warOn, true) && !hit("violence", RE.onlyGoodDead)) hit("violence", RE.violenceSlogan);
   hit("vigilante", RE.vigilante);
   if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s))) hit("slurSoft", RE.slurSoft);
   hit("stereotype", RE.stereotype, true);

@@ -24,6 +24,11 @@ const RE = {
   dehumanise: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,4}?\\W+(?:${alt(L.DEHUMANISE)})\\b|\\b(?:${alt(L.DEHUMANISE)})\\b(?:\\W+\\w+){0,3}?\\W+(?:like\\s+)?(?:these\\s+|those\\s+|the\\s+)?(?:${G})\\b`, "i"),
   violenceGroup: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,6}?\\W+(?:should|must|need to|needs to|deserve to|ought to|will)\\s+(?:all\\s+)?(?:be\\s+)?(?:${alt(L.VIOLENCE_VERBS)})\\b`, "i"),
   violenceSlogan: word(L.VIOLENT_SLOGANS),
+  // "the only good commie is a dead commie": the same word twice, any target
+  onlyGoodDead: /\bthe only good (\w+) (?:is|are) (?:a )?dead \1\b/i,
+  // "communists aren't people": denying a group is human. Matched before the negation filter,
+  // since the "not" is the marker here.
+  notHuman: new RegExp(`\\b(?:${G})\\s+(?:are not|aren't|arent|ain't)\\s+(?:even\\s+)?(?:people|human|humans|real people)\\b`, "i"),
   // "declare war on Islam", "war against the Jews"
   warOn: new RegExp(`\\b(?:declare|declaring|wage|waging|start)\\s+(?:a\\s+)?(?:holy\\s+)?war\\s+(?:on|against)\\s+(?:the\\s+)?(?:${G})\\b`, "i"),
   vigilante: word(L.VIGILANTE),
@@ -57,8 +62,8 @@ export function score(text) {
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
-  hit("dehumanise", RE.dehumanise, true);
-  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.warOn, true)) hit("violence", RE.violenceSlogan);
+  if (!hit("dehumanise", RE.notHuman)) hit("dehumanise", RE.dehumanise, true);
+  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.warOn, true) && !hit("violence", RE.onlyGoodDead)) hit("violence", RE.violenceSlogan);
   hit("vigilante", RE.vigilante);
   if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s))) hit("slurSoft", RE.slurSoft);
   hit("stereotype", RE.stereotype, true);

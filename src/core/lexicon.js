@@ -18,7 +18,7 @@ export const GROUPS = [
   "rightists", "nationalists", "fascists", "libtards", "maga", "woke", "tories", "the left", "the right",
   // derogatory nicknames, so "mussie scum" reads like "muslims are scum"
   "mussie", "mussies", "muzzie", "muzzies", "third world", "third worlders", "magats", "magat", "fash", "nazis", "zionists",
-  "globalists", "leftards", "rednecks",
+  "globalists", "leftards", "rednecks", "leftoids", "leftoid", "rightoids", "rightoid", "commie", "libs", "conservatards",
   // class, role, identity
   "the rich", "billionaires", "elites", "the elite", "landlords", "bankers", "politicians", "police", "cops", "protesters",
   "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "lesbians", "trans people", "transgenders",
@@ -58,7 +58,7 @@ export const ABSOLUTIST = ["traitors", "traitor", "enemy of the people", "enemie
 export const ESSENTIALISE = ["import third world", "import the third world", "importing the third world", "become third world",
   "is cultural", "it's in their blood", "its in their blood", "in their culture", "in their dna", "it's in their nature",
   "the natives are", "defend their own country", "defend our own country", "replace us", "replacing us",
-  "demographic replacement", "cultural suicide", "acab", "all cops are bastards", "invaders multiply", "the invaders", "they breed",
+  "demographic replacement", "cultural suicide", "acab", "all cops are bastards", "invaders multiply", "the invaders", "foreign invaders", "they breed",
   "outbreeding us", "civilizational suicide"];
 
 // Stereotype traits: "<group> are <trait>" names a whole group by a trait.
@@ -105,7 +105,7 @@ export const SLURS = [
 ];
 
 // Context-dependent: innocent in many uses (weight 1, counted only beside another marker).
-export const SLURS_SOFT = ["suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
+export const SLURS_SOFT = ["leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
   "religion of peace", "it's always them", "its always them", "thug", "thugs", "ghetto", "illegals", "dyke", "dykes", "thot",
   "thots", "fag", "fags", "cripple", "cripples", "white trash", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
 

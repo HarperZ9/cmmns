@@ -138,3 +138,13 @@ test("calls for war on a group or faith score the same for every target", () => 
     assert.equal(families(`we should declare war on ${g}`), "violence", g);
   }
 });
+
+test("denying a group is human scores the same for every target", () => {
+  const got = new Map(TARGETS.map((g) => [g, families(`${g} aren't people`)]));
+  assert.deepEqual([...got].filter(([, f]) => f !== "dehumanise"), []);
+  assert.equal(families("immigrants are not the problem"), "");
+});
+
+test("'the only good X is a dead X' is a call for violence whatever X is", () => {
+  for (const x of ["commie", "fascist", "cop", "liberal", "conservative", "immigrant"]) assert.equal(families(`the only good ${x} is a dead ${x}`), "violence", x);
+});
