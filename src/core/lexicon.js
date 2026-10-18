@@ -11,6 +11,8 @@ export const GROUPS = [
   "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "jews", "christians", "hindus", "sikhs", "atheists",
   "arabs", "africans", "blacks", "black people", "whites", "white people", "asians", "latinos", "hispanics", "mexicans", "chinese",
   "indians", "pakistanis", "somalis", "haitians", "russians", "ukrainians", "americans", "europeans", "french", "roma", "natives",
+  // faiths named as a whole, so "war on Islam" reads like "war on Muslims"
+  "islam", "christianity", "judaism", "hinduism", "the church", "the west",
   // politics
   "leftists", "liberals", "progressives", "socialists", "communists", "commies", "conservatives", "republicans", "democrats",
   "rightists", "nationalists", "fascists", "libtards", "maga", "woke", "tories", "the left", "the right",
@@ -56,7 +58,8 @@ export const ABSOLUTIST = ["traitors", "traitor", "enemy of the people", "enemie
 export const ESSENTIALISE = ["import third world", "import the third world", "importing the third world", "become third world",
   "is cultural", "it's in their blood", "its in their blood", "in their culture", "in their dna", "it's in their nature",
   "the natives are", "defend their own country", "defend our own country", "replace us", "replacing us",
-  "demographic replacement", "cultural suicide", "acab", "all cops are bastards"];
+  "demographic replacement", "cultural suicide", "acab", "all cops are bastards", "invaders multiply", "the invaders", "they breed",
+  "outbreeding us", "civilizational suicide"];
 
 // Stereotype traits: "<group> are <trait>" names a whole group by a trait.
 export const STEREOTYPE_TRAITS = ["lazy", "criminals", "criminal", "thieves", "violent", "dirty", "filthy", "stupid", "dumb",
@@ -102,9 +105,13 @@ export const SLURS = [
 ];
 
 // Context-dependent: innocent in many uses (weight 1, counted only beside another marker).
-export const SLURS_SOFT = ["the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
+export const SLURS_SOFT = ["suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
   "religion of peace", "it's always them", "its always them", "thug", "thugs", "ghetto", "illegals", "dyke", "dykes", "thot",
   "thots", "fag", "fags", "cripple", "cripples", "white trash", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
 
 // Disguised spellings: "n1gg3r", "f@g", "k1ke". Applied before slur matching only.
 export const LEET = { "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a", "$": "s", "!": "i" };
+
+// "They hate beauty / us / the West": a hatred put in a whole group's mouth (counts as motive).
+export const HATRED_OBJECTS = ["beauty", "us", "the west", "western civilization", "our way of life", "our culture", "our freedom",
+  "freedom", "christians", "jews", "muslims", "white people", "black people", "women", "america", "europe", "france"];

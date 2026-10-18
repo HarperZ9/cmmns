@@ -132,3 +132,9 @@ test("scoring stays fast enough to run on every reply", () => {
   for (let i = 0; i < 2000; i++) score("I strongly disagree with the new immigration policy and I will vote against it next year " + i);
   assert.ok(performance.now() - t0 < 1500, "2,000 replies should score in well under 1.5 s");
 });
+
+test("calls for war on a group or faith score the same for every target", () => {
+  for (const g of ["islam", "christianity", "judaism", "the west", "immigrants", "billionaires", "conservatives", "liberals"]) {
+    assert.equal(families(`we should declare war on ${g}`), "violence", g);
+  }
+});
