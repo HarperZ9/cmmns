@@ -350,147 +350,195 @@ function isFlagged(flags) {
 return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, DEFAULT_HANDLE, DOES_NOT_PROVE, ageDays, flagsFor, isFlagged };
 })();
 
-// ---- rhetoric.js
-const M_rhetoric = (() => {
-// Stance-neutral rhetoric markers. Four marker families from the dehumanisation and
-// violent-extremism literature, written so they never depend on which side a post supports:
-//   dehumanise   a group described as vermin, disease, animals, filth
-//   violence     a call for violence or collective punishment against a group
-//   conspiracy   conspiracy framing ("they don't want you to know", "paid actors")
-//   absolutist   us-versus-them framing ("traitors", "enemy of the people", "civil war now")
-// Group words and coded slogans are listed from every side so the symmetry test in
-// tests/rhetoric.symmetry.test.js can hold the scoring to equal treatment. Disagreement,
-// anger and strong opinions score 0; only the marker grammar counts.
-//
-// A score never flags a person. It is only used in the thread-level comparison in report.js.
+// ---- lexicon.js
+const M_lexicon = (() => {
+// Radar's word lists, kept apart from the matching code so they can be reviewed and updated in
+// one place. Every list covers targets in every direction; tests/rhetoric.symmetry.test.js holds
+// the scoring to equal treatment. Sources for slurs and coded terms: the ADL Hate Symbols
+// database, Hatebase, GNET and ISD extremism glossaries. Words that people also use innocently
+// (a jogger, crackers, gypsy as a self-name) go in the SOFT lists, which count for less.
 
+// People named as groups. Matching any of these lets the grammar rules ("X are vermin",
+// "all X are", "X want to destroy") apply.
 const GROUPS = [
-  // origin, faith, ethnicity
-  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "jews", "christians", "hindus", "atheists",
-  "arabs", "africans", "blacks", "whites", "asians", "latinos", "mexicans", "chinese", "russians", "americans", "french",
+  // origin, faith, ethnicity, nationality
+  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "jews", "christians", "hindus", "sikhs", "atheists",
+  "arabs", "africans", "blacks", "black people", "whites", "white people", "asians", "latinos", "hispanics", "mexicans", "chinese",
+  "indians", "pakistanis", "somalis", "haitians", "russians", "ukrainians", "americans", "europeans", "french", "roma", "natives",
   // politics
   "leftists", "liberals", "progressives", "socialists", "communists", "commies", "conservatives", "republicans", "democrats",
   "rightists", "nationalists", "fascists", "libtards", "maga", "woke", "tories", "the left", "the right",
-  // derogatory nicknames from several sides; listed so "mussie scum" reads like "muslims are scum"
-  "mussie", "mussies", "muzzie", "muzzies", "third world", "third worlders", "magats", "magat", "fash", "nazis", "zionists", "globalists", "leftards", "rednecks",
+  // derogatory nicknames, so "mussie scum" reads like "muslims are scum"
+  "mussie", "mussies", "muzzie", "muzzies", "third world", "third worlders", "magats", "magat", "fash", "nazis", "zionists",
+  "globalists", "leftards", "rednecks",
   // class, role, identity
   "the rich", "billionaires", "elites", "the elite", "landlords", "bankers", "politicians", "police", "cops", "protesters",
-  "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "trans people", "feminists", "farmers", "unions",
+  "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "lesbians", "trans people", "transgenders",
+  "feminists", "disabled people", "the disabled", "farmers", "unions",
 ];
 
-const DEHUMANISE = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "animals", "savages", "subhuman", "sub-human",
-  "infestation", "plague", "disease", "cancer", "filth", "scum", "pigs", "insects", "invaders", "a virus"];
+const DEHUMANISE = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "animals", "savages", "subhuman",
+  "sub-human", "infestation", "plague", "disease", "cancer", "filth", "scum", "pigs", "insects", "invaders", "a virus", "apes",
+  "monkeys", "beasts", "dogs"];
 
-// Physical harm only. Policy words such as "deported" or "jailed" are left out on purpose: a
-// call to deport or jail people under a law is a policy position, not a marker. "Deport them
-// all" stays in the slogans, because it targets a whole group.
-const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed", "lynched",
-  "beaten", "burned alive", "purged", "eliminated"];
+// Physical harm only: deporting or jailing people under a law is a policy position, not a marker.
+const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed",
+  "lynched", "beaten", "burned alive", "purged", "eliminated"];
 
-// Coded calls for violence from several sides, kept in matched pairs by the symmetry test.
-const VIOLENT_SLOGANS = ["helicopter rides", "day of the rope", "string them up", "line them up", "round them up", "hang them all",
-  "kill them all", "deport them all", "send them all back", "nuke them", "nuke the bastards", "pull out the guns", "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines",
-  "bash the fash", "punch a nazi", "death to"];
+const VIOLENT_SLOGANS = ["helicopter rides", "day of the rope", "string them up", "line them up", "round them up",
+  "hang them all", "kill them all", "deport them all", "send them all back", "nuke them", "nuke the bastards", "pull out the guns",
+  "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines", "bash the fash", "punch a nazi", "death to"];
 
-const CONSPIRACY = ["they don't want you to know", "they dont want you to know", "wake up people", "wake up, people", "time to wake up", "wake up sheeple", "sheeple", "do your own research",
-  "it's all planned", "its all planned", "false flag", "paid actors", "crisis actors", "controlled opposition", "the media is hiding",
-  "the media won't tell you", "the media wont tell you", "puppet masters", "great replacement", "funded by soros", "paid by soros",
-  "soros funded", "soros-funded", "funded by the kochs", "koch funded", "koch-funded", "paid by the cia", "cia op", "psyop",
-  "it's a plandemic", "plandemic", "new world order", "deep state", "shadow government"];
+const VIGILANTE = ["will deal with them", "deal with them ourselves", "take care of them ourselves",
+  "take matters into our own hands", "take matters into their own hands", "bring in the army", "bring their armies in",
+  "bring their armies", "send in the army", "send in the military", "where's the military", "wheres the military",
+  "where is the military", "where's the army", "where is the army", "time to arm up", "lock and load"];
 
-// Calls for people outside the law (gangs, mobs, "real men", militias) to act against a group,
-// and calls to send soldiers against civilians.
-const VIGILANTE = ["will deal with them", "deal with them ourselves", "take care of them ourselves", "take matters into our own hands",
-  "take matters into their own hands", "bring in the army", "bring their armies in", "bring their armies", "send in the army", "send in the military",
-  "where's the military", "wheres the military", "where is the military", "where's the army", "where is the army", "time to arm up", "lock and load"];
-
-// Claims that a whole group behaves a given way by nature, and replacement framing.
-const ESSENTIALISE = ["import third world", "import the third world", "importing the third world", "become third world",
-  "is cultural", "it's in their blood", "its in their blood", "in their culture", "in their dna", "it's in their nature",
-  "the natives are", "defend their own country", "defend our own country", "replace us", "replacing us", "demographic replacement",
-  "cultural suicide", "acab", "all cops are bastards"];
-
-// Coded hate: slurs, dog whistles and coined terms with a documented hateful meaning (sources:
-// ADL Hate Symbols database, GNET and ISD glossaries). Grouped by target so every target group is
-// covered; strong terms weigh 2, terms that need context to read as hate weigh 1 (CODED_SOFT).
-const CODED = [
-  // anti-Black
-  "black fatigue", "13/50", "despite being 13", "dindu", "dindu nuffin", "chimp out", "chimped out",
-  "pavement ape", "groid", "groids", "sheboon", "basketball americans", "fatherless behavior", "fatherless behaviour",
-  "nigger", "niggers", "planet of the apes",
-  // neo-Nazi and misogynist
-  "1488", "14/88", "14 words", "sieg heil", "hitler was right", "hitler where are you", "hitler... where are you", "foid", "foids",
-  // antisemitic
-  "(((", ")))", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough", "oy vey shut it down", "early life section", "the noticing",
-  // anti-Muslim
-  "sand people", "goat lovers",
-  // anti-Asian
-  "kung flu", "chinese virus", "china virus",
-  // anti-Latino
-  "wetback", "wetbacks", "beaner", "beaners",
-  // anti-LGBTQ
-  "troon", "troons",
-  // anti-white and anti-men
-  "white devils", "kill all whites", "kill all men", "men are trash",
-];
-// Ambiguous on their own (a real jogger, real crackers, real grooming cases): weight 1, so they only
-// count as extreme next to another marker.
-const CODED_SOFT = ["the fatigue is real", "fatigue is real", "jogger", "joggers", "crackers", "groomers", "religion of peace", "it's always them", "its always them"];
+const CONSPIRACY = ["they don't want you to know", "they dont want you to know", "wake up people", "wake up, people",
+  "time to wake up", "wake up sheeple", "sheeple", "do your own research", "it's all planned", "its all planned", "false flag",
+  "paid actors", "crisis actors", "controlled opposition", "the media is hiding", "the media won't tell you",
+  "the media wont tell you", "puppet masters", "great replacement", "funded by soros", "paid by soros", "soros funded",
+  "soros-funded", "funded by the kochs", "koch funded", "koch-funded", "paid by the cia", "cia op", "psyop", "plandemic",
+  "new world order", "deep state", "shadow government"];
 
 const ABSOLUTIST = ["traitors", "traitor", "enemy of the people", "enemies of the people", "enemies within", "enemy within",
-  "civil war now", "civil war is coming", "time for civil war", "no middle ground", "you're either with us", "youre either with us", "real americans", "real patriots",
-  "true french", "vrais français", "real french", "race traitor", "class traitor", "purge them", "the final solution",
-  "treason", "treasonous"];
+  "civil war now", "civil war is coming", "time for civil war", "no middle ground", "you're either with us", "youre either with us",
+  "real americans", "real patriots", "true french", "vrais français", "real french", "race traitor", "class traitor",
+  "purge them", "the final solution", "treason", "treasonous"];
 
+// Claims about a whole group, and replacement framing.
+const ESSENTIALISE = ["import third world", "import the third world", "importing the third world", "become third world",
+  "is cultural", "it's in their blood", "its in their blood", "in their culture", "in their dna", "it's in their nature",
+  "the natives are", "defend their own country", "defend our own country", "replace us", "replacing us",
+  "demographic replacement", "cultural suicide", "acab", "all cops are bastards"];
+
+// Stereotype traits: "<group> are <trait>" names a whole group by a trait.
+const STEREOTYPE_TRAITS = ["lazy", "criminals", "criminal", "thieves", "violent", "dirty", "filthy", "stupid", "dumb",
+  "terrorists", "rapists", "savage", "greedy", "inbred", "degenerates", "degenerate", "pedophiles", "paedophiles", "groomers",
+  "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil"];
+
+// Invented motives: "<group> want to destroy / replace / ban ..." puts an aim in a whole group's mouth.
+const MOTIVE_VERBS = ["destroy", "replace", "ban", "erase", "kill", "eliminate", "enslave", "take over", "wipe out",
+  "outbreed", "control", "groom", "indoctrinate"];
+
+// Slurs and coded terms that read as hateful on their own (weight 2).
+const SLURS = [
+  // anti-Black
+  "nigger", "niggers", "coon", "coons", "jigaboo", "porch monkey", "porch monkeys", "sambo", "darkie", "darkies", "jungle bunny",
+  "spearchucker", "groid", "groids", "sheboon", "pavement ape", "dindu", "dindu nuffin", "chimp out", "chimped out",
+  "black fatigue", "13/50", "despite being 13", "basketball americans", "fatherless behavior", "fatherless behaviour",
+  "planet of the apes",
+  // anti-Asian
+  "chink", "chinks", "gook", "gooks", "slant eye", "slant eyes", "slanty", "zipperhead", "ching chong", "kung flu",
+  "chinese virus", "china virus",
+  // anti-South Asian
+  "paki", "pakis", "pajeet", "pajeets", "curry muncher", "poo in loo",
+  // anti-Latino
+  "wetback", "wetbacks", "beaner", "beaners", "spic", "spics",
+  // antisemitic
+  "kike", "kikes", "hymie", "heeb", "heebs", "(((", ")))", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough",
+  "oy vey shut it down", "early life section", "the noticing",
+  // anti-Arab and anti-Muslim
+  "towelhead", "towelheads", "raghead", "ragheads", "sand nigger", "sand niggers", "camel jockey", "mudslime", "mudslimes",
+  "muzrat", "muzrats", "sand people", "goat lovers",
+  // anti-Indigenous and anti-Roma
+  "redskin", "redskins", "injun", "injuns", "squaw", "gyppo", "gyppos",
+  // anti-white
+  "honky", "honkies", "honkey", "whitey", "peckerwood", "white devils", "kill all whites",
+  // anti-LGBTQ
+  "faggot", "faggots", "tranny", "trannies", "troon", "troons", "shemale", "shemales", "poofter",
+  // disability
+  "retard", "retards", "retarded", "spaz", "spastic", "mongoloid",
+  // misogynist and anti-men
+  "foid", "foids", "femoid", "femoids", "roastie", "roasties", "kill all men", "men are trash",
+  // neo-Nazi
+  "1488", "14/88", "14 words", "sieg heil", "hitler was right", "hitler where are you", "hitler... where are you",
+];
+
+// Context-dependent: innocent in many uses (weight 1, counted only beside another marker).
+const SLURS_SOFT = ["the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
+  "religion of peace", "it's always them", "its always them", "thug", "thugs", "ghetto", "illegals", "dyke", "dykes", "thot",
+  "thots", "fag", "fags", "cripple", "cripples", "white trash", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
+
+// Disguised spellings: "n1gg3r", "f@g", "k1ke". Applied before slur matching only.
+const LEET = { "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a", "$": "s", "!": "i" };
+
+return { GROUPS, DEHUMANISE, VIOLENCE_VERBS, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, MOTIVE_VERBS, SLURS, SLURS_SOFT, LEET };
+})();
+
+// ---- rhetoric.js
+const M_rhetoric = (() => {
+// Stance-neutral rhetoric markers. The word lists live in lexicon.js; this file holds the grammar.
+//   dehumanise   a group described as vermin, disease, animals, filth
+//   violence     a call for violence or collective punishment against a group
+//   vigilante    a call for people outside the law, or soldiers, to act against people
+//   slur         a slur or coded hate term (strong), or a context-dependent one (slurSoft)
+//   stereotype   "<group> are <trait>": a whole group named by a trait
+//   motive       "<group> want to destroy / replace ...": an aim put in a whole group's mouth
+//   essentialise blanket and replacement claims ("all X are", "violence is cultural")
+//   conspiracy   conspiracy framing; absolutist  us-versus-them framing
+// Disagreement, anger and strong opinions score 0; only the marker grammar counts. Scores feed
+// the thread report, and the strong families also label the comment (never the person).
+
+const L = M_lexicon;
+
+const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const alt = (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|");
-const G = alt(GROUPS);
+const word = (list) => new RegExp(`\\b(?:${alt(list)})\\b`, "i");
+// Slurs may start or end with symbols ("(((", "14/88"), so their edges are any non-word character.
+const edged = (list) => new RegExp(`(?:^|[^\\w])(?:${alt(list)})(?:$|[^\\w])`, "i");
+const G = alt(L.GROUPS);
 
 const RE = {
-  // group ... dehumanising word within a short span, either order
-  dehumanise: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,4}?\\W+(?:${alt(DEHUMANISE)})\\b|\\b(?:${alt(DEHUMANISE)})\\b(?:\\W+\\w+){0,3}?\\W+(?:like\\s+)?(?:these\\s+|those\\s+|the\\s+)?(?:${G})\\b`, "i"),
-  // group ... should/must/need to be <violent verb>, or all <group> <violent verb>
-  violenceGroup: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,6}?\\W+(?:should|must|need to|needs to|deserve to|ought to|will)\\s+(?:all\\s+)?(?:be\\s+)?(?:${alt(VIOLENCE_VERBS)})\\b`, "i"),
-  violenceSlogan: new RegExp(`\\b(?:${alt(VIOLENT_SLOGANS)})\\b`, "i"),
-  conspiracy: new RegExp(`\\b(?:${alt(CONSPIRACY)})\\b`, "i"),
-  absolutist: new RegExp(`\\b(?:${alt(ABSOLUTIST)})\\b`, "i"),
-  coded: new RegExp(`(?:^|[^\\w])(?:${alt(CODED)})(?:$|[^\\w])`, "i"),
-  codedSoft: new RegExp(`\\b(?:${alt(CODED_SOFT)})\\b`, "i"),
-  vigilante: new RegExp(`\\b(?:${alt(VIGILANTE)})\\b`, "i"),
-  // a fixed phrase, or "all <group> are" / "<group> are all": a claim about every member
-  essentialise: new RegExp(`\\b(?:${alt(ESSENTIALISE)})\\b|\\ball (?:the )?(?:${G}) are\\b|\\b(?:${G}) are all\\b`, "i"),
+  dehumanise: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,4}?\\W+(?:${alt(L.DEHUMANISE)})\\b|\\b(?:${alt(L.DEHUMANISE)})\\b(?:\\W+\\w+){0,3}?\\W+(?:like\\s+)?(?:these\\s+|those\\s+|the\\s+)?(?:${G})\\b`, "i"),
+  violenceGroup: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,6}?\\W+(?:should|must|need to|needs to|deserve to|ought to|will)\\s+(?:all\\s+)?(?:be\\s+)?(?:${alt(L.VIOLENCE_VERBS)})\\b`, "i"),
+  violenceSlogan: word(L.VIOLENT_SLOGANS),
+  vigilante: word(L.VIGILANTE),
+  slur: edged(L.SLURS),
+  slurSoft: word(L.SLURS_SOFT),
+  stereotype: new RegExp(`\\b(?:${G})\\s+(?:are|is)\\s+(?:all\\s+|just\\s+|nothing but\\s+|such\\s+)?(?:${alt(L.STEREOTYPE_TRAITS)})\\b|\\btypical\\s+(?:${G})\\b`, "i"),
+  motive: new RegExp(`\\b(?:${G})\\s+(?:want|wants|are trying|plan|are planning|intend)\\s+to\\s+(?:${alt(L.MOTIVE_VERBS)})\\b`, "i"),
+  essentialise: new RegExp(`\\b(?:${alt(L.ESSENTIALISE)})\\b|\\ball (?:the )?(?:${G}) are\\b|\\b(?:${G}) are all\\b`, "i"),
+  conspiracy: word(L.CONSPIRACY),
+  absolutist: word(L.ABSOLUTIST),
 };
 
 // "Immigrants are not animals" and "nobody should be killed" are the opposite of the marker.
 const NEGATION = /\b(?:not|never|no one|nobody|aren't|arent|isn't|isnt|shouldn't|shouldnt|don't|dont)\b/i;
+const unleet = (s) => s.replace(/[013457@$!]/g, (c) => L.LEET[c] || c);
 
-const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, coded: 2, codedSoft: 1, conspiracy: 1, absolutist: 1, essentialise: 1 };
-// "Extreme" for the thread report: any violence, vigilante or dehumanising marker, or two of the
-// weaker families together.
+const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, slur: 2, slurSoft: 1, stereotype: 2, motive: 1,
+  essentialise: 1, conspiracy: 1, absolutist: 1 };
+// "Extreme" for the thread report: any strong marker, or two weaker ones together.
 const EXTREME_AT = 2;
+// Families strong enough to label the comment itself.
+const STRONG = new Set(["dehumanise", "violence", "vigilante", "slur", "stereotype"]);
 
 // Returns { score, markers: [{ family, match }], extreme }.
 function score(text) {
   const s = String(text || "").replace(/[’]/g, "'");
   const markers = [];
-  const hit = (family, re, negatable = false) => {
-    const m = s.match(re);
+  const hit = (family, re, negatable = false, on = s) => {
+    const m = on.match(re);
     if (!m || (negatable && NEGATION.test(m[0]))) return false;
-    markers.push({ family, match: m[0].slice(0, 80) });
+    markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
   hit("dehumanise", RE.dehumanise, true);
   if (!hit("violence", RE.violenceGroup, true)) hit("violence", RE.violenceSlogan);
+  hit("vigilante", RE.vigilante);
+  if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s))) hit("slurSoft", RE.slurSoft);
+  hit("stereotype", RE.stereotype, true);
+  hit("motive", RE.motive, true);
+  hit("essentialise", RE.essentialise, true);
   hit("conspiracy", RE.conspiracy);
   hit("absolutist", RE.absolutist);
-  hit("vigilante", RE.vigilante);
-  if (!hit("coded", RE.coded)) hit("codedSoft", RE.codedSoft);
-  hit("essentialise", RE.essentialise, true);
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };
 }
 
-return { GROUPS, WEIGHTS, EXTREME_AT, score };
+return { GROUPS, WEIGHTS, EXTREME_AT, STRONG, score };
 })();
 
 // ---- report.js
@@ -631,5 +679,5 @@ function parseAbout(text, handle) {
 return { parseJoined, parseNameChanges, parseAbout };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_rhetoric, ...M_report, ...M_about });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about });
 })();

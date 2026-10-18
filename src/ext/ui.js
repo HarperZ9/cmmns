@@ -9,9 +9,10 @@
     "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name",
   };
 
-  const STRONG = { coded: "coded hate term", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
+  const STRONG = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
   const MEANING = {
-    coded: "A slur, dog whistle or coined term with a documented hateful meaning (ADL Hate Symbols database, GNET, ISD).",
+    slur: "A slur, dog whistle or coined term with a documented hateful meaning (ADL Hate Symbols database, Hatebase, GNET, ISD).",
+    stereotype: "Names a whole group of people by a trait, such as criminal, lazy or violent.",
     dehumanise: "Describes a group of people as vermin, disease, animals or filth.",
     violence: "Calls for violence or collective punishment against people.",
     vigilante: "Calls for people outside the law, or soldiers, to act against people.",

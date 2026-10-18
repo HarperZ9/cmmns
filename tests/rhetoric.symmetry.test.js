@@ -94,13 +94,41 @@ test("slang slurs read as group terms from more than one side", () => {
 
 test("coded hate terms register for targets in every direction", () => {
   for (const t of ["the black fatigue is everywhere", "13/50 again", "the goyim know", "kung flu strikes", "send the wetbacks home", "more troons on tv", "white devils did this", "kill all men lol"]) {
-    assert.equal(families(t), "coded", t);
+    assert.equal(families(t), "slur", t);
   }
 });
 
 test("ambiguous coded terms weigh less and need company to count as extreme", () => {
-  assert.equal(families("the fatigue is real"), "codedSoft");
+  assert.equal(families("the fatigue is real"), "slurSoft");
   assert.equal(score("the fatigue is real").extreme, false);
   assert.equal(score("the fatigue is real, traitors all of them").extreme, true);
   for (const t of ["I saw a jogger by the lake", "crackers and cheese for lunch", "I use jq to parse json", "41% of voters agreed"]) assert.ok(!score(t).extreme, t);
+});
+
+test("stereotypes score the same for every target", () => {
+  const got = new Map(TARGETS.map((g) => [g, families(`${g} are lazy`)]));
+  assert.deepEqual([...got].filter(([, f]) => f !== "stereotype"), []);
+});
+
+test("invented motives score the same for every target", () => {
+  const got = new Map(TARGETS.map((g) => [g, families(`${g} want to destroy everything`)]));
+  assert.deepEqual([...got].filter(([, f]) => f !== "motive"), []);
+});
+
+test("slurs register in every direction, including disguised spellings", () => {
+  for (const t of ["typical chink behaviour", "go home spic", "kike bankers", "stupid towelhead", "dumb honky", "what a faggot", "such a retard", "n1gg3r", "k1ke"]) {
+    assert.ok(families(t).split(",").includes("slur"), t);
+  }
+});
+
+test("innocent words that contain or resemble slurs do not count as slurs", () => {
+  for (const t of ["a raccoon in the garden", "the Spice Girls reunion", "flame retardant foam", "I'm a fag hag for the 90s", "my japonica bloomed", "Scunthorpe United won"]) {
+    assert.ok(!families(t).split(",").includes("slur"), t);
+  }
+});
+
+test("scoring stays fast enough to run on every reply", () => {
+  const t0 = performance.now();
+  for (let i = 0; i < 2000; i++) score("I strongly disagree with the new immigration policy and I will vote against it next year " + i);
+  assert.ok(performance.now() - t0 < 1500, "2,000 replies should score in well under 1.5 s");
 });

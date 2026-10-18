@@ -7,7 +7,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const ORDER = ["places.js", "similarity.js", "mismatch.js", "flags.js", "rhetoric.js", "report.js", "about.js"];
+const ORDER = ["places.js", "similarity.js", "mismatch.js", "flags.js", "lexicon.js", "rhetoric.js", "report.js", "about.js"];
 const ident = (f) => "M_" + f.replace(/\.js$/, "");
 
 let body = "";
@@ -15,6 +15,7 @@ const all = [];
 for (const f of ORDER) {
   let src = readFileSync(join(root, "src/core", f), "utf8");
   src = src.replace(/^import \{([^}]*)\} from "\.\/([\w-]+\.js)";$/gm, (_, names, dep) => `const {${names}} = ${ident(dep)};`);
+  src = src.replace(/^import \* as (\w+) from "\.\/([\w-]+\.js)";$/gm, (_, name, dep) => `const ${name} = ${ident(dep)};`);
   const exported = [];
   src = src.replace(/^export (const|function|let|class) ([A-Za-z_$][\w$]*)/gm, (_, kind, name) => { exported.push(name); return `${kind} ${name}`; });
   body += `\n// ---- ${f}\nconst ${ident(f)} = (() => {\n${src}\nreturn { ${exported.join(", ")} };\n})();\n`;
