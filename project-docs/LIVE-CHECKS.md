@@ -18,3 +18,6 @@ signed-in X page before the extension is used for real.
 
 Checked 2026-10-18 in the author's signed-in Chrome by reading page structure only (the extension itself was not installed there). Still blocked on in a browser the agent can read (the built-in browser pane or
 Claude in Chrome). The agent does not enter passwords.
+| 8 | Profile header testids: `UserDescription`, `UserLocation`, `UserUrl`, `UserJoinDate`, follower and following links | Scan one thread; open an account card | open |
+| 9 | One-click scan: the toolbar button scans, one minimised window is reused, it closes when idle | Click Radar on a post page | open |
+| 10 | X's VPN or proxy note wording on the About page | Find an account X marks; compare with `proxyNote` in src/core/about.js | open |

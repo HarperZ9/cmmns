@@ -22,7 +22,10 @@
     if (!api || !reading || !reading.handle) return Promise.resolve();
     chain = chain.then(async () => {
       const map = await all();
-      map[reading.handle.toLowerCase()] = { ...reading, at: Date.now() };
+      // Merge: the profile page and the About page each fill part of the record.
+      const key = reading.handle.toLowerCase(), old = map[key] || {};
+      const fresh = Object.fromEntries(Object.entries(reading).filter(([, v]) => v != null));
+      map[key] = { ...old, ...fresh, at: Date.now() };
       await api.set({ [KEY]: map });
     }).catch((e) => console.error("[radar] cache write failed", e));
     return chain;

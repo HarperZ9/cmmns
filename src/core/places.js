@@ -98,6 +98,9 @@ export function parseLabel(label) {
   const c = COUNTRY.get(s.toLowerCase()) || (countryOf(s) && COUNTRY.get(countryOf(s).toLowerCase()));
   if (c) return { country: c.name, region: c.region };
   for (const [re, region] of REGION_WORDS) if (re.test(s)) return { region };
+  // Free text such as "Paris, France" or "Lyon | FR": try each part, last part first.
+  const parts = s.split(/[,|/·]+/).map((x) => x.trim()).filter(Boolean);
+  if (parts.length > 1) for (const part of parts.reverse()) { const r = parseLabel(part); if (r) return r; }
   return null;
 }
 export function regionOfCountry(name) { const c = COUNTRY.get(String(name || "").toLowerCase()); return c ? c.region : null; }

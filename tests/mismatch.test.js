@@ -67,3 +67,10 @@ test("app store and name flag are compared with where the account is based", () 
   assert.deepEqual(ids({ handle: "z", display: "Marc \u{1F1FA}\u{1F1F8}", basedIn: "United States", connectedVia: "United States App Store" }), []);
   assert.deepEqual(ids({ handle: "z", basedIn: "Europe", connectedVia: "France App Store" }), []);
 });
+
+test("a self-declared profile location is compared with where the account is based", () => {
+  const ids = (a) => flagsFor(a).map((f) => f.id);
+  assert.ok(ids({ handle: "z", profileLocation: "Paris", basedIn: "Belgium" }).includes("profile-location-elsewhere"));
+  assert.ok(!ids({ handle: "z", profileLocation: "Paris, France", basedIn: "France" }).includes("profile-location-elsewhere"));
+  assert.ok(!ids({ handle: "z", profileLocation: "somewhere over the rainbow", basedIn: "Belgium" }).includes("profile-location-elsewhere"));
+});

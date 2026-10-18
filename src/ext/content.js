@@ -4,16 +4,17 @@
 // account location, so their badges carry coordination signs only (src/ext/platforms.js).
 (() => {
   "use strict";
-  const LOOKUP_BATCH = 60;
+  const SCAN_MAX = 200;   // accounts per scan; one scan reads two pages per account
+  let scanLeft = 0;
   const lookingUp = new Set();
   const failed = new Set();   // looked up this session, nothing readable came back
-  let timer = 0, lastPath = location.pathname;
+  let timer = 0, lastPath = location.pathname, lastPending = [];
 
   // Flags for one reply from what the site offers: the account reading (X only) and clusters.
   function evidence(site, r, reading, c) {
     const cluster = c ? { size: c.ids.length, authors: c.authors } : null;
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
-    if (reading) return { mismatch, flags: PB.flagsFor({ handle: r.author, display: r.display, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote }, { mismatch, cluster }) };
+    if (reading) return { mismatch, flags: PB.flagsFor({ handle: r.author, display: r.display, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation }, { mismatch, cluster }) };
     const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display }, { cluster });
     return { mismatch, flags };
   }
@@ -38,7 +39,8 @@
     }
     if (root) PBUI.badge(root.node, { site, handle: root.author, reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, lookup, root.anchor);
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.flags).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];
-    PBUI.panel(PB.threadReport(rows), clusters, { pending: pending.length, site }, () => lookup(...pending.slice(0, LOOKUP_BATCH)));
+    PBUI.panel(PB.threadReport(rows), clusters, { pending: pending.length, scanning: scanLeft, site }, () => lookup(...pending.slice(0, SCAN_MAX)));
+    lastPending = pending;
   }
 
   function lookup(...handles) {
@@ -50,6 +52,13 @@
   }
 
   chrome.runtime.onMessage.addListener((msg) => {
+    // One click: the toolbar button scans every account on screen and opens the report.
+    if (msg && msg.type === "pb-scan") {
+      const p = document.getElementById("pb-panel");
+      if (p) p.dataset.collapsed = "0";
+      refresh().then(() => lookup(...lastPending.slice(0, SCAN_MAX))).catch((e) => console.error("[radar] scan failed", e));
+    }
+    if (msg && msg.type === "pb-progress") { scanLeft = msg.left; schedule(); }
     if (msg && msg.type === "pb-about-result") {
       lookingUp.delete(msg.handle);
       if (!msg.reading) { failed.add(msg.handle); console.warn("[radar] lookup gave no reading for", msg.handle, msg.error || ""); }

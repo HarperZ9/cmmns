@@ -20,6 +20,7 @@ export const DOES_NOT_PROVE = {
   "based-elsewhere": "The label can be wrong (VPNs, travel, X's own errors), and people abroad still speak as locals of where they come from.",
   "hate-symbol-name": "The account chose this name; it can be ironic or quoted, and it says nothing about who runs the account.",
   "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
+  "profile-location-elsewhere": "Profile locations are typed by the user, can be out of date or a joke, and people live abroad.",
   "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
 };
@@ -60,6 +61,11 @@ export function flagsFor(account, context = {}) {
   const out = [];
   const store = storeCountry(account.connectedVia);
   if (store && account.basedIn && !samePlace(store, account.basedIn)) out.push({ id: "store-elsewhere", evidence: `installed from the ${store} app store; labelled as based in ${account.basedIn}` });
+  // The location a person typed on their profile, against X's label. Free text ("Paris",
+  // "somewhere", "🇫🇷") only counts when it names a known place.
+  if (account.profileLocation && account.basedIn && parseLabel(account.profileLocation) && !samePlace(account.profileLocation, account.basedIn)) {
+    out.push({ id: "profile-location-elsewhere", evidence: `profile says "${account.profileLocation}"; labelled as based in ${account.basedIn}` });
+  }
   const shown = nameFlags(account.display).find((c) => account.basedIn && !samePlace(c, account.basedIn));
   if (shown) out.push({ id: "flag-elsewhere", evidence: `shows the ${shown} flag in its name; labelled as based in ${account.basedIn}` });
   const age = ageDays(account.joinDate, context.now);

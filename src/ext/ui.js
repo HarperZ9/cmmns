@@ -6,7 +6,7 @@
 
   const FLAG_LABEL = {
     "new-account": "new account", "name-changes": "renamed", "default-handle": "sign-up handle",
-    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country",
+    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere",
   };
 
   const STRONG = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
@@ -54,6 +54,11 @@
       ["Account based in", R.basedIn || no],
       ["Joined", R.joinDate ? `${R.joinDate.slice(0, 7)} (${age} days ago)` : no],
       ["Connected via", R.connectedVia || no],
+      ["Profile location (self-declared)", R.profileLocation || null],
+      ["Bio", R.bio ? R.bio.slice(0, 280) : null],
+      ["Website", R.website || null],
+      ["Followers / following", R.followers || R.following ? [R.followers, R.following].filter(Boolean).join(" / ") : null],
+      ["Posts", R.posts || null],
       ["VPN or proxy note", R.proxyNote ? "X notes the location may not be accurate (a VPN or proxy may be in use)" : null],
       ["Verified", R.verifiedSince ? `since ${R.verifiedSince}` : (m.reading ? "no" : no)],
       ["Affiliate of", R.affiliateOf || null],
@@ -150,10 +155,12 @@
     }
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
     if (stats.site && !stats.site.hasLocation) p.append(el("p", "pb-num", `${stats.site.name} shows no account location, so this report uses coordination signs only.`));
-    if (stats.pending) {
-      const b = el("button", "pb-chip pb-look", `Look up ${Math.min(stats.pending, 60)} more account${stats.pending === 1 ? "" : "s"}`);
+    if (stats.scanning) {
+      p.append(el("p", "pb-num", `Scanning: ${stats.scanning} account${stats.scanning === 1 ? "" : "s"} left, about ${Math.ceil((stats.scanning * 6) / 60)} min. You can keep reading.`));
+    } else if (stats.pending) {
+      const b = el("button", "pb-chip pb-look", `Scan ${Math.min(stats.pending, 200)} account${stats.pending === 1 ? "" : "s"} (about ${Math.ceil((Math.min(stats.pending, 200) * 6) / 60)} min)`);
       b.type = "button";
-      b.title = "One account every 4 seconds, in background tabs";
+      b.title = "Reads each account's public profile and About page in one minimised window. Radar's toolbar button does the same.";
       b.addEventListener("click", onLookupAll);
       p.append(b);
     }

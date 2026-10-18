@@ -45,5 +45,8 @@
       "id": "radar@local",
       "strict_min_version": "121.0"
     }
+  },
+  "action": {
+    "default_title": "Radar: scan this thread"
   }
 }

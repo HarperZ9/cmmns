@@ -20,7 +20,11 @@ add it to. Add it once to each browser profile you use.
 1. Open `chrome://extensions` (Edge: `edge://extensions`).
 2. Turn on **Developer mode**.
 3. Click **Load unpacked** and choose the folder `C:\dev\provenance-badges\src\ext`.
-4. Open any post with replies on X, Reddit or YouTube. A **Radar** panel appears at the bottom right.
+4. Pin Radar: click the puzzle-piece icon in the toolbar, then the pin next to Radar.
+5. Open any post with replies and click the **Radar** toolbar button. That one click scans every
+   account on screen: on X it reads each account's public profile and About page in one minimised
+   window, then fills in every badge, account card and the thread report. The **Scan** button in
+   the Radar panel does the same.
 
 **Firefox**
 1. Open `about:debugging#/runtime/this-firefox`.
