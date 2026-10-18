@@ -1,4 +1,4 @@
-# Design: provenance badges and the thread norm report
+# Design: Radar (provenance badges and the thread norm report)
 
 ## The problem
 Coordinated accounts shape what readers think "people like them" believe. Two patterns matter:

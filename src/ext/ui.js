@@ -33,12 +33,11 @@
   }
 
   // model: { handle, reading, flags, mismatch, lookingUp }
-  function badge(article, model, onLookup) {
+  function badge(article, model, onLookup, anchor) {
     let bar = article.querySelector(":scope .pb-bar");
     if (!bar) {
       bar = el("div", "pb-bar");
-      const anchor = article.querySelector('[data-testid="User-Name"]');
-      (anchor && anchor.parentElement ? anchor.parentElement : article).append(bar);
+      if (anchor && anchor.parentElement) anchor.after(bar); else article.append(bar);
     }
     bar.replaceChildren();
     const R = model.reading;
@@ -49,6 +48,8 @@
         ["Username changes", R.nameChanges == null ? "not shown" : String(R.nameChanges)],
         ["What it does not prove", PB.DOES_NOT_PROVE["based-elsewhere"]],
       ]));
+    } else if (model.site && !model.site.hasLocation) {
+      // no location on this site: badges only appear when there is a coordination sign
     } else if (R) {
       bar.append(chip("No location shown", "pb-quiet", [["Source", "X's about page showed no location for this account."]]));
     } else {
@@ -88,7 +89,7 @@
     }
     const collapsed = p.dataset.collapsed === "1";
     p.replaceChildren();
-    const head = el("button", "pb-panel-head", collapsed ? "Thread report ▸" : "Thread report ▾");
+    const head = el("button", "pb-panel-head", collapsed ? "Radar ▸" : "Radar ▾");
     head.type = "button";
     head.addEventListener("click", () => { p.dataset.collapsed = collapsed ? "0" : "1"; panel(report, clusters, stats, onLookupAll); });
     p.append(head);
@@ -100,6 +101,7 @@
     }
     p.append(el("p", "pb-num", `${report.replies} repl${report.replies === 1 ? "y" : "ies"} on screen, ${report.lookedUp} account${report.lookedUp === 1 ? "" : "s"} looked up.`));
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
+    if (stats.site && !stats.site.hasLocation) p.append(el("p", "pb-num", `${stats.site.name} shows no account location, so this report uses coordination signs only.`));
     if (stats.pending) {
       const b = el("button", "pb-chip pb-look", `Look up ${Math.min(stats.pending, 60)} more account${stats.pending === 1 ? "" : "s"}`);
       b.type = "button";

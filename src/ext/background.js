@@ -40,7 +40,7 @@ function pump() {
       pump();
     }, TIMEOUT_MS);
   }).catch((e) => {
-    console.error("[provenance-badges] could not open lookup tab for", job.handle, e);
+    console.error("[radar] could not open lookup tab for", job.handle, e);
     busy = false;
     pump();
   });

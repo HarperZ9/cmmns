@@ -6,6 +6,8 @@ signed-in X page before the extension is used for real.
 
 | # | Check | How | Status |
 |---|---|---|---|
+| 1a | Reddit: `shreddit-comment` with `author`, `thingid`, `[slot="comment"]` | Open a Reddit post; confirm badges | open |
+| 1b | YouTube: `ytd-comment-view-model` or `ytd-comment-renderer` with `#author-text`, `#content-text` | Open a video with comments | open |
 | 1 | Reply DOM: `article[data-testid="tweet"]`, `[data-testid="User-Name"]`, `[data-testid="tweetText"]`, status link with `<time>` | Open a post with replies; confirm badges appear under each name | open |
 | 2 | About page URL is `x.com/<handle>/about` | Open one from a profile; compare URL | open |
 | 3 | About page wording: "Account based in", "Date joined", "Connected via", username changes | Read the page text; adjust `LABELS` in `src/core/about.js` and the fixtures in `tests/about.test.js` | open |

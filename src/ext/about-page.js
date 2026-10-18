@@ -18,8 +18,8 @@
       const reading = PB.parseAbout(main ? main.innerText : "", handle);
       const found = reading.basedIn || reading.joinDate;
       if (!found && Date.now() - started < 12000) { timer = setTimeout(tryRead, 500); return; }
-      if (found) PBStore.put(reading).catch((e) => console.error("[provenance-badges] cache write failed", e));
-      else console.warn("[provenance-badges] no about fields found for", handle, "- the page layout may have changed");
+      if (found) PBStore.put(reading).catch((e) => console.error("[radar] cache write failed", e));
+      else console.warn("[radar] no about fields found for", handle, "- the page layout may have changed");
       if (forLookup) chrome.runtime.sendMessage({ type: "pb-about-read", reading: found ? reading : null }).catch(() => {});
     };
     timer = setTimeout(tryRead, 800);

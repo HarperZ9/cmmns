@@ -24,7 +24,7 @@
       const map = await all();
       map[reading.handle.toLowerCase()] = { ...reading, at: Date.now() };
       await api.set({ [KEY]: map });
-    }).catch((e) => console.error("[provenance-badges] cache write failed", e));
+    }).catch((e) => console.error("[radar] cache write failed", e));
     return chain;
   }
   async function clear() { if (api) await api.remove(KEY); }
