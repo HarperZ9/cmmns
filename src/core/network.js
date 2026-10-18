@@ -13,15 +13,18 @@ const DAY = 86400000;
 export function recordThread(log, threadKey, rows, rootPosted, now = Date.now()) {
   const L = { threads: { ...((log && log.threads) || {}) } };
   const t0 = Date.parse(rootPosted);
-  const authors = {}, hours = {};
+  const authors = {}, hours = {}, fps = {}, links = {};
   for (const r of rows) {
     const t = Date.parse(r.posted);
     const delay = Number.isFinite(t0) && Number.isFinite(t) ? Math.max(0, Math.round((t - t0) / 1000)) : null;
     const h = r.author.toLowerCase();
     if (!(h in authors) || (delay != null && (authors[h] == null || delay < authors[h]))) authors[h] = delay;
     if (Number.isFinite(t)) (hours[h] = hours[h] || []).push(t);
+    const fp = fingerprint(r.text);
+    if (fp && !(fps[fp] || []).includes(h)) (fps[fp] = fps[fp] || []).push(h);
+    for (const d of r.domains || []) if (!(links[d] || []).includes(h)) (links[d] = links[d] || []).push(h);
   }
-  L.threads[threadKey] = { at: now, authors, posts: hours };
+  L.threads[threadKey] = { at: now, authors, posts: hours, fps, links };
   // retention and size cap, oldest first
   const keys = Object.keys(L.threads).filter((k) => now - L.threads[k].at <= RETAIN_DAYS * DAY).sort((a, b) => L.threads[b].at - L.threads[a].at);
   return { threads: Object.fromEntries(keys.slice(0, MAX_THREADS).map((k) => [k, L.threads[k]])) };
@@ -78,4 +81,37 @@ export function activeHours(times) {
   }
   const quiet = hist.map((n, utc) => ({ utc, n })).filter((x) => x.n === 0).map((x) => x.utc);
   return { utcOffset: best.offset, fit: Math.round(best.share * 100) / 100, posts: ts.length, days, quietUtcHours: quiet };
+}
+
+// A short fingerprint of a reply's wording, for spotting the same text in other threads. Links,
+// mentions, case and punctuation are ignored. Short replies ("so true") return null: they repeat
+// by chance.
+export const MIN_FP_WORDS = 8;
+export function fingerprint(text) {
+  const w = String(text || "").toLowerCase().replace(/https?:\/\/\S+|@\w+/g, " ").replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
+  if (w.length < MIN_FP_WORDS) return null;
+  const s = w.join(" ");
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0;
+  return h.toString(36);
+}
+
+// The same wording in other threads the user viewed: { threads, authors } or null.
+export function echoes(log, threadKey, text) {
+  const fp = fingerprint(text);
+  if (!fp) return null;
+  const hits = Object.entries((log && log.threads) || {}).filter(([k, t]) => k !== threadKey && t.fps && t.fps[fp]);
+  if (!hits.length) return null;
+  return { threads: hits.length, authors: [...new Set(hits.flatMap(([, t]) => t.fps[fp]))] };
+}
+
+// Link domains several accounts keep posting across threads: [{ domain, threads, authors }].
+export function pushedLinks(log, domains, minThreads = 3, minAuthors = 3) {
+  const out = [];
+  for (const d of new Set(domains)) {
+    const hits = Object.values((log && log.threads) || {}).filter((t) => t.links && t.links[d]);
+    const authors = new Set(hits.flatMap((t) => t.links[d]));
+    if (hits.length >= minThreads && authors.size >= minAuthors) out.push({ domain: d, threads: hits.length, authors: authors.size });
+  }
+  return out.sort((a, b) => b.authors - a.authors);
 }

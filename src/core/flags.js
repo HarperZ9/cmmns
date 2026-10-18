@@ -21,6 +21,7 @@ const REGION_OFFSETS = { europe: [0, 3], "west asia": [2, 4], africa: [-1, 3], "
 export const DOES_NOT_PROVE = {
   "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them.",
   "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy.",
+  "copied-elsewhere": "People repost text they agree with, and memes and quotes repeat. Repeated wording shows copying or coordination, not who is behind it.",
   "new-account": "New accounts include real people who just joined, often during a news event.",
   "name-changes": "People rename accounts for many reasons; repeated renames are only common among resold or repurposed accounts.",
   "default-handle": "Many real people never change the handle X suggested.",
@@ -85,6 +86,10 @@ export function flagsFor(account, context = {}) {
   }
   if (context.activity && context.activity.fastReplies >= 3 && context.activity.medianDelay != null && context.activity.medianDelay <= 60) {
     out.push({ id: "fast-replier", evidence: `replied within a minute of the original post in ${context.activity.fastReplies} threads you viewed (median ${context.activity.medianDelay} s)` });
+  }
+  if (context.echo && context.echo.threads >= 1) {
+    const by = context.echo.authors.filter((a) => a !== String(account.handle || "").toLowerCase());
+    out.push({ id: "copied-elsewhere", evidence: `the same wording appeared in ${context.echo.threads} other thread${context.echo.threads === 1 ? "" : "s"} you viewed` + (by.length ? `, posted by ${by.slice(0, 6).map((a) => "@" + a).join(", ")}` : ", from this account") });
   }
   const store = storeCountry(account.connectedVia);
   if (store && account.basedIn && !samePlace(store, account.basedIn)) out.push({ id: "store-elsewhere", evidence: `installed from the ${store} app store; labelled as based in ${account.basedIn}` });

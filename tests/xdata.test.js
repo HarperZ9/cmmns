@@ -66,3 +66,15 @@ test("the About block is read from an About response, with the VPN note", async 
   assert.equal(a.aboutRead, true);
   assert.equal(aboutIn({ data: {} }), null);
 });
+
+test("post metadata X loads but does not show: app, language, views, edits, Community Note", async () => {
+  const { tweetsIn, COMMON_CLIENTS } = await import("../src/core/xdata.js");
+  const json = { data: { tweetResult: { result: { __typename: "Tweet", rest_id: "99",
+    source: '<a href="https://buffer.com" rel="nofollow">Buffer</a>', views: { count: "1200" },
+    edit_control: { edit_tweet_ids: ["98", "99"] }, birdwatch_pivot: { subtitle: { text: "This video is from 2019." } },
+    legacy: { lang: "fr", favorite_count: 3, retweet_count: 1, quote_count: 0, reply_count: 2 } } } } };
+  const [t] = tweetsIn(json);
+  assert.deepEqual(t, { id: "99", client: "Buffer", lang: "fr", views: 1200, edits: 1, note: "This video is from 2019.", quotes: 0, reposts: 1, likes: 3, replies: 2 });
+  assert.ok(COMMON_CLIENTS.test("Twitter for iPhone"));
+  assert.ok(!COMMON_CLIENTS.test("Buffer"));
+});

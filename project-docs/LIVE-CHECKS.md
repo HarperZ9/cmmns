@@ -25,3 +25,7 @@ Claude in Chrome). The agent does not enter passwords.
 | 12 | Automatic About data: AboutAccountQuery learned once, then repeated in the page; response carries `about_profile` | Open a post; watch "Reading About data automatically" count down | open |
 | 13 | "Translated from", Parody/Commentary labels and the "Probable spam" heading as X shows them | Compare chips with the page | open |
 
+| 14 | YouTube comment data (`commentEntityPayload.author`, `properties.publishedTime`, `toolbar.likeCountNotliked`) reaches ytdata.js | Read a /youtubei/v1/next response on a watch page | pass 2026-10-18: 8 authors read from a replies response with channel id, likes and time; displayName carries the "@handle" the page shows |
+| 15 | YouTube `videoOwnerRenderer` (channel, subscribers) and `currentVideoEndpoint` in ytInitialData | Read the watch page's data | pass 2026-10-18: channel, "13.7K subscribers" and browse id read; ytInitialData keeps the first video's id after in-page navigation, so Radar keys video data by id |
+| 16 | YouTube funding and context panels, paid-promotion overlay, member badge field | Open a state-funded broadcaster's video and a sponsored video | open |
+| 17 | X post data: `source`, `legacy.lang`, `views.count`, `edit_control`, `birdwatch_pivot` on Tweet objects | Open a post with a Community Note; open the account card | open |

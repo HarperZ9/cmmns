@@ -36,6 +36,11 @@ export function userReading(u) {
     category: pick((((u.professional || {}).category || [])[0] || {}).name),
     affiliate: pick((((u.affiliates_highlighted_label || {}).label) || {}).description),
     xLabel: pick(u.parody_commentary_fan_label && u.parody_commentary_fan_label !== "None" ? u.parody_commentary_fan_label : null),
+    defaultAvatar: L.default_profile_image === true || /default_profile_images/.test(pick((u.avatar || {}).image_url, L.profile_image_url_https) || "") ? true : null,
+    listedCount: n(L.listed_count),
+    likesCount: n(L.favourites_count),
+    mediaCount: n(L.media_count),
+    withheldIn: Array.isArray(L.withheld_in_countries) && L.withheld_in_countries.length ? L.withheld_in_countries.join(", ") : null,
     protected: L.protected === true || (u.privacy || {}).protected === true ? true : null,
     // Present only when X includes its "About this account" block in the response.
     basedIn: pick(A.account_based_in),
@@ -86,3 +91,33 @@ export function usersIn(json) {
   }
   return [...out.values()];
 }
+
+// Post-level metadata X loads with each post but does not show on the page: the app it was posted
+// from, X's detected language, views, edits and whether a Community Note is attached.
+export function tweetsIn(json) {
+  const out = new Map(), stack = [json];
+  let guard = 0;
+  while (stack.length && guard++ < 200000) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    if (v.__typename === "Tweet" && v.rest_id && v.legacy) {
+      const L = v.legacy, edits = ((v.edit_control || {}).edit_tweet_ids || []).length;
+      const r = {
+        id: v.rest_id,
+        client: v.source ? String(v.source).replace(/<[^>]*>/g, "").trim() || null : null,
+        lang: L.lang && L.lang !== "und" && L.lang !== "zxx" ? L.lang : null,
+        views: v.views && v.views.count ? Number(v.views.count) : null,
+        edits: edits > 1 ? edits - 1 : null,
+        note: v.birdwatch_pivot ? pick((v.birdwatch_pivot.subtitle || {}).text, v.birdwatch_pivot.shorttitle, v.birdwatch_pivot.title, "a Community Note is attached") : null,
+        quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count),
+      };
+      out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined)));
+    }
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+  return [...out.values()];
+}
+
+// Apps people commonly post from. Anything else (schedulers, automation tools, custom apps) is
+// worth showing, because X no longer shows it.
+export const COMMON_CLIENTS = /^(?:Twitter|X) (?:for (?:iPhone|Android|iPad|Mac)|Web App)$|^(?:Twitter|X) Web Client$/;

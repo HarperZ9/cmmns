@@ -54,3 +54,29 @@ test("inferred flags: fast replier and active hours outside the labelled region"
   const near = flagsFor({ handle: "a", basedIn: "France" }, { activity: { ...activity, fastReplies: 1, activeHours: { ...activity.activeHours, utcOffset: 2 } } }).map((f) => f.id);
   assert.deepEqual(near, []);
 });
+
+test("echoes: the same wording in other threads, ignoring links, mentions and case", async () => {
+  const { echoes, fingerprint } = await import("../src/core/network.js");
+  const text = "The election was stolen and everyone in charge knows it, wake up people";
+  assert.equal(fingerprint("so true"), null);
+  let log = recordThread({}, "t1", [{ author: "a1", posted: at(5), text }], root, now - 86400000);
+  log = recordThread(log, "t2", [{ author: "a2", posted: at(5), text: "@someone " + text.toUpperCase() + " https://x.co/1" }], root, now);
+  const e = echoes(log, "t3", text);
+  assert.equal(e.threads, 2);
+  assert.deepEqual(e.authors.sort(), ["a1", "a2"]);
+  assert.equal(echoes(log, "t3", "A completely different reply about the weather in Lyon this week"), null);
+});
+
+test("pushed links: a domain several accounts post across threads", async () => {
+  const { pushedLinks } = await import("../src/core/network.js");
+  let log = {};
+  for (let i = 0; i < 3; i++) log = recordThread(log, "t" + i, [{ author: "u" + i, posted: at(5), domains: ["junknews.example"] }, { author: "z", posted: at(9), domains: ["bbc.co.uk"] }], root, now - i * 1000);
+  assert.deepEqual(pushedLinks(log, ["junknews.example", "bbc.co.uk"]), [{ domain: "junknews.example", threads: 3, authors: 3 }]);
+});
+
+test("copied-elsewhere flag names the other accounts", async () => {
+  const { flagsFor } = await import("../src/core/flags.js");
+  const f = flagsFor({ handle: "a1" }, { echo: { threads: 2, authors: ["a1", "a2"] } }).find((x) => x.id === "copied-elsewhere");
+  assert.match(f.evidence, /2 other threads.*@a2/);
+  assert.ok(f.doesNotProve);
+});

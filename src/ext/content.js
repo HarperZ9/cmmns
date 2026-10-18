@@ -15,8 +15,9 @@
     const cluster = c ? { size: c.ids.length, authors: c.authors } : null;
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
     const activity = PB.activity(netLog, r.author);
-    if (reading) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation }, { mismatch, cluster, activity }) };
-    const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display }, { cluster });
+    const echo = PB.echoes(netLog, site.id + ":" + location.pathname, r.text);
+    if (reading) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation }, { mismatch, cluster, activity, echo }) };
+    const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display }, { cluster, echo });
     return { mismatch, flags, activity };
   }
 
@@ -41,7 +42,7 @@
     const sig = threadKey + ":" + replies.length;
     if (sig === lastRecorded) return;
     lastRecorded = sig;
-    netLog = PB.recordThread(netLog, threadKey, replies.map((r) => ({ author: r.author, posted: r.posted })), root && root.posted);
+    netLog = PB.recordThread(netLog, threadKey, replies.map((r) => ({ author: r.author, posted: r.posted, text: r.text, domains: r.domains })), root && root.posted);
     chrome.storage.local.set({ [NET_KEY]: netLog }).catch((e) => console.error("[radar] could not save the connections log", e));
   }
 
@@ -67,18 +68,20 @@
     for (const r of replies) {
       const reading = cache[r.author.toLowerCase()] || null;
       const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
-      PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, markers: PB.score(r.text).markers, machine: PB.machineSigns(r.text), paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
+      PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), yt: ytAuthors.get(r.author.toLowerCase()), markers: PB.score(r.text).markers, machine: PB.machineSigns(r.text), paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
       // Without account readings a reply's flags are complete for what the site offers.
       rows.push({ id: r.id, author: r.author, text: r.text, machine: PB.machineSigns(r.text).machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
-    if (root) PBUI.badge(root.node, { site, handle: root.author, reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, lookup, root.anchor);
+    if (root) PBUI.badge(root.node, { site, handle: root.author, tweet: tweets.get(root.id), reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, lookup, root.anchor);
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.about).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];
     // Automatic: every author without About data is asked about in the page, at a steady pace.
     if (site.hasLocation && pending.length && globalThis.PBAuto) PBAuto.want(pending, schedule);
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
+    const pushed = PB.pushedLinks(netLog, items.flatMap((r) => r.domains || []));
+    const video = site.id === "youtube" ? ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null : null;
     report.groups = PB.returningGroups(netLog, threadKey, replies.map((r) => r.author));
-    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, onClearHistory: clearNet }, () => lookup(...pending.slice(0, SCAN_MAX)));
+    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet }, () => lookup(...pending.slice(0, SCAN_MAX)));
     lastPending = pending;
   }
 
@@ -89,6 +92,20 @@
     chrome.runtime.sendMessage({ type: "pb-lookup", handles: fresh }).catch((e) => console.error("[radar] lookup request failed", e));
     schedule();
   }
+
+  // Post metadata from X's responses, and YouTube's page data (src/ext/ytsniff.js), in memory only.
+  const tweets = new Map(), ytAuthors = new Map();
+  const ytVideos = new Map();   // videoId -> info; the page's first data goes stale after in-page navigation
+  window.addEventListener("message", (e) => {
+    if (e.source !== window || !e.data) return;
+    if (e.data.source === "radar-sniff") for (const t of PB.tweetsIn(e.data.json)) tweets.set(t.id, { ...(tweets.get(t.id) || {}), ...t });
+    if (e.data.source !== "radar-yt") return;
+    const v = PB.ytVideoInfo(e.data.json);
+    if (v && v.videoId) ytVideos.set(v.videoId, { ...(ytVideos.get(v.videoId) || {}), ...v });
+    for (const [h, a] of PB.ytCommentAuthors(e.data.json)) ytAuthors.set(h, { ...(ytAuthors.get(h) || {}), ...a });
+    schedule();
+  });
+  if (/(^|\.)youtube\.com$/.test(location.hostname)) window.postMessage({ source: "radar-yt-ask" }, location.origin);
 
   // Live data: accounts in the responses X's own app already downloaded (src/ext/sniff.js). Each
   // reading is merged into the local cache, so badges fill in as the page loads, with no request.

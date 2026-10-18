@@ -6,7 +6,7 @@
 
   const FLAG_LABEL = {
     "new-account": "new account", "name-changes": "renamed", "default-handle": "sign-up handle",
-    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere", "high-volume": "posts at a very high rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute", "follow-pattern": "follows many, few follow back",
+    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere", "high-volume": "posts at a very high rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute", "copied-elsewhere": "same words in other threads", "follow-pattern": "follows many, few follow back",
   };
 
   const STRONG = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
@@ -73,6 +73,7 @@
       ["Seen by Radar", m.activity && m.activity.threads ? `in ${m.activity.threads} thread${m.activity.threads === 1 ? "" : "s"} you viewed since ${m.activity.firstSeen}` + (m.activity.medianDelay != null ? `; median reply ${m.activity.medianDelay} s after the post` : "") : null],
       ["Often alongside", m.activity && m.activity.alongside.length ? m.activity.alongside.map((x) => `@${x.handle} (${x.n} threads)`).join(", ") : null],
       ["Active hours (inferred)", m.activity && m.activity.activeHours ? `fits a UTC${m.activity.activeHours.utcOffset >= 0 ? "+" : ""}${m.activity.activeHours.utcOffset} waking day (${Math.round(m.activity.activeHours.fit * 100)}% of ${m.activity.activeHours.posts} posts)` : null],
+      ...PBRows.rows(m),
       ["Radar's flags", (m.flags || []).length ? m.flags.map((f) => f.evidence).join("; ") : "none"],
       ["Not shown", "Demographics. Platforms do not disclose them, and Radar does not guess them."],
     ];
@@ -128,6 +129,7 @@
       if (!o || d === "x.com" || d === "twitter.com") continue;
       bar.append(chip(`link: ${o.name}`, "pb-place", [["Outlet", `${o.name} (${d})`], ["Owned by", o.owner], ["Source", `Wikidata: ${o.source}`], ["What it does not prove", "Ownership is not editorial control, and Wikidata can lag a sale."]]));
     }
+    bar.append(...PBRows.chips(model, chip));
     for (const f of model.flags || []) {
       bar.append(chip(FLAG_LABEL[f.id] || f.id, f.id === "based-elsewhere" ? "pb-warn" : "pb-flag", [
         ["Evidence", f.evidence], ["What it does not prove", f.doesNotProve],
@@ -177,6 +179,7 @@
     if (report.machine && report.machine.n) p.append(el("p", "pb-num", `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text (a hint, not a finding).`));
     if (report.groups && report.groups.length) p.append(el("p", "pb-num", "Seen together before, in other threads you viewed: " + report.groups.slice(0, 4).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "."));
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
+    for (const [h, t] of PBRows.panelLines(stats.video, stats.pushed)) p.append(el("p", "pb-num", `${h}: ${t}`));
     if (stats.site && !stats.site.hasLocation) p.append(el("p", "pb-num", `${stats.site.name} shows no account location, so this report uses coordination signs only.`));
     if (stats.paused) {
       p.append(el("p", "pb-num", "X is limiting requests; Radar paused About lookups for a few minutes."));

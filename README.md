@@ -34,6 +34,14 @@ add it to. Add it once to each browser profile you use.
 
 To update after a change, press the reload arrow on Radar's card in the extensions page.
 
+## What Radar reads that the sites do not show
+
+- **X:** the app each post was sent from (schedulers and automation tools stand out), X's detected language, views and reposts, edits, any Community Note, default profile pictures, list counts and countries where X withholds the account.
+- **YouTube:** the channel, its subscribers and badges, YouTube's funding and context panels, the paid-promotion label, and per comment the author's channel id, badges, likes and edits.
+- **Across threads you view:** the same wording turning up in other threads, link domains several accounts keep pushing, accounts that keep appearing together, reply speed and inferred active hours. This log stays in your browser for 30 days and the panel can clear it.
+
+All of it comes from data the site already loaded for the page. Radar makes no request of its own for it.
+
 ## Status
 Prototype. Built and checked on a test thread (`tests/fixtures/thread.html`); not yet checked on
 live pages or measured for accuracy. See `project-docs/LIVE-CHECKS.md` and
