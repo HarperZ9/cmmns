@@ -728,7 +728,8 @@ function parseAbout(text, handle) {
     nameChanges: changes == null ? null : parseNameChanges(changes),
     verifiedSince: verified ? verified.replace(/^since\s+/i, "") : null,
     // X adds a note when it suspects a VPN or proxy ("may not be accurate"); wording unconfirmed.
-    proxyNote: /\b(?:vpn|proxy)\b|may not be accurate/i.test(String(text || "")),
+    // Only the account section counts: the sidebar's trends can mention VPNs too.
+    proxyNote: /\b(?:vpn|proxy)\b|may not be accurate/i.test(String(text || "").split(/\n(?:Trending now|What’s happening|What's happening|Who to follow)\n/)[0]),
     affiliateOf: affiliate || null,
     raw: { basedIn, joinedRaw, via, changes },
   };
