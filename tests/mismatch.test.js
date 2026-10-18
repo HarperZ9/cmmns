@@ -52,3 +52,10 @@ test("a default handle alone does not make an account flagged", () => {
   assert.equal(isFlagged(flagsFor({ handle: "Marie84736251", joinDate: "2015-01-01", nameChanges: 0 })), false);
   assert.equal(isFlagged(flagsFor({ handle: "marie", joinDate: "2026-10-16", nameChanges: 0 }, { now: Date.parse("2026-10-17") })), true);
 });
+
+test("a documented hate symbol in a chosen name is flagged, ordinary names are not", () => {
+  assert.ok(flagsFor({ handle: "jerry45", display: "FOID Hating Aryan Jerry" }).some((f) => f.id === "hate-symbol-name"));
+  assert.ok(flagsFor({ handle: "anon1488" }).some((f) => f.id === "hate-symbol-name"));
+  assert.ok(!flagsFor({ handle: "maria_1987", display: "Maria Lopez" }).some((f) => f.id === "hate-symbol-name"));
+  assert.ok(!flagsFor({ handle: "carian", display: "Darian Price" }).some((f) => f.id === "hate-symbol-name"));
+});

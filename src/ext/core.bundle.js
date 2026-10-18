@@ -302,12 +302,15 @@ const MANY_NAME_CHANGES = 3;
 const DEFAULT_HANDLE = /^[A-Za-z]+_?[0-9]{6,}$/;
 
 const DAY = 86400000;
+// Self-chosen names that carry documented hate symbols (ADL Hate Symbols database).
+const HATE_NAME = /(?:^|[^\d])(?:1488|14\/88)(?:$|[^\d])|\b(?:aryan|foid|foids|sieg ?heil|groyper|groypers)\b/i;
 
 const DOES_NOT_PROVE = {
   "new-account": "New accounts include real people who just joined, often during a news event.",
   "name-changes": "People rename accounts for many reasons; repeated renames are only common among resold or repurposed accounts.",
   "default-handle": "Many real people never change the handle X suggested.",
   "based-elsewhere": "The label can be wrong (VPNs, travel, X's own errors), and people abroad still speak as locals of where they come from.",
+  "hate-symbol-name": "The account chose this name; it can be ironic or quoted, and it says nothing about who runs the account.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
 };
 
@@ -323,6 +326,9 @@ function flagsFor(account, context = {}) {
   const age = ageDays(account.joinDate, context.now);
   if (age != null && age < NEW_ACCOUNT_DAYS) out.push({ id: "new-account", evidence: `account is ${age} day${age === 1 ? "" : "s"} old` });
   if (Number.isFinite(account.nameChanges) && account.nameChanges >= MANY_NAME_CHANGES) out.push({ id: "name-changes", evidence: `username changed ${account.nameChanges} times` });
+  const name = `${account.display || ""} ${account.handle || ""}`;
+  const sym = HATE_NAME.exec(name);
+  if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
   if (account.handle && DEFAULT_HANDLE.test(account.handle)) out.push({ id: "default-handle", evidence: `handle @${account.handle} has the sign-up pattern` });
   if (context.mismatch && context.mismatch.status === "mismatch") out.push({ id: "based-elsewhere", evidence: context.mismatch.reason });
   if (context.cluster && context.cluster.size >= 2) {
@@ -333,10 +339,12 @@ function flagsFor(account, context = {}) {
   return out.map((f) => ({ ...f, doesNotProve: DOES_NOT_PROVE[f.id] }));
 }
 
-// An account counts as "flagged" for the thread report when it has at least one flag other
-// than the weak default-handle signal on its own.
+// An account counts as "flagged" for the thread report when it has at least one authenticity
+// flag. The weak default-handle signal does not count, and neither does a hate symbol in the name:
+// that is about what the account says, and counting it would make the report circular.
+const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name"]);
 function isFlagged(flags) {
-  return flags.some((f) => f.id !== "default-handle");
+  return flags.some((f) => !NOT_AUTHENTICITY.has(f.id));
 }
 
 return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, DEFAULT_HANDLE, DOES_NOT_PROVE, ageDays, flagsFor, isFlagged };
@@ -364,7 +372,7 @@ const GROUPS = [
   "leftists", "liberals", "progressives", "socialists", "communists", "commies", "conservatives", "republicans", "democrats",
   "rightists", "nationalists", "fascists", "libtards", "maga", "woke", "tories", "the left", "the right",
   // derogatory nicknames from several sides; listed so "mussie scum" reads like "muslims are scum"
-  "mussie", "mussies", "muzzie", "muzzies", "magats", "magat", "fash", "nazis", "zionists", "globalists", "leftards", "rednecks",
+  "mussie", "mussies", "muzzie", "muzzies", "third world", "third worlders", "magats", "magat", "fash", "nazis", "zionists", "globalists", "leftards", "rednecks",
   // class, role, identity
   "the rich", "billionaires", "elites", "the elite", "landlords", "bankers", "politicians", "police", "cops", "protesters",
   "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "trans people", "feminists", "farmers", "unions",
@@ -381,7 +389,7 @@ const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "extermi
 
 // Coded calls for violence from several sides, kept in matched pairs by the symmetry test.
 const VIOLENT_SLOGANS = ["helicopter rides", "day of the rope", "string them up", "line them up", "round them up", "hang them all",
-  "kill them all", "deport them all", "send them all back", "guillotine them", "guillotines for", "bring out the guillotines",
+  "kill them all", "deport them all", "send them all back", "nuke them", "nuke the bastards", "pull out the guns", "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines",
   "bash the fash", "punch a nazi", "death to"];
 
 const CONSPIRACY = ["they don't want you to know", "they dont want you to know", "wake up people", "wake up, people", "time to wake up", "wake up sheeple", "sheeple", "do your own research",
@@ -409,6 +417,9 @@ const CODED = [
   // anti-Black
   "black fatigue", "13/50", "despite being 13", "dindu", "dindu nuffin", "chimp out", "chimped out",
   "pavement ape", "groid", "groids", "sheboon", "basketball americans", "fatherless behavior", "fatherless behaviour",
+  "nigger", "niggers", "planet of the apes",
+  // neo-Nazi and misogynist
+  "1488", "14/88", "14 words", "sieg heil", "hitler was right", "hitler where are you", "hitler... where are you", "foid", "foids",
   // antisemitic
   "(((", ")))", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough", "oy vey shut it down", "early life section", "the noticing",
   // anti-Muslim

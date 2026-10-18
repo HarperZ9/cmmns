@@ -6,7 +6,15 @@
 
   const FLAG_LABEL = {
     "new-account": "new account", "name-changes": "renamed", "default-handle": "sign-up handle",
-    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others",
+    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name",
+  };
+
+  const STRONG = { coded: "coded hate term", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
+  const MEANING = {
+    coded: "A slur, dog whistle or coined term with a documented hateful meaning (ADL Hate Symbols database, GNET, ISD).",
+    dehumanise: "Describes a group of people as vermin, disease, animals or filth.",
+    violence: "Calls for violence or collective punishment against people.",
+    vigilante: "Calls for people outside the law, or soldiers, to act against people.",
   };
 
   let openPop = null;
@@ -82,6 +90,15 @@
       b.title = "Read this account's About page in a background tab";
       b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); onLookup(model.handle); });
       bar.append(b);
+    }
+    // Language in this comment: only the strong marker families get a chip on the comment; the
+    // weaker ones count in the thread report alone. The chip describes the words, not the person.
+    for (const mk of (model.markers || []).filter((x) => STRONG[x.family])) {
+      bar.append(chip(STRONG[mk.family], "pb-warn", [
+        ["In this comment", `"${mk.match}"`],
+        ["What it is", MEANING[mk.family]],
+        ["What it does not prove", "Words can be quoted, ironic or reported speech. This describes the comment, not who wrote it or why."],
+      ]));
     }
     for (const f of model.flags || []) {
       bar.append(chip(FLAG_LABEL[f.id] || f.id, f.id === "based-elsewhere" ? "pb-warn" : "pb-flag", [

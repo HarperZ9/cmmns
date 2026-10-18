@@ -18,7 +18,7 @@ export const GROUPS = [
   "leftists", "liberals", "progressives", "socialists", "communists", "commies", "conservatives", "republicans", "democrats",
   "rightists", "nationalists", "fascists", "libtards", "maga", "woke", "tories", "the left", "the right",
   // derogatory nicknames from several sides; listed so "mussie scum" reads like "muslims are scum"
-  "mussie", "mussies", "muzzie", "muzzies", "magats", "magat", "fash", "nazis", "zionists", "globalists", "leftards", "rednecks",
+  "mussie", "mussies", "muzzie", "muzzies", "third world", "third worlders", "magats", "magat", "fash", "nazis", "zionists", "globalists", "leftards", "rednecks",
   // class, role, identity
   "the rich", "billionaires", "elites", "the elite", "landlords", "bankers", "politicians", "police", "cops", "protesters",
   "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "trans people", "feminists", "farmers", "unions",
@@ -35,7 +35,7 @@ const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "extermi
 
 // Coded calls for violence from several sides, kept in matched pairs by the symmetry test.
 const VIOLENT_SLOGANS = ["helicopter rides", "day of the rope", "string them up", "line them up", "round them up", "hang them all",
-  "kill them all", "deport them all", "send them all back", "guillotine them", "guillotines for", "bring out the guillotines",
+  "kill them all", "deport them all", "send them all back", "nuke them", "nuke the bastards", "pull out the guns", "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines",
   "bash the fash", "punch a nazi", "death to"];
 
 const CONSPIRACY = ["they don't want you to know", "they dont want you to know", "wake up people", "wake up, people", "time to wake up", "wake up sheeple", "sheeple", "do your own research",
@@ -63,6 +63,9 @@ const CODED = [
   // anti-Black
   "black fatigue", "13/50", "despite being 13", "dindu", "dindu nuffin", "chimp out", "chimped out",
   "pavement ape", "groid", "groids", "sheboon", "basketball americans", "fatherless behavior", "fatherless behaviour",
+  "nigger", "niggers", "planet of the apes",
+  // neo-Nazi and misogynist
+  "1488", "14/88", "14 words", "sieg heil", "hitler was right", "hitler where are you", "hitler... where are you", "foid", "foids",
   // antisemitic
   "(((", ")))", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough", "oy vey shut it down", "early life section", "the noticing",
   // anti-Muslim

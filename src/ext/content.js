@@ -13,8 +13,8 @@
   function evidence(site, r, reading, c) {
     const cluster = c ? { size: c.ids.length, authors: c.authors } : null;
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
-    if (reading) return { mismatch, flags: PB.flagsFor({ handle: r.author, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn }, { mismatch, cluster }) };
-    const flags = cluster ? PB.flagsFor({ handle: site.hasLocation ? r.author : "" }, { cluster }) : [];
+    if (reading) return { mismatch, flags: PB.flagsFor({ handle: r.author, display: r.display, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn }, { mismatch, cluster }) };
+    const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display }, { cluster });
     return { mismatch, flags };
   }
 
@@ -32,7 +32,7 @@
     for (const r of replies) {
       const reading = cache[r.author.toLowerCase()] || null;
       const { mismatch, flags } = evidence(site, r, reading, clusterOf.get(r.id));
-      PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
+      PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, markers: PB.score(r.text).markers, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
       // Without account readings a reply's flags are complete for what the site offers.
       rows.push({ id: r.id, author: r.author, text: r.text, flags: reading || !site.hasLocation ? flags : null });
     }
