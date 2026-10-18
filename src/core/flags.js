@@ -6,6 +6,8 @@ import { parseLabel } from "./places.js";
 
 export const NEW_ACCOUNT_DAYS = 30;
 export const MANY_NAME_CHANGES = 3;
+// About 100 posts a day, every day, is beyond what most people sustain by hand.
+export const HIGH_VOLUME_PER_DAY = 100;
 // X suggests handles like "Name12345678" at sign-up; many throwaway accounts keep them.
 export const DEFAULT_HANDLE = /^[A-Za-z]+_?[0-9]{6,}$/;
 
@@ -19,6 +21,8 @@ export const DOES_NOT_PROVE = {
   "default-handle": "Many real people never change the handle X suggested.",
   "based-elsewhere": "The label can be wrong (VPNs, travel, X's own errors), and people abroad still speak as locals of where they come from.",
   "hate-symbol-name": "The account chose this name; it can be ironic or quoted, and it says nothing about who runs the account.",
+  "high-volume": "Some people post all day, and news and alert accounts post automatically by design.",
+  "follow-pattern": "New and small accounts often follow many before anyone follows back.",
   "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
   "profile-location-elsewhere": "Profile locations are typed by the user, can be out of date or a joke, and people live abroad.",
   "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
@@ -59,6 +63,15 @@ function samePlace(a, b) {
 // context: { mismatch: result of compare(), cluster: { size, authors } | null, now }
 export function flagsFor(account, context = {}) {
   const out = [];
+  // Volume and follow patterns from the counts X loads for the page.
+  const ageForRate = ageDays(account.joinDate, context.now);
+  if (Number.isFinite(account.postsCount) && ageForRate != null) {
+    const perDay = account.postsCount / Math.max(1, ageForRate);
+    if (perDay >= HIGH_VOLUME_PER_DAY) out.push({ id: "high-volume", evidence: `about ${Math.round(perDay)} posts a day since joining (${account.postsCount.toLocaleString()} posts)` });
+  }
+  if (Number.isFinite(account.followingCount) && Number.isFinite(account.followersCount) && account.followingCount >= 2000 && account.followersCount < 100) {
+    out.push({ id: "follow-pattern", evidence: `follows ${account.followingCount.toLocaleString()} accounts; ${account.followersCount} follow back` });
+  }
   const store = storeCountry(account.connectedVia);
   if (store && account.basedIn && !samePlace(store, account.basedIn)) out.push({ id: "store-elsewhere", evidence: `installed from the ${store} app store; labelled as based in ${account.basedIn}` });
   // The location a person typed on their profile, against X's label. Free text ("Paris",
@@ -87,7 +100,7 @@ export function flagsFor(account, context = {}) {
 // An account counts as "flagged" for the thread report when it has at least one authenticity
 // flag. The weak default-handle signal does not count, and neither does a hate symbol in the name:
 // that is about what the account says, and counting it would make the report circular.
-const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name"]);
+const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name", "follow-pattern"]);
 export function isFlagged(flags) {
   return flags.some((f) => !NOT_AUTHENTICITY.has(f.id));
 }

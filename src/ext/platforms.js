@@ -26,7 +26,12 @@
         text: text(node.querySelector('[data-testid="tweetText"]')), node, anchor: nameBox,
         // X's own paid-placement label, and link domains shown in the post or its card
         paid: [...node.querySelectorAll("span")].some((sp) => /^(Ad|Promoted)$/.test(sp.textContent.trim())),
-        domains: PB.domainsIn(node.innerText) };
+        domains: PB.domainsIn(node.innerText),
+        // shown by X beside the reply: the language it was written in, and account labels
+        writtenIn: ((node.innerText.match(/Translated from (\w+)/) || [])[1]) || null,
+        pageLabel: ((node.innerText.match(/(Parody|Commentary|Fan|Automated) account/) || [])[1]) || null,
+        // replies X itself filed under its "Probable spam" heading
+        xSpam: (() => { const hd = [...document.querySelectorAll("h2, span")].find((x) => x.textContent.trim() === "Probable spam"); return !!(hd && (hd.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING)); })() };
     },
   };
 

@@ -74,3 +74,12 @@ test("a self-declared profile location is compared with where the account is bas
   assert.ok(!ids({ handle: "z", profileLocation: "Paris, France", basedIn: "France" }).includes("profile-location-elsewhere"));
   assert.ok(!ids({ handle: "z", profileLocation: "somewhere over the rainbow", basedIn: "Belgium" }).includes("profile-location-elsewhere"));
 });
+
+test("posting volume and follow patterns from page counts", () => {
+  const now = Date.parse("2026-10-18");
+  const ids = (a) => flagsFor(a, { now }).map((f) => f.id);
+  assert.ok(ids({ handle: "z", joinDate: "2026-09-18", postsCount: 9000 }).includes("high-volume"));
+  assert.ok(!ids({ handle: "z", joinDate: "2015-01-01", postsCount: 9000 }).includes("high-volume"));
+  assert.ok(ids({ handle: "z", followingCount: 4900, followersCount: 12 }).includes("follow-pattern"));
+  assert.equal(isFlagged(flagsFor({ handle: "z", followingCount: 4900, followersCount: 12 })), false);
+});

@@ -6,7 +6,7 @@
 
   const FLAG_LABEL = {
     "new-account": "new account", "name-changes": "renamed", "default-handle": "sign-up handle",
-    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere",
+    "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere", "high-volume": "posts at a very high rate", "follow-pattern": "follows many, few follow back",
   };
 
   const STRONG = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
@@ -58,8 +58,13 @@
       ["Profile location (self-declared)", R.profileLocation || null],
       ["Bio", R.bio ? R.bio.slice(0, 280) : null],
       ["Website", R.website || null],
-      ["Followers / following", R.followers || R.following ? [R.followers, R.following].filter(Boolean).join(" / ") : null],
-      ["Posts", R.posts || null],
+      ["Followers / following", R.followersCount != null ? `${R.followersCount.toLocaleString()} / ${R.followingCount.toLocaleString()}` : (R.followers || R.following ? [R.followers, R.following].filter(Boolean).join(" / ") : null)],
+      ["Posts", R.postsCount != null ? `${R.postsCount.toLocaleString()}${age ? ` (about ${Math.round(R.postsCount / Math.max(1, age))} a day)` : ""}` : (R.posts || null)],
+      ["Checkmark", R.verifiedType ? ({ Blue: "blue (paid subscription)", Business: "gold (organisation)", Government: "grey (government)" }[R.verifiedType] || R.verifiedType) : null],
+      ["X label", R.xLabel || m.pageLabel ? `${R.xLabel || m.pageLabel} account` : null],
+      ["Category", R.category || null],
+      ["Protected", R.protected ? "yes, posts are private" : null],
+      ["Data from", R.aboutRead ? "X's page data and the About page" : (R.fromPage ? "the data X loaded for this page (no request by Radar); Scan adds the About page" : null)],
       ["VPN or proxy note", R.proxyNote ? "X notes the location may not be accurate (a VPN or proxy may be in use)" : null],
       ["Verified", R.verifiedSince ? `since ${R.verifiedSince}` : (m.reading ? "no" : no)],
       ["Affiliate of", R.affiliateOf || null],
@@ -89,7 +94,7 @@
       ]));
     } else if (model.site && !model.site.hasLocation) {
       // no location on this site: badges only appear when there is a coordination sign
-    } else if (R) {
+    } else if (R && R.aboutRead) {
       bar.append(chip("No location shown", "pb-quiet", [["Source", "X's about page showed no location for this account."]]));
     } else {
       const b = el("button", "pb-chip pb-look", model.lookingUp ? "Looking up…" : model.failed ? "Nothing found, retry" : "Look up");
@@ -108,6 +113,8 @@
         ["What it does not prove", "Words can be quoted, ironic or reported speech. This describes the comment, not who wrote it or why."],
       ]));
     }
+    if (model.xSpam) bar.append(chip("X: probable spam", "pb-warn", [["Source", "X itself filed this reply under its \"Probable spam\" heading."], ["What it does not prove", "X's spam filter makes mistakes in both directions."]]));
+    if (model.writtenIn) bar.append(chip(`written in ${model.writtenIn}`, "pb-flag", [["Source", `X translated this reply from ${model.writtenIn}.`], ["Account based in", (model.reading && model.reading.basedIn) || "not known yet"], ["What it does not prove", "People write in many languages, including ones from where they grew up."]]));
     if (model.paid) bar.append(chip("ad (X label)", "pb-flag", [["Source", "X labels this post as an ad or promoted post: someone paid for it to reach you."]]));
     for (const d of model.domains || []) {
       const o = PB.ownerOfDomain(d);
@@ -162,8 +169,10 @@
     }
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
     if (stats.site && !stats.site.hasLocation) p.append(el("p", "pb-num", `${stats.site.name} shows no account location, so this report uses coordination signs only.`));
-    if (stats.scanning) {
-      p.append(el("p", "pb-num", `Scanning: ${stats.scanning} account${stats.scanning === 1 ? "" : "s"} left, about ${Math.ceil((stats.scanning * 6) / 60)} min. You can keep reading.`));
+    if (stats.paused) {
+      p.append(el("p", "pb-num", "X is limiting requests; Radar paused About lookups for a few minutes."));
+    } else if (stats.scanning) {
+      p.append(el("p", "pb-num", `Reading About data automatically: ${stats.scanning} account${stats.scanning === 1 ? "" : "s"} left.`));
     } else if (stats.pending) {
       const b = el("button", "pb-chip pb-look", `Scan ${Math.min(stats.pending, 200)} account${stats.pending === 1 ? "" : "s"} (about ${Math.ceil((Math.min(stats.pending, 200) * 6) / 60)} min)`);
       b.type = "button";

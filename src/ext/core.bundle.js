@@ -303,6 +303,8 @@ const { parseLabel } = M_places;
 
 const NEW_ACCOUNT_DAYS = 30;
 const MANY_NAME_CHANGES = 3;
+// About 100 posts a day, every day, is beyond what most people sustain by hand.
+const HIGH_VOLUME_PER_DAY = 100;
 // X suggests handles like "Name12345678" at sign-up; many throwaway accounts keep them.
 const DEFAULT_HANDLE = /^[A-Za-z]+_?[0-9]{6,}$/;
 
@@ -316,6 +318,8 @@ const DOES_NOT_PROVE = {
   "default-handle": "Many real people never change the handle X suggested.",
   "based-elsewhere": "The label can be wrong (VPNs, travel, X's own errors), and people abroad still speak as locals of where they come from.",
   "hate-symbol-name": "The account chose this name; it can be ironic or quoted, and it says nothing about who runs the account.",
+  "high-volume": "Some people post all day, and news and alert accounts post automatically by design.",
+  "follow-pattern": "New and small accounts often follow many before anyone follows back.",
   "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
   "profile-location-elsewhere": "Profile locations are typed by the user, can be out of date or a joke, and people live abroad.",
   "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
@@ -356,6 +360,15 @@ function samePlace(a, b) {
 // context: { mismatch: result of compare(), cluster: { size, authors } | null, now }
 function flagsFor(account, context = {}) {
   const out = [];
+  // Volume and follow patterns from the counts X loads for the page.
+  const ageForRate = ageDays(account.joinDate, context.now);
+  if (Number.isFinite(account.postsCount) && ageForRate != null) {
+    const perDay = account.postsCount / Math.max(1, ageForRate);
+    if (perDay >= HIGH_VOLUME_PER_DAY) out.push({ id: "high-volume", evidence: `about ${Math.round(perDay)} posts a day since joining (${account.postsCount.toLocaleString()} posts)` });
+  }
+  if (Number.isFinite(account.followingCount) && Number.isFinite(account.followersCount) && account.followingCount >= 2000 && account.followersCount < 100) {
+    out.push({ id: "follow-pattern", evidence: `follows ${account.followingCount.toLocaleString()} accounts; ${account.followersCount} follow back` });
+  }
   const store = storeCountry(account.connectedVia);
   if (store && account.basedIn && !samePlace(store, account.basedIn)) out.push({ id: "store-elsewhere", evidence: `installed from the ${store} app store; labelled as based in ${account.basedIn}` });
   // The location a person typed on their profile, against X's label. Free text ("Paris",
@@ -384,12 +397,12 @@ function flagsFor(account, context = {}) {
 // An account counts as "flagged" for the thread report when it has at least one authenticity
 // flag. The weak default-handle signal does not count, and neither does a hate symbol in the name:
 // that is about what the account says, and counting it would make the report circular.
-const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name"]);
+const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name", "follow-pattern"]);
 function isFlagged(flags) {
   return flags.some((f) => !NOT_AUTHENTICITY.has(f.id));
 }
 
-return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, DEFAULT_HANDLE, DOES_NOT_PROVE, ageDays, storeCountry, nameFlags, flagsFor, isFlagged };
+return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, HIGH_VOLUME_PER_DAY, DEFAULT_HANDLE, DOES_NOT_PROVE, ageDays, storeCountry, nameFlags, flagsFor, isFlagged };
 })();
 
 // ---- lexicon.js
@@ -802,5 +815,99 @@ function domainsIn(text) {
 return { setOwnerRows, ownerOfDomain, ownerOfHandle, domainsIn };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners });
+// ---- xdata.js
+const M_xdata = (() => {
+// Reads account metadata out of the data X's own web app has already downloaded for the page (its
+// GraphQL responses). Radar makes no request of its own for this: src/ext/sniff.js passes copies of
+// X's responses to the content script, and this module walks them for User objects.
+// X has moved fields between `legacy` and `core` over time, so both places are read.
+
+const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+
+// "Wed May 02 12:00:00 +0000 2007" -> "2007-05-02"
+function parseXDate(s) {
+  const m = String(s || "").match(/^\w{3} (\w{3}) (\d{2}) [\d:]{8} [+-]\d{4} (\d{4})$/);
+  if (m && m[1] in MONTHS) return new Date(Date.UTC(+m[3], MONTHS[m[1]], +m[2])).toISOString().slice(0, 10);
+  const t = Date.parse(s);
+  return Number.isFinite(t) ? new Date(t).toISOString().slice(0, 10) : null;
+}
+
+const pick = (...vals) => vals.find((v) => v !== undefined && v !== null && v !== "") ?? null;
+const n = (v) => (Number.isFinite(v) ? v : null);
+
+// One X User object -> Radar's reading (only the fields that are present).
+function userReading(u) {
+  const L = u.legacy || {}, C = u.core || {}, A = u.about_profile || {};
+  const handle = pick(C.screen_name, L.screen_name);
+  if (!handle) return null;
+  const url = (((L.entities || {}).url || {}).urls || [])[0];
+  const r = {
+    handle,
+    display: pick(C.name, L.name),
+    joinDate: parseXDate(pick(C.created_at, L.created_at)),
+    profileLocation: pick((u.location || {}).location, L.location),
+    bio: pick(((u.profile_bio || {}).description), L.description),
+    website: pick(url && url.expanded_url, url && url.display_url),
+    followersCount: n(L.followers_count),
+    followingCount: n(L.friends_count),
+    postsCount: n(L.statuses_count),
+    verifiedType: pick(L.verified_type, (u.verification || {}).verified_type, u.is_blue_verified || (u.verification || {}).is_blue_verified ? "Blue" : null),
+    category: pick((((u.professional || {}).category || [])[0] || {}).name),
+    affiliate: pick((((u.affiliates_highlighted_label || {}).label) || {}).description),
+    xLabel: pick(u.parody_commentary_fan_label && u.parody_commentary_fan_label !== "None" ? u.parody_commentary_fan_label : null),
+    protected: L.protected === true || (u.privacy || {}).protected === true ? true : null,
+    // Present only when X includes its "About this account" block in the response.
+    basedIn: pick(A.account_based_in),
+    connectedVia: pick(A.source),
+    nameChanges: n(Number(A.username_changes && A.username_changes.count)),
+    fromPage: true,
+  };
+  return Object.fromEntries(Object.entries(r).filter(([, v]) => v !== null && v !== undefined));
+}
+
+// The "About this account" block anywhere in a response (X's AboutAccountQuery), as Radar's
+// fields, or null. location_accurate false means X suspects a VPN or proxy.
+function aboutIn(json) {
+  const stack = [json];
+  let guard = 0;
+  while (stack.length && guard++ < 50000) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    if (v.about_profile && typeof v.about_profile === "object") {
+      const A = v.about_profile;
+      const r = {
+        basedIn: pick(A.account_based_in),
+        connectedVia: pick(A.source),
+        nameChanges: n(Number(A.username_changes && A.username_changes.count)),
+        proxyNote: A.location_accurate === false ? true : null,
+        affiliate: pick(A.affiliate_username),
+        aboutRead: true,
+      };
+      return Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined));
+    }
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+  return null;
+}
+
+// Walks any JSON value and returns one reading per distinct account found.
+function usersIn(json) {
+  const out = new Map(), stack = [json];
+  let guard = 0;
+  while (stack.length && guard++ < 200000) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    if (v.__typename === "User" && (v.legacy || v.core)) {
+      const r = userReading(v);
+      if (r) out.set(r.handle.toLowerCase(), { ...(out.get(r.handle.toLowerCase()) || {}), ...r });
+    }
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+  return [...out.values()];
+}
+
+return { parseXDate, userReading, aboutIn, usersIn };
+})();
+
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata });
 })();

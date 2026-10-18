@@ -21,10 +21,11 @@ add it to. Add it once to each browser profile you use.
 2. Turn on **Developer mode**.
 3. Click **Load unpacked** and choose the folder `C:\dev\provenance-badges\src\ext`.
 4. Pin Radar: click the puzzle-piece icon in the toolbar, then the pin next to Radar.
-5. Open any post with replies and click the **Radar** toolbar button. That one click scans every
-   account on screen: on X it reads each account's public profile and About page in one minimised
-   window, then fills in every badge, account card and the thread report. The **Scan** button in
-   the Radar panel does the same.
+5. Open any post with replies. Radar fills in by itself: account details come from the data X has
+   already loaded for the page, and each reply author's "About this account" data is read in the
+   page, one account every 1.5 seconds, with no second page. (The very first time, Radar opens one
+   About page in a minimised window so it can learn X's request; it does this again only if X
+   changes it.)
 
 **Firefox**
 1. Open `about:debugging#/runtime/this-firefox`.

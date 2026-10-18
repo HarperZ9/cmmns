@@ -21,3 +21,7 @@ Claude in Chrome). The agent does not enter passwords.
 | 8 | Profile header testids: `UserDescription`, `UserLocation`, `UserUrl`, `UserJoinDate`, follower and following links | Scan one thread; open an account card | open |
 | 9 | One-click scan: the toolbar button scans, one minimised window is reused, it closes when idle | Click Radar on a post page | open |
 | 10 | X's VPN or proxy note wording on the About page | Find an account X marks; compare with `proxyNote` in src/core/about.js | open |
+| 11 | Live page data: X's GraphQL User objects (legacy or core fields) reach the content script via sniff.js | Open a post; account cards fill without a scan | open |
+| 12 | Automatic About data: AboutAccountQuery learned once, then repeated in the page; response carries `about_profile` | Open a post; watch "Reading About data automatically" count down | open |
+| 13 | "Translated from", Parody/Commentary labels and the "Probable spam" heading as X shows them | Compare chips with the page | open |
+

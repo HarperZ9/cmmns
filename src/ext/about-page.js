@@ -34,7 +34,7 @@
   function readAbout(handle) {
     const main = document.querySelector("main") || document.body;
     const reading = PB.parseAbout(main ? main.innerText : "", handle);
-    return reading.basedIn || reading.joinDate ? reading : null;
+    return reading.basedIn || reading.joinDate ? { ...reading, aboutRead: true } : null;
   }
 
   function check() {
