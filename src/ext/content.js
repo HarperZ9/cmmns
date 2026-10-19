@@ -47,7 +47,19 @@
     chrome.storage.local.set({ [NET_KEY]: netLog }).catch((e) => console.error("[radar] could not save the connections log", e));
   }
 
+  // Source trails (src/core/trail.js): which posts carried each upload and link, kept 30 days.
+  const TRAIL_KEY = "pb.trail.v1";
+  let trailLog = {}, trailSave = 0;
+  chrome.storage.local.get(TRAIL_KEY).then((g) => { trailLog = g[TRAIL_KEY] || {}; }).catch(() => {});
+  function recordTrail(batch) {
+    trailLog = PB.recordSpread(trailLog, batch);
+    clearTimeout(trailSave);
+    trailSave = setTimeout(() => chrome.storage.local.set({ [TRAIL_KEY]: trailLog }).catch((e) => console.error("[radar] could not save trails", e)), 2000);
+  }
+
   function clearNet() {
+    trailLog = {};
+    chrome.storage.local.remove(TRAIL_KEY).catch(() => {});
     netLog = {}; lastRecorded = "";
     chrome.storage.local.remove(NET_KEY).then(refresh).catch((e) => console.error("[radar] could not clear the connections log", e));
   }
@@ -121,11 +133,11 @@
       const reading = cache[r.author.toLowerCase()] || null;
       const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
       const an = analyse(r);
-      if (near(r.node)) PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
+      if (near(r.node)) PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), trail: PB.trailFor(tweets.get(r.id), tweets, trailLog), tweets, yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
       // Without account readings a reply's flags are complete for what the site offers.
       rows.push({ id: r.id, author: r.author, text: r.text, machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
-    if (root && near(root.node)) PBUI.badge(root.node, { site, handle: root.author, tweet: tweets.get(root.id), reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, lookup, root.anchor);
+    if (root && near(root.node)) PBUI.badge(root.node, { site, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, trailLog), tweets, reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, lookup, root.anchor);
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.about).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];
     // Automatic: every author without About data is asked about in the page, at a steady pace.
     if (site.hasLocation && pending.length && globalThis.PBAuto && settings.auto) PBAuto.want(pending, schedule);
@@ -136,6 +148,7 @@
     const report = PB.threadReport(rows);
     report.bursts = PB.timingBursts(replies);
     report.state = PB.stateSummary(replies);
+    report.upstream = PB.upstream(items, tweets, trailLog);
     const pushed = PB.pushedLinks(netLog, items.flatMap((r) => r.domains || []));
     const video = site.id === "youtube" ? ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null : null;
     report.groups = PB.returningGroups(netLog, threadKey, replies.map((r) => r.author));
@@ -156,7 +169,11 @@
   const ytVideos = new Map();   // videoId -> info; the page's first data goes stale after in-page navigation
   window.addEventListener("message", (e) => {
     if (e.source !== window || !e.data) return;
-    if (e.data.source === "radar-sniff") for (const t of PB.tweetsIn(e.data.json)) tweets.set(t.id, { ...(tweets.get(t.id) || {}), ...t });
+    if (e.data.source === "radar-sniff") {
+      const batch = PB.tweetsIn(e.data.json);
+      for (const t of batch) tweets.set(t.id, { ...(tweets.get(t.id) || {}), ...t });
+      if (batch.length) recordTrail(batch);
+    }
     if (e.data.source !== "radar-yt") return;
     const v = PB.ytVideoInfo(e.data.json);
     if (v && v.videoId) ytVideos.set(v.videoId, { ...(ytVideos.get(v.videoId) || {}), ...v });

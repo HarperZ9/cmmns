@@ -950,13 +950,27 @@ function tweetsIn(json) {
         note: v.birdwatch_pivot ? pick((v.birdwatch_pivot.subtitle || {}).text, v.birdwatch_pivot.shorttitle, v.birdwatch_pivot.title, "a Community Note is attached") : null,
         posted: Number.isFinite(Date.parse(L.created_at)) ? new Date(Date.parse(L.created_at)).toISOString() : null,
         media: mediaOf(L),
+        // the trail: who wrote it, what it quotes, reposts or answers, and where its links go
+        author: authorOf(v),
+        quotedId: L.quoted_status_id_str || pick((((v.quoted_status_result || {}).result) || {}).rest_id) || null,
+        repostOf: pick(((((L.retweeted_status_result || {}).result) || {}).rest_id)) || null,
+        replyTo: L.in_reply_to_status_id_str || null,
+        replyToHandle: L.in_reply_to_screen_name || null,
+        links: ((L.entities || {}).urls || []).map((u) => u.expanded_url).filter((u) => u && !/^https?:\/\/(x|twitter)\.com\//.test(u)),
         quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count),
       };
-      out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined)));
+      out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined && !(Array.isArray(x) && !x.length))));
     }
     for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
   }
   return [...out.values()];
+}
+
+// The author of a Tweet object, from its embedded user (legacy or core fields).
+function authorOf(v) {
+  const u = ((v.core || {}).user_results || {}).result;
+  if (!u) return null;
+  return pick((u.core || {}).screen_name, (u.legacy || {}).screen_name);
 }
 
 // X ids are "snowflakes": the top bits are milliseconds since 2010-11-04. A media id therefore
@@ -1383,7 +1397,7 @@ const M_state = (() => {
 let ROWS = [];
 const byDomain = new Map(), byHandle = new Map();
 
-// rows: [{ domain?, x?, state, basis: "state-owned" | "public-broadcaster" | "named-in-report", actor?, name, operation?, source: { title, url, date } }]
+// rows: [{ domain?, x?, state, basis: "state-owned" | "public-broadcaster" | "designated" | "named-in-report", actor?, name, operation?, source: { title, url, date } }]
 // actor (report rows): who the report says ran it: "government", "commercial firm" or
 // "individuals or group". `state` is where the report says the operation came from, which is not
 // the same as a government running it.
@@ -1426,12 +1440,14 @@ function stateSummary(items) {
 
 const STATE_DOES_NOT_PROVE = {
   "state-owned": "State ownership is not proof of disinformation. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
+  "designated": "A designation records one government's assessment and policy, not an independent finding. The domain is matched to the named outlet through Wikidata unless the document gives it.",
   "public-broadcaster": "Public broadcasters range from editorially independent to government-directed. Check the outlet's charter and record, not the label.",
   "named-in-report": "The report named this domain or account in an operation at the time it was published. Domains change hands, and accounts can be reused or impersonated.",
 };
 
 // Short chip text and a sentence for one row, in the report's own terms.
 function stateLabel(h) {
+  if (h.basis === "designated") return { chip: `govt-designated: ${h.state}`, says: `${h.name}: ${h.designation}.` };
   if (h.basis === "public-broadcaster") return { chip: `public broadcaster: ${h.state}`, says: `A public broadcaster of ${h.state}, according to Wikidata: publicly owned or funded, with an editorial charter that varies by country.` };
   if (h.basis === "state-owned" && h.level === "regional") return { chip: `regional govt: ${h.state}`, says: `Owned or controlled by a regional or local government body in ${h.state}, according to Wikidata.` };
   if (h.basis === "state-owned") return { chip: `state-owned: ${h.state}`, says: `Owned or controlled by the state of ${h.state}, according to Wikidata.` };
@@ -1442,5 +1458,100 @@ function stateLabel(h) {
 return { setStateRows, stateLinksOfDomain, stateLinksOfHandle, stateSummary, STATE_DOES_NOT_PROVE, stateLabel };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state });
+// ---- trail.js
+const M_trail = (() => {
+// Source trails: where a post's material came from, and how it spread across the posts the user has
+// viewed. Downstream copies point upstream through data X itself records: a quote points to the
+// quoted post, lifted media points to the post it came from, a media id stays the same wherever
+// that exact upload is reposted, and a link's real address survives X's t.co shortener. Radar
+// follows those pointers back. It never guesses a source from wording or behaviour, and it cannot
+// see past the first upload (who filmed it, who paid for it).
+
+const TRAIL_RETAIN_DAYS = 30, TRAIL_MAX_ITEMS = 5000, TRAIL_MAX_POSTS = 40;
+const DAY = 86400000;
+
+// log: { media: { [mediaId]: Spread }, links: { [url]: Spread } }
+// Spread: { posts: [{ id, handle, at }] } sorted by time; `at` is the post time (ISO).
+function add(table, key, entry) {
+  const s = table[key] || { posts: [] };
+  if (!s.posts.some((p) => p.id === entry.id)) {
+    s.posts.push(entry);
+    s.posts.sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+    if (s.posts.length > TRAIL_MAX_POSTS) s.posts.length = TRAIL_MAX_POSTS;
+  }
+  s.seen = Date.now();
+  table[key] = s;
+}
+
+function prune(table, now) {
+  const keys = Object.keys(table).filter((k) => now - (table[k].seen || 0) <= TRAIL_RETAIN_DAYS * DAY).sort((a, b) => table[b].seen - table[a].seen);
+  return Object.fromEntries(keys.slice(0, TRAIL_MAX_ITEMS).map((k) => [k, table[k]]));
+}
+
+const mediaKey = (m) => (m.fromPost ? null : m.url || null);
+const normLink = (u) => { try { const x = new URL(u); x.hash = ""; for (const k of [...x.searchParams.keys()]) if (/^(utm_|fbclid|gclid|s$|t$|ref)/.test(k)) x.searchParams.delete(k); return x.toString().replace(/\/$/, ""); } catch { return null; } };
+
+// tweets: [{ id, author, posted, media, links }] as tweetsIn() returns them.
+function recordSpread(log, tweets, now = Date.now()) {
+  const L = { media: { ...((log && log.media) || {}) }, links: { ...((log && log.links) || {}) } };
+  for (const t of tweets) {
+    if (!t.author || !t.posted) continue;
+    const entry = { id: t.id, handle: t.author.toLowerCase(), at: t.posted };
+    for (const m of t.media || []) { const k = mediaKey(m); if (k) add(L.media, k, entry); }
+    for (const u of t.links || []) { const k = normLink(u); if (k) add(L.links, k, entry); }
+  }
+  return { media: prune(L.media, now), links: prune(L.links, now) };
+}
+
+// Who shared one upload or link: { posts, accounts, first, isFirst } for the given post.
+function spreadOf(s, postId) {
+  if (!s || !s.posts.length) return null;
+  const accounts = new Set(s.posts.map((p) => p.handle));
+  return { posts: s.posts.length, accounts: accounts.size, first: s.posts[0], isFirst: s.posts[0].id === postId, sharers: [...accounts].slice(0, 8) };
+}
+
+// The trail for one post: steps upstream, plus how its media and links spread.
+// tweets: Map id -> tweet, so quoted posts loaded on the page can be followed.
+function trailFor(t, tweets, log, maxHops = 4) {
+  if (!t) return null;
+  const steps = [];
+  let cur = t;
+  for (let hop = 0; cur && hop < maxHops; hop++) {
+    const up = cur.quotedId || cur.repostOf;
+    if (!up) break;
+    const next = tweets.get(up);
+    steps.push({ kind: cur.quotedId ? "quotes" : "reposts", id: up, handle: next && next.author, at: next && next.posted });
+    cur = next;
+  }
+  for (const m of t.media || []) {
+    if (m.fromPost) steps.push({ kind: "media from", id: m.fromPost, at: m.fromPostTime, handle: (tweets.get(m.fromPost) || {}).author });
+    steps.push({ kind: "uploaded", at: m.uploaded, type: m.type });
+  }
+  const media = (t.media || []).map((m) => spreadOf((log && log.media || {})[mediaKey(m) || ""], t.id)).filter(Boolean);
+  const links = (t.links || []).map((u) => ({ url: u, spread: spreadOf((log && log.links || {})[normLink(u) || ""], t.id) }));
+  return { steps, media, links };
+}
+
+// Upstream summary for a thread: which accounts and sites the replies' material leads back to.
+// items: [{ id }], tweets: Map. Returns { accounts: [{ handle, n }], domains: [{ domain, n }], uploads }.
+function upstream(items, tweets, log) {
+  const acc = new Map(), dom = new Map();
+  let uploads = 0, recycled = 0;
+  for (const it of items) {
+    const t = tweets.get(it.id);
+    if (!t) continue;
+    const tr = trailFor(t, tweets, log);
+    const top = [...tr.steps].reverse().find((s) => s.handle && s.handle.toLowerCase() !== String(t.author || "").toLowerCase());
+    if (top) acc.set(top.handle.toLowerCase(), (acc.get(top.handle.toLowerCase()) || 0) + 1);
+    for (const u of t.links || []) { try { const d = new URL(u).hostname.replace(/^www\./, ""); dom.set(d, (dom.get(d) || 0) + 1); } catch { /* skip */ } }
+    for (const m of tr.media) { uploads++; if (!m.isFirst && m.accounts >= 2) recycled++; }
+  }
+  const rank = (m) => [...m].map(([k, n]) => ({ k, n })).filter((x) => x.n >= 2).sort((a, b) => b.n - a.n).slice(0, 5);
+  return { accounts: rank(acc).map((x) => ({ handle: x.k, n: x.n })), domains: rank(dom).map((x) => ({ domain: x.k, n: x.n })), uploads, recycled };
+}
+
+return { TRAIL_RETAIN_DAYS, normLink, recordSpread, trailFor, upstream };
+})();
+
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state, ...M_trail });
 })();

@@ -111,13 +111,27 @@ export function tweetsIn(json) {
         note: v.birdwatch_pivot ? pick((v.birdwatch_pivot.subtitle || {}).text, v.birdwatch_pivot.shorttitle, v.birdwatch_pivot.title, "a Community Note is attached") : null,
         posted: Number.isFinite(Date.parse(L.created_at)) ? new Date(Date.parse(L.created_at)).toISOString() : null,
         media: mediaOf(L),
+        // the trail: who wrote it, what it quotes, reposts or answers, and where its links go
+        author: authorOf(v),
+        quotedId: L.quoted_status_id_str || pick((((v.quoted_status_result || {}).result) || {}).rest_id) || null,
+        repostOf: pick(((((L.retweeted_status_result || {}).result) || {}).rest_id)) || null,
+        replyTo: L.in_reply_to_status_id_str || null,
+        replyToHandle: L.in_reply_to_screen_name || null,
+        links: ((L.entities || {}).urls || []).map((u) => u.expanded_url).filter((u) => u && !/^https?:\/\/(x|twitter)\.com\//.test(u)),
         quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count),
       };
-      out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined)));
+      out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined && !(Array.isArray(x) && !x.length))));
     }
     for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
   }
   return [...out.values()];
+}
+
+// The author of a Tweet object, from its embedded user (legacy or core fields).
+function authorOf(v) {
+  const u = ((v.core || {}).user_results || {}).result;
+  if (!u) return null;
+  return pick((u.core || {}).screen_name, (u.legacy || {}).screen_name);
 }
 
 // X ids are "snowflakes": the top bits are milliseconds since 2010-11-04. A media id therefore

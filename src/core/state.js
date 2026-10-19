@@ -9,7 +9,7 @@
 let ROWS = [];
 const byDomain = new Map(), byHandle = new Map();
 
-// rows: [{ domain?, x?, state, basis: "state-owned" | "public-broadcaster" | "named-in-report", actor?, name, operation?, source: { title, url, date } }]
+// rows: [{ domain?, x?, state, basis: "state-owned" | "public-broadcaster" | "designated" | "named-in-report", actor?, name, operation?, source: { title, url, date } }]
 // actor (report rows): who the report says ran it: "government", "commercial firm" or
 // "individuals or group". `state` is where the report says the operation came from, which is not
 // the same as a government running it.
@@ -52,12 +52,14 @@ export function stateSummary(items) {
 
 export const STATE_DOES_NOT_PROVE = {
   "state-owned": "State ownership is not proof of disinformation. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
+  "designated": "A designation records one government's assessment and policy, not an independent finding. The domain is matched to the named outlet through Wikidata unless the document gives it.",
   "public-broadcaster": "Public broadcasters range from editorially independent to government-directed. Check the outlet's charter and record, not the label.",
   "named-in-report": "The report named this domain or account in an operation at the time it was published. Domains change hands, and accounts can be reused or impersonated.",
 };
 
 // Short chip text and a sentence for one row, in the report's own terms.
 export function stateLabel(h) {
+  if (h.basis === "designated") return { chip: `govt-designated: ${h.state}`, says: `${h.name}: ${h.designation}.` };
   if (h.basis === "public-broadcaster") return { chip: `public broadcaster: ${h.state}`, says: `A public broadcaster of ${h.state}, according to Wikidata: publicly owned or funded, with an editorial charter that varies by country.` };
   if (h.basis === "state-owned" && h.level === "regional") return { chip: `regional govt: ${h.state}`, says: `Owned or controlled by a regional or local government body in ${h.state}, according to Wikidata.` };
   if (h.basis === "state-owned") return { chip: `state-owned: ${h.state}`, says: `Owned or controlled by the state of ${h.state}, according to Wikidata.` };

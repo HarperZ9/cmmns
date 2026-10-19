@@ -42,6 +42,9 @@
     const old = PB.olderMedia(T);
     if (old.length) out.push({ label: `media from ${day(old[0].uploaded)}`, level: "warn", rows: [["What Radar sees", `This post was made ${day(T.posted)}, but its ${old[0].type === "photo" ? "image" : old[0].type} was first uploaded to X on ${day(old[0].uploaded)}, ${old[0].days} days earlier.`], ["Check it", "Open the card's media search links to find earlier copies, often with the real date and place."], dnp("An old upload can be honest, such as a labelled archive photo.")] });
     else if ((T.media || []).some((x) => x.fromPost)) out.push({ label: "media from another post", level: "flag", rows: [["What Radar sees", `The media was taken from an earlier post made ${day((T.media.find((x) => x.fromPost) || {}).fromPostTime)}.`], dnp("Sharing someone else's video with credit is normal.")] });
+    for (const sp of (m.trail && m.trail.media) || []) {
+      if (sp.accounts >= 3) { out.push({ label: `same upload, ${sp.accounts} accounts`, level: "flag", rows: [["What Radar sees", `This exact upload appears in ${sp.posts} posts by ${sp.accounts} accounts in what you have viewed, first posted by @${sp.first.handle} (${day(sp.first.at)}).`], ["Who", sp.sharers.map((h) => "@" + h).join(", ")], dnp("Popular videos get reposted widely by ordinary people. Many accounts on one upload shows spread, not who coordinated it.")] }); break; }
+    }
     if (T.note) out.push({ label: "Community Note", level: "flag", rows: [["Note", T.note], ["Source", "X loaded a Community Note for this post. Notes are written and rated by X users."]] });
     if (T.client && !PB.COMMON_CLIENTS.test(T.client)) out.push({ label: `via ${T.client}`, level: "flag", rows: [["Source", "The app this post was sent from, in the data X loaded. X no longer shows it."], ["What it is", "Scheduling tools, automation services and custom apps post this way."], dnp("News desks, brands and many people schedule posts with tools like these.")] });
     if (m.paid) out.push({ label: "ad", level: "flag", rows: [["Source", "X labels this an ad or promoted post: someone paid for it to reach you."]] });
@@ -55,7 +58,7 @@
     const hits = [...(m.domains || []).flatMap(PB.stateLinksOfDomain), ...PB.stateLinksOfHandle(m.handle)];
     for (const h of new Set(hits)) {
       const L = PB.stateLabel(h);
-      out.push({ label: L.chip, level: h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" ? "flag" : "info", rows: [["What it is", L.says], ["Source", `${h.name}: ${h.source.title}${h.source.date ? ` (${h.source.date})` : ""}`], ["Read it", { links: [[h.source.url.replace(/^https?:\/\//, "").slice(0, 48), h.source.url]] }], dnp(PB.STATE_DOES_NOT_PROVE[h.basis])] });
+      out.push({ label: L.chip, level: h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" || h.basis === "designated" ? "flag" : "info", rows: [["What it is", L.says], ["Source", `${h.source.title}${h.source.date ? ` (${h.source.date})` : ""}`], ["Read it", { links: [[h.source.url.replace(/^https?:\/\//, "").slice(0, 48), h.source.url]] }], h.domainSource ? ["Domain from", { links: [[h.domainSource.title, h.domainSource.url]] }] : null, dnp(PB.STATE_DOES_NOT_PROVE[h.basis])].filter(Boolean) });
     }
     for (const d of m.domains || []) {
       const o = PB.ownerOfDomain(d);

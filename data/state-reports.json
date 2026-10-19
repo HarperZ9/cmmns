@@ -11616,5 +11616,1709 @@
    "url": "https://transparency.meta.com/sr/Q2-2023-Adversarial-threat-report/",
    "date": "2023-08-29"
   }
+ },
+ {
+  "x": "peoplesaynews",
+  "state": "Russia",
+  "actor": "government",
+  "name": "People Say fictitious news brand",
+  "operation": "Report links the network to employees of RT, a Russian state-controlled media entity",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "x": "militarywave001",
+  "state": "Russia",
+  "actor": "government",
+  "name": "Military Wave fictitious news brand",
+  "operation": "Report links the network to employees of RT, a Russian state-controlled media entity",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "fox-news.in",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "unian.pm",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "jiraboom.pro",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "rbk-sourse.digital",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "lepoint.foo",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "leparisien.pm",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "polityka.pro",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "pravda-ua.rest",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "pravda-ua.space",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "fox-news.top",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger spoofed news or government domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "interventionist.us",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "cropmarketchronicles.us",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "grenzezank.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "kaputteampel.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "lexomnium.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "truthgate.us",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "warfareinsider.us",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "rrn.media",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "omnam.life",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "artichoc.io",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "lebelligerant.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "holylandherald.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "acrosstheline.press",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "derleitstern.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "derrattenfanger.net",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "mypride.press",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "ukrlm.info",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "allons-y.social",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "candidat.news",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "franceeteu.today",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "laterrasse.online",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "lavirgule.news",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "lesfrontieres.media",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "notrepays.today",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "50statesoflie.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "besuchszweck.org",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "electionwatch.live",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "honeymoney.info",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "liesofwallstreet.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "spicyconspiracy.info",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "uschina.press",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "wanderfalke.net",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger operation website or brand domain",
+  "operation": "Doppelganger",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2023",
+   "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report/",
+   "date": "2023-11"
+  }
+ },
+ {
+  "domain": "leparisien.top",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, First Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q1-2024-Adversarial-threat-report/",
+   "date": "2024-05-29"
+  }
+ },
+ {
+  "domain": "lepoint.wf",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, First Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q1-2024-Adversarial-threat-report/",
+   "date": "2024-05-29"
+  }
+ },
+ {
+  "domain": "welt.pm",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news domain, targets Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, First Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q1-2024-Adversarial-threat-report/",
+   "date": "2024-05-29"
+  }
+ },
+ {
+  "domain": "lastampa.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news domain, targets Italy",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, First Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q1-2024-Adversarial-threat-report/",
+   "date": "2024-05-29"
+  }
+ },
+ {
+  "domain": "repubblica.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news domain, targets Italy",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, First Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q1-2024-Adversarial-threat-report/",
+   "date": "2024-05-29"
+  }
+ },
+ {
+  "domain": "polskieradio.icu",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news domain, targets Poland",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, First Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q1-2024-Adversarial-threat-report/",
+   "date": "2024-05-29"
+  }
+ },
+ {
+  "domain": "closermag.eu",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "conspiracywatch.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "historia.fyi",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "lefigaro.foo",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "leparisien.wf",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "psychologies.top",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "scienceshumaines.sbs",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "thuriesmagazine.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets France",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "berliner-zeitung.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "bibelbund.cfd",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "geo.frl",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "herder.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "onmeda.click",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "psychologie-heute.eu",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "spektrum.cfd",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "zeit.cx",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "israeltoday.top",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Israel",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "lilith.day",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Israel",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "ciekawostkihistoryczne.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Poland",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "dzieckowpodrozy.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Poland",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "dzienniknaukowy.link",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Poland",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "mynaszlaku.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Poland",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "polityka.link",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Poland",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "polskieradio.cfd",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets Poland",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "beautynewsnyc.cfd",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "cosmopolitan.day",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States/Germany",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "eatingwell.cfd",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "ew.pe",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "forward.pw",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "graziamagazine.cfd",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "medicalhomeportal.boo",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "mensjournal.day",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "newyorker.bz",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "oah.icu",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "realsimple.sbs",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "slate.bz",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "wanttoknow.in",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger spoofed news or entertainment domain, targets States",
+  "operation": "Doppelganger (report attributes it to two Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "50statesoflie.so",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "artichoc.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "levinaigre.so",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "lexomnium.pw",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "rrn.so",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Global",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "holylandherald.pw",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Israel",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "ukrlm.so",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Ukraine",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "acrosstheline.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "honeymoney.to",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "mypride.pw",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "shadowwatch.co",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "truthgate.so",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "uschina.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "warfareinsider.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "grenzezank.to",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Germany",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "lebelligerant.online",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "lesifflet.online",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "derbayerischelowe.online",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Germany",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "holylandherald.online",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Israel",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "polemix.online",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Poland",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "laterrasse.io",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "lebelligerant.io",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "lesifflet.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "brennendefrage.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Germany",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "deintelligenz.io",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Germany",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "derleitstern.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Germany",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "derrattenfanger.io",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Germany",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "kaputteampel.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Germany",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "il-corrispondente.io",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Italy",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "alhiwar.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets East",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "polemix.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Poland",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "cropmarketchronicles.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "electionwatch.io",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "interventionist.cc",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "liesofwallstreet.io",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "spicyconspiracy.io",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "uschina.online",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets USA",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "la-sante.press",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "le-continent.press",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets France",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "hauynescherben.press",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Germany",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "omnam.media",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Israel",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "meisterurian.to",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Doppelganger domain listed as a latest brand or spoof, targets Germany",
+  "operation": "Doppelganger (report names Structura National Technology and Social Design Agency, Russian companies sanctioned by the EU in 2023 and by the US Treasury in 2024)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Third Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+   "date": "2024-12"
+  }
+ },
+ {
+  "domain": "yerli-media.org",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Fictitious news site targeting Georgia, Armenia and Azerbaijan",
+  "operation": "IMA Digital (Moscow-registered marketing firm)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "lurermedia.org",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Fictitious news site targeting Georgia, Armenia and Azerbaijan",
+  "operation": "IMA Digital (Moscow-registered marketing firm)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "sakartvelo-today.org",
+  "state": "Russia",
+  "actor": "commercial firm",
+  "name": "Fictitious news site targeting Georgia, Armenia and Azerbaijan",
+  "operation": "IMA Digital (Moscow-registered marketing firm)",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "euronewstop.co.uk",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Euro Top News / Newstop Afrique fictitious news site",
+  "operation": "Russia-based CIB network #2; no principal named",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "newstop.africa",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Euro Top News / Newstop Afrique fictitious news site",
+  "operation": "Russia-based CIB network #2; no principal named",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "x": "euronewstop",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Euro Top News / Newstop Afrique fictitious news brand",
+  "operation": "Russia-based CIB network #2; no principal named",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "x": "newstop_africa",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Euro Top News / Newstop Afrique fictitious news brand",
+  "operation": "Russia-based CIB network #2; no principal named",
+  "source": {
+   "title": "Meta's Adversarial Threat Report, Second Quarter 2024",
+   "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+   "date": "2024-08-15"
+  }
+ },
+ {
+  "domain": "rrn.media",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger branded website that published articles generated with OpenAI models",
+  "operation": "Doppelganger (OpenAI: accounts acting on behalf of the Russian influence operation known as Doppelganger)",
+  "source": {
+   "title": "AI and Covert Influence Operations: Latest Trends (OpenAI threat report, May 2024)",
+   "url": "https://cdn.openai.com/threat-intelligence-reports/threat-intel-report-may-2024.pdf",
+   "date": "2024-05-30"
+  }
+ },
+ {
+  "domain": "franceeteu.today",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger website that published French-language articles generated with OpenAI models",
+  "operation": "Doppelganger (OpenAI: accounts acting on behalf of the Russian influence operation known as Doppelganger)",
+  "source": {
+   "title": "AI and Covert Influence Operations: Latest Trends (OpenAI threat report, May 2024)",
+   "url": "https://cdn.openai.com/threat-intelligence-reports/threat-intel-report-may-2024.pdf",
+   "date": "2024-05-30"
+  }
+ },
+ {
+  "domain": "grenzezank.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Doppelganger website whose content was ingested to generate German posts",
+  "operation": "Doppelganger (OpenAI: accounts acting on behalf of the Russian influence operation known as Doppelganger)",
+  "source": {
+   "title": "AI and Covert Influence Operations: Latest Trends (OpenAI threat report, May 2024)",
+   "url": "https://cdn.openai.com/threat-intelligence-reports/threat-intel-report-may-2024.pdf",
+   "date": "2024-05-30"
+  }
+ },
+ {
+  "domain": "euronewstop.co.uk",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Stop News fictitious UK news website",
+  "operation": "Stop News (OpenAI: Russia-origin, consistent with an operation run by an unnamed marketing company)",
+  "source": {
+   "title": "Influence and cyber operations: an update (OpenAI threat report, October 2024)",
+   "url": "https://cdn.openai.com/threat-intelligence-reports/influence-and-cyber-operations-an-update_October-2024.pdf",
+   "date": "2024-10"
+  }
+ },
+ {
+  "domain": "britishtalks.com",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Stop News fictitious UK news website",
+  "operation": "Stop News (OpenAI: Russia-origin, consistent with an operation run by an unnamed marketing company)",
+  "source": {
+   "title": "Influence and cyber operations: an update (OpenAI threat report, October 2024)",
+   "url": "https://cdn.openai.com/threat-intelligence-reports/influence-and-cyber-operations-an-update_October-2024.pdf",
+   "date": "2024-10"
+  }
+ },
+ {
+  "domain": "newstop.africa",
+  "state": "Russia",
+  "actor": "individuals or group",
+  "name": "Stop News Africa-focused website (Newstop Africa)",
+  "operation": "Stop News recidivist activity (OpenAI: Russia-origin, consistent with an operation run by an unnamed marketing company)",
+  "source": {
+   "title": "Disrupting malicious uses of AI: October 2025 (OpenAI threat report)",
+   "url": "https://cdn.openai.com/threat-intelligence-reports/7d662b68-952f-4dfd-a2f2-fe55b041cc4a/disrupting-malicious-uses-of-ai-october-2025.pdf",
+   "date": "2025-10"
+  }
  }
 ]

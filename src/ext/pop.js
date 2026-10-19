@@ -31,7 +31,7 @@
     const p = el("div", "pb-pop");
     p.setAttribute("role", "dialog");
     for (const s of sections) {
-      if (!(s.rows || []).some(([, t]) => t) && !(s.signals || []).length && !s.foot) continue;
+      if (!(s.rows || []).some(([, t]) => t) && !(s.signals || []).length && !(s.foot && !s.title)) continue;
       const sec = el("section", "pb-sec");
       if (s.title) sec.append(el("h3", "pb-sec-h", s.title));
       for (const [h, t] of s.rows || []) renderRow(sec, h, t);

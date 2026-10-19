@@ -96,3 +96,15 @@ test("media upload dates from X ids, and media lifted from an earlier post", asy
   const fresh = { ...t, media: [{ ...t.media[0], uploaded: "2026-10-18T08:40:00.000Z" }] };
   assert.equal(olderMedia(fresh).length, 0);
 });
+
+test("trail fields: author, quoted post, repost, reply and real link addresses", async () => {
+  const { tweetsIn } = await import("../src/core/xdata.js");
+  const json = { __typename: "Tweet", rest_id: "5", core: { user_results: { result: { __typename: "User", core: { screen_name: "relay" } } } },
+    legacy: { created_at: "Sat Oct 18 08:44:00 +0000 2026", quoted_status_id_str: "4", in_reply_to_status_id_str: "3", in_reply_to_screen_name: "root",
+      entities: { urls: [{ expanded_url: "https://news.example/story" }, { expanded_url: "https://x.com/someone/status/1" }] } } };
+  const t = tweetsIn(json).find((x) => x.id === "5");
+  assert.equal(t.author, "relay");
+  assert.equal(t.quotedId, "4");
+  assert.equal(t.replyTo, "3");
+  assert.deepEqual(t.links, ["https://news.example/story"]);
+});

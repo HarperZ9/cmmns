@@ -96,3 +96,11 @@ Known gaps:
 - EU sanctions name RT and Sputnik without giving domains.
 
 `data/state-reports.README.md` lists every document, the exclusions and the judgment calls.
+
+### Source trails and designations (2026-10-18, later)
+
+**Source trails** (`src/core/trail.js`) follow a post upstream through pointers X itself records: the post it quotes or reposts, the earlier post its media was lifted from, the media's first upload time (from the media id), and the real address behind each t.co link. Radar keeps a 30-day local log of which posts carried each upload and link, so the card can say "in 6 posts by 5 accounts you have seen; first by @x at 01:00 UTC". The panel's Upstream section counts which accounts and sites a thread's material leads back to. The trail stops at the first upload: who filmed it, and who paid for it, is not in the data.
+
+**Designations** (`data/state-designations.json`): official documents in which a government or the EU classifies a named outlet as state-controlled. These are the US State Department's foreign-mission designations (China 2020, Russia 2024), EU Annex XV broadcasting suspensions, UK sanctions, US Treasury (OFAC) on IRIB, and the EU on Belteleradio. They name outlets and rarely give domains. `scripts/designations-match.mjs` maps a name to its official sites only on an exact Wikidata label or alias match in the same country, and each row cites the designation and the Wikidata match separately. The chip reads "govt-designated", and its does-not-prove line says a designation records one government's assessment, not an independent finding.
+
+**Verification.** `scripts/verify-reports.mjs` checks every report row and every designated outlet name against its cited document. It falls back to curl, the EUR-Lex PDF route and Internet Archive copies when a host blocks scripted readers. On 2026-10-18 it found 1,171 of 1,171.

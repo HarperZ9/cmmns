@@ -1,0 +1,378 @@
+{
+ "Xinhua News Agency": [
+  {
+   "domain": "xinhuanet.com",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "news.cn",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "xinhua.org",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "arabic.news.cn",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "chinaview.cn",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "french.news.cn",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "german.xinhuanet.com",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "jp.xinhuanet.com",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "kr.xinhuanet.com",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "russian.news.cn",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "spanish.news.cn",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  },
+  {
+   "domain": "english.news.cn",
+   "item": "https://www.wikidata.org/entity/Q204839",
+   "label": "Xinhua News Agency"
+  }
+ ],
+ "China Global Television Network": [
+  {
+   "domain": "cgtn.com",
+   "item": "https://www.wikidata.org/entity/Q28089296",
+   "label": "China Global Television Network"
+  }
+ ],
+ "China Radio International": [
+  {
+   "domain": "cri.cn",
+   "item": "https://www.wikidata.org/entity/Q375117",
+   "label": "China Radio International"
+  },
+  {
+   "domain": "big5.cri.cn",
+   "item": "https://www.wikidata.org/entity/Q375117",
+   "label": "China Radio International"
+  }
+ ],
+ "China Daily Distribution Corporation": [],
+ "Hai Tian Development USA": [],
+ "China Central Television": [
+  {
+   "domain": "cctv.com",
+   "item": "https://www.wikidata.org/entity/Q207936",
+   "label": "China Central Television"
+  },
+  {
+   "domain": "big5.cctv.com",
+   "item": "https://www.wikidata.org/entity/Q207936",
+   "label": "China Central Television"
+  },
+  {
+   "domain": "english.cctv.com",
+   "item": "https://www.wikidata.org/entity/Q207936",
+   "label": "China Central Television"
+  },
+  {
+   "domain": "mn.cctv.com",
+   "item": "https://www.wikidata.org/entity/Q207936",
+   "label": "China Central Television"
+  },
+  {
+   "domain": "mongol.cctv.com",
+   "item": "https://www.wikidata.org/entity/Q207936",
+   "label": "China Central Television"
+  }
+ ],
+ "China News Service": [
+  {
+   "domain": "chinanews.com.cn",
+   "item": "https://www.wikidata.org/entity/Q969272",
+   "label": "China News Service"
+  },
+  {
+   "domain": "ecns.cn",
+   "item": "https://www.wikidata.org/entity/Q969272",
+   "label": "China News Service"
+  },
+  {
+   "domain": "chine-info.com",
+   "item": "https://www.wikidata.org/entity/Q969272",
+   "label": "China News Service"
+  }
+ ],
+ "People’s Daily": [
+  {
+   "domain": "en.people.cn",
+   "item": "https://www.wikidata.org/entity/Q54340",
+   "label": "People's Daily"
+  },
+  {
+   "domain": "spanish.people.com.cn",
+   "item": "https://www.wikidata.org/entity/Q54340",
+   "label": "People's Daily"
+  },
+  {
+   "domain": "people.com.cn",
+   "item": "https://www.wikidata.org/entity/Q54340",
+   "label": "People's Daily"
+  },
+  {
+   "domain": "paper.people.com.cn",
+   "item": "https://www.wikidata.org/entity/Q54340",
+   "label": "People's Daily"
+  },
+  {
+   "domain": "peoplesdaily.pdnews.cn",
+   "item": "https://www.wikidata.org/entity/Q54340",
+   "label": "People's Daily"
+  },
+  {
+   "domain": "haiwainet.cn",
+   "item": "https://www.wikidata.org/entity/Q54340",
+   "label": "People's Daily"
+  }
+ ],
+ "Global Times": [
+  {
+   "domain": "globaltimes.cn",
+   "item": "https://www.wikidata.org/entity/Q970443",
+   "label": "Global Times"
+  },
+  {
+   "domain": "huanqiu.com",
+   "item": "https://www.wikidata.org/entity/Q970443",
+   "label": "Global Times"
+  }
+ ],
+ "Yicai Global": [],
+ "Jiefang Daily": [
+  {
+   "domain": "jfdaily.com",
+   "item": "https://www.wikidata.org/entity/Q1518038",
+   "label": "Jiefang Daily"
+  }
+ ],
+ "Xinmin Evening News": [
+  {
+   "domain": "xinmin.cn",
+   "item": "https://www.wikidata.org/entity/Q1636471",
+   "label": "Xinmin Evening News"
+  }
+ ],
+ "Social Sciences in China Press": [],
+ "Beijing Review": [
+  {
+   "domain": "bjinformation.com",
+   "item": "https://www.wikidata.org/entity/Q497493",
+   "label": "Beijing Review"
+  },
+  {
+   "domain": "bjreview.com",
+   "item": "https://www.wikidata.org/entity/Q497493",
+   "label": "Beijing Review"
+  },
+  {
+   "domain": "german.beijingreview.com.cn",
+   "item": "https://www.wikidata.org/entity/Q497493",
+   "label": "Beijing Review"
+  },
+  {
+   "domain": "beijingreview.com.cn",
+   "item": "https://www.wikidata.org/entity/Q497493",
+   "label": "Beijing Review"
+  },
+  {
+   "domain": "japanese.beijingreview.com.cn",
+   "item": "https://www.wikidata.org/entity/Q497493",
+   "label": "Beijing Review"
+  }
+ ],
+ "Economic Daily": [
+  {
+   "domain": "ce.cn",
+   "item": "https://www.wikidata.org/entity/Q15900092",
+   "label": "Economic Daily"
+  }
+ ],
+ "Rossiya Segodnya": [
+  {
+   "domain": "rt.com",
+   "item": "https://www.wikidata.org/entity/Q22868",
+   "label": "RT"
+  },
+  {
+   "domain": "rossiyasegodnya.com",
+   "item": "https://www.wikidata.org/entity/Q15294742",
+   "label": "Rossiya Segodnya"
+  },
+  {
+   "domain": "xn--c1acbl2abdlkab1og.xn--p1ai",
+   "item": "https://www.wikidata.org/entity/Q15294742",
+   "label": "Rossiya Segodnya"
+  },
+  {
+   "domain": "jinrieluosi.cn",
+   "item": "https://www.wikidata.org/entity/Q15294742",
+   "label": "Rossiya Segodnya"
+  }
+ ],
+ "RIA Novosti": [
+  {
+   "domain": "ria.ru",
+   "item": "https://www.wikidata.org/entity/Q821172",
+   "label": "RIA Novosti"
+  }
+ ],
+ "RT": [],
+ "TV-Novosti": [],
+ "Ruptly": [],
+ "Sputnik": [
+  {
+   "domain": "sputnikglobe.com",
+   "item": "https://www.wikidata.org/entity/Q18572033",
+   "label": "Sputnik"
+  }
+ ],
+ "RT- Russia Today English": [],
+ "RT- Russia Today UK": [],
+ "RT - Russia Today Germany": [],
+ "RT - Russia Today France": [],
+ "RT- Russia Today Spanish": [],
+ "Rossiya RTR / RTR Planeta": [
+  {
+   "domain": "rtr-planeta.com",
+   "item": "https://www.wikidata.org/entity/Q1490835",
+   "label": "RTR-Planeta"
+  }
+ ],
+ "Rossiya 24 / Russia 24": [
+  {
+   "domain": "vesti.ru",
+   "item": "https://www.wikidata.org/entity/Q628101",
+   "label": "Russia-24"
+  }
+ ],
+ "TV Centre International": [],
+ "NTV/NTV Mir": [
+  {
+   "domain": "ntv.ru",
+   "item": "https://www.wikidata.org/entity/Q574625",
+   "label": "NTV"
+  },
+  {
+   "domain": "ntvmir.ntv.ru",
+   "item": "https://www.wikidata.org/entity/Q4310801",
+   "label": "NTV Mir"
+  }
+ ],
+ "Rossiya 1": [
+  {
+   "domain": "smotrim.ru",
+   "item": "https://www.wikidata.org/entity/Q211511",
+   "label": "Russia-1"
+  },
+  {
+   "domain": "russia.tv",
+   "item": "https://www.wikidata.org/entity/Q211511",
+   "label": "Russia-1"
+  }
+ ],
+ "REN TV": [
+  {
+   "domain": "ren.tv",
+   "item": "https://www.wikidata.org/entity/Q1479649",
+   "label": "REN TV"
+  },
+  {
+   "domain": "televizorus.tv",
+   "item": "https://www.wikidata.org/entity/Q1479649",
+   "label": "REN TV"
+  }
+ ],
+ "Pervyi Kanal": [
+  {
+   "domain": "1tv.ru",
+   "item": "https://www.wikidata.org/entity/Q330067",
+   "label": "Channel One Russia"
+  },
+  {
+   "domain": "1tv.com",
+   "item": "https://www.wikidata.org/entity/Q330067",
+   "label": "Channel One Russia"
+  },
+  {
+   "domain": "ortv.ru",
+   "item": "https://www.wikidata.org/entity/Q330067",
+   "label": "Channel One Russia"
+  }
+ ],
+ "RT Arabic": [
+  {
+   "domain": "arabic.rt.com",
+   "item": "https://www.wikidata.org/entity/Q2988616",
+   "label": "RT Arabic"
+  }
+ ],
+ "Sputnik Arabic": [],
+ "RT Balkan": [],
+ "Oriental Review": [],
+ "Tsargrad": [],
+ "New Eastern Outlook": [
+  {
+   "domain": "journal-neo.su",
+   "item": "https://www.wikidata.org/entity/Q111982850",
+   "label": "New Eastern Outlook"
+  }
+ ],
+ "Katehon": [],
+ "Voice of Europe": [],
+ "Izvestija": [
+  {
+   "domain": "izvestia.ru",
+   "item": "https://www.wikidata.org/entity/Q753932",
+   "label": "Izvestia"
+  },
+  {
+   "domain": "iz.ru",
+   "item": "https://www.wikidata.org/entity/Q86674888",
+   "label": "Izvestia"
+  }
+ ],
+ "Rossiiskaja Gazeta": [],
+ "Islamic Republic of Iran Broadcasting": [
+  {
+   "domain": "irib.ir",
+   "item": "https://www.wikidata.org/entity/Q1674127",
+   "label": "Islamic Republic of Iran Broadcasting"
+  }
+ ],
+ "Iranian Islamic Radio and Television Union": [],
+ "International Union of Virtual Media": [],
+ "Belteleradio Company": []
+}

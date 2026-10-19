@@ -64,6 +64,12 @@
       stats.paused ? "X is limiting requests; Radar paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
     ]);
     section(p, "Coordination", coordination(report, clusters));
+    const U = report.upstream;
+    section(p, "Upstream", U ? [
+      U.accounts.length ? "Replies quote or lift media from: " + U.accounts.map((a) => `@${a.handle} (${a.n})`).join(", ") + "." : null,
+      U.domains.length ? "Most-linked sites: " + U.domains.map((d) => `${d.domain} (${d.n})`).join(", ") + "." : null,
+      U.recycled ? `${U.recycled} of ${U.uploads} uploads here were first posted by another account.` : null,
+    ] : []);
     section(p, "Sources and media", sources(report, stats.video, stats.pushed));
     const acts = el("div", "pb-actions");
     if (!stats.scanning && !stats.paused && stats.pending) acts.append(button(`Read ${Math.min(stats.pending, 200)} accounts`, "Reads each account's profile and About page in one minimised window.", onLookupAll));

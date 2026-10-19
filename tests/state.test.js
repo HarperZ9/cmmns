@@ -41,7 +41,8 @@ test("shipped state.json: every row is sourced and well formed", async () => {
   for (const r of t.rows) {
     assert.ok(r.domain || r.x, JSON.stringify(r));
     assert.ok(r.state && r.name && r.source && /^https:\/\//.test(r.source.url) && r.source.title && r.source.date, JSON.stringify(r));
-    assert.ok(["state-owned", "public-broadcaster", "named-in-report"].includes(r.basis), r.basis);
+    assert.ok(["state-owned", "public-broadcaster", "designated", "named-in-report"].includes(r.basis), r.basis);
+    if (r.basis === "designated") assert.ok(r.designation, JSON.stringify(r));
     if (r.basis === "named-in-report") assert.ok(["government", "commercial firm", "individuals or group"].includes(r.actor), JSON.stringify(r));
   }
   // one spelling per country

@@ -61,6 +61,29 @@
     return rows;
   }
 
+  // The source trail: upstream pointers X records, then how the upload and links spread.
+  const when = (iso) => (iso ? iso.slice(0, 16).replace("T", " ") : "time unknown");
+  const open = (id) => ({ links: [["open post", `https://x.com/i/status/${id}`]] });
+  function trail(m) {
+    const T = m.trail;
+    if (!T) return [];
+    const rows = [];
+    for (const st of T.steps) {
+      if (st.kind === "uploaded") { rows.push(["Upload", `${st.type === "photo" ? "image" : st.type || "media"} first uploaded ${when(st.at)} UTC`]); continue; }
+      rows.push([st.kind === "quotes" ? "Quotes" : st.kind === "reposts" ? "Reposts" : "Media from", `${st.handle ? "@" + st.handle : "a post"}, ${when(st.at)} UTC`]);
+      rows.push(["", open(st.id)]);
+    }
+    for (const sp of T.media) {
+      rows.push(["This upload", sp.isFirst ? `first seen here; ${sp.posts} post${sp.posts === 1 ? "" : "s"} by ${sp.accounts} account${sp.accounts === 1 ? "" : "s"} carry it` : `in ${sp.posts} posts by ${sp.accounts} accounts you have seen; first by @${sp.first.handle} at ${when(sp.first.at)} UTC`]);
+      if (!sp.isFirst) rows.push(["", open(sp.first.id)]);
+    }
+    for (const l of T.links) {
+      let d = l.url; try { d = new URL(l.url).hostname.replace(/^www\./, ""); } catch { /* keep */ }
+      rows.push(["Link", l.spread && l.spread.posts > 1 ? `${d}: in ${l.spread.posts} posts by ${l.spread.accounts} accounts; first by @${l.spread.first.handle}` : d]);
+    }
+    return rows;
+  }
+
   function history(m) {
     const A = m.activity;
     if (!A || !A.threads) return [];
@@ -86,6 +109,7 @@
       { title: "Signals", signals, rows: signals.length ? [] : [[null, { note: "Nothing stands out in what the site shows." }]] },
       { title: "Where", rows: where(m) },
       { title: "This post", rows: post(m) },
+      { title: "Source trail", rows: trail(m), foot: m.trail && (m.trail.steps.length || m.trail.media.length) ? "Followed through pointers X records: quotes, reposts, lifted media and upload ids. It stops at the first upload." : null },
       { title: "Account", rows: account(m) },
       { title: "In your history", rows: history(m) },
       { foot: "Radar does not show or guess demographics. Data stays in this browser." },
