@@ -14,6 +14,8 @@
     id: "x", name: "X", hasLocation: true,
     match: () => /(^|\.)(x|twitter)\.com$/.test(location.hostname),
     onThread: () => /^\/[A-Za-z0-9_]{1,15}\/status\/\d+/.test(location.pathname),
+    // Timelines, profiles, likes, lists and search: any other page that shows posts.
+    onFeed: () => !/^\/(?:settings|messages|i\/(?:flow|keyboard_shortcuts|display))/.test(location.pathname),
     items: () => [...document.querySelectorAll('article[data-testid="tweet"]')],
     read(node) {
       const nameBox = node.querySelector('[data-testid="User-Name"]');

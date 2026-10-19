@@ -1251,5 +1251,94 @@ function ytCommentAuthors(json) {
 return { ytVideoInfo, ytCommentAuthors };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata });
+// ---- timing.js
+const M_timing = (() => {
+// Timing bursts: several different accounts replying within a few seconds of each other, more
+// tightly than the thread's own pace would explain. A busy thread gets many replies a minute by
+// chance, so a burst only counts when a Poisson model at the thread's average rate makes it very
+// unlikely (P below MAX_P). Scheduled or coordinated posting shows up this way; so can a post
+// going viral at one moment, which is why this is a sign to look at, not a finding.
+
+const WINDOW_SEC = 20, MIN_ACCOUNTS = 3, MAX_P = 0.001;
+
+// P(X >= k) for X ~ Poisson(lambda).
+function poissonTail(k, lambda) {
+  if (k <= 0) return 1;
+  let term = Math.exp(-lambda), cdf = term;
+  for (let i = 1; i < k; i++) { term *= lambda / i; cdf += term; }
+  return Math.max(0, 1 - cdf);
+}
+
+// rows: [{ author, posted }]. Returns [{ from, to, authors, p }], tightest first, not overlapping.
+function timingBursts(rows, windowSec = WINDOW_SEC, minAccounts = MIN_ACCOUNTS) {
+  const pts = rows.map((r) => ({ a: String(r.author).toLowerCase(), t: Date.parse(r.posted) })).filter((x) => Number.isFinite(x.t)).sort((x, y) => x.t - y.t);
+  if (pts.length < minAccounts + 2) return [];
+  const span = (pts[pts.length - 1].t - pts[0].t) / 1000;
+  if (span <= windowSec) return [];
+  // Windows are tested at every reply, so correct for the number of starting points (Bonferroni).
+  const lambda = (pts.length * windowSec) / span, tests = pts.length;
+  const found = [];
+  for (let i = 0; i < pts.length; i++) {
+    let j = i;
+    while (j + 1 < pts.length && pts[j + 1].t - pts[i].t <= windowSec * 1000) j++;
+    const authors = [...new Set(pts.slice(i, j + 1).map((x) => x.a))];
+    if (authors.length < minAccounts) continue;
+    const p = Math.min(1, poissonTail(authors.length, lambda) * tests);
+    if (p < MAX_P) found.push({ from: new Date(pts[i].t).toISOString(), to: new Date(pts[j].t).toISOString(), authors, p, end: j });
+  }
+  found.sort((x, y) => x.p - y.p);
+  const used = new Set(), out = [];
+  for (const b of found) {
+    if (b.authors.some((a) => used.has(a))) continue;
+    b.authors.forEach((a) => used.add(a));
+    delete b.end;
+    out.push(b);
+  }
+  return out;
+}
+
+return { WINDOW_SEC, poissonTail, timingBursts };
+})();
+
+// ---- langs.js
+const M_langs = (() => {
+// Main languages per country, to decide whether "written in X" is worth a chip. A French reply
+// from an account based in France says nothing new; a Russian reply from an account based in
+// France might. Only widely spoken national and official languages are listed. A language or
+// country missing here keeps the chip, so gaps add noise, never hide anything.
+
+const SPOKEN = {
+  French: "France Belgium Switzerland Canada Luxembourg Monaco Senegal Ivory Coast Côte d'Ivoire Cameroon Mali Burkina Faso Niger Guinea Benin Togo Gabon Congo Democratic Republic of the Congo Madagascar Haiti Tunisia Algeria Morocco Lebanon Chad Rwanda Burundi Djibouti",
+  English: "United States United Kingdom Ireland Canada Australia New Zealand India Pakistan Nigeria Kenya Ghana South Africa Singapore Philippines Malta Jamaica Uganda Zambia Zimbabwe",
+  German: "Germany Austria Switzerland Luxembourg Liechtenstein Belgium",
+  Spanish: "Spain Mexico Argentina Colombia Chile Peru Venezuela Ecuador Bolivia Uruguay Paraguay Cuba Dominican Republic Guatemala Honduras El Salvador Nicaragua Costa Rica Panama Puerto Rico United States Equatorial Guinea",
+  Portuguese: "Portugal Brazil Angola Mozambique Cape Verde Guinea-Bissau",
+  Italian: "Italy Switzerland San Marino",
+  Dutch: "Netherlands Belgium Suriname",
+  Arabic: "Saudi Arabia Egypt United Arab Emirates Qatar Kuwait Bahrain Oman Yemen Iraq Syria Jordan Lebanon Palestine Libya Tunisia Algeria Morocco Sudan Mauritania Israel",
+  Russian: "Russia Belarus Kazakhstan Kyrgyzstan Ukraine Moldova Latvia Estonia",
+  Ukrainian: "Ukraine", Polish: "Poland", Czech: "Czechia Czech Republic", Slovak: "Slovakia", Hungarian: "Hungary Romania Slovakia",
+  Romanian: "Romania Moldova", Bulgarian: "Bulgaria", Greek: "Greece Cyprus", Turkish: "Turkey Türkiye Cyprus",
+  Swedish: "Sweden Finland", Norwegian: "Norway", Danish: "Denmark", Finnish: "Finland", Icelandic: "Iceland",
+  Lithuanian: "Lithuania", Latvian: "Latvia", Estonian: "Estonia", Serbian: "Serbia Bosnia and Herzegovina Montenegro", Croatian: "Croatia Bosnia and Herzegovina",
+  Slovenian: "Slovenia", Albanian: "Albania Kosovo North Macedonia", Hebrew: "Israel", Persian: "Iran Afghanistan", Urdu: "Pakistan India",
+  Hindi: "India", Bengali: "Bangladesh India", Japanese: "Japan", Korean: "South Korea North Korea", Chinese: "China Taiwan Hong Kong Singapore Macau",
+  Thai: "Thailand", Vietnamese: "Vietnam", Indonesian: "Indonesia", Malay: "Malaysia Brunei Singapore", Tagalog: "Philippines", Filipino: "Philippines",
+  Catalan: "Spain Andorra", Basque: "Spain", Welsh: "United Kingdom", Irish: "Ireland", Armenian: "Armenia", Georgian: "Georgia", Azerbaijani: "Azerbaijan",
+};
+
+const MAP = new Map(Object.entries(SPOKEN).map(([lang, list]) => [lang.toLowerCase(), list.toLowerCase()]));
+
+// True when `language` is a main language of `country`; null when either is unknown.
+function languageFits(language, country) {
+  const list = MAP.get(String(language || "").trim().toLowerCase());
+  const c = String(country || "").trim().toLowerCase();
+  if (!list || !c) return null;
+  return (" " + list + " ").includes(" " + c + " ");
+}
+
+return { languageFits };
+})();
+
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs });
 })();

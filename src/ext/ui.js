@@ -9,6 +9,7 @@
     "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name", "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere", "high-volume": "posts at a very high rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute", "copied-elsewhere": "same words in other threads", "follow-pattern": "follows many, few follow back",
   };
 
+  const WEAK = new Set(["default-handle", "follow-pattern"]);
   const STRONG = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
   const MEANING = {
     slur: "A slur, dog whistle or coined term with a documented hateful meaning (ADL Hate Symbols database, Hatebase, GNET, ISD).",
@@ -122,7 +123,9 @@
     else if (M && M.machineLike) bar.append(chip("machine-writing signs", "pb-flag", [["Signs", M.signs.join("; ")], ["How Radar decides", "Three or more independent signs in a reply of at least 25 words, using Articulate's word lists."], ["What it does not prove", "No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often. Treat this as a hint."]]));
     if (M && M.spam) bar.append(chip("spam pattern", "pb-warn", [["In this comment", `"${M.spam}"`], ["What it is", "A pattern common in scam and spam replies: giveaways, crypto, contact bait."]]));
     if (model.xSpam) bar.append(chip("X: probable spam", "pb-warn", [["Source", "X itself filed this reply under its \"Probable spam\" heading."], ["What it does not prove", "X's spam filter makes mistakes in both directions."]]));
-    if (model.writtenIn) bar.append(chip(`written in ${model.writtenIn}`, "pb-flag", [["Source", `X translated this reply from ${model.writtenIn}.`], ["Account based in", (model.reading && model.reading.basedIn) || "not known yet"], ["What it does not prove", "People write in many languages, including ones from where they grew up."]]));
+    // Only when the language is not a main language of where the account is labelled as based.
+    const place = model.reading && model.reading.basedIn && (PB.parseLabel(model.reading.basedIn) || {}).country;
+    if (model.writtenIn && PB.languageFits(model.writtenIn, place) !== true) bar.append(chip(`written in ${model.writtenIn}`, "pb-flag", [["Source", `X translated this reply from ${model.writtenIn}.`], ["Account based in", (model.reading && model.reading.basedIn) || "not known yet"], ["What it does not prove", "People write in many languages, including ones from where they grew up."]]));
     if (model.paid) bar.append(chip("ad (X label)", "pb-flag", [["Source", "X labels this post as an ad or promoted post: someone paid for it to reach you."]]));
     for (const d of model.domains || []) {
       const o = PB.ownerOfDomain(d);
@@ -130,7 +133,8 @@
       bar.append(chip(`link: ${o.name}`, "pb-place", [["Outlet", `${o.name} (${d})`], ["Owned by", o.owner], ["Source", `Wikidata: ${o.source}`], ["What it does not prove", "Ownership is not editorial control, and Wikidata can lag a sale."]]));
     }
     bar.append(...PBRows.chips(model, chip));
-    for (const f of model.flags || []) {
+    // Weak signals stay inside the account card; only the stronger ones get a chip.
+    for (const f of (model.flags || []).filter((x) => !WEAK.has(x.id))) {
       bar.append(chip(FLAG_LABEL[f.id] || f.id, f.id === "based-elsewhere" ? "pb-warn" : "pb-flag", [
         ["Evidence", f.evidence], ["What it does not prove", f.doesNotProve],
       ]));
@@ -177,6 +181,7 @@
       p.append(el("p", "pb-num", `${report.joinBurst.n} of ${report.joinBurst.of} looked-up accounts joined within the same two weeks (${report.joinBurst.from} to ${report.joinBurst.to}).`));
     }
     if (report.machine && report.machine.n) p.append(el("p", "pb-num", `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text (a hint, not a finding).`));
+    for (const b of (report.bursts || []).slice(0, 3)) p.append(el("p", "pb-num", `${b.authors.length} accounts replied within ${Math.max(1, Math.round((Date.parse(b.to) - Date.parse(b.from)) / 1000))} s (${b.from.slice(11, 19)} UTC): ${b.authors.slice(0, 6).map((a) => "@" + a).join(", ")}. At this thread's pace that happens by chance with p ≈ ${b.p < 1e-6 ? "<0.000001" : b.p.toPrecision(2)}.`));
     if (report.groups && report.groups.length) p.append(el("p", "pb-num", "Seen together before, in other threads you viewed: " + report.groups.slice(0, 4).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "."));
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
     for (const [h, t] of PBRows.panelLines(stats.video, stats.pushed)) p.append(el("p", "pb-num", `${h}: ${t}`));
@@ -191,6 +196,13 @@
       b.title = "Reads each account's public profile and About page in one minimised window. Radar's toolbar button does the same.";
       b.addEventListener("click", onLookupAll);
       p.append(b);
+    }
+    if (stats.onExport) {
+      const x = el("button", "pb-chip", "Save this report (JSON)");
+      x.type = "button";
+      x.title = "Saves the thread report, each account's labels and flags, and their sources to a file on this computer. Nothing is uploaded.";
+      x.addEventListener("click", stats.onExport);
+      p.append(x);
     }
     if (stats.onClearHistory) {
       const c = el("button", "pb-chip", "Clear Radar's thread history");

@@ -51,38 +51,69 @@
     chrome.storage.local.remove(NET_KEY).then(refresh).catch((e) => console.error("[radar] could not clear the connections log", e));
   }
 
+  // A local file the user can keep or share: the report, per-account labels and flags with what
+  // each does not prove, and where the data came from. Reply text is left out.
+  function exportReport(site, report, clusters, rows, video, pushed) {
+    const out = {
+      tool: "Radar " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), page: location.href, site: site.name,
+      report, video, pushedLinks: pushed,
+      sameTextGroups: clusters.map((c) => ({ size: c.ids.length, authors: c.authors })),
+      accounts: rows.map((r) => ({ handle: r.author, basedIn: r.basedIn || null, joinDate: r.joinDate || null, machineSigns: r.machine, flags: (r.flags || []).map((f) => ({ id: f.id, evidence: f.evidence, doesNotProve: f.doesNotProve })) })),
+      doesNotProve: PB.REPORT_DOES_NOT_PROVE,
+    };
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" }));
+    a.download = `radar-${site.id}-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }
+
+  function removePanel() { const p = document.getElementById("pb-panel"); if (p) p.remove(); }
+
+  // X's translation is X's wording, not the author's, so machine-writing signs are not read from
+  // it (its dashes and stock phrasing would count against the author). Leaks and spam still are.
+  function machineOf(r) {
+    const m = PB.machineSigns(r.text);
+    return r.writtenIn && !m.leak ? { ...m, signs: [], machineLike: false, translated: true } : m;
+  }
+
   async function refresh() {
     const site = PBSites.current();
-    if (!site || !site.onThread()) { const p = document.getElementById("pb-panel"); if (p) p.remove(); return; }
+    // Feed mode (timelines, profiles, likes, search): badges on every post, no thread report and
+    // nothing added to the connections log, because a feed is not a conversation.
+    const feed = !!site && !site.onThread() && !!(site.onFeed && site.onFeed());
+    if (!site || (!site.onThread() && !feed)) { removePanel(); return; }
     const items = site.items().map((n) => site.read(n)).filter(Boolean);
     if (!items.length) return;
-    const [root, replies] = site.hasLocation ? [items[0], items.slice(1)] : [null, items];
+    const [root, replies] = !feed && site.hasLocation ? [items[0], items.slice(1)] : [null, items];
     await ensureOwners(items);
     const threadKey = site.id + ":" + location.pathname;
-    if (replies.length) recordNet(threadKey, replies, root);
+    if (!feed && replies.length) recordNet(threadKey, replies, root);
     const cache = site.hasLocation ? await PBStore.all() : {};
-    const clusters = PB.duplicateClusters(replies);
+    const clusters = feed ? [] : PB.duplicateClusters(replies);
     const clusterOf = new Map();
     for (const c of clusters) for (const id of c.ids) clusterOf.set(id, c);
     const rows = [];
     for (const r of replies) {
       const reading = cache[r.author.toLowerCase()] || null;
       const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
-      PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), yt: ytAuthors.get(r.author.toLowerCase()), markers: PB.score(r.text).markers, machine: PB.machineSigns(r.text), paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
+      PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), yt: ytAuthors.get(r.author.toLowerCase()), markers: PB.score(r.text).markers, machine: machineOf(r), paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
       // Without account readings a reply's flags are complete for what the site offers.
-      rows.push({ id: r.id, author: r.author, text: r.text, machine: PB.machineSigns(r.text).machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
+      rows.push({ id: r.id, author: r.author, text: r.text, machine: machineOf(r).machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
     if (root) PBUI.badge(root.node, { site, handle: root.author, tweet: tweets.get(root.id), reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, lookup, root.anchor);
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.about).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];
     // Automatic: every author without About data is asked about in the page, at a steady pace.
     if (site.hasLocation && pending.length && globalThis.PBAuto) PBAuto.want(pending, schedule);
+    lastPending = pending;
+    if (feed) { removePanel(); return; }
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
+    report.bursts = PB.timingBursts(replies);
     const pushed = PB.pushedLinks(netLog, items.flatMap((r) => r.domains || []));
     const video = site.id === "youtube" ? ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null : null;
     report.groups = PB.returningGroups(netLog, threadKey, replies.map((r) => r.author));
-    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet }, () => lookup(...pending.slice(0, SCAN_MAX)));
-    lastPending = pending;
+    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet, onExport: () => exportReport(site, report, clusters, rows, video, pushed) }, () => lookup(...pending.slice(0, SCAN_MAX)));
   }
 
   function lookup(...handles) {
