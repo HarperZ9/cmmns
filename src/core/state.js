@@ -9,7 +9,10 @@
 let ROWS = [];
 const byDomain = new Map(), byHandle = new Map();
 
-// rows: [{ domain?, x?, state, basis: "state-owned" | "named-in-report", name, source: { title, url, date } }]
+// rows: [{ domain?, x?, state, basis: "state-owned" | "public-broadcaster" | "named-in-report", actor?, name, operation?, source: { title, url, date } }]
+// actor (report rows): who the report says ran it: "government", "commercial firm" or
+// "individuals or group". `state` is where the report says the operation came from, which is not
+// the same as a government running it.
 export function setStateRows(rows) {
   ROWS = Array.isArray(rows) ? rows : [];
   byDomain.clear(); byHandle.clear();
@@ -38,16 +41,26 @@ export function stateSummary(items) {
   for (const it of items) {
     const hits = [...(it.domains || []).flatMap(stateLinksOfDomain), ...stateLinksOfHandle(it.author)];
     for (const h of new Set(hits)) {
-      const k = h.state + "|" + h.basis;
-      const e = out.get(k) || { state: h.state, basis: h.basis, replies: new Set(), names: new Set() };
+      const k = h.state + "|" + h.basis + "|" + (h.actor || "") + "|" + (h.level || "");
+      const e = out.get(k) || { state: h.state, basis: h.basis, actor: h.actor || null, level: h.level || null, replies: new Set(), names: new Set() };
       e.replies.add(it.id); e.names.add(h.name);
       out.set(k, e);
     }
   }
-  return [...out.values()].map((e) => ({ state: e.state, basis: e.basis, replies: e.replies.size, names: [...e.names] })).sort((a, b) => b.replies - a.replies || a.state.localeCompare(b.state));
+  return [...out.values()].map((e) => ({ state: e.state, basis: e.basis, actor: e.actor, level: e.level, replies: e.replies.size, names: [...e.names] })).sort((a, b) => b.replies - a.replies || a.state.localeCompare(b.state));
 }
 
 export const STATE_DOES_NOT_PROVE = {
   "state-owned": "State ownership is not proof of disinformation. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
+  "public-broadcaster": "Public broadcasters range from editorially independent to government-directed. Check the outlet's charter and record, not the label.",
   "named-in-report": "The report named this domain or account in an operation at the time it was published. Domains change hands, and accounts can be reused or impersonated.",
 };
+
+// Short chip text and a sentence for one row, in the report's own terms.
+export function stateLabel(h) {
+  if (h.basis === "public-broadcaster") return { chip: `public broadcaster: ${h.state}`, says: `A public broadcaster of ${h.state}, according to Wikidata: publicly owned or funded, with an editorial charter that varies by country.` };
+  if (h.basis === "state-owned" && h.level === "regional") return { chip: `regional govt: ${h.state}`, says: `Owned or controlled by a regional or local government body in ${h.state}, according to Wikidata.` };
+  if (h.basis === "state-owned") return { chip: `state-owned: ${h.state}`, says: `Owned or controlled by the state of ${h.state}, according to Wikidata.` };
+  const who = h.actor === "government" ? `the ${h.state} government` : h.actor === "commercial firm" ? `a firm in ${h.state}${h.operation ? ` (${h.operation})` : ""}` : `people or a group in ${h.state}${h.operation ? ` (${h.operation})` : ""}`;
+  return { chip: h.actor === "government" ? `op report: ${h.state} govt` : h.actor === "commercial firm" ? `op report: firm in ${h.state}` : `op report: ${h.state}`, says: `Named in a published influence-operation report that attributes the operation to ${who}.` };
+}

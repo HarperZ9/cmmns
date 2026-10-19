@@ -50,8 +50,8 @@
 
   function stateChips(m, chip) {
     const hits = [...(m.domains || []).flatMap(PB.stateLinksOfDomain), ...PB.stateLinksOfHandle(m.handle)];
-    return [...new Set(hits)].map((h) => chip(h.basis === "state-owned" ? `state-owned: ${h.state}` : `named in ${h.state} op report`, "pb-flag", [
-      ["Source", `${h.name}: ${h.source.title}${h.source.date ? ` (${h.source.date})` : ""}`], ["Read it", { links: [[h.source.url.replace(/^https?:\/\//, "").slice(0, 60), h.source.url]] }],
+    return [...new Set(hits)].map((h) => chip(PB.stateLabel(h).chip, "pb-flag", [
+      ["What it is", PB.stateLabel(h).says], ["Source", `${h.name}: ${h.source.title}${h.source.date ? ` (${h.source.date})` : ""}`], ["Read it", { links: [[h.source.url.replace(/^https?:\/\//, "").slice(0, 60), h.source.url]] }],
       ["What it does not prove", PB.STATE_DOES_NOT_PROVE[h.basis]],
     ]));
   }

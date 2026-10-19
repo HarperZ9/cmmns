@@ -8,3 +8,4 @@ dist/
 CLAUDE.local.md
 *.zip
 project-docs/evidence/raw/
+.cache/

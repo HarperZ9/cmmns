@@ -191,7 +191,7 @@
     }
     if (report.machine && report.machine.n) p.append(el("p", "pb-num", `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text (a hint, not a finding).`));
     for (const b of (report.bursts || []).slice(0, 3)) p.append(el("p", "pb-num", `${b.authors.length} accounts replied within ${Math.max(1, Math.round((Date.parse(b.to) - Date.parse(b.from)) / 1000))} s (${b.from.slice(11, 19)} UTC): ${b.authors.slice(0, 6).map((a) => "@" + a).join(", ")}. At this thread's pace that happens by chance with p ≈ ${b.p < 1e-6 ? "<0.000001" : b.p.toPrecision(2)}.`));
-    for (const st of report.state || []) p.append(el("p", "pb-num", `${st.replies} repl${st.replies === 1 ? "y links to" : "ies link to"} or come${st.replies === 1 ? "s" : ""} from ${st.basis === "state-owned" ? "outlets owned by the state of" : "sources named in a published influence-operation report about"} ${st.state}: ${st.names.slice(0, 3).join(", ")}.`));
+    for (const st of report.state || []) p.append(el("p", "pb-num", `${st.replies} repl${st.replies === 1 ? "y" : "ies"}: ${PB.stateLabel(st).says} (${st.names.slice(0, 3).join(", ")})`));
     if (report.groups && report.groups.length) p.append(el("p", "pb-num", "Seen together before, in other threads you viewed: " + report.groups.slice(0, 4).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "."));
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
     for (const [h, t] of PBRows.panelLines(stats.video, stats.pushed)) p.append(el("p", "pb-num", `${h}: ${t}`));

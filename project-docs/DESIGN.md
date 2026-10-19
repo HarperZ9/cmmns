@@ -79,3 +79,20 @@ uploaded two or more days before the post that shows it gets a "media from <date
 media chip offers reverse image searches (Google Lens, TinEye, Bing, Yandex), and nothing is sent
 until the user clicks one. Radar cannot tell real media from AI-made media. It shows only what
 the platform or uploader discloses, such as YouTube's "Altered or synthetic content" label.
+
+### State links: what shipped on 2026-10-18
+
+`src/ext/state.json` holds 1,604 rows, built by `scripts/state-build.mjs`:
+
+- **977 report rows**, from 17 primary documents: Meta threat reports (2022 to 2026), OpenAI threat reports, the US Justice Department's 2024 Doppelganger affidavit and a 2024 State Department fact sheet. `scripts/verify-reports.mjs` downloads each document and confirms every domain or handle appears verbatim. On 2026-10-18 it found 977 of 977. Each row says who the report blames, in the report's own words: a government (86 rows), a commercial firm (217) or individuals or a group (674). A firm is never upgraded to a government. By country: Russia 698, China 131, Iran 44, Togo 29, Bangladesh 18, the United States 11, Vietnam 10, Israel 8, Venezuela 7, Türkiye 7, and 5 more with under 5 each. The counts follow what the reports published, which is not a measure of how much each country does. For example, Meta's 2022 report on a US military-linked network named no domains, so it adds no rows.
+- **627 Wikidata rows.** An outlet counts as state-owned when Wikidata classes it as state media, or when its chain of parent organisations and majority owners reaches a national government body (370 rows). Regional and city government bodies are labelled "regional govt" (136 rows), and public broadcasters get their own label (121 rows). Sovereign wealth funds, pension funds, investment funds and universities never count as controllers, and governments' own .gov-style websites are left out.
+
+Known gaps:
+
+- Wikidata files Chinese party media (Global Times, China Daily) under Chinese Communist Party bodies, which are not government entities, so under the same rule for every country those two outlets get no chip.
+- Press TV, TASS and Kan are missing because of how Wikidata models them.
+- The State Department's 2020 foreign-mission designations of Chinese outlets could not be read.
+- Google Threat Analysis Group (TAG) bulletins have not been searched yet.
+- EU sanctions name RT and Sputnik without giving domains.
+
+`data/state-reports.README.md` lists every document, the exclusions and the judgment calls.
