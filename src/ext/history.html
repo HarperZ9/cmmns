@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar history</title>
+<link rel="stylesheet" href="history.css">
+</head>
+<body>
+<header>
+  <h1>Radar history</h1>
+  <p id="scope" class="muted">Reading your local history…</p>
+</header>
+<main>
+  <section class="tiles" id="tiles" aria-label="Totals"></section>
+  <section>
+    <h2>Where your threads' material comes from</h2>
+    <p id="funnel-sentence" class="lead"></p>
+    <div class="cols">
+      <div><h3>Upstream accounts</h3><table id="up-accounts"><thead><tr><th>Account</th><th class="n">Threads</th></tr></thead><tbody></tbody></table></div>
+      <div><h3>Most-linked sites</h3><table id="up-domains"><thead><tr><th>Site</th><th>Known as</th><th class="n">Threads</th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </section>
+  <section class="cols">
+    <div><h2>Accounts that keep appearing</h2><table id="recurring"><thead><tr><th>Account</th><th class="n">Threads</th></tr></thead><tbody></tbody></table></div>
+    <div><h2>Uploads many accounts carried</h2><table id="uploads"><thead><tr><th>First posted by</th><th class="n">Accounts</th><th class="n">Posts</th></tr></thead><tbody></tbody></table></div>
+  </section>
+  <section>
+    <h2>Flagged accounts by day</h2>
+    <p class="muted">Share of looked-up accounts with at least one authenticity flag, per day you used Radar.</p>
+    <div id="trend" class="trend" role="img"></div>
+    <table id="trend-table" class="compact"><thead><tr><th>Day</th><th class="n">Threads</th><th class="n">Accounts read</th><th class="n">Flagged</th></tr></thead><tbody></tbody></table>
+  </section>
+  <section class="cols">
+    <div><h2>Where accounts are labelled as based</h2><div id="origins" class="bars"></div></div>
+    <div><h2>State links seen</h2><table id="state"><thead><tr><th>Link</th><th class="n">Replies</th></tr></thead><tbody></tbody></table></div>
+  </section>
+  <section class="actions">
+    <button id="export" type="button">Save history (JSON)</button>
+    <button id="clear" type="button">Clear history</button>
+  </section>
+  <p id="caveat" class="muted foot"></p>
+</main>
+<script src="core.bundle.js"></script>
+<script src="history.js"></script>
+</body>
+</html>

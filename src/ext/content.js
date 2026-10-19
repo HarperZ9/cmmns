@@ -57,7 +57,22 @@
     trailSave = setTimeout(() => chrome.storage.local.set({ [TRAIL_KEY]: trailLog }).catch((e) => console.error("[radar] could not save trails", e)), 2000);
   }
 
+  // One snapshot per thread for the history page (src/core/history.js), saved a moment after the
+  // thread settles so a scrolling thread is written once, not on every refresh.
+  const HISTORY_KEY = "pb.history.v1";
+  let historySave = 0;
+  function saveSnapshot(key, siteName, report) {
+    clearTimeout(historySave);
+    historySave = setTimeout(async () => {
+      try {
+        const log = (await chrome.storage.local.get(HISTORY_KEY))[HISTORY_KEY] || {};
+        await chrome.storage.local.set({ [HISTORY_KEY]: PB.addSnapshot(log, PB.snapshot(key, siteName, report)) });
+      } catch (e) { console.error("[radar] could not save the thread snapshot", e); }
+    }, 3000);
+  }
+
   function clearNet() {
+    chrome.storage.local.remove(HISTORY_KEY).catch(() => {});
     trailLog = {};
     chrome.storage.local.remove(TRAIL_KEY).catch(() => {});
     netLog = {}; lastRecorded = "";
@@ -158,6 +173,7 @@
     const pushed = PB.pushedLinks(netLog, items.flatMap((r) => r.domains || []));
     const video = site.id === "youtube" ? ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null : null;
     report.groups = PB.returningGroups(netLog, threadKey, replies.map((r) => r.author));
+    saveSnapshot(threadKey, site.name, report);
     lastSummary = { ...lastSummary, sentence: report.sentence, signs: (report.bursts || []).length + clusters.length + (report.state || []).length, state: report.state };
     PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)) }, () => lookup(...pending.slice(0, SCAN_MAX)));
   }

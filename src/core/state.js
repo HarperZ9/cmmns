@@ -63,6 +63,6 @@ export function stateLabel(h) {
   if (h.basis === "public-broadcaster") return { chip: `public broadcaster: ${h.state}`, says: `A public broadcaster of ${h.state}, according to Wikidata: publicly owned or funded, with an editorial charter that varies by country.` };
   if (h.basis === "state-owned" && h.level === "regional") return { chip: `regional govt: ${h.state}`, says: `Owned or controlled by a regional or local government body in ${h.state}, according to Wikidata.` };
   if (h.basis === "state-owned") return { chip: `state-owned: ${h.state}`, says: `Owned or controlled by the state of ${h.state}, according to Wikidata.` };
-  const who = h.actor === "government" ? `the ${h.state} government` : h.actor === "commercial firm" ? `a firm in ${h.state}${h.operation ? ` (${h.operation})` : ""}` : `people or a group in ${h.state}${h.operation ? ` (${h.operation})` : ""}`;
+  const who = h.actor === "government" ? `the government of ${h.state}` : h.actor === "commercial firm" ? `a firm in ${h.state}${h.operation ? ` (${h.operation})` : ""}` : `people or a group in ${h.state}${h.operation ? ` (${h.operation})` : ""}`;
   return { chip: h.actor === "government" ? `op report: ${h.state} govt` : h.actor === "commercial firm" ? `op report: firm in ${h.state}` : `op report: ${h.state}`, says: `Named in a published influence-operation report that attributes the operation to ${who}.` };
 }

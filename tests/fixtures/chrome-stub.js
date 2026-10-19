@@ -2,11 +2,11 @@
 // storage.local is in memory; a "pb-lookup" message answers after a short delay with the
 // reading listed in window.FIXTURE_ABOUT, the way the background worker would.
 (() => {
-  const store = {};
+  const store = { ...(globalThis.FIXTURE_STORE || {}) };
   const listeners = [];
   globalThis.chrome = {
     storage: { local: {
-      get: async (k) => ({ [k]: store[k] }),
+      get: async (k) => Object.fromEntries((Array.isArray(k) ? k : [k]).map((x) => [x, store[x]])),
       set: async (o) => { Object.assign(store, o); },
       remove: async (k) => { delete store[k]; },
     }, onChanged: { addListener: () => {} } },
