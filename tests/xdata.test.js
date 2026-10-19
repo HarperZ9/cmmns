@@ -78,3 +78,21 @@ test("post metadata X loads but does not show: app, language, views, edits, Comm
   assert.ok(COMMON_CLIENTS.test("Twitter for iPhone"));
   assert.ok(!COMMON_CLIENTS.test("Buffer"));
 });
+
+test("media upload dates from X ids, and media lifted from an earlier post", async () => {
+  const { tweetsIn, snowflakeTime, olderMedia } = await import("../src/core/xdata.js");
+  // An id for 2019-05-02T00:00:00Z: (ms - epoch) << 22
+  const id = (iso) => String((BigInt(Date.parse(iso) - 1288834974657)) << 22n);
+  assert.equal(snowflakeTime(id("2019-05-02T00:00:00Z")), "2019-05-02T00:00:00.000Z");
+  const json = { __typename: "Tweet", rest_id: "1", legacy: { created_at: "Sat Oct 18 08:44:00 +0000 2026",
+    extended_entities: { media: [{ id_str: id("2019-05-02T00:00:00Z"), type: "video", media_url_https: "https://pbs.twimg.com/x.jpg", source_status_id_str: id("2019-05-01T12:00:00Z") }] } } };
+  const [t] = tweetsIn(json);
+  assert.equal(t.posted, "2026-10-18T08:44:00.000Z");
+  assert.equal(t.media[0].uploaded.slice(0, 10), "2019-05-02");
+  assert.equal(t.media[0].fromPostTime.slice(0, 10), "2019-05-01");
+  const old = olderMedia(t);
+  assert.equal(old.length, 1);
+  assert.ok(old[0].days > 2700);
+  const fresh = { ...t, media: [{ ...t.media[0], uploaded: "2026-10-18T08:40:00.000Z" }] };
+  assert.equal(olderMedia(fresh).length, 0);
+});

@@ -37,3 +37,4 @@
 .pb-dark .pb-pop-h, .pb-dark .pb-num, .pb-dark .pb-caveat { color: #8b98a5; }
 .pb-dark .pb-caveat { border-top-color: #2f3336; }
 @media (max-width: 600px) { .pb-panel { left: 8px; right: 8px; width: auto; bottom: 64px; } }
+.pb-link { color: #1d9bf0; text-decoration: underline; cursor: pointer; }

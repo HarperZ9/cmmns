@@ -29,3 +29,6 @@ Claude in Chrome). The agent does not enter passwords.
 | 15 | YouTube `videoOwnerRenderer` (channel, subscribers) and `currentVideoEndpoint` in ytInitialData | Read the watch page's data | pass 2026-10-18: channel, "13.7K subscribers" and browse id read; ytInitialData keeps the first video's id after in-page navigation, so Radar keys video data by id |
 | 16 | YouTube funding and context panels, paid-promotion overlay, member badge field | Open a state-funded broadcaster's video and a sponsored video | open |
 | 17 | X post data: `source`, `legacy.lang`, `views.count`, `edit_control`, `birdwatch_pivot` on Tweet objects | Open a post with a Community Note; open the account card | open |
+| 18 | X media fields: `extended_entities.media[].id_str`, `source_status_id_str`, `media_url_https`; `legacy.created_at` on Tweet objects | Open a post with an old video re-shared ("From @..."); compare the chip's date | open |
+| 19 | Feed mode: badges on home, profile, likes and search pages without slowing scrolling | Scroll a timeline for a minute | open |
+| 20 | YouTube "Altered or synthetic content" text in the page data | Open a video with the disclosure | open |

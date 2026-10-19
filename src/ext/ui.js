@@ -27,7 +27,16 @@
   function popover(anchor, rows) {
     closePop();
     const p = el("div", "pb-pop");
-    for (const [h, t] of rows) { if (!t) continue; p.append(el("div", "pb-pop-h", h), el("div", "pb-pop-t", t)); }
+    for (const [h, t] of rows) {
+      if (!t) continue;
+      p.append(el("div", "pb-pop-h", h));
+      if (typeof t === "object" && t.links) {
+        // Links open only when clicked; the popover row says what each sends where.
+        const box = el("div", "pb-pop-t");
+        for (const [label, href] of t.links) { const a = el("a", "pb-link", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; box.append(a, document.createTextNode("  ")); }
+        p.append(box);
+      } else p.append(el("div", "pb-pop-t", t));
+    }
     const r = anchor.getBoundingClientRect();
     p.style.top = `${Math.round(window.scrollY + r.bottom + 6)}px`;
     p.style.left = `${Math.round(Math.min(window.scrollX + r.left, window.scrollX + document.documentElement.clientWidth - 340))}px`;
@@ -182,6 +191,7 @@
     }
     if (report.machine && report.machine.n) p.append(el("p", "pb-num", `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text (a hint, not a finding).`));
     for (const b of (report.bursts || []).slice(0, 3)) p.append(el("p", "pb-num", `${b.authors.length} accounts replied within ${Math.max(1, Math.round((Date.parse(b.to) - Date.parse(b.from)) / 1000))} s (${b.from.slice(11, 19)} UTC): ${b.authors.slice(0, 6).map((a) => "@" + a).join(", ")}. At this thread's pace that happens by chance with p ≈ ${b.p < 1e-6 ? "<0.000001" : b.p.toPrecision(2)}.`));
+    for (const st of report.state || []) p.append(el("p", "pb-num", `${st.replies} repl${st.replies === 1 ? "y links to" : "ies link to"} or come${st.replies === 1 ? "s" : ""} from ${st.basis === "state-owned" ? "outlets owned by the state of" : "sources named in a published influence-operation report about"} ${st.state}: ${st.names.slice(0, 3).join(", ")}.`));
     if (report.groups && report.groups.length) p.append(el("p", "pb-num", "Seen together before, in other threads you viewed: " + report.groups.slice(0, 4).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "."));
     if (clusters.length) p.append(el("p", "pb-num", `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest: ${clusters[0].ids.length}).`));
     for (const [h, t] of PBRows.panelLines(stats.video, stats.pushed)) p.append(el("p", "pb-num", `${h}: ${t}`));

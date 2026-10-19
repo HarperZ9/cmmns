@@ -61,3 +61,21 @@ Built 2026-10-18: 7,374 domains, 3,602 with an X handle. The background worker h
 only for the domains and handles they show. Known limits: Wikidata lags sales, some rows name a
 division rather than the parent company, and one domain can map to an edition rather than the
 main outlet. Rebuild with the author's approval and review the diff before committing.
+
+## State links and media provenance (2026-10-18)
+
+**State links** (`src/core/state.js`, built by `scripts/state-build.mjs`). A link or account gets a
+state chip only when a cited source ties it to a government. There are two bases: an ownership
+chain on Wikidata that ends at a government or state agency, or a mention in a published
+influence-operation report (platform threat reports, government filings, sanctions listings),
+with the report's title, URL and date. The same rule applies to every country. Radar does not
+attribute a reply, account or narrative to a state from its wording or behaviour. That would
+present a guess as a finding, and coordination looks the same whether a state, a PR firm or a
+fan group runs it. The table ships empty until the build runs with the author's approval.
+
+**Media provenance** (`olderMedia` in `src/core/xdata.js`). X ids encode their creation time, so
+a media id dates the first upload, and a reused source post id dates the original post. Media
+uploaded two or more days before the post that shows it gets a "media from <date>" chip. Every
+media chip offers reverse image searches (Google Lens, TinEye, Bing, Yandex), and nothing is sent
+until the user clicks one. Radar cannot tell real media from AI-made media. It shows only what
+the platform or uploader discloses, such as YouTube's "Altered or synthetic content" label.

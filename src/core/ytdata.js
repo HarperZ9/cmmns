@@ -43,6 +43,9 @@ export function ytVideoInfo(json) {
     for (const k of ["infoPanelContainerRenderer", "infoPanelContentRenderer", "clarificationRenderer", "emergencyOnebox"]) {
       if (v[k]) { const t = allText(v[k]); if (t && !panels.includes(t)) panels.push(t); }
     }
+    // The uploader's own disclosure, shown by YouTube as "Altered or synthetic content".
+    const said = typeof v.simpleText === "string" ? v.simpleText : typeof v.content === "string" ? v.content : null;
+    if (said && /altered or synthetic content/i.test(said)) out.synthetic = clean(said).slice(0, 200);
     const paid = v.paidContentOverlay && v.paidContentOverlay.paidContentOverlayRenderer;
     if (paid) out.paidPromotion = clean(txt(paid.text)) || "Includes paid promotion";
     const cv = v.currentVideoEndpoint && v.currentVideoEndpoint.watchEndpoint;

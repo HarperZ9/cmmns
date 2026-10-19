@@ -109,6 +109,8 @@ export function tweetsIn(json) {
         views: v.views && v.views.count ? Number(v.views.count) : null,
         edits: edits > 1 ? edits - 1 : null,
         note: v.birdwatch_pivot ? pick((v.birdwatch_pivot.subtitle || {}).text, v.birdwatch_pivot.shorttitle, v.birdwatch_pivot.title, "a Community Note is attached") : null,
+        posted: Number.isFinite(Date.parse(L.created_at)) ? new Date(Date.parse(L.created_at)).toISOString() : null,
+        media: mediaOf(L),
         quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count),
       };
       out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined)));
@@ -116,6 +118,31 @@ export function tweetsIn(json) {
     for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
   }
   return [...out.values()];
+}
+
+// X ids are "snowflakes": the top bits are milliseconds since 2010-11-04. A media id therefore
+// says when the image or video was first uploaded, whichever post now shows it.
+export function snowflakeTime(id) {
+  try { return new Date(Number(BigInt(String(id)) >> 22n) + 1288834974657).toISOString(); } catch { return null; }
+}
+
+// Media attached to a post: type, when it was first uploaded, and the earlier post it was taken
+// from when X records one ("From @someone" on the page).
+function mediaOf(L) {
+  const list = ((L.extended_entities || L.entities || {}).media) || [];
+  const out = list.filter((m) => m && m.id_str).map((m) => ({
+    type: m.type || "photo", url: m.media_url_https || null, uploaded: snowflakeTime(m.id_str),
+    fromPost: m.source_status_id_str || null, fromPostTime: m.source_status_id_str ? snowflakeTime(m.source_status_id_str) : null,
+  }));
+  return out.length ? out : null;
+}
+
+// Media uploaded well before the post that shows it: [{ type, uploaded, days, fromPost }].
+export const OLD_MEDIA_DAYS = 2;
+export function olderMedia(tweet) {
+  const t = Date.parse(tweet && tweet.posted);
+  if (!Number.isFinite(t)) return [];
+  return ((tweet && tweet.media) || []).map((m) => ({ ...m, days: Math.floor((t - Date.parse(m.uploaded)) / 86400000) })).filter((m) => m.days >= OLD_MEDIA_DAYS);
 }
 
 // Apps people commonly post from. Anything else (schedulers, automation tools, custom apps) is

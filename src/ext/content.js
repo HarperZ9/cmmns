@@ -22,15 +22,16 @@
   }
 
   // Ask the background worker for the owners of the domains and accounts on screen, once each.
-  const askedOwners = new Set(), ownerRows = [];
+  const askedOwners = new Set(), ownerRows = [], stateRows = [];
   async function ensureOwners(items) {
     const domains = [...new Set(items.flatMap((r) => r.domains || []))].filter((d) => !askedOwners.has(d));
     const handles = items.map((r) => r.author).filter((h) => !askedOwners.has("@" + h));
     if (!domains.length && !handles.length) return;
     domains.forEach((d) => askedOwners.add(d)); handles.forEach((h) => askedOwners.add("@" + h));
     try {
-      const rows = await chrome.runtime.sendMessage({ type: "pb-owners", domains, handles });
+      const [rows, srows] = await Promise.all([chrome.runtime.sendMessage({ type: "pb-owners", domains, handles }), chrome.runtime.sendMessage({ type: "pb-state", domains, handles })]);
       if (Array.isArray(rows) && rows.length) { ownerRows.push(...rows); PB.setOwnerRows(ownerRows); }
+      if (Array.isArray(srows) && srows.length) { stateRows.push(...srows); PB.setStateRows(stateRows); }
     } catch (e) { console.error("[radar] owner lookup failed", e); }
   }
 
@@ -110,6 +111,7 @@
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
     report.bursts = PB.timingBursts(replies);
+    report.state = PB.stateSummary(replies);
     const pushed = PB.pushedLinks(netLog, items.flatMap((r) => r.domains || []));
     const video = site.id === "youtube" ? ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null : null;
     report.groups = PB.returningGroups(netLog, threadKey, replies.map((r) => r.author));

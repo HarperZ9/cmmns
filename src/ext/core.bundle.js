@@ -948,6 +948,8 @@ function tweetsIn(json) {
         views: v.views && v.views.count ? Number(v.views.count) : null,
         edits: edits > 1 ? edits - 1 : null,
         note: v.birdwatch_pivot ? pick((v.birdwatch_pivot.subtitle || {}).text, v.birdwatch_pivot.shorttitle, v.birdwatch_pivot.title, "a Community Note is attached") : null,
+        posted: Number.isFinite(Date.parse(L.created_at)) ? new Date(Date.parse(L.created_at)).toISOString() : null,
+        media: mediaOf(L),
         quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count),
       };
       out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined)));
@@ -957,11 +959,36 @@ function tweetsIn(json) {
   return [...out.values()];
 }
 
+// X ids are "snowflakes": the top bits are milliseconds since 2010-11-04. A media id therefore
+// says when the image or video was first uploaded, whichever post now shows it.
+function snowflakeTime(id) {
+  try { return new Date(Number(BigInt(String(id)) >> 22n) + 1288834974657).toISOString(); } catch { return null; }
+}
+
+// Media attached to a post: type, when it was first uploaded, and the earlier post it was taken
+// from when X records one ("From @someone" on the page).
+function mediaOf(L) {
+  const list = ((L.extended_entities || L.entities || {}).media) || [];
+  const out = list.filter((m) => m && m.id_str).map((m) => ({
+    type: m.type || "photo", url: m.media_url_https || null, uploaded: snowflakeTime(m.id_str),
+    fromPost: m.source_status_id_str || null, fromPostTime: m.source_status_id_str ? snowflakeTime(m.source_status_id_str) : null,
+  }));
+  return out.length ? out : null;
+}
+
+// Media uploaded well before the post that shows it: [{ type, uploaded, days, fromPost }].
+const OLD_MEDIA_DAYS = 2;
+function olderMedia(tweet) {
+  const t = Date.parse(tweet && tweet.posted);
+  if (!Number.isFinite(t)) return [];
+  return ((tweet && tweet.media) || []).map((m) => ({ ...m, days: Math.floor((t - Date.parse(m.uploaded)) / 86400000) })).filter((m) => m.days >= OLD_MEDIA_DAYS);
+}
+
 // Apps people commonly post from. Anything else (schedulers, automation tools, custom apps) is
 // worth showing, because X no longer shows it.
 const COMMON_CLIENTS = /^(?:Twitter|X) (?:for (?:iPhone|Android|iPad|Mac)|Web App)$|^(?:Twitter|X) Web Client$/;
 
-return { parseXDate, userReading, aboutIn, usersIn, tweetsIn, COMMON_CLIENTS };
+return { parseXDate, userReading, aboutIn, usersIn, tweetsIn, snowflakeTime, OLD_MEDIA_DAYS, olderMedia, COMMON_CLIENTS };
 })();
 
 // ---- machine.js
@@ -1187,6 +1214,9 @@ function ytVideoInfo(json) {
     for (const k of ["infoPanelContainerRenderer", "infoPanelContentRenderer", "clarificationRenderer", "emergencyOnebox"]) {
       if (v[k]) { const t = allText(v[k]); if (t && !panels.includes(t)) panels.push(t); }
     }
+    // The uploader's own disclosure, shown by YouTube as "Altered or synthetic content".
+    const said = typeof v.simpleText === "string" ? v.simpleText : typeof v.content === "string" ? v.content : null;
+    if (said && /altered or synthetic content/i.test(said)) out.synthetic = clean(said).slice(0, 200);
     const paid = v.paidContentOverlay && v.paidContentOverlay.paidContentOverlayRenderer;
     if (paid) out.paidPromotion = clean(txt(paid.text)) || "Includes paid promotion";
     const cv = v.currentVideoEndpoint && v.currentVideoEndpoint.watchEndpoint;
@@ -1340,5 +1370,64 @@ function languageFits(language, country) {
 return { languageFits };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs });
+// ---- state.js
+const M_state = (() => {
+// State links: link domains and accounts tied to a government, from two sourced lists.
+//   state-owned       the outlet's ownership chain on Wikidata ends at a government or state body
+//   named-in-report   a platform or government report named the domain or account in an influence
+//                     operation it took down or attributed (each row cites the report)
+// The same rule applies to every country. Radar does not attribute a reply, an account or a
+// narrative to a state from what it says or how it behaves: that would be a guess presented as a
+// finding. It shows a link or an account that a cited source ties to a state, and nothing more.
+
+let ROWS = [];
+const byDomain = new Map(), byHandle = new Map();
+
+// rows: [{ domain?, x?, state, basis: "state-owned" | "named-in-report", name, source: { title, url, date } }]
+function setStateRows(rows) {
+  ROWS = Array.isArray(rows) ? rows : [];
+  byDomain.clear(); byHandle.clear();
+  for (const r of ROWS) {
+    if (r.domain) (byDomain.get(r.domain.toLowerCase()) || byDomain.set(r.domain.toLowerCase(), []).get(r.domain.toLowerCase())).push(r);
+    if (r.x) (byHandle.get(r.x.toLowerCase()) || byHandle.set(r.x.toLowerCase(), []).get(r.x.toLowerCase())).push(r);
+  }
+}
+
+// Subdomains match their parent: "de.rt.com" finds "rt.com".
+function stateLinksOfDomain(domain) {
+  const parts = String(domain || "").toLowerCase().replace(/^www\./, "").split(".");
+  for (let i = 0; i < parts.length - 1; i++) {
+    const hit = byDomain.get(parts.slice(i).join("."));
+    if (hit) return hit;
+  }
+  return [];
+}
+
+function stateLinksOfHandle(handle) { return byHandle.get(String(handle || "").toLowerCase()) || []; }
+
+// Thread summary: links and accounts per state and basis, so the panel can say "3 replies link to
+// outlets owned by the government of X" without ranking states.
+function stateSummary(items) {
+  const out = new Map();
+  for (const it of items) {
+    const hits = [...(it.domains || []).flatMap(stateLinksOfDomain), ...stateLinksOfHandle(it.author)];
+    for (const h of new Set(hits)) {
+      const k = h.state + "|" + h.basis;
+      const e = out.get(k) || { state: h.state, basis: h.basis, replies: new Set(), names: new Set() };
+      e.replies.add(it.id); e.names.add(h.name);
+      out.set(k, e);
+    }
+  }
+  return [...out.values()].map((e) => ({ state: e.state, basis: e.basis, replies: e.replies.size, names: [...e.names] })).sort((a, b) => b.replies - a.replies || a.state.localeCompare(b.state));
+}
+
+const STATE_DOES_NOT_PROVE = {
+  "state-owned": "State ownership is not proof of disinformation. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
+  "named-in-report": "The report named this domain or account in an operation at the time it was published. Domains change hands, and accounts can be reused or impersonated.",
+};
+
+return { setStateRows, stateLinksOfDomain, stateLinksOfHandle, stateSummary, STATE_DOES_NOT_PROVE };
+})();
+
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state });
 })();

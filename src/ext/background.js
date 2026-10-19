@@ -22,7 +22,22 @@ function owners() {
   return ownersReady;
 }
 
+// State links (state.json, src/core/state.js): small, but served the same way.
+let stateReady = null;
+function stateRows() {
+  if (!stateReady) stateReady = fetch(chrome.runtime.getURL("state.json")).then((r) => r.json()).then((t) => t.rows || [])
+    .catch((e) => { console.error("[radar] state.json failed to load", e); return []; });
+  return stateReady;
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg && msg.type === "pb-state") {
+    stateRows().then((rows) => {
+      const want = (msg.domains || []).map((d) => d.toLowerCase()), handles = new Set((msg.handles || []).map((h) => h.toLowerCase()));
+      sendResponse(rows.filter((r) => (r.x && handles.has(r.x.toLowerCase())) || (r.domain && want.some((d) => d === r.domain || d.endsWith("." + r.domain)))));
+    });
+    return true;
+  }
   if (msg && msg.type === "pb-owners") {
     owners().then((rows) => {
       const want = new Set((msg.domains || []).map((d) => d.toLowerCase())), handles = new Set((msg.handles || []).map((h) => h.toLowerCase()));
