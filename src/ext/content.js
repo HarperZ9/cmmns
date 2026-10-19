@@ -104,6 +104,10 @@
   chrome.storage.local.get(SETTINGS_KEY).then((g) => { settings = { ...settings, ...(g[SETTINGS_KEY] || {}) }; schedule(); }).catch(() => {});
   chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch[SETTINGS_KEY]) { settings = { ...settings, ...(ch[SETTINGS_KEY].newValue || {}) }; schedule(); } });
   let lastSummary = null, lastExport = null;
+  // The last computed pill models, so scrolling only draws rows coming into view (badge() skips
+  // rows whose evidence has not changed) instead of rebuilding the whole thread.
+  let drawn = [];
+  function drawVisible() { for (const [node, model, anchor] of drawn) if (node.isConnected && near(node)) PBUI.badge(node, model, lookup, anchor); }
 
   // X's translation is X's wording, not the author's, so machine-writing signs are not read from
   // it (its dashes and stock phrasing would count against the author). Leaks and spam still are.
@@ -128,16 +132,18 @@
     const clusters = feed ? [] : PB.duplicateClusters(replies);
     const clusterOf = new Map();
     for (const c of clusters) for (const id of c.ids) clusterOf.set(id, c);
-    const rows = [];
+    const rows = [], models = [];
     for (const r of replies) {
       const reading = cache[r.author.toLowerCase()] || null;
       const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
       const an = analyse(r);
-      if (near(r.node)) PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), trail: PB.trailFor(tweets.get(r.id), tweets, trailLog), tweets, yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
+      models.push([r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), trail: PB.trailFor(tweets.get(r.id), tweets, trailLog), yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, r.anchor]);
       // Without account readings a reply's flags are complete for what the site offers.
       rows.push({ id: r.id, author: r.author, text: r.text, machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
-    if (root && near(root.node)) PBUI.badge(root.node, { site, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, trailLog), tweets, reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, lookup, root.anchor);
+    if (root) models.push([root.node, { site, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, trailLog), reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
+    drawn = models;
+    drawVisible();
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.about).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];
     // Automatic: every author without About data is asked about in the page, at a steady pace.
     if (site.hasLocation && pending.length && globalThis.PBAuto && settings.auto) PBAuto.want(pending, schedule);
@@ -218,7 +224,8 @@
   });
 
   function schedule(ms = 250) { clearTimeout(timer); timer = setTimeout(() => refresh().catch((e) => console.error("[radar] refresh failed", e)), ms); }
-  window.addEventListener("scroll", () => schedule(120), { passive: true });
+  let scrollFrame = 0;
+  window.addEventListener("scroll", () => { if (!scrollFrame) scrollFrame = requestAnimationFrame(() => { scrollFrame = 0; drawVisible(); }); }, { passive: true });
 
   new MutationObserver((muts) => {
     if (location.pathname !== lastPath) { lastPath = location.pathname; PBUI.closePop(); PBAbout.check(); }

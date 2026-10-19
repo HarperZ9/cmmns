@@ -192,3 +192,11 @@ How the documents were read:
 - The OpenAI February 2026 report PDF could not be text-extracted (rotated pages). The Fish Food row cites the OpenAI case-study page, which says it was first published in that report.
 - `scripts/verify-reports.mjs` was not run (instruction: do not run build scripts). The new report rows were checked by a substring test against local copies of the source texts: all 143 additions were found. Designation outlet names were checked the same way for the State Department statements; the EU, Treasury, UK and Federal Register names were read directly from the extracted text.
 - Meta Q3 2023 and Q2 2024 lists were extracted by pattern from layout text. A target country is in a row name only where the Q1 to Q3 2024 table column was unambiguous.
+
+
+## Added by the lead session (2026-10-18)
+
+- Treasury press release jy2559, "Treasury Takes Action as Part of a U.S. Government Response to Russia's Foreign Malign Influence Operations" (2024-09-04), https://home.treasury.gov/news/press-releases/jy2559: `rrussianews.com` and `rrn.world`, actor `government` (the release says ANO Dialog's work was for the Russian government).
+- Removed `andaluciamorisca.org`: the cited page does not say who runs the site.
+- OpenAI Stop News rows set to `individuals or group`: OpenAI wrote that the operation "appeared consistent with" a marketing company but named none.
+- Press TV, still a gap: the Justice Department's 2021-06-22 release on seizing 33 IRTVU websites (read through the Internet Archive copy) does not name the domains.
