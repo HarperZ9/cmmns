@@ -69,7 +69,29 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   }
 
-  function removePanel() { const p = document.getElementById("pb-panel"); if (p) p.remove(); }
+  function removePanel() { PBPanel.remove(); }
+
+  // Text analysis is the costly part of a refresh; each post's text is read once.
+  const memo = new Map();
+  function analyse(r) {
+    const key = (r.writtenIn ? "t:" : "o:") + r.text;
+    let a = memo.get(key);
+    if (!a) {
+      a = { markers: PB.score(r.text).markers, machine: machineOf(r) };
+      if (memo.size > 3000) memo.clear();
+      memo.set(key, a);
+    }
+    return a;
+  }
+  // Only posts on or near the screen get their pills drawn; the rest are drawn as they scroll in.
+  const near = (n) => { const b = n.getBoundingClientRect(); return b.bottom > -600 && b.top < window.innerHeight + 900; };
+
+  // User settings (toolbar popup): badges on feeds, automatic About lookups.
+  const SETTINGS_KEY = "pb.settings";
+  let settings = { feeds: true, auto: true };
+  chrome.storage.local.get(SETTINGS_KEY).then((g) => { settings = { ...settings, ...(g[SETTINGS_KEY] || {}) }; schedule(); }).catch(() => {});
+  chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch[SETTINGS_KEY]) { settings = { ...settings, ...(ch[SETTINGS_KEY].newValue || {}) }; schedule(); } });
+  let lastSummary = null, lastExport = null;
 
   // X's translation is X's wording, not the author's, so machine-writing signs are not read from
   // it (its dashes and stock phrasing would count against the author). Leaks and spam still are.
@@ -82,7 +104,7 @@
     const site = PBSites.current();
     // Feed mode (timelines, profiles, likes, search): badges on every post, no thread report and
     // nothing added to the connections log, because a feed is not a conversation.
-    const feed = !!site && !site.onThread() && !!(site.onFeed && site.onFeed());
+    const feed = !!site && !site.onThread() && settings.feeds && !!(site.onFeed && site.onFeed());
     if (!site || (!site.onThread() && !feed)) { removePanel(); return; }
     const items = site.items().map((n) => site.read(n)).filter(Boolean);
     if (!items.length) return;
@@ -98,15 +120,17 @@
     for (const r of replies) {
       const reading = cache[r.author.toLowerCase()] || null;
       const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
-      PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), yt: ytAuthors.get(r.author.toLowerCase()), markers: PB.score(r.text).markers, machine: machineOf(r), paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
+      const an = analyse(r);
+      if (near(r.node)) PBUI.badge(r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, lookup, r.anchor);
       // Without account readings a reply's flags are complete for what the site offers.
-      rows.push({ id: r.id, author: r.author, text: r.text, machine: machineOf(r).machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
+      rows.push({ id: r.id, author: r.author, text: r.text, machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
-    if (root) PBUI.badge(root.node, { site, handle: root.author, tweet: tweets.get(root.id), reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, lookup, root.anchor);
+    if (root && near(root.node)) PBUI.badge(root.node, { site, handle: root.author, tweet: tweets.get(root.id), reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, lookup, root.anchor);
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.about).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];
     // Automatic: every author without About data is asked about in the page, at a steady pace.
-    if (site.hasLocation && pending.length && globalThis.PBAuto) PBAuto.want(pending, schedule);
+    if (site.hasLocation && pending.length && globalThis.PBAuto && settings.auto) PBAuto.want(pending, schedule);
     lastPending = pending;
+    lastSummary = { site: site.name, feed, posts: items.length, lookedUp: rows.filter((r) => r.about).length, flagged: rows.filter((r) => r.flags && PB.isFlagged(r.flags)).length, pending: pending.length, scanning: scanLeft || (globalThis.PBAuto ? PBAuto.left() : 0), origins: PB.threadReport(rows).origins || [] };
     if (feed) { removePanel(); return; }
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
@@ -115,7 +139,8 @@
     const pushed = PB.pushedLinks(netLog, items.flatMap((r) => r.domains || []));
     const video = site.id === "youtube" ? ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null : null;
     report.groups = PB.returningGroups(netLog, threadKey, replies.map((r) => r.author));
-    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet, onExport: () => exportReport(site, report, clusters, rows, video, pushed) }, () => lookup(...pending.slice(0, SCAN_MAX)));
+    lastSummary = { ...lastSummary, sentence: report.sentence, signs: (report.bursts || []).length + clusters.length + (report.state || []).length, state: report.state };
+    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)) }, () => lookup(...pending.slice(0, SCAN_MAX)));
   }
 
   function lookup(...handles) {
@@ -160,6 +185,8 @@
       refresh().then(() => lookup(...lastPending.slice(0, SCAN_MAX))).catch((e) => console.error("[radar] scan failed", e));
     }
     if (msg && msg.type === "pb-progress") { scanLeft = msg.left; schedule(); }
+    if (msg && msg.type === "pb-panel") { PBPanel.setOpen(true); schedule(0); }
+    if (msg && msg.type === "pb-export" && lastExport) lastExport();
     if (msg && msg.type === "pb-about-result") {
       lookingUp.delete(msg.handle);
       if (!msg.reading) { failed.add(msg.handle); console.warn("[radar] lookup gave no reading for", msg.handle, msg.error || ""); }
@@ -167,7 +194,14 @@
     }
   });
 
-  function schedule() { clearTimeout(timer); timer = setTimeout(() => refresh().catch((e) => console.error("[radar] refresh failed", e)), 400); }
+  // The toolbar popup asks for a summary of the current page.
+  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+    if (msg && msg.type === "pb-summary") { sendResponse(lastSummary); return false; }
+    return false;
+  });
+
+  function schedule(ms = 250) { clearTimeout(timer); timer = setTimeout(() => refresh().catch((e) => console.error("[radar] refresh failed", e)), ms); }
+  window.addEventListener("scroll", () => schedule(120), { passive: true });
 
   new MutationObserver((muts) => {
     if (location.pathname !== lastPath) { lastPath = location.pathname; PBUI.closePop(); PBAbout.check(); }

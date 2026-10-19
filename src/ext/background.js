@@ -1,5 +1,5 @@
 // Account lookups and the one-click scan.
-// - Clicking Radar's toolbar button tells the current tab to scan its thread.
+// - Radar's toolbar popup (popup.js) asks the current tab to scan its thread.
 // - A scan asks for every account on screen. This worker reads each account's profile header and
 //   its "About this account" page in ONE reused tab inside a minimised window, so no tabs flicker open and closed.
 //   One account at a time, at least GAP_MS apart, never faster than a person clicking through
@@ -8,9 +8,6 @@ const GAP_MS = 2500, TIMEOUT_MS = 12000, IDLE_CLOSE_MS = 15000;
 const queue = [];
 let busy = false, lastAt = 0, current = null, worker = null, idleTimer = 0, timeoutTimer = 0;
 
-chrome.action.onClicked.addListener((tab) => {
-  if (tab && tab.id != null) chrome.tabs.sendMessage(tab.id, { type: "pb-scan" }).catch(() => {});
-});
 
 // The ownership table (owners.json, about 1 MB) is loaded once here, never into pages. Content
 // scripts send the domains and handles a page shows and get back only the matching rows.

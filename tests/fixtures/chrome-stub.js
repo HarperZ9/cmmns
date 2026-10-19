@@ -9,11 +9,12 @@
       get: async (k) => ({ [k]: store[k] }),
       set: async (o) => { Object.assign(store, o); },
       remove: async (k) => { delete store[k]; },
-    } },
+    }, onChanged: { addListener: () => {} } },
     runtime: {
+      getManifest: () => ({ version: "fixture" }),
       onMessage: { addListener: (f) => listeners.push(f) },
       sendMessage: async (msg) => {
-        if (msg.type === "pb-owners") return [];
+        if (msg.type === "pb-owners" || msg.type === "pb-state") return [];
         if (msg.type !== "pb-lookup") return;
         for (const [i, h] of msg.handles.entries()) {
           setTimeout(async () => {

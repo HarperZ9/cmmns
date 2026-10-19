@@ -1,0 +1,96 @@
+// The account card: everything the site discloses about the account and the post, plus Radar's
+// evidence, in plain sections. It never shows or guesses demographics (race, religion, ethnicity,
+// gender, age): the platforms do not disclose them, and guessing them about a person is profiling.
+(() => {
+  "use strict";
+  const num = (x) => (x == null ? null : Number(x).toLocaleString());
+  const day = (iso) => (iso ? iso.slice(0, 10) : "unknown");
+  const SEARCH = [
+    ["Google Lens", (u) => "https://lens.google.com/uploadbyurl?url=" + encodeURIComponent(u)],
+    ["TinEye", (u) => "https://tineye.com/search?url=" + encodeURIComponent(u)],
+    ["Bing", (u) => "https://www.bing.com/images/search?view=detailv2&iss=sbi&q=imgurl:" + encodeURIComponent(u)],
+    ["Yandex", (u) => "https://yandex.com/images/search?rpt=imageview&url=" + encodeURIComponent(u)],
+  ];
+
+  function where(m) {
+    const R = m.reading || {}, A = m.activity;
+    const none = m.site && !m.site.hasLocation ? `${m.site.name} does not show this` : m.reading ? "not shown" : null;
+    return [
+      ["Based in (X label)", R.basedIn || none],
+      ["Connected via", R.connectedVia || null],
+      ["Profile says", R.profileLocation || null],
+      ["VPN or proxy", R.proxyNote ? "X notes the location may not be accurate" : null],
+      ["Active hours (inferred)", A && A.activeHours ? `fit a UTC${A.activeHours.utcOffset >= 0 ? "+" : ""}${A.activeHours.utcOffset} waking day (${Math.round(A.activeHours.fit * 100)}% of ${A.activeHours.posts} posts seen)` : null],
+    ];
+  }
+
+  function account(m) {
+    const R = m.reading || {}, Y = m.yt || {};
+    const age = R.joinDate ? PB.ageDays(R.joinDate) : null;
+    return [
+      ["Joined", R.joinDate ? `${R.joinDate.slice(0, 7)} (${age} days ago)` : null],
+      ["Followers / following", R.followersCount != null ? `${num(R.followersCount)} / ${num(R.followingCount)}` : null],
+      ["Posts", R.postsCount != null ? `${num(R.postsCount)}${age ? ` (about ${Math.round(R.postsCount / Math.max(1, age))} a day)` : ""}` : null],
+      ["Checkmark", R.verifiedType ? ({ Blue: "blue (paid subscription)", Business: "gold (organisation)", Government: "grey (government)" }[R.verifiedType] || R.verifiedType) : null],
+      ["Label", R.xLabel || m.pageLabel ? `${R.xLabel || m.pageLabel} account` : null],
+      ["Category", R.category || null],
+      ["Username changes", R.nameChanges != null ? String(R.nameChanges) : null],
+      ["Listed by", R.listedCount != null ? `${num(R.listedCount)} lists` : null],
+      ["Profile picture", R.defaultAvatar ? "never set" : null],
+      ["Withheld in", R.withheldIn ? `${R.withheldIn} (on legal demand)` : null],
+      ["Affiliate of", R.affiliateOf || R.affiliate || null],
+      ["Bio", R.bio ? R.bio.slice(0, 200) : null],
+      ["Website", R.website || null],
+      ["YouTube", [Y.verified && "verified", Y.creator && "the video's own channel", Y.artist && "official artist", Y.member].filter(Boolean).join(", ") || null],
+    ];
+  }
+
+  function post(m) {
+    const T = m.tweet || {}, Y = m.yt || {};
+    const rows = [
+      ["Posted", m.posted ? `${m.posted.slice(0, 16).replace("T", " ")} UTC` : (Y.published ? `${Y.published}${Y.edited ? ", edited" : ""}` : null)],
+      ["Sent from", T.client || null],
+      ["Language (X)", T.lang || null],
+      ["Views · likes · reposts", T.views != null ? [T.views, T.likes, T.reposts].map((x) => num(x) || "?").join(" · ") : (Y.likes ? `${Y.likes} likes` : null)],
+      ["Edited", T.edits ? `${T.edits} time${T.edits === 1 ? "" : "s"}` : null],
+    ];
+    (T.media || []).forEach((x, i) => {
+      rows.push([`${(T.media.length > 1 ? `Media ${i + 1}` : "Media")}: ${x.type === "photo" ? "image" : x.type}`, `first uploaded ${day(x.uploaded)}` + (x.fromPost ? `, taken from a post of ${day(x.fromPostTime)}` : "")]);
+      if (x.url) rows.push(["Find earlier copies", { links: SEARCH.map(([label, f]) => [label, f(x.url)]) }]);
+    });
+    return rows;
+  }
+
+  function history(m) {
+    const A = m.activity;
+    if (!A || !A.threads) return [];
+    return [
+      ["Seen by Radar", `in ${A.threads} thread${A.threads === 1 ? "" : "s"} you viewed since ${A.firstSeen}` + (A.medianDelay != null ? `; replies a median ${A.medianDelay} s after the post` : "")],
+      ["Often alongside", A.alongside.length ? A.alongside.map((x) => `@${x.handle} (${x.n})`).join(", ") : null],
+    ];
+  }
+
+  // sections for PBPop; onLookup is offered when X has not given account data yet.
+  function sections(m, signals, onLookup) {
+    const owner = PB.ownerOfHandle(m.handle);
+    const head = [
+      [null, [m.display, "@" + m.handle].filter(Boolean).join("  ")],
+      ["Owned by", owner ? `${owner.owner} (Wikidata)` : null],
+      ["Profile", m.profile ? { links: [[m.profile.replace(/^https?:\/\/(www\.)?/, ""), m.profile]] } : null],
+    ];
+    if (m.site && m.site.hasLocation && !(m.reading && (m.reading.aboutRead || m.reading.basedIn)) && onLookup) {
+      head.push(["About this account", m.lookingUp ? { note: "Reading…" } : { action: [m.failed ? "Try again" : "Read it now", () => onLookup(m.handle), "Reading…"] }]);
+    }
+    return [
+      { rows: head },
+      { title: "Signals", signals, rows: signals.length ? [] : [[null, { note: "Nothing stands out in what the site shows." }]] },
+      { title: "Where", rows: where(m) },
+      { title: "This post", rows: post(m) },
+      { title: "Account", rows: account(m) },
+      { title: "In your history", rows: history(m) },
+      { foot: "Radar does not show or guess demographics. Data stays in this browser." },
+    ];
+  }
+
+  globalThis.PBCard = Object.freeze({ sections });
+})();

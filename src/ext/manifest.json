@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Radar",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Radar: evidence on social media replies. Where an account is labelled as based, signs of coordination, and a thread report. Nothing leaves your browser.",
   "permissions": [
     "storage"
@@ -52,7 +52,10 @@
         "store.js",
         "about-page.js",
         "platforms.js",
-        "rows.js",
+        "pop.js",
+        "signals.js",
+        "card.js",
+        "panel.js",
         "ui.js",
         "auto.js",
         "content.js"
@@ -70,6 +73,7 @@
     }
   },
   "action": {
-    "default_title": "Radar: scan this thread"
+    "default_title": "Radar",
+    "default_popup": "popup.html"
   }
 }
