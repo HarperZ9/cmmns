@@ -58,6 +58,7 @@
         "panel.js",
         "ui.js",
         "auto.js",
+        "logs.js",
         "content.js"
       ],
       "css": [

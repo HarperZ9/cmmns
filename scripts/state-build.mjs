@@ -133,77 +133,85 @@ async function extraOutlets(bodies) {
   return out.filter((o) => o && !/^Q\d+$/.test(o.name));
 }
 
+// Shared state of the Wikidata walk: fetched entities and the roots each class falls under.
+const E = {}, roots = new Map();
+const qid = (r) => r.source.split("/").pop();
+const under = (e, r) => ids(e, "P31").some((c) => roots.get(c) && roots.get(c).has(r));
+const isStateBody = (e) => ![...INVESTORS, ...NOT_CONTROLLERS].some((r) => under(e, r)) && STATE_ROOTS.some((r) => under(e, r));
+const isCountry = (e) => !!e && (under(e, "Q3624078") || under(e, "Q6256"));
+const isRegional = (e) => REGIONAL_CLASSES.some((r) => under(e, r)) || (under(e, "Q56061") && !isCountry(e)) || (ids(e, "P1001").length > 0 && !isCountry(E[ids(e, "P1001")[0]]));
+// The country, not a region: P17 first ("State of California" gives United States).
+const countryOf = (e) => (isCountry(e) ? label(e) : label(E[ids(e, "P17")[0]]) || label(E[ids(e, "P1001")[0]]));
+
+// Fetch outlets, their controllers up to MAX_HOPS, the classes they use, and country labels.
+async function prepare(list) {
+  const fresh0 = [...new Set(list.map(qid))].filter((q) => !E[q]);
+  Object.assign(E, await entities(fresh0));
+  let frontier = new Set(fresh0.flatMap((q) => controllers(E[q])));
+  for (let hop = 1; hop <= MAX_HOPS && frontier.size; hop++) {
+    const fresh = [...frontier].filter((q) => !E[q]);
+    Object.assign(E, await entities(fresh));
+    console.log(`  hop ${hop}: ${fresh.length} controllers`);
+    frontier = new Set(fresh.flatMap((q) => controllers(E[q])));
+  }
+  const classes = [...new Set(Object.values(E).flatMap((e) => ids(e, "P31")))].filter((c) => !roots.has(c));
+  for (const [c, set] of await classRoots(classes)) roots.set(c, set);
+  for (const c of classes) if (!roots.has(c)) roots.set(c, new Set());
+  const missing = [...new Set(Object.values(E).flatMap((e) => [...ids(e, "P17"), ...ids(e, "P1001")]))].filter((q) => !E[q]);
+  Object.assign(E, await entities(missing));
+}
+
+// Why one outlet is state-linked, or null: its own class, else the nearest state body or public
+// broadcaster among its controllers (breadth-first). Bodies found are added to `bodies`.
+function linkOf(e, bodies) {
+  if (under(e, STATE_MEDIA)) return { via: "classed as state media on Wikidata", state: label(E[ids(e, "P17")[0]]) };
+  if (under(e, PUBLIC_BROADCASTER)) return { via: "classed as a public broadcaster on Wikidata", state: label(E[ids(e, "P17")[0]]), basis: "public-broadcaster" };
+  let level = controllers(e);
+  const seen = new Set([e.id]);
+  for (let hop = 1; hop <= MAX_HOPS && level.length; hop++) {
+    const next = [];
+    for (const q of level) {
+      if (seen.has(q)) continue;
+      seen.add(q);
+      const o = E[q];
+      if (o && isStateBody(o)) { bodies.add(q); return { via: `controlled through ${label(o)}`, state: countryOf(o), ...(isRegional(o) ? { level: "regional" } : {}) }; }
+      if (o && under(o, PUBLIC_BROADCASTER)) { bodies.add(q); return { via: `part of ${label(o)}, a public broadcaster`, state: label(E[ids(o, "P17")[0]]), basis: "public-broadcaster" }; }
+      if (o) next.push(...controllers(o));
+    }
+    level = next;
+  }
+  return null;
+}
+
+function evaluate(list, out, bodies) {
+  for (const r of list) {
+    const e = E[qid(r)];
+    if (!e || GOV_DOMAIN.test(r.domain)) continue;
+    const hit = linkOf(e, bodies);
+    if (!hit || !hit.state || /^Q\d+$/.test(hit.state)) continue;
+    const key = r.domain + "|" + canon(hit.state);
+    if (out.has(key)) continue;
+    out.set(key, {
+      domain: r.domain, ...(r.x ? { x: r.x } : {}), state: canon(hit.state), basis: hit.basis || "state-owned", ...(hit.level ? { level: hit.level } : {}), name: r.name,
+      source: { title: `Wikidata: ${r.name}, ${hit.via}`, url: r.source.replace(/^http:/, "https:"), date: new Date().toISOString().slice(0, 10) },
+    });
+  }
+}
+
 async function wikidataRows() {
-  const E = {}, roots = new Map();
-  const qid = (r) => r.source.split("/").pop();
-  // Fetch outlets, their controllers up to MAX_HOPS, and the classes they use.
-  async function prepare(list) {
-    const fresh0 = [...new Set(list.map(qid))].filter((q) => !E[q]);
-    Object.assign(E, await entities(fresh0));
-    let frontier = new Set(fresh0.flatMap((q) => controllers(E[q])));
-    for (let hop = 1; hop <= MAX_HOPS && frontier.size; hop++) {
-      const fresh = [...frontier].filter((q) => !E[q]);
-      Object.assign(E, await entities(fresh));
-      console.log(`  hop ${hop}: ${fresh.length} controllers`);
-      frontier = new Set(fresh.flatMap((q) => controllers(E[q])));
-    }
-    const classes = [...new Set(Object.values(E).flatMap((e) => ids(e, "P31")))].filter((c) => !roots.has(c));
-    for (const [c, set] of await classRoots(classes)) roots.set(c, set);
-    for (const c of classes) if (!roots.has(c)) roots.set(c, new Set());
-    const missing = [...new Set(Object.values(E).flatMap((e) => [...ids(e, "P17"), ...ids(e, "P1001")]))].filter((q) => !E[q]);
-    Object.assign(E, await entities(missing));
-  }
-  const under = (e, r) => ids(e, "P31").some((c) => roots.get(c) && roots.get(c).has(r));
-  const isStateBody = (e) => ![...INVESTORS, ...NOT_CONTROLLERS].some((r) => under(e, r)) && STATE_ROOTS.some((r) => under(e, r));
-  const isCountry = (e) => !!e && (under(e, "Q3624078") || under(e, "Q6256"));
-  const isRegional = (e) => REGIONAL_CLASSES.some((r) => under(e, r)) || (under(e, "Q56061") && !isCountry(e)) || (ids(e, "P1001").length > 0 && !isCountry(E[ids(e, "P1001")[0]]));
-  // The country, not a region: P17 first ("State of California" gives United States).
-  const countryOf = (e) => (isCountry(e) ? label(e) : label(E[ids(e, "P17")[0]]) || label(E[ids(e, "P1001")[0]]));
-
   const out = new Map(), bodies = new Set();
-  function evaluate(list) {
-    for (const r of list) {
-      const e = E[qid(r)];
-      if (!e || GOV_DOMAIN.test(r.domain)) continue;
-      let hit = null;
-      if (under(e, STATE_MEDIA)) hit = { via: "classed as state media on Wikidata", state: label(E[ids(e, "P17")[0]]) };
-      else if (under(e, PUBLIC_BROADCASTER)) hit = { via: "classed as a public broadcaster on Wikidata", state: label(E[ids(e, "P17")[0]]), basis: "public-broadcaster" };
-      // breadth-first so the nearest state body wins
-      let level = controllers(e);
-      const seen = new Set([e.id]);
-      for (let hop = 1; !hit && hop <= MAX_HOPS && level.length; hop++) {
-        const next = [];
-        for (const q of level) {
-          if (seen.has(q)) continue;
-          seen.add(q);
-          const o = E[q];
-          if (o && isStateBody(o)) { bodies.add(q); hit = { via: `controlled through ${label(o)}`, state: countryOf(o), ...(isRegional(o) ? { level: "regional" } : {}) }; break; }
-          if (o && under(o, PUBLIC_BROADCASTER)) { bodies.add(q); hit = { via: `part of ${label(o)}, a public broadcaster`, state: label(E[ids(o, "P17")[0]]), basis: "public-broadcaster" }; break; }
-          if (o) next.push(...controllers(o));
-        }
-        level = next;
-      }
-      if (!hit || !hit.state || /^Q\d+$/.test(hit.state)) continue;
-      const key = r.domain + "|" + canon(hit.state);
-      if (out.has(key)) continue;
-      out.set(key, {
-        domain: r.domain, ...(r.x ? { x: r.x } : {}), state: canon(hit.state), basis: hit.basis || "state-owned", ...(hit.level ? { level: hit.level } : {}), name: r.name,
-        source: { title: `Wikidata: ${r.name}, ${hit.via}`, url: r.source.replace(/^http:/, "https:"), date: new Date().toISOString().slice(0, 10) },
-      });
-    }
-  }
-
   const outlets = JSON.parse(readFileSync(join(root, "src/ext/owners.json"), "utf8")).rows.filter((r) => r.source);
   console.log(`pass 1: ${outlets.length} outlets from owners.json`);
   await prepare(outlets);
-  evaluate(outlets);
+  evaluate(outlets, out, bodies);
   const known = new Set(outlets.map(qid));
-  const extra = (await extraOutlets([...bodies])).filter((o) => !known.has(qid(o)));
+  // Sorted by item id so a domain several items share always cites the same item.
+  const extra = (await extraOutlets([...bodies])).filter((o) => !known.has(qid(o))).sort((a, b) => Number(qid(a).slice(1)) - Number(qid(b).slice(1)));
   console.log(`pass 2: ${extra.length} more outlets (state media, public broadcasters, children of ${bodies.size} state bodies)`);
   await prepare(extra);
   const media = extra.filter((o) => { const e = E[qid(o)]; return e && MEDIA_ROOTS.some((r) => under(e, r)); });
   console.log(`pass 2: ${media.length} of them are media`);
-  evaluate(media);
+  evaluate(media, out, bodies);
   return [...out.values()];
 }
 

@@ -8,7 +8,7 @@
     storage: { local: {
       get: async (k) => Object.fromEntries((Array.isArray(k) ? k : [k]).map((x) => [x, store[x]])),
       set: async (o) => { Object.assign(store, o); },
-      remove: async (k) => { delete store[k]; },
+      remove: async (k) => { for (const x of Array.isArray(k) ? k : [k]) delete store[x]; },
     }, onChanged: { addListener: () => {} } },
     runtime: {
       getManifest: () => ({ version: "fixture" }),

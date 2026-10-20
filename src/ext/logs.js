@@ -1,0 +1,79 @@
+// Radar's local logs and lookups, shared by the content script: the owner and state tables for
+// what is on screen, the connections log, source trails, per-thread history snapshots, and the
+// report export. Everything stays in chrome.storage.local on this machine.
+(() => {
+  "use strict";
+  // Ask the background worker for the owners of the domains and accounts on screen, once each.
+  const askedOwners = new Set(), ownerRows = [], stateRows = [];
+  async function ensureOwners(items) {
+    const domains = [...new Set(items.flatMap((r) => r.domains || []))].filter((d) => !askedOwners.has(d));
+    const handles = items.map((r) => r.author).filter((h) => !askedOwners.has("@" + h));
+    if (!domains.length && !handles.length) return;
+    domains.forEach((d) => askedOwners.add(d)); handles.forEach((h) => askedOwners.add("@" + h));
+    try {
+      const [rows, srows] = await Promise.all([chrome.runtime.sendMessage({ type: "pb-owners", domains, handles }), chrome.runtime.sendMessage({ type: "pb-state", domains, handles })]);
+      if (Array.isArray(rows) && rows.length) { ownerRows.push(...rows); PB.setOwnerRows(ownerRows); }
+      if (Array.isArray(srows) && srows.length) { stateRows.push(...srows); PB.setStateRows(stateRows); }
+    } catch (e) { console.error("[radar] owner lookup failed", e); }
+  }
+
+  // Local connections log (src/core/network.js): which accounts replied where, and how fast.
+  const NET_KEY = "pb.net.v1";
+  let netLog = {}, lastRecorded = "";
+  chrome.storage.local.get(NET_KEY).then((g) => { netLog = g[NET_KEY] || {}; }).catch(() => {});
+  function recordNet(threadKey, replies, root) {
+    const sig = threadKey + ":" + replies.length;
+    if (sig === lastRecorded) return;
+    lastRecorded = sig;
+    netLog = PB.recordThread(netLog, threadKey, replies.map((r) => ({ author: r.author, posted: r.posted, text: r.text, domains: r.domains })), root && root.posted);
+    chrome.storage.local.set({ [NET_KEY]: netLog }).catch((e) => console.error("[radar] could not save the connections log", e));
+  }
+
+  // Source trails (src/core/trail.js): which posts carried each upload and link, kept 30 days.
+  const TRAIL_KEY = "pb.trail.v1";
+  let trailLog = {}, trailSave = 0;
+  chrome.storage.local.get(TRAIL_KEY).then((g) => { trailLog = g[TRAIL_KEY] || {}; }).catch(() => {});
+  function recordTrail(batch) {
+    trailLog = PB.recordSpread(trailLog, batch);
+    clearTimeout(trailSave);
+    trailSave = setTimeout(() => chrome.storage.local.set({ [TRAIL_KEY]: trailLog }).catch((e) => console.error("[radar] could not save trails", e)), 2000);
+  }
+
+  // One snapshot per thread for the history page (src/core/history.js), saved a moment after the
+  // thread settles so a scrolling thread is written once, not on every refresh.
+  const HISTORY_KEY = "pb.history.v1";
+  let historySave = 0;
+  function saveSnapshot(key, siteName, report) {
+    clearTimeout(historySave);
+    historySave = setTimeout(async () => {
+      try {
+        const log = (await chrome.storage.local.get(HISTORY_KEY))[HISTORY_KEY] || {};
+        await chrome.storage.local.set({ [HISTORY_KEY]: PB.addSnapshot(log, PB.snapshot(key, siteName, report)) });
+      } catch (e) { console.error("[radar] could not save the thread snapshot", e); }
+    }, 3000);
+  }
+
+  function clearAll() {
+    trailLog = {}; netLog = {}; lastRecorded = "";
+    return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY]);
+  }
+
+  // A local file the user can keep or share: the report, per-account labels and flags with what
+  // each does not prove, and where the data came from. Reply text is left out.
+  function exportReport(site, report, clusters, rows, video, pushed) {
+    const out = {
+      tool: "Radar " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), page: location.href, site: site.name,
+      report, video, pushedLinks: pushed,
+      sameTextGroups: clusters.map((c) => ({ size: c.ids.length, authors: c.authors })),
+      accounts: rows.map((r) => ({ handle: r.author, basedIn: r.basedIn || null, joinDate: r.joinDate || null, machineSigns: r.machine, flags: (r.flags || []).map((f) => ({ id: f.id, evidence: f.evidence, doesNotProve: f.doesNotProve })) })),
+      doesNotProve: PB.REPORT_DOES_NOT_PROVE,
+    };
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" }));
+    a.download = `radar-${site.id}-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }
+
+  globalThis.PBLogs = Object.freeze({ ensureOwners, recordNet, recordTrail, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
+})();
