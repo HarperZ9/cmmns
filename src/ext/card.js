@@ -92,6 +92,22 @@
     return rows;
   }
 
+  // How the account posts, from its posts X loaded (src/core/pattern.js).
+  function posting(m) {
+    const P = (m.reading || {}).pattern;
+    if (!P) return [];
+    const pc = (x) => `${Math.round(x * 100)}%`;
+    const gap = P.medianGapSec == null ? null : P.medianGapSec < 120 ? `${P.medianGapSec} s` : P.medianGapSec < 7200 ? `${Math.round(P.medianGapSec / 60)} min` : `${Math.round(P.medianGapSec / 3600)} h`;
+    return [
+      ["Posts seen", `${P.posts} from ${P.from.slice(0, 10)} to ${P.to.slice(0, 10)} (about ${P.perDay} a day)`],
+      ["Sent from", P.clients.map((c) => `${c.name} ${pc(c.share)}`).join(", ") || null],
+      ["Mix", `reposts ${pc(P.reposts)}, replies ${pc(P.replies)}, quotes ${pc(P.quotes)}, with media ${pc(P.media)}`],
+      ["Typical gap", gap ? `${gap} between posts` : null],
+      ["Hours active", `${P.activeUtcHours} of 24 UTC hours across ${P.days} days`],
+      ["Languages", P.langs.map((l) => `${l.lang} ${pc(l.share)}`).join(", ") || null],
+    ];
+  }
+
   function history(m) {
     const A = m.activity;
     if (!A || !A.threads) return [];
@@ -119,6 +135,7 @@
       { title: "This post", rows: post(m) },
       { title: "Source trail", rows: trail(m), foot: m.trail && (m.trail.steps.length || m.trail.media.length) ? "Followed through pointers X records: quotes, reposts, lifted media and upload ids. It stops at the first upload." : null },
       { title: "Account", rows: account(m) },
+      { title: "How it posts", rows: posting(m), foot: (m.reading || {}).pattern ? "From the posts X loaded for this account in your browser, not its whole history." : null },
       { title: "In your history", rows: history(m) },
       { foot: "Radar does not show or guess demographics. Data stays in this browser." },
     ];

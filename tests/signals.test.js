@@ -56,3 +56,12 @@ test("the source trail section reads the upstream steps and the spread", () => {
   assert.match(text, /Quotes @origin, 2019-05-02 01:00 UTC/);
   assert.match(text, /in 4 posts by 4 accounts/);
 });
+
+test("the card's posting section reads the saved pattern", () => {
+  const pattern = { posts: 96, from: "2026-10-15T00:00:00Z", to: "2026-10-18T23:00:00Z", days: 4, perDay: 24, reposts: 0.1, replies: 0, quotes: 0, media: 0.2, clients: [{ name: "Buffer", share: 1 }], langs: [{ lang: "en", share: 1 }], medianGapSec: 3600, activeUtcHours: 24 };
+  const sec = PBCard.sections({ site: X, handle: "a", reading: { pattern }, markers: [], machine: {}, flags: [] }, [], null).find((s) => s.title === "How it posts");
+  const text = sec.rows.map(([h, t]) => `${h}: ${t}`).join(" | ");
+  assert.match(text, /Buffer 100%/);
+  assert.match(text, /60 min between posts/);
+  assert.match(text, /24 of 24 UTC hours across 4 days/);
+});

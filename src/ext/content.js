@@ -16,7 +16,7 @@
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
     const activity = PB.activity(PBLogs.net(), r.author);
     const echo = PB.echoes(PBLogs.net(), site.id + ":" + location.pathname, r.text);
-    if (reading && site.hasLocation) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation }, { mismatch, cluster, activity, echo }) };
+    if (reading && site.hasLocation) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation, pattern: reading.pattern }, { mismatch, cluster, activity, echo }) };
     // Reddit: account age, karma and sign-up name from Reddit's own account data (src/ext/reddit.js).
     const rd = site.id === "reddit" && globalThis.PBReddit ? PBReddit.get(r.author) : null;
     const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display, joinDate: rd && rd.joinDate, karma: rd && rd.karma, redditDefaultName: rd && rd.defaultName }, { cluster, echo });
@@ -117,6 +117,20 @@
     schedule();
   }
 
+  // Posting patterns (src/core/pattern.js): posts X loaded, collected per author across responses;
+  // once an author has enough, the pattern is saved with that account's reading.
+  const authorPosts = new Map();
+  function recordPatterns(batch) {
+    for (const [k, posts] of PB.byAuthor(batch)) {
+      const all = new Map((authorPosts.get(k) || []).map((p) => [p.id, p]));
+      for (const p of posts) all.set(p.id, p);
+      const list = [...all.values()].slice(-200);
+      authorPosts.set(k, list);
+      const pattern = PB.postingPattern(list);
+      if (pattern) PBStore.put({ handle: posts[0].author, pattern }).catch((e) => console.error("[radar] could not save a posting pattern", e));
+    }
+  }
+
   // Post metadata from X's responses, and YouTube's page data (src/ext/ytsniff.js), in memory only.
   const tweets = new Map(), ytAuthors = new Map();
   const ytVideos = new Map();   // videoId -> info; the page's first data goes stale after in-page navigation
@@ -125,7 +139,7 @@
     if (e.data.source === "radar-sniff") {
       const batch = PB.tweetsIn(e.data.json);
       for (const t of batch) tweets.set(t.id, { ...(tweets.get(t.id) || {}), ...t });
-      if (batch.length) recordTrail(batch);
+      if (batch.length) { recordTrail(batch); recordPatterns(batch); }
     }
     if (e.data.source !== "radar-yt") return;
     const v = PB.ytVideoInfo(e.data.json);

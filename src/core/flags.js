@@ -13,6 +13,8 @@ export const HIGH_VOLUME_PER_DAY = 100;
 export const DEFAULT_HANDLE = /^[A-Za-z]+_?[0-9]{6,}$/;
 
 const DAY = 86400000;
+// X's own apps; posts from anything else came through a third-party or automation tool.
+const COMMON_APP = /^(?:Twitter|X) (?:for (?:iPhone|Android|iPad|Mac)|Web App|Web Client)$/;
 // Self-chosen names that carry documented hate symbols (ADL Hate Symbols database).
 const HATE_NAME = /(?:^|[^\d])(?:1488|14\/88)(?:$|[^\d])|\b(?:aryan|foid|foids|sieg ?heil|groyper|groypers)\b/i;
 
@@ -23,6 +25,9 @@ export const DOES_NOT_PROVE = {
   "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them.",
   "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy.",
   "copied-elsewhere": "People repost text they agree with, and memes and quotes repeat. Repeated wording shows copying or coordination, not who is behind it.",
+  "automation-app": "Scheduling tools are common among news desks, brands and busy people.",
+  "no-sleep-gap": "Teams in several time zones, shared accounts and scheduling tools post around the clock too.",
+  "repost-only": "Some people use an account only to share others' posts.",
   "low-karma": "Many people read more than they post, and karma depends on which communities they use.",
   "new-account": "New accounts include real people who just joined, often during a news event.",
   "name-changes": "People rename accounts for many reasons; repeated renames are only common among resold or repurposed accounts.",
@@ -92,6 +97,14 @@ export function flagsFor(account, context = {}) {
   if (context.echo && context.echo.threads >= 1) {
     const by = context.echo.authors.filter((a) => a !== String(account.handle || "").toLowerCase());
     out.push({ id: "copied-elsewhere", evidence: `the same wording appeared in ${context.echo.threads} other thread${context.echo.threads === 1 ? "" : "s"} you viewed` + (by.length ? `, posted by ${by.slice(0, 6).map((a) => "@" + a).join(", ")}` : ", from this account") });
+  }
+  // How the account posts (src/core/pattern.js), from its posts X loaded.
+  const P = account.pattern;
+  if (P) {
+    const app = (P.clients || []).find((c) => !COMMON_APP.test(c.name) && c.share >= 0.8);
+    if (app) out.push({ id: "automation-app", evidence: `${Math.round(app.share * 100)}% of its last ${P.posts} posts were sent from ${app.name}` });
+    if (P.days >= 3 && P.posts >= 40 && P.activeUtcHours >= 22) out.push({ id: "no-sleep-gap", evidence: `posted in ${P.activeUtcHours} of the 24 hours of the day across ${P.days} days (${P.posts} posts)` });
+    if (P.posts >= 20 && P.reposts >= 0.9) out.push({ id: "repost-only", evidence: `${Math.round(P.reposts * 100)}% of its last ${P.posts} posts are reposts` });
   }
   const store = storeCountry(account.connectedVia);
   if (store && account.basedIn && !samePlace(store, account.basedIn)) out.push({ id: "store-elsewhere", evidence: `installed from the ${store} app store; labelled as based in ${account.basedIn}` });

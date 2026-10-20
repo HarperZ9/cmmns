@@ -330,6 +330,52 @@ const LOW_KARMA = 20;
 return { REDDIT_DEFAULT_NAME, redditAbout, LOW_KARMA };
 })();
 
+// ---- pattern.js
+const M_pattern = (() => {
+// How an account posts, from the posts X has loaded for it (a profile timeline, a thread, a search):
+// which apps it posts from, how much is reposts and replies, how often, and whether it ever stops.
+// Everything describes the account's behaviour; none of it says who runs it.
+
+const MIN_PATTERN_POSTS = 10;
+
+const median = (xs) => { if (!xs.length) return null; const s = [...xs].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
+
+// posts: tweets by one author, as tweetsIn() returns them ({ posted, client, repostOf, replyTo, quotedId, media, lang }).
+function postingPattern(posts) {
+  const ps = [...new Map(posts.filter((p) => p && p.posted).map((p) => [p.id, p])).values()].sort((a, b) => Date.parse(a.posted) - Date.parse(b.posted));
+  if (ps.length < MIN_PATTERN_POSTS) return null;
+  const n = ps.length, share = (f) => Math.round((ps.filter(f).length / n) * 100) / 100;
+  const clients = new Map();
+  for (const p of ps) if (p.client) clients.set(p.client, (clients.get(p.client) || 0) + 1);
+  const langs = new Map();
+  for (const p of ps) if (p.lang) langs.set(p.lang, (langs.get(p.lang) || 0) + 1);
+  const times = ps.map((p) => Date.parse(p.posted));
+  const gaps = times.slice(1).map((t, i) => Math.round((t - times[i]) / 1000));
+  const hours = new Set(times.map((t) => new Date(t).getUTCHours()));
+  const days = new Set(times.map((t) => new Date(t).toISOString().slice(0, 10)));
+  const spanDays = Math.max(1, (times[n - 1] - times[0]) / 86400000);
+  return {
+    posts: n, from: new Date(times[0]).toISOString(), to: new Date(times[n - 1]).toISOString(), days: days.size,
+    perDay: Math.round((n / spanDays) * 10) / 10,
+    reposts: share((p) => p.repostOf), replies: share((p) => p.replyTo && !p.repostOf), quotes: share((p) => p.quotedId), media: share((p) => (p.media || []).length),
+    clients: [...clients].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([name, k]) => ({ name, share: Math.round((k / n) * 100) / 100 })),
+    langs: [...langs].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([lang, k]) => ({ lang, share: Math.round((k / n) * 100) / 100 })),
+    medianGapSec: median(gaps),
+    // Hours of the UTC day with at least one post; people sleep, so 22 or more over several days is rare.
+    activeUtcHours: hours.size,
+  };
+}
+
+// Group a batch of loaded posts by author (lower-case handle).
+function byAuthor(tweets) {
+  const m = new Map();
+  for (const t of tweets) if (t.author) { const k = t.author.toLowerCase(); (m.get(k) || m.set(k, []).get(k)).push(t); }
+  return m;
+}
+
+return { MIN_PATTERN_POSTS, postingPattern, byAuthor };
+})();
+
 // ---- flags.js
 const M_flags = (() => {
 // Authenticity flags for one account, each with its evidence and what it does not prove.
@@ -347,6 +393,8 @@ const HIGH_VOLUME_PER_DAY = 100;
 const DEFAULT_HANDLE = /^[A-Za-z]+_?[0-9]{6,}$/;
 
 const DAY = 86400000;
+// X's own apps; posts from anything else came through a third-party or automation tool.
+const COMMON_APP = /^(?:Twitter|X) (?:for (?:iPhone|Android|iPad|Mac)|Web App|Web Client)$/;
 // Self-chosen names that carry documented hate symbols (ADL Hate Symbols database).
 const HATE_NAME = /(?:^|[^\d])(?:1488|14\/88)(?:$|[^\d])|\b(?:aryan|foid|foids|sieg ?heil|groyper|groypers)\b/i;
 
@@ -357,6 +405,9 @@ const DOES_NOT_PROVE = {
   "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them.",
   "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy.",
   "copied-elsewhere": "People repost text they agree with, and memes and quotes repeat. Repeated wording shows copying or coordination, not who is behind it.",
+  "automation-app": "Scheduling tools are common among news desks, brands and busy people.",
+  "no-sleep-gap": "Teams in several time zones, shared accounts and scheduling tools post around the clock too.",
+  "repost-only": "Some people use an account only to share others' posts.",
   "low-karma": "Many people read more than they post, and karma depends on which communities they use.",
   "new-account": "New accounts include real people who just joined, often during a news event.",
   "name-changes": "People rename accounts for many reasons; repeated renames are only common among resold or repurposed accounts.",
@@ -426,6 +477,14 @@ function flagsFor(account, context = {}) {
   if (context.echo && context.echo.threads >= 1) {
     const by = context.echo.authors.filter((a) => a !== String(account.handle || "").toLowerCase());
     out.push({ id: "copied-elsewhere", evidence: `the same wording appeared in ${context.echo.threads} other thread${context.echo.threads === 1 ? "" : "s"} you viewed` + (by.length ? `, posted by ${by.slice(0, 6).map((a) => "@" + a).join(", ")}` : ", from this account") });
+  }
+  // How the account posts (src/core/pattern.js), from its posts X loaded.
+  const P = account.pattern;
+  if (P) {
+    const app = (P.clients || []).find((c) => !COMMON_APP.test(c.name) && c.share >= 0.8);
+    if (app) out.push({ id: "automation-app", evidence: `${Math.round(app.share * 100)}% of its last ${P.posts} posts were sent from ${app.name}` });
+    if (P.days >= 3 && P.posts >= 40 && P.activeUtcHours >= 22) out.push({ id: "no-sleep-gap", evidence: `posted in ${P.activeUtcHours} of the 24 hours of the day across ${P.days} days (${P.posts} posts)` });
+    if (P.posts >= 20 && P.reposts >= 0.9) out.push({ id: "repost-only", evidence: `${Math.round(P.reposts * 100)}% of its last ${P.posts} posts are reposts` });
   }
   const store = storeCountry(account.connectedVia);
   if (store && account.basedIn && !samePlace(store, account.basedIn)) out.push({ id: "store-elsewhere", evidence: `installed from the ${store} app store; labelled as based in ${account.basedIn}` });
@@ -1701,5 +1760,5 @@ const HISTORY_DOES_NOT_PROVE = "These totals cover only the threads you opened, 
 return { HISTORY_RETAIN_DAYS, snapshot, addSnapshot, summarize, HISTORY_DOES_NOT_PROVE };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state, ...M_trail, ...M_history });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state, ...M_trail, ...M_history });
 })();
