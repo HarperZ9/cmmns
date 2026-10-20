@@ -99,8 +99,10 @@
     const pc = (x) => `${Math.round(x * 100)}%`;
     const gap = P.medianGapSec == null ? null : P.medianGapSec < 120 ? `${P.medianGapSec} s` : P.medianGapSec < 7200 ? `${Math.round(P.medianGapSec / 60)} min` : `${Math.round(P.medianGapSec / 3600)} h`;
     return [
+      ["Posts by hour", P.hourHist ? { hours: P.hourHist } : null],
+      ["Last 14 days", P.daily ? { days: P.daily } : null],
+      ["Sent from", P.clients.length ? { stack: P.clients.map((c) => ({ label: c.name, share: c.share })) } : null],
       ["Posts seen", `${P.posts} from ${P.from.slice(0, 10)} to ${P.to.slice(0, 10)} (about ${P.perDay} a day)`],
-      ["Sent from", P.clients.map((c) => `${c.name} ${pc(c.share)}`).join(", ") || null],
       ["Mix", `reposts ${pc(P.reposts)}, replies ${pc(P.replies)}, quotes ${pc(P.quotes)}, with media ${pc(P.media)}`],
       ["Typical gap", gap ? `${gap} between posts` : null],
       ["Hours active", `${P.activeUtcHours} of 24 UTC hours across ${P.days} days`],
@@ -117,27 +119,42 @@
     ];
   }
 
-  // sections for PBPop; onLookup is offered when X has not given account data yet.
+  // How this account compares with the other repliers Radar has read in this thread.
+  function compare(m) {
+    const C = m.thread, R = m.reading || {};
+    if (!C || C.n < 5) return [];
+    const age = R.joinDate ? PB.ageDays(R.joinDate) : null;
+    const same = R.basedIn ? C.places[R.basedIn] || 0 : null;
+    return [
+      ["Account age", age != null && C.medianAgeDays != null ? `${age.toLocaleString()} days; the thread's median is ${C.medianAgeDays.toLocaleString()} (${C.n} accounts read)` : null],
+      ["Same label", same != null ? `${same} of ${C.n} accounts read here are labelled ${R.basedIn}` : null],
+      ["Flagged here", `${C.flagged} of ${C.n} accounts read in this thread have at least one flag`],
+    ];
+  }
+
+  // sections for PBPop, by tab; onLookup is offered when X has not given account data yet.
   function sections(m, signals, onLookup) {
     const owner = PB.ownerOfHandle(m.handle);
     const head = [
-      [null, [m.display, "@" + m.handle].filter(Boolean).join("  ")],
       ["Owned by", owner ? `${owner.owner} (Wikidata)` : null],
       ["Profile", m.profile ? { links: [[m.profile.replace(/^https?:\/\/(www\.)?/, ""), m.profile]] } : null],
     ];
     if (m.site && m.site.hasLocation && !(m.reading && (m.reading.aboutRead || m.reading.basedIn)) && onLookup) {
       head.push(["About this account", m.lookingUp ? { note: "Reading…" } : { action: [m.failed ? "Try again" : "Read it now", () => onLookup(m.handle), "Reading…"] }]);
     }
+    // Overview: the evidence grouped by area, in the strip's order.
+    const groups = PBSignals.AREAS.map(([id, name]) => ({ tab: "overview", area: id, title: name, signals: signals.filter((x) => x.cat === id) })).filter((g) => g.signals.length);
     return [
-      { rows: head },
-      { title: "Signals", signals, rows: signals.length ? [] : [[null, { note: "Nothing stands out in what the site shows." }]] },
-      { title: "Where", rows: where(m) },
-      { title: "This post", rows: post(m) },
-      { title: "Source trail", rows: trail(m), foot: m.trail && (m.trail.steps.length || m.trail.media.length) ? "Followed through pointers X records: quotes, reposts, lifted media and upload ids. It stops at the first upload." : null },
-      { title: "Account", rows: account(m) },
-      { title: "How it posts", rows: posting(m), foot: (m.reading || {}).pattern ? "From the posts X loaded for this account in your browser, not its whole history." : null },
-      { title: "In your history", rows: history(m) },
-      { foot: "Radar does not show or guess demographics. Data stays in this browser." },
+      { tab: "overview", rows: head },
+      ...(groups.length ? groups : [{ tab: "overview", rows: [[null, { note: "Nothing stands out in what the site shows. The other tabs have the details." }]] }]),
+      { tab: "overview", title: "Compared with this thread", rows: compare(m) },
+      { tab: "account", title: "Where", rows: where(m) },
+      { tab: "account", title: "Account", rows: account(m) },
+      { tab: "account", title: "How it posts", rows: posting(m), foot: (m.reading || {}).pattern ? "From the posts X loaded for this account in your browser, not its whole history." : null },
+      { tab: "post", title: "This post", rows: post(m) },
+      { tab: "post", title: "Source trail", rows: trail(m), foot: m.trail && (m.trail.steps.length || m.trail.media.length) ? "Followed through pointers X records: quotes, reposts, lifted media and upload ids. It stops at the first upload." : null },
+      { tab: "history", title: "In your history", rows: history(m) },
+      { tab: "history", foot: "Radar does not show or guess demographics. Data stays in this browser." },
     ];
   }
 

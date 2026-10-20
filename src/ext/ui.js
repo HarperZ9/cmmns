@@ -30,12 +30,11 @@
 
   function glance(m, signals) {
     const warn = signals.filter((s) => s.level === "warn").map((s) => s.label);
-    const flags = signals.filter((s) => s.level === "flag").length;
     return {
       who: [m.display, "@" + m.handle].filter(Boolean).join("  "),
       fact: fact(m),
       warn,
-      more: flags ? `${flags} more sign${flags === 1 ? "" : "s"} below` : null,
+      areas: PBSignals.areas(signals),
     };
   }
 
@@ -46,9 +45,7 @@
     if (old) old.remove();
     PBPop.hover(article, () => {
       const signals = PBSignals.all(model);
-      const secs = PBCard.sections(model, signals, onLookup);
-      // The card's first row is the account name, which the glance already shows.
-      return [{ glance: glance(model, signals) }, { rows: secs[0].rows.slice(1) }, ...secs.slice(1)];
+      return [{ glance: glance(model, signals) }, ...PBCard.sections(model, signals, onLookup)];
     });
   }
 

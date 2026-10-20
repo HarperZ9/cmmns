@@ -88,6 +88,14 @@
       rows.push({ id: r.id, author: r.author, text: r.text, machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
     if (root) models.push([root.node, { site, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, PBLogs.trail()), reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
+    // Thread context for the window's comparison: median account age, labels and flags among the
+    // accounts read here.
+    const read = rows.filter((r) => r.about || r.joinDate);
+    const ages = read.map((r) => r.joinDate && PB.ageDays(r.joinDate)).filter((x) => x != null).sort((a, b) => a - b);
+    const places = {};
+    for (const r of read) if (r.basedIn) places[r.basedIn] = (places[r.basedIn] || 0) + 1;
+    const thread = { n: read.length, medianAgeDays: ages.length ? ages[Math.floor(ages.length / 2)] : null, places, flagged: read.filter((r) => r.flags && PB.isFlagged(r.flags)).length };
+    for (const [, model] of models) model.thread = thread;
     drawn = models;
     drawVisible();
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.about).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];

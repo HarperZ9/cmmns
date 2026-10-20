@@ -6,7 +6,8 @@
   "use strict";
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const OPEN_MS = 450, CLOSE_MS = 260, FADE_MS = 160;
-  let pop = null, owner = null, pinned = false, openTimer = 0, closeTimer = 0;
+  const TABS = [["overview", "Overview"], ["account", "Account"], ["post", "This post"], ["history", "History"]];
+  let pop = null, owner = null, pinned = false, openTimer = 0, closeTimer = 0, lastTab = "overview";
 
   function close(now) {
     clearTimeout(openTimer); clearTimeout(closeTimer);
@@ -18,12 +19,38 @@
     setTimeout(() => p.remove(), FADE_MS);
   }
 
-  // A row value is text, { links: [[label, href]] }, { action: [label, fn, busyLabel] } or { note }.
+  // Small charts. Each bar carries a title for hover, and the numbers are also in the text rows.
+  function bars(values, titles, cls) {
+    const box = el("div", `pb-mini ${cls}`), max = Math.max(1, ...values);
+    values.forEach((v, i) => { const b = el("i"); b.style.height = `${Math.max(v ? 8 : 2, Math.round((v / max) * 100))}%`; if (!v) b.className = "pb-zero"; b.title = titles[i]; box.append(b); });
+    return box;
+  }
+  function chart(t) {
+    if (t.hours) {
+      const wrap = el("div", "pb-chart");
+      wrap.append(bars(t.hours, t.hours.map((n, h) => `${String(h).padStart(2, "0")}:00 UTC: ${n} post${n === 1 ? "" : "s"}`), "pb-hours"));
+      const axis = el("div", "pb-axis"); for (const h of ["00", "06", "12", "18", "24 UTC"]) axis.append(el("span", null, h));
+      wrap.append(axis);
+      return wrap;
+    }
+    if (t.days) return bars(t.days.map((d) => d.n), t.days.map((d) => `${d.day}: ${d.n} post${d.n === 1 ? "" : "s"}`), "pb-days");
+    if (t.stack) {
+      const wrap = el("div", "pb-chart"), bar = el("div", "pb-stack");
+      t.stack.forEach((s, i) => { const seg = el("i", `pb-s${Math.min(i, 3)}`); seg.style.width = `${Math.round(s.share * 100)}%`; seg.title = `${s.label}: ${Math.round(s.share * 100)}%`; bar.append(seg); });
+      wrap.append(bar, el("div", "pb-legend", t.stack.map((s) => `${s.label} ${Math.round(s.share * 100)}%`).join(" · ")));
+      return wrap;
+    }
+    return null;
+  }
+
+  // A row value is text, { links }, { action: [label, fn, busyLabel] }, { note }, or a chart.
   function renderRow(box, h, t) {
     if (!t) return;
     const row = el("div", "pb-row");
     if (h) row.append(el("div", "pb-row-h", h));
-    if (typeof t === "object" && t.links) {
+    const c = typeof t === "object" ? chart(t) : null;
+    if (c) row.append(c);
+    else if (typeof t === "object" && t.links) {
       const v = el("div", "pb-row-v");
       for (const [label, href] of t.links) { const a = el("a", "pb-link", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; v.append(a); }
       row.append(v);
@@ -35,40 +62,75 @@
     box.append(row);
   }
 
-  // sections: [{ glance?, title?, rows: [[h, t]], signals?: [{ label, level, rows }], foot? }]
-  function build(sections) {
-    const p = el("div", "pb-pop");
-    p.setAttribute("role", "dialog");
-    p.setAttribute("aria-label", "Radar");
-    for (const s of sections) {
-      if (s.glance) { p.append(glance(s.glance)); continue; }
-      if (!(s.rows || []).some(([, t]) => t) && !(s.signals || []).length && !(s.foot && !s.title)) continue;
-      const sec = el("section", "pb-sec");
-      if (s.title) sec.append(el("h3", "pb-sec-h", s.title));
-      for (const [h, t] of s.rows || []) renderRow(sec, h, t);
-      for (const g of s.signals || []) {
-        const d = el("details", `pb-sig pb-${g.level || "info"}`);
-        d.append(el("summary", null, g.label));
-        for (const [h, t] of g.rows) renderRow(d, h, t);
-        sec.append(d);
-      }
-      if (s.foot) sec.append(el("p", "pb-foot", s.foot));
-      if (sec.childNodes.length) p.append(sec);
+  function section(s) {
+    if (!(s.rows || []).some(([, t]) => t) && !(s.signals || []).length && !(s.foot && !s.title)) return null;
+    const sec = el("section", "pb-sec");
+    if (s.area) sec.dataset.area = s.area;
+    if (s.title) sec.append(el("h3", "pb-sec-h", s.title));
+    for (const [h, t] of s.rows || []) renderRow(sec, h, t);
+    for (const g of s.signals || []) {
+      const d = el("details", `pb-sig pb-${g.level || "info"}`);
+      d.append(el("summary", null, g.label));
+      for (const [h, t] of g.rows) renderRow(d, h, t);
+      sec.append(d);
     }
-    p.addEventListener("pointerenter", () => clearTimeout(closeTimer));
-    p.addEventListener("pointerleave", () => { if (!pinned) closeTimer = setTimeout(() => close(), CLOSE_MS); });
-    p.addEventListener("pointerdown", () => { pinned = true; });
-    return p;
+    if (s.foot) sec.append(el("p", "pb-foot", s.foot));
+    return sec;
   }
 
-  // The first lines: who, the key fact, and the signals worth a look, as plain text.
-  function glance(g) {
+  // The head: who, the key facts, the warnings, then the area strip. Clicking an area opens the
+  // Overview tab at that area's evidence.
+  function head(g, select) {
     const box = el("header", "pb-glance");
     box.append(el("div", "pb-g-who", g.who));
     if (g.fact) box.append(el("div", "pb-g-fact", g.fact));
     if (g.warn && g.warn.length) box.append(el("div", "pb-g-warn", g.warn.join(" · ")));
-    if (g.more) box.append(el("div", "pb-g-more", g.more));
+    if (g.areas) {
+      const strip = el("div", "pb-strip");
+      strip.setAttribute("role", "list");
+      for (const a of g.areas) {
+        const b = el("button", `pb-area pb-a-${a.level}`); b.type = "button"; b.setAttribute("role", "listitem");
+        b.append(el("i"), el("span", null, a.name));
+        b.title = a.level === "none" ? `${a.name}: nothing found in what the site shows` : `${a.name}: ${a.n} sign${a.n === 1 ? "" : "s"}${a.level === "warn" ? ", worth a look" : ""}`;
+        if (a.n) b.addEventListener("click", (e) => { e.stopPropagation(); select("overview", a.id); });
+        else b.disabled = true;
+        strip.append(b);
+      }
+      box.append(strip);
+    }
     return box;
+  }
+
+  // sections: [{ glance }, { tab, title?, area?, rows?, signals?, foot? }, ...]
+  function build(sections) {
+    const p = el("div", "pb-pop");
+    p.setAttribute("role", "dialog");
+    p.setAttribute("aria-label", "Radar");
+    const panes = new Map(TABS.map(([id]) => [id, el("div", "pb-pane")]));
+    const tabbar = el("nav", "pb-tabs");
+    const select = (id, area) => {
+      lastTab = id;
+      for (const [k, pane] of panes) pane.hidden = k !== id;
+      for (const b of tabbar.children) b.setAttribute("aria-selected", String(b.dataset.tab === id));
+      if (area) { const sec = panes.get(id).querySelector(`[data-area="${area}"]`); if (sec) { sec.querySelectorAll("details").forEach((d) => (d.open = true)); sec.scrollIntoView({ block: "nearest" }); } }
+    };
+    for (const s of sections) {
+      if (s.glance) { p.append(head(s.glance, select)); continue; }
+      const sec = section(s);
+      if (sec) panes.get(s.tab || "overview").append(sec);
+    }
+    for (const [id, name] of TABS) {
+      if (!panes.get(id).childNodes.length) continue;
+      const b = el("button", "pb-tab", name); b.type = "button"; b.dataset.tab = id; b.setAttribute("role", "tab");
+      b.addEventListener("click", (e) => { e.stopPropagation(); select(id); });
+      tabbar.append(b);
+    }
+    p.append(tabbar, ...[...panes.values()].filter((x) => x.childNodes.length));
+    select(panes.get(lastTab).childNodes.length ? lastTab : "overview");
+    p.addEventListener("pointerenter", () => clearTimeout(closeTimer));
+    p.addEventListener("pointerleave", () => { if (!pinned) closeTimer = setTimeout(() => close(), CLOSE_MS); });
+    p.addEventListener("pointerdown", () => { pinned = true; });
+    return p;
   }
 
   // Beside the post: to its right when there is room (outside the timeline column), else to its

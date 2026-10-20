@@ -29,7 +29,18 @@ export function postingPattern(posts) {
     medianGapSec: median(gaps),
     // Hours of the UTC day with at least one post; people sleep, so 22 or more over several days is rare.
     activeUtcHours: hours.size,
+    // For the window's small charts: posts per UTC hour of the day, and per day for the last 14 days.
+    hourHist: Array.from({ length: 24 }, (_, h) => times.filter((t) => new Date(t).getUTCHours() === h).length),
+    daily: lastDays(times, 14),
   };
+}
+
+function lastDays(times, n) {
+  const end = new Date(times[times.length - 1]); end.setUTCHours(0, 0, 0, 0);
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date(end.getTime() - (n - 1 - i) * 86400000).toISOString().slice(0, 10);
+    return { day: d, n: times.filter((t) => new Date(t).toISOString().slice(0, 10) === d).length };
+  });
 }
 
 // Group a batch of loaded posts by author (lower-case handle).

@@ -43,3 +43,15 @@ test("posts are grouped by author", () => {
   assert.equal(g.get("a").length, 2);
   assert.equal(g.size, 2);
 });
+
+test("hour histogram and the last 14 days", () => {
+  const ps = Array.from({ length: 48 }, (_, i) => post(i));
+  const p = postingPattern(ps);
+  assert.equal(p.hourHist.length, 24);
+  assert.equal(p.hourHist.reduce((a, b) => a + b, 0), 48);
+  assert.equal(p.daily.length, 14);
+  assert.equal(p.daily[13].day, "2026-10-16");
+  assert.equal(p.daily[13].n, 24);
+  assert.equal(p.daily[12].n, 24);
+  assert.equal(p.daily[11].n, 0);
+});

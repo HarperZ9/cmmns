@@ -61,7 +61,28 @@ test("the card's posting section reads the saved pattern", () => {
   const pattern = { posts: 96, from: "2026-10-15T00:00:00Z", to: "2026-10-18T23:00:00Z", days: 4, perDay: 24, reposts: 0.1, replies: 0, quotes: 0, media: 0.2, clients: [{ name: "Buffer", share: 1 }], langs: [{ lang: "en", share: 1 }], medianGapSec: 3600, activeUtcHours: 24 };
   const sec = PBCard.sections({ site: X, handle: "a", reading: { pattern }, markers: [], machine: {}, flags: [] }, [], null).find((s) => s.title === "How it posts");
   const text = sec.rows.map(([h, t]) => `${h}: ${t}`).join(" | ");
-  assert.match(text, /Buffer 100%/);
+  assert.deepEqual(sec.rows.find(([h]) => h === "Sent from")[1], { stack: [{ label: "Buffer", share: 1 }] });
+  assert.equal(sec.rows.find(([h]) => h === "Posts by hour")[1], null, "no histogram without hourHist");
   assert.match(text, /60 min between posts/);
   assert.match(text, /24 of 24 UTC hours across 4 days/);
+});
+
+test("areas: strongest level per area, none where nothing was found", () => {
+  const sig = PBSignals.all({ site: X, handle: "a", markers: PB.score("Migrants are vermin").markers, machine: {}, flags: [{ id: "new-account", evidence: "e", doesNotProve: "d" }] });
+  const a = Object.fromEntries(PBSignals.areas(sig).map((x) => [x.id, x.level]));
+  assert.equal(a.language, "warn");
+  assert.equal(a.account, "flag");
+  assert.equal(a.place, "none");
+  assert.deepEqual(PBSignals.AREAS.map(([id]) => id), ["place", "account", "posting", "coordination", "language", "sources", "media"]);
+});
+
+test("overview groups signals by area; comparison needs five accounts read", () => {
+  const sig = PBSignals.all({ site: X, handle: "a", markers: [], machine: {}, flags: [{ id: "new-account", evidence: "e", doesNotProve: "d" }, { id: "automation-app", evidence: "e", doesNotProve: "d" }] });
+  const base = { site: X, handle: "a", markers: [], machine: {}, flags: [], reading: { joinDate: new Date(Date.now() - 11 * 86400000).toISOString().slice(0, 10), basedIn: "France" } };
+  const secs = PBCard.sections({ ...base, thread: { n: 20, medianAgeDays: 2400, places: { France: 12 }, flagged: 3 } }, sig, null);
+  assert.deepEqual(secs.filter((s) => s.area).map((s) => s.area), ["account", "posting"]);
+  const cmp = secs.find((s) => s.title === "Compared with this thread").rows.map(([h, t]) => `${h}: ${t}`).join(" | ");
+  assert.match(cmp, /11 days; the thread's median is 2,400/);
+  assert.match(cmp, /12 of 20 accounts read here are labelled France/);
+  assert.deepEqual(PBCard.sections({ ...base, thread: { n: 3, medianAgeDays: 1, places: {}, flagged: 0 } }, sig, null).find((s) => s.title === "Compared with this thread").rows, []);
 });
