@@ -18,7 +18,7 @@
     "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name",
     "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere",
     "high-volume": "very high post rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute",
-    "copied-elsewhere": "same words in other threads", "follow-pattern": "follows many, few follow back",
+    "copied-elsewhere": "same words in other threads", "low-karma": "low karma for its age", "follow-pattern": "follows many, few follow back",
   };
   const WEAK = new Set(["default-handle", "follow-pattern"]);
   const day = (iso) => (iso ? iso.slice(0, 10) : "unknown");

@@ -3,6 +3,7 @@
 // calibrated against the hand-labelled threads (project-docs/EVALUATION.md).
 
 import { parseLabel } from "./places.js";
+import { LOW_KARMA } from "./reddit.js";
 
 export const NEW_ACCOUNT_DAYS = 30;
 export const MANY_NAME_CHANGES = 3;
@@ -22,6 +23,7 @@ export const DOES_NOT_PROVE = {
   "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them.",
   "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy.",
   "copied-elsewhere": "People repost text they agree with, and memes and quotes repeat. Repeated wording shows copying or coordination, not who is behind it.",
+  "low-karma": "Many people read more than they post, and karma depends on which communities they use.",
   "new-account": "New accounts include real people who just joined, often during a news event.",
   "name-changes": "People rename accounts for many reasons; repeated renames are only common among resold or repurposed accounts.",
   "default-handle": "Many real people never change the handle X suggested.",
@@ -106,6 +108,9 @@ export function flagsFor(account, context = {}) {
   const name = `${account.display || ""} ${account.handle || ""}`;
   const sym = HATE_NAME.exec(name);
   if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
+  // Reddit: little karma after more than a month, and Reddit's suggested sign-up name.
+  if (Number.isFinite(account.karma) && age != null && age > NEW_ACCOUNT_DAYS && account.karma < LOW_KARMA) out.push({ id: "low-karma", evidence: `${account.karma} karma after ${age} days` });
+  if (account.redditDefaultName) out.push({ id: "default-handle", evidence: "username has the pattern Reddit suggests at sign-up" });
   if (account.handle && DEFAULT_HANDLE.test(account.handle)) out.push({ id: "default-handle", evidence: `handle @${account.handle} has the sign-up pattern` });
   if (context.mismatch && context.mismatch.status === "mismatch") out.push({ id: "based-elsewhere", evidence: context.mismatch.reason + (account.proxyNote ? " (X notes a possible VPN or proxy, so the label may be wrong)" : "") });
   if (context.cluster && context.cluster.size >= 2) {

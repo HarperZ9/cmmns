@@ -293,6 +293,43 @@ function compare(text, label) {
 return { localClaims, compare };
 })();
 
+// ---- reddit.js
+const M_reddit = (() => {
+// Reddit account data from Reddit's own public endpoint (/user/<name>/about.json), which the site
+// serves to anyone viewing a profile. Only fields Reddit shows publicly are kept.
+
+// Reddit suggests names like "Lumpy_Garden_4821" at sign-up; many throwaway accounts keep them.
+const REDDIT_DEFAULT_NAME = /^[A-Z][a-z]+[-_][A-Z][a-z]+[-_]?\d{1,4}$/;
+
+function redditAbout(json) {
+  const d = json && json.data;
+  if (!d || !d.name) return null;
+  const created = Number(d.created_utc);
+  const r = {
+    handle: d.name,
+    joinDate: Number.isFinite(created) ? new Date(created * 1000).toISOString().slice(0, 10) : null,
+    karma: Number.isFinite(d.total_karma) ? d.total_karma : (Number(d.link_karma) || 0) + (Number(d.comment_karma) || 0),
+    postKarma: Number.isFinite(d.link_karma) ? d.link_karma : null,
+    commentKarma: Number.isFinite(d.comment_karma) ? d.comment_karma : null,
+    emailVerified: d.has_verified_email === true ? true : d.has_verified_email === false ? false : null,
+    premium: d.is_gold === true ? true : null,
+    moderator: d.is_mod === true ? true : null,
+    employee: d.is_employee === true ? true : null,
+    suspended: d.is_suspended === true ? true : null,
+    bio: d.subreddit && d.subreddit.public_description ? String(d.subreddit.public_description).slice(0, 280) : null,
+    defaultName: REDDIT_DEFAULT_NAME.test(d.name) ? true : null,
+    aboutRead: true,
+  };
+  return Object.fromEntries(Object.entries(r).filter(([, v]) => v !== null && v !== undefined));
+}
+
+// Low karma for the account's age: under LOW_KARMA after more than a month. New accounts are
+// covered by the new-account flag instead.
+const LOW_KARMA = 20;
+
+return { REDDIT_DEFAULT_NAME, redditAbout, LOW_KARMA };
+})();
+
 // ---- flags.js
 const M_flags = (() => {
 // Authenticity flags for one account, each with its evidence and what it does not prove.
@@ -300,6 +337,7 @@ const M_flags = (() => {
 // calibrated against the hand-labelled threads (project-docs/EVALUATION.md).
 
 const { parseLabel } = M_places;
+const { LOW_KARMA } = M_reddit;
 
 const NEW_ACCOUNT_DAYS = 30;
 const MANY_NAME_CHANGES = 3;
@@ -319,6 +357,7 @@ const DOES_NOT_PROVE = {
   "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them.",
   "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy.",
   "copied-elsewhere": "People repost text they agree with, and memes and quotes repeat. Repeated wording shows copying or coordination, not who is behind it.",
+  "low-karma": "Many people read more than they post, and karma depends on which communities they use.",
   "new-account": "New accounts include real people who just joined, often during a news event.",
   "name-changes": "People rename accounts for many reasons; repeated renames are only common among resold or repurposed accounts.",
   "default-handle": "Many real people never change the handle X suggested.",
@@ -403,6 +442,9 @@ function flagsFor(account, context = {}) {
   const name = `${account.display || ""} ${account.handle || ""}`;
   const sym = HATE_NAME.exec(name);
   if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
+  // Reddit: little karma after more than a month, and Reddit's suggested sign-up name.
+  if (Number.isFinite(account.karma) && age != null && age > NEW_ACCOUNT_DAYS && account.karma < LOW_KARMA) out.push({ id: "low-karma", evidence: `${account.karma} karma after ${age} days` });
+  if (account.redditDefaultName) out.push({ id: "default-handle", evidence: "username has the pattern Reddit suggests at sign-up" });
   if (account.handle && DEFAULT_HANDLE.test(account.handle)) out.push({ id: "default-handle", evidence: `handle @${account.handle} has the sign-up pattern` });
   if (context.mismatch && context.mismatch.status === "mismatch") out.push({ id: "based-elsewhere", evidence: context.mismatch.reason + (account.proxyNote ? " (X notes a possible VPN or proxy, so the label may be wrong)" : "") });
   if (context.cluster && context.cluster.size >= 2) {
@@ -1650,5 +1692,5 @@ const HISTORY_DOES_NOT_PROVE = "These totals cover only the threads you opened, 
 return { HISTORY_RETAIN_DAYS, snapshot, addSnapshot, summarize, HISTORY_DOES_NOT_PROVE };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state, ...M_trail, ...M_history });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state, ...M_trail, ...M_history });
 })();

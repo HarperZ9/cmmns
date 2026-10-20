@@ -16,8 +16,10 @@
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
     const activity = PB.activity(PBLogs.net(), r.author);
     const echo = PB.echoes(PBLogs.net(), site.id + ":" + location.pathname, r.text);
-    if (reading) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation }, { mismatch, cluster, activity, echo }) };
-    const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display }, { cluster, echo });
+    if (reading && site.hasLocation) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation }, { mismatch, cluster, activity, echo }) };
+    // Reddit: account age, karma and sign-up name from Reddit's own account data (src/ext/reddit.js).
+    const rd = site.id === "reddit" && globalThis.PBReddit ? PBReddit.get(r.author) : null;
+    const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display, joinDate: rd && rd.joinDate, karma: rd && rd.karma, redditDefaultName: rd && rd.defaultName }, { cluster, echo });
     return { mismatch, flags, activity };
   }
 
@@ -72,12 +74,13 @@
     const threadKey = site.id + ":" + location.pathname;
     if (!feed && replies.length) recordNet(threadKey, replies, root);
     const cache = site.hasLocation ? await PBStore.all() : {};
+    if (site.id === "reddit" && globalThis.PBReddit && settings.auto) PBReddit.want([...new Set(items.map((r) => r.author))], schedule);
     const clusters = feed ? [] : PB.duplicateClusters(replies);
     const clusterOf = new Map();
     for (const c of clusters) for (const id of c.ids) clusterOf.set(id, c);
     const rows = [], models = [];
     for (const r of replies) {
-      const reading = cache[r.author.toLowerCase()] || null;
+      const reading = cache[r.author.toLowerCase()] || (site.id === "reddit" && globalThis.PBReddit ? PBReddit.get(r.author) : null);
       const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
       const an = analyse(r);
       models.push([r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), trail: PB.trailFor(tweets.get(r.id), tweets, PBLogs.trail()), yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, r.anchor]);

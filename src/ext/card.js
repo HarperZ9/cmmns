@@ -34,6 +34,8 @@
       ["Checkmark", R.verifiedType ? ({ Blue: "blue (paid subscription)", Business: "gold (organisation)", Government: "grey (government)" }[R.verifiedType] || R.verifiedType) : null],
       ["Label", R.xLabel || m.pageLabel ? `${R.xLabel || m.pageLabel} account` : null],
       ["Category", R.category || null],
+      ["Karma", R.karma != null ? `${num(R.karma)}${R.postKarma != null ? ` (posts ${num(R.postKarma)}, comments ${num(R.commentKarma)})` : ""}` : null],
+      ["Reddit", [R.emailVerified === false && "email not verified", R.premium && "Reddit Premium", R.moderator && "moderates communities", R.employee && "Reddit employee", R.suspended && "suspended", R.unavailable && "account unavailable"].filter(Boolean).join(", ") || null],
       ["Username changes", R.nameChanges != null ? String(R.nameChanges) : null],
       ["Listed by", R.listedCount != null ? `${num(R.listedCount)} lists` : null],
       ["Profile picture", R.defaultAvatar ? "never set" : null],

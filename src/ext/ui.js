@@ -20,7 +20,8 @@
   function summary(m) {
     const R = m.reading || {};
     if (R.basedIn) return R.basedIn;
-    if (m.site && !m.site.hasLocation) return "Account";
+    // Sites without a location label (Reddit) show the account's age when they disclose it.
+    if (m.site && !m.site.hasLocation) return R.joinDate ? `since ${R.joinDate.slice(0, 7)}` : "Account";
     if (m.lookingUp) return "Reading…";
     if (R.aboutRead) return "No location shown";
     return "Account";

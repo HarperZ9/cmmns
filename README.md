@@ -40,6 +40,7 @@ To update after a change, press the reload arrow on Radar's card in the extensio
 - **YouTube:** the channel, its subscribers and badges, YouTube's funding and context panels, the paid-promotion label, and per comment the author's channel id, badges, likes and edits.
 - **Across threads you view:** the same wording turning up in other threads, link domains several accounts keep pushing, accounts that keep appearing together, reply speed and inferred active hours. This log stays in your browser for 30 days and the panel can clear it.
 
+- **Reddit:** account age, karma, email verification and Reddit's sign-up name pattern, from Reddit's own public account data, read one account every 2 seconds and kept 14 days. New accounts and accounts with little karma after a month get flags.
 - **History page** (toolbar popup, "Open history"): across the threads you opened in the last 60 days, the upstream accounts and sites your threads' material keeps leading back to, accounts that keep appearing, uploads many accounts carried, flagged accounts by day, where accounts are labelled as based, and state links seen. Save it as JSON or clear it.
 
 All of it comes from data the site already loaded for the page. Radar makes no request of its own for it.

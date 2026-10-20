@@ -32,3 +32,4 @@ Claude in Chrome). The agent does not enter passwords.
 | 18 | X media fields: `extended_entities.media[].id_str`, `source_status_id_str`, `media_url_https`; `legacy.created_at` on Tweet objects | Open a post with an old video re-shared ("From @..."); compare the chip's date | open |
 | 19 | Feed mode: badges on home, profile, likes and search pages without slowing scrolling | Scroll a timeline for a minute | open |
 | 20 | YouTube "Altered or synthetic content" text in the page data | Open a video with the disclosure | open |
+| 21 | Reddit `/user/<name>/about.json` from the content script: same-origin fetch works, fields `created_utc`, `total_karma`, `has_verified_email` | Open a Reddit thread; check pills show "since <month>" | open |

@@ -59,6 +59,7 @@
         "ui.js",
         "auto.js",
         "logs.js",
+        "reddit.js",
         "content.js"
       ],
       "css": [
