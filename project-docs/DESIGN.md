@@ -108,3 +108,9 @@ Known gaps:
 ### History page (2026-10-18)
 
 Radar saves a small snapshot of each thread report locally (`pb.history.v1`, 60 days, at most 600 threads). `src/core/history.js` pools those snapshots with the connections log and the trail log. The history page shows the pooled flagged share with a Wilson interval, the upstream "funnel" (the accounts and sites that the quotes, lifted media and links in the user's threads lead back to, counted by threads, and how concentrated they are), recurring accounts, uploads carried by three or more accounts, a per-day flagged share, origins and state links. The page states its limit: these totals cover only what the user opened, in platform-ranked order, so they are not a sample of any platform. The concentration figure is shown only when there are more than five upstream sources.
+
+### The hover window (2026-10-19)
+
+Radar draws nothing on the page. Resting the pointer on a post for 450 ms fades in a window beside it: to the right of the timeline column when there is room, else to its left, else below or above the post. It stays while the pointer is on the post or the window, fades out 260 ms after the pointer leaves, and stays open after a click inside it until Escape or a click elsewhere. Alt+R opens it for a focused post. The first lines are a glance: the account, where the platform places it (or its age where the site shows no location), the warn-level signals by name, and how many more signs are below. The full card follows.
+
+Radar describes how an account operates. It does not try to work out who runs an account: no linking accounts across platforms, no guessing names, employers, ages or homes, no reverse search of profile photos, and no payment or tip-jar handles. Those steps would identify people, most of whom are ordinary users, and they add nothing to the evidence that an operation exists.

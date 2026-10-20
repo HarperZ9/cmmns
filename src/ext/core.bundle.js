@@ -922,6 +922,15 @@ function userReading(u) {
     likesCount: n(L.favourites_count),
     mediaCount: n(L.media_count),
     withheldIn: Array.isArray(L.withheld_in_countries) && L.withheld_in_countries.length ? L.withheld_in_countries.join(", ") : null,
+    // X's own disclosures about how the account operates. Payment and tip-jar handles are left
+    // out on purpose: they identify people, and Radar describes accounts.
+    identityVerified: ((u.verification_info || {}).is_identity_verified === true) ? true : null,
+    verifiedReason: pick((((((u.verification_info || {}).reason || {}).description) || {}).text)),
+    professionalType: pick((u.professional || {}).professional_type),
+    squareAvatar: (u.profile_image_shape || (u.avatar || {}).image_shape) === "Square" ? true : null,
+    pinnedPost: pick(((L.pinned_tweet_ids_str || [])[0])),
+    affiliatesCount: n(((u.business_account || {}).affiliates_count)),
+    creatorSubscriptions: n(u.creator_subscriptions_count),
     protected: L.protected === true || (u.privacy || {}).protected === true ? true : null,
     // Present only when X includes its "About this account" block in the response.
     basedIn: pick(A.account_based_in),

@@ -40,7 +40,7 @@
     }
     return a;
   }
-  // Only posts on or near the screen get their pills drawn; the rest are drawn as they scroll in.
+  // Only posts on or near the screen are wired; the rest are wired as they scroll in.
   const near = (n) => { const b = n.getBoundingClientRect(); return b.bottom > -600 && b.top < window.innerHeight + 900; };
 
   // User settings (toolbar popup): badges on feeds, automatic About lookups.
@@ -49,8 +49,8 @@
   chrome.storage.local.get(SETTINGS_KEY).then((g) => { settings = { ...settings, ...(g[SETTINGS_KEY] || {}) }; schedule(); }).catch(() => {});
   chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch[SETTINGS_KEY]) { settings = { ...settings, ...(ch[SETTINGS_KEY].newValue || {}) }; schedule(); } });
   let lastSummary = null, lastExport = null;
-  // The last computed pill models, so scrolling only draws rows coming into view (badge() skips
-  // rows whose evidence has not changed) instead of rebuilding the whole thread.
+  // The last computed models, so scrolling only wires posts coming into view (badge() is cheap
+  // and skips unchanged posts) instead of rebuilding the whole thread.
   let drawn = [];
   function drawVisible() { for (const [node, model, anchor] of drawn) if (node.isConnected && near(node)) PBUI.badge(node, model, lookup, anchor); }
 

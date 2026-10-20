@@ -1,11 +1,8 @@
-// One compact row of pills under each post's name line. The first pill is the account at a glance
-// (where X says it is based, or "Account" when the site shows no location) and opens the full
-// card. After it come the signals worth a look on their own and, space allowing, a couple more;
-// the rest wait in the card. A row is redrawn only when its evidence changes.
+// Nothing is drawn on the page. Each post is wired so that resting the pointer on it fades in
+// Radar's window beside it (src/ext/pop.js): a glance line with the key facts and the signals worth
+// a look, then the full card (src/ext/card.js).
 (() => {
   "use strict";
-  const { el } = PBPop;
-  const MAX_INLINE = 3;
 
   // X has its own light, dim and dark themes, independent of the system setting: follow the page.
   let themeAt = 0;
@@ -17,49 +14,42 @@
     document.documentElement.classList.toggle("pb-dark", !!dark);
   }
 
-  function summary(m) {
-    const R = m.reading || {};
-    if (R.basedIn) return R.basedIn;
-    // Sites without a location label (Reddit) show the account's age when they disclose it.
-    if (m.site && !m.site.hasLocation) return R.joinDate ? `since ${R.joinDate.slice(0, 7)}` : "Account";
-    if (m.lookingUp) return "Reading…";
-    if (R.aboutRead) return "No location shown";
-    return "Account";
+  // The key facts in one line: where the platform places the account, or its age where the site
+  // shows no location, and how it posted.
+  function fact(m) {
+    const R = m.reading || {}, T = m.tweet || {};
+    const age = R.joinDate ? PB.ageDays(R.joinDate) : null;
+    const parts = [
+      R.basedIn ? `Based in ${R.basedIn}` : m.site && m.site.hasLocation ? (m.lookingUp ? "Reading the About page…" : R.aboutRead ? "No location shown" : null) : null,
+      age != null ? (age < 365 ? `${age} days old` : `since ${R.joinDate.slice(0, 7)}`) : null,
+      R.karma != null ? `${R.karma.toLocaleString()} karma` : null,
+      T.client && !PB.COMMON_CLIENTS.test(T.client) ? `posted via ${T.client}` : null,
+    ].filter(Boolean);
+    return parts.join(" · ") || null;
   }
 
-  function pill(text, cls, sections) {
-    const b = el("button", `pb-chip ${cls || ""}`, text);
-    b.type = "button";
-    PBPop.attach(b, sections);
-    return b;
+  function glance(m, signals) {
+    const warn = signals.filter((s) => s.level === "warn").map((s) => s.label);
+    const flags = signals.filter((s) => s.level === "flag").length;
+    return {
+      who: [m.display, "@" + m.handle].filter(Boolean).join("  "),
+      fact: fact(m),
+      warn,
+      more: flags ? `${flags} more sign${flags === 1 ? "" : "s"} below` : null,
+    };
   }
 
-  // A cheap fingerprint of what the row shows, so unchanged rows are left alone.
-  function signature(m, signals) {
-    const R = m.reading || {};
-    return [m.handle, R.basedIn, R.aboutRead, R.at, m.lookingUp, m.failed, signals.map((s) => s.label).join("|"), m.activity && m.activity.threads, m.tweet && (m.tweet.media || []).length].join("~");
-  }
-
-  // model: { site, handle, display, posted, profile, reading, flags, markers, machine, tweet, yt, ... }
-  function badge(article, model, onLookup, anchor) {
+  // model: { site, handle, display, posted, profile, reading, flags, markers, machine, tweet, yt, trail, ... }
+  function badge(article, model, onLookup) {
     syncTheme();
-    const signals = PBSignals.all(model);
-    const sig = signature(model, signals);
-    let bar = article.querySelector(":scope .pb-bar");
-    if (bar && bar.dataset.sig === sig) return;
-    if (!bar) {
-      bar = el("div", "pb-bar");
-      if (anchor && anchor.parentElement) anchor.after(bar); else article.append(bar);
-    }
-    bar.dataset.sig = sig;
-    const card = () => PBCard.sections(model, signals, onLookup);
-    const inline = [...signals.filter((s) => s.level === "warn"), ...signals.filter((s) => s.level === "flag")].slice(0, MAX_INLINE);
-    const rest = signals.length - inline.length;
-    const head = pill(summary(model) + (rest > 0 ? `  +${rest}` : ""), `pb-acct${model.reading && model.reading.basedIn ? " pb-place" : ""}`, card);
-    head.setAttribute("aria-label", `Radar: account details for @${model.handle}`);
-    const nodes = [head];
-    for (const s of inline) nodes.push(pill(s.label, `pb-${s.level}`, () => [{ title: s.label, rows: s.rows }, { rows: [[null, { note: "Open the first pill for everything Radar knows about this post." }]] }]));
-    bar.replaceChildren(...nodes);
+    const old = article.querySelector(":scope .pb-bar");
+    if (old) old.remove();
+    PBPop.hover(article, () => {
+      const signals = PBSignals.all(model);
+      const secs = PBCard.sections(model, signals, onLookup);
+      // The card's first row is the account name, which the glance already shows.
+      return [{ glance: glance(model, signals) }, { rows: secs[0].rows.slice(1) }, ...secs.slice(1)];
+    });
   }
 
   globalThis.PBUI = Object.freeze({ badge, panel: (...a) => PBPanel.render(...a), closePop: PBPop.close, syncTheme });

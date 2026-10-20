@@ -108,3 +108,20 @@ test("trail fields: author, quoted post, repost, reply and real link addresses",
   assert.equal(t.replyTo, "3");
   assert.deepEqual(t.links, ["https://news.example/story"]);
 });
+
+test("X's account-operation disclosures; payment handles are not read", async () => {
+  const { usersIn } = await import("../src/core/xdata.js");
+  const u = { __typename: "User", core: { screen_name: "org" }, legacy: { pinned_tweet_ids_str: ["77"] },
+    verification_info: { is_identity_verified: true, reason: { description: { text: "This account is verified because it's an official organisation on X." } } },
+    professional: { professional_type: "Business" }, profile_image_shape: "Square", business_account: { affiliates_count: 12 },
+    creator_subscriptions_count: 3, tipjar_settings: { is_enabled: true, cash_app_handle: "$someone" } };
+  const [r] = usersIn({ u });
+  assert.equal(r.identityVerified, true);
+  assert.match(r.verifiedReason, /official organisation/);
+  assert.equal(r.professionalType, "Business");
+  assert.equal(r.squareAvatar, true);
+  assert.equal(r.pinnedPost, "77");
+  assert.equal(r.affiliatesCount, 12);
+  assert.equal(r.creatorSubscriptions, 3);
+  assert.ok(!JSON.stringify(r).includes("someone"));
+});

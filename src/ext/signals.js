@@ -2,7 +2,7 @@
 //   warn  worth a look on its own (strong language, leaked AI text, old media, an op-report link)
 //   flag  a sign that means more alongside others
 //   info  context
-// ui.js shows the warn signals and a couple of flags as pills; the card lists them all.
+// The window's glance line names the warn signals; the card lists them all.
 (() => {
   "use strict";
   const STRONG = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };

@@ -18,7 +18,7 @@
   if (!s) { buttons.forEach((b) => ($(b).disabled = true)); return; }
 
   $("site").textContent = s.site + (s.feed ? " feed" : " thread");
-  $("sentence").textContent = s.sentence || (s.feed ? "Pills show on each post as you scroll. Hover one for the account card." : "Reading the thread…");
+  $("sentence").textContent = s.sentence || (s.feed ? "Rest the pointer on any post to see what Radar knows about it." : "Reading the thread…");
   const facts = [
     ["Posts on screen", s.posts],
     ["Accounts read", `${s.lookedUp} of ${s.lookedUp + s.pending}`],
