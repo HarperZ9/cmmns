@@ -3,9 +3,27 @@
 All notable changes to Radar. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
-## Unreleased
+## 1.0.0 (2026-10-21)
+
+First public-quality release. Every sign either carries a measured error rate from
+`project-docs/EVALUATION.md` or says "not measured yet".
 
 ### Added
+- Fact-checked claims: posts that closely match a claim reviewed by one of 328 fact-checkers
+  (19,728 reviews, Google Data Commons ClaimReview feed, CC BY 4.0) show the checker's own rating
+  and a link. Matching runs offline in the browser; Radar never rules a claim false itself.
+  Community Notes show first when X loads one.
+- Rhetoric markers in French, Spanish, German, Portuguese and Italian, each with symmetry tests
+  across targets from every political direction.
+- Facebook, Instagram and Bluesky: comments feed duplicate, rhetoric and thread reports; account
+  context comes only from what the viewer opens (Page transparency, "About this account") or what
+  the app already loads (Bluesky labels).
+- Measured precision and recall for the rhetoric families on human-labelled public corpora
+  (Measuring Hate Speech, HateXplain, Civil Comments, MLMA), test split only, reproducible with
+  `node scripts/eval.mjs`.
+- A YouTube video with no comments still shows its channel and YouTube's funding and
+  paid-promotion labels; the collapsed button says "funding label" when YouTube shows one.
+- CI on Linux and Windows for every change.
 - First-run page on install: what Radar shows, what it never does, site switches and a one-click
   start (which also asks Firefox for site access).
 - Options page: per-site switches and a pause for everything, the window's areas, feeds and
@@ -22,6 +40,17 @@ were not published to a store.
 - PRIVACY.md, a store listing draft, this changelog, and the FSL-1.1-MIT licence.
 
 ### Changed
+- An account counts as flagged on one strong sign or two different weak ones. Place and timing
+  context alone (app store, typed location, a flag in the name, active hours) no longer does; on
+  a live thread it had put half the repliers in the flagged group.
+- Violence markers catch active calls ("we should exterminate X") and a violent fate carried
+  over to a named group, not only the passive form.
+- Automatic About lookups on X follow X's rate-limit headers, keep requests in reserve for the
+  viewer's own use of X, and retry a rate-limited account.
+- Threads are keyed by post id, so one thread reached by two paths no longer counts its own
+  replies as copied from elsewhere. The connections log restarts under a new key.
+- Feed pages compare an account with "this page", not "this thread".
+- Duplicate detection keeps combining marks inside words (Indic scripts).
 - Links and focus outlines in the window use ink instead of an accent blue; colour is kept for
   signs worth a look.
 - Settings are read in one place (`src/core/settings.js`), and the background worker deletes data

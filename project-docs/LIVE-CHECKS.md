@@ -52,3 +52,14 @@ Checked in the author's signed-in Chrome by reading page structure only, with th
 | 31 | Bluesky thread: `data-testid="postThreadItem-by-<handle>"`, text in `[data-word-wrap]`, post link `/profile/<handle>/post/<rkey>`; the app requests `app.bsky.unspecced.getPostThreadV2` | Open a public thread | pass 2026-10-21: 26 thread items on a public post; the V2 thread request seen in the page's resource list |
 | 32 | Bluesky response fields `author.createdAt`, `author.labels`, `author.verification` reach bsky.js | Read one getPostThreadV2 response | open: fields from the public lexicons; the response body was not read |
 | 33 | Badges and the thread window with Radar installed on Facebook, Instagram and Bluesky | Reload the extension; open a post on each | open (author check per the release gate) |
+
+## Live checks after reload, 2026-10-21 (build ab9fd9f, the author's Chrome)
+| # | Check | Result |
+|---|---|---|
+| 22 | Rhetoric recall on the riots-in-France thread | pass: the reply proposing extermination now carries "call for violence"; the report counts 1 extreme reply among the 17 to 21 accounts read (the report counts only read accounts) |
+| 23 | Flag rate on the same thread | pass: 5 of 21 accounts flagged after the tiers change, against 10 of 19 before |
+| 24 | Rate pacing | partial: lookups returned 200 at about one per 20 s with no pause from X in about 10 minutes; whether the pace came from rate-limit headers is inferred from the spacing, not seen in the headers |
+| 25 | Thread echo | fail, fixed in #6: one thread counted as two, so a reply showed "same words in 1 other thread you viewed, from this account"; threads are now keyed by post id |
+| 19 | Feed mode on x.com/home | pass with one defect fixed in #11: the window opens beside X's hover card; it said "this thread" on a feed. No long tasks in 30 s of scrolling; frame rate not measurable in a background tab |
+| 16 | YouTube funding panel | partial: CGTN and Al Jazeera English videos carry YouTube's funding text in the page, but those videos showed 0 comments, so Radar drew nothing; fixed in #12 (video context without comments). Radar on a video with comments: panel "Radar · 20" renders |
+| 1a, 21 | Reddit | open: the browser tool is blocked on reddit.com; needs the author's check |
