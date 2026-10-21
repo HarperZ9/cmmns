@@ -78,6 +78,24 @@
     "unit": "outlet rows in src/ext/owners.json"
    }
   },
+  "owner-corrections": {
+   "source": "hand-kept in this repository; every row cites a primary source and says why the Wikidata row is wrong (data/owner-corrections.json)",
+   "retrieved": "2026-10-21",
+   "licence": "FSL-1.1-MIT (the records); each cited source keeps its own terms",
+   "snapshot": {
+    "committed": true,
+    "files": {
+     "data/owner-corrections.json": {
+      "sha256": "ba0a5a73ddf597b5f9b22160b472192aa2c93111eaa1d6256b95f664d904c80d",
+      "bytes": 4517
+     }
+    }
+   },
+   "rows": {
+    "count": 6,
+    "unit": "corrected domains"
+   }
+  },
   "wikidata-state": {
    "source": "https://www.wikidata.org/w/api.php and https://query.wikidata.org/sparql (scripts/state-build.mjs)",
    "retrieved": "2026-10-20",
@@ -324,6 +342,17 @@
    ]
   },
   {
+   "id": "owner-corrections",
+   "script": "scripts/owner-corrections.mjs",
+   "args": [],
+   "inputs": [
+    "owner-corrections"
+   ],
+   "outputs": [
+    "src/ext/owners.json"
+   ]
+  },
+  {
    "id": "state",
    "script": null,
    "inputs": [
@@ -347,7 +376,7 @@
   "project-docs/evidence/technique-baselines.json": "7f68a944078830053cccb2704abc97ed4d37ab995a62320a947946baa1e83728",
   "src/core/techniques-data.js": "151675d776656c90ce334e6c828e0a00df580b1c6e79535a4ee0f36cc9d06d27",
   "project-docs/evidence/framing-results.json": "7f91f25fece092caf2510df0dc1f27f8f54aa2d96bb5db03a687783c10c7c67b",
-  "src/ext/owners.json": "6ecb33c9a51bd323de80dfdf24d408838ca8a2062ba10b055b382e65c9108c4c",
+  "src/ext/owners.json": "bac5475d6aaa8aa21c33e4fe2e97335a7696a7471bdf8172694eb0ceb810ecab",
   "src/ext/state.json": "6c28778e5e46b31cd2a01c91915110818fd433d0544e450f1f366beb0883621d"
  }
 }

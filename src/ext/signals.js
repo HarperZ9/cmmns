@@ -131,7 +131,7 @@
       }
       const o = PB.ownerOfDomain(d);
       if (!o) continue;
-      out.push({ label: `link: ${o.name}`, fam: "owner", level: "info", cat: "sources", rows: [["Outlet", `${o.name} (${d})`], [PB.ownerHeading(o), o.owner], ["Source", `Wikidata: ${o.source}`], dnp("Ownership is not editorial control, and Wikidata can lag a sale.")] });
+      out.push({ label: `link: ${o.name}`, fam: "owner", level: "info", cat: "sources", rows: [["Outlet", `${o.name} (${d})`], [PB.ownerHeading(o), o.owner], ["Source", PB.ownerSource(o)], dnp("Ownership is not editorial control, and Wikidata can lag a sale.")] });
     }
     return out;
   }

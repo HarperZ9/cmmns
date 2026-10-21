@@ -13,7 +13,7 @@
    "claims.json": "960a6220450b2eaa51439e364e0f9113b24c8c5469c841fc4e22d18d589889bd",
    "claims-2.json": "5c5c4cedce0d08793ec21cfc7f3b2e85646d099e8fa9e94ba0150c1d9202636d",
    "ops.json": "4f322b11336479fd353bcd13af49720d0b4cceb26fd24379d6713d38d05bab9a",
-   "owners.json": "6ecb33c9a51bd323de80dfdf24d408838ca8a2062ba10b055b382e65c9108c4c",
+   "owners.json": "bac5475d6aaa8aa21c33e4fe2e97335a7696a7471bdf8172694eb0ceb810ecab",
    "sites.json": "42c86e31911eb431b12ad20ccc2561abda605fb7452694b51db44218aef001f1",
    "state.json": "6c28778e5e46b31cd2a01c91915110818fd433d0544e450f1f366beb0883621d"
   }
@@ -24,5 +24,5 @@
   "x": "0iyHwn2zRDoP7RfuuxvKGxhRYmAXiS7NelteWFPo8CM",
   "y": "8n431mx6HCqh1hNM1xZmJeDX2ZPckhNUlIBezeKro_k"
  },
- "signature": "HuEVYSY97-yRtVPpe5vGf9ovPWJW9LUf6s7ZEA6-xGMqc7jaAA-kjWksaFR3iMp_1RnJ2B3Xg6-s_cAUx_ee4A"
+ "signature": "BoJFZgr-ZHd8YZ3bOxPFjIHh3cet21GayCDhtDNFxnIwBfLotB1OUiaiuLq0BHrr9DoAMiqBbnB6cuHRQQeuRQ"
 }

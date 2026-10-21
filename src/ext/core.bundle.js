@@ -3842,6 +3842,13 @@ const M_owners = (() => {
 
 let BY_DOMAIN = new Map(), BY_HANDLE = new Map();
 
+// A row corrected by data/owner-corrections.json (scripts/owner-corrections.mjs) carries
+// `correction`: { source, checked, reason, upstream, factsWrong? }. The window says so, with the
+// correction's own source, instead of crediting Wikidata.
+const ownerSourceShort = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}` : "Wikidata");
+const ownerSource = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}: ${o.correction.source}. Wikidata said "${o.correction.upstream.owner}". ${o.correction.reason}`
+  : `Wikidata${o && o.source ? `: ${o.source}` : ""}`);
+
 // rows: [{ name, domain, owner, source, x? }]
 function setOwnerRows(rows) {
   BY_DOMAIN = new Map(); BY_HANDLE = new Map();
@@ -3867,7 +3874,7 @@ function domainsIn(text) {
   return [...out];
 }
 
-return { setOwnerRows, ownerOfDomain, ownerOfHandle, domainsIn };
+return { ownerSourceShort, ownerSource, setOwnerRows, ownerOfDomain, ownerOfHandle, domainsIn };
 })();
 
 // ---- xdata.js
@@ -7340,6 +7347,7 @@ const M_sites = (() => {
 
 const { siteKey, hostOf } = M_hosts;
 const { stateLabel } = M_state;
+const { ownerOfDomain, ownerSourceShort } = M_owners;
 
 let FACTS = {}, RECORDS = {}, CHECKERS = [];
 
@@ -7359,6 +7367,9 @@ function siteFacts(host) {
   const top = siteKey(h);
   while (h) {
     const f = FACTS[h];
+    // An owner correction can mark the Wikidata facts for this host as another item's.
+    const o = f && ownerOfDomain(h);
+    if (o && o.domain === h && o.correction && o.correction.factsWrong) return null;
     if (f) return { name: f[0], founded: f[1] || null, country: f[2] || null, ownerType: f[3] || null, source: f[4] ? `https://www.wikidata.org/wiki/${f[4]}` : null };
     if (h === top || !h.includes(".")) break;
     h = h.slice(h.indexOf(".") + 1);
@@ -7409,7 +7420,7 @@ function siteInfoRows(info, opts = {}) {
   const type = ownerType(info);
   const rows = [
     ["Site", name ? `${name} (${domain})` : domain],
-    [ownerHeading(owner), owner && owner.owner ? `${owner.owner} (Wikidata)` : null],
+    [ownerHeading(owner), owner && owner.owner ? `${owner.owner} (${ownerSourceShort(owner)})` : null],
     ["Owner type", type !== "not stated" ? `${type}, ${typeSource(info)}` : null],
     ["Founded", facts && facts.founded ? `${facts.founded} (Wikidata)` : null],
     ["Country", facts && facts.country ? `${facts.country} (Wikidata)` : null],
@@ -8569,7 +8580,7 @@ const M_api_site = (() => {
 // Radar adds no score or rating of its own. Reads only the tables handed to useData().
 
 const { siteFacts, siteRecord, recordSummary, recordLine, ownerHeading, ownerType, SITE_SOURCES, SITE_RECORD_DOES_NOT_PROVE } = M_sites;
-const { ownerOfDomain } = M_owners;
+const { ownerOfDomain, ownerSource } = M_owners;
 const { stateLinksOfDomain, stateLabel, STATE_DOES_NOT_PROVE } = M_state;
 const { lookalikeOf, LOOKALIKE_DOES_NOT_PROVE } = M_lookalike;
 const { hostOf } = M_hosts;
@@ -8594,7 +8605,7 @@ function siteSummary(domain) {
   return {
     domain: d,
     facts: siteFacts(d),
-    owner: owner ? { name: owner.name, owner: owner.owner, via: owner.via || "owner", source: owner.source || null } : null,
+    owner: owner ? { name: owner.name, owner: owner.owner, via: owner.via || "owner", source: owner.source || null, ...(owner.correction ? { correction: owner.correction } : {}) } : null,
     state: stateLinksOfDomain(d).map((h) => ({ ...h })),
     record: recordSummary(siteRecord(d)),
     lookalike: lookalikeOf(d),
@@ -8619,7 +8630,7 @@ function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   }
   if (S.owner && S.owner.owner) {
     out.push({ ...base, kind: "site-owner", level: "info", label: `link: ${S.owner.name || S.domain}`,
-      shows: `${S.owner.name || S.domain} (${S.domain}). ${ownerHeading(S.owner)} ${S.owner.owner}.`, source: `Wikidata${S.owner.source ? `: ${S.owner.source}` : ""}`,
+      shows: `${S.owner.name || S.domain} (${S.domain}). ${ownerHeading(S.owner)} ${S.owner.owner}.`, source: ownerSource(S.owner),
       doesNotProve: SITE_OWNER_DOES_NOT_PROVE, data: { domain: S.domain, owner: S.owner.owner, ownerType: ownerType({ facts: S.facts, state: S.state }) } });
   }
   const line = recordLine(S.record);

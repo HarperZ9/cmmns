@@ -5,6 +5,21 @@ were not published to a store.
 
 ## Unreleased
 
+### Fixed (outlet owners)
+- Six outlet owner rows that were wrong in the Wikidata-built table now show a sourced correction,
+  marked "Radar correction" with its date and source, instead of Wikidata's row:
+  - bloomberg.com no longer lists Bank of America, whose Merrill Lynch stake was sold in 2008.
+  - dw.com is no longer "owned by ARD": DW is its own public-law broadcaster under federal law.
+  - france24.com shows France Médias Monde.
+  - redeglobo.globo.com shows Globo, not a regional affiliate's owner.
+  - xinhuanet.com shows Xinhuanet Co., Ltd., run by Xinhua News Agency.
+  - asahi.com shows "Owned by" again.
+
+  Where Wikidata's site facts came from another item, the site card hides them.
+- `data/owner-corrections.json` holds these corrections by hand. Each row cites a primary source and
+  says why the upstream row is wrong. The upstream guard reports when Wikidata agrees again, so a
+  correction can be retired.
+
 ### Changed (independence: Other coverage without an aggregator)
 - Other coverage now reads each outlet's own news feed, with no aggregator in between. Turn it on,
   then choose outlets from 33 suggested feeds across 18 countries and every owner type, or add any
