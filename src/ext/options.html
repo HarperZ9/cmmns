@@ -32,6 +32,21 @@
     <div id="reading" class="switches"></div>
   </section>
 
+  <section aria-labelledby="h-sitecards">
+    <h2 id="h-sitecards">Site cards</h2>
+    <p class="muted">Rest the pointer on a link in a post to see who owns the site, what kind of owner it has, when and where it was founded, any state link, and its fact-check record. To see the same card for a news site you are reading, press <strong>Site card for this page</strong> in Radar's toolbar menu. Radar runs on no news site until you press it.</p>
+    <h3 class="sub">Search results</h3>
+    <p class="muted">Off by default. Turning an engine on asks the browser for access to its result pages; Radar then adds a line of labels under each result and sends nothing anywhere.</p>
+    <div id="search" class="switches"></div>
+  </section>
+
+  <section aria-labelledby="h-coverage">
+    <h2 id="h-coverage">Other coverage</h2>
+    <p id="coverageText"></p>
+    <div id="coverage" class="switches"></div>
+    <p class="status muted" id="coverageStatus" role="status" aria-live="polite"></p>
+  </section>
+
   <section aria-labelledby="h-keep">
     <h2 id="h-keep">What Radar keeps</h2>
     <p class="muted">Everything stays in this browser profile. Older entries are deleted on the next start and whenever you change these numbers.</p>
@@ -77,12 +92,13 @@
     </div>
   </section>
 
-  <footer id="foot">Evidence, not verdicts. Nothing leaves this browser.</footer>
+  <footer id="foot">Evidence, not verdicts. Nothing leaves this browser unless you turn on Other coverage.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>
 <script src="pages.js"></script>
 <script src="options.js"></script>
 <script src="options-feedback.js"></script>
+<script src="options-sources.js"></script>
 </body>
 </html>

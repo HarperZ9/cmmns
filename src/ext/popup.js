@@ -15,6 +15,13 @@
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const send = (msg) => (tab && tab.id != null ? chrome.tabs.sendMessage(tab.id, msg).catch(() => null) : Promise.resolve(null));
+  // The site card for the page being read: injected into this tab only, only on this click.
+  const web = tab && /^https?:\/\//.test(tab.url || "") || (tab && !tab.url);
+  $("sitecard").disabled = !web;
+  $("sitecard").addEventListener("click", () => {
+    chrome.runtime.sendMessage({ type: "pb-site-page", tabId: tab.id }).then((r) => { if (r && r.error) console.error("[radar] site card failed", r.error); window.close(); })
+      .catch((e) => console.error("[radar] site card failed", e));
+  });
   const s = await send({ type: "pb-summary" });
   const buttons = ["scan", "panel", "export"];
   if (!s) { buttons.forEach((b) => ($(b).disabled = true)); await PBServer.offer(tab); return; }

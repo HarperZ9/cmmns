@@ -124,6 +124,18 @@ export const SPREAD_LESSONS = [
     dnp: "Ownership is not editorial control, and Wikidata can lag a sale.",
   },
   {
+    id: "site-record", title: "Site facts and fact-check record", research: [],
+    what: "The card for a linked site: its owner type, founding year and country from Wikidata, and how many fact-check reviews list the site as a place where a claim appeared, with each rating in the fact-checker's own words.",
+    examples: [
+      { side: "none", topic: "health", kind: "sign", text: "A reply links to a site founded last year whose record lists nine reviews of health claims, each rated false by a different fact-checker." },
+      { side: "none", topic: "politics", kind: "ordinary", text: "A link to a national paper with a long record, because fact-checkers often cite the interviews it prints of politicians." },
+    ],
+    why: "Where a link points tells you who stands behind the words. A young site with no stated owner and a run of reviews is a reason to check the claim yourself. An old outlet with many reviews may only be a place where powerful people get quoted.",
+    spot: "Open the list of reviews and read who made each claim. A site that printed a speech is not the speaker.",
+    counter: "Look the claim up yourself and find who said it first. Then read the same story at outlets with different owners.",
+    dnp: "A review lists a site as a place where a claim appeared. The site may have been reporting someone else's words, and each rating is about that claim, not the site. Fact-checkers choose what to check, so a count says little about how often a site is right.",
+  },
+  {
     id: "client", title: "Posting app", research: [],
     what: "The app this post was sent from, from the data X loaded. Scheduling tools, automation services and custom apps show up here.",
     examples: [

@@ -8,6 +8,11 @@ export const SETTINGS_KEY = "pb.settings";
 export const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"], ["threads", "Threads"],
   ["mastodon", "Mastodon"], ["tiktok", "TikTok"]];
 
+// Search engines where Radar can show site cards on result links. Each is off until the user turns
+// it on in the options page, which asks the browser for access to that engine's result pages.
+// [id, name, result-page matches, origin the browser grants]
+export const SEARCH_ENGINES = [["google", "Google", ["https://www.google.com/search*"], "https://www.google.com/*"], ["bing", "Bing", ["https://www.bing.com/search*"], "https://www.bing.com/*"], ["duckduckgo", "DuckDuckGo", ["https://duckduckgo.com/*"], "https://duckduckgo.com/*"]];
+
 // The areas of the window's strip; each can be hidden from the window.
 export const AREA_IDS = ["place", "account", "posting", "coordination", "language", "sources", "media"];
 
@@ -18,6 +23,9 @@ export const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1
 export const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
   historyDays: 60, aboutDays: 14, calm: false, large: false, onboarded: false,
+  // Other coverage (src/core/coverage.js): off until the user turns it on; coverageConsent is set
+  // when the user has read what it sends and clicked to send.
+  search: {}, coverage: false, coverageConsent: false,
 });
 
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
@@ -35,6 +43,8 @@ export function normalizeSettings(raw) {
     historyDays: days(s.historyDays, DEFAULTS.historyDays, RETENTION.historyDays),
     aboutDays: days(s.aboutDays, DEFAULTS.aboutDays, RETENTION.aboutDays),
     calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
+    search: switches(s.search, SEARCH_ENGINES.map(([id]) => id)), coverage: bool(s.coverage, DEFAULTS.coverage),
+    coverageConsent: bool(s.coverage, false) && bool(s.coverageConsent, false),
   };
 }
 
@@ -45,6 +55,7 @@ export function siteOn(s, id) {
 }
 
 export const areaOn = (s, area) => s.areas[area] !== false;
+export const searchOn = (s, id) => !s.paused && s.search[id] === true;
 
 // The toolbar icon: paused when Radar is paused or off for this site, reading while it is reading
 // accounts, idle otherwise.

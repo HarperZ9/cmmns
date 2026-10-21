@@ -2,7 +2,7 @@
 // content scripts, plus the retention prune the background worker runs.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULTS, SITES, normalizeSettings, siteOn, areaOn, iconState, pruneStore, dataKeys, RETENTION } from "../src/core/settings.js";
+import { DEFAULTS, SITES, SEARCH_ENGINES, searchOn, normalizeSettings, siteOn, areaOn, iconState, pruneStore, dataKeys, RETENTION } from "../src/core/settings.js";
 
 const DAY = 86400000, NOW = Date.parse("2026-10-21T00:00:00Z");
 
@@ -84,4 +84,19 @@ test("prune returns only the keys it changed, so nothing is rewritten needlessly
 test("clear-all removes every Radar key except the settings", () => {
   const keys = dataKeys(["pb.settings", "pb.tour", "pb.learn.v1", "pb.history.v1", "pb.about.v1", "pb.tpl", "other.thing"]);
   assert.deepEqual(keys.sort(), ["pb.about.v1", "pb.history.v1", "pb.learn.v1", "pb.tpl"], "the tour's No more tips is kept; self-check answers are cleared");
+});
+
+test("search-result cards and other coverage are off until the user turns them on", () => {
+  const s = normalizeSettings({});
+  assert.equal(s.coverage, false);
+  assert.equal(s.coverageConsent, false);
+  for (const [id] of SEARCH_ENGINES) assert.equal(searchOn(s, id), false, id);
+  assert.equal(searchOn(normalizeSettings({ search: { google: true } }), "google"), true);
+  assert.equal(searchOn(normalizeSettings({ search: { google: true }, paused: true }), "google"), false);
+  assert.deepEqual(normalizeSettings({ search: { evil: true } }).search, {});
+});
+
+test("consent to send does not outlive turning other coverage off", () => {
+  assert.equal(normalizeSettings({ coverage: false, coverageConsent: true }).coverageConsent, false);
+  assert.equal(normalizeSettings({ coverage: true, coverageConsent: true }).coverageConsent, true);
 });

@@ -5288,6 +5288,362 @@ function cardLines(card) {
 return { MIN_CARD_ACCOUNTS, cardPage, evidenceCard, credentialSummary, canonicalJSON, sealCard, verifyCard, cardLines };
 })();
 
+// ---- hosts.js
+const M_hosts = (() => {
+// Hosts and sites. A site is the registrable domain of a host ("transcripts.cnn.com" is cnn.com),
+// except on shared hosts, where each subdomain is somebody's own site ("someone.blogspot.com").
+// Used to file each fact-check review under the site where the reviewed claim appeared, and to look
+// a link up in the site tables. The lists name services by what they do (people post there, it
+// archives pages, it shortens links), with the same treatment for services of every country and
+// every direction.
+
+// Two-part public suffixes Radar meets in the feed and in links. Not the full Public Suffix List:
+// a missing suffix files "x.co.zz" under "co.zz", which matches no table row and shows nothing.
+const SUFFIX2 = new Set(("co.uk org.uk gov.uk ac.uk me.uk com.au net.au org.au gov.au edu.au co.nz govt.nz org.nz co.in gov.in org.in net.in nic.in " +
+  "co.jp or.jp ne.jp go.jp com.br gov.br org.br jus.br leg.br co.za gov.za org.za com.mx gob.mx org.mx com.ar gob.ar com.tr gov.tr org.tr " +
+  "com.pk gov.pk com.ng gov.ng com.ph gov.ph com.my gov.my com.sg gov.sg co.kr go.kr or.kr com.cn gov.cn org.cn com.tw gov.tw org.tw com.hk gov.hk " +
+  "co.id go.id or.id com.ua gov.ua org.ua com.eg gov.eg co.il gov.il org.il com.sa gov.sa co.ke go.ke com.gh gov.gh com.co gov.co com.pe gob.pe " +
+  "com.ve gob.ve com.bd gov.bd com.np gov.np com.lk gov.lk com.vn gov.vn co.th go.th in.th or.th com.qa gov.qa com.kw com.om com.lb com.jo " +
+  "com.hr com.gr com.ro com.pl com.pt com.es com.de com.fr com.it com.ar com.au com.cy com.mt com.ec gob.ec com.bo com.py com.uy com.do com.gt com.sv com.hn com.ni com.pa co.cr com.cu com.pr com.et com.tn com.dz " +
+  "co.ma gov.ma co.ug co.tz co.zw co.zm com.na org.ng com.af gov.af com.iq gov.iq com.ru org.ru com.by gov.by com.kz gov.kz").split(" "));
+
+// Services where each subdomain belongs to whoever writes there.
+const SHARED = new Set(["blogspot.com", "wordpress.com", "substack.com", "medium.com", "tumblr.com", "wixsite.com", "github.io", "weebly.com",
+  "go.com", "livejournal.com", "typepad.com", "over-blog.com", "squarespace.com", "webnode.com", "jimdofree.com", "home.blog", "ghost.io",
+  "neocities.org", "carrd.co", "telegra.ph", "beehiiv.com", "mailchimpsites.com", "sites.google.com", "netlify.app", "vercel.app", "pages.dev"]);
+
+// Where people post their own material. A claim posted there is the poster's, not the service's.
+const PLATFORM = ["facebook.com", "fb.watch", "fb.com", "instagram.com", "threads.net", "threads.com", "whatsapp.com", "messenger.com",
+  "x.com", "twitter.com", "youtube.com", "youtu.be", "tiktok.com", "snapchat.com", "pinterest.com", "linkedin.com", "reddit.com", "redd.it",
+  "t.me", "telegram.me", "telegram.org", "vk.com", "ok.ru", "dzen.ru", "rutube.ru", "weibo.com", "weibo.cn", "douyin.com", "bilibili.com",
+  "kuaishou.com", "xiaohongshu.com", "qq.com", "wechat.com", "zhihu.com", "line.me", "kakao.com", "naver.com", "sharechat.com", "koo.in",
+  "rumble.com", "truthsocial.com", "gab.com", "gettr.com", "parler.com", "bitchute.com", "odysee.com", "minds.com", "bsky.app", "mastodon.social",
+  "vimeo.com", "dailymotion.com", "twitch.tv", "kick.com", "soundcloud.com", "spotify.com", "podcasts.apple.com", "discord.com", "discord.gg",
+  "quora.com", "imgur.com", "flickr.com", "patreon.com", "change.org", "google.com", "docs.google.com", "drive.google.com", "dropbox.com",
+  "scribd.com", "issuu.com", "slideshare.net"];
+const ARCHIVE = ["archive.org", "web.archive.org", "archive.ph", "archive.is", "archive.today", "archive.md", "archive.li", "archive.vn", "archive.fo",
+  "perma.cc", "ghostarchive.org", "megalodon.jp", "archive.st", "awesomescreenshot.com", "webcitation.org", "cachedview.nl", "screenshot.guru"];
+const SHORTENER = ["bit.ly", "tinyurl.com", "t.co", "goo.gl", "ow.ly", "buff.ly", "is.gd", "rb.gy", "cutt.ly", "shorturl.at", "tiny.cc", "lnkd.in",
+  "wapo.st", "nyti.ms", "trib.al", "dlvr.it", "linktr.ee", "mvau.lt", "s.id", "rebrand.ly", "bl.ink", "short.io", "amzn.to", "fb.me", "spoti.fi", "apple.co"];
+// Services that carry other people's words verbatim (speech transcripts, transcript databases) or
+// republish other outlets' articles (aggregators). A claim found there belongs to the speaker or the
+// original outlet, so it is not filed under the service.
+const TRANSCRIPT = ["rev.com", "factba.se", "c-span.org", "otter.ai", "happyscribe.com", "americanrhetoric.com", "millercenter.org", "presidency.ucsb.edu"];
+const AGGREGATOR = ["yahoo.com", "msn.com", "news.google.com", "flipboard.com", "newsbreak.com", "dailyhunt.in", "operanewsapp.com", "smartnews.com", "ground.news",
+  "newsnow.co.uk", "inshorts.com", "toutiao.com", "sohu.com", "163.com", "kknews.cc", "pressreader.com", "headtopics.com", "newsbreakapp.com", "ampproject.org"];
+// Tools fact-checkers publish through: an appearance there is a fact-check, never the claim's source.
+const CHECK_TOOLS = ["checkmedia.org", "meedan.com", "meedan.org"];
+// Hosting and content delivery: the address names the host, not who published the page.
+const HOSTING = ["googleusercontent.com", "wp.com", "cloudfront.net", "amazonaws.com", "akamaized.net", "blogger.com", "files.wordpress.com", "azureedge.net", "fbcdn.net", "twimg.com"];
+const KIND = new Map([...PLATFORM.map((h) => [h, "platform"]), ...ARCHIVE.map((h) => [h, "archive"]), ...SHORTENER.map((h) => [h, "shortener"]),
+  ...TRANSCRIPT.map((h) => [h, "transcript"]), ...AGGREGATOR.map((h) => [h, "aggregator"]), ...CHECK_TOOLS.map((h) => [h, "fact-check tool"]), ...HOSTING.map((h) => [h, "hosting"])]);
+
+// "https://www.m.example.com/x" -> "example.com"; null for anything that is not an http(s) URL.
+function hostOf(url) {
+  let h;
+  try { const u = new URL(String(url || "").trim()); if (!/^https?:$/.test(u.protocol)) return null; h = u.hostname.toLowerCase(); } catch { return null; }
+  for (let i = 0; i < 2; i++) h = h.replace(/^(?:www\d?|m|mobile|amp)\./, "");
+  return h.replace(/\.$/, "") || null;
+}
+
+// The site a host belongs to, or null for an IP address, a bare suffix or a shared host itself.
+function siteKey(host) {
+  const h = String(host || "").toLowerCase().replace(/^www\./, "");
+  if (!h.includes(".") || /^\d+(?:\.\d+){3}$/.test(h) || h.includes(":")) return null;
+  const parts = h.split(".");
+  for (let n = 2; n <= 3; n++) {
+    const tail = parts.slice(-n).join(".");
+    if (SHARED.has(tail)) return parts.length > n ? parts.slice(-(n + 1)).join(".") : null;
+  }
+  const two = parts.slice(-2).join(".");
+  if (SUFFIX2.has(two)) return parts.length >= 3 ? parts.slice(-3).join(".") : null;
+  return two;
+}
+
+// What a host does with other people's material: "platform", "archive", "shortener", "transcript",
+// "aggregator", "fact-check tool", "hosting", or null.
+function hostedKind(host) {
+  const h = String(host || "").toLowerCase();
+  if (KIND.has(h)) return KIND.get(h);
+  const k = siteKey(h);
+  return (k && KIND.get(k)) || null;
+}
+
+// The page an archive copy is of, when the archive address carries it; null otherwise.
+function unwrapArchive(url) {
+  const s = String(url || "");
+  const host = hostOf(s);
+  if (!host || hostedKind(host) !== "archive") return null;
+  const m = s.match(/^https?:\/\/[^/]+\/(?:web\/)?[\d.*-]{4,}[a-z_]*\/(.+)$/i);
+  if (!m) return null;
+  const inner = m[1];
+  return /^https?:\/\//i.test(inner) ? inner : /^[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/|$)/i.test(inner) ? "http://" + inner : null;
+}
+
+// One appearance URL: { site } | { hosted } | { excluded } | null. `checkers` holds the site keys of
+// every fact-checker in the feed, so a claim "appearing" on a fact-check page is never filed there.
+function appearanceSite(url, checkers = new Set()) {
+  const inner = unwrapArchive(url);
+  const host = hostOf(inner || url);
+  if (!host) return null;
+  const kind = hostedKind(host);
+  if (kind) return { hosted: kind };
+  const key = siteKey(host);
+  if (!key) return null;
+  if (checkers.has(key)) return { excluded: "fact-checker" };
+  return { site: key };
+}
+
+// Every site one ClaimReview item lists the claim as appearing on, once each, plus counts of the
+// appearances that were set aside and why.
+function reviewSites(item, checkers = new Set()) {
+  const ir = (item && item.itemReviewed) || {};
+  const urls = [].concat(ir.appearance || [], ir.firstAppearance || []).map((a) => (a && typeof a === "object" ? a.url : a)).filter((u) => typeof u === "string");
+  const own = siteKey(hostOf(item && item.url));
+  const all = own ? new Set([...checkers, own]) : checkers;
+  const sites = new Set(), hosted = [];
+  let excluded = 0;
+  for (const u of urls) {
+    const a = appearanceSite(u, all);
+    if (!a) continue;
+    if (a.site) sites.add(a.site);
+    else if (a.hosted) hosted.push(a.hosted);
+    else excluded++;
+  }
+  return { sites: [...sites], hosted, excluded, urls: urls.length };
+}
+
+// The real address behind a platform or search-engine redirect, or the link itself. X's t.co
+// links carry the address only in their visible text ("nytimes.com/2026/…"), so `text` is used.
+function realLink(href, text = "") {
+  let u;
+  try { u = new URL(String(href || "")); } catch { return null; }
+  const h = u.hostname.replace(/^www\./, ""), q = (k) => u.searchParams.get(k);
+  const asUrl = (s) => { try { const x = new URL(s); return /^https?:$/.test(x.protocol) ? x.toString() : null; } catch { return null; } };
+  if (h === "t.co") {
+    const t = String(text || "").trim().replace(/[…]+$/, "").replace(/^https?:\/\//, "");
+    return /^[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}(?:\/\S*)?$/i.test(t) ? "https://" + t : null;
+  }
+  if (/^(?:l|lm)\.facebook\.com$/.test(h) || h === "l.instagram.com") return asUrl(q("u"));
+  if (h === "youtube.com" && u.pathname === "/redirect") return asUrl(q("q"));
+  if (h === "out.reddit.com") return asUrl(q("url"));
+  if (/^google\.[a-z.]+$/.test(h) && u.pathname === "/url") return asUrl(q("q") || q("url"));
+  if (h === "duckduckgo.com" && u.pathname.startsWith("/l/")) return asUrl(q("uddg"));
+  if (h === "bing.com" && u.pathname === "/ck/a") {
+    const v = q("u");
+    if (!v || !v.startsWith("a1")) return null;
+    try { return asUrl(atob(v.slice(2).replace(/-/g, "+").replace(/_/g, "/"))); } catch { return null; }
+  }
+  return asUrl(u.toString());
+}
+
+return { hostOf, siteKey, hostedKind, unwrapArchive, appearanceSite, reviewSites, realLink };
+})();
+
+// ---- sites.js
+const M_sites = (() => {
+// Site context for a link or the page being read: who owns the site, what kind of owner, when and
+// where it was founded, any state link, and the site's fact-check record. Every row names its
+// source. Radar adds no score or rating of its own.
+//
+// The table (src/ext/sites.json, built by scripts/sites-build.mjs) has two parts:
+//   facts    from Wikidata (CC0): name, founding date, country, and the owner type Wikidata states
+//   records  from the Data Commons ClaimReview feed (CC BY 4.0): each review a fact-checker
+//            published, filed under the site where the fact-checker said the claim appeared
+// A site's record counts reviews whose claim appeared on that site. Posts on platforms, archives
+// without the original address, shortened links and fact-checkers' own pages are never filed under
+// a site (src/core/hosts.js). Political side is never an input: nothing here reads or names one.
+
+const { siteKey, hostOf } = M_hosts;
+const { stateLabel } = M_state;
+
+let FACTS = {}, RECORDS = {}, CHECKERS = [];
+
+// table: { facts: { host: [name, founded, country, ownerType, qid] }, records: { siteKey: { n, m, since, until, reviews: [[claim, rating, ci, url, date]] } }, checkers }
+function setSiteTable(table) {
+  FACTS = (table && table.facts) || {};
+  RECORDS = (table && table.records) || {};
+  CHECKERS = (table && table.checkers) || [];
+  return Object.keys(FACTS).length;
+}
+
+const norm = (h) => hostOf(/^https?:\/\//i.test(String(h || "")) ? h : "https://" + String(h || "")) || "";
+
+// The most specific listed host, walking up no further than the site itself.
+function siteFacts(host) {
+  let h = norm(host);
+  const top = siteKey(h);
+  while (h) {
+    const f = FACTS[h];
+    if (f) return { name: f[0], founded: f[1] || null, country: f[2] || null, ownerType: f[3] || null, source: f[4] ? `https://www.wikidata.org/wiki/${f[4]}` : null };
+    if (h === top || !h.includes(".")) break;
+    h = h.slice(h.indexOf(".") + 1);
+  }
+  return null;
+}
+
+function siteRecord(host) {
+  const key = siteKey(norm(host));
+  const r = key && RECORDS[key];
+  if (!r) return null;
+  return { key, n: r.n, m: r.m, since: r.since, until: r.until, reviews: (r.reviews || []).map(([claim, rating, ci, url, date]) => ({ claim, rating, checker: CHECKERS[ci] || "unknown", url, date })) };
+}
+
+// A record without its review list, for pages that only show the line.
+const recordSummary = (rec) => (rec ? { key: rec.key, n: rec.n, m: rec.m, since: rec.since, until: rec.until, latest: rec.reviews.slice(0, 3) } : null);
+
+const plural = (n, word) => `${n.toLocaleString("en")} ${word}${n === 1 ? "" : "s"}`;
+function recordLine(rec) {
+  if (!rec || !rec.n) return null;
+  return `${plural(rec.n, "review")} by ${plural(rec.m, "fact-checker")} since ${rec.since}, ratings as the checkers wrote them`;
+}
+
+const SITE_RECORD_DOES_NOT_PROVE = "A review lists this site as a place where a claim appeared. The site may have been reporting someone else's words, and each rating is about that claim, not about the site. Fact-checkers choose what to check, so a count says little about how often a site is right.";
+const SITE_SOURCES = "Owner, owner type, founding date and country: Wikidata (CC0). Reviews: ClaimReview markup published by each fact-checker, from the Data Commons fact-check feed (CC BY 4.0).";
+
+// Owner types, in a fixed order. State links come first because they cite a source; then what
+// Wikidata states. A report naming a site in an operation is a state link, not an owner type.
+const OWNER_TYPES = ["state media", "public broadcaster", "regional govt", "nonprofit", "commercial", "nonprofit and commercial", "not stated"];
+function ownerType({ facts, state } = {}) {
+  const rows = state || [];
+  if (rows.some((h) => h.basis === "state-owned" && h.level !== "regional") || rows.some((h) => h.basis === "designated")) return "state media";
+  if (rows.some((h) => h.basis === "public-broadcaster")) return "public broadcaster";
+  if (rows.some((h) => h.basis === "state-owned" && h.level === "regional")) return "regional govt";
+  const t = facts && facts.ownerType;
+  return OWNER_TYPES.includes(t) ? t : "not stated";
+}
+const typeSource = (info) => ((info.state || []).some((h) => h.basis !== "named-in-report") ? "from the state links below" : "as Wikidata states it");
+
+// One line per state link, in the source's own terms.
+const stateRows = (rows) => (rows || []).map((h) => ["State link", `${stateLabel(h).says} Source: ${h.source && h.source.title}${h.source && h.source.date ? ` (${h.source.date})` : ""}.`]);
+
+// The rows for one site, for Radar's window. info: { domain, owner, state, facts, record }.
+// opts.onList opens the full list of reviews.
+function siteInfoRows(info, opts = {}) {
+  const { domain, owner, facts, record } = info;
+  const name = (facts && facts.name) || (owner && owner.name) || null;
+  const type = ownerType(info);
+  const rows = [
+    ["Site", name ? `${name} (${domain})` : domain],
+    [ownerHeading(owner), owner && owner.owner ? `${owner.owner} (Wikidata)` : null],
+    ["Owner type", type !== "not stated" ? `${type}, ${typeSource(info)}` : null],
+    ["Founded", facts && facts.founded ? `${facts.founded} (Wikidata)` : null],
+    ["Country", facts && facts.country ? `${facts.country} (Wikidata)` : null],
+    ...stateRows(info.state),
+  ];
+  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Radar has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
+  rows.push(["Fact-check record", recordLine(record) || "No review in Radar's table lists this site as where a claim appeared."]);
+  for (const r of (record && (record.latest || record.reviews.slice(0, 3))) || []) rows.push(["Review", `"${r.rating}": ${r.checker}, ${r.date || "date not given"}`]);
+  if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
+  rows.push(["Source", SITE_SOURCES], ["Does not prove", SITE_RECORD_DOES_NOT_PROVE]);
+  return rows.filter(([, v]) => v != null);
+}
+
+// Wikidata's owner (P127) where it states one, else the parent organisation (P749) or publisher
+// (P123), each named as what it is (scripts/owners-build.mjs).
+const ownerHeading = (o) => (o && o.via === "parent" ? "Parent organisation" : o && o.via === "publisher" ? "Published by" : "Owned by");
+
+// Short labels for a result link on a search page: state links first, then the owner or owner type.
+// The review count stays in the hover card, beside the line that says what a count does not prove:
+// on its own under a result it would read as a score.
+function siteChips(info) {
+  if (!info) return [];
+  const out = [...new Set((info.state || []).map((h) => stateLabel(h).chip))];
+  const cut = (t) => (t.length > 42 ? t.slice(0, 41) + "…" : t);
+  if (info.owner && info.owner.owner) out.push(cut(`${ownerHeading(info.owner).toLowerCase()} ${info.owner.owner}`));
+  else { const t = ownerType(info); if (t !== "not stated") out.push(t); }
+  return out;
+}
+
+// The head line of a site card: the name, then owner type, country, founding year and the review
+// count. Nothing here is a warning: a count of reviews is context, not a verdict.
+function siteGlance(info) {
+  const f = info.facts || {}, type = ownerType(info);
+  return {
+    who: f.name || (info.owner && info.owner.name) || info.domain,
+    fact: [info.domain, type !== "not stated" ? type : null, f.country, f.founded ? `since ${String(f.founded).slice(0, 4)}` : null, info.record && info.record.n ? plural(info.record.n, "fact-check review") : null].filter(Boolean).join(" · "),
+  };
+}
+
+return { setSiteTable, siteFacts, siteRecord, recordSummary, recordLine, SITE_RECORD_DOES_NOT_PROVE, SITE_SOURCES, OWNER_TYPES, ownerType, siteInfoRows, ownerHeading, siteChips, siteGlance };
+})();
+
+// ---- coverage.js
+const M_coverage = (() => {
+// "Other coverage": other outlets reporting the same story, from the GDELT Project's DOC 2.0 API.
+// This is Radar's only feature that sends anything off the machine. It is off by default; the
+// user turns it on in the options page, the browser asks for access to api.gdeltproject.org, and
+// each lookup runs only on a click. Radar sends the main words of the article's title and nothing
+// else: not the page address, not the user's history, not any post.
+//
+// Each outlet is labelled by its owner type as the site tables state it (src/core/sites.js):
+// state media, public broadcaster, regional govt, nonprofit, commercial, or not stated. Radar never
+// labels an outlet by a left or right position.
+
+const { ownerType, OWNER_TYPES } = M_sites;
+const { siteKey, hostOf } = M_hosts;
+
+const COVERAGE_HOST = "api.gdeltproject.org";
+const COVERAGE_ORIGIN = `https://${COVERAGE_HOST}/*`;
+const MAX_TERMS = 4;
+const ENDPOINT = `https://${COVERAGE_HOST}/api/v2/doc/doc`;
+
+const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Radar sends the main words of that article's title, and nothing else, to the GDELT Project's public DOC 2.0 API at api.gdeltproject.org. Radar does not send the page address, your history, any post or any account. GDELT receives the request like any web request, so it sees your IP address and the words. Its terms are at gdeltproject.org. Nothing is sent until you click.";
+
+const STOP = new Set(("the a an and or but of to in on at by for with from as is are was were be been it its this that these those their they he she his her we our you your " +
+  "not no do does did has have had will would can could should may might than then so if into about over under after before what which who when where why how " +
+  "says said say new news live update updates video watch report reports le la les des du de et un une el los las del y der die das und den ein eine").split(" "));
+
+// The title's main words, at most MAX_TERMS, lower-case, letters and digits only. Null when fewer than
+// two usable words remain (GDELT rejects short and common words).
+function coverageTerms(title) {
+  const t = String(title || "").split(/\s+[|–—-]\s+/)[0];
+  const words = t.toLowerCase().normalize("NFKC").replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/)
+    .filter((w) => w.length >= 4 || (/\d/.test(w) && w.length >= 3)).filter((w) => !STOP.has(w));
+  // GDELT matches all the words, so a long query finds almost nothing. Keep the four longest words
+  // (longer words name the story's people, places and things), in the title's order.
+  const uniq = [...new Set(words)];
+  const keep = new Set([...uniq].sort((a, b) => b.length - a.length).slice(0, MAX_TERMS));
+  const terms = uniq.filter((w) => keep.has(w));
+  return terms.length >= 2 ? terms.join(" ") : null;
+}
+
+function coverageUrl(title, { timespan = "1w", max = 50 } = {}) {
+  const q = coverageTerms(title);
+  if (!q) return null;
+  const u = new URL(ENDPOINT);
+  for (const [k, v] of [["query", q], ["mode", "ArtList"], ["format", "json"], ["maxrecords", String(max)], ["timespan", timespan], ["sort", "HybridRel"]]) u.searchParams.set(k, v);
+  return u.toString();
+}
+
+const day = (s) => { const m = String(s || "").match(/^(\d{4})(\d\d)(\d\d)/); return m ? `${m[1]}-${m[2]}-${m[3]}` : null; };
+
+// GDELT's article list to one entry per site, without the page's own site. infoOf(site) returns
+// { facts, state } from the site tables.
+function coverageList(json, { self = null, infoOf = () => ({}) } = {}) {
+  const arts = json && Array.isArray(json.articles) ? json.articles : [];
+  const own = self ? siteKey(hostOf("https://" + String(self).replace(/^https?:\/\//, ""))) : null, seen = new Set(), out = [];
+  for (const a of arts) {
+    if (!a || !/^https:\/\//i.test(String(a.url || ""))) continue;
+    const site = siteKey(hostOf(a.url));
+    if (!site || site === own || seen.has(site)) continue;
+    seen.add(site);
+    const info = infoOf(site) || {};
+    out.push({ site, url: a.url, title: String(a.title || "").slice(0, 200), seen: day(a.seendate), language: a.language || null, country: a.sourcecountry || null, type: ownerType(info), name: (info.facts && info.facts.name) || null });
+  }
+  return out;
+}
+
+// Counts per owner type, in OWNER_TYPES order; types with no outlet are left out.
+function coverageGroups(list) {
+  return OWNER_TYPES.map((type) => ({ type, n: (list || []).filter((x) => x.type === type).length })).filter((g) => g.n);
+}
+
+const COVERAGE_DOES_NOT_PROVE = "GDELT finds articles by their words, so some may be about a different event, and it covers only the outlets it monitors. Owner type is what the site tables state, not a judgment of the reporting.";
+
+return { COVERAGE_HOST, COVERAGE_ORIGIN, MAX_TERMS, COVERAGE_PRIVACY, coverageTerms, coverageUrl, coverageList, coverageGroups, COVERAGE_DOES_NOT_PROVE };
+})();
+
 // ---- settings.js
 const M_settings = (() => {
 // Radar's settings, in one normalised shape for the toolbar popup, the first-run and options pages
@@ -5300,6 +5656,11 @@ const SETTINGS_KEY = "pb.settings";
 const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"], ["threads", "Threads"],
   ["mastodon", "Mastodon"], ["tiktok", "TikTok"]];
 
+// Search engines where Radar can show site cards on result links. Each is off until the user turns
+// it on in the options page, which asks the browser for access to that engine's result pages.
+// [id, name, result-page matches, origin the browser grants]
+const SEARCH_ENGINES = [["google", "Google", ["https://www.google.com/search*"], "https://www.google.com/*"], ["bing", "Bing", ["https://www.bing.com/search*"], "https://www.bing.com/*"], ["duckduckgo", "DuckDuckGo", ["https://duckduckgo.com/*"], "https://duckduckgo.com/*"]];
+
 // The areas of the window's strip; each can be hidden from the window.
 const AREA_IDS = ["place", "account", "posting", "coordination", "language", "sources", "media"];
 
@@ -5310,6 +5671,9 @@ const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 
 const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
   historyDays: 60, aboutDays: 14, calm: false, large: false, onboarded: false,
+  // Other coverage (src/core/coverage.js): off until the user turns it on; coverageConsent is set
+  // when the user has read what it sends and clicked to send.
+  search: {}, coverage: false, coverageConsent: false,
 });
 
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
@@ -5327,6 +5691,8 @@ function normalizeSettings(raw) {
     historyDays: days(s.historyDays, DEFAULTS.historyDays, RETENTION.historyDays),
     aboutDays: days(s.aboutDays, DEFAULTS.aboutDays, RETENTION.aboutDays),
     calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
+    search: switches(s.search, SEARCH_ENGINES.map(([id]) => id)), coverage: bool(s.coverage, DEFAULTS.coverage),
+    coverageConsent: bool(s.coverage, false) && bool(s.coverageConsent, false),
   };
 }
 
@@ -5337,6 +5703,7 @@ function siteOn(s, id) {
 }
 
 const areaOn = (s, area) => s.areas[area] !== false;
+const searchOn = (s, id) => !s.paused && s.search[id] === true;
 
 // The toolbar icon: paused when Radar is paused or off for this site, reading while it is reading
 // accounts, idle otherwise.
@@ -5383,7 +5750,7 @@ const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "p
 const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1"]);
 const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));
 
-return { SETTINGS_KEY, SITES, AREA_IDS, RETENTION, DEFAULTS, normalizeSettings, siteOn, areaOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
+return { SETTINGS_KEY, SITES, SEARCH_ENGINES, AREA_IDS, RETENTION, DEFAULTS, normalizeSettings, siteOn, areaOn, searchOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
 })();
 
 // ---- families.js
@@ -5407,7 +5774,7 @@ const FAMILIES = [
   ["same-upload", "Same upload, many accounts", "coordination", D], ["duplicates", "Same text as other replies", "coordination", D],
   ["copied-elsewhere", "Same words in other threads", "coordination", D],
   ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
-  ["state-link", "State link", "sources", T], ["owner", "Outlet owner", "sources", T],
+  ["state-link", "State link", "sources", T], ["owner", "Outlet owner", "sources", T], ["site-record", "Site facts and fact-check record", "sources", T],
   ["client", "Posting app", "posting", P], ["written-in", "Written in another language", "place", P],
   ["mismatch", "Speaks as local, labelled elsewhere", "place", D], ["store-elsewhere", "App store elsewhere", "place", D],
   ["flag-elsewhere", "Flag of another country", "place", D], ["profile-location-elsewhere", "Profile says elsewhere", "place", D],
@@ -5711,5 +6078,5 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
 })();

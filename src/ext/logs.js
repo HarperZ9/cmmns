@@ -10,6 +10,8 @@
     const handles = items.map((r) => r.author).filter((h) => !askedOwners.has("@" + h));
     if (!domains.length && !handles.length) return;
     domains.forEach((d) => askedOwners.add(d)); handles.forEach((h) => askedOwners.add("@" + h));
+    // Site cards for the same domains, so the window's Sources area can show the whole card.
+    if (globalThis.PBLinkCard) await Promise.all(domains.map((d) => PBLinkCard.info(d))).catch((e) => console.error("[radar] site lookup failed", e));
     try {
       const [rows, srows] = await Promise.all([chrome.runtime.sendMessage({ type: "pb-owners", domains, handles }), chrome.runtime.sendMessage({ type: "pb-state", domains, handles })]);
       if (Array.isArray(rows) && rows.length) { ownerRows.push(...rows); PB.setOwnerRows(ownerRows); }

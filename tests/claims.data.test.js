@@ -22,13 +22,14 @@ test("claims.json stays within the 6 MB cap, each file under the add-on linter's
 test("claims.json names its source and licence", () => {
   assert.equal(table.source.licence, "CC BY 4.0");
   assert.match(table.source.url, /^https:\/\/datacommons\.org\//);
-  assert.deepEqual(table.fields, ["claim", "rating", "checker", "url", "date", "langGuess"]);
+  assert.deepEqual(table.fields, ["claim", "rating", "checker", "url", "date", "langGuess", "appearedOn"]);
 });
 
 test("every row has a claim, a rating, a fact-checker and a review link, and nothing else", () => {
   const perChecker = new Map();
   for (const r of table.rows) {
-    assert.equal(r.length, 6);
+    assert.equal(r.length, 7);
+    assert.ok(r[6] === null || /^[a-z0-9.-]+\.[a-z]{2,}$/.test(r[6]), `appearedOn ${r[6]}`);
     const [claim, rating, ci, url, date] = r;
     assert.ok(claim && rating && table.checkers[ci], JSON.stringify(r));
     assert.match(url, /^https?:\/\//);

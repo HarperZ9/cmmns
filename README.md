@@ -7,7 +7,7 @@ how the account posts, and how the thread's harshest replies compare with the re
 
 Radar gives evidence, never verdicts. It never calls anyone a bot, a propagandist or an extremist,
 and every sign says where its data came from and what it does not prove. It runs in your browser
-and sends nothing anywhere.
+and sends nothing anywhere unless you turn on Other coverage, which says what it sends first.
 
 ## Install in a minute
 
@@ -42,6 +42,16 @@ Check a download against `SHA256SUMS` from the same release.
   was measured, or that it was not.
 - **Sources:** who owns a linked outlet, and state links only where a cited report or official
   document names the site or account.
+- **Site cards:** rest the pointer on any link for the linked site's owner, owner type, founding
+  year and country from Wikidata, any cited state link, and its fact-check record ("24 reviews by
+  13 fact-checkers since 2017-03-03, ratings as the checkers wrote them") with a list of every
+  review. Press **Site card for this page** in the toolbar menu for the news site you are reading,
+  and turn on labels under Google, Bing or DuckDuckGo results in the options if you want them.
+  No score: each fact names its source, and the record says what a count does not prove.
+- **Other coverage (off by default):** on a click, other outlets covering the same story from the
+  GDELT Project, each labelled by owner type, never by a left or right score. It sends the main
+  words of the article's title to api.gdeltproject.org and nothing else, and says so before you
+  turn it on.
 - **Fact-checked claims:** when a post's wording closely matches a claim a fact-checker has
   already reviewed, the fact-checker's name, their rating in their own words and a link. About
   20,000 reviews from 328 fact-checkers ship inside Radar, so no post text is sent anywhere.
@@ -65,7 +75,8 @@ options page lists every sign with its figure.
 ## Privacy
 
 No server, no account, no analytics. Radar reads only what the site shows you, and its only
-requests go to the site you are on, for account details that site discloses. What it keeps stays in
+requests go to the site you are on, for account details that site discloses, plus the GDELT lookup
+if you turn on Other coverage and click. What it keeps stays in
 your browser: account details for 14 days and thread history for 60 by default, both adjustable,
 with a one-click "Clear all Radar data". Full details in [PRIVACY.md](PRIVACY.md).
 

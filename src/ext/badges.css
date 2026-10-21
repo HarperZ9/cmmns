@@ -136,3 +136,7 @@
 .pb-tip { margin: 6px 10px; padding: 8px 10px; border: 1px solid var(--pb-line); border-left: 3px solid var(--pb-ink); border-radius: 0; }
 .pb-tip p { margin: 0 0 6px; }
 .pb-tip-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+/* Site labels under search results (src/ext/search.js): quiet context, never a warning colour. */
+.pb-site-line { margin: 2px 0 6px; font-size: 12px; line-height: 16px; color: var(--pb-muted); cursor: default; }
+.pb-site-line:hover, .pb-site-line:focus-visible { color: var(--pb-ink); }
+.pb-site-line:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; border-radius: 2px; }
