@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Radar options</title>
+<link rel="stylesheet" href="canon.css">
 <link rel="stylesheet" href="pages.css">
 </head>
 <body>
@@ -36,7 +37,7 @@
     <p class="muted">Everything stays in this browser profile. Older entries are deleted on the next start and whenever you change these numbers.</p>
     <div class="field"><label for="historyDays">History, connections and source trails, in days<span class="hint muted" id="historyHint"></span></label><input id="historyDays" type="number" inputmode="numeric"></div>
     <div class="field"><label for="aboutDays">Account details read from About pages, in days</label><input id="aboutDays" type="number" inputmode="numeric"></div>
-    <p class="status muted mono" id="usage" aria-live="polite"></p>
+    <p class="status muted figure" id="usage" aria-live="polite"></p>
     <div class="row">
       <button id="clear" type="button" class="quiet">Clear all Radar data</button>
       <span id="clearStatus" role="status" aria-live="polite"></span>
@@ -63,7 +64,7 @@
     <h2 id="h-feedback">Your feedback on signs</h2>
     <p class="muted">Every sign in the window has <strong>This was right</strong> and <strong>This was wrong</strong>. Your marks stay in this browser. Radar keeps the sign, its kind, the thread it was in and your mark. It keeps the post text only when you tick "include the text" before marking.</p>
     <p class="muted" id="fbRule"></p>
-    <p class="status muted mono" id="fbCount" aria-live="polite"></p>
+    <p class="status muted figure" id="fbCount" aria-live="polite"></p>
     <table>
       <thead><tr><th scope="col">Sign</th><th scope="col">Right</th><th scope="col">Wrong</th></tr></thead>
       <tbody id="fbFamilies"></tbody>

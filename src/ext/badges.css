@@ -1,19 +1,22 @@
-/* Radar's pills, card and panel. They take the host site's font and sizing so they read as part of
-   the page. Colour carries meaning only: neutral for context, one warm mark for signals worth a
-   look. Follows X's light, dim and dark themes through .pb-dark on the root. */
-:root { --pb-ink: #0f1419; --pb-muted: #536471; --pb-line: rgba(83, 100, 113, 0.28); --pb-ground: #fff; --pb-hot: #b93c0a; --pb-hot-bg: rgba(185, 60, 10, 0.07); --pb-focus: #0f1419; --pb-shadow: 0 8px 28px rgba(15, 20, 25, 0.18), 0 0 1px rgba(15, 20, 25, 0.3); --pb-size: 13px; --pb-lh: 18px; }
-.pb-dark { --pb-ink: #e7e9ea; --pb-muted: #8b98a5; --pb-line: rgba(139, 152, 165, 0.3); --pb-ground: #16181c; --pb-hot: #fb923c; --pb-hot-bg: rgba(251, 146, 60, 0.1); --pb-focus: #e7e9ea; --pb-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.2); }
+/* Radar's window, panel and lesson links on social sites. They carry the canon of the author's site
+   (canon.css): Hanken Grotesk for words and Conso for figures (loaded by fonts.js under Radar's own
+   names), ink text, hairline rules, square controls, and colour only for a verdict. The ground
+   adapts to X's light, dim and dark themes (.pb-dark and .pb-dim on the root): a bone sheet on
+   light, the void on dark, and X's own blue-grey on dim. --pb-hot is the canon's drift colour and
+   marks only signs worth a look, always beside their words. */
+:root { --pb-ink: #16130f; --pb-muted: #4a443b; --pb-line: #c9bfab; --pb-rule: #7b7262; --pb-ground: #f1ece1; --pb-hot: #8f3a19; --pb-hot-bg: rgba(143, 58, 25, 0.08); --pb-focus: #16130f; --pb-shadow: 0 10px 30px rgba(22, 19, 15, 0.16), 0 0 0 1px rgba(123, 114, 98, 0.55); --pb-size: 13px; --pb-lh: 19px;
+  --pb-sans: "Radar Hanken", "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --pb-mono: "Radar Conso", "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+.pb-dark { --pb-ink: #ece5d6; --pb-muted: #b8b0a0; --pb-line: #38363b; --pb-rule: #6f6a61; --pb-ground: #0a0a0d; --pb-hot: #e29472; --pb-hot-bg: rgba(226, 148, 114, 0.1); --pb-focus: #ece5d6; --pb-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(111, 106, 97, 0.9); }
 /* X's dim theme: a blue-grey ground, so the window sits on the same calm ground as the page. */
-.pb-dark.pb-dim { --pb-muted: #8b98a5; --pb-ground: #1e2732; --pb-line: rgba(139, 152, 165, 0.32); }
-/* Accessibility (options page): larger text, and no motion at all. */
+.pb-dark.pb-dim { --pb-muted: #b8b0a0; --pb-ground: #1e2732; --pb-line: #3a4550; }
 .pb-large { --pb-size: 15px; --pb-lh: 21px; }
 .pb-large .pb-pop { width: 420px; }
 .pb-large .pb-row { grid-template-columns: 136px 1fr; }
 .pb-calm .pb-pop, .pb-calm .pb-chip { transition: none !important; transform: none !important; }
 
-.pb-bar { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 4px; font-family: inherit; font-size: 12px; line-height: 16px; }
+.pb-bar { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0 4px; font-family: var(--pb-sans); font-size: 12px; line-height: 16px; }
 .pb-chip {
-  font: inherit; font-size: 12px; line-height: 16px; padding: 1px 8px; border-radius: 999px; cursor: pointer;
+  font: inherit; font-size: 12px; line-height: 16px; padding: 1px 8px; border-radius: 2px; cursor: pointer;
   border: 1px solid var(--pb-line); background: transparent; color: var(--pb-muted);
   transition: border-color 0.12s ease, background-color 0.12s ease, color 0.12s ease;
 }
@@ -26,8 +29,8 @@
 
 .pb-pop {
   position: absolute; z-index: 2147483000; width: 360px; max-height: min(70vh, 560px); overflow: auto; padding: 4px 0;
-  border-radius: 14px; background: var(--pb-ground); color: var(--pb-ink); box-shadow: var(--pb-shadow);
-  font-family: inherit; font-size: var(--pb-size); line-height: var(--pb-lh);
+  border-radius: 2px; background: var(--pb-ground); color: var(--pb-ink); box-shadow: var(--pb-shadow);
+  font-family: var(--pb-sans); font-size: var(--pb-size); line-height: var(--pb-lh);
   opacity: 0; transform: translateX(-4px); transition: opacity 0.16s ease, transform 0.16s ease;
 }
 .pb-pop.pb-in { opacity: 1; transform: none; }
@@ -44,63 +47,63 @@
 .pb-btn:focus-visible, .pb-sig > summary:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) { .pb-pop { transition: opacity 0.1s linear; transform: none; } .pb-chip { transition: none; } }
 .pb-glance { padding: 10px 14px 8px; }
-.pb-g-who { font-weight: 700; font-size: 14px; }
+.pb-g-who { font-weight: 720; font-size: 15px; letter-spacing: -0.01em; }
 .pb-g-fact { margin-top: 2px; }
 .pb-g-warn { margin-top: 4px; color: var(--pb-hot); font-weight: 600; }
 .pb-g-more { margin-top: 2px; color: var(--pb-muted); font-size: 0.92em; }
 .pb-sec { padding: 8px 14px; border-top: 1px solid var(--pb-line); }
 .pb-sec:first-child { border-top: 0; }
-.pb-sec-h { margin: 0 0 4px; font-size: 0.85em; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--pb-muted); }
+.pb-sec-h { margin: 0 0 4px; font-size: 1em; font-weight: 700; color: var(--pb-ink); }
 .pb-row { display: grid; grid-template-columns: 112px 1fr; gap: 8px; padding: 2px 0; }
 .pb-row-h { color: var(--pb-muted); }
 .pb-row:has(> .pb-row-v:only-child), .pb-row:has(> .pb-btn:only-child) { grid-template-columns: 1fr; }
 .pb-row-v { overflow-wrap: anywhere; }
-.pb-sig { margin: 4px 0; border-radius: 10px; border: 1px solid var(--pb-line); }
+.pb-sig { margin: 4px 0; border-radius: 0; border: 1px solid var(--pb-line); }
 .pb-sig > summary { cursor: pointer; padding: 4px 10px; font-weight: 600; list-style: none; }
 .pb-sig > summary::-webkit-details-marker { display: none; }
-.pb-sig > summary::after { content: "▾"; float: right; color: var(--pb-muted); }
-.pb-sig[open] > summary::after { content: "▴"; }
+.pb-sig > summary::after { content: "+"; float: right; font-weight: 500; color: var(--pb-muted); }
+.pb-sig[open] > summary::after { content: "\2212"; }
 .pb-sig[open] { padding-bottom: 6px; }
 .pb-sig > .pb-row { padding: 2px 10px; }
 .pb-sig.pb-warn { color: inherit; background: var(--pb-hot-bg); border-color: var(--pb-hot); }
 .pb-sig.pb-warn > summary { color: var(--pb-hot); }
 .pb-foot { margin: 0; font-size: 0.92em; color: var(--pb-muted); }
-.pb-link { color: var(--pb-ink); text-decoration: underline; text-decoration-color: var(--pb-muted); text-underline-offset: 2px; margin-right: 10px; }
+.pb-link { color: var(--pb-ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--pb-rule); text-underline-offset: 2px; margin-right: 10px; }
 .pb-link:hover { text-decoration-color: var(--pb-ink); }
 .pb-link:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; border-radius: 2px; }
-.pb-btn { font: inherit; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--pb-line); background: transparent; color: var(--pb-ink); cursor: pointer; }
-.pb-btn:hover:not(:disabled) { border-color: var(--pb-muted); }
+.pb-btn { font: inherit; font-weight: 600; padding: 4px 12px; border-radius: 2px; border: 1px solid var(--pb-rule); background: transparent; color: var(--pb-ink); cursor: pointer; }
+.pb-btn:hover:not(:disabled) { border-color: var(--pb-ink); }
 .pb-btn-s { padding: 2px 9px; margin: 0 4px 4px 0; font-size: 12px; }
-.pb-frame { display: block; max-width: 100%; max-height: 120px; border-radius: 6px; border: 1px solid var(--pb-line); }
+.pb-frame { display: block; max-width: 100%; max-height: 120px; border-radius: 0; border: 1px solid var(--pb-line); }
 .pb-btn:disabled { opacity: 0.5; cursor: progress; }
 .pb-fb { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.pb-btn[aria-pressed="true"] { border-color: var(--pb-ink); font-weight: 600; }
+.pb-btn[aria-pressed="true"] { border-color: var(--pb-ink); background: var(--pb-ink); color: var(--pb-ground); }
 .pb-fb-text { display: inline-flex; align-items: center; gap: 4px; color: var(--pb-muted); font-size: 0.92em; cursor: pointer; }
 .pb-fb-status { color: var(--pb-muted); font-size: 0.92em; }
 
 .pb-panel {
   position: fixed; right: 16px; bottom: 16px; z-index: 2147482999; max-height: 64vh; overflow: auto;
-  border-radius: 16px; background: var(--pb-ground); color: var(--pb-ink); box-shadow: var(--pb-shadow);
-  font-family: inherit; font-size: var(--pb-size); line-height: var(--pb-lh);
+  border-radius: 2px; background: var(--pb-ground); color: var(--pb-ink); box-shadow: var(--pb-shadow);
+  font-family: var(--pb-sans); font-size: var(--pb-size); line-height: var(--pb-lh);
 }
 .pb-panel[data-open="1"] { width: 340px; padding: 0 0 10px; }
-.pb-panel-head { all: unset; display: block; box-sizing: border-box; width: 100%; padding: 8px 14px; cursor: pointer; font-weight: 700; }
+.pb-panel-head { all: unset; display: block; box-sizing: border-box; width: 100%; padding: 8px 14px; cursor: pointer; font-weight: 720; }
 .pb-panel[data-open="0"] .pb-panel-head { font-weight: 600; font-size: 12px; }
-.pb-panel-head:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: -2px; border-radius: 16px; }
+.pb-panel-head:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: -2px; }
 .pb-sentence { margin: 0; padding: 0 14px 8px; font-weight: 500; }
 .pb-psec { padding: 8px 14px; border-top: 1px solid var(--pb-line); }
-.pb-psec .pb-num { margin: 2px 0; color: var(--pb-ink); }
+.pb-psec .pb-num { margin: 2px 0; color: var(--pb-ink); font-variant-numeric: tabular-nums; }
 .pb-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 0; border-top: 1px solid var(--pb-line); }
 .pb-panel .pb-foot { padding: 8px 14px 0; }
 @media (max-width: 600px) { .pb-panel { left: 8px; right: 8px; bottom: 64px; } .pb-panel[data-open="1"] { width: auto; } .pb-pop { width: calc(100vw - 16px); } }
 
-/* The window's head strip: one dot per area. Warm for worth a look, ink for a sign, faint for context. */
+/* The window's head strip: one mark per area. Drift for worth a look, ink for a sign, an outline for context. */
 .pb-strip { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 8px; }
-.pb-area { all: unset; display: inline-flex; align-items: center; gap: 5px; font-size: 0.92em; color: var(--pb-muted); cursor: pointer; border-radius: 6px; padding: 1px 2px; }
+.pb-area { all: unset; display: inline-flex; align-items: center; gap: 5px; font-size: 0.92em; color: var(--pb-muted); cursor: pointer; border-radius: 0; padding: 1px 2px; }
 .pb-area:disabled { cursor: default; opacity: 0.55; }
 .pb-area:not(:disabled):hover span { text-decoration: underline; }
 .pb-area:focus-visible { outline: 2px solid var(--pb-focus); }
-.pb-area i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--pb-muted); box-sizing: border-box; }
+.pb-area i { width: 8px; height: 8px; border-radius: 0; border: 1px solid var(--pb-muted); box-sizing: border-box; }
 .pb-a-warn { color: var(--pb-hot); font-weight: 600; }
 .pb-a-warn i { background: var(--pb-hot); border-color: var(--pb-hot); }
 .pb-a-flag { color: var(--pb-ink); }
@@ -108,7 +111,7 @@
 .pb-a-info i { background: var(--pb-muted); }
 
 /* Tabs */
-.pb-tabs { display: flex; gap: 2px; padding: 0 10px; border-top: 1px solid var(--pb-line); border-bottom: 1px solid var(--pb-line); position: sticky; top: 0; background: var(--pb-ground); z-index: 1; }
+.pb-tabs { display: flex; gap: 2px; padding: 0 10px; border-top: 1px solid var(--pb-line); border-bottom: 1px solid var(--pb-rule); position: sticky; top: 0; background: var(--pb-ground); z-index: 1; }
 .pb-tab { all: unset; padding: 7px 8px; font-size: 0.92em; font-weight: 600; color: var(--pb-muted); cursor: pointer; border-bottom: 2px solid transparent; }
 .pb-tab[aria-selected="true"] { color: var(--pb-ink); border-bottom-color: var(--pb-ink); }
 .pb-tab:focus-visible { outline: 2px solid var(--pb-focus); }
@@ -117,11 +120,11 @@
 /* Small charts: single series in one ink hue; zero bars are a faint stub so gaps read as gaps. */
 .pb-chart { min-width: 0; }
 .pb-mini { display: flex; align-items: flex-end; gap: 2px; height: 34px; }
-.pb-mini i { flex: 1; background: var(--pb-ink); opacity: 0.55; border-radius: 2px 2px 0 0; min-height: 2px; }
+.pb-mini i { flex: 1; background: var(--pb-ink); opacity: 0.55; min-height: 2px; }
 .pb-mini i.pb-zero { opacity: 0.18; }
 .pb-mini i:hover { opacity: 1; }
-.pb-axis { display: flex; justify-content: space-between; font-size: 0.78em; color: var(--pb-muted); margin-top: 2px; }
-.pb-stack { display: flex; height: 8px; border-radius: 4px; overflow: hidden; gap: 2px; background: var(--pb-line); }
+.pb-axis { display: flex; justify-content: space-between; font-family: var(--pb-mono); font-size: 0.78em; color: var(--pb-muted); margin-top: 2px; }
+.pb-stack { display: flex; height: 8px; border-radius: 0; overflow: hidden; gap: 2px; background: var(--pb-line); }
 .pb-stack i { display: block; height: 100%; background: var(--pb-ink); }
 .pb-stack .pb-s0 { opacity: 0.85; } .pb-stack .pb-s1 { opacity: 0.45; } .pb-stack .pb-s2 { opacity: 0.28; } .pb-stack .pb-s3 { opacity: 0.16; }
 .pb-legend { font-size: 0.92em; margin-top: 3px; }
@@ -130,6 +133,6 @@
    opens Radar's own pages; a tip is a quiet boxed note at the top of the window or the panel. */
 .pb-open { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
 .pb-open:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; }
-.pb-tip { margin: 6px 10px; padding: 8px 10px; border: 1px solid var(--pb-line); border-left: 3px solid var(--pb-ink); border-radius: 10px; }
+.pb-tip { margin: 6px 10px; padding: 8px 10px; border: 1px solid var(--pb-line); border-left: 3px solid var(--pb-ink); border-radius: 0; }
 .pb-tip p { margin: 0 0 6px; }
 .pb-tip-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }

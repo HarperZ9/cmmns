@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>Radar</title>
+<link rel="stylesheet" href="canon.css">
 <link rel="stylesheet" href="popup.css">
 </head>
 <body>
 <header><strong>Radar</strong><span id="site"></span></header>
 <main>
   <p id="sentence" class="lead">Open a post or a feed on X, YouTube, Reddit, Facebook, Instagram, Bluesky, Threads, TikTok or a Mastodon server.</p>
-  <section id="server" class="server" hidden>
+  <section id="server" class="server bare" hidden>
     <p id="server-text"></p>
     <button id="server-on" type="button">Turn on Radar here</button>
   </section>
@@ -23,7 +24,7 @@
     <button id="options" type="button">Options</button>
     <button id="transparency" type="button">How Radar is measured</button>
   </div>
-  <section class="settings">
+  <section class="settings bare">
     <label><input type="checkbox" id="paused"> Pause Radar</label>
     <label><input type="checkbox" id="feeds"> Radar on feeds and profiles</label>
     <label><input type="checkbox" id="auto"> Read About pages automatically</label>

@@ -93,6 +93,7 @@
       "js": [
         "core.bundle.js",
         "settings.js",
+        "fonts.js",
         "store.js",
         "feedback.js",
         "meta.js",

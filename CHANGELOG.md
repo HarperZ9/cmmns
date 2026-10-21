@@ -5,6 +5,26 @@ were not published to a store.
 
 ## Unreleased
 
+### Changed (design)
+- Every Radar surface now uses the design of the author's site: bone and void grounds, ink text,
+  Hanken Grotesk for words and Conso for figures, square controls, sections that open on a
+  hairline and a registration cross, and colour only for a verdict. One shared stylesheet
+  (`canon.css`) carries the site's tokens for the first-run, options, feed, history, lessons,
+  self-check, thread card, popup, transparency and privacy pages.
+- The window and panel on social sites set their text in Hanken Grotesk and Conso, sent to the
+  page as bytes so no extension file becomes web-accessible. The ground still follows X's light,
+  dim and dark themes. Signs worth a look use the canon's drift colour beside their words.
+- The history page is one column of ruled sections, with no blue links, orange bars or rounded
+  boxes. Section labels in the window and the lessons are in mixed case.
+- The icons and the first-run drawing use the site's void and bone; the reading mark is bone.
+- The public pages link back to the author's site.
+- `tests/canon.test.js` fails on an em dash in anything a user reads, on a page without the shared
+  tokens, on a colour outside the canon and on a pill shape or an uppercase label.
+  `project-docs/DESIGN-CANON-CHECK.md` lists every value and the audit.
+
+### Fixed (design)
+- "Save card" opened a page that does not exist (`card.html`); it now opens the thread card page.
+
 ### Added
 - Threads, Mastodon and TikTok comments. Threads and Mastodon were read live (Mastodon 4.x and
   5.0); TikTok follows its public markup and is not checked live yet. Mastodon works on any server,

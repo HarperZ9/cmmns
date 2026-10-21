@@ -45,7 +45,7 @@ function examples(l) {
 
 function measured(id) {
   if (!globalThis.PB || !PB.measuredLine || id === "thread-report") return null;
-  return el("p", { class: "mono muted" }, `How Radar measures it: ${PB.measuredLine(id).text}.`);
+  return el("p", { class: "figure muted" }, `How Radar measures it: ${PB.measuredLine(id).text}.`);
 }
 
 function showLesson(l) {

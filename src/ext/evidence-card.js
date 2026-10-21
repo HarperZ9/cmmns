@@ -38,13 +38,13 @@ function draw(canvas, lines) {
   const W = 1200, PAD = 64, inner = W - 2 * PAD;
   const SANS = '"Hanken Grotesk", system-ui, sans-serif', MONO = '"Conso", ui-monospace, Consolas, monospace';
   const STYLE = {
-    title: { font: `700 44px ${SANS}`, color: "#14181c", lh: 54, before: 0 },
-    meta: { font: `400 19px ${MONO}`, color: "#4f5b66", lh: 28, before: 8 },
-    head: { font: `700 26px ${SANS}`, color: "#14181c", lh: 34, before: 30 },
-    body: { font: `400 23px ${SANS}`, color: "#14181c", lh: 33, before: 6 },
-    small: { font: `400 18px ${SANS}`, color: "#4f5b66", lh: 26, before: 4 },
-    limit: { font: `400 19px ${SANS}`, color: "#14181c", lh: 27, before: 6 },
-    hash: { font: `400 16px ${MONO}`, color: "#4f5b66", lh: 24, before: 28 },
+    title: { font: `780 44px ${SANS}`, color: "#16130f", lh: 54, before: 0 },
+    meta: { font: `400 19px ${MONO}`, color: "#4a443b", lh: 28, before: 8 },
+    head: { font: `720 26px ${SANS}`, color: "#16130f", lh: 34, before: 30 },
+    body: { font: `400 23px ${SANS}`, color: "#16130f", lh: 33, before: 6 },
+    small: { font: `400 18px ${SANS}`, color: "#4a443b", lh: 26, before: 4 },
+    limit: { font: `400 19px ${SANS}`, color: "#16130f", lh: 27, before: 6 },
+    hash: { font: `400 16px ${MONO}`, color: "#4a443b", lh: 24, before: 28 },
   };
   const ctx = canvas.getContext("2d");
   const laid = [];
@@ -56,7 +56,7 @@ function draw(canvas, lines) {
     for (const row of wrap(ctx, l.text, l.kind === "limit" ? inner - 18 : inner)) { laid.push({ st, row, y, limit: l.kind === "limit" }); y += st.lh; }
   }
   canvas.width = W; canvas.height = y + PAD;
-  ctx.fillStyle = "#f7f6f2"; ctx.fillRect(0, 0, W, canvas.height);
+  ctx.fillStyle = "#f1ece1"; ctx.fillRect(0, 0, W, canvas.height);
   ctx.textBaseline = "top";
   for (const { st, row, y: at, limit } of laid) {
     ctx.font = st.font; ctx.fillStyle = st.color;
