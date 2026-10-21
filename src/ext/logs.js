@@ -31,7 +31,9 @@
   const claimsOf = (id) => claimHits.get(id) || null;
 
   // Local connections log (src/core/network.js): which accounts replied where, and how fast.
-  const NET_KEY = "pb.net.v1";
+  // v2: threads keyed by post id (src/core/threadkey.js); v1 keyed by path and could count one
+  // thread twice, so its entries are left behind rather than mixed in.
+  const NET_KEY = "pb.net.v2";
   let netLog = {}, lastRecorded = "";
   chrome.storage.local.get(NET_KEY).then((g) => { netLog = g[NET_KEY] || {}; }).catch(() => {});
   function recordNet(threadKey, replies, root) {

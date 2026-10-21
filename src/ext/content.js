@@ -15,7 +15,7 @@
     const cluster = c ? { size: c.ids.length, authors: c.authors } : null;
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
     const activity = PB.activity(PBLogs.net(), r.author);
-    const echo = PB.echoes(PBLogs.net(), site.id + ":" + location.pathname, r.text);
+    const echo = PB.echoes(PBLogs.net(), PB.threadKey(site.id, location.pathname, location.search), r.text);
     if (reading && site.hasLocation) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation, pattern: reading.pattern }, { mismatch, cluster, activity, echo }) };
     // Reddit: account age, karma and sign-up name from Reddit's own account data (src/ext/reddit.js).
     const rd = site.id === "reddit" && globalThis.PBReddit ? PBReddit.get(r.author) : null;
@@ -71,7 +71,7 @@
     if (!items.length) return;
     const [root, replies] = !feed && site.hasLocation ? [items[0], items.slice(1)] : [null, items];
     await Promise.all([ensureOwners(items), PBLogs.ensureClaims(items)]);
-    const threadKey = site.id + ":" + location.pathname;
+    const threadKey = PB.threadKey(site.id, location.pathname, location.search);
     if (!feed && replies.length) recordNet(threadKey, replies, root);
     const cache = site.hasLocation ? await PBStore.all() : {};
     if (site.id === "reddit" && globalThis.PBReddit && settings.auto) PBReddit.want([...new Set(items.map((r) => r.author))], schedule);

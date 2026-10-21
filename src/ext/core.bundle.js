@@ -1294,6 +1294,25 @@ function machineSigns(text) {
 return { MIN_WORDS, machineSigns };
 })();
 
+// ---- threadkey.js
+const M_threadkey = (() => {
+// One key per conversation, from the id the site gives it, so the same thread reached by a
+// different path (handle case, media or analytics suffix, a comment permalink) is never
+// counted as a second thread. Unknown shapes fall back to the lower-cased path.
+
+function threadKey(siteId, pathname, search = "") {
+  const path = String(pathname || "");
+  let id = null;
+  if (siteId === "x") id = (path.match(/\/status\/(\d+)/) || [])[1];
+  else if (siteId === "reddit") id = (path.match(/\/comments\/([a-z0-9]+)/i) || [])[1];
+  else if (siteId === "youtube") id = new URLSearchParams(search).get("v") || (path.match(/^\/shorts\/([\w-]+)/) || [])[1];
+  if (id) return siteId + ":" + (siteId === "reddit" ? id.toLowerCase() : id);   // YouTube ids are case-sensitive
+  return `${siteId}:${path.toLowerCase().replace(/\/+$/, "")}`;
+}
+
+return { threadKey };
+})();
+
 // ---- network.js
 const M_network = (() => {
 // Connections and activity across the threads the user has viewed. Radar keeps a small local log
@@ -2095,5 +2114,5 @@ function claimCard(m) {
 return { MIN_CLAIM_TOKENS, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION, claimTokens, hasNegation, guessLanguage, buildClaimIndex, matchClaims, claimCard };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims });
 })();
