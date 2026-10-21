@@ -1,5 +1,5 @@
 // Signs of machine-written text and spam in a reply. A light port of Articulate's AI-tell lists
-// (C:/dev/articulate, src/articulate/rules_medium_register.py) plus reply-bot and spam patterns.
+// (Articulate, rules_medium_register.py) plus reply-bot and spam patterns.
 //
 // Why it is cautious: no detector reliably tells human from machine writing in a few sentences,
 // and AI detectors are known to flag non-native English writers far more often (Liang et al.,

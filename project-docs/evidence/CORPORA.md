@@ -1,6 +1,6 @@
 # Labelled corpora used for the rhetoric evaluation
 
-Downloaded on 2026-10-21 (UTC) to `D:/radar-data/`, outside the repository. No corpus text is
+Downloaded on 2026-10-21 (UTC) to a data directory outside the repository. No corpus text is
 committed; only counts, rates and hashes are. `scripts/eval.mjs` records the SHA-256 of each file
 in `project-docs/evidence/eval-results.json`.
 
@@ -13,7 +13,7 @@ in `project-docs/evidence/eval-results.json`.
 
 Full hashes are in `eval-results.json`.
 
-Persuasion techniques (downloaded 2026-10-21 to `D:/radar-data/ptc/`):
+Persuasion techniques (downloaded 2026-10-21 to `<data dir>/ptc/`):
 
 | Corpus | File | Source URL | Licence | Size | SHA-256 |
 |---|---|---|---|---|---|

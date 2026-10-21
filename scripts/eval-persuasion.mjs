@@ -1,5 +1,5 @@
 // Reproduces the persuasion-technique numbers in project-docs/EVALUATION.md from the PTC corpus.
-//   node scripts/eval-persuasion.mjs [--data D:/radar-data] [--split test|dev] [--cues]
+//   node scripts/eval-persuasion.mjs [--data <dir>] [--split test|dev] [--cues]
 // The corpus is downloaded once by hand (project-docs/evidence/CORPORA.md). Cue lists are tuned on
 // --split dev only (--cues prints per-cue figures there); the committed numbers are --split test,
 // which writes project-docs/evidence/persuasion-results.json and the persuasion rows of measured.js.
@@ -16,7 +16,7 @@ import { SHIP_LOW } from "../src/core/persuasion.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : dflt; };
-const DATA = arg("--data", process.env.RADAR_DATA || "D:/radar-data");
+const DATA = arg("--data", process.env.RADAR_DATA || "../radar-data");
 const SPLIT = arg("--split", "test");
 const WRITE = SPLIT === "test" && !process.argv.includes("--no-write");
 const pct = (r) => (r && r.n ? `${(r.value * 100).toFixed(1)}% (${r.k}/${r.n}, ${(r.ci[0] * 100).toFixed(1)} to ${(r.ci[1] * 100).toFixed(1)})` : "n/a");
