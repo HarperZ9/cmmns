@@ -8,7 +8,8 @@
   const queue = [], asked = new Set();
   chrome.storage.local.get(KEY).then((g) => {
     const now = Date.now();
-    cache = Object.fromEntries(Object.entries(g[KEY] || {}).filter(([, r]) => now - r.at < KEEP_DAYS * DAY));
+    const keep = globalThis.PBSettings ? PBSettings.get().aboutDays : KEEP_DAYS;
+    cache = Object.fromEntries(Object.entries(g[KEY] || {}).filter(([, r]) => now - r.at < keep * DAY));
     loaded = true; onChange(); pump();
   }).catch((e) => console.error("[radar] reddit cache failed", e));
 

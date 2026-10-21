@@ -68,6 +68,14 @@
     }, 3000);
   }
 
+  // Another tab, the options page or the background prune can change or clear these logs; keep
+  // the in-memory copies current so an old copy is never written back.
+  if (chrome.storage.onChanged) chrome.storage.onChanged.addListener((ch, area) => {
+    if (area !== "local") return;
+    if (ch[NET_KEY]) { netLog = ch[NET_KEY].newValue || {}; if (!ch[NET_KEY].newValue) lastRecorded = ""; }
+    if (ch[TRAIL_KEY]) trailLog = ch[TRAIL_KEY].newValue || {};
+  });
+
   function clearAll() {
     trailLog = {}; netLog = {}; lastRecorded = "";
     if (globalThis.PBMeta) PBMeta.clear().catch((e) => console.error("[radar] could not clear account readings", e));

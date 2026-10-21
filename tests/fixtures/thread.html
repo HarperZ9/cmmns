@@ -37,6 +37,7 @@
   T.forEach(([h, text], i) => {
     const a = document.createElement("article");
     a.setAttribute("data-testid", "tweet");
+    a.tabIndex = 0;   // X's posts take keyboard focus
     a.innerHTML = `<div data-testid="User-Name"><a href="/${h}">${h.replace(/_/g, " ")}</a> <span>@${h} · <a href="/${h}/status/10${i}"><time>2h</time></a></span></div><div data-testid="tweetText"></div>`;
     a.querySelector('[data-testid="tweetText"]').textContent = text;
     box.append(a);
@@ -45,6 +46,7 @@
 </script>
 <script src="chrome-stub.js"></script>
 <script src="../../src/ext/core.bundle.js"></script>
+<script src="../../src/ext/settings.js"></script>
 <script src="../../src/ext/store.js"></script>
 <script>Promise.all(window.FIXTURE_PRELOAD.map((r) => PBStore.put(r))).then(() => { window.FIXTURE_READY = true; document.getElementById("thread").append(document.createElement("i")); });</script>
 <script src="../../src/ext/about-page.js"></script>
