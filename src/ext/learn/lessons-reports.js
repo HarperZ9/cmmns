@@ -1,0 +1,32 @@
+// Lessons for the two signs about documented influence operations: a link or account named in a
+// published report, and an address that copies a news outlet's name. Both lean on Jonathan Rauch's
+// point in The Constitution of Knowledge (2021): checking works because claims are tested by
+// people who can be held to account, so an operation borrows the name of an outlet that answers
+// for its errors, or a voice that seems independent, to skip that test.
+
+export const REPORT_LESSONS = [
+  {
+    id: "named-in-report", title: "Named in a published report", research: [],
+    what: "A link or account that a platform, a research lab, a court filing or a government document named as part of an influence operation. The window shows who the sources say ran it, in each source's own words, and links the report.",
+    examples: [
+      { side: "none", topic: "war", kind: "sign", text: "A reply links to a site that a takedown report listed among an operation's fake news outlets, with an article no other outlet carried." },
+      { side: "none", topic: "media", kind: "fair", text: "A researcher links the same site to show readers what the operation published, and says so in the post." },
+    ],
+    why: "These operations hide who is speaking. They build outlets and personas that look local and independent, so a claim seems to come from many people when it comes from one paymaster. Reports name the assets so anyone can check. Sources often disagree on who ran an operation: one says linked to, another says directed by. Radar shows each one.",
+    spot: "Read the report's own words on attribution. Linked to is weaker than run by. Note the date: a domain can expire and be bought by someone else.",
+    counter: "Ask who first published the claim and who has checked it since. Find the story at outlets that sign their work and correct their errors.",
+    dnp: "A report names an address at the time it was published. The person who shares it may not know, or may be warning others. Domains expire and are bought again.",
+  },
+  {
+    id: "lookalike-domain", title: "Look-alike news address", research: [],
+    what: "A link whose address copies a major outlet's name with another ending, one letter changed, or letters from another alphabet that look the same, such as washingtonpost.pm or theguaradian.com.",
+    examples: [
+      { side: "none", topic: "politics", kind: "sign", text: "A reply links to spiegel.ltd, a page styled like Der Spiegel with a story the real Spiegel never ran." },
+      { side: "none", topic: "media", kind: "ordinary", text: "A link to a small local paper whose name is one letter away from a national outlet, with its own staff and address." },
+    ],
+    why: "A cloned outlet borrows trust it did not earn. Real newsrooms answer for their mistakes, and that record is why readers believe them. A copy takes the name without the record. Doppelganger cloned dozens of European papers this way, and Endless Mayfly faked Arab and Israeli outlets.",
+    spot: "Read the address before the headline. Check the ending against the outlet's own site. Look for the story on the real outlet's home page.",
+    counter: "Open the outlet's real site yourself, not through the link, and search for the story there. If it is not there, the outlet did not publish it.",
+    dnp: "A similar address is not proof of a fake: outlets use other addresses, and unrelated sites share common words. Open the outlet's own site and compare.",
+  },
+];

@@ -4,7 +4,25 @@
 (() => {
   "use strict";
   // Ask the background worker for the owners of the domains and accounts on screen, once each.
-  const askedOwners = new Set(), ownerRows = [], stateRows = [];
+  const askedOwners = new Set(), ownerRows = [], stateRows = [], opsParts = { docs: [], ops: new Map(), indicators: new Map() };
+  // Matching operations (src/core/ops.js) for these domains and handles, merged into what is known.
+  async function askOps(domains, handles) {
+    const got = await chrome.runtime.sendMessage({ type: "pb-ops", domains, handles });
+    if (!got || !got.indicators || !got.indicators.length) return;
+    opsParts.docs = got.docs;
+    for (const o of got.ops) opsParts.ops.set(o.id, o);
+    for (const i of got.indicators) opsParts.indicators.set((i.d || "@" + i.x) + "|" + i.op, i);
+    PB.setOpsTable({ docs: opsParts.docs, ops: [...opsParts.ops.values()], indicators: [...opsParts.indicators.values()] });
+  }
+  // Websites, bio domains and bio @handles of the accounts Radar has read, asked once each.
+  async function ensureProfiles(readings) {
+    const all = readings.map(PB.profileLinks);
+    const domains = [...new Set(all.flatMap((p) => p.domains))].filter((d) => !askedOwners.has(d));
+    const handles = [...new Set(all.flatMap((p) => p.handles))].filter((h) => !askedOwners.has("@" + h));
+    if (!domains.length && !handles.length) return;
+    domains.forEach((d) => askedOwners.add(d)); handles.forEach((h) => askedOwners.add("@" + h));
+    try { await askOps(domains, handles); } catch (e) { console.error("[radar] profile lookup failed", e); }
+  }
   async function ensureOwners(items) {
     const domains = [...new Set(items.flatMap((r) => r.domains || []))].filter((d) => !askedOwners.has(d));
     const handles = items.map((r) => r.author).filter((h) => !askedOwners.has("@" + h));
@@ -16,6 +34,7 @@
       const [rows, srows] = await Promise.all([chrome.runtime.sendMessage({ type: "pb-owners", domains, handles }), chrome.runtime.sendMessage({ type: "pb-state", domains, handles })]);
       if (Array.isArray(rows) && rows.length) { ownerRows.push(...rows); PB.setOwnerRows(ownerRows); }
       if (Array.isArray(srows) && srows.length) { stateRows.push(...srows); PB.setStateRows(stateRows); }
+      await askOps(domains, handles);
     } catch (e) { console.error("[radar] owner lookup failed", e); }
   }
 
@@ -131,5 +150,5 @@
     chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => console.error("[radar] could not open the card page", e));
   }
 
-  globalThis.PBLogs = Object.freeze({ ensureOwners, ensureClaims, claimsOf, recordNet, recordTrail, recordFeed, saveCard, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
+  globalThis.PBLogs = Object.freeze({ ensureOwners, ensureProfiles, ensureClaims, claimsOf, recordNet, recordTrail, recordFeed, saveCard, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
 })();

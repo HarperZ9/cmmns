@@ -30,6 +30,15 @@ function stateRows() {
   return stateReady;
 }
 
+// Documented influence operations (ops.json, src/core/ops.js): loaded once here; pages get only the
+// operations and indicators that match what they show.
+let opsReady = null;
+function opsTable() {
+  if (!opsReady) opsReady = fetch(chrome.runtime.getURL("ops.json")).then((r) => r.json())
+    .catch((e) => { console.error("[radar] ops.json failed to load", e); return { docs: [], ops: [], indicators: [] }; });
+  return opsReady;
+}
+
 // Fact-checked claims (claims.json and the parts it names, src/core/claims.js, about 6 MB): indexed once here. Pages send
 // the text of the posts they show and get back only the matches. Nothing leaves the browser.
 let claimsReady = null;
@@ -67,6 +76,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const want = (msg.domains || []).map((d) => d.toLowerCase()), handles = new Set((msg.handles || []).map((h) => h.toLowerCase()));
       sendResponse(rows.filter((r) => (r.x && handles.has(r.x.toLowerCase())) || (r.domain && want.some((d) => d === r.domain || d.endsWith("." + r.domain)))));
     });
+    return true;
+  }
+  if (msg && msg.type === "pb-ops") {
+    opsTable().then((t) => sendResponse(msg.all ? t : PB.opsLookup(t, { domains: msg.domains || [], handles: msg.handles || [] })));
     return true;
   }
   if (msg && msg.type === "pb-owners") {

@@ -260,7 +260,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </tbody></table></div>
 <p class="muted">Precision agrees across sides within the intervals. Where a gap remains, the thread report undercounts extreme replies aimed at the side with lower recall.</p>
 <h2>Every sign</h2>
-<p>Each of Radar's 56 signs, with the line its window shows beside it.</p>
+<p>Each of Radar's 58 signs, with the line its window shows beside it.</p>
 <details class="how-we-know"><summary>Every sign and its measured line</summary>
 <div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Kind</th><th scope="col">What the window says</th></tr></thead><tbody>
 <tr><td>Slur or coded hate term</td><td>Language</td><td>Radar's own rule</td><td>precision 91% (95% interval 90 to 92%), 4392 badges checked, held-out test set</td></tr>
@@ -285,6 +285,8 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td>Fact-checked claim</td><td>Sources</td><td>Radar's own rule</td><td>not measured yet</td></tr>
 <tr><td>Ad label</td><td>Sources</td><td>The site's own label</td><td>the site's own label, not a Radar detector</td></tr>
 <tr><td>State link</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
+<tr><td>Named in a published report</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
+<tr><td>Look-alike news address</td><td>Sources</td><td>Radar's own rule</td><td>not measured yet</td></tr>
 <tr><td>Outlet owner</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
 <tr><td>Site facts and fact-check record</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
 <tr><td>Posting app</td><td>Posting</td><td>The site's own label</td><td>the site's own label, not a Radar detector</td></tr>
@@ -321,8 +323,56 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td>Persuasion: exaggeration</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 10% (95% interval 2 to 40%), 10 spans checked, held-out news articles</td></tr>
 </tbody></table></div>
 </details>
+
+<h2>Documented influence operations</h2>
+<p>Radar carries 98 influence operations from 27 attributed countries, first published between 2018 and 2026, and 1,237 domains and accounts their sources named (1,194 domains). A link or account that a report named shows "Named in a published report", with who the sources say ran it, in each source's own words.</p>
+<p><strong>What the counts mean.</strong> These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.</p>
+<p>Every operation meets the same bar, whatever the country: at least one primary source that was read (a platform report, a research lab, a court or government document, or reporting that names its sources), an operator type that a source itself states, and a cited source for every field. A test enforces this on the data.</p>
+<h3>By year of first report</h3>
+<div class="scroll"><table><thead><tr><th scope="col">Year</th><th scope="col">Operations</th><th scope="col">By attributed country</th><th scope="col">Bar</th></tr></thead><tbody>
+<tr><td>2018</td><td class="num">4</td><td class="num">Russia 2, Iran 1, Myanmar 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮</span></td></tr>
+<tr><td>2019</td><td class="num">22</td><td class="num">Russia 5, United Arab Emirates 4, India 3, Saudi Arabia 3, China 2, Egypt 1, Iran 1, Israel 1, Pakistan 1, Venezuela 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮</span></td></tr>
+<tr><td>2020</td><td class="num">14</td><td class="num">Russia 5, Azerbaijan 1, Belarus 1, Honduras 1, Iran 1, Philippines 1, Saudi Arabia 1, Serbia 1, Thailand 1, Türkiye 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮▮▮▮▮▮▮▮▮▮</span></td></tr>
+<tr><td>2021</td><td class="num">5</td><td class="num">Ethiopia 1, Iran 1, Nicaragua 1, Russia 1, Uganda 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮▮</span></td></tr>
+<tr><td>2022</td><td class="num">4</td><td class="num">China 2, Russia 1, United States 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮</span></td></tr>
+<tr><td>2023</td><td class="num">8</td><td class="num">China 2, Cuba 1, Georgia 1, Israel 1, Togo 1, United Arab Emirates 1, Venezuela 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮▮▮▮▮</span></td></tr>
+<tr><td>2024</td><td class="num">24</td><td class="num">Russia 11, Iran 4, China 3, United States 2, Azerbaijan 1, Bangladesh 1, Israel 1, Myanmar 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮</span></td></tr>
+<tr><td>2025</td><td class="num">8</td><td class="num">China 6, Ghana 1, Iran 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮▮▮▮▮</span></td></tr>
+<tr><td>2026</td><td class="num">9</td><td class="num">Iran 5, China 2, Israel 1, Pakistan 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮▮▮▮▮▮</span></td></tr>
+</tbody></table></div>
+<h3>By attributed country</h3>
+<p>Operator type follows the source's own words. "Linked to a state" means a source says linked to or associated with a government without saying it ran the operation; "origin only" means the source names a country and no operator.</p>
+<div class="scroll"><table><thead><tr><th scope="col">Country</th><th scope="col">Operations</th><th scope="col">Documents cited</th><th scope="col">Government</th><th scope="col">State media</th><th scope="col">Contractor</th><th scope="col">Linked to a state</th><th scope="col">Firm, no state named</th><th scope="col">Origin only</th></tr></thead><tbody>
+<tr><td>Russia</td><td class="num">25</td><td class="num">49</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">11</td><td class="num">2</td><td class="num">7</td></tr>
+<tr><td>China</td><td class="num">17</td><td class="num">27</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">2</td><td class="num">4</td><td class="num">10</td></tr>
+<tr><td>Iran</td><td class="num">14</td><td class="num">24</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">8</td></tr>
+<tr><td>United Arab Emirates</td><td class="num">5</td><td class="num">5</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">3</td><td class="num">1</td></tr>
+<tr><td>Israel</td><td class="num">4</td><td class="num">16</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">3</td><td class="num">0</td></tr>
+<tr><td>Saudi Arabia</td><td class="num">4</td><td class="num">6</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">2</td><td class="num">1</td><td class="num">0</td></tr>
+<tr><td>India</td><td class="num">3</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">2</td><td class="num">0</td></tr>
+<tr><td>United States</td><td class="num">3</td><td class="num">6</td><td class="num">2</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Azerbaijan</td><td class="num">2</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Myanmar</td><td class="num">2</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Pakistan</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Venezuela</td><td class="num">2</td><td class="num">4</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">1</td><td class="num">0</td></tr>
+<tr><td>Bangladesh</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Belarus</td><td class="num">1</td><td class="num">4</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Cuba</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Egypt</td><td class="num">1</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Ethiopia</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Georgia</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Ghana</td><td class="num">1</td><td class="num">2</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td></tr>
+<tr><td>Honduras</td><td class="num">1</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Nicaragua</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Philippines</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Serbia</td><td class="num">1</td><td class="num">3</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Thailand</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Togo</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td></tr>
+<tr><td>Türkiye</td><td class="num">1</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+<tr><td>Uganda</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
+</tbody></table></div>
 <h2>What is not measured</h2>
-<ul><li>Radar's own rules with no measurement yet: Call for vigilantes, Named conspiracy theory, Leaked AI text, Machine-writing signs, Spam pattern, Hate symbol in name, Media older than the post, Same upload, many accounts, Same words in other threads, Same link or upload in several languages, Material passed through other accounts, Fact-checked claim, App store elsewhere, Flag of another country, Profile says elsewhere, Active hours fit elsewhere, Replies within a minute, Posts through an automation app, Posts around the clock, Almost only reposts, Very high post rate, New account, Renamed, Sign-up handle, Follows many, few follow back, Low karma for its age, Name borrows a brand. The window says &quot;not measured yet&quot; beside each of them.</li>
+<ul><li>Radar's own rules with no measurement yet: Call for vigilantes, Named conspiracy theory, Leaked AI text, Machine-writing signs, Spam pattern, Hate symbol in name, Media older than the post, Same upload, many accounts, Same words in other threads, Same link or upload in several languages, Material passed through other accounts, Fact-checked claim, Look-alike news address, App store elsewhere, Flag of another country, Profile says elsewhere, Active hours fit elsewhere, Replies within a minute, Posts through an automation app, Posts around the clock, Almost only reposts, Very high post rate, New account, Renamed, Sign-up handle, Follows many, few follow back, Low karma for its age, Name borrows a brand. The window says &quot;not measured yet&quot; beside each of them.</li>
 <li>Same text as other replies, and speaks as local, labelled elsewhere: tested only on cases written alongside the rules (below). No error rate on real replies exists yet.</li>
 <li>Live threads: no thread from X, YouTube, Reddit, Facebook, Instagram or Bluesky has been labelled by hand yet, so no figure here comes from those sites.</li>
 <li>French language signs: too few hits in the French corpus to measure. Persuasion cues in French: no corpus Radar may use.</li>

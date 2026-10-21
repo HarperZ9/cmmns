@@ -83,7 +83,7 @@ These were read and gave no usable domain or handle (see the next section for re
 - Meta Q4 2024, Q1 2025 and H1 2026: Russian cases are described with no Russian domains or handles (the Q4 2024 Doppelganger section has no list; H1 2026 has no indicator appendix).
 - Meta Q2/Q3 2025: the Russian cases (sub-Saharan Africa freelancers, the RT-linked Allo Afrique and Derniere Minute brands, a Moldova operation) give no domains or handles.
 - OpenAI February 2025 (no Russian case) and June 2025 (Helgoland Bite: a Telegram channel and an unnamed X account, no domain or handle).
-- Meta second half 2026: no such report exists as of 2026-10-18. The transparency.meta.com address returns an error page.
+- Meta second half 2026: no such report exists as of 2026-10-18. The transparency.meta.com address returns an error page. Corrected 2026-10-21: the report exists at transparency.meta.com/sr/H2-2026-adversarial-threat-report/ (see data/ops.README.md). Its rows are not in this file yet.
 - Google Threat Analysis Group bulletins: see the next section.
 
 ### Searched, nothing usable

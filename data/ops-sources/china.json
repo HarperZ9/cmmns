@@ -1,0 +1,2774 @@
+[
+ {
+  "id": "spamouflage-dragonbridge",
+  "name": "Spamouflage",
+  "aliases": [
+   "Spamouflage Dragon",
+   "DRAGONBRIDGE",
+   "Storm-1376"
+  ],
+  "state": "China",
+  "operator": "No single body named by the platform and lab sources; Meta found links to individuals associated with Chinese law enforcement",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "The behavior appeared designed to support the Chinese government and discredit its critics, both at home and abroad.",
+    "section": "p.1 (describes intent; Graphika names no operator)"
+   },
+   {
+    "source": "s4",
+    "operatorType": "linked to a state",
+    "says": "our investigation found links to individuals associated with Chinese law enforcement.",
+    "section": "04 China, Executive summary, p.11"
+   },
+   {
+    "source": "s5",
+    "operatorType": "origin only",
+    "says": "we assess with high confidence to be operating in support of the political interests of the People's Republic of China (PRC)",
+    "section": "introduction (states alignment with PRC interests, not an operator)"
+   },
+   {
+    "source": "s6",
+    "operatorType": "linked to a state",
+    "says": "a spammy influence network linked to the People's Republic of China (PRC).",
+    "section": "introduction"
+   },
+   {
+    "source": "s7",
+    "operatorType": "linked to a state",
+    "says": "Microsoft's designation for the Chinese Communist Party (CCP)-linked actor commonly known as \"Spamouflage\" or \"Dragonbridge.\"",
+    "section": "Chinese influence operations, p.7"
+   },
+   {
+    "source": "s3",
+    "operatorType": "linked to a state",
+    "says": "Chinese state-linked influence operation (IO) Spamouflage",
+    "section": "landing-page summary"
+   },
+   {
+    "source": "s8",
+    "operatorType": "government",
+    "says": "Some of this operation's social media activity was attributed by the FBI to a unit within China's Ministry of Public Security.",
+    "section": "Spamouflage case study, pp.23-24 (OpenAI relays the FBI attribution; OpenAI's own words are 'China-origin')"
+   },
+   {
+    "source": "s9",
+    "operatorType": "government",
+    "says": "it's likely that at least some operators behind the campaign are affiliated with the Yancheng Public Security Bureau, the MPS",
+    "section": "article body (sentence continues: or internet commentators hired by the Cyberspace Administration of China)"
+   }
+  ],
+  "active": {
+   "from": 2018
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "TikTok",
+   "Reddit",
+   "Medium",
+   "Blogspot",
+   "Pinterest",
+   "Quora",
+   "Vimeo",
+   "SoundCloud",
+   "LiveJournal",
+   "VKontakte",
+   "Odnoklassniki",
+   "forums",
+   "websites"
+  ],
+  "languages": [
+   "zh",
+   "en",
+   "fr",
+   "es",
+   "ru",
+   "ja",
+   "ko",
+   "th",
+   "id",
+   "tl",
+   "de",
+   "fi",
+   "pt",
+   "la",
+   "cy"
+  ],
+  "targets": [
+   "Hong Kong protesters",
+   "critics of the Chinese government at home and abroad",
+   "Taiwan",
+   "United States",
+   "Australia",
+   "United Kingdom",
+   "Japan",
+   "South Korea",
+   "global Chinese-speaking audiences"
+  ],
+  "narratives": "Praise for China and Xinjiang and attacks on critics of the Chinese government (Guo Wengui, Yan Limeng, journalists and dissidents such as Cai Xia), alongside criticism of the US and Western policy. Later waves pushed US wedge issues, Taiwan election content and conspiracy claims such as a US origin for COVID-19 and US blame for the Maui wildfires.",
+  "techniques": [
+   "fake personas",
+   "hijacked or bought accounts",
+   "spam amplification",
+   "comment brigading",
+   "AI-generated text",
+   "AI-generated images or video",
+   "deepfake audio or video",
+   "content laundering",
+   "machine translation",
+   "ads",
+   "harassment of critics"
+  ],
+  "indicators": [
+   {
+    "domain": "revealscum.com",
+    "kind": "operation site",
+    "source": "s8",
+    "section": "Spamouflage case study, Indicators table"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1",
+    "s4",
+    "s6"
+   ],
+   "languages": [
+    "s1",
+    "s4",
+    "s6"
+   ],
+   "targets": [
+    "s1",
+    "s4",
+    "s6",
+    "s7"
+   ],
+   "narratives": [
+    "s1",
+    "s4",
+    "s6",
+    "s7",
+    "s8"
+   ],
+   "techniques": [
+    "s1",
+    "s2",
+    "s4",
+    "s5",
+    "s6",
+    "s7",
+    "s8"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Graphika",
+    "title": "Cross-Platform Spam Network Targeted Hong Kong Protests: \"Spamouflage Dragon\" used hijacked and fake accounts to amplify video content",
+    "url": "https://public-assets.graphika.com/reports/graphika_report_spamouflage.pdf",
+    "date": "2019-09-25",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Graphika",
+    "title": "Deepfake It Till You Make It: Pro-Chinese Actors Promote AI-Generated Video Footage of Fictitious People in Online Influence Operation",
+    "url": "https://public-assets.graphika.com/reports/graphika-report-deepfake-it-till-you-make-it.pdf",
+    "date": "2023-02-07",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s3",
+    "publisher": "Graphika",
+    "title": "The #Americans",
+    "url": "https://graphika.com/the-americans/",
+    "date": "2024-09-03",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (landing-page summary only; the full PDF is gated and returned 403)"
+   },
+   {
+    "id": "s4",
+    "publisher": "Meta",
+    "title": "Second Quarter Adversarial Threat Report (Q2 2023)",
+    "url": "https://transparency.meta.com/sr/Q2-2023-Adversarial-threat-report",
+    "date": "2023-08",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s5",
+    "publisher": "Mandiant (Google Cloud blog)",
+    "title": "Pro-PRC DRAGONBRIDGE Influence Campaign Leverages New TTPs to Aggressively Target U.S. Interests, Including Midterm Elections",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/prc-dragonbridge-influence-elections",
+    "date": "2022-10-26",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s6",
+    "publisher": "Google Threat Analysis Group",
+    "title": "Google disrupted over 10,000 instances of DRAGONBRIDGE activity in Q1 2024",
+    "url": "https://blog.google/threat-analysis-group/google-disrupted-dragonbridge-activity-q1-2024/",
+    "date": "2024-06-26",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s7",
+    "publisher": "Microsoft Threat Analysis Center",
+    "title": "Same targets, new playbooks: East Asia threat actors employ unique methods",
+    "url": "https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/final/en-us/microsoft-brand/documents/MTAC-East-Asia-Report.pdf",
+    "date": "2024-04",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s8",
+    "publisher": "OpenAI",
+    "title": "AI and Covert Influence Operations: Latest Trends",
+    "url": "https://downloads.ctfassets.net/kftzwdyauwt9/5IMxzTmUclSOAcWUXbkVrK/3cfab518e6b10789ab8843bcca18b633/Threat_Intel_Report.pdf",
+    "date": "2024-05-30",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (PDF on OpenAI's asset CDN; the openai.com landing page returned 403)"
+   },
+   {
+    "id": "s9",
+    "publisher": "Australian Strategic Policy Institute (The Strategist)",
+    "title": "CCP's increasingly sophisticated cyber-enabled influence operation",
+    "url": "https://www.aspistrategist.org.au/ccps-increasingly-sophisticated-cyber-enabled-influence-operation/",
+    "date": "2023-04-26",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s10",
+    "publisher": "US Department of Justice, US Attorney's Office EDNY",
+    "title": "34 Officers of the People's Republic of China National Police Charged with Perpetrating Transnational Repression Scheme Targeting U.S. Residents",
+    "url": "https://www.justice.gov/usao-edny/pr/34-officers-peoples-republic-china-national-police-charged-perpetrating-transnational",
+    "date": "2023-04-17",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "not fetched: justice.gov served a bot-verification interstitial; the national release at justice.gov/archives/opa/pr/40-officers-china-s-national-police-charged-transnational-repression-schemes-targeting-us also returned no content. Title taken from the URL slug and search listing; date from the brief, unverified"
+   }
+  ],
+  "notes": "Sources disagree on operator strength and the entry keeps each one's words. Platform sources say 'linked to' or 'associated with' (Meta: Chinese law enforcement; TAG: the PRC; MTAC: the CCP). Graphika 2019 describes intent only and Mandiant 2022 states alignment with PRC interests only. The two government-level attributions are second-hand here: OpenAI relays an FBI attribution of 'some' activity to a Ministry of Public Security unit, and ASPI says 'likely'. The DOJ EDNY complaint about the MPS '912 Special Project Working Group' (s10) could not be opened, so no field rests on it. Graphika 2019 dates elements to the second half of 2018. MTAC says Storm-1376 spans over 175 websites and 58 languages but lists no domains. Meta's X handles are a sample from its appendix; many are likely suspended. The #Americans PDF is gated; its landing page names no handles. Language list combines Meta (Chinese and English primary, French, then smaller volumes) and TAG."
+ },
+ {
+  "id": "paperwall",
+  "name": "PAPERWALL",
+  "aliases": [],
+  "state": "China",
+  "operator": "Shenzhen Haimaiyunxiang Media Co., Ltd. (Haimai)",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "We attribute PAPERWALL to a PR firm based in China, Shenzhen Haimaiyunxiang Media Co., Ltd., or \"Haimai.\"",
+    "section": "Attribution section (based on shared Google AdSense IDs)"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "TAG believes Times Newswire is, in turn, operated by another Chinese media company, Shenzhen Haimai Yunxiang Media Co., Ltd., or \"Haimai\"",
+    "section": "Shenzhen Haimai Yunxiang Media section (TAG says the PAPERWALL sites were operated and controlled directly by Times Newswire)"
+   }
+  ],
+  "active": {
+   "from": 2020
+  },
+  "platforms": [
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "fr",
+   "it",
+   "es",
+   "ja"
+  ],
+  "targets": [
+   "South Korea",
+   "Japan",
+   "Russia",
+   "United Kingdom",
+   "France",
+   "29 other countries in Europe, Asia and Latin America"
+  ],
+  "narratives": "Verbatim reposts of Chinese state media (CGTN, Global Times) mixed with scraped local news and commercial press releases, plus ad hominem attacks on figures Beijing views as hostile (Li-Meng Yan, Falun Gong's Li Hongzhi) and conspiracy theories aimed at the US and its allies.",
+  "techniques": [
+   "fake news outlets",
+   "content laundering",
+   "state media amplification",
+   "harassment of critics"
+  ],
+  "indicators": [
+   {
+    "domain": "updatenews.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "volgogradpost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "ulstergrowth.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "tulunet.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "torinohuman.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "teotihuacaneco.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "taurustimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "tarragonapost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "stptb.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "sendaishimbun.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "usa-aa.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "doloreshoy.co",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "splinsider.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "garagumsowda.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "laplatapost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "lujanexpresar.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "wienbuzz.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "boicpost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "brasilindustry.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "brmingpao.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "financeiropost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "goiasmine.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "pauloexpressar.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "pernambucostar.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "rioninepage.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "swisshubnews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "sanrafaelscoop.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "martapost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "bohemiadaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "frankfurtsta.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "munichnp.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "dkindustry.co",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "lguazu.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "andregaceta.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "cordovapress.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "sevillatimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "guellherald.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "suomiexpress.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "frnewsfeed.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "froneplus.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "friendlyparis.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "alpsbiz.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "economyfr.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "eiffelpost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "fftribune.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "louispress.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "provencedaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "rmtcityfr.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "doyletimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "napolimoney.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "italiafinanziarie.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "milanomodaweekly.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "romajournal.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "veneziapost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "dy-press.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "fujiyamatimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "fukuitoday.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "fukuoka-ken.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "ginzadaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   },
+   {
+    "domain": "hokkaidotr.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: list of PAPERWALL domains by target country"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Citizen Lab (University of Toronto)",
+    "title": "PAPERWALL: Chinese Websites Posing as Local News Outlets Target Global Audiences with Pro-Beijing Content",
+    "url": "https://citizenlab.ca/2024/02/paperwall-chinese-websites-posing-as-local-news-outlets-with-pro-beijing-content/",
+    "date": "2024-02-07",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated on the page (shows copyright The Citizen Lab)",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Google Threat Intelligence Group",
+    "title": "Seeing Through a GLASSBRIDGE: Understanding the Digital Marketing Ecosystem Spreading Pro-PRC Influence Operations",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/glassbridge-pro-prc-influence-operations",
+    "date": "2024-11-22",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Citizen Lab counts at least 123 domains in 30 countries as of 2023-12-21; this entry takes 60, starting with the 10 that Google (s2) also lists for Haimai, then the Citizen Lab appendix in its order. Citizen Lab names a PR firm and states no government principal; it notes Times Newswire is not attributed to the same operators. Google (s2) assesses that Haimai operates Times Newswire. Start year: Citizen Lab says updatenews.info was registered in July 2019 but could be tied to PAPERWALL only from May 2020. Citizen Lab and Google differ on the operator link: Citizen Lab ties the sites to Haimai through AdSense IDs and leaves Times Newswire unattributed, while Google says Times Newswire ran the sites and Haimai runs Times Newswire. Languages: Citizen Lab says sites use the local languages of target countries and cites Italian, French, Spanish and Japanese examples, with attack articles mostly in English; other local languages (ko, ru, de and more) are implied but not itemised here."
+ },
+ {
+  "id": "haienergy",
+  "name": "HaiEnergy",
+  "aliases": [],
+  "state": "China",
+  "operator": "Shanghai Haixun Technology Co., Ltd (Haixun) (linked; extent of involvement undetermined)",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "we believe these sites are linked to Shanghai Haixun Technology Co., Ltd (上海海讯社科技有限公司), a Chinese public relations (PR) firm",
+    "section": "introduction"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "infrastructure attributed to the Chinese public relations (PR) firm Shanghai Haixun Technology Co., Ltd",
+    "section": "introduction"
+   }
+  ],
+  "active": {
+   "from": 2021
+  },
+  "platforms": [
+   "websites",
+   "Facebook",
+   "X"
+  ],
+  "languages": [
+   "ar",
+   "zh",
+   "en",
+   "fr",
+   "hi",
+   "it",
+   "ko",
+   "ru",
+   "th",
+   "uk",
+   "vi"
+  ],
+  "targets": [
+   "North America",
+   "Europe",
+   "Middle East",
+   "Asia",
+   "United States"
+  ],
+  "narratives": "Pro-CCP 'positive energy' content, reshaping the international image of Xinjiang and opposing the US Xinjiang import ban, attacks on PRC critics (Adrian Zenz, Guo Wengui, Yan Limeng, Falun Gong), and criticism of the US and allies on Taiwan, Pelosi, Roe v. Wade and alleged biolabs in Ukraine.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "forged documents",
+   "content laundering",
+   "state media amplification",
+   "paid influencers",
+   "paid placement in real media"
+  ],
+  "indicators": [
+   {
+    "domain": "24usnews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "aisakorea.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "allcitytimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "annatimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "austriaweekly.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "caifutw.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "charmdaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "czechweekly.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "directortimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "dongadaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "egyptdaily.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "elecdaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "espanadaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "eutimes.fr",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "exactlynews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "finlandweekly.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "hanidaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "hannapress.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "hkdaily.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "hotintaiwan.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "hurriyetbusiness.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "inspectnews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "jakartaglobe.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "kreconomy.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "krpopstar.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "latestjobnews.in",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "lehuatimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "loritimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "mechatimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "moscowtv.vip",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "nanyangdaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "netsbay.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "newdelhinews.club",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "newzealandgazette.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "nigeriacom.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "nycmorning.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "portugaldaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "qatardaily.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "randdaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "rubusiness.club",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "ruindustrial.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "russiadaily.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "saintimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "saudiweekly.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "seouldaily.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "startupindiamagazine.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "swissweekly.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "swisszeitung.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "thekoreatimes.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "therussiadaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "thethailands.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "thewarsawvoice.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "thtruth.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "toyotimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "trademarksdaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "unseenews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "weeklyhongkong.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "yarltimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   },
+   {
+    "domain": "yasudaily.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Table 2: websites linked to Haixun (59 apex domains of 72 sites)"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Mandiant (Google Cloud blog)",
+    "title": "Pro-PRC \"HaiEnergy\" Information Operations Campaign Leverages Infrastructure from Public Relations Firm to Disseminate Content on Inauthentic News Sites",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/pro-prc-information-operations-campaign-haienergy/",
+    "date": "2022-08-04",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Mandiant (Google Cloud blog)",
+    "title": "Pro-PRC HaiEnergy Campaign Exploits U.S. News Outlets via Newswire Services to Target U.S. Audiences; Evidence of Commissioned Protests in Washington, D.C.",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/pro-prc-haienergy-us-news/",
+    "date": "2023-07-24",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Mandiant 2022 says it lacks sufficient evidence to determine how far Haixun is involved in, or aware of, HaiEnergy; 'linked to' is kept as stated and no state principal is named. Table 2 lists 72 sites (59 domains plus 13 subdomains); the 59 apex domains are given, subdomains (for example markets.charmdaily.com) omitted. Several names imitate real outlets (thekoreatimes.org, jakartaglobe.org, thewarsawvoice.com); Mandiant lists them as Haixun-linked sites, not as the real outlets. Mandiant 2023 found content placed via Times Newswire and World Newswire onto subdomains of US outlets that point to FinancialContent infrastructure; those US outlets were not compromised and are excluded. 'paid influencers' rests on Haixun's Fiverr commissions (s2); 'paid placement in real media' rests on the newswire placements (s2). Mandiant also assesses the campaign may have financed two small protests in Washington, D.C. in 2022 (s2). 'forged documents' rests on fabricated letters about Adrian Zenz (s1)."
+ },
+ {
+  "id": "glassbridge",
+  "name": "GLASSBRIDGE",
+  "aliases": [],
+  "state": "China",
+  "operator": "Four firms: Shanghai Haixun Technology Co., Ltd; Shenzhen Haimai Yunxiang Media Co., Ltd; DURINBRIDGE (alias); Shenzhen Bowen Media Information Technology Co., Ltd",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "an umbrella group of four different companies that operate networks of inauthentic news sites and newswire services",
+    "section": "introduction"
+   },
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "We cannot attribute who hired these services to create the sites and publish content",
+    "section": "introduction (Google assesses the firms may take directions from a shared customer)"
+   }
+  ],
+  "active": {
+   "from": 2022
+  },
+  "platforms": [
+   "websites",
+   "YouTube"
+  ],
+  "languages": [
+   "zh",
+   "en",
+   "fr",
+   "de",
+   "ja",
+   "th"
+  ],
+  "targets": [
+   "Australia",
+   "Austria",
+   "Czechia",
+   "Egypt",
+   "France",
+   "Germany",
+   "Hungary",
+   "Kenya",
+   "India",
+   "Indonesia",
+   "Japan",
+   "Luxembourg",
+   "Macao",
+   "Malaysia",
+   "New Zealand",
+   "Nigeria",
+   "Poland",
+   "Portugal",
+   "Qatar",
+   "Russia",
+   "Saudi Arabia",
+   "Singapore",
+   "South Korea",
+   "Spain",
+   "Switzerland",
+   "Taiwan",
+   "Thailand",
+   "Turkey",
+   "United States",
+   "Vietnam",
+   "Chinese-speaking diaspora"
+  ],
+  "narratives": "Imitation local news sites mix filler and copied local news with PRC state positions on the South China Sea, Taiwan, Xinjiang, Falun Gong and COVID-19, Global Times articles, and DRAGONBRIDGE content such as attacks on Guo Wengui and Taiwan election narratives.",
+  "techniques": [
+   "fake news outlets",
+   "content laundering",
+   "state media amplification",
+   "paid influencers",
+   "paid placement in real media",
+   "typosquatted domains"
+  ],
+  "indicators": [
+   {
+    "domain": "updatenews.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "volgogradpost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "ulstergrowth.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "tulunet.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "torinohuman.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "teotihuacaneco.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "taurustimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "tarragonapost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "stptb.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "sendaishimbun.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Haimai Yunxiang Media"
+   },
+   {
+    "domain": "pollandobserver.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "japandigest.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "melbournenews.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "japanheadline.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "voiceofthailand.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "dailybangkokpost.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "kolnerzeitschrift.de",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "italiannotizie.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "macaoposts.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "dailysydney.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "bitcoinnewstokyo.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shenzhen Bowen Media"
+   },
+   {
+    "domain": "eutimes.fr",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "hurriyetbusiness.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "saudiweekly.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "newzealandgazette.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "macaomorning.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "technologykr.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "thaicitynews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "taiwanweekly.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "malaysiaunion.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "bitcherrynet.cn",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "qichetimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "digitaljapan.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "baobeimama.com.cn",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "moderntimes.com.cn",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "jakartapost.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "uscitynews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "russiabbs.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "turkishdaily.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "dertagesspiegel.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "spaintour.club",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: Shanghai Haixun Technology"
+   },
+   {
+    "domain": "dailydispatcher.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "easterntribunal.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "suratkhabar.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "buzzingasia.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "internasionalkini.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "thinkbusinesstoday.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "stargazersarchive.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "starsgazette.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "glamorousnews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "lifevoyageurs.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   },
+   {
+    "domain": "heartofmalaysia.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of compromise, example domains: DURINBRIDGE"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Google Threat Intelligence Group",
+    "title": "Seeing Through a GLASSBRIDGE: Understanding the Digital Marketing Ecosystem Spreading Pro-PRC Influence Operations",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/glassbridge-pro-prc-influence-operations",
+    "date": "2024-11-22",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (post updated 2024-12-04 to add example domains)"
+   }
+  ],
+  "notes": "Umbrella grouping that overlaps PAPERWALL (Haimai) and HaiEnergy (Haixun); some domains repeat across those entries. Google says the content is aligned with PRC political interests but names no state principal; it says the firms may be taking directions from a shared customer. Google says DURINBRIDGE 'is not an IO actor' and likely published IO content for a customer or partner. Google blocked more than 1,000 GLASSBRIDGE sites from Google News and Discover since 2022; 'from 2022' is when blocking began, not a first-seen date. The 52 indicators are Google's examples. Language list is Google's for Shenzhen Bowen; Haixun targets English and Chinese audiences among others. 'typosquatted domains' rests on lookalike names in Google's list (dertagesspiegel.com, jakartapost.org, dailybangkokpost.com); Google itself calls them imitation news sites. 'paid influencers' rests on Haixun's Fiverr recruitment of for-hire accounts, citing Mandiant July 2023."
+ },
+ {
+  "id": "hong-kong-2019-takedowns",
+  "name": "China-origin network focused on Hong Kong (August 2019 platform takedowns)",
+  "aliases": [],
+  "state": "China",
+  "operator": "Not named; Meta found links to individuals associated with the Chinese government",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "our investigation found links to individuals associated with the Chinese government.",
+    "section": "body"
+   },
+   {
+    "source": "s2",
+    "operatorType": "origin only",
+    "says": "This discovery was consistent with recent observations and actions related to China announced by Facebook and Twitter.",
+    "section": "body"
+   },
+   {
+    "source": "s3",
+    "operatorType": "linked to a state",
+    "says": "Twitter, Facebook, and YouTube all took down assets belonging to a Chinese state-linked information operation.",
+    "section": "p.1 (Graphika's description of the August 2019 takedowns)"
+   }
+  ],
+  "active": {
+   "from": 2019,
+   "to": 2019
+  },
+  "platforms": [
+   "Facebook",
+   "X",
+   "YouTube"
+  ],
+  "languages": [
+   "zh"
+  ],
+  "targets": [
+   "Hong Kong"
+  ],
+  "narratives": "Content about local political news in Hong Kong and the ongoing protests, including posts likening protesters to ISIS fighters.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "hijacked or bought accounts",
+   "spam amplification"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1",
+    "s2"
+   ],
+   "platforms": [
+    "s1",
+    "s2",
+    "s3"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1",
+    "s3"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook Newsroom)",
+    "title": "Removing Coordinated Inauthentic Behavior From China",
+    "url": "https://about.fb.com/news/2019/08/removing-cib-china/",
+    "date": "2019-08-19",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Google",
+    "title": "Maintaining the integrity of our platforms",
+    "url": "https://blog.google/outreach-initiatives/public-policy/maintaining-integrity-our-platforms/",
+    "date": "2019-08-22",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s3",
+    "publisher": "Graphika",
+    "title": "Cross-Platform Spam Network Targeted Hong Kong Protests: \"Spamouflage Dragon\" used hijacked and fake accounts to amplify video content",
+    "url": "https://public-assets.graphika.com/reports/graphika_report_spamouflage.pdf",
+    "date": "2019-09-25",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s4",
+    "publisher": "Twitter (X) Safety",
+    "title": "Information operations directed at Hong Kong",
+    "url": "https://blog.x.com/en_us/topics/company/2019/information_operations_directed_at_Hong_Kong",
+    "date": "2019-08-19",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "not fetched: blog.x.com returned a Cloudflare bot challenge (403); title from the URL slug, date from the brief, both unverified"
+   }
+  ],
+  "notes": "Meta removed 7 Pages, 3 Groups and 5 Facebook accounts (about 15,500 Page followers), acting on a Twitter tip. Google disabled 210 YouTube channels and reports VPN use to disguise origin. Twitter's own announcement (s4), which the brief says used 'state-backed', could not be opened, so no field or attribution rests on it. Language 'zh' is inferred from Meta's translated content samples and is not a stated list. 'hijacked or bought accounts' and 'spam amplification' rest on Graphika's citation of DFRLab and ASPI analysis that the Twitter assets were largely spam accounts bought in bulk. Graphika later linked the amplification layer to what it named Spamouflage; see that entry. No indicators were published in the sources read."
+ },
+ {
+  "id": "meta-2022-09-china-us-czechia",
+  "name": "China-origin network targeting the US and Czechia (Meta, September 2022)",
+  "aliases": [],
+  "state": "China",
+  "operator": "Unknown",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "We took down a small network that originated in China and targeted the United States, the Czech Republic",
+    "section": "China"
+   }
+  ],
+  "active": {
+   "from": 2021,
+   "to": 2022
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "cs",
+   "zh",
+   "fr"
+  ],
+  "targets": [
+   "United States",
+   "Czechia",
+   "Chinese-speaking audiences",
+   "French-speaking audiences"
+  ],
+  "narratives": "In the US it posted on both sides of the political spectrum ahead of the 2022 midterms; in Czechia it criticised the state's support for Ukraine and its economic cost, using that to warn against antagonising China.",
+  "techniques": [
+   "fake personas"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook Newsroom)",
+    "title": "Removing Coordinated Inauthentic Behavior From China and Russia",
+    "url": "https://about.fb.com/news/2022/09/removing-coordinated-inauthentic-behavior-from-china-and-russia/",
+    "date": "2022-09-27",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta describes four short-lived efforts between fall 2021 and mid-September 2022, posting during China working hours, with little engagement. Platforms include two Czech petition sites (unnamed in the newsroom post). Languages are inferred from the stated target audiences, not listed by Meta. Meta's full report PDF (about.fb.com/wp-content/uploads/2022/11/CIB-Report_-China-Russia-Sept-2022.pdf) was not opened, so its indicators are not included. Meta's Q4 2023 report found some links between this network and a later China-origin network; OpenAI's 'Uncle Spam' (June 2025) says it followed this threat actor."
+ },
+ {
+  "id": "meta-2023-q3-china-india-tibet",
+  "name": "China-origin network targeting India and the Tibet region (Meta, Q3 2023)",
+  "aliases": [],
+  "state": "China",
+  "operator": "Unknown",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "This network originated in China and targeted primarily India and the Tibet region and, to a lesser extent, the United States.",
+    "section": "01 China, p.4"
+   }
+  ],
+  "active": {
+   "from": 2023,
+   "to": 2023
+  },
+  "platforms": [
+   "Facebook",
+   "X"
+  ],
+  "languages": [
+   "en",
+   "hi",
+   "zh"
+  ],
+  "targets": [
+   "India (Arunachal Pradesh)",
+   "Tibet region",
+   "United States"
+  ],
+  "narratives": "Personas posing as journalists, lawyers and activists; Tibet-focused accounts posed as pro-independence activists while accusing the Dalai Lama and followers of corruption and pedophilia, and Arunachal Pradesh accounts praised the Indian army while accusing the Indian government of corruption and backing ethnic violence in Manipur.",
+  "techniques": [
+   "fake personas",
+   "comment brigading"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Third Quarter Adversarial Threat Report (Q3 2023)",
+    "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report",
+    "date": "2023-11",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta removed 13 accounts and seven Groups. Active years are the report period only; Meta gives no start date. No indicators extracted."
+ },
+ {
+  "id": "meta-2023-q3-china-us-politics",
+  "name": "China-origin network posing as Americans (Meta, Q3 2023)",
+  "aliases": [],
+  "state": "China",
+  "operator": "Unknown",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "This network originated in China and targeted the United States.",
+    "section": "02 China, p.5"
+   }
+  ],
+  "active": {
+   "from": 2023,
+   "to": 2023
+  },
+  "platforms": [
+   "Facebook",
+   "X"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "United States"
+  ],
+  "narratives": "Posts in English about US politics and US-China relations that criticised both sides of the US political spectrum, largely using partisan content copied from X.",
+  "techniques": [
+   "fake personas",
+   "content laundering"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Third Quarter Adversarial Threat Report (Q3 2023)",
+    "url": "https://transparency.meta.com/sr/Q3-2023-Adversarial-threat-report",
+    "date": "2023-11",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta removed 4,789 Facebook accounts. In mid-2023 some accounts switched to posing as India-based and engaged with the India/Tibet network. 'content laundering' here means copy-pasting real users' partisan posts. No indicators extracted."
+ },
+ {
+  "id": "meta-2023-q4-china-military-families",
+  "name": "China-origin network posing as US military families and anti-war activists (Meta, Q4 2023)",
+  "aliases": [],
+  "state": "China",
+  "operator": "Unknown",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "This network originated in China and targeted US audiences.",
+    "section": "China, p.18"
+   }
+  ],
+  "active": {
+   "from": 2023,
+   "to": 2024
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "YouTube",
+   "Medium",
+   "websites"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "United States"
+  ],
+  "narratives": "Content about the US military, especially aircraft carriers, and criticism of US policy toward Taiwan and Israel and of US support for Ukraine, including a petition styled as written by Americans against US support for Taiwan.",
+  "techniques": [
+   "fake personas"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Fourth Quarter Adversarial Threat Report: Countering the Surveillance-for-Hire Industry & Influence Operations",
+    "url": "https://transparency.meta.com/sr/Q4-2023-Adversarial-threat-report",
+    "date": "2024-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta removed 33 Facebook accounts, six Pages, six Groups and four Instagram accounts, and found some links to the unattributed China network it disrupted in September 2022. Meta's appendix lists YouTube and Medium account URLs and a rootsaction.org petition; these are platform-hosted assets and are excluded under the indicator rules. Years are the report window (Q4 2023 takedown, petition count as of 5 February 2024); Meta gives no start date."
+ },
+ {
+  "id": "openai-sponsored-discontent",
+  "name": "Sponsored Discontent",
+  "aliases": [],
+  "state": "China",
+  "operator": "Unknown; bylines in some published articles connected the author to Jilin Yousen Culture Communication Co, Ltd",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "Likely China-origin ChatGPT accounts generating social media content in English and long-form articles in Spanish",
+    "section": "Influence activity: \"Sponsored Discontent\", p.13"
+   }
+  ],
+  "active": {
+   "from": 2024,
+   "to": 2025
+  },
+  "platforms": [
+   "X",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "zh",
+   "es"
+  ],
+  "targets": [
+   "Cai Xia (dissident critic)",
+   "Latin American audiences (Peru, Mexico, Ecuador)",
+   "United States (as subject)"
+  ],
+  "narratives": "Short English and Chinese posts attacking dissident Cai Xia, and Spanish long-form articles portraying US inequality, violence, drug use and homelessness as signs of failed American leadership, published around the 2024 APEC forum in Peru.",
+  "techniques": [
+   "fake personas",
+   "AI-generated text",
+   "machine translation",
+   "paid placement in real media",
+   "content laundering",
+   "harassment of critics"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "OpenAI",
+    "title": "Disrupting malicious uses of our models: an update February 2025",
+    "url": "https://cdn.openai.com/threat-intelligence-reports/disrupting-malicious-uses-of-our-models-february-2025-update.pdf",
+    "date": "2025-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "OpenAI notes overlap with Spamouflage for the Cai Xia comments but treats this as a distinct line of effort. The Latin American outlets that published the articles (La Republica, Wapa, El Popular, Libero, Extra, Expreso, El Universal, El Plural) are real outlets and are excluded; at least one article was marked 'patrocinado' (sponsored), and OpenAI says some publications may have resulted from a financial arrangement. The company named in bylines is recorded as a byline fact, not as OpenAI's attribution of the operator. 'content laundering' rests on translating and expanding public Chinese-language articles into Spanish. OpenAI rates it Category 4 on the Breakout Scale. No indicators published."
+ },
+ {
+  "id": "openai-sneer-review",
+  "name": "Sneer Review",
+  "aliases": [],
+  "state": "China",
+  "operator": "Unknown",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "Likely China-origin activity generating social media content and internal reviews",
+    "section": "Covert IO: Operation \"Sneer Review\", p.7"
+   }
+  ],
+  "active": {
+   "from": 2025,
+   "to": 2025
+  },
+  "platforms": [
+   "TikTok",
+   "X",
+   "Reddit",
+   "Facebook",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "zh",
+   "ur"
+  ],
+  "targets": [
+   "Taiwan ('Reversed Front' game)",
+   "Mahrang Baloch (Pakistani activist)",
+   "US audiences (USAID closure, tariffs)"
+  ],
+  "narratives": "Critical comments and a fake 'backlash' article about a Taiwanese anti-CCP board game, a false pornography claim against Baloch activist Mahrang Baloch, and both-sided comments on the USAID shutdown tied to US tariffs.",
+  "techniques": [
+   "fake personas",
+   "comment brigading",
+   "AI-generated text",
+   "fake news outlets",
+   "harassment of critics"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "OpenAI",
+    "title": "Disrupting malicious uses of AI: June 2025",
+    "url": "https://cdn.openai.com/threat-intelligence-reports/5f73af09-a3a3-4a55-992e-069237681620/disrupting-malicious-uses-of-ai-june-2025.pdf",
+    "date": "2025-06",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "One user claimed in a prompt to work for the Chinese Propaganda Department; OpenAI says it has no independent evidence for this, so it is not used as an attribution. The accounts also drafted an internal performance review describing the operation, and an essay styled as a public security document. 'fake news outlets' rests on two Facebook Pages posing as news outlets. Dates: report published June 2025 and content references the 2025 USAID closure; no start date given. No indicators published."
+ },
+ {
+  "id": "openai-vague-focus",
+  "name": "VAGue Focus",
+  "aliases": [],
+  "state": "China",
+  "operator": "Unknown",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "Likely China-origin activity focused on social engineering in US and Europe",
+    "section": "Social engineering meets IO: Operation \"VAGue Focus\", p.17"
+   }
+  ],
+  "active": {
+   "from": 2024,
+   "to": 2025
+  },
+  "platforms": [
+   "X",
+   "websites"
+  ],
+  "languages": [
+   "zh",
+   "en"
+  ],
+  "targets": [
+   "United States",
+   "Europe",
+   "journalists and researchers"
+  ],
+  "narratives": "Personas posing as European or Turkey-based journalists and analysts for 'Focus Lens News', 'BrightWave Media Europe' and 'Visionary Advisory Group' sought information on US economic and financial policy, including paid interview offers and offers to pay for classified documents.",
+  "techniques": [
+   "fake personas",
+   "front organisations",
+   "fake news outlets",
+   "AI-generated text",
+   "machine translation",
+   "hijacked or bought accounts"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "OpenAI",
+    "title": "Disrupting malicious uses of AI: June 2025",
+    "url": "https://cdn.openai.com/threat-intelligence-reports/5f73af09-a3a3-4a55-992e-069237681620/disrupting-malicious-uses-of-ai-june-2025.pdf",
+    "date": "2025-06",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "OpenAI says the operators themselves described the entities as fronts for intelligence collection. OpenAI identified nine X accounts and one domain but names neither, so no indicators are listed. 'hijacked or bought accounts' rests on OpenAI's note that the Focus Lens News X account (created 2014, dormant until mid-2024) is typical of compromised and repurposed accounts. Start year 2024 rests on that mid-2024 reactivation."
+ },
+ {
+  "id": "openai-uncle-spam",
+  "name": "Uncle Spam",
+  "aliases": [],
+  "state": "China",
+  "operator": "Unknown",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "We banned a number of ChatGPT accounts linked to a China-origin influence operation following a lead from our peers at Meta.",
+    "section": "Covert IO: Operation \"Uncle Spam\", p.32"
+   }
+  ],
+  "active": {
+   "from": 2025,
+   "to": 2025
+  },
+  "platforms": [
+   "X",
+   "Bluesky"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "United States"
+  ],
+  "narratives": "Polarised posts on both sides of US debates, chiefly for and against tariffs, including fictitious US veteran personas critical of the administration.",
+  "techniques": [
+   "fake personas",
+   "AI-generated text",
+   "AI-generated images or video"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "OpenAI",
+    "title": "Disrupting malicious uses of AI: June 2025",
+    "url": "https://cdn.openai.com/threat-intelligence-reports/5f73af09-a3a3-4a55-992e-069237681620/disrupting-malicious-uses-of-ai-june-2025.pdf",
+    "date": "2025-06",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "OpenAI ties this to the threat actor in Meta's original 2022 report (see meta-2022-09-china-us-czechia). The accounts also sought code to scrape profile data from X and Bluesky. 'AI-generated images' rests on AI-made logos used as profile pictures, such as 'Veterans for Justice'. Language 'en' is inferred from the US-facing samples. No indicators published."
+ },
+ {
+  "id": "openai-nine-emdash-line",
+  "name": "Nine—emdash Line",
+  "aliases": [
+   "Nine--emdash Line"
+  ],
+  "state": "China",
+  "operator": "Unknown",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "potentially affiliated with a covert influence operation originating from China",
+    "section": "Covert IO: Operation \"Nine--emdash Line\", p.30"
+   }
+  ],
+  "active": {
+   "from": 2025,
+   "to": 2025
+  },
+  "platforms": [
+   "X",
+   "Instagram",
+   "TikTok"
+  ],
+  "languages": [
+   "en",
+   "yue"
+  ],
+  "targets": [
+   "Philippines",
+   "Vietnam",
+   "Hong Kong pro-democracy figures",
+   "United States"
+  ],
+  "narratives": "English posts on Vietnam's alleged environmental damage in the South China Sea and claims that Philippine President Marcos used drugs and manipulated elections, plus Cantonese posts branding Hong Kong pro-democracy figures (Jimmy Lai, Nathan Law, Agnes Chow) criminals or traitors.",
+  "techniques": [
+   "fake personas",
+   "AI-generated text",
+   "comment brigading",
+   "harassment of critics"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "OpenAI",
+    "title": "Disrupting malicious uses of AI: an update (October 2025)",
+    "url": "https://cdn.openai.com/threat-intelligence-reports/7d662b68-952f-4dfd-a2f2-fe55b041cc4a/disrupting-malicious-uses-of-ai-october-2025.pdf",
+    "date": "2025-10",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "OpenAI says the accounts resembled Spamouflage but it found no technical links. 'yue' (Cantonese) is ISO 639-3; no ISO 639-1 code exists, and 'zh' would lose the distinction. The Marcos video was not generated by OpenAI models and the Philippine government called it a deepfake or digitally altered; 'deepfake' is not listed as an operation technique because OpenAI does not say the operation made it. Philstar.com independently reported part of the X network. No indicators published. The October 2025 report's other China section covers PRC-linked surveillance and phishing requests, not covert IO; 'Stop News' in that report is Russia-origin."
+ },
+ {
+  "id": "openai-cyber-special-operations",
+  "name": "Cyber special operations (网络特战)",
+  "aliases": [
+   "China's \"Cyber Special Operations\""
+  ],
+  "state": "China",
+  "operator": "Chinese law enforcement (per OpenAI's assessment of one user's activity)",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "We banned a ChatGPT account linked to an individual associated with Chinese law enforcement.",
+    "section": "Case Studies, Covert IO: China's \"Cyber Special Operations\", p.28"
+   },
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "The available evidence suggests that Chinese law enforcement is implementing a strategy of \"cyber special operations\"",
+    "section": "same section, p.28"
+   }
+  ],
+  "active": {
+   "from": 2023,
+   "to": 2025
+  },
+  "platforms": [
+   "X",
+   "YouTube",
+   "Blogspot",
+   "Pixiv",
+   "Bluesky",
+   "websites"
+  ],
+  "languages": [
+   "zh",
+   "ja",
+   "en"
+  ],
+  "targets": [
+   "Japanese Prime Minister Sanae Takaichi",
+   "Chinese dissidents and CCP critics worldwide",
+   "Safeguard Defenders",
+   "United States",
+   "Japan"
+  ],
+  "narratives": "A campaign accusing Takaichi of far-right ties and stoking anger over US tariffs on Japanese agriculture under the hashtag #右翼共生者, alongside a wider effort to discredit, harass and silence dissidents through mass posting, fake obituaries, impersonation accounts and abusive reporting.",
+  "techniques": [
+   "fake personas",
+   "harassment of critics",
+   "intimidation",
+   "forged documents",
+   "impersonating real outlets or officials",
+   "AI-generated images or video",
+   "comment brigading",
+   "spam amplification"
+  ],
+  "indicators": [
+   {
+    "domain": "revealscum.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Tactical Range, p.33 (site OpenAI first linked to Spamouflage in May 2024)"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "OpenAI",
+    "title": "Disrupting malicious uses of our models: an update, February 2026",
+    "url": "https://cdn.openai.com/pdf/df438d70-e3fe-4a6c-a403-ff632def8f79/disrupting-malicious-uses-of-ai.pdf",
+    "date": "2026-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (PDF located through a press link and opened directly from cdn.openai.com; text extracted with broken spacing, read manually)"
+   }
+  ],
+  "notes": "The two attribution lines differ: the account is 'linked to an individual associated with' law enforcement, while the strategy is attributed to Chinese law enforcement with 'evidence suggests'. Top-level operatorType follows the second, hedged statement; treat it as OpenAI's assessment, not a confirmed fact. Much of the scale (hundreds of staff, thousands of fake accounts, over 100 tactics, locally deployed models such as DeepSeek and Qwen) comes from the user's own status reports, which OpenAI could only partly corroborate. Open-source corroboration covers the Takaichi hashtag (from late October 2025), a Jie Lijian fake-obituary campaign (August 2023, per a VoA Chinese service report) and impersonation accounts on X and Bluesky. X accounts named in the report (for example @whyyoutouzhele and @huikezhen) belong to targets and are excluded. OpenAI ties revealscum.com to Spamouflage and relays the 2023 DOJ allegations against Chinese officers. 'forged documents' and 'impersonating officials' are tactics the user described; OpenAI did not independently confirm them. Report date: OpenAI lists it as February 2026 (press coverage gives 2026-02-25; not verified on openai.com, which returned 403)."
+ },
+ {
+  "id": "falsos-amigos",
+  "name": "Falsos Amigos",
+  "aliases": [],
+  "state": "China",
+  "operator": "Unknown",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "We assess that the actor(s) behind the activity are very likely located in China",
+    "section": "Key Findings / Network Assessment"
+   }
+  ],
+  "active": {
+   "from": 2024
+  },
+  "platforms": [
+   "websites",
+   "Facebook",
+   "Instagram",
+   "Mastodon",
+   "Threads",
+   "X"
+  ],
+  "languages": [
+   "en",
+   "fr",
+   "es",
+   "vi"
+  ],
+  "targets": [
+   "young audiences in Africa",
+   "the Americas",
+   "Asia",
+   "Europe"
+  ],
+  "narratives": "Translated and summarised CGTN articles presenting China as an engaged, peaceful diplomatic actor and the US negatively, covering US tariffs, Iran-Israel tensions, Ukraine and Taiwan ('One country, two systems').",
+  "techniques": [
+   "fake news outlets",
+   "content laundering",
+   "state media amplification",
+   "AI-generated text",
+   "AI-generated images or video",
+   "machine translation",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "actumeridien.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "amigonews.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "khabarasia.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "myglobalnews.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "mynewspaper.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "namasteheadlines.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "newsamigo.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "newspaperamigo.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "soleilactu.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "videostory.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   },
+   {
+    "domain": "vietworldnow.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains section and Domain Registration Data table"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Graphika",
+    "title": "Falsos Amigos: Network of Domains and Social Media Accounts Uses AI Tools to Launder Reports From Chinese State Media Outlet CGTN in Multiple Languages",
+    "url": "https://public-assets.graphika.com/reports/graphika_report_falsos_amigos.pdf",
+    "date": "2025-08-27",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Le Monde (Les Décodeurs)",
+    "title": "Comment la France a identifié un réseau de sites de propagande liés à Pékin",
+    "url": "https://www.lemonde.fr/les-decodeurs/article/2026/06/05/comment-la-france-a-identifie-un-reseau-de-sites-de-propagande-lies-a-pekin_6697911_4355770.html",
+    "date": "2026-06-05",
+    "kind": "press",
+    "lang": "fr",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "not fetched: lemonde.fr served a client challenge; title from the URL slug, unverified"
+   }
+  ],
+  "notes": "Graphika could not attribute the network to a specific actor. Its China assessment rests on Alibaba/HiChina registration with Beijing or Hangzhou registrants, Facebook page managers in China, and one domain's SSL organisation, Global International Video Communications Co., which Graphika describes as a state-owned enterprise set up by CCTV and CGTN. Graphika also found an ad beneficiary name matching a CGTN Digital employee's LinkedIn profile but could not confirm they are the same person. Secondary coverage says France's VIGINUM disclosed on 2026-06-04 that the network (13 sites by then) is managed from within CGTN; neither the VIGINUM document nor Le Monde (s2) could be opened, so that state-media attribution is UNVERIFIED here and does not change operatorType. soleilactu.com resolved only to a WordPress template. Ten of 11 domains were created 5-7 December 2024 or 13-14 March 2025."
+ },
+ {
+  "id": "graphika-glass-onion",
+  "name": "Glass Onion",
+  "aliases": [],
+  "state": "China",
+  "operator": "Two Chinese companies with technical links to the network (unnamed on the public page)",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "technical links connecting this network to two Chinese companies",
+    "section": "landing-page key findings (Google previously tied these companies to HaiEnergy)"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2026
+  },
+  "platforms": [
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "zh"
+  ],
+  "targets": [
+   "global audiences"
+  ],
+  "narratives": "Spoofed news sites carrying pro-China and pro-CPC messaging and Chinese state media content alongside ads and commercial placements by Chinese PR and digital marketing firms.",
+  "techniques": [
+   "cloned news sites",
+   "impersonating real outlets or officials",
+   "state media amplification",
+   "content laundering",
+   "spam amplification"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Graphika",
+    "title": "Glass Onion: Peeling Back the Layers of a Pro-China Online Ecosystem",
+    "url": "https://graphika.com/glass-onion",
+    "date": "2026-01-13",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (landing page only; full report gated)"
+   }
+  ],
+  "notes": "Graphika found 43 domains and 37 subdomains spoofing outlets such as the New York Times, the Guardian and the Wall Street Journal. The domain list sits in the gated PDF and is not included. Content links to 30 Chinese companies and three individuals in PR and marketing; Graphika says these firms used the domains in contracts promoting CPC-linked entities but that it is unclear whether those entities knew the domains spoofed news outlets. 'spam amplification' rests on amplification by Spamouflage-linked accounts. Tactics resemble HaiEnergy, PAPERWALL and DURINBRIDGE. No start year on the landing page; 'to' is the report year. Target audience is not stated beyond global."
+ }
+]
