@@ -1,6 +1,7 @@
 # Lexicon sources
 
-Where the non-English rhetoric word lists come from (`src/core/lexicon-{fr,es,de,pt,it}.js`).
+Where the non-English rhetoric word lists come from (`src/core/lexicon-{fr,es,de,pt,it}.js`), and the
+English terms added for side recall.
 Checked 2026-10-21. The English list cites its own sources in `lexicon.js`.
 
 ## How the lists were built
@@ -41,6 +42,48 @@ Checked 2026-10-21. The English list cites its own sources in `lexicon.js`.
 | German | Zecken, Gutmenschen | Nazis, AfDler | Kartoffeln (Germans), Bonzen (the rich) |
 | Portuguese | petralhas, petralhada, esquerdopatas, comunas, mortadelas | bolsominions, bolsonarada, coxinhas, minions, gado | isentões (the uncommitted) |
 | Italian | zecche, zecche rosse, piddini, sinistroidi, buonisti, radical chic | fasci, fasciorazzisti, destrorsi | sbirri (police) |
+
+## English terms added for side recall (2026-10-21)
+
+Added to close the recall gap between the two sides (`EVALUATION.md`, "Side comparison"). The
+misses were read on the dev split; each term below is in the list only because a dictionary records
+it as a slur or derogatory, and only after it passed the dev precision rule. The labels were read
+from each Wiktionary entry's source (`action=raw`) on 2026-10-21. Wiktionary is CC BY-SA 4.0;
+only the usage label is cited, no text is copied.
+
+| Term | Label in Wiktionary | Aimed at | Dev precision, pooled |
+|---|---|---|---|
+| white trash | US, pejorative, ethnic slur, offensive | white people, the rural poor | 76/93 |
+| trailer trash | US, slang, derogatory | white people, the rural poor | 18/29 |
+| wigger, whigger | pejorative, ethnic slur | white people | 8/10 |
+| mudshark ("mud shark" entry) | slang, derogatory, offensive, ethnic slur | white women with Black partners | 35/38 |
+| cuck | derogatory, slang | men; coined in the alt-right | 233/259 |
+| cuckservative | US politics, slang, derogatory | conservatives; coined in the alt-right | 8/8 |
+| soy boy, soyboy | Internet slang, pejorative | men, often on the left | 19/20 |
+| Bible thumper | pejorative | Christians | 3/5 |
+| fundie | pejorative, slang | Christians | 2/5 |
+| Christofascist | pejorative, political | Christians | no dev hits |
+| papist | religious slur | Catholics | no dev hits |
+| Christard | slang, religious slur, derogatory, offensive | Christians | no dev hits |
+
+Group names, not slurs, from both directions: trumptards ("Trumptard": pejorative, derogatory),
+trumpanzees (pejorative), rethuglicans and repugnicans (derogatory), demonrats (derogatory), next to
+the existing libtards ("libtard": derogatory), magats ("MAGAt": derogatory) and conservatards. On
+Civil dev, libtard sat on toxic text 4 times in 21, so the political coinages stay group names for
+every side. "incels" is a self-name and is a group name too.
+
+The grammar "<identity word> <gendered slur>" ("white bitch", "black hoes") joins two kinds of
+recorded word: an identity word from the group list, and a word Wiktionary labels offensive or
+derogatory when used of a person (bitch, hoe, whore, slut, cunt). The fifteen identity words are the
+same in every direction. Dev precision, pooled: 84/96.
+
+Left out, with the reason: redneck ("usually pejorative, offensive, ethnic slur") and hillbilly
+("often pejorative") are also self-names and sat on toxic text 1 in 10 and 3 in 12 times on Civil
+dev; they stay group names. Cracker has a food sense; it stays on the weak list. "beta male" has no
+derogatory label in Wiktionary. "mud shark" with a space is also a fish (the spiny dogfish).
+
+Background on the anti-white and anti-rural terms: Matt Wray, "Not Quite White: White Trash and the
+Boundaries of Whiteness", Duke University Press, 2006 (cited from memory, not re-read for this list).
 
 ## Known gaps
 

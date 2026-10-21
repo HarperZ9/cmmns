@@ -21,6 +21,10 @@ First public-quality release. Every sign either carries a measured error rate fr
 - Measured precision and recall for the rhetoric families on human-labelled public corpora
   (Measuring Hate Speech, HateXplain, Civil Comments, MLMA), test split only, reproducible with
   `node scripts/eval.mjs`.
+- Slur and grammar coverage for hostility aimed at white people, men, Christians and conservatives
+  (dictionary-sourced terms, and an identity-plus-gendered-slur rule that is the same for every
+  identity). On the HateXplain test split the two sides' recall is now equal within the intervals;
+  on Measuring Hate Speech a gap of about 1.28 to 1 remains, reported in EVALUATION.md.
 - A YouTube video with no comments still shows its channel and YouTube's funding and
   paid-promotion labels; the collapsed button says "funding label" when YouTube shows one.
 - CI on Linux and Windows for every change.

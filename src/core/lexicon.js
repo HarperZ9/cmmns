@@ -1,7 +1,8 @@
 // Radar's word lists, kept apart from the matching code so they can be reviewed and updated in
 // one place. Every list covers targets in every direction; tests/rhetoric.symmetry.test.js holds
 // the scoring to equal treatment. Sources for slurs and coded terms: the ADL Hate Symbols
-// database, Hatebase, GNET and ISD extremism glossaries. Words that people also use innocently
+// database, Hatebase, GNET and ISD extremism glossaries; terms added for side recall on 2026-10-21 cite
+// Wiktionary labels in project-docs/evidence/LEXICON-SOURCES.md. Words that people also use innocently
 // (a jogger, crackers, gypsy as a self-name) go in the SOFT lists, which count for less.
 
 // People named as groups. Matching any of these lets the grammar rules ("X are vermin",
@@ -27,6 +28,9 @@ export const GROUPS = [
   "evangelicals", "catholics", "white men", "white women", "black men", "black women", "straight people", "straights",
   "gay people", "gay men", "queers", "jewish people", "muslim people", "christian people", "caucasians", "white kids",
   "black kids", "white guys", "black guys", "white girls", "black girls", "hillbillies", "arab people", "asian people",
+  // added 2026-10-21 for the side-recall fix (project-docs/evidence/LEXICON-SOURCES.md): a self-named group, and
+  // political coinages from both directions, so the grammar reads "trumptards are scum" like "libtards are scum"
+  "incels", "trumptards", "trumpanzees", "rethuglicans", "repugnicans", "demonrats", "conservatards",
 ];
 
 // The dehumanising nouns that stay unambiguous right after a group ("commie filth", "migrant rats").
@@ -119,6 +123,13 @@ export const SLURS = [
   "redskin", "redskins", "injun", "injuns", "squaw", "gyppo", "gyppos",
   // anti-white
   "whitey", "cracka", "crackas", "white devil", "peckerwood", "white devils", "kill all whites",
+  // added 2026-10-21 (side-recall fix; sources in project-docs/evidence/LEXICON-SOURCES.md)
+  "white trash", "trailer trash", "wigger", "wiggers", "whigger", "whiggers", "mudshark", "mudsharks",
+  // anti-Christian and anti-Catholic
+  "bible thumper", "bible thumpers", "bible-thumper", "bible-thumpers", "fundie", "fundies", "christofascist", "christofascists",
+  "papist", "papists", "christard", "christards",
+  // aimed at men and at conservatives
+  "cuck", "cucks", "cuckservative", "cuckservatives", "soyboy", "soyboys", "soy boy", "soy boys",
   // anti-LGBTQ
   "faggot", "faggots", "tranny", "trannies", "troon", "troons", "shemale", "shemales", "poofter",
   // disability
@@ -136,9 +147,15 @@ export const SLURS_DEMOTED = ["honky", "honkies", "honkey", "dindu", "dindu nuff
 
 export const SLURS_SOFT = [...SLURS_DEMOTED, "leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
   "religion of peace", "it's always them", "its always them", "thug", "thugs", "ghetto", "illegals", "dyke", "dykes", "thot",
-  "thots", "fag", "fags", "cripple", "cripples", "white trash", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
+  "thots", "fag", "fags", "cripple", "cripples", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
 
 // Disguised spellings: "n1gg3r", "f@g", "k1ke". Applied before slur matching only.
+// "<identity> bitch", "<identity> whores": a gendered slur fused with an identity word. The same
+// identity words for every direction (tests/rhetoric.symmetry.test.js).
+export const IDENTITY_ADJ = ["white", "black", "asian", "mexican", "jewish", "arab", "muslim", "latina", "latino", "brown",
+  "indian", "chinese", "gay", "christian", "hispanic"];
+export const GENDERED_SLURS = ["bitch", "bitches", "hoe", "hoes", "whore", "whores", "slut", "sluts", "cunt", "cunts"];
+
 export const LEET = { "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a", "$": "s", "!": "i" };
 
 // "They hate beauty / us / the West": a hatred put in a whole group's mouth (counts as motive).
