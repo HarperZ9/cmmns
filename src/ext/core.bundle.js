@@ -2925,7 +2925,24 @@ function upstream(items, tweets, log) {
   return { accounts: rank(acc).map((x) => ({ handle: x.k, n: x.n })), domains: rank(dom).map((x) => ({ domain: x.k, n: x.n })), uploads, recycled };
 }
 
-return { TRAIL_RETAIN_DAYS, normLink, recordSpread, trailFor, upstream };
+// "First seen" for each piece of media on a post: the earliest post Radar has seen carrying the same
+// upload (same media id, so the same file X stores), and the post X credits it to ("From @account").
+// The earliest of the two leads. Radar sees only what the user viewed; X's upload time comes from
+// the media id. [{ type, uploaded, from, seen, first }], where first is { handle, at, id, how }.
+function firstSeen(t, tweets, log) {
+  const table = (log && log.media) || {};
+  return ((t && t.media) || []).map((m) => {
+    const from = m.fromPost ? { id: m.fromPost, at: m.fromPostTime || null, handle: (tweets.get(m.fromPost) || {}).author || null } : null;
+    const s = m.url && table[m.url];
+    const seen = s && s.posts.length ? { ...s.posts[0], posts: s.posts.length, accounts: new Set(s.posts.map((p) => p.handle)).size } : null;
+    const cands = [from && { ...from, how: "from" }, seen && { id: seen.id, handle: seen.handle, at: seen.at, how: "seen" }].filter((c) => c && c.at);
+    cands.sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+    const first = cands[0] || (from && { ...from, how: "from" }) || null;
+    return { type: m.type, url: m.url || null, uploaded: m.uploaded || null, from, seen, first: first && first.id === t.id ? { ...first, isThis: true } : first };
+  });
+}
+
+return { TRAIL_RETAIN_DAYS, normLink, recordSpread, trailFor, upstream, firstSeen };
 })();
 
 // ---- history.js
@@ -3204,6 +3221,862 @@ function claimCard(m) {
 return { MIN_CLAIM_TOKENS, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION, claimTokens, hasNegation, guessLanguage, buildClaimIndex, matchClaims, claimCard };
 })();
 
+// ---- cbor.js
+const M_cbor = (() => {
+// A small CBOR decoder and encoder (RFC 8949), enough for C2PA claims, assertions and COSE
+// signatures. Decoding keeps byte strings as Uint8Array, maps with text or integer keys as plain
+// objects, tags as { tag, value } and the exact encoded bytes of the top value.
+
+const td = new TextDecoder("utf-8", { fatal: false });
+
+function head(b, i) {
+  const ib = b[i], major = ib >> 5, ai = ib & 31;
+  if (ai < 24) return [major, ai, i + 1];
+  if (ai === 24) return [major, b[i + 1], i + 2];
+  if (ai === 25) return [major, (b[i + 1] << 8) | b[i + 2], i + 3];
+  if (ai === 26) return [major, ((b[i + 1] << 24) >>> 0) + (b[i + 2] << 16) + (b[i + 3] << 8) + b[i + 4], i + 5];
+  if (ai === 27) {
+    let v = 0n;
+    for (let k = 1; k <= 8; k++) v = (v << 8n) | BigInt(b[i + k]);
+    return [major, v <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(v) : v, i + 9];
+  }
+  if (ai === 31) return [major, -1, i + 1];
+  throw new Error("cbor: bad length");
+}
+
+function half(h) {
+  const e = (h >> 10) & 31, f = h & 1023, s = h & 0x8000 ? -1 : 1;
+  if (e === 0) return s * 2 ** -14 * (f / 1024);
+  if (e === 31) return f ? NaN : s * Infinity;
+  return s * 2 ** (e - 15) * (1 + f / 1024);
+}
+
+function item(b, i, depth) {
+  if (depth > 64) throw new Error("cbor: too deep");
+  if (i >= b.length) throw new Error("cbor: truncated");
+  const [major, n, j] = head(b, i);
+  switch (major) {
+    case 0: return [n, j];
+    case 1: return [typeof n === "bigint" ? -1n - n : -1 - n, j];
+    case 2: case 3: {
+      if (n === -1) {
+        const parts = []; let k = j;
+        while (b[k] !== 0xff) { const [p, nk] = item(b, k, depth + 1); parts.push(p); k = nk; }
+        return [major === 3 ? parts.join("") : bytesConcat(parts), k + 1];
+      }
+      if (j + n > b.length) throw new Error("cbor: truncated");
+      const s = b.subarray(j, j + n);
+      return [major === 3 ? td.decode(s) : s, j + n];
+    }
+    case 4: {
+      const out = []; let k = j;
+      if (n === -1) { while (b[k] !== 0xff) { const [v, nk] = item(b, k, depth + 1); out.push(v); k = nk; } return [out, k + 1]; }
+      for (let c = 0; c < n; c++) { const [v, nk] = item(b, k, depth + 1); out.push(v); k = nk; }
+      return [out, k];
+    }
+    case 5: {
+      const out = {}; let k = j;
+      for (let c = 0; n === -1 ? b[k] !== 0xff : c < n; c++) {
+        const [key, k1] = item(b, k, depth + 1); const [v, k2] = item(b, k1, depth + 1);
+        out[typeof key === "object" ? JSON.stringify(key) : String(key)] = v; k = k2;
+      }
+      return [out, n === -1 ? k + 1 : k];
+    }
+    case 6: { const [v, k] = item(b, j, depth + 1); return [{ tag: n, value: v }, k]; }
+    default: {
+      const ai = b[i] & 31;
+      if (ai === 20) return [false, j]; if (ai === 21) return [true, j];
+      if (ai === 22) return [null, j]; if (ai === 23) return [undefined, j];
+      if (ai === 25) return [half(n), j];
+      if (ai === 26) return [new DataView(b.buffer, b.byteOffset + i + 1, 4).getFloat32(0), j];
+      if (ai === 27) return [new DataView(b.buffer, b.byteOffset + i + 1, 8).getFloat64(0), j];
+      return [n, j];
+    }
+  }
+}
+
+function bytesConcat(parts) {
+  const len = parts.reduce((s, p) => s + p.length, 0), out = new Uint8Array(len);
+  let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+
+// Decode one CBOR value from the start of bytes.
+function cborDecode(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  return item(b, 0, 0)[0];
+}
+
+function encHead(major, n) {
+  if (n < 24) return [(major << 5) | n];
+  if (n < 256) return [(major << 5) | 24, n];
+  if (n < 65536) return [(major << 5) | 25, n >> 8, n & 255];
+  return [(major << 5) | 26, (n >>> 24) & 255, (n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+// Encode the small subset COSE's Sig_structure needs: arrays, text, byte strings, integers.
+function cborEncode(v) {
+  if (Array.isArray(v)) return bytesConcat([Uint8Array.from(encHead(4, v.length)), ...v.map(cborEncode)]);
+  if (v instanceof Uint8Array) return bytesConcat([Uint8Array.from(encHead(2, v.length)), v]);
+  if (typeof v === "string") { const s = new TextEncoder().encode(v); return bytesConcat([Uint8Array.from(encHead(3, s.length)), s]); }
+  if (Number.isInteger(v)) return Uint8Array.from(v >= 0 ? encHead(0, v) : encHead(1, -1 - v));
+  if (v === null) return Uint8Array.of(0xf6);
+  throw new Error("cbor: cannot encode " + typeof v);
+}
+
+return { bytesConcat, cborDecode, cborEncode };
+})();
+
+// ---- jumbf.js
+const M_jumbf = (() => {
+// Finds a C2PA manifest store inside a media file and parses its JUMBF boxes (ISO/IEC 19566-5).
+// Containers, per the C2PA 2.x specification's embedding rules:
+//   JPEG  APP11 segments carrying "JP" JUMBF fragments, joined by box instance and sequence number
+//   PNG   a caBX chunk
+//   WebP  a RIFF chunk named C2PA
+//   MP4   a top-level uuid box with the C2PA UUID, purpose "manifest"
+// Each parsed box keeps its byte offsets in the file it came from, so hashes can be recomputed.
+
+const { bytesConcat } = M_cbor;
+
+const u32 = (b, i) => ((b[i] << 24) >>> 0) + (b[i + 1] << 16) + (b[i + 2] << 8) + b[i + 3];
+const ascii = (b, i, n) => String.fromCharCode(...b.subarray(i, i + n));
+const hex = (b) => [...b].map((x) => x.toString(16).padStart(2, "0")).join("");
+const C2PA_BMFF_UUID = "d8fec3d61b0e483c92975828877ec481";
+
+function mediaFormat(b) {
+  if (b.length < 12) return null;
+  if (b[0] === 0xff && b[1] === 0xd8) return "jpeg";
+  if (b[0] === 0x89 && ascii(b, 1, 3) === "PNG") return "png";
+  if (ascii(b, 0, 4) === "RIFF" && ascii(b, 8, 4) === "WEBP") return "webp";
+  if (ascii(b, 4, 4) === "ftyp") return "bmff";
+  if (ascii(b, 0, 3) === "GIF") return "gif";
+  return null;
+}
+
+// JPEG segments before the image data: [{ marker, start, end, data }] (data excludes the length).
+function jpegSegments(b) {
+  const out = [];
+  let i = 2;
+  while (i + 4 <= b.length && b[i] === 0xff) {
+    const marker = b[i + 1];
+    if (marker === 0xd8 || (marker >= 0xd0 && marker <= 0xd7) || marker === 0x01) { i += 2; continue; }
+    if (marker === 0xff) { i++; continue; }
+    const len = (b[i + 2] << 8) | b[i + 3];
+    out.push({ marker, start: i, end: i + 2 + len, data: b.subarray(i + 4, i + 2 + len) });
+    if (marker === 0xda) break;
+    i += 2 + len;
+  }
+  return out;
+}
+
+function pngChunks(b) {
+  const out = [];
+  for (let i = 8; i + 12 <= b.length;) {
+    const len = u32(b, i), type = ascii(b, i + 4, 4);
+    out.push({ type, start: i, end: i + 12 + len, data: b.subarray(i + 8, i + 8 + len) });
+    if (type === "IEND") break;
+    i += 12 + len;
+  }
+  return out;
+}
+
+function riffChunks(b) {
+  const out = [];
+  const le = (i) => b[i] + (b[i + 1] << 8) + (b[i + 2] << 16) + ((b[i + 3] << 24) >>> 0);
+  for (let i = 12; i + 8 <= b.length;) {
+    const len = le(i + 4), type = ascii(b, i, 4);
+    out.push({ type, start: i, end: i + 8 + len + (len & 1), data: b.subarray(i + 8, i + 8 + len) });
+    i += 8 + len + (len & 1);
+  }
+  return out;
+}
+
+// Top-level ISO BMFF boxes: [{ type, start, end, header, uuid }].
+function bmffBoxes(b, from = 0, to = b.length) {
+  const out = [];
+  for (let i = from; i + 8 <= to;) {
+    let size = u32(b, i), header = 8;
+    const type = ascii(b, i + 4, 4);
+    if (size === 1) { size = Number((BigInt(u32(b, i + 8)) << 32n) | BigInt(u32(b, i + 12))); header = 16; }
+    else if (size === 0) size = to - i;
+    if (size < header || i + size > to) break;
+    const box = { type, start: i, end: i + size, header };
+    if (type === "uuid") { box.uuid = hex(b.subarray(i + header, i + header + 16)); box.header += 16; }
+    out.push(box);
+    i += size;
+  }
+  return out;
+}
+
+// The manifest store's bytes and where they sit in the file: { format, store, ranges } or null.
+function findManifestStore(b) {
+  const format = mediaFormat(b);
+  if (format === "jpeg") {
+    const parts = new Map();
+    for (const s of jpegSegments(b)) {
+      if (s.marker !== 0xeb || s.data[0] !== 0x4a || s.data[1] !== 0x50) continue;
+      const en = (s.data[2] << 8) | s.data[3], z = u32(s.data, 4), body = s.data.subarray(8);
+      if (!parts.has(en)) parts.set(en, []);
+      parts.get(en).push({ z, body, s });
+    }
+    for (const list of parts.values()) {
+      list.sort((a, c) => a.z - c.z);
+      if (ascii(list[0].body, 4, 4) !== "jumb") continue;
+      const store = bytesConcat(list.map((p, k) => (k === 0 ? p.body : p.body.subarray(8))));
+      if (labelOf(store) === "c2pa") return { format, store, ranges: list.map((p) => [p.s.start, p.s.end]) };
+    }
+    return { format, store: null };
+  }
+  if (format === "png") {
+    const c = pngChunks(b).find((x) => x.type === "caBX");
+    return { format, store: c ? c.data : null, ranges: c ? [[c.start, c.end]] : [] };
+  }
+  if (format === "webp") {
+    const c = riffChunks(b).find((x) => x.type === "C2PA");
+    return { format, store: c ? c.data : null, ranges: c ? [[c.start, c.end]] : [] };
+  }
+  if (format === "bmff") {
+    for (const x of bmffBoxes(b)) {
+      if (x.type !== "uuid" || x.uuid !== C2PA_BMFF_UUID) continue;
+      let i = x.start + x.header + 4;                       // FullBox version and flags
+      let purpose = ""; while (i < x.end && b[i]) purpose += String.fromCharCode(b[i++]);
+      i++;
+      if (purpose !== "manifest") continue;
+      i += 8;                                               // offset of the first merkle box
+      return { format, store: b.subarray(i, x.end), ranges: [[x.start, x.end]] };
+    }
+    return { format, store: null };
+  }
+  return { format, store: null };
+}
+
+function labelOf(store) {
+  try { return parseBox(store, 0).label; } catch { return null; }
+}
+
+// One JUMBF box at offset i: superboxes ("jumb") get { type, uuid, label, children },
+// content boxes get { type, data }. start/end/contentStart are offsets within buf.
+function parseBox(buf, i, depth = 0) {
+  if (depth > 16 || i + 8 > buf.length) throw new Error("jumbf: truncated");
+  let size = u32(buf, i), header = 8;
+  const type = ascii(buf, i + 4, 4);
+  if (size === 1) { size = Number((BigInt(u32(buf, i + 8)) << 32n) | BigInt(u32(buf, i + 12))); header = 16; }
+  else if (size === 0) size = buf.length - i;
+  const end = i + size;
+  if (size < header || end > buf.length) throw new Error("jumbf: bad box size");
+  const box = { type, start: i, end, contentStart: i + header };
+  if (type !== "jumb") { box.data = buf.subarray(i + header, end); return box; }
+  box.children = [];
+  for (let k = i + header; k < end;) { const c = parseBox(buf, k, depth + 1); box.children.push(c); k = c.end; }
+  const d = box.children[0];
+  if (!d || d.type !== "jumd") throw new Error("jumbf: superbox without description");
+  box.uuid = hex(d.data.subarray(0, 16));
+  const toggles = d.data[16];
+  if (toggles & 2) { const z = d.data.indexOf(0, 17); box.label = new TextDecoder().decode(d.data.subarray(17, z < 0 ? d.data.length : z)); }
+  box.content = box.children.slice(1);
+  return box;
+}
+
+// The store as nested boxes, plus a lookup by label path ("c2pa/urn:.../c2pa.claim").
+function parseStore(store) {
+  const root = parseBox(store, 0);
+  return { root, buf: store, manifests: (root.content || []).filter((x) => x.type === "jumb") };
+}
+
+const childByLabel = (box, label) => (box.content || []).find((c) => c.type === "jumb" && (c.label === label || (c.label || "").startsWith(label + "__")));
+
+return { C2PA_BMFF_UUID, mediaFormat, jpegSegments, pngChunks, riffChunks, bmffBoxes, findManifestStore, parseBox, parseStore, childByLabel };
+})();
+
+// ---- der.js
+const M_der = (() => {
+// Just enough DER (X.690) to read an X.509 certificate from a C2PA signature: who it names, who
+// issued it, its validity dates and its public key in a form WebCrypto can import.
+
+function tlv(b, i) {
+  const tag = b[i];
+  let len = b[i + 1], h = 2;
+  if (len & 0x80) { const n = len & 0x7f; len = 0; for (let k = 0; k < n; k++) len = len * 256 + b[i + 2 + k]; h = 2 + n; }
+  if (i + h + len > b.length) throw new Error("der: truncated");
+  return { tag, start: i, cs: i + h, end: i + h + len };
+}
+
+function kids(b, node) {
+  const out = [];
+  for (let i = node.cs; i < node.end;) { const k = tlv(b, i); out.push(k); i = k.end; }
+  return out;
+}
+
+function oid(b, n) {
+  const v = b.subarray(n.cs, n.end), parts = [Math.floor(v[0] / 40), v[0] % 40];
+  let x = 0;
+  for (let k = 1; k < v.length; k++) { x = x * 128 + (v[k] & 0x7f); if (!(v[k] & 0x80)) { parts.push(x); x = 0; } }
+  return parts.join(".");
+}
+
+const NAMES = { "2.5.4.3": "CN", "2.5.4.10": "O", "2.5.4.11": "OU", "2.5.4.6": "C", "2.5.4.7": "L", "2.5.4.8": "ST", "1.2.840.113549.1.9.1": "email" };
+const td = new TextDecoder();
+
+function name(b, n) {
+  const out = {};
+  for (const rdn of kids(b, n)) for (const atv of kids(b, rdn)) {
+    const [t, v] = kids(b, atv), key = NAMES[oid(b, t)];
+    if (key && !out[key]) out[key] = td.decode(b.subarray(v.cs, v.end));
+  }
+  return out;
+}
+
+function time(b, n) {
+  const s = td.decode(b.subarray(n.cs, n.end));
+  const m = n.tag === 0x17 ? s.match(/^(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)?Z$/) : s.match(/^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)?Z$/);
+  if (!m) return null;
+  const y = n.tag === 0x17 ? (+m[1] < 50 ? 2000 + +m[1] : 1900 + +m[1]) : +m[1];
+  return new Date(Date.UTC(y, +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0))).toISOString();
+}
+
+const KEY = { "1.2.840.10045.2.1": "ec", "1.2.840.113549.1.1.1": "rsa", "1.2.840.113549.1.1.10": "rsa-pss", "1.3.101.112": "ed25519" };
+const CURVE = { "1.2.840.10045.3.1.7": "P-256", "1.3.132.0.34": "P-384", "1.3.132.0.35": "P-521" };
+
+// An RSA-PSS key re-labelled as rsaEncryption, which is the only RSA form WebCrypto imports.
+function rsaSpki(b, keyBits) {
+  const bits = b.subarray(keyBits.start, keyBits.end);
+  const alg = Uint8Array.of(0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00);
+  return seq([alg, bits]);
+}
+
+function seq(parts) {
+  const len = parts.reduce((s, p) => s + p.length, 0);
+  const lenBytes = len < 128 ? [len] : len < 256 ? [0x81, len] : len < 65536 ? [0x82, len >> 8, len & 255] : [0x83, len >> 16, (len >> 8) & 255, len & 255];
+  const out = new Uint8Array(1 + lenBytes.length + len);
+  out[0] = 0x30; out.set(lenBytes, 1);
+  let o = 1 + lenBytes.length;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+
+// { subject, issuer, notBefore, notAfter, keyType, curve, spki, selfIssued } from DER bytes.
+function readCertificate(der) {
+  const b = der instanceof Uint8Array ? der : new Uint8Array(der);
+  const cert = tlv(b, 0), [tbs] = kids(b, cert);
+  let f = kids(b, tbs);
+  if (f[0].tag === 0xa0) f = f.slice(1);                 // explicit version
+  const [, , issuer, validity, subject, spkiNode] = f;
+  const [nb, na] = kids(b, validity);
+  const [algSeq, keyBits] = kids(b, spkiNode);
+  const [algOid, params] = kids(b, algSeq);
+  const keyType = KEY[oid(b, algOid)] || "unknown";
+  const out = {
+    subject: name(b, subject), issuer: name(b, issuer),
+    notBefore: time(b, nb), notAfter: time(b, na), keyType,
+    spki: keyType === "rsa-pss" ? rsaSpki(b, keyBits) : b.slice(spkiNode.start, spkiNode.end),
+  };
+  if (keyType === "ec" && params && params.tag === 0x06) out.curve = CURVE[oid(b, params)] || null;
+  out.selfIssued = JSON.stringify(out.subject) === JSON.stringify(out.issuer);
+  return out;
+}
+
+return { readCertificate };
+})();
+
+// ---- aimeta.js
+const M_aimeta = (() => {
+// Metadata outside Content Credentials that says how a file was made: the IPTC digital source type
+// in XMP, generator text that image tools write into PNG text chunks, and the EXIF Software and
+// Artist fields. It reads only what the file states; a file can be stripped or relabelled, and
+// most platforms strip all of this on upload.
+
+const { mediaFormat, jpegSegments, pngChunks, riffChunks } = M_jumbf;
+
+// IPTC NewsCodes digital source types (cv.iptc.org/newscodes/digitalsourcetype), in plain words.
+const SOURCE_TYPES = {
+  trainedAlgorithmicMedia: ["made with generative AI", "ai"],
+  compositeWithTrainedAlgorithmicMedia: ["includes generative AI elements", "ai"],
+  algorithmicallyEnhanced: ["enhanced by an algorithm", "edit"],
+  algorithmicMedia: ["made by an algorithm without training data", "synthetic"],
+  compositeSynthetic: ["a composite with synthetic elements", "synthetic"],
+  digitalArt: ["digital art made by a person", "art"],
+  digitalCapture: ["captured by a camera or recorder", "capture"],
+  computationalCapture: ["captured with computational processing", "capture"],
+  compositeCapture: ["a composite of captured elements", "capture"],
+  screenCapture: ["a screen capture", "capture"],
+  virtualRecording: ["a recording of a virtual scene", "synthetic"],
+  negativeFilm: ["scanned from negative film", "capture"], positiveFilm: ["scanned from positive film", "capture"],
+  print: ["scanned from a print", "capture"], humanEdits: ["edited by a person", "edit"], minorHumanEdits: ["minor edits by a person", "edit"],
+  dataDrivenMedia: ["generated from data", "synthetic"], composite: ["a composite", "edit"],
+};
+
+// "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia" -> { code, says, kind }
+function sourceType(uri) {
+  const code = String(uri || "").split("/").pop();
+  const t = SOURCE_TYPES[code];
+  return t ? { code, says: t[0], kind: t[1] } : code ? { code, says: code, kind: "other" } : null;
+}
+
+// Names of image and video generators that tools write into metadata. Case-insensitive.
+const GENERATORS = /\b(midjourney|dall[-·. ]?e|stable diffusion|sdxl|adobe firefly|firefly|imagen|gemini|made with google ai|novelai|leonardo\.?ai|ideogram|flux(?:\.1)?|comfyui|automatic1111|invokeai|bing image creator|microsoft designer|sora|runway|pika|kling|veo|dreamstudio|nightcafe|playground ai|krea)\b/i;
+const PNG_GEN_KEYS = new Set(["parameters", "prompt", "workflow", "invokeai_metadata", "sd-metadata", "dream", "generation_data"]);
+
+const latin1 = (b) => { let s = ""; for (let i = 0; i < b.length; i += 8192) s += String.fromCharCode(...b.subarray(i, i + 8192)); return s; };
+const utf8 = (b) => new TextDecoder().decode(b);
+
+// Text blocks in the file's metadata: [{ kind: "xmp"|"exif"|"text"|"comment", key, text }].
+function metadataBlocks(b) {
+  const f = mediaFormat(b), out = [];
+  if (f === "jpeg") {
+    for (const s of jpegSegments(b)) {
+      const head = latin1(s.data.subarray(0, 40));
+      if (s.marker === 0xe1 && head.startsWith("http://ns.adobe.com/xap/1.0/\0")) out.push({ kind: "xmp", text: utf8(s.data.subarray(29)) });
+      else if (s.marker === 0xe1 && head.startsWith("Exif\0")) out.push(...exifText(s.data.subarray(6)));
+      else if (s.marker === 0xfe) out.push({ kind: "comment", text: utf8(s.data) });
+    }
+  } else if (f === "png") {
+    for (const c of pngChunks(b)) {
+      if (c.type === "tEXt" || c.type === "iTXt") {
+        const z = c.data.indexOf(0), key = latin1(c.data.subarray(0, z));
+        let body = c.data.subarray(z + 1);
+        if (c.type === "iTXt") { if (body[0]) continue; let k = 2; for (let n = 0; n < 2; n++) k = body.indexOf(0, k) + 1; body = body.subarray(k); }
+        out.push(key === "XML:com.adobe.xmp" ? { kind: "xmp", text: utf8(body) } : { kind: "text", key, text: utf8(body) });
+      } else if (c.type === "eXIf") out.push(...exifText(c.data));
+    }
+  } else if (f === "webp") {
+    for (const c of riffChunks(b)) {
+      if (c.type === "XMP ") out.push({ kind: "xmp", text: utf8(c.data) });
+      else if (c.type === "EXIF") out.push(...exifText(c.data[0] === 0x45 ? c.data.subarray(6) : c.data));
+    }
+  }
+  return out;
+}
+
+const EXIF_TAGS = { 0x010e: "ImageDescription", 0x010f: "Make", 0x0110: "Model", 0x0131: "Software", 0x013b: "Artist" };
+
+// The text fields of EXIF IFD0 that name a device, a tool or an author.
+function exifText(t) {
+  try {
+    const le = t[0] === 0x49, r16 = (i) => (le ? t[i] | (t[i + 1] << 8) : (t[i] << 8) | t[i + 1]);
+    const r32 = (i) => (le ? (t[i] | (t[i + 1] << 8) | (t[i + 2] << 16)) + t[i + 3] * 16777216 : t[i] * 16777216 + ((t[i + 1] << 16) | (t[i + 2] << 8) | t[i + 3]));
+    const ifd = r32(4), n = r16(ifd), out = [];
+    for (let k = 0; k < n && k < 200; k++) {
+      const e = ifd + 2 + k * 12, tag = r16(e), type = r16(e + 2), count = r32(e + 4);
+      if (!EXIF_TAGS[tag] || type !== 2) continue;
+      const at = count <= 4 ? e + 8 : r32(e + 8);
+      const s = utf8(t.subarray(at, at + count)).replace(/\0+$/, "").trim();
+      if (s) out.push({ kind: "exif", key: EXIF_TAGS[tag], text: s.slice(0, 200) });
+    }
+    return out;
+  } catch { return []; }
+}
+
+// What the metadata says about how the file was made: { sourceTypes, generators, fields, any, remote },
+// where remote is the address of Content Credentials stored online (XMP dcterms:provenance).
+function aiMetadata(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const blocks = metadataBlocks(b), types = new Map(), gens = new Set(), fields = [];
+  let remote = null;
+  for (const k of blocks) {
+    if (k.kind === "xmp") {
+      for (const m of k.text.matchAll(/DigitalSourceType(?:="|>)\s*([^"<\s]+)/g)) { const t = sourceType(m[1]); if (t) types.set(t.code, t); }
+      const prov = k.text.match(/dcterms:provenance(?:="|>)\s*(https?:\/\/[^"<\s]+)/);
+      if (prov) remote = prov[1];
+      for (const m of k.text.matchAll(/(?:xmp:CreatorTool|tiff:Software)(?:="|>)([^"<]{1,120})/g)) fields.push({ key: "Creator tool (XMP)", text: m[1].trim() });
+    }
+    if (k.kind === "text" && PNG_GEN_KEYS.has(k.key.toLowerCase())) gens.add(`PNG text "${k.key}" holds image-generator settings`);
+    if (k.kind === "exif" || (k.kind === "text" && /^(software|source|comment|description)$/i.test(k.key))) fields.push({ key: k.key, text: k.text.slice(0, 160) });
+    const g = k.text.match(GENERATORS);
+    if (g && k.kind !== "xmp") gens.add(`${k.key || k.kind} names ${g[1]}`);
+  }
+  return { sourceTypes: [...types.values()], generators: [...gens], fields: fields.slice(0, 6), any: blocks.length > 0, remote };
+}
+
+return { SOURCE_TYPES, sourceType, metadataBlocks, aiMetadata };
+})();
+
+// ---- c2pa-verify.js
+const M_c2pa_verify = (() => {
+// Checks a C2PA manifest without a network call: the claim signature (COSE_Sign1 over the claim,
+// with the key in the signer's certificate), the hash of every assertion the claim lists, and the
+// hard binding that ties the claim to the file's bytes (c2pa.hash.data, or c2pa.hash.bmff for MP4).
+// Each check is { ok: true | false | null, text }: null means Radar could not check it here.
+// Not checked here: whether the certificate chains to a trusted issuer, revocation, and the
+// time-stamp authority's signature.
+
+const { cborDecode, cborEncode, bytesConcat } = M_cbor;
+const { bmffBoxes } = M_jumbf;
+const { readCertificate } = M_der;
+
+const HASH = { sha256: "SHA-256", sha384: "SHA-384", sha512: "SHA-512" };
+const subtle = () => (globalThis.crypto && globalThis.crypto.subtle) || null;
+const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+
+async function digest(alg, bytes) {
+  const name = HASH[alg || "sha256"];
+  if (!name || !subtle()) return null;
+  return new Uint8Array(await subtle().digest(name, bytes));
+}
+
+// Resolve a hashed URI ("self#jumbf=c2pa.assertions/x" or "self#jumbf=/c2pa/urn:.../x") to a box.
+function resolveUri(store, manifest, url) {
+  const path = String(url || "").replace(/^self#jumbf=/, "");
+  let box = manifest, parts = path.split("/").filter(Boolean);
+  if (path.startsWith("/") || path.startsWith("c2pa/")) { box = store.root; parts = parts.slice(1); }
+  for (const p of parts) {
+    box = (box.content || []).find((c) => c.type === "jumb" && c.label === p);
+    if (!box) return null;
+  }
+  return box;
+}
+
+// Every hashed URI in the claim, recomputed over the referenced box's contents (its header excluded).
+async function checkAssertions(store, manifest, claim) {
+  const refs = [...(claim.assertions || []), ...(claim.created_assertions || []), ...(claim.gathered_assertions || [])];
+  if (!refs.length) return { ok: null, text: "the claim lists no assertions" };
+  let bad = 0, missing = 0;
+  for (const r of refs) {
+    const box = resolveUri(store, manifest, r.url);
+    if (!box) { missing++; continue; }
+    const h = await digest(r.alg || claim.alg, store.buf.subarray(box.contentStart, box.end));
+    if (!h) return { ok: null, text: `hash algorithm ${r.alg || claim.alg} is not supported here` };
+    if (!same(h, r.hash)) bad++;
+  }
+  if (bad) return { ok: false, text: `${bad} of ${refs.length} assertions changed after signing` };
+  if (missing) return { ok: false, text: `${missing} of ${refs.length} assertions the claim lists are missing` };
+  return { ok: true, text: `all ${refs.length} assertions match the signed claim` };
+}
+
+const COSE = { "-7": ["ECDSA", "SHA-256"], "-35": ["ECDSA", "SHA-384"], "-36": ["ECDSA", "SHA-512"], "-37": ["RSA-PSS", "SHA-256", 32], "-38": ["RSA-PSS", "SHA-384", 48], "-39": ["RSA-PSS", "SHA-512", 64], "-8": ["Ed25519"] };
+const ALG_NAME = { "-7": "ES256", "-35": "ES384", "-36": "ES512", "-37": "PS256", "-38": "PS384", "-39": "PS512", "-8": "Ed25519" };
+
+// The COSE_Sign1 signature: { sign: check, cert, alg, timestamp }.
+async function checkSignature(sigBytes, claimBytes, claimVersion = 2) {
+  let s;
+  try { s = cborDecode(sigBytes); } catch { return { sign: { ok: false, text: "the signature cannot be read" } }; }
+  const arr = s && s.tag === 18 ? s.value : s;
+  if (!Array.isArray(arr) || arr.length !== 4) return { sign: { ok: false, text: "the signature is not a COSE_Sign1 structure" } };
+  const [protBytes, unprot, , sig] = arr;
+  const prot = protBytes && protBytes.length ? cborDecode(protBytes) : {};
+  const chain = prot["33"] || (unprot || {})["33"] || (unprot || {}).x5chain;
+  const leafDer = Array.isArray(chain) ? chain[0] : chain;
+  const algId = String(prot["1"]), alg = COSE[algId];
+  const out = { alg: ALG_NAME[algId] || algId, timestamp: !!(unprot && (unprot.sigTst || unprot.sigTst2)) };
+  if (!leafDer) return { ...out, sign: { ok: null, text: "the signature carries no certificate" } };
+  try { out.cert = readCertificate(leafDer); } catch { return { ...out, sign: { ok: false, text: "the signer's certificate cannot be read" } }; }
+  if (!alg || !subtle()) return { ...out, sign: { ok: null, text: `signature algorithm ${out.alg} is not supported here` } };
+  const tbs = cborEncode(["Signature1", protBytes, new Uint8Array(0), claimBytes]);
+  out.sign = await verifyWith(alg, out.cert, sig, tbs);
+  // C2PA 2.x puts the certificate in the signed header. A version 2 claim with the certificate
+  // outside it could have another certificate with the same key and a different name swapped in.
+  // Version 1 files did this routinely, and the 1.x specification allowed it.
+  if (out.sign.ok && !prot["33"] && claimVersion >= 2) out.sign = { ok: null, text: "the signature matches, but the certificate sits outside the signed part (an older format), so the name on it is not bound to the signature" };
+  return out;
+}
+
+async function verifyWith([name, hash, salt], cert, sig, tbs) {
+  try {
+    const params = name === "ECDSA" ? { name, namedCurve: cert.curve } : name === "RSA-PSS" ? { name, hash } : { name };
+    const key = await subtle().importKey("spki", cert.spki, params, false, ["verify"]);
+    const ok = await subtle().verify(name === "ECDSA" ? { name, hash } : name === "RSA-PSS" ? { name, saltLength: salt } : { name }, key, sig, tbs);
+    return ok ? { ok: true, text: "the signature matches the claim and the signer's certificate" } : { ok: false, text: "the signature does not match the claim: the claim was changed or signed by another key" };
+  } catch (e) {
+    return { ok: null, text: `this browser cannot check ${name} signatures (${String(e && e.message || e).slice(0, 60)})` };
+  }
+}
+
+// c2pa.hash.data: the file's bytes outside the exclusion ranges.
+async function checkDataHash(file, a, complete) {
+  if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
+  const parts = [];
+  let p = 0;
+  for (const e of [...(a.exclusions || [])].sort((x, y) => x.start - y.start)) {
+    if (e.start < p || e.start + e.length > file.length) return { ok: false, text: "the exclusion ranges do not fit this file" };
+    parts.push(file.subarray(p, e.start)); p = e.start + e.length;
+  }
+  parts.push(file.subarray(p));
+  const h = await digest(a.alg || "sha256", bytesConcat(parts));
+  if (!h) return { ok: null, text: `hash algorithm ${a.alg} is not supported here` };
+  return same(h, a.hash) ? { ok: true, text: "the file's bytes match the signed hash" } : { ok: false, text: "the file's bytes changed after signing" };
+}
+
+const u64 = (n) => { const o = new Uint8Array(8); new DataView(o.buffer).setBigUint64(0, BigInt(n)); return o; };
+
+// Container boxes whose children an exclusion path can name. meta is a FullBox (4 bytes first).
+const CONTAINERS = new Set(["moov", "trak", "mdia", "minf", "stbl", "edts", "dinf", "udta", "mvex", "moof", "traf", "mfra", "meta", "iprp", "ipco", "sinf", "schi"]);
+
+const b64 = (v) => (v instanceof Uint8Array ? v : typeof v === "string" ? Uint8Array.from(atob(v), (c) => c.charCodeAt(0)) : null);
+
+// A rule applies when its data, version and flags conditions hold for the box.
+function matches(file, box, rule) {
+  const ok = (rule.data || []).every((d) => { const v = b64(d.value); return v && same(file.subarray(box.start + d.offset, box.start + d.offset + v.length), v); });
+  if (!ok) return false;
+  const at = box.start + box.header;
+  if (rule.version != null && file[at] !== rule.version) return false;
+  if (rule.flags != null) {
+    const want = b64(rule.flags), have = file.subarray(at + 1, at + 4);
+    if (!want || want.length !== 3) return false;
+    if (rule.exact === false ? !want.every((x, i) => (have[i] & x) === x) : !same(have, want)) return false;
+  }
+  return true;
+}
+
+// The ranges a matching rule removes: the whole box, or its subsets (length 0 runs to the end).
+function rangesOf(box, rule, depth) {
+  if (!rule.subset) return [[box.start, box.end, depth, true]];
+  return rule.subset.map((x) => [Math.min(box.end, box.start + x.offset), x.length ? Math.min(box.end, box.start + x.offset + x.length) : box.end, depth, false]).filter(([a, c]) => c > a);
+}
+
+// Byte ranges excluded by xpath rules such as "/uuid" or "/moov/trak/mdia/minf/stbl/stco".
+function exclusionRanges(file, rules) {
+  const out = [];
+  const walk = (from, to, path, depth) => {
+    if (depth > 8) return;
+    for (const box of bmffBoxes(file, from, to)) {
+      const p = path + "/" + box.type;
+      const hit = rules.find((r) => r.xpath === p && matches(file, box, r));
+      if (hit) { out.push(...rangesOf(box, hit, depth)); if (!hit.subset) continue; }
+      if (CONTAINERS.has(box.type) && rules.some((r) => (r.xpath || "").startsWith(p + "/"))) walk(box.start + box.header + (box.type === "meta" ? 4 : 0), box.end, p, depth + 1);
+    }
+  };
+  walk(0, file.length, "", 0);
+  return out;
+}
+
+// c2pa.hash.bmff: the file without its excluded boxes; v2 and later put the 8-byte offset of each
+// top-level box that is hashed before it.
+async function checkBmffHash(file, a, label, complete) {
+  if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
+  const rules = a.exclusions || [];
+  if (!a.hash || a.merkle || rules.some((r) => !/^(\/[\w ]{4})+$/.test(r.xpath || ""))) {
+    return { ok: null, text: "this video uses a hash layout Radar does not check yet (fragments or partial exclusions)" };
+  }
+  const withOffsets = /\.v[2-9]$/.test(label), ex = exclusionRanges(file, rules);
+  const top = new Set(ex.filter((e) => e[2] === 0 && e[3]).map((e) => e[0]));
+  const parts = [];
+  for (const box of bmffBoxes(file)) {
+    if (top.has(box.start)) continue;
+    if (withOffsets) parts.push(u64(box.start));
+    let p = box.start;
+    for (const [s, e] of ex.filter((x) => !(x[2] === 0 && x[3]) && x[0] >= box.start && x[1] <= box.end).sort((x, y) => x[0] - y[0])) { parts.push(file.subarray(p, s)); p = e; }
+    parts.push(file.subarray(p, box.end));
+  }
+  const h = await digest(a.alg || "sha256", bytesConcat(parts));
+  if (!h) return { ok: null, text: `hash algorithm ${a.alg} is not supported here` };
+  return same(h, a.hash) ? { ok: true, text: "the video's bytes match the signed hash" } : { ok: false, text: "the video's bytes changed after signing" };
+}
+
+return { resolveUri, checkAssertions, checkSignature, checkDataHash, checkBmffHash };
+})();
+
+// ---- c2pa.js
+const M_c2pa = (() => {
+// Reads Content Credentials (C2PA 2.x manifests) from a media file's bytes and says what they claim
+// and which parts Radar could check. It never calls a file authentic: a valid credential shows who
+// signed a claim and that the file has not changed since, not that the claim is true. A missing
+// credential is the common case, because most platforms strip metadata on upload.
+
+const { cborDecode } = M_cbor;
+const { findManifestStore, parseStore, childByLabel } = M_jumbf;
+const { checkAssertions, checkSignature, checkDataHash, checkBmffHash } = M_c2pa_verify;
+const { sourceType, aiMetadata } = M_aimeta;
+
+const content = (box) => (box && box.content && box.content[0]) || null;
+function decodeBox(box) { const c = content(box); if (!c) return null; try { return c.type === "json" ? JSON.parse(new TextDecoder().decode(c.data)) : cborDecode(c.data); } catch { return null; } }
+const assertionsOf = (m) => (childByLabel(m, "c2pa.assertions") || {}).content || [];
+const base = (label) => String(label || "").replace(/__\d+$/, "");
+
+function generatorOf(claim) {
+  const g = claim.claim_generator_info;
+  const one = Array.isArray(g) ? g[0] : g;
+  if (one && one.name) return one.version ? `${one.name} ${one.version}` : one.name;
+  return claim.claim_generator ? String(claim.claim_generator).split(" ")[0].replace("/", " ") : null;
+}
+
+const agent = (a) => (!a ? null : typeof a === "string" ? a : [a.name, a.version].filter(Boolean).join(" ") || null);
+
+// What one manifest claims: actions, source types, generator, title and ingredients.
+function summarise(m) {
+  const claimBox = (m.content || []).find((c) => /^c2pa\.claim(\.v2)?$/.test(c.label));
+  const claim = decodeBox(claimBox) || {};
+  const actions = [], ingredients = [];
+  for (const a of assertionsOf(m)) {
+    const label = base(a.label), v = decodeBox(a);
+    if (!v) continue;
+    if (/^c2pa\.actions(\.v2)?$/.test(label)) for (const x of v.actions || []) actions.push({ action: x.action, source: sourceType(x.digitalSourceType), agent: agent(x.softwareAgent) });
+    if (/^c2pa\.ingredient/.test(label)) ingredients.push({ title: v["dc:title"] || v.title || null, relationship: v.relationship || null, manifest: ((v.activeManifest || v.c2pa_manifest || {}).url || "").match(/urn:[^/]+/)?.[0] || null });
+  }
+  return { label: m.label, claimBox, claim, title: claim["dc:title"] || null, generator: generatorOf(claim), actions, ingredients, version: claimBox && claimBox.label === "c2pa.claim.v2" ? 2 : 1 };
+}
+
+// The hard binding assertion of a manifest, checked against the file. An update manifest has
+// none of its own: the binding of the manifest it updates (its parentOf ingredient) applies.
+// Adding the update manifest grew the store, so the parent's exclusion range is retried as the
+// store's current place in the file: every byte outside the credentials is still compared.
+async function binding(file, m, complete, store, ranges, depth = 0) {
+  const s = summarise(m), parent = s.ingredients.find((x) => x.relationship === "parentOf");
+  if (!assertionsOf(m).some((a) => /^c2pa\.hash\./.test(base(a.label))) && parent && parent.manifest && depth < 4) {
+    const pm = store.manifests.find((x) => x.label === parent.manifest || (x.label || "").endsWith(parent.manifest));
+    if (pm && pm !== m) {
+      const b = await binding(file, pm, complete, store, ranges, depth + 1);
+      if (b.ok !== false || !ranges || !ranges.length) return b;
+      const v = decodeBox(assertionsOf(pm).find((a) => base(a.label) === "c2pa.hash.data"));
+      return v ? checkDataHash(file, { ...v, exclusions: [{ start: ranges[0][0], length: ranges[ranges.length - 1][1] - ranges[0][0] }] }, complete) : b;
+    }
+  }
+  for (const a of assertionsOf(m)) {
+    const label = base(a.label), v = decodeBox(a);
+    if (label === "c2pa.hash.data" && v) return checkDataHash(file, v, complete);
+    if (/^c2pa\.hash\.bmff/.test(label) && v) return checkBmffHash(file, v, label, complete);
+    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is not checked by Radar yet` };
+  }
+  return { ok: false, text: "the manifest has no hard binding to the file's bytes" };
+}
+
+async function signatureOf(store, m, s) {
+  const sigBox = childByLabel(m, "c2pa.signature");
+  if (!s.claimBox || !sigBox || !content(sigBox)) return { sign: { ok: false, text: "the claim or its signature is missing" } };
+  return checkSignature(content(sigBox).data, content(s.claimBox).data, s.version);
+}
+
+const isAi = (s) => s.actions.some((a) => a.source && a.source.kind === "ai");
+
+// The full reading for one file. complete: false when only the start of the file was read.
+async function readCredentials(bytes, { complete = true } = {}) {
+  const file = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const meta = aiMetadata(file);
+  let found;
+  try { found = findManifestStore(file); } catch { found = { format: null, store: null }; }
+  const out = { format: found.format, found: !!found.store, meta };
+  if (!found.store) return meta.remote ? { ...out, remote: meta.remote } : out;
+  let store;
+  try { store = parseStore(found.store); } catch { return { ...out, broken: "the Content Credentials in this file cannot be read" }; }
+  if (!store.manifests.length) return { ...out, broken: "the credential store holds no manifest" };
+  const active = store.manifests[store.manifests.length - 1], s = summarise(active);
+  const sig = await signatureOf(store, active, s);
+  const checks = {
+    signature: sig.sign,
+    assertions: await checkAssertions(store, active, s.claim),
+    binding: await binding(file, active, complete, store, found.ranges),
+  };
+  const earlier = [];
+  for (const m of store.manifests.slice(0, -1)) {
+    const e = summarise(m), es = await signatureOf(store, m, e);
+    earlier.push({ title: e.title, generator: e.generator, ai: isAi(e), signer: es.cert ? es.cert.subject : null, signature: es.sign });
+  }
+  return {
+    ...out, manifests: store.manifests.length,
+    active: { title: s.title, generator: s.generator, actions: s.actions, ingredients: s.ingredients, claimVersion: s.version, ai: isAi(s), alg: sig.alg, timestamp: sig.timestamp, cert: sig.cert || null },
+    checks, earlier, aiAnywhere: isAi(s) || earlier.some((e) => e.ai),
+  };
+}
+
+// The overall state, in words Radar can stand behind: "unchanged", "changed", "unchecked", "remote" or "none".
+function credentialState(r) {
+  if (r && !r.found && r.remote) return "remote";
+  if (!r || !r.found) return "none";
+  if (r.broken) return "changed";
+  const c = Object.values(r.checks || {});
+  if (c.some((x) => x.ok === false)) return "changed";
+  return c.every((x) => x.ok === true) ? "unchanged" : "unchecked";
+}
+
+return { readCredentials, credentialState };
+})();
+
+// ---- mediacheck.js
+const M_mediacheck = (() => {
+// Words for a media check: the rows the window shows for one file, and the signals it raises.
+// The wording never calls a file authentic or fake. Credentials record what the signing tool
+// declared; a valid signature shows who signed and that the file has not changed since.
+
+const { credentialState } = M_c2pa;
+
+const CREDENTIALS_DO_NOT_PROVE = "Credentials record what the signing tool declared. A valid signature shows who signed and that the file has not changed since, not that what it shows is true.";
+const NO_CREDENTIALS = "No Content Credentials found (platforms often strip them on upload). This says nothing about the file either way.";
+const TRUST = "Not checked against a trust list: anyone can make a certificate with any name on it.";
+
+const host = (u) => { try { return new URL(u).hostname; } catch { return "an address it names"; } };
+const who = (c) => (c ? [c.CN, c.O].filter(Boolean).filter((x, i, a) => a.indexOf(x) === i).join(", ") || "an unnamed signer" : "unknown");
+const failed = (r) => Object.values(r.checks || {}).filter((c) => c.ok === false).map((c) => c.text);
+const open = (r) => Object.values(r.checks || {}).filter((c) => c.ok === null).map((c) => c.text);
+
+function made(r) {
+  const a = (r.active.actions || []).find((x) => x.source) || (r.active.actions || [])[0];
+  if (!a) return null;
+  const how = a.source ? `${a.source.says} (${a.source.code})` : a.action;
+  return a.agent ? `${how}, by ${a.agent}` : how;
+}
+
+// Rows for the card: [label, text] pairs. r is readCredentials() output, or an error state.
+function credentialRows(r) {
+  if (!r) return [];
+  if (r.error) return [["Content Credentials", r.error]];
+  const rows = [], state = credentialState(r);
+  if (state === "none") rows.push(["Content Credentials", NO_CREDENTIALS]);
+  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}. Radar does not fetch them, so nothing was checked.`]);
+  else if (r.broken) rows.push(["Content Credentials", `found, but ${r.broken}`]);
+  else {
+    rows.push(["Content Credentials", state === "unchanged" ? "found and checked: the file has not changed since it was signed"
+      : state === "changed" ? `found, but they no longer match: ${failed(r).join("; ")}` : `found; not every part could be checked here: ${open(r).join("; ")}`]);
+    rows.push(["Signed by", `${who(r.active.cert && r.active.cert.subject)} (${r.active.alg || "unknown algorithm"}). ${TRUST}`]);
+    if (r.active.cert && r.active.cert.issuer && !r.active.cert.selfIssued) rows.push(["Certificate from", who(r.active.cert.issuer)]);
+    if (r.active.cert && r.active.cert.notAfter) rows.push(["Certificate dates", `${r.active.cert.notBefore.slice(0, 10)} to ${r.active.cert.notAfter.slice(0, 10)}`]);
+    const m = made(r);
+    if (m) rows.push(["Says it was", m]);
+    if (r.active.generator) rows.push(["Signing tool", r.active.generator]);
+    for (const e of r.earlier || []) if (e.ai) rows.push(["Earlier version", `the credentials say an earlier version${e.title ? ` (${e.title})` : ""} was made with generative AI`]);
+    if (r.active.timestamp) rows.push(["Time-stamp", "attached; Radar does not check the time-stamp authority's signature"]);
+  }
+  for (const t of (r.meta && r.meta.sourceTypes) || []) rows.push(["Metadata says", `${t.says} (IPTC ${t.code})`]);
+  for (const g of (r.meta && r.meta.generators) || []) rows.push(["Generator metadata", g]);
+  for (const f of (r.meta && r.meta.fields) || []) rows.push([f.key, f.text]);
+  if (state === "none" && r.meta && !r.meta.any) rows.push(["Other metadata", "none in the file; the platform probably removed it"]);
+  return rows;
+}
+
+const dnp = (t) => ["Does not prove", t];
+
+// Signals for the window: [{ label, fam, level, cat, rows }].
+function credentialSignals(r) {
+  if (!r || r.error) return [];
+  const out = [], state = credentialState(r);
+  if (r.found && r.aiAnywhere) {
+    out.push({ label: "credentials: made with AI", fam: "c2pa", level: "warn", cat: "media", rows: [["What Radar read", r.active.ai ? `The file's Content Credentials say it was ${made(r)}.` : "The credentials say an earlier version of this file was made with generative AI."], ["Signed by", who(r.active.cert && r.active.cert.subject)], ["Checks", state === "unchanged" ? "signature, assertions and file bytes all match" : state], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+  } else if (r.found && state === "unchanged") {
+    const m = made(r);
+    out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What Radar read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+  }
+  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Radar found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms can break credentials without any intent to mislead.")] });
+  const ai = ((r.meta && r.meta.sourceTypes) || []).find((t) => t.kind === "ai");
+  if (ai || ((r.meta && r.meta.generators) || []).length) {
+    out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What Radar read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
+  }
+  return out;
+}
+
+return { CREDENTIALS_DO_NOT_PROVE, NO_CREDENTIALS, credentialRows, credentialSignals };
+})();
+
+// ---- keyframes.js
+const M_keyframes = (() => {
+// Where to take frames from a video the page already loaded, for a reverse search of its frames.
+// Frames come from the part the browser has buffered, so taking them fetches nothing new where
+// the player allows; the window restores the playing position afterwards.
+
+// duration in seconds; buffered as [[start, end], ...]; n frames. Times rounded to 0.1 s.
+function keyframeTimes(duration, buffered, n = 4) {
+  const ranges = (buffered || []).map(([s, e]) => [Math.max(0, s), Number.isFinite(duration) ? Math.min(e, duration) : e]).filter(([s, e]) => e > s);
+  let lo, hi;
+  if (ranges.length) { lo = Math.min(...ranges.map((r) => r[0])); hi = Math.max(...ranges.map((r) => r[1])); }
+  else if (Number.isFinite(duration) && duration > 0) { lo = 0; hi = duration; }
+  else return [];
+  const span = hi - lo, k = Math.max(1, n);
+  const out = [];
+  for (let i = 0; i < k; i++) out.push(Math.round((lo + span * (k === 1 ? 0.5 : 0.1 + (0.8 * i) / (k - 1))) * 10) / 10);
+  return [...new Set(out)];
+}
+
+return { keyframeTimes };
+})();
+
 // ---- settings.js
 const M_settings = (() => {
 // Radar's settings, in one normalised shape for the toolbar popup, the first-run and options pages
@@ -3303,7 +4176,7 @@ const M_families = (() => {
 const { MEASURED } = M_measured;
 const { TECHNIQUES, techniqueStatus } = M_persuasion;
 
-const D = "detector", P = "platform", T = "table";
+const D = "detector", P = "platform", T = "table", F = "file";
 const FAMILIES = [
   ["slur", "Slur or coded hate term", "language", D], ["stereotype", "Group stereotype", "language", D],
   ["dehumanise", "Dehumanising language", "language", D], ["violence", "Call for violence", "language", D],
@@ -3325,6 +4198,8 @@ const FAMILIES = [
   ["new-account", "New account", "account", D], ["name-changes", "Renamed", "account", D],
   ["default-handle", "Sign-up handle", "account", D], ["follow-pattern", "Follows many, few follow back", "account", D],
   ["low-karma", "Low karma for its age", "account", D],
+  ["c2pa", "Content Credentials", "media", F], ["c2pa-changed", "Credentials do not match", "media", F],
+  ["ai-metadata", "AI-generation metadata", "media", F],
 ].map(([id, name, area, kind]) => ({ id, name, area, kind }));
 // Persuasion techniques sit in the Language area. Their measured line comes from techniqueStatus.
 const TECH = "technique";
@@ -3346,6 +4221,7 @@ const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.
 function measuredLine(id, table = MEASURED) {
   const f = BY_ID.get(id);
   if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Radar detector" };
+  if (f && f.kind === F) return { measured: false, text: "what the file itself declares; Radar checks the signature, not the claim" };
   if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
   if (f && f.kind === TECH) { const st = techniqueStatus(id); return { measured: st.shown, text: st.text }; }
   const r = (table || {})[id];
@@ -3485,5 +4361,5 @@ function joinClaims(main, parts = []) {
 return { CLAIMS_PART_MAX, splitClaims, joinClaims };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_measured, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_measured, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts });
 })();

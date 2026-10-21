@@ -57,6 +57,8 @@
     for (const sp of (m.trail && m.trail.media) || []) {
       if (sp.accounts >= 3) { out.push({ label: `same upload, ${sp.accounts} accounts`, fam: "same-upload", level: "flag", cat: "coordination", rows: [["What Radar sees", `This exact upload appears in ${sp.posts} posts by ${sp.accounts} accounts in what you have viewed, first posted by @${sp.first.handle} (${day(sp.first.at)}).`], ["Who", sp.sharers.map((h) => "@" + h).join(", ")], dnp("Popular videos get reposted widely by ordinary people. Many accounts on one upload shows spread, not who coordinated it.")] }); break; }
     }
+    // Content Credentials and AI metadata, once the user has checked a file in this post.
+    if (globalThis.PBMedia) for (const r of PBMedia.resultsFor(m.node, m.tweet)) out.push(...PB.credentialSignals(r));
     if (T.client && !PB.COMMON_CLIENTS.test(T.client)) out.push({ label: `via ${T.client}`, fam: "client", level: "flag", cat: "posting", rows: [["Source", "The app this post was sent from, in the data X loaded. X no longer shows it."], ["What it is", "Scheduling tools, automation services and custom apps post this way."], dnp("News desks, brands and many people schedule posts with tools like these.")] });
     if (m.paid) out.push({ label: "ad", fam: "ad", level: "flag", cat: "sources", rows: [["Source", "X labels this an ad or promoted post: someone paid for it to reach you."]] });
     const place = m.reading && m.reading.basedIn && (PB.parseLabel(m.reading.basedIn) || {}).country;

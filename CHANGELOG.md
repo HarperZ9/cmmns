@@ -6,6 +6,23 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- Media checks in the window, on click only. "Check this file" reads Content Credentials (C2PA 2.x
+  and 1.x manifests) from JPEG, PNG, WebP and MP4 files the page already loaded, with no library
+  and no network call beyond re-reading that file. It checks the claim signature (ES256, ES384,
+  ES512, PS256, PS384, PS512, Ed25519), every assertion hash and the hash that binds the claim to
+  the file's bytes, and shows who signed, which tool, and what the credentials say, such as "made
+  with generative AI (trainedAlgorithmicMedia)", including in earlier versions of an edited file.
+  It also reads IPTC digital source type in XMP, image-generator settings in PNG text and the EXIF
+  Software field. A file with none says "no Content Credentials found (platforms often strip
+  them)"; Radar never calls a file authentic. Three new families: Content Credentials,
+  Credentials do not match, and AI-generation metadata.
+- Video frames for reverse search, as InVID does: "Take 4 frames" copies frames from the loaded
+  part of the page's own video and restores playback; each frame has Google Lens, Bing, TinEye and
+  Yandex buttons that copy it to the clipboard and open the service, so nothing is sent until you
+  paste it.
+- "First seen" for each piece of media: the earliest post Radar has seen with the same upload, and
+  the "From @account" post X credits it to. Reverse search links now say that a click sends the
+  image address to that service.
 - Persuasion techniques: span-level cues for eleven techniques from the SemEval-2020 Task 11 and
   SemEval-2023 Task 3 taxonomy (loaded language, name calling, bandwagon, appeal to fear,
   flag-waving, thought-terminating cliche, whataboutism, black-and-white fallacy, doubt, appeal to
