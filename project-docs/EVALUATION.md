@@ -132,6 +132,90 @@ hit. Hindi violence and Arabic slurs: **not measured** (no hits on natural text)
   symmetry suites (`tests/rhetoric.{ar,ru,uk,zh,hi}.test.js`) hold every template to the same
   result across 19 to 26 targets from every direction, including each camp's coinages for the other.
 
+## Derived word lists: Hebrew, Turkish, Korean, Japanese, Persian, Indonesian, Hindi (test split, 2026-10-21)
+
+Nobody typed these lists. `scripts/derive-lexicon.mjs` picks every term from the dev split of the
+human-labelled corpora in `evidence/CORPORA.md` ("Hebrew, Turkish, Korean, Japanese, Persian,
+Indonesian, Hindi") and writes them to `src/core/lexicon-derived.js`. The dev statistics for each
+term are in `evidence/derived-lexicon.json`. `scripts/eval-derived.mjs` then read the test split
+once and wrote `evidence/derived-results.json`, the derived rows in `src/core/measured-langs.js` and
+the ship list. Same seed and split rule as above.
+
+Reproduce: download the corpora, then `node scripts/derive-lexicon.mjs` and
+`node scripts/eval-derived.mjs`. The derivation takes about three minutes.
+
+**Method.**
+1. Candidates. Words and pairs of neighbouring words for Hebrew, Turkish, Persian, Indonesian and
+   Hindi. Character 2- to 4-grams for Korean and Japanese, which do not mark word boundaries the
+   way the matcher needs; Korean n-grams must start a word (an eojeol), so a piece of an ordinary
+   word is never a candidate. A Turkish word longer than five letters counts by its first five,
+   matched with any ending. Each script has its own normal form (`src/core/rhetoric-derived.js`):
+   Hebrew points removed, Turkish dotted and dotless i lowercased the Turkish way, Japanese NFKC,
+   Persian yeh and kaf unified with the zero-width non-joiner kept, letters repeated three or more
+   times squeezed in Latin-script languages. Hebrew one-letter prefixes and Persian plural endings
+   attach to a term when it is matched.
+2. Weighted log-odds with an informative Dirichlet prior (Monroe, Colaresi and Quinn 2008), on
+   document frequencies, group hate against every other item. One pooled contrast and one per
+   labelled target with at least 30 hate items, each giving at most 80 candidates with z of at least
+   3.1, so no single target supplies the list.
+3. Filters, in order: a term that is or contains a plain group name, party, public figure or place
+   (`scripts/eval/derived-groups.mjs`) is dropped; a term that fires on more than two texts in other
+   languages (the English, French, Arabic, Russian, Ukrainian and Chinese corpora, and the other
+   derived languages) is dropped; a Korean term that appears in more than 1 in 2,000 Naver movie
+   reviews is dropped as ordinary vocabulary; a term must then reach the dev bar: at least five dev
+   items, and a Wilson lower bound on the share labelled group hate of at least 0.6 and at least
+   0.35 above the language's base rate.
+4. A term that contains a shorter kept term is dropped; terms are then taken round-robin across the
+   contrasts, up to 160.
+5. Only the slur family is derived. Grammar templates were not added: no corpus here supports a
+   template grammar with enough labelled cases.
+
+**The gate**, fixed before the test split was read: a language ships when its list was derived
+against a group-hate label, at least 20 of its signs fall on labelled natural text, and the Wilson
+lower bound of their precision against the corpus's hostile label is at least 0.7. HateCheck is
+measured, never derived from and never pooled.
+
+| Language | Terms | Test signs | Precision vs hostile (95% interval) | vs group hate | Result |
+|---|---|---|---|---|---|
+| Korean | 54 | 8,635 | 93.8% (93.3 to 94.3) | K-MHaS 90.0%, BEEP! 86.9% | ships |
+| Indonesian | 1 | 40 | 85.0% (70.9 to 92.9) | IDHSD 87.2% (34/39) | ships |
+| Japanese | 2 | 54 | 63.0% (49.6 to 74.6) | 74.1% (40/54) | held back: lower bound under 0.7 |
+| Hebrew | 3 | 99 | 96.0% (90.1 to 98.4) | no group label | held back: offensive-or-not labels only |
+| Hindi | 4 | 187 | 97.9% (94.6 to 99.2) | no group label | held back: offensive-or-not labels only |
+| Turkish | 0 | 0 | not measured | | held back: no term cleared the dev bar |
+| Persian | 0 | 0 | not measured | | held back: no term cleared the dev bar |
+
+Korean recall against group hate: K-MHaS 44.8% (7,626/17,032), BEEP! 13.7% (139/1,018). Per
+K-MHaS target: age 55.1%, gender 36.6%, origin 50.9%, politics 42.5%, race 25.0% (38/152), religion
+63.9%. Indonesian recall: IDHSD 26.0% (34/131), IndoDiscourse 0 of 380; the single term,
+"penista" (blasphemer), comes from the 2017 Jakarta election tweets in IDHSD and almost never
+appears in the 2023 to 2024 IndoDiscourse texts.
+
+Hebrew and Hindi clear 0.7 on the numbers, but their corpora mark only offensive versus not, so
+their lists hold insults and pronouns ("you", "dogs", "trash") rather than group slurs. Labelling
+those as slurs would misdescribe the post, so both are held back; see the author items in
+`evidence/CORPORA.md`. Turkish: TurkishHateMap's hate label sits almost entirely in its refugee
+topic and on topic words (asylum, border, war), none of which reached the bar. Persian: the
+strongest candidates were names of religious figures, which the name filter removes.
+
+What the window says: a Korean or Indonesian sign carries "Found by the Korean word list derived
+from labelled research data" with the number above. The held-back lists never run on a reply.
+
+### What these numbers do not prove
+- The Korean corpora are news comments; the Korean list was measured there, not on X or YouTube
+  replies. Words that cleared the bar because news comments use them in one sense, such as
+  "무능" (incompetent) or "추방" (deportation), may read differently elsewhere.
+- No corpus labels a target's political direction, so no side comparison was run. The Korean list
+  holds terms aimed in both directions (at progressives and at conservatives, at men and at
+  women), and the symmetry suite (`tests/rhetoric.derived.test.js`) holds every derived language to
+  the same result across 22 to 48 targets, but the share of each direction in the list follows the
+  corpus, not a quota.
+- Indonesian rests on one term and 40 test signs, from a 713-tweet corpus about one election.
+- Recall is partial everywhere. A reply in these languages with no badge has not been checked for
+  rhetoric the list does not hold.
+- The English, French and five-language numbers above are unchanged with the derived lists on:
+  `scripts/eval.mjs` and `scripts/eval-langs.mjs` give the same counts.
+
 ## Side comparison: closed on HateXplain, open on MHS
 Strong-family recall and precision on hostile text aimed at each side's usual targets (test split;
 group lists in `evidence/CORPORA.md`). "Before" is the release with the four language grammars;

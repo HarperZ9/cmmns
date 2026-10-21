@@ -1,0 +1,1222 @@
+{
+ "generated": "2026-10-21",
+ "split": "dev",
+ "seed": "radar-eval-2026-10-21",
+ "params": {
+  "Z_MIN": 3.1,
+  "MIN_POS": 5,
+  "PER_CONTRAST": 80,
+  "MIN_TARGET": 30,
+  "BAR_HITS": 5,
+  "BAR_LOW": 0.6,
+  "BAR_LIFT": 0.35,
+  "FOREIGN_MAX": 2,
+  "REF_MAX": 0.0005,
+  "MAX_TERMS": 160,
+  "A0": 500
+ },
+ "inputs": [
+  {
+   "file": "prepared/derive-olah.jsonl",
+   "sha256": "e51c9528114a7f82deed2d945e4077a3d13c54aa66af41b2729ccfc94640af92"
+  },
+  {
+   "file": "prepared/derive-offenseval-tr.jsonl",
+   "sha256": "e489493ba945c0712961477e6e624b948d8c0dcf0906ac1436203a2a9c2c5ec8"
+  },
+  {
+   "file": "prepared/derive-hatemap-tr.jsonl",
+   "sha256": "67d6dba961ca7e170d1660c2e0dde9a1fd2cbf89644f9eb9b54e25d5e16dc0d4"
+  },
+  {
+   "file": "prepared/derive-kmhas.jsonl",
+   "sha256": "ecc6d2491a98103340c41107bbc47c21f9423ce3c86dad5801216be1c8e0e966"
+  },
+  {
+   "file": "prepared/derive-beep.jsonl",
+   "sha256": "3007f66b15a4d664ccc73fb60f5e0002ae1f254f563980f0f8b91f7119a4f772"
+  },
+  {
+   "file": "prepared/derive-llmjp.jsonl",
+   "sha256": "e278b71a79602949227646c78f6bd759aafb0b6c90e10d4b232477ec9d8f4d9f"
+  },
+  {
+   "file": "prepared/derive-inspection-ja.jsonl",
+   "sha256": "fcd7d57f085fbf9b5266aac98e28bcf88ec2f967eb41fae89af3de74c0a617ff"
+  },
+  {
+   "file": "prepared/derive-persian-off.jsonl",
+   "sha256": "f9d55a8db2f086260b0319ae268167f29c9673d87de33331591a647a3190e80d"
+  },
+  {
+   "file": "prepared/derive-indodiscourse.jsonl",
+   "sha256": "a70d1cf188829e02426e66edc390ba0cb03c47caf130d3e3f61fd326edd85c26"
+  },
+  {
+   "file": "prepared/derive-idhsd.jsonl",
+   "sha256": "e874a2ab78cbf97e0fa8ca52b3895ce5a46061f094d6284f05767ebc24b9e695"
+  },
+  {
+   "file": "prepared/derive-nsmc.jsonl",
+   "sha256": "0b71a659160efe246fcb384b15af263aaf6460ab7bd81d5c9e088c457e180312"
+  }
+ ],
+ "languages": {
+  "he": {
+   "basis": "hostile",
+   "bar": 0.758,
+   "dev": {
+    "items": 1005,
+    "positive": 410
+   },
+   "contrasts": [
+    {
+     "name": "all",
+     "candidates": 4
+    }
+   ],
+   "dropped": {
+    "group": 0,
+    "foreign": 0,
+    "reference": 0,
+    "bar": 1
+   },
+   "terms": [
+    {
+     "term": "זונה",
+     "contrast": "all",
+     "z": 5.37,
+     "dev": {
+      "k": 68,
+      "n": 68,
+      "value": 1,
+      "ci": [
+       0.947,
+       1
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "זבל",
+     "contrast": "all",
+     "z": 3.85,
+     "dev": {
+      "k": 35,
+      "n": 36,
+      "value": 0.972,
+      "ci": [
+       0.858,
+       0.995
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "נפש",
+     "contrast": "all",
+     "z": 3.64,
+     "dev": {
+      "k": 20,
+      "n": 21,
+      "value": 0.952,
+      "ci": [
+       0.773,
+       0.992
+      ]
+     },
+     "foreign": 0
+    }
+   ]
+  },
+  "tr": {
+   "basis": "group",
+   "bar": 0.6,
+   "dev": {
+    "items": 26089,
+    "positive": 784
+   },
+   "contrasts": [
+    {
+     "name": "all",
+     "candidates": 80
+    },
+    {
+     "name": "refugees",
+     "candidates": 80
+    }
+   ],
+   "dropped": {
+    "group": 18,
+    "foreign": 5,
+    "reference": 0,
+    "bar": 59
+   },
+   "terms": []
+  },
+  "ko": {
+   "basis": "group",
+   "bar": 0.658,
+   "dev": {
+    "items": 59028,
+    "positive": 18210
+   },
+   "contrasts": [
+    {
+     "name": "all",
+     "candidates": 80
+    },
+    {
+     "name": "age",
+     "candidates": 80
+    },
+    {
+     "name": "gender",
+     "candidates": 80
+    },
+    {
+     "name": "origin",
+     "candidates": 80
+    },
+    {
+     "name": "politics",
+     "candidates": 80
+    },
+    {
+     "name": "race",
+     "candidates": 21
+    },
+    {
+     "name": "religion",
+     "candidates": 80
+    }
+   ],
+   "dropped": {
+    "group": 66,
+    "foreign": 1,
+    "reference": 52,
+    "bar": 139
+   },
+   "terms": [
+    {
+     "term": "틀딱",
+     "contrast": "all",
+     "z": 25.5,
+     "dev": {
+      "k": 1489,
+      "n": 1520,
+      "value": 0.98,
+      "ci": [
+       0.971,
+       0.986
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "조센",
+     "contrast": "origin",
+     "z": 11.95,
+     "dev": {
+      "k": 104,
+      "n": 111,
+      "value": 0.937,
+      "ci": [
+       0.876,
+       0.969
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "예수쟁",
+     "contrast": "religion",
+     "z": 11.8,
+     "dev": {
+      "k": 85,
+      "n": 88,
+      "value": 0.966,
+      "ci": [
+       0.905,
+       0.988
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "종북",
+     "contrast": "politics",
+     "z": 11.16,
+     "dev": {
+      "k": 63,
+      "n": 79,
+      "value": 0.797,
+      "ci": [
+       0.696,
+       0.871
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "나이값",
+     "contrast": "age",
+     "z": 10.14,
+     "dev": {
+      "k": 41,
+      "n": 49,
+      "value": 0.837,
+      "ci": [
+       0.71,
+       0.915
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "꼴페",
+     "contrast": "gender",
+     "z": 9.97,
+     "dev": {
+      "k": 64,
+      "n": 69,
+      "value": 0.928,
+      "ci": [
+       0.841,
+       0.969
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "한남",
+     "contrast": "all",
+     "z": 16.86,
+     "dev": {
+      "k": 340,
+      "n": 375,
+      "value": 0.907,
+      "ci": [
+       0.873,
+       0.932
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "쪽바",
+     "contrast": "origin",
+     "z": 10.82,
+     "dev": {
+      "k": 425,
+      "n": 427,
+      "value": 0.995,
+      "ci": [
+       0.983,
+       0.999
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "광신",
+     "contrast": "religion",
+     "z": 8.58,
+     "dev": {
+      "k": 26,
+      "n": 31,
+      "value": 0.839,
+      "ci": [
+       0.674,
+       0.929
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "무능",
+     "contrast": "politics",
+     "z": 10.24,
+     "dev": {
+      "k": 64,
+      "n": 77,
+      "value": 0.831,
+      "ci": [
+       0.732,
+       0.899
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "틀니",
+     "contrast": "age",
+     "z": 10.1,
+     "dev": {
+      "k": 73,
+      "n": 77,
+      "value": 0.948,
+      "ci": [
+       0.874,
+       0.98
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "여적",
+     "contrast": "gender",
+     "z": 9.4,
+     "dev": {
+      "k": 56,
+      "n": 67,
+      "value": 0.836,
+      "ci": [
+       0.729,
+       0.906
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "사이비",
+     "contrast": "all",
+     "z": 16.26,
+     "dev": {
+      "k": 301,
+      "n": 379,
+      "value": 0.794,
+      "ci": [
+       0.751,
+       0.832
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "나라로",
+     "contrast": "origin",
+     "z": 9.04,
+     "dev": {
+      "k": 43,
+      "n": 51,
+      "value": 0.843,
+      "ci": [
+       0.72,
+       0.918
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "정신병자",
+     "contrast": "religion",
+     "z": 8.57,
+     "dev": {
+      "k": 55,
+      "n": 71,
+      "value": 0.775,
+      "ci": [
+       0.665,
+       0.856
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "나베",
+     "contrast": "politics",
+     "z": 8.94,
+     "dev": {
+      "k": 49,
+      "n": 55,
+      "value": 0.891,
+      "ci": [
+       0.782,
+       0.949
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "늙다",
+     "contrast": "age",
+     "z": 9.21,
+     "dev": {
+      "k": 40,
+      "n": 45,
+      "value": 0.889,
+      "ci": [
+       0.765,
+       0.952
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "달창",
+     "contrast": "gender",
+     "z": 8.07,
+     "dev": {
+      "k": 167,
+      "n": 170,
+      "value": 0.982,
+      "ci": [
+       0.949,
+       0.994
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "빨갱",
+     "contrast": "all",
+     "z": 14.86,
+     "dev": {
+      "k": 331,
+      "n": 348,
+      "value": 0.951,
+      "ci": [
+       0.923,
+       0.969
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "개한",
+     "contrast": "origin",
+     "z": 8.94,
+     "dev": {
+      "k": 53,
+      "n": 61,
+      "value": 0.869,
+      "ci": [
+       0.762,
+       0.932
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "사회악",
+     "contrast": "religion",
+     "z": 7.88,
+     "dev": {
+      "k": 33,
+      "n": 39,
+      "value": 0.846,
+      "ci": [
+       0.703,
+       0.928
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "매국",
+     "contrast": "politics",
+     "z": 8.84,
+     "dev": {
+      "k": 65,
+      "n": 78,
+      "value": 0.833,
+      "ci": [
+       0.735,
+       0.9
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "맘충",
+     "contrast": "age",
+     "z": 8,
+     "dev": {
+      "k": 157,
+      "n": 160,
+      "value": 0.981,
+      "ci": [
+       0.946,
+       0.994
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "쿵쾅",
+     "contrast": "all",
+     "z": 14.64,
+     "dev": {
+      "k": 238,
+      "n": 286,
+      "value": 0.832,
+      "ci": [
+       0.785,
+       0.871
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "왜구",
+     "contrast": "origin",
+     "z": 8.84,
+     "dev": {
+      "k": 63,
+      "n": 71,
+      "value": 0.887,
+      "ci": [
+       0.793,
+       0.942
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "추방",
+     "contrast": "religion",
+     "z": 7.57,
+     "dev": {
+      "k": 37,
+      "n": 45,
+      "value": 0.822,
+      "ci": [
+       0.687,
+       0.907
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "노망",
+     "contrast": "age",
+     "z": 7.94,
+     "dev": {
+      "k": 36,
+      "n": 39,
+      "value": 0.923,
+      "ci": [
+       0.797,
+       0.973
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "재앙",
+     "contrast": "all",
+     "z": 13.9,
+     "dev": {
+      "k": 234,
+      "n": 257,
+      "value": 0.911,
+      "ci": [
+       0.869,
+       0.94
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "종특",
+     "contrast": "origin",
+     "z": 8.74,
+     "dev": {
+      "k": 49,
+      "n": 58,
+      "value": 0.845,
+      "ci": [
+       0.731,
+       0.916
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "쓰레기들",
+     "contrast": "religion",
+     "z": 6.98,
+     "dev": {
+      "k": 69,
+      "n": 80,
+      "value": 0.863,
+      "ci": [
+       0.77,
+       0.921
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "노땅",
+     "contrast": "age",
+     "z": 7.86,
+     "dev": {
+      "k": 25,
+      "n": 30,
+      "value": 0.833,
+      "ci": [
+       0.664,
+       0.927
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "일베",
+     "contrast": "all",
+     "z": 13.84,
+     "dev": {
+      "k": 237,
+      "n": 320,
+      "value": 0.741,
+      "ci": [
+       0.69,
+       0.786
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "북괴",
+     "contrast": "origin",
+     "z": 8.18,
+     "dev": {
+      "k": 42,
+      "n": 53,
+      "value": 0.792,
+      "ci": [
+       0.665,
+       0.88
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "대깨",
+     "contrast": "age",
+     "z": 7.85,
+     "dev": {
+      "k": 239,
+      "n": 241,
+      "value": 0.992,
+      "ci": [
+       0.97,
+       0.998
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "꼰대",
+     "contrast": "all",
+     "z": 13.66,
+     "dev": {
+      "k": 209,
+      "n": 257,
+      "value": 0.813,
+      "ci": [
+       0.761,
+       0.856
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "뇌가",
+     "contrast": "age",
+     "z": 7.74,
+     "dev": {
+      "k": 41,
+      "n": 48,
+      "value": 0.854,
+      "ci": [
+       0.728,
+       0.928
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "토착",
+     "contrast": "all",
+     "z": 13.65,
+     "dev": {
+      "k": 300,
+      "n": 313,
+      "value": 0.958,
+      "ci": [
+       0.93,
+       0.976
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "꼴통",
+     "contrast": "age",
+     "z": 7.74,
+     "dev": {
+      "k": 50,
+      "n": 55,
+      "value": 0.909,
+      "ci": [
+       0.804,
+       0.961
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "김치",
+     "contrast": "all",
+     "z": 13.32,
+     "dev": {
+      "k": 199,
+      "n": 229,
+      "value": 0.869,
+      "ci": [
+       0.819,
+       0.907
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "개독",
+     "contrast": "all",
+     "z": 13.23,
+     "dev": {
+      "k": 421,
+      "n": 429,
+      "value": 0.981,
+      "ci": [
+       0.964,
+       0.991
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "홍어",
+     "contrast": "all",
+     "z": 12.59,
+     "dev": {
+      "k": 211,
+      "n": 226,
+      "value": 0.934,
+      "ci": [
+       0.893,
+       0.959
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "짱깨",
+     "contrast": "all",
+     "z": 12.31,
+     "dev": {
+      "k": 553,
+      "n": 558,
+      "value": 0.991,
+      "ci": [
+       0.979,
+       0.996
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "메갈",
+     "contrast": "all",
+     "z": 11.86,
+     "dev": {
+      "k": 161,
+      "n": 204,
+      "value": 0.789,
+      "ci": [
+       0.728,
+       0.84
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "개돼",
+     "contrast": "all",
+     "z": 11.3,
+     "dev": {
+      "k": 145,
+      "n": 182,
+      "value": 0.797,
+      "ci": [
+       0.732,
+       0.849
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "좌빨",
+     "contrast": "all",
+     "z": 10.91,
+     "dev": {
+      "k": 257,
+      "n": 263,
+      "value": 0.977,
+      "ci": [
+       0.951,
+       0.99
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "짱개",
+     "contrast": "all",
+     "z": 10.83,
+     "dev": {
+      "k": 307,
+      "n": 312,
+      "value": 0.984,
+      "ci": [
+       0.963,
+       0.993
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "한녀",
+     "contrast": "all",
+     "z": 10.69,
+     "dev": {
+      "k": 145,
+      "n": 157,
+      "value": 0.924,
+      "ci": [
+       0.871,
+       0.956
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "계집",
+     "contrast": "all",
+     "z": 10.19,
+     "dev": {
+      "k": 119,
+      "n": 151,
+      "value": 0.788,
+      "ci": [
+       0.716,
+       0.846
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "꺼져",
+     "contrast": "all",
+     "z": 10.12,
+     "dev": {
+      "k": 129,
+      "n": 176,
+      "value": 0.733,
+      "ci": [
+       0.663,
+       0.793
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "친일",
+     "contrast": "all",
+     "z": 9.89,
+     "dev": {
+      "k": 120,
+      "n": 161,
+      "value": 0.745,
+      "ci": [
+       0.673,
+       0.806
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "문빠",
+     "contrast": "all",
+     "z": 9.82,
+     "dev": {
+      "k": 107,
+      "n": 128,
+      "value": 0.836,
+      "ci": [
+       0.762,
+       0.89
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "미개",
+     "contrast": "all",
+     "z": 9.58,
+     "dev": {
+      "k": 103,
+      "n": 127,
+      "value": 0.811,
+      "ci": [
+       0.734,
+       0.87
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "부들",
+     "contrast": "all",
+     "z": 9.45,
+     "dev": {
+      "k": 110,
+      "n": 148,
+      "value": 0.743,
+      "ci": [
+       0.667,
+       0.807
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "헬조",
+     "contrast": "all",
+     "z": 9.41,
+     "dev": {
+      "k": 102,
+      "n": 130,
+      "value": 0.785,
+      "ci": [
+       0.706,
+       0.847
+      ]
+     },
+     "foreign": 0
+    }
+   ]
+  },
+  "ja": {
+   "basis": "group",
+   "bar": 0.6,
+   "dev": {
+    "items": 2132,
+    "positive": 205
+   },
+   "contrasts": [
+    {
+     "name": "all",
+     "candidates": 80
+    }
+   ],
+   "dropped": {
+    "group": 26,
+    "foreign": 7,
+    "reference": 0,
+    "bar": 45
+   },
+   "terms": [
+    {
+     "term": "死ね",
+     "contrast": "all",
+     "z": 7.17,
+     "dev": {
+      "k": 29,
+      "n": 38,
+      "value": 0.763,
+      "ci": [
+       0.608,
+       0.87
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "反日",
+     "contrast": "all",
+     "z": 6.78,
+     "dev": {
+      "k": 28,
+      "n": 33,
+      "value": 0.848,
+      "ci": [
+       0.691,
+       0.933
+      ]
+     },
+     "foreign": 1
+    }
+   ]
+  },
+  "fa": {
+   "basis": "group",
+   "bar": 0.6,
+   "dev": {
+    "items": 18916,
+    "positive": 1435
+   },
+   "contrasts": [
+    {
+     "name": "all",
+     "candidates": 80
+    },
+    {
+     "name": "Guild",
+     "candidates": 45
+    },
+    {
+     "name": "Nationality",
+     "candidates": 31
+    },
+    {
+     "name": "Race&Ethnicity",
+     "candidates": 44
+    },
+    {
+     "name": "Religion",
+     "candidates": 80
+    }
+   ],
+   "dropped": {
+    "group": 55,
+    "foreign": 22,
+    "reference": 0,
+    "bar": 113
+   },
+   "terms": []
+  },
+  "id": {
+   "basis": "group",
+   "bar": 0.6,
+   "dev": {
+    "items": 12750,
+    "positive": 528
+   },
+   "contrasts": [
+    {
+     "name": "all",
+     "candidates": 80
+    }
+   ],
+   "dropped": {
+    "group": 18,
+    "foreign": 12,
+    "reference": 0,
+    "bar": 48
+   },
+   "terms": [
+    {
+     "term": "penista",
+     "contrast": "all",
+     "z": 11.49,
+     "dev": {
+      "k": 37,
+      "n": 42,
+      "value": 0.881,
+      "ci": [
+       0.75,
+       0.948
+      ]
+     },
+     "foreign": 0
+    }
+   ]
+  },
+  "hi": {
+   "basis": "hostile",
+   "bar": 0.85,
+   "dev": {
+    "items": 2500,
+    "positive": 1250
+   },
+   "contrasts": [
+    {
+     "name": "all",
+     "candidates": 49
+    }
+   ],
+   "dropped": {
+    "group": 6,
+    "foreign": 3,
+    "reference": 0,
+    "bar": 36
+   },
+   "terms": [
+    {
+     "term": "तुम",
+     "contrast": "all",
+     "z": 4.79,
+     "dev": {
+      "k": 71,
+      "n": 73,
+      "value": 0.973,
+      "ci": [
+       0.905,
+       0.992
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "कुत्ते",
+     "contrast": "all",
+     "z": 3.56,
+     "dev": {
+      "k": 41,
+      "n": 42,
+      "value": 0.976,
+      "ci": [
+       0.877,
+       0.996
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "धर्म",
+     "contrast": "all",
+     "z": 3.47,
+     "dev": {
+      "k": 38,
+      "n": 39,
+      "value": 0.974,
+      "ci": [
+       0.868,
+       0.995
+      ]
+     },
+     "foreign": 0
+    },
+    {
+     "term": "साले",
+     "contrast": "all",
+     "z": 3.23,
+     "dev": {
+      "k": 87,
+      "n": 87,
+      "value": 1,
+      "ci": [
+       0.958,
+       1
+      ]
+     },
+     "foreign": 0
+    }
+   ]
+  }
+ }
+}

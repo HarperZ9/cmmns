@@ -2413,6 +2413,151 @@ function scoreHi(hit, have) {
 return { prepHi, RE_HI, NEGATION_HI, scoreHi };
 })();
 
+// ---- lexicon-derived.js
+const M_lexicon_derived = (() => {
+// Word lists derived from human-labelled corpora by scripts/derive-lexicon.mjs (dev split only).
+// Generated; do not edit between the markers. Each language lists its "slur" terms and the label
+// they were derived against: "group" (hate aimed at a group) or "hostile" (the corpus has only an
+// offensive-or-not label). A term ending in "*" is a Turkish stem matched with any ending. How each
+// term was picked, with its dev counts: project-docs/evidence/derived-lexicon.json.
+
+// derived:begin (scripts/derive-lexicon.mjs)
+const DERIVED = {
+  he: {"basis":"hostile","slur":["זבל","זונה","נפש"]},
+  tr: {"basis":"group","slur":[]},
+  ko: {"basis":"group","slur":["개독","개돼","개한","계집","광신","김치","꺼져","꼰대","꼴통","꼴페","나라로","나베","나이값","노땅","노망","뇌가","늙다","달창","대깨","맘충","매국","메갈","무능","문빠","미개","부들","북괴","빨갱","사이비","사회악","쓰레기들","여적","예수쟁","왜구","일베","재앙","정신병자","조센","종북","종특","좌빨","짱개","짱깨","쪽바","추방","친일","쿵쾅","토착","틀니","틀딱","한남","한녀","헬조","홍어"]},
+  ja: {"basis":"group","slur":["反日","死ね"]},
+  fa: {"basis":"group","slur":[]},
+  id: {"basis":"group","slur":["penista"]},
+  hi: {"basis":"hostile","slur":["कुत्ते","तुम","धर्म","साले"]},
+};
+// derived:end
+
+// The languages whose list cleared the test-split gate in scripts/eval-derived.mjs. A language not
+// listed is held back: its list is kept for the record and never runs on a reply.
+// ship:begin (scripts/eval-derived.mjs)
+const DERIVED_SHIP = ["ko","id"];
+// ship:end
+
+return { DERIVED, DERIVED_SHIP };
+})();
+
+// ---- rhetoric-derived.js
+const M_rhetoric_derived = (() => {
+// Word lists derived from human-labelled corpora, for Hebrew, Turkish, Korean, Japanese, Persian,
+// Indonesian and Hindi. Nobody types these lists: scripts/derive-lexicon.mjs picks each term on the
+// dev split of the corpora in project-docs/evidence/CORPORA.md and writes lexicon-derived.js. This
+// file holds the Unicode handling both sides share, so a term is found in a reply exactly as it was
+// counted in the corpus.
+//   prepDerived(code, text)   the normal form a language's terms are counted and matched in
+//   candidates(code, text)    the terms a text offers to the derivation (words, word pairs, n-grams)
+//   compileTerms(code, list)  one regex for a list of terms
+// Korean and Japanese do not separate words with spaces the way the matcher needs, so they are
+// counted and matched as character n-grams. Turkish adds suffixes to a stem, so a long Turkish word
+// is counted by its first five letters and matched as that stem plus any ending.
+
+const { DERIVED, DERIVED_SHIP } = M_lexicon_derived;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// Hebrew points and cantillation; the maqaf, paseq and sof pasuq are punctuation and stay.
+const HE_MARKS = /[֑-ׇֽֿׁׂׅׄ]/g;
+// Arabic vowel signs and the tatweel, which Persian writers add or drop freely.
+const FA_MARKS = /[ً-ْٰـ]/g;
+// "anjiiing" and "anjing" are one word; three or more of a letter become one.
+const squeeze = (s) => s.replace(/(\p{L})\1{2,}/gu, "$1");
+
+const PREP = {
+  he: (s) => s.normalize("NFC").replace(HE_MARKS, "").toLowerCase(),
+  tr: (s) => squeeze(s.normalize("NFC").toLocaleLowerCase("tr")),
+  // NFC, not NFKC: NFKC would turn the jamo of "ㅅㅂ" into conjoining jamo.
+  ko: (s) => s.normalize("NFC").toLowerCase(),
+  // NFKC folds half-width katakana and full-width Latin.
+  ja: (s) => s.normalize("NFKC").toLowerCase(),
+  fa: (s) => s.normalize("NFC").replace(/[يى]/g, "ی").replace(/ك/g, "ک").replace(FA_MARKS, "").replace(/‌+/g, "‌").toLowerCase(),
+  id: (s) => squeeze(s.normalize("NFC").toLowerCase()),
+  hi: (s) => squeeze(s.normalize("NFC").toLowerCase()),
+};
+const DERIVED_CODES = Object.keys(PREP);
+const prepDerived = (code, s) => PREP[code](String(s || ""));
+
+// Character runs for the n-gram languages: Hangul syllables and jamo; kana, kanji and the long-vowel mark.
+const RUNS = { ko: /[ᄀ-ᇿ㄰-㆏가-힯]+/gu, ja: /[぀-ヿㇰ-ㇿ㐀-鿿ｦ-ﾟ々〆ー]+/gu };
+const NGRAM = [2, 4];
+// A word: letters, marks and digits, with the Persian zero-width non-joiner and the Hebrew geresh inside it.
+const WORD = /[\p{L}\p{M}\p{N}‌׳״']+/gu;
+const STEM = 5;
+const trim = (w) => w.replace(/^['‌]+|['‌]+$/g, "");
+const words = (s) => (s.match(WORD) || []).map(trim).filter((w) => w && !/^\p{N}+$/u.test(w));
+const unit = (code, w) => (code === "tr" && [...w].length > STEM ? [...w].slice(0, STEM).join("") + "*" : w);
+const longEnough = (w) => [...w.replace(/\*$/, "")].length >= 3;
+
+// Korean n-grams start a word (an eojeol: a stem with its particles), so "대들" inside "세대들"
+// (generations) is never a candidate. Japanese has no word spaces, so its n-grams start anywhere.
+const WORD_START = { ko: true };
+function ngrams(code, s) {
+  const out = new Set();
+  for (const run of s.match(RUNS[code]) || []) {
+    const ch = [...run], starts = WORD_START[code] ? 1 : ch.length;
+    for (let n = NGRAM[0]; n <= NGRAM[1]; n++) for (let i = 0; i < starts && i + n <= ch.length; i++) out.add(ch.slice(i, i + n).join(""));
+  }
+  return out;
+}
+
+// The terms a prepared text offers: each word (or Turkish stem) and each pair of neighbouring words.
+function candidates(code, prepared) {
+  if (RUNS[code]) return ngrams(code, prepared);
+  const w = words(prepared), out = new Set();
+  for (let i = 0; i < w.length; i++) {
+    const u = unit(code, w[i]);
+    if (longEnough(u)) out.add(u);
+    if (i + 1 < w.length) out.add(`${w[i]} ${w[i + 1]}`);
+  }
+  return out;
+}
+
+const B = "(?<![\\p{L}\\p{M}\\p{N}_])", E = "(?![\\p{L}\\p{M}\\p{N}_])";
+// Hebrew writes "and", "the", "in", "to", "from", "that" and "as" as one-letter prefixes.
+const PREFIX = { he: "(?:[והבלמשכ]{1,2})?" };
+// Persian plurals and the ezafe join with or without the zero-width non-joiner.
+const SUFFIX = { fa: "(?:\\u200c?(?:های|ها|ان|ی))?" };
+const altOf = (list) => [...new Set(list)].map((t) => esc(t).replace(/ /g, "\\s+")).sort((a, b) => b.length - a.length).join("|");
+
+// One regex for a list of terms, built the same way for the derivation and for replies.
+function compileTerms(code, list) {
+  if (!list.length) return null;
+  if (RUNS[code]) return new RegExp(`${WORD_START[code] ? `(?<!${RUNS[code].source.slice(0, -1)})` : ""}(?:${altOf(list)})`, "u");
+  const stems = list.filter((t) => t.endsWith("*")).map((t) => t.slice(0, -1)), exact = list.filter((t) => !t.endsWith("*"));
+  const parts = [];
+  if (exact.length) parts.push(`(?:${altOf(exact)})${SUFFIX[code] || ""}${E}`);
+  if (stems.length) parts.push(`(?:${altOf(stems)})[\\p{L}\\p{M}]*${E}`);
+  return new RegExp(`${B}${PREFIX[code] || ""}(?:${parts.join("|")})`, "u");
+}
+
+// The languages the evaluation let through (measured-langs.js), each with its compiled list.
+const COMPILED = new Map();
+function compiled(code) {
+  if (!COMPILED.has(code)) COMPILED.set(code, compileTerms(code, (DERIVED[code] && DERIVED[code].slur) || []));
+  return COMPILED.get(code);
+}
+
+// Hindi already has a written grammar under "hi"; its derived list reports as "hi-data".
+const markerCode = (code) => (code === "hi" ? "hi-data" : code);
+
+// A LANGUAGES entry for rhetoric.js. Only "slur" is derived: terms that cleared the dev bar against
+// each corpus's group-directed hate label.
+function derivedLanguage(code) {
+  return {
+    code: markerCode(code), report: true, negation: /(?!)/u, prep: (s) => prepDerived(code, s),
+    score: (hit, have) => { const re = compiled(code); if (re && !have.has("slur")) hit("slur", re, false); },
+  };
+}
+
+// The entries rhetoric.js runs: the shipped languages, or any list of codes (the evaluation runs all).
+const derivedLanguages = (codes = DERIVED_SHIP) => codes.map(derivedLanguage);
+
+return { DERIVED_CODES, prepDerived, candidates, compileTerms, markerCode, derivedLanguage, derivedLanguages };
+})();
+
 // ---- theories.js
 const M_theories = (() => {
 // Named conspiracy theories: an extension of the conspiracy family in rhetoric.js. The conspiracy
@@ -2577,6 +2722,7 @@ const { scoreRu, NEGATION_RU, prepRu } = M_rhetoric_ru;
 const { scoreUk, NEGATION_UK } = M_rhetoric_uk;
 const { scoreZh, NEGATION_ZH, prepZh } = M_rhetoric_zh;
 const { scoreHi, NEGATION_HI, prepHi } = M_rhetoric_hi;
+const { derivedLanguages } = M_rhetoric_derived;
 const { mentionedIntl } = M_rhetoric_mention;
 const { foldConfusables } = M_confusables;
 const { theoryMatches } = M_theories;
@@ -2689,6 +2835,9 @@ const LANGUAGES = [
   { code: "zh", report: true, score: scoreZh, negation: NEGATION_ZH, prep: prepZh },
   { code: "hi", report: true, score: scoreHi, negation: NEGATION_HI, prep: prepHi },
 ];
+// Word lists derived from labelled corpora (rhetoric-derived.js), only for the languages that
+// cleared the test-split gate. They run after the written grammars.
+const DERIVED_LANGUAGES = derivedLanguages();
 
 // A matcher that records a marker when `re` matches and, if negatable, the match has no negation.
 function recorder(s, markers) {
@@ -2719,8 +2868,9 @@ function scoreEnglish(s, hit) {
 }
 
 // Returns { score, markers: [{ family, match, lang? }], extreme }. lang: the code of the language
-// grammar that found the marker; absent for English.
-function score(text) {
+// grammar that found the marker; absent for English. opts.derived: derived-list codes to run in
+// place of the shipped ones (the evaluation passes every code).
+function score(text, opts = {}) {
   // Look-alike letters from other scripts are folded first (src/core/confusables.js).
   const s = foldConfusables(text).replace(/[’]/g, "'");
   const markers = [];
@@ -2729,7 +2879,7 @@ function score(text) {
   for (const t of theoryMatches(s)) {
     if (!mention(s, Object.assign([t.match], { index: t.index }))) markers.push({ family: "conspiracy-theory", theory: t.theory, match: t.match });
   }
-  for (const lang of LANGUAGES) {
+  for (const lang of [...LANGUAGES, ...(opts.derived ? derivedLanguages(opts.derived) : DERIVED_LANGUAGES)]) {
     const have = new Set(markers.map((m) => m.family));
     const on = lang.prep ? lang.prep(s) : s;
     const from = markers.length;
@@ -2819,7 +2969,8 @@ const M_measured_langs = (() => {
 // corpora listed for the language.
 
 const LANG_NAMES = { fr: "French", es: "Spanish", de: "German", pt: "Portuguese", it: "Italian", ar: "Arabic",
-  ru: "Russian", uk: "Ukrainian", zh: "Chinese", hi: "Hindi" };
+  ru: "Russian", uk: "Ukrainian", zh: "Chinese", hi: "Hindi", he: "Hebrew", tr: "Turkish", ko: "Korean", ja: "Japanese",
+  fa: "Persian", id: "Indonesian", "hi-data": "Hindi" };
 
 // langs:begin (scripts/eval-langs.mjs)
 const MEASURED_LANGS = {
@@ -2831,12 +2982,34 @@ const MEASURED_LANGS = {
 };
 // langs:end
 
+// The word lists derived from labelled corpora (lexicon-derived.js), measured on the test split by
+// scripts/eval-derived.mjs. ship: false means held back; the list never runs and the row records why.
+// derived:begin (scripts/eval-derived.mjs)
+const MEASURED_DERIVED = {
+  "he": {"precision":0.96,"low":0.901,"high":0.984,"n":99,"split":"test","sources":"OLaH","ship":false,"reason":"the corpora label offensive-or-not only, not group hate"},
+  "tr": {"precision":null,"low":null,"high":null,"n":0,"split":"test","sources":"OffensEval 2020 Turkish and TurkishHateMap","ship":false,"reason":"no term cleared the dev bar"},
+  "ko": {"precision":0.938,"low":0.933,"high":0.943,"n":8635,"split":"test","sources":"K-MHaS and BEEP!","ship":true},
+  "ja": {"precision":0.63,"low":0.496,"high":0.746,"n":54,"split":"test","sources":"LLM-jp Toxicity v2 and inspection-ai Japanese toxicity","ship":false,"reason":"lower bound 0.496 under 0.7"},
+  "fa": {"precision":null,"low":null,"high":null,"n":0,"split":"test","sources":"Persian Offensive Language","ship":false,"reason":"no term cleared the dev bar"},
+  "id": {"precision":0.85,"low":0.709,"high":0.929,"n":40,"split":"test","sources":"IndoDiscourse and IDHSD","ship":true},
+  "hi-data": {"precision":0.979,"low":0.946,"high":0.992,"n":187,"split":"test","sources":"TextDetox","ship":false,"reason":"the corpora label offensive-or-not only, not group hate"},
+};
+// derived:end
+
 const pc = (x) => Math.round(x * 100);
 // Fewer checked signs than this give an interval too wide to show as a number.
 const MIN_N = 20;
 
+// The line the window shows beside a marker a derived word list found.
+function derivedLine(code, r) {
+  const name = LANG_NAMES[code] || code;
+  return `Found by the ${name} word list derived from labelled research data. In ${name}, ${pc(r.precision)}% of these signs were on ` +
+    `text people labelled hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
+}
+
 // The line the window shows beside a marker a language grammar found.
 function langLine(code) {
+  if (MEASURED_DERIVED[code] && MEASURED_DERIVED[code].ship) return derivedLine(code, MEASURED_DERIVED[code]);
   const name = LANG_NAMES[code] || code;
   const r = MEASURED_LANGS[code];
   if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;
@@ -2845,7 +3018,7 @@ function langLine(code) {
     `hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
 }
 
-return { LANG_NAMES, MEASURED_LANGS, MIN_N, langLine };
+return { LANG_NAMES, MEASURED_LANGS, MEASURED_DERIVED, MIN_N, langLine };
 })();
 
 // ---- persuasion-cues.js
@@ -7260,5 +7433,5 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_trail, ...M_crosslang, ...M_flooding, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_trail, ...M_crosslang, ...M_flooding, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
 })();
