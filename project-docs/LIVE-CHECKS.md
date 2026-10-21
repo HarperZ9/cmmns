@@ -22,7 +22,7 @@ Claude in Chrome). The agent does not enter passwords.
 | 9 | One-click scan: the toolbar button scans, one minimised window is reused, it closes when idle | Click Radar on a post page | open |
 | 10 | X's VPN or proxy note wording on the About page | Find an account X marks; compare with `proxyNote` in src/core/about.js | open |
 | 11 | Live page data: X's GraphQL User objects (legacy or core fields) reach the content script via sniff.js | Open a post; account cards fill without a scan | open |
-| 12 | Automatic About data: AboutAccountQuery learned once, then repeated in the page; response carries `about_profile` | Open a post; watch "Reading About data automatically" count down | open |
+| 12 | Automatic About data: AboutAccountQuery learned once, then repeated in the page; response carries `about_profile` | Open a post; watch "Reading About data automatically" count down | pass 2026-10-21: on a 154-reply post the thread report read 19 of 19, then 24 of 24 accounts with no manual step; the hover window showed "Based in" and join month |
 | 13 | "Translated from", Parody/Commentary labels and the "Probable spam" heading as X shows them | Compare chips with the page | open |
 
 | 14 | YouTube comment data (`commentEntityPayload.author`, `properties.publishedTime`, `toolbar.likeCountNotliked`) reaches ytdata.js | Read a /youtubei/v1/next response on a watch page | pass 2026-10-18: 8 authors read from a replies response with channel id, likes and time; displayName carries the "@handle" the page shows |
@@ -33,3 +33,6 @@ Claude in Chrome). The agent does not enter passwords.
 | 19 | Feed mode: badges on home, profile, likes and search pages without slowing scrolling | Scroll a timeline for a minute | open |
 | 20 | YouTube "Altered or synthetic content" text in the page data | Open a video with the disclosure | open |
 | 21 | Reddit `/user/<name>/about.json` from the content script: same-origin fetch works, fields `created_utc`, `total_karma`, `has_verified_email` | Open a Reddit thread; check the window shows the account age | open |
+
+| 22 | Live rhetoric recall on a real thread | Open a political reply thread; compare the report's extreme count with a reading of the replies | 2026-10-21, before the fix: a 154-reply post about the riots in France; of 44 replies loaded, 26 were French that X had not translated, 16 English, 1 Chinese, 1 Spanish. The report said 0 extreme replies although one English reply proposed exterminating a group. Causes: violence grammar matched only the passive form, and no French markers. Fixed in `rhetoric.js` (active calls, carried-over fate) and `rhetoric-fr.js`, covered by `tests/rhetoric.recall.test.js`. Recheck on the same post after reloading the extension: open |
+| 23 | Hover window on live X | Hover a reply | pass 2026-10-21: area strip, tabs and "Compared with this thread" render; thread showed 10 of 19 accounts flagged, which needs a look at which flags fire (possible over-flagging) |

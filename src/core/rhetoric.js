@@ -11,6 +11,7 @@
 // the thread report, and the strong families also label the comment (never the person).
 
 import * as L from "./lexicon.js";
+import { scoreFr, NEGATION_FR } from "./rhetoric-fr.js";
 
 export const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -19,11 +20,18 @@ const word = (list) => new RegExp(`\\b(?:${alt(list)})\\b`, "i");
 // Slurs may start or end with symbols ("(((", "14/88"), so their edges are any non-word character.
 const edged = (list) => new RegExp(`(?:^|[^\\w])(?:${alt(list)})(?:$|[^\\w])`, "i");
 const G = alt(L.GROUPS);
+const CALL = "should|must|need to|needs to|have to|has to|let's|lets|let us|time to|gotta|got to|ought to|we will|we'll" +
+  "|we'd|we would|i'd|i would";
+const DET = "(?:the\\s+|these\\s+|those\\s+|our\\s+|their\\s+|your\\s+)?";
 
 const RE = {
   dehumanise: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,4}?\\W+(?:${alt(L.DEHUMANISE)})\\b|\\b(?:${alt(L.DEHUMANISE)})\\b(?:\\W+\\w+){0,3}?\\W+(?:like\\s+)?(?:these\\s+|those\\s+|the\\s+)?(?:${G})\\b`, "i"),
   violenceGroup: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,6}?\\W+(?:should|must|need to|needs to|deserve to|ought to|will)\\s+(?:all\\s+)?(?:be\\s+)?(?:${alt(L.VIOLENCE_VERBS)})\\b`, "i"),
   violenceSlogan: word(L.VIOLENT_SLOGANS),
+  // "we should exterminate the X", "let's kill all the X": a call with the group as the object
+  violenceCall: new RegExp(`\\b(?:${CALL})\\s+(?:just\\s+)?(?:${alt(L.KILL_VERBS)})\\s+(?:all\\s+(?:of\\s+)?|every one of\\s+|each of\\s+|every\\s+)?${DET}(?:${G})\\b`, "i"),
+  // "... the same fate for our X", counted only when the text names a killing (VIOLENT_STEM)
+  sameFate: new RegExp(`\\bsame fate\\s+(?:for|to|as)\\s+(?:all\\s+)?${DET}(?:${G})\\b`, "i"),
   // "the only good commie is a dead commie": the same word twice, any target
   onlyGoodDead: /\bthe only good (\w+) (?:is|are) (?:a )?dead \1\b/i,
   // "communists aren't people": denying a group is human. Matched before the negation filter,
@@ -43,6 +51,7 @@ const RE = {
 
 // "Immigrants are not animals" and "nobody should be killed" are the opposite of the marker.
 const NEGATION = /\b(?:not|never|no one|nobody|aren't|arent|isn't|isnt|shouldn't|shouldnt|don't|dont)\b/i;
+const VIOLENT_STEM = /\b(?:extermin|kill|massacr|slaughter|genocid|gass(?:ed|ing)|hang(?:ed|ing)|shoot|shot|lynch|wiped? out|wiping out|eradicat)/i;
 const unleet = (s) => s.replace(/[013457@$!]/g, (c) => L.LEET[c] || c);
 
 export const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, slur: 2, slurSoft: 1, stereotype: 2, motive: 1,
@@ -58,12 +67,15 @@ export function score(text) {
   const markers = [];
   const hit = (family, re, negatable = false, on = s) => {
     const m = on.match(re);
-    if (!m || (negatable && NEGATION.test(m[0]))) return false;
+    if (!m || (negatable && (NEGATION.test(m[0]) || NEGATION_FR.test(m[0])))) return false;
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
   if (!hit("dehumanise", RE.notHuman)) hit("dehumanise", RE.dehumanise, true);
-  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.warOn, true) && !hit("violence", RE.onlyGoodDead)) hit("violence", RE.violenceSlogan);
+  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.violenceCall, true) && !hit("violence", RE.warOn, true)
+    && !hit("violence", RE.onlyGoodDead) && !(VIOLENT_STEM.test(s) && hit("violence", RE.sameFate, true))) {
+    hit("violence", RE.violenceSlogan);
+  }
   hit("vigilante", RE.vigilante);
   if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s))) hit("slurSoft", RE.slurSoft);
   hit("stereotype", RE.stereotype, true);
@@ -71,6 +83,7 @@ export function score(text) {
   hit("essentialise", RE.essentialise, true);
   hit("conspiracy", RE.conspiracy);
   hit("absolutist", RE.absolutist);
+  scoreFr(hit, new Set(markers.map((m) => m.family)));
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };
 }

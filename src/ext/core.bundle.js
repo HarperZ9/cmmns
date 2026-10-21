@@ -548,7 +548,7 @@ const M_lexicon = (() => {
 // "all X are", "X want to destroy") apply.
 const GROUPS = [
   // origin, faith, ethnicity, nationality
-  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "jews", "christians", "hindus", "sikhs", "atheists",
+  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "moslems", "jews", "christians", "hindus", "sikhs", "atheists",
   "arabs", "africans", "blacks", "black people", "whites", "white people", "asians", "latinos", "hispanics", "mexicans", "chinese",
   "indians", "pakistanis", "somalis", "haitians", "russians", "ukrainians", "americans", "europeans", "french", "roma", "natives",
   // faiths named as a whole, so "war on Islam" reads like "war on Muslims"
@@ -572,6 +572,10 @@ const DEHUMANISE = ["vermin", "rats", "cockroaches", "roaches", "parasites", "le
 // Physical harm only: deporting or jailing people under a law is a policy position, not a marker.
 const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed",
   "lynched", "beaten", "burned alive", "purged", "eliminated"];
+
+// Active calls: "we should exterminate X", "let's kill all the X". Physical harm only, as above.
+const KILL_VERBS = ["exterminate", "kill", "shoot", "hang", "gas", "lynch", "wipe out", "eradicate", "massacre",
+  "slaughter", "execute", "burn"];
 
 const VIOLENT_SLOGANS = ["helicopter rides", "day of the rope", "string them up", "line them up", "round them up",
   "hang them all", "kill them all", "deport them all", "send them all back", "nuke them", "nuke the bastards", "pull out the guns",
@@ -656,7 +660,98 @@ const LEET = { "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": 
 const HATRED_OBJECTS = ["beauty", "us", "the west", "western civilization", "our way of life", "our culture", "our freedom",
   "freedom", "christians", "jews", "muslims", "white people", "black people", "women", "america", "europe", "france"];
 
-return { GROUPS, DEHUMANISE, VIOLENCE_VERBS, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, MOTIVE_VERBS, SLURS, SLURS_SOFT, LEET, HATRED_OBJECTS };
+return { GROUPS, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, MOTIVE_VERBS, SLURS, SLURS_SOFT, LEET, HATRED_OBJECTS };
+})();
+
+// ---- lexicon-fr.js
+const M_lexicon_fr = (() => {
+// French word lists for the stance-neutral markers in rhetoric-fr.js. Same families and the same
+// rule as lexicon.js: a group named with marker grammar counts, disagreement and policy do not.
+// Accented and unaccented spellings are both listed, since replies often drop accents.
+
+const GROUPS_FR = [
+  // origine, religion, nationalité
+  "immigrés", "immigres", "migrants", "étrangers", "etrangers", "réfugiés", "refugies", "musulmans", "juifs", "chrétiens",
+  "chretiens", "arabes", "africains", "noirs", "blancs", "asiatiques", "maghrébins", "maghrebins", "roms", "gitans",
+  "turcs", "algériens", "algeriens", "marocains", "français", "francais",
+  // politique
+  "gauchistes", "gauchos", "fachos", "fascistes", "communistes", "nationalistes", "macronistes", "wokistes", "islamistes",
+  // classe, rôle, identité
+  "riches", "milliardaires", "patrons", "flics", "policiers", "manifestants", "émeutiers", "emeutiers", "journalistes",
+  "féministes", "feministes", "homosexuels", "trans", "femmes", "hommes",
+];
+
+const DEHUMANISE_FR = ["vermine", "rats", "cafards", "parasites", "animaux", "sauvages", "sous-hommes", "sous-humains",
+  "racaille", "racailles", "ordures", "déchets", "dechets", "porcs", "chiens", "singes", "bêtes", "betes", "cancer", "peste",
+  "gangrène", "gangrene", "cloportes", "nuisibles"];
+
+// Infinitives after "il faut", "on doit": physical harm only. Expelling or jailing is policy.
+const KILL_INF_FR = ["exterminer", "tuer", "fusiller", "pendre", "gazer", "massacrer", "éradiquer", "eradiquer", "buter",
+  "abattre", "brûler", "bruler", "lyncher", "flinguer", "liquider", "exécuter", "executer"];
+
+// Participles after "méritent d'être", "doivent être".
+const KILL_PP_FR = ["fusillés", "fusilles", "pendus", "exterminés", "extermines", "tués", "tues", "gazés", "gazes",
+  "massacrés", "massacres", "éliminés", "elimines", "abattus", "éradiqués", "eradiques", "brûlés", "brules", "lynchés",
+  "lynches", "exécutés", "executes"];
+
+const STEREOTYPE_TRAITS_FR = ["criminels", "voleurs", "violents", "sales", "terroristes", "violeurs", "délinquants",
+  "delinquants", "barbares", "dégénérés", "degeneres", "fainéants", "faineants", "menteurs", "pédophiles", "pedophiles",
+  "envahisseurs", "cons", "débiles", "debiles", "stupides"];
+
+const CONSPIRACY_FR = ["grand remplacement", "faux drapeau", "réveillez-vous", "reveillez-vous", "les médias vous cachent",
+  "les medias vous cachent", "on vous ment", "payés par soros", "payes par soros", "financés par soros", "finances par soros",
+  "financé par soros", "état profond", "etat profond", "nouvel ordre mondial"];
+
+// Pronoun slogans with no group named.
+const SLOGANS_FR = ["tous les buter", "il faut tous les tuer", "on va tous les buter", "tous les fusiller"];
+
+return { GROUPS_FR, DEHUMANISE_FR, KILL_INF_FR, KILL_PP_FR, STEREOTYPE_TRAITS_FR, CONSPIRACY_FR, SLOGANS_FR };
+})();
+
+// ---- rhetoric-fr.js
+const M_rhetoric_fr = (() => {
+// French grammar for the stance-neutral markers. JavaScript's \b treats accented letters as
+// non-word characters, so every boundary here is a Unicode letter lookaround with the "u" flag.
+// These run only for families the English grammar did not already find in the same text.
+
+const F = M_lexicon_fr;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const alt = (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|");
+const B = "(?<![\\p{L}\\p{N}_])", E = "(?![\\p{L}\\p{N}_])";
+const re = (src) => new RegExp(src, "iu");
+const G = alt(F.GROUPS_FR), D = alt(F.DEHUMANISE_FR);
+const FILL = "(?:\\s+[\\p{L}']+){0,3}?";
+const ART = "(?:les\\s+|ces\\s+|tous\\s+ces\\s+|des\\s+)?";
+
+const RE_FR = {
+  dehumanise: re(`${B}(?:${G})${E}${FILL}\\s+(?:sont|c'est|ce sont|restent)\\s+(?:tous\\s+|toutes\\s+|que\\s+)?` +
+    `(?:des\\s+|de la\\s+|de l'|du\\s+|une\\s+|un\\s+|d'|de\\s+)?(?:vraies?\\s+|vrais\\s+|sales\\s+)?(?:${D})${E}`),
+  dehumaniseOf: re(`${B}(?:ces|cette|ce|cet)\\s+(?:${D})\\s+(?:de\\s+|d')(?:${G})${E}`),
+  violenceCall: re(`${B}(?:il faut|faut|il faudrait|faudrait|il faudra|on doit|on devrait|on va|allons)\\s+` +
+    `(?:tous\\s+|toutes\\s+)?(?:${alt(F.KILL_INF_FR)})\\s+(?:tous\\s+|toutes\\s+)?${ART}(?:${G})${E}`),
+  violenceDeserve: re(`${B}(?:${G})${E}(?:\\s+[\\p{L}']+){0,4}?\\s+(?:doivent|devraient|méritent|meritent|mériteraient)` +
+    `\\s+(?:tous\\s+|toutes\\s+)?(?:d'être|d'etre|être|etre)\\s+(?:${alt(F.KILL_PP_FR)})${E}`),
+  violenceSlogan: re(`${B}(?:(?:mort aux|à mort les|a mort les)\\s+(?:${G})|${alt(F.SLOGANS_FR)})${E}`),
+  stereotype: re(`${B}(?:${G})${E}\\s+(?:sont|restent)\\s+(?:tous\\s+|toutes\\s+|juste\\s+|que\\s+|rien que\\s+)?` +
+    `(?:des\\s+|de\\s+)?(?:${alt(F.STEREOTYPE_TRAITS_FR)})${E}`),
+  conspiracy: re(`${B}(?:${alt(F.CONSPIRACY_FR)})${E}`),
+};
+
+// "ne sont pas des animaux", "jamais": the opposite of the marker.
+const NEGATION_FR = /(?<![\p{L}])(?:ne|n'|pas|jamais|aucun|aucune)(?![\p{L}])/iu;
+
+// Adds French markers through `hit(family, regex, negatable)` for families not yet in `have`.
+function scoreFr(hit, have) {
+  if (!have.has("dehumanise") && !hit("dehumanise", RE_FR.dehumanise, true)) hit("dehumanise", RE_FR.dehumaniseOf, true);
+  if (!have.has("violence") && !hit("violence", RE_FR.violenceCall, true) && !hit("violence", RE_FR.violenceDeserve, true)) {
+    hit("violence", RE_FR.violenceSlogan);
+  }
+  if (!have.has("stereotype")) hit("stereotype", RE_FR.stereotype, true);
+  if (!have.has("conspiracy")) hit("conspiracy", RE_FR.conspiracy);
+}
+
+return { RE_FR, NEGATION_FR, scoreFr };
 })();
 
 // ---- rhetoric.js
@@ -674,6 +769,7 @@ const M_rhetoric = (() => {
 // the thread report, and the strong families also label the comment (never the person).
 
 const L = M_lexicon;
+const { scoreFr, NEGATION_FR } = M_rhetoric_fr;
 
 const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -682,11 +778,18 @@ const word = (list) => new RegExp(`\\b(?:${alt(list)})\\b`, "i");
 // Slurs may start or end with symbols ("(((", "14/88"), so their edges are any non-word character.
 const edged = (list) => new RegExp(`(?:^|[^\\w])(?:${alt(list)})(?:$|[^\\w])`, "i");
 const G = alt(L.GROUPS);
+const CALL = "should|must|need to|needs to|have to|has to|let's|lets|let us|time to|gotta|got to|ought to|we will|we'll" +
+  "|we'd|we would|i'd|i would";
+const DET = "(?:the\\s+|these\\s+|those\\s+|our\\s+|their\\s+|your\\s+)?";
 
 const RE = {
   dehumanise: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,4}?\\W+(?:${alt(L.DEHUMANISE)})\\b|\\b(?:${alt(L.DEHUMANISE)})\\b(?:\\W+\\w+){0,3}?\\W+(?:like\\s+)?(?:these\\s+|those\\s+|the\\s+)?(?:${G})\\b`, "i"),
   violenceGroup: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,6}?\\W+(?:should|must|need to|needs to|deserve to|ought to|will)\\s+(?:all\\s+)?(?:be\\s+)?(?:${alt(L.VIOLENCE_VERBS)})\\b`, "i"),
   violenceSlogan: word(L.VIOLENT_SLOGANS),
+  // "we should exterminate the X", "let's kill all the X": a call with the group as the object
+  violenceCall: new RegExp(`\\b(?:${CALL})\\s+(?:just\\s+)?(?:${alt(L.KILL_VERBS)})\\s+(?:all\\s+(?:of\\s+)?|every one of\\s+|each of\\s+|every\\s+)?${DET}(?:${G})\\b`, "i"),
+  // "... the same fate for our X", counted only when the text names a killing (VIOLENT_STEM)
+  sameFate: new RegExp(`\\bsame fate\\s+(?:for|to|as)\\s+(?:all\\s+)?${DET}(?:${G})\\b`, "i"),
   // "the only good commie is a dead commie": the same word twice, any target
   onlyGoodDead: /\bthe only good (\w+) (?:is|are) (?:a )?dead \1\b/i,
   // "communists aren't people": denying a group is human. Matched before the negation filter,
@@ -706,6 +809,7 @@ const RE = {
 
 // "Immigrants are not animals" and "nobody should be killed" are the opposite of the marker.
 const NEGATION = /\b(?:not|never|no one|nobody|aren't|arent|isn't|isnt|shouldn't|shouldnt|don't|dont)\b/i;
+const VIOLENT_STEM = /\b(?:extermin|kill|massacr|slaughter|genocid|gass(?:ed|ing)|hang(?:ed|ing)|shoot|shot|lynch|wiped? out|wiping out|eradicat)/i;
 const unleet = (s) => s.replace(/[013457@$!]/g, (c) => L.LEET[c] || c);
 
 const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, slur: 2, slurSoft: 1, stereotype: 2, motive: 1,
@@ -721,12 +825,15 @@ function score(text) {
   const markers = [];
   const hit = (family, re, negatable = false, on = s) => {
     const m = on.match(re);
-    if (!m || (negatable && NEGATION.test(m[0]))) return false;
+    if (!m || (negatable && (NEGATION.test(m[0]) || NEGATION_FR.test(m[0])))) return false;
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
   if (!hit("dehumanise", RE.notHuman)) hit("dehumanise", RE.dehumanise, true);
-  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.warOn, true) && !hit("violence", RE.onlyGoodDead)) hit("violence", RE.violenceSlogan);
+  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.violenceCall, true) && !hit("violence", RE.warOn, true)
+    && !hit("violence", RE.onlyGoodDead) && !(VIOLENT_STEM.test(s) && hit("violence", RE.sameFate, true))) {
+    hit("violence", RE.violenceSlogan);
+  }
   hit("vigilante", RE.vigilante);
   if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s))) hit("slurSoft", RE.slurSoft);
   hit("stereotype", RE.stereotype, true);
@@ -734,6 +841,7 @@ function score(text) {
   hit("essentialise", RE.essentialise, true);
   hit("conspiracy", RE.conspiracy);
   hit("absolutist", RE.absolutist);
+  scoreFr(hit, new Set(markers.map((m) => m.family)));
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };
 }
@@ -1771,5 +1879,5 @@ const HISTORY_DOES_NOT_PROVE = "These totals cover only the threads you opened, 
 return { HISTORY_RETAIN_DAYS, snapshot, addSnapshot, summarize, HISTORY_DOES_NOT_PROVE };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state, ...M_trail, ...M_history });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state, ...M_trail, ...M_history });
 })();

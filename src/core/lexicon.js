@@ -8,7 +8,7 @@
 // "all X are", "X want to destroy") apply.
 export const GROUPS = [
   // origin, faith, ethnicity, nationality
-  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "jews", "christians", "hindus", "sikhs", "atheists",
+  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "moslems", "jews", "christians", "hindus", "sikhs", "atheists",
   "arabs", "africans", "blacks", "black people", "whites", "white people", "asians", "latinos", "hispanics", "mexicans", "chinese",
   "indians", "pakistanis", "somalis", "haitians", "russians", "ukrainians", "americans", "europeans", "french", "roma", "natives",
   // faiths named as a whole, so "war on Islam" reads like "war on Muslims"
@@ -32,6 +32,10 @@ export const DEHUMANISE = ["vermin", "rats", "cockroaches", "roaches", "parasite
 // Physical harm only: deporting or jailing people under a law is a policy position, not a marker.
 export const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed",
   "lynched", "beaten", "burned alive", "purged", "eliminated"];
+
+// Active calls: "we should exterminate X", "let's kill all the X". Physical harm only, as above.
+export const KILL_VERBS = ["exterminate", "kill", "shoot", "hang", "gas", "lynch", "wipe out", "eradicate", "massacre",
+  "slaughter", "execute", "burn"];
 
 export const VIOLENT_SLOGANS = ["helicopter rides", "day of the rope", "string them up", "line them up", "round them up",
   "hang them all", "kill them all", "deport them all", "send them all back", "nuke them", "nuke the bastards", "pull out the guns",
