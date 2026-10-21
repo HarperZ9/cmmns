@@ -25,6 +25,13 @@
     <div><h2>Accounts that keep appearing</h2><table id="recurring"><thead><tr><th>Account</th><th class="n">Threads</th></tr></thead><tbody></tbody></table></div>
     <div><h2>Uploads many accounts carried</h2><table id="uploads"><thead><tr><th>First posted by</th><th class="n">Accounts</th><th class="n">Posts</th></tr></thead><tbody></tbody></table></div>
   </section>
+  <section aria-labelledby="h-graph">
+    <h2 id="h-graph">Accounts that keep replying together</h2>
+    <p id="graph-note" class="muted"></p>
+    <svg id="graph" class="graph" aria-labelledby="h-graph"></svg>
+    <div id="graph-evidence" class="evidence" tabindex="-1" hidden></div>
+    <table id="graph-table" class="compact"><thead><tr><th scope="col">Account</th><th scope="col">Account</th><th scope="col" class="n">Threads together</th><th scope="col">Threads (evidence)</th></tr></thead><tbody></tbody></table>
+  </section>
   <section>
     <h2>Flagged accounts by day</h2>
     <p class="muted">Share of looked-up accounts with at least one authenticity flag, per day you used Radar.</p>
@@ -42,6 +49,7 @@
   <p id="caveat" class="muted foot"></p>
 </main>
 <script src="core.bundle.js"></script>
+<script src="history-graph.js"></script>
 <script src="history.js"></script>
 </body>
 </html>

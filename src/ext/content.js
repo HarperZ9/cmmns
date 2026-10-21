@@ -36,7 +36,8 @@
     const key = (r.writtenIn ? "t:" : "o:") + r.text;
     let a = memo.get(key);
     if (!a) {
-      a = { markers: PB.score(r.text).markers, persuasion: PB.persuasion(r.text), machine: machineOf(r) };
+      const sc = PB.score(r.text);
+      a = { markers: sc.markers, extreme: sc.extreme, persuasion: PB.persuasion(r.text), machine: machineOf(r) };
       if (memo.size > 3000) memo.clear();
       memo.set(key, a);
     }
@@ -95,7 +96,7 @@
       const an = analyse(r);
       models.push([r.node, { site, node: r.node, tweets, postId: r.id, threadKey, text: r.text, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), trail: PB.trailFor(tweets.get(r.id), tweets, PBLogs.trail()), yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, persuasion: an.persuasion, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, claims: PBLogs.claimsOf(r.id), reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, r.anchor]);
       // Without account readings a reply's flags are complete for what the site offers.
-      rows.push({ id: r.id, author: r.author, text: r.text, machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
+      rows.push({ id: r.id, author: r.author, text: r.text, extreme: an.extreme, techniques: an.persuasion.map((h) => h.technique), machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
     if (root) models.push([root.node, { site, node: root.node, tweets, postId: root.id, threadKey, text: root.text, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, PBLogs.trail()), claims: PBLogs.claimsOf(root.id), reading: cache[root.author.toLowerCase()] || (site.reading ? site.reading(root.author) : null), flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
     // Thread context for the window's comparison: median account age, labels and flags among the
@@ -114,7 +115,7 @@
     lastPending = pending;
     icon(PB.iconState({ reading: scanLeft || (globalThis.PBAuto ? PBAuto.left() : 0) }));
     lastSummary = { site: site.name, feed, posts: items.length, lookedUp: rows.filter((r) => r.about).length, flagged: rows.filter((r) => r.flags && PB.isFlagged(r.flags)).length, pending: pending.length, scanning: scanLeft || (globalThis.PBAuto ? PBAuto.left() : 0), origins: PB.threadReport(rows).origins || [] };
-    if (feed) { removePanel(); return; }
+    if (feed) { removePanel(); recordFeed(site, items); return; }
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
     report.bursts = PB.timingBursts(replies);
@@ -123,9 +124,20 @@
     const pushed = PB.pushedLinks(PBLogs.net(), items.flatMap((r) => r.domains || []));
     const video = currentVideo(site);
     report.groups = PB.returningGroups(PBLogs.net(), threadKey, replies.map((r) => r.author));
+    report.context = PB.threadContext(items, { noteOf, claimsOf: PBLogs.claimsOf });
     saveSnapshot(threadKey, site.name, report);
     lastSummary = { ...lastSummary, sentence: report.sentence, signs: (report.bursts || []).length + clusters.length + (report.state || []).length, state: report.state };
-    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)) }, () => lookup(...pending.slice(0, SCAN_MAX)));
+    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onCard: () => PBLogs.saveCard({ site, report, items, replies, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
+  }
+
+  // Feed dashboard (src/core/feed.js): each feed post once per day, with what it linked and the
+  // signs Radar read in it. Post ids and counts only; no text is kept.
+  const noteOf = (id) => (tweets.get(id) || {}).note || null;
+  function recordFeed(site, items) {
+    PBLogs.recordFeed(site.name, items.map((r) => {
+      const an = analyse(r), c = PBLogs.claimsOf(r.id);
+      return { id: r.id, domains: r.domains || [], strong: an.extreme, note: !!noteOf(r.id), claims: c ? c.length : 0, techniques: an.persuasion.map((h) => h.technique) };
+    }));
   }
 
   function currentVideo(site) {

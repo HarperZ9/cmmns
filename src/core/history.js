@@ -21,6 +21,10 @@ export function snapshot(key, site, report, now = Date.now()) {
     bursts: (report.bursts || []).length,
     origins: (report.origins || []).slice(0, 8),
     state: (report.state || []).map((s) => ({ state: s.state, basis: s.basis, actor: s.actor || null, replies: s.replies })),
+    // Feed dashboard fields (src/core/feed.js); null in snapshots saved before they existed.
+    strong: report.strong ? report.strong.n : null,
+    techniques: report.techniques || null,
+    context: report.context ? { posts: report.context.posts, notes: report.context.notes, claims: report.context.claims, links: (report.context.links || []).slice(0, 20) } : null,
     upstream: report.upstream ? { accounts: report.upstream.accounts, domains: report.upstream.domains, uploads: report.upstream.uploads, recycled: report.upstream.recycled } : null,
   };
 }

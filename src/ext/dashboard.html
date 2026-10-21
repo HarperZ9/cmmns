@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your feed · Radar</title>
+<link rel="stylesheet" href="pages.css">
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+<main class="wide">
+  <header>
+    <h1>Your feed</h1>
+    <p class="lead">What the posts and threads you opened with Radar on carried: the sites they linked, how they argued, and what others had already checked. Counted in this browser only.</p>
+    <div class="window" role="group" aria-label="Time window">
+      <button type="button" class="quiet" data-days="7" aria-pressed="true">Last 7 days</button>
+      <button type="button" class="quiet" data-days="30" aria-pressed="false">Last 30 days</button>
+      <button type="button" class="quiet" data-days="60" aria-pressed="false">Last 60 days</button>
+    </div>
+    <p id="scope" class="mono muted" aria-live="polite">Reading your local logs…</p>
+  </header>
+
+  <section aria-labelledby="h-sites">
+    <h2 id="h-sites">Sites linked most</h2>
+    <p id="sites-say"></p>
+    <div id="sites" class="bars"></div>
+  </section>
+
+  <section aria-labelledby="h-state">
+    <h2 id="h-state">State-linked sites</h2>
+    <p id="state-say"></p>
+    <div id="state" class="share"></div>
+  </section>
+
+  <section aria-labelledby="h-strong">
+    <h2 id="h-strong">Strong rhetoric signs</h2>
+    <p id="strong-say"></p>
+    <div id="strong" class="share"></div>
+    <p id="days-scale" class="muted small"></p>
+    <div id="days" class="days" role="img"></div>
+    <details><summary>Numbers by day</summary><table id="days-table"><thead><tr><th scope="col">Day</th><th scope="col" class="n">Posts and replies</th><th scope="col" class="n">With strong signs</th></tr></thead><tbody></tbody></table></details>
+  </section>
+
+  <section aria-labelledby="h-tech">
+    <h2 id="h-tech">Persuasion techniques</h2>
+    <p id="tech-say"></p>
+    <div id="tech" class="bars"></div>
+  </section>
+
+  <section aria-labelledby="h-flag">
+    <h2 id="h-flag">Flagged accounts</h2>
+    <p id="flag-say"></p>
+    <div id="flag" class="share"></div>
+  </section>
+
+  <section aria-labelledby="h-checks">
+    <h2 id="h-checks">Community Notes and fact-checks</h2>
+    <p id="checks-say"></p>
+  </section>
+
+  <section aria-labelledby="h-together">
+    <h2 id="h-together">Accounts that keep appearing together</h2>
+    <p id="together-say"></p>
+    <table id="together"><thead><tr><th scope="col">Accounts</th><th scope="col" class="n">Threads together</th><th scope="col">The threads</th></tr></thead><tbody></tbody></table>
+    <p class="muted"><a href="history.html">The history page</a> draws these as a graph.</p>
+  </section>
+
+  <section>
+    <p id="not-show" class="limit"></p>
+  </section>
+  <footer id="foot"></footer>
+</main>
+<script src="core.bundle.js"></script>
+<script src="settings.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

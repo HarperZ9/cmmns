@@ -36,3 +36,18 @@ a:hover { text-decoration: underline; }
 button { font: inherit; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
 button:hover { border-color: var(--muted); }
 .foot { font-size: 12px; padding-bottom: 32px; }
+.graph { width: 100%; height: auto; display: block; margin: 8px 0; }
+.graph line { stroke: var(--muted); stroke-opacity: 0.55; }
+.graph .edge-labels text { font: 11px ui-monospace, Consolas, monospace; fill: var(--ink); text-anchor: middle; dominant-baseline: middle; paint-order: stroke; stroke: var(--card); stroke-width: 4px; }
+.graph .node circle { fill: var(--ink); stroke: var(--card); stroke-width: 2; }
+.graph .node text { font-size: 11px; fill: var(--ink); text-anchor: middle; paint-order: stroke; stroke: var(--card); stroke-width: 3px; }
+.graph .node { cursor: default; outline: none; }
+.graph .node:focus-visible circle { stroke: var(--ink); stroke-width: 3; r: 11; }
+.graph.focused line:not(.lit), .graph.focused .edge-labels text:not(.lit) { opacity: 0.15; }
+.graph line.lit { stroke: var(--ink); stroke-opacity: 1; }
+.graph line { cursor: pointer; }
+.evidence { border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; margin: 8px 0; font-size: 13px; }
+.evidence h3 { text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--ink); }
+.evidence ul { margin: 0; padding-left: 18px; }
+.mono { font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+#graph-table td.n, #graph-table th.n { padding-right: 14px; white-space: nowrap; }

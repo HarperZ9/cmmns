@@ -8,22 +8,7 @@
 <body>
 <header><h1>Radar history</h1><p id="scope" class="muted"></p></header>
 <main id="main"></main>
-<script>
-// Invented sample history: every account, site and number here is made up.
-const now = Date.now(), day = 86400000;
-const reports = {};
-const up = [["origin_one", "relay_a"], ["origin_one"], ["origin_one", "origin_two"], ["origin_two"], ["origin_three", "origin_one"]];
-for (let i = 0; i < 12; i++) {
-  reports["x:/t/" + i] = { key: "x:/t/" + i, site: i % 4 ? "X" : "YouTube", at: now - (11 - i) * day * 0.6, replies: 40 + i * 3, lookedUp: 20 + i, flaggedK: 3 + (i % 5),
-    extreme: { n: 6, k: 3 }, others: { n: 14 + i, k: i % 4 }, machine: i % 3, bursts: i % 4 === 0 ? 1 : 0,
-    origins: [{ place: "France", n: 8 }, { place: "United States", n: 5 }, { place: "Nigeria", n: i % 3 }, { place: "Russia", n: 1 }],
-    state: i % 3 === 0 ? [{ state: "Russia", basis: "named-in-report", actor: "government", replies: 2 }] : [],
-    upstream: { accounts: up[i % up.length].map((h) => ({ handle: h, n: 2 })), domains: [{ domain: "example-news.test", n: 2 }, { domain: "clips.example", n: 2 }], uploads: 4, recycled: 2 } };
-}
-const net = { threads: { a: { authors: { repeat_one: 1, repeat_two: 2 } }, b: { authors: { repeat_one: 1 } }, c: { authors: { repeat_one: 1, repeat_two: 1 } }, d: { authors: { repeat_two: 1 } } } };
-const trail = { media: { m1: { posts: [{ id: "1", handle: "origin_one", at: "2019-05-02T01:00:00Z" }, { id: "2", handle: "relay_a", at: "2026-10-18T10:00:00Z" }, { id: "3", handle: "relay_b", at: "2026-10-18T10:01:00Z" }, { id: "4", handle: "relay_c", at: "2026-10-18T10:02:00Z" }] } } };
-window.FIXTURE_STORE = { "pb.history.v1": reports, "pb.net.v1": net, "pb.trail.v1": trail };
-</script>
+<script src="feed-data.js"></script>
 <script src="chrome-stub.js"></script>
 <script>
 // Load the real page body, then its scripts, so the fixture shows exactly what ships.
@@ -31,7 +16,7 @@ fetch("../../src/ext/history.html").then((r) => r.text()).then((html) => {
   const doc = new DOMParser().parseFromString(html, "text/html");
   document.body.querySelectorAll("header, main").forEach((n) => n.remove());
   document.body.prepend(doc.querySelector("header"), doc.querySelector("main"));
-  for (const src of ["../../src/ext/core.bundle.js", "../../src/ext/history.js"]) { const s = document.createElement("script"); s.src = src; s.async = false; document.body.append(s); }
+  for (const src of ["../../src/ext/core.bundle.js", "../../src/ext/history-graph.js", "../../src/ext/history.js"]) { const s = document.createElement("script"); s.src = src; s.async = false; document.body.append(s); }
 });
 </script>
 </body>

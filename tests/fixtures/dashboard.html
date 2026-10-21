@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Radar feed fixture</title>
+<link rel="stylesheet" href="../../src/ext/pages.css"><link rel="stylesheet" href="../../src/ext/dashboard.css">
+</head>
+<body>
+<main id="main"></main>
+<script src="feed-data.js"></script>
+<script src="chrome-stub.js"></script>
+<script>
+// Load the real page body, then its scripts, so the fixture shows exactly what ships.
+fetch("../../src/ext/dashboard.html").then((r) => r.text()).then((html) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  document.body.querySelectorAll("main").forEach((n) => n.remove());
+  document.body.prepend(doc.querySelector("main"));
+  for (const src of ["../../src/ext/core.bundle.js", "../../src/ext/settings.js", "../../src/ext/dashboard.js"]) { const s = document.createElement("script"); s.src = src; s.async = false; document.body.append(s); }
+});
+</script>
+</body>
+</html>

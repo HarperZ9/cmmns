@@ -45,7 +45,7 @@
     ];
   }
 
-  // stats: { site, pending, scanning, paused, video, pushed, onExport, onClearHistory }
+  // stats: { site, pending, scanning, paused, video, pushed, onExport, onCard, onClearHistory }
   function render(report, clusters, stats, onLookupAll) {
     let p = document.getElementById("pb-panel");
     if (!p) { p = el("aside", "pb-panel"); p.id = "pb-panel"; document.body.append(p); }
@@ -90,6 +90,7 @@
     const acts = el("div", "pb-actions");
     if (!stats.scanning && !stats.paused && stats.pending) acts.append(button(`Read ${Math.min(stats.pending, 200)} accounts`, "Reads each account's profile and About page in one minimised window.", onLookupAll));
     if (stats.onExport) acts.append(button("Save report", "Saves the report and each account's flags to a JSON file on this computer. Nothing is uploaded.", stats.onExport));
+    if (stats.onCard) acts.append(button("Save card", "Makes a card about this thread (never about one account) to read, then save or share as an image and a JSON file.", stats.onCard));
     if (stats.onClearHistory) acts.append(button("Clear history", "Forgets which accounts Radar has seen in which threads (this browser only).", stats.onClearHistory));
     p.append(acts);
     p.append(el("p", "pb-foot", PB.REPORT_DOES_NOT_PROVE));

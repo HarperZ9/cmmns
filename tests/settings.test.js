@@ -58,6 +58,8 @@ test("prune drops entries older than the user's retention, in every log", () => 
   const store = {
     "pb.history.v1": { a: { at: old }, b: { at: fresh } },
     "pb.net.v1": { threads: { a: { at: old }, b: { at: fresh } } },
+    "pb.net.v2": { threads: { a: { at: old }, b: { at: fresh } } },
+    "pb.feed.v1": { "X|old": { at: old }, "X|new": { at: fresh } },
     "pb.trail.v1": { media: { m1: { seen: old }, m2: { seen: fresh } }, links: { l1: { seen: old } } },
     "pb.about.v1": { alice: { at: old }, bob: { at: fresh } },
     "pb.reddit.v1": { carol: { at: old } },
@@ -65,6 +67,8 @@ test("prune drops entries older than the user's retention, in every log", () => 
   const out = pruneStore(store, normalizeSettings({ historyDays: 10, aboutDays: 10 }), NOW);
   assert.deepEqual(Object.keys(out["pb.history.v1"]), ["b"]);
   assert.deepEqual(Object.keys(out["pb.net.v1"].threads), ["b"]);
+  assert.deepEqual(Object.keys(out["pb.net.v2"].threads), ["b"]);
+  assert.deepEqual(Object.keys(out["pb.feed.v1"]), ["X|new"]);
   assert.deepEqual(Object.keys(out["pb.trail.v1"].media), ["m2"]);
   assert.deepEqual(out["pb.trail.v1"].links, {});
   assert.deepEqual(Object.keys(out["pb.about.v1"]), ["bob"]);

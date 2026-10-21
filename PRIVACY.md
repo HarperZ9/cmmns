@@ -46,9 +46,11 @@ profile you installed Radar in. It is not synced to other devices.
 |---|---|---|
 | Settings (`pb.settings`) | Your choices on the options page | Until you change them or remove Radar |
 | Account details (`pb.about.v1`, `pb.reddit.v1`) | What X or Reddit disclosed about accounts you saw: location label, join date, counts, name changes, and a summary of posting times and apps | 14 days by default; 1 to 30 days in options |
-| Connections log (`pb.net.v1`) | Which accounts replied in which threads you opened, how many seconds after the post, link domains, and a short hash of each reply's wording (not the wording) | 30 days, or less if you set history shorter |
+| Connections log (`pb.net.v2`) | Which accounts replied in which threads you opened, how many seconds after the post, link domains, and a short hash of each reply's wording (not the wording) | 30 days, or less if you set history shorter |
 | Source trails (`pb.trail.v1`) | Post ids, handles and times that carried the same upload or link | 30 days, or less if you set history shorter |
-| Thread history (`pb.history.v1`) | One summary per thread you opened: counts, origins, flagged shares. No reply text | 60 days by default; 1 to 60 days in options, at most 600 threads |
+| Thread history (`pb.history.v1`) | One summary per thread you opened: counts, origins, flagged shares, linked sites, Community Note and fact-check counts. No reply text | 60 days by default; 1 to 60 days in options, at most 600 threads |
+| Feed tally (`pb.feed.v1`) | Per site and day: the ids of feed posts counted (so each counts once), how many linked each site, and how many showed strong rhetoric signs, a Community Note or a fact-check match. No post text | 60 days by default; follows the history setting |
+| Thread card (session storage) | The card you asked for from a thread panel, held until the card page opens it. It names no account | Until the browser closes |
 | Your feedback (`pb.feedback.v1`) | Your "This was right" and "This was wrong" marks: which sign (its kind, the post id and a short hash of its label), the thread, your mark and the time. The post text only for marks where you ticked "include the text" | Until you clear it or remove Radar; at most 2,000 marks, the oldest dropped first |
 | X request shape (`pb.tpl`) | The shape of X's About request, so Radar can repeat it. It holds no login token; the token is read fresh from X's cookie each time | Until X changes it or you clear Radar's data |
 

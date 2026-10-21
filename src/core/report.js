@@ -20,11 +20,13 @@ export function wilson(k, n, z = 1.96) {
 
 const pct = (x) => Math.round(x * 100);
 
-// replies: [{ id, author, text, flags: [...] | null }]  (null = account not looked up)
-export function threadReport(replies) {
+// replies: [{ id, author, text, flags: [...] | null, extreme?, techniques? }]  (null = account not
+// looked up). `extreme` and `techniques` may come precomputed from the content script's memo.
+export function threadReport(replies, shown = shownTechniques()) {
   const known = [], unknown = [];
   for (const r of replies) (Array.isArray(r.flags) ? known : unknown).push(r);
-  const rows = known.map((r) => ({ ...r, extreme: score(r.text).extreme, flagged: isFlagged(r.flags) }));
+  const isExtreme = (r) => (typeof r.extreme === "boolean" ? r.extreme : score(r.text).extreme);
+  const rows = known.map((r) => ({ ...r, extreme: isExtreme(r), flagged: isFlagged(r.flags) }));
   const ext = rows.filter((r) => r.extreme), rest = rows.filter((r) => !r.extreme);
   const kE = ext.filter((r) => r.flagged).length, kR = rest.filter((r) => r.flagged).length;
   const out = {
@@ -37,7 +39,11 @@ export function threadReport(replies) {
   out.machine = { n: replies.filter((r) => r.machine).length };
   out.origins = origins(known);
   out.joinBurst = joinBurst(known);
-  out.persuasion = persuasionShare(replies);
+  out.persuasion = persuasionShare(replies, shown);
+  // For the feed dashboard: replies with strong rhetoric signs (the report's "extreme" score), over
+  // every reply, and how many replies used each shown technique.
+  out.strong = { n: rows.filter((r) => r.extreme).length + unknown.filter(isExtreme).length, of: replies.length };
+  out.techniques = techniqueCounts(replies, shown);
   out.verdict = verdict(out);
   out.sentence = sentence(out);
   return out;
@@ -99,6 +105,16 @@ export function persuasionShare(replies, shown = shownTechniques()) {
   const part = (g, who) => `${g.k} of ${g.n} from ${who} accounts${g.n ? ` (${pct(g.share)}%, 95% interval ${pct(g.ci[0])} to ${pct(g.ci[1])}%)` : ""}`;
   const sentence = `Replies using ${names}: ${part(flagged, "flagged")}, ${part(unflagged, "unflagged")}.`;
   return { techniques: shown, flagged, unflagged, notLookedUp: replies.length - known.length, sentence };
+}
+
+function techniqueCounts(replies, shown) {
+  const out = {};
+  if (!shown.length) return out;
+  for (const r of replies) {
+    const ids = Array.isArray(r.techniques) ? r.techniques.filter((t) => shown.includes(t)) : persuasion(r.text, shown).map((h) => h.technique);
+    for (const t of new Set(ids)) out[t] = (out[t] || 0) + 1;
+  }
+  return out;
 }
 
 export const REPORT_DOES_NOT_PROVE = "A skew can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event. It says nothing about any one reply or account.";

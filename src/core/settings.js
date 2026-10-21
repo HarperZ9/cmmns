@@ -63,8 +63,13 @@ export function pruneStore(store, settings, now = Date.now()) {
   const out = {};
   const H = store["pb.history.v1"];
   if (H) { const k = keepMap(H, "at", hist); if (size(k) !== size(H)) out["pb.history.v1"] = k; }
-  const N = store["pb.net.v1"];
-  if (N && N.threads) { const k = keepMap(N.threads, "at", hist); if (size(k) !== size(N.threads)) out["pb.net.v1"] = { ...N, threads: k }; }
+  // The connections log moved to v2 (threads keyed by post id); v1 is pruned until it empties.
+  for (const key of ["pb.net.v1", "pb.net.v2"]) {
+    const N = store[key];
+    if (N && N.threads) { const k = keepMap(N.threads, "at", hist); if (size(k) !== size(N.threads)) out[key] = { ...N, threads: k }; }
+  }
+  const F = store["pb.feed.v1"];
+  if (F) { const k = keepMap(F, "at", hist); if (size(k) !== size(F)) out["pb.feed.v1"] = k; }
   const T = store["pb.trail.v1"];
   if (T) {
     const media = keepMap(T.media, "seen", hist), links = keepMap(T.links, "seen", hist);
@@ -77,7 +82,7 @@ export function pruneStore(store, settings, now = Date.now()) {
   return out;
 }
 
-export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
+export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
 // "Clear all Radar data": every Radar key except the settings themselves.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.

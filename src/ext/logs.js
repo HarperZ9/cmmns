@@ -68,6 +68,22 @@
     }, 3000);
   }
 
+  // Feed posts for the "Your feed" page (src/core/feed.js), merged into what is stored so several
+  // tabs add to one tally. Saved a moment after the feed settles.
+  const FEED_KEY = "pb.feed.v1";
+  let feedSave = 0, feedPending = [];
+  function recordFeed(siteName, posts) {
+    feedPending.push(...posts);
+    clearTimeout(feedSave);
+    feedSave = setTimeout(async () => {
+      const batch = feedPending; feedPending = [];
+      try {
+        const log = (await chrome.storage.local.get(FEED_KEY))[FEED_KEY] || {};
+        await chrome.storage.local.set({ [FEED_KEY]: PB.addFeedPosts(log, siteName, batch) });
+      } catch (e) { console.error("[radar] could not save the feed tally", e); }
+    }, 3000);
+  }
+
   // Another tab, the options page or the background prune can change or clear these logs; keep
   // the in-memory copies current so an old copy is never written back.
   if (chrome.storage.onChanged) chrome.storage.onChanged.addListener((ch, area) => {
@@ -79,7 +95,8 @@
   function clearAll() {
     trailLog = {}; netLog = {}; lastRecorded = "";
     if (globalThis.PBMeta) PBMeta.clear().catch((e) => console.error("[radar] could not clear account readings", e));
-    return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY]);
+    feedPending = [];
+    return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY, FEED_KEY]);
   }
 
   // A local file the user can keep or share: the report, per-account labels and flags with what
@@ -99,5 +116,18 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   }
 
-  globalThis.PBLogs = Object.freeze({ ensureOwners, ensureClaims, claimsOf, recordNet, recordTrail, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
+  // A thread card (src/core/evidence.js): built here from what is on screen, then shown on the card
+  // page (card.html) to read before saving or sharing. Refused for threads with too few accounts.
+  function saveCard({ site, report, items, replies, clusters, media }) {
+    const claims = items.flatMap((r) => claimsOf(r.id) || []);
+    const sites = (report.context ? report.context.links : []).map((l) => ({
+      domain: l.domain, n: l.n, owner: PB.ownerOfDomain(l.domain) ? PB.ownerOfDomain(l.domain).owner : null,
+      state: [...new Set(PB.stateLinksOfDomain(l.domain).map((h) => PB.stateLabel(h).chip))],
+    }));
+    const built = PB.evidenceCard({ tool: "Radar " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), site: site.name, page: location.href, thread: true,
+      authors: replies.map((r) => r.author), report, sameText: clusters.length, claims, sites, media });
+    chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => console.error("[radar] could not open the card page", e));
+  }
+
+  globalThis.PBLogs = Object.freeze({ ensureOwners, ensureClaims, claimsOf, recordNet, recordTrail, recordFeed, saveCard, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
 })();

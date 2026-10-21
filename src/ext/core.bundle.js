@@ -1778,11 +1778,13 @@ function wilson(k, n, z = 1.96) {
 
 const pct = (x) => Math.round(x * 100);
 
-// replies: [{ id, author, text, flags: [...] | null }]  (null = account not looked up)
-function threadReport(replies) {
+// replies: [{ id, author, text, flags: [...] | null, extreme?, techniques? }]  (null = account not
+// looked up). `extreme` and `techniques` may come precomputed from the content script's memo.
+function threadReport(replies, shown = shownTechniques()) {
   const known = [], unknown = [];
   for (const r of replies) (Array.isArray(r.flags) ? known : unknown).push(r);
-  const rows = known.map((r) => ({ ...r, extreme: score(r.text).extreme, flagged: isFlagged(r.flags) }));
+  const isExtreme = (r) => (typeof r.extreme === "boolean" ? r.extreme : score(r.text).extreme);
+  const rows = known.map((r) => ({ ...r, extreme: isExtreme(r), flagged: isFlagged(r.flags) }));
   const ext = rows.filter((r) => r.extreme), rest = rows.filter((r) => !r.extreme);
   const kE = ext.filter((r) => r.flagged).length, kR = rest.filter((r) => r.flagged).length;
   const out = {
@@ -1795,7 +1797,11 @@ function threadReport(replies) {
   out.machine = { n: replies.filter((r) => r.machine).length };
   out.origins = origins(known);
   out.joinBurst = joinBurst(known);
-  out.persuasion = persuasionShare(replies);
+  out.persuasion = persuasionShare(replies, shown);
+  // For the feed dashboard: replies with strong rhetoric signs (the report's "extreme" score), over
+  // every reply, and how many replies used each shown technique.
+  out.strong = { n: rows.filter((r) => r.extreme).length + unknown.filter(isExtreme).length, of: replies.length };
+  out.techniques = techniqueCounts(replies, shown);
   out.verdict = verdict(out);
   out.sentence = sentence(out);
   return out;
@@ -1857,6 +1863,16 @@ function persuasionShare(replies, shown = shownTechniques()) {
   const part = (g, who) => `${g.k} of ${g.n} from ${who} accounts${g.n ? ` (${pct(g.share)}%, 95% interval ${pct(g.ci[0])} to ${pct(g.ci[1])}%)` : ""}`;
   const sentence = `Replies using ${names}: ${part(flagged, "flagged")}, ${part(unflagged, "unflagged")}.`;
   return { techniques: shown, flagged, unflagged, notLookedUp: replies.length - known.length, sentence };
+}
+
+function techniqueCounts(replies, shown) {
+  const out = {};
+  if (!shown.length) return out;
+  for (const r of replies) {
+    const ids = Array.isArray(r.techniques) ? r.techniques.filter((t) => shown.includes(t)) : persuasion(r.text, shown).map((h) => h.technique);
+    for (const t of new Set(ids)) out[t] = (out[t] || 0) + 1;
+  }
+  return out;
 }
 
 const REPORT_DOES_NOT_PROVE = "A skew can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event. It says nothing about any one reply or account.";
@@ -2970,6 +2986,10 @@ function snapshot(key, site, report, now = Date.now()) {
     bursts: (report.bursts || []).length,
     origins: (report.origins || []).slice(0, 8),
     state: (report.state || []).map((s) => ({ state: s.state, basis: s.basis, actor: s.actor || null, replies: s.replies })),
+    // Feed dashboard fields (src/core/feed.js); null in snapshots saved before they existed.
+    strong: report.strong ? report.strong.n : null,
+    techniques: report.techniques || null,
+    context: report.context ? { posts: report.context.posts, notes: report.context.notes, claims: report.context.claims, links: (report.context.links || []).slice(0, 20) } : null,
     upstream: report.upstream ? { accounts: report.upstream.accounts, domains: report.upstream.domains, uploads: report.upstream.uploads, recycled: report.upstream.recycled } : null,
   };
 }
@@ -4077,6 +4097,391 @@ function keyframeTimes(duration, buffered, n = 4) {
 return { keyframeTimes };
 })();
 
+// ---- graph.js
+const M_graph = (() => {
+// The coordination graph: accounts that keep replying in the same threads the user opened, from the
+// local connections log (network.js), and a small deterministic force layout to draw it. An edge
+// is "these two accounts replied in n of the same threads". That happens with friends, fans of the
+// same creator and people who follow the same news, as well as with coordinated accounts.
+
+const GRAPH_MIN = 2, GRAPH_MAX_NODES = 500, EDGE_MAX_THREADS = 20;
+const SEP = "\u0000";
+
+// net: { threads: { [key]: { at, authors: { [handle]: delay }, fps: { [fingerprint]: [handles] } } } }
+// Returns { nodes: [{ id, threads, degree, weight }], edges: [{ a, b, n, threads, sameText }], truncated }.
+// Each edge carries its evidence: the keys of the threads (newest first, at most EDGE_MAX_THREADS)
+// where both accounts replied, and in how many of them both posted the same wording.
+function coGraph(net, { min = GRAPH_MIN, maxNodes = GRAPH_MAX_NODES, since = -Infinity } = {}) {
+  const threads = Object.entries((net && net.threads) || {}).filter(([, t]) => t && (t.at == null || t.at >= since))
+    .sort((x, y) => (y[1].at || 0) - (x[1].at || 0));
+  // Only accounts seen in at least `min` threads can share `min` threads with anyone.
+  const seen = new Map();
+  for (const [, t] of threads) for (const h of Object.keys(t.authors || {})) seen.set(h, (seen.get(h) || 0) + 1);
+  const pairs = new Map();
+  for (const [key, t] of threads) {
+    const hs = Object.keys(t.authors || {}).filter((h) => seen.get(h) >= min).sort();
+    const same = sameTextPairs(t.fps);
+    for (let i = 0; i < hs.length; i++) for (let j = i + 1; j < hs.length; j++) {
+      const k = hs[i] + SEP + hs[j];
+      let p = pairs.get(k);
+      if (!p) pairs.set(k, (p = { n: 0, threads: [], sameText: 0 }));
+      p.n++;
+      if (p.threads.length < EDGE_MAX_THREADS) p.threads.push(key);
+      if (same.has(k)) p.sameText++;
+    }
+  }
+  let edges = [...pairs].filter(([, p]) => p.n >= min).map(([k, p]) => { const [a, b] = k.split(SEP); return { a, b, ...p }; });
+  const weight = new Map();
+  for (const e of edges) for (const h of [e.a, e.b]) weight.set(h, (weight.get(h) || 0) + e.n);
+  const ranked = [...weight].sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1));
+  const keep = new Set(ranked.slice(0, maxNodes).map(([h]) => h));
+  const truncated = ranked.length > keep.size;
+  edges = edges.filter((e) => keep.has(e.a) && keep.has(e.b)).sort((x, y) => y.n - x.n || (x.a + x.b < y.a + y.b ? -1 : 1));
+  const degree = new Map();
+  for (const e of edges) for (const h of [e.a, e.b]) degree.set(h, (degree.get(h) || 0) + 1);
+  const nodes = [...keep].filter((h) => degree.has(h)).map((id) => ({ id, threads: seen.get(id), degree: degree.get(id), weight: weight.get(id) }));
+  return { nodes, edges, truncated };
+}
+
+// Pairs of accounts that posted the same wording in one thread (fps: { fingerprint: [handles] }).
+function sameTextPairs(fps) {
+  const out = new Set();
+  for (const hs of Object.values(fps || {})) {
+    const s = [...hs].sort();
+    for (let i = 0; i < s.length; i++) for (let j = i + 1; j < s.length; j++) out.add(s[i] + SEP + s[j]);
+  }
+  return out;
+}
+
+// Fruchterman-Reingold, seeded on a circle in a fixed order, so the same log draws the same way.
+// Repulsion is all-pairs, so the number of rounds shrinks as the graph grows: 500 accounts lay out
+// in 60 rounds, inside the one-second budget that tests/graph.test.js measures.
+function forceLayout(graph, { width = 640, height = 360, pad = 20, iterations } = {}) {
+  const ns = [...graph.nodes].sort((a, b) => (a.id < b.id ? -1 : 1));
+  const n = ns.length, cx = width / 2, cy = height / 2;
+  if (!n) return { nodes: [], edges: graph.edges };
+  const X = new Float64Array(n), Y = new Float64Array(n), DX = new Float64Array(n), DY = new Float64Array(n);
+  for (let i = 0; i < n; i++) { X[i] = cx + (width / 3) * Math.cos((2 * Math.PI * i) / n); Y[i] = cy + (height / 3) * Math.sin((2 * Math.PI * i) / n); }
+  const idx = new Map(ns.map((v, i) => [v.id, i]));
+  const links = graph.edges.map((e) => [idx.get(e.a), idx.get(e.b), Math.min(2, 0.5 + e.n / 4)]).filter(([i, j]) => i != null && j != null);
+  const k = Math.sqrt(((width - 2 * pad) * (height - 2 * pad)) / n) * 0.75, k2 = k * k;
+  const rounds = iterations || Math.max(40, Math.min(300, Math.round(30000 / n)));
+  let temp = width / 8;
+  const cool = Math.pow(0.5 / temp, 1 / rounds);
+  for (let it = 0; it < rounds; it++) {
+    DX.fill(0); DY.fill(0);
+    for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+      let dx = X[i] - X[j], dy = Y[i] - Y[j], d2 = dx * dx + dy * dy;
+      if (d2 < 1e-4) { dx = 0.01 * (i - j); dy = 0.01; d2 = dx * dx + dy * dy; }
+      const f = k2 / d2;   // (k^2 / d) along the unit vector, which is (dx, dy) / d
+      DX[i] += dx * f; DY[i] += dy * f; DX[j] -= dx * f; DY[j] -= dy * f;
+    }
+    for (const [i, j, w] of links) {
+      const dx = X[i] - X[j], dy = Y[i] - Y[j], f = (Math.sqrt(dx * dx + dy * dy) / k) * w;   // d^2 / k along the unit vector
+      DX[i] -= dx * f; DY[i] -= dy * f; DX[j] += dx * f; DY[j] += dy * f;
+    }
+    // Gravity toward the centre keeps separate clusters from drifting apart; the drawing is
+    // fitted to the box at the end, so nothing is pinned against an edge on the way.
+    for (let i = 0; i < n; i++) {
+      DX[i] -= (X[i] - cx) * GRAVITY * Math.sqrt(n); DY[i] -= (Y[i] - cy) * GRAVITY * Math.sqrt(n);
+      const len = Math.sqrt(DX[i] * DX[i] + DY[i] * DY[i]) || 1, step = Math.min(len, temp);
+      X[i] += (DX[i] / len) * step; Y[i] += (DY[i] / len) * step;
+    }
+    temp = Math.max(0.5, temp * cool);
+  }
+  fit(X, Y, width, height, pad);
+  const round = (x) => Math.round(x * 10) / 10;
+  return { nodes: ns.map((v, i) => ({ ...v, x: round(X[i]), y: round(Y[i]) })), edges: graph.edges };
+}
+
+const GRAVITY = 0.6;
+
+// Scales the drawing up, evenly on both axes, to fill the box: a dense cluster would otherwise sit
+// small in the middle.
+function fit(X, Y, width, height, pad) {
+  const n = X.length;
+  if (n < 2) { if (n) { X[0] = width / 2; Y[0] = height / 2; } return; }
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (let i = 0; i < n; i++) { x0 = Math.min(x0, X[i]); x1 = Math.max(x1, X[i]); y0 = Math.min(y0, Y[i]); y1 = Math.max(y1, Y[i]); }
+  const s = Math.min((width - 2 * pad) / Math.max(1, x1 - x0), (height - 2 * pad) / Math.max(1, y1 - y0));
+  const ox = (width - s * (x1 - x0)) / 2, oy = (height - s * (y1 - y0)) / 2;
+  for (let i = 0; i < n; i++) { X[i] = ox + s * (X[i] - x0); Y[i] = oy + s * (Y[i] - y0); }
+}
+
+// A link to a thread from its key (src/core/threadkey.js), where the key holds enough to build one.
+function threadUrl(key) {
+  const m = String(key || "").match(/^([a-z]+):(.+)$/);
+  if (!m || m[2].startsWith("/")) return null;
+  const id = m[2];
+  return ({ x: `https://x.com/i/status/${id}`, reddit: `https://www.reddit.com/comments/${id}`, youtube: `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`, instagram: `https://www.instagram.com/p/${id}/` })[m[1]] || null;
+}
+
+const GRAPH_DOES_NOT_PROVE = "Two accounts replying in the same threads is what friends, fans of one creator and people following the same news do, as well as coordinated accounts. The graph covers only threads you opened, and it says nothing about who runs any account.";
+
+return { GRAPH_MIN, coGraph, forceLayout, threadUrl, GRAPH_DOES_NOT_PROVE };
+})();
+
+// ---- feed.js
+const M_feed = (() => {
+// "Your feed": what the user's feeds and threads carried over the last 7 or 30 days, from local
+// logs only. Thread snapshots come from history.js; feed posts are tallied here per site and day,
+// each post once. Every figure keeps its count and its denominator, so the page can write the
+// numbers out. A snapshot saved before a field existed is left out of that field's denominator.
+
+const { wilson } = M_report;
+const { shownTechniques } = M_persuasion;
+const { coGraph } = M_graph;
+
+const FEED_RETAIN_DAYS = 60, FEED_MAX_IDS = 3000;
+const DAY = 86400000;
+const dayOf = (t) => new Date(t).toISOString().slice(0, 10);
+
+// posts: [{ id, domains, strong, note, claims, techniques }]. Log: { "site|day": entry }.
+function addFeedPosts(log, site, posts, now = Date.now()) {
+  const L = { ...(log || {}) };
+  const key = `${site}|${dayOf(now)}`;
+  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {} };
+  const have = new Set(e.ids);
+  for (const p of posts) {
+    if (!p || !p.id || have.has(p.id) || e.ids.length >= FEED_MAX_IDS) continue;
+    have.add(p.id); e.ids.push(p.id);
+    e.posts++;
+    if (p.strong) e.strong++;
+    if (p.note) e.notes++;
+    if (p.claims) e.claims++;
+    for (const d of new Set(p.domains || [])) e.links[d] = (e.links[d] || 0) + 1;
+    for (const t of new Set(p.techniques || [])) e.techniques[t] = (e.techniques[t] || 0) + 1;
+  }
+  e.at = now;
+  L[key] = e;
+  return Object.fromEntries(Object.entries(L).filter(([, v]) => now - v.at <= FEED_RETAIN_DAYS * DAY));
+}
+
+// One thread's context for its snapshot: posts linking each site, Community Notes and posts that
+// match a fact-checked claim. items: [{ id, domains }]; noteOf, claimsOf: (id) => value or null.
+function threadContext(items, { noteOf = () => null, claimsOf = () => null } = {}) {
+  const links = new Map();
+  let notes = 0, claims = 0;
+  for (const it of items) {
+    for (const d of new Set(it.domains || [])) links.set(d, (links.get(d) || 0) + 1);
+    if (noteOf(it.id)) notes++;
+    const c = claimsOf(it.id);
+    if (c && c.length) claims++;
+  }
+  return { posts: items.length, notes, claims, links: [...links].map(([domain, n]) => ({ domain, n })).sort((a, b) => b.n - a.n || (a.domain < b.domain ? -1 : 1)) };
+}
+
+const share = (k, n) => (n ? { k, n, share: k / n, ci: wilson(k, n) } : null);
+const count = (k, n) => (n ? { k, n } : null);
+const add = (m, k, n) => m.set(k, (m.get(k) || 0) + n);
+
+// reports: history snapshots; feedLog: addFeedPosts log; net: connections log.
+// opts: { days, now, isState(domain), shown: technique ids the window may show }.
+function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isState = () => false, shown = shownTechniques() } = {}) {
+  const since = now - days * DAY;
+  const snaps = Object.values(reports || {}).filter((s) => s && s.at >= since);
+  const feeds = Object.values(feedLog || {}).filter((f) => f && f.at >= since);
+  const T = { strongK: 0, strongN: 0, ctxK: { notes: 0, claims: 0 }, ctxN: 0, looked: 0, flagged: 0 };
+  const sites = new Map(), tech = new Map(), daily = dailyFrame(days, now);
+  for (const s of snaps) {
+    T.looked += s.lookedUp || 0; T.flagged += s.flaggedK || 0;
+    if (s.strong != null) { T.strongK += s.strong; T.strongN += s.replies || 0; }
+    if (s.context) {
+      T.ctxN += s.context.posts || 0; T.ctxK.notes += s.context.notes || 0; T.ctxK.claims += s.context.claims || 0;
+      for (const l of s.context.links || []) add(sites, l.domain, l.n);
+    }
+    for (const [t, n] of Object.entries(s.techniques || {})) add(tech, t, n);
+    dayAdd(daily, s.at, { posts: s.replies || 0, strong: s.strong, strongN: s.strong != null ? s.replies || 0 : 0, threads: 1 });
+  }
+  for (const f of feeds) {
+    T.strongK += f.strong; T.strongN += f.posts; T.ctxN += f.posts; T.ctxK.notes += f.notes; T.ctxK.claims += f.claims;
+    for (const [d, n] of Object.entries(f.links || {})) add(sites, d, n);
+    for (const [t, n] of Object.entries(f.techniques || {})) add(tech, t, n);
+    dayAdd(daily, f.at, { posts: f.posts, strong: f.strong, strongN: f.posts, feedPosts: f.posts });
+  }
+  const mentions = [...sites.values()].reduce((a, b) => a + b, 0);
+  const stateK = [...sites].filter(([d]) => isState(d)).reduce((a, [, n]) => a + n, 0);
+  return {
+    days, from: dayOf(since), to: dayOf(now),
+    threads: snaps.length, feedPosts: feeds.reduce((a, f) => a + f.posts, 0), replies: snaps.reduce((a, s) => a + (s.replies || 0), 0),
+    sites: [...sites].map(([domain, n]) => ({ domain, n })).sort((a, b) => b.n - a.n || (a.domain < b.domain ? -1 : 1)).slice(0, 10),
+    siteMentions: mentions, siteCount: sites.size,
+    state: share(stateK, mentions),
+    strong: share(T.strongK, T.strongN),
+    flagged: share(T.flagged, T.looked),
+    notes: count(T.ctxK.notes, T.ctxN), claims: count(T.ctxK.claims, T.ctxN),
+    techniques: { shown: [...shown], counts: [...tech].filter(([t]) => shown.includes(t)).map(([id, n]) => ({ id, n })).sort((a, b) => b.n - a.n) },
+    together: coGraph(net, { min: 3, since, maxNodes: 40 }).edges.slice(0, 10),
+    daily: [...daily.values()],
+  };
+}
+
+function dailyFrame(days, now) {
+  const m = new Map();
+  for (let i = days - 1; i >= 0; i--) { const d = dayOf(now - i * DAY); m.set(d, { day: d, posts: 0, strong: 0, strongN: 0, threads: 0, feedPosts: 0 }); }
+  return m;
+}
+function dayAdd(m, at, v) {
+  const e = m.get(dayOf(at));
+  if (!e) return;
+  e.posts += v.posts; e.strong += v.strong || 0; e.strongN += v.strongN; e.threads += v.threads || 0; e.feedPosts += v.feedPosts || 0;
+}
+
+const FEED_DOES_NOT_SHOW = "What this does not show: what your feed would carry for anyone else, or what a platform carries overall. These counts cover only posts and threads you opened with Radar on, in the order each platform chose to show them. A site's share says how often it was linked, not whether it is accurate, and a strong-rhetoric sign is about wording, not about the person who wrote it.";
+
+return { FEED_RETAIN_DAYS, addFeedPosts, threadContext, feedDashboard, FEED_DOES_NOT_SHOW };
+})();
+
+// ---- evidence.js
+const M_evidence = (() => {
+// Evidence cards: one thread, as one viewer saw it, in a form to save or share. A card carries the
+// thread report, fact-check matches, media and site context, where each part came from and what
+// it does not prove, and a SHA-256 hash of its own content so a copy can be checked.
+//
+// A card is never about one person. It names no account, not even the original poster (an X link
+// is rewritten to its /i/status/ form), and it is refused for a page that is not a thread or a
+// thread with fewer than MIN_CARD_ACCOUNTS distinct reply accounts.
+
+const { REPORT_DOES_NOT_PROVE } = M_report;
+const { CLAIM_ATTRIBUTION, CLAIM_DOES_NOT_PROVE } = M_claims;
+const { credentialState } = M_c2pa;
+const { CREDENTIALS_DO_NOT_PROVE } = M_mediacheck;
+
+const MIN_CARD_ACCOUNTS = 5, CARD_VERSION = 1;
+const r3 = (x) => Math.round(x * 1000) / 1000;
+const ci = (c) => (Array.isArray(c) ? c.map(r3) : null);
+
+// Keeps the thread's address and drops whatever names a person or tracks the visit.
+function cardPage(url) {
+  let u;
+  try { u = new URL(url); } catch { return null; }
+  const keep = ["v", "story_fbid", "id"];
+  const q = new URLSearchParams([...u.searchParams].filter(([k]) => keep.includes(k)));
+  let path = u.pathname;
+  if (/^(www\.)?(x|twitter)\.com$/.test(u.hostname)) { const m = path.match(/\/status\/(\d+)/); if (m) path = `/i/status/${m[1]}`; }
+  return `${u.origin}${path}${q.size ? "?" + q : ""}`;
+}
+
+// input: { tool, savedAt, site, page, thread, authors, report, sameText, claims, sites, media }
+// media: the Content Credentials readings (src/core/c2pa.js) for files the user checked in this
+// thread, or null. Only their states and AI-generation marks go on the card, never a signer's name.
+// Returns { ok: true, card } or { ok: false, reason }.
+function evidenceCard(input) {
+  if (!input || !input.thread) return { ok: false, reason: "Cards are made for threads only, not for profiles or feeds." };
+  const accounts = new Set((input.authors || []).map((h) => String(h).toLowerCase())).size;
+  if (accounts < MIN_CARD_ACCOUNTS) return { ok: false, reason: `This thread has ${accounts} reply account${accounts === 1 ? "" : "s"}. A card needs at least ${MIN_CARD_ACCOUNTS} accounts, so it cannot be about one person.` };
+  const R = input.report || {}, U = R.upstream || {};
+  const claims = dedupe(input.claims || []).slice(0, 5).map((c) => ({ claim: c.claim, rating: c.rating, checker: c.checker, url: c.url, date: c.date || null, overlap: c.coverage != null ? r3(c.coverage) : null }));
+  const sites = (input.sites || []).slice(0, 8).map((s) => ({ domain: s.domain, posts: s.n, owner: s.owner || null, state: s.state || [] }));
+  const card = {
+    kind: "radar-thread-card", version: CARD_VERSION, tool: input.tool, savedAt: input.savedAt,
+    thread: { site: input.site, page: cardPage(input.page), replyAccounts: accounts },
+    report: {
+      replies: R.replies, accountsRead: R.lookedUp, notRead: R.notLookedUp, verdict: R.verdict, sentence: R.sentence,
+      extreme: R.extreme ? { n: R.extreme.n, flagged: R.extreme.flagged, ci: ci(R.extreme.ci) } : null,
+      others: R.others ? { n: R.others.n, flagged: R.others.flagged, ci: ci(R.others.ci) } : null,
+      timingBursts: (R.bursts || []).length, sameTextGroups: input.sameText || 0, machineSigns: R.machine ? R.machine.n : 0,
+      returningPairs: (R.groups || []).length, persuasion: R.persuasion ? R.persuasion.sentence : null,
+    },
+    claims, sites,
+    media: { uploads: U.uploads || 0, recycledUploads: U.recycled || 0, credentials: credentialSummary(input.media) },
+  };
+  card.sources = sourcesOf(card, input);
+  card.doesNotProve = limitsOf(card);
+  return { ok: true, card };
+}
+
+// { checked, unchanged, changed, unchecked, none, ai } over the files checked, or null.
+function credentialSummary(results) {
+  if (!Array.isArray(results) || !results.length) return null;
+  const out = { checked: results.length, unchanged: 0, changed: 0, unchecked: 0, none: 0, ai: 0 };
+  for (const r of results) {
+    const st = credentialState(r);
+    out[st === "remote" ? "none" : st]++;
+    if (r && (r.aiAnywhere || ((r.meta && r.meta.sourceTypes) || []).some((t) => t.kind === "ai"))) out.ai++;
+  }
+  return out;
+}
+
+function dedupe(claims) { const seen = new Set(); return claims.filter((c) => c && c.url && !seen.has(c.url) && seen.add(c.url)); }
+
+function sourcesOf(card, input) {
+  const day = String(input.savedAt || "").slice(0, 10);
+  return [
+    `Replies and posts as ${card.thread.site} showed them to this viewer on ${day}, read by Radar in this browser.`,
+    "Account flags: what each platform discloses on profiles and About pages, read by Radar in this browser. Rules and measured error rates: Radar's EVALUATION.md.",
+    card.claims.length ? CLAIM_ATTRIBUTION : null,
+    card.sites.some((s) => s.owner) ? "Outlet owners: Radar's ownership table, built from Wikidata; each row links its Wikidata item." : null,
+    card.sites.some((s) => s.state.length) ? "State links: Wikidata ownership chains, and the platform or government reports each link cites." : null,
+    "Media: whether an upload was first posted by another account, from the posts this viewer's page loaded.",
+    card.media.credentials ? "Content Credentials: C2PA manifests read and checked in this browser from files the viewer chose to check." : null,
+  ].filter(Boolean);
+}
+
+function limitsOf(card) {
+  return [
+    "This card covers one thread as one viewer saw it, ranked by the platform. It names no account and judges no person.",
+    REPORT_DOES_NOT_PROVE,
+    card.claims.length ? CLAIM_DOES_NOT_PROVE : null,
+    card.sites.some((s) => s.state.length) ? "A state link says a cited source ties the site to a state. It is not proof that a post is false." : null,
+    card.media.credentials ? CREDENTIALS_DO_NOT_PROVE : null,
+    card.media.recycledUploads ? "A recycled upload can be a fair repost or a correction; it shows where the file was first seen, not who made it." : null,
+  ].filter(Boolean);
+}
+
+// JSON with sorted keys and no spacing, so the same content always gives the same bytes.
+function canonicalJSON(v) {
+  if (Array.isArray(v)) return "[" + v.map(canonicalJSON).join(",") + "]";
+  if (v && typeof v === "object") return "{" + Object.keys(v).filter((k) => v[k] !== undefined).sort().map((k) => JSON.stringify(k) + ":" + canonicalJSON(v[k])).join(",") + "}";
+  return JSON.stringify(v === undefined ? null : v);
+}
+
+async function sha256(text) {
+  const buf = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function sealCard(card) {
+  const { hash, ...body } = card;
+  return { ...body, hash: { alg: "SHA-256", of: "canonical JSON of this card without the hash field (sorted keys, no spaces)", value: await sha256(canonicalJSON(body)) } };
+}
+
+async function verifyCard(card) {
+  if (!card || !card.hash) return false;
+  const { hash, ...body } = card;
+  return hash.value === (await sha256(canonicalJSON(body)));
+}
+
+const pc = (x) => `${Math.round(x * 100)}%`;
+
+// The card as lines for the PNG: { kind: title | meta | head | body | small | limit | hash, text }.
+function cardLines(card) {
+  const R = card.report, L = [];
+  const push = (kind, text) => { if (text) L.push({ kind, text }); };
+  push("title", "Radar thread card");
+  push("meta", `${card.thread.site} thread · ${card.thread.page} · saved ${String(card.savedAt).slice(0, 16).replace("T", " ")} UTC`);
+  push("head", "Thread report");
+  push("body", R.sentence);
+  push("body", `${R.replies} replies from ${card.thread.replyAccounts} accounts; ${R.accountsRead} accounts read.` + (R.verdict !== "too-few" && R.extreme && R.extreme.ci ? ` Extreme replies from flagged accounts: 95% interval ${pc(R.extreme.ci[0])} to ${pc(R.extreme.ci[1])}.` : ""));
+  push("body", `Coordination signs: ${R.timingBursts} timing burst${R.timingBursts === 1 ? "" : "s"}, ${R.sameTextGroups} group${R.sameTextGroups === 1 ? "" : "s"} of near-identical replies, ${R.returningPairs} account pair${R.returningPairs === 1 ? "" : "s"} seen together before, ${R.machineSigns} repl${R.machineSigns === 1 ? "y" : "ies"} with machine-writing signs.`);
+  push("body", R.persuasion);
+  if (card.claims.length) { push("head", "Fact-checked claims"); for (const c of card.claims) push("body", `${c.checker} rated a similar claim "${c.rating}": ${c.claim} (${c.url})`); }
+  if (card.sites.length) { push("head", "Sites linked"); push("body", card.sites.map((s) => [`${s.domain} (${s.posts})`, s.owner ? `owned by ${s.owner}` : null, ...s.state].filter(Boolean).join(", ")).join("; ")); }
+  push("head", "Media");
+  push("body", card.media.uploads ? `${card.media.recycledUploads} of ${card.media.uploads} uploads were first posted by another account.` : "No uploads were read in this thread.");
+  const C = card.media.credentials;
+  push("body", C ? `Content Credentials, ${C.checked} file${C.checked === 1 ? "" : "s"} checked: ${C.unchanged} signed and unchanged, ${C.changed} changed since signing, ${C.unchecked} not fully checked, ${C.none} with none found; ${C.ai} marked as made with generative AI (by credentials or IPTC metadata).` : "No file in this thread was checked for Content Credentials.");
+  push("head", "Sources");
+  for (const s of card.sources) push("small", s);
+  push("head", "What this does not prove");
+  for (const s of card.doesNotProve) push("limit", s);
+  if (card.hash) push("hash", `${card.hash.alg} ${card.hash.value}. The JSON saved with this image holds the same content; hash it to check a copy.`);
+  return L;
+}
+
+return { MIN_CARD_ACCOUNTS, cardPage, evidenceCard, credentialSummary, canonicalJSON, sealCard, verifyCard, cardLines };
+})();
+
 // ---- settings.js
 const M_settings = (() => {
 // Radar's settings, in one normalised shape for the toolbar popup, the first-run and options pages
@@ -4144,8 +4549,13 @@ function pruneStore(store, settings, now = Date.now()) {
   const out = {};
   const H = store["pb.history.v1"];
   if (H) { const k = keepMap(H, "at", hist); if (size(k) !== size(H)) out["pb.history.v1"] = k; }
-  const N = store["pb.net.v1"];
-  if (N && N.threads) { const k = keepMap(N.threads, "at", hist); if (size(k) !== size(N.threads)) out["pb.net.v1"] = { ...N, threads: k }; }
+  // The connections log moved to v2 (threads keyed by post id); v1 is pruned until it empties.
+  for (const key of ["pb.net.v1", "pb.net.v2"]) {
+    const N = store[key];
+    if (N && N.threads) { const k = keepMap(N.threads, "at", hist); if (size(k) !== size(N.threads)) out[key] = { ...N, threads: k }; }
+  }
+  const F = store["pb.feed.v1"];
+  if (F) { const k = keepMap(F, "at", hist); if (size(k) !== size(F)) out["pb.feed.v1"] = k; }
   const T = store["pb.trail.v1"];
   if (T) {
     const media = keepMap(T.media, "seen", hist), links = keepMap(T.links, "seen", hist);
@@ -4158,7 +4568,7 @@ function pruneStore(store, settings, now = Date.now()) {
   return out;
 }
 
-const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
+const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
 // "Clear all Radar data": every Radar key except the settings themselves.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
@@ -4493,5 +4903,5 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_measured, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_measured, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
 })();

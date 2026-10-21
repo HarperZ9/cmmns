@@ -81,3 +81,17 @@ test("with no technique shown there is no persuasion line", async () => {
   const { persuasionShare } = await import("../src/core/report.js");
   assert.equal(persuasionShare([reply(0, "what a disgusting smear", clean)], []), null);
 });
+
+test("strong rhetoric is counted over every reply, looked up or not, for the feed dashboard", () => {
+  const rows = [reply(0, "immigrants are " + EXTREME, flagged), reply(1, "immigrants are " + EXTREME, null), reply(2, CALM, clean), reply(3, CALM, null)];
+  const r = threadReport(rows);
+  assert.deepEqual(r.strong, { n: 2, of: 4 });
+  // A precomputed score from the content script is used as given.
+  assert.equal(threadReport([{ ...reply(0, CALM, clean), extreme: true }]).strong.n, 1);
+});
+
+test("technique counts cover shown techniques only", () => {
+  const rows = [reply(0, "what a disgusting smear", clean), reply(1, "what a disgusting smear", null), reply(2, CALM, clean)];
+  assert.deepEqual(threadReport(rows, ["loaded-language"]).techniques, { "loaded-language": 2 });
+  assert.deepEqual(threadReport(rows, []).techniques, {});
+});
