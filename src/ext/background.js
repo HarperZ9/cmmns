@@ -40,8 +40,20 @@ function claimIndex() {
   return claimsReady;
 }
 
+// The window's two faces (fonts.js) as bytes: the page never loads an extension URL, so the
+// fonts need no web-accessible resource and pass any font policy the site sets.
+let fontsReady = null;
+function fontBytes() {
+  const b64 = (buf) => { const u = new Uint8Array(buf); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
+  const get = ([family, file, weight]) => fetch(chrome.runtime.getURL("fonts/" + file)).then((r) => r.arrayBuffer()).then((b) => ({ family, weight, data: b64(b) }));
+  if (!fontsReady) fontsReady = Promise.all([["Radar Hanken", "hanken-grotesk.woff2", "100 900"], ["Radar Conso", "conso-regular.woff2", "400"]].map(get))
+    .catch((e) => { console.error("[radar] the window's fonts failed to load", e); fontsReady = null; return []; });
+  return fontsReady;
+}
+
 const cards = {};   // fallback where storage.session is missing
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg && msg.type === "pb-fonts") { fontBytes().then(sendResponse); return true; }
   if (msg && msg.type === "pb-claims") {
     claimIndex().then((index) => {
       const out = {};
@@ -65,11 +77,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     });
     return true;   // answer asynchronously
   }
-  // A thread card from a content script: kept for this session only, then shown on card.html.
+  // A thread card from a content script: kept for this session only, then shown on evidence-card.html.
   if (msg && msg.type === "pb-card-open") {
     const id = String(Date.now());
     const put = chrome.storage.session ? chrome.storage.session.set({ ["pb.card." + id]: msg.built }) : Promise.resolve((cards[id] = msg.built));
-    put.then(() => chrome.tabs.create({ url: chrome.runtime.getURL("card.html#" + id) })).catch((e) => console.error("[radar] could not open the card", e));
+    put.then(() => chrome.tabs.create({ url: chrome.runtime.getURL("evidence-card.html#" + id) })).catch((e) => console.error("[radar] could not open the card", e));
   }
   if (msg && msg.type === "pb-card-get") {
     const key = "pb.card." + msg.id;

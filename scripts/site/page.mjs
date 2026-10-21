@@ -1,7 +1,7 @@
 // Shared by scripts/transparency.mjs and scripts/privacy.mjs: the page shell for Radar's public
 // pages, a small Markdown reader for the subset the project's docs use, and the writer that puts
 // each page both inside the extension (src/ext) and in docs/ for the public site.
-import { copyFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -54,31 +54,25 @@ export function markdown(src, { skipTitle = true } = {}) {
   return out.join("\n");
 }
 
-const CSS = `@font-face { font-family: "Hanken Grotesk"; src: url("fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
-@font-face { font-family: "Conso"; src: url("fonts/conso-regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-:root { --ink: #14181c; --muted: #4f5b66; --line: #d9dcd6; --ground: #f7f6f2; --raised: #fffefb; --hot: #b93c0a;
-  --sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink: #e8e6e1; --muted: #a3acb5; --line: #2e3439; --ground: #111417; --raised: #181c20; --hot: #fb923c; } }
-:root[data-theme="dark"] { --ink: #e8e6e1; --muted: #a3acb5; --line: #2e3439; --ground: #111417; --raised: #181c20; --hot: #fb923c; }
-* { box-sizing: border-box; }
-html, body { background: var(--ground); }
-body { margin: 0; color: var(--ink); font: 400 16px/1.6 var(--sans); }
-main { max-width: 960px; margin: 0 auto; padding: 48px 16px 64px; }
-h1 { font-size: 2em; line-height: 1.15; margin: 0 0 8px; }
-h2 { font-size: 1.3em; margin: 40px 0 12px; padding-top: 24px; border-top: 1px solid var(--line); }
-h3 { font-size: 1.05em; margin: 24px 0 8px; }
-p, li { max-width: 68ch; }
-a { color: var(--ink); text-underline-offset: 3px; }
-code, .mono { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
-.lead { font-size: 1.15em; }
-.muted { color: var(--muted); }
-.hot { color: var(--hot); font-weight: 600; }
-.scroll { overflow-x: auto; margin: 12px 0; }
-table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
-th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); }
-th { color: var(--muted); font-weight: 600; }
-td.num { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
-footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9em; }`;
+// The pages carry the shared tokens (src/ext/canon.css) inline, without its comments, then their
+// own layout, so docs/ needs no stylesheet beside the fonts.
+const CANON = readFileSync(join(ROOT, "src", "ext", "canon.css"), "utf8").replace(/\r\n/g, "\n").replace(/\/\*[\s\S]*?\*\/\n?/g, "").trim();
+const CSS = `${CANON}
+main { max-width: 60rem; margin: 0 auto; padding: var(--s-7) var(--gutter) var(--s-8); }
+h1 { font-size: var(--t-display); margin: 0 0 var(--s-3); }
+h2 { font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); margin: var(--s-7) 0 var(--s-3); }
+h2:not(.bare) { position: relative; padding-top: var(--s-5); background: linear-gradient(var(--line), var(--line)) top left / 100% 1px no-repeat; }
+h2:not(.bare)::before { content: ""; position: absolute; top: -7px; left: -7px; width: 15px; height: 15px; pointer-events: none;
+  background: linear-gradient(var(--ink), var(--ink)) center / 1px 100% no-repeat, linear-gradient(var(--ink), var(--ink)) center / 100% 1px no-repeat; }
+h3 { font-size: var(--t-h3); margin: var(--s-5) 0 var(--s-2); }
+p, li { max-width: var(--measure); }
+code { font-size: .92em; }
+.lead { font-size: var(--t-dek); }
+.muted { color: var(--soft); }
+.scroll { overflow-x: auto; margin: var(--s-3) 0; }
+table { font-size: .92em; }
+td.num { font-size: .92em; text-align: left; }
+footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid var(--line); color: var(--soft); font-size: var(--t-meta); }`;
 
 export function page({ title, description, updated, body }) {
   return `<!doctype html>
@@ -97,7 +91,7 @@ ${CSS}
 <h1>${esc(title)}</h1>
 <p class="muted">Updated ${esc(updated)}.</p>
 ${body}
-<footer>Radar. Evidence, not verdicts. Nothing leaves your browser. <a href="${REPO}">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a></footer>
+<footer>Radar. Evidence, not verdicts. Nothing leaves your browser. <a href="${REPO}">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
 </main>
 </body>
 </html>

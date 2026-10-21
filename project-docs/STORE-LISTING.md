@@ -162,7 +162,7 @@ files).
 4. The transparency page at the side-balance table.
 5. The first-run page: what Radar shows, what it never does, the site switches.
 
-Small promo tile (CWS, 440x280, required): the aperture icon on the ink ground with the name, from
+Small promo tile (CWS, 440x280, required): the aperture icon on the void ground (#060608) with the name in Hanken Grotesk 780, from
 `assets/icons/radar.svg`. Marquee (1400x560): optional, skip. Icon: `src/ext/icons/radar-128.png`.
 YouTube video: the CWS listing page lists one; if the dashboard requires it, a 30 to 60 second
 screen recording of the fixture thread, uploaded to the author's channel.

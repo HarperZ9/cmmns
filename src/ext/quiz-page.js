@@ -33,7 +33,7 @@ function verdict(item, said) {
 
 function card(item, n) {
   const li = el("li", { class: "item" });
-  li.append(el("p", { class: "muted mono" }, `Post ${n} of ${ORDERED.length}`), el("p", { class: "post" }, item.text));
+  li.append(el("p", { class: "muted figure" }, `Post ${n} of ${ORDERED.length}`), el("p", { class: "post" }, item.text));
   const row = el("div", { class: "row", role: "group", "aria-label": QUESTION });
   const out = el("div", { "aria-live": "polite" });
   for (const [key, label] of ANSWERS) {

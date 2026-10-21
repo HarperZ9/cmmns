@@ -4,6 +4,10 @@
 (() => {
   const store = { ...(globalThis.FIXTURE_STORE || {}) };
   const listeners = [];
+  // The worker's font bytes (background.js), read from src/ext/fonts relative to the fixture.
+  const b64 = (buf) => { const u = new Uint8Array(buf); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
+  const fixtureFonts = () => Promise.all([["Radar Hanken", "hanken-grotesk.woff2", "100 900"], ["Radar Conso", "conso-regular.woff2", "400"]]
+    .map(([family, file, weight]) => fetch(new URL("../../src/ext/fonts/" + file, document.currentScript ? document.currentScript.src : location.href)).then((r) => r.arrayBuffer()).then((b) => ({ family, weight, data: b64(b) }))));
   globalThis.chrome = {
     storage: { local: {
       get: async (k) => Object.fromEntries((Array.isArray(k) ? k : [k]).map((x) => [x, store[x]])),
@@ -15,6 +19,7 @@
       onMessage: { addListener: (f) => listeners.push(f) },
       sendMessage: async (msg) => {
         if (msg.type === "pb-owners" || msg.type === "pb-state") return [];
+        if (msg.type === "pb-fonts") return fixtureFonts();
         if (msg.type === "pb-card-open") { globalThis.FIXTURE_CARD = msg.built; return; }
         if (msg.type !== "pb-lookup") return;
         for (const [i, h] of msg.handles.entries()) {

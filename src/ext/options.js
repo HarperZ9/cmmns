@@ -101,7 +101,7 @@
     for (const f of [...PB.FAMILIES].sort((a, b) => order(a) - order(b))) {
       const line = PB.measuredLine(f.id);
       const tr = el("tr");
-      tr.append(el("td", {}, f.name), el("td", {}, f.area[0].toUpperCase() + f.area.slice(1)), el("td", { class: line.measured ? "mono" : "muted" }, line.text));
+      tr.append(el("td", {}, f.name), el("td", {}, f.area[0].toUpperCase() + f.area.slice(1)), el("td", { class: line.measured ? "figure" : "muted" }, line.text));
       $("families").append(tr);
     }
   }

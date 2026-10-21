@@ -1,7 +1,8 @@
-"""Draw Radar's icons: the aperture, a luminous orb inside fine concentric line-work on an ink disk.
+"""Draw Radar's icons: the aperture, a luminous orb inside fine concentric line-work on a void disk,
+in the bone and void of the author's site (DESIGN-CANON-CHECK.md).
 
 Writes the SVG sources to assets/icons/ and PNG renders at 16, 32, 48 and 128 px to src/ext/icons/,
-for three toolbar states: idle, reading (one warm mark on the outer ring) and paused (the orb
+for three toolbar states: idle, reading (one lit mark on the outer ring) and paused (the orb
 closed to a thin ring). Small sizes drop the finest rings so the form survives at 16 px.
 
     python scripts/render-icons.py
@@ -14,7 +15,7 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parent.parent
 SVG_DIR, PNG_DIR = ROOT / "assets" / "icons", ROOT / "src" / "ext" / "icons"
 SIZES = (16, 32, 48, 128)
-INK, LINE, HOT, PAUSED_GROUND = "#0f1419", "#e7e9ea", "#fb923c", "#3a4148"
+INK, LINE, HOT, PAUSED_GROUND = "#060608", "#ece5d6", "#fff6e6", "#29282c"
 
 
 def rings(detail: bool, opacity: float) -> str:
@@ -40,15 +41,15 @@ def svg(state: str, detail: bool) -> str:
     ground = PAUSED_GROUND if state == "paused" else INK
     defs = (
         '<defs><radialGradient id="orb" cx="0.5" cy="0.46" r="0.5">'
-        '<stop offset="0" stop-color="#fffdf7"/><stop offset="0.45" stop-color="#f1ede4"/>'
-        '<stop offset="0.8" stop-color="#cfd6dc" stop-opacity="0.55"/><stop offset="1" stop-color="#cfd6dc" stop-opacity="0"/>'
+        '<stop offset="0" stop-color="#fff6e6"/><stop offset="0.45" stop-color="#ece5d6"/>'
+        '<stop offset="0.8" stop-color="#b8b0a0" stop-opacity="0.55"/><stop offset="1" stop-color="#b8b0a0" stop-opacity="0"/>'
         "</radialGradient></defs>"
     )
     if state == "paused":
         core = f'<circle cx="64" cy="64" r="{16 if detail else 20}" fill="none" stroke="{LINE}" stroke-opacity="0.9" stroke-width="{3 if detail else 9}"/>'
         art = rings(detail, 0.45) + core
     else:
-        core = f'<circle cx="64" cy="64" r="{30 if detail else 34}" fill="url(#orb)"/><circle cx="64" cy="64" r="{11 if detail else 14}" fill="#fffdf7"/>'
+        core = f'<circle cx="64" cy="64" r="{30 if detail else 34}" fill="url(#orb)"/><circle cx="64" cy="64" r="{11 if detail else 14}" fill="#fff6e6"/>'
         art = rings(detail, 0.8) + blades(detail) + core
     mark = ""
     if state == "reading":
@@ -56,7 +57,7 @@ def svg(state: str, detail: bool) -> str:
         mark = f'<circle cx="{64 + r * 0.7071:.1f}" cy="{64 - r * 0.7071:.1f}" r="{10 if detail else 21}" fill="{HOT}" stroke="{ground}" stroke-width="{3 if detail else 5}"/>'
     return (
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">'
-        f"{defs}<circle cx=\"64\" cy=\"64\" r=\"60\" fill=\"{ground}\" stroke=\"#8b98a5\" stroke-opacity=\"0.5\" stroke-width=\"{2 if detail else 4}\"/>{art}{mark}</svg>"
+        f"{defs}<circle cx=\"64\" cy=\"64\" r=\"60\" fill=\"{ground}\" stroke=\"#6f6a61\" stroke-opacity=\"0.9\" stroke-width=\"{2 if detail else 4}\"/>{art}{mark}</svg>"
     )
 
 
