@@ -27,6 +27,16 @@ test("YouTube: the video id from watch and shorts", () => {
   assert.equal(threadKey("youtube", "/shorts/dQw4w9WgXcQ", ""), "youtube:dQw4w9WgXcQ");
 });
 
+test("Instagram, Bluesky and Facebook: the post id, case kept", () => {
+  assert.equal(threadKey("instagram", "/exampleowner/p/AbC_d-1/c/18000000000000001/", ""), "instagram:AbC_d-1");
+  assert.equal(threadKey("instagram", "/reel/AbC_d-1/", ""), "instagram:AbC_d-1");
+  assert.equal(threadKey("bluesky", "/profile/Alice.Example.com/post/3mabc", ""), "bluesky:3mabc");
+  assert.equal(threadKey("facebook", "/ExamplePage/posts/pfbid0AbC", "?comment_id=1"), "facebook:pfbid0AbC");
+  assert.equal(threadKey("facebook", "/permalink.php", "?story_fbid=123&id=9"), "facebook:123");
+  assert.equal(threadKey("facebook", "/watch/", "?v=456"), "facebook:456");
+  assert.equal(threadKey("facebook", "/reel/789", ""), "facebook:789");
+});
+
 test("anything else falls back to the lower-cased path", () => {
   assert.equal(threadKey("facebook", "/Some/Path/", ""), "facebook:/some/path");
 });

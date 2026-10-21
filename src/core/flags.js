@@ -13,6 +13,9 @@ export const HIGH_VOLUME_PER_DAY = 100;
 export const DEFAULT_HANDLE = /^[A-Za-z]+_?[0-9]{6,}$/;
 
 const DAY = 86400000;
+// Moderation label values about authenticity. Labels about content (rude, intolerant, nudity)
+// are shown on the card but never flag the account.
+export const PLATFORM_AUTH_LABELS = new Set(["spam", "impersonation", "scam", "inauthentic", "engagement-farming"]);
 // X's own apps; posts from anything else came through a third-party or automation tool.
 const COMMON_APP = /^(?:Twitter|X) (?:for (?:iPhone|Android|iPad|Mac)|Web App|Web Client)$/;
 // Self-chosen names that carry documented hate symbols (ADL Hate Symbols database).
@@ -39,6 +42,7 @@ export const DOES_NOT_PROVE = {
   "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
   "profile-location-elsewhere": "Profile locations are typed by the user, can be out of date or a joke, and people live abroad.",
   "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
+  "platform-label": "A moderation label is the service's own judgement; labels can be wrong, disputed or applied in bulk.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
 };
 
@@ -123,6 +127,9 @@ export function flagsFor(account, context = {}) {
   if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
   // Reddit: little karma after more than a month, and Reddit's suggested sign-up name.
   if (Number.isFinite(account.karma) && age != null && age > NEW_ACCOUNT_DAYS && account.karma < LOW_KARMA) out.push({ id: "low-karma", evidence: `${account.karma} karma after ${age} days` });
+  // Bluesky: moderation labels about how an account behaves, not what it says.
+  const auth = (account.platformLabels || []).filter((l) => PLATFORM_AUTH_LABELS.has(l));
+  if (auth.length) out.push({ id: "platform-label", evidence: `labelled "${auth.join('", "')}" by ${account.labelSource || "the platform's moderation"}` });
   if (account.redditDefaultName) out.push({ id: "default-handle", evidence: "username has the pattern Reddit suggests at sign-up" });
   if (account.handle && DEFAULT_HANDLE.test(account.handle)) out.push({ id: "default-handle", evidence: `handle @${account.handle} has the sign-up pattern` });
   if (context.mismatch && context.mismatch.status === "mismatch") out.push({ id: "based-elsewhere", evidence: context.mismatch.reason + (account.proxyNote ? " (X notes a possible VPN or proxy, so the label may be wrong)" : "") });

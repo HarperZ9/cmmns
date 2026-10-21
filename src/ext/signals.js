@@ -19,6 +19,7 @@
     "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere",
     "high-volume": "very high post rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute",
     "copied-elsewhere": "same words in other threads", "low-karma": "low karma for its age", "automation-app": "posts through an automation app", "no-sleep-gap": "posts around the clock", "repost-only": "almost only reposts", "follow-pattern": "follows many, few follow back",
+    "platform-label": "moderation label",
   };
   const WEAK = new Set(["default-handle", "follow-pattern"]);
   // The areas the window's summary strip shows, in order, and which area each account flag is in.

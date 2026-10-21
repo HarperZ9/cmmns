@@ -404,6 +404,9 @@ const HIGH_VOLUME_PER_DAY = 100;
 const DEFAULT_HANDLE = /^[A-Za-z]+_?[0-9]{6,}$/;
 
 const DAY = 86400000;
+// Moderation label values about authenticity. Labels about content (rude, intolerant, nudity)
+// are shown on the card but never flag the account.
+const PLATFORM_AUTH_LABELS = new Set(["spam", "impersonation", "scam", "inauthentic", "engagement-farming"]);
 // X's own apps; posts from anything else came through a third-party or automation tool.
 const COMMON_APP = /^(?:Twitter|X) (?:for (?:iPhone|Android|iPad|Mac)|Web App|Web Client)$/;
 // Self-chosen names that carry documented hate symbols (ADL Hate Symbols database).
@@ -430,6 +433,7 @@ const DOES_NOT_PROVE = {
   "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
   "profile-location-elsewhere": "Profile locations are typed by the user, can be out of date or a joke, and people live abroad.",
   "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
+  "platform-label": "A moderation label is the service's own judgement; labels can be wrong, disputed or applied in bulk.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
 };
 
@@ -514,6 +518,9 @@ function flagsFor(account, context = {}) {
   if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
   // Reddit: little karma after more than a month, and Reddit's suggested sign-up name.
   if (Number.isFinite(account.karma) && age != null && age > NEW_ACCOUNT_DAYS && account.karma < LOW_KARMA) out.push({ id: "low-karma", evidence: `${account.karma} karma after ${age} days` });
+  // Bluesky: moderation labels about how an account behaves, not what it says.
+  const auth = (account.platformLabels || []).filter((l) => PLATFORM_AUTH_LABELS.has(l));
+  if (auth.length) out.push({ id: "platform-label", evidence: `labelled "${auth.join('", "')}" by ${account.labelSource || "the platform's moderation"}` });
   if (account.redditDefaultName) out.push({ id: "default-handle", evidence: "username has the pattern Reddit suggests at sign-up" });
   if (account.handle && DEFAULT_HANDLE.test(account.handle)) out.push({ id: "default-handle", evidence: `handle @${account.handle} has the sign-up pattern` });
   if (context.mismatch && context.mismatch.status === "mismatch") out.push({ id: "based-elsewhere", evidence: context.mismatch.reason + (account.proxyNote ? " (X notes a possible VPN or proxy, so the label may be wrong)" : "") });
@@ -540,7 +547,7 @@ function isFlagged(flags) {
   return new Set(counted.map((f) => f.id)).size >= 2;
 }
 
-return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, HIGH_VOLUME_PER_DAY, DEFAULT_HANDLE, DOES_NOT_PROVE, ageDays, storeCountry, nameFlags, flagsFor, WEAK_FLAGS, isFlagged };
+return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, HIGH_VOLUME_PER_DAY, DEFAULT_HANDLE, PLATFORM_AUTH_LABELS, DOES_NOT_PROVE, ageDays, storeCountry, nameFlags, flagsFor, WEAK_FLAGS, isFlagged };
 })();
 
 // ---- lexicon.js
@@ -1511,6 +1518,173 @@ function parseAbout(text, handle) {
 return { parseJoined, parseNameChanges, parseAbout };
 })();
 
+// ---- meta.js
+const M_meta = (() => {
+// Account context Meta shows the viewer on Facebook and Instagram, read from the text the site
+// renders when the viewer opens it. Radar makes no request of its own for it.
+// - Instagram: "About this account" (profile menu): date joined, "Account based in", former
+//   usernames, verified. Layout checked live 2026-10-21: each label on its own line, then its value.
+// - Facebook: "Page transparency" on a Page: creation date, name changes, and the countries of the
+//   people who manage the Page. Wording from Meta's public description; live check open.
+
+const { parseAbout, parseJoined } = M_about;
+
+const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+const MON = "(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\.?";
+const iso = (y, m, d) => new Date(Date.UTC(+y, MONTHS[m.slice(0, 3).toLowerCase()], +d)).toISOString().slice(0, 10);
+const compact = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null && v !== undefined && v !== false && v !== ""));
+const linesOf = (text) => String(text || "").split(/\n+/).map((l) => l.trim()).filter(Boolean);
+
+// "February 8, 2009" or "8 February 2009"; falls back to month and year ("March 2019").
+function parseFullDate(s) {
+  const t = String(s || "");
+  let m = t.match(new RegExp(MON + "\\s+(\\d{1,2}),?\\s+(\\d{4})", "i"));
+  if (m) return iso(m[3], m[1], m[2]);
+  m = t.match(new RegExp("(\\d{1,2})\\s+" + MON + ",?\\s+(\\d{4})", "i"));
+  if (m) return iso(m[3], m[2], m[1]);
+  return parseJoined(t);
+}
+
+const IG_LABEL = /^(?:date joined|account based in|verified|former usernames?|accounts? with shared followers|close|about this account)$/i;
+
+// text: the dialog's innerText. handle: the account, when known from the page; otherwise the line
+// under the dialog's title.
+function igAbout(text, handle) {
+  const lines = linesOf(text);
+  const top = lines.findIndex((l) => /^about this account$/i.test(l));
+  if (top < 0) return null;
+  const who = handle || (lines[top + 1] && /^[A-Za-z0-9._]{1,30}$/.test(lines[top + 1]) ? lines[top + 1] : null);
+  const a = parseAbout(lines.join("\n"), who);
+  const hidden = /^not shared$/i.test(a.basedIn || "");
+  let former;
+  const f = lines.findIndex((l) => /^former usernames?\b/i.test(l));
+  if (f >= 0) {
+    const n = lines[f].match(/(\d+)/);
+    if (n) former = +n[1];
+    else { former = 0; for (let i = f + 1; i < lines.length && !IG_LABEL.test(lines[i]); i++) if (/^@?[A-Za-z0-9._]{1,30}$/.test(lines[i])) former++; }
+  }
+  const r = compact({ handle: who, joinDate: a.joinDate, basedIn: hidden ? null : a.basedIn, basedInHidden: hidden,
+    nameChanges: former, verified: lines.some((l) => /^verified$/i.test(l)), labelSource: "Instagram", aboutRead: true });
+  return r.joinDate || r.basedIn || hidden ? r : null;
+}
+
+// The value on a label's line ("Page created - May 3, 2015") or on the next line.
+function valueAfter(lines, re) {
+  for (let i = 0; i < lines.length; i++) {
+    if (!re.test(lines[i])) continue;
+    const rest = lines[i].replace(re, "").replace(/^[\s:·\-–—]+/, "").trim();
+    return rest || lines[i + 1] || null;
+  }
+  return null;
+}
+
+// "Exampleland (4)" entries after the managers' heading, on one line or one per line.
+function managers(lines) {
+  const at = lines.findIndex((l) => /location for (?:the )?people who manage this page/i.test(l));
+  if (at < 0) return [];
+  const out = [];
+  const take = (s) => { for (const m of s.matchAll(/([^,():]+?)\s*\((\d+)\)/g)) out.push({ country: m[1].replace(/^.*includes\s*/i, "").trim(), people: +m[2] }); };
+  take(lines[at].replace(/^.*?:/, ""));
+  for (let i = at + 1; i < lines.length && /\(\d+\)\s*$/.test(lines[i]); i++) take(lines[i]);
+  return out.filter((x) => x.country);
+}
+
+function pageTransparency(text, handle) {
+  const lines = linesOf(text);
+  if (!lines.some((l) => /^page transparency$/i.test(l))) return null;
+  const created = valueAfter(lines, /^(?:page created|creation date|created)\b/i);
+  const renames = lines.filter((l) => /^changed name to\b/i.test(l)).length;
+  const noRename = lines.some((l) => /(?:has not|hasn't|never) changed its name|^no name changes/i.test(l));
+  const from = managers(lines);
+  const ads = lines.some((l) => /\bcurrently running ads\b/i.test(l) && !/\bnot currently running\b/i.test(l));
+  const r = compact({ handle, joinDate: parseFullDate(created), nameChanges: renames || (noRename ? 0 : null),
+    managedFrom: from.length ? from : null, basedIn: from.length === 1 ? from[0].country : null, runningAds: ads,
+    labelSource: "Facebook Page transparency", aboutRead: true });
+  return r.joinDate || r.managedFrom || r.nameChanges != null ? r : null;
+}
+
+// Paths on facebook.com that are not people or Pages.
+const NOT_ACCOUNT = /^(?:groups|watch|reel|reels|photo|photos|posts|events|marketplace|gaming|stories|story\.php|permalink\.php|photo\.php|hashtag|search|share|login|help|policies|privacy|settings|notifications|messages|friends|bookmarks|pages|l\.php|ads|business)$/i;
+
+// A stable key for the account a Facebook profile link points to: the vanity name, or "id.<n>".
+function fbKey(href) {
+  let u;
+  try { u = new URL(href); } catch (_) { return null; }
+  if (!/(^|\.)facebook\.com$/.test(u.hostname) || /^l\./.test(u.hostname)) return null;
+  const parts = u.pathname.split("/").filter(Boolean);
+  if (parts[0] === "profile.php") return /^\d+$/.test(u.searchParams.get("id") || "") ? "id." + u.searchParams.get("id") : null;
+  if (parts[0] === "people" && /^\d+$/.test(parts[2] || "")) return "id." + parts[2];
+  if (parts.length !== 1 || NOT_ACCOUNT.test(parts[0]) || !/^[A-Za-z0-9.]{3,50}$/.test(parts[0])) return null;
+  return parts[0].toLowerCase();
+}
+
+// The profile URL for a key from fbKey.
+function fbProfile(key) {
+  return key && key.startsWith("id.") ? `https://www.facebook.com/profile.php?id=${key.slice(3)}` : `https://www.facebook.com/${key}`;
+}
+
+return { parseFullDate, igAbout, pageTransparency, fbKey, fbProfile };
+})();
+
+// ---- bsky.js
+const M_bsky = (() => {
+// Bluesky account and post data from the responses the Bluesky web app already loaded for the
+// page (app.bsky.unspecced.getPostThreadV2, app.bsky.feed.getPostThread, getProfile(s), feeds),
+// passed on by src/ext/bskysniff.js. Radar makes no request of its own. Field names follow the
+// public AT Protocol lexicons (app.bsky.actor.defs#profileViewBasic, app.bsky.feed.defs#postView).
+
+function walk(json, visit, limit = 200000) {
+  const stack = [json];
+  let guard = 0;
+  while (stack.length && guard++ < limit) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    visit(v);
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+}
+
+const isProfile = (v) => typeof v.did === "string" && v.did.startsWith("did:") && typeof v.handle === "string";
+
+// handle (lower case) -> what Bluesky loaded about the account. Labels the account put on itself
+// (src equal to its own DID) and system values starting with "!" are left out.
+function bskyAuthors(json) {
+  const out = new Map();
+  if (!json) return out;
+  walk(json, (v) => {
+    if (!isProfile(v)) return;
+    const labels = (Array.isArray(v.labels) ? v.labels : []).filter((l) => l && l.val && l.src !== v.did && !String(l.val).startsWith("!")).map((l) => String(l.val));
+    const r = { handle: v.handle, did: v.did, aboutRead: true, labelSource: "Bluesky moderation" };
+    if (v.displayName) r.display = String(v.displayName).slice(0, 80);
+    if (typeof v.createdAt === "string" && /^\d{4}-\d{2}-\d{2}/.test(v.createdAt)) r.joinDate = v.createdAt.slice(0, 10);
+    if (labels.length) r.platformLabels = [...new Set(labels)];
+    if (v.verification && v.verification.verifiedStatus === "valid") r.verified = true;
+    if (v.verification && v.verification.trustedVerifierStatus === "valid") r.trustedVerifier = true;
+    if (v.handle === "handle.invalid") r.handleInvalid = true;
+    if (Number.isFinite(v.followersCount)) r.followersCount = v.followersCount;
+    if (Number.isFinite(v.followsCount)) r.followingCount = v.followsCount;
+    if (Number.isFinite(v.postsCount)) r.postsCount = v.postsCount;
+    const k = v.handle.toLowerCase();
+    out.set(k, { ...(out.get(k) || {}), ...r });
+  });
+  return out;
+}
+
+// Post record key -> { id, author, posted, langs } for posts in the response.
+function bskyPosts(json) {
+  const out = new Map();
+  if (!json) return out;
+  walk(json, (v) => {
+    if (typeof v.uri !== "string" || !v.author || !isProfile(v.author) || !v.record || typeof v.record.text !== "string") return;
+    const id = v.uri.split("/").pop();
+    out.set(id, { id, author: v.author.handle, posted: v.record.createdAt || null, langs: Array.isArray(v.record.langs) ? v.record.langs : [] });
+  });
+  return out;
+}
+
+return { bskyAuthors, bskyPosts };
+})();
+
 // ---- owners.js
 const M_owners = (() => {
 // Who owns the outlet behind a link or an account. The table (src/ext/owners.json) is built from
@@ -1796,6 +1970,12 @@ function threadKey(siteId, pathname, search = "") {
   if (siteId === "x") id = (path.match(/\/status\/(\d+)/) || [])[1];
   else if (siteId === "reddit") id = (path.match(/\/comments\/([a-z0-9]+)/i) || [])[1];
   else if (siteId === "youtube") id = new URLSearchParams(search).get("v") || (path.match(/^\/shorts\/([\w-]+)/) || [])[1];
+  else if (siteId === "instagram") id = (path.match(/\/(?:p|reels?|tv)\/([\w-]+)/) || [])[1];
+  else if (siteId === "bluesky") id = (path.match(/\/post\/([a-z0-9]+)/i) || [])[1];
+  else if (siteId === "facebook") {
+    const q = new URLSearchParams(search);
+    id = (path.match(/\/(?:posts|videos|reel)\/([\w-]+)/) || [])[1] || q.get("story_fbid") || q.get("v") || q.get("fbid");
+  }
   if (id) return siteId + ":" + (siteId === "reddit" ? id.toLowerCase() : id);   // YouTube ids are case-sensitive
   return `${siteId}:${path.toLowerCase().replace(/\/+$/, "")}`;
 }
@@ -2604,5 +2784,5 @@ function claimCard(m) {
 return { MIN_CLAIM_TOKENS, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION, claimTokens, hasNegation, guessLanguage, buildClaimIndex, matchClaims, claimCard };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims });
 })();
