@@ -60,7 +60,11 @@
     section(p, "Flagged accounts", report.verdict === "too-few" ? [] : [`Among the most extreme replies: ${pct(report.extreme.share)} (95% interval ${ci(report.extreme.ci)}).`, `Among the rest: ${pct(report.others.share)} (${ci(report.others.ci)}).`]);
     section(p, "Where accounts are based", [
       report.origins && report.origins.length ? report.origins.slice(0, 6).map((o) => `${o.place} ${o.n}`).join(" · ") : null,
-      stats.site && !stats.site.hasLocation ? `${stats.site.name} shows no account location; this view uses coordination signs only.` : `${report.lookedUp} of ${report.replies} accounts read so far.`,
+      stats.site && !stats.site.hasLocation ? ({
+        instagram: `${report.lookedUp} of ${report.replies} accounts have an "About this account" you opened. Instagram shows where an account is based only there.`,
+        facebook: `${report.lookedUp} of ${report.replies} accounts have Page transparency you opened. Facebook shows it for Pages, not people.`,
+        bluesky: `${report.lookedUp} of ${report.replies} accounts have Bluesky data (join date, moderation labels). Bluesky shows no account location.`,
+      }[stats.site.id] || `${stats.site.name} shows no account location; this view uses coordination signs only.`) : `${report.lookedUp} of ${report.replies} accounts read so far.`,
       stats.paused ? "X is limiting requests; Radar paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
     ]);
     section(p, "Coordination", coordination(report, clusters));

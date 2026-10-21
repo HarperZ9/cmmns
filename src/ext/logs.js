@@ -70,6 +70,7 @@
 
   function clearAll() {
     trailLog = {}; netLog = {}; lastRecorded = "";
+    if (globalThis.PBMeta) PBMeta.clear().catch((e) => console.error("[radar] could not clear account readings", e));
     return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY]);
   }
 

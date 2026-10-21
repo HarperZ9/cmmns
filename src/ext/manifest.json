@@ -10,7 +10,10 @@
     "https://x.com/*",
     "https://twitter.com/*",
     "https://www.reddit.com/*",
-    "https://www.youtube.com/*"
+    "https://www.youtube.com/*",
+    "https://www.facebook.com/*",
+    "https://www.instagram.com/*",
+    "https://bsky.app/*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -43,14 +46,28 @@
     },
     {
       "matches": [
+        "https://bsky.app/*"
+      ],
+      "js": [
+        "bskysniff.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
         "https://x.com/*",
         "https://twitter.com/*",
         "https://www.reddit.com/*",
-        "https://www.youtube.com/*"
+        "https://www.youtube.com/*",
+        "https://www.facebook.com/*",
+        "https://www.instagram.com/*",
+        "https://bsky.app/*"
       ],
       "js": [
         "core.bundle.js",
         "store.js",
+        "meta.js",
         "about-page.js",
         "platforms.js",
         "pop.js",

@@ -25,7 +25,7 @@ test("core.bundle.js matches a fresh build of src/core", () => {
 
 test("the bundle exposes the functions the content scripts call", async () => {
   await import("../src/ext/core.bundle.js");
-  for (const name of ["parseAbout", "compare", "flagsFor", "duplicateClusters", "threadReport", "score", "DOES_NOT_PROVE", "REPORT_DOES_NOT_PROVE", "buildClaimIndex", "matchClaims", "claimCard"]) {
+  for (const name of ["parseAbout", "compare", "flagsFor", "duplicateClusters", "threadReport", "score", "DOES_NOT_PROVE", "REPORT_DOES_NOT_PROVE", "buildClaimIndex", "matchClaims", "claimCard", "igAbout", "pageTransparency", "fbKey", "fbProfile", "bskyAuthors", "bskyPosts"]) {
     assert.ok(name in globalThis.PB, name);
   }
 });

@@ -6,7 +6,13 @@ not be what they seem. It runs in your browser and sends nothing anywhere.
 - **On X:** where X labels each account as based, how old the account is, how often it changed
   its name, and a flag when a reply speaks as a local ("here in France") from an account labelled
   as based somewhere else.
-- **On X, Reddit and YouTube:** groups of near-identical replies posted by different accounts,
+- **On Instagram and Facebook:** when you open an account's "About this account" (Instagram) or a
+  Page's "Page transparency" (Facebook), Radar remembers what Meta shows there: the date joined or
+  created, where the account is based or the countries of the people who manage the Page, and name
+  changes. Replies from those accounts then get the same age, rename and "speaks as a local" flags.
+- **On Bluesky:** each account's join date and the moderation labels Bluesky's own service put on
+  it, read from the thread data the Bluesky app already loaded. Bluesky shows no account location.
+- **On every site:** groups of near-identical replies posted by different accounts,
   and a thread report that says whether the most extreme replies come mostly from flagged accounts.
 
 Every badge opens a note saying where its data came from and what it does not prove. Radar never
@@ -54,7 +60,9 @@ All of it comes from data the site already loaded for the page. Radar makes no r
 ## Status
 Prototype. Built and checked on a test thread (`tests/fixtures/thread.html`); not yet checked on
 live pages or measured for accuracy. See `project-docs/LIVE-CHECKS.md` and
-`project-docs/EVALUATION.md`. Facebook and Instagram are planned.
+`project-docs/EVALUATION.md`. Facebook, Instagram and Bluesky are checked against synthetic
+fixtures (`tests/fixtures/meta.html?site=facebook`, `instagram`, `bluesky`) and the live page
+structure; the extension itself is not yet checked installed on them.
 
 ## Develop
 `npm test` runs the tests. `npm run build` regenerates `src/ext/core.bundle.js` from `src/core`.

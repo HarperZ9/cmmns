@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixture: Facebook, Instagram, Bluesky</title>
+<link rel="stylesheet" href="../../src/ext/badges.css">
+<style>
+  body { margin: 0; background: #fff; color: #1c1e21; font: 15px/1.4 system-ui, sans-serif; }
+  main { max-width: 620px; margin: 0 auto; padding: 0 16px; }
+  .c { padding: 10px 0; border-bottom: 1px solid #e4e6eb; }
+  .note { padding: 12px 0; color: #65676b; font-size: 13px; }
+  [role="dialog"] { position: fixed; right: 16px; bottom: 16px; width: 260px; padding: 12px; background: #f0f2f5; white-space: pre-line; font-size: 13px; }
+</style>
+<script>
+  // ?site=facebook | instagram | bluesky. Every account, name and comment here is invented. The
+  // markup copies only the structure Radar reads on each site (checked live 2026-10-21).
+  const SITE = new URLSearchParams(location.search).get("site") || "facebook";
+  document.documentElement.dataset.pbFixture = SITE;
+  const C = [
+    ["daily.reader", "Daily Reader", "Great launch, congratulations to the whole team."],
+    ["truth.now.77", "Truth Now", "Here in France nobody believes this. Wake up, it is all staged by foreign money!"],
+    ["patriot.voice", "Patriot Voice", "Here in France nobody believes this. Wake up, it is all staged by foreign money!"],
+    ["id.100000000000042", "Sam Example", "Where can I watch the replay?"],
+    ["fresh.page.news", "Fresh Page News", "Wake up people, it is all staged by foreign money"],
+  ];
+  const now = Date.now();
+  // Readings the site would have shown the viewer earlier (meta.js keeps them per site).
+  const R = {
+    "facebook:fresh.page.news": { handle: "fresh.page.news", joinDate: new Date(now - 9 * 864e5).toISOString().slice(0, 10), nameChanges: 4, managedFrom: [{ country: "Nigeria", people: 2 }], basedIn: "Nigeria", labelSource: "Facebook Page transparency", aboutRead: true, at: now },
+    "instagram:truth.now.77": { handle: "truth.now.77", joinDate: "2026-10-12", basedIn: "India", labelSource: "Instagram", aboutRead: true, at: now },
+    "bluesky:patriot.voice": { handle: "patriot.voice", joinDate: "2026-10-18", platformLabels: ["spam"], labelSource: "Bluesky moderation", aboutRead: true, at: now },
+  };
+  window.FIXTURE_STORE = { "pb.meta.v1": R };
+</script>
+</head>
+<body>
+<main>
+  <div class="note">Fixture: invented accounts and comments in the structure Radar reads on Facebook, Instagram or Bluesky. Switch with ?site=facebook, ?site=instagram or ?site=bluesky.</div>
+  <div id="thread" role="main"></div>
+</main>
+<script>
+  const box = document.getElementById("thread");
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const fbHref = (k) => k.startsWith("id.") ? `https://www.facebook.com/profile.php?id=${k.slice(3)}&comment_id=Y29tbWVudA` : `https://www.facebook.com/${k}?comment_id=Y29tbWVudA`;
+  if (SITE === "bluesky") {
+    const root = document.createElement("div");
+    root.className = "c"; root.dataset.testid = "postThreadItem-by-launch.example";
+    root.innerHTML = `<a href="/profile/launch.example">Launch Example</a><div data-word-wrap="1">We launched today.</div><a href="/profile/launch.example/post/3root">time</a>`;
+    box.append(root);
+  }
+  C.forEach(([k, name, text], i) => {
+    const d = document.createElement("div");
+    d.className = "c";
+    if (SITE === "facebook") {
+      d.setAttribute("role", "article");
+      d.setAttribute("aria-label", `Comment by ${name} ${i + 1} hours ago`);
+      d.innerHTML = `<a href="${fbHref(k)}"></a><a href="${fbHref(k)}"><span>${esc(name)}</span></a><div dir="auto">${esc(text)}</div><a href="https://www.facebook.com/ExamplePage/posts/pfbid0fixture?comment_id=10000000000000${i}">${i + 1}h</a>`;
+    } else if (SITE === "instagram") {
+      const h = k.startsWith("id.") ? "sam.example" : k;
+      d.innerHTML = `<div><a href="/${h}/"></a><span dir="auto"><a href="/${h}/"><span dir="auto">${h}</span></a></span><span dir="auto">${i + 1}h</span><a href="/exampleowner/p/FIXTURE1/c/1800000000000000${i}/"><time datetime="2026-10-21T0${i}:00:00.000Z">${i + 1}h</time></a></div><span dir="auto">${esc(text)}</span><div role="button"><span dir="auto">Reply</span></div>`;
+    } else {
+      const h = k.startsWith("id.") ? "sam.example.com" : k;
+      d.dataset.testid = `postThreadItem-by-${h}`;
+      d.innerHTML = `<a href="/profile/${h}">${esc(name)}</a><div data-word-wrap="1">${esc(text)}</div><a href="/profile/${h}/post/3c${i}">${i + 1}h</a>`;
+    }
+    box.append(d);
+  });
+</script>
+<script src="chrome-stub.js"></script>
+<script src="../../src/ext/core.bundle.js"></script>
+<script src="../../src/ext/store.js"></script>
+<script src="../../src/ext/meta.js"></script>
+<script src="../../src/ext/platforms.js"></script>
+<script src="../../src/ext/pop.js"></script>
+<script src="../../src/ext/signals.js"></script>
+<script src="../../src/ext/card.js"></script>
+<script src="../../src/ext/panel.js"></script>
+<script src="../../src/ext/ui.js"></script>
+<script src="../../src/ext/logs.js"></script>
+<script src="../../src/ext/content.js"></script>
+<script>
+  // Instagram: an "About this account" dialog as the viewer would open it; meta.js reads it.
+  if (SITE === "instagram") setTimeout(() => {
+    const d = document.createElement("div");
+    d.setAttribute("role", "dialog");
+    d.textContent = "About this account\npatriot.voice\nDate joined\nOctober 2026\nAccount based in\nPakistan\nFormer usernames\nold_handle_1\nold_handle_2\nold_handle_3\nClose";
+    document.body.append(d);
+  }, 800);
+  // Bluesky: a thread response as the app would load it; bskysniff.js would post this.
+  if (SITE === "bluesky") setTimeout(() => {
+    const a = (handle, createdAt) => ({ did: "did:plc:" + handle.replace(/\W/g, ""), handle, createdAt, labels: [] });
+    window.postMessage({ source: "radar-bsky", json: { thread: [
+      { value: { post: { uri: "at://x/app.bsky.feed.post/3c0", author: a("daily.reader", "2019-05-01T00:00:00Z"), record: { text: "t", createdAt: "2026-10-21T08:00:00Z" } } } },
+      { value: { post: { uri: "at://x/app.bsky.feed.post/3c1", author: a("truth.now.77", "2026-10-19T00:00:00Z"), record: { text: "t", createdAt: "2026-10-21T08:00:05Z" } } } },
+    ] } }, location.origin);
+  }, 500);
+</script>
+</body>
+</html>

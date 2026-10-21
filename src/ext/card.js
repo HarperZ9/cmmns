@@ -14,9 +14,11 @@
 
   function where(m) {
     const R = m.reading || {}, A = m.activity;
-    const none = m.site && !m.site.hasLocation ? `${m.site.name} does not show this` : m.reading ? "not shown" : null;
+    const site = m.site ? m.site.name : "X";
+    const none = R.basedInHidden ? "not shared by the account" : m.site && m.site.id === "instagram" ? "open the account's About this account to read it" : m.site && m.site.id === "facebook" ? "shown for Pages in Page transparency" : m.site && !m.site.hasLocation ? `${site} does not show this` : m.reading ? "not shown" : null;
     return [
-      ["Based in (X label)", R.basedIn || none],
+      [`Based in (${site} label)`, R.basedIn || none],
+      ["Managed from (Facebook)", R.managedFrom ? R.managedFrom.map((x) => `${x.country} (${x.people})`).join(", ") : null],
       ["Connected via", R.connectedVia || null],
       ["Profile says", R.profileLocation || null],
       ["VPN or proxy", R.proxyNote ? "X notes the location may not be accurate" : null],
@@ -43,6 +45,8 @@
       ["Karma", R.karma != null ? `${num(R.karma)}${R.postKarma != null ? ` (posts ${num(R.postKarma)}, comments ${num(R.commentKarma)})` : ""}` : null],
       ["Reddit", [R.emailVerified === false && "email not verified", R.premium && "Reddit Premium", R.moderator && "moderates communities", R.employee && "Reddit employee", R.suspended && "suspended", R.unavailable && "account unavailable"].filter(Boolean).join(", ") || null],
       ["Username changes", R.nameChanges != null ? String(R.nameChanges) : null],
+      ["Moderation labels", R.platformLabels ? `${R.platformLabels.join(", ")} (${R.labelSource || "platform"})` : null],
+      ["Site marks", [R.verified && "verified", R.trustedVerifier && "trusted verifier", R.runningAds && "Page is running ads", R.handleInvalid && "handle does not resolve"].filter(Boolean).join(", ") || null],
       ["Listed by", R.listedCount != null ? `${num(R.listedCount)} lists` : null],
       ["Profile picture", R.defaultAvatar ? "never set" : null],
       ["Withheld in", R.withheldIn ? `${R.withheldIn} (on legal demand)` : null],

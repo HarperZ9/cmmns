@@ -17,9 +17,11 @@
     const activity = PB.activity(PBLogs.net(), r.author);
     const echo = PB.echoes(PBLogs.net(), PB.threadKey(site.id, location.pathname, location.search), r.text);
     if (reading && site.hasLocation) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation, pattern: reading.pattern }, { mismatch, cluster, activity, echo }) };
-    // Reddit: account age, karma and sign-up name from Reddit's own account data (src/ext/reddit.js).
-    const rd = site.id === "reddit" && globalThis.PBReddit ? PBReddit.get(r.author) : null;
-    const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display, joinDate: rd && rd.joinDate, karma: rd && rd.karma, redditDefaultName: rd && rd.defaultName }, { cluster, echo });
+    // Other sites: what each one discloses (src/ext/platforms.js reading()): Reddit's account age,
+    // karma and sign-up name; Instagram's and Facebook's join date, label and renames; Bluesky's
+    // join date and moderation labels.
+    const rd = reading || {};
+    const flags = PB.flagsFor({ handle: site.hasLocation ? r.author : "", display: r.display, joinDate: rd.joinDate, karma: rd.karma, redditDefaultName: rd.defaultName, nameChanges: rd.nameChanges, basedIn: rd.basedIn, platformLabels: rd.platformLabels, labelSource: rd.labelSource }, { mismatch, cluster, echo });
     return { mismatch, flags, activity };
   }
 
@@ -69,25 +71,25 @@
     if (!site || (!site.onThread() && !feed)) { removePanel(); return; }
     const items = site.items().map((n) => site.read(n)).filter(Boolean);
     if (!items.length) return;
-    const [root, replies] = !feed && site.hasLocation ? [items[0], items.slice(1)] : [null, items];
+    const [root, replies] = !feed && (site.hasLocation || site.rootFirst) ? [items[0], items.slice(1)] : [null, items];
     await Promise.all([ensureOwners(items), PBLogs.ensureClaims(items)]);
     const threadKey = PB.threadKey(site.id, location.pathname, location.search);
     if (!feed && replies.length) recordNet(threadKey, replies, root);
     const cache = site.hasLocation ? await PBStore.all() : {};
-    if (site.id === "reddit" && globalThis.PBReddit && settings.auto) PBReddit.want([...new Set(items.map((r) => r.author))], schedule);
+    if (site.want && settings.auto) site.want([...new Set(items.map((r) => r.author))], schedule);
     const clusters = feed ? [] : PB.duplicateClusters(replies);
     const clusterOf = new Map();
     for (const c of clusters) for (const id of c.ids) clusterOf.set(id, c);
     const rows = [], models = [];
     for (const r of replies) {
-      const reading = cache[r.author.toLowerCase()] || (site.id === "reddit" && globalThis.PBReddit ? PBReddit.get(r.author) : null);
+      const reading = cache[r.author.toLowerCase()] || (site.reading ? site.reading(r.author) : null);
       const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
       const an = analyse(r);
       models.push([r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), trail: PB.trailFor(tweets.get(r.id), tweets, PBLogs.trail()), yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, claims: PBLogs.claimsOf(r.id), reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, r.anchor]);
       // Without account readings a reply's flags are complete for what the site offers.
       rows.push({ id: r.id, author: r.author, text: r.text, machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
-    if (root) models.push([root.node, { site, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, PBLogs.trail()), claims: PBLogs.claimsOf(root.id), reading: cache[root.author.toLowerCase()] || null, flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
+    if (root) models.push([root.node, { site, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, PBLogs.trail()), claims: PBLogs.claimsOf(root.id), reading: cache[root.author.toLowerCase()] || (site.reading ? site.reading(root.author) : null), flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
     // Thread context for the window's comparison: median account age, labels and flags among the
     // accounts read here.
     const read = rows.filter((r) => r.about || r.joinDate);
@@ -156,6 +158,7 @@
     schedule();
   });
   if (/(^|\.)youtube\.com$/.test(location.hostname)) window.postMessage({ source: "radar-yt-ask" }, location.origin);
+  if (globalThis.PBMeta) PBMeta.onChange(() => schedule());
 
   // Live data: accounts in the responses X's own app already downloaded (src/ext/sniff.js). Each
   // reading is merged into the local cache, so badges fill in as the page loads, with no request.

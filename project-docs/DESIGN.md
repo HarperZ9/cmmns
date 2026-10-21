@@ -26,9 +26,26 @@ extreme rhetoric so it reads as normal for a group. A reader scrolling replies c
 | Platform | Location signal | Status |
 |---|---|---|
 | X | "About this account": inferred country or region, join date, username changes, how the app was installed (rolled out November 2025) | milestone 1 and 2 |
-| Facebook, Instagram | "Based in" on some high-reach accounts; Page Transparency | milestone 3 |
+| Instagram | "About this account": date joined, "Account based in", former usernames, verified | shipped 2026-10-21, passive only |
+| Facebook | Page transparency: creation date, name changes, countries of the people who manage a Page | shipped 2026-10-21, passive only; wording unconfirmed live |
+| Bluesky | none; join date and moderation labels from the app's own thread data | shipped 2026-10-21 |
 | YouTube | self-declared channel country only | milestone 3, behaviour signals |
 | Reddit | none | milestone 3, behaviour signals |
+
+## How account data is read on Facebook, Instagram and Bluesky
+- **Instagram and Facebook, passive only.** When the viewer opens an account's "About this account"
+  dialog or a Page's transparency view, src/ext/meta.js reads the rendered text and keeps it per site
+  for 14 days. Radar never opens these itself. Instagram delivers the dialog as a Bloks UI payload
+  from `/async/wbloks/fetch/`, not as data, so there is no stable request to repeat the way
+  src/ext/sniff.js repeats X's About request; Facebook shows transparency only for Pages, one Page
+  at a time. Automatic lookups on Meta would need either, and stay out of scope until one is stable.
+- **Facebook manager countries.** A Page lists every country of the people who manage it. Radar
+  uses it as the account's label only when exactly one country is listed; with several, the card
+  lists them and no "speaks as a local" comparison is made.
+- **Bluesky.** src/ext/bskysniff.js copies the thread, profile and feed responses the Bluesky app
+  already requested. Moderation labels about authenticity (spam, impersonation, scam, inauthentic,
+  engagement-farming) raise the "moderation label" flag; labels about content are shown, never
+  flagged, and self-labels are ignored.
 
 ## How account data is read on X
 - **Passive:** whenever the user opens an account's About page, the reading is cached locally.
