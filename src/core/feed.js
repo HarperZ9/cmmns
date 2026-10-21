@@ -6,16 +6,18 @@
 import { wilson } from "./report.js";
 import { shownTechniques } from "./persuasion.js";
 import { coGraph } from "./graph.js";
+import { framingShown, framingStatus } from "./framing.js";
 
 export const FEED_RETAIN_DAYS = 60, FEED_MAX_IDS = 3000;
 const DAY = 86400000;
 const dayOf = (t) => new Date(t).toISOString().slice(0, 10);
 
-// posts: [{ id, domains, strong, note, claims, techniques }]. Log: { "site|day": entry }.
+// posts: [{ id, domains, strong, note, claims, techniques, frame }]. frame: "person-story",
+// "structural", "mixed", "none" (long enough, neither) or absent (too short). Log: { "site|day": entry }.
 export function addFeedPosts(log, site, posts, now = Date.now()) {
   const L = { ...(log || {}) };
   const key = `${site}|${dayOf(now)}`;
-  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {} };
+  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques }, frames: { ...(L[key].frames || {}) } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {}, frames: {} };
   const have = new Set(e.ids);
   for (const p of posts) {
     if (!p || !p.id || have.has(p.id) || e.ids.length >= FEED_MAX_IDS) continue;
@@ -26,6 +28,7 @@ export function addFeedPosts(log, site, posts, now = Date.now()) {
     if (p.claims) e.claims++;
     for (const d of new Set(p.domains || [])) e.links[d] = (e.links[d] || 0) + 1;
     for (const t of new Set(p.techniques || [])) e.techniques[t] = (e.techniques[t] || 0) + 1;
+    if (p.frame) e.frames[p.frame] = (e.frames[p.frame] || 0) + 1;
   }
   e.at = now;
   L[key] = e;
@@ -52,12 +55,12 @@ const add = (m, k, n) => m.set(k, (m.get(k) || 0) + n);
 
 // reports: history snapshots; feedLog: addFeedPosts log; net: connections log.
 // opts: { days, now, isState(domain), shown: technique ids the window may show }.
-export function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isState = () => false, shown = shownTechniques() } = {}) {
+export function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isState = () => false, shown = shownTechniques(), framingRow } = {}) {
   const since = now - days * DAY;
   const snaps = Object.values(reports || {}).filter((s) => s && s.at >= since);
   const feeds = Object.values(feedLog || {}).filter((f) => f && f.at >= since);
   const T = { strongK: 0, strongN: 0, ctxK: { notes: 0, claims: 0 }, ctxN: 0, looked: 0, flagged: 0 };
-  const sites = new Map(), tech = new Map(), daily = dailyFrame(days, now);
+  const sites = new Map(), tech = new Map(), frames = new Map(), daily = dailyFrame(days, now);
   for (const s of snaps) {
     T.looked += s.lookedUp || 0; T.flagged += s.flaggedK || 0;
     if (s.strong != null) { T.strongK += s.strong; T.strongN += s.replies || 0; }
@@ -72,6 +75,7 @@ export function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(
     T.strongK += f.strong; T.strongN += f.posts; T.ctxN += f.posts; T.ctxK.notes += f.notes; T.ctxK.claims += f.claims;
     for (const [d, n] of Object.entries(f.links || {})) add(sites, d, n);
     for (const [t, n] of Object.entries(f.techniques || {})) add(tech, t, n);
+    for (const [t, n] of Object.entries(f.frames || {})) add(frames, t, n);
     dayAdd(daily, f.at, { posts: f.posts, strong: f.strong, strongN: f.posts, feedPosts: f.posts });
   }
   const mentions = [...sites.values()].reduce((a, b) => a + b, 0);
@@ -86,9 +90,21 @@ export function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(
     flagged: share(T.flagged, T.looked),
     notes: count(T.ctxK.notes, T.ctxN), claims: count(T.ctxK.claims, T.ctxN),
     techniques: { shown: [...shown], counts: [...tech].filter(([t]) => shown.includes(t)).map(([id, n]) => ({ id, n })).sort((a, b) => b.n - a.n) },
+    framing: framingBalance(frames, framingRow),
     together: coGraph(net, { min: 3, since, maxNodes: 40 }).edges.slice(0, 10),
     daily: [...daily.values()],
   };
+}
+
+// The episodic and thematic balance: of feed posts long enough to read, the share told only through
+// a person's story and the share explained only through structure (trends, numbers, policy), each
+// with its Wilson interval. Held back, with its reason and no counts, until the person-story reading
+// clears its measurement (src/core/framing.js).
+function framingBalance(frames, row) {
+  const status = row === undefined ? framingStatus() : framingStatus(row);
+  if (!(row === undefined ? framingShown() : framingShown(row))) return { shown: false, status: status.text };
+  const g = (k) => frames.get(k) || 0, n = g("person-story") + g("structural") + g("mixed") + g("none");
+  return { shown: true, status: status.text, read: n, personStory: share(g("person-story"), n), structural: share(g("structural"), n), mixed: share(g("mixed"), n) };
 }
 
 function dailyFrame(days, now) {

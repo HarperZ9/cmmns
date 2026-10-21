@@ -159,4 +159,32 @@ export const PERSUASION_LESSONS = [
     counter: "\"Biggest in history\" can be checked against history. A record with its record book, like the fair example, is a fact. With no measure, give the claim no size.",
     dnp: "Some things really are records.",
   },
+  {
+    id: "motive-attribution", title: "Hidden motive", research: ["badnews-2019"],
+    what: "The post says what someone really wants, behind what they say. The plan is masked as safety, the real reason is money, it was never about the children. The hidden aim is stated, and no evidence of it is shown.",
+    examples: [
+      { side: "left", topic: "trade", kind: "sign", text: "The tariff is dressed up as protecting workers. The real reason is a payout for their donors." },
+      { side: "right", topic: "education", kind: "sign", text: "The new curriculum is masked as inclusion. Their real agenda is to take parents out of the picture." },
+      { side: "centre", topic: "elections", kind: "sign", text: "Both parties call the boundary change fair. It was never about fairness, it is a textbook move to keep their seats." },
+      { side: "none", topic: "media", kind: "fair", text: "The minister said the contract was about speed. Emails released under the records request show the firm's owner asked for it a month before the tender." },
+    ],
+    why: "A motive cannot be checked from the outside, so it cannot be refuted either. Once readers accept that a person's words hide a different aim, every later word from that person reads as cover. Bad News taught discrediting as a way to dismiss a source without answering it.",
+    spot: "Find the stated reason and the claimed real reason. Then look for what the post offers as proof of the second one.",
+    counter: "A motive with documents behind it, like the emails in the fair example, is a finding. A motive read off someone's words is a guess about their mind.",
+    dnp: "People do hide their aims, and documents sometimes show it.",
+  },
+  {
+    id: "just-asking", title: "Just asking questions", research: ["goviral-2021"],
+    what: "An accusation put as a question. Isn't it strange that the files went missing? Makes you wonder who knew. The post suggests the charge and never states it, so it never has to defend it.",
+    examples: [
+      { side: "left", topic: "technology", kind: "sign", text: "Isn't it odd that the app's privacy page changed the week before the election? I'm just asking." },
+      { side: "right", topic: "health", kind: "sign", text: "Three hospitals report the same thing in one week. Is it just a coincidence? Ask yourself who gains." },
+      { side: "centre", topic: "crime", kind: "sign", text: "The witness changed her story twice. I'm not saying she lied, but it makes you wonder." },
+      { side: "none", topic: "science", kind: "fair", text: "Question for the authors: the methods say 400 patients, the table says 312. Where did the other 88 go?" },
+    ],
+    why: "A question feels open-minded, and a reader fills in the answer the writer wanted. Go Viral! taught conspiracy framing, which leans on hints that never become claims.",
+    spot: "Rewrite the question as the statement it implies. Then look for the evidence the post gives for that statement.",
+    counter: "An honest question asks for something checkable and would accept the answer, like the missing patients in the fair example. A question with only one acceptable answer is a claim in disguise.",
+    dnp: "Real questions find real problems.",
+  },
 ];

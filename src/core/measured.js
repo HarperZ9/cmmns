@@ -22,6 +22,8 @@ export const MEASURED_PERSUASION = {
   "doubt": {"precision":0.333,"low":0.061,"high":0.792,"n":3,"split":"test","recall":0.004,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
   "appeal-to-authority": {"precision":0,"low":0,"high":0.658,"n":2,"split":"test","recall":0,"chance":0.012,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
   "exaggeration": {"precision":0.1,"low":0.018,"high":0.404,"n":10,"split":"test","recall":0.005,"chance":0.01,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "motive-attribution": {"precision":0,"low":0,"high":0.49,"n":4,"split":"test","recall":0,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "just-asking": {"precision":0,"low":0,"high":0.658,"n":2,"split":"test","recall":0,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
 };
 // persuasion:end
 export const MEASURED = {

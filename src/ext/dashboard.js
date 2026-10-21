@@ -105,6 +105,17 @@
       : T.counts.length ? `Counted only for techniques that passed their measurement: ${T.shown.map((t) => PB.TECHNIQUES[t].name.toLowerCase()).join(", ")}.` : "None of the measured techniques was seen in this window.";
   }
 
+  // The episodic and thematic balance (src/core/feed.js framingBalance): held with its reason and no
+  // counts until the person-story reading clears its measurement.
+  function framing(d) {
+    const F = d.framing || { shown: false, status: "held back: not measured" };
+    $("framing-say").textContent = !F.shown
+      ? `Not shown yet. Radar can read whether a feed post tells an issue through one person's story or explains it through trends, numbers and policy, but that reading is ${F.status.replace(/^held back: /, "")}. It starts here once it passes the same bar as every other sign.`
+      : F.read ? `Of ${plural(F.read, "feed post", "feed posts")} long enough to read, these told an issue only through one person's story, and these explained it only through structure. The rest did both or neither. ${PB.FRAMING_DOES_NOT_PROVE}` : "No feed posts long enough to read in this window.";
+    shareBar($("framing-person"), F.shown ? F.personStory : null, "posts told only as a person's story");
+    shareBar($("framing-structure"), F.shown ? F.structural : null, "posts explained only through structure");
+  }
+
   function checks(d) {
     $("flag-say").textContent = d.flagged
       ? `${plural(d.flagged.k, "account", "accounts")} of ${d.flagged.n.toLocaleString()} read were flagged: one strong sign, such as a very new account or a reply that speaks as a local from somewhere else, or two different weaker signs.`
@@ -152,7 +163,7 @@
     const d = PB.feedDashboard(store[KEYS.reports], store[KEYS.feed], store[KEYS.net], { days, isState });
     const held = Math.min(days, keep);
     $("scope").textContent = `${plural(d.threads, "thread", "threads")} and ${plural(d.feedPosts, "feed post", "feed posts")}, ${d.from} to ${d.to}.` + (held < days ? ` Radar keeps ${keep} days (Options), so this covers ${keep}.` : "");
-    sites(d); operations(); rhetoric(d); techniques(d); checks(d); media(days);
+    sites(d); operations(); rhetoric(d); techniques(d); framing(d); checks(d); media(days);
     for (const b of document.querySelectorAll(".window button")) b.setAttribute("aria-pressed", String(+b.dataset.days === days));
   }
 

@@ -454,6 +454,88 @@
      0.01
     ]
    }
+  },
+  "motive-attribution": {
+   "against": [
+    "Doubt"
+   ],
+   "precision": {
+    "k": 0,
+    "n": 4,
+    "value": 0,
+    "ci": [
+     0,
+     0.49
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 0,
+    "n": 4,
+    "value": 0,
+    "ci": [
+     0,
+     0.49
+    ]
+   },
+   "recall": {
+    "k": 0,
+    "n": 244,
+    "value": 0,
+    "ci": [
+     0,
+     0.016
+    ]
+   },
+   "chance": {
+    "k": 5226,
+    "n": 169664,
+    "value": 0.031,
+    "ci": [
+     0.03,
+     0.032
+    ]
+   }
+  },
+  "just-asking": {
+   "against": [
+    "Doubt"
+   ],
+   "precision": {
+    "k": 0,
+    "n": 2,
+    "value": 0,
+    "ci": [
+     0,
+     0.658
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 0,
+    "n": 2,
+    "value": 0,
+    "ci": [
+     0,
+     0.658
+    ]
+   },
+   "recall": {
+    "k": 0,
+    "n": 244,
+    "value": 0,
+    "ci": [
+     0,
+     0.016
+    ]
+   },
+   "chance": {
+    "k": 5226,
+    "n": 169664,
+    "value": 0.031,
+    "ci": [
+     0.03,
+     0.032
+    ]
+   }
   }
  }
 }

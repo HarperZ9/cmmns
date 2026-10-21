@@ -140,6 +140,7 @@
     report.bursts = PB.timingBursts(replies);
     report.flood = PB.floodSign(replies, tech.rateOf, { bursts: report.bursts });
     report.crossLang = tech.groups;
+    report.swarm = root ? PB.swarmSign(replies, swarmMarks(rows)) : null;
     report.state = PB.stateSummary(replies);
     report.upstream = PB.upstream(items, tweets, PBLogs.trail());
     const pushed = PB.pushedLinks(PBLogs.net(), items.flatMap((r) => r.domains || []));
@@ -151,13 +152,25 @@
     PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, viewed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onCard: () => PBLogs.saveCard({ site, report, items, replies, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
   }
 
+  // The swarming sign's marks (src/core/swarming.js): an account is new when it joined under
+  // NEW_ACCOUNT_DAYS before its reply, flagged when Radar flagged it. Unread accounts are unknown.
+  function swarmMarks(rows) {
+    const by = new Map(rows.filter((r) => r.joinDate || r.flags).map((r) => [String(r.author).toLowerCase(), r]));
+    return (h, at) => {
+      const r = by.get(h);
+      if (!r) return null;
+      const age = r.joinDate ? PB.ageDays(r.joinDate, at) : null;
+      return { new: age != null && age < PB.NEW_ACCOUNT_DAYS, flagged: !!(r.flags && PB.isFlagged(r.flags)) };
+    };
+  }
+
   // Feed dashboard (src/core/feed.js): each feed post once per day, with what it linked and the
   // signs Radar read in it. Post ids and counts only; no text is kept.
   const noteOf = (id) => (tweets.get(id) || {}).note || null;
   function recordFeed(site, items) {
     PBLogs.recordFeed(site.name, items.map((r) => {
       const an = analyse(r), c = PBLogs.claimsOf(r.id);
-      return { id: r.id, domains: r.domains || [], strong: an.extreme, note: !!noteOf(r.id), claims: c ? c.length : 0, techniques: an.persuasion.map((h) => h.technique) };
+      return { id: r.id, domains: r.domains || [], strong: an.extreme, note: !!noteOf(r.id), claims: c ? c.length : 0, techniques: an.persuasion.map((h) => h.technique), frame: PB.feedFrame(r.text) };
     }));
   }
 

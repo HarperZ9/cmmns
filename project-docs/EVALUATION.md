@@ -329,6 +329,8 @@ word tokens inside a gold span of the technique.
 | thought-terminating cliche | 0/1 | 0% | 0.2% | held back: 1 hit |
 | whataboutism | 0/1 | 0% | 0.6% | held back: 1 hit |
 | black-and-white fallacy | no hits | 0% | 0.5% | held back: no hits |
+| hidden motive (proxy: "Doubt") | 0/4 | 0% | 3.1% | held back: 4 hits |
+| just asking questions (proxy: "Doubt") | 0/2 | 0% | 3.1% | held back: 2 hits |
 
 Reading the table:
 - Loaded language, name calling and flag-waving sit 25 to 80 times above chance. The cues find
@@ -509,6 +511,75 @@ look-alikes and 18 controls, among them sub-accounts that carry the affiliation 
 alone it never counts toward "flagged". No labelled set of impersonation accounts was used, so it
 reads "not measured yet". Wikidata lists only some of each outlet's accounts, so a real sub-account
 without the badge or a check can trip it.
+
+## Framing, hidden motives, swarming and cloned outlets (2026-10-21)
+Four signs from `project-docs/TECHNIQUES.md`. None has a labelled corpus Radar may use for
+precision, so each has an organic rate, a proxy figure or "not measured". `node
+scripts/framing-baselines.mjs` and `node scripts/techniques-baselines.mjs` reproduce the rates and
+write `evidence/framing-results.json` and `evidence/technique-baselines.json`.
+
+**Episodic and thematic framing: held, not measured.** `src/core/framing.js` reads a post of 12
+words or more as a person-story (cues for one person's case: an age, "my neighbour", "this
+mother who", "she was evicted") when it has no structural cue (a percentage, a rate, "since
+2019", "data show", policy, law, funding, "across the country"), as structural in the reverse
+case, and as mixed with both. The frame definitions follow Iyengar (1991) and the narrative-frame
+part of the Mendelsohn, Budak and Jurgens (NAACL 2021) codebook; no codebook text is copied. The
+bar to show was set before looking: a Wilson lower bound of 0.7 from at least 20 held-out hits.
+Corpora checked on 2026-10-21, none usable:
+- Media Frames Corpus (Card et al. 2015, github.com/dallascard/media_frames_corpus): the
+  annotations are GPL-3.0, but the article text must be fetched from LexisNexis Academic, which
+  needs a subscription account, and the repository is marked deprecated. Its labels are the 15
+  policy frames of the Boydstun codebook, not episodic and thematic.
+- Gun Violence Frame Corpus (Liu et al., CoNLL 2019): headlines labelled with nine issue frames
+  (gun rights, mental health, school safety and others), not episodic and thematic. A reduced
+  copy is on Zenodo under CC BY 4.0 (record 10822952); the full release states no licence.
+- Mendelsohn et al. 2021 (github.com/juliamendelsohn/framing): the only corpus found with
+  episodic and thematic labels. The repository and its models state no licence, and the data are
+  tweet ids, whose text needs X's API. Asking the authors for a licence is the author's call.
+No corpus was downloaded for this check.
+
+Context, not a measurement: on PHEME (CC BY 4.0), of 64,858 replies of 12 words or more, 0.90%
+read as person-stories (582; 95% interval 0.83 to 0.97%), 1.67% as structural (1,080; 1.57 to
+1.77%) and 0.01% as mixed. Of 5,968 root posts, 1.11% and 1.01%. Nobody checked whether these
+reads are right. Symmetry (`tests/framing.symmetry.test.js`): four templates across 20 groups and
+10 issues give the same frame for all 200 pairs, and no group or issue name is a cue.
+
+The "Your feed" balance line uses the same reading and the same hold: while the person-story
+sign is held, the page shows the reason and no counts (`tests/framing.test.js`).
+
+**Hidden motive and just asking questions: measured on a proxy, held.** Two persuasion
+techniques with English cues. PTC has no label for either, so both are scored against its "Doubt"
+label (questioning credibility), the nearest one; that makes the figures a proxy. On the test
+split: hidden motive 0 of 4 spans, just asking 0 of 2, both far under the 20-hit minimum. The test
+split was read twice: the second read followed a fix to one cue whose question mark was not
+escaped ("coincidence?" matched "coincidenc"); no cue was tuned between the reads. On PHEME, the
+cues fire on 0.02% (motive) and 0.04% (just asking) of 98,929 replies. Symmetry: four new
+templates across 26 targets in `tests/persuasion.symmetry.test.js`, plus two controls ("asked a
+question", "the reason they gave") that find nothing.
+
+**Swarming: organic rate only.** `src/core/swarming.js` fires when, within ten minutes, at least
+6 of at least 8 accounts Radar read are new (joined under 30 days before the reply) or flagged,
+and they are at least half of those read. The thresholds were fixed before running and checked on
+the PHEME dev half (1 of 2,434 threads), then read on the test half (1 of 2,278; 0.04%, 95%
+interval 0.01 to 0.25%). By size: 0 of 3,087 threads with 5 to 19 replies, 1 of 1,384 at 20 to 49
+(0.07%), 1 of 181 at 50 to 99 (0.55%), 0 of 60 at 100 or more. On PHEME "flagged" can only be
+the very-high-rate flag; in the browser it is any Radar flag, so the browser rate may be higher.
+No labelled harassment corpus was used, so precision is not measured. The sign carries counts
+only, never handles.
+
+**Cloned-outlet framing: not measured on posts.** `src/core/cloned.js` marks a look-alike link
+when the post names the copied outlet, and lists the operations whose reports named the address.
+The address check (`lookalike.js`) catches 147 of the 1,174 domains named in published reports
+and matches none of 52,598 domains in the owner and site tables. Those tables were used to tune
+it, so these are regression controls, not a held-out error rate. No labelled set of posts citing
+clones exists here.
+
+What these numbers do not prove:
+- An organic rate says how often a sign fires on ordinary 2014 and 2015 Twitter threads. It says
+  nothing about how often it is right on a campaign.
+- PHEME's threads were not checked for swarms or person-stories, and some may be both.
+- A proxy label is not the technique: "Doubt" spans include many moves that are not hidden-motive
+  claims.
 
 ## Threads
 At least one event with threads from opposing sides (for example a protest covered by outlets on

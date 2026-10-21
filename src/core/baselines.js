@@ -18,10 +18,10 @@ const size = (b) => (b.max === Infinity || b.max == null ? `${b.min} or more rep
 // The measured rate for one sign: { k, n, share, ci, bin } or null when the thread falls outside
 // every bin. ctx: { replies } for signs in one thread, { viewed } for signs across threads.
 export function baselineFor(sign, ctx = {}) {
-  const inThread = { "same-text": "same", burst: "burst", flood: "flood", "cross-language": "cross" }[sign];
+  const inThread = { "same-text": "same", burst: "burst", flood: "flood", "cross-language": "cross", swarm: "swarm" }[sign];
   const across = { together: "together", "copied-elsewhere": "echo" }[sign];
   const bin = inThread ? sizeBin(ctx.replies || 0) : across ? viewBin(ctx.viewed || 0) : null;
-  const table = sign === "flood" || sign === "cross-language" ? TECHNIQUE_BASELINES : BASELINES;
+  const table = sign === "flood" || sign === "cross-language" || sign === "swarm" ? TECHNIQUE_BASELINES : BASELINES;
   const r = bin && table[inThread || across] && table[inThread || across][bin.id];
   return r && r.n ? { ...r, bin } : null;
 }
@@ -33,6 +33,7 @@ const WHAT = {
   "copied-elsewhere": ["wording that turned up in another thread", "replies of 8 words or more"],
   flood: ["a flood of replies from very high-rate accounts", "threads"],
   "cross-language": ["one link or upload carried by replies in different languages", "threads"],
+  swarm: ["many new or flagged accounts replying within ten minutes", "threads"],
 };
 
 // One sentence for the window, or null: "In ordinary threads with 20 to 49 replies, ... showed up

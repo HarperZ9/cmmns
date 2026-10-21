@@ -83,6 +83,18 @@ export const CUES_EN = {
     "(?:totally|completely|utterly) (?:destroyed|ruined|failed|collapsed)", "the most " + `${W} ${W}` + " in history",
     "a million times", "beyond (?:belief|comprehension)", "of epic proportions",
   ],
+  "motive-attribution": [
+    "(?:masked|disguised|dressed up|masquerading) as", "under the guise of", "the real (?:reason|agenda|motive|goal|aim|purpose|plan)",
+    "(?:hidden|secret|true) (?:agenda|motive|motives|aim|aims|plan)", "secretly (?:want|wants|wanted|plan|plans|planning|working|trying|hoping)",
+    "textbook (?:move|tactic|playbook|strategy|propaganda)", "(?:it|this) (?:was|is) never (?:really )?about", "(?:just|only|merely) a (?:cover|pretext|smokescreen|front) for",
+    "what (?:they|he|she) (?:really|actually) want", "(?:their|his|her) real (?:intention|intentions|motive|motives)",
+  ],
+  "just-asking": [
+    "just asking(?: (?:questions|a question))?", "i'?m just asking", "just a question", "(?:makes|make|should make) you (?:wonder|think)",
+    "isn'?t it (?:strange|odd|funny|interesting|curious|convenient) (?:that|how)", "why (?:is|are) (?:no one|nobody) asking",
+    "ask yourselves? (?:why|who|how)", "is (?:it|this) (?:just )?(?:a )?coincidence", "coincidence\\?", "(?:one|you) (?:has|have) to wonder",
+    "i'?m not saying (?:it|they|he|she|that)[^.?!]{0,40}but",
+  ],
 };
 
 // French cues for the same techniques. SemEval-2023 Task 3 has French data, but its terms allow use
