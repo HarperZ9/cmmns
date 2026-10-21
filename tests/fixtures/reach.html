@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixture: Threads, Mastodon, TikTok</title>
+<link rel="stylesheet" href="../../src/ext/badges.css">
+<style>
+  body { margin: 0; background: #fff; color: #1c1e21; font: 15px/1.4 system-ui, sans-serif; }
+  main { max-width: 620px; margin: 0 auto; padding: 0 16px; }
+  .c { padding: 10px 0; border-bottom: 1px solid #e4e6eb; }
+  .note { padding: 12px 0; color: #65676b; font-size: 13px; }
+</style>
+<script>
+  // ?site=threads | mastodon | mastodon5 | tiktok. Every account, name and comment here is
+  // invented. The markup copies only the structure Radar reads on each site: Threads and Mastodon
+  // as read live on 2026-10-21, TikTok from its public data-e2e attributes (not yet seen live).
+  const SITE = new URLSearchParams(location.search).get("site") || "threads";
+  document.documentElement.dataset.pbFixture = SITE.replace(/\d$/, "");
+  const C = [
+    ["launch.example", "We launched today."],
+    ["daily.reader", "Great launch, congratulations to the whole team."],
+    ["truth.now.77", "Wake up, it is all staged by foreign money! Migrants are vermin."],
+    ["patriot.voice", "Wake up, it is all staged by foreign money! Migrants are vermin."],
+    ["fresh.page.news", "либералы — крысы"],
+    ["sam.example", "Where can I watch the replay?"],
+  ];
+</script>
+</head>
+<body>
+<main>
+  <div class="note">Fixture: invented posts in the structure Radar reads on Threads, Mastodon (4.x and 5.0) or TikTok. Switch with ?site=threads, ?site=mastodon, ?site=mastodon5 or ?site=tiktok.</div>
+  <div id="thread" role="main"></div>
+</main>
+<script>
+  const box = document.getElementById("thread");
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  C.forEach(([h, text], i) => {
+    const d = document.createElement("div");
+    d.className = "c";
+    const t = `2026-10-21T0${i}:00:00.000Z`;
+    if (SITE === "threads") {
+      d.dataset.pressableContainer = "true";
+      d.innerHTML = `<div><a href="/@${h}"><span dir="auto">${h}</span></a> <a href="/@${h}/post/DF${i}xyz"><time datetime="${t}">${i + 1}h</time></a></div>` +
+        `<div><span dir="auto">${esc(text)}</span></div><div role="button"><span dir="auto">${i * 3}</span></div>`;
+    } else if (SITE === "mastodon") {
+      d.innerHTML = `<article data-id="11746${i}"><div class="status status-public" data-id="11746${i}"><div class="status__info">` +
+        `<a class="status__display-name" href="/@${h}"><span class="display-name__account">@${h}</span></a>` +
+        `<a class="status__relative-time" href="/@${h}${i === 4 ? "@remote.example" : ""}/11746${i}"><time datetime="${t}">${i + 1}h</time></a></div>` +
+        `<div class="status__content"><div class="status__content__text"><p>${esc(text)}</p></div></div></div></article>`;
+    } else if (SITE === "mastodon5") {
+      d.innerHTML = `<article data-id="11747${i}" class="_comp_status__root _comp_status__variantThread"><header class="_comp_status__header">` +
+        `<a class="_comp_status_header__nameLink" href="/@${h}">${h}</a><a class="_comp_status_header__date" href="/@${h}/11747${i}"><time datetime="${t}">${i + 1}h</time></a></header>` +
+        `<div class="_comp_status_content__root"><div class="_comp_status_content__text"><p>${esc(text)}</p></div></div></article>`;
+    } else {
+      d.className = "c DivCommentItemContainer";
+      d.innerHTML = `<div data-e2e="comment-username-1"><a href="/@${h}">${h}</a></div><p data-e2e="comment-level-1"><span>${esc(text)}</span></p>`;
+    }
+    box.append(d);
+  });
+  if (SITE.startsWith("mastodon")) { const m = document.createElement("div"); m.id = "mastodon"; document.body.prepend(m); }
+</script>
+<script src="chrome-stub.js"></script>
+<script src="../../src/ext/core.bundle.js"></script>
+<script src="../../src/ext/settings.js"></script>
+<script src="../../src/ext/store.js"></script>
+<script src="../../src/ext/meta.js"></script>
+<script src="../../src/ext/about-page.js"></script>
+<script src="../../src/ext/platforms-reach.js"></script>
+<script src="../../src/ext/platforms.js"></script>
+<script src="../../src/ext/pop.js"></script>
+<script src="../../src/ext/signals.js"></script>
+<script src="../../src/ext/card.js"></script>
+<script src="../../src/ext/panel.js"></script>
+<script src="../../src/ext/ui.js"></script>
+<script src="../../src/ext/auto.js"></script>
+<script src="../../src/ext/logs.js"></script>
+<script src="../../src/ext/reddit.js"></script>
+<script src="../../src/ext/content.js"></script>
+<script>
+  // Mastodon: a thread response as the server's web app would load it; fedisniff.js would post it.
+  if (SITE.startsWith("mastodon")) setTimeout(() => {
+    const acc = (acct, created, bot) => ({ id: "1", username: acct.split("@")[0], acct, url: "https://example.social/@" + acct, created_at: created, bot: !!bot,
+      followers_count: 3, following_count: 900, statuses_count: 12 });
+    window.postMessage({ source: "radar-masto", json: { ancestors: [], descendants: [
+      { id: "1", content: "<p>x</p>", created_at: "2026-10-21T01:00:00Z", account: acc("daily.reader", "2018-04-01T00:00:00Z") },
+      { id: "2", content: "<p>x</p>", created_at: "2026-10-21T02:00:00Z", account: acc("truth.now.77", "2026-10-19T00:00:00Z", true) },
+    ] } }, location.origin);
+  }, 500);
+</script>
+</body>
+</html>

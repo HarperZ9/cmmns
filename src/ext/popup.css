@@ -12,12 +12,16 @@ dt { color: var(--muted); }
 dd { margin: 0; text-align: right; font-family: "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12px; font-variant-numeric: tabular-nums; }
 dd.hot { color: var(--hot); font-weight: 600; }
 .actions { display: grid; gap: 6px; }
+.server { margin: 0 0 12px; padding: 10px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.server p { margin: 0 0 8px; }
 button { font: inherit; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; text-align: left; }
 button:hover:not(:disabled) { border-color: var(--muted); }
 button:disabled { opacity: 0.45; cursor: default; }
 .settings { display: grid; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
 input[type="checkbox"] { accent-color: var(--ink); }
 label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+/* Firefox for Android opens the popup as a full page. */
+@media (hover: none), (max-width: 480px) { body { width: auto; } button { min-height: 44px; } }
 footer { padding: 8px 14px 12px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--line); }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .pb-large body { font-size: 15px; }

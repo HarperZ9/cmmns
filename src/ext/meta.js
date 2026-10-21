@@ -1,8 +1,10 @@
-// Account readings for Facebook, Instagram and Bluesky, kept per site in this browser for 14 days.
-// They come only from what the site already shows or loaded for the viewer:
+// Account readings for Facebook, Instagram, Bluesky and Mastodon, kept per site in this browser for
+// 14 days, and post times for Bluesky, Mastodon and TikTok, in memory only. They come only from what
+// the site already shows or loaded for the viewer:
 // - Instagram: the "About this account" dialog, read when the viewer opens it.
 // - Facebook: the "Page transparency" section of a Page, read when the viewer opens it.
 // - Bluesky: the app's own thread, profile and feed responses (src/ext/bskysniff.js).
+// - Mastodon and TikTok: the web app's own status, thread and comment responses (src/ext/fedisniff.js).
 // Radar makes no request of its own on these sites.
 (() => {
   "use strict";
@@ -64,5 +66,20 @@
     if (posts.size > 5000) posts.clear();
   });
 
-  globalThis.PBMeta = Object.freeze({ get, put, clear, post: (id) => posts.get(id) || null, onChange: (cb) => { onChange = cb; } });
+  // Mastodon and TikTok: data the app downloaded, posted by fedisniff.js. Mastodon accounts are
+  // keyed per server, since "user" alone means a local account of the server being viewed.
+  window.addEventListener("message", (e) => {
+    if (e.source !== window || !e.data) return;
+    if (e.data.source === "radar-masto") {
+      for (const [, r] of PB.mastoAccounts(e.data.json)) put("mastodon@" + host, r);
+      for (const [id, p] of PB.mastoStatuses(e.data.json)) posts.set(id, p);
+    } else if (e.data.source === "radar-tiktok") {
+      for (const [id, p] of PB.tiktokComments(e.data.json)) posts.set(id, p);
+    } else return;
+    if (posts.size > 5000) posts.clear();
+    onChange();
+  });
+
+  globalThis.PBMeta = Object.freeze({ get, put, clear, post: (id) => posts.get(id) || null, findPost: (pred) => [...posts.values()].find(pred) || null,
+    onChange: (cb) => { onChange = cb; } });
 })();

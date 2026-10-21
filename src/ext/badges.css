@@ -31,6 +31,14 @@
   opacity: 0; transform: translateX(-4px); transition: opacity 0.16s ease, transform 0.16s ease;
 }
 .pb-pop.pb-in { opacity: 1; transform: none; }
+/* Narrow and touch screens: the window fits the screen, and each post has one tap target. */
+.pb-pop { max-width: calc(100vw - 16px); box-sizing: border-box; }
+.pb-tap {
+  display: inline-block; margin: 4px 0 0 6px; min-height: 32px; min-width: 44px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--pb-line); background: var(--pb-ground); color: var(--pb-muted); font-family: inherit; font-size: 12px; font-weight: 600; line-height: 1;
+  cursor: pointer; touch-action: manipulation; vertical-align: middle;
+}
+.pb-tap:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; }
 .pb-pop:focus { outline: none; }
 .pb-pop:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 2px; }
 .pb-btn:focus-visible, .pb-sig > summary:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; }

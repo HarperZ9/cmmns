@@ -107,6 +107,11 @@ Shows the evidence behind the posts and accounts in the social media threads the
 | Host `https://www.reddit.com/*` | Reads comments and Reddit's public account data for comment authors, one account every 2 seconds. |
 | Host `https://www.facebook.com/*`, `https://www.instagram.com/*` | Reads comments and the account transparency details Meta shows when the user opens them. |
 | Host `https://bsky.app/*` | Reads replies, account data and moderation labels the Bluesky app loaded. |
+| `scripting` | Runs Radar on a Mastodon server only after the user turns it on for that server, and checks, when the user opens the toolbar button on such a page, whether it is the Mastodon web app (its root element, version and domain, nothing else). |
+| `activeTab` | Lets that one check read the current tab when the user opens the toolbar button, and no other time. |
+| Host `https://www.threads.com/*`, `https://www.threads.net/*` | Reads the posts and replies Threads shows on the page. |
+| Host `https://www.tiktok.com/*` | Reads the comments TikTok shows and the comment list its app already loaded. |
+| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Radar here" on that server; the browser shows its own prompt. Never granted for all sites. The options page lists the servers and takes access back. |
 
 The APIs Radar also calls (`action`, `tabs.create`, `tabs.query`, `tabs.sendMessage`,
 `windows.create`) need no manifest permission. `tests/store-listing.test.js` fails when the

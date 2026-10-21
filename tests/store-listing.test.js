@@ -34,6 +34,7 @@ test("every requested host and permission has a justification", () => {
   for (const p of manifest.permissions || []) assert.ok(md.includes("| `" + p + "` |"), p);
   for (const h of manifest.host_permissions || []) assert.ok(md.includes("`" + h + "`"), h);
   assert.equal(manifest.optional_permissions, undefined, "optional permissions need their own row");
+  for (const h of manifest.optional_host_permissions || []) assert.ok(md.includes("Optional host `" + h + "`"), h);
 });
 
 test("the Firefox id is the permanent one and declares no data collection", () => {

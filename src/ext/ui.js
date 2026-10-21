@@ -49,7 +49,7 @@
   }
 
   // model: { site, handle, display, posted, profile, reading, flags, markers, machine, tweet, yt, trail, ... }
-  function badge(article, model, onLookup) {
+  function badge(article, model, onLookup, anchor) {
     syncTheme();
     const old = article.querySelector(":scope .pb-bar");
     if (old) old.remove();
@@ -58,7 +58,7 @@
       if (settings && model.site && !PB.siteOn(settings, model.site.id)) return null;
       const signals = PBSignals.all(model, settings);
       return [{ glance: glance(model, signals) }, ...tour(signals), ...PBCard.sections(model, signals, onLookup)];
-    });
+    }, anchor);
   }
 
   globalThis.PBUI = Object.freeze({ badge, panel: (...a) => PBPanel.render(...a), closePop: PBPop.close, syncTheme });

@@ -2214,7 +2214,7 @@ function langLine(code) {
   const r = MEASURED_LANGS[code];
   if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;
   if (r.n < MIN_N) return `Found by the ${name} word list. Not measured in ${name}: only ${r.n} of these signs in labelled text.`;
-  return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of these signs were on text people labelled ` +
+  return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of the strong signs Radar found were on text people labelled ` +
     `hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
 }
 
@@ -2831,6 +2831,96 @@ function bskyPosts(json) {
 }
 
 return { bskyAuthors, bskyPosts };
+})();
+
+// ---- fedi.js
+const M_fedi = (() => {
+// Mastodon and TikTok data from the responses each site's own web app already loaded, passed on by
+// src/ext/fedisniff.js. Radar makes no request of its own. Field names follow Mastodon's public REST
+// API (Account and Status entities) and the comment list TikTok's web app requests.
+
+function walk(json, visit, limit = 200000) {
+  const stack = [json];
+  let guard = 0;
+  while (stack.length && guard++ < limit) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    visit(v);
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+}
+
+const day = (s) => (typeof s === "string" && /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : null);
+const num = (x) => (Number.isFinite(x) ? x : undefined);
+
+// A Mastodon Account entity: id, username, acct, url, created_at.
+const isMastoAccount = (v) => typeof v.acct === "string" && typeof v.username === "string" && typeof v.url === "string" && "created_at" in v;
+
+// acct (lower case, "user" for local, "user@host" for remote) -> what the server loaded about the
+// account. `bot` is the account's own "automated" switch; `group` marks a group actor.
+function mastoAccounts(json) {
+  const out = new Map();
+  if (!json) return out;
+  walk(json, (v) => {
+    if (!isMastoAccount(v)) return;
+    const r = { handle: v.acct, aboutRead: true, labelSource: "Mastodon" };
+    if (v.display_name) r.display = String(v.display_name).slice(0, 80);
+    const joined = day(v.created_at);
+    if (joined) r.joinDate = joined;
+    if (v.bot === true) r.platformLabels = ["automated (set by the account)"];
+    if (v.group === true) r.group = true;
+    if (v.moved) r.moved = true;
+    if (num(v.followers_count) != null) r.followersCount = v.followers_count;
+    if (num(v.following_count) != null) r.followingCount = v.following_count;
+    if (num(v.statuses_count) != null) r.postsCount = v.statuses_count;
+    const k = v.acct.toLowerCase();
+    out.set(k, { ...(out.get(k) || {}), ...r });
+  });
+  return out;
+}
+
+// Status id -> { id, author, posted, lang } for statuses in the response.
+function mastoStatuses(json) {
+  const out = new Map();
+  if (!json) return out;
+  walk(json, (v) => {
+    if (typeof v.id !== "string" || typeof v.content !== "string" || !v.account || !isMastoAccount(v.account)) return;
+    out.set(v.id, { id: v.id, author: v.account.acct, posted: v.created_at || null, lang: v.language || null });
+  });
+  return out;
+}
+
+// What the page probe in the toolbar popup found: the Mastodon web app's root element and the
+// version and domain from its initial state. Only those two fields are read from the state.
+function mastodonProbe(p) {
+  if (!p || !p.root) return null;
+  const version = typeof p.version === "string" ? p.version.slice(0, 40) : null;
+  const domain = typeof p.domain === "string" && /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(p.domain) ? p.domain.toLowerCase() : null;
+  return version ? { version, domain } : null;
+}
+
+// The origin pattern Radar asks permission for, from a tab's URL; null for anything but https.
+function instanceOrigin(url) {
+  let u;
+  try { u = new URL(url); } catch (_) { return null; }
+  if (u.protocol !== "https:" || !u.hostname.includes(".")) return null;
+  return `https://${u.hostname}/*`;
+}
+
+// TikTok comment list: cid -> { id, author, text, posted } (create_time is in seconds). Kept in
+// memory only, to match each rendered comment to its id and time.
+function tiktokComments(json) {
+  const out = new Map();
+  if (!json) return out;
+  walk(json, (v) => {
+    if (typeof v.cid !== "string" || typeof v.text !== "string" || !v.user || typeof v.user.unique_id !== "string") return;
+    const t = Number(v.create_time);
+    out.set(v.cid, { id: v.cid, author: v.user.unique_id, text: v.text.slice(0, 500), posted: Number.isFinite(t) && t > 0 ? new Date(t * 1000).toISOString() : null });
+  });
+  return out;
+}
+
+return { mastoAccounts, mastoStatuses, mastodonProbe, instanceOrigin, tiktokComments };
 })();
 
 // ---- owners.js
@@ -5207,7 +5297,8 @@ const M_settings = (() => {
 const SETTINGS_KEY = "pb.settings";
 
 // Sites Radar has an adapter for. A site added later starts on unless the user switches it off.
-const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"]];
+const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"], ["threads", "Threads"],
+  ["mastodon", "Mastodon"], ["tiktok", "TikTok"]];
 
 // The areas of the window's strip; each can be hidden from the window.
 const AREA_IDS = ["place", "account", "posting", "coordination", "language", "sources", "media"];
@@ -5286,9 +5377,10 @@ function pruneStore(store, settings, now = Date.now()) {
 
 const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
-// "Clear all Radar data": every Radar key except the settings themselves.
+// "Clear all Radar data": every Radar key except the settings themselves. The Mastodon servers the
+// user turned on (pb.instances.v1) are settings too, removed in the options page with their access.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
-const KEPT = new Set([SETTINGS_KEY, "pb.tour"]);
+const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1"]);
 const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));
 
 return { SETTINGS_KEY, SITES, AREA_IDS, RETENTION, DEFAULTS, normalizeSettings, siteOn, areaOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
@@ -5619,5 +5711,5 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
 })();
