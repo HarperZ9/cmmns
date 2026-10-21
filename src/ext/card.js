@@ -128,7 +128,7 @@
     return [
       ["Account age", age != null && C.medianAgeDays != null ? `${age.toLocaleString()} days; the thread's median is ${C.medianAgeDays.toLocaleString()} (${C.n} accounts read)` : null],
       ["Same label", same != null ? `${same} of ${C.n} accounts read here are labelled ${R.basedIn}` : null],
-      ["Flagged here", `${C.flagged} of ${C.n} accounts read in this thread have at least one flag`],
+      ["Flagged here", `${C.flagged} of ${C.n} accounts read in this thread have one strong sign or two weaker ones`],
     ];
   }
 
