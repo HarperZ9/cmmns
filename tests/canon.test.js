@@ -9,14 +9,16 @@ const ROOT = join(import.meta.dirname, "..");
 const list = (dir, re) => readdirSync(join(ROOT, dir)).filter((f) => re.test(f)).map((f) => join(dir, f));
 const read = (p) => readFileSync(join(ROOT, p), "utf8");
 
-// Everything a user can read: pages, scripts that build text (the core bundle included), styles,
-// Radar's own data files, the store listing, the README and the privacy policy. The claims and
-// owners tables quote fact-checkers and Wikidata word for word, so they keep their punctuation.
-const QUOTED = /^(claims(-\d+)?|owners)\.json$/;
+// Everything a user can read: pages, scripts that build text, styles, Radar's own data files, the
+// store listing, the README and the privacy policy. Left out: the claims and owners tables, which
+// quote fact-checkers and Wikidata word for word; the rhetoric grammars and word lists, where a
+// dash is the copula Radar matches in Russian and Ukrainian and is never shown; and the core
+// bundle, which is built from the core files checked here.
+const SKIP = /^(claims(-\d+)?\.json|owners\.json|core\.bundle\.js|(rhetoric|lexicon)(-[a-z]+)?\.js)$/;
 const USER_FACING = [
-  ...list("src/ext", /\.(html|js|css|json)$/).filter((p) => !QUOTED.test(basename(p))), ...list("src/ext/learn", /\.js$/), ...list("src/core", /\.js$/),
+  ...list("src/ext", /\.(html|js|css|json)$/), ...list("src/ext/learn", /\.js$/), ...list("src/core", /\.js$/),
   ...list("docs", /\.html$/), "README.md", "PRIVACY.md", "project-docs/STORE-LISTING.md",
-];
+].filter((p) => !SKIP.test(basename(p)));
 
 // A regular expression that looks for an em dash (the machine-writing sign, the About-page reader)
 // is a detector, not text, so regex literals are removed before the check.
