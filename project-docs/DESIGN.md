@@ -185,3 +185,29 @@ The head shows the account, the key facts, warnings by name, and a strip of seve
 **Packaging** (`scripts/package.mjs`, `scripts/zip.mjs`). A dependency-free zip writer with sorted entries, a fixed 1980-01-01 timestamp and deflate level 9; Chrome gets a service worker manifest, Firefox background scripts and a minimum version of 128. The same tree gives the same bytes on the same Node zlib; a different zlib build can change the compressed bytes.
 
 **Type.** Extension pages bundle Hanken Grotesk (SIL OFL 1.1). Conso is named first in the figure stack but not bundled, because its licence permits the author's site and has not been checked for redistribution inside an extension; the system monospace stands in.
+
+### Add-on identity (2026-10-21)
+The Firefox add-on id is `radar@harperz9.github.io` (`browser_specific_settings.gecko.id`). It must
+never change. AMO ties every signed version, every user's installed copy and its update path to
+this id; a new id is a new add-on, and existing users would never receive an update. The author
+owns harperz9.github.io through GitHub Pages, so the id stays theirs. `tests/store-listing.test.js`
+fails if it changes.
+
+### Trust: feedback, calibration and the transparency page (2026-10-21)
+- Every sign in the window that belongs to a badge family has "This was right" and "This was
+  wrong" (src/ext/feedback.js, pure logic in src/core/feedback.js). A mark holds the sign id
+  (family, post id, hash of the label), the family, the thread key, the verdict and the time, in
+  `pb.feedback.v1`. The post text is kept only when the user ticks "include the text", cut to 1,000
+  characters. At most 2,000 marks; the oldest go first. "Clear all Radar data" deletes them.
+- After 10 marks on one family the window adds "Your feedback: N of M right" under the "Measured"
+  row. It is the user's own count, labelled "not a measurement", and never replaces or changes the
+  measured figure.
+- The options page saves the marks as a JSON file (format `radar-feedback/1`) only on a click. No
+  code path sends it; the user chooses whether to share it.
+- scripts/transparency.mjs builds the transparency page from eval-results.json,
+  persuasion-results.json, families.js, EVALUATION.md (the "do not prove" bullets) and CORPORA.md
+  (corpora and licences). scripts/privacy.mjs builds the public privacy policy from PRIVACY.md.
+  Both write into src/ext (opened from the options page and the popup) and into docs/ for GitHub
+  Pages. `tests/pages.test.js` fails when either copy is stale or leaks a local path.
+- The fact-check table ships as claims.json plus claims-2.json (src/core/claims-parts.js): the
+  Firefox add-on linter refuses any file over 5 MB, and AMO will not sign a package it cannot read.

@@ -19,6 +19,28 @@ were not published to a store.
   the post argues", and its precision. It never counts toward "flagged", and the thread report
   gives it a separate line by flagged and unflagged accounts.
 
+### Added (trust)
+- "This was right" and "This was wrong" on every sign in the window. Marks stay in your browser
+  with the sign, its kind and the thread; the post text only if you tick "include the text". After
+  10 marks on one kind of sign, the window shows "Your feedback: N of M right" under the measured
+  figure, never in its place. The options page lists your marks, saves them to a file when you ask,
+  and clears them. Nothing is sent.
+- A transparency page, inside Radar (options page and popup) and on the public site: every sign
+  with its measured precision, recall and interval, the data it was checked on and its licence,
+  the side-balance table, what is not measured and the known limits. Generated from the evaluation
+  results by `npm run pages`.
+- The privacy policy as a public page, generated from PRIVACY.md, now dated and covering feedback.
+- Conso for figures on Radar's own pages, beside Hanken Grotesk.
+- Store listing text, permission justifications, privacy-practice answers and screenshot plan for
+  the Chrome Web Store and Firefox Add-ons.
+
+### Changed (trust)
+- Firefox add-on id is now `radar@harperz9.github.io`, permanent, and the manifest declares no
+  data collection.
+- The fact-check table ships in two files, each under 5 MB, so Firefox's add-on checks can read it.
+  The rows are unchanged.
+- The manifest description leads with what Radar is: free, no account, nothing leaves your browser.
+
 ## 1.0.0 (2026-10-21)
 
 First public-quality release. Every sign either carries a measured error rate from
