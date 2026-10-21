@@ -232,6 +232,19 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <p class="muted">These describe framing, which the corpora do not label. Their figures against hostility labels are context, not error rates.</p>
 <h3>The thread report's "extreme"</h3>
 <p>Precision against Measuring Hate Speech severity labels: <span class="mono">70.3% (896 of 1,275; 67.7% to 72.7%)</span>. Recall: <span class="mono">17.2% (896 of 5,224; 16.2% to 18.2%)</span>. On HateXplain: precision <span class="mono">60.1% (1,950 of 3,246; 58.4% to 61.7%)</span>. Most severe replies do not count as extreme, so the report undercounts them.</p>
+<h3>Word lists derived from labelled data</h3>
+<p>For Hebrew, Turkish, Korean, Japanese, Persian, Indonesian and Hindi, a script picks each slur term from the training half of public corpora labelled by people, and the other half measures it. A language shows signs only when its list was derived against labels of hate aimed at a group and the 95% interval of its precision starts at 70% or above, from at least 20 signs. Held-back lists never run.</p>
+<details class="how-we-know"><summary>Every derived list, with counts</summary>
+<div class="scroll"><table><thead><tr><th scope="col">Language</th><th scope="col">Terms</th><th scope="col">Precision on hostile text (95% interval)</th><th scope="col">Data</th><th scope="col">Status</th></tr></thead><tbody>
+<tr><td>Hebrew</td><td>3</td><td><span class="mono">96.0% (95 of 99; 90.1% to 98.4%)</span></td><td>OLaH</td><td>Held back: its corpora mark offensive or not, not hate at a group, so the list holds insults</td></tr>
+<tr><td>Turkish</td><td>0</td><td>not measured</td><td>OffensEval 2020 Turkish and TurkishHateMap</td><td>Held back: no term passed the check on the training half</td></tr>
+<tr><td>Korean</td><td>54</td><td><span class="mono">93.8% (8,102 of 8,635; 93.3% to 94.3%)</span></td><td>K-MHaS and BEEP!</td><td>Shows in the window</td></tr>
+<tr><td>Japanese</td><td>2</td><td><span class="mono">63.0% (34 of 54; 49.6% to 74.6%)</span></td><td>LLM-jp Toxicity v2 and inspection-ai Japanese toxicity</td><td>Held back: the interval starts below 70%</td></tr>
+<tr><td>Persian</td><td>0</td><td>not measured</td><td>Persian Offensive Language</td><td>Held back: no term passed the check on the training half</td></tr>
+<tr><td>Indonesian</td><td>1</td><td><span class="mono">85.0% (34 of 40; 70.9% to 92.9%)</span></td><td>IndoDiscourse and IDHSD</td><td>Shows in the window</td></tr>
+<tr><td>Hindi</td><td>4</td><td><span class="mono">97.9% (183 of 187; 94.6% to 99.2%)</span></td><td>TextDetox</td><td>Held back: its corpora mark offensive or not, not hate at a group, so the list holds insults</td></tr>
+</tbody></table></div>
+</details>
 <h2>Persuasion techniques</h2>
 <p>Checked on the Propaganda Techniques Corpus v2 (CC BY 4.0), news articles labelled span by span. A technique shows in the window only when its precision is at least 80% and its 95% interval starts at 70% or above, from at least 20 hits. Published systems reach F1 of about 30 to 44 on these techniques, where a confident label is wrong more often than right. Whataboutism needs the whole exchange, so it never shows on one reply. No technique has cleared the bar.</p>
 <details class="how-we-know"><summary>Every technique, with counts</summary>
@@ -401,6 +414,17 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td><a href="https://huggingface.co/datasets/textdetox/multilingual_toxicity_dataset">TextDetox 2024 multilingual toxicity (Dementieva et al. 2024), splits ar, ru, uk, hi</a></td><td>OpenRAIL++ (the compilation); see below</td></tr>
 <tr><td><a href="https://github.com/thu-coai/COLDataset">COLD, test split (Deng et al., EMNLP 2022)</a></td><td>Apache-2.0</td></tr>
 <tr><td><a href="https://huggingface.co/datasets/Paul/hatecheck-arabic">Multilingual HateCheck (Röttger et al., WOAH 2022), Arabic, Hindi, Mandarin</a></td><td>CC BY 4.0</td></tr>
+<tr><td><a href="https://github.com/NataliaVanetik/HebrewOffensiveLanguageDatasetForTheDetoxificationProject">OLaH (Litvak et al., LREC 2022; filtered release for the detoxification project), Hebrew</a></td><td>MIT</td></tr>
+<tr><td><a href="https://coltekin.github.io/offensive-turkish/">OffensEval 2020 Turkish (Çöltekin, LREC 2020), Turkish</a></td><td>CC BY (README; the dataset card says CC BY 2.0)</td></tr>
+<tr><td><a href="https://huggingface.co/datasets/turkish-nlp-suite/TurkishHateMap">TurkishHateMap (Altinok), 12 topics, Turkish</a></td><td>CC BY-SA 4.0</td></tr>
+<tr><td><a href="https://github.com/adlnlp/K-MHaS">K-MHaS (Lee et al., COLING 2022), Korean</a></td><td>CC BY-SA 4.0</td></tr>
+<tr><td><a href="https://github.com/kocohub/korean-hate-speech">BEEP! Korean HateSpeech (Moon et al., SocialNLP 2020), train and dev, Korean</a></td><td>CC BY-SA 4.0</td></tr>
+<tr><td><a href="https://github.com/e9t/nsmc">NSMC, Naver movie reviews (reference text only; the sentiment label is unused), Korean</a></td><td>CC0 1.0</td></tr>
+<tr><td><a href="https://gitlab.llm-jp.nii.ac.jp/datasets/llm-jp-toxicity-dataset-v2">LLM-jp Toxicity Dataset v2, Japanese</a></td><td>CC BY 4.0</td></tr>
+<tr><td><a href="https://github.com/inspection-ai/japanese-toxic-dataset">inspection-ai Japanese toxicity subset, Japanese</a></td><td>Apache-2.0</td></tr>
+<tr><td><a href="https://github.com/EKebriaei/Persian-Offensive-Language-Dataset">Persian offensive language (Kebriaei et al., Machine Learning 2024), Persian</a></td><td>CC BY 4.0 (README)</td></tr>
+<tr><td><a href="https://huggingface.co/datasets/Exqrch/IndoDiscourse">IndoDiscourse, formerly IndoToxic2024 (Susanto et al. 2025), Indonesian</a></td><td>Apache-2.0; the card adds &quot;for research purposes only&quot;</td></tr>
+<tr><td><a href="https://github.com/ialfina/id-hatespeech-detection">IDHSD (Alfina et al., ICACSIS 2017), Indonesian</a></td><td>Free use without permission; no public copies (README)</td></tr>
 </tbody></table></div>
 <p>No corpus text is in Radar or its repository; only counts, rates and file hashes are. The evaluation scripts in <a href="https://github.com/HarperZ9/radar">Radar's repository</a> reproduce every number here from the downloaded corpora.</p>
 <footer>Radar. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage. <a href="https://github.com/HarperZ9/radar">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>

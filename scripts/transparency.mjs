@@ -104,6 +104,18 @@ ${html}
 // Measured on the seeded set in tests/confusables.test.js.
 export const FOLD_SEEDED = { before: 75, after: 100 };
 
+// The derived word lists (scripts/eval-derived.mjs): one row per language, shipped or held back.
+const DERIVED_NAMES = { he: "Hebrew", tr: "Turkish", ko: "Korean", ja: "Japanese", fa: "Persian", id: "Indonesian", hi: "Hindi" };
+function derivedRows(R) {
+  return R.languages.map((l) => row([esc(DERIVED_NAMES[l.code]), String(l.terms), l.gate.n ? `<span class="mono">${rate(l.gate)}</span>` : "not measured",
+    esc(l.sources), esc(l.ship ? "Shows in the window" : `Held back: ${heldWhy(l)}`)]));
+}
+function heldWhy(l) {
+  if (!l.terms) return "no term passed the check on the training half";
+  if (l.basis !== "group") return "its corpora mark offensive or not, not hate at a group, so the list holds insults";
+  return l.gate.n < 20 ? "fewer than 20 signs to measure" : "the interval starts below 70%";
+}
+
 const ul = (items, fmt = esc) => `<ul>${items.map((x) => `<li>${fmt(x)}</li>`).join("\n")}</ul>`;
 
 export function render() {
@@ -112,6 +124,7 @@ export function render() {
   const D = JSON.parse(read("project-docs/evidence/eval-results.json")), fams = D.families;
   const sources = corpora(read("project-docs/evidence/CORPORA.md"));
   const B = JSON.parse(read("project-docs/evidence/baseline-results.json"));
+  const R = JSON.parse(read("project-docs/evidence/derived-results.json"));
   const lead = leadSigns({ D, ptc, B, fold: { ...FOLD_SEEDED, ...B.fold } });
   const limits = [...bullets(evalMd, "### What the numbers do not prove"), ...bullets(evalMd, "### What the persuasion numbers do not prove")];
   const body = `
@@ -135,6 +148,9 @@ ${more("Weaker signs, with counts", tbl(["Sign", "Share on hostile text (95% int
 <p class="muted">These describe framing, which the corpora do not label. Their figures against hostility labels are context, not error rates.</p>
 <h3>The thread report's "extreme"</h3>
 <p>Precision against Measuring Hate Speech severity labels: <span class="mono">${rate(D.extreme.precision)}</span>. Recall: <span class="mono">${rate(D.extreme.recall)}</span>. On HateXplain: precision <span class="mono">${rate(D.extreme.byCorpus.hatexplain)}</span>. Most severe replies do not count as extreme, so the report undercounts them.</p>
+<h3>Word lists derived from labelled data</h3>
+<p>For Hebrew, Turkish, Korean, Japanese, Persian, Indonesian and Hindi, a script picks each slur term from the training half of public corpora labelled by people, and the other half measures it. A language shows signs only when its list was derived against labels of hate aimed at a group and the 95% interval of its precision starts at 70% or above, from at least 20 signs. Held-back lists never run.</p>
+${more("Every derived list, with counts", tbl(["Language", "Terms", "Precision on hostile text (95% interval)", "Data", "Status"], derivedRows(R)))}
 <h2>Persuasion techniques</h2>
 <p>Checked on the Propaganda Techniques Corpus v2 (CC BY 4.0), news articles labelled span by span. A technique shows in the window only when its precision is at least 80% and its 95% interval starts at 70% or above, from at least 20 hits. Published systems reach F1 of about 30 to 44 on these techniques, where a confident label is wrong more often than right. Whataboutism needs the whole exchange, so it never shows on one reply. No technique has cleared the bar.</p>
 ${more("Every technique, with counts", tbl(["Technique", "Precision (95% interval)", "Recall", "Chance", "Status"], persuasionRows(ptc)))}

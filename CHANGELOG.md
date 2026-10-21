@@ -5,6 +5,23 @@ were not published to a store.
 
 ## Unreleased
 
+### Added (derived word lists)
+- Korean and Indonesian slur signs from word lists derived from human-labelled research corpora,
+  not typed by hand. A script picks each term on the dev split by weighted log-odds against the
+  corpora's group-hate labels, drops group, party and public names and terms that fire on other
+  languages, and keeps only terms that clear a dev precision bar. Korean (54 terms, K-MHaS and
+  BEEP!): 93.8% of test signs on text people labelled hostile (95% interval 93.3 to 94.3, 8,635
+  checked), with terms aimed at both political camps and at both men and women. Indonesian (one
+  term, IDHSD and IndoDiscourse): 85.0% (70.9 to 92.9, 40 checked).
+- Held back, with their figures recorded in project-docs/EVALUATION.md: Japanese (63.0%, lower
+  bound under 0.7), Hebrew and Hindi (their corpora label offensive-or-not only, so the lists hold
+  insults, not group slurs), Turkish and Persian (no term cleared the dev bar). Held-back lists
+  never run on a reply.
+- Unicode handling for each script: Korean and Japanese as character n-grams, Korean only at a
+  word start; Hebrew points and prefixes; Turkish dotted and dotless i and stems; Persian yeh,
+  kaf and the zero-width non-joiner.
+- Symmetry suite for all seven languages, with targets from every direction.
+
 ### Added
 - Named conspiracy theories. A post that uses a documented theory by name or by its stock line
   (chemtrails, adrenochrome, QAnon slogans, satanic ritual abuse, "Great Reset" plot framing, stolen
