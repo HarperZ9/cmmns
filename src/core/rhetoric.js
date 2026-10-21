@@ -22,8 +22,10 @@ import { scoreRu, NEGATION_RU, prepRu } from "./rhetoric-ru.js";
 import { scoreUk, NEGATION_UK } from "./rhetoric-uk.js";
 import { scoreZh, NEGATION_ZH, prepZh } from "./rhetoric-zh.js";
 import { scoreHi, NEGATION_HI, prepHi } from "./rhetoric-hi.js";
+import { derivedLanguages } from "./rhetoric-derived.js";
 import { mentionedIntl } from "./rhetoric-mention.js";
 import { foldConfusables } from "./confusables.js";
+import { theoryMatches } from "./theories.js";
 
 export const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -108,7 +110,9 @@ function mention(s, m) {
 const unleet = (s) => s.replace(/[013457@$!]/g, (c) => L.LEET[c] || c);
 
 export const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, slur: 2, slurSoft: 1, stereotype: 2, motive: 1,
-  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1 };
+  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1,
+  // Named theories (theories.js) are not measured yet, so they stay out of "extreme".
+  "conspiracy-theory": 0 };
 // "Extreme" for the thread report: any strong marker, or two weaker ones together.
 export const EXTREME_AT = 2;
 // Families strong enough to label the comment itself.
@@ -131,6 +135,9 @@ export const LANGUAGES = [
   { code: "zh", report: true, score: scoreZh, negation: NEGATION_ZH, prep: prepZh },
   { code: "hi", report: true, score: scoreHi, negation: NEGATION_HI, prep: prepHi },
 ];
+// Word lists derived from labelled corpora (rhetoric-derived.js), only for the languages that
+// cleared the test-split gate. They run after the written grammars.
+const DERIVED_LANGUAGES = derivedLanguages();
 
 // A matcher that records a marker when `re` matches and, if negatable, the match has no negation.
 function recorder(s, markers) {
@@ -161,14 +168,18 @@ function scoreEnglish(s, hit) {
 }
 
 // Returns { score, markers: [{ family, match, lang? }], extreme }. lang: the code of the language
-// grammar that found the marker; absent for English.
-export function score(text) {
+// grammar that found the marker; absent for English. opts.derived: derived-list codes to run in
+// place of the shipped ones (the evaluation passes every code).
+export function score(text, opts = {}) {
   // Look-alike letters from other scripts are folded first (src/core/confusables.js).
   const s = foldConfusables(text).replace(/[’]/g, "'");
   const markers = [];
   const hit = recorder(s, markers);
   scoreEnglish(s, hit);
-  for (const lang of LANGUAGES) {
+  for (const t of theoryMatches(s)) {
+    if (!mention(s, Object.assign([t.match], { index: t.index }))) markers.push({ family: "conspiracy-theory", theory: t.theory, match: t.match });
+  }
+  for (const lang of [...LANGUAGES, ...(opts.derived ? derivedLanguages(opts.derived) : DERIVED_LANGUAGES)]) {
     const have = new Set(markers.map((m) => m.family));
     const on = lang.prep ? lang.prep(s) : s;
     const from = markers.length;

@@ -9,6 +9,13 @@ export const RESEARCH = {
     found: "Bad News lets players practise six techniques: impersonation, emotional language, polarisation, conspiracy theories, discrediting opponents and trolling. About 15,000 players rated fake posts as less reliable after playing (d from 0.16 to 0.36 by technique), across education, age and political ideology.",
     limit: "Players chose to take part, there was no control group, and the sample leaned young, male and liberal.",
   },
+  "enders-2023": {
+    // Read from the publisher's abstract on 2026-10-21.
+    cite: "Enders, A., Farhart, C., Miller, J., Uscinski, J., Saunders, K. and Drochon, H. (2023). Are Republicans and conservatives more likely to believe conspiracy theories? Political Behavior 45, 2001 to 2024.",
+    url: "https://doi.org/10.1007/s11109-022-09812-3",
+    found: "Across 20 US surveys from 2012 to 2021 (37,776 people) and surveys in 20 more countries (26,416 people), any lean of conspiracy belief toward the right was small and inconsistent. When the story was held constant and only the villain's party changed, both sides endorsed it at similar rates.",
+    limit: "Surveys measure what people say they believe, not what they post, and the result depends on which theories are asked about.",
+  },
   "badnews-2020": {
     cite: "Basol, M., Roozenbeek, J. and van der Linden, S. (10 January 2020). Good News about Bad News: gamified inoculation boosts confidence and cognitive immunity against fake news. Journal of Cognition 3(1), 2.",
     url: "https://doi.org/10.5334/joc.91",

@@ -5,7 +5,8 @@
 // corpora listed for the language.
 
 export const LANG_NAMES = { fr: "French", es: "Spanish", de: "German", pt: "Portuguese", it: "Italian", ar: "Arabic",
-  ru: "Russian", uk: "Ukrainian", zh: "Chinese", hi: "Hindi" };
+  ru: "Russian", uk: "Ukrainian", zh: "Chinese", hi: "Hindi", he: "Hebrew", tr: "Turkish", ko: "Korean", ja: "Japanese",
+  fa: "Persian", id: "Indonesian", "hi-data": "Hindi" };
 
 // langs:begin (scripts/eval-langs.mjs)
 export const MEASURED_LANGS = {
@@ -17,12 +18,34 @@ export const MEASURED_LANGS = {
 };
 // langs:end
 
+// The word lists derived from labelled corpora (lexicon-derived.js), measured on the test split by
+// scripts/eval-derived.mjs. ship: false means held back; the list never runs and the row records why.
+// derived:begin (scripts/eval-derived.mjs)
+export const MEASURED_DERIVED = {
+  "he": {"precision":0.96,"low":0.901,"high":0.984,"n":99,"split":"test","sources":"OLaH","ship":false,"reason":"the corpora label offensive-or-not only, not group hate"},
+  "tr": {"precision":null,"low":null,"high":null,"n":0,"split":"test","sources":"OffensEval 2020 Turkish and TurkishHateMap","ship":false,"reason":"no term cleared the dev bar"},
+  "ko": {"precision":0.938,"low":0.933,"high":0.943,"n":8635,"split":"test","sources":"K-MHaS and BEEP!","ship":true},
+  "ja": {"precision":0.63,"low":0.496,"high":0.746,"n":54,"split":"test","sources":"LLM-jp Toxicity v2 and inspection-ai Japanese toxicity","ship":false,"reason":"lower bound 0.496 under 0.7"},
+  "fa": {"precision":null,"low":null,"high":null,"n":0,"split":"test","sources":"Persian Offensive Language","ship":false,"reason":"no term cleared the dev bar"},
+  "id": {"precision":0.85,"low":0.709,"high":0.929,"n":40,"split":"test","sources":"IndoDiscourse and IDHSD","ship":true},
+  "hi-data": {"precision":0.979,"low":0.946,"high":0.992,"n":187,"split":"test","sources":"TextDetox","ship":false,"reason":"the corpora label offensive-or-not only, not group hate"},
+};
+// derived:end
+
 const pc = (x) => Math.round(x * 100);
 // Fewer checked signs than this give an interval too wide to show as a number.
 export const MIN_N = 20;
 
+// The line the window shows beside a marker a derived word list found.
+function derivedLine(code, r) {
+  const name = LANG_NAMES[code] || code;
+  return `Found by the ${name} word list derived from labelled research data. In ${name}, ${pc(r.precision)}% of these signs were on ` +
+    `text people labelled hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
+}
+
 // The line the window shows beside a marker a language grammar found.
 export function langLine(code) {
+  if (MEASURED_DERIVED[code] && MEASURED_DERIVED[code].ship) return derivedLine(code, MEASURED_DERIVED[code]);
   const name = LANG_NAMES[code] || code;
   const r = MEASURED_LANGS[code];
   if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;

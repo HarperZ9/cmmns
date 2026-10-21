@@ -36,7 +36,22 @@
       base("same-text", clusters.length),
       groups.length ? "Seen together in other threads you viewed: " + groups.slice(0, 3).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "." : null,
       base("together", groups.length),
+      ...flooding(report.flood, base),
+      ...(report.crossLang || []).slice(0, 2).map((g) => `One ${g.kind === "claim" ? "fact-checked claim" : g.kind === "media" ? "upload" : "link"} carried by ${g.accounts} accounts in ${g.langs.length} languages (${g.langs.map((l) => l.replace("script:", "")).join(", ")}).`),
+      base("cross-language", (report.crossLang || []).length),
       report.machine && report.machine.n ? `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text.` : null,
+    ];
+  }
+
+  // The flooding sign (src/core/flooding.js): volume, speed, then repeat posters as context.
+  function flooding(f, base) {
+    if (!f) return [];
+    return [
+      f.volume ? `${f.volume.accounts.length} accounts posting ${f.threshold} or more times a day wrote ${Math.round(f.volume.share * 100)}% of the ${f.volume.known} replies whose account rate Radar knows.` : null,
+      f.speed ? `${f.speed.highRate} of the ${f.speed.accounts} accounts in a burst at ${f.speed.from.slice(11, 16)} UTC post ${f.threshold} or more times a day.` : null,
+      f.repeaters.length ? `Context: ${f.repeaters.map((x) => `@${x.handle} replied ${x.n} times`).join(", ")}. Conversations do this too.` : null,
+      base("flood", true),
+      PB.FLOOD_DOES_NOT_PROVE,
     ];
   }
 

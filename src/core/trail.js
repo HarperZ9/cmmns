@@ -9,7 +9,8 @@ export const TRAIL_RETAIN_DAYS = 30, TRAIL_MAX_ITEMS = 5000, TRAIL_MAX_POSTS = 4
 const DAY = 86400000;
 
 // log: { media: { [mediaId]: Spread }, links: { [url]: Spread } }
-// Spread: { posts: [{ id, handle, at }] } sorted by time; `at` is the post time (ISO).
+// Spread: { posts: [{ id, handle, at, lang? }] } sorted by time; `at` is the post time (ISO), `lang` X's
+// language code for the post when X gave one (for src/core/crosslang.js).
 function add(table, key, entry) {
   const s = table[key] || { posts: [] };
   if (!s.posts.some((p) => p.id === entry.id)) {
@@ -34,7 +35,7 @@ export function recordSpread(log, tweets, now = Date.now()) {
   const L = { media: { ...((log && log.media) || {}) }, links: { ...((log && log.links) || {}) } };
   for (const t of tweets) {
     if (!t.author || !t.posted) continue;
-    const entry = { id: t.id, handle: t.author.toLowerCase(), at: t.posted };
+    const entry = { id: t.id, handle: t.author.toLowerCase(), at: t.posted, ...(t.lang ? { lang: t.lang } : {}) };
     for (const m of t.media || []) { const k = mediaKey(m); if (k) add(L.media, k, entry); }
     for (const u of t.links || []) { const k = normLink(u); if (k) add(L.links, k, entry); }
   }

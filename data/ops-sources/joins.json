@@ -1,0 +1,121 @@
+{
+ "about": "Which data/state-reports.json rows (by the start of their operation field) belong to which operation, and domains never shipped as indicators.",
+ "joins": [
+  {
+   "op": "doppelganger-rrn",
+   "prefixes": [
+    "Doppelganger",
+    "ANO Dialog / Doppelganger"
+   ]
+  },
+  {
+   "op": "spamouflage-dragonbridge",
+   "prefixes": [
+    "Spamouflage"
+   ]
+  },
+  {
+   "op": "storm-2035",
+   "prefixes": [
+    "Storm-2035"
+   ]
+  },
+  {
+   "op": "meta-q1-2025-iran-azerbaijan",
+   "prefixes": [
+    "Linked to Storm-2035"
+   ]
+  },
+  {
+   "op": "stoic-zero-zeno",
+   "prefixes": [
+    "STOIC"
+   ]
+  },
+  {
+   "op": "endless-mayfly",
+   "prefixes": [
+    "Endless Mayfly"
+   ]
+  },
+  {
+   "op": "iuvm-liberty-front-press",
+   "prefixes": [
+    "IUVM"
+   ]
+  },
+  {
+   "op": "stop-news",
+   "prefixes": [
+    "Stop News",
+    "Russia-based CIB network #2"
+   ]
+  },
+  {
+   "op": "meta-q2-2024-ima-digital-caucasus",
+   "prefixes": [
+    "IMA Digital"
+   ]
+  },
+  {
+   "op": "venezuela-us-predictvia-2023",
+   "prefixes": [
+    "Predictvia"
+   ]
+  },
+  {
+   "op": "togo-gpci-burkina-2023",
+   "prefixes": [
+    "Groupe Panafricain"
+   ]
+  },
+  {
+   "op": "digitsol-empowering-ghana-2024",
+   "prefixes": [
+    "DigitSol"
+   ]
+  },
+  {
+   "op": "bangladesh-awami-league-cri-2024",
+   "prefixes": [
+    "Linked to individuals associated with the Awami League"
+   ]
+  },
+  {
+   "op": "myanmar-military-q4-2023",
+   "prefixes": [
+    "Linked to individuals associated with the Myanmar military"
+   ]
+  },
+  {
+   "op": "cotton-sandstorm-2024-hacktivist-brands",
+   "prefixes": [
+    "Linked to Cotton Sandstorm"
+   ]
+  },
+  {
+   "op": "rt-covert-tenet",
+   "prefixes": [
+    "RT covert platforms"
+   ]
+  },
+  {
+   "op": "pakistan-ispr-balochistan-diaries-2026",
+   "prefixes": [
+    "Network attributed to the Pakistani military"
+   ]
+  }
+ ],
+ "exclude": [
+  {
+   "domain": "news360.com",
+   "why": "A generic name that Wikidata records as a real news service; the Bangladesh network's site may be a different one, so it is held back."
+  }
+ ],
+ "realOutletFronts": [
+  {
+   "domain": "dcleaks.com",
+   "why": "On Wikidata as a website, and named by the July 2018 indictment as a GRU front."
+  }
+ ]
+}

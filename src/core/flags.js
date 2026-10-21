@@ -4,6 +4,7 @@
 
 import { parseLabel } from "./places.js";
 import { LOW_KARMA } from "./reddit.js";
+import { brandLookalike, BRAND_DOES_NOT_PROVE } from "./brands.js";
 
 export const NEW_ACCOUNT_DAYS = 30;
 export const MANY_NAME_CHANGES = 3;
@@ -44,6 +45,7 @@ export const DOES_NOT_PROVE = {
   "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
   "platform-label": "A moderation label is the service's own judgement; labels can be wrong, disputed or applied in bulk.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
+  "brand-lookalike": BRAND_DOES_NOT_PROVE,
 };
 
 export function ageDays(joinDate, now = Date.now()) {
@@ -125,6 +127,10 @@ export function flagsFor(account, context = {}) {
   const name = `${account.display || ""} ${account.handle || ""}`;
   const sym = HATE_NAME.exec(name);
   if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
+  // A name that borrows a platform's or an outlet's brand (src/core/brands.js). Only where the site
+  // gives the handle the brand list is keyed on (X), so the caller sets brandCheck.
+  const brand = account.brandCheck ? brandLookalike(account) : null;
+  if (brand) out.push({ id: "brand-lookalike", evidence: brand.evidence, source: brand.source });
   // Reddit: little karma after more than a month, and Reddit's suggested sign-up name.
   if (Number.isFinite(account.karma) && age != null && age > NEW_ACCOUNT_DAYS && account.karma < LOW_KARMA) out.push({ id: "low-karma", evidence: `${account.karma} karma after ${age} days` });
   // Bluesky: moderation labels about how an account behaves, not what it says.
@@ -149,7 +155,7 @@ export function flagsFor(account, context = {}) {
 // report circular.
 const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name", "follow-pattern"]);
 export const WEAK_FLAGS = new Set(["store-elsewhere", "profile-location-elsewhere", "flag-elsewhere", "hours-elsewhere",
-  "fast-replier", "repost-only", "low-karma"]);
+  "fast-replier", "repost-only", "low-karma", "brand-lookalike"]);
 export function isFlagged(flags) {
   const counted = flags.filter((f) => !NOT_AUTHENTICITY.has(f.id));
   if (counted.some((f) => !WEAK_FLAGS.has(f.id))) return true;

@@ -6,21 +6,23 @@
 // corpus, not a sample of today's X, and some of their accounts may themselves have coordinated.
 
 import { BASELINES } from "./baselines-data.js";
+import { TECHNIQUE_BASELINES } from "./techniques-data.js";
 import { sizeBin, viewBin } from "./baselines-bins.js";
 
 export const BASELINE_SOURCE = "Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus, not a sample of today's X.";
 
-const share = (x) => (x < 0.1 ? `${(x * 100).toFixed(1)}%` : `${Math.round(x * 100)}%`);
+const share = (x) => (x > 0 && x < 0.001 ? `${(x * 100).toFixed(2)}%` : x < 0.1 ? `${(x * 100).toFixed(1)}%` : `${Math.round(x * 100)}%`);
 const range = (ci) => `${share(ci[0])} to ${share(ci[1])}`.replace(/% to/, " to");
 const size = (b) => (b.max === Infinity || b.max == null ? `${b.min} or more replies` : `${b.min} to ${b.max} replies`);
 
 // The measured rate for one sign: { k, n, share, ci, bin } or null when the thread falls outside
 // every bin. ctx: { replies } for signs in one thread, { viewed } for signs across threads.
 export function baselineFor(sign, ctx = {}) {
-  const inThread = { "same-text": "same", burst: "burst" }[sign];
+  const inThread = { "same-text": "same", burst: "burst", flood: "flood", "cross-language": "cross" }[sign];
   const across = { together: "together", "copied-elsewhere": "echo" }[sign];
   const bin = inThread ? sizeBin(ctx.replies || 0) : across ? viewBin(ctx.viewed || 0) : null;
-  const r = bin && BASELINES[inThread || across] && BASELINES[inThread || across][bin.id];
+  const table = sign === "flood" || sign === "cross-language" ? TECHNIQUE_BASELINES : BASELINES;
+  const r = bin && table[inThread || across] && table[inThread || across][bin.id];
   return r && r.n ? { ...r, bin } : null;
 }
 
@@ -29,6 +31,8 @@ const WHAT = {
   burst: ["a burst of replies like this", "threads"],
   together: ["a pair of accounts seen together in two or more other threads", "threads"],
   "copied-elsewhere": ["wording that turned up in another thread", "replies of 8 words or more"],
+  flood: ["a flood of replies from very high-rate accounts", "threads"],
+  "cross-language": ["one link or upload carried by replies in different languages", "threads"],
 };
 
 // One sentence for the window, or null: "In ordinary threads with 20 to 49 replies, ... showed up

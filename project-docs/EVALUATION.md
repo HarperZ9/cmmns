@@ -132,6 +132,90 @@ hit. Hindi violence and Arabic slurs: **not measured** (no hits on natural text)
   symmetry suites (`tests/rhetoric.{ar,ru,uk,zh,hi}.test.js`) hold every template to the same
   result across 19 to 26 targets from every direction, including each camp's coinages for the other.
 
+## Derived word lists: Hebrew, Turkish, Korean, Japanese, Persian, Indonesian, Hindi (test split, 2026-10-21)
+
+Nobody typed these lists. `scripts/derive-lexicon.mjs` picks every term from the dev split of the
+human-labelled corpora in `evidence/CORPORA.md` ("Hebrew, Turkish, Korean, Japanese, Persian,
+Indonesian, Hindi") and writes them to `src/core/lexicon-derived.js`. The dev statistics for each
+term are in `evidence/derived-lexicon.json`. `scripts/eval-derived.mjs` then read the test split
+once and wrote `evidence/derived-results.json`, the derived rows in `src/core/measured-langs.js` and
+the ship list. Same seed and split rule as above.
+
+Reproduce: download the corpora, then `node scripts/derive-lexicon.mjs` and
+`node scripts/eval-derived.mjs`. The derivation takes about three minutes.
+
+**Method.**
+1. Candidates. Words and pairs of neighbouring words for Hebrew, Turkish, Persian, Indonesian and
+   Hindi. Character 2- to 4-grams for Korean and Japanese, which do not mark word boundaries the
+   way the matcher needs; Korean n-grams must start a word (an eojeol), so a piece of an ordinary
+   word is never a candidate. A Turkish word longer than five letters counts by its first five,
+   matched with any ending. Each script has its own normal form (`src/core/rhetoric-derived.js`):
+   Hebrew points removed, Turkish dotted and dotless i lowercased the Turkish way, Japanese NFKC,
+   Persian yeh and kaf unified with the zero-width non-joiner kept, letters repeated three or more
+   times squeezed in Latin-script languages. Hebrew one-letter prefixes and Persian plural endings
+   attach to a term when it is matched.
+2. Weighted log-odds with an informative Dirichlet prior (Monroe, Colaresi and Quinn 2008), on
+   document frequencies, group hate against every other item. One pooled contrast and one per
+   labelled target with at least 30 hate items, each giving at most 80 candidates with z of at least
+   3.1, so no single target supplies the list.
+3. Filters, in order: a term that is or contains a plain group name, party, public figure or place
+   (`scripts/eval/derived-groups.mjs`) is dropped; a term that fires on more than two texts in other
+   languages (the English, French, Arabic, Russian, Ukrainian and Chinese corpora, and the other
+   derived languages) is dropped; a Korean term that appears in more than 1 in 2,000 Naver movie
+   reviews is dropped as ordinary vocabulary; a term must then reach the dev bar: at least five dev
+   items, and a Wilson lower bound on the share labelled group hate of at least 0.6 and at least
+   0.35 above the language's base rate.
+4. A term that contains a shorter kept term is dropped; terms are then taken round-robin across the
+   contrasts, up to 160.
+5. Only the slur family is derived. Grammar templates were not added: no corpus here supports a
+   template grammar with enough labelled cases.
+
+**The gate**, fixed before the test split was read: a language ships when its list was derived
+against a group-hate label, at least 20 of its signs fall on labelled natural text, and the Wilson
+lower bound of their precision against the corpus's hostile label is at least 0.7. HateCheck is
+measured, never derived from and never pooled.
+
+| Language | Terms | Test signs | Precision vs hostile (95% interval) | vs group hate | Result |
+|---|---|---|---|---|---|
+| Korean | 54 | 8,635 | 93.8% (93.3 to 94.3) | K-MHaS 90.0%, BEEP! 86.9% | ships |
+| Indonesian | 1 | 40 | 85.0% (70.9 to 92.9) | IDHSD 87.2% (34/39) | ships |
+| Japanese | 2 | 54 | 63.0% (49.6 to 74.6) | 74.1% (40/54) | held back: lower bound under 0.7 |
+| Hebrew | 3 | 99 | 96.0% (90.1 to 98.4) | no group label | held back: offensive-or-not labels only |
+| Hindi | 4 | 187 | 97.9% (94.6 to 99.2) | no group label | held back: offensive-or-not labels only |
+| Turkish | 0 | 0 | not measured | | held back: no term cleared the dev bar |
+| Persian | 0 | 0 | not measured | | held back: no term cleared the dev bar |
+
+Korean recall against group hate: K-MHaS 44.8% (7,626/17,032), BEEP! 13.7% (139/1,018). Per
+K-MHaS target: age 55.1%, gender 36.6%, origin 50.9%, politics 42.5%, race 25.0% (38/152), religion
+63.9%. Indonesian recall: IDHSD 26.0% (34/131), IndoDiscourse 0 of 380; the single term,
+"penista" (blasphemer), comes from the 2017 Jakarta election tweets in IDHSD and almost never
+appears in the 2023 to 2024 IndoDiscourse texts.
+
+Hebrew and Hindi clear 0.7 on the numbers, but their corpora mark only offensive versus not, so
+their lists hold insults and pronouns ("you", "dogs", "trash") rather than group slurs. Labelling
+those as slurs would misdescribe the post, so both are held back; see the author items in
+`evidence/CORPORA.md`. Turkish: TurkishHateMap's hate label sits almost entirely in its refugee
+topic and on topic words (asylum, border, war), none of which reached the bar. Persian: the
+strongest candidates were names of religious figures, which the name filter removes.
+
+What the window says: a Korean or Indonesian sign carries "Found by the Korean word list derived
+from labelled research data" with the number above. The held-back lists never run on a reply.
+
+### What these numbers do not prove
+- The Korean corpora are news comments; the Korean list was measured there, not on X or YouTube
+  replies. Words that cleared the bar because news comments use them in one sense, such as
+  "무능" (incompetent) or "추방" (deportation), may read differently elsewhere.
+- No corpus labels a target's political direction, so no side comparison was run. The Korean list
+  holds terms aimed in both directions (at progressives and at conservatives, at men and at
+  women), and the symmetry suite (`tests/rhetoric.derived.test.js`) holds every derived language to
+  the same result across 22 to 48 targets, but the share of each direction in the list follows the
+  corpus, not a quota.
+- Indonesian rests on one term and 40 test signs, from a 713-tweet corpus about one election.
+- Recall is partial everywhere. A reply in these languages with no badge has not been checked for
+  rhetoric the list does not hold.
+- The English, French and five-language numbers above are unchanged with the derived lists on:
+  `scripts/eval.mjs` and `scripts/eval-langs.mjs` give the same counts.
+
 ## Side comparison: closed on HateXplain, open on MHS
 Strong-family recall and precision on hostile text aimed at each side's usual targets (test split;
 group lists in `evidence/CORPORA.md`). "Before" is the release with the four language grammars;
@@ -340,6 +424,41 @@ What the baselines do not prove:
 - No labelled set of coordinated threads was used here, so no recall for any coordination sign is
   measured on real data.
 
+## Technique signs: flooding and cross-language repetition (2026-10-21)
+Two signs from `project-docs/TECHNIQUES.md`, measured for how often they fire on ordinary threads.
+`python -I scripts/eval/prep-pheme-techniques.py <data>/pheme` writes a text-free extract (hashed
+account ids, times, language codes, links, media ids, post counts, join times), and
+`node scripts/techniques-baselines.mjs` writes `evidence/technique-baselines.json` and
+`src/core/techniques-data.js`.
+
+| Sign, thread size | Ordinary threads (95% interval) |
+|---|---|
+| Flooding, 5 to 19 replies | 0.55% (17 of 3,087; 0.34 to 0.88) |
+| Flooding, 20 to 49 | 1.8% (25 of 1,384; 1.2 to 2.7) |
+| Flooding, 50 to 99 | 2.2% (4 of 181; 0.9 to 5.5) |
+| Flooding, 100 or more | 3.3% (2 of 60; 0.9 to 11.4) |
+| Cross-language, 5 to 19 replies | 0.03% (1 of 3,087; 0.01 to 0.18) |
+| Cross-language, 20 to 49 | 0.14% (2 of 1,384; 0.04 to 0.53) |
+| Cross-language, 50 to 99 | 1.1% (2 of 181; 0.3 to 3.9) |
+| Cross-language, 100 or more | 0% (0 of 60; 0 to 6.0) |
+
+How the thresholds were set. The flooding rate threshold is the existing "very high post rate" flag
+(100 a day). The share (a quarter of replies with a known rate, from three or more accounts) was
+chosen after looking at the whole corpus, so these rates are in-sample; the dev and test halves
+give 0.9% and 1.2% overall. Accounts replying five or more times in one thread showed up in 23% of
+ordinary threads, so repetition is shown as context and never fires the sign.
+
+What the baselines changed. Cross-language first fired on 2.3% to 3.4% of threads; 167 of 177 groups
+were replies carrying the root post's own link or upload in other languages. The root post's
+material is now set aside, as the same-text sign sets aside the root's wording.
+
+What these numbers do not prove:
+- PHEME is Twitter in 2014 and 2015 and mostly English (94% of replies); multilingual threads are
+  rarer there than on today's X.
+- Twitter's language code is wrong on short replies; a wrong code can make one language look like two.
+- No labelled set of flooded or multilingual campaign threads exists here, so no precision or recall.
+- Cross-language across viewed threads and the laundering chain are not measured.
+
 ## Look-alike letters (2026-10-21)
 Text is folded to the Unicode confusables table (UTS #39, version 18.0.0) before the duplicates sign,
 the cross-thread fingerprint, claim matching and the rhetoric word lists (`src/core/confusables.js`).
@@ -356,6 +475,40 @@ script when every letter can be read in it, else toward the word's own majority;
   plain ones and one mixed-script word. The synthetic duplicate cases keep their precision.
 - Limit: a lone Russian word quoted inside English text, whose every letter has a Latin look-alike
   ("сор"), folds to Latin. Folding applies only to the copy Radar matches, never to what it shows.
+
+## Named conspiracy theories (2026-10-21): not measured
+`src/core/theories.js` extends the conspiracy family with twelve documented theories (QAnon slogans,
+adrenochrome, satanic ritual abuse, chemtrails, "Great Reset" plot framing, stolen and rigged
+elections, machine and satellite vote-flipping, staged shootings, 9/11 inside job, 5G and COVID-19,
+vaccine harm, hidden cures), each with dated sources and its own does-not-prove line. Election and
+staged-event claims match both directions; `tests/theories.symmetry.test.js` pairs each right-coded
+claim with its left-coded twin (Dominion and Starlink, 2020 and 2016, Sandy Hook and Butler).
+
+No corpus was usable for a precision figure, so the family reads "not measured yet", carries weight
+0 and never counts toward "extreme":
+- LOCO (Miani, Hills and Bangerter 2021, 96,743 documents, osf.io/snpcg): the OSF project states no
+  licence (checked 2026-10-21 through the OSF API: `node_license` is null), so Radar may not use it.
+  Asking the authors for a licence is the author's call.
+- COCO (Langguth et al. 2023, 3,495 tweets with stance labels over 12 COVID-19 conspiracy topics):
+  the release holds tweet IDs only. The text needs hydration through X's API, which Radar does not
+  use, and no licence is stated for the labels.
+- MM-COVID: labels fake and real news, not conspiracy theories. Its Hugging Face mirror says
+  Apache-2.0; the original authors' terms were not confirmed.
+No corpus was downloaded for this check.
+
+Context, not a measurement: on the CC0 Civil Comments test split already on disk, the family fired on
+10 of 97,320 comments after the debunk, mockery and reported-claim guards (22 before them). The
+building agent read those hits and many of them mock or report a theory; no person labelled them.
+
+## Brand look-alike accounts (2026-10-21): not measured
+`src/core/brands.js` flags a name that borrows one of 42 platform and outlet brands (each with its
+Wikidata item and the X usernames that item lists, queried 2026-10-21) with a word that makes it read
+as the brand's own voice. X's affiliation badge, an organisation or government check, and X's parody,
+commentary or fan label clear the flag. `tests/brands.test.js` holds synthetic accounts only: 10
+look-alikes and 18 controls, among them sub-accounts that carry the affiliation badge. Weak tier:
+alone it never counts toward "flagged". No labelled set of impersonation accounts was used, so it
+reads "not measured yet". Wikidata lists only some of each outlet's accounts, so a real sub-account
+without the badge or a check can trip it.
 
 ## Threads
 At least one event with threads from opposing sides (for example a protest covered by outlets on

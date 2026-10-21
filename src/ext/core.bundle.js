@@ -229,6 +229,342 @@ function foldConfusables(text) {
 return { MIN_LATIN_WORDS, foldConfusables };
 })();
 
+// ---- lookalike-outlets.js
+const M_lookalike_outlets = (() => {
+// Major news outlets whose names influence operations have copied (the cloned and look-alike domains
+// in data/ops-sources) and other widely read outlets. Each row: the names a look-alike would copy,
+// and every domain the outlet itself uses, which never match. "generic" names (a common word many
+// unrelated outlets use) are checked for misspellings only, never for a swapped ending.
+// Official domains checked against Wikidata's official-website property and the outlets' own pages
+// in October 2026.
+const OUTLETS = [
+  ["The Washington Post", ["washingtonpost.com", "wapo.st"]], ["Fox News", ["foxnews.com", "foxbusiness.com"]],
+  ["Der Spiegel", ["spiegel.de"]], ["Frankfurter Allgemeine", ["faz.net"]], ["Le Monde", ["lemonde.fr"]],
+  ["Le Parisien", ["leparisien.fr"]], ["RBC", ["rbc.ru", "rbc.ua"], ["rbk"]], ["Süddeutsche Zeitung", ["sueddeutsche.de", "sz.de"]],
+  ["Der Tagesspiegel", ["tagesspiegel.de"], ["dertagesspiegel"]], ["Bild", ["bild.de", "bild.tv"]], ["Die Welt", ["welt.de"]],
+  ["Daily Mail", ["dailymail.co.uk", "dailymail.com"]], ["La Repubblica", ["repubblica.it"]], ["Delfi", ["delfi.lt", "delfi.lv", "delfi.ee"]],
+  ["20 Minutes", ["20minutes.fr", "20min.ch", "20minutes.ch", "20minutes.tv"]], ["ANSA", ["ansa.it"]], ["The Guardian", ["theguardian.com"]],
+  ["t-online", ["t-online.de"]], ["nd", ["nd-aktuell.de"]], ["BBC", ["bbc.com", "bbc.co.uk"]], ["The New York Times", ["nytimes.com", "nyti.ms"]],
+  ["CNN", ["cnn.com"]], ["Reuters", ["reuters.com"]], ["AP News", ["apnews.com"]], ["Al Jazeera", ["aljazeera.com", "aljazeera.net"]],
+  ["Al Arabiya", ["alarabiya.net"], ["alarabyia"]], ["Haaretz", ["haaretz.com", "haaretz.co.il"]], ["The Times of Israel", ["timesofisrael.com"]],
+  ["The Jerusalem Post", ["jpost.com"], ["jerusalempost", "thejerusalempost"]], ["Israel Hayom", ["israelhayom.com", "israelhayom.co.il"]],
+  ["Israel National News", ["israelnationalnews.com"]], ["The Independent", ["independent.co.uk"], [], true],
+  ["The Atlantic", ["theatlantic.com"]], ["Foreign Policy", ["foreignpolicy.com"]], ["Bloomberg", ["bloomberg.com"]],
+  ["HuffPost", ["huffpost.com", "huffingtonpost.com", "huffingtonpost.co.uk", "huffingtonpost.fr", "huffingtonpost.es", "huffingtonpost.it", "huffingtonpost.de", "huffingtonpost.jp", "huffingtonpost.kr", "huffingtonpost.gr"]],
+  ["Politico", ["politico.com", "politico.eu"]], ["France 24", ["france24.com"]], ["Le Soir", ["lesoir.be"], [], true],
+  ["National Post", ["nationalpost.com"]], ["The Globe and Mail", ["theglobeandmail.com"]], ["Washington Examiner", ["washingtonexaminer.com"]],
+  ["MintPress News", ["mintpressnews.com"]], ["The Herald", ["heraldscotland.com"], ["theheraldscotland"]], ["Breaking Israel News", ["breakingisraelnews.com"]],
+  ["The Brussels Times", ["brusselstimes.com"]], ["Budapest Beacon", ["budapestbeacon.com"]], ["Emarat Al Youm", ["emaratalyoum.com"]],
+  ["Al Jazirah", ["al-jazirah.com"]], ["Al Riyadh", ["alriyadh.com"]], ["Sharjah 24", ["sharjah24.ae"]], ["Shorouk News", ["shorouknews.com"]],
+  ["El Watan News", ["elwatannews.com"]], ["Arabi21", ["arabi21.com"]], ["Euronews", ["euronews.com"]], ["Le Figaro", ["lefigaro.fr"]],
+  ["Corriere della Sera", ["corriere.it"]], ["El País", ["elpais.com"]], ["Die Zeit", ["zeit.de"]], ["The Kyiv Independent", ["kyivindependent.com"]],
+  ["Kyiv Post", ["kyivpost.com"]], ["USA Today", ["usatoday.com"]], ["NBC News", ["nbcnews.com"]], ["CBS News", ["cbsnews.com"]],
+  ["Los Angeles Times", ["latimes.com"]], ["New York Post", ["nypost.com"]], ["Newsweek", ["newsweek.com"]],
+  ["South China Morning Post", ["scmp.com"]], ["The Straits Times", ["straitstimes.com"]], ["The Japan Times", ["japantimes.co.jp"]],
+  ["The Korea Times", ["koreatimes.co.kr", "koreatimes.com"], ["thekoreatimes"]], ["Jakarta Globe", ["jakartaglobe.id"]], ["Bangkok Post", ["bangkokpost.com"], ["dailybangkokpost"]],
+  ["The Times of India", ["timesofindia.indiatimes.com", "indiatimes.com"], ["timesofindia"]], ["Hürriyet", ["hurriyet.com.tr", "hurriyetdailynews.com"]],
+  ["Ukrainska Pravda", ["pravda.com.ua"], ["pravda-ua"]], ["Kommersant", ["kommersant.ru", "kommersant.com", "kommersant.uk"]], ["Meduza", ["meduza.io"]],
+  ["Le Point", ["lepoint.fr"]], ["Libération", ["liberation.fr"]], ["Ouest-France", ["ouest-france.fr"]], ["Deutsche Welle", ["dw.com"]],
+  ["Agence France-Presse", ["afp.com"]], ["Associated Press", ["ap.org"]], ["The Wall Street Journal", ["wsj.com"]], ["Financial Times", ["ft.com"]],
+  ["The Economist", ["economist.com"]], ["The Telegraph", ["telegraph.co.uk"], [], true], ["Sky News", ["news.sky.com", "sky.com"]],
+  ["ABC News", ["abcnews.go.com", "abc.net.au", "abcnews.com"]], ["Berliner Morgenpost", ["morgenpost.de"]], ["La Stampa", ["lastampa.it"]],
+  ["UNIAN", ["unian.ua", "unian.net", "unian.info", "unian.tv"]], ["Obozrevatel", ["obozrevatel.com"]], ["La Croix", ["la-croix.com"]],
+  ["Polskie Radio", ["polskieradio.pl", "polskieradio24.pl", "polskieradio.com"]], ["Slate", ["slate.com", "slate.fr"]], ["The New Yorker", ["newyorker.com"]],
+  ["Berliner Zeitung", ["berliner-zeitung.de"]], ["Walla", ["walla.co.il"]], ["Mako", ["mako.co.il"]], ["Spektrum", ["spektrum.de"]],
+  ["Psychologie Heute", ["psychologie-heute.de"]], ["Closer", ["closermag.fr"]], ["Cosmopolitan", ["cosmopolitan.com", "cosmopolitan.fr", "cosmopolitan.de", "cosmopolitan.tv"]],
+  ["EatingWell", ["eatingwell.com"]], ["Real Simple", ["realsimple.com"]], ["Grazia", ["grazia.it", "grazia.fr"]],
+  ["Herder", ["herder.de"]], ["Bundespolizei", ["bundespolizei.de"]], ["Onmeda", ["onmeda.de"]], ["Sciences Humaines", ["scienceshumaines.com"]], ["Axios", ["axios.com"]], ["The Hill", ["thehill.com"]], ["Al-Monitor", ["al-monitor.com"]],
+].map(([name, domains, aliases = [], generic = false]) => ({ name, domains, aliases, generic }));
+
+// Real outlets that are not any listed outlet but sit one edit from one (found by the control test
+// over the owner and site tables). They never match.
+const UNRELATED_REAL = ["20minutos.es", "alwatannews.net", "economista.com.mx", "ekonomist.me", "indypendent.org", "republica.com", "republica.com.uy"];
+
+return { OUTLETS, UNRELATED_REAL };
+})();
+
+// ---- lookalike.js
+const M_lookalike = (() => {
+// Look-alike news domains: a weak sign that a link copies the name of a major outlet, the way the
+// Doppelganger and Endless Mayfly operations did (washingtonpost.pm, spiegel.ltd, theguaradian.com).
+// Three patterns, each against the outlets in lookalike-outlets.js:
+//   ending swap   the outlet's own name on an ending it does not use (washingtonpost.pm, bild.pics)
+//   misspelling   one letter added, dropped, changed or two swapped (theatlatnic.com, speigel.net)
+//   look-alike letters  an internationalised name whose letters only look like the outlet's
+// An outlet's own domains and their subdomains never match. The sign is about the address, never
+// about who posted it: real people share these links, often to warn others.
+const { OUTLETS, UNRELATED_REAL } = M_lookalike_outlets;
+const { TO_LATIN } = M_confusables_data;
+
+// Second-level endings run by a country registry. Anything else with a dot (co.com, eu.com) is a
+// private registry that sells look-alike endings and counts as a swapped ending.
+const CC2 = /^(co|com|org|net|ac|gov|edu|or|ne|go|in|info|biz|news|ltd|plc|me)\.[a-z]{2}$/;
+// Country endings that are sold as generic ones.
+const GENERIC_CC = new Set(["pm", "ws", "me", "co", "cc", "tv", "io", "to", "nu", "la", "ai", "gg", "ly", "su", "fm", "am", "cx", "bz", "wf", "pw", "so"]);
+// Private second-level endings sold to anyone, which look like a country's.
+const PRIVATE2 = new Set(["co.com", "eu.com", "us.com", "uk.com", "de.com", "gb.com", "br.com", "cn.com", "ru.com", "sa.com", "za.com", "jpn.com", "in.net", "us.org"]);
+const COMMON = new Set(["com", "net", "org"]);
+const norm = (s) => s.replace(/-/g, "").replace(/vv/g, "w");
+
+const LATIN = (() => { const a = [...TO_LATIN], m = new Map(); for (let i = 0; i + 1 < a.length; i += 2) m.set(a[i], a[i + 1]); return m; })();
+
+// RFC 3492 decoding of one "xn--" label; null when it is not valid.
+function punyDecode(label) {
+  if (!/^xn--/.test(label)) return label;
+  const s = label.slice(4), base = 36, tmin = 1, tmax = 26, skew = 38, damp = 700;
+  const cut = s.lastIndexOf("-"), out = cut > 0 ? [...s.slice(0, cut)] : [];
+  let n = 128, i = 0, bias = 72, p = cut > 0 ? cut + 1 : 0;
+  const digit = (c) => (c >= 48 && c < 58 ? c - 22 : c >= 97 && c < 123 ? c - 97 : 36);
+  const adapt = (delta, len, first) => {
+    delta = first ? Math.floor(delta / damp) : delta >> 1; delta += Math.floor(delta / len);
+    let k = 0; for (; delta > ((base - tmin) * tmax) >> 1; k += base) delta = Math.floor(delta / (base - tmin));
+    return k + Math.floor(((base - tmin + 1) * delta) / (delta + skew));
+  };
+  while (p < s.length) {
+    const old = i;
+    for (let w = 1, k = base; ; k += base) {
+      if (p >= s.length) return null;
+      const d = digit(s.charCodeAt(p++));
+      if (d >= base) return null;
+      i += d * w;
+      const t = k <= bias ? tmin : k >= bias + tmax ? tmax : k - bias;
+      if (d < t) break;
+      w *= base - t;
+    }
+    bias = adapt(i - old, out.length + 1, old === 0);
+    n += Math.floor(i / (out.length + 1)); i %= out.length + 1;
+    out.splice(i++, 0, String.fromCodePoint(n));
+  }
+  return out.join("");
+}
+
+// A label in plain Latin letters: look-alike letters mapped, accents dropped.
+function plain(label) {
+  const u = punyDecode(label);
+  if (u == null) return label;
+  return [...u].map((c) => LATIN.get(c) || c).join("").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+}
+
+// How two names differ by one edit, or null: "swap" (two neighbours swapped), "change" (one letter
+// changed), "extra" or "missing" (one letter added or dropped), "double" (a letter doubled).
+function oneEdit(a, b) {
+  if (a === b || Math.abs(a.length - b.length) > 1) return null;
+  let i = 0;
+  while (i < a.length && a[i] === b[i]) i++;
+  if (a.length === b.length) {
+    if (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2)) return "swap";
+    return a.slice(i + 1) === b.slice(i + 1) ? "change" : null;
+  }
+  const [long, short] = a.length > b.length ? [a, b] : [b, a];
+  if (long.slice(i + 1) !== short.slice(i)) return null;
+  if (long[i] === long[i - 1] || long[i] === long[i + 1]) return a.length > b.length ? "double" : "missing";
+  return a.length > b.length ? "extra" : "missing";
+}
+// The shortest outlet name each kind of edit is checked on. Shorter names collide with real outlets
+// (nypost and kypost, usatoday and uatoday, apnews and panews), found by the control in tests/lookalike.test.js.
+const MIN_EDIT = { swap: 7, double: 4, change: 9, extra: 9, missing: 9 };
+
+// The name part and the ending of a host: "theguardian.co.com" gives ["theguardian", "co.com"].
+function splitHost(host) {
+  const parts = host.split("."), two = parts.slice(-2).join(".");
+  const k = parts.length > 2 && (CC2.test(two) || PRIVATE2.has(two)) ? 2 : 1;
+  return [parts[parts.length - k - 1] || "", parts.slice(-k).join(".")];
+}
+
+const own = (host, o) => o.domains.some((d) => host === d || host.endsWith("." + d));
+// The outlet's own names: from its domains that have no subdomain ("abcnews.go.com" gives none).
+const nameOf = (d) => { const [label, ending] = splitHost(d); return d === `${label}.${ending}` ? label : null; };
+const INDEX = OUTLETS.map((o) => ({ o, names: new Set(o.domains.map(nameOf).filter(Boolean).map(norm)), aliases: new Set(o.aliases.map(norm)) }));
+const KNOWN = new Set([...OUTLETS.flatMap((o) => o.domains), ...UNRELATED_REAL]);
+
+function endingSwapped(ending, brand) {
+  if (COMMON.has(ending)) return brand.length >= 8;
+  if (/^[a-z]{2}$/.test(ending)) return GENERIC_CC.has(ending);
+  if (CC2.test(ending)) return false;
+  return true;
+}
+
+// { outlet, official, how } for a look-alike of a listed outlet, or null.
+function lookalikeOf(domain) {
+  const host = String(domain || "").toLowerCase().replace(/^www\./, "").replace(/\.$/, "");
+  if (!host.includes(".") || KNOWN.has(host) || UNRELATED_REAL.some((d) => host.endsWith("." + d))) return null;
+  const [label, ending] = splitHost(host);
+  const name = norm(plain(label)), puny = /^xn--/.test(label);
+  for (const { o, names, aliases } of INDEX) {
+    if (own(host, o)) return null;
+    const hit = (how) => ({ outlet: o.name, official: o.domains[0], how });
+    if (aliases.has(name)) return hit("copies the name");
+    if (names.has(name)) {
+      if (puny) return hit("look-alike letters");
+      if (!o.generic && name.length >= 3 && endingSwapped(ending, name)) return hit("swapped ending");
+      continue;
+    }
+    for (const n of names) {
+      const kind = oneEdit(name, n);
+      // A short name doubled on a sold ending (bildd.lol) counts; on .com it is often a real site.
+      if (kind && n.length >= MIN_EDIT[kind] && (kind !== "double" || n.length >= 6 || endingSwapped(ending, n))) return hit(puny ? "look-alike letters" : "misspelling");
+    }
+  }
+  return null;
+}
+
+const LOOKALIKE_DOES_NOT_PROVE = "A similar address is not proof of a fake: outlets use other addresses, and unrelated sites share common words. Open the outlet's own site and compare.";
+
+return { punyDecode, oneEdit, splitHost, lookalikeOf, LOOKALIKE_DOES_NOT_PROVE };
+})();
+
+// ---- brands.js
+const M_brands = (() => {
+// Brand look-alike accounts: a display name or handle that borrows a platform's or a major
+// outlet's brand ("X Global", "BBC Breaking") on an account that is not one of that brand's own.
+// Weak flag tier: context, never a verdict, and alone it never counts toward "flagged".
+//
+// The brand list is curated. Each entry names its Wikidata item, and `handles` are the X usernames
+// that item lists (Wikidata property P2002, queried 2026-10-21). That list is incomplete, so the
+// platform's own data comes first: X's affiliation badge for the brand, an organisation or
+// government check, or X's parody, commentary or fan label each clear the flag.
+//
+// A name only counts when it carries the brand plus a word that makes it read as the brand's own
+// voice ("breaking", "live", "support", "official"), or is the brand name alone. Fans, critics and
+// archive accounts that say so ("fan", "parody", "not affiliated") are left alone.
+
+const { TO_LATIN } = M_confusables_data;
+
+const W = (q) => `https://www.wikidata.org/wiki/${q}`;
+const P = "platform", O = "outlet";
+// [name shown in the evidence, kind, Wikidata item, names the brand goes by, X usernames from Wikidata]
+const RAW = [
+  ["X", P, "Q918", ["X", "Twitter"], ["X"]],
+  ["YouTube", P, "Q866", ["YouTube"], ["YouTube"]],
+  ["Meta", P, "Q380", ["Meta"], ["Meta"]],
+  ["Facebook", P, "Q355", ["Facebook"], ["FacebookApp"]],
+  ["Instagram", P, "Q209330", ["Instagram"], ["instagram"]],
+  ["Threads", P, "Q120281745", ["Threads"], []],
+  ["TikTok", P, "Q48938223", ["TikTok"], ["tiktok_us"]],
+  ["Bluesky", P, "Q78194383", ["Bluesky"], ["bluesky"]],
+  ["Reddit", P, "Q1136", ["Reddit"], ["reddit", "Reddit_UK"]],
+  ["Google", P, "Q95", ["Google"], ["Google", "GoogleUK", "GoogleIndia", "NewsFromGoogle"]],
+  ["BBC News", O, "Q1160945", ["BBC News", "BBC"], ["BBCNews", "BBCBreaking", "BBCAfrica", "bbcchinese", "BBCNewsEnts", "bbcnewsjapan", "BBCSomali"]],
+  ["BBC World News", O, "Q208491", ["BBC World", "BBC World News"], ["BBCWorld"]],
+  ["CNN", O, "Q48340", ["CNN"], ["CNN", "cnni", "cnnbrk", "CNNOriginals", "CNNPolitics", "CNNPR", "cnnweather"]],
+  ["Reuters", O, "Q130879", ["Reuters"], ["Reuters", "reuters_russia", "reutersbiz", "ReutersIndia", "ReutersIran", "ReutersJapan", "ReutersLegal", "reuterspictures", "ReutersScience", "ReutersUK", "ReutersWorld"]],
+  ["Associated Press", O, "Q40469", ["Associated Press", "AP News", "AP"], ["AP"]],
+  ["AFP", O, "Q40464", ["AFP", "Agence France-Presse", "AFP News"], ["AFP", "AFPar", "afpbbcom", "AFPde", "AFPespanol", "afpfr"]],
+  ["Fox News", O, "Q186068", ["Fox News"], ["FoxNews", "foxheadlines", "foxnewsalert", "FoxNewsOpinion", "foxnewspolitics", "foxnewsvideo"]],
+  ["NBC News", O, "Q2877626", ["NBC News"], ["NBCNews", "BreakingNews", "NBCNewsHealth", "NBCNewsTech"]],
+  ["ABC News (US)", O, "Q287171", ["ABC News"], ["ABC"]],
+  ["ABC News (Australia)", O, "Q4650197", ["ABC News"], ["abcnews"]],
+  ["MS NOW (MSNBC)", O, "Q13973", ["MS NOW", "MSNBC"], []],
+  ["NPR", O, "Q671510", ["NPR"], ["NPR", "nprpolitics", "NPRHealth", "nprmusic", "nprbooks"]],
+  ["The New York Times", O, "Q9684", ["The New York Times", "New York Times", "NYT"], ["nytimes", "nytimesworld", "nytpolitics", "nytopinion", "NYTScience", "nytvideo", "nytgraphics"]],
+  ["The Washington Post", O, "Q166032", ["The Washington Post", "Washington Post"], ["washingtonpost", "PostGraphics", "capitalweather"]],
+  ["The Wall Street Journal", O, "Q164746", ["The Wall Street Journal", "Wall Street Journal", "WSJ"], ["WSJ"]],
+  ["The Guardian", O, "Q11148", ["The Guardian"], ["guardian"]],
+  ["Bloomberg News", O, "Q14270642", ["Bloomberg News", "Bloomberg"], []],
+  ["Al Jazeera", O, "Q13477", ["Al Jazeera"], ["aljazeera", "AJABreaking", "AJArabic"]],
+  ["Sky News", O, "Q217228", ["Sky News"], ["SkyNews", "SkyNewsBreak"]],
+  ["Newsmax", O, "Q27037115", ["Newsmax"], ["NEWSMAX"]],
+  ["Breitbart News", O, "Q4960434", ["Breitbart News", "Breitbart"], ["BreitbartNews", "BreitbartLondon"]],
+  ["The Daily Wire", O, "Q25094513", ["The Daily Wire", "Daily Wire"], ["realDailyWire"]],
+  ["HuffPost", O, "Q18049522", ["HuffPost"], ["HuffPost", "HuffPostPol", "HuffPostUK"]],
+  ["Daily Mail", O, "Q210534", ["Daily Mail", "MailOnline"], ["MailOnline"]],
+  ["USA Today", O, "Q39681", ["USA Today"], ["USATODAY"]],
+  ["Politico", O, "Q3109740", ["Politico"], ["politico", "POLITICOMag"]],
+  ["Axios", O, "Q28230873", ["Axios"], ["axios"]],
+  ["Financial Times", O, "Q183399", ["Financial Times"], ["FT", "FinancialTimes"]],
+  ["The Economist", O, "Q180089", ["The Economist"], ["TheEconomist"]],
+  ["Deutsche Welle", O, "Q153770", ["Deutsche Welle", "DW News"], ["DeutscheWelle", "dw_europe"]],
+  ["Le Monde", O, "Q12461", ["Le Monde"], ["lemondefr"]],
+  ["Der Spiegel", O, "Q131478", ["Der Spiegel"], ["derspiegel", "SPIEGEL_EIL"]],
+];
+
+const LATIN = (() => { const a = [...TO_LATIN], m = new Map(); for (let i = 0; i + 1 < a.length; i += 2) m.set(a[i], a[i + 1]); return m; })();
+// Styled letters ("𝕏", fullwidth) become plain, then a Cyrillic or Greek word made only of Latin
+// look-alikes becomes Latin when the name also has a Latin word ("ВВС Breaking"), then single
+// letters in a row join ("B B C" reads "bbc").
+function nameTokens(text) {
+  const s = String(text || "").normalize("NFKC");
+  let words = s.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  if (words.some((w) => /^[A-Za-z0-9]+$/.test(w))) {
+    words = words.map((w) => ([...w].every((c) => /[A-Za-z0-9]/.test(c) || LATIN.has(c)) ? [...w].map((c) => LATIN.get(c) || c).join("") : w));
+  }
+  const out = [];
+  for (const w of words.map((x) => x.toLowerCase())) {
+    if (w.length === 1 && out.length && out[out.length - 1].single) out[out.length - 1].t += w;
+    else out.push({ t: w, single: w.length === 1 });
+  }
+  return out.map((x) => x.t);
+}
+
+const BRANDS = RAW.map(([name, kind, q, names, handles]) => ({ name, kind, source: W(q), names, handles,
+  nameTokens: names.map(nameTokens), keys: names.map((n) => nameTokens(n).join("")).filter((k) => k.length >= 3) }));
+
+const CUES = {
+  outlet: ["breaking", "news", "live", "alert", "alerts", "update", "updates", "official", "world", "global", "hq", "now", "24", "247", "24h", "24x7", "flash", "report", "reports", "headlines"],
+  platform: ["support", "help", "helpdesk", "safety", "security", "official", "global", "team", "verified", "verification", "admin", "hq", "appeals", "copyright", "care", "center", "centre", "trust", "moderation", "premium", "service"],
+};
+const LONG_CUES = { outlet: CUES.outlet.filter((c) => c.length >= 5), platform: CUES.platform.filter((c) => c.length >= 5) };
+// Accounts that say what they are. "notaffiliated" covers "not affiliated" once spaces go.
+const SAYS_UNOFFICIAL = /\b(?:fan|fans|parody|satire|unofficial|critic|critics|commentary)\b|not\s*affiliated/i;
+const ORG_CHECK = new Set(["Business", "Government"]);
+
+const BRAND_DOES_NOT_PROVE = "Fans, critics, reporters and local partners put outlet and platform names in their profiles, and the list of official accounts Radar checks against is incomplete. A brand in a name does not show who runs the account or that anyone meant to deceive.";
+
+const at = (hay, needle) => { for (let i = 0; i + needle.length <= hay.length; i++) if (needle.every((t, j) => hay[i + j] === t)) return i; return -1; };
+
+// The brand a display name borrows, as { brand, matched } or null.
+function displayMatch(tokens) {
+  let best = null;
+  for (const b of BRANDS) {
+    b.nameTokens.forEach((nt, i) => {
+      const k = at(tokens, nt);
+      if (k < 0) return;
+      const rest = [...tokens.slice(0, k), ...tokens.slice(k + nt.length)];
+      const alone = rest.length === 0 && nt.join("").length >= 4;
+      if (!alone && !rest.some((t) => CUES[b.kind].includes(t))) return;
+      if (!best || nt.length > best.len) best = { brand: b, matched: b.names[i], len: nt.length };
+    });
+  }
+  return best;
+}
+
+// The brand a handle borrows: it starts with a brand name and the rest is digits or a cue word.
+function handleMatch(handle) {
+  const h = String(handle || "").toLowerCase();
+  for (const b of BRANDS) for (const key of [...b.keys, ...b.handles.map((x) => x.toLowerCase()).filter((x) => x.length >= 3)]) {
+    if (!h.startsWith(key) || h === key) continue;
+    const rest = h.slice(key.length), parts = rest.split("_").filter(Boolean);
+    if (/^[_\d]+$/.test(rest) || parts.some((p) => CUES[b.kind].includes(p)) || LONG_CUES[b.kind].some((c) => rest.includes(c))) return { brand: b, matched: key };
+  }
+  return null;
+}
+
+// account: { handle, display, affiliate?, verifiedType?, xLabel? }. Returns
+// { brand, kind, where, evidence, source } or null.
+function brandLookalike(account) {
+  const handle = String(account.handle || ""), display = String(account.display || "");
+  if (/parody|commentary|fan/i.test(account.xLabel || "") || ORG_CHECK.has(account.verifiedType)) return null;
+  if (SAYS_UNOFFICIAL.test(`${display} ${handle.replace(/_/g, " ")}`)) return null;
+  const d = displayMatch(nameTokens(display));
+  const m = d || handleMatch(handle);
+  if (!m) return null;
+  // Every brand that goes by the matched name ("ABC News" is two outlets) shares the check.
+  const same = BRANDS.filter((b) => b === m.brand || b.names.some((n) => m.brand.names.includes(n)));
+  const own = new Set(same.flatMap((b) => b.handles.map((x) => x.toLowerCase())));
+  if (own.has(handle.toLowerCase())) return null;
+  if (account.affiliate) {
+    const aff = nameTokens(account.affiliate), affKey = aff.join("");
+    if (own.has(affKey) || same.some((b) => b.nameTokens.some((nt) => at(aff, nt) >= 0))) return null;
+  }
+  const where = d ? `display name "${display.slice(0, 50)}"` : `handle @${handle}`;
+  const who = d ? `; @${handle} is not` : " and is not";
+  const evidence = `${where} uses the ${m.brand.name} brand${who} among the ${m.brand.name} accounts Wikidata lists, and the page shows no ${m.brand.name} affiliation badge or organisation check`;
+  return { brand: m.brand.name, kind: m.brand.kind, where: d ? "display" : "handle", evidence, source: m.brand.source };
+}
+
+return { nameTokens, BRANDS, BRAND_DOES_NOT_PROVE, brandLookalike };
+})();
+
 // ---- similarity.js
 const M_similarity = (() => {
 // Near-duplicate replies across different accounts. Copied or templated text posted by many
@@ -534,6 +870,7 @@ const M_flags = (() => {
 
 const { parseLabel } = M_places;
 const { LOW_KARMA } = M_reddit;
+const { brandLookalike, BRAND_DOES_NOT_PROVE } = M_brands;
 
 const NEW_ACCOUNT_DAYS = 30;
 const MANY_NAME_CHANGES = 3;
@@ -574,6 +911,7 @@ const DOES_NOT_PROVE = {
   "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
   "platform-label": "A moderation label is the service's own judgement; labels can be wrong, disputed or applied in bulk.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
+  "brand-lookalike": BRAND_DOES_NOT_PROVE,
 };
 
 function ageDays(joinDate, now = Date.now()) {
@@ -655,6 +993,10 @@ function flagsFor(account, context = {}) {
   const name = `${account.display || ""} ${account.handle || ""}`;
   const sym = HATE_NAME.exec(name);
   if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
+  // A name that borrows a platform's or an outlet's brand (src/core/brands.js). Only where the site
+  // gives the handle the brand list is keyed on (X), so the caller sets brandCheck.
+  const brand = account.brandCheck ? brandLookalike(account) : null;
+  if (brand) out.push({ id: "brand-lookalike", evidence: brand.evidence, source: brand.source });
   // Reddit: little karma after more than a month, and Reddit's suggested sign-up name.
   if (Number.isFinite(account.karma) && age != null && age > NEW_ACCOUNT_DAYS && account.karma < LOW_KARMA) out.push({ id: "low-karma", evidence: `${account.karma} karma after ${age} days` });
   // Bluesky: moderation labels about how an account behaves, not what it says.
@@ -679,7 +1021,7 @@ function flagsFor(account, context = {}) {
 // report circular.
 const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name", "follow-pattern"]);
 const WEAK_FLAGS = new Set(["store-elsewhere", "profile-location-elsewhere", "flag-elsewhere", "hours-elsewhere",
-  "fast-replier", "repost-only", "low-karma"]);
+  "fast-replier", "repost-only", "low-karma", "brand-lookalike"]);
 function isFlagged(flags) {
   const counted = flags.filter((f) => !NOT_AUTHENTICITY.has(f.id));
   if (counted.some((f) => !WEAK_FLAGS.has(f.id))) return true;
@@ -2071,6 +2413,289 @@ function scoreHi(hit, have) {
 return { prepHi, RE_HI, NEGATION_HI, scoreHi };
 })();
 
+// ---- lexicon-derived.js
+const M_lexicon_derived = (() => {
+// Word lists derived from human-labelled corpora by scripts/derive-lexicon.mjs (dev split only).
+// Generated; do not edit between the markers. Each language lists its "slur" terms and the label
+// they were derived against: "group" (hate aimed at a group) or "hostile" (the corpus has only an
+// offensive-or-not label). A term ending in "*" is a Turkish stem matched with any ending. How each
+// term was picked, with its dev counts: project-docs/evidence/derived-lexicon.json.
+
+// derived:begin (scripts/derive-lexicon.mjs)
+const DERIVED = {
+  he: {"basis":"hostile","slur":["זבל","זונה","נפש"]},
+  tr: {"basis":"group","slur":[]},
+  ko: {"basis":"group","slur":["개독","개돼","개한","계집","광신","김치","꺼져","꼰대","꼴통","꼴페","나라로","나베","나이값","노땅","노망","뇌가","늙다","달창","대깨","맘충","매국","메갈","무능","문빠","미개","부들","북괴","빨갱","사이비","사회악","쓰레기들","여적","예수쟁","왜구","일베","재앙","정신병자","조센","종북","종특","좌빨","짱개","짱깨","쪽바","추방","친일","쿵쾅","토착","틀니","틀딱","한남","한녀","헬조","홍어"]},
+  ja: {"basis":"group","slur":["反日","死ね"]},
+  fa: {"basis":"group","slur":[]},
+  id: {"basis":"group","slur":["penista"]},
+  hi: {"basis":"hostile","slur":["कुत्ते","तुम","धर्म","साले"]},
+};
+// derived:end
+
+// The languages whose list cleared the test-split gate in scripts/eval-derived.mjs. A language not
+// listed is held back: its list is kept for the record and never runs on a reply.
+// ship:begin (scripts/eval-derived.mjs)
+const DERIVED_SHIP = ["ko","id"];
+// ship:end
+
+return { DERIVED, DERIVED_SHIP };
+})();
+
+// ---- rhetoric-derived.js
+const M_rhetoric_derived = (() => {
+// Word lists derived from human-labelled corpora, for Hebrew, Turkish, Korean, Japanese, Persian,
+// Indonesian and Hindi. Nobody types these lists: scripts/derive-lexicon.mjs picks each term on the
+// dev split of the corpora in project-docs/evidence/CORPORA.md and writes lexicon-derived.js. This
+// file holds the Unicode handling both sides share, so a term is found in a reply exactly as it was
+// counted in the corpus.
+//   prepDerived(code, text)   the normal form a language's terms are counted and matched in
+//   candidates(code, text)    the terms a text offers to the derivation (words, word pairs, n-grams)
+//   compileTerms(code, list)  one regex for a list of terms
+// Korean and Japanese do not separate words with spaces the way the matcher needs, so they are
+// counted and matched as character n-grams. Turkish adds suffixes to a stem, so a long Turkish word
+// is counted by its first five letters and matched as that stem plus any ending.
+
+const { DERIVED, DERIVED_SHIP } = M_lexicon_derived;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// Hebrew points and cantillation; the maqaf, paseq and sof pasuq are punctuation and stay.
+const HE_MARKS = /[֑-ׇֽֿׁׂׅׄ]/g;
+// Arabic vowel signs and the tatweel, which Persian writers add or drop freely.
+const FA_MARKS = /[ً-ْٰـ]/g;
+// "anjiiing" and "anjing" are one word; three or more of a letter become one.
+const squeeze = (s) => s.replace(/(\p{L})\1{2,}/gu, "$1");
+
+const PREP = {
+  he: (s) => s.normalize("NFC").replace(HE_MARKS, "").toLowerCase(),
+  tr: (s) => squeeze(s.normalize("NFC").toLocaleLowerCase("tr")),
+  // NFC, not NFKC: NFKC would turn the jamo of "ㅅㅂ" into conjoining jamo.
+  ko: (s) => s.normalize("NFC").toLowerCase(),
+  // NFKC folds half-width katakana and full-width Latin.
+  ja: (s) => s.normalize("NFKC").toLowerCase(),
+  fa: (s) => s.normalize("NFC").replace(/[يى]/g, "ی").replace(/ك/g, "ک").replace(FA_MARKS, "").replace(/‌+/g, "‌").toLowerCase(),
+  id: (s) => squeeze(s.normalize("NFC").toLowerCase()),
+  hi: (s) => squeeze(s.normalize("NFC").toLowerCase()),
+};
+const DERIVED_CODES = Object.keys(PREP);
+const prepDerived = (code, s) => PREP[code](String(s || ""));
+
+// Character runs for the n-gram languages: Hangul syllables and jamo; kana, kanji and the long-vowel mark.
+const RUNS = { ko: /[ᄀ-ᇿ㄰-㆏가-힯]+/gu, ja: /[぀-ヿㇰ-ㇿ㐀-鿿ｦ-ﾟ々〆ー]+/gu };
+const NGRAM = [2, 4];
+// A word: letters, marks and digits, with the Persian zero-width non-joiner and the Hebrew geresh inside it.
+const WORD = /[\p{L}\p{M}\p{N}‌׳״']+/gu;
+const STEM = 5;
+const trim = (w) => w.replace(/^['‌]+|['‌]+$/g, "");
+const words = (s) => (s.match(WORD) || []).map(trim).filter((w) => w && !/^\p{N}+$/u.test(w));
+const unit = (code, w) => (code === "tr" && [...w].length > STEM ? [...w].slice(0, STEM).join("") + "*" : w);
+const longEnough = (w) => [...w.replace(/\*$/, "")].length >= 3;
+
+// Korean n-grams start a word (an eojeol: a stem with its particles), so "대들" inside "세대들"
+// (generations) is never a candidate. Japanese has no word spaces, so its n-grams start anywhere.
+const WORD_START = { ko: true };
+function ngrams(code, s) {
+  const out = new Set();
+  for (const run of s.match(RUNS[code]) || []) {
+    const ch = [...run], starts = WORD_START[code] ? 1 : ch.length;
+    for (let n = NGRAM[0]; n <= NGRAM[1]; n++) for (let i = 0; i < starts && i + n <= ch.length; i++) out.add(ch.slice(i, i + n).join(""));
+  }
+  return out;
+}
+
+// The terms a prepared text offers: each word (or Turkish stem) and each pair of neighbouring words.
+function candidates(code, prepared) {
+  if (RUNS[code]) return ngrams(code, prepared);
+  const w = words(prepared), out = new Set();
+  for (let i = 0; i < w.length; i++) {
+    const u = unit(code, w[i]);
+    if (longEnough(u)) out.add(u);
+    if (i + 1 < w.length) out.add(`${w[i]} ${w[i + 1]}`);
+  }
+  return out;
+}
+
+const B = "(?<![\\p{L}\\p{M}\\p{N}_])", E = "(?![\\p{L}\\p{M}\\p{N}_])";
+// Hebrew writes "and", "the", "in", "to", "from", "that" and "as" as one-letter prefixes.
+const PREFIX = { he: "(?:[והבלמשכ]{1,2})?" };
+// Persian plurals and the ezafe join with or without the zero-width non-joiner.
+const SUFFIX = { fa: "(?:\\u200c?(?:های|ها|ان|ی))?" };
+const altOf = (list) => [...new Set(list)].map((t) => esc(t).replace(/ /g, "\\s+")).sort((a, b) => b.length - a.length).join("|");
+
+// One regex for a list of terms, built the same way for the derivation and for replies.
+function compileTerms(code, list) {
+  if (!list.length) return null;
+  if (RUNS[code]) return new RegExp(`${WORD_START[code] ? `(?<!${RUNS[code].source.slice(0, -1)})` : ""}(?:${altOf(list)})`, "u");
+  const stems = list.filter((t) => t.endsWith("*")).map((t) => t.slice(0, -1)), exact = list.filter((t) => !t.endsWith("*"));
+  const parts = [];
+  if (exact.length) parts.push(`(?:${altOf(exact)})${SUFFIX[code] || ""}${E}`);
+  if (stems.length) parts.push(`(?:${altOf(stems)})[\\p{L}\\p{M}]*${E}`);
+  return new RegExp(`${B}${PREFIX[code] || ""}(?:${parts.join("|")})`, "u");
+}
+
+// The languages the evaluation let through (measured-langs.js), each with its compiled list.
+const COMPILED = new Map();
+function compiled(code) {
+  if (!COMPILED.has(code)) COMPILED.set(code, compileTerms(code, (DERIVED[code] && DERIVED[code].slur) || []));
+  return COMPILED.get(code);
+}
+
+// Hindi already has a written grammar under "hi"; its derived list reports as "hi-data".
+const markerCode = (code) => (code === "hi" ? "hi-data" : code);
+
+// A LANGUAGES entry for rhetoric.js. Only "slur" is derived: terms that cleared the dev bar against
+// each corpus's group-directed hate label.
+function derivedLanguage(code) {
+  return {
+    code: markerCode(code), report: true, negation: /(?!)/u, prep: (s) => prepDerived(code, s),
+    score: (hit, have) => { const re = compiled(code); if (re && !have.has("slur")) hit("slur", re, false); },
+  };
+}
+
+// The entries rhetoric.js runs: the shipped languages, or any list of codes (the evaluation runs all).
+const derivedLanguages = (codes = DERIVED_SHIP) => codes.map(derivedLanguage);
+
+return { DERIVED_CODES, prepDerived, candidates, compileTerms, markerCode, derivedLanguage, derivedLanguages };
+})();
+
+// ---- theories.js
+const M_theories = (() => {
+// Named conspiracy theories: an extension of the conspiracy family in rhetoric.js. The conspiracy
+// family finds framing ("wake up", "false flag"); this file finds a documented theory by name or by
+// its stock claim ("chemtrails", "the 2020 election was stolen"), so the window can say which
+// theory it is, what the record shows, and where that record comes from.
+//
+// Theories come from every direction. Survey work finds that people on the left and the right
+// endorse conspiracy claims at similar rates when the content is held constant (Enders et al.
+// 2023), so election and staged-event claims are matched both ways and tests/theories.symmetry.test.js
+// pairs each claim with its other-side twin. Political side is never an input here.
+//
+// Not measured: no corpus with conspiracy labels and a usable licence was found (see
+// project-docs/EVALUATION.md). Until one is, these markers carry weight 0 and never count toward
+// the thread report's "extreme".
+
+const { GROUPS } = M_lexicon;
+
+const S = (title, url, date) => ({ title, url, date });
+const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
+const AP_QANON = S("AP, QAnon's 'Save the Children' morphs into popular slogan", "https://www.wsls.com/news/politics/2020/10/28/qanons-save-the-children-morphs-into-popular-slogan/", "2020-10-28");
+const NAMING = "People quote, mock and argue against these claims, and Radar skips only obvious debunking.";
+
+const THEORY_DOES_NOT_PROVE = `Naming a theory is not believing it. ${NAMING} This describes the post, not who wrote it or why, and a post that names a theory can still contain true statements.`;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const G = GROUPS.map(esc).sort((a, b) => b.length - a.length).join("|");
+const YEAR = "(?:(?:19|20)\\d\\d\\s+)?";
+
+const THEORIES = [
+  { id: "qanon", name: "QAnon", terms: ["wwg1wga", "where we go one we go all", "q sent me", "q drops", "qanon was right", "qanon is right"],
+    claim: "A secret cabal of elites runs the world and an insider called Q leaks its coming downfall.",
+    record: "None of Q's dated predictions came true. ADL and ISD document the movement and its slogans.",
+    sources: [S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022"), S("ISD, QAnon explainer", "https://www.isdglobal.org/explainers/qanon/", "2023"), AP_QANON],
+    dnp: "QAnon slogans are also quoted by reporters, researchers and former followers." },
+  { id: "adrenochrome", name: "Adrenochrome harvesting", terms: ["adrenochrome", "adrenochrome harvesting", "harvesting adrenochrome"],
+    claim: "Celebrities and elites traffic children to harvest a drug from their blood.",
+    record: "Adrenochrome is an ordinary oxidation product of adrenaline with no such use. AP reported the claim as baseless.",
+    sources: [AP_QANON, S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022")],
+    dnp: "The word also appears in chemistry, in fiction and in posts mocking the claim." },
+  { id: "satanic-abuse", name: "Satanic ritual abuse network", terms: ["satanic ritual abuse", "satanic pedophile", "satanic pedophiles", "satanic paedophiles", "satanic cabal", "satanic elites", "pizzagate", "frazzledrip"],
+    claim: "Organised satanic groups abuse children in rituals, protected by people in power.",
+    record: "An FBI guide for investigators (Lanning, 1992) found no corroboration for the claims of organised satanic abuse it reviewed.",
+    sources: [S("Lanning, Investigator's Guide to Allegations of Ritual Child Abuse (FBI, NCJ 136592)", "https://www.ojp.gov/ncjrs/virtual-library/abstracts/investigators-guide-allegations-ritual-child-abuse", "1992-01")],
+    dnp: "Real abuse cases are discussed with some of these words, and historians write about the panic itself." },
+  { id: "chemtrails", name: "Chemtrails", terms: ["chemtrails", "chemtrail", "chem trails", "chem-trails", "they are spraying us", "they're spraying us"],
+    claim: "Aircraft trails are chemicals sprayed in secret on the public.",
+    record: "76 of 77 atmospheric scientists and geochemists surveyed had seen no evidence of a secret spraying programme (Shearer et al., 2016).",
+    sources: [S("Shearer, West, Caldeira and Davis, Environmental Research Letters 11", "https://doi.org/10.1088/1748-9326/11/8/084011", "2016-08-10")],
+    dnp: "Solar geoengineering is a real research field, and people ask honest questions about contrails." },
+  { id: "great-reset", name: "\"Great Reset\" plot", terms: ["great reset agenda", "great reset plot", "great reset plan to", "you will own nothing and be happy", "you'll own nothing and be happy", "you will own nothing and you will be happy"],
+    claim: "The World Economic Forum's Great Reset is a hidden plan by elites to take property and freedoms.",
+    record: "The Great Reset is a public WEF initiative from June 2020. ADL and ISD document how the plot framing grew from it.",
+    sources: [S("ISD, The Great Reset explainer", "https://www.isdglobal.org/explainers/the-great-reset/", "2021"), S("ADL, Great Reset conspiracy flourishes amid continued pandemic", "https://www.adl.org/resources/blog/great-reset-conspiracy-flourishes-amid-continued-pandemic", "2021")],
+    dnp: "People criticise the WEF and its policies openly. The \"own nothing\" line is also used as a joke about rents and subscriptions." },
+  { id: "stolen-election", name: "Stolen or rigged election", terms: ["stop the steal", "stolen election"],
+    patterns: [`\\b(?:the\\s+)?${YEAR}election\\s+(?:was|got|is being|has been)\\s+(?:stolen|rigged)\\b`, `\\b(?:${G}|they)\\s+(?:rigged|stole)\\s+the\\s+${YEAR}election\\b`],
+    claim: "An election result was reversed by fraud on a scale that changed who won.",
+    record: "Courts, audits and election officials found no fraud that changed the 2020 result (CISA joint statement), and the Senate Intelligence Committee found no evidence that votes were changed in 2016.",
+    sources: [S("CISA, Joint statement from the Elections Infrastructure Government Coordinating Council", "https://www.cisa.gov/news-events/news/joint-statement-elections-infrastructure-government-coordinating-council-election", "2020-11-12"), S("US Senate Select Committee on Intelligence, Report Volume 1, Russian Efforts Against Election Infrastructure", "https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume1.pdf", "2019-07-25"), ENDERS],
+    dnp: "Real election fraud cases exist and are prosecuted. Claims about one race, one county or past history can be true." },
+  { id: "vote-flipping", name: "Machines or satellites flipped the votes", terms: [],
+    patterns: ["\\b(?:dominion|smartmatic|starlink|the machines|voting machines|the satellites)\\s+(?:flipped|switched|changed|rigged|altered)\\s+(?:the\\s+)?(?:votes?|election|results?|tallies|totals)\\b",
+      "\\b(?:russia|china|iran|they)\\s+(?:hacked|changed|altered|flipped)\\s+(?:the\\s+)?(?:vote\\s+(?:totals|tallies|counts)|voting machines|votes)\\b"],
+    claim: "Voting machines, satellites or a foreign government changed vote counts.",
+    record: "The Senate Intelligence Committee found no evidence that 2016 tallies were altered. PolitiFact rated the 2024 Starlink claim Pants on Fire: tabulators are not online during counting.",
+    sources: [S("US Senate Select Committee on Intelligence, Report Volume 1", "https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume1.pdf", "2019-07-25"), S("PolitiFact, No, Elon Musk's Starlink wasn't used to rig the 2024 election", "https://www.politifact.com/factchecks/2024/nov/12/threads-posts/no-elon-musks-starlink-wasnt-used-to-rig-the-2024/", "2024-11-12"), ENDERS],
+    dnp: "Foreign influence campaigns and machine faults are real and documented. They are different from changed counts." },
+  { id: "staged-shooting", name: "Staged shooting", terms: [],
+    patterns: ["\\b(?:the\\s+)?(?:[\\w-]+\\s+){0,2}(?:shooting|assassination attempt|massacre)\\s+was\\s+(?:staged|fake|faked|a false flag|a hoax)\\b",
+      "\\b(?:sandy hook|butler|parkland|uvalde)\\b[^.!?]{0,40}\\b(?:staged|crisis actors|false flag|hoax)\\b"],
+    claim: "A shooting was staged with actors or faked to win sympathy or a policy.",
+    record: "Researchers tracked staging claims about the 2024 Butler attempt from both sides (QUT, 2024). Courts found the Sandy Hook hoax claims defamatory.",
+    sources: [S("QUT Digital Media Research Centre, Conspiracy theories on the Trump assassination attempt are spreading like wildfire", "https://www.qut.edu.au/news/realfocus/conspiracy-theories-on-the-trump-assassination-attempt-are-spreading-like-wildfire", "2024-07"), ENDERS],
+    dnp: "Asking how security failed is not a staging claim, and official accounts are sometimes corrected." },
+  { id: "inside-job", name: "9/11 inside job", terms: ["9/11 was an inside job", "911 was an inside job", "bush did 9/11", "bush did 911", "jet fuel can't melt steel beams", "jet fuel cant melt steel beams"],
+    claim: "The US government planned or carried out the 11 September 2001 attacks.",
+    record: "NIST's investigation explained the collapses of the towers and of WTC 7 by impact damage and fire.",
+    sources: [S("NIST, World Trade Center Disaster Study", "https://www.nist.gov/world-trade-center-investigation", "2008")],
+    dnp: "Intelligence failures before 9/11 are documented, and the phrase is also used as a joke." },
+  { id: "covid-5g", name: "5G caused COVID-19", terms: [],
+    patterns: ["\\b5g\\s+(?:causes|caused|spreads|spread|is spreading)\\s+(?:the\\s+)?(?:covid|coronavirus|the virus)\\b", "\\b(?:covid|coronavirus)\\s+(?:is|was)\\s+(?:caused|spread)\\s+by\\s+5g\\b"],
+    claim: "5G mobile networks cause or spread COVID-19.",
+    record: "A virus cannot travel on radio waves. Ahmed et al. (2020) traced how the claim spread on Twitter.",
+    sources: [S("Ahmed et al., COVID-19 and the 5G Conspiracy Theory: Social Network Analysis of Twitter Data, JMIR 22(5)", "https://doi.org/10.2196/19458", "2020-05-06")],
+    dnp: "People ask honest questions about radio exposure, which is studied and regulated." },
+  { id: "vaccine-harm", name: "Vaccines cause autism or carry microchips", terms: ["microchips in the vaccine", "microchips in vaccines", "vaccine microchips", "vaccines have microchips"],
+    patterns: ["\\bvaccines?\\s+(?:cause|causes|caused)\\s+autism\\b"],
+    claim: "Childhood vaccines cause autism, or vaccines carry tracking microchips.",
+    record: "A meta-analysis of studies covering over 1.2 million children found no link between vaccines and autism (Taylor et al., 2014).",
+    sources: [S("Taylor, Swerdfeger and Eslick, Vaccines are not associated with autism: an evidence-based meta-analysis, Vaccine 32(29)", "https://doi.org/10.1016/j.vaccine.2014.04.085", "2014-06-17")],
+    dnp: "Vaccines have real, documented side effects, and parents ask honest questions about them." },
+  { id: "hidden-cure", name: "Hidden cure", terms: ["hiding the cure for cancer", "hiding the cure", "suppressing the cure", "they have the cure for cancer", "sitting on the cure"],
+    claim: "Drug companies or regulators hide a cure to protect profits.",
+    record: "In a 2013 US survey, 37% agreed the FDA suppresses natural cures for cancer (Oliver and Wood, 2014); no such hidden cure has been shown.",
+    sources: [S("Oliver and Wood, Medical Conspiracy Theories and Health Behaviors in the United States, JAMA Internal Medicine 174(5)", "https://doi.org/10.1001/jamainternmed.2014.190", "2014-05")],
+    dnp: "Drug pricing, buried trial results and industry lobbying are real and documented." },
+];
+
+const word = (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|");
+const COMPILED = THEORIES.map((t) => ({ id: t.id,
+  res: [...((t.terms || []).length ? [new RegExp(`(?:^|[^\\w])(${word(t.terms)})(?=$|[^\\w])`, "i")] : []), ...(t.patterns || []).map((p) => new RegExp(p, "i"))] }));
+const BY_ID = new Map(THEORIES.map((t) => [t.id, t]));
+const theoryById = (id) => BY_ID.get(id) || null;
+
+// Text that discusses a theory as false or as a theory, group-blind. A post that says "the
+// chemtrails conspiracy theory", "no evidence", "debunked" or "fact check" is about the claim.
+const DISCUSSED = /\b(?:conspiracy theor(?:y|ies|ist|ists)|debunk(?:ed|ing|s)?|baseless|no evidence|false claims?|the claim that|myths?|hoax claims?|fact[- ]?checks?|misinformation|disinformation|panic|is false|are false|not true|pants on fire)\b/i;
+// Mockery is discussion too ("Pizzagate nonsense", "let me guess, chemtrails").
+const MOCKED = /\b(?:nonsense|tin ?foil|crackpots?|loony|kooks?|gullib\w*|let me guess|nutjobs?|wackos?)\b/i;
+// A claim reported or argued about, not made: "he keeps saying the election was rigged", "if you
+// believe that, you also believe 9/11 was an inside job". This also skips some first-person belief
+// ("I believe ..."): precision comes first.
+const REPORTED_CLAIM = /\b(?:say|says|said|saying|claim|claims|claimed|claiming|tout(?:s|ed|ing)|suggest(?:s|ed|ing)|insist(?:s|ed|ing)|alleg(?:e|es|ed|ing)|assum(?:e|es|ed|ing)|believ(?:e|es|ed|ing)|think|thinks|thinking|heard)\b[^.!?]{0,40}$/i;
+const NEGATED = /\b(?:not|never|wasn't|wasnt|isn't|isnt|no|didn't|didnt)\s+(?:\w+\s+){0,2}$/i;
+
+// [{ theory, match, index }], one per theory, for text that uses a theory (not one that debunks it).
+function theoryMatches(text) {
+  const s = String(text || "");
+  if (DISCUSSED.test(s) || MOCKED.test(s)) return [];
+  const out = [];
+  for (const c of COMPILED) {
+    for (const re of c.res) {
+      const m = s.match(re);
+      if (!m) continue;
+      const match = (m[1] || m[0]).trim(), index = m.index + m[0].indexOf(match);
+      const before = s.slice(Math.max(0, index - 60), index);
+      if (NEGATED.test(before.slice(-30)) || REPORTED_CLAIM.test(before) || /\b(?:not|never)\b/i.test(m[0])) continue;
+      out.push({ theory: c.id, match: match.slice(0, 80), index });
+      break;
+    }
+  }
+  return out;
+}
+
+return { THEORY_DOES_NOT_PROVE, THEORIES, theoryById, theoryMatches };
+})();
+
 // ---- rhetoric.js
 const M_rhetoric = (() => {
 // Stance-neutral rhetoric markers. The word lists live in lexicon.js; this file holds the grammar.
@@ -2097,8 +2722,10 @@ const { scoreRu, NEGATION_RU, prepRu } = M_rhetoric_ru;
 const { scoreUk, NEGATION_UK } = M_rhetoric_uk;
 const { scoreZh, NEGATION_ZH, prepZh } = M_rhetoric_zh;
 const { scoreHi, NEGATION_HI, prepHi } = M_rhetoric_hi;
+const { derivedLanguages } = M_rhetoric_derived;
 const { mentionedIntl } = M_rhetoric_mention;
 const { foldConfusables } = M_confusables;
+const { theoryMatches } = M_theories;
 
 const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -2183,7 +2810,9 @@ function mention(s, m) {
 const unleet = (s) => s.replace(/[013457@$!]/g, (c) => L.LEET[c] || c);
 
 const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, slur: 2, slurSoft: 1, stereotype: 2, motive: 1,
-  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1 };
+  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1,
+  // Named theories (theories.js) are not measured yet, so they stay out of "extreme".
+  "conspiracy-theory": 0 };
 // "Extreme" for the thread report: any strong marker, or two weaker ones together.
 const EXTREME_AT = 2;
 // Families strong enough to label the comment itself.
@@ -2206,6 +2835,9 @@ const LANGUAGES = [
   { code: "zh", report: true, score: scoreZh, negation: NEGATION_ZH, prep: prepZh },
   { code: "hi", report: true, score: scoreHi, negation: NEGATION_HI, prep: prepHi },
 ];
+// Word lists derived from labelled corpora (rhetoric-derived.js), only for the languages that
+// cleared the test-split gate. They run after the written grammars.
+const DERIVED_LANGUAGES = derivedLanguages();
 
 // A matcher that records a marker when `re` matches and, if negatable, the match has no negation.
 function recorder(s, markers) {
@@ -2236,14 +2868,18 @@ function scoreEnglish(s, hit) {
 }
 
 // Returns { score, markers: [{ family, match, lang? }], extreme }. lang: the code of the language
-// grammar that found the marker; absent for English.
-function score(text) {
+// grammar that found the marker; absent for English. opts.derived: derived-list codes to run in
+// place of the shipped ones (the evaluation passes every code).
+function score(text, opts = {}) {
   // Look-alike letters from other scripts are folded first (src/core/confusables.js).
   const s = foldConfusables(text).replace(/[’]/g, "'");
   const markers = [];
   const hit = recorder(s, markers);
   scoreEnglish(s, hit);
-  for (const lang of LANGUAGES) {
+  for (const t of theoryMatches(s)) {
+    if (!mention(s, Object.assign([t.match], { index: t.index }))) markers.push({ family: "conspiracy-theory", theory: t.theory, match: t.match });
+  }
+  for (const lang of [...LANGUAGES, ...(opts.derived ? derivedLanguages(opts.derived) : DERIVED_LANGUAGES)]) {
     const have = new Set(markers.map((m) => m.family));
     const on = lang.prep ? lang.prep(s) : s;
     const from = markers.length;
@@ -2333,7 +2969,8 @@ const M_measured_langs = (() => {
 // corpora listed for the language.
 
 const LANG_NAMES = { fr: "French", es: "Spanish", de: "German", pt: "Portuguese", it: "Italian", ar: "Arabic",
-  ru: "Russian", uk: "Ukrainian", zh: "Chinese", hi: "Hindi" };
+  ru: "Russian", uk: "Ukrainian", zh: "Chinese", hi: "Hindi", he: "Hebrew", tr: "Turkish", ko: "Korean", ja: "Japanese",
+  fa: "Persian", id: "Indonesian", "hi-data": "Hindi" };
 
 // langs:begin (scripts/eval-langs.mjs)
 const MEASURED_LANGS = {
@@ -2345,12 +2982,34 @@ const MEASURED_LANGS = {
 };
 // langs:end
 
+// The word lists derived from labelled corpora (lexicon-derived.js), measured on the test split by
+// scripts/eval-derived.mjs. ship: false means held back; the list never runs and the row records why.
+// derived:begin (scripts/eval-derived.mjs)
+const MEASURED_DERIVED = {
+  "he": {"precision":0.96,"low":0.901,"high":0.984,"n":99,"split":"test","sources":"OLaH","ship":false,"reason":"the corpora label offensive-or-not only, not group hate"},
+  "tr": {"precision":null,"low":null,"high":null,"n":0,"split":"test","sources":"OffensEval 2020 Turkish and TurkishHateMap","ship":false,"reason":"no term cleared the dev bar"},
+  "ko": {"precision":0.938,"low":0.933,"high":0.943,"n":8635,"split":"test","sources":"K-MHaS and BEEP!","ship":true},
+  "ja": {"precision":0.63,"low":0.496,"high":0.746,"n":54,"split":"test","sources":"LLM-jp Toxicity v2 and inspection-ai Japanese toxicity","ship":false,"reason":"lower bound 0.496 under 0.7"},
+  "fa": {"precision":null,"low":null,"high":null,"n":0,"split":"test","sources":"Persian Offensive Language","ship":false,"reason":"no term cleared the dev bar"},
+  "id": {"precision":0.85,"low":0.709,"high":0.929,"n":40,"split":"test","sources":"IndoDiscourse and IDHSD","ship":true},
+  "hi-data": {"precision":0.979,"low":0.946,"high":0.992,"n":187,"split":"test","sources":"TextDetox","ship":false,"reason":"the corpora label offensive-or-not only, not group hate"},
+};
+// derived:end
+
 const pc = (x) => Math.round(x * 100);
 // Fewer checked signs than this give an interval too wide to show as a number.
 const MIN_N = 20;
 
+// The line the window shows beside a marker a derived word list found.
+function derivedLine(code, r) {
+  const name = LANG_NAMES[code] || code;
+  return `Found by the ${name} word list derived from labelled research data. In ${name}, ${pc(r.precision)}% of these signs were on ` +
+    `text people labelled hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
+}
+
 // The line the window shows beside a marker a language grammar found.
 function langLine(code) {
+  if (MEASURED_DERIVED[code] && MEASURED_DERIVED[code].ship) return derivedLine(code, MEASURED_DERIVED[code]);
   const name = LANG_NAMES[code] || code;
   const r = MEASURED_LANGS[code];
   if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;
@@ -2359,7 +3018,7 @@ function langLine(code) {
     `hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
 }
 
-return { LANG_NAMES, MEASURED_LANGS, MIN_N, langLine };
+return { LANG_NAMES, MEASURED_LANGS, MEASURED_DERIVED, MIN_N, langLine };
 })();
 
 // ---- persuasion-cues.js
@@ -3736,6 +4395,14 @@ const BASELINES = {"generated":"2026-10-21","source":{"name":"PHEME","site":"Twi
 return { BASELINES };
 })();
 
+// ---- techniques-data.js
+const M_techniques_data = (() => {
+// Generated by scripts/techniques-baselines.mjs from project-docs/evidence/technique-baselines.json. Do not edit.
+const TECHNIQUE_BASELINES = {"generated":"2026-10-21","flood":{"5-19":{"k":17,"n":3087,"share":0.0055,"ci":[0.0034,0.0088]},"20-49":{"k":25,"n":1384,"share":0.0181,"ci":[0.0123,0.0265]},"50-99":{"k":4,"n":181,"share":0.0221,"ci":[0.0086,0.0554]},"100+":{"k":2,"n":60,"share":0.0333,"ci":[0.0092,0.1136]}},"cross":{"5-19":{"k":1,"n":3087,"share":0.0003,"ci":[0.0001,0.0018]},"20-49":{"k":2,"n":1384,"share":0.0014,"ci":[0.0004,0.0053]},"50-99":{"k":2,"n":181,"share":0.011,"ci":[0.003,0.0394]},"100+":{"k":0,"n":60,"share":0,"ci":[0,0.0602]}},"multilingual":{"5-19":{"k":992,"n":3087,"share":0.3213,"ci":[0.3051,0.338]},"20-49":{"k":581,"n":1384,"share":0.4198,"ci":[0.3941,0.446]},"50-99":{"k":85,"n":181,"share":0.4696,"ci":[0.3983,0.5422]},"100+":{"k":36,"n":60,"share":0.6,"ci":[0.4737,0.7143]}}};
+
+return { TECHNIQUE_BASELINES };
+})();
+
 // ---- baselines.js
 const M_baselines = (() => {
 // What normal looks like for each coordination sign: how often the same sign showed up in
@@ -3746,21 +4413,23 @@ const M_baselines = (() => {
 // corpus, not a sample of today's X, and some of their accounts may themselves have coordinated.
 
 const { BASELINES } = M_baselines_data;
+const { TECHNIQUE_BASELINES } = M_techniques_data;
 const { sizeBin, viewBin } = M_baselines_bins;
 
 const BASELINE_SOURCE = "Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus, not a sample of today's X.";
 
-const share = (x) => (x < 0.1 ? `${(x * 100).toFixed(1)}%` : `${Math.round(x * 100)}%`);
+const share = (x) => (x > 0 && x < 0.001 ? `${(x * 100).toFixed(2)}%` : x < 0.1 ? `${(x * 100).toFixed(1)}%` : `${Math.round(x * 100)}%`);
 const range = (ci) => `${share(ci[0])} to ${share(ci[1])}`.replace(/% to/, " to");
 const size = (b) => (b.max === Infinity || b.max == null ? `${b.min} or more replies` : `${b.min} to ${b.max} replies`);
 
 // The measured rate for one sign: { k, n, share, ci, bin } or null when the thread falls outside
 // every bin. ctx: { replies } for signs in one thread, { viewed } for signs across threads.
 function baselineFor(sign, ctx = {}) {
-  const inThread = { "same-text": "same", burst: "burst" }[sign];
+  const inThread = { "same-text": "same", burst: "burst", flood: "flood", "cross-language": "cross" }[sign];
   const across = { together: "together", "copied-elsewhere": "echo" }[sign];
   const bin = inThread ? sizeBin(ctx.replies || 0) : across ? viewBin(ctx.viewed || 0) : null;
-  const r = bin && BASELINES[inThread || across] && BASELINES[inThread || across][bin.id];
+  const table = sign === "flood" || sign === "cross-language" ? TECHNIQUE_BASELINES : BASELINES;
+  const r = bin && table[inThread || across] && table[inThread || across][bin.id];
   return r && r.n ? { ...r, bin } : null;
 }
 
@@ -3769,6 +4438,8 @@ const WHAT = {
   burst: ["a burst of replies like this", "threads"],
   together: ["a pair of accounts seen together in two or more other threads", "threads"],
   "copied-elsewhere": ["wording that turned up in another thread", "replies of 8 words or more"],
+  flood: ["a flood of replies from very high-rate accounts", "threads"],
+  "cross-language": ["one link or upload carried by replies in different languages", "threads"],
 };
 
 // One sentence for the window, or null: "In ordinary threads with 20 to 49 replies, ... showed up
@@ -3936,6 +4607,105 @@ function stateLabel(h) {
 return { setStateRows, stateLinksOfDomain, stateLinksOfHandle, stateSummary, STATE_DOES_NOT_PROVE, stateLabel };
 })();
 
+// ---- ops.js
+const M_ops = (() => {
+// Documented influence operations (ops.json, built by scripts/ops-build.mjs): the matcher behind
+// "Named in a published report", and the counts behind the trend view. A link or an account
+// matches when a cited source named that exact domain (or a parent of it) or account as an
+// operation's asset. The sign is about the indicator, never about the person who posted or shared
+// it: people share operation sites without knowing, and often to warn others.
+
+let TABLE = { docs: [], ops: [], indicators: [] };
+const OPS = new Map(), BY_DOMAIN = new Map(), BY_HANDLE = new Map();
+const push = (m, k, v) => (m.get(k) || m.set(k, []).get(k)).push(v);
+
+// table: { docs, ops, indicators } as ops.json has it, or a part of it from the background worker.
+function setOpsTable(table) {
+  TABLE = { docs: (table && table.docs) || [], ops: (table && table.ops) || [], indicators: (table && table.indicators) || [] };
+  OPS.clear(); BY_DOMAIN.clear(); BY_HANDLE.clear();
+  for (const o of TABLE.ops) OPS.set(o.id, o);
+  for (const i of TABLE.indicators) {
+    if (!OPS.has(i.op)) continue;
+    if (i.d) push(BY_DOMAIN, i.d, i);
+    if (i.x) push(BY_HANDLE, i.x, i);
+  }
+}
+
+const hit = (i) => ({ op: OPS.get(i.op), indicator: i, doc: TABLE.docs[i.doc] || null });
+// Subdomains match their parent: "de.rrn.world" finds "rrn.world".
+function opsOfDomain(domain) {
+  const parts = String(domain || "").toLowerCase().replace(/^www\./, "").split(".");
+  for (let k = 0; k < parts.length - 1; k++) {
+    const got = BY_DOMAIN.get(parts.slice(k).join("."));
+    if (got) return got.map(hit);
+  }
+  return [];
+}
+const opsOfHandle = (h) => (BY_HANDLE.get(String(h || "").replace(/^@/, "").toLowerCase()) || []).map(hit);
+
+// The part of a full table that a page needs for these domains and handles (the worker answers
+// with this, so pages never load the whole table).
+function opsLookup(table, { domains = [], handles = [] } = {}) {
+  const want = domains.map((d) => String(d).toLowerCase().replace(/^www\./, "")), hs = new Set(handles.map((h) => String(h).toLowerCase()));
+  const indicators = table.indicators.filter((i) => (i.x && hs.has(i.x)) || (i.d && want.some((d) => d === i.d || d.endsWith("." + i.d))));
+  const ids = new Set(indicators.map((i) => i.op));
+  return { docs: table.docs, ops: table.ops.filter((o) => ids.has(o.id)), indicators };
+}
+
+// The domains and accounts a profile names: its website, and domains and @handles in its bio.
+const HOST = /(?<![\w@.-])((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24})(?![\w.-]*\w)/gi, AT = /(?:^|[^\w@])@(\w{1,15})(?!\w)/g;
+function profileLinks(reading) {
+  const r = reading || {}, domains = new Set(), handles = new Set();
+  try { if (r.website) domains.add(new URL(/^https?:/i.test(r.website) ? r.website : "https://" + r.website).hostname.replace(/^www\./, "").toLowerCase()); } catch { /* not an address */ }
+  for (const m of String(r.bio || "").matchAll(HOST)) if (/[a-z]/i.test(m[1].split(".").pop())) domains.add(m[1].toLowerCase().replace(/^www\./, ""));
+  for (const m of String(r.bio || "").matchAll(AT)) handles.add(m[1].toLowerCase());
+  return { domains: [...domains], handles: [...handles] };
+}
+
+const TYPE_WORDS = {
+  "government": "a government body", "state media": "state media", "contractor": "a firm or group working for a government",
+  "linked to a state": "people or a group the source links to a government", "commercial firm": "a firm, no government named", "origin only": "no operator named",
+};
+const OPS_DOES_NOT_PROVE = "The report named this domain or account as part of an operation when it was published. It says nothing about the person who posted or shared it: people share these links without knowing, or to warn others. Domains expire and are bought again, and accounts are reused.";
+
+// The window's rows for one hit, in the sources' own words. Every attribution is listed with its
+// document, so disagreements between sources stay visible.
+function opRows(h) {
+  const o = h.op, doc = h.doc || {};
+  const said = o.attributions.map((a) => { const d = TABLE.docs[a.doc] || {}; return `${d.publisher || d.title}${d.date ? ` (${d.date})` : ""}: "${a.says}"`; });
+  return [
+    ["Operation", `${o.name}${o.aliases && o.aliases.length ? ` (also: ${o.aliases.slice(0, 3).join(", ")})` : ""}`],
+    ["Attributed to", `${o.state}: ${o.operator}. Operator type: ${TYPE_WORDS[o.operatorType] || o.operatorType}.`],
+    ["Sources say", said.slice(0, 4).join(" ")],
+    ["Named as", `${h.indicator.kind} in ${doc.title || "the report"}${doc.date ? `, ${doc.date}` : ""}`],
+    ["Read it", { links: [[String(doc.url || "").replace(/^https?:\/\//, "").slice(0, 48), doc.url]] }],
+    ["Does not prove", OPS_DOES_NOT_PROVE],
+  ];
+}
+
+// Counts for the trend view. Year is the year an operation was first published by any cited source.
+// It counts what investigators found and published, not how much activity there was.
+const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.";
+function opsTrend(table = TABLE) {
+  const years = new Map(), states = new Map();
+  for (const o of table.ops) {
+    const y = Number(String(o.first).slice(0, 4));
+    const ye = years.get(y) || years.set(y, { year: y, n: 0, byState: {} }).get(y);
+    ye.n++; ye.byState[o.state] = (ye.byState[o.state] || 0) + 1;
+    const se = states.get(o.state) || states.set(o.state, { state: o.state, n: 0, byType: {}, docs: new Set() }).get(o.state);
+    se.n++; se.byType[o.operatorType] = (se.byType[o.operatorType] || 0) + 1;
+    for (const d of o.docs) se.docs.add(d);
+  }
+  return {
+    total: table.ops.length,
+    byYear: [...years.values()].sort((a, b) => a.year - b.year),
+    byState: [...states.values()].map((s) => ({ ...s, docs: s.docs.size })).sort((a, b) => b.n - a.n || a.state.localeCompare(b.state)),
+  };
+}
+
+return { setOpsTable, opsOfDomain, opsOfHandle, opsLookup, profileLinks, OPS_DOES_NOT_PROVE, opRows, OPS_TREND_CAVEAT, opsTrend };
+})();
+
 // ---- trail.js
 const M_trail = (() => {
 // Source trails: where a post's material came from, and how it spread across the posts the user has
@@ -3949,7 +4719,8 @@ const TRAIL_RETAIN_DAYS = 30, TRAIL_MAX_ITEMS = 5000, TRAIL_MAX_POSTS = 40;
 const DAY = 86400000;
 
 // log: { media: { [mediaId]: Spread }, links: { [url]: Spread } }
-// Spread: { posts: [{ id, handle, at }] } sorted by time; `at` is the post time (ISO).
+// Spread: { posts: [{ id, handle, at, lang? }] } sorted by time; `at` is the post time (ISO), `lang` X's
+// language code for the post when X gave one (for src/core/crosslang.js).
 function add(table, key, entry) {
   const s = table[key] || { posts: [] };
   if (!s.posts.some((p) => p.id === entry.id)) {
@@ -3974,7 +4745,7 @@ function recordSpread(log, tweets, now = Date.now()) {
   const L = { media: { ...((log && log.media) || {}) }, links: { ...((log && log.links) || {}) } };
   for (const t of tweets) {
     if (!t.author || !t.posted) continue;
-    const entry = { id: t.id, handle: t.author.toLowerCase(), at: t.posted };
+    const entry = { id: t.id, handle: t.author.toLowerCase(), at: t.posted, ...(t.lang ? { lang: t.lang } : {}) };
     for (const m of t.media || []) { const k = mediaKey(m); if (k) add(L.media, k, entry); }
     for (const u of t.links || []) { const k = normLink(u); if (k) add(L.links, k, entry); }
   }
@@ -4046,6 +4817,235 @@ function firstSeen(t, tweets, log) {
 }
 
 return { TRAIL_RETAIN_DAYS, normLink, recordSpread, trailFor, upstream, firstSeen };
+})();
+
+// ---- crosslang.js
+const M_crosslang = (() => {
+// Cross-language repetition: one link, one upload or one fact-checked claim carried by replies in
+// different languages from different accounts. RAND's "firehose" model and Rauch's account of
+// flooding both describe one claim pushed through many channels at once; a campaign that reaches
+// several language communities with the same material leaves this trace (project-docs/TECHNIQUES.md).
+// Radar matches the material, never the wording: a translation of a claim matches only when a
+// fact-checker reviewed the claim and both posts match that review. Language comes from the
+// platform's own code (X's "lang"); without one, a distinct writing system stands in, and Latin
+// text without a code counts as unknown. The rule is the same for every language and account.
+
+const { normLink } = M_trail;
+
+const MIN_ACCOUNTS = 2;
+const CROSS_DOES_NOT_PROVE = "Multilingual people, translators, news agencies and diaspora communities share the same link or video in several languages. This shows the material crossing languages, not who sent it or whether anyone coordinated.";
+
+const SCRIPTS = [["Kore", /\p{Script=Hangul}/u], ["Jpan", /[\p{Script=Hiragana}\p{Script=Katakana}]/u], ["Hani", /\p{Script=Han}/u],
+  ["Hebr", /\p{Script=Hebrew}/u], ["Arab", /\p{Script=Arabic}/u], ["Cyrl", /\p{Script=Cyrillic}/u], ["Deva", /\p{Script=Devanagari}/u],
+  ["Thai", /\p{Script=Thai}/u], ["Grek", /\p{Script=Greek}/u], ["Beng", /\p{Script=Bengali}/u], ["Geor", /\p{Script=Georgian}/u], ["Armn", /\p{Script=Armenian}/u]];
+
+// The first distinct writing system in the text, or null (Latin, digits, emoji, nothing).
+function scriptOf(text) {
+  const s = String(text || "");
+  for (const [code, re] of SCRIPTS) if (re.test(s)) return code;
+  return null;
+}
+
+// Older codes Twitter still emits for Indonesian, Hebrew and Yiddish.
+const OLD = { in: "id", iw: "he", ji: "yi" };
+const code = (c) => { const x = String(c).toLowerCase(); return OLD[x] || x; };
+
+// A reply's language: the platform's code, else "script:<code>", else null.
+function langOf(r) {
+  if (r && r.lang) return code(r.lang);
+  const sc = scriptOf(r && r.text);
+  return sc ? "script:" + sc : null;
+}
+
+// The items a reply carries: [[kind, key]]. Media lifted from another post has no file key here.
+function itemsOf(r) {
+  const out = [];
+  for (const u of r.links || []) { const k = normLink(u); if (k) out.push(["link", k]); }
+  for (const m of r.media || []) if (m && m.url && !m.fromPost) out.push(["media", m.url]);
+  for (const c of r.claims || []) if (c && c.url) out.push(["claim", c.url]);
+  return out;
+}
+
+// Two different accounts writing in two different languages among the posts carrying one item. An
+// account that carried the item in more than one language is a translator here, not a second
+// community, so it does not count toward the crossing.
+function crosses(posts) {
+  const known = posts.filter((p) => p.lang);
+  const platform = known.filter((p) => !p.lang.startsWith("script:"));
+  const use = platform.length ? platform : known;
+  const langsOf = new Map();
+  for (const p of use) { if (!langsOf.has(p.author)) langsOf.set(p.author, new Set()); langsOf.get(p.author).add(p.lang); }
+  const single = [...langsOf].filter(([, ls]) => ls.size === 1).map(([, ls]) => [...ls][0]);
+  return new Set(single).size >= 2 ? { use, basis: platform.length ? "platform" : "script" } : null;
+}
+
+function summarise(kind, key, posts, hit) {
+  const langs = [...new Set(hit.use.map((p) => p.lang))].sort();
+  return { kind, key, langs, accounts: new Set(posts.map((p) => p.author)).size, ids: posts.map((p) => p.id), basis: hit.basis };
+}
+
+// rows: [{ id, author, lang, text, links, media, claims }]; root: the post replied to, or null.
+// Returns the items carried in two or more languages, most accounts first. The root post's own
+// links and uploads are set aside: replies in many languages carrying the post they answer are
+// people reacting to it, and on ordinary threads that made 167 of 177 groups (EVALUATION.md).
+function crossLanguage(rows, { root = null } = {}) {
+  const skip = new Set(root ? itemsOf(root).map(([kind, key]) => kind + "|" + key) : []);
+  const by = new Map();
+  for (const r of rows || []) {
+    const lang = langOf(r), author = String(r.author || "").toLowerCase();
+    for (const [kind, key] of itemsOf(r)) {
+      const k = kind + "|" + key;
+      if (skip.has(k)) continue;
+      if (!by.has(k)) by.set(k, { kind, key, posts: [] });
+      const g = by.get(k);
+      if (!g.posts.some((p) => p.id === r.id)) g.posts.push({ id: r.id, author, lang });
+    }
+  }
+  const out = [];
+  for (const g of by.values()) {
+    if (new Set(g.posts.map((p) => p.author)).size < MIN_ACCOUNTS) continue;
+    const hit = crosses(g.posts);
+    if (hit) out.push(summarise(g.kind, g.key, g.posts, hit));
+  }
+  return out.sort((a, b) => b.accounts - a.accounts || b.langs.length - a.langs.length);
+}
+
+// Across the threads the user viewed: the post's links and uploads whose spread in the trail log
+// (src/core/trail.js) crosses languages. t: a tweet as tweetsIn() returns it.
+function acrossViewed(t, log) {
+  if (!t) return [];
+  const out = [];
+  const tables = [["link", (log && log.links) || {}, (t.links || []).map(normLink)], ["media", (log && log.media) || {}, (t.media || []).filter((m) => m.url && !m.fromPost).map((m) => m.url)]];
+  for (const [kind, table, keys] of tables) {
+    for (const key of keys) {
+      const s = key && table[key];
+      if (!s) continue;
+      const posts = s.posts.map((p) => ({ id: p.id, author: p.handle, lang: p.lang ? code(p.lang) : null }));
+      const hit = new Set(posts.map((p) => p.author)).size >= MIN_ACCOUNTS && crosses(posts);
+      if (hit) out.push({ ...summarise(kind, key, posts, hit), across: true });
+    }
+  }
+  return out;
+}
+
+return { MIN_ACCOUNTS, CROSS_DOES_NOT_PROVE, scriptOf, langOf, crossLanguage, acrossViewed };
+})();
+
+// ---- flooding.js
+const M_flooding = (() => {
+// The flooding sign. RAND's "firehose of falsehood" (Paul and Matthews 2016) names high volume
+// across many channels and rapid, continuous repetition; Rauch calls the aim "flooding the zone"
+// so that people stop believing anything (project-docs/TECHNIQUES.md). In one thread Radar can see
+// two traces of it: several accounts posting at very high rates carry a large share of the
+// replies (volume), or a timing burst (src/core/timing.js) is made of such accounts (speed).
+// The rate is the account's own post count over its age, the same figure as the "very high post
+// rate" flag. Accounts that reply many times in one thread are shown as context only: on ordinary
+// threads that is what conversation looks like (project-docs/EVALUATION.md).
+
+const { HIGH_VOLUME_PER_DAY, ageDays } = M_flags;
+
+const FLOOD_MIN_ACCOUNTS = 3, FLOOD_SHARE = 0.25, MIN_KNOWN = 10, BURST_HIGH = 2, REPEAT_MIN = 5;
+const FLOOD_DOES_NOT_PROVE = "News, alert and fan accounts post all day by design, and a busy thread draws the most active accounts on the site. This describes how the replies were posted, not who runs any account or why.";
+
+// Posts per day since joining, or null when either number is missing.
+function ratePerDay(account, now = Date.now()) {
+  if (!account || !Number.isFinite(account.postsCount) || !account.joinDate) return null;
+  const age = ageDays(account.joinDate, now);
+  return age == null ? null : account.postsCount / Math.max(1, age);
+}
+
+function volumeOf(rows, rateOf) {
+  let known = 0, high = 0;
+  const accounts = new Set();
+  for (const r of rows) {
+    const x = rateOf(String(r.author).toLowerCase());
+    if (x == null) continue;
+    known++;
+    if (x >= HIGH_VOLUME_PER_DAY) { high++; accounts.add(String(r.author).toLowerCase()); }
+  }
+  return { known, replies: high, share: known ? Math.round((high / known) * 100) / 100 : 0, accounts: [...accounts] };
+}
+
+function repeaters(rows) {
+  const n = new Map();
+  for (const r of rows) { const h = String(r.author).toLowerCase(); n.set(h, (n.get(h) || 0) + 1); }
+  return [...n].filter(([, k]) => k >= REPEAT_MIN).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([handle, k]) => ({ handle, n: k }));
+}
+
+// rows: [{ author, posted }]; rateOf(handle) -> posts a day or null; bursts from timingBursts().
+// Returns null, or { volume, speed, repeaters, threshold }; volume or speed is null when its part
+// did not fire.
+function floodSign(rows, rateOf, { bursts = [] } = {}) {
+  const v = volumeOf(rows || [], rateOf);
+  const volume = v.known >= MIN_KNOWN && v.accounts.length >= FLOOD_MIN_ACCOUNTS && v.share >= FLOOD_SHARE ? v : null;
+  let speed = null;
+  for (const b of bursts || []) {
+    const high = b.authors.filter((a) => { const x = rateOf(String(a).toLowerCase()); return x != null && x >= HIGH_VOLUME_PER_DAY; });
+    if (high.length >= BURST_HIGH && (!speed || high.length > speed.highRate)) speed = { from: b.from, to: b.to, accounts: b.authors.length, highRate: high.length };
+  }
+  if (!volume && !speed) return null;
+  return { volume, speed, repeaters: repeaters(rows || []), threshold: HIGH_VOLUME_PER_DAY };
+}
+
+return { FLOOD_MIN_ACCOUNTS, FLOOD_DOES_NOT_PROVE, ratePerDay, floodSign };
+})();
+
+// ---- chain.js
+const M_chain = (() => {
+// The laundering chain: a post, the accounts and sites its material passed through, and the
+// earliest origin Radar can see. Laundering is what makes one source look like many independent
+// ones (Rauch's "artificial copies"; DISARM T0128.004, Launder Information Assets). The chain uses
+// only pointers the platform records and Radar's own first-seen log (src/core/trail.js): a quote
+// or repost points upstream, "media from" names the post the media came from, the same upload or
+// the same link seen earlier names an earlier sharer. It never infers a source from wording, and
+// it stops where the platform's pointers stop.
+
+const { trailFor, firstSeen, normLink } = M_trail;
+
+const CHAIN_DOES_NOT_PROVE = "Radar cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.";
+
+const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return null; } };
+const hours = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 360000) / 10;
+
+// Upstream accounts from quotes, reposts and "media from", nearest first.
+function pointerHops(t, tweets) {
+  const tr = trailFor(t, tweets, null) || { steps: [] };
+  return tr.steps.filter((s) => s.kind !== "uploaded").map((s) => ({ handle: s.handle ? String(s.handle).toLowerCase() : null, id: s.id, at: s.at || null, how: s.kind }));
+}
+
+// Earlier sharers of the same upload or link, from the first-seen log.
+function earlierSharers(t, tweets, log) {
+  const out = [];
+  for (const f of firstSeen(t, tweets, log)) if (f.seen && f.seen.id !== t.id) out.push({ handle: f.seen.handle, id: f.seen.id, at: f.seen.at, how: "same upload seen earlier" });
+  const table = (log && log.links) || {};
+  for (const u of t.links || []) {
+    const s = table[normLink(u) || ""], p = s && s.posts[0];
+    if (p && p.id !== t.id) out.push({ handle: p.handle, id: p.id, at: p.at, how: "same link seen earlier", site: host(u) });
+  }
+  return out.sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+}
+
+// t: a tweet; tweets: Map id -> tweet; log: the trail log. Returns null when nothing is upstream,
+// else { hops: [{ role, handle?, domain?, id?, at, how }], intermediaries, originHidden, hoursFromOrigin }.
+function launderingChain(t, tweets, log) {
+  if (!t) return null;
+  const me = String(t.author || "").toLowerCase();
+  const up = pointerHops(t, tweets || new Map());
+  const earlier = earlierSharers(t, tweets || new Map(), log).filter((e) => e.handle && e.handle !== me);
+  const sites = [...new Set((t.links || []).map(host).filter(Boolean))];
+  const origin = [up[up.length - 1], earlier[0]].filter((x) => x && x.handle && x.at).sort((a, b) => Date.parse(a.at) - Date.parse(b.at))[0]
+    || up[up.length - 1] || null;
+  if (!origin && !sites.length) return null;
+  const mids = up.filter((h) => h !== origin && h.handle !== (origin && origin.handle)).map((h) => ({ role: "intermediary", ...h }));
+  const siteHops = origin && origin.how === "same link seen earlier" ? sites.map((d) => ({ role: "intermediary", domain: d, how: "linked site" })) : [];
+  if (!origin) return { hops: [{ role: "post", handle: me, id: t.id, at: t.posted }, ...sites.map((d) => ({ role: "intermediary", domain: d, how: "linked site" }))], intermediaries: sites.length, originHidden: true, hoursFromOrigin: null };
+  const hops = [{ role: "post", handle: me, id: t.id, at: t.posted }, ...mids, ...siteHops, { role: "origin", ...origin }];
+  // The post points straight at the origin only when its own nearest pointer is the origin.
+  const direct = up.length > 0 && up[0].handle === origin.handle;
+  return { hops, intermediaries: mids.length + siteHops.length, originHidden: !direct, hoursFromOrigin: origin.at && t.posted ? hours(origin.at, t.posted) : null };
+}
+
+return { CHAIN_DOES_NOT_PROVE, launderingChain };
 })();
 
 // ---- history.js
@@ -6119,14 +7119,17 @@ const D = "detector", P = "platform", T = "table", F = "file";
 const FAMILIES = [
   ["slur", "Slur or coded hate term", "language", D], ["stereotype", "Group stereotype", "language", D],
   ["dehumanise", "Dehumanising language", "language", D], ["violence", "Call for violence", "language", D],
-  ["vigilante", "Call for vigilantes", "language", D], ["leaked-ai", "Leaked AI text", "language", D],
+  ["vigilante", "Call for vigilantes", "language", D], ["conspiracy-theory", "Named conspiracy theory", "language", D], ["leaked-ai", "Leaked AI text", "language", D],
   ["machine-writing", "Machine-writing signs", "language", D], ["spam-pattern", "Spam pattern", "language", D],
   ["x-spam", "X: probable spam", "language", P], ["hate-symbol-name", "Hate symbol in name", "language", D],
   ["old-media", "Media older than the post", "media", D], ["lifted-media", "Media from another post", "media", P],
   ["same-upload", "Same upload, many accounts", "coordination", D], ["duplicates", "Same text as other replies", "coordination", D],
   ["copied-elsewhere", "Same words in other threads", "coordination", D],
+  ["cross-language", "Same link or upload in several languages", "coordination", D],
+  ["laundered", "Material passed through other accounts", "sources", D],
   ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
-  ["state-link", "State link", "sources", T], ["owner", "Outlet owner", "sources", T], ["site-record", "Site facts and fact-check record", "sources", T],
+  ["state-link", "State link", "sources", T], ["named-in-report", "Named in a published report", "sources", T],
+  ["lookalike-domain", "Look-alike news address", "sources", D], ["owner", "Outlet owner", "sources", T], ["site-record", "Site facts and fact-check record", "sources", T],
   ["client", "Posting app", "posting", P], ["written-in", "Written in another language", "place", P],
   ["mismatch", "Speaks as local, labelled elsewhere", "place", D], ["store-elsewhere", "App store elsewhere", "place", D],
   ["flag-elsewhere", "Flag of another country", "place", D], ["profile-location-elsewhere", "Profile says elsewhere", "place", D],
@@ -6136,7 +7139,7 @@ const FAMILIES = [
   ["high-volume", "Very high post rate", "posting", D],
   ["new-account", "New account", "account", D], ["name-changes", "Renamed", "account", D],
   ["default-handle", "Sign-up handle", "account", D], ["follow-pattern", "Follows many, few follow back", "account", D],
-  ["low-karma", "Low karma for its age", "account", D],
+  ["low-karma", "Low karma for its age", "account", D], ["brand-lookalike", "Name borrows a brand", "account", D],
   ["c2pa", "Content Credentials", "media", F], ["c2pa-changed", "Credentials do not match", "media", F],
   ["ai-metadata", "AI-generation metadata", "media", F],
 ].map(([id, name, area, kind]) => ({ id, name, area, kind }));
@@ -6430,5 +7433,5 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_trail, ...M_crosslang, ...M_flooding, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
 })();

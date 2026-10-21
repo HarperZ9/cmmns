@@ -1,0 +1,2221 @@
+[
+ {
+  "id": "india-srivastava-indian-chronicles",
+  "name": "Indian Chronicles",
+  "aliases": [
+   "EP Today network",
+   "265 fake local media outlets serving Indian interests"
+  ],
+  "state": "India",
+  "operator": "Srivastava Group (New Delhi), amplified by ANI",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "the operation led by the Srivastava Group and amplified by ANI",
+    "section": "Indian Chronicles, key findings"
+   },
+   {
+    "source": "s2",
+    "operatorType": "origin only",
+    "says": "Over 265 fake local news sites in more than 65 countries are managed by an Indian influence network",
+    "section": "Uncovered: 265 outlets, lead"
+   }
+  ],
+  "active": {
+   "from": 2005,
+   "to": 2020
+  },
+  "platforms": [
+   "websites",
+   "X"
+  ],
+  "languages": [],
+  "targets": [
+   "European Union institutions (European Parliament, MEPs)",
+   "United Nations (Human Rights Council, Geneva)",
+   "Pakistan (reputation)",
+   "Indian domestic audiences"
+  ],
+  "narratives": "Content discredited Pakistan, and to a lesser extent China, and promoted India's international image; the main audience for repackaged content was the Indian public via ANI.",
+  "techniques": [
+   "fake news outlets",
+   "impersonating real outlets or officials",
+   "content laundering",
+   "front organisations",
+   "typosquatted domains",
+   "search and chatbot seeding"
+  ],
+  "indicators": [
+   {
+    "domain": "eptoday.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "EP Today section"
+   },
+   {
+    "domain": "timesofgeneva.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Times of Geneva section"
+   },
+   {
+    "domain": "4newsagency.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "4 News Agency section"
+   },
+   {
+    "domain": "newyorkmorningtelegraph.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "introduction"
+   },
+   {
+    "domain": "thedublingazette.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "introduction"
+   },
+   {
+    "domain": "timesofportugal.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "introduction"
+   },
+   {
+    "domain": "sadf.eu",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "domain registration section"
+   },
+   {
+    "domain": "southasiapeaceforum.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "domain registration section"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s2"
+   ],
+   "languages": [],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "EU DisinfoLab",
+    "title": "Indian Chronicles: deep dive into a 15-year operation targeting the EU and UN to serve Indian interests",
+    "url": "https://www.disinfo.eu/publications/indian-chronicles-deep-dive-into-a-15-year-operation-targeting-the-eu-and-un-to-serve-indian-interests/",
+    "date": "2020-12-09",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (web page summary via WebFetch; full PDF not read)"
+   },
+   {
+    "id": "s2",
+    "publisher": "EU DisinfoLab",
+    "title": "Uncovered: 265 coordinated fake local media outlets serving Indian interests",
+    "url": "https://www.disinfo.eu/publications/uncovered-265-coordinated-fake-local-media-outlets-serving-indian-interests/",
+    "date": "2019-11-26",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (web page summary via WebFetch)"
+   }
+  ],
+  "notes": "Neither EU DisinfoLab report attributes the operation to the Indian government or intelligence services. They name the Srivastava Group and 'Indian stakeholders'. The 2019 piece mentions 'Indian governmental interests' only in a rhetorical question, not as a finding. operatorType is 'commercial firm' because the named operator is a private group and no state principal is stated. No EU DisinfoLab publication titled 'Tainted Love' was found; the 2019 work is the November 2019 '265 outlets' report and an October 2019 EP Today thread (not opened). Indian Chronicles says 550+ domains were registered but names only a few, and gives inconsistent outlet counts (750+ in 119 countries vs 500+ in 95). Languages are not stated by either source. The 'search and chatbot seeding' tag reflects the 2019 report's statement that duplicated content aimed to influence search results; there is no chatbot claim. Big News Network is described as a partner network, not an operation-created asset, so it is excluded. sadf.eu and southasiapeaceforum.com are named in a domain-registration context; whether each was an operation site rather than a related NGO site was not checked against the full PDF."
+ },
+ {
+  "id": "india-inc-it-cell-2019",
+  "name": "India network linked to an INC IT Cell",
+  "aliases": [],
+  "state": "India",
+  "operator": "Individuals associated with an Indian National Congress (INC) IT Cell",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "our review found that it was connected to individuals associated with an INC IT Cell",
+    "section": "India section"
+   }
+  ],
+  "active": {
+   "from": 2014,
+   "to": 2019
+  },
+  "platforms": [
+   "Facebook"
+  ],
+  "languages": [],
+  "targets": [
+   "India (domestic)"
+  ],
+  "narratives": "Pages posted local news and political issues ahead of the 2019 Indian elections, promoting the INC and criticising opponents including the BJP.",
+  "techniques": [
+   "fake personas",
+   "spam amplification",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Removing Coordinated Inauthentic Behavior and Spam From India and Pakistan",
+    "url": "https://about.fb.com/news/2019/04/cib-and-spam-from-india-pakistan/",
+    "date": "2019-04-01",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "The INC was the opposition party in April 2019, not the governing party, so it is not a ruling-party organ. operatorType 'linked to a state' is the nearest category; strictly the source links it to a political party, not a state, and a consumer may prefer to treat it as non-state. Active years are the advertising dates the source gives (August 2014 to March 2019). 687 assets (138 Pages, 549 accounts). Languages and indicators not published."
+ },
+ {
+  "id": "india-silver-touch-2019",
+  "name": "India network linked to Silver Touch",
+  "aliases": [],
+  "state": "India",
+  "operator": "Individuals associated with Silver Touch, an Indian IT firm",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "linked to individuals associated with an Indian IT firm, Silver Touch",
+    "section": "India (Silver Touch) section"
+   }
+  ],
+  "active": {
+   "from": 2014,
+   "to": 2019
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [],
+  "targets": [
+   "India (domestic)"
+  ],
+  "narratives": "Posts covered the Indian government, the 2019 elections and the BJP, and alleged misconduct by opponents including the INC.",
+  "techniques": [
+   "fake personas",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Removing Coordinated Inauthentic Behavior and Spam From India and Pakistan",
+    "url": "https://about.fb.com/news/2019/04/cib-and-spam-from-india-pakistan/",
+    "date": "2019-04-01",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta names a private IT firm and does not state a government principal, so operatorType is 'commercial firm'. Content favoured the BJP, the governing party at the time, per Meta's description. Active years are the advertising dates (June 2014 to February 2019). 15 assets; one Page with about 2.6 million followers. Languages and indicators not published."
+ },
+ {
+  "id": "pakistan-ispr-2019",
+  "name": "Pakistan network linked to ISPR employees",
+  "aliases": [],
+  "state": "Pakistan",
+  "operator": "Employees of the Inter-Service Public Relations (ISPR) of the Pakistani military",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "linked to employees of the ISPR (Inter-Service Public Relations) of the Pakistani military",
+    "section": "Pakistan section"
+   }
+  ],
+  "active": {
+   "from": 2015,
+   "to": 2018
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [],
+  "targets": [
+   "Pakistan (domestic)",
+   "India"
+  ],
+  "narratives": "Military fan Pages, Kashmir community Pages and general news Pages posted local and political news, including about the Indian government, political leaders and the military.",
+  "techniques": [
+   "fake personas",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Removing Coordinated Inauthentic Behavior and Spam From India and Pakistan",
+    "url": "https://about.fb.com/news/2019/04/cib-and-spam-from-india-pakistan/",
+    "date": "2019-04-01",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta's wording is 'linked to employees of' the ISPR. The brief classes the military as government, so operatorType is 'government', but the source does not say ISPR directed it as an institution. Meta's H1 2026 report describes this 2019 case as an adversarial campaign against regional rivals. Active years are the ad dates (May 2015 to December 2018). 103 assets; about 2.8 million Page followers. 'India' as a target is inferred from the content description; the 2019 post names no target country explicitly. No languages or indicators published."
+ },
+ {
+  "id": "pakistan-ispr-balochistan-diaries-2026",
+  "name": "The Balochistan Diaries (domestic Pakistani activity displaying wide use of AI)",
+  "aliases": [],
+  "state": "Pakistan",
+  "operator": "Inter-Services Public Relations (ISPR) wing of the Pakistani military",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "we took down a network attributed to the Pakistani military's Inter-Services Public Relations (ISPR) wing",
+    "section": "Deep Dive: Domestic Pakistani Activity, p.44"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2026
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "ur"
+  ],
+  "targets": [
+   "Pakistan (domestic), especially Balochistan audiences"
+  ],
+  "narratives": "Nationalist messages of unity promoting Pakistan's central government, with personas posing as Baloch journalists and activists and comments criticising regional rivals.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "AI-generated text",
+   "AI-generated images or video",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "thebalchistandiaries.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "p.45"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "First Half 2026 Adversarial Threat Report",
+    "url": "https://transparency.meta.com/sr/first-half-2026-Adversarial-threat-report/",
+    "date": "2026-03-11",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (PDF served at that address)"
+   }
+  ],
+  "notes": "Domain copied verbatim as printed ('thebalchistandiaries[.]com'). The brand is spelled 'The Balochistan Diaries' in the same section, so the domain may carry a typo in the source; unverified which spelling is live. 23 Facebook accounts, 8 Pages, 14 Instagram accounts; about $3,000 in ads in Pakistani rupees. The investigation began from an industry-peer tip. Start year not stated. AI use per Meta: target identification, LLM text in English and Urdu, and AI video of photorealistic 'journalist' personas. Profile pictures were stolen photos, not generated. 'to': 2026 is the report date, not a stated end of activity."
+ },
+ {
+  "id": "turkiye-akp-youth-wing-2020",
+  "name": "Türkiye network associated with the AKP youth wing",
+  "aliases": [
+   "Political Retweet Rings and Compromised Accounts"
+  ],
+  "state": "Türkiye",
+  "operator": "Youth wing of the Justice and Development Party (AKP), the ruling party",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "Technical signals point to the network being associated with the youth wing of the party",
+    "section": "Turkey section"
+   },
+   {
+    "source": "s2",
+    "operatorType": "government",
+    "says": "Twitter attributes the network to the youth wing of the Justice and Development Party (AKP), Turkey's ruling party",
+    "section": "Abstract"
+   }
+  ],
+  "active": {
+   "from": 2017,
+   "to": 2020
+  },
+  "platforms": [
+   "X"
+  ],
+  "languages": [],
+  "targets": [
+   "Türkiye (domestic)"
+  ],
+  "narratives": "Amplified narratives favourable to the AKP and President Erdoğan and criticised the opposition HDP and CHP; some tweets promoted the 2017 constitutional referendum and the October 2019 Syria offensive.",
+  "techniques": [
+   "fake personas",
+   "hijacked or bought accounts",
+   "spam amplification"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s2"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Twitter (now X)",
+    "title": "Disclosing networks of state-linked information operations we've removed",
+    "url": "https://blog.x.com/en_us/topics/company/2020/information-operations-june-2020",
+    "date": "2020-06-11",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched via Internet Archive copy of blog.twitter.com (blog.x.com returns 403 to automated fetch)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Stanford Internet Observatory",
+    "title": "Political Retweet Rings and Compromised Accounts: A Twitter Influence Operation Linked to the Youth Wing of Turkey's Ruling Party",
+    "url": "https://purl.stanford.edu/vw345qt9750",
+    "date": "2020-06-11",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "CC BY-NC-ND 4.0",
+    "checked": "2026-10-21 fetched (repository abstract page; full PDF not opened)"
+   }
+  ],
+  "notes": "Twitter's wording is 'associated with'. The AKP is the ruling party, so the brief's ruling-party-organ rule gives 'government'. Twitter says the set includes compromised accounts of organisations critical of Erdoğan that were repeated hacking targets; the broader network also ran cryptocurrency spam. 7,340 accounts, about 37 million tweets. The 2017 start year is inferred from SIO's note on referendum tweets; account creation dates were not read. Languages are not stated in the material read (audience is Turkish citizens; Turkish is likely but unconfirmed). The full SIO whitepaper (June 2020; repository record dated 2022) was not read. No handles appear in the material read."
+ },
+ {
+  "id": "venezuela-state-backed-twitter-2019",
+  "name": "Venezuela state-backed domestic influence campaign (Twitter, January 2019)",
+  "aliases": [
+   "#TrollTracker: Venezuelan Government-linked Influence Campaign"
+  ],
+  "state": "Venezuela",
+  "operator": "Not named; Twitter calls it state-backed",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "1,196 accounts located in Venezuela which appear to be engaged in a state-backed influence campaign targeting domestic audiences",
+    "section": "Venezuela section"
+   },
+   {
+    "source": "s2",
+    "operatorType": "linked to a state",
+    "says": "State-backed influence operation promoted Maduro regime",
+    "section": "subtitle"
+   }
+  ],
+  "active": {
+   "from": 2014,
+   "to": 2019
+  },
+  "platforms": [
+   "X"
+  ],
+  "languages": [],
+  "targets": [
+   "Venezuela (domestic)"
+  ],
+  "narratives": "Pro-Maduro and pro-armed-forces messaging, amplification of Russian state media content, and attacks on opposition figures, per DFRLab's analysis of the dataset.",
+  "techniques": [
+   "spam amplification",
+   "state media amplification"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s2"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s2"
+   ],
+   "techniques": [
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Twitter (now X)",
+    "title": "Empowering further research of potential information operations",
+    "url": "https://blog.x.com/en_us/topics/company/2019/further_research_information_operations",
+    "date": "2019-01-31",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched via Internet Archive copy of blog.twitter.com (blog.x.com returns 403 to automated fetch)"
+   },
+   {
+    "id": "s2",
+    "publisher": "DFRLab (Atlantic Council)",
+    "title": "#TrollTracker: Venezuelan Government-linked Influence Campaign on Twitter",
+    "url": "https://dfrlab.org/?p=273",
+    "date": "2019-03-13",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (WebFetch summary)"
+   },
+   {
+    "id": "s3",
+    "publisher": "Twitter (now X)",
+    "title": "Information operations on Twitter: principles, process, and disclosure",
+    "url": "https://blog.x.com/en_us/topics/company/2019/information-ops-on-twitter",
+    "date": "2019-06-13",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched via Internet Archive copy of blog.twitter.com (blog.x.com returns 403 to automated fetch)"
+   }
+  ],
+  "notes": "Twitter says the accounts 'appear to be engaged in a state-backed' campaign and names no operating body, so operatorType is 'linked to a state'. The same January 2019 post discloses a separate set of 764 Venezuela-located accounts that Twitter could not tie to a government. The June 2019 post (s3) says 33 more accounts connected to that 764 set 'were operated by a commercial entity originating in Venezuela', not the state. Keep those sets separate from this one. Active years come from DFRLab's account-creation spikes (2014, 2016, 2017). DFRLab names accounts such as @ForoCandanga and a suspended ministry handle, but the fetched summary did not establish which belonged to the takedown set, so no indicators are listed. 'state media amplification' reflects DFRLab's finding that the accounts pushed Actualidad RT and Sputnik content. A later Twitter disclosure (2021-12-02) removed 277 Venezuelan accounts amplifying the government via the 'Twitter Patria' app; that is a separate operation, not included. Languages not stated in the material read. DFRLab date taken from the WebFetch summary and not cross-checked."
+ },
+ {
+  "id": "venezuela-us-predictvia-2023",
+  "name": "Venezuela/US-based network linked to Predictvia",
+  "aliases": [
+   "Elecciones Guate 2023",
+   "Catracho News",
+   "Hondurasleaks"
+  ],
+  "state": "Venezuela",
+  "operator": "Predictvia, a Florida-registered firm operating from Venezuela and the United States",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "our investigation found links to Predictvia, a Florida-registered firm, operating from both Venezuela and the United States",
+    "section": "Venezuela and the United States, p.17"
+   }
+  ],
+  "active": {
+   "from": 2022,
+   "to": 2023
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "Medium",
+   "websites"
+  ],
+  "languages": [
+   "es"
+  ],
+  "targets": [
+   "Guatemala",
+   "Honduras"
+  ],
+  "narratives": "Criticism of the mayor of San Juan Sacatepéquez in Guatemala, and of corruption and the President of the Honduran Congress, with supportive commentary about Honduras's Liberal Party.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "fake fact-checks",
+   "hijacked or bought accounts",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "eleccionesguate2023.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 7"
+   },
+   {
+    "domain": "catrachonews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 7"
+   },
+   {
+    "domain": "hondurasleaks.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 7"
+   },
+   {
+    "x": "elecciongt2023",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Appendix 7"
+   },
+   {
+    "x": "catracho_news",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Appendix 7"
+   },
+   {
+    "x": "LeaksHonduras",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Appendix 7"
+   },
+   {
+    "x": "legion_504",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Appendix 7"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Q1 2023",
+    "url": "https://about.fb.com/wp-content/uploads/2023/06/Meta-Quarterly-Adversarial-Threat-Report-Q1-2023.pdf",
+    "date": "2023-05",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "No government principal is stated; included because the task named it. Meta gives the origin as both Venezuela and the United States, and 'state' records Venezuela, listed first in the source. 'hijacked or bought accounts' reflects Meta's statement that some accounts had Cyrillic names and were likely acquired from account farms in Eastern Europe. The 2022 start year is inferred from the Internet Archive dates Meta cites for the HondurasLeaks site. Found after a Reuters tip; Meta issued a cease-and-desist letter."
+ },
+ {
+  "id": "nicaragua-telcor-fsln-2021",
+  "name": "Nicaragua troll farm run by the government and FSLN",
+  "aliases": [
+   "TELCOR troll farm"
+  ],
+  "state": "Nicaragua",
+  "operator": "Government of Nicaragua and the FSLN; primarily employees of TELCOR, with clusters in the Supreme Court and INSS",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "We removed a troll farm run by the government of Nicaragua and the Sandinista National Liberation Front (FSLN) party",
+    "section": "Executive summary, p.3"
+   }
+  ],
+  "active": {
+   "from": 2018,
+   "to": 2021
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "TikTok",
+   "X",
+   "YouTube",
+   "Blogspot",
+   "Telegram",
+   "websites"
+  ],
+  "languages": [],
+  "targets": [
+   "Nicaragua (domestic)"
+  ],
+  "narratives": "Early on it discredited the 2018 student protesters and government critics; from late 2019 it flooded the space with pro-government and pro-FSLN content through many media brands.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "impersonating real outlets or officials",
+   "harassment of critics",
+   "spam amplification",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "barricada.com.ni",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Cross-internet media network, p.9"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "October 2021 Coordinated Inauthentic Behavior Report",
+    "url": "https://about.fb.com/wp-content/uploads/2021/11/October-2021-CIB-Report-Updated-Nov-5.pdf",
+    "date": "2021-11-01",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "896 Facebook accounts, 132 Pages, 24 Groups, 362 Instagram accounts. Operators worked 9am to 5pm on weekdays from the postal service headquarters in Managua. 'harassment of critics' reflects coordinated mass reporting of critics, which mostly failed. 'impersonating real outlets or officials' reflects Meta's note that brands occasionally impersonated opposition organisations. Other brands (Molotov Digital, Siempre Más Allá, Redvolución) are named, but no domain is printed for them or they sit on Blogspot/Blogger, so only barricada.com.ni is listed. The report shows translated Spanish samples but does not state a language, so 'languages' is left empty; Spanish is near certain."
+ },
+ {
+  "id": "azerbaijan-nap-youth-union-2020",
+  "name": "Azerbaijan network linked to the Youth Union of New Azerbaijani Party",
+  "aliases": [],
+  "state": "Azerbaijan",
+  "operator": "Youth Union of the New Azerbaijani Party (ruling party)",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "Our investigation linked this activity to the Youth Union of New Azerbaijani Party",
+    "section": "Azerbaijan, p.13"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2020
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [
+   "az",
+   "ru",
+   "en"
+  ],
+  "targets": [
+   "Azerbaijan (domestic)",
+   "Pages of international and local media",
+   "opposition figures"
+  ],
+  "narratives": "Comments praised President Ilham Aliyev and the New Azerbaijani Party, accused opposition leaders of treason, covered Armenia-Azerbaijan tensions and Nagorno-Karabakh, and denied human rights abuse allegations.",
+  "techniques": [
+   "fake personas",
+   "comment brigading",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "October 2020 Coordinated Inauthentic Behavior Report",
+    "url": "https://about.fb.com/wp-content/uploads/2020/11/October-2020-CIB-Report.pdf",
+    "date": "2020-11-05",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta first announced the takedown on 2020-10-08; the detailed write-up is in the October 2020 report published 2020-11-05. 589 Facebook accounts, 7,665 Pages and 437 Instagram accounts. Most assets were Pages built to look like user profiles, run by authentic accounts. Posting followed weekday working-hour shifts. Start year not stated. Meta's October 2021 report lists Azerbaijan among 2021 government-linked takedowns, which may be a later network; not checked."
+ },
+ {
+  "id": "azerbaijan-baku-initiative-group-2024",
+  "name": "UN-notorious BIG",
+  "aliases": [
+   "Baku Initiative Group (BIG)"
+  ],
+  "state": "Azerbaijan",
+  "operator": "Baku Initiative Group (BIG), founded at the initiative of the presidential-decree think tank AIR Center, with a cluster of 423 X accounts",
+  "operatorType": "contractor",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "contractor",
+    "says": "le BIG peut être considéré comme une officine de propagande d'État contre la France",
+    "section": "Synthèse, p.2"
+   }
+  ],
+  "active": {
+   "from": 2023,
+   "to": 2024
+  },
+  "platforms": [
+   "X",
+   "Facebook",
+   "Instagram",
+   "websites"
+  ],
+  "languages": [
+   "fr",
+   "en",
+   "az"
+  ],
+  "targets": [
+   "France",
+   "French overseas territories (DROM-COM), including New Caledonia, Mayotte and Martinique",
+   "Corsica"
+  ],
+  "narratives": "Content hostile to France exploited independence movements and colonial history to contest France's territorial integrity overseas; during the May 2024 New Caledonia riots it spread doctored photos and videos accusing security forces of killing protesters.",
+  "techniques": [
+   "fake personas",
+   "spam amplification",
+   "front organisations",
+   "forged documents"
+  ],
+  "indicators": [
+   {
+    "domain": "bakuinitiative.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "L'environnement numérique du BIG, p.18"
+   },
+   {
+    "domain": "btq.org.az",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "p.18 (mirror of the BIG site)"
+   },
+   {
+    "x": "bakuinitiative",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "p.18, note 47"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "VIGINUM / SGDSN (France)",
+    "title": "UN-notorious BIG : une campagne numérique de manipulation de l'information ciblant les DROM-COM et la Corse (Rapport technique)",
+    "url": "https://www.sgdsn.gouv.fr/files/files/Publications/20241202_NP_SGDSN_VIGINUM_RAPPORT-BIG.pdf",
+    "date": "2024-12-02",
+    "kind": "government",
+    "lang": "fr",
+    "terms": "not stated (French government publication; reuse licence not checked)",
+    "checked": "2026-10-21 fetched, French original read"
+   }
+  ],
+  "notes": "Read in the French original. VIGINUM says it traced cluster accounts to individuals close to Azerbaijani political power and found a direct link ('lien direct') with the Azerbaijani state through BIG's website. It quotes President Aliyev calling BIG 'our child'. BIG presents itself as an NGO, so operatorType is 'contractor' (an organisation the source ties to a state principal); 'government' is arguable and this is a judgement call. The report cover says October 2024 and SGDSN published it on 2 December 2024. An English version exists at https://www.sgdsn.gouv.fr/files/files/Publications/20241202_NP_SGDSN_VIGINUM_RAPPORT-BIG_ENG.pdf (not read). 'forged documents' is the closest tag for VIGINUM's 'montages photo ou vidéo'; no tag covers doctored media exactly. Languages: VIGINUM says 93% of the cluster's accounts posted mainly in Azerbaijani and that it translated English and Azerbaijani posts; French content is implied by the francophone targeting. Annex 2 lists all 423 X accounts in the cluster. They are not reproduced because most carry personal names, several tied to named YAP employees, and the brief bars private individuals. The PDF text extraction had encoding damage; quoted passages were checked against readable text. A 2023 VIGINUM technical note on Corsica is cited inside the report but was not opened."
+ },
+ {
+  "id": "philippines-military-police-2020",
+  "name": "Philippines network linked to the Philippine military and police",
+  "aliases": [],
+  "state": "Philippines",
+  "operator": "Philippine military and Philippine police",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "our investigation found links to Philippine military and Philippine police",
+    "section": "Philippines section"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2020
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [
+   "tl",
+   "en"
+  ],
+  "targets": [
+   "Philippines (domestic)"
+  ],
+  "narratives": "Posts covered military counter-terrorism activity, the pending anti-terrorism bill, criticism of communism, youth activists and the opposition, and the CPP-NPA-NDF.",
+  "techniques": [
+   "fake personas",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Removing Coordinated Inauthentic Behavior",
+    "url": "https://about.fb.com/news/2020/09/removing-coordinated-inauthentic-behavior-china-philippines/",
+    "date": "2020-09-22",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Removed under Meta's policy against foreign or government interference. 64 Facebook accounts, 32 Pages, 33 Instagram accounts (figures updated 2020-10-12). Meta says activity 'accelerated between 2019 and 2020'; the start year is not stated. 'tl' stands for Filipino as the source names it. Found partly from Rappler and civil-society reporting."
+ },
+ {
+  "id": "thailand-royal-thai-army-2020",
+  "name": "Thailand network linked to the Royal Thai Army",
+  "aliases": [
+   "Cheerleading Without Fans"
+  ],
+  "state": "Thailand",
+  "operator": "Royal Thai Army (RTA)",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "a network of accounts partaking in information operations that we can reliably link to the Royal Thai Army (RTA)",
+    "section": "Thailand section"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2020
+  },
+  "platforms": [
+   "X"
+  ],
+  "languages": [],
+  "targets": [
+   "Thailand (domestic)",
+   "Thai political opposition figures"
+  ],
+  "narratives": "Amplified pro-army and pro-government content and targeted prominent political opposition figures.",
+  "techniques": [
+   "spam amplification",
+   "harassment of critics"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Twitter (now X)",
+    "title": "Disclosing networks to our state-linked information operations archive",
+    "url": "https://blog.x.com/en_us/topics/company/2020/disclosing-removed-networks-to-our-archive-of-state-linked-information",
+    "date": "2020-10-08",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched via Internet Archive copy of blog.twitter.com (blog.x.com returns 403 to automated fetch)"
+   }
+  ],
+  "notes": "926 accounts. 'harassment of critics' maps Twitter's phrase 'behavior targeting prominent political opposition figures'. The Stanford Internet Observatory analysis ('Cheerleading Without Fans', 2020-10-08) was found but its PDF was not opened. Separately, Meta's February 2021 CIB report found links between a 77-account network and the Thai military's Internal Security Operations Command (ISOC) targeting the southern provinces; that is a different operation and is not included. Languages not stated in the post."
+ },
+ {
+  "id": "georgia-strategic-communications-2023",
+  "name": "Georgia-based network linked to the Strategic Communications Department of the Government Administration",
+  "aliases": [],
+  "state": "Georgia",
+  "operator": "Strategic Communications Department of the Government Administration of Georgia",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "our investigation found links to the Strategic Communications Department of the Government Administration of Georgia",
+    "section": "Georgia, p.20"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2023
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "TikTok"
+  ],
+  "languages": [
+   "ka"
+  ],
+  "targets": [
+   "Georgia (domestic)",
+   "Georgian opposition activists and protesters"
+  ],
+  "narratives": "Pages posing as pro-government grassroots groups amplified government posts and pro-government media and attacked the opposition, especially during protests over the proposed 'foreign agents' law.",
+  "techniques": [
+   "fake personas",
+   "comment brigading",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Q1 2023",
+    "url": "https://about.fb.com/wp-content/uploads/2023/06/Meta-Quarterly-Adversarial-Threat-Report-Q1-2023.pdf",
+    "date": "2023-05",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "80 Facebook accounts, 26 Pages, 9 Groups, 2 Instagram accounts; about $33,500 in ads. The appendix lists only TikTok handles, which fall outside the brief's indicator types (domains and X handles), so indicators are empty. Start year not stated; the protests referenced are those of March 2023."
+ },
+ {
+  "id": "serbia-sns-internet-team",
+  "name": "Serbia network linked to the Serbian Progressive Party (SNS) Internet Team",
+  "aliases": [
+   "Fighting Like a Lion for Serbia"
+  ],
+  "state": "Serbia",
+  "operator": "Employees of the Serbian Progressive Party (SNS), known as its Internet Team, and state employees",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "attribute this CIB network to employees of the Serbian Progressive Party, known as its Internet Team, and state employees from around Serbia",
+    "section": "Serbia, pp.10-11"
+   },
+   {
+    "source": "s2",
+    "operatorType": "government",
+    "says": "A takedown of accounts linked to the Serbian Progressive Party (SNS), the party of current President of Serbia Aleksandar Vučić",
+    "section": "Summary list"
+   },
+   {
+    "source": "s3",
+    "operatorType": "government",
+    "says": "An Analysis of Government-Linked Influence Operations in Serbia",
+    "section": "title page"
+   }
+  ],
+  "active": {
+   "from": 2018,
+   "to": 2022
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "websites"
+  ],
+  "languages": [
+   "sr"
+  ],
+  "targets": [
+   "Serbia (domestic)",
+   "Serbian opposition and the '1 of 5 Million' protest movement"
+  ],
+  "narratives": "Built a perception of grassroots support for President Vučić and the SNS, attacked opposition figures, and boosted pro-Vučić outlets; it also commented directly on news websites.",
+  "techniques": [
+   "fake personas",
+   "spam amplification",
+   "comment brigading",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s3",
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s3"
+   ],
+   "narratives": [
+    "s1",
+    "s2",
+    "s3"
+   ],
+   "techniques": [
+    "s1",
+    "s3"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Q4 2022",
+    "url": "https://about.fb.com/wp-content/uploads/2023/02/Meta-Quarterly-Adversarial-Threat-Report-Q4-2022.pdf",
+    "date": "2023-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Stanford Internet Observatory",
+    "title": "Analysis of April 2020 Twitter takedowns linked to Saudia Arabia, the UAE, Egypt, Honduras, Serbia, and Indonesia",
+    "url": "https://cyber.fsi.stanford.edu/io/news/april-2020-twitter-takedown",
+    "date": "2020-04-02",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched via Internet Archive copy (live page returns 403)"
+   },
+   {
+    "id": "s3",
+    "publisher": "Stanford Internet Observatory",
+    "title": "\"Fighting Like a Lion for Serbia\": An Analysis of Government-Linked Influence Operations in Serbia",
+    "url": "https://fsi-live.s3.us-west-1.amazonaws.com/s3fs-public/serbia_march_twitter.pdf",
+    "date": "2020-04-02",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Twitter's own April 2020 announcement (8,558 accounts, 43 million tweets) was made through @TwitterSafety and was not fetched; its numbers come via SIO. SIO's paper says Twitter announced the takedown on March 26, 2020, while SIO's summary page and press date it April 2, 2020; unresolved. Meta (Q4 2022): 5,374 Facebook accounts, 12 Groups, and either 100 or 1,060 Instagram accounts (the report body and its statistics disagree), with at least $150,000 in ads. The operation coordinated through a web app Meta blocked in 2020. SIO names top accounts in the Twitter set, but they carry personal names and may belong to real party activists, so no handles are listed. The SNS is the ruling party, and Meta also names state employees, so 'government' applies."
+ },
+ {
+  "id": "honduras-presidency-twitter-2020",
+  "name": "Honduras network linked to the president's social media manager",
+  "aliases": [
+   "#VivaJOH o #FueraJOH"
+  ],
+  "state": "Honduras",
+  "operator": "Social media manager (staffer) of Honduran President Juan Orlando Hernández",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "Twitter announced a takedown of datasets attributed to the social media manager of Honduran president Juan Orlando Hernández",
+    "section": "Summary, p.3"
+   },
+   {
+    "source": "s2",
+    "operatorType": "government",
+    "says": "A takedown of accounts linked to a staffer of Honduran president Juan Orlando Hernández",
+    "section": "Summary list"
+   }
+  ],
+  "active": {
+   "from": 2015,
+   "to": 2020
+  },
+  "platforms": [
+   "X"
+  ],
+  "languages": [],
+  "targets": [
+   "Honduras (domestic)"
+  ],
+  "narratives": "Promotion of President Hernández and government initiatives through hashtags such as #LaNuevaHonduras and #HondurasAvanza; recently created accounts mainly retweeted the president.",
+  "techniques": [
+   "spam amplification",
+   "state media amplification"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Stanford Internet Observatory",
+    "title": "#VivaJOH o #FueraJOH: An analysis of Twitter's takedown of Honduran accounts",
+    "url": "https://fsi-live.s3.us-west-1.amazonaws.com/s3fs-public/04022020-hondurastakedown.pdf",
+    "date": "2020-04-02",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Stanford Internet Observatory",
+    "title": "Analysis of April 2020 Twitter takedowns linked to Saudia Arabia, the UAE, Egypt, Honduras, Serbia, and Indonesia",
+    "url": "https://cyber.fsi.stanford.edu/io/news/april-2020-twitter-takedown",
+    "date": "2020-04-02",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched via Internet Archive copy (live page returns 403)"
+   }
+  ],
+  "notes": "3,104 accounts and 1,165,019 tweets. The takedown included official accounts such as state broadcaster Televisión Nacional de Honduras and government offices; these are real government accounts, not fabricated assets, so they are not listed as indicators. 'state media amplification' reflects TNH's central place in the set. SIO also found about a dozen accounts of self-described writers, artists and feminists critical of the president in the set, which complicates the dataset. Twitter's own announcement was not fetched. Spanish hashtags are quoted, but no language is stated. The 2015 start is the first activity peak SIO notes (start of the re-election bid); accounts date back to 2008. SIO links it to a Meta takedown of 2019-07-25 (181 accounts, 1,488 Pages), not opened."
+ },
+ {
+  "id": "cuba-government-2022",
+  "name": "Cuba network linked to the Cuban government",
+  "aliases": [],
+  "state": "Cuba",
+  "operator": "Cuban government and its various entities",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "our investigation found links to the Cuban government and its various entities",
+    "section": "Cuba, p.12"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2022
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "Telegram",
+   "X",
+   "YouTube",
+   "Picta"
+  ],
+  "languages": [
+   "es"
+  ],
+  "targets": [
+   "Cuba (domestic)",
+   "Cuban diaspora, including in the United States"
+  ],
+  "narratives": "Built a perception of broad support for the government and attacked opposition members and critics, often calling them 'worms', while urging people to report them.",
+  "techniques": [
+   "fake personas",
+   "AI-generated images or video",
+   "harassment of critics",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Q4 2022",
+    "url": "https://about.fb.com/wp-content/uploads/2023/02/Meta-Quarterly-Adversarial-Threat-Report-Q4-2022.pdf",
+    "date": "2023-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "363 Facebook accounts, 270 Pages, 229 Groups, 72 Instagram accounts. 'AI-generated images or video' reflects profile photos likely made with GANs. No indicators published. Separately, Twitter's 2020-10-08 disclosure suspended 526 fake accounts 'run by youth organizations with ties to the Cuban government', including the UJC and FEU; that is a different takedown and is not merged here. The same Meta report covers a Bolivia network linked to the Bolivian government and the MAS party (not included, cap)."
+ },
+ {
+  "id": "myanmar-military-2018",
+  "name": "Myanmar military covert Pages",
+  "aliases": [],
+  "state": "Myanmar",
+  "operator": "Myanmar military (Tatmadaw)",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "they used seemingly independent news and opinion Pages to covertly push the messages of the Myanmar military",
+    "section": "main text"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2018
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [],
+  "targets": [
+   "Myanmar (domestic)"
+  ],
+  "narratives": "Seemingly independent news and opinion Pages covertly pushed the military's messages; Meta cites UN findings that related actors inflamed ethnic and religious tensions.",
+  "techniques": [
+   "fake news outlets"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Removing Myanmar Military Officials From Facebook",
+    "url": "https://about.fb.com/news/2018/08/removing-myanmar-officials/",
+    "date": "2018-08-28",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "The page shows 2018-08-28 (UTC); the announcement is widely reported as 2018-08-27 US time. The post combines bans of 20 individuals and organisations, including Senior General Min Aung Hlaing and the Myawady TV network, with removal of 46 Pages and 12 accounts for coordinated inauthentic behavior. This record covers the CIB portion. Meta's sentence says the Pages pushed the military's messages; it does not say in so many words that the military operated them, though the title and context imply it. No languages or indicators published."
+ },
+ {
+  "id": "myanmar-military-q4-2023",
+  "name": "Myanmar-based network linked to individuals associated with the Myanmar military",
+  "aliases": [],
+  "state": "Myanmar",
+  "operator": "Individuals associated with the Myanmar military",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "our investigation found links to individuals associated with the Myanmar military",
+    "section": "Myanmar, p.19"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2023
+  },
+  "platforms": [
+   "Facebook",
+   "Telegram",
+   "YouTube",
+   "X",
+   "Viber",
+   "websites"
+  ],
+  "languages": [
+   "my"
+  ],
+  "targets": [
+   "Myanmar (domestic)",
+   "ethnic armed organisations and minority groups"
+  ],
+  "narratives": "Original articles praised the Burmese army and criticised ethnic armed organisations and minority groups, with fake accounts posing as Kachin, Rohingya, Rakhine and Chin people.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "hminewai.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Myanmar-based CIB network"
+   },
+   {
+    "domain": "kothet.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Myanmar-based CIB network"
+   },
+   {
+    "domain": "banyunt.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Myanmar-based CIB network"
+   },
+   {
+    "x": "KoThet969",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Appendix, Myanmar-based CIB network"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Fourth Quarter 2023 Adversarial Threat Report",
+    "url": "https://transparency.meta.com/sr/Q4-2023-Adversarial-threat-report/",
+    "date": "2024-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (PDF served at that address)"
+   }
+  ],
+  "notes": "Wording is 'links to individuals associated with', so operatorType is 'linked to a state' rather than 'government'. 381 Facebook accounts, 88 Pages, 19 Groups. The network also posted to a small extent in Kachin, Rohingya, Rakhine and Chin, which have no ISO 639-1 codes (ISO 639-3: kac, rhg, rki; 'Chin' is a language group). The appendix table's columns are misaligned in extraction; banyunt.info sits beside the YouTube row but is a domain. Telegram channels are excluded per the brief."
+ },
+ {
+  "id": "bangladesh-awami-league-cri-2024",
+  "name": "Bangladesh-based network linked to the Awami League and CRI",
+  "aliases": [],
+  "state": "Bangladesh",
+  "operator": "Individuals associated with the Awami League party and the Center for Research and Information (CRI)",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "our investigation found links to individuals associated with the Awami League party and the Center for Research and Information",
+    "section": "Bangladesh, p.6"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2024
+  },
+  "platforms": [
+   "Facebook",
+   "YouTube",
+   "X",
+   "TikTok",
+   "Telegram",
+   "websites"
+  ],
+  "languages": [
+   "bn",
+   "en"
+  ],
+  "targets": [
+   "Bangladesh (domestic)",
+   "Bangladesh Nationalist Party (BNP)"
+  ],
+  "narratives": "Criticised the BNP, alleging corruption and a role in pre-election violence, and praised the incumbent government and ruling party, including its role in technological development.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "impersonating real outlets or officials",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "dhakatv.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "bnppara.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "bdpolitico.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "bdpolitico.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "banglanewsbank.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "bdperspectives.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "bangladeshtimes360.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "londonbanglanews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "bdanalytica.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "bnpnews.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "hyperjoshim.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "bdsarcasm.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "khambastar.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "newsbangladesh.org.bd",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "domain": "todaybd24.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   },
+   {
+    "x": "bd_politico",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Appendix, Bangladesh-based CIB network"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "First Quarter 2024 Adversarial Threat Report",
+    "url": "https://transparency.meta.com/sr/Q1-2024-Adversarial-threat-report/",
+    "date": "2024-05",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (PDF served at that address)"
+   }
+  ],
+  "notes": "The Awami League was the ruling party at the time, but the wording is 'links to individuals associated with' and CRI is a non-profit, so operatorType is 'linked to a state'; 'government' is arguable under the ruling-party rule. 50 Facebook accounts and 98 Pages with about 3.4 million Page followers (Prothom Alo reported 34 million; Meta's figure is 3.4 million). Some Pages used names of existing Bangladeshi news organisations and some used the BNP's name. Indicators are copied from the appendix. 'news360.com' is printed verbatim but is a generic name; check before use. The appendix also lists the X account 'tonmoybuet', omitted because it may be a personal-name account. Shift pattern 0700-2100 GMT."
+ },
+ {
+  "id": "uganda-gcic-ministry-ict-2021",
+  "name": "Uganda network linked to the Government Citizens Interaction Center",
+  "aliases": [],
+  "state": "Uganda",
+  "operator": "Government Citizens Interaction Center at the Ministry of Information and Communications Technology",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "our investigation found links to the Government Citizens Interaction Center at the Ministry of Information and Communications Technology in Uganda",
+    "section": "Uganda section"
+   }
+  ],
+  "active": {
+   "from": 2020,
+   "to": 2021
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "Uganda (domestic)",
+   "National Unity Platform and opposition candidate Robert Kyagulanyi"
+  ],
+  "narratives": "Supported President Museveni and the NRM, promoted Lt. Gen. Muhoozi Kainerugaba as a possible future candidate, attacked the opposition, and pushed #StopHooliganism after protests over the opposition candidate's arrest.",
+  "techniques": [
+   "fake personas",
+   "impersonating real outlets or officials",
+   "comment brigading",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "January 2021 Coordinated Inauthentic Behavior Report",
+    "url": "https://about.fb.com/wp-content/uploads/2021/02/January-2021-CIB-Report.pdf",
+    "date": "2021-02-10",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (PDF text extraction had a character-substitution font; decoded by hand)"
+   }
+  ],
+  "notes": "220 Facebook accounts, 32 Pages, 59 Groups, 139 Instagram accounts. Removed in early January 2021 before the election, after a DFRLab tip. The network impersonated at least one public figure in Uganda. The 2020 start reflects the fall 2020 hashtag campaign. Twitter's 2021-12-02 disclosure separately removed 418 accounts supporting Museveni and the NRM without naming an operator; it is not merged here."
+ },
+ {
+  "id": "ethiopia-insa-2021",
+  "name": "Ethiopia network linked to INSA",
+  "aliases": [],
+  "state": "Ethiopia",
+  "operator": "Individuals associated with INSA, the Information Network Security Agency",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "our investigation found links to individuals associated with INSA, the Information Network Security Agency in Ethiopia",
+    "section": "Ethiopia, p.25"
+   }
+  ],
+  "active": {
+   "from": null,
+   "to": 2021
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [
+   "am"
+  ],
+  "targets": [
+   "Ethiopia (domestic)",
+   "Ethiopian opposition groups"
+  ],
+  "narratives": "Praised the Prosperity Party and Prime Minister Abiy Ahmed, criticised Egypt and Sudan over the dam project and opposition groups including the OLF, EDP and TPLF, and commented on protests against US sanctions.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "spam amplification",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "June 2021 Coordinated Inauthentic Behavior Report",
+    "url": "https://about.fb.com/wp-content/uploads/2021/07/June-2021-CIB-Report-Final.pdf",
+    "date": "2021-07-08",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Wording is 'links to individuals associated with' a state agency, so operatorType is 'linked to a state'. Meta's October 2021 report counts it among 2021 'government-linked CIB networks'. 62 Facebook accounts, 49 Pages, 26 Groups, 32 Instagram accounts; first announced earlier in June 2021. Meta assessed that the activity was not directly focused on Tigray. Posting accelerated in 2020; the start year is not stated."
+ },
+ {
+  "id": "togo-gpci-burkina-2023",
+  "name": "Togo/Burkina Faso-based network linked to GPCI",
+  "aliases": [
+   "Aimons Notre Afrique (comeback)"
+  ],
+  "state": "Togo",
+  "operator": "Groupe Panafricain pour le Commerce et l'Investissement (GPCI), a political marketing consultancy in Togo",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "our investigation found links to a political marketing consultancy in Togo called the Groupe Panafricain pour le Commerce et l'Investissement (GPCI)",
+    "section": "Togo and Burkina Faso, p.19"
+   }
+  ],
+  "active": {
+   "from": 2021,
+   "to": 2023
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "websites"
+  ],
+  "languages": [
+   "fr"
+  ],
+  "targets": [
+   "Burkina Faso"
+  ],
+  "narratives": "Fake Burkinabè news sites and grassroots Pages posted positive commentary about military ruler Captain Ibrahim Traoré, the armed forces and the MPSR.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "gpci.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "etoileducontinent.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "afriqueactualite.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lepotentieldafrique.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lavoixdafrique.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "leuropeafrique.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lepanafricanisme.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lemessagerafricain.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lereveilafricain.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lemondeactualite.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "infodafrique.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lanouvellelettre.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "linfodumonde.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "afriqueevenementiel.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lintelligentdafrique.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "loccident.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lanouvelleducontinent.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lequotidiendafrique.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lemondeenvrai.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "sursautdafrique.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lafrique.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "afriquelibre.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "miroirdafrique.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "atalakou.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "ouaga24.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "ledementi.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "dounia.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "lemeilleurdafrique.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   },
+   {
+    "domain": "afriktimes.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix 8, Togo/Burkina Faso-based CIB network"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Q1 2023",
+    "url": "https://about.fb.com/wp-content/uploads/2023/06/Meta-Quarterly-Adversarial-Threat-Report-Q1-2023.pdf",
+    "date": "2023-05",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "No government principal is stated. The operator is a Togolese consultancy and the content favoured Burkina Faso's military government. Included because the task named it; it does not meet the explicit-government bar. Meta assesses it as a comeback of a network taken down in April 2021 and linked to Aimons Notre Afrique, an NGO in the Central African Republic; the 2021 start year reflects that link. gpci.info is the firm's own site, listed because the appendix places it under acquired assets."
+ }
+]

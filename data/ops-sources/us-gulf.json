@@ -1,0 +1,1309 @@
+[
+ {
+  "id": "us-pro-western-covert-io-2017-2022",
+  "name": "Pro-Western covert influence operations (Unheard Voice); Meta: United States CIB network",
+  "aliases": [
+   "Unheard Voice",
+   "CENTCOM-linked accounts"
+  ],
+  "state": "United States",
+  "operator": "Individuals associated with the US military (Meta); US Central Command named by officials to the Washington Post and in internal Twitter emails reported by The Intercept; Graphika/SIO made no attribution",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "neither company has publicly attributed the activity to any entity or organization",
+    "section": "1 Executive Summary, p.2"
+   },
+   {
+    "source": "s2",
+    "operatorType": "linked to a state",
+    "says": "our investigation found links to individuals associated with the US military",
+    "section": "01 United States, p.4-5"
+   },
+   {
+    "source": "s3",
+    "operatorType": "linked to a state",
+    "says": "two officials familiar with the matter said that U.S. Central Command is among those whose activities are facing scrutiny",
+    "section": "body, paragraph 3"
+   },
+   {
+    "source": "s4",
+    "operatorType": "government",
+    "says": "the Pentagon appeared to shift tactics and began concealing its affiliation with some of these accounts",
+    "section": "introduction"
+   }
+  ],
+  "active": {
+   "from": 2017,
+   "to": 2022
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "Telegram",
+   "VKontakte",
+   "Odnoklassniki",
+   "websites"
+  ],
+  "languages": [
+   "ar",
+   "fa",
+   "ru",
+   "ps",
+   "ur",
+   "kk",
+   "ky",
+   "en"
+  ],
+  "targets": [
+   "Afghanistan",
+   "Algeria",
+   "Iran",
+   "Iraq",
+   "Kazakhstan",
+   "Kyrgyzstan",
+   "Russia",
+   "Somalia",
+   "Syria",
+   "Tajikistan",
+   "Uzbekistan",
+   "Yemen",
+   "Lebanon",
+   "Russian-speaking Central Asian audiences"
+  ],
+  "narratives": "Promoted US and allied interests and praised US aid and military cooperation, while criticizing Russia (especially over the invasion of Ukraine), China (treatment of Uyghurs) and Iran (regional influence, the IRGC); some anti-extremism and COVID-19 content.",
+  "techniques": [
+   "fake personas",
+   "AI-generated images or video",
+   "fake news outlets",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "darichenews.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "4 Iran, Figure 37 (Dariche News sham outlet)"
+   },
+   {
+    "x": "mktashif",
+    "kind": "operation account",
+    "source": "s4",
+    "section": "account Kahler asked Twitter to whitelist; s4 says researchers flagged its likely deep-fake photo"
+   },
+   {
+    "x": "yemencurrent",
+    "kind": "operation account",
+    "source": "s4",
+    "section": "Kahler spreadsheet, priority-service request"
+   },
+   {
+    "x": "dala2el",
+    "kind": "operation account",
+    "source": "s4",
+    "section": "described as one of the CENTCOM accounts"
+   },
+   {
+    "x": "althughur",
+    "kind": "operation account",
+    "source": "s4",
+    "section": "described as another CENTCOM account"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "languages": [
+    "s1",
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Graphika and Stanford Internet Observatory",
+    "title": "Unheard Voice: Evaluating five years of pro-Western covert influence operations",
+    "url": "https://stacks.stanford.edu/file/druid:nj914nx9540/unheard-voice-tt.pdf",
+    "date": "2022-08-24",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Third Quarter 2022",
+    "url": "https://about.fb.com/wp-content/uploads/2022/11/Quarterly-Adversarial-Threat-Report-Q2-2022-1.pdf",
+    "date": "2022-11-22",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (PDF filename says Q2 but content is the Q3 2022 report, linked from about.fb.com/news/2022/11/metas-adversarial-threat-report-q3-2022/)"
+   },
+   {
+    "id": "s3",
+    "publisher": "The Washington Post",
+    "title": "Pentagon reviews psychological operations amid Facebook, Twitter complaints (Ellen Nakashima)",
+    "url": "https://www.washingtonpost.com/national-security/2022/09/19/pentagon-psychological-operations-facebook-twitter/",
+    "date": "2022-09-19",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "not fetched directly (403/timeout); text read via the Stars and Stripes syndicated copy https://www.stripes.com/theaters/us/2022-09-19/pentagon-clandestine-psychological-operations-7388658.html on 2026-10-21; WaPo URL confirmed by search index"
+   },
+   {
+    "id": "s4",
+    "publisher": "The Intercept",
+    "title": "Twitter Aided the Pentagon in Its Covert Online Propaganda Campaign (Lee Fang)",
+    "url": "https://theintercept.com/2022/12/20/twitter-dod-us-military-accounts/",
+    "date": "2022-12-20",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Graphika/SIO analysed only the covert activity and could not attribute it; Twitter listed presumptive countries of origin as the US and Great Britain, Meta the US. The Twitter dataset (146 accounts, Mar 2012 to Feb 2022, later enlarged to Aug 2022) also held an overt set tied to the US government's Trans-Regional Web Initiative; years here (2017-2022) follow the covert Meta dataset per s1. CENTCOM-sponsored sites the covert accounts linked to (central.asia-news.com, afghanistan.asia-news.com, pakistan.asia-news.com, almashareq.com, diyaruna.com) are overt US military sites per s1 and are excluded as indicators because s1 does not say the covert operation created them. s1 names the sham outlet Intergazeta's website but not its domain. s3 relies on unnamed defense and administration officials; it also reports, per officials, that Facebook disabled CENTCOM-created fictitious personas in 2020 posting in Arabic, Farsi and Urdu about COVID-19 origins. s4 relies on internal Twitter emails, logs and archived bios; it says the accounts began openly US-government-affiliated and some later dropped the affiliation, and it links only @mktashif directly to the Graphika/SIO findings (mktashif matches the Arabic 'Discoverer' persona that s1 section 6.2.1 says once claimed to belong to CENTCOM, an inference). s4 says the CENTCOM spreadsheet held 52 accounts but names only four. Languages ps/ur/kk/ky/en come from s1 (Afghanistan and Central Asia groups); ar/fa/ru from both s1 and s2. Ads: s2 reports about $2,500 in Facebook ad spend."
+ },
+ {
+  "id": "us-military-anti-vax-philippines-2020-2021",
+  "name": "Pentagon secret anti-vax propaganda campaign (Philippines, Central Asia, Middle East)",
+  "aliases": [
+   "#Chinaangvirus campaign"
+  ],
+  "state": "United States",
+  "operator": "US military: pushed by Special Operations Command Pacific and run through the psychological operations center at MacDill Air Force Base, Tampa, with contractors (primary contractor General Dynamics IT per the Pentagon audit); US Central Command ran a version for the Middle East and Central Asia",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "the Pentagon, which ran the program through the military's psychological operations center in Tampa, Florida",
+    "section": "body, sources involved in planning and execution"
+   },
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "more than 150 phony accounts that were operated from Tampa by U.S. Central Command and its contractors, according to an internal X document",
+    "section": "body, Central Asia and Middle East section"
+   },
+   {
+    "source": "s1",
+    "operatorType": "contractor",
+    "says": "the military's primary contractor handling the campaign, General Dynamics IT, had employed sloppy tradecraft",
+    "section": "body, Pentagon audit"
+   }
+  ],
+  "active": {
+   "from": 2020,
+   "to": 2021
+  },
+  "platforms": [
+   "X",
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [
+   "tl",
+   "en"
+  ],
+  "targets": [
+   "Philippines",
+   "Kazakhstan",
+   "Kyrgyzstan",
+   "Uzbekistan",
+   "Turkmenistan",
+   "Central Asia",
+   "Middle East",
+   "Muslim audiences"
+  ],
+  "narratives": "Sowed doubt about the safety, efficacy and quality of Chinese COVID-19 aid, test kits, masks and the Sinovac vaccine; in Muslim-majority regions it amplified claims that Chinese vaccines contained pork gelatin and were forbidden under Islamic law.",
+  "techniques": [
+   "fake personas",
+   "spam amplification"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Reuters",
+    "title": "Pentagon ran secret anti-vax campaign to incite fear of China vaccines (Chris Bing and Joel Schectman)",
+    "url": "https://www.reuters.com/investigates/special-report/usa-covid-propaganda/",
+    "date": "2024-06-14",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "fetched 2026-10-21 via Wayback Machine capture 20240615234924 (reuters.com returns 401 to automated clients)"
+   }
+  ],
+  "notes": "Reuters bases the finding on interviews with more than two dozen current and former US officials, military contractors, social media analysts and researchers; a review of Facebook, X and Instagram posts, technical data and documents; an internal X document; and acknowledgement by a senior Defense Department official who gave no details. Reuters identified at least 300 X accounts matching descriptions from former officials, almost all created in summer 2020; X removed them as a coordinated bot campaign after Reuters asked. Reuters does not say the military created each of those 300, and names no handles, so indicators are empty. Reuters says the effort began in spring 2020, the NSC ordered it stopped in spring 2021, and some deceptive COVID-related posts ran into summer 2021. Tagalog and English posts are quoted; content aimed at Central Asia and the Middle East appears only in translation, so its languages are not recorded. 'spam amplification' reflects X's own determination of a coordinated bot campaign as reported by Reuters."
+ },
+ {
+  "id": "us-cia-covert-influence-china-2019",
+  "name": "CIA covert influence operation against China",
+  "aliases": [],
+  "state": "United States",
+  "operator": "Central Intelligence Agency (CIA), under a 2019 presidential covert action authorization",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "the CIA created a small team of operatives who used bogus internet identities to spread negative narratives about Xi Jinping's government",
+    "section": "paragraph 2 (three former officials)"
+   }
+  ],
+  "active": {
+   "from": 2019
+  },
+  "platforms": [
+   "Chinese social media (platforms not named)"
+  ],
+  "languages": [],
+  "targets": [
+   "China",
+   "Southeast Asia",
+   "Africa",
+   "South Pacific"
+  ],
+  "narratives": "Alleged that Communist Party members hid ill-gotten money overseas and portrayed the Belt and Road Initiative as corrupt and wasteful; officials told Reuters the narratives were based in fact but released under false cover.",
+  "techniques": [
+   "fake personas"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Reuters",
+    "title": "Exclusive: Trump launched CIA covert influence operation against China (Joel Schectman and Christopher Bing)",
+    "url": "https://www.reuters.com/world/us/trump-launched-cia-covert-influence-operation-against-china-2024-03-14/",
+    "date": "2024-03-14",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "fetched 2026-10-21 via Wayback Machine capture 20240318233729 (reuters.com blocks automated clients)"
+   }
+  ],
+  "notes": "Sole source is Reuters citing former US officials with direct knowledge (three on the team and narratives, four on targeting Southeast Asia, Africa and the South Pacific). The CIA declined to comment; the NSC declined to say whether it remains active, so no end year. No platform report corroborates it and no assets are named. Reuters also says the team leaked disparaging intelligence to overseas news outlets; that does not map cleanly to an allowed technique and is recorded here only. Languages unknown."
+ },
+ {
+  "id": "saudi-smaat-twitter-2019",
+  "name": "State-backed information operation originating in Saudi Arabia (Smaat)",
+  "aliases": [
+   "Smaat network"
+  ],
+  "state": "Saudi Arabia",
+  "operator": "Smaat, a Saudi social media marketing and management company",
+  "operatorType": "contractor",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "contractor",
+    "says": "attribute these accounts to a significant state-backed information operation on Twitter originating in Saudi Arabia",
+    "section": "State-backed information operations originating in Saudi Arabia"
+   },
+   {
+    "source": "s1",
+    "operatorType": "contractor",
+    "says": "Smaat managed a range of Twitter accounts for high-profile individuals, as well as many government departments in Saudi Arabia",
+    "section": "same section"
+   },
+   {
+    "source": "s2",
+    "operatorType": "contractor",
+    "says": "The political narratives the accounts pushed were consistent with the objectives of the Kingdom of Saudi Arabia",
+    "section": "body"
+   }
+  ],
+  "active": {
+   "to": 2019
+  },
+  "platforms": [
+   "X"
+  ],
+  "languages": [
+   "ar"
+  ],
+  "targets": [
+   "Saudi Arabia",
+   "Qatar",
+   "Iran",
+   "Turkey",
+   "Western audiences"
+  ],
+  "narratives": "Amplified messages favourable to Saudi authorities and Saudi geopolitical interests, including Iran sanctions and Saudi officials' Western media appearances; SIO found attacks on Qatar, Iran and Turkey and denials of the Crown Prince's involvement in Jamal Khashoggi's killing.",
+  "techniques": [
+   "spam amplification",
+   "fake personas",
+   "hijacked or bought accounts"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Twitter (now X)",
+    "title": "New disclosures to our archive of state-backed information operations",
+    "url": "https://blog.x.com/en_us/topics/company/2019/new-disclosures-to-our-archive-of-state-backed-information-operations",
+    "date": "2019-12-20",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "blog.x.com returns 403 to automated clients; read via Wayback Machine capture 20260822083313 on 2026-10-21"
+   },
+   {
+    "id": "s2",
+    "publisher": "Stanford Internet Observatory",
+    "title": "Analyzing a Twitter Takedown Originating in Saudi Arabia",
+    "url": "https://cyber.fsi.stanford.edu/io/news/smaat-twitter-takedown",
+    "date": "2019-12-20",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "live URL redirects to tip.fsi.stanford.edu; read via Wayback Machine 2023 capture on 2026-10-21"
+   }
+  ],
+  "notes": "Twitter disclosed 5,929 accounts as the core of a network of more than 88,000 spammy accounts and says Smaat created, purchased and/or managed them on behalf of, 'but not necessarily with the knowledge of', its clients. Twitter calls it state-backed but names no government principal directly; the contractor label rests on that plus Smaat's government-department clients. 'hijacked or bought accounts' follows Twitter's 'created, purchased, and/or managed' wording and its reference to potentially compromised accounts; 'fake personas' follows SIO (accounts claiming to be Qatari citizens). Twitter's archive dates the dataset 'October 2019'; start year not stated. SIO says a Smaat co-founder was the Saudi agent who recruited two Twitter employees to spy on critics; that is SIO's statement. Neither source publishes handles or domains."
+ },
+ {
+  "id": "saudi-gov-linked-meta-2019",
+  "name": "Coordinated inauthentic behavior originating from Saudi Arabia",
+  "aliases": [],
+  "state": "Saudi Arabia",
+  "operator": "Individuals associated with the government of Saudi Arabia",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "our review found links to individuals associated with the government of Saudi Arabia",
+    "section": "Saudi Arabia section"
+   }
+  ],
+  "active": {
+   "to": 2019
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "websites"
+  ],
+  "languages": [
+   "ar"
+  ],
+  "targets": [
+   "Qatar",
+   "Saudi Arabia",
+   "United Arab Emirates",
+   "Bahrain",
+   "Egypt",
+   "Morocco",
+   "Palestine",
+   "Lebanon",
+   "Jordan"
+  ],
+  "narratives": "Promoted Crown Prince Mohammad bin Salman, Vision 2030 and Saudi military successes in Yemen, criticized Iran, Qatar and Turkey, and questioned the credibility of Al Jazeera and Amnesty International.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior in UAE, Egypt and Saudi Arabia",
+    "url": "https://about.fb.com/news/2019/08/cib-uae-egypt-saudi-arabia/",
+    "date": "2019-08-01",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "217 Facebook accounts, 144 Pages, 5 Groups, 31 Instagram accounts; about $108,000 in ads. Pages masqueraded as local news organizations and drove traffic to an off-platform domain Meta does not name. Meta credits public reporting by Bellingcat. Start year not stated."
+ },
+ {
+  "id": "saudi-state-media-linked-twitter-2019",
+  "name": "Accounts linked to Saudi Arabia's state-run media apparatus",
+  "aliases": [],
+  "state": "Saudi Arabia",
+  "operator": "Saudi Arabia's state-run media apparatus (linked)",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "a small group of six accounts linked to Saudi Arabia's state-run media apparatus",
+    "section": "UAE, Egypt and Saudi Arabia section"
+   }
+  ],
+  "active": {
+   "to": 2019
+  },
+  "platforms": [
+   "X"
+  ],
+  "languages": [],
+  "targets": [],
+  "narratives": "Accounts presented themselves as independent journalistic outlets while amplifying narratives favourable to the Saudi government.",
+  "techniques": [
+   "fake news outlets"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Twitter (now X)",
+    "title": "Disclosing new data to our archive of information operations",
+    "url": "https://blog.x.com/en_us/topics/company/2019/info-ops-disclosure-data-september-2019",
+    "date": "2019-09-20",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "blog.x.com returns 403 to automated clients; read via Wayback Machine capture 20261012232031 on 2026-10-21"
+   }
+  ],
+  "notes": "Twitter's archive labels the dataset 'Saudi Arabia (April 2019) - 6 Accounts'. Languages and targets not stated. The same post says Twitter suspended Saud al-Qahtani's account for platform manipulation outside the archive; that is an individual's account and is not recorded as an indicator."
+ },
+ {
+  "id": "sa-eg-ae-twitter-2020",
+  "name": "SA_EG_AE network (Saudi Arabia, Egypt, UAE), April 2020 disclosure",
+  "aliases": [
+   "KSA affiliated actor"
+  ],
+  "state": "Saudi Arabia",
+  "operator": "Multiple social media management firms, linked to DotDev (Egypt/UAE) and Smaat (Saudi Arabia); Facebook attributed 55 linked Pages to Maat (Egypt)",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "attributed to state linked information operations originating from Serbia, Honduras, Egypt, Indonesia, and a KSA affiliated actor",
+    "section": "Datasets released in April 2020"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "Twitter believes multiple social media management firms created the accounts in this network",
+    "section": "Saudi Arabia/UAE/Egypt"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "Facebook attributes these Pages to Maat, a social media marketing firm",
+    "section": "introduction"
+   }
+  ],
+  "active": {
+   "from": 2013,
+   "to": 2020
+  },
+  "platforms": [
+   "X",
+   "Facebook",
+   "YouTube",
+   "websites"
+  ],
+  "languages": [],
+  "targets": [
+   "Libya",
+   "Sudan",
+   "Qatar",
+   "Turkey",
+   "Iran",
+   "Iraq",
+   "Syria",
+   "Yemen",
+   "Mauritania",
+   "Algeria",
+   "Middle East and North Africa"
+  ],
+  "narratives": "Anti-Turkey, anti-Qatar and anti-Iran content; support for Khalifa Haftar and discrediting of Libyan peace talks, criticism of the Syrian government and of Iranian influence in Iraq, praise of the Mauritanian government and criticism of the Houthis; recent Pages used COVID-19 to push these lines.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "content laundering"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s2"
+   ],
+   "platforms": [
+    "s2"
+   ],
+   "targets": [
+    "s2"
+   ],
+   "narratives": [
+    "s2"
+   ],
+   "techniques": [
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Twitter (now X)",
+    "title": "Information operations (Transparency Center archive page)",
+    "url": "https://transparency.twitter.com/en/reports/information-operations.html",
+    "date": "2020-04-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "live page retired; read via Wayback Machine 2021 capture on 2026-10-21"
+   },
+   {
+    "id": "s2",
+    "publisher": "Stanford Internet Observatory",
+    "title": "Analysis of April 2020 Twitter takedowns linked to Saudia Arabia, the UAE, Egypt, Honduras, Serbia, and Indonesia",
+    "url": "https://cyber.fsi.stanford.edu/io/news/april-2020-twitter-takedown",
+    "date": "2020-04-02",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "live URL redirects to tip.fsi.stanford.edu; read via Wayback Machine 2023 capture on 2026-10-21"
+   }
+  ],
+  "notes": "5,350 accounts and 36.5 million tweets; found after an SIO tip in December 2019 about the hashtag 'Sarraj the traitor of Libya'. Twitter's own April 2020 announcement was a @TwitterSafety thread I did not retrieve; Twitter's wording here comes from the archived transparency page and SIO's paraphrase. SIO says pro-Haftar tweets began in 2013 (the 'from' year). SIO mentions news-like domains for Algeria and Iran created the same day but does not list them in the post (its whitepaper may); 'content laundering' reflects SIO's description of hashtag laundering through an aligned news site and YouTube channel. No indicators in the sources read. State follows Twitter's 'KSA affiliated actor' label; activity spanned Saudi Arabia, Egypt and the UAE. Languages not stated in the post (hashtag shown is Arabic)."
+ },
+ {
+  "id": "uae-egypt-new-waves-newave-meta-2019",
+  "name": "Coordinated inauthentic behavior originating in the UAE and Egypt (New Waves / Newave)",
+  "aliases": [
+   "New Waves",
+   "Newave"
+  ],
+  "state": "United Arab Emirates",
+  "operator": "Marketing firms New Waves (Egypt) and Newave (UAE)",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "our investigation found links to two marketing firms — New Waves in Egypt, and Newave in the UAE",
+    "section": "UAE and Egypt section"
+   }
+  ],
+  "active": {
+   "from": 2018,
+   "to": 2019
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [],
+  "targets": [
+   "Libya",
+   "Sudan",
+   "Comoros",
+   "Qatar",
+   "Turkey",
+   "Lebanon",
+   "Syria",
+   "Jordan",
+   "Morocco"
+  ],
+  "narratives": "Promoted the UAE and covered alleged Qatari and Turkish support for terrorism, Iran's role in Yemen, the Libya conflict, Saudi-led coalition successes in Yemen and Somaliland independence.",
+  "techniques": [
+   "fake personas",
+   "hijacked or bought accounts",
+   "fake news outlets",
+   "impersonating real outlets or officials",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior in UAE, Egypt and Saudi Arabia",
+    "url": "https://about.fb.com/news/2019/08/cib-uae-egypt-saudi-arabia/",
+    "date": "2019-08-01",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "259 Facebook accounts, 102 Pages, 5 Groups, 4 Events, 17 Instagram accounts; about $167,000 in ads paid mainly in US dollars and dirhams. Meta says operators used compromised and fake accounts, impersonated public figures, and ran Pages posing as local news organizations. Active years are bounded only by the Events Meta lists (June 2018 to June 2019), so the real start may be earlier. Meta names no state principal. Sample posts are Arabic in translation but Meta states no languages, so none recorded."
+ },
+ {
+  "id": "uae-egypt-dotdev-twitter-2019",
+  "name": "UAE and Egypt network created and managed by DotDev",
+  "aliases": [
+   "DotDev"
+  ],
+  "state": "United Arab Emirates",
+  "operator": "DotDev, a private technology company operating in the UAE and Egypt",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "these accounts were created and managed by DotDev, a private technology company operating in the UAE and Egypt",
+    "section": "UAE and Egypt section"
+   }
+  ],
+  "active": {
+   "to": 2019
+  },
+  "platforms": [
+   "X"
+  ],
+  "languages": [],
+  "targets": [
+   "Qatar",
+   "Iran"
+  ],
+  "narratives": "A multi-faceted operation primarily targeting Qatar, and also Iran, that amplified messaging supportive of the Saudi government.",
+  "techniques": [],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Twitter (now X)",
+    "title": "Disclosing new data to our archive of information operations",
+    "url": "https://blog.x.com/en_us/topics/company/2019/info-ops-disclosure-data-september-2019",
+    "date": "2019-09-20",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "blog.x.com returns 403 to automated clients; read via Wayback Machine capture 20261012232031 on 2026-10-21"
+   }
+  ],
+  "notes": "271 accounts. Twitter published it in its archive of state-backed operations, but the post names only DotDev and no government principal, so operatorType is commercial firm. The post states no specific techniques. SIO (April 2020) linked a later network to DotDev; see sa-eg-ae-twitter-2020."
+ },
+ {
+  "id": "uae-4248-accounts-twitter-2019",
+  "name": "Network of 4,248 accounts operating uniquely from the UAE",
+  "aliases": [],
+  "state": "United Arab Emirates",
+  "operator": "Not named",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "a separate group of 4,248 accounts operating uniquely from the UAE, mainly directed at Qatar and Yemen",
+    "section": "UAE and Egypt section"
+   }
+  ],
+  "active": {
+   "to": 2019
+  },
+  "platforms": [
+   "X"
+  ],
+  "languages": [],
+  "targets": [
+   "Qatar",
+   "Yemen"
+  ],
+  "narratives": "Tweeted about regional issues such as the Yemeni civil war and the Houthi movement, aimed mainly at Qatar and Yemen.",
+  "techniques": [
+   "fake personas"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Twitter (now X)",
+    "title": "Disclosing new data to our archive of information operations",
+    "url": "https://blog.x.com/en_us/topics/company/2019/info-ops-disclosure-data-september-2019",
+    "date": "2019-09-20",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "blog.x.com returns 403 to automated clients; read via Wayback Machine capture 20261012232031 on 2026-10-21"
+   }
+  ],
+  "notes": "Twitter says the accounts often employed false personae. The archive labels the dataset 'United Arab Emirates (March 2019) - 4,248 Accounts'. Operator not named."
+ },
+ {
+  "id": "egypt-el-fagr-2019-2020",
+  "name": "El Fagr network",
+  "aliases": [],
+  "state": "Egypt",
+  "operator": "El Fagr, an Egyptian newspaper; Twitter says the network was taking direction from the Egyptian government",
+  "operatorType": "contractor",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "our investigation found links to an Egyptian newspaper El Fagr",
+    "section": "Egypt section"
+   },
+   {
+    "source": "s2",
+    "operatorType": "contractor",
+    "says": "Information we gained externally indicates it was taking direction from the Egyptian government",
+    "section": "Twitter statement quoted in body"
+   },
+   {
+    "source": "s3",
+    "operatorType": "commercial firm",
+    "says": "This takedown was attributed to actors linked to the El Fagr newspaper in Egypt",
+    "section": "Egypt / El Fagr"
+   }
+  ],
+  "active": {
+   "to": 2020
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "websites"
+  ],
+  "languages": [],
+  "targets": [
+   "Somalia",
+   "Yemen",
+   "Saudi Arabia",
+   "Sudan",
+   "Tunisia",
+   "Iran",
+   "Turkey",
+   "Lebanon",
+   "Qatar"
+  ],
+  "narratives": "Supported the UAE, Saudi Arabia and the Egyptian government, criticized Qatar, Iran and Turkey, and covered Yemen's southern separatist movement.",
+  "techniques": [
+   "fake personas",
+   "hijacked or bought accounts",
+   "fake news outlets",
+   "impersonating real outlets or officials",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "x": "Foxnewseurope_f",
+    "kind": "operation account",
+    "source": "s3",
+    "section": "Egypt / El Fagr: fabricated property posing as a regional affiliate of a real outlet"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s2"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s3"
+   ],
+   "techniques": [
+    "s1",
+    "s3"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior in UAE, Nigeria, Indonesia and Egypt",
+    "url": "https://about.fb.com/news/2019/10/removing-coordinated-inauthentic-behavior-in-uae-nigeria-indonesia-and-egypt/",
+    "date": "2019-10-03",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Al Jazeera",
+    "title": "Twitter removes thousands of accounts linked to Saudi, Egypt",
+    "url": "https://www.aljazeera.com/news/2020/4/2/twitter-removes-thousands-of-accounts-linked-to-saudi-egypt",
+    "date": "2020-04-02",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (quotes Twitter's 2 April 2020 statement; Twitter's own @TwitterSafety thread not retrieved)"
+   },
+   {
+    "id": "s3",
+    "publisher": "Stanford Internet Observatory",
+    "title": "Analysis of April 2020 Twitter takedowns linked to Saudia Arabia, the UAE, Egypt, Honduras, Serbia, and Indonesia",
+    "url": "https://cyber.fsi.stanford.edu/io/news/april-2020-twitter-takedown",
+    "date": "2020-04-02",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "live URL redirects to tip.fsi.stanford.edu; read via Wayback Machine 2023 capture on 2026-10-21"
+   }
+  ],
+  "notes": "Meta (Oct 2019): 163 Facebook accounts, 51 Pages, 33 Groups, 4 Instagram accounts, under $31,000 in ads; Pages posed as independent local news and some appear purchased. Twitter (Apr 2020): 2,541 accounts; the government-direction claim is Twitter's, based on 'information we gained externally', quoted via Al Jazeera because I could not retrieve Twitter's original thread. El Fagr's online managing editor denied taking instructions (AFP via Al Jazeera). The Twitter 20 September 2019 post (DotDev) does not mention El Fagr; the El Fagr Twitter takedown is the April 2020 one. SIO notes heavy amplification of El Fagr's editor's own account; that is a real person's account and is excluded. Languages not stated in the sources read."
+ },
+ {
+  "id": "uae-egypt-nigeria-charles-communications-meta-2019",
+  "name": "Coordinated inauthentic behavior originating in the UAE, Egypt and Nigeria (Charles Communications, MintReach, Flexell)",
+  "aliases": [
+   "Charles Communications",
+   "MintReach",
+   "Flexell"
+  ],
+  "state": "United Arab Emirates",
+  "operator": "Marketing firms Charles Communications (UAE), MintReach (Nigeria) and Flexell (Egypt)",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "our investigation found links to three marketing firms — Charles Communications in UAE, MintReach in Nigeria and Flexell in Egypt",
+    "section": "UAE, Egypt and Nigeria section"
+   }
+  ],
+  "active": {
+   "to": 2019
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [],
+  "targets": [
+   "Middle East",
+   "Africa",
+   "Europe",
+   "North and South America",
+   "South Asia",
+   "East Asia",
+   "Australia"
+  ],
+  "narratives": "Country-localized local-news content promoting the UAE, including its activity in Yemen and the first Emirati astronaut, with criticism of Qatar, Turkey, Iran and the Muslim Brotherhood, and content on the Iran nuclear deal and elections.",
+  "techniques": [
+   "fake personas"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior in UAE, Nigeria, Indonesia and Egypt",
+    "url": "https://about.fb.com/news/2019/10/removing-coordinated-inauthentic-behavior-in-uae-nigeria-indonesia-and-egypt/",
+    "date": "2019-10-03",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Not in the original task list; added because Meta documents it as originating in the UAE. 211 Facebook accounts, 107 Pages, 43 Groups, 87 Instagram accounts. Meta names marketing firms only, no state principal. Meta says Pages shared local news in targeted countries and promoted UAE content; it does not say they posed as news outlets, so 'fake news outlets' is not recorded."
+ },
+ {
+  "id": "uae-alp-services-abu-dhabi-secrets",
+  "name": "Alp Services campaign for the UAE (Abu Dhabi Secrets)",
+  "aliases": [
+   "Abu Dhabi Secrets"
+  ],
+  "state": "United Arab Emirates",
+  "operator": "Alp Services, a Geneva private intelligence firm, hired by the UAE (nominal client Ariaf Studies and Research; per The New Yorker, Alp's files show the bills went to Mohammed bin Zayed)",
+  "operatorType": "contractor",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "contractor",
+    "says": "The U.A.E. had hired Brero as part of a long-running feud with its neighbor Qatar.",
+    "section": "body"
+   },
+   {
+    "source": "s1",
+    "operatorType": "contractor",
+    "says": "between August 21, 2017, and June 30, 2020, the U.A.E. paid Brero at least 5.7 million euros",
+    "section": "body, internal Alp accounting"
+   },
+   {
+    "source": "s2",
+    "operatorType": "contractor",
+    "says": "On y croise un agent du renseignement émirati, des détectives suisses, des chercheurs et deux célèbres journalistes français",
+    "section": "standfirst (French original)"
+   }
+  ],
+  "active": {
+   "from": 2017,
+   "to": 2021
+  },
+  "platforms": [
+   "websites",
+   "Wikipedia",
+   "Medium",
+   "blogs"
+  ],
+  "languages": [
+   "en",
+   "fr"
+  ],
+  "targets": [
+   "France",
+   "Switzerland",
+   "Italy",
+   "Europe",
+   "Qatar",
+   "Muslim Brotherhood-linked individuals and organisations in Europe"
+  ],
+  "narratives": "Portrayed people and organisations in Europe as fronts for the Muslim Brotherhood, Qatar or terrorism, to damage their reputations and business relationships as part of the UAE's rivalry with Qatar.",
+  "techniques": [
+   "fake personas",
+   "content laundering",
+   "harassment of critics"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1",
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "The New Yorker",
+    "title": "The Dirty Secrets of a Smear Campaign (David D. Kirkpatrick)",
+    "url": "https://www.newyorker.com/magazine/2023/04/03/the-dirty-secrets-of-a-smear-campaign",
+    "date": "2023-03-27",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (via r.jina.ai text proxy)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Mediapart",
+    "title": "Une fuite de données révèle l’ingérence des Émirats en France",
+    "url": "https://www.mediapart.fr/journal/france/010323/une-fuite-de-donnees-revele-l-ingerence-des-emirats-en-france",
+    "date": "2023-03-01",
+    "kind": "press",
+    "lang": "fr",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "fetched 2026-10-21; paywalled, only the French standfirst was readable"
+   }
+  ],
+  "notes": "The New Yorker names its sources: terabytes of Alp files stolen by unidentified hackers who offered them for sale, which the reporter says he corroborated in hundreds of details, plus former Alp employees; Alp's lawyer called some files 'obviously forged' without specifying which. Mediapart cites a document leak and several testimonies. Techniques per s1: drafting and defending damaging Wikipedia entries in several languages, paying a freelance writer for pseudonymous online articles, an operative using a pseudonym to lobby a compliance database, and sustained targeting of named individuals. s1 also reports payments to working journalists and an academic; those are real people and are not recorded. No domains or X handles are named as operation assets, so indicators are empty. End year 2021 reflects s1 saying the most recent hacked files date from early 2021. Language codes: en from the English Medium/online articles in s1, fr from the French-targeted activity in s2; neither source gives a full language list. Only Mediapart's standfirst was read; European Investigative Collaborations partner articles were not retrieved."
+ },
+ {
+  "id": "digitsol-empowering-ghana-2024",
+  "name": "Empowering Ghana (DigitSol) Ghana election operation",
+  "aliases": [
+   "Empowering Ghana",
+   "DigitSol"
+  ],
+  "state": "Ghana",
+  "operator": "DigitSol, a UAE marketing firm with an office in Ghana (Meta); a commercial entity with offices in the UAE and Ghana (OpenAI)",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "linked to a commercial entity with offices in the United Arab Emirates and Ghana, named DigitSol",
+    "section": "Actor"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "our investigation found links to the UAE marketing firm DigitSol with an office in Ghana",
+    "section": "Ghana"
+   }
+  ],
+  "active": {
+   "from": 2024,
+   "to": 2024
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "TikTok",
+   "WhatsApp",
+   "websites"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "Ghana"
+  ],
+  "narratives": "Supported Vice-President Mahamudu Bawumia and criticized former President John Mahama ahead of Ghana's December 2024 presidential election, through a fictitious youth movement.",
+  "techniques": [
+   "AI-generated text",
+   "AI-generated images or video",
+   "fake personas",
+   "front organisations",
+   "comment brigading",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "empoweringghana.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domain Associated With This Operation"
+   },
+   {
+    "x": "empoweringghana",
+    "kind": "operation account",
+    "source": "s2",
+    "section": "Ghana-based CIB network threat indicator table"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1",
+    "s2"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "languages": [
+    "s1",
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "OpenAI",
+    "title": "Covert influence operation: Ghana election activity (case study from the February 2025 threat report)",
+    "url": "https://openai.com/index/disrupting-malicious-uses-of-ai-ghana-election/",
+    "date": "2025-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "fetched 2026-10-21 via r.jina.ai text proxy (openai.com returns 403 to automated clients); full PDF linked at https://cdn.openai.com/threat-intelligence-reports/disrupting-malicious-uses-of-our-models-february-2025-update.pdf, not opened"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Fourth Quarter 2024",
+    "url": "https://transparency.meta.com/sr/Q4-2024-Adversarial-threat-report",
+    "date": "2025-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "fetched 2026-10-21 via r.jina.ai text proxy"
+   }
+  ],
+  "notes": "Meta says the network 'originated primarily in Ghana' and targeted Ghanaian audiences; the operator is a UAE-based firm. Neither source names a state principal, so this is a commercial operation with a UAE-based operator, recorded under state Ghana per Meta's origin wording. Meta: 42 Facebook accounts, 1 Page, 33 Instagram accounts, about $10,200 in ads, about 880,000 Instagram followers mostly outside Ghana, likely fake engagement. OpenAI: last posts 8 December 2024, the day after the election; about 900,000 Instagram followers judged likely inflated. 'comment brigading' reflects sets of about 30 AI-generated comments posted by a single account under the operation's own posts. Meta's table also lists youtube.com/@EmpoweringGhana and tiktok.com/@empoweringghana, which are not domains or X handles and are not recorded. Meta lists YamoahFestus as an operation account and says the operation posed as fictitious journalists and activists, but does not say whether this particular name is fictitious."
+ }
+]

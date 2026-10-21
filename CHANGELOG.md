@@ -3,6 +3,93 @@
 All notable changes to Radar. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
+## 2.1.0 (2026-10-21)
+
+Named in published reports: 98 documented influence operations from 27 countries, with the investigators' own
+attribution wording. Techniques read from behaviour, not wording: flooding, cross-language repetition and
+laundering chains. Named conspiracy theories, brand-borrowing accounts, and Korean and Indonesian markers
+derived from labelled data.
+
+### Added (derived word lists)
+- Korean and Indonesian slur signs from word lists derived from human-labelled research corpora,
+  not typed by hand. A script picks each term on the dev split by weighted log-odds against the
+  corpora's group-hate labels, drops group, party and public names and terms that fire on other
+  languages, and keeps only terms that clear a dev precision bar. Korean (54 terms, K-MHaS and
+  BEEP!): 93.8% of test signs on text people labelled hostile (95% interval 93.3 to 94.3, 8,635
+  checked), with terms aimed at both political camps and at both men and women. Indonesian (one
+  term, IDHSD and IndoDiscourse): 85.0% (70.9 to 92.9, 40 checked).
+- Held back, with their figures recorded in project-docs/EVALUATION.md: Japanese (63.0%, lower
+  bound under 0.7), Hebrew and Hindi (their corpora label offensive-or-not only, so the lists hold
+  insults, not group slurs), Turkish and Persian (no term cleared the dev bar). Held-back lists
+  never run on a reply.
+- Unicode handling for each script: Korean and Japanese as character n-grams, Korean only at a
+  word start; Hebrew points and prefixes; Turkish dotted and dotless i and stems; Persian yeh,
+  kaf and the zero-width non-joiner.
+- Symmetry suite for all seven languages, with targets from every direction.
+
+### Added
+- Named conspiracy theories. A post that uses a documented theory by name or by its stock line
+  (chemtrails, adrenochrome, QAnon slogans, satanic ritual abuse, "Great Reset" plot framing, stolen
+  or rigged elections, machine or satellite vote-flipping, staged shootings, 9/11 inside job, 5G and
+  COVID-19, vaccine harm, hidden cures) gets an info sign in the Language area. It names the theory,
+  says what the record shows and links the dated sources. Election and staged-event claims match in
+  both directions, checked by matched pairs. Posts that debunk, mock or report a theory are skipped.
+  Not measured yet: no conspiracy-labelled corpus with a usable licence was found, so the sign
+  never counts toward the thread report.
+- Name borrows a brand. An account whose name or handle borrows a platform's or a major outlet's
+  brand ("X Global", "BBC Breaking") and is not one of its accounts gets a weak account sign on X.
+  X's affiliation badge, an organisation check, or X's parody, commentary or fan label clears it.
+  The brand list names each outlet's Wikidata item. Alone it never counts toward "flagged". Not
+  measured yet.
+- A lesson for each new sign.
+
+### Research
+- project-docs/IMAGE-TEXT.md compares on-device options for reading text inside images and
+  recommends a path, with targets and a privacy statement. Nothing ships yet.
+
+### Added (techniques)
+- A technique map, `project-docs/TECHNIQUES.md`: flooding, laundering, cloned outlets, coordinated
+  amplification, repetition across languages, "just asking questions" and demoralisation, and
+  swarming, each mapped from Rauch, RAND's "firehose of falsehood" (Paul and Matthews 2016) and
+  DISARM ids to what Radar can observe, with its status, gap and precision target.
+- Same link, upload or fact-checked claim in several languages: a sign on replies when accounts
+  writing in different languages carry the same item, in one thread or across threads you viewed.
+  The root post's own material is set aside.
+- Flooding: a thread line when three or more accounts posting 100 or more times a day write a
+  quarter of the replies, or a timing burst is made of such accounts. Repeat posters show as context.
+- The laundering chain: the post, the accounts and sites its material passed through, and the
+  earliest origin Radar saw, in the card's trail and as a Sources sign when the post does not point
+  at the origin. Built only from pointers the site records.
+- Lessons for the two new post signs.
+
+### Measured (techniques)
+- On ordinary threads (PHEME), flooding fires on 0.55% to 3.3% of threads by size and
+  cross-language on 0% to 1.1%. Neither has a labelled campaign set, so no precision is claimed.
+### Added (influence operations)
+- "Named in a published report": a link in a post, an account, or a website, domain or @handle in
+  an account's profile that a published report named as an influence operation's asset. The window
+  names the operation, who each source says ran it in the source's own words (linked to stays linked
+  to), the report and its date, and what the match does not prove. It is about the link or account,
+  never the person who shared it.
+- The table behind it: 98 operations from 27 attributed countries, 2017 to 2026, cited field by field
+  to 176 primary documents (platform threat reports, research labs, court filings, sanctions texts and
+  government reports, and reporting that names its sources), with 1,237 domains and accounts.
+  `data/ops.README.md` lists what was left out and why, and the licence of each kind of source.
+- "Look-alike news address", a separate weaker sign: a link that copies a major outlet's name on
+  another ending, with one letter off, or with look-alike letters (washingtonpost.pm, theguaradian.com).
+  It matches none of the 50,000-odd real outlet domains in Radar's owner and site tables.
+- Documented operations per year and per attributed country on the dashboard and the transparency
+  page, with the caveat beside the numbers: they count what investigators found and published, not
+  how much activity there was.
+- Two lessons, one per new sign.
+
+### Tests (influence operations)
+- One evidence rule for every country (`src/core/ops-schema.js`): a read source, an operator type a
+  source states, a citation for every field. A symmetry test checks that relabelling an operation's
+  country changes nothing, and that the rule code names no country.
+- False-match controls: no real outlet's domain is shipped as an indicator, and no real outlet matches
+  a look-alike pattern.
+
 ## 2.0.0 (2026-10-21)
 
 Radar now answers, in one hover: where a post comes from, who is pushing it, how it argues, whether a

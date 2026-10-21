@@ -8,6 +8,8 @@ import { LANGUAGE_LESSONS } from "./lessons-language.js";
 import { SPREAD_LESSONS } from "./lessons-spread.js";
 import { ACCOUNT_LESSONS } from "./lessons-account.js";
 import { MEDIA_LESSONS } from "./lessons-media.js";
+import { REPORT_LESSONS } from "./lessons-reports.js";
+import { TECHNIQUE_LESSONS } from "./lessons-techniques.js";
 
 // Spoken pace, in words a minute. The inoculation videos ran about 90 seconds.
 export const WORDS_PER_MINUTE = 150;
@@ -24,15 +26,15 @@ export const MAX_SECONDS = 120;
 export const GROUPS = [
   ["Language", LANGUAGE_LESSONS.map((l) => l.id)],
   ["Persuasion techniques", PERSUASION_LESSONS.map((l) => l.id)],
-  ["Coordination and media", ["duplicates", "copied-elsewhere", "same-upload", "old-media", "lifted-media", ...MEDIA_LESSONS.map((l) => l.id)]],
-  ["Sources", ["community-note", "fact-check", "ad", "state-link", "owner", "site-record", "client"]],
+  ["Coordination and media", ["duplicates", "copied-elsewhere", "cross-language", "same-upload", "old-media", "lifted-media", ...MEDIA_LESSONS.map((l) => l.id)]],
+  ["Sources", ["community-note", "fact-check", "ad", "state-link", "named-in-report", "lookalike-domain", "owner", "site-record", "laundered", "client"]],
   ["Place", ["mismatch", "written-in", "store-elsewhere", "flag-elsewhere", "profile-location-elsewhere", "hours-elsewhere"]],
   ["Posting", ["fast-replier", "automation-app", "no-sleep-gap", "repost-only", "high-volume"]],
-  ["Account", ["new-account", "name-changes", "default-handle", "follow-pattern", "low-karma"]],
+  ["Account", ["new-account", "name-changes", "default-handle", "follow-pattern", "low-karma", "brand-lookalike"]],
   ["The thread", ["thread-report"]],
 ];
 
-export const LESSONS = [...LANGUAGE_LESSONS, ...PERSUASION_LESSONS, ...SPREAD_LESSONS, ...MEDIA_LESSONS, ...ACCOUNT_LESSONS];
+export const LESSONS = [...LANGUAGE_LESSONS, ...PERSUASION_LESSONS, ...SPREAD_LESSONS, ...REPORT_LESSONS, ...MEDIA_LESSONS, ...TECHNIQUE_LESSONS, ...ACCOUNT_LESSONS];
 const BY_ID = new Map(LESSONS.map((l) => [l.id, l]));
 
 export const lesson = (id) => BY_ID.get(id) || null;

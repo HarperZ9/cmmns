@@ -16,7 +16,7 @@
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
     const activity = PB.activity(PBLogs.net(), r.author);
     const echo = PB.echoes(PBLogs.net(), PB.threadKey(site.id, location.pathname, location.search), r.text);
-    if (reading && site.hasLocation) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation, pattern: reading.pattern }, { mismatch, cluster, activity, echo }) };
+    if (reading && site.hasLocation) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation, pattern: reading.pattern, brandCheck: !!site.hasLocation, verifiedType: reading.verifiedType, affiliate: reading.affiliate || reading.affiliateOf, xLabel: reading.xLabel || r.pageLabel }, { mismatch, cluster, activity, echo }) };
     // Other sites: what each one discloses (src/ext/platforms.js reading()): Reddit's account age,
     // karma and sign-up name; Instagram's and Facebook's join date, label and renames; Bluesky's
     // join date and moderation labels.
@@ -71,6 +71,20 @@
     return r.writtenIn && !m.leak ? { ...m, signs: [], machineLike: false, translated: true } : m;
   }
 
+  // The technique signs (project-docs/TECHNIQUES.md): one link, upload or reviewed claim across
+  // languages, the account rates the flooding sign reads, and each post's laundering chain.
+  function techniques(site, replies, root, cache) {
+    const row = (r) => { const T = tweets.get(r.id) || {}; return { id: r.id, author: r.author, lang: T.lang || null, text: r.text, links: T.links || [], media: T.media || [], claims: PBLogs.claimsOf(r.id) || [] }; };
+    const groups = PB.crossLanguage(replies.map(row), { root: root && row(root) });
+    const rateOf = (h) => { const rd = cache[h] || (site.reading ? site.reading(h) : null); return rd ? PB.ratePerDay(rd) : null; };
+    const perPost = (m) => {
+      const T = m.tweet, mine = groups.filter((g) => g.ids.includes(m.postId));
+      return { crossLang: T ? [...mine, ...PB.acrossViewed(T, PBLogs.trail()).filter((x) => !mine.some((g) => g.key === x.key))] : mine,
+        chain: T ? PB.launderingChain(T, tweets, PBLogs.trail()) : null };
+    };
+    return { groups, rateOf, perPost };
+  }
+
   async function refresh() {
     const site = PBSites.current();
     // Feed mode (timelines, profiles, likes, search): badges on every post, no thread report and
@@ -89,16 +103,18 @@
     const clusters = feed ? [] : PB.duplicateClusters(replies, { root });
     const clusterOf = new Map();
     for (const c of clusters) for (const id of c.ids) clusterOf.set(id, c);
-    const rows = [], models = [];
+    const rows = [], models = [], readings = [];
     for (const r of replies) {
       const reading = cache[r.author.toLowerCase()] || (site.reading ? site.reading(r.author) : null);
       const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
       const an = analyse(r);
       models.push([r.node, { site, node: r.node, tweets, postId: r.id, threadKey, text: r.text, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), trail: PB.trailFor(tweets.get(r.id), tweets, PBLogs.trail()), yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, persuasion: an.persuasion, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, claims: PBLogs.claimsOf(r.id), reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, r.anchor]);
       // Without account readings a reply's flags are complete for what the site offers.
+      if (reading) readings.push(reading);
       rows.push({ id: r.id, author: r.author, text: r.text, extreme: an.extreme, techniques: an.persuasion.map((h) => h.technique), machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
     if (root) models.push([root.node, { site, node: root.node, tweets, postId: root.id, threadKey, text: root.text, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, PBLogs.trail()), claims: PBLogs.claimsOf(root.id), reading: cache[root.author.toLowerCase()] || (site.reading ? site.reading(root.author) : null), flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
+    PBLogs.ensureProfiles(readings).catch((e) => console.error("[radar] profile lookup failed", e));
     // Thread context for the window's comparison: median account age, labels and flags among the
     // accounts read here.
     const read = rows.filter((r) => r.about || r.joinDate);
@@ -108,6 +124,8 @@
     const viewed = Object.keys((PBLogs.net() || {}).threads || {}).length;
     const thread = { feed: !!feed, replies: replies.length, viewed, n: read.length, medianAgeDays: ages.length ? ages[Math.floor(ages.length / 2)] : null, places, flagged: read.filter((r) => r.flags && PB.isFlagged(r.flags)).length };
     for (const [, model] of models) model.thread = thread;
+    const tech = techniques(site, replies, root, cache);
+    for (const [, model] of models) Object.assign(model, tech.perPost(model));
     drawn = models;
     drawVisible();
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.about).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];
@@ -120,6 +138,8 @@
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
     report.bursts = PB.timingBursts(replies);
+    report.flood = PB.floodSign(replies, tech.rateOf, { bursts: report.bursts });
+    report.crossLang = tech.groups;
     report.state = PB.stateSummary(replies);
     report.upstream = PB.upstream(items, tweets, PBLogs.trail());
     const pushed = PB.pushedLinks(PBLogs.net(), items.flatMap((r) => r.domains || []));

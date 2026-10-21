@@ -19,7 +19,7 @@
     "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere",
     "high-volume": "very high post rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute",
     "copied-elsewhere": "same words in other threads", "low-karma": "low karma for its age", "automation-app": "posts through an automation app", "no-sleep-gap": "posts around the clock", "repost-only": "almost only reposts", "follow-pattern": "follows many, few follow back",
-    "platform-label": "moderation label",
+    "platform-label": "moderation label", "brand-lookalike": "name borrows a brand",
   };
   const WEAK = new Set(["default-handle", "follow-pattern"]);
   // The areas the window's summary strip shows, in order, and which area each account flag is in.
@@ -36,6 +36,11 @@
     const out = [];
     for (const mk of (m.markers || []).filter((x) => STRONG[x.family])) {
       out.push({ label: STRONG[mk.family], fam: mk.family, lang: mk.lang, level: "warn", cat: "language", rows: [["In this post", `"${mk.match}"`], ["What it is", MEANING[mk.family]], ...(mk.lang ? [["Language", PB.langLine(mk.lang)]] : []), dnp("Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.")] });
+    }
+    // Named conspiracy theories (src/core/theories.js): info level, sourced, not measured yet.
+    for (const mk of (m.markers || []).filter((x) => x.family === "conspiracy-theory")) {
+      const t = PB.theoryById(mk.theory);
+      if (t) out.push({ label: `names a theory: ${t.name}`, fam: "conspiracy-theory", level: "info", cat: "language", rows: [["In this post", `"${mk.match}"`], ["The theory", t.claim], ["What the record shows", t.record], ["Sources", { links: t.sources.map((x) => [`${x.title.split(", ")[0]} (${x.date})`, x.url]) }], dnp(`${t.dnp} ${PB.THEORY_DOES_NOT_PROVE}`)] });
     }
     // Persuasion techniques: how the post argues. Info level, and never an account flag.
     for (const t of m.persuasion || []) {
@@ -57,6 +62,9 @@
     for (const sp of (m.trail && m.trail.media) || []) {
       if (sp.accounts >= 3) { out.push({ label: `same upload, ${sp.accounts} accounts`, fam: "same-upload", level: "flag", cat: "coordination", rows: [["What Radar sees", `This exact upload appears in ${sp.posts} posts by ${sp.accounts} accounts in what you have viewed, first posted by @${sp.first.handle} (${day(sp.first.at)}).`], ["Who", sp.sharers.map((h) => "@" + h).join(", ")], dnp("Popular videos get reposted widely by ordinary people. Many accounts on one upload shows spread, not who coordinated it.")] }); break; }
     }
+    for (const g of (m.crossLang || []).slice(0, 1)) out.push({ label: `same ${g.kind === "claim" ? "claim" : g.kind === "media" ? "upload" : "link"} in ${g.langs.length} languages`, fam: "cross-language", level: "flag", cat: "coordination", rows: [["What Radar sees", `This ${g.kind === "claim" ? "fact-checked claim" : g.kind === "media" ? "upload" : "link"} is carried by ${g.accounts} accounts writing in ${g.langs.map((l) => l.replace("script:", "") + (l.startsWith("script:") ? " script" : "")).join(", ")}${g.across ? ", across threads you viewed" : " in this thread"}.`], ["Language from", g.basis === "script" ? "the writing system, since the site gave no language" : "the language the site assigns each post"], ...(g.across ? [["In ordinary threads", "Not measured across threads yet."]] : baseline("cross-language", m)), dnp(PB.CROSS_DOES_NOT_PROVE)] });
+    const C = m.chain;
+    if (C && C.originHidden && C.intermediaries >= 1) out.push({ label: `passed through ${C.intermediaries} ${C.intermediaries === 1 ? "step" : "steps"}`, fam: "laundered", level: "info", cat: "sources", rows: [["Chain", C.hops.map((h) => (h.handle ? "@" + h.handle : h.domain) + (h.role === "origin" ? " (earliest Radar saw)" : "")).join(" → ")], C.hoursFromOrigin != null ? ["Time from origin", `${C.hoursFromOrigin} h`] : null, dnp(PB.CHAIN_DOES_NOT_PROVE)].filter(Boolean) });
     // Content Credentials and AI metadata, once the user has checked a file in this post.
     if (globalThis.PBMedia) for (const r of PBMedia.resultsFor(m.node, m.tweet)) out.push(...PB.credentialSignals(r));
     if (T.client && !PB.COMMON_CLIENTS.test(T.client)) out.push({ label: `via ${T.client}`, fam: "client", level: "flag", cat: "posting", rows: [["Source", "The app this post was sent from, in the data X loaded. X no longer shows it."], ["What it is", "Scheduling tools, automation services and custom apps post this way."], dnp("News desks, brands and many people schedule posts with tools like these.")] });
@@ -66,9 +74,36 @@
     return out;
   }
 
+  // Domains and accounts named in a published influence-operation report (src/core/ops.js), from
+  // the post's links, the account's handle and what its profile names. One sign per operation.
+  function reports(m) {
+    const prof = PB.profileLinks ? PB.profileLinks(m.reading) : { domains: [], handles: [] };
+    const where = [...(m.domains || []).map((d) => [d, "This post links to", PB.opsOfDomain(d)]), ...prof.domains.map((d) => [d, "This account's profile names", PB.opsOfDomain(d)]),
+      [m.handle, "This account is", PB.opsOfHandle(m.handle)], ...prof.handles.map((h) => [h, "This account's profile names", PB.opsOfHandle(h)])];
+    const out = [], seen = new Set();
+    for (const [what, how, hits] of where) for (const h of hits || []) {
+      if (!h.op || seen.has(h.op.id)) continue;
+      seen.add(h.op.id);
+      const shown = h.indicator.x ? "@" + h.indicator.x : h.indicator.d;
+      out.push({ label: "Named in a published report", fam: "named-in-report", level: "warn", cat: "sources", rows: [["What Radar sees", `${how} ${shown}${what && what.toLowerCase() !== shown.replace(/^@/, "") ? ` (${what})` : ""}.`], ...PB.opRows(h)] });
+    }
+    return { out, domains: new Set(where.filter(([, , h]) => h && h.length).map(([d]) => String(d).toLowerCase())) };
+  }
+
+  // Look-alike news addresses (src/core/lookalike.js): a weak sign of its own.
+  function lookalikes(m) {
+    return (m.domains || []).map((d) => [d, PB.lookalikeOf(d)]).filter(([, h]) => h).map(([d, h]) => ({
+      label: `look-alike of ${h.official}`, fam: "lookalike-domain", level: "flag", cat: "sources",
+      rows: [["What Radar sees", `This post links to ${d}, which ${h.how === "swapped ending" ? "uses the name of" : h.how === "copies the name" ? "copies the name of" : h.how === "look-alike letters" ? "spells with look-alike letters the name of" : "is one letter away from the name of"} ${h.outlet} (${h.official}).`],
+        ["Why it matters", "Operations such as Doppelganger copied real outlets on addresses like washingtonpost.pm to borrow their trust."], dnp(PB.LOOKALIKE_DOES_NOT_PROVE)],
+    }));
+  }
+
   function links(m) {
-    const out = [];
-    const hits = [...(m.domains || []).flatMap(PB.stateLinksOfDomain), ...PB.stateLinksOfHandle(m.handle)];
+    const rep = reports(m), out = [...rep.out, ...lookalikes(m)];
+    // A report hit replaces the older state-table chip for the same domain or account.
+    const covered = (h) => h.basis === "named-in-report" && (rep.domains.has(String(h.domain || "").toLowerCase()) || rep.domains.has(String(h.x || "").toLowerCase()));
+    const hits = [...(m.domains || []).flatMap(PB.stateLinksOfDomain), ...PB.stateLinksOfHandle(m.handle)].filter((h) => !covered(h));
     for (const h of new Set(hits)) {
       const L = PB.stateLabel(h);
       out.push({ label: L.chip, fam: "state-link", cat: "sources", level: h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" || h.basis === "designated" ? "flag" : "info", rows: [["What it is", L.says], ["Source", `${h.source.title}${h.source.date ? ` (${h.source.date})` : ""}`], ["Read it", { links: [[h.source.url.replace(/^https?:\/\//, "").slice(0, 48), h.source.url]] }], h.domainSource ? ["Domain from", { links: [[h.domainSource.title, h.domainSource.url]] }] : null, dnp(PB.STATE_DOES_NOT_PROVE[h.basis])].filter(Boolean) });

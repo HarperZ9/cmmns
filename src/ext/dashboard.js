@@ -63,6 +63,20 @@
     shareBar($("state"), d.state, "links to state-linked sites");
   }
 
+  // Documented operations: the whole table's counts, and which of the logged sites a report named.
+  let opsAll = null;
+  try { opsAll = await chrome.runtime.sendMessage({ type: "pb-ops", all: true }); } catch (e) { console.error("[radar] ops table failed", e); }
+  function operations() {
+    if (!opsAll || !opsAll.ops || !opsAll.ops.length) { $("ops-say").textContent = "The operations table did not load."; return; }
+    const T = PB.opsTrend(opsAll), named = PB.opsLookup(opsAll, { domains: [...domains] });
+    const sites = new Set(named.indicators.map((i) => i.d));
+    $("ops-say").textContent = `Radar carries ${plural(T.total, "operation", "operations")} from ${plural(T.byState.length, "attributed country", "attributed countries")}, each cited to the reports that found it. ` +
+      (sites.size ? `${plural(sites.size, "site", "sites")} in your logs ${sites.size === 1 ? "was" : "were"} named in one of those reports: ${[...sites].slice(0, 5).join(", ")}.` : "No site in your logs was named in one of those reports.");
+    $("ops-caveat").textContent = PB.OPS_TREND_CAVEAT;
+    bars($("ops-years"), T.byYear.map((y) => ({ ...y, label: String(y.year) })), (r) => r.label);
+    bars($("ops-states"), T.byState, (r) => r.state, (r) => `${plural(r.docs, "document", "documents")}`);
+  }
+
   function rhetoric(d) {
     $("strong-say").textContent = d.strong
       ? `${plural(d.strong.k, "post or reply", "posts and replies")} of ${d.strong.n.toLocaleString()} showed strong rhetoric signs: dehumanising words, calls for violence, slurs, or two weaker signs together.`
@@ -138,7 +152,7 @@
     const d = PB.feedDashboard(store[KEYS.reports], store[KEYS.feed], store[KEYS.net], { days, isState });
     const held = Math.min(days, keep);
     $("scope").textContent = `${plural(d.threads, "thread", "threads")} and ${plural(d.feedPosts, "feed post", "feed posts")}, ${d.from} to ${d.to}.` + (held < days ? ` Radar keeps ${keep} days (Options), so this covers ${keep}.` : "");
-    sites(d); rhetoric(d); techniques(d); checks(d); media(days);
+    sites(d); operations(); rhetoric(d); techniques(d); checks(d); media(days);
     for (const b of document.querySelectorAll(".window button")) b.setAttribute("aria-pressed", String(+b.dataset.days === days));
   }
 
