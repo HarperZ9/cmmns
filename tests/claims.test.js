@@ -3,7 +3,7 @@
 // that look similar but are a different claim; each must stay unmatched.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildClaimIndex, matchClaims, claimTokens, guessLanguage, claimCard, CLAIM_DOES_NOT_PROVE, MIN_CLAIM_TOKENS } from "../src/core/claims.js";
+import { buildClaimIndex, matchClaims, claimTokens, guessLanguage, claimCard, CLAIM_DOES_NOT_PROVE, MIN_CLAIM_TOKENS, nearToken } from "../src/core/claims.js";
 
 const TABLE = {
   checkers: ["Checker A", "Checker B", "Checker C"],
@@ -104,4 +104,21 @@ test("control: a word that is a function word in another language still counts (
   const t = buildClaimIndex({ checkers: ["X"], rows: [["Video shows mayor hugging son", "False", 0, "https://x.example/1", "2025-01-01", "en"]] });
   assert.deepEqual(matchClaims(t, "Video shows the mayor hugging his wife at the parade"), []);
   assert.equal(matchClaims(t, "video shows mayor hugging son").length, 1);
+});
+
+// Text read from an image: one wrong letter in a word, mended only toward a single claim word.
+test("fuzzy matching mends one misread letter in image text, and only when asked", () => {
+  const misread = "Photo shows Eiffel Towcr on fire after protests in Paris";
+  assert.deepEqual(matchClaims(idx, misread), []);
+  assert.deepEqual(matchClaims(idx, misread, { fuzzy: true }).map((m) => m.url), ["https://c.example/3"]);
+  const digits = "The 2O20 election was stolen through millions of fake mail-in ballots in Arizona";
+  assert.deepEqual(matchClaims(idx, digits, { fuzzy: true }).map((m) => m.url), ["https://a.example/1"]);
+});
+
+test("fuzzy matching leaves short words, known words and ambiguous words alone", () => {
+  const two = buildClaimIndex({ checkers: [], rows: [["mayors banned cars downtown from tuesday onward", "False", 0, "u", null, "en"], ["mayors banned bars downtown from tuesday onward", "False", 0, "v", null, "en"]] });
+  assert.equal(nearToken(two, "dars"), "dars");   // cars and bars are both one edit away
+  assert.equal(nearToken(two, "car"), "car");     // under four letters
+  assert.equal(nearToken(idx, "photo"), "photo"); // already a claim word
+  assert.equal(nearToken(idx, "towcr"), "tower");
 });

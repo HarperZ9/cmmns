@@ -44,8 +44,8 @@ derived from labelled data.
 - A lesson for each new sign.
 
 ### Research
-- project-docs/IMAGE-TEXT.md compares on-device options for reading text inside images and
-  recommends a path, with targets and a privacy statement. Nothing ships yet.
+- project-docs/IMAGE-TEXT.md compares on-device options for reading text inside images, with
+  targets and a privacy statement. Radar now ships its own recogniser (below).
 
 ### Added (techniques)
 - A technique map, `project-docs/TECHNIQUES.md`: flooding, laundering, cloned outlets, coordinated
@@ -89,6 +89,30 @@ derived from labelled data.
   country changes nothing, and that the rule code names no country.
 - False-match controls: no real outlet's domain is shipped as an indicator, and no real outlet matches
   a look-alike pattern.
+
+### Added (text in images)
+- Read text in this image. With "Read text in images" turned on in the options page (off by
+  default), the window's Media area offers "Read text in this image" under each image of a post. On
+  that click only, Radar reads the words in the image on your device with its own recogniser and runs
+  the same theory, rhetoric, persuasion and fact-check checks on them. Each sign found that way is
+  labelled "in image:", stays at info level, shows the recogniser's confidence, reads "not measured
+  yet" and never counts toward the thread report. The image and its text never leave the browser.
+  Latin-script text only.
+- Radar's own recogniser, with no third-party code: an ink mask, line and word finding, and a small
+  convolutional network read by CTC, in JavaScript with a 546-byte WebAssembly SIMD kernel (plain
+  JavaScript where WebAssembly is not allowed). Weights 270 KB, trained by Radar on synthetic lines.
+  It runs in the background worker, never in the page.
+- Fact-check matching for image text mends one misread letter in a word when exactly one claim
+  word is one edit away. Typed text is matched as before.
+- A lesson, "Words inside a picture".
+
+### Measured (text in images)
+- Character error rate 1.03% (95% interval 0.56 to 1.66) on 120 synthetic screenshots rendered by
+  Chrome, and 3.00% (2.13 to 4.20) on 22 screenshots of Radar's own published pages; target 5%.
+  Tesseract.js, as a research baseline only: 5.76% and 4.03%.
+- Median time from bytes to text 0.16 s on synthetic screenshots and 0.50 s on dense text pages on
+  a desktop; 0.72 s and 2.58 s with the CPU slowed four times, where dense pages miss the 1.5 s
+  target. Details and limits in project-docs/IMAGE-TEXT.md.
 
 ## 2.0.0 (2026-10-21)
 

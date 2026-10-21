@@ -64,6 +64,13 @@ the page's own video player in the tab; choosing a search service then copies on
 clipboard and opens that service, which receives nothing until you paste the frame there.
 Credentials stored online (a file that points to a remote manifest) are never fetched.
 
+**Reading text in an image, off by default, only when you click.** With "Read text in images"
+turned on in the options page, "Read text in this image" re-requests that one image the same way,
+from the address the page used and without cookies, and hands its bytes to Radar's own background
+worker in your browser. The words are read there by code and weights shipped inside Radar; nothing
+is downloaded for it. The image, the text and any hash of either never leave your browser. The text
+is kept in memory for that window only.
+
 ## What Radar keeps, where, and for how long
 
 Everything is kept in `chrome.storage.local` (Firefox: `browser.storage.local`) in the browser

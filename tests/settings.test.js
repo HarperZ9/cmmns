@@ -100,3 +100,9 @@ test("consent to send does not outlive turning other coverage off", () => {
   assert.equal(normalizeSettings({ coverage: false, coverageConsent: true }).coverageConsent, false);
   assert.equal(normalizeSettings({ coverage: true, coverageConsent: true }).coverageConsent, true);
 });
+
+test("reading text in images is off until the user turns it on", () => {
+  assert.equal(normalizeSettings({}).imageText, false);
+  assert.equal(normalizeSettings({ imageText: "yes" }).imageText, false);
+  assert.equal(normalizeSettings({ imageText: true }).imageText, true);
+});

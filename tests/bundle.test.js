@@ -11,17 +11,16 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const bundle = join(root, "src/ext/core.bundle.js");
 
-test("core.bundle.js matches a fresh build of src/core", () => {
+test("core.bundle.js and ocr.bundle.js match a fresh build of src/core and src/ocr", () => {
   const lf = (s) => s.split("\r\n").join("\n");
-  const before = readFileSync(bundle, "utf8");
-  const backup = bundle + ".bak";
-  copyFileSync(bundle, backup);
+  const files = [bundle, join(root, "src/ext/ocr.bundle.js")];
+  const before = files.map((f) => readFileSync(f, "utf8"));
+  for (const f of files) copyFileSync(f, f + ".bak");
   try {
     execFileSync(process.execPath, [join(root, "scripts/build.mjs")], { stdio: "ignore" });
-    assert.equal(lf(readFileSync(bundle, "utf8")), lf(before), "run `npm run build` and commit the bundle");
+    files.forEach((f, i) => assert.equal(lf(readFileSync(f, "utf8")), lf(before[i]), `run \`npm run build\` and commit ${f}`));
   } finally {
-    copyFileSync(backup, bundle);
-    rmSync(backup);
+    for (const f of files) { copyFileSync(f + ".bak", f); rmSync(f + ".bak"); }
   }
 });
 

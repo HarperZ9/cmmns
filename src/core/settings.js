@@ -26,6 +26,9 @@ export const DEFAULTS = Object.freeze({
   // Other coverage (src/core/coverage.js): off until the user turns it on; coverageConsent is set
   // when the user has read what it sends and clicked to send.
   search: {}, coverage: false, coverageConsent: false,
+  // Read text in images (src/core/imagetext.js, src/ocr): off until the user turns it on; even then
+  // it runs only on a click, on this device.
+  imageText: false,
 });
 
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
@@ -45,6 +48,7 @@ export function normalizeSettings(raw) {
     calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
     search: switches(s.search, SEARCH_ENGINES.map(([id]) => id)), coverage: bool(s.coverage, DEFAULTS.coverage),
     coverageConsent: bool(s.coverage, false) && bool(s.coverageConsent, false),
+    imageText: bool(s.imageText, DEFAULTS.imageText),
   };
 }
 

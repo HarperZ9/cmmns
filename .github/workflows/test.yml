@@ -22,7 +22,7 @@ jobs:
         shell: bash
         run: |
           npm run build
-          git diff --exit-code --ignore-cr-at-eol -- src/ext/core.bundle.js
+          git diff --exit-code --ignore-cr-at-eol -- src/ext/core.bundle.js src/ext/ocr.bundle.js
   c2pa-reference:
     # Radar's Content Credentials verdicts must never be more favourable than c2patool's on the
     # c2pa-rs test fixtures (MIT/Apache-2.0), fetched at a pinned commit and never committed here.
