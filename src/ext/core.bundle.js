@@ -229,6 +229,190 @@ function foldConfusables(text) {
 return { MIN_LATIN_WORDS, foldConfusables };
 })();
 
+// ---- lookalike-outlets.js
+const M_lookalike_outlets = (() => {
+// Major news outlets whose names influence operations have copied (the cloned and look-alike domains
+// in data/ops-sources) and other widely read outlets. Each row: the names a look-alike would copy,
+// and every domain the outlet itself uses, which never match. "generic" names (a common word many
+// unrelated outlets use) are checked for misspellings only, never for a swapped ending.
+// Official domains checked against Wikidata's official-website property and the outlets' own pages
+// in October 2026.
+const OUTLETS = [
+  ["The Washington Post", ["washingtonpost.com", "wapo.st"]], ["Fox News", ["foxnews.com", "foxbusiness.com"]],
+  ["Der Spiegel", ["spiegel.de"]], ["Frankfurter Allgemeine", ["faz.net"]], ["Le Monde", ["lemonde.fr"]],
+  ["Le Parisien", ["leparisien.fr"]], ["RBC", ["rbc.ru", "rbc.ua"], ["rbk"]], ["Süddeutsche Zeitung", ["sueddeutsche.de", "sz.de"]],
+  ["Der Tagesspiegel", ["tagesspiegel.de"], ["dertagesspiegel"]], ["Bild", ["bild.de", "bild.tv"]], ["Die Welt", ["welt.de"]],
+  ["Daily Mail", ["dailymail.co.uk", "dailymail.com"]], ["La Repubblica", ["repubblica.it"]], ["Delfi", ["delfi.lt", "delfi.lv", "delfi.ee"]],
+  ["20 Minutes", ["20minutes.fr", "20min.ch", "20minutes.ch", "20minutes.tv"]], ["ANSA", ["ansa.it"]], ["The Guardian", ["theguardian.com"]],
+  ["t-online", ["t-online.de"]], ["nd", ["nd-aktuell.de"]], ["BBC", ["bbc.com", "bbc.co.uk"]], ["The New York Times", ["nytimes.com", "nyti.ms"]],
+  ["CNN", ["cnn.com"]], ["Reuters", ["reuters.com"]], ["AP News", ["apnews.com"]], ["Al Jazeera", ["aljazeera.com", "aljazeera.net"]],
+  ["Al Arabiya", ["alarabiya.net"], ["alarabyia"]], ["Haaretz", ["haaretz.com", "haaretz.co.il"]], ["The Times of Israel", ["timesofisrael.com"]],
+  ["The Jerusalem Post", ["jpost.com"], ["jerusalempost", "thejerusalempost"]], ["Israel Hayom", ["israelhayom.com", "israelhayom.co.il"]],
+  ["Israel National News", ["israelnationalnews.com"]], ["The Independent", ["independent.co.uk"], [], true],
+  ["The Atlantic", ["theatlantic.com"]], ["Foreign Policy", ["foreignpolicy.com"]], ["Bloomberg", ["bloomberg.com"]],
+  ["HuffPost", ["huffpost.com", "huffingtonpost.com", "huffingtonpost.co.uk", "huffingtonpost.fr", "huffingtonpost.es", "huffingtonpost.it", "huffingtonpost.de", "huffingtonpost.jp", "huffingtonpost.kr", "huffingtonpost.gr"]],
+  ["Politico", ["politico.com", "politico.eu"]], ["France 24", ["france24.com"]], ["Le Soir", ["lesoir.be"], [], true],
+  ["National Post", ["nationalpost.com"]], ["The Globe and Mail", ["theglobeandmail.com"]], ["Washington Examiner", ["washingtonexaminer.com"]],
+  ["MintPress News", ["mintpressnews.com"]], ["The Herald", ["heraldscotland.com"], ["theheraldscotland"]], ["Breaking Israel News", ["breakingisraelnews.com"]],
+  ["The Brussels Times", ["brusselstimes.com"]], ["Budapest Beacon", ["budapestbeacon.com"]], ["Emarat Al Youm", ["emaratalyoum.com"]],
+  ["Al Jazirah", ["al-jazirah.com"]], ["Al Riyadh", ["alriyadh.com"]], ["Sharjah 24", ["sharjah24.ae"]], ["Shorouk News", ["shorouknews.com"]],
+  ["El Watan News", ["elwatannews.com"]], ["Arabi21", ["arabi21.com"]], ["Euronews", ["euronews.com"]], ["Le Figaro", ["lefigaro.fr"]],
+  ["Corriere della Sera", ["corriere.it"]], ["El País", ["elpais.com"]], ["Die Zeit", ["zeit.de"]], ["The Kyiv Independent", ["kyivindependent.com"]],
+  ["Kyiv Post", ["kyivpost.com"]], ["USA Today", ["usatoday.com"]], ["NBC News", ["nbcnews.com"]], ["CBS News", ["cbsnews.com"]],
+  ["Los Angeles Times", ["latimes.com"]], ["New York Post", ["nypost.com"]], ["Newsweek", ["newsweek.com"]],
+  ["South China Morning Post", ["scmp.com"]], ["The Straits Times", ["straitstimes.com"]], ["The Japan Times", ["japantimes.co.jp"]],
+  ["The Korea Times", ["koreatimes.co.kr", "koreatimes.com"], ["thekoreatimes"]], ["Jakarta Globe", ["jakartaglobe.id"]], ["Bangkok Post", ["bangkokpost.com"], ["dailybangkokpost"]],
+  ["The Times of India", ["timesofindia.indiatimes.com", "indiatimes.com"], ["timesofindia"]], ["Hürriyet", ["hurriyet.com.tr", "hurriyetdailynews.com"]],
+  ["Ukrainska Pravda", ["pravda.com.ua"], ["pravda-ua"]], ["Kommersant", ["kommersant.ru", "kommersant.com", "kommersant.uk"]], ["Meduza", ["meduza.io"]],
+  ["Le Point", ["lepoint.fr"]], ["Libération", ["liberation.fr"]], ["Ouest-France", ["ouest-france.fr"]], ["Deutsche Welle", ["dw.com"]],
+  ["Agence France-Presse", ["afp.com"]], ["Associated Press", ["ap.org"]], ["The Wall Street Journal", ["wsj.com"]], ["Financial Times", ["ft.com"]],
+  ["The Economist", ["economist.com"]], ["The Telegraph", ["telegraph.co.uk"], [], true], ["Sky News", ["news.sky.com", "sky.com"]],
+  ["ABC News", ["abcnews.go.com", "abc.net.au", "abcnews.com"]], ["Berliner Morgenpost", ["morgenpost.de"]], ["La Stampa", ["lastampa.it"]],
+  ["UNIAN", ["unian.ua", "unian.net", "unian.info", "unian.tv"]], ["Obozrevatel", ["obozrevatel.com"]], ["La Croix", ["la-croix.com"]],
+  ["Polskie Radio", ["polskieradio.pl", "polskieradio24.pl", "polskieradio.com"]], ["Slate", ["slate.com", "slate.fr"]], ["The New Yorker", ["newyorker.com"]],
+  ["Berliner Zeitung", ["berliner-zeitung.de"]], ["Walla", ["walla.co.il"]], ["Mako", ["mako.co.il"]], ["Spektrum", ["spektrum.de"]],
+  ["Psychologie Heute", ["psychologie-heute.de"]], ["Closer", ["closermag.fr"]], ["Cosmopolitan", ["cosmopolitan.com", "cosmopolitan.fr", "cosmopolitan.de", "cosmopolitan.tv"]],
+  ["EatingWell", ["eatingwell.com"]], ["Real Simple", ["realsimple.com"]], ["Grazia", ["grazia.it", "grazia.fr"]],
+  ["Herder", ["herder.de"]], ["Bundespolizei", ["bundespolizei.de"]], ["Onmeda", ["onmeda.de"]], ["Sciences Humaines", ["scienceshumaines.com"]], ["Axios", ["axios.com"]], ["The Hill", ["thehill.com"]], ["Al-Monitor", ["al-monitor.com"]],
+].map(([name, domains, aliases = [], generic = false]) => ({ name, domains, aliases, generic }));
+
+// Real outlets that are not any listed outlet but sit one edit from one (found by the control test
+// over the owner and site tables). They never match.
+const UNRELATED_REAL = ["20minutos.es", "alwatannews.net", "economista.com.mx", "ekonomist.me", "indypendent.org", "republica.com", "republica.com.uy"];
+
+return { OUTLETS, UNRELATED_REAL };
+})();
+
+// ---- lookalike.js
+const M_lookalike = (() => {
+// Look-alike news domains: a weak sign that a link copies the name of a major outlet, the way the
+// Doppelganger and Endless Mayfly operations did (washingtonpost.pm, spiegel.ltd, theguaradian.com).
+// Three patterns, each against the outlets in lookalike-outlets.js:
+//   ending swap   the outlet's own name on an ending it does not use (washingtonpost.pm, bild.pics)
+//   misspelling   one letter added, dropped, changed or two swapped (theatlatnic.com, speigel.net)
+//   look-alike letters  an internationalised name whose letters only look like the outlet's
+// An outlet's own domains and their subdomains never match. The sign is about the address, never
+// about who posted it: real people share these links, often to warn others.
+const { OUTLETS, UNRELATED_REAL } = M_lookalike_outlets;
+const { TO_LATIN } = M_confusables_data;
+
+// Second-level endings run by a country registry. Anything else with a dot (co.com, eu.com) is a
+// private registry that sells look-alike endings and counts as a swapped ending.
+const CC2 = /^(co|com|org|net|ac|gov|edu|or|ne|go|in|info|biz|news|ltd|plc|me)\.[a-z]{2}$/;
+// Country endings that are sold as generic ones.
+const GENERIC_CC = new Set(["pm", "ws", "me", "co", "cc", "tv", "io", "to", "nu", "la", "ai", "gg", "ly", "su", "fm", "am", "cx", "bz", "wf", "pw", "so"]);
+// Private second-level endings sold to anyone, which look like a country's.
+const PRIVATE2 = new Set(["co.com", "eu.com", "us.com", "uk.com", "de.com", "gb.com", "br.com", "cn.com", "ru.com", "sa.com", "za.com", "jpn.com", "in.net", "us.org"]);
+const COMMON = new Set(["com", "net", "org"]);
+const norm = (s) => s.replace(/-/g, "").replace(/vv/g, "w");
+
+const LATIN = (() => { const a = [...TO_LATIN], m = new Map(); for (let i = 0; i + 1 < a.length; i += 2) m.set(a[i], a[i + 1]); return m; })();
+
+// RFC 3492 decoding of one "xn--" label; null when it is not valid.
+function punyDecode(label) {
+  if (!/^xn--/.test(label)) return label;
+  const s = label.slice(4), base = 36, tmin = 1, tmax = 26, skew = 38, damp = 700;
+  const cut = s.lastIndexOf("-"), out = cut > 0 ? [...s.slice(0, cut)] : [];
+  let n = 128, i = 0, bias = 72, p = cut > 0 ? cut + 1 : 0;
+  const digit = (c) => (c >= 48 && c < 58 ? c - 22 : c >= 97 && c < 123 ? c - 97 : 36);
+  const adapt = (delta, len, first) => {
+    delta = first ? Math.floor(delta / damp) : delta >> 1; delta += Math.floor(delta / len);
+    let k = 0; for (; delta > ((base - tmin) * tmax) >> 1; k += base) delta = Math.floor(delta / (base - tmin));
+    return k + Math.floor(((base - tmin + 1) * delta) / (delta + skew));
+  };
+  while (p < s.length) {
+    const old = i;
+    for (let w = 1, k = base; ; k += base) {
+      if (p >= s.length) return null;
+      const d = digit(s.charCodeAt(p++));
+      if (d >= base) return null;
+      i += d * w;
+      const t = k <= bias ? tmin : k >= bias + tmax ? tmax : k - bias;
+      if (d < t) break;
+      w *= base - t;
+    }
+    bias = adapt(i - old, out.length + 1, old === 0);
+    n += Math.floor(i / (out.length + 1)); i %= out.length + 1;
+    out.splice(i++, 0, String.fromCodePoint(n));
+  }
+  return out.join("");
+}
+
+// A label in plain Latin letters: look-alike letters mapped, accents dropped.
+function plain(label) {
+  const u = punyDecode(label);
+  if (u == null) return label;
+  return [...u].map((c) => LATIN.get(c) || c).join("").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+}
+
+// How two names differ by one edit, or null: "swap" (two neighbours swapped), "change" (one letter
+// changed), "extra" or "missing" (one letter added or dropped), "double" (a letter doubled).
+function oneEdit(a, b) {
+  if (a === b || Math.abs(a.length - b.length) > 1) return null;
+  let i = 0;
+  while (i < a.length && a[i] === b[i]) i++;
+  if (a.length === b.length) {
+    if (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2)) return "swap";
+    return a.slice(i + 1) === b.slice(i + 1) ? "change" : null;
+  }
+  const [long, short] = a.length > b.length ? [a, b] : [b, a];
+  if (long.slice(i + 1) !== short.slice(i)) return null;
+  if (long[i] === long[i - 1] || long[i] === long[i + 1]) return a.length > b.length ? "double" : "missing";
+  return a.length > b.length ? "extra" : "missing";
+}
+// The shortest outlet name each kind of edit is checked on. Shorter names collide with real outlets
+// (nypost and kypost, usatoday and uatoday, apnews and panews), found by the control in tests/lookalike.test.js.
+const MIN_EDIT = { swap: 7, double: 4, change: 9, extra: 9, missing: 9 };
+
+// The name part and the ending of a host: "theguardian.co.com" gives ["theguardian", "co.com"].
+function splitHost(host) {
+  const parts = host.split("."), two = parts.slice(-2).join(".");
+  const k = parts.length > 2 && (CC2.test(two) || PRIVATE2.has(two)) ? 2 : 1;
+  return [parts[parts.length - k - 1] || "", parts.slice(-k).join(".")];
+}
+
+const own = (host, o) => o.domains.some((d) => host === d || host.endsWith("." + d));
+// The outlet's own names: from its domains that have no subdomain ("abcnews.go.com" gives none).
+const nameOf = (d) => { const [label, ending] = splitHost(d); return d === `${label}.${ending}` ? label : null; };
+const INDEX = OUTLETS.map((o) => ({ o, names: new Set(o.domains.map(nameOf).filter(Boolean).map(norm)), aliases: new Set(o.aliases.map(norm)) }));
+const KNOWN = new Set([...OUTLETS.flatMap((o) => o.domains), ...UNRELATED_REAL]);
+
+function endingSwapped(ending, brand) {
+  if (COMMON.has(ending)) return brand.length >= 8;
+  if (/^[a-z]{2}$/.test(ending)) return GENERIC_CC.has(ending);
+  if (CC2.test(ending)) return false;
+  return true;
+}
+
+// { outlet, official, how } for a look-alike of a listed outlet, or null.
+function lookalikeOf(domain) {
+  const host = String(domain || "").toLowerCase().replace(/^www\./, "").replace(/\.$/, "");
+  if (!host.includes(".") || KNOWN.has(host) || UNRELATED_REAL.some((d) => host.endsWith("." + d))) return null;
+  const [label, ending] = splitHost(host);
+  const name = norm(plain(label)), puny = /^xn--/.test(label);
+  for (const { o, names, aliases } of INDEX) {
+    if (own(host, o)) return null;
+    const hit = (how) => ({ outlet: o.name, official: o.domains[0], how });
+    if (aliases.has(name)) return hit("copies the name");
+    if (names.has(name)) {
+      if (puny) return hit("look-alike letters");
+      if (!o.generic && name.length >= 3 && endingSwapped(ending, name)) return hit("swapped ending");
+      continue;
+    }
+    for (const n of names) {
+      const kind = oneEdit(name, n);
+      // A short name doubled on a sold ending (bildd.lol) counts; on .com it is often a real site.
+      if (kind && n.length >= MIN_EDIT[kind] && (kind !== "double" || n.length >= 6 || endingSwapped(ending, n))) return hit(puny ? "look-alike letters" : "misspelling");
+    }
+  }
+  return null;
+}
+
+const LOOKALIKE_DOES_NOT_PROVE = "A similar address is not proof of a fake: outlets use other addresses, and unrelated sites share common words. Open the outlet's own site and compare.";
+
+return { punyDecode, oneEdit, splitHost, lookalikeOf, LOOKALIKE_DOES_NOT_PROVE };
+})();
+
 // ---- brands.js
 const M_brands = (() => {
 // Brand look-alike accounts: a display name or handle that borrows a platform's or a major
@@ -4250,6 +4434,105 @@ function stateLabel(h) {
 return { setStateRows, stateLinksOfDomain, stateLinksOfHandle, stateSummary, STATE_DOES_NOT_PROVE, stateLabel };
 })();
 
+// ---- ops.js
+const M_ops = (() => {
+// Documented influence operations (ops.json, built by scripts/ops-build.mjs): the matcher behind
+// "Named in a published report", and the counts behind the trend view. A link or an account
+// matches when a cited source named that exact domain (or a parent of it) or account as an
+// operation's asset. The sign is about the indicator, never about the person who posted or shared
+// it: people share operation sites without knowing, and often to warn others.
+
+let TABLE = { docs: [], ops: [], indicators: [] };
+const OPS = new Map(), BY_DOMAIN = new Map(), BY_HANDLE = new Map();
+const push = (m, k, v) => (m.get(k) || m.set(k, []).get(k)).push(v);
+
+// table: { docs, ops, indicators } as ops.json has it, or a part of it from the background worker.
+function setOpsTable(table) {
+  TABLE = { docs: (table && table.docs) || [], ops: (table && table.ops) || [], indicators: (table && table.indicators) || [] };
+  OPS.clear(); BY_DOMAIN.clear(); BY_HANDLE.clear();
+  for (const o of TABLE.ops) OPS.set(o.id, o);
+  for (const i of TABLE.indicators) {
+    if (!OPS.has(i.op)) continue;
+    if (i.d) push(BY_DOMAIN, i.d, i);
+    if (i.x) push(BY_HANDLE, i.x, i);
+  }
+}
+
+const hit = (i) => ({ op: OPS.get(i.op), indicator: i, doc: TABLE.docs[i.doc] || null });
+// Subdomains match their parent: "de.rrn.world" finds "rrn.world".
+function opsOfDomain(domain) {
+  const parts = String(domain || "").toLowerCase().replace(/^www\./, "").split(".");
+  for (let k = 0; k < parts.length - 1; k++) {
+    const got = BY_DOMAIN.get(parts.slice(k).join("."));
+    if (got) return got.map(hit);
+  }
+  return [];
+}
+const opsOfHandle = (h) => (BY_HANDLE.get(String(h || "").replace(/^@/, "").toLowerCase()) || []).map(hit);
+
+// The part of a full table that a page needs for these domains and handles (the worker answers
+// with this, so pages never load the whole table).
+function opsLookup(table, { domains = [], handles = [] } = {}) {
+  const want = domains.map((d) => String(d).toLowerCase().replace(/^www\./, "")), hs = new Set(handles.map((h) => String(h).toLowerCase()));
+  const indicators = table.indicators.filter((i) => (i.x && hs.has(i.x)) || (i.d && want.some((d) => d === i.d || d.endsWith("." + i.d))));
+  const ids = new Set(indicators.map((i) => i.op));
+  return { docs: table.docs, ops: table.ops.filter((o) => ids.has(o.id)), indicators };
+}
+
+// The domains and accounts a profile names: its website, and domains and @handles in its bio.
+const HOST = /(?<![\w@.-])((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24})(?![\w.-]*\w)/gi, AT = /(?:^|[^\w@])@(\w{1,15})(?!\w)/g;
+function profileLinks(reading) {
+  const r = reading || {}, domains = new Set(), handles = new Set();
+  try { if (r.website) domains.add(new URL(/^https?:/i.test(r.website) ? r.website : "https://" + r.website).hostname.replace(/^www\./, "").toLowerCase()); } catch { /* not an address */ }
+  for (const m of String(r.bio || "").matchAll(HOST)) if (/[a-z]/i.test(m[1].split(".").pop())) domains.add(m[1].toLowerCase().replace(/^www\./, ""));
+  for (const m of String(r.bio || "").matchAll(AT)) handles.add(m[1].toLowerCase());
+  return { domains: [...domains], handles: [...handles] };
+}
+
+const TYPE_WORDS = {
+  "government": "a government body", "state media": "state media", "contractor": "a firm or group working for a government",
+  "linked to a state": "people or a group the source links to a government", "commercial firm": "a firm, no government named", "origin only": "no operator named",
+};
+const OPS_DOES_NOT_PROVE = "The report named this domain or account as part of an operation when it was published. It says nothing about the person who posted or shared it: people share these links without knowing, or to warn others. Domains expire and are bought again, and accounts are reused.";
+
+// The window's rows for one hit, in the sources' own words. Every attribution is listed with its
+// document, so disagreements between sources stay visible.
+function opRows(h) {
+  const o = h.op, doc = h.doc || {};
+  const said = o.attributions.map((a) => { const d = TABLE.docs[a.doc] || {}; return `${d.publisher || d.title}${d.date ? ` (${d.date})` : ""}: "${a.says}"`; });
+  return [
+    ["Operation", `${o.name}${o.aliases && o.aliases.length ? ` (also: ${o.aliases.slice(0, 3).join(", ")})` : ""}`],
+    ["Attributed to", `${o.state}: ${o.operator}. Operator type: ${TYPE_WORDS[o.operatorType] || o.operatorType}.`],
+    ["Sources say", said.slice(0, 4).join(" ")],
+    ["Named as", `${h.indicator.kind} in ${doc.title || "the report"}${doc.date ? `, ${doc.date}` : ""}`],
+    ["Read it", { links: [[String(doc.url || "").replace(/^https?:\/\//, "").slice(0, 48), doc.url]] }],
+    ["Does not prove", OPS_DOES_NOT_PROVE],
+  ];
+}
+
+// Counts for the trend view. Year is the year an operation was first published by any cited source.
+// It counts what investigators found and published, not how much activity there was.
+const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.";
+function opsTrend(table = TABLE) {
+  const years = new Map(), states = new Map();
+  for (const o of table.ops) {
+    const y = Number(String(o.first).slice(0, 4));
+    const ye = years.get(y) || years.set(y, { year: y, n: 0, byState: {} }).get(y);
+    ye.n++; ye.byState[o.state] = (ye.byState[o.state] || 0) + 1;
+    const se = states.get(o.state) || states.set(o.state, { state: o.state, n: 0, byType: {}, docs: new Set() }).get(o.state);
+    se.n++; se.byType[o.operatorType] = (se.byType[o.operatorType] || 0) + 1;
+    for (const d of o.docs) se.docs.add(d);
+  }
+  return {
+    total: table.ops.length,
+    byYear: [...years.values()].sort((a, b) => a.year - b.year),
+    byState: [...states.values()].map((s) => ({ ...s, docs: s.docs.size })).sort((a, b) => b.n - a.n || a.state.localeCompare(b.state)),
+  };
+}
+
+return { setOpsTable, opsOfDomain, opsOfHandle, opsLookup, profileLinks, OPS_DOES_NOT_PROVE, opRows, OPS_TREND_CAVEAT, opsTrend };
+})();
+
 // ---- trail.js
 const M_trail = (() => {
 // Source trails: where a post's material came from, and how it spread across the posts the user has
@@ -6672,7 +6955,8 @@ const FAMILIES = [
   ["cross-language", "Same link or upload in several languages", "coordination", D],
   ["laundered", "Material passed through other accounts", "sources", D],
   ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
-  ["state-link", "State link", "sources", T], ["owner", "Outlet owner", "sources", T], ["site-record", "Site facts and fact-check record", "sources", T],
+  ["state-link", "State link", "sources", T], ["named-in-report", "Named in a published report", "sources", T],
+  ["lookalike-domain", "Look-alike news address", "sources", D], ["owner", "Outlet owner", "sources", T], ["site-record", "Site facts and fact-check record", "sources", T],
   ["client", "Posting app", "posting", P], ["written-in", "Written in another language", "place", P],
   ["mismatch", "Speaks as local, labelled elsewhere", "place", D], ["store-elsewhere", "App store elsewhere", "place", D],
   ["flag-elsewhere", "Flag of another country", "place", D], ["profile-location-elsewhere", "Profile says elsewhere", "place", D],
@@ -6976,5 +7260,5 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_crosslang, ...M_flooding, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_trail, ...M_crosslang, ...M_flooding, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
 })();

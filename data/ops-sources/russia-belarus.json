@@ -1,0 +1,4287 @@
+[
+ {
+  "id": "internet-research-agency-us-2014-2018",
+  "name": "Internet Research Agency (Project Lakhta) interference operations targeting the United States",
+  "aliases": [
+   "IRA",
+   "Project Lakhta",
+   "translator project"
+  ],
+  "state": "Russia",
+  "operator": "Internet Research Agency LLC, funded by Yevgeniy Prigozhin and Concord Management and Consulting LLC / Concord Catering",
+  "operatorType": "contractor",
+  "attributions": [
+   {
+    "source": "s3",
+    "operatorType": "contractor",
+    "says": "At the direction of the Kremlin, the IRA sought to influence the 2016 U.S. presidential election",
+    "section": "Vol. 2, Sec. V.B, PDF p. 32"
+   },
+   {
+    "source": "s3",
+    "operatorType": "contractor",
+    "says": "The IRA is funded and directed by Yevgeniy Prigozhin, a Russia oligarch who works to conduct ... influence operations globally on behalf of the Kremlin.",
+    "section": "Vol. 2, Sec. V.A, PDF p. 23"
+   },
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "Defendant ORGANIZATION received funding for its operations from Defendant YEVGENIY VIKTOROVICH PRIGOZHIN and companies he controlled",
+    "section": "Indictment para. 3"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "Concord Management and Consulting LLC, which is controlled by Prigozhin, provided funding to the IRA.",
+    "section": "press release, IRA designation"
+   },
+   {
+    "source": "s4",
+    "operatorType": "origin only",
+    "says": "controlled by the Russia-based Internet Research Agency (IRA)",
+    "section": "post body"
+   }
+  ],
+  "active": {
+   "from": 2014,
+   "to": 2018
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "Tumblr",
+   "Reddit",
+   "Pinterest"
+  ],
+  "languages": [
+   "en",
+   "ru"
+  ],
+  "targets": [
+   "United States",
+   "Russia",
+   "Azerbaijan",
+   "Uzbekistan",
+   "Ukraine"
+  ],
+  "narratives": "The indictment says the organization aimed to sow discord in the US political system through divisive social issues and, by 2016, backed Trump and disparaged Clinton; the Senate report stresses race and policing content and voter-suppression messaging aimed at Black Americans. Meta's 2018 removal covered mostly Russian-language Pages aimed at Russia and its neighbours.",
+  "techniques": [
+   "fake personas",
+   "ads",
+   "impersonating real outlets or officials",
+   "front organisations"
+  ],
+  "indicators": [
+   {
+    "x": "TEN_GOP",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Indictment para. 36"
+   },
+   {
+    "x": "March_for_Trump",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Indictment para. 54"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1",
+    "s4"
+   ],
+   "platforms": [
+    "s1",
+    "s3"
+   ],
+   "languages": [
+    "s1",
+    "s4"
+   ],
+   "targets": [
+    "s1",
+    "s3",
+    "s4"
+   ],
+   "narratives": [
+    "s1",
+    "s3",
+    "s4"
+   ],
+   "techniques": [
+    "s1",
+    "s2",
+    "s3"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "US Department of Justice (Special Counsel's Office)",
+    "title": "Indictment, United States v. Internet Research Agency LLC et al., No. 1:18-cr-00032-DLF (D.D.C.)",
+    "url": "https://www.justice.gov/opa/press-release/file/1035562/download",
+    "date": "2018-02-16",
+    "kind": "court",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched (PDF; same text at govinfo.gov GOVPUB-J-PURL-gpo89499); DOJ press-release page sits behind a bot interstitial and was not read"
+   },
+   {
+    "id": "s2",
+    "publisher": "US Department of the Treasury",
+    "title": "Treasury Sanctions Russian Cyber Actors for Interference with the 2016 U.S. Elections and Malicious Cyber-Attacks",
+    "url": "https://home.treasury.gov/news/press-releases/sm0312",
+    "date": "2018-03-15",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s3",
+    "publisher": "US Senate Select Committee on Intelligence",
+    "title": "Report on Russian Active Measures Campaigns and Interference in the 2016 U.S. Election, Volume 2: Russia's Use of Social Media with Additional Views",
+    "url": "https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume2.pdf",
+    "date": "2019-10-08",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched (PDF)"
+   },
+   {
+    "id": "s4",
+    "publisher": "Meta (Facebook)",
+    "title": "Authenticity Matters: The IRA Has No Place on Facebook",
+    "url": "https://about.fb.com/news/2018/04/authenticity-matters/",
+    "date": "2018-04-03",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "'from 2014' is the indictment's start; 'to 2018' reflects the indictment ('to the present' at Feb 2018) and Meta's April 2018 removal, not a stated end. Indictment techniques: false US personas, stolen US identities, US-based VPN infrastructure, social ads bought in the names of US persons, staged rallies, paying real US persons. 'impersonating real outlets or officials' maps to @TEN_GOP falsely claiming to be the Tennessee Republican party. 'front organisations' maps to Pages posing as US activist groups (e.g. Being Patriotic, Blacktivist). Twitter's 2018 IRA disclosures on blog.x.com returned a Cloudflare challenge and were not read; no field uses them. The indictment publishes no domains. Concord's 'various Russian government contracts' (indictment para. 11) is not a statement that the government directed the IRA; the Senate report carries the government-direction attribution, hence 'contractor'."
+ },
+ {
+  "id": "peace-data-2020",
+  "name": "PeaceData",
+  "aliases": [
+   "Peace Data",
+   "Peace Monitor"
+  ],
+  "state": "Russia",
+  "operator": "Individuals associated with past activity by the Internet Research Agency",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "linked to individuals associated with past activity by the Russian Internet Research Agency (IRA)",
+    "section": "Russia network section"
+   },
+   {
+    "source": "s2",
+    "operatorType": "linked to a state",
+    "says": "Facebook Takes Down Small, Recently Created Network Linked to Russia's Internet Research Agency",
+    "section": "subtitle"
+   }
+  ],
+  "active": {
+   "from": 2019,
+   "to": 2020
+  },
+  "platforms": [
+   "Facebook",
+   "X",
+   "LinkedIn",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "ar"
+  ],
+  "targets": [
+   "United States",
+   "United Kingdom",
+   "Algeria",
+   "Egypt",
+   "English-speaking countries",
+   "Middle East and North Africa",
+   "progressive and left-wing audiences"
+  ],
+  "narratives": "Graphika says the site posed as an independent left-wing outlet covering US race protests, alleged US war crimes, corruption and capitalism, apparently to pull progressive audiences away from Biden; Arabic content also attacked France and Macron over Africa.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "AI-generated images or video",
+   "content laundering"
+  ],
+  "indicators": [
+   {
+    "domain": "peacedata.net",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Introduction, p.1"
+   },
+   {
+    "domain": "peacemonitor.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "website history section (now redirects to peacedata.net)"
+   },
+   {
+    "x": "peacedata_",
+    "kind": "operation account",
+    "source": "s2",
+    "section": "website history section"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s2"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "languages": [
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "August 2020 Coordinated Inauthentic Behavior Report",
+    "url": "https://about.fb.com/news/2020/09/august-2020-cib-report/",
+    "date": "2020-09-01",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Graphika",
+    "title": "IRA Again: Unlucky Thirteen",
+    "url": "https://public-assets.graphika.com/reports/graphika_report_ira_again_unlucky_thirteen.pdf",
+    "date": "2020-09-01",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated in the report",
+    "checked": "2026-10-21 fetched (PDF)"
+   }
+  ],
+  "notes": "Site began publishing December 2019; domain registered 6 Feb 2020; Facebook Pages created May 2020 (Graphika). Graphika says Facebook removed 13 accounts and 2 Pages; Meta's post says 8 Facebook accounts and 2 Pages (counts differ). Meta's post does not name PeaceData. Writers were real, apparently unwitting novice freelancers and are not listed. 'content laundering' reflects copied articles and unwitting bylines. Investigation began from an FBI tip. @peacedata.net and @peacedataofficial in Graphika are Facebook Page handles, not X, and are omitted."
+ },
+ {
+  "id": "prigozhin-africa-2019",
+  "name": "Prigozhin-linked Facebook operations in Africa (Libya, Sudan, Madagascar, CAR, Mozambique, DRC and others)",
+  "aliases": [
+   "Evidence of Russia-Linked Influence Operations in Africa",
+   "Wagner Group Facebook Pages"
+  ],
+  "state": "Russia",
+  "operator": "Entities associated with Yevgeniy Prigozhin, including (per SIO, apparently) the Wagner Group",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "entities associated with Russian financier Yevgeniy Prigozhin, who was previously indicted by the US Justice Department",
+    "section": "introduction"
+   },
+   {
+    "source": "s2",
+    "operatorType": "linked to a state",
+    "says": "a Facebook operation attributed to entities tied to Prigozhin -- including, it appears, the Wagner Group",
+    "section": "1 Executive Summary, p.2"
+   }
+  ],
+  "active": {
+   "from": 2014,
+   "to": 2019
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "Telegram",
+   "WhatsApp",
+   "X",
+   "websites"
+  ],
+  "languages": [
+   "ar",
+   "en",
+   "fr",
+   "mg",
+   "ru"
+  ],
+  "targets": [
+   "Libya",
+   "Sudan",
+   "Central African Republic",
+   "Madagascar",
+   "Mozambique",
+   "Democratic Republic of the Congo",
+   "Cameroon",
+   "Côte d'Ivoire"
+  ],
+  "narratives": "SIO says the Pages gave almost uniformly positive coverage of Russia's activities, disparaged the UN, France, Turkey, Qatar and Libya's GNA, and fostered unity around Russia-aligned actors; Sudan news Pages backed whichever government held power.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "hijacked or bought accounts",
+   "ads",
+   "content laundering",
+   "front organisations",
+   "state media amplification"
+  ],
+  "indicators": [
+   {
+    "domain": "khartoumstar.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "3.1 News Pages, p.15"
+   },
+   {
+    "domain": "sudandaily.org",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "3.1 News Pages, p.15"
+   },
+   {
+    "domain": "shabaktynews.net",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "3.1 News Pages, p.15"
+   },
+   {
+    "domain": "afriquepanorama.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "5 Activities Targeting Madagascar"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "languages": [
+    "s1",
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing More Coordinated Inauthentic Behavior From Russia",
+    "url": "https://about.fb.com/news/2019/10/removing-more-coordinated-inauthentic-behavior-from-russia/",
+    "date": "2019-10-30",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Stanford Internet Observatory",
+    "title": "Evidence of Russia-Linked Influence Operations in Africa",
+    "url": "https://stacks.stanford.edu/file/yh993mk2487/29oct2019_sio_-_russia_linked_influence_operations_in_africa.final_.pdf",
+    "date": "2019-10-29",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "CC BY-NC-ND 4.0 (Stanford Digital Repository record)",
+    "checked": "2026-10-21 fetched (PDF; record https://purl.stanford.edu/yh993mk2487)"
+   }
+  ],
+  "notes": "Meta removed three networks (multi-country Africa, Sudan, Libya); only its introduction ties 'these campaigns' to Prigozhin-associated entities, and Meta does not name Wagner. Active years are Meta's ad dates (Libya ads from May 2014; Africa and Sudan ads April 2018 to Oct 2019). 'hijacked or bought accounts' reflects Meta's 'compromised accounts' plus authentic local nationals' accounts used to run Pages. 'state media amplification' reflects Sudan and Libya Pages sharing SUNA, Sputnik and RT (Meta). Languages: Arabic and English (Meta, Sudan/Libya), French and Malagasy (SIO, CAR/Madagascar), English, French and Russian geopolitics Pages (SIO); no source read states Mozambique's content language. SIO relays AfricaIntelligence's report that Prigozhin owns afriquepanorama.com. iaccenters.com omitted: SIO says only that some observers suggest it is a Wagner front. SIO describes Wagner's relation to the state as contested, so operatorType stays 'linked to a state'. The Dossier Center document on Wagner was not read."
+ },
+ {
+  "id": "gru-facebook-pages-2014-2019",
+  "name": "GRU online operations (Facebook-attributed GRU Pages, personas, think tanks and media outlets)",
+  "aliases": [
+   "Potemkin Pages & Personas",
+   "Inside Syria Media Center",
+   "Crna Gora News Agency",
+   "The Informer",
+   "World News Observer",
+   "Victory for Peace",
+   "NBene Group",
+   "Fancy Bears",
+   "Foul Play",
+   "Baltimore is Everywhere"
+  ],
+  "state": "Russia",
+  "operator": "GRU (Main Directorate of the General Staff of the Armed Forces of the Russian Federation), per Facebook's attribution",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "Facebook attributed the material to the Main Directorate of the General Staff of the Armed Forces of the Russian Federation",
+    "section": "1. Document Purpose, p.3"
+   }
+  ],
+  "active": {
+   "from": 2014,
+   "to": 2018
+  },
+  "platforms": [
+   "Facebook",
+   "X",
+   "Reddit",
+   "YouTube",
+   "Instagram",
+   "Medium",
+   "Quora",
+   "LiveLeak",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "ar",
+   "bs",
+   "de",
+   "ru"
+  ],
+  "targets": [
+   "Syria",
+   "Montenegro",
+   "Ukraine",
+   "United States",
+   "Japan",
+   "Iran",
+   "Balkans",
+   "Estonia",
+   "Germany",
+   "Russia"
+  ],
+  "narratives": "SIO says the operations seeded long-form state-aligned content: pro-Assad Syria coverage, attacks on Montenegro's pro-NATO leader around its 2016 election, Ukraine and Kuril Islands material, US race issues, and sports hack-and-leak dumps aimed at anti-doping bodies.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "front organisations",
+   "content laundering",
+   "hack and leak",
+   "state media amplification",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "insidesyriamc.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "4.2, p.13"
+   },
+   {
+    "domain": "cgna.info",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "4.2, p.13"
+   },
+   {
+    "domain": "cgna.me",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "4.2, p.13"
+   },
+   {
+    "domain": "theinformer.life",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "4.2, p.13; The Informer"
+   },
+   {
+    "domain": "fancybear.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "4.2, p.13"
+   },
+   {
+    "domain": "nbenegroup.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Nbenegroup.com, p.38"
+   },
+   {
+    "domain": "victoryforpeace.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Victory for Peace and InfoRos, p.49"
+   },
+   {
+    "domain": "dcleaks.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "5.4 Hack and Leak Operations"
+   },
+   {
+    "x": "Inside_Syria",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Inside Syria Media Center"
+   },
+   {
+    "x": "crnagoranews",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Crna Gora News Agency"
+   },
+   {
+    "x": "The_lnformer",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "The Informer (lowercase L as printed in source)"
+   },
+   {
+    "x": "WorldObs",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "World News Observer"
+   },
+   {
+    "x": "FancyBears",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Fancy Bears, p.77"
+   },
+   {
+    "x": "FoulPlaySI",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Foul Play, p.80"
+   },
+   {
+    "x": "BaltimoreIsWhr",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Baltimore is Everywhere"
+   },
+   {
+    "x": "dcleaks_",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "DCLeaks"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Stanford Internet Observatory",
+    "title": "Potemkin Pages & Personas: Assessing GRU Online Operations, 2014-2019",
+    "url": "https://stacks.stanford.edu/file/cv483mb5313/potemkin-pages-personas-sio-wp.pdf",
+    "date": "2019-11-12",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "CC BY-NC-ND 4.0 per Stanford Digital Repository record; the PDF itself reads 'Copyright 2019, Stanford Internet Observatory'",
+    "checked": "2026-10-21 fetched (PDF; record https://purl.stanford.edu/cv483mb5313)"
+   }
+  ],
+  "notes": "The GRU attribution is Facebook's (data given to SSCI); SIO analysed the data and did not independently attribute. SIO says the four main domains 'are likely attributable to the GRU' because names match the Pages; other indicators come from SIO's per-cluster sections. cgna.me now hosts unrelated content per SIO. Posts span 2014 to 2018 (Pages taken down in or before 2018); the title's 2019 reflects off-Facebook activity SIO found. SIO also reports persona-bylined articles placed in at least 142 alternative outlets (not said to be paid, so 'paid placement in real media' is not used). Persona X handles (e.g. MilkoPejovic) omitted because SIO says one persona's photo matches a real individual. conflictzone.info and votemontenegro.eu omitted: SIO links them to Pages without stating control. Only one Page (Victory for Peace) bought ads. Overlaps with gru-2016-hack-and-leak."
+ },
+ {
+  "id": "gru-2016-hack-and-leak",
+  "name": "GRU 2016 hack-and-leak operation (DCLeaks and Guccifer 2.0)",
+  "aliases": [
+   "DCLeaks",
+   "Guccifer 2.0",
+   "GRU Units 26165 and 74455"
+  ],
+  "state": "Russia",
+  "operator": "GRU Units 26165 and 74455",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "were GRU officers who knowingly and intentionally conspired with each other",
+    "section": "Indictment para. 2"
+   },
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "Unit 74455 assisted in the release of stolen documents through the DCLeaks and Guccifer 2.0 personas",
+    "section": "Indictment, Unit 74455 defendants paragraph"
+   },
+   {
+    "source": "s2",
+    "operatorType": "government",
+    "says": "The GRU was directly involved in interfering in the 2016 U.S. election through cyber-enabled activities.",
+    "section": "press release, GRU designation"
+   }
+  ],
+  "active": {
+   "from": 2016,
+   "to": 2016
+  },
+  "platforms": [
+   "websites",
+   "Facebook",
+   "X",
+   "WordPress"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "United States"
+  ],
+  "narratives": "The indictment says the conspirators staged releases of emails and documents stolen from the Clinton Campaign, DCCC and DNC to interfere with the 2016 election and published anti-Clinton content; Guccifer 2.0 falsely posed as a lone Romanian hacker.",
+  "techniques": [
+   "hack and leak",
+   "fake personas",
+   "fake news outlets",
+   "typosquatted domains"
+  ],
+  "indicators": [
+   {
+    "domain": "dcleaks.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indictment, 'Stolen Documents Released through DCLeaks'"
+   },
+   {
+    "domain": "actblues.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indictment, DCCC intrusion section (spoof of ActBlue)"
+   },
+   {
+    "x": "dcleaks_",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Indictment para. 39"
+   },
+   {
+    "x": "BaltimoreIsWhr",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Indictment para. 39"
+   },
+   {
+    "x": "Guccifer_2",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Indictment, Guccifer 2.0 section"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "US Department of Justice (Special Counsel's Office)",
+    "title": "Indictment, United States v. Viktor Borisovich Netyksho et al., No. 1:18-cr-00215-ABJ (D.D.C.)",
+    "url": "https://www.justice.gov/archives/sco/file/1080281/dl",
+    "date": "2018-07-13",
+    "kind": "court",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched (PDF); DOJ press-release page sits behind a bot interstitial and was not read"
+   },
+   {
+    "id": "s2",
+    "publisher": "US Department of the Treasury",
+    "title": "Treasury Sanctions Russian Cyber Actors for Interference with the 2016 U.S. Elections and Malicious Cyber-Attacks",
+    "url": "https://home.treasury.gov/news/press-releases/sm0312",
+    "date": "2018-03-15",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Hacking from at least March 2016; releases June to November 2016 (indictment). The indictment does not state content language; 'en' is inferred from US targeting. The indictment also charges hacking of state boards of elections and an election-software vendor (Unit 74455). Organization 1 (a third-party leak site) is not listed. Malware C2 domain linuxkrnl.net is not an influence asset and is omitted. actblues.com was used to redirect DCCC site visitors (credential theft), included as an operation-registered spoof domain. Fake Facebook personas named in the indictment (Alice Donovan, Jason Scott, Richard Gingrey) have no handles given."
+ },
+ {
+  "id": "secondary-infektion",
+  "name": "Secondary Infektion",
+  "aliases": [
+   "Operation Secondary Infektion"
+  ],
+  "state": "Russia",
+  "operator": "Unidentified central entity run from Russia (DFRLab: possibly an intelligence operation)",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "a long-running Russian information operation, encompassing multiple campaigns on social media run by a central entity",
+    "section": "Executive Summary"
+   },
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "As of May 2020, this operation has not been directly attributed to a particular actor or entity.",
+    "section": "Executive Summary"
+   },
+   {
+    "source": "s2",
+    "operatorType": "origin only",
+    "says": "A Russian-based information operation ... possibly an intelligence operation",
+    "section": "article body"
+   },
+   {
+    "source": "s3",
+    "operatorType": "origin only",
+    "says": "We found two separate, unconnected operations that originated in Russia",
+    "section": "opening paragraph"
+   }
+  ],
+  "active": {
+   "from": 2014,
+   "to": 2020
+  },
+  "platforms": [
+   "Reddit",
+   "Medium",
+   "X",
+   "Quora",
+   "Facebook",
+   "YouTube",
+   "websites"
+  ],
+  "languages": [
+   "ru",
+   "en",
+   "de",
+   "fr",
+   "es",
+   "sv",
+   "uk"
+  ],
+  "targets": [
+   "Ukraine",
+   "United States",
+   "Germany",
+   "Poland",
+   "United Kingdom",
+   "France",
+   "Sweden",
+   "Turkey",
+   "Latvia",
+   "Austria",
+   "Spain",
+   "Baltic states",
+   "Kremlin critics"
+  ],
+  "narratives": "Graphika lists nine themes: Ukraine as a failed state, US and NATO aggression, a weak and divided Europe, Kremlin critics as corrupt or unstable, Muslims as invaders, Russia as victim, rigged Western elections, Turkey as destabilizing, and Russophobic sports bodies.",
+  "techniques": [
+   "forged documents",
+   "fake personas",
+   "impersonating real outlets or officials",
+   "hack and leak"
+  ],
+  "indicators": [
+   {
+    "x": "indepexp",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Early Experiments with Personas, 'An Early Cluster, 2014-2016'"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s2",
+    "s3"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Graphika",
+    "title": "Exposing Secondary Infektion: Forgeries, interference, and attacks on Kremlin critics across six years and 300 sites and platforms",
+    "url": "https://secondaryinfektion.org/downloads/secondary-infektion-report.pdf",
+    "date": "2020-06-16",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright Graphika 2020, facts and short quotes only",
+    "checked": "2026-10-21 fetched via Wayback snapshot 20200616154032 (live secondaryinfektion.org did not resolve on 2026-10-21); landing page https://graphika.com/reports/exposing-secondary-infektion fetched live"
+   },
+   {
+    "id": "s2",
+    "publisher": "Atlantic Council DFRLab",
+    "title": "Operation \"Secondary Infektion\": A Suspected Russian Intelligence Operation Targeting Europe and the United States",
+    "url": "https://dfrlab.org/2019/06/22/operation-secondary-infektion/",
+    "date": "2019-06-22",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright DFRLab, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s3",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing More Coordinated Inauthentic Behavior From Russia",
+    "url": "https://about.fb.com/news/2019/05/more-cib-from-russia/",
+    "date": "2019-05-06",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Graphika says it was run from Russia by an unknown entity; DFRLab's title says 'suspected Russian intelligence operation' and its text 'possibly an intelligence operation'. Neither names an agency, so operatorType is 'origin only'. Meta's May 2019 post covers two Russia networks; the second (16 Facebook accounts, 4 Pages, 1 Instagram account; Austria, Baltics, Germany, Spain, Ukraine, UK) is the one DFRLab and Graphika build on. Graphika says seven languages; the codes listed are the languages named in the report text, and that they are exactly the seven is our reading. 'hack and leak' reflects the 2019 US-UK trade documents leak Graphika attributes to the operation. Graphika found 250+ suspected forgeries impersonating officials (e.g. Pompeo, Rubio, Bildt) and NGOs. Third-party forums used (e.g. homment.com) are hosts, not indicators. @cyber_legion / cyberlegion.org omitted: Graphika says only 'briefly associated'. Graphika's companion database was not reviewed."
+ },
+ {
+  "id": "fazze-vaccine-2020-2021",
+  "name": "Fazze anti-vaccine influence-for-hire operation",
+  "aliases": [
+   "Influence the Influencers: Covid Vaccine Operation from Russia"
+  ],
+  "state": "Russia",
+  "operator": "Fazze, a subsidiary of a UK-registered marketing firm whose operations were primarily conducted from Russia",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "Our investigation found links between this campaign and Fazze, a subsidiary of a UK-registered marketing firm, whose operations were primarily conducted from Russia.",
+    "section": "In-depth analysis, Executive Summary"
+   }
+  ],
+  "active": {
+   "from": 2020,
+   "to": 2021
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "Medium",
+   "Reddit",
+   "Change.org",
+   "YouTube"
+  ],
+  "languages": [
+   "en",
+   "hi",
+   "pt",
+   "es"
+  ],
+  "targets": [
+   "India",
+   "Latin America",
+   "Brazil",
+   "Argentina",
+   "United States",
+   "France",
+   "Germany"
+  ],
+  "narratives": "Meta says the first wave claimed the AstraZeneca vaccine was dangerous and would turn people into chimpanzees; the second, in May 2021, claimed Pfizer's vaccine had a far higher casualty rate, using a document presented as hacked from AstraZeneca.",
+  "techniques": [
+   "fake personas",
+   "paid influencers",
+   "spam amplification",
+   "hack and leak",
+   "content laundering"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "July 2021 Coordinated Inauthentic Behavior Report",
+    "url": "https://about.fb.com/wp-content/uploads/2021/08/July-2021-CIB-Report.pdf",
+    "date": "2021-08-10",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched (PDF; summary post https://about.fb.com/news/2021/08/july-2021-coordinated-inauthentic-behavior-report/ also fetched)"
+   }
+  ],
+  "notes": "Meta: 65 Facebook and 243 Instagram accounts removed under its foreign interference policy; fake accounts likely came from account farms in Bangladesh and Pakistan and posed as Indian. Meta names no government principal and says who commissioned Fazze remains open. 'hack and leak' reflects the operation's claim of a hacked AstraZeneca document; how it got the document is unconfirmed. Influencer payments in France and Germany come from open-source reporting Meta cites, not on-platform evidence; Meta says the Brazil and India influencer posts were likely recruited. Meta names no operation domains (it says it blocked associated domains); ethicalhacker.org, Medium, Reddit and Change.org are hosts. Influencers are real people and are not listed. The parent firm's name (AdNow) appears in press coverage, not in the Meta text read here."
+ },
+ {
+  "id": "meta-gru-networks-2020",
+  "name": "Russian military intelligence-linked networks removed by Meta (February and September 2020)",
+  "aliases": [],
+  "state": "Russia",
+  "operator": "Russian military, including military intelligence services",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "found links to Russian military intelligence services",
+    "section": "Russia network section"
+   },
+   {
+    "source": "s2",
+    "operatorType": "linked to a state",
+    "says": "connected these clusters to the Russian military including military intelligence services",
+    "section": "network 1"
+   }
+  ],
+  "active": {
+   "from": 2020,
+   "to": 2020
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "websites"
+  ],
+  "languages": [
+   "ru",
+   "en",
+   "uk",
+   "ar"
+  ],
+  "targets": [
+   "Ukraine",
+   "Syria",
+   "Turkey",
+   "Japan",
+   "Armenia",
+   "Georgia",
+   "Belarus",
+   "Moldova",
+   "United Kingdom",
+   "United States",
+   "Baltic states"
+  ],
+  "narratives": "Meta says the networks posted on Ukrainian politics, MH17, alleged security-service leaks about ethnic tensions in Crimea, Russia's role in Syria, Turkish politics, NATO, Asia-Pacific geopolitics and politics in the Baltics, Caucasus and Belarus.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "front organisations"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1",
+    "s2"
+   ],
+   "platforms": [
+    "s2"
+   ],
+   "languages": [
+    "s1",
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior From Russia, Iran, Vietnam and Myanmar",
+    "url": "https://about.fb.com/news/2020/02/removing-coordinated-inauthentic-behavior/",
+    "date": "2020-02-12",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior",
+    "url": "https://about.fb.com/news/2020/09/removing-coordinated-inauthentic-behavior-russia/",
+    "date": "2020-09-24",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta's wording is 'links to' / 'connected ... to', so operatorType is 'linked to a state' rather than 'government'. Meta ties September 2020 network 1 to its February 2020 and August 2018 removals, so they are combined here. Neither post gives activity start dates; 'active' records only the takedown year. Personas posed as citizen journalists and contacted policymakers and journalists; some Pages claimed to be hacktivist groups and content referenced past alleged leaks (not coded as hack and leak). No domains or handles are published in the posts. Feb 2020: 78 accounts, 11 Pages, 29 Groups, 4 Instagram; Sept 2020: 224 accounts, 35 Pages, 18 Groups, 34 Instagram."
+ },
+ {
+  "id": "ira-linked-turkey-think-tank-2020",
+  "name": "IRA-linked network posing as a Turkey-based think tank (Meta, September 2020)",
+  "aliases": [],
+  "state": "Russia",
+  "operator": "Individuals associated with past activity by the Internet Research Agency",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "links to individuals associated with past activity by the Russian Internet Research Agency",
+    "section": "network 2"
+   }
+  ],
+  "active": {
+   "from": 2020,
+   "to": 2020
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "tr"
+  ],
+  "targets": [
+   "Turkey",
+   "Europe",
+   "United States"
+  ],
+  "narratives": "Meta lists local elections, geopolitical conspiracies, elections in Hong Kong, Spain, the UK and US, racial injustice and police brutality, the pandemic, US sanctions and foreign policy, Israel and Venezuela.",
+  "techniques": [
+   "fake personas",
+   "front organisations",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior",
+    "url": "https://about.fb.com/news/2020/09/removing-coordinated-inauthentic-behavior-russia/",
+    "date": "2020-09-24",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta does not name the think-tank website, so no indicator. Investigation began with FBI information; accounts posed as locals in Turkey, Canada and the US and recruited writers. About $4,800 ad spend. 'active' is the takedown year only."
+ },
+ {
+  "id": "russian-intelligence-linked-journals-2020",
+  "name": "Network posing as independent journals linked to Russian intelligence services (Meta, September 2020)",
+  "aliases": [],
+  "state": "Russia",
+  "operator": "Individuals in Russia, including those associated with Russian intelligence services",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "links to individuals in Russia, including those associated with Russian intelligence services",
+    "section": "network 3"
+   }
+  ],
+  "active": {
+   "from": 2019,
+   "to": 2020
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "websites"
+  ],
+  "languages": [
+   "ru",
+   "en"
+  ],
+  "targets": [
+   "Belarus",
+   "Russia's neighbouring countries",
+   "Ukraine",
+   "United States",
+   "global audiences"
+  ],
+  "narratives": "Meta lists Belarus protests and elections, Russian and Ukrainian politics, geopolitical conspiracies, Russia-NATO relations, criticism of US foreign policy and US candidates across the spectrum.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior",
+    "url": "https://about.fb.com/news/2020/09/removing-coordinated-inauthentic-behavior-russia/",
+    "date": "2020-09-24",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "'from 2019' rests on Meta linking this network to its July 2019 enforcement; activity start is otherwise not stated. Personas posed as editors and researchers soliciting articles; off-platform sites posed as independent journals and are not named. About $13,000 ad spend, mostly rubles."
+ },
+ {
+  "id": "ira-linked-ghana-nigeria-2020",
+  "name": "IRA-linked network operated from Ghana and Nigeria targeting the US (EBLA)",
+  "aliases": [
+   "EBLA"
+  ],
+  "state": "Russia",
+  "operator": "Local nationals in Ghana and Nigeria acting on behalf of individuals in Russia; links to EBLA (a Ghana NGO) and to individuals associated with past IRA activity",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "in Ghana and Nigeria on behalf of individuals in Russia",
+    "section": "post body (same paragraph names EBLA and past IRA activity)"
+   }
+  ],
+  "active": {
+   "from": 2019,
+   "to": 2020
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "United States"
+  ],
+  "narratives": "Meta says posts covered US news, Black history, fashion, celebrity gossip, LGBTQ issues and oppression and police brutality, with no apparent election focus.",
+  "techniques": [
+   "fake personas",
+   "front organisations"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior From Russia",
+    "url": "https://about.fb.com/news/2020/03/removing-coordinated-inauthentic-behavior-from-russia/",
+    "date": "2020-03-12",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta: 49 Facebook accounts, 69 Pages, 85 Instagram accounts. 'from 2019' reflects Meta's note that people joined the network in the second half of 2019. 'en' is inferred from US targeting, not stated. Pages posed as NGOs or personal blogs. CNN's parallel investigation was not read."
+ },
+ {
+  "id": "ira-linked-instagram-us-2019",
+  "name": "IRA-linked Instagram network targeting the US (Meta, October 2019)",
+  "aliases": [],
+  "state": "Russia",
+  "operator": "Unnamed operators in Russia showing some links to the Internet Research Agency",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "showed some links to the Internet Research Agency (IRA)",
+    "section": "Russia network section"
+   }
+  ],
+  "active": {
+   "from": 2019,
+   "to": 2019
+  },
+  "platforms": [
+   "Instagram",
+   "Facebook"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "United States",
+   "US swing states"
+  ],
+  "narratives": "Meta says the accounts posed as conservatives or progressives and posted on both sides of US elections, environment, racial tensions, LGBTQ issues, candidates and Confederate ideas, partly reusing old IRA memes.",
+  "techniques": [
+   "fake personas",
+   "content laundering"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing More Coordinated Inauthentic Behavior From Iran and Russia",
+    "url": "https://about.fb.com/news/2019/10/removing-more-coordinated-inauthentic-behavior-from-iran-and-russia/",
+    "date": "2019-10-21",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta: 50 Instagram accounts and 1 Facebook account; about 246,000 followers, about 60% in the US. 'some links' is Meta's hedged wording. 'en' inferred from US targeting. Activity dates not given; 'active' is the takedown year. 'content laundering' reflects reposted screenshots of news and public figures' posts. Graphika's companion analysis was not read."
+ },
+ {
+  "id": "sputnik-linked-pages-2019",
+  "name": "Sputnik employee-linked Pages posing as independent news (Meta, January 2019)",
+  "aliases": [],
+  "state": "Russia",
+  "operator": "Employees of Sputnik, a Moscow-based news agency",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "Pages and accounts were linked to employees of Sputnik, a news agency based in Moscow",
+    "section": "network 1"
+   }
+  ],
+  "active": {
+   "from": 2013,
+   "to": 2019
+  },
+  "platforms": [
+   "Facebook"
+  ],
+  "languages": [],
+  "targets": [
+   "Romania",
+   "Latvia",
+   "Estonia",
+   "Lithuania",
+   "Armenia",
+   "Azerbaijan",
+   "Georgia",
+   "Tajikistan",
+   "Uzbekistan",
+   "Kazakhstan",
+   "Moldova",
+   "Russia",
+   "Kyrgyzstan"
+  ],
+  "narratives": "Meta says Pages presented as independent news or general-interest Pages and frequently posted about anti-NATO sentiment, protest movements and anti-corruption.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior from Russia",
+    "url": "https://about.fb.com/news/2019/01/removing-cib-from-russia/",
+    "date": "2019-01-17",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright (Meta Platforms), facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta says 'linked to employees of Sputnik', not run by Sputnik as an institution, so operatorType is 'linked to a state' rather than 'state media'. Active years are Meta's ad dates (October 2013 to January 2019); activity before 2017 is outside the requested window but Meta gives it. Languages not stated by Meta. 364 Pages and accounts, about $135,000 in ads. The same post's second network (Ukraine-focused, 'shared characteristics with previous Internet Research Agency (IRA) activity') is not entered separately."
+ },
+ {
+  "id": "doppelganger-rrn",
+  "name": "Doppelganger",
+  "aliases": [
+   "RRN (Reliable Recent News / Recent Reliable News)",
+   "Reliable Russian News",
+   "Storm-1099",
+   "Ruza Flood"
+  ],
+  "state": "Russia",
+  "operator": "Social Design Agency (SDA) and Structura National Technologies, with ANO Dialog, under the Russian Presidential Administration (per US DOJ and Treasury)",
+  "operatorType": "contractor",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "many elements are pointing towards the involvement of Russia-based actors",
+    "section": "Doppelganger report page, summary (no formal attribution claimed)"
+   },
+   {
+    "source": "s2",
+    "operatorType": "origin only",
+    "says": "Our investigations linked this network to two companies in Russia: Structura National Technologies, an information technology firm, and Social Design Agency",
+    "section": "02 Russia, Update as of December 15, 2022"
+   },
+   {
+    "source": "s7",
+    "operatorType": "origin only",
+    "says": "l'implication d'individus russes ou russophones ainsi que de plusieurs sociétés russes",
+    "section": "Synthèse, 13 juin 2023 (publication page)"
+   },
+   {
+    "source": "s3",
+    "operatorType": "contractor",
+    "says": "two Russian entities involved in the Russian-led digital disinformation campaign \"RRN\" (Recent Reliable News)",
+    "section": "Annex, entry 1579 (Gambachidze); entries for Social Design Agency and Structura (246)"
+   },
+   {
+    "source": "s4",
+    "operatorType": "contractor",
+    "says": "at the direction of the Russian Presidential Administration",
+    "section": "Press release jy2195, SDA and Structura section"
+   },
+   {
+    "source": "s6",
+    "operatorType": "contractor",
+    "says": "under the direction and control of the Russian Presidential Administration, and in particular Sergei Vladilenovich Kiriyenko",
+    "section": "Affidavit para. 1 (Case 2:24-mj-01395, E.D. Pa.)"
+   },
+   {
+    "source": "s5",
+    "operatorType": "contractor",
+    "says": "operating under the direction and control of the Russian Presidential Administration",
+    "section": "Press release, para. 1"
+   },
+   {
+    "source": "s8",
+    "operatorType": "linked to a state",
+    "says": "the Russia-affiliated influence actor Microsoft tracks as Storm-1099—better known as \"Doppelganger\"",
+    "section": "p. 4"
+   },
+   {
+    "source": "s9",
+    "operatorType": "contractor",
+    "says": "ANO Dialog, one of the Russian organizations behind the Russia-affiliated group Microsoft tracks as Ruza Flood (Doppelganger)",
+    "section": "p. 1"
+   }
+  ],
+  "active": {
+   "from": 2022
+  },
+  "platforms": [
+   "websites",
+   "Facebook",
+   "Instagram",
+   "X",
+   "Telegram",
+   "YouTube",
+   "LiveJournal",
+   "Change.org",
+   "Avaaz",
+   "9GAG"
+  ],
+  "languages": [
+   "en",
+   "fr",
+   "de",
+   "it",
+   "es",
+   "ru",
+   "uk",
+   "pl"
+  ],
+  "targets": [
+   "Germany",
+   "France",
+   "Italy",
+   "Ukraine",
+   "United Kingdom",
+   "Latvia",
+   "United States",
+   "Israel",
+   "Mexico"
+  ],
+  "narratives": "Sources summarise the content as attacking Ukraine and Ukrainian refugees, praising Russia, arguing that Western sanctions harm Europeans, and alleging Western russophobia; the DOJ adds aims of reducing support for Ukraine and influencing voters in the 2024 US election.",
+  "techniques": [
+   "cloned news sites",
+   "typosquatted domains",
+   "impersonating real outlets or officials",
+   "fake news outlets",
+   "fake personas",
+   "ads",
+   "AI-generated text",
+   "AI-generated images or video",
+   "machine translation",
+   "paid influencers",
+   "comment brigading",
+   "fake fact-checks"
+  ],
+  "indicators": [
+   {
+    "domain": "washingtonpost.pm",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "fox-news.top",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "fox-news.in",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "spiegel.agency",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "faz.ltd",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "lemonde.ltd",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "leparisien.ltd",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "rbk.media",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "sueddeutsche.co",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "tagesspiegel.co",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "bild.work",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "pravda-ua.com",
+    "kind": "cloned news domain",
+    "source": "s6",
+    "section": "Attachments A-1 to A-9 (SUBJECT DOMAINS); para. 85"
+   },
+   {
+    "domain": "bild.pics",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "welt.tours",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "dailymail.top",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "repubblica.life",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "delfi.life",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "dailymail.cam",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "dailymail.cfd",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "20minuts.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "ansa.ltd",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "spiegel.ltd",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "theguardian.co.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "bild.asia",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "bild.vip",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "delfi.today",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "delfi.top",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "rbk.today",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "spiegel.today",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "spiegel.fun",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "spiegel.quest",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "tonline.cfd",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "tonline.life",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "tonline.today",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "spiegel.pro",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "bild.eu.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "bild.llc",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "spiegeli.life",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "welt.ltd",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "t-onlinr.life",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "tagesspiegel.ltd",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "sueddeutsche.me",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "spiegel.ink",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "sueddeutsche.online",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "t-online.life",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "nd-aktuell.net",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "bild.expert",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "bild.ws",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "faz.agency",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "spiegel.work",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "welt.ws",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "welt.media",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "faz.life",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "spiegel.cab",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains (updated 15 Dec 2022)"
+   },
+   {
+    "domain": "rrn.world",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains"
+   },
+   {
+    "domain": "avisindependent.eu",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, 2. Russia, Domains"
+   },
+   {
+    "domain": "rrussianews.com",
+    "kind": "operation site",
+    "source": "s7",
+    "section": "p. 1, Création du site web RRN; Annexe 3"
+   },
+   {
+    "domain": "waronfakes.com",
+    "kind": "operation site",
+    "source": "s6",
+    "section": "Attachments A-2, A-3 (SUBJECT DOMAINS)"
+   },
+   {
+    "domain": "tribunalukraine.info",
+    "kind": "operation site",
+    "source": "s6",
+    "section": "Attachments A-2, A-3 (SUBJECT DOMAINS)"
+   },
+   {
+    "domain": "vip-news.org",
+    "kind": "operation site",
+    "source": "s6",
+    "section": "Attachments A-2, A-3 (SUBJECT DOMAINS)"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s2",
+    "s6"
+   ],
+   "platforms": [
+    "s2",
+    "s11"
+   ],
+   "languages": [
+    "s2",
+    "s7",
+    "s11"
+   ],
+   "targets": [
+    "s2",
+    "s3",
+    "s5"
+   ],
+   "narratives": [
+    "s1",
+    "s2",
+    "s7",
+    "s5"
+   ],
+   "techniques": [
+    "s2",
+    "s4",
+    "s5",
+    "s6",
+    "s7",
+    "s11"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "EU DisinfoLab",
+    "title": "Doppelganger - Media clones serving Russian propaganda",
+    "url": "https://www.disinfo.eu/doppelganger/",
+    "date": "2022-09-27",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "Copyright EU DisinfoLab, all rights reserved; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta",
+    "title": "Recapping Our 2022 Coordinated Inauthentic Behavior Enforcements / CIB report China and Russia, September 2022 (PDF, updated 15 December 2022)",
+    "url": "https://about.fb.com/wp-content/uploads/2022/11/CIB-Report_-China-Russia-Sept-2022.pdf",
+    "date": "2022-09-27",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated; facts and short quotes only",
+    "checked": "2026-10-21 fetched (PDF and newsroom post https://about.fb.com/news/2022/09/removing-coordinated-inauthentic-behavior-from-china-and-russia/)"
+   },
+   {
+    "id": "s3",
+    "publisher": "Council of the European Union (Official Journal)",
+    "title": "Council Decision (CFSP) 2023/1566 of 28 July 2023 amending Decision 2014/145/CFSP",
+    "url": "https://eur-lex.europa.eu/eli/dec/2023/1566/oj",
+    "date": "2023-07-28",
+    "kind": "government",
+    "lang": "en",
+    "terms": "EU reuse policy (Decision 2011/833/EU), reuse with attribution",
+    "checked": "2026-10-21 fetched (via EUR-Lex HTML, CELEX 32023D1566)"
+   },
+   {
+    "id": "s4",
+    "publisher": "US Department of the Treasury",
+    "title": "Treasury Sanctions Actors Supporting Kremlin-Directed Malign Influence Efforts",
+    "url": "https://home.treasury.gov/news/press-releases/jy2195",
+    "date": "2024-03-20",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s5",
+    "publisher": "US Department of Justice",
+    "title": "Justice Department Disrupts Covert Russian Government-Sponsored Foreign Malign Influence Operation Targeting Audiences in the United States and Elsewhere",
+    "url": "https://www.justice.gov/archives/opa/pr/justice-department-disrupts-covert-russian-government-sponsored-foreign-malign-influence",
+    "date": "2024-09-04",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s6",
+    "publisher": "US District Court, E.D. Pennsylvania (FBI affidavit)",
+    "title": "Affidavit in Support of Seizure Warrant, United States v. Certain Domains, Case No. 24-mj-1395",
+    "url": "https://www.justice.gov/opa/media/1366261/dl",
+    "date": "2024-09-04",
+    "kind": "court",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched (277-page PDF)"
+   },
+   {
+    "id": "s7",
+    "publisher": "SGDSN / VIGINUM (France)",
+    "title": "RRN : une campagne numérique de manipulation de l'information complexe et persistante (rapport technique, 19 juin 2023)",
+    "url": "https://www.sgdsn.gouv.fr/files/files/viginum/Publications/20230619_NP_VIGINUM_RAPPORT-CAMPAGNE-RRN_VF_0.pdf",
+    "date": "2023-06-19",
+    "kind": "government",
+    "lang": "fr",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (French original read; synthesis page dated 13 June 2023 at https://www.sgdsn.gouv.fr/publications/rrn-une-campagne-numerique-de-manipulation-de-linformation-complexe-et-persistante)"
+   },
+   {
+    "id": "s8",
+    "publisher": "Microsoft Threat Analysis Center",
+    "title": "Russian influence efforts converge on 2024 Paris Olympic Games",
+    "url": "https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/final/en-us/microsoft-brand/documents/MTAC_Report_Russian_Influence_and_Paris_2024.pdf",
+    "date": "2024-06-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright Microsoft; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s9",
+    "publisher": "Microsoft Threat Analysis Center",
+    "title": "Russia leverages cyber proxies and Volga Flood assets in expansive influence efforts (Election Report 4)",
+    "url": "https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/msc/documents/presentations/CSR/MTAC-Election-Report-4.pdf",
+    "date": "2024-09-17",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright Microsoft; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s11",
+    "publisher": "OpenAI",
+    "title": "AI and Covert Influence Operations: Latest Trends",
+    "url": "https://cdn.openai.com/threat-intelligence-reports/threat-intel-report-may-2024.pdf",
+    "date": "2024-05-30",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Attribution strengthens over time and the sources differ in kind: EU DisinfoLab (2022-09) made no formal attribution and did not exclude a false flag; Meta (Dec 2022 update) linked the network to SDA and Structura; VIGINUM cites Meta and finds Russian or Russian-speaking individuals and Russian companies; EU Council lists SDA and Structura as key actors; US Treasury and DOJ state direction by the Russian Presidential Administration (DOJ names Kiriyenko). Microsoft calls it Storm-1099 (June 2024) and Ruza Flood (Sept 2024) and ties ANO Dialog to it. EU text spells the brand 'Recent Reliable News'; VIGINUM and Microsoft use 'Reliable Recent News'; original 2022 domain stood for 'Reliable Russian News'. Indicator counts: Meta lists 516 unique domains (as of 15 Dec 2022); VIGINUM Annex 3 lists 353 domains; the DOJ affidavit seizes 32 SUBJECT DOMAINS. 60 taken: DOJ cloned-news domains, then Meta cloned-news domains, then RRN and related operation sites. The DOJ affidavit also states SDA used paid 'influencers'; no individuals are listed here. 'fake fact-checks' rests on VIGINUM's link between RRN and the War on Fakes site. EU DisinfoLab's own domain list sits in its PDF/Qurium report, which I did not open. Microsoft s9 also used for the Ruza Flood alias and its ANO Dialog link (p. 4)."
+ },
+ {
+  "id": "portal-kombat-pravda",
+  "name": "Portal Kombat",
+  "aliases": [
+   "Pravda network",
+   "Pravda ecosystem",
+   "pravda.network"
+  ],
+  "state": "Russia",
+  "operator": "TigerWeb, a Crimea-based Russian web firm, in creating and administering the sites; VIGINUM hypothesises it serves an unidentified principal",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "le rôle majeur joué par une entreprise russe domiciliée en Crimée, TigerWeb, dans la création et l'administration des sites",
+    "section": "Seconde partie, Synthèse, p. 2"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "TigerWeb servirait de prestataire de services pour le compte d'un opérateur dont l'identité n'est pas connue à ce stade",
+    "section": "Seconde partie, Synthèse, p. 2"
+   },
+   {
+    "source": "s4",
+    "operatorType": "origin only",
+    "says": "Russia-linked Pravda network",
+    "section": "Title"
+   },
+   {
+    "source": "s3",
+    "operatorType": "origin only",
+    "says": "A pro-Russia content aggregation network, Pravda, appears to be set up to flood large-language models with pro-Kremlin content",
+    "section": "Executive Summary, p. 1"
+   }
+  ],
+  "active": {
+   "from": 2013
+  },
+  "platforms": [
+   "websites",
+   "Telegram",
+   "VK"
+  ],
+  "languages": [
+   "fr",
+   "de",
+   "pl",
+   "es",
+   "en",
+   "ru",
+   "uk"
+  ],
+  "targets": [
+   "France",
+   "Germany",
+   "Austria",
+   "Switzerland",
+   "Poland",
+   "Spain",
+   "United Kingdom",
+   "United States",
+   "Ukraine (occupied territories and Russian-speaking audiences)",
+   "Russia",
+   "Africa",
+   "Asia-Pacific",
+   "Middle East",
+   "North America"
+  ],
+  "narratives": "VIGINUM summarises the network as portraying Russia's 'special military operation' positively and denigrating Ukraine and its leaders by mass-relaying pro-Russian Telegram posts, Russian agency copy and official sources; ASP argues the volume looks built to seed pro-Kremlin content into large language models.",
+  "techniques": [
+   "fake news outlets",
+   "content laundering",
+   "search and chatbot seeding",
+   "machine translation",
+   "spam amplification",
+   "state media amplification"
+  ],
+  "indicators": [
+   {
+    "domain": "pravda-de.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1: List of identified sites (pravda ecosystem)"
+   },
+   {
+    "domain": "pravda-en.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1: List of identified sites (pravda ecosystem)"
+   },
+   {
+    "domain": "pravda-es.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1: List of identified sites (pravda ecosystem)"
+   },
+   {
+    "domain": "pravda-fr.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1: List of identified sites (pravda ecosystem)"
+   },
+   {
+    "domain": "pravda-pl.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1: List of identified sites (pravda ecosystem)"
+   },
+   {
+    "domain": "news-pravda.com",
+    "kind": "operation site",
+    "source": "s4",
+    "section": "X Community Notes section"
+   },
+   {
+    "domain": "cherkassy-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "kherson-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "lnr-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "poltava-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "vin-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "zp-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "chernigov-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "dnepr-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "dnr-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "kirovograd-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "news-kiev.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "news-odessa.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "nikolaev-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "sumy-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "zhitomir-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "berdyansk-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "donetsk-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "lugansk-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "mariupol-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "melitopol-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "alchevsk-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "bc-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "dneprodzerzhinsk-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "gorlovka-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "kramatorsk-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "kremenchug-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "krivoy-rog-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "news-makeevka.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "nikopol-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "pavlograd-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "slavyansk-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "tiraspol-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "norilsk-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "nabchelny-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "nk-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "tagil-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "news-surgut.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "chernovcy-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "if-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "rovno-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "volyn-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "khmelnitskiy-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "lvov-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "ternopol-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "uzhgorod-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "news-balashiha.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "volzhskiy-news.ru",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (-news.ru ecosystem)"
+   },
+   {
+    "domain": "crimea-news.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (historical ecosystem)"
+   },
+   {
+    "domain": "piter-news.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (historical ecosystem)"
+   },
+   {
+    "domain": "sevastopol-news.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (historical ecosystem)"
+   },
+   {
+    "domain": "kiev-news.com.ua",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (historical ecosystem)"
+   },
+   {
+    "domain": "lenta.kharkiv.ua",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (historical ecosystem)"
+   },
+   {
+    "domain": "topnews.kiev.ua",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (historical ecosystem)"
+   },
+   {
+    "domain": "topnews.odessa.ua",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Annex 1 (historical ecosystem)"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1",
+    "s4"
+   ],
+   "targets": [
+    "s1",
+    "s3"
+   ],
+   "narratives": [
+    "s1",
+    "s3"
+   ],
+   "techniques": [
+    "s1",
+    "s3",
+    "s4"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "SGDSN / VIGINUM (France)",
+    "title": "Portal Kombat: A structured and coordinated pro-Russian propaganda network (technical report, also in French as 'Portal Kombat : un réseau structuré et coordonné de propagande prorusse')",
+    "url": "https://www.sgdsn.gouv.fr/files/files/20240212_NP_SGDSN_VIGINUM_PORTAL-KOMBAT-NETWORK_ENG_VF.pdf",
+    "date": "2024-02-12",
+    "kind": "government",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (English and French PDFs both read; French: https://www.sgdsn.gouv.fr/files/files/20240212_NP_SGDSN_VIGINUM_RAPPORT-RESEAU-PORTAL-KOMBAT_VF.pdf)"
+   },
+   {
+    "id": "s2",
+    "publisher": "SGDSN / VIGINUM (France)",
+    "title": "Portal Kombat : un réseau structuré et coordonné de propagande pro-russe, seconde partie (rapport technique)",
+    "url": "https://www.sgdsn.gouv.fr/files/files/Publications/20240214_NP_SGDSN_VIGINUM_RAPPORT-RESEAU-PORTAL-KOMBAT_PARTIE2_VF.pdf",
+    "date": "2024-02-14",
+    "kind": "government",
+    "lang": "fr",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (French original read)"
+   },
+   {
+    "id": "s3",
+    "publisher": "American Sunlight Project",
+    "title": "A Pro-Russia Content Network Foreshadows the Automated Future of Info Ops",
+    "url": "https://static1.squarespace.com/static/6612cbdfd9a9ce56ef931004/t/67fd396818196f3d1666bc23/1744648558879/PK+Report.pdf",
+    "date": "2025-02-26",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (copy hosted on ASP's Squarespace store; the copy fetched had 8 pages, press reports describe 22 pages)"
+   },
+   {
+    "id": "s4",
+    "publisher": "DFRLab (Atlantic Council) with CheckFirst",
+    "title": "Russia-linked Pravda network cited on Wikipedia, LLMs, and X",
+    "url": "https://dfrlab.org/2025/03/12/pravda-network-wikipedia-llm-x/",
+    "date": "2025-03-12",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright DFRLab, licence not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "VIGINUM attributes creation and administration to TigerWeb (Crimea) and does not name a state principal; it says the operator behind TigerWeb is unknown and notes similarities with the Inforos network. operatorType 'commercial firm' follows that wording; 'state' is Russia because VIGINUM calls TigerWeb a Russian company and the network pro-Russian. VIGINUM part 1 lists 193 sites (Annex 1; 190 domains parsed); ASP counts 182 Pravda domains and subdomains and points to a spreadsheet at americansunlight.org/portal-kombat-pravda-database; VIGINUM also published a domain CSV on GitHub (VIGINUM-FR/Rapports-Techniques). 60 taken: the five pravda-*.com portals, news-pravda.com (DFRLab), the 47 .ru sites listed in Annex 1 and 7 historical-ecosystem sites. The LLM-grooming claim is ASP's hypothesis ('appears', 'may'); a later peer-reviewed study cited in press found a smaller effect. I did not open that study. I did not open the separate DFRLab/CheckFirst February 2025 expansion report. VIGINUM reports low direct traffic (about 31,000 visits per month across the five pravda portals, Nov 2023)."
+ },
+ {
+  "id": "storm-1516",
+  "name": "Storm-1516",
+  "aliases": [
+   "Neva Flood (Microsoft, from March 2025)"
+  ],
+  "state": "Russia",
+  "operator": "Individuals and organisations close to the Russian government, including John Mark Dougan and members of the Prigozhin and Dugin ecosystems (VIGINUM); possible GRU Unit 29155 coordination reported but not confirmed",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "confirm the involvement of individuals and organisations close to the Russian government, including John Mark DOUGAN",
+    "section": "1. Summary, p. 3"
+   },
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "VIGINUM is not able to confirm the direct involvement of KHOROSHENKY or Unit 29155 in the conduct of Storm-1516",
+    "section": "4.4, p. 27"
+   },
+   {
+    "source": "s2",
+    "operatorType": "linked to a state",
+    "says": "l'implication d'individus et d'organisations proches du gouvernement russe",
+    "section": "1. Synthèse, p. 3 (French edition)"
+   },
+   {
+    "source": "s3",
+    "operatorType": "origin only",
+    "says": "elements of prolific Russian actor Storm-1516 began producing content",
+    "section": "p. 2"
+   },
+   {
+    "source": "s4",
+    "operatorType": "linked to a state",
+    "says": "Storm-1516 is tightly connected to the Russian Foundation to Battle Injustice (R-FBI)",
+    "section": "Abstract (repository page)"
+   }
+  ],
+  "active": {
+   "from": 2023
+  },
+  "platforms": [
+   "websites",
+   "YouTube",
+   "X",
+   "Telegram",
+   "TikTok",
+   "Facebook"
+  ],
+  "languages": [
+   "en",
+   "fr",
+   "de"
+  ],
+  "targets": [
+   "Ukraine",
+   "France",
+   "United States",
+   "Germany",
+   "European audiences",
+   "Russian opposition"
+  ],
+  "narratives": "VIGINUM summarises the set as discrediting Ukraine's government to cut Western aid, with recurring claims that Zelensky and his circle divert aid to buy luxury assets, plus fabrications aimed at European and US leaders during elections; Microsoft describes 2024 videos aimed at the Harris-Walz campaign.",
+  "techniques": [
+   "deepfake audio or video",
+   "AI-generated images or video",
+   "AI-generated text",
+   "fake personas",
+   "paid placement in real media",
+   "content laundering",
+   "fake news outlets",
+   "impersonating real outlets or officials",
+   "forged documents",
+   "paid influencers",
+   "hijacked or bought accounts"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s3"
+   ],
+   "narratives": [
+    "s1",
+    "s3"
+   ],
+   "techniques": [
+    "s1",
+    "s3",
+    "s4"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "SGDSN / VIGINUM (France)",
+    "title": "Analysis of the Russian information manipulation set Storm-1516 (Technical report)",
+    "url": "https://www.sgdsn.gouv.fr/files/files/Publications/20250507_TLP-CLEAR_NP_SGDSN_VIGINUM_Technical%20report_Storm-1516.pdf",
+    "date": "2025-05-07",
+    "kind": "government",
+    "lang": "en",
+    "terms": "TLP:CLEAR; reuse licence not stated",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "SGDSN / VIGINUM (France)",
+    "title": "Analyse du mode opératoire informationnel russe Storm-1516 (rapport technique)",
+    "url": "https://www.sgdsn.gouv.fr/files/2025-05/20250507_TLP-CLEAR_NP_SGDSN_VIGINUM_Rapport%20technique_Storm-1516.pdf",
+    "date": "2025-05-07",
+    "kind": "government",
+    "lang": "fr",
+    "terms": "TLP:CLEAR; reuse licence not stated",
+    "checked": "2026-10-21 fetched (French original read for the summary attribution)"
+   },
+   {
+    "id": "s3",
+    "publisher": "Microsoft Threat Analysis Center",
+    "title": "Russia leverages cyber proxies and Volga Flood assets in expansive influence efforts (Election Report 4)",
+    "url": "https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/msc/documents/presentations/CSR/MTAC-Election-Report-4.pdf",
+    "date": "2024-09-17",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright Microsoft; facts and short quotes only",
+    "checked": "2026-10-21 fetched (blog: https://blogs.microsoft.com/on-the-issues/2024/09/17/russian-election-interference-efforts-focus-on-the-harris-walz-campaign/)"
+   },
+   {
+    "id": "s4",
+    "publisher": "Clemson University Media Forensics Hub",
+    "title": "Writers of the Storm: Who's Behind the Ongoing Production of Pro-Russian False Narratives",
+    "url": "https://open.clemson.edu/mfh_ci_reports/10",
+    "date": "2024-10",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (repository page and abstract only; PDF at https://open.clemson.edu/cgi/viewcontent.cgi?article=1009&context=mfh_ci_reports not read)"
+   }
+  ],
+  "notes": "VIGINUM documents 77 operations (Aug 2023 to 5 Mar 2025), names John Mark Dougan, Prigozhin-linked R-FBI/BJA and Project Lakhta, and Dugin-linked CGE; it reports, from Washington Post-cited European intelligence documents, an allegation that GRU Unit 29155 officer Yury Khoroshenky funds and coordinates the set, and says it cannot confirm this. Microsoft (Sept 2024 blog) calls it a group 'identified by news reports as a Kremlin-aligned troll farm' and assesses Russian actors' synchronised shifts come from top-down Kremlin direction; MTAC reports #2 and #3 (2024) were not opened. Clemson first identified the campaign in Dec 2023. No indicators given here: VIGINUM's channel list (6.3.2) mixes real outlets and real individuals' X accounts (excluded by rule), its laundering list (6.3.1) is real African and Middle East outlets (victims or paid placements), and its first-dissemination sites are the CopyCop domains listed under the CopyCop entry. Platform list from VIGINUM's distribution-chain section and appendix 6.1."
+ },
+ {
+  "id": "operation-overload",
+  "name": "Operation Overload",
+  "aliases": [
+   "Matryoshka",
+   "Storm-1679"
+  ],
+  "state": "Russia",
+  "operator": "unknown; sources describe pro-Russian or Russia-based actors",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "a large-scale, cross-country, multi-platform disinformation campaign designed to spread pro-Russian propaganda in the West",
+    "section": "2. Executive Summary, p. 4"
+   },
+   {
+    "source": "s2",
+    "operatorType": "origin only",
+    "says": "confirm that the operation is based in Russia",
+    "section": "Update page (12 Sept 2024)"
+   },
+   {
+    "source": "s3",
+    "operatorType": "linked to a state",
+    "says": "Russia-affiliated influence actor Storm-1679",
+    "section": "Figure 1 caption and p. 3"
+   },
+   {
+    "source": "s4",
+    "operatorType": "linked to a state",
+    "says": "a newer group reportedly aligned with the Kremlin",
+    "section": "Blog text on Storm-1679"
+   }
+  ],
+  "active": {
+   "from": 2023
+  },
+  "platforms": [
+   "X",
+   "Telegram",
+   "email",
+   "VK",
+   "Odnoklassniki",
+   "websites",
+   "Bluesky"
+  ],
+  "languages": [
+   "en",
+   "fr",
+   "de"
+  ],
+  "targets": [
+   "fact-checkers and newsrooms",
+   "France",
+   "Germany",
+   "Ukraine",
+   "United States",
+   "International Olympic Committee / Paris 2024"
+  ],
+  "narratives": "CheckFirst describes anti-Ukraine fakes aimed at France and Germany, sent to fact-checkers to waste their time and get debunks that spread the content; Microsoft describes Storm-1679 videos spoofing outlets to predict violence at the Paris Olympics and smear the IOC, and later the Harris campaign.",
+  "techniques": [
+   "impersonating real outlets or officials",
+   "AI-generated images or video",
+   "deepfake audio or video",
+   "fake personas",
+   "hijacked or bought accounts",
+   "spam amplification",
+   "comment brigading",
+   "forged documents",
+   "content laundering"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1",
+    "s5"
+   ],
+   "languages": [
+    "s1",
+    "s3"
+   ],
+   "targets": [
+    "s1",
+    "s3",
+    "s4"
+   ],
+   "narratives": [
+    "s1",
+    "s3",
+    "s4"
+   ],
+   "techniques": [
+    "s1",
+    "s3"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "CheckFirst and Reset.Tech",
+    "title": "Operation Overload: how pro-Russian actors flood newsrooms with fake content and seek to divert their efforts",
+    "url": "https://checkfirst.network/wp-content/uploads/2024/06/Operation_Overload_WEB.pdf",
+    "date": "2024-06-04",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "CC BY-SA (stated in report)",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "CheckFirst",
+    "title": "Operation Overload: A Growing Disinformation Threat Now Targeting the U.S. Presidential Election",
+    "url": "https://checkfirst.network/operation-overload-a-growing-disinformation-threat-now-targeting-the-u-s-presidential-election/",
+    "date": "2024-09-12",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated on page",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s3",
+    "publisher": "Microsoft Threat Analysis Center",
+    "title": "Russian influence efforts converge on 2024 Paris Olympic Games",
+    "url": "https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/final/en-us/microsoft-brand/documents/MTAC_Report_Russian_Influence_and_Paris_2024.pdf",
+    "date": "2024-06-02",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright Microsoft; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s4",
+    "publisher": "Microsoft (On the Issues)",
+    "title": "Russian election interference efforts focus on the Harris-Walz campaign",
+    "url": "https://blogs.microsoft.com/on-the-issues/2024/09/17/russian-election-interference-efforts-focus-on-the-harris-walz-campaign/",
+    "date": "2024-09-17",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright Microsoft; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s5",
+    "publisher": "Clemson University Media Forensics Hub",
+    "title": "Operation Overload - Matryoshka's Next Layer",
+    "url": "https://open.clemson.edu/mfh_ci_reports/12",
+    "date": "2026-03-25",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (repository page and abstract only)"
+   }
+  ],
+  "notes": "Alias mapping: CheckFirst (June 2024) builds on Antibot4Navalny/AFP 'Matryoshka' but does not mention Storm-1679; Microsoft's June 2024 report does not mention Overload; the Clemson 2026 abstract joins the three names with 'aka', with footnotes I did not read. Treat the Storm-1679 equivalence as asserted by Clemson, not shown by Microsoft. CheckFirst names no operator; its Sept 2024 update cites a Russian residential IP behind emails. Microsoft says Storm-1679 deceived US celebrities into recording Cameo videos and used AI audio imitating Tom Cruise; no celebrity is listed here. Indicators: six anonymous seeder/pinger X accounts named by CheckFirst; repurposed or hacked accounts of real people (e.g. Fig. 14) excluded. CheckFirst says it collected 200+ emails and saw 800+ organisations targeted. The CheckFirst Sept 2024 update counts about 71,000 emails Jan-Sept 2024 (press summary; not re-verified on the page)."
+ },
+ {
+  "id": "copycop",
+  "name": "CopyCop",
+  "aliases": [
+   "Storm-1516 (per Recorded Future 2025)"
+  ],
+  "state": "Russia",
+  "operator": "John Mark Dougan with support from the Center for Geopolitical Expertise (CGE) and the GRU (Recorded Future 2025 assessment)",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "this network is likely operated from Russia and is likely aligned with the Russian government",
+    "section": "Executive Summary, p. 1"
+   },
+   {
+    "source": "s2",
+    "operatorType": "government",
+    "says": "very likely operated by John Mark Dougan with support from the Moscow-based Center for Geopolitical Expertise (CGE) and the Main Directorate",
+    "section": "Executive Summary, p. 1"
+   },
+   {
+    "source": "s3",
+    "operatorType": "linked to a state",
+    "says": "Proven involvement of John Mark DOUGAN through the CopyCop network",
+    "section": "4.1 heading"
+   }
+  ],
+  "active": {
+   "from": 2023
+  },
+  "platforms": [
+   "websites",
+   "X",
+   "Telegram"
+  ],
+  "languages": [
+   "en",
+   "fr",
+   "de",
+   "tr",
+   "uk",
+   "sw"
+  ],
+  "targets": [
+   "United States",
+   "United Kingdom",
+   "France",
+   "Germany",
+   "Canada",
+   "Armenia",
+   "Moldova",
+   "Ukraine"
+  ],
+  "narratives": "Recorded Future summarises the content as undermining Western support for Ukraine and Western domestic politics, covering the war from a pro-Russian angle and Gaza critically of Israel, and in 2024 favouring Republican candidates; the 2025 report adds smears of pro-Western leaders.",
+  "techniques": [
+   "fake news outlets",
+   "AI-generated text",
+   "content laundering",
+   "fake personas",
+   "impersonating real outlets or officials",
+   "deepfake audio or video",
+   "fake fact-checks",
+   "cloned news sites"
+  ],
+  "indicators": [
+   {
+    "domain": "bbc-uk.news",
+    "kind": "cloned news domain",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "dcweekly.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "clearstory.news",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "miamichron.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "infosindependants.fr",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "britishchronicle.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "londonchronicle.news",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "gbgeopolitics.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "sanfranchron.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "bostontimes.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "chicagocrier.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "londoncrier.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "londoncrier.co.uk",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "xposedem.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix A: Indicators of Compromise"
+   },
+   {
+    "domain": "allstatesnews.us",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "alohadigest.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "bayoucitycrier.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "bayoucitytoday.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "capitalcitydaily.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "capitoldaily.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "dailyweekly.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "fldaily.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "flga.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "goldengatedaily.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "kjfk.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "klas.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "klax.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "kmia.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "kpbi.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "kphl.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "ksfo.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "ksmo.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "lachronicle.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "lareport.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "metroreport.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "sfreport.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "silvercity.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "steelcitydaily.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "twincityreport.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "txdaily.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "usatimes.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "walx.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "wdmdtv.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "windycitycrier.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "windycitymirror.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "windycitytimes.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "wktv.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "wtat.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "wval.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix A: CopyCop US Websites"
+   },
+   {
+    "domain": "truefact.news",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Appendix B: Truefact Cluster Websites"
+   },
+   {
+    "domain": "houstonpost.org",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   },
+   {
+    "domain": "seattle-tribune.com",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   },
+   {
+    "domain": "atlanta-observer.com",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   },
+   {
+    "domain": "flagstaffpost.com",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   },
+   {
+    "domain": "raleigh-herald.com",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   },
+   {
+    "domain": "harrisburg-chronicle.com",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   },
+   {
+    "domain": "pennsylvaniamessenger.com",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   },
+   {
+    "domain": "michigantribune.org",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   },
+   {
+    "domain": "georgiagazette.us",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   },
+   {
+    "domain": "nevadaannouncer.com",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "6.2 Domain names linked to CopyCop"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1",
+    "s3"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1",
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2",
+    "s3"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Recorded Future (Insikt Group)",
+    "title": "Russia-Linked CopyCop Uses LLMs to Weaponize Influence Content at Scale",
+    "url": "https://assets.recordedfuture.com/insikt-report-pdfs/2024/cta-2024-0509.pdf",
+    "date": "2024-05-09",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright Recorded Future; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Recorded Future (Insikt Group)",
+    "title": "CopyCop Deepens Its Playbook with New Websites and Targets",
+    "url": "https://assets.recordedfuture.com/insikt-report-pdfs/2025/cta-ru-2025-0917.pdf",
+    "date": "2025-09-17",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright Recorded Future; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s3",
+    "publisher": "SGDSN / VIGINUM (France)",
+    "title": "Analysis of the Russian information manipulation set Storm-1516 (Technical report)",
+    "url": "https://www.sgdsn.gouv.fr/files/files/Publications/20250507_TLP-CLEAR_NP_SGDSN_VIGINUM_Technical%20report_Storm-1516.pdf",
+    "date": "2025-05-07",
+    "kind": "government",
+    "lang": "en",
+    "terms": "TLP:CLEAR; reuse licence not stated",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Attribution rises from 'likely operated from Russia, likely aligned with the Russian government' (RF May 2024) to 'very likely operated by Dougan with CGE and GRU support' (RF Sept 2025); operatorType 'linked to a state' reflects the earlier and VIGINUM wording, while the 2025 RF line is recorded as 'government' because it names the GRU in a support role. Dougan publicly denied the sites were part of a Russian operation (as reported by RF). RF and VIGINUM treat CopyCop as the website arm of Storm-1516. The June 2024 RF follow-up (cta-ru-2024-0624, 120 new sites) was not read. Indicator pool: RF 2024 lists 14 domains, RF 2025 appendices list about 180, VIGINUM 6.2 lists about 300; 60 taken. sarahwestall.com/.org in VIGINUM's list were excluded because they bear a real private person's name. 'cloned news sites' rests on bbc-uk.news (RF: 'almost certainly looking to impersonate the BBC')."
+ },
+ {
+  "id": "rt-covert-tenet",
+  "name": "RT covert influence projects (U.S. Company-1 scheme; African Stream; Red)",
+  "aliases": [
+   "Tenet Media (press name for U.S. Company-1)"
+  ],
+  "state": "Russia",
+  "operator": "RT (TV-Novosti), Russian state-controlled media; RT employees Kostiantyn Kalashnikov and Elena Afanasyeva (charged)",
+  "operatorType": "state media",
+  "attributions": [
+   {
+    "source": "s2",
+    "operatorType": "state media",
+    "says": "RT, formerly known as \"Russia Today,\" is a state-controlled media outlet funded and directed by the Government of Russia",
+    "section": "Indictment para. 1"
+   },
+   {
+    "source": "s1",
+    "operatorType": "state media",
+    "says": "Employees of Russian State-Controlled Media Outlet Deployed Nearly $10 Million to Publish RT-Curated Content",
+    "section": "Press release subtitle"
+   },
+   {
+    "source": "s3",
+    "operatorType": "state media",
+    "says": "RT has leveraged its extensive state funding to covertly recruit and pay social media personalities and provide them with unbranded content",
+    "section": "RT's Covert Influence Around the World"
+   }
+  ],
+  "active": {
+   "from": 2022,
+   "to": 2024
+  },
+  "platforms": [
+   "YouTube",
+   "TikTok",
+   "Instagram",
+   "X",
+   "websites"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "United States",
+   "Moldova",
+   "Germany",
+   "France",
+   "Africa",
+   "Argentina",
+   "Europe",
+   "South America"
+  ],
+  "narratives": "The DOJ says the US company's videos, while not uniform, mostly served Russia's stated aim of amplifying US domestic divisions on issues such as immigration and inflation; the State Department describes RT proxy outlets, election interference in Moldova and influence projects in Europe, Africa and the Americas.",
+  "techniques": [
+   "paid influencers",
+   "front organisations",
+   "fake personas",
+   "state media amplification"
+  ],
+  "indicators": [
+   {
+    "domain": "africanstream.media",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "RT's Covert Influence Around the World"
+   },
+   {
+    "domain": "thered.stream",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "RT's Covert Influence Around the World"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1",
+    "s3"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s3"
+   ],
+   "narratives": [
+    "s1",
+    "s3"
+   ],
+   "techniques": [
+    "s1",
+    "s2",
+    "s3"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "US Department of Justice",
+    "title": "Two RT Employees Indicted for Covertly Funding and Directing U.S. Company that Published Thousands of Videos in Furtherance of Russian Interests",
+    "url": "https://www.justice.gov/archives/opa/pr/two-rt-employees-indicted-covertly-funding-and-directing-us-company-published-thousands",
+    "date": "2024-09-04",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "US District Court, S.D. New York",
+    "title": "Sealed Indictment, United States v. Kostiantyn Kalashnikov and Elena Afanasyeva, 24 Cr. 519",
+    "url": "https://www.justice.gov/opa/media/1366266/dl",
+    "date": "2024-09-04",
+    "kind": "court",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s3",
+    "publisher": "US Department of State (Office of the Spokesperson)",
+    "title": "Alerting the World to RT's Global Covert Activities",
+    "url": "https://2021-2025.state.gov/alerting-the-world-to-rts-global-covert-activities/",
+    "date": "2024-09-13",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched (archived 2021-2025 State Department site)"
+   }
+  ],
+  "notes": "Charges are allegations; the defendants are at large and have not been tried. The DOJ documents call the company 'U.S. Company-1' and do not name it; 'Tenet Media' is the name used in press reporting, not in these sources. Per the brief, no US influencers are listed. The State Department fact sheet also describes an RT-embedded cyber entity with ties to Russian intelligence (since spring 2023) and an RT-run military crowdfunding programme; 'hack and leak' is not listed because State does not describe leaks. Active-from 2022 rests on State's 'for over two years' (as of Sept 2024); the US scheme ran about Oct 2023 to Aug 2024."
+ },
+ {
+  "id": "voice-of-europe",
+  "name": "Voice of Europe",
+  "aliases": [],
+  "state": "Russia",
+  "operator": "Viktor Medvedchuk, acting through Voice of Europe s.r.o. and Artem Marchevskyi (Czech MFA)",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "runs a Russian influence operation from the Russian Federation on the territory of the Czech Republic",
+    "section": "Press release, para. 2"
+   },
+   {
+    "source": "s2",
+    "operatorType": "linked to a state",
+    "says": "media outlets under the permanent direct or indirect control of the leadership of the Russian Federation",
+    "section": "Recital 9; Annex adds 'Voice of Europe' to Annex XV"
+   }
+  ],
+  "active": {
+   "to": 2024
+  },
+  "platforms": [
+   "websites"
+  ],
+  "languages": [],
+  "targets": [
+   "Czech Republic",
+   "European Union",
+   "European Parliament elections 2024",
+   "Ukraine"
+  ],
+  "narratives": "The Czech MFA says the operation aimed to undermine Ukraine's territorial integrity, sovereignty and independence; the EU regulation places it among Russian-controlled outlets running propaganda against the Union.",
+  "techniques": [
+   "fake news outlets",
+   "front organisations"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s2"
+   ],
+   "languages": [],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Ministry of Foreign Affairs of the Czech Republic",
+    "title": "The Czech Government Approves Listings to the National Sanctions List on the basis of the Proposal by Foreign Minister",
+    "url": "https://mzv.gov.cz/jnp/en/issues_and_press/press_releases/the_czech_government_approves_listings.html",
+    "date": "2024-03-28",
+    "kind": "government",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (English version; Czech-language original not located)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Council of the European Union (Official Journal)",
+    "title": "Council Regulation (EU) 2024/1428 of 17 May 2024 amending Regulation (EU) No 833/2014",
+    "url": "https://eur-lex.europa.eu/eli/reg/2024/1428/oj",
+    "date": "2024-05-17",
+    "kind": "government",
+    "lang": "en",
+    "terms": "EU reuse policy (Decision 2011/833/EU), reuse with attribution",
+    "checked": "2026-10-21 fetched (via EUR-Lex HTML, CELEX 32024R1428)"
+   }
+  ],
+  "notes": "The government decision was taken on 27 March 2024; the MFA release is dated 28 March 2024. Medvedchuk is a Ukrainian politician living in Russia; the Czech source says he ran the operation 'from the Russian Federation', so state = Russia, operatorType 'linked to a state' (no Russian state body named as running it). The EU regulation suspends broadcasting by Voice of Europe as an outlet under Russian leadership control; the separate EU individual listings of 27 May 2024 were not opened. Reported cash payments to European politicians come from press and Czech officials' statements, not from these two documents, so 'paid influencers' is not listed. Neither source names the website domain or languages, so indicators and languages are empty; 'websites' platform is inferred from the regulation's 'media outlets' wording and the MFA's reference to the company and is weak. Active-from unknown."
+ },
+ {
+  "id": "bad-grammar",
+  "name": "Bad Grammar",
+  "aliases": [],
+  "state": "Russia",
+  "operator": "individuals from Russia (unnamed)",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "We linked this activity to individuals from Russia.",
+    "section": "Bad Grammar, Actor, p. 13"
+   }
+  ],
+  "active": {
+   "from": 2024,
+   "to": 2024
+  },
+  "platforms": [
+   "Telegram"
+  ],
+  "languages": [
+   "ru",
+   "en"
+  ],
+  "targets": [
+   "Russia",
+   "Ukraine",
+   "United States",
+   "Moldova",
+   "Baltic States",
+   "Tajik audiences"
+  ],
+  "narratives": "OpenAI says the comments attacked the presidents of Ukraine and Moldova as corrupt and Western-steered and argued the US should stop backing Ukraine, using personas on both sides of US politics; after the March 2024 Moscow attack a cluster urged Tajik-Russian unity.",
+  "techniques": [
+   "AI-generated text",
+   "fake personas",
+   "comment brigading",
+   "spam amplification"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "OpenAI",
+    "title": "AI and Covert Influence Operations: Latest Trends",
+    "url": "https://cdn.openai.com/threat-intelligence-reports/threat-intel-report-may-2024.pdf",
+    "date": "2024-05-30",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated; facts and short quotes only",
+    "checked": "2026-10-21 fetched (blog: https://openai.com/index/disrupting-deceptive-uses-of-AI-by-covert-influence-operations/)"
+   }
+  ],
+  "notes": "OpenAI rates it Breakout Scale category 1. The report publishes no indicators for Bad Grammar; the Telegram channels it names (@Slavyangrad, @police_frequency, @SGTNewsNetwork) are channels the network commented on, not its own accounts, so they are excluded. Active years: OpenAI's report covers the three months before May 2024 and cites February and March 2024 activity; start date unknown."
+ },
+ {
+  "id": "ghostwriter-unc1151",
+  "name": "Ghostwriter",
+  "aliases": [
+   "UNC1151 (technical component)"
+  ],
+  "state": "Belarus",
+  "operator": "UNC1151, assessed by Mandiant as linked to the Belarusian government (moderate confidence: Belarusian military)",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "aligned with Russian security interests",
+    "section": "Title and summary (July 2020); no state named"
+   },
+   {
+    "source": "s2",
+    "operatorType": "linked to a state",
+    "says": "UNC1151, a suspected state-sponsored cyber espionage actor",
+    "section": "Executive Summary (April 2021); no state named"
+   },
+   {
+    "source": "s3",
+    "operatorType": "government",
+    "says": "Mandiant assesses with high confidence that UNC1151 is linked to the Belarusian government and with moderate confidence is linked to the Belarusian military",
+    "section": "Attribution summary"
+   },
+   {
+    "source": "s3",
+    "operatorType": "linked to a state",
+    "says": "We cannot rule out Russian contributions to either UNC1151 or Ghostwriter",
+    "section": "Attribution summary"
+   },
+   {
+    "source": "s4",
+    "operatorType": "government",
+    "says": "malicious cyber activities, collectively designated as Ghostwriter, and associated these with the Russian state",
+    "section": "Declaration text, para. 1"
+   }
+  ],
+  "active": {
+   "from": 2017
+  },
+  "platforms": [
+   "websites",
+   "email",
+   "Telegram",
+   "social media (compromised accounts, platform not recorded)"
+  ],
+  "languages": [
+   "en",
+   "lt",
+   "pl",
+   "lv",
+   "uk",
+   "ru",
+   "de"
+  ],
+  "targets": [
+   "Lithuania",
+   "Latvia",
+   "Poland",
+   "Ukraine",
+   "Germany",
+   "Belarusian opposition"
+  ],
+  "narratives": "Mandiant summarises early content as anti-NATO (troop presence as threat, fabricated nuclear and COVID claims) and post-2020 content as framing Belarus protests as Western-run, alleging scandal in Polish and Lithuanian ruling parties, and stoking Polish-Lithuanian tension.",
+  "techniques": [
+   "hack and leak",
+   "forged documents",
+   "fake personas",
+   "impersonating real outlets or officials",
+   "hijacked or bought accounts",
+   "fake news outlets"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1",
+    "s2",
+    "s3"
+   ],
+   "languages": [
+    "s3"
+   ],
+   "targets": [
+    "s1",
+    "s3"
+   ],
+   "narratives": [
+    "s1",
+    "s3"
+   ],
+   "techniques": [
+    "s1",
+    "s2",
+    "s3"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Mandiant (FireEye)",
+    "title": "'Ghostwriter' Influence Campaign: Unknown Actors Leverage Website Compromises and Fabricated Content to Push Narratives Aligned With Russian Security Interests",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/ghostwriter-influence-campaign/",
+    "date": "2020-07-28",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright Google; facts and short quotes only",
+    "checked": "2026-10-21 fetched (blog page; original FireEye PDF not opened)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Mandiant",
+    "title": "Ghostwriter Update: Cyber Espionage Group UNC1151 Likely Conducts Ghostwriter Influence Activity",
+    "url": "https://services.google.com/fh/files/misc/ghostwriter_update_report.pdf",
+    "date": "2021-04-28",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright Mandiant/Google; facts and short quotes only",
+    "checked": "2026-10-21 fetched (date from publication record, not printed in PDF text read)"
+   },
+   {
+    "id": "s3",
+    "publisher": "Mandiant",
+    "title": "UNC1151 Assessed with High Confidence to have Links to Belarus, Ghostwriter Campaign Aligned with Belarusian Government Interests",
+    "url": "https://cloud.google.com/blog/topics/threat-intelligence/unc1151-linked-to-belarus-government/",
+    "date": "2021-11-15",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright Google; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s4",
+    "publisher": "Council of the European Union",
+    "title": "Declaration by the High Representative on behalf of the European Union on respect for the EU's democratic processes",
+    "url": "https://www.consilium.europa.eu/en/press/press-releases/2021/09/24/declaration-by-the-high-representative-on-behalf-of-the-european-union-on-respect-for-the-eu-s-democratic-processes/",
+    "date": "2021-09-24",
+    "kind": "government",
+    "lang": "en",
+    "terms": "EU reuse policy, reuse with attribution",
+    "checked": "2026-10-21 fetched via Internet Archive capture of the official page (live page returned 403 / browser check)"
+   }
+  ],
+  "notes": "Sources disagree on the state. Mandiant (Nov 2021) assesses with high confidence that Ghostwriter operations support the Belarusian government and with moderate confidence that Belarus sponsors them and is at least partly responsible; it says Russian contributions cannot be ruled out and it lacks evidence either way. The EU declaration (Sept 2021) records that some Member States associated Ghostwriter with the Russian state. Mandiant's July 2020 report named no state. state = Belarus follows the latest Mandiant attribution as the brief directs; the EU 'Russian state' attribution is kept above. The 2021-11 high-confidence line covers UNC1151 (the cyber unit); for Ghostwriter itself Mandiant's confidence on Belarusian sponsorship is moderate. Platforms: user-submitted news sites and compromised news websites (2020), compromised social media accounts of Polish officials (2021), Telegram channels and Belarusian state TV pickup (2021-11). The 2021 report says Polish officials' social media accounts were compromised; which platforms was not recorded from the text read. Indicators: Mandiant publishes UNC1151 credential-phishing domains (spoofed webmail), which are espionage infrastructure, not influence sites; compromised news sites are victims. None included."
+ },
+ {
+  "id": "stop-news",
+  "name": "Stop News",
+  "aliases": [
+   "Russia-based CIB network #2 (Meta Q2 2024)",
+   "Euro Top News",
+   "Newstop:Afrique"
+  ],
+  "state": "Russia",
+  "operator": "unnamed; OpenAI says consistent with a marketing company",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "This activity originated in Russia and appeared consistent with an operation run by a marketing company.",
+    "section": "Stop News, Actor, p. 23"
+   },
+   {
+    "source": "s2",
+    "operatorType": "origin only",
+    "says": "This network originated in Russia and targeted primarily English- and French-speaking audiences globally.",
+    "section": "02 Russia, p. 8"
+   }
+  ],
+  "active": {
+   "from": 2024,
+   "to": 2024
+  },
+  "platforms": [
+   "websites",
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "Telegram"
+  ],
+  "languages": [
+   "en",
+   "fr",
+   "ru"
+  ],
+  "targets": [
+   "United Kingdom",
+   "Francophone Africa",
+   "West Africa",
+   "France",
+   "Ukraine"
+  ],
+  "narratives": "Meta and OpenAI describe AI-summarised news mixed with entertainment, promoting Russian integration in Francophone Africa and criticising France there, and arguing in English that Western support for Ukraine should shrink; OpenAI notes attacks on France's Olympics organisation.",
+  "techniques": [
+   "fake news outlets",
+   "AI-generated text",
+   "AI-generated images or video",
+   "fake personas",
+   "ads",
+   "content laundering"
+  ],
+  "indicators": [
+   {
+    "domain": "euronewstop.co.uk",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains associated with this activity, p. 28"
+   },
+   {
+    "domain": "newstop.africa",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains associated with this activity, p. 28"
+   },
+   {
+    "domain": "britishtalks.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains associated with this activity, p. 28"
+   },
+   {
+    "domain": "britishattitudes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Domains associated with this activity, p. 28"
+   },
+   {
+    "x": "euronewstop",
+    "kind": "operation account",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, Russia-based CIB network #2"
+   },
+   {
+    "x": "newstop_africa",
+    "kind": "operation account",
+    "source": "s2",
+    "section": "Appendix: Threat indicators, Russia-based CIB network #2"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1",
+    "s2"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "OpenAI",
+    "title": "Influence and cyber operations: an update",
+    "url": "https://cdn.openai.com/threat-intelligence-reports/influence-and-cyber-operations-an-update_October-2024.pdf",
+    "date": "2024-10-09",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated; facts and short quotes only",
+    "checked": "2026-10-21 fetched (blog: https://openai.com/global-affairs/an-update-on-disrupting-deceptive-uses-of-ai/)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Q2 2024",
+    "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+    "date": "2024-08-15",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated; facts and short quotes only",
+    "checked": "2026-10-21 fetched (date from press coverage of release; not printed in text read)"
+   }
+  ],
+  "notes": "OpenAI says it began from Meta's Q2 2024 off-platform indicators, so the two describe the same network. Meta ad spend about $2,800; Breakout Scale category 3 per OpenAI because UK sites set up 'information partnerships' with a Welsh school, a Yorkshire church and a California chambers association (unwitting partners, not listed). Meta notes Euro Top News used the address of OK! Magazine and a VAT number of an unconnected UK firm (impersonation of real entities, victims not listed). Russian-language content was commercial promotion for St Petersburg businesses."
+ },
+ {
+  "id": "meta-q2-2024-ima-digital-caucasus",
+  "name": "Russia-based CIB network #1 (Meta Q2 2024)",
+  "aliases": [
+   "Agora Expert Club",
+   "yerli-media",
+   "sakartvelo-today"
+  ],
+  "state": "Russia",
+  "operator": "individuals associated with IMA Digital, a Moscow-registered marketing firm (Meta: 'links to')",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "our investigation found links to individuals associated with a Moscow-registered marketing firm called IMA Digital",
+    "section": "01 Russia, p. 7"
+   }
+  ],
+  "active": {
+   "to": 2024
+  },
+  "platforms": [
+   "websites",
+   "Facebook",
+   "Instagram",
+   "YouTube",
+   "Telegram",
+   "TikTok"
+  ],
+  "languages": [
+   "ka",
+   "hy",
+   "az",
+   "ru"
+  ],
+  "targets": [
+   "Georgia",
+   "Armenia",
+   "Azerbaijan"
+  ],
+  "narratives": "Meta says the sites backed Georgian Dream and attacked protesters against the foreign agent law, criticised the West in Azerbaijan, and in Armenia praised Russia and criticised the Prime Minister.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "ads",
+   "paid influencers"
+  ],
+  "indicators": [
+   {
+    "domain": "yerli-media.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: Threat indicators, Russia-based CIB network #1"
+   },
+   {
+    "domain": "lurermedia.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: Threat indicators, Russia-based CIB network #1"
+   },
+   {
+    "domain": "sakartvelo-today.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Appendix: Threat indicators, Russia-based CIB network #1"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Q2 2024",
+    "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+    "date": "2024-08-15",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta does not name the operation; the name field uses Meta's label. Meta says the network 'co-opted people in Armenia' to make videos; recorded as 'paid influencers' loosely, since Meta does not say they were paid; no individuals listed. Indicator 'lurermedia.org' is copied as printed; the same table's search terms say 'luremedia', so one spelling may be a typo in the source. Ad spend about $77,000. operatorType 'origin only' because Meta states links to individuals associated with a firm, not that the firm ran it, and names no state principal. Start year not stated."
+ },
+ {
+  "id": "meta-q2-2024-ukrainian-european-front",
+  "name": "Russia-based CIB network #3 (Meta Q2 2024)",
+  "aliases": [
+   "Ukrainian European Front",
+   "Mрія (Dream) art collective"
+  ],
+  "state": "Russia",
+  "operator": "individuals in Russia, some connected with people behind past IRA, Social Design Agency and NewsFront campaigns (Meta)",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "links to individuals in Russia, including some connected with people involved in numerous CIB campaigns we removed in the past",
+    "section": "03 Russia, p. 11"
+   }
+  ],
+  "active": {
+   "to": 2024
+  },
+  "platforms": [
+   "Facebook",
+   "Telegram",
+   "TikTok",
+   "X"
+  ],
+  "languages": [
+   "uk",
+   "ro"
+  ],
+  "targets": [
+   "Ukraine",
+   "Ukrainian diaspora in Europe",
+   "Moldova",
+   "France",
+   "Germany",
+   "Poland"
+  ],
+  "narratives": "Meta describes a feigned pro-Ukraine stance that stressed Ukrainian casualties, harsher punishment for draft evasion and demands for a 2024 presidential election, plus amplification of staged street stunts such as coffins at the Eiffel Tower; in Moldova it backed pro-Russian politicians.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "front organisations",
+   "ads",
+   "spam amplification"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Q2 2024",
+    "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+    "date": "2024-08-15",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta cannot confirm the offline stunts were organised by the same individuals. It mentions amplification of TikTok videos by a person publicly reported as GRU-recruited for the 2023 Star of David graffiti; that person is not listed. Meta's indicators for this network are Telegram channels only (t.me hosts excluded by rule), so indicators are empty. 'spam amplification' rests on Meta's note of likely purchased fake engagement from Brazil. Languages: Ukrainian is inferred from the Ukrainian-audience content and Romanian is stated for Moldova; Meta does not list all languages."
+ },
+ {
+  "id": "meta-q2-2024-ruposters",
+  "name": "Russia-based CIB network #4 (Meta Q2 2024)",
+  "aliases": [
+   "Center for Information Defense (fictitious entity)"
+  ],
+  "state": "Russia",
+  "operator": "clusters run by social media management groups in Sri Lanka and Nepal; links to Ruposters, a Moscow news aggregator with a history of government-related contracts (Meta)",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "our investigation found links to Ruposters, a news aggregator based in Moscow, with a public history of servicing government-related contracts",
+    "section": "04 Russia, pp. 12-13"
+   }
+  ],
+  "active": {
+   "to": 2024
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [
+   "uk",
+   "pl",
+   "en"
+  ],
+  "targets": [
+   "Ukraine",
+   "Poland",
+   "European Union",
+   "United States"
+  ],
+  "narratives": "Meta says the network attacked Zelensky and Ukraine's government over conscription and failure to protect citizens, raised Ukrainian-migrant issues in Poland, and in English criticised Western arms aid to Ukraine.",
+  "techniques": [
+   "fake personas",
+   "impersonating real outlets or officials",
+   "front organisations",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Quarterly Adversarial Threat Report, Q2 2024",
+    "url": "https://transparency.meta.com/sr/Q2-2024-Adversarial-threat-report/",
+    "date": "2024-08-15",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "not stated; facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta says the network originated in Russia while its two clusters were operated from Sri Lanka and Nepal; the investigation began from an FBI tip. Accounts impersonated Western public figures, including pro-Russia commentators (not listed). Meta's appendix gives no domains or X handles for this network. Ad spend about $41,000."
+ }
+]

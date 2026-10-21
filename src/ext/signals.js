@@ -74,9 +74,36 @@
     return out;
   }
 
+  // Domains and accounts named in a published influence-operation report (src/core/ops.js), from
+  // the post's links, the account's handle and what its profile names. One sign per operation.
+  function reports(m) {
+    const prof = PB.profileLinks ? PB.profileLinks(m.reading) : { domains: [], handles: [] };
+    const where = [...(m.domains || []).map((d) => [d, "This post links to", PB.opsOfDomain(d)]), ...prof.domains.map((d) => [d, "This account's profile names", PB.opsOfDomain(d)]),
+      [m.handle, "This account is", PB.opsOfHandle(m.handle)], ...prof.handles.map((h) => [h, "This account's profile names", PB.opsOfHandle(h)])];
+    const out = [], seen = new Set();
+    for (const [what, how, hits] of where) for (const h of hits || []) {
+      if (!h.op || seen.has(h.op.id)) continue;
+      seen.add(h.op.id);
+      const shown = h.indicator.x ? "@" + h.indicator.x : h.indicator.d;
+      out.push({ label: "Named in a published report", fam: "named-in-report", level: "warn", cat: "sources", rows: [["What Radar sees", `${how} ${shown}${what && what.toLowerCase() !== shown.replace(/^@/, "") ? ` (${what})` : ""}.`], ...PB.opRows(h)] });
+    }
+    return { out, domains: new Set(where.filter(([, , h]) => h && h.length).map(([d]) => String(d).toLowerCase())) };
+  }
+
+  // Look-alike news addresses (src/core/lookalike.js): a weak sign of its own.
+  function lookalikes(m) {
+    return (m.domains || []).map((d) => [d, PB.lookalikeOf(d)]).filter(([, h]) => h).map(([d, h]) => ({
+      label: `look-alike of ${h.official}`, fam: "lookalike-domain", level: "flag", cat: "sources",
+      rows: [["What Radar sees", `This post links to ${d}, which ${h.how === "swapped ending" ? "uses the name of" : h.how === "copies the name" ? "copies the name of" : h.how === "look-alike letters" ? "spells with look-alike letters the name of" : "is one letter away from the name of"} ${h.outlet} (${h.official}).`],
+        ["Why it matters", "Operations such as Doppelganger copied real outlets on addresses like washingtonpost.pm to borrow their trust."], dnp(PB.LOOKALIKE_DOES_NOT_PROVE)],
+    }));
+  }
+
   function links(m) {
-    const out = [];
-    const hits = [...(m.domains || []).flatMap(PB.stateLinksOfDomain), ...PB.stateLinksOfHandle(m.handle)];
+    const rep = reports(m), out = [...rep.out, ...lookalikes(m)];
+    // A report hit replaces the older state-table chip for the same domain or account.
+    const covered = (h) => h.basis === "named-in-report" && (rep.domains.has(String(h.domain || "").toLowerCase()) || rep.domains.has(String(h.x || "").toLowerCase()));
+    const hits = [...(m.domains || []).flatMap(PB.stateLinksOfDomain), ...PB.stateLinksOfHandle(m.handle)].filter((h) => !covered(h));
     for (const h of new Set(hits)) {
       const L = PB.stateLabel(h);
       out.push({ label: L.chip, fam: "state-link", cat: "sources", level: h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" || h.basis === "designated" ? "flag" : "info", rows: [["What it is", L.says], ["Source", `${h.source.title}${h.source.date ? ` (${h.source.date})` : ""}`], ["Read it", { links: [[h.source.url.replace(/^https?:\/\//, "").slice(0, 48), h.source.url]] }], h.domainSource ? ["Domain from", { links: [[h.domainSource.title, h.domainSource.url]] }] : null, dnp(PB.STATE_DOES_NOT_PROVE[h.basis])].filter(Boolean) });

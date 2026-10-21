@@ -43,6 +43,30 @@ were not published to a store.
 ### Measured (techniques)
 - On ordinary threads (PHEME), flooding fires on 0.55% to 3.3% of threads by size and
   cross-language on 0% to 1.1%. Neither has a labelled campaign set, so no precision is claimed.
+### Added (influence operations)
+- "Named in a published report": a link in a post, an account, or a website, domain or @handle in
+  an account's profile that a published report named as an influence operation's asset. The window
+  names the operation, who each source says ran it in the source's own words (linked to stays linked
+  to), the report and its date, and what the match does not prove. It is about the link or account,
+  never the person who shared it.
+- The table behind it: 98 operations from 27 attributed countries, 2017 to 2026, cited field by field
+  to 176 primary documents (platform threat reports, research labs, court filings, sanctions texts and
+  government reports, and reporting that names its sources), with 1,237 domains and accounts.
+  `data/ops.README.md` lists what was left out and why, and the licence of each kind of source.
+- "Look-alike news address", a separate weaker sign: a link that copies a major outlet's name on
+  another ending, with one letter off, or with look-alike letters (washingtonpost.pm, theguaradian.com).
+  It matches none of the 50,000-odd real outlet domains in Radar's owner and site tables.
+- Documented operations per year and per attributed country on the dashboard and the transparency
+  page, with the caveat beside the numbers: they count what investigators found and published, not
+  how much activity there was.
+- Two lessons, one per new sign.
+
+### Tests (influence operations)
+- One evidence rule for every country (`src/core/ops-schema.js`): a read source, an operator type a
+  source states, a citation for every field. A symmetry test checks that relabelling an operation's
+  country changes nothing, and that the rule code names no country.
+- False-match controls: no real outlet's domain is shipped as an indicator, and no real outlet matches
+  a look-alike pattern.
 
 ## 2.0.0 (2026-10-21)
 

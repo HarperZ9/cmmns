@@ -1,6 +1,6 @@
 // Builds Radar's transparency page from the evaluation results: every sign with its measured precision and
 // recall, intervals, corpus and licence; the side-balance table; what is not measured; the known
-// limits. Inputs: project-docs/evidence/eval-results.json and persuasion-results.json (written by
+// limits; documented influence operations by year and country (data/ops.json). Inputs: project-docs/evidence/eval-results.json and persuasion-results.json (written by
 // scripts/eval.mjs and scripts/eval-persuasion.mjs), families.js, EVALUATION.md and CORPORA.md.
 // Writes src/ext/transparency.html (opened from options and the popup) and docs/transparency.html.
 //   node scripts/transparency.mjs
@@ -13,6 +13,7 @@ import { MEASURED_DOES_NOT_PROVE } from "../src/core/measured.js";
 import { TECHNIQUES, PERSUASION_DOES_NOT_PROVE } from "../src/core/persuasion.js";
 import { FIGURE_CSS } from "./site/figures.mjs";
 import { leadSigns } from "./site/signs.mjs";
+import { opsSection } from "./site/ops-trend.mjs";
 
 const read = (p) => readFileSync(join(ROOT, p), "utf8");
 const pct = (x) => `${(x * 100).toFixed(1)}%`;
@@ -147,6 +148,7 @@ ${tbl(["Corpus", "Recall, right's usual targets", "Recall, left's usual targets"
 <h2>Every sign</h2>
 <p>Each of Radar's ${FAMILIES.length} signs, with the line its window shows beside it.</p>
 ${more("Every sign and its measured line", tbl(["Sign", "Area", "Kind", "What the window says"], everySignRows()))}
+${opsSection(JSON.parse(read("data/ops.json")))}
 <h2>What is not measured</h2>
 ${ul(notMeasured(fams))}
 <h2>Known limits</h2>

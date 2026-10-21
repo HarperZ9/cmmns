@@ -1,0 +1,2692 @@
+[
+ {
+  "id": "stoic-zero-zeno",
+  "name": "Zero Zeno",
+  "aliases": [
+   "STOIC",
+   "Stoic",
+   "Israel-based CIB network (Meta Q1 2024)",
+   "Pro-Israeli influence network (FakeReporter)"
+  ],
+  "state": "Israel",
+  "operator": "STOIC (Stoic), a Tel Aviv political marketing firm (Meta, OpenAI, FakeReporter); per the New York Times and Haaretz, commissioned by Israel's Ministry of Diaspora Affairs",
+  "operatorType": "contractor",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "we found links to STOIC, a political marketing and business intelligence firm based in Tel Aviv, Israel",
+    "section": "Israel section, pp. 10-11"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "The network was operated by STOIC, a political campaign management firm in Israel.",
+    "section": "Zero Zeno case study, Actor, p. 31"
+   },
+   {
+    "source": "s3",
+    "operatorType": "contractor",
+    "says": "The covert campaign was commissioned by Israel's Ministry of Diaspora Affairs, a government body ... four Israeli officials said.",
+    "section": "lede; the article also cites 'documents related to the operation'"
+   },
+   {
+    "source": "s4",
+    "operatorType": "commercial firm",
+    "says": "the Israeli company STOIC created and operates the influence network.",
+    "section": "Executive Summary, p. 2"
+   },
+   {
+    "source": "s5",
+    "operatorType": "contractor",
+    "says": "The operation was orchestrated by Israel's Diaspora Affairs Ministry and run by a political campaigning firm",
+    "section": "subheadline (article body paywalled)"
+   }
+  ],
+  "active": {
+   "from": 2023,
+   "to": 2024
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "Threads",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "he"
+  ],
+  "targets": [
+   "United States (incl. members of Congress, many of them Black Democrats)",
+   "Canada",
+   "Israel",
+   "India",
+   "Ghana (preparation only, per OpenAI)"
+  ],
+  "narratives": "Pro-Israel messaging on the Gaza war: calls to release hostages, praise for Israeli military action, attacks on UNRWA and on pro-Palestinian campus protesters, and claims that 'radical Islam' threatens Canada. Smaller clusters attacked Qatar, praised the Histadrut, and in May 2024 criticised India's BJP.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "front organisations",
+   "AI-generated text",
+   "AI-generated images or video",
+   "comment brigading",
+   "spam amplification",
+   "hijacked or bought accounts"
+  ],
+  "indicators": [
+   {
+    "domain": "nonagenda.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Israel-based CIB network threat indicators, p. 30"
+   },
+   {
+    "domain": "ufnews.io",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Israel-based CIB network threat indicators, p. 30"
+   },
+   {
+    "domain": "uc4canada.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Israel-based CIB network threat indicators, p. 30"
+   },
+   {
+    "domain": "the-good-samaritan.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Israel-based CIB network threat indicators, p. 30"
+   },
+   {
+    "domain": "moral-alliance.com",
+    "kind": "operation site",
+    "source": "s4",
+    "section": "pp. 16-17"
+   },
+   {
+    "domain": "moralalliance.co",
+    "kind": "operation site",
+    "source": "s4",
+    "section": "pp. 17-18"
+   },
+   {
+    "domain": "serenitynow.today",
+    "kind": "operation site",
+    "source": "s4",
+    "section": "p. 18, reverse IP lookup"
+   },
+   {
+    "domain": "thehumanfellowship.co",
+    "kind": "operation site",
+    "source": "s4",
+    "section": "p. 18, reverse IP lookup"
+   },
+   {
+    "domain": "arabslavetrade.wiki",
+    "kind": "operation site",
+    "source": "s4",
+    "section": "p. 18, reverse IP lookup"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s3",
+    "s6",
+    "s2"
+   ],
+   "platforms": [
+    "s1",
+    "s2",
+    "s6",
+    "s7"
+   ],
+   "languages": [
+    "s2",
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s2",
+    "s3"
+   ],
+   "narratives": [
+    "s1",
+    "s2",
+    "s3"
+   ],
+   "techniques": [
+    "s1",
+    "s2",
+    "s3",
+    "s4"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Adversarial Threat Report, First Quarter 2024 (May 2024)",
+    "url": "https://transparency.meta.com/sr/Q1-2024-Adversarial-threat-report",
+    "date": "2024-05-29",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "OpenAI",
+    "title": "AI and Covert Influence Operations: Latest Trends",
+    "url": "https://downloads.ctfassets.net/kftzwdyauwt9/5IMxzTmUclSOAcWUXbkVrK/3cfab518e6b10789ab8843bcca18b633/Threat_Intel_Report.pdf",
+    "date": "2024-05-30",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (PDF; the companion page openai.com/index/disrupting-deceptive-uses-of-AI-by-covert-influence-operations/ returned HTTP 403 to automated fetch)"
+   },
+   {
+    "id": "s3",
+    "publisher": "The New York Times",
+    "title": "Israel Secretly Targets U.S. Lawmakers With Influence Campaign on Gaza War (Sheera Frenkel)",
+    "url": "https://www.nytimes.com/2024/06/05/technology/israel-campaign-gaza-social-media.html",
+    "date": "2024-06-05",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched via Wayback Machine capture 20250103113733 (nytimes.com refuses automated fetch)"
+   },
+   {
+    "id": "s4",
+    "publisher": "FakeReporter",
+    "title": "Pro-Israeli Influence Network: New Findings",
+    "url": "https://fakereporter.net/pdf/pro-Israeli_influence_network-new_findings-0624.pdf",
+    "date": "2024-06-05",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched via Wayback capture 20240605143046 (live URL now returns 404)"
+   },
+   {
+    "id": "s5",
+    "publisher": "Haaretz",
+    "title": "Israel Secretly Targeted American Lawmakers With Gaza War Influence Campaign (Omer Benjakob)",
+    "url": "https://www.haaretz.com/israel-news/security-aviation/2024-06-05/ty-article-magazine/.premium/israel-secretly-targeted-american-lawmakers-with-gaza-war-influence-campaign/0000018f-e7c8-d11f-a5cf-e7cb62af0000",
+    "date": "2024-06-05",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (paywalled: headline, subheadline and first sentence only)"
+   },
+   {
+    "id": "s6",
+    "publisher": "FakeReporter",
+    "title": "רשת השפעה פרו-ישראלית (Pro-Israeli influence network), November 2023 - March 2024",
+    "url": "https://fakereporter.net/pdf/pro-israel_influence_network_report-0324.pdf",
+    "date": "2024-03-19",
+    "kind": "researcher",
+    "lang": "he",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched via Wayback capture 20240321014657; read in Hebrew"
+   },
+   {
+    "id": "s7",
+    "publisher": "DFRLab (Atlantic Council)",
+    "title": "Inauthentic campaign amplifying Islamophobic content targeting Canadians",
+    "url": "https://dfrlab.org/2024/03/28/inauthentic-campaign-amplifying-islamophobic-content-targeting-canadians/",
+    "date": "2024-03-28",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "One operation, several attributions kept separate. Meta says only that it 'found links to' STOIC; OpenAI says STOIC operated it. The NYT attributes the commissioning and a budget of about $2 million to the Ministry of Diaspora Affairs, citing four current and former ministry members and documents, including a message it viewed. The ministry denied involvement and said it had no connection to Stoic; Stoic did not respond. Haaretz's subheadline makes the same ministry attribution; its body is paywalled and was not read. FakeReporter's March 2024 Hebrew report (s6) identified the network (hundreds of fake profiles aimed at US lawmakers, mainly African-American Democrats; assets Non-Agenda, The Moral Alliance, Unfold Magazine) without naming an operator. Its June 2024 report (s4) ties the network to STOIC through Meta's report, an exposed Git repository referencing 'stoico_back' and 'farm_back', and a GitHub account it links to a STOIC co-founder. DFRLab (s7) said it is difficult to determine who is behind the accounts. NYT dates the start to October 2023 and says it was still active on X in June 2024; FakeReporter dates activity from November 2023. Unfold Magazine's domain is not given in the text I extracted. X amplifier handles listed by DFRLab were read only through a summarising fetch and are omitted to avoid transcription errors. A local fetch hook blocked Hebrew-language web search, so Haaretz's Hebrew edition was not read."
+ },
+ {
+  "id": "archimedes-group",
+  "name": "Archimedes Group",
+  "aliases": [
+   "Archimedes Tarva (the firm's product, per DFRLab)"
+  ],
+  "state": "Israel",
+  "operator": "Archimedes Group, Israeli political marketing firm",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "our investigation found that some of this activity was linked to an Israeli commercial entity, Archimedes Group.",
+    "section": "main text"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "Facebook removed hundreds of inauthentic pages and other assets operated by Israeli political marketing firm Archimedes Group",
+    "section": "standfirst"
+   }
+  ],
+  "active": {
+   "from": 2012,
+   "to": 2019
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [
+   "fr"
+  ],
+  "targets": [
+   "Nigeria",
+   "Senegal",
+   "Togo",
+   "Angola",
+   "Niger",
+   "Tunisia",
+   "Mali",
+   "Ghana",
+   "Latin America",
+   "Southeast Asia"
+  ],
+  "narratives": "Election-focused pages boosted or attacked local politicians (for example around Nigeria's February 2019 presidential election), posed as local news or fact-checking outlets, and pushed purported leaks about candidates. DFRLab found no consistent ideological theme.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets",
+   "fake fact-checks",
+   "ads"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (Facebook)",
+    "title": "Removing Coordinated Inauthentic Behavior From Israel (Nathaniel Gleicher)",
+    "url": "https://about.fb.com/news/2019/05/removing-coordinated-inauthentic-behavior-from-israel/",
+    "date": "2019-05-16",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "DFRLab (Atlantic Council)",
+    "title": "Inauthentic Israeli Facebook Assets Target the World",
+    "url": "https://dfrlab.org/2019/05/17/inauthentic-israeli-facebook-assets-target-the-world/",
+    "date": "2019-05-17",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta removed 265 Facebook and Instagram assets; about $812,000 in ads; first ad December 2012, most recent April 2019. Meta banned the firm and its subsidiaries and sent a cease and desist letter. DFRLab judged the activity profit-driven. No source names a state client. Languages: DFRLab quotes French-language page names (e.g. a Mali 'fake news' watchdog page); other languages are not stated. Neither source publishes domain or X indicators. In 2023 a Meta spokesperson told the Guardian that Team Jorge's Aims bots were connected to a now-defunct Israeli firm banned in 2019; the Guardian does not name it, so no link to Archimedes is asserted here."
+ },
+ {
+  "id": "team-jorge",
+  "name": "Team Jorge",
+  "aliases": [
+   "Aims (Advanced Impact Media Solutions)",
+   "Demoman International (company used for some operations, per the Guardian)"
+  ],
+  "state": "Israel",
+  "operator": "Team Jorge, a private Israel-based unit led by Tal Hanan (alias 'Jorge')",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "Team Jorge, which runs a private service offering to covertly meddle in elections without a trace.",
+    "section": "main text"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "one group of Israeli disinformation experts pitched its services to journalists posing as potential clients",
+    "section": "main text"
+   }
+  ],
+  "active": {
+   "from": 2015,
+   "to": 2022
+  },
+  "platforms": [
+   "X",
+   "Facebook",
+   "Instagram",
+   "LinkedIn",
+   "Telegram",
+   "YouTube",
+   "email"
+  ],
+  "languages": [],
+  "targets": [
+   "Africa",
+   "South and Central America",
+   "United States",
+   "Europe",
+   "Kenya (2022 election)",
+   "Nigeria (2015 presidential race)",
+   "Aims bot campaigns in UK, US, Canada, Germany, Switzerland, Mexico, Senegal, India, United Arab Emirates"
+  ],
+  "narratives": "A disinformation-for-hire service that sabotages rival campaigns with hacking, fabricated material, planted media stories and bot amplification for paying political and corporate clients. The reporters found Aims bots active mostly in commercial disputes.",
+  "techniques": [
+   "fake personas",
+   "spam amplification",
+   "hack and leak",
+   "hijacked or bought accounts",
+   "content laundering",
+   "forged documents",
+   "intimidation"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1",
+    "s2"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "The Guardian",
+    "title": "Revealed: the hacking and disinformation team meddling in elections",
+    "url": "https://www.theguardian.com/world/2023/feb/15/revealed-disinformation-team-jorge-claim-meddling-elections-tal-hanan",
+    "date": "2023-02-15",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "OCCRP (Story Killers consortium, coordinated by Forbidden Stories)",
+    "title": "Hacks, Bots and Blackmail: How Secret Cyber Mercenaries Disrupt Elections",
+    "url": "https://www.occrp.org/en/project/story-killers/hacks-bots-and-blackmail-how-secret-cyber-mercenaries-disrupt-elections",
+    "date": "2023-02-15",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (date taken from the consortium's coordinated 15 February 2023 release; page date not separately confirmed)"
+   }
+  ],
+  "notes": "State client: no source I read names a state client. The Guardian reports that Hanan said his services were available to intelligence agencies, political campaigns and private companies, that he described his team as graduates of government agencies, and that a company he used (Demoman International) is registered on an Israeli Ministry of Defense export-promotion site; the MoD did not respond. Many claims (33 presidential-level campaigns, 27 'successful') are Hanan's own, and the Guardian says not all could be verified. Hanan denied wrongdoing. Haaretz/TheMarker co-published (Benjakob and Megiddo, 15 Feb 2023) but I did not retrieve that article. Activity years: the Guardian documents 2015 work in Nigeria; the undercover meetings ran July-December 2022; Hanan claims more than two decades. Languages are not stated. No domain or X indicators are published."
+ },
+ {
+  "id": "rokh-solis-blackcore",
+  "name": "Rokh Solis",
+  "aliases": [
+   "Blackcore (BlackCore)",
+   "Israel-based influence-for-hire CIB network (Meta H2 2026)",
+   "'Mother-Child' (the operators' own name for their amplification tactic, per Meta)"
+  ],
+  "state": "Israel",
+  "operator": "VIGINUM: probably Blackcore, an Israeli private entity with no verifiable legal status; Meta: individuals based in Israel running influence-for-hire",
+  "operatorType": "commercial firm",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "commercial firm",
+    "says": "Plusieurs éléments techniques ont orienté les investigations de VIGINUM vers une entité privée israélienne nommée Blackcore",
+    "section": "Synthèse, p. 2; section 3.3 heading: 'Une entreprise israélienne probablement à l'origine des campagnes'"
+   },
+   {
+    "source": "s2",
+    "operatorType": "origin only",
+    "says": "Meta's investigation revealed links to individuals based in Israel. We assess this is an influence-for-hire operation",
+    "section": "CIB section, 2. Israel"
+   },
+   {
+    "source": "s4",
+    "operatorType": "commercial firm",
+    "says": "a digital operation whose infrastructure leads back to BlackCore, the Israeli influence firm under investigation in France",
+    "section": "standfirst (body paywalled)"
+   }
+  ],
+  "active": {
+   "from": 2025,
+   "to": 2026
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "TikTok",
+   "websites"
+  ],
+  "languages": [
+   "fr"
+  ],
+  "targets": [
+   "France (La France Insoumise and its candidates in Marseille, Toulouse and Roubaix, March 2026 municipal elections)",
+   "United Kingdom",
+   "Australia",
+   "Iran",
+   "Togo",
+   "Gabon",
+   "Angola",
+   "United States (NYC mayoral campaign)"
+  ],
+  "narratives": "VIGINUM: smears of La France Insoumise and three of its municipal candidates, including accusations of crimes, and a polarising pair of fronts (a conservative identitarian movement and a pseudo radical-Islamist group) that cast LFI as Muslim communitarian. Meta: client-specific campaigns, including anti-immigrant and anti-Muslim content in France, the UK and Australia, partisan content in Togo and Gabon, and anti-government messaging in Iran and Angola.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "front organisations",
+   "AI-generated text",
+   "AI-generated images or video",
+   "spam amplification",
+   "comment brigading",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "lalternative2026.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Synthèse, p. 2"
+   },
+   {
+    "domain": "blogdesophie.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Synthèse, p. 2"
+   },
+   {
+    "domain": "delogupourpalestine.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Synthèse, p. 2"
+   },
+   {
+    "domain": "piquemalzero.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Synthèse, p. 2"
+   },
+   {
+    "domain": "forsane-alizza.eu",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Synthèse, p. 2"
+   },
+   {
+    "domain": "rcn-france.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Synthèse, p. 2"
+   },
+   {
+    "domain": "rcn-france.com",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "Indicators of Compromise"
+   },
+   {
+    "domain": "sadaqahpalestine.com",
+    "kind": "operation site",
+    "source": "s3",
+    "section": "Indicators of Compromise"
+   },
+   {
+    "x": "LeBlogdeSophie0",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "section 2, fn. 6"
+   },
+   {
+    "x": "sadaqahpalestin",
+    "kind": "operation account",
+    "source": "s3",
+    "section": "Indicators of Compromise"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2",
+    "s5"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "VIGINUM (SGDSN, France)",
+    "title": "Rokh Solis : Analyse d'un mode opératoire informationnel ayant ciblé les élections municipales de mars 2026 (rapport technique)",
+    "url": "https://www.sgdsn.gouv.fr/files/files/viginum/Publications/20260611_SGDSN_VIGINUM_Rapport-technique_Rokh-Solis.pdf",
+    "date": "2026-06-11",
+    "kind": "government",
+    "lang": "fr",
+    "terms": "not stated in the document (French government publication)",
+    "checked": "2026-10-21 fetched; read in French (an English version is posted at https://www.sgdsn.gouv.fr/files/files/viginum/SGDSN_VIGINUM_Technical-Report_Rokh-Solis.pdf)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta",
+    "title": "Semiannual Adversarial Threat Report, Second Half 2026",
+    "url": "https://transparency.meta.com/sr/H2-2026-adversarial-threat-report/",
+    "date": "2026-08",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (cover reads 'AUGUST 2026 SECOND HALF'; title as listed on Meta's threat-reporting index)"
+   },
+   {
+    "id": "s3",
+    "publisher": "Meta (GitHub facebook/threat-research)",
+    "title": "Israel-Based Influence Operation Targeting France, the United Kingdom, Australia, Iran, Togo, Gabon, and Angola",
+    "url": "https://github.com/facebook/threat-research/blob/main/indicators/meta-h2-2026-israel-cib-based-network.md",
+    "date": "2026",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "MIT License (repository licence)",
+    "checked": "2026-10-21 fetched (raw file)"
+   },
+   {
+    "id": "s4",
+    "publisher": "Haaretz (with Libération)",
+    "title": "The fake Gaza charity linked to the anti-left disinformation campaign in France (Omer Benjakob and Amaelle Guiton)",
+    "url": "https://www.haaretz.com/israel-news/security-aviation/2026-06-11/ty-article-magazine/.premium/the-fake-gaza-charity-linked-to-the-anti-left-disinformation-campaign-in-france/0000019e-b6a8-d7bd-a3bf-beec56f10000",
+    "date": "2026-06-11",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (paywalled: standfirst and opening paragraph only)"
+   },
+   {
+    "id": "s5",
+    "publisher": "Haaretz (with Libération)",
+    "title": "Revealed: An anti-left influence operation in France leads to Tel Aviv (Omer Benjakob)",
+    "url": "https://www.haaretz.com/israel-news/security-aviation/2026-05-18/ty-article-magazine/.premium/revealed-an-anti-left-influence-op-in-france-leads-to-tel-aviv/0000019e-3686-d4f9-a7bf-feaecb1b0000",
+    "date": "2026-05-18",
+    "kind": "press",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (paywalled: standfirst only; it reports AI-generated fake nude images of a left-wing candidate)"
+   }
+  ],
+  "notes": "Merging VIGINUM's Rokh Solis with Meta's H2 2026 Israel network is my inference from shared indicators: Meta's published IOCs (s3) include lalternative2026.com, blogdesophie.com, delogupourpalestine.com, rcn-france.com, forsane-alizza.eu and sadaqahpalestine.com, all of which VIGINUM ties to Rokh Solis. Meta does not name Blackcore and covers more countries. VIGINUM says the wider ecosystem of Israeli cyber firms prevents it from identifying the exact operators with sufficient confidence, and that nothing establishes who commissioned the work. It also notes hashtags and posts shared with the pro-Israel organisation ELNET, as a marker of foreign involvement, without attributing the campaign to it. VIGINUM links sadaqahpalestine.com to Blackcore infrastructure through a shared mail server. Secondary coverage reports the Israeli foreign ministry told Reuters it had no knowledge of Blackcore; Reuters was not fetched. Active: VIGINUM dates assets from March 2025 (account creation, rcn-france.com registration); blackcore.online was registered on 22 August 2025. Personal names in VIGINUM section 3.3 are omitted."
+ },
+ {
+  "id": "iuvm-liberty-front-press",
+  "name": "Liberty Front Press",
+  "aliases": [
+   "International Union of Virtual Media (IUVM)",
+   "Quest 4 Truth (Q4T)",
+   "US Journal",
+   "Real Progressive Front",
+   "British Left",
+   "Critics Chronicle",
+   "Instituto Manquehue"
+  ],
+  "state": "Iran",
+  "operator": "International Union of Virtual Media (IUVM) per Meta 2025 and OpenAI 2024; the US Treasury designated IUVM as owned or controlled by the IRGC-Qods Force; Meta 2018 linked the network to Iranian state media",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "we assess with moderate confidence that this activity originates from Iranian actors.",
+    "section": "Who Is Conducting This Activity and Why?"
+   },
+   {
+    "source": "s2",
+    "operatorType": "linked to a state",
+    "says": "We are able to link this network to Iranian state media through publicly available website registration information",
+    "section": "Iran section"
+   },
+   {
+    "source": "s3",
+    "operatorType": "government",
+    "says": "International Union of Virtual Media (IUVM) were designated pursuant to E.O. 13848 for being owned or controlled by the IRGC-QF.",
+    "section": "designations"
+   },
+   {
+    "source": "s4",
+    "operatorType": "contractor",
+    "says": "attribute this multi-year operation to Iran's International Union of Virtual Media (IUVM), a sanctioned propaganda group with close links to the Iranian government.",
+    "section": "Updating Attribution of Persistent Iranian Influence Operation to 'Endless Mayfly', pp. 23-24"
+   },
+   {
+    "source": "s5",
+    "operatorType": "origin only",
+    "says": "accounts linked to people associated with the International Union of Virtual Media (IUVM), an Iranian entity",
+    "section": "IUVM case study, Actor, p. 28"
+   }
+  ],
+  "active": {
+   "from": 2013,
+   "to": 2024
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "Google+",
+   "TikTok",
+   "VKontakte",
+   "Odnoklassniki",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "fr",
+   "ar"
+  ],
+  "targets": [
+   "United States",
+   "United Kingdom",
+   "Latin America",
+   "Middle East",
+   "France",
+   "Israel",
+   "global audiences"
+  ],
+  "narratives": "Content aligned with Iranian foreign policy: anti-US, anti-Israel and anti-Saudi themes, support for Palestinians, Iran and the 'Axis of Resistance', delivered through outlets posing as independent news and civil-society groups, some styled as American progressives.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "typosquatted domains",
+   "impersonating real outlets or officials",
+   "AI-generated text",
+   "state media amplification",
+   "content laundering"
+  ],
+  "indicators": [
+   {
+    "domain": "libertyfrontpress.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Figure 1; Liberty Front Press section"
+   },
+   {
+    "domain": "usjournal.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "US Journal section"
+   },
+   {
+    "domain": "rpfront.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Real Progressive Front section"
+   },
+   {
+    "domain": "britishleft.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Figure 1"
+   },
+   {
+    "domain": "criticschronicle.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Figure 1"
+   },
+   {
+    "domain": "institutomanquehue.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Figure 1"
+   },
+   {
+    "x": "LibMovement1",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Liberty Movement accounts table"
+   },
+   {
+    "x": "PalestinianLM",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Liberty Movement accounts table"
+   },
+   {
+    "x": "USJOURNAL0",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "Table 6"
+   },
+   {
+    "domain": "iuvmpress.co",
+    "kind": "operation site",
+    "source": "s5",
+    "section": "IUVM indicators, p. 30"
+   },
+   {
+    "domain": "iuvmarchive.org",
+    "kind": "operation site",
+    "source": "s5",
+    "section": "IUVM indicators, p. 30"
+   },
+   {
+    "domain": "alettehad.net",
+    "kind": "cloned news domain",
+    "source": "s4",
+    "section": "p. 25, typosquatting example"
+   },
+   {
+    "domain": "7sabah.tr.com",
+    "kind": "operation site",
+    "source": "s4",
+    "section": "p. 25"
+   },
+   {
+    "domain": "amerikagozlemi.com",
+    "kind": "operation site",
+    "source": "s4",
+    "section": "p. 25"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s2",
+    "s4",
+    "s5"
+   ],
+   "platforms": [
+    "s1",
+    "s2",
+    "s5"
+   ],
+   "languages": [
+    "s1",
+    "s5"
+   ],
+   "targets": [
+    "s1",
+    "s2",
+    "s4",
+    "s5"
+   ],
+   "narratives": [
+    "s4",
+    "s5",
+    "s1"
+   ],
+   "techniques": [
+    "s1",
+    "s2",
+    "s4",
+    "s5"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "FireEye (now Mandiant / Google Cloud)",
+    "title": "Suspected Iranian Influence Operation: Leveraging Inauthentic News Sites and Social Media Aimed at U.S., U.K., Other Audiences (special report)",
+    "url": "https://www.fireeye.com/content/dam/fireeye-www/current-threats/pdfs/rpt-FireEye-Iranian-IO.pdf",
+    "date": "2018-08-21",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched via Wayback capture 20190101033503 (live URL redirects to a Mandiant landing page); summary blog live at https://cloud.google.com/blog/topics/threat-intelligence/suspected-iranian-influence-operation/"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta (Facebook)",
+    "title": "Taking Down More Coordinated Inauthentic Behavior",
+    "url": "https://about.fb.com/news/2018/08/more-coordinated-inauthentic-behavior/",
+    "date": "2018-08-21",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s3",
+    "publisher": "US Department of the Treasury",
+    "title": "Treasury Sanctions Iranian Entities for Attempted Election Interference",
+    "url": "https://home.treasury.gov/news/press-releases/sm1158",
+    "date": "2020-10-22",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s4",
+    "publisher": "Meta",
+    "title": "Semiannual Adversarial Threat Report, Second and Third Quarter 2025",
+    "url": "https://transparency.meta.com/sr/Q2-Q3-2025-Adversarial-threat-report/",
+    "date": "2025-12",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s5",
+    "publisher": "OpenAI",
+    "title": "AI and Covert Influence Operations: Latest Trends",
+    "url": "https://downloads.ctfassets.net/kftzwdyauwt9/5IMxzTmUclSOAcWUXbkVrK/3cfab518e6b10789ab8843bcca18b633/Threat_Intel_Report.pdf",
+    "date": "2024-05-30",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (PDF; the companion page openai.com/index/disrupting-deceptive-uses-of-AI-by-covert-influence-operations/ returned HTTP 403 to automated fetch)"
+   }
+  ],
+  "notes": "Attributions differ in strength and are kept apart: FireEye (moderate confidence, Iranian origin); Meta 2018 (linked to Iranian state media; one part, Quest 4 Truth, linked to Press TV); OpenAI 2024 (IUVM, 'an Iranian entity'); Meta 2025 (attributes the whole Liberty Front Press / Endless Mayfly lineage, 2013 to the 2024 US election, to IUVM). The Treasury designation (s3) concerns IUVM as an entity, owned or controlled by the IRGC-QF, and describes Iranian government components disguised as news organisations; it does not mention Liberty Front Press by name. Meta's 2025 footnote states the US sanction basis. Arabic: FireEye mentions Arabic-language, Middle East-focused sites it did not detail. FireEye also ties yemenshia.com and the Persian-language gahvare.com through registrant data; these are omitted as their status as operation assets is less direct. OpenAI notes earlier IUVM domains were seized by the FBI in 2020. Meta 2025 shares further infrastructure in its GitHub repository (proxy IPs only, not domains)."
+ },
+ {
+  "id": "endless-mayfly",
+  "name": "Endless Mayfly",
+  "aliases": [
+   "IUVM (per Meta 2025 attribution)"
+  ],
+  "state": "Iran",
+  "operator": "Citizen Lab: an Iran-aligned network, operator not named; Meta 2025: International Union of Virtual Media (IUVM)",
+  "operatorType": "contractor",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "we conclude with moderate confidence that Endless Mayfly is Iran-aligned and has been operational since at least early 2016.",
+    "section": "Summary"
+   },
+   {
+    "source": "s3",
+    "operatorType": "contractor",
+    "says": "attribute this operation to Iran's International Union of Virtual Media (IUVM), a US-sanctioned propaganda group with close ties to the Iranian government.",
+    "section": "Case Studies summary, 'Persistent Iranian Influence Operation (Endless Mayfly)'"
+   }
+  ],
+  "active": {
+   "from": 2016,
+   "to": 2019
+  },
+  "platforms": [
+   "X",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "fr",
+   "ar"
+  ],
+  "targets": [
+   "Saudi Arabia",
+   "United States",
+   "Israel"
+  ],
+  "narratives": "False and divisive stories critical of Saudi Arabia, the United States and Israel, published on look-alike copies of real news sites, amplified by inauthentic personas, then deleted once picked up, with a later shift to persona-bylined articles on third-party sites.",
+  "techniques": [
+   "typosquatted domains",
+   "cloned news sites",
+   "impersonating real outlets or officials",
+   "fake personas",
+   "content laundering"
+  ],
+  "indicators": [
+   {
+    "domain": "addustuor.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Addustour)"
+   },
+   {
+    "domain": "al-jazirah.org",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Jazeera)"
+   },
+   {
+    "domain": "al-shargh.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Sharq)"
+   },
+   {
+    "domain": "al-watan.co",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Watan News)"
+   },
+   {
+    "domain": "alarabyia.org",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Arabyia)"
+   },
+   {
+    "domain": "alettehad.net",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Ittihad)"
+   },
+   {
+    "domain": "aliraq-news.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Iraq News)"
+   },
+   {
+    "domain": "aljlazeera.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Jazeera)"
+   },
+   {
+    "domain": "alryiadh.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Riyadh)"
+   },
+   {
+    "domain": "alwatannewspaper.net",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Watan News)"
+   },
+   {
+    "domain": "bbc-arabic.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: BBC Arabic)"
+   },
+   {
+    "domain": "belfercenter.net",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Belfer Center)"
+   },
+   {
+    "domain": "bloomberq.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Bloomberg)"
+   },
+   {
+    "domain": "braekingisraelnews.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Breaking Israel News)"
+   },
+   {
+    "domain": "breakingisraelnews.net",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Breaking Israel News)"
+   },
+   {
+    "domain": "brusslestimes.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Brussels Time)"
+   },
+   {
+    "domain": "budapestbaecon.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Budapest Beacon)"
+   },
+   {
+    "domain": "bundesergierung.de",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Bundesregierung)"
+   },
+   {
+    "domain": "com-news-world.site",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: BBC)"
+   },
+   {
+    "domain": "com-users.info",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "domains.csv (impersonates: has a Twitter subdomain)"
+   },
+   {
+    "domain": "dawalhaq.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Dawaalhaq ( Islamic News Agency ))"
+   },
+   {
+    "domain": "daylisabah.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Daily Sabah)"
+   },
+   {
+    "domain": "democraticcoalition.net",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "domains.csv"
+   },
+   {
+    "domain": "elwataannews.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: El Watan News)"
+   },
+   {
+    "domain": "emaratallyoum.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: emaratalyoum)"
+   },
+   {
+    "domain": "emaratalyuom.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: emaratalyoum)"
+   },
+   {
+    "domain": "foreignpoilcy.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Foreign Policy)"
+   },
+   {
+    "domain": "foriegnpolicy.net",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Foreign Policy)"
+   },
+   {
+    "domain": "haaaretz.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Haaretz)"
+   },
+   {
+    "domain": "indepnedent.co",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Independent)"
+   },
+   {
+    "domain": "israelhayom.net",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: http://www.israelhayom.com/)"
+   },
+   {
+    "domain": "israellinarabic.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Israel In Arabic)"
+   },
+   {
+    "domain": "israelnationalnews.co",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: israelnationalnews.com)"
+   },
+   {
+    "domain": "israelnationalnews.net",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Israel National news)"
+   },
+   {
+    "domain": "jerusaleimonline.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Jerusalem Online)"
+   },
+   {
+    "domain": "lesoir.info",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Le Soir)"
+   },
+   {
+    "domain": "mesralarabiya.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Masralabia)"
+   },
+   {
+    "domain": "mintpressnevvs.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Mint Press News)"
+   },
+   {
+    "domain": "nationalepost.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: National Post)"
+   },
+   {
+    "domain": "policito.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Politico)"
+   },
+   {
+    "domain": "sharjah24.co",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Sharjah24.ae)"
+   },
+   {
+    "domain": "shoruknews.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Al Shorouk)"
+   },
+   {
+    "domain": "speigel.net",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Spiegel)"
+   },
+   {
+    "domain": "thaguardian.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: The Guardian)"
+   },
+   {
+    "domain": "theatlatnic.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: The Atlantic)"
+   },
+   {
+    "domain": "theglobeandmail.org",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: The Globe And Mail)"
+   },
+   {
+    "domain": "theguaradian.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: The Guardian)"
+   },
+   {
+    "domain": "theheraldscotland.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Herald Scotland)"
+   },
+   {
+    "domain": "thejerusalempost.org",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: The Jerusalem Post)"
+   },
+   {
+    "domain": "timesoffisrael.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Times of Israel)"
+   },
+   {
+    "domain": "timesofisraeil.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Times of Israel)"
+   },
+   {
+    "domain": "waradena.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Waradana)"
+   },
+   {
+    "domain": "washnigtonexaminer.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Washington Examiner)"
+   },
+   {
+    "domain": "xn--aljaeera-4t0d.net",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Aljazeera)"
+   },
+   {
+    "domain": "xn--alnaaregypt-cm8e.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Alnahar Egypt)"
+   },
+   {
+    "domain": "xn--arab21-6va.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Arabi21)"
+   },
+   {
+    "domain": "xn--c-wpma.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: CNN)"
+   },
+   {
+    "domain": "xn--emaraalyoum-1b9e.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: emaratalyoum)"
+   },
+   {
+    "domain": "xn--etik-k54a.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Detik)"
+   },
+   {
+    "domain": "xn--frace24-mkb.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: France 24)"
+   },
+   {
+    "domain": "xn--haarez-m17b.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Haaretz)"
+   },
+   {
+    "domain": "xn--huffngtonpost-69b.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Huffington Post)"
+   },
+   {
+    "domain": "xn--israelinarabi-ugb.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Israel In Arabic)"
+   },
+   {
+    "domain": "xn--nationmaser-5b9e.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Nation Master)"
+   },
+   {
+    "domain": "xn--ndependent-77a.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: The Independent)"
+   },
+   {
+    "domain": "xn--plitico-d5b.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Politico)"
+   },
+   {
+    "domain": "xn--r-2rm.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: RT)"
+   },
+   {
+    "domain": "xn--sraelinarabic-29b.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: Israel In Arabic)"
+   },
+   {
+    "domain": "xn--telocal-xt3c.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: The Local)"
+   },
+   {
+    "domain": "xn--theguardan-4ub.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: The guardian)"
+   },
+   {
+    "domain": "xn--theguardia-dq2e.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: The guardian)"
+   },
+   {
+    "domain": "xn--wa-exs.com",
+    "kind": "cloned news domain",
+    "source": "s2",
+    "section": "domains.csv (impersonates: wam.ae)"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1",
+    "s2",
+    "s3"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Citizen Lab (University of Toronto)",
+    "title": "Burned After Reading: Endless Mayfly's Ephemeral Disinformation Campaign",
+    "url": "https://citizenlab.ca/research/burned-after-reading-endless-mayflys-ephemeral-disinformation-campaign/",
+    "date": "2019-05-14",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated",
+    "checked": "2026-10-21 fetched (old URL citizenlab.ca/2019/05/burned-after-reading-... redirects here)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Citizen Lab (GitHub citizenlab/endless_mayfly)",
+    "title": "domains.csv (Endless Mayfly dataset)",
+    "url": "https://github.com/citizenlab/endless_mayfly/blob/master/domains.csv",
+    "date": "2019-05-14",
+    "kind": "researcher",
+    "lang": "en",
+    "terms": "not stated (repository has no licence file)",
+    "checked": "2026-10-21 fetched (raw CSV, 72 rows)"
+   },
+   {
+    "id": "s3",
+    "publisher": "Meta",
+    "title": "Semiannual Adversarial Threat Report, Second and Third Quarter 2025",
+    "url": "https://transparency.meta.com/sr/Q2-Q3-2025-Adversarial-threat-report/",
+    "date": "2025-12",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "All 72 domains in Citizen Lab's domains.csv are listed verbatim (defanging removed), above the brief's 60-indicator cap, because the task asked for the full typosquat list for look-alike detection. 70 are typed 'Media' (impersonating outlets) and kept as cloned news domains; com-users.info (a spoofed Twitter subdomain host), dawalhaq.com and democraticcoalition.net (type 'Unknown') are marked operation site; bundesergierung.de and belfercenter.net impersonate a government and an academic centre. Several are punycode homoglyph domains (xn--...). The CSV row for israelnationalnews.net carries a trailing space in the source, trimmed here. Citizen Lab's 'Iran-aligned' is weaker than origin: it does not say Iran ran the network. Meta 2025 links Endless Mayfly to Liberty Front Press and attributes both to IUVM; see iuvm-liberty-front-press. Citizen Lab's active window (2016 to its 2019 publication) is used; Meta's linked lineage runs 2013 to 2024."
+ },
+ {
+  "id": "emennet-pasargad-2020-election",
+  "name": "Voter Intimidation and Influence Campaign",
+  "aliases": [
+   "Emennet Pasargad",
+   "Eeleyanet Gostar",
+   "Net Peygard Samavat Company (former name, per Treasury)",
+   "fake 'Proud Boys' emails"
+  ],
+  "state": "Iran",
+  "operator": "Emennet Pasargad (formerly Eeleyanet Gostar), an Iran-based company; employees Seyyed Mohammad Hosein Musa Kazemi and Sajjad Kashian indicted",
+  "operatorType": "contractor",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "contractor",
+    "says": "experienced Iran-based computer hackers who worked as contractors for an Iran-based company formerly known as Eeleyanet Gostar, and now known as Emennet Pasargad",
+    "section": "press release"
+   },
+   {
+    "source": "s2",
+    "operatorType": "contractor",
+    "says": "Leading this attempted election influence campaign was Iranian cyber company Emennet Pasargad.",
+    "section": "press release"
+   }
+  ],
+  "active": {
+   "from": 2020,
+   "to": 2020
+  },
+  "platforms": [
+   "email",
+   "Facebook"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "United States (registered Democratic voters, Republican members of Congress, Trump campaign associates, White House advisers, media)"
+  ],
+  "narratives": "Emails posing as the Proud Boys threatened Democratic voters, while messages and a video falsely claimed Democrats planned to exploit voter-registration security flaws to fake mail-in ballots.",
+  "techniques": [
+   "impersonating real outlets or officials",
+   "intimidation",
+   "hijacked or bought accounts",
+   "forged documents"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "US Department of Justice",
+    "title": "Two Iranian Nationals Charged for Cyber-Enabled Disinformation and Threat Campaign Designed to Influence the 2020 U.S. Presidential Election",
+    "url": "https://www.justice.gov/archives/opa/pr/two-iranian-nationals-charged-cyber-enabled-disinformation-and-threat-campaign-designed",
+    "date": "2021-11-18",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched via Wayback capture 20230127053040 of the original /opa/pr/ path (live archive page renders without text to automated fetch)"
+   },
+   {
+    "id": "s2",
+    "publisher": "US Department of the Treasury",
+    "title": "Treasury Sanctions Iran Cyber Actors for Attempting to Influence the 2020 U.S. Presidential Election",
+    "url": "https://home.treasury.gov/news/press-releases/jy0494",
+    "date": "2021-11-18",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "DOJ dates the campaign August-November 2020. DOJ says Eeleyanet Gostar is known to have provided services to the Iranian government, including the Guardian Council; Treasury says Emennet was previously designated (as Net Peygard Samavat) for supporting the IRGC Electronic Warfare and Cyber Defense Organization. Neither release states that a government body ordered this campaign, so 'contractor' rests on Treasury's IRGC-support finding. 'Forged documents' refers to the fabricated video with simulated intrusions; DOJ also describes hacking a state voter website and a US media company. The releases publish no domains or X handles. Personal names are those of indicted defendants as published by DOJ."
+ },
+ {
+  "id": "storm-2035",
+  "name": "Storm-2035",
+  "aliases": [
+   "Nio Thinker",
+   "Savannah Time",
+   "EvenPolitics",
+   "Teorator",
+   "Westland Sun"
+  ],
+  "state": "Iran",
+  "operator": "An Iranian network (Microsoft, OpenAI); Meta 2025 folds the 2024 US-election activity reported by Microsoft and OpenAI into its IUVM attribution",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "An Iranian network, Storm-2035, comprising four websites masquerading as news outlets",
+    "section": "Iran-run covert news sites target US voter groups, p. 4"
+   },
+   {
+    "source": "s2",
+    "operatorType": "origin only",
+    "says": "a cluster of ChatGPT accounts that were generating content for a covert Iranian influence operation identified as Storm-2035",
+    "section": "main text"
+   },
+   {
+    "source": "s3",
+    "operatorType": "contractor",
+    "says": "This set of linked networks spans from our first Iranian CIB disruption in 2018 through off-platform activity targeting the 2024 US elections.",
+    "section": "p. 24, with footnote 2: 'As reported by our peers at Microsoft and OpenAI'"
+   }
+  ],
+  "active": {
+   "from": 2020,
+   "to": 2024
+  },
+  "platforms": [
+   "websites",
+   "X",
+   "Instagram"
+  ],
+  "languages": [
+   "en",
+   "es",
+   "fr",
+   "ar"
+  ],
+  "targets": [
+   "United States (progressive and conservative voter groups; Latinx communities)",
+   "Venezuela",
+   "Scotland (independence)"
+  ],
+  "narratives": "Polarising content for both ends of the US spectrum on the presidential candidates, LGBTQ rights and the Israel-Hamas war, plus the Gaza conflict, Israel at the Olympics, Venezuelan politics and Scottish independence, mixed with fashion and beauty posts.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "AI-generated text",
+   "content laundering"
+  ],
+  "indicators": [
+   {
+    "domain": "niothinker.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Domains connected with this activity"
+   },
+   {
+    "domain": "savannahtime.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Domains connected with this activity"
+   },
+   {
+    "domain": "evenpolitics.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Domains connected with this activity"
+   },
+   {
+    "domain": "teorator.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Domains connected with this activity"
+   },
+   {
+    "domain": "westlandsun.com",
+    "kind": "operation site",
+    "source": "s2",
+    "section": "Domains connected with this activity"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1",
+    "s2"
+   ],
+   "platforms": [
+    "s1",
+    "s2"
+   ],
+   "languages": [
+    "s1",
+    "s2"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Microsoft Threat Analysis Center (MTAC)",
+    "title": "Iran steps into US election 2024 with cyber-enabled influence operations",
+    "url": "https://aka.ms/ElectionReport-Aug2024",
+    "date": "2024-08-09",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (resolves to a Microsoft CDN PDF; companion post https://blogs.microsoft.com/on-the-issues/2024/08/08/iran-targeting-2024-us-election/)"
+   },
+   {
+    "id": "s2",
+    "publisher": "OpenAI",
+    "title": "Disrupting a covert Iranian influence operation",
+    "url": "https://openai.com/index/disrupting-a-covert-iranian-influence-operation/",
+    "date": "2024-08-16",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched via Wayback capture 20241228203315 (openai.com returns a bot challenge to automated fetch)"
+   },
+   {
+    "id": "s3",
+    "publisher": "Meta",
+    "title": "Semiannual Adversarial Threat Report, Second and Third Quarter 2025",
+    "url": "https://transparency.meta.com/sr/Q2-Q3-2025-Adversarial-threat-report/",
+    "date": "2025-12",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Microsoft's section heading reads 'Iran-run covert news sites'; its text says 'An Iranian network' and names no government body, so 'origin only' is used. Microsoft says the four sites are part of a broader campaign active since at least 2020 with over a dozen sites in French, Spanish, Arabic and English; it names Nio Thinker, Savannah Time and EvenPolitics but publishes no domains. OpenAI found five sites and about a dozen X accounts and one Instagram account. Meta 2025's IUVM attribution covers activity targeting the 2024 US elections as reported by Microsoft and OpenAI; reading that as Storm-2035 is my inference from the footnote. Meta Q1 2025 separately linked an Azeri-language network to Storm-2035 (see meta-q1-2025-iran-azerbaijan)."
+ },
+ {
+  "id": "irgc-2024-campaign-hack-and-leak",
+  "name": "IRGC hack-and-leak operation against a 2024 US presidential campaign",
+  "aliases": [
+   "Mint Sandstorm (Microsoft, for June 2024 targeting of a campaign official; not named in the DOJ release)"
+  ],
+  "state": "Iran",
+  "operator": "Islamic Revolutionary Guard Corps (IRGC); three IRGC employees indicted (Masoud Jalili, Seyyed Ali Aghamiri, Yaser Balaghi)",
+  "operatorType": "government",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "charging Iranian nationals, and Islamic Revolutionary Guard Corps (IRGC) employees",
+    "section": "press release, first paragraph"
+   },
+   {
+    "source": "s1",
+    "operatorType": "government",
+    "says": "Jalili, Aghamiri, and Balaghi, working on behalf of the IRGC, commenced a wide-ranging hacking campaign",
+    "section": "press release"
+   }
+  ],
+  "active": {
+   "from": 2020,
+   "to": 2024
+  },
+  "platforms": [
+   "email"
+  ],
+  "languages": [
+   "en"
+  ],
+  "targets": [
+   "United States (a 2024 presidential campaign, which the quoted ODNI/FBI/CISA statement identifies as former President Trump's)",
+   "US media organisations",
+   "individuals associated with President Biden's campaign",
+   "current and former US officials"
+  ],
+  "narratives": "Stolen non-public campaign material was sent to journalists and to people tied to the rival campaign to undermine the victim campaign before the election, as part of wider IRGC efforts to stoke discord and erode confidence in US elections.",
+  "techniques": [
+   "hack and leak",
+   "impersonating real outlets or officials"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "US Department of Justice",
+    "title": "Three IRGC Cyber Actors Indicted for 'Hack-and-Leak' Operation Designed to Influence the 2024 U.S. Presidential Election",
+    "url": "https://www.justice.gov/opa/pr/three-irgc-cyber-actors-indicted-hack-and-leak-operation-designed-influence-2024-us",
+    "date": "2024-09-27",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched via Wayback capture 20241231222432 (the live justice.gov archive page renders without text to automated fetch)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Microsoft Threat Analysis Center (MTAC)",
+    "title": "Iran steps into US election 2024 with cyber-enabled influence operations",
+    "url": "https://aka.ms/ElectionReport-Aug2024",
+    "date": "2024-08-09",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "DOJ dates the wider hacking conspiracy from about January 2020; campaign targeting began around May 2024 and the leak phase in late June 2024. 'Impersonating real outlets or officials' refers to DOJ's description of fraudulent email accounts in the names of prominent US persons and international institutions and spoofed login pages. The Microsoft report (s2) describes Mint Sandstorm, 'a group run by the IRGC', sending a spearphish to a presidential campaign official in June 2024; DOJ does not use Microsoft's actor name, so the alias is a cross-reference, not an equivalence. DOJ publishes no domains or X handles in the release."
+ },
+ {
+  "id": "irtvu-domain-seizures-2021",
+  "name": "Iranian Islamic Radio and Television Union (IRTVU) websites",
+  "aliases": [
+   "IRTVU"
+  ],
+  "state": "Iran",
+  "operator": "Iranian Islamic Radio and Television Union (IRTVU), designated by Treasury as owned or controlled by the IRGC-QF",
+  "operatorType": "state media",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "state media",
+    "says": "the United States seized 33 websites used by the Iranian Islamic Radio and Television Union (IRTVU)",
+    "section": "press release"
+   },
+   {
+    "source": "s2",
+    "operatorType": "government",
+    "says": "IRTVU, a propaganda arm of the IRGC-QF, and IUVM aided Bayan Gostar in efforts to reach U.S. audiences.",
+    "section": "press release"
+   }
+  ],
+  "active": {},
+  "platforms": [
+   "websites"
+  ],
+  "languages": [],
+  "targets": [
+   "United States"
+  ],
+  "narratives": "Treasury describes components of the Iranian government, including IRTVU, posing as news organisations or media outlets to target the United States with disinformation and malign influence operations.",
+  "techniques": [
+   "fake news outlets",
+   "state media amplification"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "US Department of Justice",
+    "title": "United States Seizes Websites Used by the Iranian Islamic Radio and Television Union and Kata'ib Hizballah",
+    "url": "https://www.justice.gov/archives/opa/pr/united-states-seizes-websites-used-iranian-islamic-radio-and-television-union-and-kata-ib",
+    "date": "2021-06-22",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched via Wayback capture 20251231202604"
+   },
+   {
+    "id": "s2",
+    "publisher": "US Department of the Treasury",
+    "title": "Treasury Sanctions Iranian Entities for Attempted Election Interference",
+    "url": "https://home.treasury.gov/news/press-releases/sm1158",
+    "date": "2020-10-22",
+    "kind": "government",
+    "lang": "en",
+    "terms": "US government work, public domain (17 USC 105)",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "The DOJ release does not name Press TV and does not list the 33 seized domains; press reports that presstv.com was among them were not verified against a primary source, so no indicator is given. The seizure basis is sanctions (IRTVU obtained US domain services without an OFAC licence); three further domains belonged to Kata'ib Hizballah and are out of scope. Activity years are not stated."
+ },
+ {
+  "id": "meta-q1-2024-iran-israel-personas",
+  "name": "Iran-based CIB network targeting Israel (Meta Q1 2024)",
+  "aliases": [
+   "JGTM",
+   "Kodesh News",
+   "Secular Israelis",
+   "Tikva Odesa"
+  ],
+  "state": "Iran",
+  "operator": "not named; network originated in Iran",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "This network originated in Iran and targeted Israel.",
+    "section": "Iran section, p. 9"
+   }
+  ],
+  "active": {
+   "from": 2023,
+   "to": 2024
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "Telegram",
+   "YouTube",
+   "X",
+   "TikTok"
+  ],
+  "languages": [
+   "he"
+  ],
+  "targets": [
+   "Israel",
+   "Israelis abroad"
+  ],
+  "narratives": "Hebrew-language personas posing as Israelis: right-leaning accounts that backed Netanyahu before October 7 and then Ben-Gvir while criticising Netanyahu's war response, fictitious Haredi news outlets, and personas posing as liberal women protesters and LGBTQ+ supporters.",
+  "techniques": [
+   "fake personas",
+   "fake news outlets"
+  ],
+  "indicators": [
+   {
+    "domain": "jgtm.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Iran-based CIB network threat indicators, p. 28"
+   },
+   {
+    "domain": "tikvaodesa.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Iran-based CIB network threat indicators, p. 28"
+   },
+   {
+    "x": "changebeliever",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "p. 28"
+   },
+   {
+    "x": "SecularIsraelis",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "p. 28"
+   },
+   {
+    "x": "JgtmOrg",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "p. 28"
+   },
+   {
+    "x": "jgtm_offical",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "p. 28"
+   },
+   {
+    "x": "KodeshNews",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "p. 28"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Adversarial Threat Report, First Quarter 2024 (May 2024)",
+    "url": "https://transparency.meta.com/sr/Q1-2024-Adversarial-threat-report",
+    "date": "2024-05-29",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta removed 22 Facebook accounts, 8 Pages, 8 Groups and 23 Instagram accounts. Start year 2023 is inferred from Meta's statement that one cluster posted before the 7 October 2023 attack; Meta gives no start date. Meta credits public research by the Israel Democracy Institute (not fetched). Telegram and TikTok indicators in the report are omitted per the domain/X-only rule. The handle 'jgtm_offical' is spelled as in the source."
+ },
+ {
+  "id": "cotton-sandstorm-2024-hacktivist-brands",
+  "name": "Iran-based CIB network posing as hacktivist collectives (Meta Q3 2024)",
+  "aliases": [
+   "Cotton Sandstorm",
+   "Emennet Pasargad",
+   "Aria Sepehr Ayandehsazan (ASA)",
+   "Zeus",
+   "Cyber Court",
+   "Net Hunter",
+   "Regiment Groupe Union Defense (RGUD)",
+   "WeRedEvils0g"
+  ],
+  "state": "Iran",
+  "operator": "Meta: Cotton Sandstorm, which Microsoft connected to the IRGC; FBI/Treasury/INCD: Emennet Pasargad operating as Aria Sepehr Ayandehsazan (ASA)",
+  "operatorType": "linked to a state",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "linked to a state",
+    "says": "linked it to an Iranian threat actor, Cotton Sandstorm, which Microsoft previously connected to Iran's Islamic Revolutionary Guard Corps or IRGC",
+    "section": "Iran section, p. 10"
+   },
+   {
+    "source": "s2",
+    "operatorType": "commercial firm",
+    "says": "since April 2024, ASA has used the online persona 'Cyber Court' to promote the activities of several purported hacktivist groups",
+    "section": "Threat Actor Details"
+   }
+  ],
+  "active": {
+   "from": 2024,
+   "to": 2024
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "YouTube",
+   "Telegram",
+   "X",
+   "websites"
+  ],
+  "languages": [
+   "en",
+   "he",
+   "fr"
+  ],
+  "targets": [
+   "Israel",
+   "France (2024 Paris Olympics)",
+   "Israeli athletes"
+  ],
+  "narratives": "Fake anti-West hacktivist brands claimed to leak Israeli government documents, called for banning Israeli athletes from the Paris Olympics, and sent threats to Israeli athletes under a fake French far-right banner.",
+  "techniques": [
+   "fake personas",
+   "front organisations",
+   "hack and leak",
+   "cloned news sites",
+   "impersonating real outlets or officials",
+   "intimidation",
+   "AI-generated images or video"
+  ],
+  "indicators": [
+   {
+    "domain": "cybercourt.io",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Iran-based CIB network threat indicators, p. 21"
+   },
+   {
+    "domain": "jerusalem-news.com",
+    "kind": "cloned news domain",
+    "source": "s1",
+    "section": "p. 21; impersonated a real news website (Meta: mimicking the Jerusalem Post)"
+   },
+   {
+    "domain": "rgud-group.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "p. 21"
+   },
+   {
+    "domain": "rgud-group.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "p. 21"
+   },
+   {
+    "domain": "zeusistalking.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "p. 21"
+   },
+   {
+    "domain": "zeusistalking.net",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "p. 21"
+   },
+   {
+    "x": "zeus_is_talking",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "p. 21"
+   },
+   {
+    "x": "rgud181178",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "p. 22"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1",
+    "s2"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1",
+    "s2"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1",
+    "s2"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Adversarial Threat Report, Third Quarter 2024",
+    "url": "https://transparency.meta.com/sr/Q3-2024-Adversarial-threat-report/",
+    "date": "2024-12",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "FBI, US Department of the Treasury and Israel National Cyber Directorate",
+    "title": "New Tradecraft of Iranian Cyber Group Aria Sepehr Ayandehsazan aka Emennet Pasargad (JCSA-20241030-001)",
+    "url": "https://www.ic3.gov/CSA/2024/241030.pdf",
+    "date": "2024-10-30",
+    "kind": "government",
+    "lang": "en",
+    "terms": "TLP:CLEAR; US government work, public domain (17 USC 105); co-authored by INCD",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta removed 48 Facebook and 2 Instagram accounts and found some connections to a CIB network it reported in May 2023. The joint advisory says ASA runs the cover-hacktivist groups itself ('Makhlab al-Nasr', 'NET Hunter', 'Emirate Students Movement', 'Zeus is Talking'), describes a campaign ('Sample') meant to intimidate Israelis, and lists AI services used for voice modulation and image work, including an AI-generated news anchor in an earlier operation. Advisory network IOCs (IPs, hosting reseller domains) are infrastructure, not influence assets, and are omitted; Meta's Telegram channels and hacker-forum profiles are omitted per the indicator rule. Microsoft's August 2024 report also lists Cotton Sandstorm (a.k.a. Emennet Pasargad) with 'IRGC' affiliation; see emennet-pasargad-2020-election for the same company's 2020 campaign."
+ },
+ {
+  "id": "meta-q1-2025-iran-azerbaijan",
+  "name": "Iran-based CIB network targeting Azeri-speaking audiences (Meta Q1 2025)",
+  "aliases": [],
+  "state": "Iran",
+  "operator": "not named; Meta found links to the Storm-2035 activity",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "This network originated in Iran and targeted Azeri-speaking audiences in Azerbaijan and Turkey",
+    "section": "Iran section, p. 6"
+   }
+  ],
+  "active": {
+   "from": 2024,
+   "to": 2025
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X",
+   "YouTube",
+   "websites"
+  ],
+  "languages": [
+   "az"
+  ],
+  "targets": [
+   "Azerbaijan",
+   "Turkey"
+  ],
+  "narratives": "Azeri-language posts on the Paris Olympics, Israel's 2024 pager attacks, boycotts of American brands, and criticism of the US, President Biden and Israel's actions in Gaza.",
+  "techniques": [
+   "fake personas",
+   "spam amplification",
+   "comment brigading",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "israelboycottvoice.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Iran-based CIB network threat indicators, p. 10"
+   },
+   {
+    "domain": "palestinesupporter.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Iran-based CIB network threat indicators, p. 10"
+   },
+   {
+    "x": "BoycottVoice3",
+    "kind": "operation account",
+    "source": "s1",
+    "section": "p. 10"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Adversarial Threat Report, First Quarter 2025",
+    "url": "https://transparency.meta.com/sr/Q1-2025-Adversarial-threat-report/",
+    "date": "2025-05",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Meta removed 17 Facebook accounts, 22 Pages and 21 Instagram accounts; about $70 in ads. Accounts posed as female journalists and pro-Palestine activists and used trending hashtags. Meta found the network from Google Threat Intelligence Group information and 'found links between this operation and the STORM-2035 activity reported on by OpenAI and Microsoft'. Start year 2024 is inferred from the topics (Paris Olympics, 2024 pager attacks)."
+ },
+ {
+  "id": "meta-h1-2026-iran-us-personas",
+  "name": "Iran-based CIB network targeting the United States and Iraq (Meta H1 2026 deep dive)",
+  "aliases": [],
+  "state": "Iran",
+  "operator": "not named; Meta linked the activity to individuals in Iran",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "The network originated in Iran and primarily targeted English-speaking audiences in the United States",
+    "section": "Deep Dive: Dissecting the Kill Chain of an Early-Stage Iranian Influence Operation"
+   }
+  ],
+  "active": {
+   "from": 2024,
+   "to": 2025
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X"
+  ],
+  "languages": [
+   "en",
+   "ar"
+  ],
+  "targets": [
+   "United States",
+   "Iraq"
+  ],
+  "narratives": "Criticism of US Middle East policy and Israel and support for Gaza, carried by a ring of 'creator' personas (such as a political scientist, a women's rights activist and a cartoonist) and lower-effort 'amplifier' accounts.",
+  "techniques": [
+   "fake personas",
+   "AI-generated images or video",
+   "comment brigading"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Semiannual Adversarial Threat Report, First Half 2026",
+    "url": "https://transparency.meta.com/sr/first-half-2026-Adversarial-threat-report/",
+    "date": "2026-03",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta (GitHub facebook/threat-research)",
+    "title": "Indicators of Compromise: Iran-Based Influence Operation Network Targeting United States, Iraq",
+    "url": "https://github.com/facebook/threat-research/blob/main/indicators/meta-h1-2026-iran-based-cib-network-1.md",
+    "date": "2026",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "MIT License (repository licence)",
+    "checked": "2026-10-21 fetched (raw file)"
+   }
+  ],
+  "notes": "Meta actioned 8 Facebook accounts, 2 Pages and 294 Instagram accounts. Meta assesses it as an expansion of an operation that began in 2024 on X. The report's CIB section covers networks removed in Q4 2025, so 2025 is used as the end year. Arabic comes from Meta's statement of an earlier component targeting Arabic-speaking audiences in Iraq."
+ },
+ {
+  "id": "meta-h1-2026-iran-azerbaijan",
+  "name": "Iran-based CIB network targeting Azerbaijan (Meta H1 2026)",
+  "aliases": [],
+  "state": "Iran",
+  "operator": "Azerbaijani individuals located in Iran and Germany (Meta)",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "We attribute this network to Azerbaijani individuals located in Iran and Germany.",
+    "section": "Network summary"
+   }
+  ],
+  "active": {
+   "from": 2022
+  },
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "websites"
+  ],
+  "languages": [
+   "ru"
+  ],
+  "targets": [
+   "Azerbaijan",
+   "Azerbaijani diaspora in Russia"
+  ],
+  "narratives": "Aimed to destabilise Azerbaijan politically, promote Iranian regional interests and undermine Western influence, including by injecting narratives into comment sections of major news pages.",
+  "techniques": [
+   "fake personas",
+   "comment brigading",
+   "ads"
+  ],
+  "indicators": [
+   {
+    "domain": "sizinyol.org",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of Compromise"
+   },
+   {
+    "domain": "qafqaztimes.com",
+    "kind": "operation site",
+    "source": "s1",
+    "section": "Indicators of Compromise"
+   }
+  ],
+  "cite": {
+   "active": [
+    "s1"
+   ],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [
+    "s1"
+   ],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta (GitHub facebook/threat-research)",
+    "title": "Indicators of Compromise: Iran-Based Influence Operation Network Targeting Azerbaijan",
+    "url": "https://github.com/facebook/threat-research/blob/main/indicators/meta-h1-2026-iran-based-cib-network-2.md",
+    "date": "2026",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "MIT License (repository licence)",
+    "checked": "2026-10-21 fetched (raw file)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta",
+    "title": "Semiannual Adversarial Threat Report, First Half 2026",
+    "url": "https://transparency.meta.com/sr/first-half-2026-Adversarial-threat-report/",
+    "date": "2026-03",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched"
+   }
+  ],
+  "notes": "Read from Meta's GitHub network summary (s1), which reproduces the report text; the corresponding section of the H1 2026 PDF (s2) was downloaded but this network's section was not separately read. Meta actioned 367 Facebook accounts, 3 Pages and 360 Instagram accounts; about $400 in ads, mostly in euros; active since 2022. Russian is the only language the summary states (accounts styled as diaspora in Moscow); Azerbaijani is likely but not stated. Platforms 'websites' rests on the two domains in the IOC file."
+ },
+ {
+  "id": "meta-h2-2026-iran-africa",
+  "name": "Iran-based CIB network targeting Sub-Saharan Africa (Meta H2 2026)",
+  "aliases": [],
+  "state": "Iran",
+  "operator": "not named; Meta found links to actors in Iran",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "Meta's investigation revealed links to actors in Iran.",
+    "section": "CIB section, 3. Iran"
+   }
+  ],
+  "active": {},
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "X"
+  ],
+  "languages": [],
+  "targets": [
+   "Nigeria",
+   "South Africa",
+   "Kenya",
+   "Ethiopia",
+   "Sudan"
+  ],
+  "narratives": "Anti-Western and anti-imperialist themes, support for pro-Hamas activism, and opposition to African states normalising relations with Israel, posted by personas styled as local researchers, nurses and women's rights advocates.",
+  "techniques": [
+   "fake personas",
+   "AI-generated images or video",
+   "comment brigading"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Semiannual Adversarial Threat Report, Second Half 2026",
+    "url": "https://transparency.meta.com/sr/H2-2026-adversarial-threat-report/",
+    "date": "2026-08",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (cover reads 'AUGUST 2026 SECOND HALF'; title as listed on Meta's threat-reporting index)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta (GitHub facebook/threat-research)",
+    "title": "Iran-Based Influence Operation Targeting Sub-Saharan Africa",
+    "url": "https://github.com/facebook/threat-research/blob/main/indicators/meta-h2-2026-iran-cib-based-network-3.md",
+    "date": "2026",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "MIT License (repository licence)",
+    "checked": "2026-10-21 fetched (raw file)"
+   }
+  ],
+  "notes": "Meta removed 23 Facebook accounts, 13 Pages, 1 Group and 11 Instagram accounts. Meta says operators used profile pictures of local individuals overlaid with activist symbols and AI-made graphics. Activity years and languages are not stated."
+ },
+ {
+  "id": "meta-h2-2026-iran-azerbaijan",
+  "name": "Iran-based CIB network targeting Azerbaijan (Meta H2 2026)",
+  "aliases": [],
+  "state": "Iran",
+  "operator": "Azerbaijani individuals in Iran (Meta)",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "our investigation found links to Azerbaijani individuals in Iran.",
+    "section": "CIB section, 8. Iran"
+   }
+  ],
+  "active": {},
+  "platforms": [
+   "Facebook",
+   "Instagram",
+   "TikTok",
+   "Telegram"
+  ],
+  "languages": [],
+  "targets": [
+   "Azerbaijan",
+   "Georgia",
+   "Armenia"
+  ],
+  "narratives": "Pro-Iran and pro-Shia narratives, criticism of Azerbaijan's internal affairs and efforts to undermine confidence in its government, spread through single-topic brands posing as local Azerbaijani outlets.",
+  "techniques": [
+   "fake news outlets",
+   "fake personas",
+   "AI-generated images or video",
+   "comment brigading"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Semiannual Adversarial Threat Report, Second Half 2026",
+    "url": "https://transparency.meta.com/sr/H2-2026-adversarial-threat-report/",
+    "date": "2026-08",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (cover reads 'AUGUST 2026 SECOND HALF'; title as listed on Meta's threat-reporting index)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta (GitHub facebook/threat-research)",
+    "title": "Iran-Based Influence Operation Targeting Azerbaijan",
+    "url": "https://github.com/facebook/threat-research/blob/main/indicators/meta-h2-2026-iran-cib-based-network-2.md",
+    "date": "2026",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "MIT License (repository licence)",
+    "checked": "2026-10-21 fetched (raw file)"
+   }
+  ],
+  "notes": "Meta removed 15 Facebook accounts, 7 Pages and 96 Instagram accounts. Meta's IOC file lists only Telegram and TikTok accounts, which the indicator rule excludes, so indicators are empty. Activity years and languages are not stated."
+ },
+ {
+  "id": "meta-h2-2026-iran-us-memes",
+  "name": "Iran-based CIB network targeting the United States (Meta H2 2026)",
+  "aliases": [],
+  "state": "Iran",
+  "operator": "not named; Meta found links to actors in Iran",
+  "operatorType": "origin only",
+  "attributions": [
+   {
+    "source": "s1",
+    "operatorType": "origin only",
+    "says": "Although the people behind it attempted to conceal their identity, our investigation found links to actors in Iran.",
+    "section": "CIB section, 9. Iran"
+   }
+  ],
+  "active": {},
+  "platforms": [
+   "Facebook",
+   "Instagram"
+  ],
+  "languages": [],
+  "targets": [
+   "United States"
+  ],
+  "narratives": "Civic meme accounts run by personas posing as US activists, students and designers, posting on US politics (including anti-Republican views), the Israel-Palestine conflict and immigration, and tagging journalists and politicians to seek collaborations.",
+  "techniques": [
+   "fake personas"
+  ],
+  "indicators": [],
+  "cite": {
+   "active": [],
+   "platforms": [
+    "s1"
+   ],
+   "languages": [],
+   "targets": [
+    "s1"
+   ],
+   "narratives": [
+    "s1",
+    "s2"
+   ],
+   "techniques": [
+    "s1"
+   ]
+  },
+  "sources": [
+   {
+    "id": "s1",
+    "publisher": "Meta",
+    "title": "Semiannual Adversarial Threat Report, Second Half 2026",
+    "url": "https://transparency.meta.com/sr/H2-2026-adversarial-threat-report/",
+    "date": "2026-08",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "copyright, facts and short quotes only",
+    "checked": "2026-10-21 fetched (cover reads 'AUGUST 2026 SECOND HALF'; title as listed on Meta's threat-reporting index)"
+   },
+   {
+    "id": "s2",
+    "publisher": "Meta (GitHub facebook/threat-research)",
+    "title": "Iran-Based Influence Operation Targeting United States",
+    "url": "https://github.com/facebook/threat-research/blob/main/indicators/meta-h2-2026-iran-cib-based-network.md",
+    "date": "2026",
+    "kind": "platform",
+    "lang": "en",
+    "terms": "MIT License (repository licence)",
+    "checked": "2026-10-21 fetched (raw file)"
+   }
+  ],
+  "notes": "Meta removed 4 Facebook and 31 Instagram accounts and used only US and Canadian proxy or hosting IPs, per Meta. Meta says some content was AI-generated without saying whether text or images, so no AI technique is tagged. Meta's IOC file states no IOCs. Activity years and languages are not stated."
+ }
+]
