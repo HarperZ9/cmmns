@@ -59,8 +59,11 @@ extreme rhetoric so it reads as normal for a group. A reader scrolling replies c
   country or region level.
 - **Duplicates** (`src/core/similarity.js`): word 3-gram MinHash with banding, confirmed by exact
   Jaccard of at least 0.6, across distinct authors, ignoring replies under 6 words.
-- **Rhetoric** (`src/core/rhetoric.js`): four marker families (dehumanise, violence, conspiracy,
-  absolutist) with negation handling. Policy positions such as deportation under law score zero.
+- **Rhetoric** (`src/core/rhetoric.js`): strong families (dehumanise, violence, vigilante, slur,
+  stereotype) that label the post, and weak ones (motive, essentialise, conspiracy, absolutist,
+  contempt, context-dependent slurs) that only feed "extreme". Negation, reported speech and quoted
+  words do not count. Policy positions such as deportation under law score zero. Measured precision
+  per family is in `src/core/measured.js` (EVALUATION.md).
   French, Spanish, German, Portuguese and Italian grammars (`rhetoric-<lang>.js` with
   `lexicon-<lang>.js`) run after English in the order listed in `LANGUAGES`, and each adds only
   families not yet found. Each language negates with its own words and has its own symmetry test

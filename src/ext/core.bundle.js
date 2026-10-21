@@ -577,23 +577,39 @@ const GROUPS = [
   "the rich", "billionaires", "elites", "the elite", "landlords", "bankers", "politicians", "police", "cops", "protesters",
   "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "lesbians", "trans people", "transgenders",
   "feminists", "disabled people", "the disabled", "farmers", "unions",
+  // added 2026-10-21 from the dev split, one per direction where both exist
+  "evangelicals", "catholics", "white men", "white women", "black men", "black women", "straight people", "straights",
+  "gay people", "gay men", "queers", "jewish people", "muslim people", "christian people", "caucasians", "white kids",
+  "black kids", "white guys", "black guys", "white girls", "black girls", "hillbillies", "arab people", "asian people",
 ];
+
+// The dehumanising nouns that stay unambiguous right after a group ("commie filth", "migrant rats").
+// Words with ordinary uses next to a group noun ("police dogs", "women with cancer") are left out.
+const DEHUMANISE_ADJACENT = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "subhuman",
+  "sub-human", "savages", "filth", "scum", "insects", "apes", "monkeys", "beasts", "pigs", "invaders"];
+
+// "An infestation of X", "hordes of X".
+const SWARM = ["infestation", "plague", "swarm", "swarms", "horde", "hordes"];
 
 const DEHUMANISE = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "animals", "savages", "subhuman",
   "sub-human", "infestation", "plague", "disease", "cancer", "filth", "scum", "pigs", "insects", "invaders", "a virus", "apes",
   "monkeys", "beasts", "dogs"];
 
 // Physical harm only: deporting or jailing people under a law is a policy position, not a marker.
-const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed",
-  "lynched", "beaten", "burned alive", "purged", "eliminated"];
+const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed", "genocided",
+  "lynched", "beaten", "burned alive", "purged", "eliminated",
+  "murdered", "tortured"];
 
 // Active calls: "we should exterminate X", "let's kill all the X". Physical harm only, as above.
 const KILL_VERBS = ["exterminate", "kill", "shoot", "hang", "gas", "lynch", "wipe out", "eradicate", "massacre",
-  "slaughter", "execute", "burn"];
+  "slaughter", "execute", "burn", "genocide", "nuke", "murder", "torture"];
 
-const VIOLENT_SLOGANS = ["helicopter rides", "day of the rope", "string them up", "line them up", "round them up",
+// Death wishes after "deserve to", "should all": "X deserve to die".
+const DEATH_WISH = ["die", "rot", "burn in hell", "be put down", "be wiped off the earth"];
+
+const VIOLENT_SLOGANS = ["free helicopter rides", "day of the rope", "string them up", "line them up", "round them up",
   "hang them all", "kill them all", "deport them all", "send them all back", "nuke them", "nuke the bastards", "pull out the guns",
-  "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines", "bash the fash", "punch a nazi", "death to"];
+  "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines", "bash the fash", "punch a nazi"];
 
 const VIGILANTE = ["will deal with them", "deal with them ourselves", "take care of them ourselves",
   "take matters into our own hands", "take matters into their own hands", "bring in the army", "bring their armies in",
@@ -622,7 +638,12 @@ const ESSENTIALISE = ["import third world", "import the third world", "importing
 // Stereotype traits: "<group> are <trait>" names a whole group by a trait.
 const STEREOTYPE_TRAITS = ["lazy", "criminals", "criminal", "thieves", "violent", "dirty", "filthy", "stupid", "dumb",
   "terrorists", "rapists", "savage", "greedy", "inbred", "degenerates", "degenerate", "pedophiles", "paedophiles", "groomers",
-  "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil"];
+  "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil",
+  "disgusting", "worthless", "useless", "ugly", "garbage"];
+
+// Intensifiers allowed between "are" and the trait: "X are fucking stupid", "X are inherently violent".
+const INTENSIFIERS = ["fucking", "so", "too", "really", "damn", "inherently", "naturally", "genetically", "always",
+  "basically", "literally", "very"];
 
 // Invented motives: "<group> want to destroy / replace / ban ..." puts an aim in a whole group's mouth.
 const MOTIVE_VERBS = ["destroy", "replace", "ban", "erase", "kill", "eliminate", "enslave", "take over", "wipe out",
@@ -632,7 +653,7 @@ const MOTIVE_VERBS = ["destroy", "replace", "ban", "erase", "kill", "eliminate",
 const SLURS = [
   // anti-Black
   "nigger", "niggers", "coon", "coons", "jigaboo", "porch monkey", "porch monkeys", "sambo", "darkie", "darkies", "jungle bunny",
-  "spearchucker", "groid", "groids", "sheboon", "pavement ape", "dindu", "dindu nuffin", "chimp out", "chimped out",
+  "spearchucker", "groid", "groids", "sheboon", "pavement ape", "chimp out", "chimped out",
   "black fatigue", "13/50", "despite being 13", "basketball americans", "fatherless behavior", "fatherless behaviour",
   "planet of the apes",
   // anti-Asian
@@ -643,7 +664,7 @@ const SLURS = [
   // anti-Latino
   "wetback", "wetbacks", "beaner", "beaners", "spic", "spics",
   // antisemitic
-  "kike", "kikes", "hymie", "heeb", "heebs", "(((", ")))", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough",
+  "kike", "kikes", "hymie", "heeb", "heebs", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough",
   "oy vey shut it down", "early life section", "the noticing",
   // anti-Arab and anti-Muslim
   "towelhead", "towelheads", "raghead", "ragheads", "sand nigger", "sand niggers", "camel jockey", "mudslime", "mudslimes",
@@ -651,7 +672,7 @@ const SLURS = [
   // anti-Indigenous and anti-Roma
   "redskin", "redskins", "injun", "injuns", "squaw", "gyppo", "gyppos",
   // anti-white
-  "honky", "honkies", "honkey", "whitey", "peckerwood", "white devils", "kill all whites",
+  "whitey", "cracka", "crackas", "white devil", "peckerwood", "white devils", "kill all whites",
   // anti-LGBTQ
   "faggot", "faggots", "tranny", "trannies", "troon", "troons", "shemale", "shemales", "poofter",
   // disability
@@ -663,7 +684,11 @@ const SLURS = [
 ];
 
 // Context-dependent: innocent in many uses (weight 1, counted only beside another marker).
-const SLURS_SOFT = ["leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
+// Moved from SLURS on 2026-10-21: the upper 95% bound of their dev-split precision was under 0.75
+// (project-docs/EVALUATION.md). One anti-white and one anti-Black term; the rule is the same for every list.
+const SLURS_DEMOTED = ["honky", "honkies", "honkey", "dindu", "dindu nuffin"];
+
+const SLURS_SOFT = [...SLURS_DEMOTED, "leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
   "religion of peace", "it's always them", "its always them", "thug", "thugs", "ghetto", "illegals", "dyke", "dykes", "thot",
   "thots", "fag", "fags", "cripple", "cripples", "white trash", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
 
@@ -674,7 +699,11 @@ const LEET = { "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": 
 const HATRED_OBJECTS = ["beauty", "us", "the west", "western civilization", "our way of life", "our culture", "our freedom",
   "freedom", "christians", "jews", "muslims", "white people", "black people", "women", "america", "europe", "france"];
 
-return { GROUPS, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, MOTIVE_VERBS, SLURS, SLURS_SOFT, LEET, HATRED_OBJECTS };
+// Declared hatred of a whole group ("I hate X", "fuck all the X"). Weight 1: anger counts for
+// little on its own, and it never labels the post.
+const CONTEMPT_VERBS = ["hate", "despise", "loathe", "can't stand", "cant stand"];
+
+return { GROUPS, DEHUMANISE_ADJACENT, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, SLURS_DEMOTED, SLURS_SOFT, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
 })();
 
 // ---- rhetoric-util.js
@@ -1243,6 +1272,7 @@ const M_rhetoric = (() => {
 //   motive       "<group> want to destroy / replace ...": an aim put in a whole group's mouth
 //   essentialise blanket and replacement claims ("all X are", "violence is cultural")
 //   conspiracy   conspiracy framing; absolutist  us-versus-them framing
+//   contempt     declared hatred of a whole group ("I hate X", "fuck all the X"), weight 1
 // Disagreement, anger and strong opinions score 0; only the marker grammar counts. Scores feed
 // the thread report, and the strong families also label the comment (never the person).
 
@@ -1263,11 +1293,38 @@ const G = alt(L.GROUPS);
 const CALL = "should|must|need to|needs to|have to|has to|let's|lets|let us|time to|gotta|got to|ought to|we will|we'll" +
   "|we'd|we would|i'd|i would";
 const DET = "(?:the\\s+|these\\s+|those\\s+|our\\s+|their\\s+|your\\s+)?";
+const FILLERS = "(?:(?:all|just|nothing but|such|literally|basically|like|no better than|worse than|a bunch of|a pack of|" +
+  "a|an|the|fucking|filthy|dirty|disgusting|vile|rabid|stinking|dumb|savage)\\s+){0,4}";
+// For the unambiguous nouns only: up to four words after "are" with no preposition among them
+// ("X are horny useless rats", not "farmers are losing money to rats"), or a coordinated group
+// ("nationalists and fascist scum").
+const ADJ = alt(L.DEHUMANISE_ADJACENT);
+const WINDOW = "(?:(?!(?:to|from|by|with|of|for|about|on|in|at|than|over|against|and|or|not|never)\\b)[\\w']+,?\\s+){0,4}?";
+const LINK = "(?:(?:and|or|&)\\s+[\\w-]+\\s+|(?:fucking|filthy|dirty|disgusting|vile|stinking|rabid|ghetto|lazy|worthless|useless|" +
+  "economic|socioeconomic)\\s+)?";
+const INTENSE =`(?:(?:${alt(L.INTENSIFIERS)})\\s+)?`;
 
 const RE = {
-  dehumanise: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,4}?\\W+(?:${alt(L.DEHUMANISE)})\\b|\\b(?:${alt(L.DEHUMANISE)})\\b(?:\\W+\\w+){0,3}?\\W+(?:like\\s+)?(?:these\\s+|those\\s+|the\\s+)?(?:${G})\\b`, "i"),
+  // "X are (nothing but) (filthy) rats", "commie filth", "an infestation of X". A marker word a few
+  // words away from a group ("women with cancer", "police dogs") is not enough.
+  dehumanise: new RegExp(`\\b(?:${G})(?:\\s+(?:are|is|r)|\\s*[-:=])\\s+${FILLERS}(?:${alt(L.DEHUMANISE)})\\b` +
+    `|\\b(?:${G})\\s+(?:are|is|r)\\s+${WINDOW}(?:${ADJ})\\b` +
+    `|\\b(?:${G})\\s+${LINK}(?:${ADJ})\\b` +
+    `|\\b(?:${ADJ})\\s+like\\s+(?:these\\s+|those\\s+|the\\s+|all\\s+)?(?:${G})\\b` +
+    `|\\b(?:${alt(L.SWARM)})\\s+of\\s+(?:the\\s+)?(?:${G})\\b`, "i"),
   violenceGroup: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,6}?\\W+(?:should|must|need to|needs to|deserve to|ought to|will)\\s+(?:all\\s+)?(?:be\\s+)?(?:${alt(L.VIOLENCE_VERBS)})\\b`, "i"),
   violenceSlogan: word(L.VIOLENT_SLOGANS),
+  // "X deserve to die", "X should all die"
+  deathWish: new RegExp(`\\b(?:${G})\\s+(?:all\\s+)?(?:deserve to|deserves to|should all|must all|should|must|ought to|need to)` +
+    `\\s+(?:just\\s+)?(?:${alt(L.DEATH_WISH)})\\b`, "i"),
+  // "death to X" as a slogan: at the start of a clause, not "beaten to death to make a point"
+  deathTo: /(?:^|[.!?;:\n(]\s*|\s[-–]\s)death to\s+\w+/i,
+  helicopterFor: new RegExp(`\\bhelicopter rides?\\s+for\\s+(?:all\\s+)?${DET}(?:${G})\\b`, "i"),
+  contempt: new RegExp(`\\b(?:i|we)\\s+(?:fucking\\s+|really\\s+|just\\s+|absolutely\\s+)?(?:${alt(L.CONTEMPT_VERBS)})\\s+` +
+    `(?:all\\s+)?${DET}(?:${G})\\b(?!\\s+(?:said|say|says|did|do|think|want|voted|policy|policies))` +
+    `|\\bfuck\\s+(?:all\\s+)?(?:of\\s+)?${DET}(?:${G})\\b|\\b(?:${G})\\s+are\\s+the\\s+worst\\b`, "i"),
+  // the echo: "(((them)))"
+  echo: /\(\(\(\s*[\w\s.'-]{1,40}?\s*\)\)\)/,
   // "we should exterminate the X", "let's kill all the X": a call with the group as the object
   violenceCall: new RegExp(`\\b(?:${CALL})\\s+(?:just\\s+)?(?:${alt(L.KILL_VERBS)})\\s+(?:all\\s+(?:of\\s+)?|every one of\\s+|each of\\s+|every\\s+)?${DET}(?:${G})\\b`, "i"),
   // "... the same fate for our X", counted only when the text names a killing (VIOLENT_STEM)
@@ -1282,7 +1339,7 @@ const RE = {
   vigilante: word(L.VIGILANTE),
   slur: edged(L.SLURS),
   slurSoft: word(L.SLURS_SOFT),
-  stereotype: new RegExp(`\\b(?:${G})\\s+(?:are|is)\\s+(?:all\\s+|just\\s+|nothing but\\s+|such\\s+)?(?:${alt(L.STEREOTYPE_TRAITS)})\\b|\\btypical\\s+(?:${G})\\b`, "i"),
+  stereotype: new RegExp(`\\b(?:${G})\\s+(?:are|is)\\s+(?:all\\s+|just\\s+|nothing but\\s+|such\\s+)?${INTENSE}(?:${alt(L.STEREOTYPE_TRAITS)})\\b|\\btypical\\s+(?:${G})\\b`, "i"),
   motive: new RegExp(`\\b(?:${G})\\s+(?:want|wants|are trying|plan|are planning|intend)\\s+to\\s+(?:${alt(L.MOTIVE_VERBS)})\\b|\\b(?:they|${G})\\s+(?:all\\s+)?hate\\s+(?:${alt(L.HATRED_OBJECTS)})\\b`, "i"),
   essentialise: new RegExp(`\\b(?:${alt(L.ESSENTIALISE)})\\b|\\ball (?:the )?(?:${G}) are\\b|\\b(?:${G}) are all\\b`, "i"),
   conspiracy: word(L.CONSPIRACY),
@@ -1292,10 +1349,22 @@ const RE = {
 // "Immigrants are not animals" and "nobody should be killed" are the opposite of the marker.
 const NEGATION = /\b(?:not|never|no one|nobody|aren't|arent|isn't|isnt|shouldn't|shouldnt|don't|dont)\b/i;
 const VIOLENT_STEM = /\b(?:extermin|kill|massacr|slaughter|genocid|gass(?:ed|ing)|hang(?:ed|ing)|shoot|shot|lynch|wiped? out|wiping out|eradicat)/i;
+// Reported speech and quoted words are a mention, not the speaker's own use: "he called X vermin",
+// "compared X to rats", "the word "slur"". Group-blind, so it treats every target alike.
+const REPORTED = /\b(?:call(?:s|ed|ing)?|compar(?:e|es|ed|ing)|describ(?:e|es|ed|ing)|label(?:s|ed|led|ing)?|brand(?:s|ed|ing)?|dubb?(?:s|ed|ing)?|refer(?:s|red|ring)? to)\b[^.!?"]{0,40}$/i;
+const QUOTES = /["“”«»]/;
+function mention(s, m) {
+  const at = m.index ?? s.indexOf(m[0]);
+  const start = at + (m[0].length - m[0].trimStart().length), end = at + m[0].trimEnd().length;
+  const before = s.slice(Math.max(0, start - 60), start), after = s.slice(end, end + 2);
+  if (REPORTED.test(before)) return true;
+  const lead = m[0].trim();
+  return QUOTES.test(before.slice(-1)) && QUOTES.test(after.slice(0, 1)) || (QUOTES.test(lead[0]) && QUOTES.test(lead[lead.length - 1]));
+}
 const unleet = (s) => s.replace(/[013457@$!]/g, (c) => L.LEET[c] || c);
 
 const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, slur: 2, slurSoft: 1, stereotype: 2, motive: 1,
-  essentialise: 1, conspiracy: 1, absolutist: 1 };
+  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1 };
 // "Extreme" for the thread report: any strong marker, or two weaker ones together.
 const EXTREME_AT = 2;
 // Families strong enough to label the comment itself.
@@ -1315,7 +1384,7 @@ const LANGUAGES = [
 function recorder(s, markers) {
   return (family, re, negatable = false, on = s, negation = NEGATION) => {
     const m = on.match(re);
-    if (!m || (negatable && negation.test(m[0]))) return false;
+    if (!m || (negatable && negation.test(m[0])) || mention(s, m)) return false;
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
@@ -1324,16 +1393,18 @@ function recorder(s, markers) {
 function scoreEnglish(s, hit) {
   if (!hit("dehumanise", RE.notHuman)) hit("dehumanise", RE.dehumanise, true);
   if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.violenceCall, true) && !hit("violence", RE.warOn, true)
-    && !hit("violence", RE.onlyGoodDead) && !(VIOLENT_STEM.test(s) && hit("violence", RE.sameFate, true))) {
-    hit("violence", RE.violenceSlogan);
+    && !hit("violence", RE.deathWish, true) && !hit("violence", RE.onlyGoodDead)
+    && !(VIOLENT_STEM.test(s) && hit("violence", RE.sameFate, true))) {
+    if (!hit("violence", RE.deathTo) && !hit("violence", RE.helicopterFor)) hit("violence", RE.violenceSlogan);
   }
   hit("vigilante", RE.vigilante);
-  if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s))) hit("slurSoft", RE.slurSoft);
+  if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)) hit("slurSoft", RE.slurSoft);
   hit("stereotype", RE.stereotype, true);
   hit("motive", RE.motive, true);
   hit("essentialise", RE.essentialise, true);
   hit("conspiracy", RE.conspiracy);
   hit("absolutist", RE.absolutist);
+  hit("contempt", RE.contempt, true);
 }
 
 // Returns { score, markers: [{ family, match }], extreme }.
@@ -2876,17 +2947,52 @@ return { SETTINGS_KEY, SITES, AREA_IDS, RETENTION, DEFAULTS, normalizeSettings, 
 // ---- measured.js
 const M_measured = (() => {
 // Measured accuracy per badge family, from the held-out test split in project-docs/EVALUATION.md.
-// The evaluation fills this table; the window and the options page read it through
+// Generated by scripts/eval.mjs; do not edit. The window and the options page read MEASURED through
 // families.js (measuredLine). A family with no row here shows "not measured yet".
 //
 // Row shape, one per family id from families.js:
 //   { precision, low, high, n, split: "test", recall?, side?, date?, source? }
 //   precision, low, high: 0 to 1 (low and high are the 95% interval); n: badges checked.
+//   range: [lowest, highest] precision across corpora with at least 20 hits, or null.
+// MEASURED_DETAIL holds every family (weak ones too), the side comparison and the SYNTHETIC
+// duplicate and mismatch pilots, which are not human-labelled and get no row in MEASURED.
 
-const MEASURED_AT = null;
-const MEASURED = {};
+const MEASURED_AT = "2026-10-21";
+const MEASURED = {
+  "dehumanise": {"precision":0.923,"low":0.797,"high":0.973,"n":39,"split":"test","recall":0.002,"range":null,"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "violence": {"precision":0.875,"low":0.79,"high":0.929,"n":88,"split":"test","recall":0.021,"range":[0.967,0.967],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "slur": {"precision":0.918,"low":0.91,"high":0.927,"n":4009,"split":"test","recall":null,"range":[0.355,0.96],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "stereotype": {"precision":0.833,"low":0.746,"high":0.895,"n":96,"split":"test","recall":0.006,"range":[0.917,0.917],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+};
 
-return { MEASURED_AT, MEASURED };
+const MEASURED_DETAIL = {
+ "generated": "2026-10-21",
+ "split": "test",
+ "seed": "radar-eval-2026-10-21",
+ "extremeAt": 2,
+ "extreme": {"precision":{"k":794,"n":1093,"value":0.726,"ci":[0.699,0.752]},"recall":{"k":794,"n":5224,"value":0.152,"ci":[0.143,0.162]},"against":"mhs: hate_speech_score > 0.5","byCorpus":{"mhs":{"k":794,"n":1093,"value":0.726,"ci":[0.699,0.752]},"hatexplain":{"k":1897,"n":3063,"value":0.619,"ci":[0.602,0.636]},"civil":{"k":0,"n":0,"value":null,"ci":null},"mlma-fr":{"k":0,"n":9,"value":0,"ci":[0,0.299]}}},
+ "sides": {"mhs":{"right":{"recall":{"k":702,"n":7584,"value":0.093,"ci":[0.086,0.099]},"precision":{"k":702,"n":730,"value":0.962,"ci":[0.945,0.973]}},"left":{"recall":{"k":107,"n":2499,"value":0.043,"ci":[0.036,0.051]},"precision":{"k":107,"n":114,"value":0.939,"ci":[0.879,0.97]}},"gap":{"precision":false,"recall":true}},"hatexplain":{"right":{"recall":{"k":1814,"n":4197,"value":0.432,"ci":[0.417,0.447]},"precision":{"k":1814,"n":1849,"value":0.981,"ci":[0.974,0.986]}},"left":{"recall":{"k":46,"n":251,"value":0.183,"ci":[0.14,0.236]},"precision":{"k":46,"n":46,"value":1,"ci":[0.923,1]}},"gap":{"precision":false,"recall":true}}},
+ "duplicates": {"synthetic":true,"precision":{"k":85,"n":87,"value":0.977,"ci":[0.92,0.994]},"recall":{"k":85,"n":85,"value":1,"ci":[0.957,1]}},
+ "mismatch": {"synthetic":true,"precision":{"k":14,"n":14,"value":1,"ci":[0.785,1]},"recall":{"k":14,"n":14,"value":1,"ci":[0.785,1]}},
+ families: {
+   "dehumanise": {"precision":{"k":36,"n":39,"value":0.923,"ci":[0.797,0.973]},"precisionRange":null,"byCorpus":{"mhs":{"k":17,"n":19,"value":0.895,"ci":[0.686,0.971]},"hatexplain":{"k":18,"n":18,"value":1,"ci":[0.824,1]},"civil":{"k":1,"n":2,"value":0.5,"ci":[0.095,0.905]}},"specific":{"against":"mhs:dehumanise","precision":{"k":11,"n":19,"value":0.579,"ci":[0.363,0.769]},"recall":{"k":11,"n":5046,"value":0.002,"ci":[0.001,0.004]}},"recall":{"k":11,"n":5046,"value":0.002,"ci":[0.001,0.004]},"measured":true,"note":null},
+   "violence": {"precision":{"k":77,"n":88,"value":0.875,"ci":[0.79,0.929]},"precisionRange":[0.967,0.967],"byCorpus":{"mhs":{"k":59,"n":61,"value":0.967,"ci":[0.888,0.991]},"hatexplain":{"k":15,"n":18,"value":0.833,"ci":[0.608,0.942]},"civil":{"k":3,"n":9,"value":0.333,"ci":[0.121,0.646]}},"specific":{"against":"mhs:violence","precision":{"k":39,"n":61,"value":0.639,"ci":[0.514,0.748]},"recall":{"k":39,"n":1819,"value":0.021,"ci":[0.016,0.029]}},"recall":{"k":39,"n":1819,"value":0.021,"ci":[0.016,0.029]},"measured":true,"note":null},
+   "vigilante": {"precision":{"k":2,"n":3,"value":0.667,"ci":[0.208,0.939]},"precisionRange":null,"byCorpus":{"mhs":{"k":2,"n":2,"value":1,"ci":[0.342,1]},"hatexplain":{"k":0,"n":0,"value":null,"ci":null},"civil":{"k":0,"n":1,"value":0,"ci":[0,0.793]}},"specific":null,"recall":null,"measured":false,"note":"fewer than 20 hits in the test split; not measured"},
+   "slur": {"precision":{"k":3682,"n":4009,"value":0.918,"ci":[0.91,0.927]},"precisionRange":[0.355,0.96],"byCorpus":{"mhs":{"k":916,"n":954,"value":0.96,"ci":[0.946,0.971]},"hatexplain":{"k":2755,"n":3024,"value":0.911,"ci":[0.9,0.921]},"civil":{"k":11,"n":31,"value":0.355,"ci":[0.211,0.531]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "slurSoft": {"precision":{"k":908,"n":1363,"value":0.666,"ci":[0.641,0.691]},"precisionRange":[0.206,0.919],"byCorpus":{"mhs":{"k":397,"n":432,"value":0.919,"ci":[0.889,0.941]},"hatexplain":{"k":468,"n":722,"value":0.648,"ci":[0.613,0.682]},"civil":{"k":43,"n":209,"value":0.206,"ci":[0.156,0.266]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "stereotype": {"precision":{"k":80,"n":96,"value":0.833,"ci":[0.746,0.895]},"precisionRange":[0.917,0.917],"byCorpus":{"mhs":{"k":66,"n":72,"value":0.917,"ci":[0.83,0.961]},"hatexplain":{"k":11,"n":15,"value":0.733,"ci":[0.48,0.891]},"civil":{"k":3,"n":9,"value":0.333,"ci":[0.121,0.646]}},"specific":{"against":"mhs:stereotype","precision":{"k":51,"n":72,"value":0.708,"ci":[0.595,0.801]},"recall":{"k":51,"n":8368,"value":0.006,"ci":[0.005,0.008]}},"recall":{"k":51,"n":8368,"value":0.006,"ci":[0.005,0.008]},"measured":true,"note":null},
+   "motive": {"precision":{"k":29,"n":40,"value":0.725,"ci":[0.572,0.839]},"precisionRange":[0.818,0.818],"byCorpus":{"mhs":{"k":18,"n":22,"value":0.818,"ci":[0.615,0.927]},"hatexplain":{"k":9,"n":13,"value":0.692,"ci":[0.424,0.873]},"civil":{"k":2,"n":5,"value":0.4,"ci":[0.118,0.769]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "essentialise": {"precision":{"k":59,"n":102,"value":0.578,"ci":[0.481,0.67]},"precisionRange":[0.258,0.75],"byCorpus":{"mhs":{"k":33,"n":47,"value":0.702,"ci":[0.56,0.813]},"hatexplain":{"k":18,"n":24,"value":0.75,"ci":[0.551,0.88]},"civil":{"k":8,"n":31,"value":0.258,"ci":[0.137,0.432]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "conspiracy": {"precision":{"k":34,"n":118,"value":0.288,"ci":[0.214,0.376]},"precisionRange":[0.036,0.036],"byCorpus":{"mhs":{"k":15,"n":17,"value":0.882,"ci":[0.657,0.967]},"hatexplain":{"k":16,"n":17,"value":0.941,"ci":[0.73,0.99]},"civil":{"k":3,"n":84,"value":0.036,"ci":[0.012,0.1]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "absolutist": {"precision":{"k":137,"n":270,"value":0.507,"ci":[0.448,0.567]},"precisionRange":[0.329,0.842],"byCorpus":{"mhs":{"k":33,"n":43,"value":0.767,"ci":[0.623,0.868]},"hatexplain":{"k":48,"n":57,"value":0.842,"ci":[0.726,0.915]},"civil":{"k":56,"n":170,"value":0.329,"ci":[0.263,0.403]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "contempt": {"precision":{"k":92,"n":100,"value":0.92,"ci":[0.85,0.959]},"precisionRange":[0.914,0.931],"byCorpus":{"mhs":{"k":64,"n":70,"value":0.914,"ci":[0.825,0.96]},"hatexplain":{"k":27,"n":29,"value":0.931,"ci":[0.78,0.981]},"civil":{"k":1,"n":1,"value":1,"ci":[0.207,1]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "strong": {"precision":{"k":3839,"n":4197,"value":0.915,"ci":[0.906,0.923]},"precisionRange":[0.346,0.956],"byCorpus":{"mhs":{"k":1039,"n":1087,"value":0.956,"ci":[0.942,0.967]},"hatexplain":{"k":2782,"n":3058,"value":0.91,"ci":[0.899,0.919]},"civil":{"k":18,"n":52,"value":0.346,"ci":[0.232,0.482]}},"specific":null,"recall":null,"measured":true,"note":null},
+ },
+};
+
+const MEASURED_DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), not on this site's replies. Precision says how often a marker sat on text the annotators judged hostile to a group; it does not say why anyone wrote it, and it can differ on other sites and topics.";
+
+return { MEASURED_AT, MEASURED, MEASURED_DETAIL, MEASURED_DOES_NOT_PROVE };
 })();
 
 // ---- families.js

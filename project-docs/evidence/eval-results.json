@@ -1,0 +1,6504 @@
+{
+ "generated": "2026-10-21",
+ "split": "test",
+ "seed": "radar-eval-2026-10-21",
+ "extremeAt": 2,
+ "families": {
+  "dehumanise": {
+   "precision": {
+    "k": 36,
+    "n": 39,
+    "value": 0.923,
+    "ci": [
+     0.797,
+     0.973
+    ]
+   },
+   "precisionRange": null,
+   "byCorpus": {
+    "mhs": {
+     "k": 17,
+     "n": 19,
+     "value": 0.895,
+     "ci": [
+      0.686,
+      0.971
+     ]
+    },
+    "hatexplain": {
+     "k": 18,
+     "n": 18,
+     "value": 1,
+     "ci": [
+      0.824,
+      1
+     ]
+    },
+    "civil": {
+     "k": 1,
+     "n": 2,
+     "value": 0.5,
+     "ci": [
+      0.095,
+      0.905
+     ]
+    }
+   },
+   "specific": {
+    "against": "mhs:dehumanise",
+    "precision": {
+     "k": 11,
+     "n": 19,
+     "value": 0.579,
+     "ci": [
+      0.363,
+      0.769
+     ]
+    },
+    "recall": {
+     "k": 11,
+     "n": 5046,
+     "value": 0.002,
+     "ci": [
+      0.001,
+      0.004
+     ]
+    }
+   },
+   "recall": {
+    "k": 11,
+    "n": 5046,
+    "value": 0.002,
+    "ci": [
+     0.001,
+     0.004
+    ]
+   },
+   "measured": true,
+   "note": null
+  },
+  "violence": {
+   "precision": {
+    "k": 77,
+    "n": 88,
+    "value": 0.875,
+    "ci": [
+     0.79,
+     0.929
+    ]
+   },
+   "precisionRange": [
+    0.967,
+    0.967
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 59,
+     "n": 61,
+     "value": 0.967,
+     "ci": [
+      0.888,
+      0.991
+     ]
+    },
+    "hatexplain": {
+     "k": 15,
+     "n": 18,
+     "value": 0.833,
+     "ci": [
+      0.608,
+      0.942
+     ]
+    },
+    "civil": {
+     "k": 3,
+     "n": 9,
+     "value": 0.333,
+     "ci": [
+      0.121,
+      0.646
+     ]
+    }
+   },
+   "specific": {
+    "against": "mhs:violence",
+    "precision": {
+     "k": 39,
+     "n": 61,
+     "value": 0.639,
+     "ci": [
+      0.514,
+      0.748
+     ]
+    },
+    "recall": {
+     "k": 39,
+     "n": 1819,
+     "value": 0.021,
+     "ci": [
+      0.016,
+      0.029
+     ]
+    }
+   },
+   "recall": {
+    "k": 39,
+    "n": 1819,
+    "value": 0.021,
+    "ci": [
+     0.016,
+     0.029
+    ]
+   },
+   "measured": true,
+   "note": null
+  },
+  "vigilante": {
+   "precision": {
+    "k": 2,
+    "n": 3,
+    "value": 0.667,
+    "ci": [
+     0.208,
+     0.939
+    ]
+   },
+   "precisionRange": null,
+   "byCorpus": {
+    "mhs": {
+     "k": 2,
+     "n": 2,
+     "value": 1,
+     "ci": [
+      0.342,
+      1
+     ]
+    },
+    "hatexplain": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": null
+    },
+    "civil": {
+     "k": 0,
+     "n": 1,
+     "value": 0,
+     "ci": [
+      0,
+      0.793
+     ]
+    }
+   },
+   "specific": null,
+   "recall": null,
+   "measured": false,
+   "note": "fewer than 20 hits in the test split; not measured"
+  },
+  "slur": {
+   "precision": {
+    "k": 3682,
+    "n": 4009,
+    "value": 0.918,
+    "ci": [
+     0.91,
+     0.927
+    ]
+   },
+   "precisionRange": [
+    0.355,
+    0.96
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 916,
+     "n": 954,
+     "value": 0.96,
+     "ci": [
+      0.946,
+      0.971
+     ]
+    },
+    "hatexplain": {
+     "k": 2755,
+     "n": 3024,
+     "value": 0.911,
+     "ci": [
+      0.9,
+      0.921
+     ]
+    },
+    "civil": {
+     "k": 11,
+     "n": 31,
+     "value": 0.355,
+     "ci": [
+      0.211,
+      0.531
+     ]
+    }
+   },
+   "specific": null,
+   "recall": null,
+   "measured": true,
+   "note": null
+  },
+  "slurSoft": {
+   "precision": {
+    "k": 908,
+    "n": 1363,
+    "value": 0.666,
+    "ci": [
+     0.641,
+     0.691
+    ]
+   },
+   "precisionRange": [
+    0.206,
+    0.919
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 397,
+     "n": 432,
+     "value": 0.919,
+     "ci": [
+      0.889,
+      0.941
+     ]
+    },
+    "hatexplain": {
+     "k": 468,
+     "n": 722,
+     "value": 0.648,
+     "ci": [
+      0.613,
+      0.682
+     ]
+    },
+    "civil": {
+     "k": 43,
+     "n": 209,
+     "value": 0.206,
+     "ci": [
+      0.156,
+      0.266
+     ]
+    }
+   },
+   "specific": null,
+   "recall": null,
+   "measured": true,
+   "note": null
+  },
+  "stereotype": {
+   "precision": {
+    "k": 80,
+    "n": 96,
+    "value": 0.833,
+    "ci": [
+     0.746,
+     0.895
+    ]
+   },
+   "precisionRange": [
+    0.917,
+    0.917
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 66,
+     "n": 72,
+     "value": 0.917,
+     "ci": [
+      0.83,
+      0.961
+     ]
+    },
+    "hatexplain": {
+     "k": 11,
+     "n": 15,
+     "value": 0.733,
+     "ci": [
+      0.48,
+      0.891
+     ]
+    },
+    "civil": {
+     "k": 3,
+     "n": 9,
+     "value": 0.333,
+     "ci": [
+      0.121,
+      0.646
+     ]
+    }
+   },
+   "specific": {
+    "against": "mhs:stereotype",
+    "precision": {
+     "k": 51,
+     "n": 72,
+     "value": 0.708,
+     "ci": [
+      0.595,
+      0.801
+     ]
+    },
+    "recall": {
+     "k": 51,
+     "n": 8368,
+     "value": 0.006,
+     "ci": [
+      0.005,
+      0.008
+     ]
+    }
+   },
+   "recall": {
+    "k": 51,
+    "n": 8368,
+    "value": 0.006,
+    "ci": [
+     0.005,
+     0.008
+    ]
+   },
+   "measured": true,
+   "note": null
+  },
+  "motive": {
+   "precision": {
+    "k": 29,
+    "n": 40,
+    "value": 0.725,
+    "ci": [
+     0.572,
+     0.839
+    ]
+   },
+   "precisionRange": [
+    0.818,
+    0.818
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 18,
+     "n": 22,
+     "value": 0.818,
+     "ci": [
+      0.615,
+      0.927
+     ]
+    },
+    "hatexplain": {
+     "k": 9,
+     "n": 13,
+     "value": 0.692,
+     "ci": [
+      0.424,
+      0.873
+     ]
+    },
+    "civil": {
+     "k": 2,
+     "n": 5,
+     "value": 0.4,
+     "ci": [
+      0.118,
+      0.769
+     ]
+    }
+   },
+   "specific": null,
+   "recall": null,
+   "measured": true,
+   "note": null
+  },
+  "essentialise": {
+   "precision": {
+    "k": 59,
+    "n": 102,
+    "value": 0.578,
+    "ci": [
+     0.481,
+     0.67
+    ]
+   },
+   "precisionRange": [
+    0.258,
+    0.75
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 33,
+     "n": 47,
+     "value": 0.702,
+     "ci": [
+      0.56,
+      0.813
+     ]
+    },
+    "hatexplain": {
+     "k": 18,
+     "n": 24,
+     "value": 0.75,
+     "ci": [
+      0.551,
+      0.88
+     ]
+    },
+    "civil": {
+     "k": 8,
+     "n": 31,
+     "value": 0.258,
+     "ci": [
+      0.137,
+      0.432
+     ]
+    }
+   },
+   "specific": null,
+   "recall": null,
+   "measured": true,
+   "note": null
+  },
+  "conspiracy": {
+   "precision": {
+    "k": 34,
+    "n": 118,
+    "value": 0.288,
+    "ci": [
+     0.214,
+     0.376
+    ]
+   },
+   "precisionRange": [
+    0.036,
+    0.036
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 15,
+     "n": 17,
+     "value": 0.882,
+     "ci": [
+      0.657,
+      0.967
+     ]
+    },
+    "hatexplain": {
+     "k": 16,
+     "n": 17,
+     "value": 0.941,
+     "ci": [
+      0.73,
+      0.99
+     ]
+    },
+    "civil": {
+     "k": 3,
+     "n": 84,
+     "value": 0.036,
+     "ci": [
+      0.012,
+      0.1
+     ]
+    }
+   },
+   "specific": null,
+   "recall": null,
+   "measured": true,
+   "note": null
+  },
+  "absolutist": {
+   "precision": {
+    "k": 137,
+    "n": 270,
+    "value": 0.507,
+    "ci": [
+     0.448,
+     0.567
+    ]
+   },
+   "precisionRange": [
+    0.329,
+    0.842
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 33,
+     "n": 43,
+     "value": 0.767,
+     "ci": [
+      0.623,
+      0.868
+     ]
+    },
+    "hatexplain": {
+     "k": 48,
+     "n": 57,
+     "value": 0.842,
+     "ci": [
+      0.726,
+      0.915
+     ]
+    },
+    "civil": {
+     "k": 56,
+     "n": 170,
+     "value": 0.329,
+     "ci": [
+      0.263,
+      0.403
+     ]
+    }
+   },
+   "specific": null,
+   "recall": null,
+   "measured": true,
+   "note": null
+  },
+  "contempt": {
+   "precision": {
+    "k": 92,
+    "n": 100,
+    "value": 0.92,
+    "ci": [
+     0.85,
+     0.959
+    ]
+   },
+   "precisionRange": [
+    0.914,
+    0.931
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 64,
+     "n": 70,
+     "value": 0.914,
+     "ci": [
+      0.825,
+      0.96
+     ]
+    },
+    "hatexplain": {
+     "k": 27,
+     "n": 29,
+     "value": 0.931,
+     "ci": [
+      0.78,
+      0.981
+     ]
+    },
+    "civil": {
+     "k": 1,
+     "n": 1,
+     "value": 1,
+     "ci": [
+      0.207,
+      1
+     ]
+    }
+   },
+   "specific": null,
+   "recall": null,
+   "measured": true,
+   "note": null
+  },
+  "strong": {
+   "precision": {
+    "k": 3839,
+    "n": 4197,
+    "value": 0.915,
+    "ci": [
+     0.906,
+     0.923
+    ]
+   },
+   "precisionRange": [
+    0.346,
+    0.956
+   ],
+   "byCorpus": {
+    "mhs": {
+     "k": 1039,
+     "n": 1087,
+     "value": 0.956,
+     "ci": [
+      0.942,
+      0.967
+     ]
+    },
+    "hatexplain": {
+     "k": 2782,
+     "n": 3058,
+     "value": 0.91,
+     "ci": [
+      0.899,
+      0.919
+     ]
+    },
+    "civil": {
+     "k": 18,
+     "n": 52,
+     "value": 0.346,
+     "ci": [
+      0.232,
+      0.482
+     ]
+    }
+   },
+   "specific": null,
+   "recall": null,
+   "measured": true,
+   "note": null
+  }
+ },
+ "extreme": {
+  "precision": {
+   "k": 794,
+   "n": 1093,
+   "value": 0.726,
+   "ci": [
+    0.699,
+    0.752
+   ]
+  },
+  "recall": {
+   "k": 794,
+   "n": 5224,
+   "value": 0.152,
+   "ci": [
+    0.143,
+    0.162
+   ]
+  },
+  "against": "mhs: hate_speech_score > 0.5",
+  "byCorpus": {
+   "mhs": {
+    "k": 794,
+    "n": 1093,
+    "value": 0.726,
+    "ci": [
+     0.699,
+     0.752
+    ]
+   },
+   "hatexplain": {
+    "k": 1897,
+    "n": 3063,
+    "value": 0.619,
+    "ci": [
+     0.602,
+     0.636
+    ]
+   },
+   "civil": {
+    "k": 0,
+    "n": 0,
+    "value": null,
+    "ci": null
+   },
+   "mlma-fr": {
+    "k": 0,
+    "n": 9,
+    "value": 0,
+    "ci": [
+     0,
+     0.299
+    ]
+   }
+  }
+ },
+ "sides": {
+  "mhs": {
+   "right": {
+    "recall": {
+     "k": 702,
+     "n": 7584,
+     "value": 0.093,
+     "ci": [
+      0.086,
+      0.099
+     ]
+    },
+    "precision": {
+     "k": 702,
+     "n": 730,
+     "value": 0.962,
+     "ci": [
+      0.945,
+      0.973
+     ]
+    }
+   },
+   "left": {
+    "recall": {
+     "k": 107,
+     "n": 2499,
+     "value": 0.043,
+     "ci": [
+      0.036,
+      0.051
+     ]
+    },
+    "precision": {
+     "k": 107,
+     "n": 114,
+     "value": 0.939,
+     "ci": [
+      0.879,
+      0.97
+     ]
+    }
+   },
+   "gap": {
+    "precision": false,
+    "recall": true
+   }
+  },
+  "hatexplain": {
+   "right": {
+    "recall": {
+     "k": 1814,
+     "n": 4197,
+     "value": 0.432,
+     "ci": [
+      0.417,
+      0.447
+     ]
+    },
+    "precision": {
+     "k": 1814,
+     "n": 1849,
+     "value": 0.981,
+     "ci": [
+      0.974,
+      0.986
+     ]
+    }
+   },
+   "left": {
+    "recall": {
+     "k": 46,
+     "n": 251,
+     "value": 0.183,
+     "ci": [
+      0.14,
+      0.236
+     ]
+    },
+    "precision": {
+     "k": 46,
+     "n": 46,
+     "value": 1,
+     "ci": [
+      0.923,
+      1
+     ]
+    }
+   },
+   "gap": {
+    "precision": false,
+    "recall": true
+   }
+  }
+ },
+ "duplicates": {
+  "synthetic": true,
+  "precision": {
+   "k": 85,
+   "n": 87,
+   "value": 0.977,
+   "ci": [
+    0.92,
+    0.994
+   ]
+  },
+  "recall": {
+   "k": 85,
+   "n": 85,
+   "value": 1,
+   "ci": [
+    0.957,
+    1
+   ]
+  }
+ },
+ "mismatch": {
+  "synthetic": true,
+  "precision": {
+   "k": 14,
+   "n": 14,
+   "value": 1,
+   "ci": [
+    0.785,
+    1
+   ]
+  },
+  "recall": {
+   "k": 14,
+   "n": 14,
+   "value": 1,
+   "ci": [
+    0.785,
+    1
+   ]
+  }
+ },
+ "inputs": [
+  {
+   "file": "mhs/measuring-hate-speech.parquet",
+   "sha256": "0d65ce8cfb857f5db90e74ce295067bba7473fe12115715f9dd18d2a5f87e976"
+  },
+  {
+   "file": "hatexplain/dataset.json",
+   "sha256": "63bb3340fee0ec469b09690d04cb68f7c187787dd8b83807f071892c084967fb"
+  },
+  {
+   "file": "civil/test.parquet",
+   "sha256": "410f803ff161e7c4ba005db7de5b444cac413f4861bf056b0fd69d670d75aa08"
+  },
+  {
+   "file": "mlma/hate_speech_mlma.zip",
+   "sha256": "56db7efb1b64a2570f63d0cdb48d119c5e32eccff13f3c22bf17a4331956dc43"
+  },
+  {
+   "file": "prepared/mhs.jsonl",
+   "sha256": "2991619a4570460f94a00c65b581ecb8bed07715bb2f7115412e6b54ec0304ea"
+  },
+  {
+   "file": "prepared/hatexplain.jsonl",
+   "sha256": "b174e01a4494a8d7729d02d643e4038a756b005c256552a4a3990aa8b68d9046"
+  },
+  {
+   "file": "prepared/civil.jsonl",
+   "sha256": "5c47dddbdb94e9472deb93a8cdf52cec45dca6e6e1c86bd1e482c0f0d30250fa"
+  },
+  {
+   "file": "prepared/mlma-fr.jsonl",
+   "sha256": "f7e9580a72fa75d7797ff1fa21b640283d9c4928f59c8e0f113e85a8dc5aa9de"
+  }
+ ],
+ "corpora": {
+  "mhs": {
+   "n": 19789,
+   "prevalence": {
+    "k": 12295,
+    "n": 19789,
+    "value": 0.621,
+    "ci": [
+     0.615,
+     0.628
+    ]
+   },
+   "families": {
+    "dehumanise": {
+     "againstHostile": {
+      "tp": 17,
+      "fp": 2,
+      "fn": 12278,
+      "tn": 7492,
+      "precision": {
+       "k": 17,
+       "n": 19,
+       "value": 0.895,
+       "ci": [
+        0.686,
+        0.971
+       ]
+      },
+      "recall": {
+       "k": 17,
+       "n": 12295,
+       "value": 0.001,
+       "ci": [
+        0.001,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": {
+      "tp": 11,
+      "fp": 8,
+      "fn": 5035,
+      "tn": 14735,
+      "precision": {
+       "k": 11,
+       "n": 19,
+       "value": 0.579,
+       "ci": [
+        0.363,
+        0.769
+       ]
+      },
+      "recall": {
+       "k": 11,
+       "n": 5046,
+       "value": 0.002,
+       "ci": [
+        0.001,
+        0.004
+       ]
+      },
+      "prevalence": {
+       "k": 5046,
+       "n": 19789,
+       "value": 0.255,
+       "ci": [
+        0.249,
+        0.261
+       ]
+      }
+     }
+    },
+    "violence": {
+     "againstHostile": {
+      "tp": 59,
+      "fp": 2,
+      "fn": 12236,
+      "tn": 7492,
+      "precision": {
+       "k": 59,
+       "n": 61,
+       "value": 0.967,
+       "ci": [
+        0.888,
+        0.991
+       ]
+      },
+      "recall": {
+       "k": 59,
+       "n": 12295,
+       "value": 0.005,
+       "ci": [
+        0.004,
+        0.006
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": {
+      "tp": 39,
+      "fp": 22,
+      "fn": 1780,
+      "tn": 17948,
+      "precision": {
+       "k": 39,
+       "n": 61,
+       "value": 0.639,
+       "ci": [
+        0.514,
+        0.748
+       ]
+      },
+      "recall": {
+       "k": 39,
+       "n": 1819,
+       "value": 0.021,
+       "ci": [
+        0.016,
+        0.029
+       ]
+      },
+      "prevalence": {
+       "k": 1819,
+       "n": 19789,
+       "value": 0.092,
+       "ci": [
+        0.088,
+        0.096
+       ]
+      }
+     }
+    },
+    "vigilante": {
+     "againstHostile": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 12293,
+      "tn": 7494,
+      "precision": {
+       "k": 2,
+       "n": 2,
+       "value": 1,
+       "ci": [
+        0.342,
+        1
+       ]
+      },
+      "recall": {
+       "k": 2,
+       "n": 12295,
+       "value": 0,
+       "ci": [
+        0,
+        0.001
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "slur": {
+     "againstHostile": {
+      "tp": 916,
+      "fp": 38,
+      "fn": 11379,
+      "tn": 7456,
+      "precision": {
+       "k": 916,
+       "n": 954,
+       "value": 0.96,
+       "ci": [
+        0.946,
+        0.971
+       ]
+      },
+      "recall": {
+       "k": 916,
+       "n": 12295,
+       "value": 0.075,
+       "ci": [
+        0.07,
+        0.079
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "slurSoft": {
+     "againstHostile": {
+      "tp": 397,
+      "fp": 35,
+      "fn": 11898,
+      "tn": 7459,
+      "precision": {
+       "k": 397,
+       "n": 432,
+       "value": 0.919,
+       "ci": [
+        0.889,
+        0.941
+       ]
+      },
+      "recall": {
+       "k": 397,
+       "n": 12295,
+       "value": 0.032,
+       "ci": [
+        0.029,
+        0.036
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "stereotype": {
+     "againstHostile": {
+      "tp": 66,
+      "fp": 6,
+      "fn": 12229,
+      "tn": 7488,
+      "precision": {
+       "k": 66,
+       "n": 72,
+       "value": 0.917,
+       "ci": [
+        0.83,
+        0.961
+       ]
+      },
+      "recall": {
+       "k": 66,
+       "n": 12295,
+       "value": 0.005,
+       "ci": [
+        0.004,
+        0.007
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": {
+      "tp": 51,
+      "fp": 21,
+      "fn": 8317,
+      "tn": 11400,
+      "precision": {
+       "k": 51,
+       "n": 72,
+       "value": 0.708,
+       "ci": [
+        0.595,
+        0.801
+       ]
+      },
+      "recall": {
+       "k": 51,
+       "n": 8368,
+       "value": 0.006,
+       "ci": [
+        0.005,
+        0.008
+       ]
+      },
+      "prevalence": {
+       "k": 8368,
+       "n": 19789,
+       "value": 0.423,
+       "ci": [
+        0.416,
+        0.43
+       ]
+      }
+     }
+    },
+    "motive": {
+     "againstHostile": {
+      "tp": 18,
+      "fp": 4,
+      "fn": 12277,
+      "tn": 7490,
+      "precision": {
+       "k": 18,
+       "n": 22,
+       "value": 0.818,
+       "ci": [
+        0.615,
+        0.927
+       ]
+      },
+      "recall": {
+       "k": 18,
+       "n": 12295,
+       "value": 0.001,
+       "ci": [
+        0.001,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "essentialise": {
+     "againstHostile": {
+      "tp": 33,
+      "fp": 14,
+      "fn": 12262,
+      "tn": 7480,
+      "precision": {
+       "k": 33,
+       "n": 47,
+       "value": 0.702,
+       "ci": [
+        0.56,
+        0.813
+       ]
+      },
+      "recall": {
+       "k": 33,
+       "n": 12295,
+       "value": 0.003,
+       "ci": [
+        0.002,
+        0.004
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "conspiracy": {
+     "againstHostile": {
+      "tp": 15,
+      "fp": 2,
+      "fn": 12280,
+      "tn": 7492,
+      "precision": {
+       "k": 15,
+       "n": 17,
+       "value": 0.882,
+       "ci": [
+        0.657,
+        0.967
+       ]
+      },
+      "recall": {
+       "k": 15,
+       "n": 12295,
+       "value": 0.001,
+       "ci": [
+        0.001,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "absolutist": {
+     "againstHostile": {
+      "tp": 33,
+      "fp": 10,
+      "fn": 12262,
+      "tn": 7484,
+      "precision": {
+       "k": 33,
+       "n": 43,
+       "value": 0.767,
+       "ci": [
+        0.623,
+        0.868
+       ]
+      },
+      "recall": {
+       "k": 33,
+       "n": 12295,
+       "value": 0.003,
+       "ci": [
+        0.002,
+        0.004
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "contempt": {
+     "againstHostile": {
+      "tp": 64,
+      "fp": 6,
+      "fn": 12231,
+      "tn": 7488,
+      "precision": {
+       "k": 64,
+       "n": 70,
+       "value": 0.914,
+       "ci": [
+        0.825,
+        0.96
+       ]
+      },
+      "recall": {
+       "k": 64,
+       "n": 12295,
+       "value": 0.005,
+       "ci": [
+        0.004,
+        0.007
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "strong": {
+     "againstHostile": {
+      "tp": 1039,
+      "fp": 48,
+      "fn": 11256,
+      "tn": 7446,
+      "precision": {
+       "k": 1039,
+       "n": 1087,
+       "value": 0.956,
+       "ci": [
+        0.942,
+        0.967
+       ]
+      },
+      "recall": {
+       "k": 1039,
+       "n": 12295,
+       "value": 0.085,
+       "ci": [
+        0.08,
+        0.09
+       ]
+      },
+      "prevalence": {
+       "k": 12295,
+       "n": 19789,
+       "value": 0.621,
+       "ci": [
+        0.615,
+        0.628
+       ]
+      }
+     }
+    }
+   },
+   "sides": {
+    "strong": {
+     "right-targets": {
+      "tp": 702,
+      "fp": 28,
+      "fn": 6882,
+      "tn": 4142,
+      "precision": {
+       "k": 702,
+       "n": 730,
+       "value": 0.962,
+       "ci": [
+        0.945,
+        0.973
+       ]
+      },
+      "recall": {
+       "k": 702,
+       "n": 7584,
+       "value": 0.093,
+       "ci": [
+        0.086,
+        0.099
+       ]
+      },
+      "prevalence": {
+       "k": 7584,
+       "n": 11754,
+       "value": 0.645,
+       "ci": [
+        0.637,
+        0.654
+       ]
+      }
+     },
+     "left-targets": {
+      "tp": 107,
+      "fp": 7,
+      "fn": 2392,
+      "tn": 1564,
+      "precision": {
+       "k": 107,
+       "n": 114,
+       "value": 0.939,
+       "ci": [
+        0.879,
+        0.97
+       ]
+      },
+      "recall": {
+       "k": 107,
+       "n": 2499,
+       "value": 0.043,
+       "ci": [
+        0.036,
+        0.051
+       ]
+      },
+      "prevalence": {
+       "k": 2499,
+       "n": 4070,
+       "value": 0.614,
+       "ci": [
+        0.599,
+        0.629
+       ]
+      }
+     },
+     "both": {
+      "tp": 228,
+      "fp": 3,
+      "fn": 1783,
+      "tn": 1373,
+      "precision": {
+       "k": 228,
+       "n": 231,
+       "value": 0.987,
+       "ci": [
+        0.963,
+        0.996
+       ]
+      },
+      "recall": {
+       "k": 228,
+       "n": 2011,
+       "value": 0.113,
+       "ci": [
+        0.1,
+        0.128
+       ]
+      },
+      "prevalence": {
+       "k": 2011,
+       "n": 3387,
+       "value": 0.594,
+       "ci": [
+        0.577,
+        0.61
+       ]
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": true
+     }
+    },
+    "strongNoSlur": {
+     "right-targets": {
+      "tp": 65,
+      "fp": 7,
+      "fn": 7519,
+      "tn": 4163,
+      "precision": {
+       "k": 65,
+       "n": 72,
+       "value": 0.903,
+       "ci": [
+        0.813,
+        0.952
+       ]
+      },
+      "recall": {
+       "k": 65,
+       "n": 7584,
+       "value": 0.009,
+       "ci": [
+        0.007,
+        0.011
+       ]
+      },
+      "prevalence": {
+       "k": 7584,
+       "n": 11754,
+       "value": 0.645,
+       "ci": [
+        0.637,
+        0.654
+       ]
+      }
+     },
+     "left-targets": {
+      "tp": 47,
+      "fp": 2,
+      "fn": 2452,
+      "tn": 1569,
+      "precision": {
+       "k": 47,
+       "n": 49,
+       "value": 0.959,
+       "ci": [
+        0.863,
+        0.989
+       ]
+      },
+      "recall": {
+       "k": 47,
+       "n": 2499,
+       "value": 0.019,
+       "ci": [
+        0.014,
+        0.025
+       ]
+      },
+      "prevalence": {
+       "k": 2499,
+       "n": 4070,
+       "value": 0.614,
+       "ci": [
+        0.599,
+        0.629
+       ]
+      }
+     },
+     "both": {
+      "tp": 31,
+      "fp": 1,
+      "fn": 1980,
+      "tn": 1375,
+      "precision": {
+       "k": 31,
+       "n": 32,
+       "value": 0.969,
+       "ci": [
+        0.843,
+        0.994
+       ]
+      },
+      "recall": {
+       "k": 31,
+       "n": 2011,
+       "value": 0.015,
+       "ci": [
+        0.011,
+        0.022
+       ]
+      },
+      "prevalence": {
+       "k": 2011,
+       "n": 3387,
+       "value": 0.594,
+       "ci": [
+        0.577,
+        0.61
+       ]
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": true
+     }
+    },
+    "extreme": {
+     "right-targets": {
+      "tp": 708,
+      "fp": 28,
+      "fn": 6876,
+      "tn": 4142,
+      "precision": {
+       "k": 708,
+       "n": 736,
+       "value": 0.962,
+       "ci": [
+        0.946,
+        0.974
+       ]
+      },
+      "recall": {
+       "k": 708,
+       "n": 7584,
+       "value": 0.093,
+       "ci": [
+        0.087,
+        0.1
+       ]
+      },
+      "prevalence": {
+       "k": 7584,
+       "n": 11754,
+       "value": 0.645,
+       "ci": [
+        0.637,
+        0.654
+       ]
+      }
+     },
+     "left-targets": {
+      "tp": 107,
+      "fp": 7,
+      "fn": 2392,
+      "tn": 1564,
+      "precision": {
+       "k": 107,
+       "n": 114,
+       "value": 0.939,
+       "ci": [
+        0.879,
+        0.97
+       ]
+      },
+      "recall": {
+       "k": 107,
+       "n": 2499,
+       "value": 0.043,
+       "ci": [
+        0.036,
+        0.051
+       ]
+      },
+      "prevalence": {
+       "k": 2499,
+       "n": 4070,
+       "value": 0.614,
+       "ci": [
+        0.599,
+        0.629
+       ]
+      }
+     },
+     "both": {
+      "tp": 228,
+      "fp": 3,
+      "fn": 1783,
+      "tn": 1373,
+      "precision": {
+       "k": 228,
+       "n": 231,
+       "value": 0.987,
+       "ci": [
+        0.963,
+        0.996
+       ]
+      },
+      "recall": {
+       "k": 228,
+       "n": 2011,
+       "value": 0.113,
+       "ci": [
+        0.1,
+        0.128
+       ]
+      },
+      "prevalence": {
+       "k": 2011,
+       "n": 3387,
+       "value": 0.594,
+       "ci": [
+        0.577,
+        0.61
+       ]
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": true
+     }
+    }
+   },
+   "groups": {
+    "strong": {
+     "age_children": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 59,
+      "tn": 57,
+      "precision": {
+       "k": 4,
+       "n": 4,
+       "value": 1,
+       "ci": [
+        0.51,
+        1
+       ]
+      },
+      "recall": {
+       "k": 4,
+       "n": 63,
+       "value": 0.063,
+       "ci": [
+        0.025,
+        0.152
+       ]
+      },
+      "prevalence": {
+       "k": 63,
+       "n": 120,
+       "value": 0.525,
+       "ci": [
+        0.436,
+        0.612
+       ]
+      }
+     },
+     "age_middle_aged": {
+      "tp": 2,
+      "fp": 1,
+      "fn": 41,
+      "tn": 31,
+      "precision": {
+       "k": 2,
+       "n": 3,
+       "value": 0.667,
+       "ci": [
+        0.208,
+        0.939
+       ]
+      },
+      "recall": {
+       "k": 2,
+       "n": 43,
+       "value": 0.047,
+       "ci": [
+        0.013,
+        0.155
+       ]
+      },
+      "prevalence": {
+       "k": 43,
+       "n": 75,
+       "value": 0.573,
+       "ci": [
+        0.461,
+        0.679
+       ]
+      }
+     },
+     "age_seniors": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 48,
+      "tn": 25,
+      "precision": {
+       "k": 1,
+       "n": 2,
+       "value": 0.5,
+       "ci": [
+        0.095,
+        0.905
+       ]
+      },
+      "recall": {
+       "k": 1,
+       "n": 49,
+       "value": 0.02,
+       "ci": [
+        0.004,
+        0.107
+       ]
+      },
+      "prevalence": {
+       "k": 49,
+       "n": 75,
+       "value": 0.653,
+       "ci": [
+        0.541,
+        0.751
+       ]
+      }
+     },
+     "age_teenagers": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 65,
+      "tn": 41,
+      "precision": {
+       "k": 3,
+       "n": 3,
+       "value": 1,
+       "ci": [
+        0.438,
+        1
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 68,
+       "value": 0.044,
+       "ci": [
+        0.015,
+        0.122
+       ]
+      },
+      "prevalence": {
+       "k": 68,
+       "n": 109,
+       "value": 0.624,
+       "ci": [
+        0.53,
+        0.709
+       ]
+      }
+     },
+     "age_young_adults": {
+      "tp": 2,
+      "fp": 1,
+      "fn": 96,
+      "tn": 48,
+      "precision": {
+       "k": 2,
+       "n": 3,
+       "value": 0.667,
+       "ci": [
+        0.208,
+        0.939
+       ]
+      },
+      "recall": {
+       "k": 2,
+       "n": 98,
+       "value": 0.02,
+       "ci": [
+        0.006,
+        0.071
+       ]
+      },
+      "prevalence": {
+       "k": 98,
+       "n": 147,
+       "value": 0.667,
+       "ci": [
+        0.587,
+        0.738
+       ]
+      }
+     },
+     "disability_cognitive": {
+      "tp": 110,
+      "fp": 1,
+      "fn": 84,
+      "tn": 25,
+      "precision": {
+       "k": 110,
+       "n": 111,
+       "value": 0.991,
+       "ci": [
+        0.951,
+        0.998
+       ]
+      },
+      "recall": {
+       "k": 110,
+       "n": 194,
+       "value": 0.567,
+       "ci": [
+        0.497,
+        0.635
+       ]
+      },
+      "prevalence": {
+       "k": 194,
+       "n": 220,
+       "value": 0.882,
+       "ci": [
+        0.832,
+        0.918
+       ]
+      }
+     },
+     "disability_neurological": {
+      "tp": 8,
+      "fp": 0,
+      "fn": 42,
+      "tn": 24,
+      "precision": {
+       "k": 8,
+       "n": 8,
+       "value": 1,
+       "ci": [
+        0.676,
+        1
+       ]
+      },
+      "recall": {
+       "k": 8,
+       "n": 50,
+       "value": 0.16,
+       "ci": [
+        0.083,
+        0.285
+       ]
+      },
+      "prevalence": {
+       "k": 50,
+       "n": 74,
+       "value": 0.676,
+       "ci": [
+        0.563,
+        0.771
+       ]
+      }
+     },
+     "disability_physical": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 27,
+      "tn": 11,
+      "precision": {
+       "k": 2,
+       "n": 2,
+       "value": 1,
+       "ci": [
+        0.342,
+        1
+       ]
+      },
+      "recall": {
+       "k": 2,
+       "n": 29,
+       "value": 0.069,
+       "ci": [
+        0.019,
+        0.22
+       ]
+      },
+      "prevalence": {
+       "k": 29,
+       "n": 40,
+       "value": 0.725,
+       "ci": [
+        0.572,
+        0.839
+       ]
+      }
+     },
+     "disability_unspecific": {
+      "tp": 25,
+      "fp": 1,
+      "fn": 41,
+      "tn": 22,
+      "precision": {
+       "k": 25,
+       "n": 26,
+       "value": 0.962,
+       "ci": [
+        0.811,
+        0.993
+       ]
+      },
+      "recall": {
+       "k": 25,
+       "n": 66,
+       "value": 0.379,
+       "ci": [
+        0.271,
+        0.499
+       ]
+      },
+      "prevalence": {
+       "k": 66,
+       "n": 89,
+       "value": 0.742,
+       "ci": [
+        0.642,
+        0.821
+       ]
+      }
+     },
+     "gender_men": {
+      "tp": 48,
+      "fp": 3,
+      "fn": 993,
+      "tn": 563,
+      "precision": {
+       "k": 48,
+       "n": 51,
+       "value": 0.941,
+       "ci": [
+        0.841,
+        0.98
+       ]
+      },
+      "recall": {
+       "k": 48,
+       "n": 1041,
+       "value": 0.046,
+       "ci": [
+        0.035,
+        0.061
+       ]
+      },
+      "prevalence": {
+       "k": 1041,
+       "n": 1607,
+       "value": 0.648,
+       "ci": [
+        0.624,
+        0.671
+       ]
+      }
+     },
+     "gender_non_binary": {
+      "tp": 2,
+      "fp": 1,
+      "fn": 61,
+      "tn": 74,
+      "precision": {
+       "k": 2,
+       "n": 3,
+       "value": 0.667,
+       "ci": [
+        0.208,
+        0.939
+       ]
+      },
+      "recall": {
+       "k": 2,
+       "n": 63,
+       "value": 0.032,
+       "ci": [
+        0.009,
+        0.109
+       ]
+      },
+      "prevalence": {
+       "k": 63,
+       "n": 138,
+       "value": 0.457,
+       "ci": [
+        0.376,
+        0.54
+       ]
+      }
+     },
+     "gender_transgender_men": {
+      "tp": 3,
+      "fp": 4,
+      "fn": 113,
+      "tn": 137,
+      "precision": {
+       "k": 3,
+       "n": 7,
+       "value": 0.429,
+       "ci": [
+        0.158,
+        0.75
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 116,
+       "value": 0.026,
+       "ci": [
+        0.009,
+        0.073
+       ]
+      },
+      "prevalence": {
+       "k": 116,
+       "n": 257,
+       "value": 0.451,
+       "ci": [
+        0.392,
+        0.512
+       ]
+      }
+     },
+     "gender_transgender_unspecified": {
+      "tp": 17,
+      "fp": 2,
+      "fn": 90,
+      "tn": 171,
+      "precision": {
+       "k": 17,
+       "n": 19,
+       "value": 0.895,
+       "ci": [
+        0.686,
+        0.971
+       ]
+      },
+      "recall": {
+       "k": 17,
+       "n": 107,
+       "value": 0.159,
+       "ci": [
+        0.102,
+        0.24
+       ]
+      },
+      "prevalence": {
+       "k": 107,
+       "n": 280,
+       "value": 0.382,
+       "ci": [
+        0.327,
+        0.44
+       ]
+      }
+     },
+     "gender_transgender_women": {
+      "tp": 5,
+      "fp": 3,
+      "fn": 76,
+      "tn": 105,
+      "precision": {
+       "k": 5,
+       "n": 8,
+       "value": 0.625,
+       "ci": [
+        0.306,
+        0.863
+       ]
+      },
+      "recall": {
+       "k": 5,
+       "n": 81,
+       "value": 0.062,
+       "ci": [
+        0.027,
+        0.136
+       ]
+      },
+      "prevalence": {
+       "k": 81,
+       "n": 189,
+       "value": 0.429,
+       "ci": [
+        0.36,
+        0.5
+       ]
+      }
+     },
+     "gender_women": {
+      "tp": 83,
+      "fp": 3,
+      "fn": 3268,
+      "tn": 1146,
+      "precision": {
+       "k": 83,
+       "n": 86,
+       "value": 0.965,
+       "ci": [
+        0.902,
+        0.988
+       ]
+      },
+      "recall": {
+       "k": 83,
+       "n": 3351,
+       "value": 0.025,
+       "ci": [
+        0.02,
+        0.031
+       ]
+      },
+      "prevalence": {
+       "k": 3351,
+       "n": 4500,
+       "value": 0.745,
+       "ci": [
+        0.732,
+        0.757
+       ]
+      }
+     },
+     "origin_immigrant": {
+      "tp": 19,
+      "fp": 2,
+      "fn": 512,
+      "tn": 259,
+      "precision": {
+       "k": 19,
+       "n": 21,
+       "value": 0.905,
+       "ci": [
+        0.711,
+        0.973
+       ]
+      },
+      "recall": {
+       "k": 19,
+       "n": 531,
+       "value": 0.036,
+       "ci": [
+        0.023,
+        0.055
+       ]
+      },
+      "prevalence": {
+       "k": 531,
+       "n": 792,
+       "value": 0.67,
+       "ci": [
+        0.637,
+        0.702
+       ]
+      }
+     },
+     "origin_migrant_worker": {
+      "tp": 3,
+      "fp": 1,
+      "fn": 110,
+      "tn": 50,
+      "precision": {
+       "k": 3,
+       "n": 4,
+       "value": 0.75,
+       "ci": [
+        0.301,
+        0.954
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 113,
+       "value": 0.027,
+       "ci": [
+        0.009,
+        0.075
+       ]
+      },
+      "prevalence": {
+       "k": 113,
+       "n": 164,
+       "value": 0.689,
+       "ci": [
+        0.615,
+        0.755
+       ]
+      }
+     },
+     "origin_specific_country": {
+      "tp": 41,
+      "fp": 2,
+      "fn": 1012,
+      "tn": 703,
+      "precision": {
+       "k": 41,
+       "n": 43,
+       "value": 0.953,
+       "ci": [
+        0.845,
+        0.987
+       ]
+      },
+      "recall": {
+       "k": 41,
+       "n": 1053,
+       "value": 0.039,
+       "ci": [
+        0.029,
+        0.052
+       ]
+      },
+      "prevalence": {
+       "k": 1053,
+       "n": 1758,
+       "value": 0.599,
+       "ci": [
+        0.576,
+        0.622
+       ]
+      }
+     },
+     "origin_undocumented": {
+      "tp": 13,
+      "fp": 1,
+      "fn": 370,
+      "tn": 142,
+      "precision": {
+       "k": 13,
+       "n": 14,
+       "value": 0.929,
+       "ci": [
+        0.685,
+        0.987
+       ]
+      },
+      "recall": {
+       "k": 13,
+       "n": 383,
+       "value": 0.034,
+       "ci": [
+        0.02,
+        0.057
+       ]
+      },
+      "prevalence": {
+       "k": 383,
+       "n": 526,
+       "value": 0.728,
+       "ci": [
+        0.689,
+        0.764
+       ]
+      }
+     },
+     "politics_alt_right": {
+      "tp": 5,
+      "fp": 1,
+      "fn": 79,
+      "tn": 23,
+      "precision": {
+       "k": 5,
+       "n": 6,
+       "value": 0.833,
+       "ci": [
+        0.436,
+        0.97
+       ]
+      },
+      "recall": {
+       "k": 5,
+       "n": 84,
+       "value": 0.06,
+       "ci": [
+        0.026,
+        0.132
+       ]
+      },
+      "prevalence": {
+       "k": 84,
+       "n": 108,
+       "value": 0.778,
+       "ci": [
+        0.691,
+        0.846
+       ]
+      }
+     },
+     "politics_communist": {
+      "tp": 2,
+      "fp": 1,
+      "fn": 52,
+      "tn": 12,
+      "precision": {
+       "k": 2,
+       "n": 3,
+       "value": 0.667,
+       "ci": [
+        0.208,
+        0.939
+       ]
+      },
+      "recall": {
+       "k": 2,
+       "n": 54,
+       "value": 0.037,
+       "ci": [
+        0.01,
+        0.125
+       ]
+      },
+      "prevalence": {
+       "k": 54,
+       "n": 67,
+       "value": 0.806,
+       "ci": [
+        0.696,
+        0.883
+       ]
+      }
+     },
+     "politics_conservative": {
+      "tp": 7,
+      "fp": 1,
+      "fn": 132,
+      "tn": 36,
+      "precision": {
+       "k": 7,
+       "n": 8,
+       "value": 0.875,
+       "ci": [
+        0.529,
+        0.978
+       ]
+      },
+      "recall": {
+       "k": 7,
+       "n": 139,
+       "value": 0.05,
+       "ci": [
+        0.025,
+        0.1
+       ]
+      },
+      "prevalence": {
+       "k": 139,
+       "n": 176,
+       "value": 0.79,
+       "ci": [
+        0.724,
+        0.843
+       ]
+      }
+     },
+     "politics_democrat": {
+      "tp": 4,
+      "fp": 1,
+      "fn": 157,
+      "tn": 43,
+      "precision": {
+       "k": 4,
+       "n": 5,
+       "value": 0.8,
+       "ci": [
+        0.376,
+        0.964
+       ]
+      },
+      "recall": {
+       "k": 4,
+       "n": 161,
+       "value": 0.025,
+       "ci": [
+        0.01,
+        0.062
+       ]
+      },
+      "prevalence": {
+       "k": 161,
+       "n": 205,
+       "value": 0.785,
+       "ci": [
+        0.724,
+        0.836
+       ]
+      }
+     },
+     "politics_green_party": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 23,
+      "tn": 11,
+      "precision": {
+       "k": 0,
+       "n": 1,
+       "value": 0,
+       "ci": [
+        0,
+        0.793
+       ]
+      },
+      "recall": {
+       "k": 0,
+       "n": 23,
+       "value": 0,
+       "ci": [
+        0,
+        0.143
+       ]
+      },
+      "prevalence": {
+       "k": 23,
+       "n": 35,
+       "value": 0.657,
+       "ci": [
+        0.492,
+        0.792
+       ]
+      }
+     },
+     "politics_leftist": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 103,
+      "tn": 23,
+      "precision": {
+       "k": 1,
+       "n": 2,
+       "value": 0.5,
+       "ci": [
+        0.095,
+        0.905
+       ]
+      },
+      "recall": {
+       "k": 1,
+       "n": 104,
+       "value": 0.01,
+       "ci": [
+        0.002,
+        0.052
+       ]
+      },
+      "prevalence": {
+       "k": 104,
+       "n": 128,
+       "value": 0.813,
+       "ci": [
+        0.736,
+        0.871
+       ]
+      }
+     },
+     "politics_liberal": {
+      "tp": 9,
+      "fp": 1,
+      "fn": 151,
+      "tn": 33,
+      "precision": {
+       "k": 9,
+       "n": 10,
+       "value": 0.9,
+       "ci": [
+        0.596,
+        0.982
+       ]
+      },
+      "recall": {
+       "k": 9,
+       "n": 160,
+       "value": 0.056,
+       "ci": [
+        0.03,
+        0.103
+       ]
+      },
+      "prevalence": {
+       "k": 160,
+       "n": 194,
+       "value": 0.825,
+       "ci": [
+        0.765,
+        0.872
+       ]
+      }
+     },
+     "politics_libertarian": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 32,
+      "tn": 13,
+      "precision": {
+       "k": 0,
+       "n": 1,
+       "value": 0,
+       "ci": [
+        0,
+        0.793
+       ]
+      },
+      "recall": {
+       "k": 0,
+       "n": 32,
+       "value": 0,
+       "ci": [
+        0,
+        0.107
+       ]
+      },
+      "prevalence": {
+       "k": 32,
+       "n": 46,
+       "value": 0.696,
+       "ci": [
+        0.552,
+        0.809
+       ]
+      }
+     },
+     "politics_republican": {
+      "tp": 9,
+      "fp": 1,
+      "fn": 179,
+      "tn": 58,
+      "precision": {
+       "k": 9,
+       "n": 10,
+       "value": 0.9,
+       "ci": [
+        0.596,
+        0.982
+       ]
+      },
+      "recall": {
+       "k": 9,
+       "n": 188,
+       "value": 0.048,
+       "ci": [
+        0.025,
+        0.088
+       ]
+      },
+      "prevalence": {
+       "k": 188,
+       "n": 247,
+       "value": 0.761,
+       "ci": [
+        0.704,
+        0.81
+       ]
+      }
+     },
+     "politics_socialist": {
+      "tp": 2,
+      "fp": 1,
+      "fn": 65,
+      "tn": 14,
+      "precision": {
+       "k": 2,
+       "n": 3,
+       "value": 0.667,
+       "ci": [
+        0.208,
+        0.939
+       ]
+      },
+      "recall": {
+       "k": 2,
+       "n": 67,
+       "value": 0.03,
+       "ci": [
+        0.008,
+        0.102
+       ]
+      },
+      "prevalence": {
+       "k": 67,
+       "n": 82,
+       "value": 0.817,
+       "ci": [
+        0.72,
+        0.886
+       ]
+      }
+     },
+     "race_asian": {
+      "tp": 23,
+      "fp": 1,
+      "fn": 195,
+      "tn": 279,
+      "precision": {
+       "k": 23,
+       "n": 24,
+       "value": 0.958,
+       "ci": [
+        0.798,
+        0.993
+       ]
+      },
+      "recall": {
+       "k": 23,
+       "n": 218,
+       "value": 0.106,
+       "ci": [
+        0.071,
+        0.153
+       ]
+      },
+      "prevalence": {
+       "k": 218,
+       "n": 498,
+       "value": 0.438,
+       "ci": [
+        0.395,
+        0.482
+       ]
+      }
+     },
+     "race_black": {
+      "tp": 169,
+      "fp": 7,
+      "fn": 1258,
+      "tn": 827,
+      "precision": {
+       "k": 169,
+       "n": 176,
+       "value": 0.96,
+       "ci": [
+        0.92,
+        0.981
+       ]
+      },
+      "recall": {
+       "k": 169,
+       "n": 1427,
+       "value": 0.118,
+       "ci": [
+        0.103,
+        0.136
+       ]
+      },
+      "prevalence": {
+       "k": 1427,
+       "n": 2261,
+       "value": 0.631,
+       "ci": [
+        0.611,
+        0.651
+       ]
+      }
+     },
+     "race_latinx": {
+      "tp": 22,
+      "fp": 4,
+      "fn": 331,
+      "tn": 269,
+      "precision": {
+       "k": 22,
+       "n": 26,
+       "value": 0.846,
+       "ci": [
+        0.665,
+        0.939
+       ]
+      },
+      "recall": {
+       "k": 22,
+       "n": 353,
+       "value": 0.062,
+       "ci": [
+        0.042,
+        0.093
+       ]
+      },
+      "prevalence": {
+       "k": 353,
+       "n": 626,
+       "value": 0.564,
+       "ci": [
+        0.525,
+        0.602
+       ]
+      }
+     },
+     "race_middle_eastern": {
+      "tp": 24,
+      "fp": 2,
+      "fn": 426,
+      "tn": 250,
+      "precision": {
+       "k": 24,
+       "n": 26,
+       "value": 0.923,
+       "ci": [
+        0.759,
+        0.979
+       ]
+      },
+      "recall": {
+       "k": 24,
+       "n": 450,
+       "value": 0.053,
+       "ci": [
+        0.036,
+        0.078
+       ]
+      },
+      "prevalence": {
+       "k": 450,
+       "n": 702,
+       "value": 0.641,
+       "ci": [
+        0.605,
+        0.676
+       ]
+      }
+     },
+     "race_native_american": {
+      "tp": 3,
+      "fp": 1,
+      "fn": 97,
+      "tn": 109,
+      "precision": {
+       "k": 3,
+       "n": 4,
+       "value": 0.75,
+       "ci": [
+        0.301,
+        0.954
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 100,
+       "value": 0.03,
+       "ci": [
+        0.01,
+        0.085
+       ]
+      },
+      "prevalence": {
+       "k": 100,
+       "n": 210,
+       "value": 0.476,
+       "ci": [
+        0.41,
+        0.544
+       ]
+      }
+     },
+     "race_pacific_islander": {
+      "tp": 3,
+      "fp": 1,
+      "fn": 73,
+      "tn": 85,
+      "precision": {
+       "k": 3,
+       "n": 4,
+       "value": 0.75,
+       "ci": [
+        0.301,
+        0.954
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 76,
+       "value": 0.039,
+       "ci": [
+        0.014,
+        0.11
+       ]
+      },
+      "prevalence": {
+       "k": 76,
+       "n": 162,
+       "value": 0.469,
+       "ci": [
+        0.394,
+        0.546
+       ]
+      }
+     },
+     "race_white": {
+      "tp": 47,
+      "fp": 4,
+      "fn": 745,
+      "tn": 408,
+      "precision": {
+       "k": 47,
+       "n": 51,
+       "value": 0.922,
+       "ci": [
+        0.815,
+        0.969
+       ]
+      },
+      "recall": {
+       "k": 47,
+       "n": 792,
+       "value": 0.059,
+       "ci": [
+        0.045,
+        0.078
+       ]
+      },
+      "prevalence": {
+       "k": 792,
+       "n": 1204,
+       "value": 0.658,
+       "ci": [
+        0.631,
+        0.684
+       ]
+      }
+     },
+     "religion_atheist": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 78,
+      "tn": 64,
+      "precision": {
+       "k": 1,
+       "n": 2,
+       "value": 0.5,
+       "ci": [
+        0.095,
+        0.905
+       ]
+      },
+      "recall": {
+       "k": 1,
+       "n": 79,
+       "value": 0.013,
+       "ci": [
+        0.002,
+        0.068
+       ]
+      },
+      "prevalence": {
+       "k": 79,
+       "n": 144,
+       "value": 0.549,
+       "ci": [
+        0.467,
+        0.628
+       ]
+      }
+     },
+     "religion_buddhist": {
+      "tp": 2,
+      "fp": 1,
+      "fn": 39,
+      "tn": 43,
+      "precision": {
+       "k": 2,
+       "n": 3,
+       "value": 0.667,
+       "ci": [
+        0.208,
+        0.939
+       ]
+      },
+      "recall": {
+       "k": 2,
+       "n": 41,
+       "value": 0.049,
+       "ci": [
+        0.013,
+        0.161
+       ]
+      },
+      "prevalence": {
+       "k": 41,
+       "n": 85,
+       "value": 0.482,
+       "ci": [
+        0.379,
+        0.587
+       ]
+      }
+     },
+     "religion_christian": {
+      "tp": 8,
+      "fp": 1,
+      "fn": 410,
+      "tn": 423,
+      "precision": {
+       "k": 8,
+       "n": 9,
+       "value": 0.889,
+       "ci": [
+        0.565,
+        0.98
+       ]
+      },
+      "recall": {
+       "k": 8,
+       "n": 418,
+       "value": 0.019,
+       "ci": [
+        0.01,
+        0.037
+       ]
+      },
+      "prevalence": {
+       "k": 418,
+       "n": 842,
+       "value": 0.496,
+       "ci": [
+        0.463,
+        0.53
+       ]
+      }
+     },
+     "religion_hindu": {
+      "tp": 5,
+      "fp": 1,
+      "fn": 70,
+      "tn": 107,
+      "precision": {
+       "k": 5,
+       "n": 6,
+       "value": 0.833,
+       "ci": [
+        0.436,
+        0.97
+       ]
+      },
+      "recall": {
+       "k": 5,
+       "n": 75,
+       "value": 0.067,
+       "ci": [
+        0.029,
+        0.147
+       ]
+      },
+      "prevalence": {
+       "k": 75,
+       "n": 183,
+       "value": 0.41,
+       "ci": [
+        0.341,
+        0.482
+       ]
+      }
+     },
+     "religion_jewish": {
+      "tp": 36,
+      "fp": 1,
+      "fn": 286,
+      "tn": 212,
+      "precision": {
+       "k": 36,
+       "n": 37,
+       "value": 0.973,
+       "ci": [
+        0.862,
+        0.995
+       ]
+      },
+      "recall": {
+       "k": 36,
+       "n": 322,
+       "value": 0.112,
+       "ci": [
+        0.082,
+        0.151
+       ]
+      },
+      "prevalence": {
+       "k": 322,
+       "n": 535,
+       "value": 0.602,
+       "ci": [
+        0.56,
+        0.642
+       ]
+      }
+     },
+     "religion_mormon": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 56,
+      "tn": 44,
+      "precision": {
+       "k": 1,
+       "n": 2,
+       "value": 0.5,
+       "ci": [
+        0.095,
+        0.905
+       ]
+      },
+      "recall": {
+       "k": 1,
+       "n": 57,
+       "value": 0.018,
+       "ci": [
+        0.003,
+        0.093
+       ]
+      },
+      "prevalence": {
+       "k": 57,
+       "n": 102,
+       "value": 0.559,
+       "ci": [
+        0.462,
+        0.651
+       ]
+      }
+     },
+     "religion_muslim": {
+      "tp": 18,
+      "fp": 2,
+      "fn": 627,
+      "tn": 430,
+      "precision": {
+       "k": 18,
+       "n": 20,
+       "value": 0.9,
+       "ci": [
+        0.699,
+        0.972
+       ]
+      },
+      "recall": {
+       "k": 18,
+       "n": 645,
+       "value": 0.028,
+       "ci": [
+        0.018,
+        0.044
+       ]
+      },
+      "prevalence": {
+       "k": 645,
+       "n": 1077,
+       "value": 0.599,
+       "ci": [
+        0.569,
+        0.628
+       ]
+      }
+     },
+     "sexuality_bisexual": {
+      "tp": 31,
+      "fp": 3,
+      "fn": 215,
+      "tn": 521,
+      "precision": {
+       "k": 31,
+       "n": 34,
+       "value": 0.912,
+       "ci": [
+        0.77,
+        0.97
+       ]
+      },
+      "recall": {
+       "k": 31,
+       "n": 246,
+       "value": 0.126,
+       "ci": [
+        0.09,
+        0.173
+       ]
+      },
+      "prevalence": {
+       "k": 246,
+       "n": 770,
+       "value": 0.319,
+       "ci": [
+        0.288,
+        0.353
+       ]
+      }
+     },
+     "sexuality_gay": {
+      "tp": 393,
+      "fp": 9,
+      "fn": 935,
+      "tn": 852,
+      "precision": {
+       "k": 393,
+       "n": 402,
+       "value": 0.978,
+       "ci": [
+        0.958,
+        0.988
+       ]
+      },
+      "recall": {
+       "k": 393,
+       "n": 1328,
+       "value": 0.296,
+       "ci": [
+        0.272,
+        0.321
+       ]
+      },
+      "prevalence": {
+       "k": 1328,
+       "n": 2189,
+       "value": 0.607,
+       "ci": [
+        0.586,
+        0.627
+       ]
+      }
+     },
+     "sexuality_lesbian": {
+      "tp": 31,
+      "fp": 2,
+      "fn": 253,
+      "tn": 529,
+      "precision": {
+       "k": 31,
+       "n": 33,
+       "value": 0.939,
+       "ci": [
+        0.804,
+        0.983
+       ]
+      },
+      "recall": {
+       "k": 31,
+       "n": 284,
+       "value": 0.109,
+       "ci": [
+        0.078,
+        0.151
+       ]
+      },
+      "prevalence": {
+       "k": 284,
+       "n": 815,
+       "value": 0.348,
+       "ci": [
+        0.317,
+        0.382
+       ]
+      }
+     },
+     "sexuality_straight": {
+      "tp": 8,
+      "fp": 2,
+      "fn": 307,
+      "tn": 229,
+      "precision": {
+       "k": 8,
+       "n": 10,
+       "value": 0.8,
+       "ci": [
+        0.49,
+        0.943
+       ]
+      },
+      "recall": {
+       "k": 8,
+       "n": 315,
+       "value": 0.025,
+       "ci": [
+        0.013,
+        0.049
+       ]
+      },
+      "prevalence": {
+       "k": 315,
+       "n": 546,
+       "value": 0.577,
+       "ci": [
+        0.535,
+        0.618
+       ]
+      }
+     }
+    }
+   },
+   "extreme": {
+    "againstSevere": {
+     "tp": 794,
+     "fp": 299,
+     "fn": 4430,
+     "tn": 14266,
+     "precision": {
+      "k": 794,
+      "n": 1093,
+      "value": 0.726,
+      "ci": [
+       0.699,
+       0.752
+      ]
+     },
+     "recall": {
+      "k": 794,
+      "n": 5224,
+      "value": 0.152,
+      "ci": [
+       0.143,
+       0.162
+      ]
+     },
+     "prevalence": {
+      "k": 5224,
+      "n": 19789,
+      "value": 0.264,
+      "ci": [
+       0.258,
+       0.27
+      ]
+     }
+    },
+    "againstHostile": {
+     "tp": 1045,
+     "fp": 48,
+     "fn": 11250,
+     "tn": 7446,
+     "precision": {
+      "k": 1045,
+      "n": 1093,
+      "value": 0.956,
+      "ci": [
+       0.942,
+       0.967
+      ]
+     },
+     "recall": {
+      "k": 1045,
+      "n": 12295,
+      "value": 0.085,
+      "ci": [
+       0.08,
+       0.09
+      ]
+     },
+     "prevalence": {
+      "k": 12295,
+      "n": 19789,
+      "value": 0.621,
+      "ci": [
+       0.615,
+       0.628
+      ]
+     }
+    }
+   }
+  },
+  "hatexplain": {
+   "n": 10017,
+   "prevalence": {
+    "k": 6182,
+    "n": 10017,
+    "value": 0.617,
+    "ci": [
+     0.608,
+     0.627
+    ]
+   },
+   "families": {
+    "dehumanise": {
+     "againstHostile": {
+      "tp": 18,
+      "fp": 0,
+      "fn": 6164,
+      "tn": 3835,
+      "precision": {
+       "k": 18,
+       "n": 18,
+       "value": 1,
+       "ci": [
+        0.824,
+        1
+       ]
+      },
+      "recall": {
+       "k": 18,
+       "n": 6182,
+       "value": 0.003,
+       "ci": [
+        0.002,
+        0.005
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "violence": {
+     "againstHostile": {
+      "tp": 15,
+      "fp": 3,
+      "fn": 6167,
+      "tn": 3832,
+      "precision": {
+       "k": 15,
+       "n": 18,
+       "value": 0.833,
+       "ci": [
+        0.608,
+        0.942
+       ]
+      },
+      "recall": {
+       "k": 15,
+       "n": 6182,
+       "value": 0.002,
+       "ci": [
+        0.001,
+        0.004
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "vigilante": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 6182,
+      "tn": 3835,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 6182,
+       "value": 0,
+       "ci": [
+        0,
+        0.001
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "slur": {
+     "againstHostile": {
+      "tp": 2755,
+      "fp": 269,
+      "fn": 3427,
+      "tn": 3566,
+      "precision": {
+       "k": 2755,
+       "n": 3024,
+       "value": 0.911,
+       "ci": [
+        0.9,
+        0.921
+       ]
+      },
+      "recall": {
+       "k": 2755,
+       "n": 6182,
+       "value": 0.446,
+       "ci": [
+        0.433,
+        0.458
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "slurSoft": {
+     "againstHostile": {
+      "tp": 468,
+      "fp": 254,
+      "fn": 5714,
+      "tn": 3581,
+      "precision": {
+       "k": 468,
+       "n": 722,
+       "value": 0.648,
+       "ci": [
+        0.613,
+        0.682
+       ]
+      },
+      "recall": {
+       "k": 468,
+       "n": 6182,
+       "value": 0.076,
+       "ci": [
+        0.069,
+        0.083
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "stereotype": {
+     "againstHostile": {
+      "tp": 11,
+      "fp": 4,
+      "fn": 6171,
+      "tn": 3831,
+      "precision": {
+       "k": 11,
+       "n": 15,
+       "value": 0.733,
+       "ci": [
+        0.48,
+        0.891
+       ]
+      },
+      "recall": {
+       "k": 11,
+       "n": 6182,
+       "value": 0.002,
+       "ci": [
+        0.001,
+        0.003
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "motive": {
+     "againstHostile": {
+      "tp": 9,
+      "fp": 4,
+      "fn": 6173,
+      "tn": 3831,
+      "precision": {
+       "k": 9,
+       "n": 13,
+       "value": 0.692,
+       "ci": [
+        0.424,
+        0.873
+       ]
+      },
+      "recall": {
+       "k": 9,
+       "n": 6182,
+       "value": 0.001,
+       "ci": [
+        0.001,
+        0.003
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "essentialise": {
+     "againstHostile": {
+      "tp": 18,
+      "fp": 6,
+      "fn": 6164,
+      "tn": 3829,
+      "precision": {
+       "k": 18,
+       "n": 24,
+       "value": 0.75,
+       "ci": [
+        0.551,
+        0.88
+       ]
+      },
+      "recall": {
+       "k": 18,
+       "n": 6182,
+       "value": 0.003,
+       "ci": [
+        0.002,
+        0.005
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "conspiracy": {
+     "againstHostile": {
+      "tp": 16,
+      "fp": 1,
+      "fn": 6166,
+      "tn": 3834,
+      "precision": {
+       "k": 16,
+       "n": 17,
+       "value": 0.941,
+       "ci": [
+        0.73,
+        0.99
+       ]
+      },
+      "recall": {
+       "k": 16,
+       "n": 6182,
+       "value": 0.003,
+       "ci": [
+        0.002,
+        0.004
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "absolutist": {
+     "againstHostile": {
+      "tp": 48,
+      "fp": 9,
+      "fn": 6134,
+      "tn": 3826,
+      "precision": {
+       "k": 48,
+       "n": 57,
+       "value": 0.842,
+       "ci": [
+        0.726,
+        0.915
+       ]
+      },
+      "recall": {
+       "k": 48,
+       "n": 6182,
+       "value": 0.008,
+       "ci": [
+        0.006,
+        0.01
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "contempt": {
+     "againstHostile": {
+      "tp": 27,
+      "fp": 2,
+      "fn": 6155,
+      "tn": 3833,
+      "precision": {
+       "k": 27,
+       "n": 29,
+       "value": 0.931,
+       "ci": [
+        0.78,
+        0.981
+       ]
+      },
+      "recall": {
+       "k": 27,
+       "n": 6182,
+       "value": 0.004,
+       "ci": [
+        0.003,
+        0.006
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "strong": {
+     "againstHostile": {
+      "tp": 2782,
+      "fp": 276,
+      "fn": 3400,
+      "tn": 3559,
+      "precision": {
+       "k": 2782,
+       "n": 3058,
+       "value": 0.91,
+       "ci": [
+        0.899,
+        0.919
+       ]
+      },
+      "recall": {
+       "k": 2782,
+       "n": 6182,
+       "value": 0.45,
+       "ci": [
+        0.438,
+        0.462
+       ]
+      },
+      "prevalence": {
+       "k": 6182,
+       "n": 10017,
+       "value": 0.617,
+       "ci": [
+        0.608,
+        0.627
+       ]
+      }
+     }
+    }
+   },
+   "sides": {
+    "strong": {
+     "right-targets": {
+      "tp": 1814,
+      "fp": 35,
+      "fn": 2383,
+      "tn": 643,
+      "precision": {
+       "k": 1814,
+       "n": 1849,
+       "value": 0.981,
+       "ci": [
+        0.974,
+        0.986
+       ]
+      },
+      "recall": {
+       "k": 1814,
+       "n": 4197,
+       "value": 0.432,
+       "ci": [
+        0.417,
+        0.447
+       ]
+      },
+      "prevalence": {
+       "k": 4197,
+       "n": 4875,
+       "value": 0.861,
+       "ci": [
+        0.851,
+        0.87
+       ]
+      }
+     },
+     "left-targets": {
+      "tp": 46,
+      "fp": 0,
+      "fn": 205,
+      "tn": 85,
+      "precision": {
+       "k": 46,
+       "n": 46,
+       "value": 1,
+       "ci": [
+        0.923,
+        1
+       ]
+      },
+      "recall": {
+       "k": 46,
+       "n": 251,
+       "value": 0.183,
+       "ci": [
+        0.14,
+        0.236
+       ]
+      },
+      "prevalence": {
+       "k": 251,
+       "n": 336,
+       "value": 0.747,
+       "ci": [
+        0.698,
+        0.791
+       ]
+      }
+     },
+     "both": {
+      "tp": 682,
+      "fp": 4,
+      "fn": 479,
+      "tn": 107,
+      "precision": {
+       "k": 682,
+       "n": 686,
+       "value": 0.994,
+       "ci": [
+        0.985,
+        0.998
+       ]
+      },
+      "recall": {
+       "k": 682,
+       "n": 1161,
+       "value": 0.587,
+       "ci": [
+        0.559,
+        0.615
+       ]
+      },
+      "prevalence": {
+       "k": 1161,
+       "n": 1272,
+       "value": 0.913,
+       "ci": [
+        0.896,
+        0.927
+       ]
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": true
+     }
+    },
+    "strongNoSlur": {
+     "right-targets": {
+      "tp": 27,
+      "fp": 0,
+      "fn": 4170,
+      "tn": 678,
+      "precision": {
+       "k": 27,
+       "n": 27,
+       "value": 1,
+       "ci": [
+        0.875,
+        1
+       ]
+      },
+      "recall": {
+       "k": 27,
+       "n": 4197,
+       "value": 0.006,
+       "ci": [
+        0.004,
+        0.009
+       ]
+      },
+      "prevalence": {
+       "k": 4197,
+       "n": 4875,
+       "value": 0.861,
+       "ci": [
+        0.851,
+        0.87
+       ]
+      }
+     },
+     "left-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 251,
+      "tn": 85,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 251,
+       "value": 0,
+       "ci": [
+        0,
+        0.015
+       ]
+      },
+      "prevalence": {
+       "k": 251,
+       "n": 336,
+       "value": 0.747,
+       "ci": [
+        0.698,
+        0.791
+       ]
+      }
+     },
+     "both": {
+      "tp": 12,
+      "fp": 0,
+      "fn": 1149,
+      "tn": 111,
+      "precision": {
+       "k": 12,
+       "n": 12,
+       "value": 1,
+       "ci": [
+        0.757,
+        1
+       ]
+      },
+      "recall": {
+       "k": 12,
+       "n": 1161,
+       "value": 0.01,
+       "ci": [
+        0.006,
+        0.018
+       ]
+      },
+      "prevalence": {
+       "k": 1161,
+       "n": 1272,
+       "value": 0.913,
+       "ci": [
+        0.896,
+        0.927
+       ]
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": false
+     }
+    },
+    "extreme": {
+     "right-targets": {
+      "tp": 1817,
+      "fp": 35,
+      "fn": 2380,
+      "tn": 643,
+      "precision": {
+       "k": 1817,
+       "n": 1852,
+       "value": 0.981,
+       "ci": [
+        0.974,
+        0.986
+       ]
+      },
+      "recall": {
+       "k": 1817,
+       "n": 4197,
+       "value": 0.433,
+       "ci": [
+        0.418,
+        0.448
+       ]
+      },
+      "prevalence": {
+       "k": 4197,
+       "n": 4875,
+       "value": 0.861,
+       "ci": [
+        0.851,
+        0.87
+       ]
+      }
+     },
+     "left-targets": {
+      "tp": 46,
+      "fp": 0,
+      "fn": 205,
+      "tn": 85,
+      "precision": {
+       "k": 46,
+       "n": 46,
+       "value": 1,
+       "ci": [
+        0.923,
+        1
+       ]
+      },
+      "recall": {
+       "k": 46,
+       "n": 251,
+       "value": 0.183,
+       "ci": [
+        0.14,
+        0.236
+       ]
+      },
+      "prevalence": {
+       "k": 251,
+       "n": 336,
+       "value": 0.747,
+       "ci": [
+        0.698,
+        0.791
+       ]
+      }
+     },
+     "both": {
+      "tp": 683,
+      "fp": 4,
+      "fn": 478,
+      "tn": 107,
+      "precision": {
+       "k": 683,
+       "n": 687,
+       "value": 0.994,
+       "ci": [
+        0.985,
+        0.998
+       ]
+      },
+      "recall": {
+       "k": 683,
+       "n": 1161,
+       "value": 0.588,
+       "ci": [
+        0.56,
+        0.616
+       ]
+      },
+      "prevalence": {
+       "k": 1161,
+       "n": 1272,
+       "value": 0.913,
+       "ci": [
+        0.896,
+        0.927
+       ]
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": true
+     }
+    }
+   },
+   "groups": {
+    "strong": {
+     "African": {
+      "tp": 1017,
+      "fp": 21,
+      "fn": 525,
+      "tn": 89,
+      "precision": {
+       "k": 1017,
+       "n": 1038,
+       "value": 0.98,
+       "ci": [
+        0.969,
+        0.987
+       ]
+      },
+      "recall": {
+       "k": 1017,
+       "n": 1542,
+       "value": 0.66,
+       "ci": [
+        0.636,
+        0.683
+       ]
+      },
+      "prevalence": {
+       "k": 1542,
+       "n": 1652,
+       "value": 0.933,
+       "ci": [
+        0.92,
+        0.944
+       ]
+      }
+     },
+     "Arab": {
+      "tp": 211,
+      "fp": 0,
+      "fn": 170,
+      "tn": 21,
+      "precision": {
+       "k": 211,
+       "n": 211,
+       "value": 1,
+       "ci": [
+        0.982,
+        1
+       ]
+      },
+      "recall": {
+       "k": 211,
+       "n": 381,
+       "value": 0.554,
+       "ci": [
+        0.504,
+        0.603
+       ]
+      },
+      "prevalence": {
+       "k": 381,
+       "n": 402,
+       "value": 0.948,
+       "ci": [
+        0.921,
+        0.966
+       ]
+      }
+     },
+     "Asian": {
+      "tp": 83,
+      "fp": 1,
+      "fn": 95,
+      "tn": 46,
+      "precision": {
+       "k": 83,
+       "n": 84,
+       "value": 0.988,
+       "ci": [
+        0.936,
+        0.998
+       ]
+      },
+      "recall": {
+       "k": 83,
+       "n": 178,
+       "value": 0.466,
+       "ci": [
+        0.394,
+        0.54
+       ]
+      },
+      "prevalence": {
+       "k": 178,
+       "n": 225,
+       "value": 0.791,
+       "ci": [
+        0.733,
+        0.839
+       ]
+      }
+     },
+     "Caucasian": {
+      "tp": 35,
+      "fp": 0,
+      "fn": 168,
+      "tn": 65,
+      "precision": {
+       "k": 35,
+       "n": 35,
+       "value": 1,
+       "ci": [
+        0.901,
+        1
+       ]
+      },
+      "recall": {
+       "k": 35,
+       "n": 203,
+       "value": 0.172,
+       "ci": [
+        0.127,
+        0.23
+       ]
+      },
+      "prevalence": {
+       "k": 203,
+       "n": 268,
+       "value": 0.757,
+       "ci": [
+        0.703,
+        0.805
+       ]
+      }
+     },
+     "Hispanic": {
+      "tp": 131,
+      "fp": 1,
+      "fn": 36,
+      "tn": 9,
+      "precision": {
+       "k": 131,
+       "n": 132,
+       "value": 0.992,
+       "ci": [
+        0.958,
+        0.999
+       ]
+      },
+      "recall": {
+       "k": 131,
+       "n": 167,
+       "value": 0.784,
+       "ci": [
+        0.716,
+        0.84
+       ]
+      },
+      "prevalence": {
+       "k": 167,
+       "n": 177,
+       "value": 0.944,
+       "ci": [
+        0.899,
+        0.969
+       ]
+      }
+     },
+     "Homosexual": {
+      "tp": 443,
+      "fp": 14,
+      "fn": 404,
+      "tn": 116,
+      "precision": {
+       "k": 443,
+       "n": 457,
+       "value": 0.969,
+       "ci": [
+        0.949,
+        0.982
+       ]
+      },
+      "recall": {
+       "k": 443,
+       "n": 847,
+       "value": 0.523,
+       "ci": [
+        0.489,
+        0.556
+       ]
+      },
+      "prevalence": {
+       "k": 847,
+       "n": 977,
+       "value": 0.867,
+       "ci": [
+        0.844,
+        0.887
+       ]
+      }
+     },
+     "Islam": {
+      "tp": 233,
+      "fp": 1,
+      "fn": 747,
+      "tn": 154,
+      "precision": {
+       "k": 233,
+       "n": 234,
+       "value": 0.996,
+       "ci": [
+        0.976,
+        0.999
+       ]
+      },
+      "recall": {
+       "k": 233,
+       "n": 980,
+       "value": 0.238,
+       "ci": [
+        0.212,
+        0.265
+       ]
+      },
+      "prevalence": {
+       "k": 980,
+       "n": 1135,
+       "value": 0.863,
+       "ci": [
+        0.842,
+        0.882
+       ]
+      }
+     },
+     "Jewish": {
+      "tp": 586,
+      "fp": 3,
+      "fn": 383,
+      "tn": 60,
+      "precision": {
+       "k": 586,
+       "n": 589,
+       "value": 0.995,
+       "ci": [
+        0.985,
+        0.998
+       ]
+      },
+      "recall": {
+       "k": 586,
+       "n": 969,
+       "value": 0.605,
+       "ci": [
+        0.574,
+        0.635
+       ]
+      },
+      "prevalence": {
+       "k": 969,
+       "n": 1032,
+       "value": 0.939,
+       "ci": [
+        0.923,
+        0.952
+       ]
+      }
+     },
+     "Men": {
+      "tp": 9,
+      "fp": 0,
+      "fn": 20,
+      "tn": 13,
+      "precision": {
+       "k": 9,
+       "n": 9,
+       "value": 1,
+       "ci": [
+        0.701,
+        1
+       ]
+      },
+      "recall": {
+       "k": 9,
+       "n": 29,
+       "value": 0.31,
+       "ci": [
+        0.173,
+        0.492
+       ]
+      },
+      "prevalence": {
+       "k": 29,
+       "n": 42,
+       "value": 0.69,
+       "ci": [
+        0.54,
+        0.809
+       ]
+      }
+     },
+     "Refugee": {
+      "tp": 26,
+      "fp": 0,
+      "fn": 304,
+      "tn": 162,
+      "precision": {
+       "k": 26,
+       "n": 26,
+       "value": 1,
+       "ci": [
+        0.871,
+        1
+       ]
+      },
+      "recall": {
+       "k": 26,
+       "n": 330,
+       "value": 0.079,
+       "ci": [
+        0.054,
+        0.113
+       ]
+      },
+      "prevalence": {
+       "k": 330,
+       "n": 492,
+       "value": 0.671,
+       "ci": [
+        0.628,
+        0.711
+       ]
+      }
+     },
+     "Women": {
+      "tp": 108,
+      "fp": 0,
+      "fn": 541,
+      "tn": 125,
+      "precision": {
+       "k": 108,
+       "n": 108,
+       "value": 1,
+       "ci": [
+        0.966,
+        1
+       ]
+      },
+      "recall": {
+       "k": 108,
+       "n": 649,
+       "value": 0.166,
+       "ci": [
+        0.14,
+        0.197
+       ]
+      },
+      "prevalence": {
+       "k": 649,
+       "n": 774,
+       "value": 0.839,
+       "ci": [
+        0.811,
+        0.863
+       ]
+      }
+     }
+    }
+   },
+   "extreme": {
+    "againstSevere": {
+     "tp": 1897,
+     "fp": 1166,
+     "fn": 1119,
+     "tn": 5835,
+     "precision": {
+      "k": 1897,
+      "n": 3063,
+      "value": 0.619,
+      "ci": [
+       0.602,
+       0.636
+      ]
+     },
+     "recall": {
+      "k": 1897,
+      "n": 3016,
+      "value": 0.629,
+      "ci": [
+       0.612,
+       0.646
+      ]
+     },
+     "prevalence": {
+      "k": 3016,
+      "n": 10017,
+      "value": 0.301,
+      "ci": [
+       0.292,
+       0.31
+      ]
+     }
+    },
+    "againstHostile": {
+     "tp": 2786,
+     "fp": 277,
+     "fn": 3396,
+     "tn": 3558,
+     "precision": {
+      "k": 2786,
+      "n": 3063,
+      "value": 0.91,
+      "ci": [
+       0.899,
+       0.919
+      ]
+     },
+     "recall": {
+      "k": 2786,
+      "n": 6182,
+      "value": 0.451,
+      "ci": [
+       0.438,
+       0.463
+      ]
+     },
+     "prevalence": {
+      "k": 6182,
+      "n": 10017,
+      "value": 0.617,
+      "ci": [
+       0.608,
+       0.627
+      ]
+     }
+    }
+   }
+  },
+  "civil": {
+   "n": 48660,
+   "prevalence": {
+    "k": 3979,
+    "n": 48660,
+    "value": 0.082,
+    "ci": [
+     0.079,
+     0.084
+    ]
+   },
+   "families": {
+    "dehumanise": {
+     "againstHostile": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 3978,
+      "tn": 44680,
+      "precision": {
+       "k": 1,
+       "n": 2,
+       "value": 0.5,
+       "ci": [
+        0.095,
+        0.905
+       ]
+      },
+      "recall": {
+       "k": 1,
+       "n": 3979,
+       "value": 0,
+       "ci": [
+        0,
+        0.001
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "violence": {
+     "againstHostile": {
+      "tp": 3,
+      "fp": 6,
+      "fn": 3976,
+      "tn": 44675,
+      "precision": {
+       "k": 3,
+       "n": 9,
+       "value": 0.333,
+       "ci": [
+        0.121,
+        0.646
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 3979,
+       "value": 0.001,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": {
+      "tp": 0,
+      "fp": 9,
+      "fn": 115,
+      "tn": 48536,
+      "precision": {
+       "k": 0,
+       "n": 9,
+       "value": 0,
+       "ci": [
+        0,
+        0.299
+       ]
+      },
+      "recall": {
+       "k": 0,
+       "n": 115,
+       "value": 0,
+       "ci": [
+        0,
+        0.032
+       ]
+      },
+      "prevalence": {
+       "k": 115,
+       "n": 48660,
+       "value": 0.002,
+       "ci": [
+        0.002,
+        0.003
+       ]
+      }
+     }
+    },
+    "vigilante": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 3979,
+      "tn": 44680,
+      "precision": {
+       "k": 0,
+       "n": 1,
+       "value": 0,
+       "ci": [
+        0,
+        0.793
+       ]
+      },
+      "recall": {
+       "k": 0,
+       "n": 3979,
+       "value": 0,
+       "ci": [
+        0,
+        0.001
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "slur": {
+     "againstHostile": {
+      "tp": 11,
+      "fp": 20,
+      "fn": 3968,
+      "tn": 44661,
+      "precision": {
+       "k": 11,
+       "n": 31,
+       "value": 0.355,
+       "ci": [
+        0.211,
+        0.531
+       ]
+      },
+      "recall": {
+       "k": 11,
+       "n": 3979,
+       "value": 0.003,
+       "ci": [
+        0.002,
+        0.005
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "slurSoft": {
+     "againstHostile": {
+      "tp": 43,
+      "fp": 166,
+      "fn": 3936,
+      "tn": 44515,
+      "precision": {
+       "k": 43,
+       "n": 209,
+       "value": 0.206,
+       "ci": [
+        0.156,
+        0.266
+       ]
+      },
+      "recall": {
+       "k": 43,
+       "n": 3979,
+       "value": 0.011,
+       "ci": [
+        0.008,
+        0.015
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "stereotype": {
+     "againstHostile": {
+      "tp": 3,
+      "fp": 6,
+      "fn": 3976,
+      "tn": 44675,
+      "precision": {
+       "k": 3,
+       "n": 9,
+       "value": 0.333,
+       "ci": [
+        0.121,
+        0.646
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 3979,
+       "value": 0.001,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "motive": {
+     "againstHostile": {
+      "tp": 2,
+      "fp": 3,
+      "fn": 3977,
+      "tn": 44678,
+      "precision": {
+       "k": 2,
+       "n": 5,
+       "value": 0.4,
+       "ci": [
+        0.118,
+        0.769
+       ]
+      },
+      "recall": {
+       "k": 2,
+       "n": 3979,
+       "value": 0.001,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "essentialise": {
+     "againstHostile": {
+      "tp": 8,
+      "fp": 23,
+      "fn": 3971,
+      "tn": 44658,
+      "precision": {
+       "k": 8,
+       "n": 31,
+       "value": 0.258,
+       "ci": [
+        0.137,
+        0.432
+       ]
+      },
+      "recall": {
+       "k": 8,
+       "n": 3979,
+       "value": 0.002,
+       "ci": [
+        0.001,
+        0.004
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "conspiracy": {
+     "againstHostile": {
+      "tp": 3,
+      "fp": 81,
+      "fn": 3976,
+      "tn": 44600,
+      "precision": {
+       "k": 3,
+       "n": 84,
+       "value": 0.036,
+       "ci": [
+        0.012,
+        0.1
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 3979,
+       "value": 0.001,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "absolutist": {
+     "againstHostile": {
+      "tp": 56,
+      "fp": 114,
+      "fn": 3923,
+      "tn": 44567,
+      "precision": {
+       "k": 56,
+       "n": 170,
+       "value": 0.329,
+       "ci": [
+        0.263,
+        0.403
+       ]
+      },
+      "recall": {
+       "k": 56,
+       "n": 3979,
+       "value": 0.014,
+       "ci": [
+        0.011,
+        0.018
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "contempt": {
+     "againstHostile": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 3978,
+      "tn": 44681,
+      "precision": {
+       "k": 1,
+       "n": 1,
+       "value": 1,
+       "ci": [
+        0.207,
+        1
+       ]
+      },
+      "recall": {
+       "k": 1,
+       "n": 3979,
+       "value": 0,
+       "ci": [
+        0,
+        0.001
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "strong": {
+     "againstHostile": {
+      "tp": 18,
+      "fp": 34,
+      "fn": 3961,
+      "tn": 44647,
+      "precision": {
+       "k": 18,
+       "n": 52,
+       "value": 0.346,
+       "ci": [
+        0.232,
+        0.482
+       ]
+      },
+      "recall": {
+       "k": 18,
+       "n": 3979,
+       "value": 0.005,
+       "ci": [
+        0.003,
+        0.007
+       ]
+      },
+      "prevalence": {
+       "k": 3979,
+       "n": 48660,
+       "value": 0.082,
+       "ci": [
+        0.079,
+        0.084
+       ]
+      }
+     }
+    }
+   },
+   "sides": {
+    "strong": {
+     "right-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "prevalence": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      }
+     },
+     "left-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "prevalence": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      }
+     },
+     "both": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "prevalence": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": false
+     }
+    },
+    "strongNoSlur": {
+     "right-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "prevalence": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      }
+     },
+     "left-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "prevalence": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      }
+     },
+     "both": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "prevalence": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": false
+     }
+    },
+    "extreme": {
+     "right-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "prevalence": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      }
+     },
+     "left-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "prevalence": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      }
+     },
+     "both": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 0,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "prevalence": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": false
+     }
+    }
+   },
+   "groups": {
+    "strong": {}
+   },
+   "extreme": {
+    "againstSevere": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 0,
+     "tn": 0,
+     "precision": {
+      "k": 0,
+      "n": 0,
+      "value": null,
+      "ci": null
+     },
+     "recall": {
+      "k": 0,
+      "n": 0,
+      "value": null,
+      "ci": null
+     },
+     "prevalence": {
+      "k": 0,
+      "n": 0,
+      "value": null,
+      "ci": null
+     }
+    },
+    "againstHostile": {
+     "tp": 19,
+     "fp": 37,
+     "fn": 3960,
+     "tn": 44644,
+     "precision": {
+      "k": 19,
+      "n": 56,
+      "value": 0.339,
+      "ci": [
+       0.229,
+       0.47
+      ]
+     },
+     "recall": {
+      "k": 19,
+      "n": 3979,
+      "value": 0.005,
+      "ci": [
+       0.003,
+       0.007
+      ]
+     },
+     "prevalence": {
+      "k": 3979,
+      "n": 48660,
+      "value": 0.082,
+      "ci": [
+       0.079,
+       0.084
+      ]
+     }
+    }
+   }
+  },
+  "mlma-fr": {
+   "n": 2006,
+   "prevalence": {
+    "k": 1584,
+    "n": 2006,
+    "value": 0.79,
+    "ci": [
+     0.771,
+     0.807
+    ]
+   },
+   "families": {
+    "dehumanise": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1584,
+      "tn": 422,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "violence": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1584,
+      "tn": 422,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "vigilante": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1584,
+      "tn": 422,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "slur": {
+     "againstHostile": {
+      "tp": 8,
+      "fp": 1,
+      "fn": 1576,
+      "tn": 421,
+      "precision": {
+       "k": 8,
+       "n": 9,
+       "value": 0.889,
+       "ci": [
+        0.565,
+        0.98
+       ]
+      },
+      "recall": {
+       "k": 8,
+       "n": 1584,
+       "value": 0.005,
+       "ci": [
+        0.003,
+        0.01
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "slurSoft": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1584,
+      "tn": 422,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "stereotype": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1584,
+      "tn": 422,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "motive": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1584,
+      "tn": 422,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "essentialise": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1584,
+      "tn": 422,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "conspiracy": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 1,
+      "fn": 1584,
+      "tn": 421,
+      "precision": {
+       "k": 0,
+       "n": 1,
+       "value": 0,
+       "ci": [
+        0,
+        0.793
+       ]
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "absolutist": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1584,
+      "tn": 422,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "contempt": {
+     "againstHostile": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1584,
+      "tn": 422,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 1584,
+       "value": 0,
+       "ci": [
+        0,
+        0.002
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     },
+     "againstSpecific": null
+    },
+    "strong": {
+     "againstHostile": {
+      "tp": 8,
+      "fp": 1,
+      "fn": 1576,
+      "tn": 421,
+      "precision": {
+       "k": 8,
+       "n": 9,
+       "value": 0.889,
+       "ci": [
+        0.565,
+        0.98
+       ]
+      },
+      "recall": {
+       "k": 8,
+       "n": 1584,
+       "value": 0.005,
+       "ci": [
+        0.003,
+        0.01
+       ]
+      },
+      "prevalence": {
+       "k": 1584,
+       "n": 2006,
+       "value": 0.79,
+       "ci": [
+        0.771,
+        0.807
+       ]
+      }
+     }
+    }
+   },
+   "sides": {
+    "strong": {
+     "right-targets": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 511,
+      "tn": 149,
+      "precision": {
+       "k": 1,
+       "n": 1,
+       "value": 1,
+       "ci": [
+        0.207,
+        1
+       ]
+      },
+      "recall": {
+       "k": 1,
+       "n": 512,
+       "value": 0.002,
+       "ci": [
+        0,
+        0.011
+       ]
+      },
+      "prevalence": {
+       "k": 512,
+       "n": 661,
+       "value": 0.775,
+       "ci": [
+        0.741,
+        0.805
+       ]
+      }
+     },
+     "left-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "tn": 1,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 11,
+       "value": 0,
+       "ci": [
+        0,
+        0.259
+       ]
+      },
+      "prevalence": {
+       "k": 11,
+       "n": 12,
+       "value": 0.917,
+       "ci": [
+        0.646,
+        0.985
+       ]
+      }
+     },
+     "both": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 280,
+      "tn": 40,
+      "precision": {
+       "k": 3,
+       "n": 3,
+       "value": 1,
+       "ci": [
+        0.438,
+        1
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 283,
+       "value": 0.011,
+       "ci": [
+        0.004,
+        0.031
+       ]
+      },
+      "prevalence": {
+       "k": 283,
+       "n": 323,
+       "value": 0.876,
+       "ci": [
+        0.836,
+        0.908
+       ]
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": false
+     }
+    },
+    "strongNoSlur": {
+     "right-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 512,
+      "tn": 149,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 512,
+       "value": 0,
+       "ci": [
+        0,
+        0.007
+       ]
+      },
+      "prevalence": {
+       "k": 512,
+       "n": 661,
+       "value": 0.775,
+       "ci": [
+        0.741,
+        0.805
+       ]
+      }
+     },
+     "left-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "tn": 1,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 11,
+       "value": 0,
+       "ci": [
+        0,
+        0.259
+       ]
+      },
+      "prevalence": {
+       "k": 11,
+       "n": 12,
+       "value": 0.917,
+       "ci": [
+        0.646,
+        0.985
+       ]
+      }
+     },
+     "both": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 283,
+      "tn": 40,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 283,
+       "value": 0,
+       "ci": [
+        0,
+        0.013
+       ]
+      },
+      "prevalence": {
+       "k": 283,
+       "n": 323,
+       "value": 0.876,
+       "ci": [
+        0.836,
+        0.908
+       ]
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": false
+     }
+    },
+    "extreme": {
+     "right-targets": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 511,
+      "tn": 149,
+      "precision": {
+       "k": 1,
+       "n": 1,
+       "value": 1,
+       "ci": [
+        0.207,
+        1
+       ]
+      },
+      "recall": {
+       "k": 1,
+       "n": 512,
+       "value": 0.002,
+       "ci": [
+        0,
+        0.011
+       ]
+      },
+      "prevalence": {
+       "k": 512,
+       "n": 661,
+       "value": 0.775,
+       "ci": [
+        0.741,
+        0.805
+       ]
+      }
+     },
+     "left-targets": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "tn": 1,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 11,
+       "value": 0,
+       "ci": [
+        0,
+        0.259
+       ]
+      },
+      "prevalence": {
+       "k": 11,
+       "n": 12,
+       "value": 0.917,
+       "ci": [
+        0.646,
+        0.985
+       ]
+      }
+     },
+     "both": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 280,
+      "tn": 40,
+      "precision": {
+       "k": 3,
+       "n": 3,
+       "value": 1,
+       "ci": [
+        0.438,
+        1
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 283,
+       "value": 0.011,
+       "ci": [
+        0.004,
+        0.031
+       ]
+      },
+      "prevalence": {
+       "k": 283,
+       "n": 323,
+       "value": 0.876,
+       "ci": [
+        0.836,
+        0.908
+       ]
+      }
+     },
+     "gap": {
+      "precision": false,
+      "recall": false
+     }
+    }
+   },
+   "groups": {
+    "strong": {
+     "african_descent": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 122,
+      "tn": 29,
+      "precision": {
+       "k": 1,
+       "n": 1,
+       "value": 1,
+       "ci": [
+        0.207,
+        1
+       ]
+      },
+      "recall": {
+       "k": 1,
+       "n": 123,
+       "value": 0.008,
+       "ci": [
+        0.001,
+        0.045
+       ]
+      },
+      "prevalence": {
+       "k": 123,
+       "n": 152,
+       "value": 0.809,
+       "ci": [
+        0.739,
+        0.864
+       ]
+      }
+     },
+     "arabs": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 118,
+      "tn": 34,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 118,
+       "value": 0,
+       "ci": [
+        0,
+        0.032
+       ]
+      },
+      "prevalence": {
+       "k": 118,
+       "n": 152,
+       "value": 0.776,
+       "ci": [
+        0.704,
+        0.835
+       ]
+      }
+     },
+     "asians": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 27,
+      "tn": 5,
+      "precision": {
+       "k": 3,
+       "n": 3,
+       "value": 1,
+       "ci": [
+        0.438,
+        1
+       ]
+      },
+      "recall": {
+       "k": 3,
+       "n": 30,
+       "value": 0.1,
+       "ci": [
+        0.035,
+        0.256
+       ]
+      },
+      "prevalence": {
+       "k": 30,
+       "n": 35,
+       "value": 0.857,
+       "ci": [
+        0.706,
+        0.937
+       ]
+      }
+     },
+     "immigrants": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 29,
+      "tn": 23,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 29,
+       "value": 0,
+       "ci": [
+        0,
+        0.117
+       ]
+      },
+      "prevalence": {
+       "k": 29,
+       "n": 52,
+       "value": 0.558,
+       "ci": [
+        0.423,
+        0.684
+       ]
+      }
+     },
+     "indian/hindu": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 145,
+      "tn": 25,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 145,
+       "value": 0,
+       "ci": [
+        0,
+        0.026
+       ]
+      },
+      "prevalence": {
+       "k": 145,
+       "n": 170,
+       "value": 0.853,
+       "ci": [
+        0.792,
+        0.898
+       ]
+      }
+     },
+     "jews": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 30,
+      "tn": 5,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 30,
+       "value": 0,
+       "ci": [
+        0,
+        0.114
+       ]
+      },
+      "prevalence": {
+       "k": 30,
+       "n": 35,
+       "value": 0.857,
+       "ci": [
+        0.706,
+        0.937
+       ]
+      }
+     },
+     "left_wing_people": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 157,
+      "tn": 34,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 157,
+       "value": 0,
+       "ci": [
+        0,
+        0.024
+       ]
+      },
+      "prevalence": {
+       "k": 157,
+       "n": 191,
+       "value": 0.822,
+       "ci": [
+        0.762,
+        0.87
+       ]
+      }
+     },
+     "muslims": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 32,
+      "tn": 14,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 32,
+       "value": 0,
+       "ci": [
+        0,
+        0.107
+       ]
+      },
+      "prevalence": {
+       "k": 32,
+       "n": 46,
+       "value": 0.696,
+       "ci": [
+        0.552,
+        0.809
+       ]
+      }
+     },
+     "special_needs": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 78,
+      "tn": 5,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 78,
+       "value": 0,
+       "ci": [
+        0,
+        0.047
+       ]
+      },
+      "prevalence": {
+       "k": 78,
+       "n": 83,
+       "value": 0.94,
+       "ci": [
+        0.867,
+        0.974
+       ]
+      }
+     },
+     "women": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 27,
+      "tn": 6,
+      "precision": {
+       "k": 0,
+       "n": 0,
+       "value": null,
+       "ci": null
+      },
+      "recall": {
+       "k": 0,
+       "n": 27,
+       "value": 0,
+       "ci": [
+        0,
+        0.125
+       ]
+      },
+      "prevalence": {
+       "k": 27,
+       "n": 33,
+       "value": 0.818,
+       "ci": [
+        0.656,
+        0.914
+       ]
+      }
+     }
+    }
+   },
+   "extreme": {
+    "againstSevere": {
+     "tp": 0,
+     "fp": 9,
+     "fn": 194,
+     "tn": 1803,
+     "precision": {
+      "k": 0,
+      "n": 9,
+      "value": 0,
+      "ci": [
+       0,
+       0.299
+      ]
+     },
+     "recall": {
+      "k": 0,
+      "n": 194,
+      "value": 0,
+      "ci": [
+       0,
+       0.019
+      ]
+     },
+     "prevalence": {
+      "k": 194,
+      "n": 2006,
+      "value": 0.097,
+      "ci": [
+       0.085,
+       0.11
+      ]
+     }
+    },
+    "againstHostile": {
+     "tp": 8,
+     "fp": 1,
+     "fn": 1576,
+     "tn": 421,
+     "precision": {
+      "k": 8,
+      "n": 9,
+      "value": 0.889,
+      "ci": [
+       0.565,
+       0.98
+      ]
+     },
+     "recall": {
+      "k": 8,
+      "n": 1584,
+      "value": 0.005,
+      "ci": [
+       0.003,
+       0.01
+      ]
+     },
+     "prevalence": {
+      "k": 1584,
+      "n": 2006,
+      "value": 0.79,
+      "ci": [
+       0.771,
+       0.807
+      ]
+     }
+    }
+   }
+  }
+ },
+ "duplicatesDetail": {
+  "synthetic": true,
+  "unit": "reply pairs from different authors",
+  "replies": 61,
+  "tp": 85,
+  "fp": 2,
+  "fn": 0,
+  "tn": 1742,
+  "precision": {
+   "k": 85,
+   "n": 87,
+   "value": 0.977,
+   "ci": [
+    0.92,
+    0.994
+   ]
+  },
+  "recall": {
+   "k": 85,
+   "n": 85,
+   "value": 1,
+   "ci": [
+    0.957,
+    1
+   ]
+  },
+  "prevalence": {
+   "k": 85,
+   "n": 1829,
+   "value": 0.046,
+   "ci": [
+    0.038,
+    0.057
+   ]
+  }
+ },
+ "mismatchDetail": {
+  "synthetic": true,
+  "unit": "reply and label pairs",
+  "cases": 32,
+  "tp": 14,
+  "fp": 0,
+  "fn": 0,
+  "tn": 18,
+  "precision": {
+   "k": 14,
+   "n": 14,
+   "value": 1,
+   "ci": [
+    0.785,
+    1
+   ]
+  },
+  "recall": {
+   "k": 14,
+   "n": 14,
+   "value": 1,
+   "ci": [
+    0.785,
+    1
+   ]
+  },
+  "prevalence": {
+   "k": 14,
+   "n": 32,
+   "value": 0.438,
+   "ci": [
+    0.282,
+    0.607
+   ]
+  }
+ }
+}
