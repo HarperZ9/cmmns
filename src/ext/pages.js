@@ -10,20 +10,21 @@
     return e;
   };
 
-  // The aperture: a luminous orb inside fine concentric line-work. Ring spacing and weight follow a
-  // fixed sequence, so the drawing is the same every time. `mark` adds the one warm point.
+  // The aperture: a luminous orb inside fine concentric line-work on the void, in the bone and void
+  // of the author's site. Ring spacing and weight follow a fixed sequence, so the drawing is the same
+  // every time. `mark` adds the one lit point on the outer ring.
   function aperture(mark) {
     const s = el("svg:svg", { viewBox: "0 0 128 128", "aria-hidden": "true" });
     const defs = el("svg:defs"), g = el("svg:radialGradient", { id: "pb-orb", cx: "0.5", cy: "0.46", r: "0.5" });
-    for (const [o, c, a] of [["0", "#fffdf7", 1], ["0.45", "#f1ede4", 1], ["0.8", "#cfd6dc", 0.5], ["1", "#cfd6dc", 0]]) g.append(el("svg:stop", { offset: o, "stop-color": c, "stop-opacity": a }));
+    for (const [o, c, a] of [["0", "#fff6e6", 1], ["0.45", "#ece5d6", 1], ["0.8", "#b8b0a0", 0.5], ["1", "#b8b0a0", 0]]) g.append(el("svg:stop", { offset: o, "stop-color": c, "stop-opacity": a }));
     defs.append(g); s.append(defs);
-    s.append(el("svg:circle", { cx: 64, cy: 64, r: 62, fill: "#14181c", stroke: "#8b98a5", "stroke-opacity": 0.45, "stroke-width": 1 }));
+    s.append(el("svg:circle", { cx: 64, cy: 64, r: 62, fill: "#060608", stroke: "#6f6a61", "stroke-opacity": 0.9, "stroke-width": 1 }));
     for (let i = 0; i < 22; i++) {
       const r = 20 + i * 1.95 + (i % 3) * 0.4;
-      s.append(el("svg:circle", { cx: 64, cy: 64, r: r.toFixed(2), fill: "none", stroke: "#e7e9ea", "stroke-width": i % 5 === 0 ? 0.9 : 0.35, "stroke-opacity": (0.18 + 0.5 * Math.sin((i / 21) * Math.PI)).toFixed(2) }));
+      s.append(el("svg:circle", { cx: 64, cy: 64, r: r.toFixed(2), fill: "none", stroke: "#ece5d6", "stroke-width": i % 5 === 0 ? 0.9 : 0.35, "stroke-opacity": (0.18 + 0.5 * Math.sin((i / 21) * Math.PI)).toFixed(2) }));
     }
-    s.append(el("svg:circle", { cx: 64, cy: 64, r: 30, fill: "url(#pb-orb)" }), el("svg:circle", { cx: 64, cy: 64, r: 11, fill: "#fffdf7" }));
-    if (mark) s.append(el("svg:circle", { cx: 99.4, cy: 28.6, r: 6, fill: "var(--hot)", stroke: "#14181c", "stroke-width": 2.5 }));
+    s.append(el("svg:circle", { cx: 64, cy: 64, r: 30, fill: "url(#pb-orb)" }), el("svg:circle", { cx: 64, cy: 64, r: 11, fill: "#fff6e6" }));
+    if (mark) s.append(el("svg:circle", { cx: 99.4, cy: 28.6, r: 5, fill: "#fff6e6", stroke: "#060608", "stroke-width": 2.5 }));
     return s;
   }
 
@@ -39,11 +40,14 @@
     return label;
   }
 
-  const ORIGINS = { x: ["https://x.com/*", "https://twitter.com/*"], youtube: ["https://www.youtube.com/*"], reddit: ["https://www.reddit.com/*"], facebook: ["https://www.facebook.com/*"], instagram: ["https://www.instagram.com/*"], bluesky: ["https://bsky.app/*"] };
+  const ORIGINS = { x: ["https://x.com/*", "https://twitter.com/*"], youtube: ["https://www.youtube.com/*"], reddit: ["https://www.reddit.com/*"], facebook: ["https://www.facebook.com/*"], instagram: ["https://www.instagram.com/*"], bluesky: ["https://bsky.app/*"],
+    threads: ["https://www.threads.com/*", "https://www.threads.net/*"], tiktok: ["https://www.tiktok.com/*"] };
   // [[id, name, origins]] for the sites this build has host access for.
   function sites() {
     const hosts = (chrome.runtime.getManifest().host_permissions || []);
-    return PB.SITES.map(([id, name]) => [id, name, ORIGINS[id] || []]).filter(([, , o]) => o.some((x) => hosts.includes(x)));
+    // Mastodon has no fixed host: it is listed when the build can ask for servers one by one.
+    const servers = (chrome.runtime.getManifest().optional_host_permissions || []).length > 0;
+    return PB.SITES.map(([id, name]) => [id, name, ORIGINS[id] || []]).filter(([id, , o]) => o.some((x) => hosts.includes(x)) || (id === "mastodon" && servers));
   }
 
   globalThis.PBPages = Object.freeze({ el, aperture, switchRow, sites });

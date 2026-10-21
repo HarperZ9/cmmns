@@ -4,6 +4,7 @@
 | Detector | Measure | Data |
 |---|---|---|
 | Rhetoric markers | precision and recall per family, per side, per target group | four public human-labelled corpora (`evidence/CORPORA.md`) |
+| Persuasion techniques | span precision per technique, with recall and a chance baseline | the Propaganda Techniques Corpus (PTC, SemEval-2020 Task 11) |
 | Report "extreme" | precision against human severity labels | the same corpora |
 | Duplicates | pair precision and recall | SYNTHETIC cases (`scripts/eval/synthetic.mjs`) |
 | Mismatch | precision and recall of "speaks as local, labelled elsewhere" | SYNTHETIC cases |
@@ -12,12 +13,16 @@
 Precision comes first: a badge on a real person's honest reply is the main harm.
 
 ## How to reproduce
-1. Download the four corpora listed in `evidence/CORPORA.md` to `D:/radar-data/` (or set
+1. Download the four corpora listed in `evidence/CORPORA.md` to a data directory outside the repository, `../radar-data/` by default (or set
    `RADAR_DATA`). Python with pyarrow flattens them on the first run (`scripts/eval/prep.py`).
 2. `node scripts/eval.mjs` prints every number below for the test split and rewrites
    `evidence/eval-results.json` and `src/core/measured.js`. `--split dev` prints the tuning split
    and writes nothing.
 3. The results file records the SHA-256 of every raw and prepared input.
+4. Persuasion techniques: download `datasets-v2.tgz` (`evidence/CORPORA.md`) to
+   `<data dir>/ptc/` and extract it into `<data dir>/ptc/x/`. `npm run eval:persuasion`
+   prints the test split and rewrites `evidence/persuasion-results.json` and the persuasion block
+   of `src/core/measured.js`. `--split dev --cues` prints per-cue figures for tuning.
 
 The split is fixed (seed `radar-eval-2026-10-21`, about 50/50 per corpus). Every lexicon and
 grammar change was tuned on dev. Test was read once, after tuning.
@@ -74,6 +79,58 @@ was built. They show that the detectors follow their rules. They are not error r
   replies do not count as extreme.
 - **Synthetic.** The duplicate and mismatch figures come from cases written alongside the rules. No
   person other than the rules' author, and no model, labelled them.
+
+## Arabic, Russian, Ukrainian, Chinese and Hindi (test split, 2026-10-21)
+
+Reproduce: download the corpora in `evidence/CORPORA.md` ("Arabic, Russian, Ukrainian, Chinese and
+Hindi"), then `node scripts/eval-langs.mjs`. It prints the test split, writes
+`evidence/lang-results.json` and the language rows in `src/core/measured-langs.js`, which the window
+shows beside a marker a language grammar found. `--split dev --show N` prints dev hits on
+non-hostile items for tuning, to the console only. Same seed and split rule as above; dev was read
+for tuning, test once.
+
+Strong families (slur, dehumanise, violence, stereotype, vigilante), precision against each
+corpus's broad hostile or toxic label:
+
+| Language | Corpus | Hits | Precision (95% interval) | Recall | Family-specific |
+|---|---|---|---|---|---|
+| Arabic | MLMA | 26 | 96.2% (81.1 to 99.3) | 2.1% | vs "hateful": 73.1% (19/26) |
+| Arabic | TextDetox (OSACT4) | 3 | 3 of 3 | 0.2% | none |
+| Arabic | HateCheck (templates) | 77 | 96.1% (89.2 to 98.7) | 5.9% | dehumanise P 25/25, R 35.7%; violence 3/3, R 2.1%; slur R 0 of 45 |
+| Russian | TextDetox | 95 | 100% (96.1 to 100) | 7.6% | none; all 95 are slurs |
+| Ukrainian | TextDetox | 15 | 15 of 15 | 1.2% | none |
+| Chinese | COLD | 29 | 75.9% (57.9 to 87.8) | 2.1% | vs "attack group": 75.9% (22/29) |
+| Chinese | HateCheck (templates) | 61 | 95.1% (86.5 to 98.3) | 5.1% | dehumanise 10/10; violence 83.3% (15/18); slur 19/19, R 25.3% |
+| Hindi | TextDetox | 5 | 5 of 5 | 0.4% | none |
+| Hindi | HateCheck (templates, Latin spelling) | 13 | 13 of 13 | 1.0% | dehumanise 10/10, R 14.3%; violence R 0 of 139 |
+
+What the window says: Arabic and Chinese show a measured line (pooled natural text: Arabic 96.6%,
+28/29, interval 82.8 to 99.4; Chinese 75.9%, 22/29, 57.9 to 87.8). Russian shows 100% (95/95, 96.1 to
+100), all from slurs. Ukrainian (15 signs) and Hindi (5) show "not measured", since fewer than 20
+signs were checked. The French, Spanish, German, Portuguese and Italian grammars show "not
+measured" too.
+
+Ukrainian: no human-labelled corpus of group-directed hate with a usable licence was found, so
+the Ukrainian dehumanise, violence and stereotype grammar is **not measured**; only its slurs were
+hit. Hindi violence and Arabic slurs: **not measured** (no hits on natural text).
+
+### What these numbers do not prove
+- TextDetox is balanced 50/50 toxic, so its precision sits above what a natural feed would give.
+  Its toxic items are mostly insults at one person, so its recall says almost nothing about group
+  rhetoric.
+- HateCheck cases are templates. Its dev and test halves share templates, and group names were
+  added after reading dev misses, so its test recall is optimistic. It shows that the grammar and
+  its negation and counter-speech rules work; it is not an error rate on real replies.
+- Chinese COLD precision (75.9%) is the lowest: seven hits on text annotators called safe, several
+  of them anti-bias speech that quotes a slur or a stereotype to reject it. Reported speech in
+  Chinese is only partly caught (`src/core/rhetoric-mention.js`).
+- Recall is low everywhere (1% to 8%). These grammars catch explicit forms only. A reply in these
+  languages with no badge has not been checked for subtler rhetoric.
+- The English results above are unchanged by these grammars: `scripts/eval.mjs --split test`
+  gives the same counts on all four English and French corpora.
+- No side comparison was run: none of these corpora labels targets by political direction. The
+  symmetry suites (`tests/rhetoric.{ar,ru,uk,zh,hi}.test.js`) hold every template to the same
+  result across 19 to 26 targets from every direction, including each camp's coinages for the other.
 
 ## Side comparison: closed on HateXplain, open on MHS
 Strong-family recall and precision on hostile text aimed at each side's usual targets (test split;
@@ -146,13 +203,167 @@ not in the extension. Status: not measured.
 - Effect on test, before and after: strong precision MHS 94.0% to 95.6%, HateXplain 90.0% to 91.0%,
   Civil 34.4% to 34.6%. Strong recall MHS 8.8% to 8.4%, HateXplain 46.5% to 45.0%.
 
+## Persuasion techniques (PTC test split, 2026-10-21): none ship
+Radar looks for eleven techniques from the SemEval-2020 Task 11 and SemEval-2023 Task 3 taxonomy.
+Each is a list of lexical and grammatical cues that name no group, person, party or side
+(`src/core/persuasion-cues.js`). The rule, set before measuring: a technique shows in the window
+only when its held-out span precision has a 95% Wilson lower bound of at least 0.7 from at least 20
+hits. On 2026-10-21 the bar was raised: the point precision must also be at least 80%
+(`SHIP_PRECISION`), and whataboutism never shows on one reply (`CONTEXT_ONLY`). **No technique met
+the old bar or the new one, so none is shown.**
+
+Why 80% on precision. Published systems score these techniques at F1 of about 30 to 44: LLMs on
+SemEval-2023 Task 3 reach 41.0 in Bulgarian, 44.4 in Croatian, 41.9 in Polish, 29.3 in Russian and
+29.9 in Slovene, rank below an XLM-R baseline on binary detection, and score near zero on straw man,
+whataboutism and red herring, which need context across paragraphs (Jose and Greenstadt, SlavicNLP
+2025). At that level a confident label on a stranger's post is wrong more often than right. A
+lower bound of 0.7 alone allowed a technique right only 75 times in 100 to show; the point bar of 80%
+closes that, and the lower bound keeps a small lucky sample out. Whataboutism needs what the other
+side did and said, which one reply does not carry, so no reply-level measurement can clear it. The code, the French cues, the window entries and
+the report line are built and tested. They switch on by themselves when a row in `measured.js`
+clears the bar. `node scripts/eval-persuasion.mjs` reproduces every number here and records the
+SHA-256 of the corpus archive in `evidence/persuasion-results.json`.
+
+How it is measured. PTC's public release labels only its 371 training articles, so those were split
+by article with the fixed seed (189 dev, 182 test). A Radar span is correct when it overlaps a gold
+span of the same technique. PTC merges some labels: bandwagon is scored against "Bandwagon,
+Reductio ad hitlerum" and whataboutism against "Whataboutism, Straw men, Red herring". Cues were
+pruned on dev in two rounds. Dev precision of the kept cues was 80.3% for loaded language, 72.2%
+for name calling and 65.5% for flag-waving. Test was read once, after that. "Chance" is the share of
+word tokens inside a gold span of the technique.
+
+| Technique | Test precision (Wilson 95%) | Recall | Chance | Status |
+|---|---|---|---|---|
+| loaded language | 60.3% (82/136; 51.9 to 68.1) | 7.9% | 2.3% | held back: lower bound under 0.7 |
+| name calling | 48.8% (21/43; 34.6 to 63.2) | 4.4% | 1.1% | held back: lower bound under 0.7 |
+| flag-waving | 40.7% (11/27; 24.5 to 59.3) | 12.8% | 0.5% | held back: lower bound under 0.7 |
+| exaggeration | 10.0% (1/10; 1.8 to 40.4) | 0.5% | 1.0% | held back: 10 hits |
+| bandwagon | 0/3 | 0% | 0.3% | held back: 3 hits |
+| doubt | 1/3 | 0.4% | 3.1% | held back: 3 hits |
+| appeal to fear | 0/2 | 0% | 1.3% | held back: 2 hits |
+| appeal to authority | 0/2 | 0% | 1.2% | held back: 2 hits |
+| thought-terminating cliche | 0/1 | 0% | 0.2% | held back: 1 hit |
+| whataboutism | 0/1 | 0% | 0.6% | held back: 1 hit |
+| black-and-white fallacy | no hits | 0% | 0.5% | held back: no hits |
+
+Reading the table:
+- Loaded language, name calling and flag-waving sit 25 to 80 times above chance. The cues find
+  the technique. They do not find it with few enough mistakes to label a stranger's post.
+- Dev overstated precision by about 20 points for each of the three. Cues kept for doing well on a
+  few dev hits did worse on test. A larger tuning set would help more than more cues.
+- Post hoc, and not used to ship anything: 80.1% (72.7 to 86.0) of loaded-language spans overlap a
+  gold span of some technique. The cues land on persuasive text more often than on the exact label.
+- Most techniques almost never appear as fixed phrases in news prose. Bandwagon, fear, cliches,
+  whataboutism and black-and-white framing may be more phrase-bound in replies than in articles.
+  No labelled reply corpus that Radar may use exists to check that.
+
+Skipped, because a lexical detector cannot find them without world knowledge: slogans (what counts
+as a slogan depends on who coined it, so a slogan list would be a list of sides), causal
+oversimplification (needs the real causes), straw man (needs the opponent's real position), red
+herring (needs to know what is relevant), and repetition (a document-level count, not a span cue).
+Ideology labels such as "fascist" or "communist" are not name-calling cues. Whether such a label is
+accurate is world knowledge, and the same words are targets in the symmetry test.
+
+French has cues for all eleven techniques and no measurement, because the SemEval-2023 Task 3
+French data may be used only inside that shared task (`evidence/CORPORA.md`). A French entry would
+show only for a technique that ships, with "not measured in French" beside it.
+
+Symmetry (`tests/persuasion.symmetry.test.js`): 14 English templates across 26 targets and 11
+French templates across 24 targets, from every political direction, find the same techniques for
+every target. Each target alone finds none. All pass.
+
+Thread report: once a technique ships, the report adds one separate line. It gives the share of
+looked-up replies using a shown technique among flagged and among unflagged accounts, each with its
+Wilson interval. It never changes "flagged", the extreme comparison or the verdict
+(`tests/report.test.js`).
+
+### What the persuasion numbers do not prove
+- PTC is news articles from 48 outlets, mostly 2017 to 2019. Replies are shorter and blunter, and
+  precision there is not measured. It could be higher or lower.
+- PTC's labels are not exhaustive. A true use the annotators did not mark counts as a miss, so
+  precision leans low.
+- A technique describes how a post argues. It does not say the post is false, or anything about
+  who wrote it.
+
+## Organic baselines for the coordination signs (2026-10-21)
+Every coordination sign now carries what normal looks like: how often the same sign fired in
+ordinary threads, beside the count observed. The window says the baseline's source in the same row.
+`node scripts/baselines.mjs` reproduces every number here from the PHEME corpus prepared by
+`scripts/eval/prep-pheme.py`, and writes `evidence/baseline-results.json` and
+`src/core/baselines-data.js`.
+
+Data. PHEME (Zubiaga et al.), 6,425 Twitter threads from nine 2014 and 2015 news events (Charlie
+Hebdo, the Sydney siege, Ferguson, the Ottawa shooting, Germanwings and four smaller ones), CC BY 4.0,
+figshare 10.6084/m9.figshare.6392078, archive SHA-256 `079f6ffd...a9bc58dd` (full hash in the results
+file). No text from it is committed. Two null models of independent posting run beside it
+(`scripts/baselines/nulls.mjs`): reply times drawn on their own at the thread's own pace (a smoothed
+bootstrap of its delays), and accounts placed in threads at random with each account's thread count
+and each thread's size kept.
+
+| Sign, thread size | Ordinary threads (95% interval) | Independent-posting null |
+|---|---|---|
+| Same text, 5 to 19 replies | 0.5% (14 of 3,087; 0.3 to 0.8) | |
+| Same text, 20 to 49 | 1.4% (20 of 1,384; 0.9 to 2.2) | |
+| Same text, 50 to 99 | 3.3% (6 of 181; 1.5 to 7.0) | |
+| Same text, 100 or more | 6.7% (4 of 60; 2.6 to 15.9) | |
+| Burst, 5 to 19 replies | 1.3% (39 of 3,087; 0.9 to 1.7) | 2.8% |
+| Burst, 20 to 49 | 2.2% (31 of 1,384; 1.6 to 3.2) | 3.6% |
+| Burst, 50 to 99 | 1.1% (2 of 181; 0.3 to 3.9) | 5.3% |
+| Burst, 100 or more | 3.3% (2 of 60; 0.9 to 11.4) | 12.2% |
+| Seen together, about 10 threads viewed | 0% (0 of 1,600; 0 to 0.2) | 0% |
+| Seen together, about 30 | 0% (0 of 4,800; 0 to 0.1) | 0% |
+| Seen together, about 100 | 0.2% (32 of 14,000; 0.2 to 0.3) | 0% |
+| Same words in another thread, about 100 viewed | 0.8% of replies of 8 words or more | |
+
+"Seen together" draws 20 random samples of W threads from each event with at least 2W threads. Pairs in
+three or more of the same threads, as the feed page lists them: a median of 0 at every W, real and null.
+
+What the baselines changed. Both signs fired far too often on ordinary threads, and both were fixed
+before these figures were taken:
+- Same text fired on 33.2% to 46.7% of threads by size. Almost every group was replies that copied the
+  post they quoted ("RT @outlet: ..." or a quote in curly quotes) or repeated the root post's headline,
+  the pattern Luceri et al. (arXiv 2505.10867) found on TikTok. The sign now sets aside quoted text
+  (`ownWords` in `src/core/similarity.js`) and shingles shared with the root post. The synthetic cases
+  keep 85 of 87 precision and 85 of 85 recall.
+- Bursts fired on 11.6% of threads overall and 39% of threads with 50 or more replies. The test
+  compared each 20-second window with the thread's average rate, and replies rush in after a post.
+  It now compares with the higher of the average and the local pace in the 120 seconds around the
+  window (`LOCAL_SEC` in `src/core/timing.js`): 1.6% of threads overall.
+
+What the baselines do not prove:
+- PHEME is Twitter in 2014 and 2015, when quoting meant pasting text; it is not a sample of today's X.
+- PHEME's threads were not checked for coordination. A baseline is "ordinary as collected", and some
+  of its bursts and copies may themselves be coordinated, which would make normal look busier.
+- The burst rate on ordinary threads is still above the test's nominal 0.1%, and the independent
+  null fires more often than the real threads. A burst is a sign to look at beside its baseline, not
+  a finding.
+- No labelled set of coordinated threads was used here, so no recall for any coordination sign is
+  measured on real data.
+
+## Look-alike letters (2026-10-21)
+Text is folded to the Unicode confusables table (UTS #39, version 18.0.0) before the duplicates sign,
+the cross-thread fingerprint, claim matching and the rhetoric word lists (`src/core/confusables.js`).
+Only words that mix Latin, Cyrillic, Greek, Armenian or Cherokee letters fold, toward the text's main
+script when every letter can be read in it, else toward the word's own majority; styled letters
+(fullwidth, mathematical, circled) read as plain ones, and invisible splitters are removed.
+
+- Seeded set: 100 copies of generated replies with one letter swapped for a Cyrillic or Greek
+  look-alike (`tests/confusables.test.js`). The duplicates sign found 75 of 100 before folding and 100
+  of 100 after; the cross-thread fingerprint matches all 100.
+- Controls: 17 sentences in Russian, Ukrainian, Serbian, Greek, Arabic, Hindi, Chinese, Armenian,
+  Cherokee, Hebrew, Japanese and accented Latin, and mixed English with Russian names, are unchanged.
+- Ordinary text: 6 of 96,337 PHEME replies change at all, by fullwidth digits and letters read as
+  plain ones and one mixed-script word. The synthetic duplicate cases keep their precision.
+- Limit: a lone Russian word quoted inside English text, whose every letter has a Latin look-alike
+  ("сор"), folds to Latin. Folding applies only to the copy Radar matches, never to what it shows.
+
 ## Threads
 At least one event with threads from opposing sides (for example a protest covered by outlets on
 the left and the right), reported per side. Not run yet: it needs the author's labels.
 
 ## Privacy
 Raw captures hold other people's posts and handles. They stay in `project-docs/evidence/raw/`,
-which git ignores. The corpora stay in `D:/radar-data/`. Only counts, rates and hashes are committed.
+which git ignores. The corpora stay in the data directory, outside the repository. Only counts, rates and hashes are committed.
 
 ## Other checks
 | Check | Result |

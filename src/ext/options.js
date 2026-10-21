@@ -15,6 +15,21 @@
     for (const [id, name] of sites()) $("sites").append(switchRow(name, null, PB.siteOn({ ...s(), paused: false }, id), (on) => save({ sites: { ...s().sites, [id]: on } })));
   }
 
+  // Mastodon servers the user turned Radar on for (src/ext/instances.js).
+  async function servers() {
+    const list = (await chrome.runtime.sendMessage({ type: "pb-instance-list" }).catch(() => null)) || [];
+    const ul = $("servers");
+    ul.replaceChildren();
+    if (!list.length) { ul.append(el("li", { class: "hint" }, "None yet.")); return; }
+    for (const host of list) {
+      const li = el("li", {}, host + " ");
+      const b = el("button", { type: "button", class: "btn" }, "Remove");
+      b.addEventListener("click", () => chrome.runtime.sendMessage({ type: "pb-instance-remove", host }).then(servers).catch((e) => console.error("[radar] could not remove", host, e)));
+      li.append(b);
+      ul.append(li);
+    }
+  }
+
   const AREA_HINTS = {
     place: "Where the platform places the account, and replies that speak as a local of somewhere else.",
     account: "Age, renames, sign-up handles and follow patterns.",
@@ -86,11 +101,11 @@
     for (const f of [...PB.FAMILIES].sort((a, b) => order(a) - order(b))) {
       const line = PB.measuredLine(f.id);
       const tr = el("tr");
-      tr.append(el("td", {}, f.name), el("td", {}, f.area[0].toUpperCase() + f.area.slice(1)), el("td", { class: line.measured ? "mono" : "muted" }, line.text));
+      tr.append(el("td", {}, f.name), el("td", {}, f.area[0].toUpperCase() + f.area.slice(1)), el("td", { class: line.measured ? "figure" : "muted" }, line.text));
       $("families").append(tr);
     }
   }
 
-  siteSwitches(); windowSwitches(); retention(); clearAll(); access(); families(); usage();
-  $("foot").textContent = `Radar ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Nothing leaves this browser.`;
+  siteSwitches(); servers(); windowSwitches(); retention(); clearAll(); access(); families(); usage();
+  $("foot").textContent = `Radar ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Nothing leaves this browser unless you turn on Other coverage.`;
 })().catch((e) => console.error("[radar] options page failed", e));

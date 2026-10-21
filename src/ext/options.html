@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Radar options</title>
+<link rel="stylesheet" href="canon.css">
 <link rel="stylesheet" href="pages.css">
 </head>
 <body>
@@ -19,6 +20,9 @@
   <section aria-labelledby="h-sites">
     <h2 id="h-sites">Sites</h2>
     <div id="sites" class="switches"></div>
+    <h3 id="h-servers">Mastodon servers</h3>
+    <p class="hint">Radar runs on a Mastodon server only after you open it, click the Radar button and allow it. Removing a server here takes the access back.</p>
+    <ul id="servers" class="servers" aria-labelledby="h-servers"></ul>
   </section>
 
   <section aria-labelledby="h-window">
@@ -28,12 +32,27 @@
     <div id="reading" class="switches"></div>
   </section>
 
+  <section aria-labelledby="h-sitecards">
+    <h2 id="h-sitecards">Site cards</h2>
+    <p class="muted">Rest the pointer on a link in a post to see who owns the site, what kind of owner it has, when and where it was founded, any state link, and its fact-check record. To see the same card for a news site you are reading, press <strong>Site card for this page</strong> in Radar's toolbar menu. Radar runs on no news site until you press it.</p>
+    <h3 class="sub">Search results</h3>
+    <p class="muted">Off by default. Turning an engine on asks the browser for access to its result pages; Radar then adds a line of labels under each result and sends nothing anywhere.</p>
+    <div id="search" class="switches"></div>
+  </section>
+
+  <section aria-labelledby="h-coverage">
+    <h2 id="h-coverage">Other coverage</h2>
+    <p id="coverageText"></p>
+    <div id="coverage" class="switches"></div>
+    <p class="status muted" id="coverageStatus" role="status" aria-live="polite"></p>
+  </section>
+
   <section aria-labelledby="h-keep">
     <h2 id="h-keep">What Radar keeps</h2>
     <p class="muted">Everything stays in this browser profile. Older entries are deleted on the next start and whenever you change these numbers.</p>
     <div class="field"><label for="historyDays">History, connections and source trails, in days<span class="hint muted" id="historyHint"></span></label><input id="historyDays" type="number" inputmode="numeric"></div>
     <div class="field"><label for="aboutDays">Account details read from About pages, in days</label><input id="aboutDays" type="number" inputmode="numeric"></div>
-    <p class="status muted mono" id="usage" aria-live="polite"></p>
+    <p class="status muted figure" id="usage" aria-live="polite"></p>
     <div class="row">
       <button id="clear" type="button" class="quiet">Clear all Radar data</button>
       <span id="clearStatus" role="status" aria-live="polite"></span>
@@ -49,17 +68,37 @@
   <section aria-labelledby="h-measured">
     <h2 id="h-measured">How sure each sign is</h2>
     <p class="muted" id="measuredNote"></p>
+    <p><a href="transparency.html">How each sign was measured, and what is not measured</a> · <a href="privacy.html">Privacy policy</a></p>
     <table>
       <thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Measured</th></tr></thead>
       <tbody id="families"></tbody>
     </table>
   </section>
 
-  <footer id="foot">Evidence, not verdicts. Nothing leaves this browser.</footer>
+  <section aria-labelledby="h-feedback">
+    <h2 id="h-feedback">Your feedback on signs</h2>
+    <p class="muted">Every sign in the window has <strong>This was right</strong> and <strong>This was wrong</strong>. Your marks stay in this browser. Radar keeps the sign, its kind, the thread it was in and your mark. It keeps the post text only when you tick "include the text" before marking.</p>
+    <p class="muted" id="fbRule"></p>
+    <p class="status muted figure" id="fbCount" aria-live="polite"></p>
+    <table>
+      <thead><tr><th scope="col">Sign</th><th scope="col">Right</th><th scope="col">Wrong</th></tr></thead>
+      <tbody id="fbFamilies"></tbody>
+    </table>
+    <p class="muted">Saving writes a JSON file to your computer. Radar never sends it. If you want to help measure Radar, you can attach the file to an issue on <a href="https://github.com/HarperZ9/radar/issues" target="_blank" rel="noopener noreferrer">Radar's repository</a>. Read it first: it holds the threads you marked, and the text of any post you chose to include.</p>
+    <div class="row">
+      <button id="fbExport" type="button">Save feedback to a file</button>
+      <button id="fbClear" type="button" class="quiet">Clear feedback</button>
+      <span id="fbStatus" role="status" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <footer id="foot">Evidence, not verdicts. Nothing leaves this browser unless you turn on Other coverage.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>
 <script src="pages.js"></script>
 <script src="options.js"></script>
+<script src="options-feedback.js"></script>
+<script src="options-sources.js"></script>
 </body>
 </html>

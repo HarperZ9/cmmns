@@ -3,29 +3,38 @@
 <head>
 <meta charset="utf-8">
 <title>Radar</title>
+<link rel="stylesheet" href="canon.css">
 <link rel="stylesheet" href="popup.css">
 </head>
 <body>
 <header><strong>Radar</strong><span id="site"></span></header>
 <main>
-  <p id="sentence" class="lead">Open a post or a feed on X, YouTube, Reddit, Facebook, Instagram or Bluesky.</p>
+  <p id="sentence" class="lead">Open a post or a feed on X, YouTube, Reddit, Facebook, Instagram, Bluesky, Threads, TikTok or a Mastodon server.</p>
+  <section id="server" class="server bare" hidden>
+    <p id="server-text"></p>
+    <button id="server-on" type="button">Turn on Radar here</button>
+  </section>
   <dl id="facts"></dl>
   <div class="actions">
     <button id="scan" type="button">Read all accounts</button>
     <button id="panel" type="button">Open thread panel</button>
     <button id="export" type="button">Save report</button>
+    <button id="dashboard" type="button">Your feed</button>
+    <button id="sitecard" type="button">Site card for this page</button>
     <button id="history" type="button">Open history</button>
     <button id="options" type="button">Options</button>
+    <button id="transparency" type="button">How Radar is measured</button>
   </div>
-  <section class="settings">
+  <section class="settings bare">
     <label><input type="checkbox" id="paused"> Pause Radar</label>
     <label><input type="checkbox" id="feeds"> Radar on feeds and profiles</label>
     <label><input type="checkbox" id="auto"> Read About pages automatically</label>
   </section>
 </main>
-<footer>Evidence, not verdicts. Nothing leaves this browser.</footer>
+<footer>Evidence, not verdicts. Nothing leaves this browser unless you turn on Other coverage.</footer>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>
+<script src="popup-server.js"></script>
 <script src="popup.js"></script>
 </body>
 </html>

@@ -8,6 +8,8 @@
   const ci = (c) => `${pct(c[0])} to ${pct(c[1])}`;
   const num = (x) => (x == null ? null : Number(x).toLocaleString());
   let open = false;
+  // The tour's thread-report tip (src/ext/tour.js), taken once per page and kept until dismissed.
+  let tip = null, tipDone = false;
   try { open = sessionStorage.getItem("pb.panel.open") === "1"; } catch (_) { /* storage blocked */ }
 
   function section(p, title, lines) {
@@ -21,12 +23,19 @@
 
   function button(label, title, fn) { const b = el("button", "pb-btn", label); b.type = "button"; b.title = title; b.addEventListener("click", fn); return b; }
 
-  function coordination(report, clusters) {
+  // Each coordination sign is followed by how often it shows up in ordinary threads
+  // (src/core/baselines.js), so the count reads against normal.
+  function coordination(report, clusters, viewed) {
+    const base = (sign, on) => (on ? PB.baselineLine(sign, { replies: report.replies, viewed }) : null);
+    const bursts = report.bursts || [], groups = report.groups || [];
     return [
       report.joinBurst && report.joinBurst.n >= 3 ? `${report.joinBurst.n} of ${report.joinBurst.of} looked-up accounts joined within the same two weeks (${report.joinBurst.from} to ${report.joinBurst.to}).` : null,
-      ...(report.bursts || []).slice(0, 3).map((b) => `${b.authors.length} accounts replied within ${Math.max(1, Math.round((Date.parse(b.to) - Date.parse(b.from)) / 1000))} s at ${b.from.slice(11, 16)} UTC (${b.authors.slice(0, 4).map((a) => "@" + a).join(", ")}). Chance at this thread's pace: p ≈ ${b.p < 1e-6 ? "<0.000001" : b.p.toPrecision(2)}.`),
+      ...bursts.slice(0, 3).map((b) => `${b.authors.length} accounts replied within ${Math.max(1, Math.round((Date.parse(b.to) - Date.parse(b.from)) / 1000))} s at ${b.from.slice(11, 16)} UTC (${b.authors.slice(0, 4).map((a) => "@" + a).join(", ")}). Chance at this thread's pace: p ≈ ${b.p < 1e-6 ? "<0.000001" : b.p.toPrecision(2)}.`),
+      base("burst", bursts.length),
       clusters.length ? `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest ${clusters[0].ids.length}).` : null,
-      report.groups && report.groups.length ? "Seen together in other threads you viewed: " + report.groups.slice(0, 3).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "." : null,
+      base("same-text", clusters.length),
+      groups.length ? "Seen together in other threads you viewed: " + groups.slice(0, 3).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "." : null,
+      base("together", groups.length),
       report.machine && report.machine.n ? `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text.` : null,
     ];
   }
@@ -43,7 +52,7 @@
     ];
   }
 
-  // stats: { site, pending, scanning, paused, video, pushed, onExport, onClearHistory }
+  // stats: { site, pending, scanning, paused, video, pushed, viewed, onExport, onCard, onClearHistory }
   function render(report, clusters, stats, onLookupAll) {
     let p = document.getElementById("pb-panel");
     if (!p) { p = el("aside", "pb-panel"); p.id = "pb-panel"; document.body.append(p); }
@@ -57,6 +66,12 @@
     head.setAttribute("aria-expanded", String(open));
     head.addEventListener("click", () => { open = !open; try { sessionStorage.setItem("pb.panel.open", open ? "1" : "0"); } catch (_) { /* ignore */ } render(report, clusters, stats, onLookupAll); });
     p.append(head);
+    if (!tip && !tipDone && globalThis.PBTour) tip = PBTour.take("panel");
+    if (tip && !tipDone) {
+      const box = PBPop.tipBox({ ...tip, open: ["Lesson: the thread report", "learn.html#thread-report"] });
+      box.addEventListener("click", (e) => { if (e.target.tagName === "BUTTON") tipDone = true; });
+      p.append(box);
+    }
     if (!open) return;
     p.append(el("p", "pb-sentence", report.replies ? report.sentence : "No comments loaded on this page, so there is no reply report. The source details below still apply."));
     section(p, "Flagged accounts", report.verdict === "too-few" ? [] : [`Among the most extreme replies: ${pct(report.extreme.share)} (95% interval ${ci(report.extreme.ci)}).`, `Among the rest: ${pct(report.others.share)} (${ci(report.others.ci)}).`]);
@@ -69,7 +84,11 @@
       }[stats.site.id] || `${stats.site.name} shows no account location; this view uses coordination signs only.`) : `${report.lookedUp} of ${report.replies} accounts read so far.`,
       stats.paused ? "X is limiting requests; Radar paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
     ]);
-    section(p, "Coordination", coordination(report, clusters));
+    const coord = coordination(report, clusters, stats.viewed);
+    section(p, "Coordination", coord);
+    if (coord.some((t) => t && t.includes(" showed up in "))) p.lastChild.append(el("p", "pb-foot", PB.BASELINE_SOURCE));
+    // Persuasion techniques get their own line; they never count toward "flagged".
+    section(p, "Persuasion", report.persuasion ? [report.persuasion.sentence] : []);
     const U = report.upstream;
     section(p, "Upstream", U ? [
       U.accounts.length ? "Replies quote or lift media from: " + U.accounts.map((a) => `@${a.handle} (${a.n})`).join(", ") + "." : null,
@@ -80,6 +99,7 @@
     const acts = el("div", "pb-actions");
     if (!stats.scanning && !stats.paused && stats.pending) acts.append(button(`Read ${Math.min(stats.pending, 200)} accounts`, "Reads each account's profile and About page in one minimised window.", onLookupAll));
     if (stats.onExport) acts.append(button("Save report", "Saves the report and each account's flags to a JSON file on this computer. Nothing is uploaded.", stats.onExport));
+    if (stats.onCard) acts.append(button("Save card", "Makes a card about this thread (never about one account) to read, then save or share as an image and a JSON file.", stats.onCard));
     if (stats.onClearHistory) acts.append(button("Clear history", "Forgets which accounts Radar has seen in which threads (this browser only).", stats.onClearHistory));
     p.append(acts);
     p.append(el("p", "pb-foot", PB.REPORT_DOES_NOT_PROVE));

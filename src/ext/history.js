@@ -6,7 +6,7 @@
   const $ = (id) => document.getElementById(id);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const pct = (x) => `${Math.round(x * 100)}%`;
-  const KEYS = { reports: "pb.history.v1", net: "pb.net.v1", trail: "pb.trail.v1" };
+  const KEYS = { reports: "pb.history.v1", net: "pb.net.v2", trail: "pb.trail.v1" };
   const store = await chrome.storage.local.get(Object.values(KEYS));
   const s = PB.summarize(store[KEYS.reports], store[KEYS.net], store[KEYS.trail]);
 
@@ -75,6 +75,8 @@
     row.append(el("span", null, o.place), track, el("em", null, String(o.n)));
     $("origins").append(row);
   }
+
+  PBGraph.render({ svg: $("graph"), table: $("graph-table"), note: $("graph-note"), evidence: $("graph-evidence") }, store[KEYS.net]);
 
   $("export").addEventListener("click", () => {
     const a = document.createElement("a");

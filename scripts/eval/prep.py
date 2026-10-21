@@ -2,7 +2,7 @@
 
 This is a format conversion only: every label mapping, aggregation and split lives in
 scripts/eval/corpora.mjs so the decisions sit in one place. Needs pyarrow (parquet reader).
-Usage: python -I scripts/eval/prep.py D:/radar-data
+Usage: python -I scripts/eval/prep.py <data dir>
 """
 import csv, json, os, sys
 import pyarrow.parquet as pq
@@ -50,7 +50,7 @@ def mlma(root):
 
 
 def main():
-    root = sys.argv[1] if len(sys.argv) > 1 else "D:/radar-data"
+    root = sys.argv[1] if len(sys.argv) > 1 else "../radar-data"
     out = os.path.join(root, "prepared")
     os.makedirs(out, exist_ok=True)
     for name, fn in [("mhs", mhs), ("hatexplain", hatexplain), ("civil", civil), ("mlma-fr", mlma)]:

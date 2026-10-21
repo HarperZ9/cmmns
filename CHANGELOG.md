@@ -3,6 +3,217 @@
 All notable changes to Radar. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
+## 2.0.0 (2026-10-21)
+
+Radar now answers, in one hover: where a post comes from, who is pushing it, how it argues, whether a
+fact-checker has reviewed it, and whether its media carries Content Credentials. Every answer is sourced
+and states its limit. Nothing leaves the browser unless you turn on Other coverage and click.
+
+### Added (sources)
+- Site cards on links. Rest the pointer on an outbound link in a post, or focus it, for the linked
+  site's owner, owner type, founding year and country (Wikidata), any cited state link, and its
+  fact-check record: "N reviews by M fact-checkers since <date>, ratings as the checkers wrote
+  them", the three newest reviews and the full list on its own page. The post window's Sources area
+  shows the same card. Redirects from X, Facebook, YouTube, Reddit and the search engines resolve to
+  the real address first.
+- "Site card for this page" in the toolbar menu shows the card for the news site you are reading.
+  Radar runs on that page only when you press it.
+- Labels under Google, Bing and DuckDuckGo results, off until you turn an engine on in the options
+  page; the browser asks for that engine's access then. The labels name the owner and any state
+  link; the review count stays in the card beside its limits.
+- Other coverage, off by default: on a click, other outlets covering the same story from the GDELT
+  Project, each labelled by owner type (state media, public broadcaster, regional govt, nonprofit,
+  commercial, or not stated), never by a left or right score. It sends the four longest words of the
+  article's title to api.gdeltproject.org and nothing else. The options page says so before you turn
+  it on, Firefox asks for the "website content" permission then, and the first use shows the exact
+  words and waits for your click. It is the only feature that sends anything.
+- The fact-check table keeps, for each review, the site where the fact-checker said the claim
+  appeared (domain only; null for posts on platforms, archives, transcripts and aggregators). A new
+  site table holds facts for 48,341 sites and fact-check records for 2,451 (`data/sites.README.md`).
+  The owner table grows from 7,374 to 19,864 domains: where Wikidata names no owner, the parent
+  organisation or publisher, labelled as such.
+
+### Measured (sources)
+- On the feed of 2026-10-20, 66.8% of 87,647 reviews list where the claim appeared and 5.6% name a
+  site; 74.7% of those with an appearance were on platforms only. A hand read of 40 random
+  attributions found 36 correct, 2 citing a site as context, 2 malformed rows now dropped.
+- Every site a shipped review names has a record (100%, tested).
+- Of 500 news links sampled from Google News search feeds in 14 editions, 42.2% resolve to an owner
+  row and 55.4% to any site fact (target 85%: not met).
+- Other coverage on 100 headlines from Google News feeds in 10 editions (2026-10-21, one request
+  every 12 s plus one retry): GDELT answered 24 and refused or dropped 76 (55 "please limit
+  requests", 20 network failures, 1 title too short). 9 of 100 found at least 3 other outlets (9 of
+  the 24 answered); median time 25.5 s overall, 18.6 s when answered. Targets of 70% and 3 s: not
+  met. The limit is GDELT's availability from this machine, not the query.
+
+### Added (research)
+- What normal looks like, beside every coordination sign. Near-identical replies, bursts of replies,
+  accounts seen together and wording seen in other threads now show how often the same sign turned
+  up in ordinary threads of the same size, with its interval and source: the PHEME corpus of Twitter
+  threads from 2014 and 2015 news events (CC BY 4.0), with independent-posting simulations beside it
+  in `project-docs/EVALUATION.md`. In threads of 20 to 49 replies, a same-text group shows up in 1.4%
+  of ordinary threads and a burst in 2.2%.
+- Look-alike letters no longer hide a copy. A Cyrillic "а" or a Greek "ο" swapped into an English
+  word, fullwidth or mathematical letters, and invisible splitters are folded before the duplicates
+  sign, the cross-thread fingerprint, claim matching and the word lists, using the Unicode
+  confusables table (UTS #39, Unicode License v3). On 100 seeded copies the duplicates sign finds 100,
+  up from 75. Text written in one script, such as Russian, Greek or Arabic, is never changed.
+- Community Note timing: when X loads a note, the window says when it was written, how long after
+  the post and how long ago, from the note's own id. The page does not say when X began to show it.
+- Content Credentials survival on the feed page: of the files you checked, per site, how many still
+  carried intact credentials, how many were changed and how many had none. Radar keeps a short hash
+  of each file's address, never the address (`pb.media.v1`, pruned with your history setting).
+  A CI conformance test holds the count to c2patool's verdicts on the c2pa-rs test files: they agree
+  on which files carry credentials for 42 of 43, and the one miss is named.
+
+### Changed (research)
+- Near-identical replies no longer count text a reply quotes ("RT @outlet: ..." or a quoted post) or
+  the wording of the post it answers. Before this, the sign fired on a third of ordinary threads.
+- Bursts are tested against the thread's local pace as well as its average. The rush of replies
+  after a post had fired the sign on 39% of ordinary threads with 50 or more replies; it now fires
+  on 1.1% to 3.3% by size.
+- Persuasion techniques show only at 80% measured precision or more, with the interval starting at
+  70%, from at least 20 hits; whataboutism never shows on one reply. Published systems score about
+  30 to 44 F1 on these techniques. No technique clears the bar yet, so none shows, as before.
+
+### Changed (design follow-ups)
+- The transparency page leads with one figure per sign: a plain sentence, the interval drawn as a
+  figure, and the counts under "How we know", as on the author's product pages. The dense tables
+  sit in disclosures.
+- The thread card image no longer prints its SHA-256 hash; the hash stays in the JSON file and under
+  "Check a copy" on the card page.
+- Keyboard hints name Conso directly and never fall below 14px.
+
+### Changed (design)
+- Every Radar surface now uses the design of the author's site: bone and void grounds, ink text,
+  Hanken Grotesk for words and Conso for figures, square controls, sections that open on a
+  hairline and a registration cross, and colour only for a verdict. One shared stylesheet
+  (`canon.css`) carries the site's tokens for the first-run, options, feed, history, lessons,
+  self-check, thread card, popup, transparency and privacy pages.
+- The window and panel on social sites set their text in Hanken Grotesk and Conso, sent to the
+  page as bytes so no extension file becomes web-accessible. The ground still follows X's light,
+  dim and dark themes. Signs worth a look use the canon's drift colour beside their words.
+- The history page is one column of ruled sections, with no blue links, orange bars or rounded
+  boxes. Section labels in the window and the lessons are in mixed case.
+- The icons and the first-run drawing use the site's void and bone; the reading mark is bone.
+- The public pages link back to the author's site.
+- `tests/canon.test.js` fails on an em dash in anything a user reads, on a page without the shared
+  tokens, on a colour outside the canon and on a pill shape or an uppercase label.
+  `project-docs/DESIGN-CANON-CHECK.md` lists every value and the audit.
+
+### Fixed (design)
+- "Save card" opened a page that does not exist (`card.html`); it now opens the thread card page.
+
+### Added
+- Threads, Mastodon and TikTok comments. Threads and Mastodon were read live (Mastodon 4.x and
+  5.0); TikTok follows its public markup and is not checked live yet. Mastodon works on any server,
+  and only on servers you choose: open the server, click Radar's button, and your browser asks you
+  to allow that one server. Options lists them and takes access back. On Mastodon, Radar shows the
+  account's join date and whether the account marked itself as automated, from the data the
+  server already loaded. No new requests on any of the three.
+- Rhetoric in Arabic, Russian, Ukrainian, Chinese and Hindi (Devanagari and Latin spelling):
+  dehumanising language, calls for violence, stereotypes, slurs and conspiracy framing, with the
+  names each side coins for the other and symmetry tests across 19 to 26 targets per language.
+  Measured on held-out human-labelled text where a usable corpus exists: Arabic 96.6% (82.8 to
+  99.4, 29 signs, MLMA and OSACT4), Russian 100% (96.1 to 100, 95 signs, all slurs), Chinese 75.9%
+  (57.9 to 87.8, 29 signs, COLD). Ukrainian and Hindi show "not measured": too few signs in
+  labelled text. Each sign now says which language's word list found it.
+- Firefox for Android: the same package installs on Firefox 128 or later. On a touch screen each
+  post gets one "Radar" button that opens the window on a tap; the window and the popup fit the
+  screen. Testing steps in `project-docs/ANDROID.md`; not yet run on a phone.
+- Content Credentials fail-safe: a version 1 manifest in MP4 now reads "could not fully verify
+  (older manifest format)", never "has not changed since it was signed", and a CI property test
+  holds Radar to never giving a more favourable verdict than c2patool on the c2pa-rs test files.
+- Media checks in the window, on click only. "Check this file" reads Content Credentials (C2PA 2.x
+  and 1.x manifests) from JPEG, PNG, WebP and MP4 files the page already loaded, with no library
+  and no network call beyond re-reading that file. It checks the claim signature (ES256, ES384,
+  ES512, PS256, PS384, PS512, Ed25519), every assertion hash and the hash that binds the claim to
+  the file's bytes, and shows who signed, which tool, and what the credentials say, such as "made
+  with generative AI (trainedAlgorithmicMedia)", including in earlier versions of an edited file.
+  It also reads IPTC digital source type in XMP, image-generator settings in PNG text and the EXIF
+  Software field. A file with none says "no Content Credentials found (platforms often strip
+  them)"; Radar never calls a file authentic. Three new families: Content Credentials,
+  Credentials do not match, and AI-generation metadata.
+- Video frames for reverse search, as InVID does: "Take 4 frames" copies frames from the loaded
+  part of the page's own video and restores playback; each frame has Google Lens, Bing, TinEye and
+  Yandex buttons that copy it to the clipboard and open the service, so nothing is sent until you
+  paste it.
+- "First seen" for each piece of media: the earliest post Radar has seen with the same upload, and
+  the "From @account" post X credits it to. Reverse search links now say that a click sends the
+  image address to that service.
+- Lessons: every sign and persuasion technique has a local lesson of one to two minutes, opened
+  from the sign's "Learn" link in the window (52 lessons). Each says what the move is, shows
+  made-up examples, explains why it works on people and how to spot it without Radar, gives the
+  counter-move and what the sign does not prove, and says a post with the sign can still be true.
+  Examples come evenly from left, right and centre (a test counts them), and every lesson pairs
+  the sign with a fair use or an ordinary account that trips the same sign.
+- Self-check: eighteen made-up posts, half leaning on a move and half giving real support, hard to
+  easy, with the reason after every answer. It is scored by discernment (hits against false
+  alarms, d') and only when you open "How you are doing", because replications found the Bad
+  News game made players doubt true posts as much as false ones. Answers stay in this browser.
+- First-week tour: three tips over the first uses (the window, the thread report, a lesson), each
+  shown once, at most one an hour, none after the first week, and "No more tips" ends it for good.
+  Clearing Radar's data keeps that choice.
+- Research behind the lessons, read 2026-10-20 and cited with dates on the lessons page:
+  Roozenbeek and van der Linden 2019; Basol et al. 2020 and 2021; Maertens et al. 2021;
+  Roozenbeek et al. 2022 (Science Advances); and the replications Modirrousta-Galian and Higham
+  2023, Graham et al. 2023, Seabrooke et al. 2025 and Modirrousta-Galian et al. 2026.
+- "Your feed": a local page, opened from the toolbar popup, of what your feeds and threads carried
+  over the last 7, 30 or 60 days. Sites linked most with their owners, the share of links to
+  state-linked sites, the share of posts and replies with strong rhetoric signs, persuasion
+  techniques (only those that passed their measurement; none yet), the flagged-account share,
+  Community Notes and fact-check matches seen, and accounts that keep appearing together with
+  links to the threads. Every share shows its count, denominator and 95% interval. It says what
+  it does not show, keeps to your retention setting, and makes no network request. No streaks,
+  badges or notifications.
+- Coordination graph on the history page: accounts that replied in two or more of the same threads,
+  as a small force layout with each link labelled by its count. Tab reaches every account; Enter
+  or a click lists the threads behind each link. A table holds the same pairs and threads. 500
+  accounts draw in about 0.1 s.
+- Thread cards: "Save card" in the thread panel opens a card to read, then save or share as a PNG
+  and a JSON with a SHA-256 hash of its content. A card carries the thread report, fact-check
+  matches, linked sites, upload reuse and the Content Credentials states of any files you checked,
+  its sources and what it does not prove. It names no
+  account and is refused for threads with fewer than five reply accounts.
+- Persuasion techniques: span-level cues for eleven techniques from the SemEval-2020 Task 11 and
+  SemEval-2023 Task 3 taxonomy (loaded language, name calling, bandwagon, appeal to fear,
+  flag-waving, thought-terminating cliche, whataboutism, black-and-white fallacy, doubt, appeal to
+  authority, exaggeration), in English and French. No cue names a group, person, party or side. A
+  symmetry test checks that across targets from every political direction in both languages.
+- Measured on the held-out split of the Propaganda Techniques Corpus (CC BY 4.0). No technique
+  reached the shipping bar, a precision interval starting at 70%. Loaded language came closest at
+  60.3% (51.9 to 68.1), so none shows yet. The options page lists each technique with its figure
+  and why it is held back. A technique that clears the bar later appears in the Language area with
+  the matched words, a one-line definition, "a technique can carry a true claim; it describes how
+  the post argues", and its precision. It never counts toward "flagged", and the thread report
+  gives it a separate line by flagged and unflagged accounts.
+
+### Added (trust)
+- "This was right" and "This was wrong" on every sign in the window. Marks stay in your browser
+  with the sign, its kind and the thread; the post text only if you tick "include the text". After
+  10 marks on one kind of sign, the window shows "Your feedback: N of M right" under the measured
+  figure, never in its place. The options page lists your marks, saves them to a file when you ask,
+  and clears them. Nothing is sent.
+- A transparency page, inside Radar (options page and popup) and on the public site: every sign
+  with its measured precision, recall and interval, the data it was checked on and its licence,
+  the side-balance table, what is not measured and the known limits. Generated from the evaluation
+  results by `npm run pages`.
+- The privacy policy as a public page, generated from PRIVACY.md, now dated and covering feedback.
+- Conso for figures on Radar's own pages, beside Hanken Grotesk.
+- Store listing text, permission justifications, privacy-practice answers and screenshot plan for
+  the Chrome Web Store and Firefox Add-ons.
+
+### Changed (trust)
+- Firefox add-on id is now `radar@harperz9.github.io`, permanent, and the manifest declares no
+  data collection.
+- The fact-check table ships in two files, each under 5 MB, so Firefox's add-on checks can read it.
+  The rows are unchanged.
+- The manifest description leads with what Radar is: free, no account, nothing leaves your browser.
+
+### Fixed
+- The history page read the connections log under its old key, so "Accounts that keep appearing"
+  could be empty or stale, and the retention setting did not prune the current log.
+
 ## 1.0.0 (2026-10-21)
 
 First public-quality release. Every sign either carries a measured error rate from

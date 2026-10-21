@@ -1,0 +1,459 @@
+{
+ "generated": "2026-10-21",
+ "split": "test",
+ "seed": "radar-eval-2026-10-21",
+ "shipLow": 0.7,
+ "corpus": "PTC v2 (SemEval-2020 Task 11), training articles split by article",
+ "input": {
+  "file": "ptc/datasets-v2.tgz",
+  "sha256": "fd2d2c358d42b2e326e7f6f148007b384f0a0ffac5ab6db21e3889313a8516bb"
+ },
+ "articles": 182,
+ "techniques": {
+  "loaded-language": {
+   "against": [
+    "Loaded_Language"
+   ],
+   "precision": {
+    "k": 82,
+    "n": 136,
+    "value": 0.603,
+    "ci": [
+     0.519,
+     0.681
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 109,
+    "n": 136,
+    "value": 0.801,
+    "ci": [
+     0.727,
+     0.86
+    ]
+   },
+   "recall": {
+    "k": 80,
+    "n": 1015,
+    "value": 0.079,
+    "ci": [
+     0.064,
+     0.097
+    ]
+   },
+   "chance": {
+    "k": 3842,
+    "n": 169664,
+    "value": 0.023,
+    "ci": [
+     0.022,
+     0.023
+    ]
+   }
+  },
+  "name-calling": {
+   "against": [
+    "Name_Calling,Labeling"
+   ],
+   "precision": {
+    "k": 21,
+    "n": 43,
+    "value": 0.488,
+    "ci": [
+     0.346,
+     0.632
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 28,
+    "n": 43,
+    "value": 0.651,
+    "ci": [
+     0.502,
+     0.776
+    ]
+   },
+   "recall": {
+    "k": 21,
+    "n": 474,
+    "value": 0.044,
+    "ci": [
+     0.029,
+     0.067
+    ]
+   },
+   "chance": {
+    "k": 1859,
+    "n": 169664,
+    "value": 0.011,
+    "ci": [
+     0.01,
+     0.011
+    ]
+   }
+  },
+  "bandwagon": {
+   "against": [
+    "Bandwagon,Reductio_ad_hitlerum"
+   ],
+   "precision": {
+    "k": 0,
+    "n": 3,
+    "value": 0,
+    "ci": [
+     0,
+     0.562
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 0,
+    "n": 3,
+    "value": 0,
+    "ci": [
+     0,
+     0.562
+    ]
+   },
+   "recall": {
+    "k": 0,
+    "n": 32,
+    "value": 0,
+    "ci": [
+     0,
+     0.107
+    ]
+   },
+   "chance": {
+    "k": 551,
+    "n": 169664,
+    "value": 0.003,
+    "ci": [
+     0.003,
+     0.004
+    ]
+   }
+  },
+  "appeal-to-fear": {
+   "against": [
+    "Appeal_to_fear-prejudice"
+   ],
+   "precision": {
+    "k": 0,
+    "n": 2,
+    "value": 0,
+    "ci": [
+     0,
+     0.658
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 0,
+    "n": 2,
+    "value": 0,
+    "ci": [
+     0,
+     0.658
+    ]
+   },
+   "recall": {
+    "k": 0,
+    "n": 134,
+    "value": 0,
+    "ci": [
+     0,
+     0.028
+    ]
+   },
+   "chance": {
+    "k": 2149,
+    "n": 169664,
+    "value": 0.013,
+    "ci": [
+     0.012,
+     0.013
+    ]
+   }
+  },
+  "flag-waving": {
+   "against": [
+    "Flag-Waving"
+   ],
+   "precision": {
+    "k": 11,
+    "n": 27,
+    "value": 0.407,
+    "ci": [
+     0.245,
+     0.593
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 16,
+    "n": 27,
+    "value": 0.593,
+    "ci": [
+     0.407,
+     0.755
+    ]
+   },
+   "recall": {
+    "k": 11,
+    "n": 86,
+    "value": 0.128,
+    "ci": [
+     0.073,
+     0.215
+    ]
+   },
+   "chance": {
+    "k": 837,
+    "n": 169664,
+    "value": 0.005,
+    "ci": [
+     0.005,
+     0.005
+    ]
+   }
+  },
+  "thought-terminating": {
+   "against": [
+    "Thought-terminating_Cliches"
+   ],
+   "precision": {
+    "k": 0,
+    "n": 1,
+    "value": 0,
+    "ci": [
+     0,
+     0.793
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 0,
+    "n": 1,
+    "value": 0,
+    "ci": [
+     0,
+     0.793
+    ]
+   },
+   "recall": {
+    "k": 0,
+    "n": 41,
+    "value": 0,
+    "ci": [
+     0,
+     0.086
+    ]
+   },
+   "chance": {
+    "k": 286,
+    "n": 169664,
+    "value": 0.002,
+    "ci": [
+     0.002,
+     0.002
+    ]
+   }
+  },
+  "whataboutism": {
+   "against": [
+    "Whataboutism,Straw_Men,Red_Herring"
+   ],
+   "precision": {
+    "k": 0,
+    "n": 1,
+    "value": 0,
+    "ci": [
+     0,
+     0.793
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 0,
+    "n": 1,
+    "value": 0,
+    "ci": [
+     0,
+     0.793
+    ]
+   },
+   "recall": {
+    "k": 0,
+    "n": 65,
+    "value": 0,
+    "ci": [
+     0,
+     0.056
+    ]
+   },
+   "chance": {
+    "k": 1019,
+    "n": 169664,
+    "value": 0.006,
+    "ci": [
+     0.006,
+     0.006
+    ]
+   }
+  },
+  "black-and-white": {
+   "against": [
+    "Black-and-White_Fallacy"
+   ],
+   "precision": {
+    "k": 0,
+    "n": 0,
+    "value": null,
+    "ci": null
+   },
+   "precisionAnyTechnique": {
+    "k": 0,
+    "n": 0,
+    "value": null,
+    "ci": null
+   },
+   "recall": {
+    "k": 0,
+    "n": 42,
+    "value": 0,
+    "ci": [
+     0,
+     0.084
+    ]
+   },
+   "chance": {
+    "k": 793,
+    "n": 169664,
+    "value": 0.005,
+    "ci": [
+     0.004,
+     0.005
+    ]
+   }
+  },
+  "doubt": {
+   "against": [
+    "Doubt"
+   ],
+   "precision": {
+    "k": 1,
+    "n": 3,
+    "value": 0.333,
+    "ci": [
+     0.061,
+     0.792
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 1,
+    "n": 3,
+    "value": 0.333,
+    "ci": [
+     0.061,
+     0.792
+    ]
+   },
+   "recall": {
+    "k": 1,
+    "n": 244,
+    "value": 0.004,
+    "ci": [
+     0.001,
+     0.023
+    ]
+   },
+   "chance": {
+    "k": 5226,
+    "n": 169664,
+    "value": 0.031,
+    "ci": [
+     0.03,
+     0.032
+    ]
+   }
+  },
+  "appeal-to-authority": {
+   "against": [
+    "Appeal_to_Authority"
+   ],
+   "precision": {
+    "k": 0,
+    "n": 2,
+    "value": 0,
+    "ci": [
+     0,
+     0.658
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 1,
+    "n": 2,
+    "value": 0.5,
+    "ci": [
+     0.095,
+     0.905
+    ]
+   },
+   "recall": {
+    "k": 0,
+    "n": 72,
+    "value": 0,
+    "ci": [
+     0,
+     0.051
+    ]
+   },
+   "chance": {
+    "k": 1956,
+    "n": 169664,
+    "value": 0.012,
+    "ci": [
+     0.011,
+     0.012
+    ]
+   }
+  },
+  "exaggeration": {
+   "against": [
+    "Exaggeration,Minimisation"
+   ],
+   "precision": {
+    "k": 1,
+    "n": 10,
+    "value": 0.1,
+    "ci": [
+     0.018,
+     0.404
+    ]
+   },
+   "precisionAnyTechnique": {
+    "k": 1,
+    "n": 10,
+    "value": 0.1,
+    "ci": [
+     0.018,
+     0.404
+    ]
+   },
+   "recall": {
+    "k": 1,
+    "n": 220,
+    "value": 0.005,
+    "ci": [
+     0.001,
+     0.025
+    ]
+   },
+   "chance": {
+    "k": 1636,
+    "n": 169664,
+    "value": 0.01,
+    "ci": [
+     0.009,
+     0.01
+    ]
+   }
+  }
+ }
+}

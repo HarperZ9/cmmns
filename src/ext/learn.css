@@ -1,0 +1,22 @@
+/* The lessons and self-check pages, on top of canon.css and pages.css: the same ink on a calm
+   ground, the same two faces, mixed-case labels. The hot mark is the does-not-prove reminder. */
+.learn header { margin-bottom: var(--s-2); }
+.learn h1 { margin: var(--s-1) 0 var(--s-2); }
+.learn section { padding: var(--s-5) 0; }
+.learn nav { position: relative; padding-top: var(--s-5); border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: var(--s-4); }
+ul.index, ul.examples, ul.sources, ol.items { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-3); }
+ol.items { gap: 0; }
+ul.index { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--s-2) var(--s-5); }
+ul.sources li p { margin: var(--s-1) 0 0; font-size: var(--t-meta); color: var(--soft); }
+.ex { padding: var(--s-3) var(--s-4); border: 1px solid var(--line); background: var(--panel); }
+.ex p { margin: var(--s-1) 0 0; }
+.ex-kind { font-size: var(--t-label); font-weight: 650; color: var(--soft); }
+.ex-sign { border-color: var(--ink); background: transparent; }
+.true-too { font-weight: 650; border-left: 3px solid var(--hot); padding-left: var(--s-3); }
+.item { padding: var(--s-4) 0 var(--s-5); border-top: 1px solid var(--line-strong); }
+.item .post { font-size: 1.05em; margin: 0 0 var(--s-3); }
+.item .row { margin-bottom: var(--s-2); }
+.item .row button { color: var(--ink); background: transparent; border-color: var(--line-strong); }
+.item .verdict { margin: var(--s-2) 0 0; }
+.item .verdict strong { font-weight: 700; }
+details.mine { margin-top: var(--s-4); }

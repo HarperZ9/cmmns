@@ -40,6 +40,8 @@
     a.tabIndex = 0;   // X's posts take keyboard focus
     a.innerHTML = `<div data-testid="User-Name"><a href="/${h}">${h.replace(/_/g, " ")}</a> <span>@${h} · <a href="/${h}/status/10${i}"><time>2h</time></a></span></div><div data-testid="tweetText"></div>`;
     a.querySelector('[data-testid="tweetText"]').textContent = text;
+    // A synthetic image signed with test Content Credentials (tests/fixtures/c2pa), for the media rows.
+    if (i === 1) { const img = document.createElement("img"); img.src = "c2pa/ai.jpg"; img.width = 240; img.height = 240; img.alt = "synthetic test image"; a.append(img); }
     box.append(a);
   });
   window.FIXTURE_PRELOAD = T.filter((t) => t[2] && t[3]).map((t) => ({ handle: t[0], ...t[2] }));
@@ -47,11 +49,15 @@
 <script src="chrome-stub.js"></script>
 <script src="../../src/ext/core.bundle.js"></script>
 <script src="../../src/ext/settings.js"></script>
+<script src="../../src/ext/fonts.js"></script>
 <script src="../../src/ext/store.js"></script>
+<script src="../../src/ext/feedback.js"></script>
 <script>Promise.all(window.FIXTURE_PRELOAD.map((r) => PBStore.put(r))).then(() => { window.FIXTURE_READY = true; document.getElementById("thread").append(document.createElement("i")); });</script>
 <script src="../../src/ext/about-page.js"></script>
 <script src="../../src/ext/platforms.js"></script>
 <script src="../../src/ext/pop.js"></script>
+<script src="../../src/ext/media.js"></script>
+<script src="../../src/ext/mediacard.js"></script>
 <script src="../../src/ext/signals.js"></script>
 <script src="../../src/ext/card.js"></script>
 <script src="../../src/ext/panel.js"></script>

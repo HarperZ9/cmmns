@@ -97,3 +97,74 @@ Boundaries of Whiteness", Duke University Press, 2006 (cited from memory, not re
 - Hurtlex lookups covered the visible parts of each file through a web reader, not a full local
   read; a word marked "not found" there may still be present.
 - None of these lists has measured precision or recall yet (EVALUATION.md).
+
+## Arabic, Russian, Ukrainian, Chinese and Hindi (2026-10-21)
+
+Lists: `src/core/lexicon-{ar,ru,uk,zh,hi}.js`. Same rule as above: each word is typed by hand as a
+fact about usage, no rows or scores are copied, and a word is a slur only when a source below
+records it as one and it has no common innocent sense in these languages. The dictionary labels
+were read from each Wiktionary entry's source (`action=raw`) on 2026-10-21. Wiktionary is CC BY-SA
+4.0; only the usage label is cited.
+
+| Term | Language | Label in Wiktionary | Used as |
+|---|---|---|---|
+| хохлы (plural only) | ru, uk | ethnic slur, pejorative (singular also "tuft of hair") | slur |
+| москаль | uk | derogatory, ethnic slur | slur |
+| кацап | ru, uk | slang, pejorative, ethnic slur | slur |
+| русня | ru, uk | collective, ethnic slur, offensive | slur |
+| жид | ru | offensive, ethnic slur (uk: dated, potentially offensive) | slur |
+| хач | ru | offensive, ethnic slur | slur |
+| пидор, підар | ru, uk | vulgar, offensive | slur |
+| чурка | ru | racial slur, but also "block of wood" | group name only |
+| укроп | ru | ethnic slur, but also "dill" | group name only |
+| ватник, рашист, либераст, бандеровец, колорад, порохобот | ru, uk | pejorative or derogatory, political | group names (coined camps) |
+| орк | ru, uk | pejorative neologism for Russian soldiers | dehumanising noun and group name |
+| رافضي | ar | religious slur (for Shia) | slur |
+| ناصبي | ar | religious slur (for Sunnis) | slur |
+| 支那 | zh | ethnic slur, derogatory, offensive | slur |
+| 臺巴子 | zh | derogatory (Taiwanese) | slur |
+| 黑鬼, 小日本, 白皮豬 | zh | ethnic slur | slur |
+| 娘炮 | zh | derogatory, offensive | slur |
+| 蝗蟲 | zh | Hong Kong slang ethnic slur, but also "locust" | dehumanising noun; "大陆蝗虫" as slur |
+| 五毛, 小粉紅, 白左, 美分黨, 公知, 女拳, 直男癌, 國男, 共匪 | zh | derogatory or disparaging, political | group names (coined camps) |
+| 阿三 | zh | slur by extension, also a Shanghai nickname | group name only |
+| रंडी | hi | derogatory | only fused with a group ("<group> रंडी") |
+| भक्त, अंधभक्त | hi | politics slang; Indian politics, derogatory | group names |
+| चमार | hi | derogatory sense, but also a caste self-name | not listed as a slur |
+
+Other sources:
+- कटुआ, कटमुल्ला: Center for the Study of Organized Hate, "Decoding Hate" glossary entry
+  "Katua / Katmulla / Katmulli" (csohate.org), which records them as slurs for Muslims.
+- लव जिहाद and the other "X jihad" forms: documented as conspiracy narratives in press and academic
+  coverage of Indian politics (for example the Wikipedia article "Love jihad conspiracy theory",
+  cited for the label only). गोदी मीडिया ("lapdog media") and "presstitute" are the two camps'
+  terms for distrusted media and are listed together.
+- Arabic "أحفاد القردة والخنازير" (descendants of apes and pigs): an antisemitic trope documented
+  by the ADL and by scholarship on antisemitic discourse; listed as a dehumanising phrase.
+- "الموت لـ" ("death to"), "смерть ..." and "杀光 ..." are written as grammar over any target, so
+  "الموت لأمريكا" and "الموت لإسرائيل", or "смерть ватникам" and "смерть бандеровцам", score alike.
+- The war's slogan "москаляку на гілляку" ("the Moskal to the branch") is a lynching chant recorded
+  in reporting on the war; the grammar "<group> на гілляку / на ножі" covers every target.
+- Funding accusations ("проплачены госдепом" / "проплачены кремлем", "ممولين من قطر" / "ممولين من
+  الإمارات", "拿了美国的钱" / "拿了中共的钱", "चीन के पैसे पर" / "सोरोस के पैसे पर") list paymasters from
+  every direction, as the German "von Soros bezahlt" / "von Putin bezahlt" pair does.
+
+Coined political terms, by direction:
+
+| Language | Coined for one camp | Coined for the other | Others |
+|---|---|---|---|
+| Russian | ватники, путинисты, рашисты, колорады (pro-Kremlin) | либерасты, навальнисты, бандеровцы (liberal, opposition, Ukrainian) | совки, релоканты |
+| Ukrainian | ватники, рашисти, ждуни, сепари | бандерівці, укропи (used by the other side) | порохоботи / зеботи (domestic camps) |
+| Arabic | خرفان, إخوانجية (Brotherhood supporters) | عبيد البيادة, مطبلين (army and regime supporters) | روافض / نواصب (sects), ذباب إلكتروني |
+| Chinese | 五毛, 小粉红 (pro-government) | 美分, 公知, 白左 (pro-Western, liberal) | 女拳 / 直男癌, 废青 / 黑警 |
+| Hindi | भक्त, अंधभक्त, संघी, चड्डीधारी | लिबरांडू, सिकुलर, आंदोलनजीवी, अर्बन नक्सल | गद्दार, देशद्रोही |
+
+Group names for disabled people, trans people and castes (Arabic معاقين, متحولين جنسيا; Hindi
+शूद्र, विकलांग, असमिया and their Latin spellings) were added after reading misses on the
+Multilingual HateCheck dev half. They belong in any group list, but see CORPORA.md on why HateCheck
+test numbers move with dev tuning.
+
+Known gaps in these five: Hindi has no motive, contempt or conspiracy grammar beyond the listed
+phrases, and its Latin spelling varies far more than the list does; Chinese pinyin and homophone
+spellings are not read; Arabic dialect spellings beyond Egyptian and Gulf fillers are partly covered;
+Russian and Ukrainian have no essentialise grammar.

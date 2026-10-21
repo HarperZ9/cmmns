@@ -1,12 +1,16 @@
 // Radar's window: it fades in beside a post when the pointer rests on the post, stays while the
 // pointer is on the post or the window, and fades out when it leaves. Clicking inside the window
-// keeps it open until Escape or a click elsewhere. Nothing is drawn on the page itself. Content is
+// keeps it open until Escape or a click elsewhere. On a touch screen, where nothing hovers, each post
+// gets one small "Radar" button that opens the window on a tap; otherwise nothing is drawn on the
+// page itself. Content is
 // built from data with textContent only, never innerHTML, so nothing a post says can inject markup.
 (() => {
   "use strict";
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const OPEN_MS = 450, CLOSE_MS = 260, FADE_MS = 160;
   const TABS = [["overview", "Overview"], ["account", "Account"], ["post", "This post"], ["history", "History"]];
+  // A device whose main pointer cannot hover (phones, Firefox for Android).
+  const TOUCH = !!(globalThis.matchMedia && matchMedia("(hover: none)").matches);
   let pop = null, owner = null, pinned = false, openTimer = 0, closeTimer = 0, lastTab = "overview", uid = 0, quiet = null;
 
   function close(now, refocus) {
@@ -44,7 +48,32 @@
     return null;
   }
 
-  // A row value is text, { links }, { action: [label, fn, busyLabel] }, { note }, or a chart.
+  // Radar's own pages (a lesson, the self-check) open in a new tab through the worker, which
+  // accepts only those pages (PB.safePage). A content script cannot link to them directly.
+  function openButton(label, path) {
+    const b = el("button", "pb-link pb-open", label); b.type = "button";
+    b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); try { chrome.runtime.sendMessage({ type: "pb-open-page", path }).catch(() => {}); } catch (err) { console.error("[radar] could not open", path, err); } });
+    return b;
+  }
+
+  // A tour tip: its text, "Got it", "No more tips", and an optional page to open.
+  function tipBox(tip) {
+    const box = el("div", "pb-tip");
+    box.setAttribute("role", "note");
+    box.append(el("p", null, tip.text));
+    const row = el("div", "pb-tip-row");
+    if (tip.open) row.append(openButton(tip.open[0], tip.open[1]));
+    const done = el("button", "pb-btn", "Got it"); done.type = "button";
+    done.addEventListener("click", (e) => { e.stopPropagation(); box.remove(); });
+    const stop = el("button", "pb-link pb-open", "No more tips"); stop.type = "button";
+    stop.addEventListener("click", (e) => { e.stopPropagation(); if (globalThis.PBTour) PBTour.stop(); box.remove(); });
+    row.append(done, stop);
+    box.append(row);
+    return box;
+  }
+
+  // A row value is text, { links }, { action: [label, fn, busyLabel] }, { actions: [[label, fn]] },
+  // { feedback }, { open }, { image: dataUrl } (a frame Radar took from the page's own video), { note }, or a chart.
   function renderRow(box, h, t) {
     if (!t) return;
     const row = el("div", "pb-row");
@@ -55,6 +84,16 @@
       const v = el("div", "pb-row-v");
       for (const [label, href] of t.links) { const a = el("a", "pb-link", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; v.append(a); }
       row.append(v);
+    } else if (typeof t === "object" && t.feedback && globalThis.PBFeedback) {
+      row.append(PBFeedback.control(t.feedback));
+    } else if (typeof t === "object" && t.image) {
+      const img = el("img", "pb-frame"); img.src = t.image; img.alt = t.alt || ""; row.append(img);
+    } else if (typeof t === "object" && t.actions) {
+      const v = el("div", "pb-row-v");
+      for (const [label, fn] of t.actions) { const b = el("button", "pb-btn pb-btn-s", label); b.type = "button"; b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); fn(); }); v.append(b); }
+      row.append(v);
+    } else if (typeof t === "object" && t.open) {
+      row.append(openButton(t.open[0], t.open[1]));
     } else if (typeof t === "object" && t.action) {
       const b = el("button", "pb-btn", t.action[0]); b.type = "button";
       b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); t.action[1](); b.disabled = true; b.textContent = t.action[2] || "Working…"; });
@@ -64,6 +103,7 @@
   }
 
   function section(s) {
+    if (s.tip) return tipBox(s.tip);
     if (!(s.rows || []).some(([, t]) => t) && !(s.signals || []).length && !(s.foot && !s.title)) return null;
     const sec = el("section", "pb-sec");
     if (s.area) sec.dataset.area = s.area;
@@ -193,12 +233,13 @@
 
   // Wire a post. `sections` is a function, so the window is built only when it opens and always
   // shows the post's latest evidence. Wired once per element.
-  function hover(target, sections) {
+  function hover(target, sections, anchor) {
     target.__pbSections = sections;
+    if (TOUCH) tap(target, anchor || target);
     if (target.__pbWired) return;
     target.__pbWired = true;
-    target.addEventListener("pointerenter", () => { clearTimeout(openTimer); openTimer = setTimeout(() => show(target, () => target.__pbSections()), OPEN_MS); });
-    target.addEventListener("pointerleave", () => { clearTimeout(openTimer); if (!pinned && owner === target) closeTimer = setTimeout(() => close(), CLOSE_MS); });
+    target.addEventListener("pointerenter", (e) => { if (e.pointerType === "touch") return; clearTimeout(openTimer); openTimer = setTimeout(() => show(target, () => target.__pbSections()), OPEN_MS); });
+    target.addEventListener("pointerleave", (e) => { if (e.pointerType === "touch") return; clearTimeout(openTimer); if (!pinned && owner === target) closeTimer = setTimeout(() => close(), CLOSE_MS); });
     // Keyboard: focusing the post opens its window; Alt+R moves focus into it; Escape closes it
     // and returns focus to the post. Focus leaving both the post and the window closes it.
     target.addEventListener("focusin", (e) => { if (e.target !== target) return; if (quiet === target) { quiet = null; return; } clearTimeout(openTimer); openTimer = setTimeout(() => show(target, () => target.__pbSections()), 150); });
@@ -209,11 +250,39 @@
     target.addEventListener("keydown", (e) => { if (e.altKey && (e.key === "r" || e.key === "R")) { e.preventDefault(); enter(show(target, () => target.__pbSections())); } });
   }
 
+  // Touch: a tap on the post's button opens its window, held open until a tap elsewhere. The tap
+  // never reaches the site, so it does not open the post.
+  function tap(target, anchor) {
+    if (!anchor || !anchor.isConnected || anchor.querySelector(":scope > .pb-tap")) return;
+    const b = el("button", "pb-tap", "Radar");
+    b.type = "button";
+    b.setAttribute("aria-label", "Show what Radar knows about this post");
+    b.addEventListener("click", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (owner === target && pop) { close(); return; }
+      if (show(target, () => target.__pbSections())) pinned = true;
+    });
+    for (const t of ["pointerdown", "touchstart", "mousedown"]) b.addEventListener(t, (e) => e.stopPropagation(), { passive: true });
+    anchor.append(b);
+  }
+
+  // Rebuild the open window in place with the post's latest evidence (after a media check).
+  function refresh() {
+    if (!pop || !owner || !owner.__pbSections) return;
+    const list = owner.__pbSections();
+    if (!list) return;
+    const keep = pinned, old = pop, next = build(list);
+    next.style.left = old.style.left; next.style.top = old.style.top;
+    next.classList.add("pb-in");
+    old.replaceWith(next);
+    pop = next; pinned = keep;
+  }
+
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pop) close(false, true); }, true);
   // Focus leaving the window (Tab past its last control) closes it, unless it went back to the post.
   document.addEventListener("focusin", (e) => { if (pop && !pop.contains(e.target) && !(owner && owner.contains(e.target))) close(); }, true);
-  document.addEventListener("pointerdown", (e) => { if (pop && pinned && !pop.contains(e.target)) close(); }, true);
+  document.addEventListener("pointerdown", (e) => { if (pop && pinned && !pop.contains(e.target) && !(e.target.closest && e.target.closest(".pb-tap"))) close(); }, true);
   window.addEventListener("scroll", () => { if (pop && !pinned) close(); }, { passive: true });
 
-  globalThis.PBPop = Object.freeze({ hover, show, close, el });
+  globalThis.PBPop = Object.freeze({ hover, show, close, el, refresh, tipBox, TOUCH });
 })();

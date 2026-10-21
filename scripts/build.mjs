@@ -7,9 +7,9 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const ORDER = ["places.js", "similarity.js", "mismatch.js", "reddit.js", "pattern.js", "flags.js", "lexicon.js", "rhetoric-util.js", "lexicon-fr.js", "rhetoric-fr.js", "lexicon-es.js", "rhetoric-es.js", "lexicon-de.js", "rhetoric-de.js", "lexicon-pt.js", "rhetoric-pt.js", "lexicon-it.js", "rhetoric-it.js", "rhetoric.js", "report.js", "about.js", "meta.js", "bsky.js", "owners.js", "xdata.js", "machine.js", "threadkey.js", "network.js", "ytdata.js", "timing.js", "pace.js", "langs.js", "state.js", "trail.js", "history.js", "claims.js"];
-// Product modules (settings, measured accuracy, badge families) come last; they read no other core module but measured.js.
-const PRODUCT = ["settings.js", "measured.js", "families.js"];
+const ORDER = ["places.js", "confusables-data.js", "confusables.js", "similarity.js", "mismatch.js", "reddit.js", "pattern.js", "flags.js", "lexicon.js", "rhetoric-util.js", "lexicon-fr.js", "rhetoric-fr.js", "lexicon-es.js", "rhetoric-es.js", "lexicon-de.js", "rhetoric-de.js", "lexicon-pt.js", "rhetoric-pt.js", "lexicon-it.js", "rhetoric-it.js", "rhetoric-mention.js", "lexicon-ar.js", "rhetoric-ar.js", "lexicon-ru.js", "rhetoric-ru.js", "lexicon-uk.js", "rhetoric-uk.js", "lexicon-zh.js", "rhetoric-zh.js", "lexicon-hi.js", "rhetoric-hi.js", "rhetoric.js", "measured.js", "measured-langs.js", "persuasion-cues.js", "persuasion.js", "report.js", "about.js", "meta.js", "bsky.js", "fedi.js", "owners.js", "xdata.js", "machine.js", "threadkey.js", "network.js", "ytdata.js", "timing.js", "baselines-bins.js", "baselines-data.js", "baselines.js", "pace.js", "langs.js", "state.js", "trail.js", "history.js", "claims.js", "cbor.js", "jumbf.js", "der.js", "aimeta.js", "c2pa-verify.js", "c2pa.js", "mediacheck.js", "survival.js", "keyframes.js", "graph.js", "feed.js", "evidence.js", "hosts.js", "sites.js", "coverage.js"];
+// Product modules (settings, badge families) come last; they read only measured.js and persuasion.js.
+const PRODUCT = ["settings.js", "families.js", "feedback.js", "claims-parts.js", "learn.js"];
 const ident = (f) => "M_" + f.replace(/\.js$/, "").replace(/-/g, "_");
 
 let body = "";
@@ -19,7 +19,7 @@ for (const f of [...ORDER, ...PRODUCT]) {
   src = src.replace(/^import \{([^}]*)\} from "\.\/([\w-]+\.js)";$/gm, (_, names, dep) => `const {${names}} = ${ident(dep)};`);
   src = src.replace(/^import \* as (\w+) from "\.\/([\w-]+\.js)";$/gm, (_, name, dep) => `const ${name} = ${ident(dep)};`);
   const exported = [];
-  src = src.replace(/^export (const|function|let|class) ([A-Za-z_$][\w$]*)/gm, (_, kind, name) => { exported.push(name); return `${kind} ${name}`; });
+  src = src.replace(/^export (const|async function|function|let|class) ([A-Za-z_$][\w$]*)/gm, (_, kind, name) => { exported.push(name); return `${kind} ${name}`; });
   body += `\n// ---- ${f}\nconst ${ident(f)} = (() => {\n${src}\nreturn { ${exported.join(", ")} };\n})();\n`;
   all.push(`...${ident(f)}`);
 }

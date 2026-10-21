@@ -19,12 +19,20 @@ const TYPES = [
   "Q35127",    // website
   "Q3220391",  // social networking service
   "Q15416",    // television program (news shows carry their network's owner)
+  "Q41298",    // magazine
+  "Q14350",    // radio station
+  "Q1126006",  // public broadcaster
+  "Q15265344", // broadcaster
 ];
-const QUERY = `
-SELECT ?item ?itemLabel ?site ?owner ?ownerLabel ?xuser WHERE {
-  VALUES ?type { ${TYPES.map((t) => "wd:" + t).join(" ")} }
-  ?item wdt:P31 ?type; wdt:P856 ?site; p:P127 ?st.
-  ?st ps:P127 ?owner; wikibase:rank ?rank.
+// Owner first (P127). Where Wikidata states no current owner, the parent organisation (P749), then
+// the publisher (P123), each labelled as what it is: a publisher is not an owner.
+const VIA = [["P127", "owner"], ["P749", "parent"], ["P123", "publisher"]];
+const query = (type) => `
+SELECT ?item ?itemLabel ?site ?owner ?ownerLabel ?xuser ?via WHERE {
+  VALUES ?type { wd:${type} }
+  VALUES (?p ?ps ?via) { ${VIA.map(([pid, v]) => `(p:${pid} ps:${pid} "${v}")`).join(" ")} }
+  ?item wdt:P31/wdt:P279? ?type; wdt:P856 ?site; ?p ?st.
+  ?st ?ps ?owner; wikibase:rank ?rank.
   FILTER(?rank != wikibase:DeprecatedRank)
   FILTER NOT EXISTS { ?st pq:P582 ?end }
   FILTER NOT EXISTS { ?owner wdt:P570 ?died }        # people who have died are not current owners
@@ -32,12 +40,17 @@ SELECT ?item ?itemLabel ?site ?owner ?ownerLabel ?xuser WHERE {
   FILTER(?owner != ?item)
   OPTIONAL { ?item wdt:P2002 ?xuser }               # X username, for account cards
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de,es". }
-} LIMIT 60000`;
+} LIMIT 200000`;
 
-const url = "https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(QUERY);
-const res = await fetch(url, { headers: { "User-Agent": "Radar ownership table builder (local, manual run)" } });
-if (!res.ok) { console.error("Wikidata query failed:", res.status, (await res.text()).slice(0, 500)); process.exit(1); }
-const raw = (await res.json()).results.bindings;
+// One query per class, so no single query runs into the service's time limit.
+const raw = [];
+for (const type of TYPES) {
+  const url = "https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(query(type));
+  const res = await fetch(url, { headers: { "User-Agent": "Radar ownership table builder (local, manual run)" } });
+  if (!res.ok) { console.error("Wikidata query failed:", type, res.status, (await res.text()).slice(0, 500)); process.exit(1); }
+  raw.push(...(await res.json()).results.bindings);
+  await new Promise((r) => setTimeout(r, 1500));
+}
 
 // One row per domain. The item whose website is exactly the domain wins; owners of that item are
 // joined. Labels that are bare Q-ids (no English label) are dropped.
@@ -45,15 +58,16 @@ const byDomain = new Map();
 for (const b of raw) {
   let host;
   try { host = new URL(b.site.value).hostname.replace(/^www\./, "").toLowerCase(); } catch { continue; }
-  const owner = b.ownerLabel.value;
+  const owner = b.ownerLabel.value, via = b.via.value, rank = VIA.findIndex(([, v]) => v === via);
   if (/^Q\d+$/.test(owner) || /^Q\d+$/.test(b.itemLabel.value)) continue;
-  const row = byDomain.get(host) || { name: b.itemLabel.value, domain: host, item: b.item.value, owners: new Map(), x: b.xuser ? b.xuser.value.toLowerCase() : null };
+  const row = byDomain.get(host) || { name: b.itemLabel.value, domain: host, item: b.item.value, owners: new Map(), rank, x: b.xuser ? b.xuser.value.toLowerCase() : null };
   if (row.item !== b.item.value) continue;   // keep the first item seen for the domain
-  row.owners.set(owner, b.owner.value);
+  if (rank < row.rank) { row.owners = new Map(); row.rank = rank; }   // an owner statement beats a parent or publisher
+  if (rank === row.rank) row.owners.set(owner, b.owner.value);
   byDomain.set(host, row);
 }
 const rows = [...byDomain.values()].map((r) => ({
-  name: r.name, domain: r.domain, owner: [...r.owners.keys()].join("; "), source: r.item, ...(r.x ? { x: r.x } : {}),
+  name: r.name, domain: r.domain, owner: [...r.owners.keys()].join("; "), source: r.item, ...(r.rank ? { via: VIA[r.rank][1] } : {}), ...(r.x ? { x: r.x } : {}),
 })).sort((a, b) => a.domain.localeCompare(b.domain));
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");

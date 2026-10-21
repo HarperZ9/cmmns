@@ -63,3 +63,22 @@ Checked in the author's signed-in Chrome by reading page structure only, with th
 | 19 | Feed mode on x.com/home | pass with one defect fixed in #11: the window opens beside X's hover card; it said "this thread" on a feed. No long tasks in 30 s of scrolling; frame rate not measurable in a background tab |
 | 16 | YouTube funding panel | partial: CGTN and Al Jazeera English videos carry YouTube's funding text in the page, but those videos showed 0 comments, so Radar drew nothing; fixed in #12 (video context without comments). Radar on a video with comments: panel "Radar · 20" renders |
 | 1a, 21 | Reddit | open: the browser tool is blocked on reddit.com; needs the author's check |
+
+## Threads, Mastodon, TikTok (stream 6, 2026-10-21)
+Checked in the author's Chrome by reading page structure only, signed out on each site, with the
+extension not installed. Nothing was posted, liked, followed or messaged; no private messaging
+panel opened. Fixtures are synthetic (`tests/fixtures/reach.html`), and the fixture adapters were
+checked in a local page on 2026-10-21 (all six posts read on each site, badges and thread panel
+drawn, touch mode tested at 375 px).
+
+| # | Check | How | Status |
+|---|---|---|---|
+| 34 | Threads post page: each post is a `[data-pressable-container]` box with `<time>` inside its permalink `/@user/post/<code>`; body in a `span[dir="auto"]` outside links; first box is the post, the rest replies | Open a public post (threads.net redirects to threads.com) | pass 2026-10-21: 24 boxes on a public post, every one with a permalink time and an author link; the body is the longest plain span |
+| 35 | Threads data in the page's own requests | Resource list | 2026-10-21: one `/api/graphql` endpoint for everything; Radar reads the rendered page and copies no response |
+| 36 | Mastodon 4.x: `.status[data-id]`, `a.status__relative-time` to `/@acct/<id>` around `<time>`, `.status__content__text` | fosstodon.org explore page | pass 2026-10-21: remote authors as `/@user@host/<id>` |
+| 37 | Mastodon 5.0 (alpha on mastodon.social): `article._comp_status__root[data-id]`, `a._comp_status_header__date` to `/@acct/<id>` around `<time>`, `._comp_status_content__text` | A public thread on mastodon.social | pass 2026-10-21: 45 statuses in the thread; ancestors, the focused post (`data-variant="page"`), then replies |
+| 38 | Mastodon detection: `#mastodon` root element and `#initial-state` JSON with `meta.version` and `meta.domain` | Both servers | pass 2026-10-21. The probe reads only version and domain; the same JSON also holds the signed-in viewer's access token, which Radar never reads |
+| 39 | Mastodon thread request `/api/v1/statuses/<id>/context` and `/api/v1/statuses/<id>` (Account `created_at`, `bot`, counts) | Resource list on a thread | partial 2026-10-21: the requests were seen; the response bodies were not read. Fields follow Mastodon's public API documentation |
+| 40 | Permission flow: popup offer, browser prompt, scripts registered for that server only, removal in options | Install the build; open a Mastodon server; click the toolbar button | open (author check after reload) |
+| 41 | TikTok comments: `data-e2e="comment-level-1"`, `comment-username-1`; comment list request `/api/comment/list/` | Open a video's comments | blocked 2026-10-21: signed out, TikTok showed a log-in dialog and then a "Create username" sign-up step before any comment loaded. The check stopped there and created nothing. The adapter follows TikTok's public data-e2e attributes and needs the author's check in a signed-in browser |
+| 42 | Firefox for Android: install from file, tap a post's Radar button, popup as a page, a Mastodon server prompt | Steps in `project-docs/ANDROID.md` | open (needs a phone or emulator) |

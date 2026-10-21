@@ -97,3 +97,25 @@ test("on a feed the comparison speaks of the page, not a thread", () => {
   assert.match(text, /median on this page/);
   assert.doesNotMatch(text, /thread/);
 });
+
+test("a persuasion technique is an info-level language entry with its words, definition, limit and measurement", () => {
+  const persuasion = PB.persuasion("What a disgusting smear.", ["loaded-language"]);
+  const sig = PBSignals.all({ site: X, handle: "a", markers: [], machine: {}, flags: [], persuasion });
+  const s = sig.find((x) => x.fam === "loaded-language");
+  assert.equal(s.label, "persuasion: loaded language");
+  assert.equal(s.level, "info");
+  assert.equal(s.cat, "language");
+  const rows = Object.fromEntries(s.rows);
+  assert.equal(rows["In this post"], "\"disgusting\"");
+  assert.match(rows["What it is"], /emotional charge/);
+  assert.equal(rows["Does not prove"], "A technique can carry a true claim; it describes how the post argues.");
+  assert.match(rows.Measured, /precision \d+% \(95% interval \d+ to \d+%\)/);
+});
+
+test("a persuasion entry never becomes an account flag", () => {
+  const persuasion = PB.persuasion("Everyone knows it, before it's too late.", ["bandwagon", "appeal-to-fear"]);
+  assert.equal(persuasion.length, 2);
+  assert.equal(PB.isFlagged([]), false);
+  const sig = PBSignals.all({ site: X, handle: "a", markers: [], machine: {}, flags: [], persuasion });
+  assert.ok(sig.filter((x) => x.fam === "bandwagon" || x.fam === "appeal-to-fear").every((x) => x.level === "info" && x.cat === "language"));
+});

@@ -87,3 +87,20 @@ export function upstream(items, tweets, log) {
   const rank = (m) => [...m].map(([k, n]) => ({ k, n })).filter((x) => x.n >= 2).sort((a, b) => b.n - a.n).slice(0, 5);
   return { accounts: rank(acc).map((x) => ({ handle: x.k, n: x.n })), domains: rank(dom).map((x) => ({ domain: x.k, n: x.n })), uploads, recycled };
 }
+
+// "First seen" for each piece of media on a post: the earliest post Radar has seen carrying the same
+// upload (same media id, so the same file X stores), and the post X credits it to ("From @account").
+// The earliest of the two leads. Radar sees only what the user viewed; X's upload time comes from
+// the media id. [{ type, uploaded, from, seen, first }], where first is { handle, at, id, how }.
+export function firstSeen(t, tweets, log) {
+  const table = (log && log.media) || {};
+  return ((t && t.media) || []).map((m) => {
+    const from = m.fromPost ? { id: m.fromPost, at: m.fromPostTime || null, handle: (tweets.get(m.fromPost) || {}).author || null } : null;
+    const s = m.url && table[m.url];
+    const seen = s && s.posts.length ? { ...s.posts[0], posts: s.posts.length, accounts: new Set(s.posts.map((p) => p.handle)).size } : null;
+    const cands = [from && { ...from, how: "from" }, seen && { id: seen.id, handle: seen.handle, at: seen.at, how: "seen" }].filter((c) => c && c.at);
+    cands.sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+    const first = cands[0] || (from && { ...from, how: "from" }) || null;
+    return { type: m.type, url: m.url || null, uploaded: m.uploaded || null, from, seen, first: first && first.id === t.id ? { ...first, isThis: true } : first };
+  });
+}

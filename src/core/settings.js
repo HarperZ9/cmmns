@@ -5,7 +5,13 @@
 export const SETTINGS_KEY = "pb.settings";
 
 // Sites Radar has an adapter for. A site added later starts on unless the user switches it off.
-export const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"]];
+export const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"], ["threads", "Threads"],
+  ["mastodon", "Mastodon"], ["tiktok", "TikTok"]];
+
+// Search engines where Radar can show site cards on result links. Each is off until the user turns
+// it on in the options page, which asks the browser for access to that engine's result pages.
+// [id, name, result-page matches, origin the browser grants]
+export const SEARCH_ENGINES = [["google", "Google", ["https://www.google.com/search*"], "https://www.google.com/*"], ["bing", "Bing", ["https://www.bing.com/search*"], "https://www.bing.com/*"], ["duckduckgo", "DuckDuckGo", ["https://duckduckgo.com/*"], "https://duckduckgo.com/*"]];
 
 // The areas of the window's strip; each can be hidden from the window.
 export const AREA_IDS = ["place", "account", "posting", "coordination", "language", "sources", "media"];
@@ -17,6 +23,9 @@ export const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1
 export const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
   historyDays: 60, aboutDays: 14, calm: false, large: false, onboarded: false,
+  // Other coverage (src/core/coverage.js): off until the user turns it on; coverageConsent is set
+  // when the user has read what it sends and clicked to send.
+  search: {}, coverage: false, coverageConsent: false,
 });
 
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
@@ -34,6 +43,8 @@ export function normalizeSettings(raw) {
     historyDays: days(s.historyDays, DEFAULTS.historyDays, RETENTION.historyDays),
     aboutDays: days(s.aboutDays, DEFAULTS.aboutDays, RETENTION.aboutDays),
     calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
+    search: switches(s.search, SEARCH_ENGINES.map(([id]) => id)), coverage: bool(s.coverage, DEFAULTS.coverage),
+    coverageConsent: bool(s.coverage, false) && bool(s.coverageConsent, false),
   };
 }
 
@@ -44,6 +55,7 @@ export function siteOn(s, id) {
 }
 
 export const areaOn = (s, area) => s.areas[area] !== false;
+export const searchOn = (s, id) => !s.paused && s.search[id] === true;
 
 // The toolbar icon: paused when Radar is paused or off for this site, reading while it is reading
 // accounts, idle otherwise.
@@ -63,8 +75,15 @@ export function pruneStore(store, settings, now = Date.now()) {
   const out = {};
   const H = store["pb.history.v1"];
   if (H) { const k = keepMap(H, "at", hist); if (size(k) !== size(H)) out["pb.history.v1"] = k; }
-  const N = store["pb.net.v1"];
-  if (N && N.threads) { const k = keepMap(N.threads, "at", hist); if (size(k) !== size(N.threads)) out["pb.net.v1"] = { ...N, threads: k }; }
+  // The connections log moved to v2 (threads keyed by post id); v1 is pruned until it empties.
+  for (const key of ["pb.net.v1", "pb.net.v2"]) {
+    const N = store[key];
+    if (N && N.threads) { const k = keepMap(N.threads, "at", hist); if (size(k) !== size(N.threads)) out[key] = { ...N, threads: k }; }
+  }
+  const F = store["pb.feed.v1"];
+  if (F) { const k = keepMap(F, "at", hist); if (size(k) !== size(F)) out["pb.feed.v1"] = k; }
+  const M = store["pb.media.v1"];
+  if (M) { const k = keepMap(M, "at", hist); if (size(k) !== size(M)) out["pb.media.v1"] = k; }
   const T = store["pb.trail.v1"];
   if (T) {
     const media = keepMap(T.media, "seen", hist), links = keepMap(T.links, "seen", hist);
@@ -77,7 +96,10 @@ export function pruneStore(store, settings, now = Date.now()) {
   return out;
 }
 
-export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
+export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.media.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
-// "Clear all Radar data": every Radar key except the settings themselves.
-export const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && k !== SETTINGS_KEY);
+// "Clear all Radar data": every Radar key except the settings themselves. The Mastodon servers the
+// user turned on (pb.instances.v1) are settings too, removed in the options page with their access.
+// The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
+const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1"]);
+export const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));

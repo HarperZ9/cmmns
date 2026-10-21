@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Radar",
-  "version": "1.0.0",
-  "description": "Evidence on social media replies: where an account is labelled as based, signs of coordination, and a thread report. Nothing leaves your browser.",
+  "version": "2.0.0",
+  "description": "Free, no account, nothing leaves your browser unless you opt in. Sourced evidence on posts and links, each sign with its error rate.",
   "icons": {
     "16": "icons/radar-16.png",
     "32": "icons/radar-32.png",
@@ -10,7 +10,9 @@
     "128": "icons/radar-128.png"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "scripting",
+    "activeTab"
   ],
   "host_permissions": [
     "https://x.com/*",
@@ -19,13 +21,18 @@
     "https://www.youtube.com/*",
     "https://www.facebook.com/*",
     "https://www.instagram.com/*",
-    "https://bsky.app/*"
+    "https://bsky.app/*",
+    "https://www.threads.com/*",
+    "https://www.threads.net/*",
+    "https://www.tiktok.com/*"
   ],
   "background": {
     "service_worker": "background.js",
     "scripts": [
       "core.bundle.js",
       "lifecycle.js",
+      "instances.js",
+      "sources-bg.js",
       "background.js"
     ]
   },
@@ -63,22 +70,42 @@
     },
     {
       "matches": [
+        "https://www.tiktok.com/*"
+      ],
+      "js": [
+        "fedisniff.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
         "https://x.com/*",
         "https://twitter.com/*",
         "https://www.reddit.com/*",
         "https://www.youtube.com/*",
         "https://www.facebook.com/*",
         "https://www.instagram.com/*",
-        "https://bsky.app/*"
+        "https://bsky.app/*",
+        "https://www.threads.com/*",
+        "https://www.threads.net/*",
+        "https://www.tiktok.com/*"
       ],
       "js": [
         "core.bundle.js",
         "settings.js",
+        "fonts.js",
         "store.js",
+        "feedback.js",
         "meta.js",
         "about-page.js",
+        "platforms-reach.js",
         "platforms.js",
+        "tour.js",
         "pop.js",
+        "media.js",
+        "mediacard.js",
+        "linkcard.js",
         "signals.js",
         "card.js",
         "panel.js",
@@ -96,8 +123,19 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "radar@local",
+      "id": "radar@harperz9.github.io",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ],
+        "optional": [
+          "websiteContent"
+        ]
+      },
       "strict_min_version": "121.0"
+    },
+    "gecko_android": {
+      "strict_min_version": "128.0"
     }
   },
   "action": {
@@ -111,5 +149,8 @@
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
-  }
+  },
+  "optional_host_permissions": [
+    "https://*/*"
+  ]
 }

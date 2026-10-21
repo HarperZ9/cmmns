@@ -4,13 +4,6 @@
 (() => {
   "use strict";
   const num = (x) => (x == null ? null : Number(x).toLocaleString());
-  const day = (iso) => (iso ? iso.slice(0, 10) : "unknown");
-  const SEARCH = [
-    ["Google Lens", (u) => "https://lens.google.com/uploadbyurl?url=" + encodeURIComponent(u)],
-    ["TinEye", (u) => "https://tineye.com/search?url=" + encodeURIComponent(u)],
-    ["Bing", (u) => "https://www.bing.com/images/search?view=detailv2&iss=sbi&q=imgurl:" + encodeURIComponent(u)],
-    ["Yandex", (u) => "https://yandex.com/images/search?rpt=imageview&url=" + encodeURIComponent(u)],
-  ];
 
   function where(m) {
     const R = m.reading || {}, A = m.activity;
@@ -66,10 +59,6 @@
       ["Views · likes · reposts", T.views != null ? [T.views, T.likes, T.reposts].map((x) => num(x) || "?").join(" · ") : (Y.likes ? `${Y.likes} likes` : null)],
       ["Edited", T.edits ? `${T.edits} time${T.edits === 1 ? "" : "s"}` : null],
     ];
-    (T.media || []).forEach((x, i) => {
-      rows.push([`${(T.media.length > 1 ? `Media ${i + 1}` : "Media")}: ${x.type === "photo" ? "image" : x.type}`, `first uploaded ${day(x.uploaded)}` + (x.fromPost ? `, taken from a post of ${day(x.fromPostTime)}` : "")]);
-      if (x.url) rows.push(["Find earlier copies", { links: SEARCH.map(([label, f]) => [label, f(x.url)]) }]);
-    });
     return rows;
   }
 
@@ -142,13 +131,14 @@
   function sections(m, signals, onLookup) {
     const owner = PB.ownerOfHandle(m.handle);
     const head = [
-      ["Owned by", owner ? `${owner.owner} (Wikidata)` : null],
+      [PB.ownerHeading(owner), owner ? `${owner.owner} (Wikidata)` : null],
       ["Profile", m.profile ? { links: [[m.profile.replace(/^https?:\/\/(www\.)?/, ""), m.profile]] } : null],
     ];
     if (m.site && m.site.hasLocation && !(m.reading && (m.reading.aboutRead || m.reading.basedIn)) && onLookup) {
       head.push(["About this account", m.lookingUp ? { note: "Reading…" } : { action: [m.failed ? "Try again" : "Read it now", () => onLookup(m.handle), "Reading…"] }]);
     }
     // Overview: the evidence grouped by area, in the strip's order.
+    const media = globalThis.PBMediaCard ? PBMediaCard.rows(m) : [];
     const groups = PBSignals.AREAS.map(([id, name]) => ({ tab: "overview", area: id, title: name, signals: signals.filter((x) => x.cat === id) })).filter((g) => g.signals.length);
     return [
       { tab: "overview", rows: head },
@@ -158,6 +148,7 @@
       { tab: "account", title: "Account", rows: account(m) },
       { tab: "account", title: "How it posts", rows: posting(m), foot: (m.reading || {}).pattern ? "From the posts X loaded for this account in your browser, not its whole history." : null },
       { tab: "post", title: "This post", rows: post(m) },
+      { tab: "post", title: "Media", rows: media, foot: media.length ? "Most platforms strip Content Credentials and other metadata on upload, so a missing credential is the usual case and says nothing either way." : null },
       { tab: "post", title: "Source trail", rows: trail(m), foot: m.trail && (m.trail.steps.length || m.trail.media.length) ? "Followed through pointers X records: quotes, reposts, lifted media and upload ids. It stops at the first upload." : null },
       { tab: "history", title: "In your history", rows: history(m) },
       { tab: "history", foot: "Radar does not show or guess demographics. Data stays in this browser." },
