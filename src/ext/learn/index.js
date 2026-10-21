@@ -28,7 +28,7 @@ export const GROUPS = [
   ["Sources", ["community-note", "fact-check", "ad", "state-link", "owner", "site-record", "client"]],
   ["Place", ["mismatch", "written-in", "store-elsewhere", "flag-elsewhere", "profile-location-elsewhere", "hours-elsewhere"]],
   ["Posting", ["fast-replier", "automation-app", "no-sleep-gap", "repost-only", "high-volume"]],
-  ["Account", ["new-account", "name-changes", "default-handle", "follow-pattern", "low-karma"]],
+  ["Account", ["new-account", "name-changes", "default-handle", "follow-pattern", "low-karma", "brand-lookalike"]],
   ["The thread", ["thread-report"]],
 ];
 

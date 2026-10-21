@@ -19,7 +19,7 @@
     "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere",
     "high-volume": "very high post rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute",
     "copied-elsewhere": "same words in other threads", "low-karma": "low karma for its age", "automation-app": "posts through an automation app", "no-sleep-gap": "posts around the clock", "repost-only": "almost only reposts", "follow-pattern": "follows many, few follow back",
-    "platform-label": "moderation label",
+    "platform-label": "moderation label", "brand-lookalike": "name borrows a brand",
   };
   const WEAK = new Set(["default-handle", "follow-pattern"]);
   // The areas the window's summary strip shows, in order, and which area each account flag is in.
@@ -36,6 +36,11 @@
     const out = [];
     for (const mk of (m.markers || []).filter((x) => STRONG[x.family])) {
       out.push({ label: STRONG[mk.family], fam: mk.family, lang: mk.lang, level: "warn", cat: "language", rows: [["In this post", `"${mk.match}"`], ["What it is", MEANING[mk.family]], ...(mk.lang ? [["Language", PB.langLine(mk.lang)]] : []), dnp("Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.")] });
+    }
+    // Named conspiracy theories (src/core/theories.js): info level, sourced, not measured yet.
+    for (const mk of (m.markers || []).filter((x) => x.family === "conspiracy-theory")) {
+      const t = PB.theoryById(mk.theory);
+      if (t) out.push({ label: `names a theory: ${t.name}`, fam: "conspiracy-theory", level: "info", cat: "language", rows: [["In this post", `"${mk.match}"`], ["The theory", t.claim], ["What the record shows", t.record], ["Sources", { links: t.sources.map((x) => [`${x.title.split(", ")[0]} (${x.date})`, x.url]) }], dnp(`${t.dnp} ${PB.THEORY_DOES_NOT_PROVE}`)] });
     }
     // Persuasion techniques: how the post argues. Info level, and never an account flag.
     for (const t of m.persuasion || []) {

@@ -229,6 +229,158 @@ function foldConfusables(text) {
 return { MIN_LATIN_WORDS, foldConfusables };
 })();
 
+// ---- brands.js
+const M_brands = (() => {
+// Brand look-alike accounts: a display name or handle that borrows a platform's or a major
+// outlet's brand ("X Global", "BBC Breaking") on an account that is not one of that brand's own.
+// Weak flag tier: context, never a verdict, and alone it never counts toward "flagged".
+//
+// The brand list is curated. Each entry names its Wikidata item, and `handles` are the X usernames
+// that item lists (Wikidata property P2002, queried 2026-10-21). That list is incomplete, so the
+// platform's own data comes first: X's affiliation badge for the brand, an organisation or
+// government check, or X's parody, commentary or fan label each clear the flag.
+//
+// A name only counts when it carries the brand plus a word that makes it read as the brand's own
+// voice ("breaking", "live", "support", "official"), or is the brand name alone. Fans, critics and
+// archive accounts that say so ("fan", "parody", "not affiliated") are left alone.
+
+const { TO_LATIN } = M_confusables_data;
+
+const W = (q) => `https://www.wikidata.org/wiki/${q}`;
+const P = "platform", O = "outlet";
+// [name shown in the evidence, kind, Wikidata item, names the brand goes by, X usernames from Wikidata]
+const RAW = [
+  ["X", P, "Q918", ["X", "Twitter"], ["X"]],
+  ["YouTube", P, "Q866", ["YouTube"], ["YouTube"]],
+  ["Meta", P, "Q380", ["Meta"], ["Meta"]],
+  ["Facebook", P, "Q355", ["Facebook"], ["FacebookApp"]],
+  ["Instagram", P, "Q209330", ["Instagram"], ["instagram"]],
+  ["Threads", P, "Q120281745", ["Threads"], []],
+  ["TikTok", P, "Q48938223", ["TikTok"], ["tiktok_us"]],
+  ["Bluesky", P, "Q78194383", ["Bluesky"], ["bluesky"]],
+  ["Reddit", P, "Q1136", ["Reddit"], ["reddit", "Reddit_UK"]],
+  ["Google", P, "Q95", ["Google"], ["Google", "GoogleUK", "GoogleIndia", "NewsFromGoogle"]],
+  ["BBC News", O, "Q1160945", ["BBC News", "BBC"], ["BBCNews", "BBCBreaking", "BBCAfrica", "bbcchinese", "BBCNewsEnts", "bbcnewsjapan", "BBCSomali"]],
+  ["BBC World News", O, "Q208491", ["BBC World", "BBC World News"], ["BBCWorld"]],
+  ["CNN", O, "Q48340", ["CNN"], ["CNN", "cnni", "cnnbrk", "CNNOriginals", "CNNPolitics", "CNNPR", "cnnweather"]],
+  ["Reuters", O, "Q130879", ["Reuters"], ["Reuters", "reuters_russia", "reutersbiz", "ReutersIndia", "ReutersIran", "ReutersJapan", "ReutersLegal", "reuterspictures", "ReutersScience", "ReutersUK", "ReutersWorld"]],
+  ["Associated Press", O, "Q40469", ["Associated Press", "AP News", "AP"], ["AP"]],
+  ["AFP", O, "Q40464", ["AFP", "Agence France-Presse", "AFP News"], ["AFP", "AFPar", "afpbbcom", "AFPde", "AFPespanol", "afpfr"]],
+  ["Fox News", O, "Q186068", ["Fox News"], ["FoxNews", "foxheadlines", "foxnewsalert", "FoxNewsOpinion", "foxnewspolitics", "foxnewsvideo"]],
+  ["NBC News", O, "Q2877626", ["NBC News"], ["NBCNews", "BreakingNews", "NBCNewsHealth", "NBCNewsTech"]],
+  ["ABC News (US)", O, "Q287171", ["ABC News"], ["ABC"]],
+  ["ABC News (Australia)", O, "Q4650197", ["ABC News"], ["abcnews"]],
+  ["MS NOW (MSNBC)", O, "Q13973", ["MS NOW", "MSNBC"], []],
+  ["NPR", O, "Q671510", ["NPR"], ["NPR", "nprpolitics", "NPRHealth", "nprmusic", "nprbooks"]],
+  ["The New York Times", O, "Q9684", ["The New York Times", "New York Times", "NYT"], ["nytimes", "nytimesworld", "nytpolitics", "nytopinion", "NYTScience", "nytvideo", "nytgraphics"]],
+  ["The Washington Post", O, "Q166032", ["The Washington Post", "Washington Post"], ["washingtonpost", "PostGraphics", "capitalweather"]],
+  ["The Wall Street Journal", O, "Q164746", ["The Wall Street Journal", "Wall Street Journal", "WSJ"], ["WSJ"]],
+  ["The Guardian", O, "Q11148", ["The Guardian"], ["guardian"]],
+  ["Bloomberg News", O, "Q14270642", ["Bloomberg News", "Bloomberg"], []],
+  ["Al Jazeera", O, "Q13477", ["Al Jazeera"], ["aljazeera", "AJABreaking", "AJArabic"]],
+  ["Sky News", O, "Q217228", ["Sky News"], ["SkyNews", "SkyNewsBreak"]],
+  ["Newsmax", O, "Q27037115", ["Newsmax"], ["NEWSMAX"]],
+  ["Breitbart News", O, "Q4960434", ["Breitbart News", "Breitbart"], ["BreitbartNews", "BreitbartLondon"]],
+  ["The Daily Wire", O, "Q25094513", ["The Daily Wire", "Daily Wire"], ["realDailyWire"]],
+  ["HuffPost", O, "Q18049522", ["HuffPost"], ["HuffPost", "HuffPostPol", "HuffPostUK"]],
+  ["Daily Mail", O, "Q210534", ["Daily Mail", "MailOnline"], ["MailOnline"]],
+  ["USA Today", O, "Q39681", ["USA Today"], ["USATODAY"]],
+  ["Politico", O, "Q3109740", ["Politico"], ["politico", "POLITICOMag"]],
+  ["Axios", O, "Q28230873", ["Axios"], ["axios"]],
+  ["Financial Times", O, "Q183399", ["Financial Times"], ["FT", "FinancialTimes"]],
+  ["The Economist", O, "Q180089", ["The Economist"], ["TheEconomist"]],
+  ["Deutsche Welle", O, "Q153770", ["Deutsche Welle", "DW News"], ["DeutscheWelle", "dw_europe"]],
+  ["Le Monde", O, "Q12461", ["Le Monde"], ["lemondefr"]],
+  ["Der Spiegel", O, "Q131478", ["Der Spiegel"], ["derspiegel", "SPIEGEL_EIL"]],
+];
+
+const LATIN = (() => { const a = [...TO_LATIN], m = new Map(); for (let i = 0; i + 1 < a.length; i += 2) m.set(a[i], a[i + 1]); return m; })();
+// Styled letters ("𝕏", fullwidth) become plain, then a Cyrillic or Greek word made only of Latin
+// look-alikes becomes Latin when the name also has a Latin word ("ВВС Breaking"), then single
+// letters in a row join ("B B C" reads "bbc").
+function nameTokens(text) {
+  const s = String(text || "").normalize("NFKC");
+  let words = s.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  if (words.some((w) => /^[A-Za-z0-9]+$/.test(w))) {
+    words = words.map((w) => ([...w].every((c) => /[A-Za-z0-9]/.test(c) || LATIN.has(c)) ? [...w].map((c) => LATIN.get(c) || c).join("") : w));
+  }
+  const out = [];
+  for (const w of words.map((x) => x.toLowerCase())) {
+    if (w.length === 1 && out.length && out[out.length - 1].single) out[out.length - 1].t += w;
+    else out.push({ t: w, single: w.length === 1 });
+  }
+  return out.map((x) => x.t);
+}
+
+const BRANDS = RAW.map(([name, kind, q, names, handles]) => ({ name, kind, source: W(q), names, handles,
+  nameTokens: names.map(nameTokens), keys: names.map((n) => nameTokens(n).join("")).filter((k) => k.length >= 3) }));
+
+const CUES = {
+  outlet: ["breaking", "news", "live", "alert", "alerts", "update", "updates", "official", "world", "global", "hq", "now", "24", "247", "24h", "24x7", "flash", "report", "reports", "headlines"],
+  platform: ["support", "help", "helpdesk", "safety", "security", "official", "global", "team", "verified", "verification", "admin", "hq", "appeals", "copyright", "care", "center", "centre", "trust", "moderation", "premium", "service"],
+};
+const LONG_CUES = { outlet: CUES.outlet.filter((c) => c.length >= 5), platform: CUES.platform.filter((c) => c.length >= 5) };
+// Accounts that say what they are. "notaffiliated" covers "not affiliated" once spaces go.
+const SAYS_UNOFFICIAL = /\b(?:fan|fans|parody|satire|unofficial|critic|critics|commentary)\b|not\s*affiliated/i;
+const ORG_CHECK = new Set(["Business", "Government"]);
+
+const BRAND_DOES_NOT_PROVE = "Fans, critics, reporters and local partners put outlet and platform names in their profiles, and the list of official accounts Radar checks against is incomplete. A brand in a name does not show who runs the account or that anyone meant to deceive.";
+
+const at = (hay, needle) => { for (let i = 0; i + needle.length <= hay.length; i++) if (needle.every((t, j) => hay[i + j] === t)) return i; return -1; };
+
+// The brand a display name borrows, as { brand, matched } or null.
+function displayMatch(tokens) {
+  let best = null;
+  for (const b of BRANDS) {
+    b.nameTokens.forEach((nt, i) => {
+      const k = at(tokens, nt);
+      if (k < 0) return;
+      const rest = [...tokens.slice(0, k), ...tokens.slice(k + nt.length)];
+      const alone = rest.length === 0 && nt.join("").length >= 4;
+      if (!alone && !rest.some((t) => CUES[b.kind].includes(t))) return;
+      if (!best || nt.length > best.len) best = { brand: b, matched: b.names[i], len: nt.length };
+    });
+  }
+  return best;
+}
+
+// The brand a handle borrows: it starts with a brand name and the rest is digits or a cue word.
+function handleMatch(handle) {
+  const h = String(handle || "").toLowerCase();
+  for (const b of BRANDS) for (const key of [...b.keys, ...b.handles.map((x) => x.toLowerCase()).filter((x) => x.length >= 3)]) {
+    if (!h.startsWith(key) || h === key) continue;
+    const rest = h.slice(key.length), parts = rest.split("_").filter(Boolean);
+    if (/^[_\d]+$/.test(rest) || parts.some((p) => CUES[b.kind].includes(p)) || LONG_CUES[b.kind].some((c) => rest.includes(c))) return { brand: b, matched: key };
+  }
+  return null;
+}
+
+// account: { handle, display, affiliate?, verifiedType?, xLabel? }. Returns
+// { brand, kind, where, evidence, source } or null.
+function brandLookalike(account) {
+  const handle = String(account.handle || ""), display = String(account.display || "");
+  if (/parody|commentary|fan/i.test(account.xLabel || "") || ORG_CHECK.has(account.verifiedType)) return null;
+  if (SAYS_UNOFFICIAL.test(`${display} ${handle.replace(/_/g, " ")}`)) return null;
+  const d = displayMatch(nameTokens(display));
+  const m = d || handleMatch(handle);
+  if (!m) return null;
+  // Every brand that goes by the matched name ("ABC News" is two outlets) shares the check.
+  const same = BRANDS.filter((b) => b === m.brand || b.names.some((n) => m.brand.names.includes(n)));
+  const own = new Set(same.flatMap((b) => b.handles.map((x) => x.toLowerCase())));
+  if (own.has(handle.toLowerCase())) return null;
+  if (account.affiliate) {
+    const aff = nameTokens(account.affiliate), affKey = aff.join("");
+    if (own.has(affKey) || same.some((b) => b.nameTokens.some((nt) => at(aff, nt) >= 0))) return null;
+  }
+  const where = d ? `display name "${display.slice(0, 50)}"` : `handle @${handle}`;
+  const who = d ? `; @${handle} is not` : " and is not";
+  const evidence = `${where} uses the ${m.brand.name} brand${who} among the ${m.brand.name} accounts Wikidata lists, and the page shows no ${m.brand.name} affiliation badge or organisation check`;
+  return { brand: m.brand.name, kind: m.brand.kind, where: d ? "display" : "handle", evidence, source: m.brand.source };
+}
+
+return { nameTokens, BRANDS, BRAND_DOES_NOT_PROVE, brandLookalike };
+})();
+
 // ---- similarity.js
 const M_similarity = (() => {
 // Near-duplicate replies across different accounts. Copied or templated text posted by many
@@ -534,6 +686,7 @@ const M_flags = (() => {
 
 const { parseLabel } = M_places;
 const { LOW_KARMA } = M_reddit;
+const { brandLookalike, BRAND_DOES_NOT_PROVE } = M_brands;
 
 const NEW_ACCOUNT_DAYS = 30;
 const MANY_NAME_CHANGES = 3;
@@ -574,6 +727,7 @@ const DOES_NOT_PROVE = {
   "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
   "platform-label": "A moderation label is the service's own judgement; labels can be wrong, disputed or applied in bulk.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
+  "brand-lookalike": BRAND_DOES_NOT_PROVE,
 };
 
 function ageDays(joinDate, now = Date.now()) {
@@ -655,6 +809,10 @@ function flagsFor(account, context = {}) {
   const name = `${account.display || ""} ${account.handle || ""}`;
   const sym = HATE_NAME.exec(name);
   if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
+  // A name that borrows a platform's or an outlet's brand (src/core/brands.js). Only where the site
+  // gives the handle the brand list is keyed on (X), so the caller sets brandCheck.
+  const brand = account.brandCheck ? brandLookalike(account) : null;
+  if (brand) out.push({ id: "brand-lookalike", evidence: brand.evidence, source: brand.source });
   // Reddit: little karma after more than a month, and Reddit's suggested sign-up name.
   if (Number.isFinite(account.karma) && age != null && age > NEW_ACCOUNT_DAYS && account.karma < LOW_KARMA) out.push({ id: "low-karma", evidence: `${account.karma} karma after ${age} days` });
   // Bluesky: moderation labels about how an account behaves, not what it says.
@@ -679,7 +837,7 @@ function flagsFor(account, context = {}) {
 // report circular.
 const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name", "follow-pattern"]);
 const WEAK_FLAGS = new Set(["store-elsewhere", "profile-location-elsewhere", "flag-elsewhere", "hours-elsewhere",
-  "fast-replier", "repost-only", "low-karma"]);
+  "fast-replier", "repost-only", "low-karma", "brand-lookalike"]);
 function isFlagged(flags) {
   const counted = flags.filter((f) => !NOT_AUTHENTICITY.has(f.id));
   if (counted.some((f) => !WEAK_FLAGS.has(f.id))) return true;
@@ -2071,6 +2229,144 @@ function scoreHi(hit, have) {
 return { prepHi, RE_HI, NEGATION_HI, scoreHi };
 })();
 
+// ---- theories.js
+const M_theories = (() => {
+// Named conspiracy theories: an extension of the conspiracy family in rhetoric.js. The conspiracy
+// family finds framing ("wake up", "false flag"); this file finds a documented theory by name or by
+// its stock claim ("chemtrails", "the 2020 election was stolen"), so the window can say which
+// theory it is, what the record shows, and where that record comes from.
+//
+// Theories come from every direction. Survey work finds that people on the left and the right
+// endorse conspiracy claims at similar rates when the content is held constant (Enders et al.
+// 2023), so election and staged-event claims are matched both ways and tests/theories.symmetry.test.js
+// pairs each claim with its other-side twin. Political side is never an input here.
+//
+// Not measured: no corpus with conspiracy labels and a usable licence was found (see
+// project-docs/EVALUATION.md). Until one is, these markers carry weight 0 and never count toward
+// the thread report's "extreme".
+
+const { GROUPS } = M_lexicon;
+
+const S = (title, url, date) => ({ title, url, date });
+const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
+const AP_QANON = S("AP, QAnon's 'Save the Children' morphs into popular slogan", "https://www.wsls.com/news/politics/2020/10/28/qanons-save-the-children-morphs-into-popular-slogan/", "2020-10-28");
+const NAMING = "People quote, mock and argue against these claims, and Radar skips only obvious debunking.";
+
+const THEORY_DOES_NOT_PROVE = `Naming a theory is not believing it. ${NAMING} This describes the post, not who wrote it or why, and a post that names a theory can still contain true statements.`;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const G = GROUPS.map(esc).sort((a, b) => b.length - a.length).join("|");
+const YEAR = "(?:(?:19|20)\\d\\d\\s+)?";
+
+const THEORIES = [
+  { id: "qanon", name: "QAnon", terms: ["wwg1wga", "where we go one we go all", "q sent me", "q drops", "qanon was right", "qanon is right"],
+    claim: "A secret cabal of elites runs the world and an insider called Q leaks its coming downfall.",
+    record: "None of Q's dated predictions came true. ADL and ISD document the movement and its slogans.",
+    sources: [S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022"), S("ISD, QAnon explainer", "https://www.isdglobal.org/explainers/qanon/", "2023"), AP_QANON],
+    dnp: "QAnon slogans are also quoted by reporters, researchers and former followers." },
+  { id: "adrenochrome", name: "Adrenochrome harvesting", terms: ["adrenochrome", "adrenochrome harvesting", "harvesting adrenochrome"],
+    claim: "Celebrities and elites traffic children to harvest a drug from their blood.",
+    record: "Adrenochrome is an ordinary oxidation product of adrenaline with no such use. AP reported the claim as baseless.",
+    sources: [AP_QANON, S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022")],
+    dnp: "The word also appears in chemistry, in fiction and in posts mocking the claim." },
+  { id: "satanic-abuse", name: "Satanic ritual abuse network", terms: ["satanic ritual abuse", "satanic pedophile", "satanic pedophiles", "satanic paedophiles", "satanic cabal", "satanic elites", "pizzagate", "frazzledrip"],
+    claim: "Organised satanic groups abuse children in rituals, protected by people in power.",
+    record: "An FBI guide for investigators (Lanning, 1992) found no corroboration for the claims of organised satanic abuse it reviewed.",
+    sources: [S("Lanning, Investigator's Guide to Allegations of Ritual Child Abuse (FBI, NCJ 136592)", "https://www.ojp.gov/ncjrs/virtual-library/abstracts/investigators-guide-allegations-ritual-child-abuse", "1992-01")],
+    dnp: "Real abuse cases are discussed with some of these words, and historians write about the panic itself." },
+  { id: "chemtrails", name: "Chemtrails", terms: ["chemtrails", "chemtrail", "chem trails", "chem-trails", "they are spraying us", "they're spraying us"],
+    claim: "Aircraft trails are chemicals sprayed in secret on the public.",
+    record: "76 of 77 atmospheric scientists and geochemists surveyed had seen no evidence of a secret spraying programme (Shearer et al., 2016).",
+    sources: [S("Shearer, West, Caldeira and Davis, Environmental Research Letters 11", "https://doi.org/10.1088/1748-9326/11/8/084011", "2016-08-10")],
+    dnp: "Solar geoengineering is a real research field, and people ask honest questions about contrails." },
+  { id: "great-reset", name: "\"Great Reset\" plot", terms: ["great reset agenda", "great reset plot", "great reset plan to", "you will own nothing and be happy", "you'll own nothing and be happy", "you will own nothing and you will be happy"],
+    claim: "The World Economic Forum's Great Reset is a hidden plan by elites to take property and freedoms.",
+    record: "The Great Reset is a public WEF initiative from June 2020. ADL and ISD document how the plot framing grew from it.",
+    sources: [S("ISD, The Great Reset explainer", "https://www.isdglobal.org/explainers/the-great-reset/", "2021"), S("ADL, Great Reset conspiracy flourishes amid continued pandemic", "https://www.adl.org/resources/blog/great-reset-conspiracy-flourishes-amid-continued-pandemic", "2021")],
+    dnp: "People criticise the WEF and its policies openly. The \"own nothing\" line is also used as a joke about rents and subscriptions." },
+  { id: "stolen-election", name: "Stolen or rigged election", terms: ["stop the steal", "stolen election"],
+    patterns: [`\\b(?:the\\s+)?${YEAR}election\\s+(?:was|got|is being|has been)\\s+(?:stolen|rigged)\\b`, `\\b(?:${G}|they)\\s+(?:rigged|stole)\\s+the\\s+${YEAR}election\\b`],
+    claim: "An election result was reversed by fraud on a scale that changed who won.",
+    record: "Courts, audits and election officials found no fraud that changed the 2020 result (CISA joint statement), and the Senate Intelligence Committee found no evidence that votes were changed in 2016.",
+    sources: [S("CISA, Joint statement from the Elections Infrastructure Government Coordinating Council", "https://www.cisa.gov/news-events/news/joint-statement-elections-infrastructure-government-coordinating-council-election", "2020-11-12"), S("US Senate Select Committee on Intelligence, Report Volume 1, Russian Efforts Against Election Infrastructure", "https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume1.pdf", "2019-07-25"), ENDERS],
+    dnp: "Real election fraud cases exist and are prosecuted. Claims about one race, one county or past history can be true." },
+  { id: "vote-flipping", name: "Machines or satellites flipped the votes", terms: [],
+    patterns: ["\\b(?:dominion|smartmatic|starlink|the machines|voting machines|the satellites)\\s+(?:flipped|switched|changed|rigged|altered)\\s+(?:the\\s+)?(?:votes?|election|results?|tallies|totals)\\b",
+      "\\b(?:russia|china|iran|they)\\s+(?:hacked|changed|altered|flipped)\\s+(?:the\\s+)?(?:vote\\s+(?:totals|tallies|counts)|voting machines|votes)\\b"],
+    claim: "Voting machines, satellites or a foreign government changed vote counts.",
+    record: "The Senate Intelligence Committee found no evidence that 2016 tallies were altered. PolitiFact rated the 2024 Starlink claim Pants on Fire: tabulators are not online during counting.",
+    sources: [S("US Senate Select Committee on Intelligence, Report Volume 1", "https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume1.pdf", "2019-07-25"), S("PolitiFact, No, Elon Musk's Starlink wasn't used to rig the 2024 election", "https://www.politifact.com/factchecks/2024/nov/12/threads-posts/no-elon-musks-starlink-wasnt-used-to-rig-the-2024/", "2024-11-12"), ENDERS],
+    dnp: "Foreign influence campaigns and machine faults are real and documented. They are different from changed counts." },
+  { id: "staged-shooting", name: "Staged shooting", terms: [],
+    patterns: ["\\b(?:the\\s+)?(?:[\\w-]+\\s+){0,2}(?:shooting|assassination attempt|massacre)\\s+was\\s+(?:staged|fake|faked|a false flag|a hoax)\\b",
+      "\\b(?:sandy hook|butler|parkland|uvalde)\\b[^.!?]{0,40}\\b(?:staged|crisis actors|false flag|hoax)\\b"],
+    claim: "A shooting was staged with actors or faked to win sympathy or a policy.",
+    record: "Researchers tracked staging claims about the 2024 Butler attempt from both sides (QUT, 2024). Courts found the Sandy Hook hoax claims defamatory.",
+    sources: [S("QUT Digital Media Research Centre, Conspiracy theories on the Trump assassination attempt are spreading like wildfire", "https://www.qut.edu.au/news/realfocus/conspiracy-theories-on-the-trump-assassination-attempt-are-spreading-like-wildfire", "2024-07"), ENDERS],
+    dnp: "Asking how security failed is not a staging claim, and official accounts are sometimes corrected." },
+  { id: "inside-job", name: "9/11 inside job", terms: ["9/11 was an inside job", "911 was an inside job", "bush did 9/11", "bush did 911", "jet fuel can't melt steel beams", "jet fuel cant melt steel beams"],
+    claim: "The US government planned or carried out the 11 September 2001 attacks.",
+    record: "NIST's investigation explained the collapses of the towers and of WTC 7 by impact damage and fire.",
+    sources: [S("NIST, World Trade Center Disaster Study", "https://www.nist.gov/world-trade-center-investigation", "2008")],
+    dnp: "Intelligence failures before 9/11 are documented, and the phrase is also used as a joke." },
+  { id: "covid-5g", name: "5G caused COVID-19", terms: [],
+    patterns: ["\\b5g\\s+(?:causes|caused|spreads|spread|is spreading)\\s+(?:the\\s+)?(?:covid|coronavirus|the virus)\\b", "\\b(?:covid|coronavirus)\\s+(?:is|was)\\s+(?:caused|spread)\\s+by\\s+5g\\b"],
+    claim: "5G mobile networks cause or spread COVID-19.",
+    record: "A virus cannot travel on radio waves. Ahmed et al. (2020) traced how the claim spread on Twitter.",
+    sources: [S("Ahmed et al., COVID-19 and the 5G Conspiracy Theory: Social Network Analysis of Twitter Data, JMIR 22(5)", "https://doi.org/10.2196/19458", "2020-05-06")],
+    dnp: "People ask honest questions about radio exposure, which is studied and regulated." },
+  { id: "vaccine-harm", name: "Vaccines cause autism or carry microchips", terms: ["microchips in the vaccine", "microchips in vaccines", "vaccine microchips", "vaccines have microchips"],
+    patterns: ["\\bvaccines?\\s+(?:cause|causes|caused)\\s+autism\\b"],
+    claim: "Childhood vaccines cause autism, or vaccines carry tracking microchips.",
+    record: "A meta-analysis of studies covering over 1.2 million children found no link between vaccines and autism (Taylor et al., 2014).",
+    sources: [S("Taylor, Swerdfeger and Eslick, Vaccines are not associated with autism: an evidence-based meta-analysis, Vaccine 32(29)", "https://doi.org/10.1016/j.vaccine.2014.04.085", "2014-06-17")],
+    dnp: "Vaccines have real, documented side effects, and parents ask honest questions about them." },
+  { id: "hidden-cure", name: "Hidden cure", terms: ["hiding the cure for cancer", "hiding the cure", "suppressing the cure", "they have the cure for cancer", "sitting on the cure"],
+    claim: "Drug companies or regulators hide a cure to protect profits.",
+    record: "In a 2013 US survey, 37% agreed the FDA suppresses natural cures for cancer (Oliver and Wood, 2014); no such hidden cure has been shown.",
+    sources: [S("Oliver and Wood, Medical Conspiracy Theories and Health Behaviors in the United States, JAMA Internal Medicine 174(5)", "https://doi.org/10.1001/jamainternmed.2014.190", "2014-05")],
+    dnp: "Drug pricing, buried trial results and industry lobbying are real and documented." },
+];
+
+const word = (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|");
+const COMPILED = THEORIES.map((t) => ({ id: t.id,
+  res: [...((t.terms || []).length ? [new RegExp(`(?:^|[^\\w])(${word(t.terms)})(?=$|[^\\w])`, "i")] : []), ...(t.patterns || []).map((p) => new RegExp(p, "i"))] }));
+const BY_ID = new Map(THEORIES.map((t) => [t.id, t]));
+const theoryById = (id) => BY_ID.get(id) || null;
+
+// Text that discusses a theory as false or as a theory, group-blind. A post that says "the
+// chemtrails conspiracy theory", "no evidence", "debunked" or "fact check" is about the claim.
+const DISCUSSED = /\b(?:conspiracy theor(?:y|ies|ist|ists)|debunk(?:ed|ing|s)?|baseless|no evidence|false claims?|the claim that|myths?|hoax claims?|fact[- ]?checks?|misinformation|disinformation|panic|is false|are false|not true|pants on fire)\b/i;
+// Mockery is discussion too ("Pizzagate nonsense", "let me guess, chemtrails").
+const MOCKED = /\b(?:nonsense|tin ?foil|crackpots?|loony|kooks?|gullib\w*|let me guess|nutjobs?|wackos?)\b/i;
+// A claim reported or argued about, not made: "he keeps saying the election was rigged", "if you
+// believe that, you also believe 9/11 was an inside job". This also skips some first-person belief
+// ("I believe ..."): precision comes first.
+const REPORTED_CLAIM = /\b(?:say|says|said|saying|claim|claims|claimed|claiming|tout(?:s|ed|ing)|suggest(?:s|ed|ing)|insist(?:s|ed|ing)|alleg(?:e|es|ed|ing)|assum(?:e|es|ed|ing)|believ(?:e|es|ed|ing)|think|thinks|thinking|heard)\b[^.!?]{0,40}$/i;
+const NEGATED = /\b(?:not|never|wasn't|wasnt|isn't|isnt|no|didn't|didnt)\s+(?:\w+\s+){0,2}$/i;
+
+// [{ theory, match, index }], one per theory, for text that uses a theory (not one that debunks it).
+function theoryMatches(text) {
+  const s = String(text || "");
+  if (DISCUSSED.test(s) || MOCKED.test(s)) return [];
+  const out = [];
+  for (const c of COMPILED) {
+    for (const re of c.res) {
+      const m = s.match(re);
+      if (!m) continue;
+      const match = (m[1] || m[0]).trim(), index = m.index + m[0].indexOf(match);
+      const before = s.slice(Math.max(0, index - 60), index);
+      if (NEGATED.test(before.slice(-30)) || REPORTED_CLAIM.test(before) || /\b(?:not|never)\b/i.test(m[0])) continue;
+      out.push({ theory: c.id, match: match.slice(0, 80), index });
+      break;
+    }
+  }
+  return out;
+}
+
+return { THEORY_DOES_NOT_PROVE, THEORIES, theoryById, theoryMatches };
+})();
+
 // ---- rhetoric.js
 const M_rhetoric = (() => {
 // Stance-neutral rhetoric markers. The word lists live in lexicon.js; this file holds the grammar.
@@ -2099,6 +2395,7 @@ const { scoreZh, NEGATION_ZH, prepZh } = M_rhetoric_zh;
 const { scoreHi, NEGATION_HI, prepHi } = M_rhetoric_hi;
 const { mentionedIntl } = M_rhetoric_mention;
 const { foldConfusables } = M_confusables;
+const { theoryMatches } = M_theories;
 
 const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -2183,7 +2480,9 @@ function mention(s, m) {
 const unleet = (s) => s.replace(/[013457@$!]/g, (c) => L.LEET[c] || c);
 
 const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, slur: 2, slurSoft: 1, stereotype: 2, motive: 1,
-  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1 };
+  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1,
+  // Named theories (theories.js) are not measured yet, so they stay out of "extreme".
+  "conspiracy-theory": 0 };
 // "Extreme" for the thread report: any strong marker, or two weaker ones together.
 const EXTREME_AT = 2;
 // Families strong enough to label the comment itself.
@@ -2243,6 +2542,9 @@ function score(text) {
   const markers = [];
   const hit = recorder(s, markers);
   scoreEnglish(s, hit);
+  for (const t of theoryMatches(s)) {
+    if (!mention(s, Object.assign([t.match], { index: t.index }))) markers.push({ family: "conspiracy-theory", theory: t.theory, match: t.match });
+  }
   for (const lang of LANGUAGES) {
     const have = new Set(markers.map((m) => m.family));
     const on = lang.prep ? lang.prep(s) : s;
@@ -6119,7 +6421,7 @@ const D = "detector", P = "platform", T = "table", F = "file";
 const FAMILIES = [
   ["slur", "Slur or coded hate term", "language", D], ["stereotype", "Group stereotype", "language", D],
   ["dehumanise", "Dehumanising language", "language", D], ["violence", "Call for violence", "language", D],
-  ["vigilante", "Call for vigilantes", "language", D], ["leaked-ai", "Leaked AI text", "language", D],
+  ["vigilante", "Call for vigilantes", "language", D], ["conspiracy-theory", "Named conspiracy theory", "language", D], ["leaked-ai", "Leaked AI text", "language", D],
   ["machine-writing", "Machine-writing signs", "language", D], ["spam-pattern", "Spam pattern", "language", D],
   ["x-spam", "X: probable spam", "language", P], ["hate-symbol-name", "Hate symbol in name", "language", D],
   ["old-media", "Media older than the post", "media", D], ["lifted-media", "Media from another post", "media", P],
@@ -6136,7 +6438,7 @@ const FAMILIES = [
   ["high-volume", "Very high post rate", "posting", D],
   ["new-account", "New account", "account", D], ["name-changes", "Renamed", "account", D],
   ["default-handle", "Sign-up handle", "account", D], ["follow-pattern", "Follows many, few follow back", "account", D],
-  ["low-karma", "Low karma for its age", "account", D],
+  ["low-karma", "Low karma for its age", "account", D], ["brand-lookalike", "Name borrows a brand", "account", D],
   ["c2pa", "Content Credentials", "media", F], ["c2pa-changed", "Credentials do not match", "media", F],
   ["ai-metadata", "AI-generation metadata", "media", F],
 ].map(([id, name, area, kind]) => ({ id, name, area, kind }));
@@ -6430,5 +6732,5 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
 })();

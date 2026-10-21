@@ -185,6 +185,19 @@ export const ACCOUNT_LESSONS = [
     dnp: "",
   },
   {
+    id: "brand-lookalike", title: "Name borrows a brand", research: ["badnews-2019"],
+    what: "The display name or handle carries a platform's or a news outlet's brand with a word like breaking, live, support or official, on an account that is not one of that brand's own.",
+    examples: [
+      { side: "none", topic: "media", kind: "sign", text: "An account named \"World News Breaking\" in the colours of a big broadcaster, joined last month, posting a shocking quote no other outlet carries." },
+      { side: "none", topic: "tech", kind: "sign", text: "An account named \"Platform Support Team\" replying to complaints with a link to \"verify your account\"." },
+      { side: "none", topic: "media", kind: "ordinary", text: "A broadcaster's regional desk, with the site's grey badge that links it to the main outlet." },
+    ],
+    why: "A trusted name lends its trust to whatever is posted under it. Impersonation was one of the six techniques in Bad News, and fake support accounts are a common way to steal logins.",
+    spot: "Look for the platform's own markers first: an affiliation badge that names the outlet, or an organisation check. Then open the outlet's own site and see which accounts it lists.",
+    counter: "Get breaking news from the outlet's own account or site, not from a name that looks like it. Never sign in or pay through a link a support account sends you.",
+    dnp: "",
+  },
+  {
     id: "low-karma", title: "Low karma for its age", research: [],
     what: "On Reddit, the account has far less karma than its age would suggest.",
     examples: [

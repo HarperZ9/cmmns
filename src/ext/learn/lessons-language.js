@@ -102,6 +102,20 @@ export const LANGUAGE_LESSONS = [
     dnp: "No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.",
   },
   {
+    id: "conspiracy-theory", title: "Named conspiracy theory", research: ["enders-2023", "badnews-2019"],
+    what: "The post uses a documented conspiracy theory by name or by its stock line: chemtrails, a stolen election, a staged shooting, a hidden cure. Radar names the theory and shows what checkers found.",
+    examples: [
+      { side: "left", topic: "elections", kind: "sign", text: "Satellites flipped the votes in the swing states. Nobody wins like that." },
+      { side: "right", topic: "elections", kind: "sign", text: "The machines flipped the votes overnight. Nobody wins like that." },
+      { side: "centre", topic: "health", kind: "sign", text: "Look up. Those trails are chemicals, and they are spraying us." },
+      { side: "none", topic: "elections", kind: "fair", text: "Every audit in the state matched the machine count within a few votes. The full report is on the election office site." },
+    ],
+    why: "A theory gives a messy event one hidden author, and that feels better than chance or failure. Survey studies find people on the left and the right accept these claims at similar rates when the story is the same and only the villain changes. Radar matches every direction the same way.",
+    spot: "Look for a secret plan, a hidden group and a claim that the evidence was hidden too. Then open the sources in the window and read what investigators found.",
+    counter: "Ask what evidence would change the writer's mind. If no evidence could, the claim cannot be checked. Real wrongdoing leaves records, courts and named people, and you can look those up.",
+    dnp: "Naming a theory is not believing it. People quote, mock and argue against these claims, and Radar skips only obvious debunking. This sign is not measured yet and never counts toward the thread report.",
+  },
+  {
     id: "spam-pattern", title: "Spam pattern", research: [],
     what: "A pattern common in scam and spam posts: giveaways, crypto offers, \"message me\" bait, links to strangers' channels.",
     examples: [

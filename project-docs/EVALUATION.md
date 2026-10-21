@@ -357,6 +357,40 @@ script when every letter can be read in it, else toward the word's own majority;
 - Limit: a lone Russian word quoted inside English text, whose every letter has a Latin look-alike
   ("сор"), folds to Latin. Folding applies only to the copy Radar matches, never to what it shows.
 
+## Named conspiracy theories (2026-10-21): not measured
+`src/core/theories.js` extends the conspiracy family with twelve documented theories (QAnon slogans,
+adrenochrome, satanic ritual abuse, chemtrails, "Great Reset" plot framing, stolen and rigged
+elections, machine and satellite vote-flipping, staged shootings, 9/11 inside job, 5G and COVID-19,
+vaccine harm, hidden cures), each with dated sources and its own does-not-prove line. Election and
+staged-event claims match both directions; `tests/theories.symmetry.test.js` pairs each right-coded
+claim with its left-coded twin (Dominion and Starlink, 2020 and 2016, Sandy Hook and Butler).
+
+No corpus was usable for a precision figure, so the family reads "not measured yet", carries weight
+0 and never counts toward "extreme":
+- LOCO (Miani, Hills and Bangerter 2021, 96,743 documents, osf.io/snpcg): the OSF project states no
+  licence (checked 2026-10-21 through the OSF API: `node_license` is null), so Radar may not use it.
+  Asking the authors for a licence is the author's call.
+- COCO (Langguth et al. 2023, 3,495 tweets with stance labels over 12 COVID-19 conspiracy topics):
+  the release holds tweet IDs only. The text needs hydration through X's API, which Radar does not
+  use, and no licence is stated for the labels.
+- MM-COVID: labels fake and real news, not conspiracy theories. Its Hugging Face mirror says
+  Apache-2.0; the original authors' terms were not confirmed.
+No corpus was downloaded for this check.
+
+Context, not a measurement: on the CC0 Civil Comments test split already on disk, the family fired on
+10 of 97,320 comments after the debunk, mockery and reported-claim guards (22 before them). The
+building agent read those hits and many of them mock or report a theory; no person labelled them.
+
+## Brand look-alike accounts (2026-10-21): not measured
+`src/core/brands.js` flags a name that borrows one of 42 platform and outlet brands (each with its
+Wikidata item and the X usernames that item lists, queried 2026-10-21) with a word that makes it read
+as the brand's own voice. X's affiliation badge, an organisation or government check, and X's parody,
+commentary or fan label clear the flag. `tests/brands.test.js` holds synthetic accounts only: 10
+look-alikes and 18 controls, among them sub-accounts that carry the affiliation badge. Weak tier:
+alone it never counts toward "flagged". No labelled set of impersonation accounts was used, so it
+reads "not measured yet". Wikidata lists only some of each outlet's accounts, so a real sub-account
+without the badge or a check can trip it.
+
 ## Threads
 At least one event with threads from opposing sides (for example a protest covered by outlets on
 the left and the right), reported per side. Not run yet: it needs the author's labels.
