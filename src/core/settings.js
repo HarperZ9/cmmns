@@ -105,5 +105,6 @@ export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.
 // "Clear all Radar data": every Radar key except the settings themselves. The Mastodon servers the
 // user turned on (pb.instances.v1) are settings too, removed in the options page with their access.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
-const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1"]);
+// Imported data packs and the keys the user trusts (src/ext/packs-bg.js) are choices too.
+const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1", "pb.packs.v1", "pb.packkeys.v1"]);
 export const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));

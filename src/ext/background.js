@@ -6,7 +6,7 @@
 //   profiles. The window closes itself when the queue has been empty for IDLE_CLOSE_MS.
 // Chrome runs this file as a service worker and loads the core bundle and the housekeeping here;
 // Firefox lists them before this file in the manifest's background scripts.
-if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js", "instances.js", "sources-bg.js", "ocr.bundle.js", "ocr-bg.js");
+if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js", "instances.js", "packs-bg.js", "sources-bg.js", "ocr.bundle.js", "ocr-bg.js");
 const GAP_MS = 2500, TIMEOUT_MS = 12000, IDLE_CLOSE_MS = 15000;
 const queue = [];
 let busy = false, lastAt = 0, current = null, worker = null, idleTimer = 0, timeoutTimer = 0;
@@ -35,6 +35,7 @@ function stateRows() {
 let opsReady = null;
 function opsTable() {
   if (!opsReady) opsReady = fetch(chrome.runtime.getURL("ops.json")).then((r) => r.json())
+    .then(async (t) => PB.mergePackOps(t, await PBPacks.enabled()))
     .catch((e) => { console.error("[radar] ops.json failed to load", e); return { docs: [], ops: [], indicators: [] }; });
   return opsReady;
 }
@@ -44,7 +45,7 @@ function opsTable() {
 let claimsReady = null;
 function claimIndex() {
   const get = (name) => fetch(chrome.runtime.getURL(name)).then((r) => r.json());
-  if (!claimsReady) claimsReady = get("claims.json").then(async (main) => PB.buildClaimIndex(PB.joinClaims(main, await Promise.all((main.parts || []).map(get)))))
+  if (!claimsReady) claimsReady = get("claims.json").then(async (main) => PB.buildClaimIndex(PB.mergePackClaims(PB.joinClaims(main, await Promise.all((main.parts || []).map(get))), await PBPacks.enabled())))
     .catch((e) => { console.error("[radar] claims.json failed to load", e); return null; });
   return claimsReady;
 }
@@ -59,6 +60,9 @@ function fontBytes() {
     .catch((e) => { console.error("[radar] the window's fonts failed to load", e); fontsReady = null; return []; });
   return fontsReady;
 }
+
+// A pack enabled, disabled or removed in the options page: rebuild the tables that include packs.
+PBPacks.onChange(() => { claimsReady = null; opsReady = null; });
 
 const cards = {};   // fallback where storage.session is missing
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {

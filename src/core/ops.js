@@ -77,7 +77,9 @@ export function opRows(h) {
 export const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.";
 export function opsTrend(table = TABLE) {
   const years = new Map(), states = new Map();
-  for (const o of table.ops) {
+  // Operations from data packs (src/core/packs-content.js) are shown on matches but never counted here.
+  const own = table.ops.filter((o) => !o.pack);
+  for (const o of own) {
     const y = Number(String(o.first).slice(0, 4));
     const ye = years.get(y) || years.set(y, { year: y, n: 0, byState: {} }).get(y);
     ye.n++; ye.byState[o.state] = (ye.byState[o.state] || 0) + 1;
@@ -86,7 +88,7 @@ export function opsTrend(table = TABLE) {
     for (const d of o.docs) se.docs.add(d);
   }
   return {
-    total: table.ops.length,
+    total: own.length,
     byYear: [...years.values()].sort((a, b) => a.year - b.year),
     byState: [...states.values()].map((s) => ({ ...s, docs: s.docs.size })).sort((a, b) => b.n - a.n || a.state.localeCompare(b.state)),
   };

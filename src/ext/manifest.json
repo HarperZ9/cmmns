@@ -32,6 +32,7 @@
       "core.bundle.js",
       "lifecycle.js",
       "instances.js",
+      "packs-bg.js",
       "sources-bg.js",
       "ocr.bundle.js",
       "ocr-bg.js",

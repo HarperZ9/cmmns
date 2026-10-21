@@ -1,0 +1,15 @@
+{
+ "about": "Review priority for scripts/upstream-guard.mjs: when an upstream source changes the owner, publisher, parent or state label of one of these sites, or drops it, the change is flagged for a person to read before it ships. Inclusion means only that many people read the site and a silent change there would reach many users; it says nothing about the site's quality or stance. The list spans countries, languages, ownership types and political leanings on purpose. Platforms are included because owners.json covers them.",
+ "domains": [
+  "nytimes.com", "washingtonpost.com", "wsj.com", "usatoday.com", "latimes.com", "nypost.com", "cnn.com", "foxnews.com", "msnbc.com", "nbcnews.com",
+  "cbsnews.com", "abcnews.go.com", "npr.org", "apnews.com", "reuters.com", "bloomberg.com", "politico.com", "axios.com", "thehill.com", "newsmax.com",
+  "breitbart.com", "dailywire.com", "huffpost.com", "vox.com", "theatlantic.com", "newsweek.com", "time.com", "forbes.com", "businessinsider.com", "voanews.com",
+  "bbc.co.uk", "bbc.com", "theguardian.com", "telegraph.co.uk", "thetimes.co.uk", "dailymail.co.uk", "thesun.co.uk", "independent.co.uk", "ft.com", "economist.com",
+  "sky.com", "gbnews.com", "lemonde.fr", "lefigaro.fr", "france24.com", "spiegel.de", "bild.de", "faz.net", "dw.com", "elpais.com",
+  "elmundo.es", "corriere.it", "repubblica.it", "nos.nl", "rt.com", "sputnikglobe.com", "tass.com", "ria.ru", "cgtn.com", "globaltimes.cn",
+  "xinhuanet.com", "chinadaily.com.cn", "scmp.com", "nhk.or.jp", "asahi.com", "yomiuri.co.jp", "timesofindia.indiatimes.com", "ndtv.com", "hindustantimes.com", "thehindu.com",
+  "aljazeera.com", "alarabiya.net", "presstv.ir", "trtworld.com", "haaretz.com", "timesofisrael.com", "jpost.com", "abc.net.au", "smh.com.au", "cbc.ca",
+  "globo.com", "folha.uol.com.br", "clarin.com", "eluniversal.com.mx", "news24.com", "kyivindependent.com", "pravda.com.ua",
+  "x.com", "twitter.com", "facebook.com", "instagram.com", "youtube.com", "tiktok.com", "reddit.com", "threads.net", "bsky.app", "telegram.org"
+ ]
+}

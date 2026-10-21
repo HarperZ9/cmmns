@@ -7,6 +7,7 @@
 // thread with fewer than MIN_CARD_ACCOUNTS distinct reply accounts.
 
 import { REPORT_DOES_NOT_PROVE } from "./report.js";
+import { canonicalJSON, sha256Hex } from "./sig.js";
 import { CLAIM_ATTRIBUTION, CLAIM_DOES_NOT_PROVE } from "./claims.js";
 import { credentialState } from "./c2pa.js";
 import { CREDENTIALS_DO_NOT_PROVE } from "./mediacheck.js";
@@ -93,17 +94,8 @@ function limitsOf(card) {
   ].filter(Boolean);
 }
 
-// JSON with sorted keys and no spacing, so the same content always gives the same bytes.
-export function canonicalJSON(v) {
-  if (Array.isArray(v)) return "[" + v.map(canonicalJSON).join(",") + "]";
-  if (v && typeof v === "object") return "{" + Object.keys(v).filter((k) => v[k] !== undefined).sort().map((k) => JSON.stringify(k) + ":" + canonicalJSON(v[k])).join(",") + "}";
-  return JSON.stringify(v === undefined ? null : v);
-}
-
-async function sha256(text) {
-  const buf = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
+// Canonical JSON and SHA-256 come from sig.js, shared with evidence bundles and data packs.
+const sha256 = sha256Hex;
 
 export async function sealCard(card) {
   const { hash, ...body } = card;

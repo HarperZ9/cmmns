@@ -193,7 +193,7 @@ function evaluate(list, out, bodies) {
     if (out.has(key)) continue;
     out.set(key, {
       domain: r.domain, ...(r.x ? { x: r.x } : {}), state: canon(hit.state), basis: hit.basis || "state-owned", ...(hit.level ? { level: hit.level } : {}), name: r.name,
-      source: { title: `Wikidata: ${r.name}, ${hit.via}`, url: r.source.replace(/^http:/, "https:"), date: new Date().toISOString().slice(0, 10) },
+      source: { title: `Wikidata: ${r.name}, ${hit.via}`, url: r.source.replace(/^http:/, "https:"), date: (process.env.RADAR_BUILT || new Date().toISOString().slice(0, 10)) },
     });
   }
 }
@@ -252,6 +252,6 @@ function designationRows() {
 }
 
 const rows = [...(await wikidataRows()), ...reportRows(), ...designationRows()].sort((a, b) => (a.domain || a.x).localeCompare(b.domain || b.x));
-writeFileSync(join(root, "src/ext/state.json"), JSON.stringify({ built: new Date().toISOString().slice(0, 10), rows }) + "\n");
+writeFileSync(join(root, "src/ext/state.json"), JSON.stringify({ built: (process.env.RADAR_BUILT || new Date().toISOString().slice(0, 10)), rows }) + "\n");
 const per = rows.reduce((m, r) => ((m[r.state] = (m[r.state] || 0) + 1), m), {});
 console.log(`state.json: ${rows.length} rows`, Object.entries(per).sort((a, b) => b[1] - a[1]).slice(0, 15));

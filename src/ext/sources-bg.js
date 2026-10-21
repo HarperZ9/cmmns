@@ -13,13 +13,15 @@
     }).catch((e) => { console.error("[radar] site tables failed to load", e); ready = null; return false; });
     return ready;
   }
+  // Site notes from enabled data packs (packs-bg.js) are set alongside the bundled tables.
+  const withPacks = () => Promise.all([tables(), globalThis.PBPacks ? PBPacks.enabled() : null]);
   const settings = async () => PB.normalizeSettings((await chrome.storage.local.get(PB.SETTINGS_KEY))[PB.SETTINGS_KEY]);
 
   // Everything Radar knows about one site, from the bundled tables only.
   function infoOf(domain, full) {
     const host = PB.hostOf("https://" + String(domain).replace(/^https?:\/\//, "")) || String(domain);
     const rec = PB.siteRecord(host);
-    return { domain: host, owner: PB.ownerOfDomain(host), state: PB.stateLinksOfDomain(host), facts: PB.siteFacts(host), record: full ? rec : PB.recordSummary(rec) };
+    return { domain: host, owner: PB.ownerOfDomain(host), state: PB.stateLinksOfDomain(host), facts: PB.siteFacts(host), record: full ? rec : PB.recordSummary(rec), notes: PB.siteNotesOf(host) };
   }
 
   // Other coverage: at most one request every 5 seconds, as GDELT asks.
@@ -40,7 +42,7 @@
     if (/^Please limit/.test(text)) { await new Promise((r) => setTimeout(r, 6000)); lastCall = Date.now(); text = await ask(); }
     let json = null;
     try { json = JSON.parse(text); } catch { return { error: "gdelt", detail: text.slice(0, 160), ms: Date.now() - t0 }; }
-    await tables();
+    await withPacks();
     const list = PB.coverageList(json, { self: msg.domain, infoOf: (d) => infoOf(d) });
     return { list, groups: PB.coverageGroups(list), query: PB.coverageTerms(msg.title), ms: Date.now() - t0 };
   }
@@ -74,8 +76,8 @@
   const answer = (p, sendResponse) => { p.then(sendResponse, (e) => { console.error("[radar] site request failed", e); sendResponse({ error: String(e && e.message || e) }); }); return true; };
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg || typeof msg.type !== "string") return undefined;
-    if (msg.type === "pb-sites") return answer(tables().then(() => Object.fromEntries((msg.domains || []).slice(0, 60).map((d) => [d, infoOf(d)]))), sendResponse);
-    if (msg.type === "pb-site-list") return answer(tables().then(() => infoOf(msg.domain, true)), sendResponse);
+    if (msg.type === "pb-sites") return answer(withPacks().then(() => Object.fromEntries((msg.domains || []).slice(0, 60).map((d) => [d, infoOf(d)]))), sendResponse);
+    if (msg.type === "pb-site-list") return answer(withPacks().then(() => infoOf(msg.domain, true)), sendResponse);
     if (msg.type === "pb-open-sites") { chrome.tabs.create({ url: chrome.runtime.getURL("sites.html") + "#" + encodeURIComponent(msg.domain || "") }); return undefined; }
     if (msg.type === "pb-coverage") return answer(coverage(msg), sendResponse);
     if (msg.type === "pb-open-options") { chrome.runtime.openOptionsPage(); return undefined; }

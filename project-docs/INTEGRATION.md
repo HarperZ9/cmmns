@@ -187,8 +187,11 @@ A bundle is a JSON file holding what Radar found on one thread or export:
 
 - the post ids, and each evidence item with its matched words;
 - the Radar version and the API version;
-- `dataLock`: a SHA-256 over the data tables used (lines `<sha256>  <file>` sorted by name), so
-  anyone can tell which tables made the evidence by hashing a release's files the same way;
+- `dataLock`: a SHA-256 over the data tables used (lines `<sha256>  <file>` sorted by name, each
+  file hashed with LF line ends so Windows and Linux checkouts agree). The per-file hashes are the
+  ones `data/LOCK.json` pins for those tables and the project key signs in
+  `src/ext/radar-data.pack.json`, so the same value follows from the lockfile, from the signed pack
+  or from a release's files (`tests/datalock.bundle.test.js`); see project-docs/DATA-SOVEREIGNTY.md;
 - the time it was saved;
 - `signer`: the algorithm, the public key as a JWK and its key id (the first 16 hex characters of
   the SHA-256 of the canonical JWK);

@@ -25,6 +25,44 @@ were not published to a store.
   outbox.json or a Bluesky repository .car, read on the device with nothing sent. Images and video
   get the Content Credentials check.
 
+### Added (data sovereignty)
+- A dataset lockfile, `data/LOCK.json`: every input the data build reads (Wikidata tables, the
+  Data Commons fact-check feed, the Unicode confusables table, the PHEME corpus, the hand-kept
+  operation and state sources) with its source, retrieval date, licence, row count and the SHA-256
+  of its raw snapshot, plus the SHA-256 of every table the build writes. A table that changes
+  without its lock entry fails the tests.
+- `npm run build:offline`: rebuilds every table it has a pinned snapshot for with the network
+  blocked, and fails when a snapshot or a rebuilt table differs from the lock. With every snapshot
+  present, all seven rebuildable steps reproduce the committed tables byte for byte.
+- The Unicode confusables snapshot is committed (`data/snapshots/`). Larger snapshots, and those
+  holding other people's posts or names, stay outside the repository and are pinned by hash.
+- An upstream-change guard, `scripts/upstream-guard.mjs`: diffs a fresh table against the locked
+  one and flags mass removals, bulk edits, an owner or state label flipped or a site dropped among
+  97 high-reach sites (`data/high-reach.json`), any state label change, and a fact-checker whose
+  rows vanish.
+- Signed data packs. A pack is a JSON file signed with ECDSA P-256 through WebCrypto, adding
+  fact-checked claims, operation indicators or site notes, each citing an https source. In the
+  options page, under Data packs, you pick a file; Radar shows which key signed it and what it adds,
+  and uses it only after you trust that key. Packs can be turned off, removed or distrusted. Radar
+  never downloads a pack. Pack rows carry their pack's name and never count in the operations trend.
+- Radar's own data ships as a pack signed by the project key (`src/ext/radar-data.pack.json`);
+  "Check Radar's own data" in the options page checks the installed tables against it.
+  `scripts/pack.mjs` creates keys, signs and verifies packs.
+- A test that fails when any file in the tree holds private key material, and `.gitignore` rules
+  for key files. Method and threat model: project-docs/DATA-SOVEREIGNTY.md.
+
+### Changed (data sovereignty)
+- One copy of canonical JSON, SHA-256, base64url and ECDSA P-256, `src/core/sig.js`, now serves
+  sealed evidence cards, evidence bundles and data packs. A bundle's `dataLock` hashes each table
+  with LF line ends and equals the hash of the table hashes pinned in `data/LOCK.json` and signed in
+  `radar-data.pack.json`.
+- The fact-check table is rebuilt from its pinned feed snapshot: 19,387 claims, 8 more than 2.1.0
+  shipped (39 in, 31 out, at the size cap's edge). The 2.1.0 copy could not be rebuilt from any
+  snapshot on hand.
+- `scripts/owners-build.mjs` can keep its raw Wikidata answers (`--save-raw`) and rebuild from them
+  offline (`--in`), and lists each outlet's owners in a stable order. Data builders take the date
+  they write from `RADAR_BUILT`, so a rebuild is reproducible.
+
 ### Added (text in images)
 - Read text in this image. With "Read text in images" turned on in the options page (off by
   default), the window's Media area offers "Read text in this image" under each image of a post. On

@@ -90,6 +90,7 @@ profile you installed Radar in. It is not synced to other devices.
 | Your feedback (`pb.feedback.v1`) | Your "This was right" and "This was wrong" marks: which sign (its kind, the post id and a short hash of its label), the thread, your mark and the time. The post text only for marks where you ticked "include the text" | Until you clear it or remove Radar; at most 2,000 marks, the oldest dropped first |
 | Account details from other sites (`pb.meta.v1`) | What Instagram, Facebook, Bluesky or a Mastodon server showed about accounts you saw: join date, counts, labels, renames | 14 days |
 | Mastodon servers (`pb.instances.v1`) | The servers you turned Radar on for | Until you remove them |
+| Data packs (`pb.packs.v1`, `pb.packkeys.v1`) | Pack files you imported on the options page, whether each is on, and the public keys you chose to trust. Radar never downloads a pack and sends none anywhere | Until you remove them |
 | X request shape (`pb.tpl`) | The shape of X's About request, so Radar can repeat it. It holds no login token; the token is read fresh from X's cookie each time | Until X changes it or you clear Radar's data |
 
 Post data from the page (views, posting app, media upload times) is held in memory for the tab and
