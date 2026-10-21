@@ -1279,6 +1279,45 @@ function scoreIt(hit, have) {
 return { RE_IT, NEGATION_IT, scoreIt };
 })();
 
+// ---- rhetoric-mention.js
+const M_rhetoric_mention = (() => {
+// Reported speech and quoted words in Arabic, Russian, Ukrainian, Chinese and Hindi: a mention of a
+// marker, not the speaker's own use ("عمري ما قلت ان ...", "他骂女人是垃圾", "не называй их ...").
+// Group-blind, so every target is treated alike. English has its own rule in rhetoric.js.
+
+const CUES = [
+  // Arabic: said that, calls, describes, phrases like, believe that
+  "قلت ان", "تقول ان", "يقول ان", "بتقول ان", "بيقول ان", "قال ان", "قالوا ان", "تسمي", "بتسمي", "يسمي", "بيسمي", "تسمية",
+  "وصف", "وصفت", "يصف", "عبارات", "عبارة", "كلمة", "زي ان", "تصدق ان", "يصدق ان", "مقولة",
+  // Russian and Ukrainian: calls, said that, writes that, the word
+  "называет", "называют", "назвал", "назвала", "называть", "называй", "сказал что", "сказала что", "говорит что", "пишет что",
+  "сравнил", "слово", "фраза", "називає", "називають", "назвав", "назвала", "називати", "сказав що", "каже що", "пише що",
+  "порівняв", "слово", "фраза",
+  // Chinese: scolds as, calls, shouts, sends, threatens, like the saying. "说" (say) is left out: a
+  // speaker who says it is using it.
+  "骂", "称", "叫", "喊", "发送", "扬言", "类似", "宣称", "称呼",
+  // Hindi: saying that, calls, believing that
+  "कहना कि", "कहते हैं कि", "कहा कि", "बोलना कि", "मानना कि", "कहना", "बुलाना", "kehna ki", "kehte hain ki", "kaha ki",
+  "bolna ki", "vishwas nahi kar sakte ki", "maanna ki",
+];
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// The cue may sit up to 24 characters before the match, with no sentence end between.
+const CUE = new RegExp(`(?:${CUES.map(esc).join("|")})[^.!?。！？؟\\n]{0,24}$`, "iu");
+const OPEN = /["“«「『„]/u, CLOSE = /["”»」』“]/u;
+
+// s: the text the match came from; m: the match. True when the match is reported or quoted.
+function mentionedIntl(s, m) {
+  const at = m.index ?? s.indexOf(m[0]);
+  const before = s.slice(Math.max(0, at - 40), at), after = s.slice(at + m[0].length, at + m[0].length + 12);
+  if (CUE.test(before)) return true;
+  // An open quote before the match with no close between, and a close soon after.
+  const lastOpen = Math.max(...[...before].map((c, i) => (OPEN.test(c) ? i : -1)));
+  return lastOpen >= 0 && !CLOSE.test(before.slice(lastOpen + 1)) && CLOSE.test(after);
+}
+
+return { mentionedIntl };
+})();
+
 // ---- lexicon-ar.js
 const M_lexicon_ar = (() => {
 // Arabic word lists for the stance-neutral markers in rhetoric-ar.js. Same families and the same
@@ -1298,12 +1337,13 @@ const GROUPS_AR = [
   "ليبراليين", "ليبراليون", "شيوعيين", "ملحدين", "حوثيين", "دواعش", "كيزان", "روافض", "رافضة", "نواصب", "ثوار", "فلول",
   "مطبلين", "مطبعين", "منبطحين", "ممانعين",
   // الطبقة والدور والهوية
-  "أغنياء", "فقراء", "شرطة", "صحفيين", "إعلاميين", "نسويات", "نسويين", "نساء", "حريم", "رجال", "مثليين", "شواذ",
+  "أغنياء", "فقراء", "شرطة", "صحفيين", "إعلاميين", "نسويات", "نسويين", "نساء", "حريم", "رجال", "مثليين", "مثلين", "شواذ",
+  "متحولين جنسيا", "متحولين", "معاقين", "معاقيين", "ذوي الاحتياجات",
 ];
 
 const DEHUMANISE_AR = ["حشرات", "صراصير", "صراصر", "جرذان", "فئران", "كلاب", "خنازير", "قردة", "قرود", "حيوانات",
   "بهائم", "وحوش", "ديدان", "طفيليات", "جراثيم", "فيروس", "وباء", "سرطان", "طاعون", "قمامة", "زبالة", "حثالة", "أنجاس",
-  "نجس", "قذارة", "أوساخ", "حمير", "أفاعي", "ثعابين", "عقارب", "ذباب", "مسوخ", "دواب", "نفايات"];
+  "نجس", "قذارة", "أوساخ", "حمير", "أفاعي", "ثعابين", "عقارب", "ذباب", "مسوخ", "دواب", "نفايات", "خرى", "خرا"];
 // Phrases that dehumanise with no group named (the apes-and-pigs trope).
 const DEHUMANISE_PHRASES_AR = ["أحفاد القردة والخنازير", "أبناء القردة والخنازير", "إخوان القردة والخنازير"];
 
@@ -1346,13 +1386,13 @@ const { RX, scoreRules } = M_rhetoric_util;
 
 const { alt, B, E, re } = RX;
 // Same length for the alef and ya swaps; marks and tatweel are removed.
-const prepAr = (s) => s.replace(/[ً-ٰٟـ]/g, "").replace(/[أإآٱ]/g, "ا").replace(/ى/g, "ي");
+const prepAr = (s) => s.replace(/[\u064B-\u065F\u0670\u0640]/g, "").replace(/[\u0623\u0625\u0622\u0671]/g, "\u0627").replace(/\u0649/g, "\u064A");
 const A = (list) => alt(list.map(prepAr));
 const PRE = "(?:و|ف)?(?:ال|لل|بال|كال|ل|ب)?";
 const G = `${PRE}(?:${A(L.GROUPS_AR)})`;
 const NEG = "(?:(?:ليسوا|ليسو|ليس|ليست|مش|مو|مب|ما\\s+هم|ماهم|غير)\\s+)?";
 const ALL = "(?:(?:كل|جميع|كافة|هؤلاء|هذول|هذولا)\\s+)?";
-const HUM = "(?:(?:كلهم|هم|هما|مجرد|عبارة\\s+عن|ليسوا\\s+الا|ما\\s+هم\\s+الا|ماهم\\s+الا|الا)\\s+)*";
+const HUM = "(?:(?:كلهم|هم|هما|زيك|زيكم|دول|دي|ده|دا|هادول|مجرد|عبارة\\s+عن|ليسوا\\s+الا|ما\\s+هم\\s+الا|ماهم\\s+الا|الا)\\s+)*";
 
 const RE_AR = {
   dehumanise: re(`${B}${ALL}${G}${E}\\s+${HUM}${NEG}${HUM}(?:ال)?(?:${A(L.DEHUMANISE_AR)})${E}`),
@@ -1777,14 +1817,16 @@ const GROUPS_HI = [
   "गद्दारों", "देशद्रोही", "देशद्रोहियों", "मोदीभक्त", "मोदीभक्तों",
   // वर्ग, भूमिका, पहचान
   "औरतें", "औरतों", "महिलाएं", "महिलाओं", "मर्द", "मर्दों", "नारीवादी", "नारीवादियों", "फेमिनिस्ट", "फेमिनिस्टों", "पुलिसवाले",
-  "पुलिसवालों", "अमीर", "अमीरों", "नेता", "नेताओं", "पत्रकार", "पत्रकारों",
+  "पुलिसवालों", "अमीर", "अमीरों", "नेता", "नेताओं", "पत्रकार", "पत्रकारों", "शूद्र", "शूद्रों", "असमिया", "विकलांग", "विकलांगों", "हिजड़े",
+  "हिजड़ों", "किन्नर", "किन्नरों", "समलैंगिक", "समलैंगिकों",
 ];
 const GROUPS_HI_LATN = ["musalman", "musalmaan", "musalmano", "musalmanon", "musalmaano", "muslim", "muslims", "muslimo",
   "mulle", "mullo", "hindu", "hindus", "hinduo", "hinduon", "dalit", "daliton", "sikh", "sikho", "isai", "isaiyon", "bihari",
   "biharion", "pakistani", "bangladeshi", "rohingya", "sanghi", "sanghiyon", "bhakt", "bhakto", "andhbhakt", "andhbhakto",
   "congressi", "librandu", "librandus", "sickular", "sickulars", "jihadi", "jihadiyo", "naxal", "naxali", "khalistani", "gaddar",
   "gaddaro", "deshdrohi", "aurat", "aurate", "auraten", "aurato", "auraton", "mard", "mardo", "feminist", "feminists", "hijre",
-  "hijro", "kinnar", "gay log", "neta", "netao", "patrakar"];
+  "hijro", "hijde", "kinnar", "gay log", "neta", "netao", "patrakar", "shudra", "shudro", "assamese", "auratein",
+  "aurtein", "viklang", "apahij"];
 
 const DEHUMANISE_HI = ["कीड़े", "कीड़ा", "कीड़े-मकोड़े", "दीमक", "कुत्ते", "कुत्ता", "सूअर", "सुअर", "जानवर", "कॉकरोच",
   "तिलचट्टे", "चूहे", "मच्छर", "गंदगी", "कचरा", "कैंसर", "वायरस", "नासूर", "राक्षस", "हैवान", "दानव", "जोंक", "परजीवी",
@@ -1844,7 +1886,7 @@ const prepHi = (s) => s.normalize("NFC");
 const N = (list) => alt(list.map((w) => w.normalize("NFC")));
 
 function grammar(w) {
-  const G = `(?:${N(w.groups)})`, S = "\\s+";
+  const G = `(?:${N(w.groups)})(?:\\s+(?:${w.like}))?`, S = "\\s+";
   const PRE = `(?:(?:${w.these})${S})?`;
   const Q = `(?:${w.quant})`, NEG = `(?:${S}(?:${w.not}))?`, COP = `(?:${S}(?:${w.cop}))`;
   // "<group> सब <noun> (नहीं) (हैं)" or "<group> <noun> (नहीं) हैं"
@@ -1859,10 +1901,11 @@ function grammar(w) {
 
 const DEVA = grammar({ groups: L.GROUPS_HI, dehumanise: L.DEHUMANISE_HI, kill: L.KILL_HI, traits: L.STEREOTYPE_TRAITS_HI,
   these: "ये|इन|सारे|सभी|सब|उन", quant: "सब|सारे|सभी|तो|बस|सिर्फ|निरे|सब के सब", not: "नहीं|ना|न|मत|कभी नहीं",
-  cop: "हैं|है|हो|होते हैं|होते है|ही हैं", obj: "को" });
+  cop: "हैं|है|हो|होते हैं|होते है|ही हैं", obj: "को", like: "जैसे लोग|जैसी लोग|लोग" });
 const LATN = grammar({ groups: L.GROUPS_HI_LATN, dehumanise: L.DEHUMANISE_HI_LATN, kill: L.KILL_HI_LATN,
   traits: L.STEREOTYPE_TRAITS_HI_LATN, these: "ye|yeh|in|saare|sare|sabhi|sab|un", quant: "sab|saare|sare|sabhi|bas|sirf",
-  not: "nahi|nahin|nhi|na|mat|kabhi nahi", cop: "hai|hain|hote hain|hote hai|ho|hi hain", obj: "ko" });
+  not: "nahi|nahin|nhi|na|mat|kabhi nahi", cop: "hai|hain|hote hain|hote hai|ho|hi hain", obj: "ko",
+  like: "jaise log|jaisi log|log" });
 
 const RE_HI = {
   deva: DEVA, latn: LATN,
@@ -1915,6 +1958,7 @@ const { scoreRu, NEGATION_RU, prepRu } = M_rhetoric_ru;
 const { scoreUk, NEGATION_UK } = M_rhetoric_uk;
 const { scoreZh, NEGATION_ZH, prepZh } = M_rhetoric_zh;
 const { scoreHi, NEGATION_HI, prepHi } = M_rhetoric_hi;
+const { mentionedIntl } = M_rhetoric_mention;
 
 const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -2008,25 +2052,26 @@ const STRONG = new Set(["dehumanise", "violence", "vigilante", "slur", "stereoty
 // Other languages, in order. Each adds only families that English and the languages before it
 // did not find, and negates its matches with its own negation words. `prep` normalises the text
 // for that language's lists (one alef in Arabic, simplified Chinese, NFC Hindi) before matching.
-// Ukrainian reads the modifier apostrophe as ', as replies type both.
+// Ukrainian reads the modifier apostrophe as ', as replies type both. `report` adds the reported-
+// speech and quotation cues of rhetoric-mention.js for that language.
 const LANGUAGES = [
   { code: "fr", score: scoreFr, negation: NEGATION_FR },
   { code: "es", score: scoreEs, negation: NEGATION_ES },
   { code: "de", score: scoreDe, negation: NEGATION_DE },
   { code: "pt", score: scorePt, negation: NEGATION_PT },
   { code: "it", score: scoreIt, negation: NEGATION_IT },
-  { code: "ar", score: scoreAr, negation: NEGATION_AR, prep: prepAr },
-  { code: "ru", score: scoreRu, negation: NEGATION_RU, prep: prepRu },
-  { code: "uk", score: scoreUk, negation: NEGATION_UK, prep: (t) => prepRu(t).replace(/ʼ/g, "'") },
-  { code: "zh", score: scoreZh, negation: NEGATION_ZH, prep: prepZh },
-  { code: "hi", score: scoreHi, negation: NEGATION_HI, prep: prepHi },
+  { code: "ar", report: true, score: scoreAr, negation: NEGATION_AR, prep: prepAr },
+  { code: "ru", report: true, score: scoreRu, negation: NEGATION_RU, prep: prepRu },
+  { code: "uk", report: true, score: scoreUk, negation: NEGATION_UK, prep: (t) => prepRu(t).replace(/ʼ/g, "'") },
+  { code: "zh", report: true, score: scoreZh, negation: NEGATION_ZH, prep: prepZh },
+  { code: "hi", report: true, score: scoreHi, negation: NEGATION_HI, prep: prepHi },
 ];
 
 // A matcher that records a marker when `re` matches and, if negatable, the match has no negation.
 function recorder(s, markers) {
-  return (family, re, negatable = false, on = s, negation = NEGATION) => {
+  return (family, re, negatable = false, on = s, negation = NEGATION, intl = false) => {
     const m = on.match(re);
-    if (!m || (negatable && negation.test(m[0])) || mention(on, m)) return false;
+    if (!m || (negatable && negation.test(m[0])) || mention(on, m) || (intl && mentionedIntl(on, m))) return false;
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
@@ -2050,7 +2095,8 @@ function scoreEnglish(s, hit) {
   hit("contempt", RE.contempt, true);
 }
 
-// Returns { score, markers: [{ family, match }], extreme }.
+// Returns { score, markers: [{ family, match, lang? }], extreme }. lang: the code of the language
+// grammar that found the marker; absent for English.
 function score(text) {
   const s = String(text || "").replace(/[’]/g, "'");
   const markers = [];
@@ -2059,7 +2105,11 @@ function score(text) {
   for (const lang of LANGUAGES) {
     const have = new Set(markers.map((m) => m.family));
     const on = lang.prep ? lang.prep(s) : s;
-    lang.score((family, re, negatable = false) => hit(family, re, negatable, on, lang.negation), have);
+    const from = markers.length;
+    lang.score((family, re, negatable = false) => hit(family, re, negatable, on, lang.negation, !!lang.report), have);
+    // Each marker a language grammar found carries its code, so the window can say which word
+    // list found it and how that language was measured.
+    for (let i = from; i < markers.length; i++) markers[i].lang = lang.code;
   }
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };
@@ -2131,6 +2181,44 @@ const MEASURED_DETAIL = {
 const MEASURED_DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), not on this site's replies. Precision says how often a marker sat on text the annotators judged hostile to a group; it does not say why anyone wrote it, and it can differ on other sites and topics.";
 
 return { MEASURED_AT, MEASURED_PERSUASION, MEASURED, MEASURED_DETAIL, MEASURED_DOES_NOT_PROVE };
+})();
+
+// ---- measured-langs.js
+const M_measured_langs = (() => {
+// Measured precision of the strong rhetoric families per language, from the held-out test split in
+// project-docs/EVALUATION.md ("Arabic, Russian, Ukrainian, Chinese and Hindi"). Generated by
+// scripts/eval-langs.mjs; do not edit between the markers. A language with no row says "not
+// measured". Precision here is against each corpus's broad hostile or toxic label, pooled over the
+// corpora listed for the language.
+
+const LANG_NAMES = { fr: "French", es: "Spanish", de: "German", pt: "Portuguese", it: "Italian", ar: "Arabic",
+  ru: "Russian", uk: "Ukrainian", zh: "Chinese", hi: "Hindi" };
+
+// langs:begin (scripts/eval-langs.mjs)
+const MEASURED_LANGS = {
+  ar: {"precision":0.966,"low":0.828,"high":0.994,"n":29,"split":"test","sources":"MLMA and TextDetox (OSACT4)"},
+  ru: {"precision":1,"low":0.961,"high":1,"n":95,"split":"test","sources":"TextDetox"},
+  uk: {"precision":1,"low":0.796,"high":1,"n":15,"split":"test","sources":"TextDetox"},
+  zh: {"precision":0.759,"low":0.579,"high":0.878,"n":29,"split":"test","sources":"COLD"},
+  hi: {"precision":1,"low":0.566,"high":1,"n":5,"split":"test","sources":"TextDetox"},
+};
+// langs:end
+
+const pc = (x) => Math.round(x * 100);
+// Fewer checked signs than this give an interval too wide to show as a number.
+const MIN_N = 20;
+
+// The line the window shows beside a marker a language grammar found.
+function langLine(code) {
+  const name = LANG_NAMES[code] || code;
+  const r = MEASURED_LANGS[code];
+  if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;
+  if (r.n < MIN_N) return `Found by the ${name} word list. Not measured in ${name}: only ${r.n} of these signs in labelled text.`;
+  return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of these signs were on text people labelled ` +
+    `hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
+}
+
+return { LANG_NAMES, MEASURED_LANGS, MIN_N, langLine };
 })();
 
 // ---- persuasion-cues.js
@@ -5531,5 +5619,5 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_rhetoric, ...M_measured, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
 })();

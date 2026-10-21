@@ -13,7 +13,7 @@ export const prepHi = (s) => s.normalize("NFC");
 const N = (list) => alt(list.map((w) => w.normalize("NFC")));
 
 function grammar(w) {
-  const G = `(?:${N(w.groups)})`, S = "\\s+";
+  const G = `(?:${N(w.groups)})(?:\\s+(?:${w.like}))?`, S = "\\s+";
   const PRE = `(?:(?:${w.these})${S})?`;
   const Q = `(?:${w.quant})`, NEG = `(?:${S}(?:${w.not}))?`, COP = `(?:${S}(?:${w.cop}))`;
   // "<group> सब <noun> (नहीं) (हैं)" or "<group> <noun> (नहीं) हैं"
@@ -28,10 +28,11 @@ function grammar(w) {
 
 const DEVA = grammar({ groups: L.GROUPS_HI, dehumanise: L.DEHUMANISE_HI, kill: L.KILL_HI, traits: L.STEREOTYPE_TRAITS_HI,
   these: "ये|इन|सारे|सभी|सब|उन", quant: "सब|सारे|सभी|तो|बस|सिर्फ|निरे|सब के सब", not: "नहीं|ना|न|मत|कभी नहीं",
-  cop: "हैं|है|हो|होते हैं|होते है|ही हैं", obj: "को" });
+  cop: "हैं|है|हो|होते हैं|होते है|ही हैं", obj: "को", like: "जैसे लोग|जैसी लोग|लोग" });
 const LATN = grammar({ groups: L.GROUPS_HI_LATN, dehumanise: L.DEHUMANISE_HI_LATN, kill: L.KILL_HI_LATN,
   traits: L.STEREOTYPE_TRAITS_HI_LATN, these: "ye|yeh|in|saare|sare|sabhi|sab|un", quant: "sab|saare|sare|sabhi|bas|sirf",
-  not: "nahi|nahin|nhi|na|mat|kabhi nahi", cop: "hai|hain|hote hain|hote hai|ho|hi hain", obj: "ko" });
+  not: "nahi|nahin|nhi|na|mat|kabhi nahi", cop: "hai|hain|hote hain|hote hai|ho|hi hain", obj: "ko",
+  like: "jaise log|jaisi log|log" });
 
 export const RE_HI = {
   deva: DEVA, latn: LATN,

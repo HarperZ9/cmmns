@@ -17,14 +17,16 @@ export const GROUPS_HI = [
   "गद्दारों", "देशद्रोही", "देशद्रोहियों", "मोदीभक्त", "मोदीभक्तों",
   // वर्ग, भूमिका, पहचान
   "औरतें", "औरतों", "महिलाएं", "महिलाओं", "मर्द", "मर्दों", "नारीवादी", "नारीवादियों", "फेमिनिस्ट", "फेमिनिस्टों", "पुलिसवाले",
-  "पुलिसवालों", "अमीर", "अमीरों", "नेता", "नेताओं", "पत्रकार", "पत्रकारों",
+  "पुलिसवालों", "अमीर", "अमीरों", "नेता", "नेताओं", "पत्रकार", "पत्रकारों", "शूद्र", "शूद्रों", "असमिया", "विकलांग", "विकलांगों", "हिजड़े",
+  "हिजड़ों", "किन्नर", "किन्नरों", "समलैंगिक", "समलैंगिकों",
 ];
 export const GROUPS_HI_LATN = ["musalman", "musalmaan", "musalmano", "musalmanon", "musalmaano", "muslim", "muslims", "muslimo",
   "mulle", "mullo", "hindu", "hindus", "hinduo", "hinduon", "dalit", "daliton", "sikh", "sikho", "isai", "isaiyon", "bihari",
   "biharion", "pakistani", "bangladeshi", "rohingya", "sanghi", "sanghiyon", "bhakt", "bhakto", "andhbhakt", "andhbhakto",
   "congressi", "librandu", "librandus", "sickular", "sickulars", "jihadi", "jihadiyo", "naxal", "naxali", "khalistani", "gaddar",
   "gaddaro", "deshdrohi", "aurat", "aurate", "auraten", "aurato", "auraton", "mard", "mardo", "feminist", "feminists", "hijre",
-  "hijro", "kinnar", "gay log", "neta", "netao", "patrakar"];
+  "hijro", "hijde", "kinnar", "gay log", "neta", "netao", "patrakar", "shudra", "shudro", "assamese", "auratein",
+  "aurtein", "viklang", "apahij"];
 
 export const DEHUMANISE_HI = ["कीड़े", "कीड़ा", "कीड़े-मकोड़े", "दीमक", "कुत्ते", "कुत्ता", "सूअर", "सुअर", "जानवर", "कॉकरोच",
   "तिलचट्टे", "चूहे", "मच्छर", "गंदगी", "कचरा", "कैंसर", "वायरस", "नासूर", "राक्षस", "हैवान", "दानव", "जोंक", "परजीवी",

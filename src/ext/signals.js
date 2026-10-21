@@ -35,7 +35,7 @@
   function language(m) {
     const out = [];
     for (const mk of (m.markers || []).filter((x) => STRONG[x.family])) {
-      out.push({ label: STRONG[mk.family], fam: mk.family, level: "warn", cat: "language", rows: [["In this post", `"${mk.match}"`], ["What it is", MEANING[mk.family]], dnp("Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.")] });
+      out.push({ label: STRONG[mk.family], fam: mk.family, level: "warn", cat: "language", rows: [["In this post", `"${mk.match}"`], ["What it is", MEANING[mk.family]], ...(mk.lang ? [["Language", PB.langLine(mk.lang)]] : []), dnp("Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.")] });
     }
     // Persuasion techniques: how the post argues. Info level, and never an account flag.
     for (const t of m.persuasion || []) {

@@ -8,13 +8,13 @@ import { RX, scoreRules } from "./rhetoric-util.js";
 
 const { alt, B, E, re } = RX;
 // Same length for the alef and ya swaps; marks and tatweel are removed.
-export const prepAr = (s) => s.replace(/[ً-ٰٟـ]/g, "").replace(/[أإآٱ]/g, "ا").replace(/ى/g, "ي");
+export const prepAr = (s) => s.replace(/[\u064B-\u065F\u0670\u0640]/g, "").replace(/[\u0623\u0625\u0622\u0671]/g, "\u0627").replace(/\u0649/g, "\u064A");
 const A = (list) => alt(list.map(prepAr));
 const PRE = "(?:و|ف)?(?:ال|لل|بال|كال|ل|ب)?";
 const G = `${PRE}(?:${A(L.GROUPS_AR)})`;
 const NEG = "(?:(?:ليسوا|ليسو|ليس|ليست|مش|مو|مب|ما\\s+هم|ماهم|غير)\\s+)?";
 const ALL = "(?:(?:كل|جميع|كافة|هؤلاء|هذول|هذولا)\\s+)?";
-const HUM = "(?:(?:كلهم|هم|هما|مجرد|عبارة\\s+عن|ليسوا\\s+الا|ما\\s+هم\\s+الا|ماهم\\s+الا|الا)\\s+)*";
+const HUM = "(?:(?:كلهم|هم|هما|زيك|زيكم|دول|دي|ده|دا|هادول|مجرد|عبارة\\s+عن|ليسوا\\s+الا|ما\\s+هم\\s+الا|ماهم\\s+الا|الا)\\s+)*";
 
 export const RE_AR = {
   dehumanise: re(`${B}${ALL}${G}${E}\\s+${HUM}${NEG}${HUM}(?:ال)?(?:${A(L.DEHUMANISE_AR)})${E}`),

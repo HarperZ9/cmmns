@@ -80,6 +80,58 @@ was built. They show that the detectors follow their rules. They are not error r
 - **Synthetic.** The duplicate and mismatch figures come from cases written alongside the rules. No
   person other than the rules' author, and no model, labelled them.
 
+## Arabic, Russian, Ukrainian, Chinese and Hindi (test split, 2026-10-21)
+
+Reproduce: download the corpora in `evidence/CORPORA.md` ("Arabic, Russian, Ukrainian, Chinese and
+Hindi"), then `node scripts/eval-langs.mjs`. It prints the test split, writes
+`evidence/lang-results.json` and the language rows in `src/core/measured-langs.js`, which the window
+shows beside a marker a language grammar found. `--split dev --show N` prints dev hits on
+non-hostile items for tuning, to the console only. Same seed and split rule as above; dev was read
+for tuning, test once.
+
+Strong families (slur, dehumanise, violence, stereotype, vigilante), precision against each
+corpus's broad hostile or toxic label:
+
+| Language | Corpus | Hits | Precision (95% interval) | Recall | Family-specific |
+|---|---|---|---|---|---|
+| Arabic | MLMA | 26 | 96.2% (81.1 to 99.3) | 2.1% | vs "hateful": 73.1% (19/26) |
+| Arabic | TextDetox (OSACT4) | 3 | 3 of 3 | 0.2% | none |
+| Arabic | HateCheck (templates) | 77 | 96.1% (89.2 to 98.7) | 5.9% | dehumanise P 25/25, R 35.7%; violence 3/3, R 2.1%; slur R 0 of 45 |
+| Russian | TextDetox | 95 | 100% (96.1 to 100) | 7.6% | none; all 95 are slurs |
+| Ukrainian | TextDetox | 15 | 15 of 15 | 1.2% | none |
+| Chinese | COLD | 29 | 75.9% (57.9 to 87.8) | 2.1% | vs "attack group": 75.9% (22/29) |
+| Chinese | HateCheck (templates) | 61 | 95.1% (86.5 to 98.3) | 5.1% | dehumanise 10/10; violence 83.3% (15/18); slur 19/19, R 25.3% |
+| Hindi | TextDetox | 5 | 5 of 5 | 0.4% | none |
+| Hindi | HateCheck (templates, Latin spelling) | 13 | 13 of 13 | 1.0% | dehumanise 10/10, R 14.3%; violence R 0 of 139 |
+
+What the window says: Arabic and Chinese show a measured line (pooled natural text: Arabic 96.6%,
+28/29, interval 82.8 to 99.4; Chinese 75.9%, 22/29, 57.9 to 87.8). Russian shows 100% (95/95, 96.1 to
+100), all from slurs. Ukrainian (15 signs) and Hindi (5) show "not measured", since fewer than 20
+signs were checked. The French, Spanish, German, Portuguese and Italian grammars show "not
+measured" too.
+
+Ukrainian: no human-labelled corpus of group-directed hate with a usable licence was found, so
+the Ukrainian dehumanise, violence and stereotype grammar is **not measured**; only its slurs were
+hit. Hindi violence and Arabic slurs: **not measured** (no hits on natural text).
+
+### What these numbers do not prove
+- TextDetox is balanced 50/50 toxic, so its precision sits above what a natural feed would give.
+  Its toxic items are mostly insults at one person, so its recall says almost nothing about group
+  rhetoric.
+- HateCheck cases are templates. Its dev and test halves share templates, and group names were
+  added after reading dev misses, so its test recall is optimistic. It shows that the grammar and
+  its negation and counter-speech rules work; it is not an error rate on real replies.
+- Chinese COLD precision (75.9%) is the lowest: seven hits on text annotators called safe, several
+  of them anti-bias speech that quotes a slur or a stereotype to reject it. Reported speech in
+  Chinese is only partly caught (`src/core/rhetoric-mention.js`).
+- Recall is low everywhere (1% to 8%). These grammars catch explicit forms only. A reply in these
+  languages with no badge has not been checked for subtler rhetoric.
+- The English results above are unchanged by these grammars: `scripts/eval.mjs --split test`
+  gives the same counts on all four English and French corpora.
+- No side comparison was run: none of these corpora labels targets by political direction. The
+  symmetry suites (`tests/rhetoric.{ar,ru,uk,zh,hi}.test.js`) hold every template to the same
+  result across 19 to 26 targets from every direction, including each camp's coinages for the other.
+
 ## Side comparison: closed on HateXplain, open on MHS
 Strong-family recall and precision on hostile text aimed at each side's usual targets (test split;
 group lists in `evidence/CORPORA.md`). "Before" is the release with the four language grammars;
