@@ -1,6 +1,6 @@
 {
   "name": "radar",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "description": "Evidence badges for social media replies: where an account is based, coordination signs, and a thread norm report.",
