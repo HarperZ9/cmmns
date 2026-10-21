@@ -93,7 +93,7 @@
 
   function checks(d) {
     $("flag-say").textContent = d.flagged
-      ? `${plural(d.flagged.k, "account", "accounts")} of ${d.flagged.n.toLocaleString()} read had at least one authenticity flag, such as a very new account or a location label that differs from what the account claims.`
+      ? `${plural(d.flagged.k, "account", "accounts")} of ${d.flagged.n.toLocaleString()} read were flagged: one strong sign, such as a very new account or a reply that speaks as a local from somewhere else, or two different weaker signs.`
       : "No accounts read yet in this window.";
     shareBar($("flag"), d.flagged, "accounts read with a flag");
     $("checks-say").textContent = d.notes
