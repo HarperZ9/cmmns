@@ -340,6 +340,41 @@ What the baselines do not prove:
 - No labelled set of coordinated threads was used here, so no recall for any coordination sign is
   measured on real data.
 
+## Technique signs: flooding and cross-language repetition (2026-10-21)
+Two signs from `project-docs/TECHNIQUES.md`, measured for how often they fire on ordinary threads.
+`python -I scripts/eval/prep-pheme-techniques.py <data>/pheme` writes a text-free extract (hashed
+account ids, times, language codes, links, media ids, post counts, join times), and
+`node scripts/techniques-baselines.mjs` writes `evidence/technique-baselines.json` and
+`src/core/techniques-data.js`.
+
+| Sign, thread size | Ordinary threads (95% interval) |
+|---|---|
+| Flooding, 5 to 19 replies | 0.55% (17 of 3,087; 0.34 to 0.88) |
+| Flooding, 20 to 49 | 1.8% (25 of 1,384; 1.2 to 2.7) |
+| Flooding, 50 to 99 | 2.2% (4 of 181; 0.9 to 5.5) |
+| Flooding, 100 or more | 3.3% (2 of 60; 0.9 to 11.4) |
+| Cross-language, 5 to 19 replies | 0.03% (1 of 3,087; 0.01 to 0.18) |
+| Cross-language, 20 to 49 | 0.14% (2 of 1,384; 0.04 to 0.53) |
+| Cross-language, 50 to 99 | 1.1% (2 of 181; 0.3 to 3.9) |
+| Cross-language, 100 or more | 0% (0 of 60; 0 to 6.0) |
+
+How the thresholds were set. The flooding rate threshold is the existing "very high post rate" flag
+(100 a day). The share (a quarter of replies with a known rate, from three or more accounts) was
+chosen after looking at the whole corpus, so these rates are in-sample; the dev and test halves
+give 0.9% and 1.2% overall. Accounts replying five or more times in one thread showed up in 23% of
+ordinary threads, so repetition is shown as context and never fires the sign.
+
+What the baselines changed. Cross-language first fired on 2.3% to 3.4% of threads; 167 of 177 groups
+were replies carrying the root post's own link or upload in other languages. The root post's
+material is now set aside, as the same-text sign sets aside the root's wording.
+
+What these numbers do not prove:
+- PHEME is Twitter in 2014 and 2015 and mostly English (94% of replies); multilingual threads are
+  rarer there than on today's X.
+- Twitter's language code is wrong on short replies; a wrong code can make one language look like two.
+- No labelled set of flooded or multilingual campaign threads exists here, so no precision or recall.
+- Cross-language across viewed threads and the laundering chain are not measured.
+
 ## Look-alike letters (2026-10-21)
 Text is folded to the Unicode confusables table (UTS #39, version 18.0.0) before the duplicates sign,
 the cross-thread fingerprint, claim matching and the rhetoric word lists (`src/core/confusables.js`).
