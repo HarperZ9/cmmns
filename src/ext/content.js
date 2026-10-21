@@ -36,7 +36,7 @@
     const key = (r.writtenIn ? "t:" : "o:") + r.text;
     let a = memo.get(key);
     if (!a) {
-      a = { markers: PB.score(r.text).markers, machine: machineOf(r) };
+      a = { markers: PB.score(r.text).markers, persuasion: PB.persuasion(r.text), machine: machineOf(r) };
       if (memo.size > 3000) memo.clear();
       memo.set(key, a);
     }
@@ -93,7 +93,7 @@
       const reading = cache[r.author.toLowerCase()] || (site.reading ? site.reading(r.author) : null);
       const { mismatch, flags, activity } = evidence(site, r, reading, clusterOf.get(r.id));
       const an = analyse(r);
-      models.push([r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), trail: PB.trailFor(tweets.get(r.id), tweets, PBLogs.trail()), yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, claims: PBLogs.claimsOf(r.id), reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, r.anchor]);
+      models.push([r.node, { site, handle: r.author, display: r.display, posted: r.posted, profile: site.profileOf ? site.profileOf(r.author) : r.profile, activity, tweet: tweets.get(r.id), trail: PB.trailFor(tweets.get(r.id), tweets, PBLogs.trail()), yt: ytAuthors.get(r.author.toLowerCase()), markers: an.markers, persuasion: an.persuasion, machine: an.machine, paid: r.paid, domains: r.domains, writtenIn: r.writtenIn, pageLabel: r.pageLabel, xSpam: r.xSpam, claims: PBLogs.claimsOf(r.id), reading, flags, mismatch, lookingUp: lookingUp.has(r.author), failed: failed.has(r.author) }, r.anchor]);
       // Without account readings a reply's flags are complete for what the site offers.
       rows.push({ id: r.id, author: r.author, text: r.text, machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }

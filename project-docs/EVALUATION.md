@@ -4,6 +4,7 @@
 | Detector | Measure | Data |
 |---|---|---|
 | Rhetoric markers | precision and recall per family, per side, per target group | four public human-labelled corpora (`evidence/CORPORA.md`) |
+| Persuasion techniques | span precision per technique, with recall and a chance baseline | the Propaganda Techniques Corpus (PTC, SemEval-2020 Task 11) |
 | Report "extreme" | precision against human severity labels | the same corpora |
 | Duplicates | pair precision and recall | SYNTHETIC cases (`scripts/eval/synthetic.mjs`) |
 | Mismatch | precision and recall of "speaks as local, labelled elsewhere" | SYNTHETIC cases |
@@ -18,6 +19,10 @@ Precision comes first: a badge on a real person's honest reply is the main harm.
    `evidence/eval-results.json` and `src/core/measured.js`. `--split dev` prints the tuning split
    and writes nothing.
 3. The results file records the SHA-256 of every raw and prepared input.
+4. Persuasion techniques: download `datasets-v2.tgz` (`evidence/CORPORA.md`) to
+   `D:/radar-data/ptc/` and extract it into `D:/radar-data/ptc/x/`. `npm run eval:persuasion`
+   prints the test split and rewrites `evidence/persuasion-results.json` and the persuasion block
+   of `src/core/measured.js`. `--split dev --cues` prints per-cue figures for tuning.
 
 The split is fixed (seed `radar-eval-2026-10-21`, about 50/50 per corpus). Every lexicon and
 grammar change was tuned on dev. Test was read once, after tuning.
@@ -145,6 +150,77 @@ not in the extension. Status: not measured.
   "honky" (4/10) and "dindu nuffin" (2/10), one aimed at each side.
 - Effect on test, before and after: strong precision MHS 94.0% to 95.6%, HateXplain 90.0% to 91.0%,
   Civil 34.4% to 34.6%. Strong recall MHS 8.8% to 8.4%, HateXplain 46.5% to 45.0%.
+
+## Persuasion techniques (PTC test split, 2026-10-21): none ship
+Radar looks for eleven techniques from the SemEval-2020 Task 11 and SemEval-2023 Task 3 taxonomy.
+Each is a list of lexical and grammatical cues that name no group, person, party or side
+(`src/core/persuasion-cues.js`). The rule, set before measuring: a technique shows in the window
+only when its held-out span precision has a 95% Wilson lower bound of at least 0.7 from at least 20
+hits. **No technique met it, so none is shown.** The code, the French cues, the window entries and
+the report line are built and tested. They switch on by themselves when a row in `measured.js`
+clears the bar. `node scripts/eval-persuasion.mjs` reproduces every number here and records the
+SHA-256 of the corpus archive in `evidence/persuasion-results.json`.
+
+How it is measured. PTC's public release labels only its 371 training articles, so those were split
+by article with the fixed seed (189 dev, 182 test). A Radar span is correct when it overlaps a gold
+span of the same technique. PTC merges some labels: bandwagon is scored against "Bandwagon,
+Reductio ad hitlerum" and whataboutism against "Whataboutism, Straw men, Red herring". Cues were
+pruned on dev in two rounds. Dev precision of the kept cues was 80.3% for loaded language, 72.2%
+for name calling and 65.5% for flag-waving. Test was read once, after that. "Chance" is the share of
+word tokens inside a gold span of the technique.
+
+| Technique | Test precision (Wilson 95%) | Recall | Chance | Status |
+|---|---|---|---|---|
+| loaded language | 60.3% (82/136; 51.9 to 68.1) | 7.9% | 2.3% | held back: lower bound under 0.7 |
+| name calling | 48.8% (21/43; 34.6 to 63.2) | 4.4% | 1.1% | held back: lower bound under 0.7 |
+| flag-waving | 40.7% (11/27; 24.5 to 59.3) | 12.8% | 0.5% | held back: lower bound under 0.7 |
+| exaggeration | 10.0% (1/10; 1.8 to 40.4) | 0.5% | 1.0% | held back: 10 hits |
+| bandwagon | 0/3 | 0% | 0.3% | held back: 3 hits |
+| doubt | 1/3 | 0.4% | 3.1% | held back: 3 hits |
+| appeal to fear | 0/2 | 0% | 1.3% | held back: 2 hits |
+| appeal to authority | 0/2 | 0% | 1.2% | held back: 2 hits |
+| thought-terminating cliche | 0/1 | 0% | 0.2% | held back: 1 hit |
+| whataboutism | 0/1 | 0% | 0.6% | held back: 1 hit |
+| black-and-white fallacy | no hits | 0% | 0.5% | held back: no hits |
+
+Reading the table:
+- Loaded language, name calling and flag-waving sit 25 to 80 times above chance. The cues find
+  the technique. They do not find it with few enough mistakes to label a stranger's post.
+- Dev overstated precision by about 20 points for each of the three. Cues kept for doing well on a
+  few dev hits did worse on test. A larger tuning set would help more than more cues.
+- Post hoc, and not used to ship anything: 80.1% (72.7 to 86.0) of loaded-language spans overlap a
+  gold span of some technique. The cues land on persuasive text more often than on the exact label.
+- Most techniques almost never appear as fixed phrases in news prose. Bandwagon, fear, cliches,
+  whataboutism and black-and-white framing may be more phrase-bound in replies than in articles.
+  No labelled reply corpus that Radar may use exists to check that.
+
+Skipped, because a lexical detector cannot find them without world knowledge: slogans (what counts
+as a slogan depends on who coined it, so a slogan list would be a list of sides), causal
+oversimplification (needs the real causes), straw man (needs the opponent's real position), red
+herring (needs to know what is relevant), and repetition (a document-level count, not a span cue).
+Ideology labels such as "fascist" or "communist" are not name-calling cues. Whether such a label is
+accurate is world knowledge, and the same words are targets in the symmetry test.
+
+French has cues for all eleven techniques and no measurement, because the SemEval-2023 Task 3
+French data may be used only inside that shared task (`evidence/CORPORA.md`). A French entry would
+show only for a technique that ships, with "not measured in French" beside it.
+
+Symmetry (`tests/persuasion.symmetry.test.js`): 14 English templates across 26 targets and 11
+French templates across 24 targets, from every political direction, find the same techniques for
+every target. Each target alone finds none. All pass.
+
+Thread report: once a technique ships, the report adds one separate line. It gives the share of
+looked-up replies using a shown technique among flagged and among unflagged accounts, each with its
+Wilson interval. It never changes "flagged", the extreme comparison or the verdict
+(`tests/report.test.js`).
+
+### What the persuasion numbers do not prove
+- PTC is news articles from 48 outlets, mostly 2017 to 2019. Replies are shorter and blunter, and
+  precision there is not measured. It could be higher or lower.
+- PTC's labels are not exhaustive. A true use the annotators did not mark counts as a miss, so
+  precision leans low.
+- A technique describes how a post argues. It does not say the post is false, or anything about
+  who wrote it.
 
 ## Threads
 At least one event with threads from opposing sides (for example a protest covered by outlets on

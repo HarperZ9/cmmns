@@ -8,6 +8,7 @@
 
 import { score } from "./rhetoric.js";
 import { isFlagged } from "./flags.js";
+import { persuasion, shownTechniques, TECHNIQUES } from "./persuasion.js";
 
 export const MIN_EXTREME = 10;   // below this, the report says "too few to compare"
 
@@ -36,6 +37,7 @@ export function threadReport(replies) {
   out.machine = { n: replies.filter((r) => r.machine).length };
   out.origins = origins(known);
   out.joinBurst = joinBurst(known);
+  out.persuasion = persuasionShare(replies);
   out.verdict = verdict(out);
   out.sentence = sentence(out);
   return out;
@@ -80,6 +82,23 @@ function sentence(r) {
     case "skewed-away": return `${base} Extreme replies come less often from flagged accounts here.${cover}`;
     default: return `${base} The difference is within the uncertainty.${cover}`;
   }
+}
+
+// A separate line for persuasion techniques: the share of looked-up replies using any shown
+// technique, among flagged and among unflagged accounts. It never feeds "flagged" or the verdict.
+// Returns null when no technique is shown.
+export function persuasionShare(replies, shown = shownTechniques()) {
+  if (!shown.length) return null;
+  const known = replies.filter((r) => Array.isArray(r.flags));
+  const group = (rs) => {
+    const k = rs.filter((r) => persuasion(r.text, shown).length).length;
+    return { n: rs.length, k, share: rs.length ? k / rs.length : 0, ci: wilson(k, rs.length) };
+  };
+  const flagged = group(known.filter((r) => isFlagged(r.flags))), unflagged = group(known.filter((r) => !isFlagged(r.flags)));
+  const names = shown.map((t) => TECHNIQUES[t].name.toLowerCase()).join(" or ");
+  const part = (g, who) => `${g.k} of ${g.n} from ${who} accounts${g.n ? ` (${pct(g.share)}%, 95% interval ${pct(g.ci[0])} to ${pct(g.ci[1])}%)` : ""}`;
+  const sentence = `Replies using ${names}: ${part(flagged, "flagged")}, ${part(unflagged, "unflagged")}.`;
+  return { techniques: shown, flagged, unflagged, notLookedUp: replies.length - known.length, sentence };
 }
 
 export const REPORT_DOES_NOT_PROVE = "A skew can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event. It says nothing about any one reply or account.";

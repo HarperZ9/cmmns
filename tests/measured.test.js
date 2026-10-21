@@ -33,3 +33,12 @@ test("the detail keeps the split, the side comparison and a does-not-prove line"
   assert.ok(MEASURED_DOES_NOT_PROVE.length > 40);
   assert.ok(!/\u2014/.test(MEASURED_DOES_NOT_PROVE), "no em dashes in user-facing text");
 });
+
+test("the persuasion block survives a rewrite of measured.js by scripts/eval.mjs", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { currentBlock, persuasionBlock } = await import("../scripts/eval/summarise-persuasion.mjs");
+  const { MEASURED_PERSUASION } = await import("../src/core/measured.js");
+  const src = readFileSync(new URL("../src/core/measured.js", import.meta.url), "utf8").split("\r\n").join("\n");
+  assert.equal(currentBlock(src), persuasionBlock(MEASURED_PERSUASION));
+  for (const id of Object.keys(MEASURED_PERSUASION)) assert.equal(MEASURED[id], undefined, `${id} stays out of MEASURED`);
+});

@@ -70,6 +70,8 @@
       stats.paused ? "X is limiting requests; Radar paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
     ]);
     section(p, "Coordination", coordination(report, clusters));
+    // Persuasion techniques get their own line; they never count toward "flagged".
+    section(p, "Persuasion", report.persuasion ? [report.persuasion.sentence] : []);
     const U = report.upstream;
     section(p, "Upstream", U ? [
       U.accounts.length ? "Replies quote or lift media from: " + U.accounts.map((a) => `@${a.handle} (${a.n})`).join(", ") + "." : null,

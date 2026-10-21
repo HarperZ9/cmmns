@@ -10,6 +10,20 @@
 // duplicate and mismatch pilots, which are not human-labelled and get no row in MEASURED.
 
 export const MEASURED_AT = "2026-10-21";
+// persuasion:begin (scripts/eval-persuasion.mjs)
+export const MEASURED_PERSUASION = {
+  "loaded-language": {"precision":0.603,"low":0.519,"high":0.681,"n":136,"split":"test","recall":0.079,"chance":0.023,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "name-calling": {"precision":0.488,"low":0.346,"high":0.632,"n":43,"split":"test","recall":0.044,"chance":0.011,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "bandwagon": {"precision":0,"low":0,"high":0.562,"n":3,"split":"test","recall":0,"chance":0.003,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "appeal-to-fear": {"precision":0,"low":0,"high":0.658,"n":2,"split":"test","recall":0,"chance":0.013,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "flag-waving": {"precision":0.407,"low":0.245,"high":0.593,"n":27,"split":"test","recall":0.128,"chance":0.005,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "thought-terminating": {"precision":0,"low":0,"high":0.793,"n":1,"split":"test","recall":0,"chance":0.002,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "whataboutism": {"precision":0,"low":0,"high":0.793,"n":1,"split":"test","recall":0,"chance":0.006,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "doubt": {"precision":0.333,"low":0.061,"high":0.792,"n":3,"split":"test","recall":0.004,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "appeal-to-authority": {"precision":0,"low":0,"high":0.658,"n":2,"split":"test","recall":0,"chance":0.012,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "exaggeration": {"precision":0.1,"low":0.018,"high":0.404,"n":10,"split":"test","recall":0.005,"chance":0.01,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+};
+// persuasion:end
 export const MEASURED = {
   "dehumanise": {"precision":0.923,"low":0.797,"high":0.973,"n":39,"split":"test","recall":0.002,"range":null,"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
   "violence": {"precision":0.875,"low":0.79,"high":0.929,"n":88,"split":"test","recall":0.021,"range":[0.967,0.967],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},

@@ -37,6 +37,10 @@
     for (const mk of (m.markers || []).filter((x) => STRONG[x.family])) {
       out.push({ label: STRONG[mk.family], fam: mk.family, level: "warn", cat: "language", rows: [["In this post", `"${mk.match}"`], ["What it is", MEANING[mk.family]], dnp("Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.")] });
     }
+    // Persuasion techniques: how the post argues. Info level, and never an account flag.
+    for (const t of m.persuasion || []) {
+      out.push({ label: `persuasion: ${t.name.toLowerCase()}`, fam: t.technique, level: "info", cat: "language", rows: [["In this post", `"${t.match}"`], ["What it is", t.definition], t.lang === "fr" ? ["French cue", "Not measured in French. The figure below is for English news articles."] : null, dnp(PB.PERSUASION_DOES_NOT_PROVE)].filter(Boolean) });
+    }
     const M = m.machine;
     if (M && M.leak) out.push({ label: "leaked AI text", fam: "leaked-ai", level: "warn", cat: "language", rows: [["In this post", `"${M.leak}"`], ["What it is", "Text a chatbot writes, posted without editing."], dnp("People quote chatbots, joke, or paste a reply on purpose.")] });
     else if (M && M.machineLike) out.push({ label: "machine-writing signs", fam: "machine-writing", level: "flag", cat: "language", rows: [["Signs", M.signs.join("; ")], ["How Radar decides", "Three or more independent signs in a post of at least 25 words, using Articulate's word lists."], dnp("No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.")] });
