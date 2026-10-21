@@ -115,6 +115,33 @@ Radar draws nothing on the page. Resting the pointer on a post for 450 ms fades 
 
 Radar describes how an account operates. It does not try to work out who runs an account: no linking accounts across platforms, no guessing names, employers, ages or homes, no reverse search of profile photos, and no payment or tip-jar handles. Those steps would identify people, most of whom are ordinary users, and they add nothing to the evidence that an operation exists.
 
+### Fact-checked claims (2026-10-21)
+
+`src/core/claims.js` matches each post against claims fact-checkers have already reviewed, from a
+table bundled with Radar (`src/ext/claims.json`, 19,728 reviews from 328 fact-checkers, 6 MB,
+built from the Data Commons ClaimReview feed under CC BY 4.0 by `scripts/claims-build.mjs`). The
+background worker indexes the table once; pages send the text of the posts they show and get back
+only the matches. A match reads "A fact-checker reviewed a similar claim", with the fact-checker's
+name, their rating in their own words, the claim they reviewed, the date and a link. Its
+does-not-prove line: similar wording is not the same claim; check the source. Radar never rates a
+post itself. A Community Note X attached to a post is now the first signal in the window.
+
+A post matches only when it carries at least 85% of the claim's rarity-weighted content words,
+every name and number in the claim, at least 30% of the claim's word pairs in order, and no claim
+word swapped for another between the same neighbours. `tests/claims.test.js` holds the
+false-match controls (same topic, different year, different place, a swapped word, scattered
+words, stock phrases) and `tests/claims.symmetry.test.js` holds the matcher to the same decision
+and score for 24 named actors and 12 groups from every direction. On the built table, each of
+2,000 sampled claims finds its own review (1,998 of 2,000), seven generic posts on politics, health
+and conflict match nothing, and 41 of 3,000 sampled claims match a different review; read by hand,
+those were the same claim reviewed twice in different words.
+
+Sources whose terms are unknown are not bundled: EUvsDisinfo, Community Notes downloads, the Duke
+Reporters' Lab dataset and the IFCN signatory list (`data/claims.README.md`). Known limits: the
+matcher splits words on spaces, so Chinese, Japanese and Thai claims match only near-verbatim; the
+stemmer is English-centred; the table covers 2024-03 to 2026-10; and which claims are in it is
+what fact-checkers chose to check.
+
 ### The window, reorganised (2026-10-19)
 
 The head shows the account, the key facts, warnings by name, and a strip of seven areas: Place, Account, Posting, Coordination, Language, Sources and Media. Each area's dot is warm when something there is worth a look, ink for a sign, faint for context, and hollow when nothing was found. Clicking an area opens the Overview at that area's evidence. Four tabs follow: **Overview** (the evidence grouped by area, and a comparison with the other accounts read in the thread), **Account** (where, the account record, and how it posts, with a 24-hour posting clock, the last 14 days and the share of posts per app), **This post** (post metadata and the source trail) and **History**. The window remembers the last tab used. The charts are single-series, in one ink hue, with a title on each bar and the same numbers as text below them.

@@ -43,6 +43,12 @@ To update after a change, press the reload arrow on Radar's card in the extensio
 - **Reddit:** account age, karma, email verification and Reddit's sign-up name pattern, from Reddit's own public account data, read one account every 2 seconds and kept 14 days. New accounts and accounts with little karma after a month get flags.
 - **History page** (toolbar popup, "Open history"): across the threads you opened in the last 60 days, the upstream accounts and sites your threads' material keeps leading back to, accounts that keep appearing, uploads many accounts carried, flagged accounts by day, where accounts are labelled as based, and state links seen. Save it as JSON or clear it.
 
+- **Fact-checked claims:** when a post's wording closely matches a claim a fact-checker has
+  already reviewed, the window shows the fact-checker's name, their rating in their own words and
+  a link. About 20,000 reviews from 328 fact-checkers ship inside Radar (Data Commons ClaimReview
+  feed, CC BY 4.0), so no post text is sent anywhere. Similar wording is not the same claim, and
+  Radar never rates a post itself. A Community Note on a post is shown first.
+
 All of it comes from data the site already loaded for the page. Radar makes no request of its own for it.
 
 ## Status
