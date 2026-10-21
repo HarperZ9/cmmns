@@ -12,6 +12,10 @@
 
 import * as L from "./lexicon.js";
 import { scoreFr, NEGATION_FR } from "./rhetoric-fr.js";
+import { scoreEs, NEGATION_ES } from "./rhetoric-es.js";
+import { scoreDe, NEGATION_DE } from "./rhetoric-de.js";
+import { scorePt, NEGATION_PT } from "./rhetoric-pt.js";
+import { scoreIt, NEGATION_IT } from "./rhetoric-it.js";
 
 export const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -61,16 +65,27 @@ export const EXTREME_AT = 2;
 // Families strong enough to label the comment itself.
 export const STRONG = new Set(["dehumanise", "violence", "vigilante", "slur", "stereotype"]);
 
-// Returns { score, markers: [{ family, match }], extreme }.
-export function score(text) {
-  const s = String(text || "").replace(/[’]/g, "'");
-  const markers = [];
-  const hit = (family, re, negatable = false, on = s) => {
+// Other languages, in order. Each adds only families that English and the languages before it
+// did not find, and negates its matches with its own negation words.
+export const LANGUAGES = [
+  { code: "fr", score: scoreFr, negation: NEGATION_FR },
+  { code: "es", score: scoreEs, negation: NEGATION_ES },
+  { code: "de", score: scoreDe, negation: NEGATION_DE },
+  { code: "pt", score: scorePt, negation: NEGATION_PT },
+  { code: "it", score: scoreIt, negation: NEGATION_IT },
+];
+
+// A matcher that records a marker when `re` matches and, if negatable, the match has no negation.
+function recorder(s, markers) {
+  return (family, re, negatable = false, on = s, negation = NEGATION) => {
     const m = on.match(re);
-    if (!m || (negatable && (NEGATION.test(m[0]) || NEGATION_FR.test(m[0])))) return false;
+    if (!m || (negatable && negation.test(m[0]))) return false;
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
+}
+
+function scoreEnglish(s, hit) {
   if (!hit("dehumanise", RE.notHuman)) hit("dehumanise", RE.dehumanise, true);
   if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.violenceCall, true) && !hit("violence", RE.warOn, true)
     && !hit("violence", RE.onlyGoodDead) && !(VIOLENT_STEM.test(s) && hit("violence", RE.sameFate, true))) {
@@ -83,7 +98,18 @@ export function score(text) {
   hit("essentialise", RE.essentialise, true);
   hit("conspiracy", RE.conspiracy);
   hit("absolutist", RE.absolutist);
-  scoreFr(hit, new Set(markers.map((m) => m.family)));
+}
+
+// Returns { score, markers: [{ family, match }], extreme }.
+export function score(text) {
+  const s = String(text || "").replace(/[’]/g, "'");
+  const markers = [];
+  const hit = recorder(s, markers);
+  scoreEnglish(s, hit);
+  for (const lang of LANGUAGES) {
+    const have = new Set(markers.map((m) => m.family));
+    lang.score((family, re, negatable = false) => hit(family, re, negatable, s, lang.negation), have);
+  }
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };
 }

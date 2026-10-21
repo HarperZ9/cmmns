@@ -44,12 +44,18 @@ extreme rhetoric so it reads as normal for a group. A reader scrolling replies c
   Jaccard of at least 0.6, across distinct authors, ignoring replies under 6 words.
 - **Rhetoric** (`src/core/rhetoric.js`): four marker families (dehumanise, violence, conspiracy,
   absolutist) with negation handling. Policy positions such as deportation under law score zero.
+  French, Spanish, German, Portuguese and Italian grammars (`rhetoric-<lang>.js` with
+  `lexicon-<lang>.js`) run after English in the order listed in `LANGUAGES`, and each adds only
+  families not yet found. Each language negates with its own words and has its own symmetry test
+  (`tests/rhetoric.<lang>.test.js`; French in `tests/rhetoric.recall.test.js`). Word-list sources: `evidence/LEXICON-SOURCES.md`.
 - **Report** (`src/core/report.js`): as above; needs at least 10 extreme replies.
 
 ## Known limits
 - X's labels can be wrong; VPNs and travel move them; users can broaden them to a region.
 - The local-claim patterns are English and a little French. Other languages read as "no claim".
-- The rhetoric lexicon is English and hand-built. It needs precision and recall measured on
+- The rhetoric lexicons are hand-built. The non-English ones cover dehumanise, violence,
+  stereotype, conspiracy and (except French) slurs; motive, essentialise, vigilante and
+  absolutist are English only. Every lexicon needs precision and recall measured on
   labelled data before anyone relies on the report (EVALUATION.md).
 - The report sees only the replies X chose to render and the accounts that were looked up.
 
