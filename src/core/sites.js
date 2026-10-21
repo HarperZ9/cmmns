@@ -12,6 +12,7 @@
 
 import { siteKey, hostOf } from "./hosts.js";
 import { stateLabel } from "./state.js";
+import { ownerOfDomain, ownerSourceShort } from "./owners.js";
 
 let FACTS = {}, RECORDS = {}, CHECKERS = [];
 
@@ -31,6 +32,9 @@ export function siteFacts(host) {
   const top = siteKey(h);
   while (h) {
     const f = FACTS[h];
+    // An owner correction can mark the Wikidata facts for this host as another item's.
+    const o = f && ownerOfDomain(h);
+    if (o && o.domain === h && o.correction && o.correction.factsWrong) return null;
     if (f) return { name: f[0], founded: f[1] || null, country: f[2] || null, ownerType: f[3] || null, source: f[4] ? `https://www.wikidata.org/wiki/${f[4]}` : null };
     if (h === top || !h.includes(".")) break;
     h = h.slice(h.indexOf(".") + 1);
@@ -81,7 +85,7 @@ export function siteInfoRows(info, opts = {}) {
   const type = ownerType(info);
   const rows = [
     ["Site", name ? `${name} (${domain})` : domain],
-    [ownerHeading(owner), owner && owner.owner ? `${owner.owner} (Wikidata)` : null],
+    [ownerHeading(owner), owner && owner.owner ? `${owner.owner} (${ownerSourceShort(owner)})` : null],
     ["Owner type", type !== "not stated" ? `${type}, ${typeSource(info)}` : null],
     ["Founded", facts && facts.founded ? `${facts.founded} (Wikidata)` : null],
     ["Country", facts && facts.country ? `${facts.country} (Wikidata)` : null],

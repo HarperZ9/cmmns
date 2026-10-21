@@ -63,9 +63,23 @@ function checkerFlags(oldMap, newMap, t) {
   return out;
 }
 
+// Owner rows carrying a hand-kept correction (data/owner-corrections.json): when Wikidata now says
+// the same as the correction, it can be retired; when Wikidata changed again, someone should look.
+export function correctionFlags(oldData, newData) {
+  const sort = (o) => String(o || "").split("; ").sort().join("; "), out = [];
+  const before = new Map(((oldData && oldData.rows) || []).filter((r) => r.correction).map((r) => [r.domain, r.correction.upstream]));
+  for (const r of (newData && newData.rows) || []) {
+    if (!r.correction) continue;
+    const up = r.correction.upstream, was = before.get(r.domain);
+    if (sort(up.owner) === sort(r.owner) && (up.via || "owner") === (r.via || "owner")) out.push({ level: "medium", kind: "correction can be retired", detail: `${r.domain}: Wikidata now says "${up.owner}", the same as the correction` });
+    else if (was && sort(was.owner) !== sort(up.owner)) out.push({ level: "medium", kind: "upstream changed under a correction", detail: `${r.domain}: Wikidata "${was.owner}" -> "${up.owner}"; the correction still shows "${r.owner}"` });
+  }
+  return out;
+}
+
 export function guard(oldData, newData, { kind = detectKind(newData), reach = new Set(), thresholds = THRESHOLDS } = {}) {
   const oldMap = VIEWS[kind](oldData), newMap = VIEWS[kind](newData), d = diffViews(oldMap, newMap);
-  const flags = [...volumeFlags(d, thresholds), ...labelFlags(d, kind, reach), ...(kind === "claims" ? checkerFlags(oldMap, newMap, thresholds) : [])];
+  const flags = [...volumeFlags(d, thresholds), ...labelFlags(d, kind, reach), ...(kind === "claims" ? checkerFlags(oldMap, newMap, thresholds) : []), ...(kind === "owners" ? correctionFlags(oldData, newData) : [])];
   return { kind, ...d, flags, high: flags.filter((f) => f.level === "high").length };
 }
 

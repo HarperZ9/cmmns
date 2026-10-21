@@ -3,7 +3,7 @@
 // Radar adds no score or rating of its own. Reads only the tables handed to useData().
 
 import { siteFacts, siteRecord, recordSummary, recordLine, ownerHeading, ownerType, SITE_SOURCES, SITE_RECORD_DOES_NOT_PROVE } from "./sites.js";
-import { ownerOfDomain } from "./owners.js";
+import { ownerOfDomain, ownerSource } from "./owners.js";
 import { stateLinksOfDomain, stateLabel, STATE_DOES_NOT_PROVE } from "./state.js";
 import { lookalikeOf, LOOKALIKE_DOES_NOT_PROVE } from "./lookalike.js";
 import { hostOf } from "./hosts.js";
@@ -28,7 +28,7 @@ export function siteSummary(domain) {
   return {
     domain: d,
     facts: siteFacts(d),
-    owner: owner ? { name: owner.name, owner: owner.owner, via: owner.via || "owner", source: owner.source || null } : null,
+    owner: owner ? { name: owner.name, owner: owner.owner, via: owner.via || "owner", source: owner.source || null, ...(owner.correction ? { correction: owner.correction } : {}) } : null,
     state: stateLinksOfDomain(d).map((h) => ({ ...h })),
     record: recordSummary(siteRecord(d)),
     lookalike: lookalikeOf(d),
@@ -53,7 +53,7 @@ export function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   }
   if (S.owner && S.owner.owner) {
     out.push({ ...base, kind: "site-owner", level: "info", label: `link: ${S.owner.name || S.domain}`,
-      shows: `${S.owner.name || S.domain} (${S.domain}). ${ownerHeading(S.owner)} ${S.owner.owner}.`, source: `Wikidata${S.owner.source ? `: ${S.owner.source}` : ""}`,
+      shows: `${S.owner.name || S.domain} (${S.domain}). ${ownerHeading(S.owner)} ${S.owner.owner}.`, source: ownerSource(S.owner),
       doesNotProve: SITE_OWNER_DOES_NOT_PROVE, data: { domain: S.domain, owner: S.owner.owner, ownerType: ownerType({ facts: S.facts, state: S.state }) } });
   }
   const line = recordLine(S.record);

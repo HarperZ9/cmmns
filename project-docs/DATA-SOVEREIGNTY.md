@@ -45,7 +45,7 @@ External snapshots live under `RADAR_DATA` (default `../radar-data` beside the r
 entry says why it is not committed and how to fetch it again; the hash says whether the copy you
 fetched is the one Radar was built from.
 
-Honest gap: the owner table (`src/ext/owners.json`) and the state table (`src/ext/state.json`) were
+Honest gap: the Wikidata part of the owner table (`src/ext/owners.json`) and the state table (`src/ext/state.json`) were
 built before this lockfile existed, and their raw Wikidata answers were not kept. Both tables are
 pinned by hash, and the guard can diff any new build against them, but neither can be rebuilt
 offline yet. `node scripts/owners-build.mjs --save-raw $RADAR_DATA/wikidata-owners.json` keeps the raw
@@ -103,9 +103,38 @@ listed in a different order raise nothing.
 countries, languages, ownership types and political leanings. Being on it means a silent change
 there would reach many users. It says nothing about the site.
 
-Run against the owner table that shipped before 2026-10-20, the guard flags 7 high-reach changes in
-the current table, among them `dw.com` now owned by "ARD" and `redeglobo.globo.com` by "O Diário de
-Mogi". Those changes reached users before the guard existed. They are left for a separate review.
+Run against the owner table that shipped before 2026-10-20, the guard flagged 7 high-reach changes
+on 6 sites that had reached users before the guard existed. Each was checked against a primary
+source on 2026-10-21. All 6 rows were wrong or misleading, and each now has a correction (below).
+
+## Owner corrections
+
+`data/owner-corrections.json` is a hand-kept list of rows where Wikidata is wrong. Each row gives
+the domain, the corrected owner, a primary source (the outlet's own site, a statute or a company
+filing; Wikipedia and Wikidata are pointers only), what that source says, the date checked and why
+the upstream row is wrong. `factsWrong` marks a domain whose Wikidata site facts describe another
+item; the site card then hides them.
+
+`scripts/owner-corrections.mjs` applies the corrections to `src/ext/owners.json`, and
+`owners-build.mjs` applies them after every fetch. A corrected row keeps what Wikidata said
+(`correction.upstream`), and the window credits "Radar correction, checked <date>" with its source
+instead of Wikidata. The step is idempotent and runs in the offline build. The guard reports
+"correction can be retired" when Wikidata comes to say the same, and "upstream changed under a
+correction" when Wikidata changes again. `owner-corrections.mjs --check` exits 1 in either case or
+when a corrected domain has gone.
+
+| Site | Wikidata said | Correction | Source |
+|---|---|---|---|
+| asahi.com | published by Asahi Shimbun Company | owned by Asahi Shimbun Company | the site's title and copyright line |
+| bloomberg.com | Bank of America; Michael Bloomberg (from the Bloomberg Television item) | Bloomberg L.P. | Merrill Lynch 10-K for 2008 (stake sold to Bloomberg Inc. on 2008-07-17); bloomberg.com terms |
+| dw.com | ARD | Deutsche Welle, a public-law broadcaster under German federal law | Deutsche-Welle-Gesetz §§ 1 and 45 |
+| france24.com | France 24 | France Médias Monde | France Médias Monde's own site |
+| redeglobo.globo.com | O Diário de Mogi (from the TV Diário affiliate item) | Globo Comunicação e Participações S.A. | the site's copyright line |
+| xinhuanet.com | parent China Xinhua News Network Corporation (from the CNC World item) | Xinhuanet Co., Ltd., run by Xinhua News Agency | the site's footer |
+
+Does not prove: a correction is right as of the date checked, from the source it cites. Ownership
+changes, and a correction can go stale like any other row; the guard only notices when Wikidata
+moves.
 
 ## How packs work
 
