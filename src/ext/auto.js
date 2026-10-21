@@ -4,13 +4,15 @@
 // kept in chrome.storage.local (no CSRF token; that is read fresh from X's cookie each time).
 // If Radar has never seen X make that request, it opens the About page of ONE account once in the
 // minimised worker window so X makes it; after that everything happens in the page.
-// Pace: one account every GAP_MS. A 429 (rate limit) pauses for PAUSE_MS. A 400/404 means X
+// Pace: from X's rate-limit headers (PB.nextStep in src/core/pace.js), never faster than one
+// account every 1.5 s. A 429 waits for X's reset and retries the handle. A 400/404 means X
 // changed the request, so the shape is forgotten and learned again.
 (() => {
   "use strict";
-  const KEY = "pb.tpl", GAP_MS = 1500, PAUSE_MS = 5 * 60000;
-  const queue = [], asked = new Set();
-  let template = null, busy = false, pausedUntil = 0, bootstrapping = false, onChange = () => {};
+  const KEY = "pb.tpl", GAP_MS = 1500, LIMITED_MS = 60000;
+  const queue = [], asked = new Set(), tries = new Map();
+  // nextAt spaces requests; pausedUntil is set only when X is limiting (a 429 or the reserve reached).
+  let template = null, current = null, nextAt = 0, pausedUntil = 0, bootstrapping = false, onChange = () => {};
   const api = (globalThis.chrome && chrome.storage && chrome.storage.local) || null;
 
   const toPage = (msg) => window.postMessage(msg, location.origin);
@@ -28,20 +30,25 @@
       bootstrapping = false;
       setTemplate(e.data.template);
     }
-    if (e.data.source === "radar-about-done") done(e.data.handle, e.data.status);
+    if (e.data.source === "radar-about-done") done(e.data.handle, e.data.status, e.data);
   });
 
-  function done(handle, status) {
-    busy = false;
-    if (status === 429) pausedUntil = Date.now() + PAUSE_MS;
+  // Pacing comes from X's rate-limit headers (PB.nextStep); a 429 or timeout retries the handle.
+  function done(handle, status, rl = {}) {
+    if (handle !== current) return;   // a late reply for a handle the timeout already settled
+    current = null;
+    const now = Date.now();
+    const step = PB.nextStep({ status, remaining: rl.remaining, reset: rl.reset, now, tries: tries.get(handle) || 0 });
+    if (step.retry) { tries.set(handle, (tries.get(handle) || 0) + 1); queue.unshift(handle); }
+    nextAt = now + step.delay;
+    if (status === 429 || step.delay >= LIMITED_MS) pausedUntil = nextAt;
     if (status === 400 || status === 404 || status === "no-template") {
       template = null;
       if (api) api.remove(KEY).catch(() => {});
-      asked.delete(handle);
       queue.unshift(handle);
     }
     onChange();
-    setTimeout(pump, GAP_MS);
+    setTimeout(pump, step.delay);
   }
 
   function bootstrap() {
@@ -52,13 +59,12 @@
   }
 
   function pump() {
-    if (busy || !queue.length) return;
-    if (Date.now() < pausedUntil) { setTimeout(pump, pausedUntil - Date.now()); return; }
+    if (current || !queue.length) return;
+    if (Date.now() < nextAt) { setTimeout(pump, nextAt - Date.now()); return; }
     if (!template) { bootstrap(); return; }
-    busy = true;
-    const handle = queue.shift();
+    const handle = current = queue.shift();
     toPage({ source: "radar-ask-about", handle });
-    setTimeout(() => { if (busy) done(handle, "timeout"); }, 15000);
+    setTimeout(() => done(handle, "timeout"), 15000);
   }
 
   // handles: accounts on screen with no About data yet. Each is asked once per page session.
@@ -68,5 +74,5 @@
     pump();
   }
 
-  globalThis.PBAuto = Object.freeze({ want, left: () => queue.length + (busy ? 1 : 0), paused: () => Date.now() < pausedUntil });
+  globalThis.PBAuto = Object.freeze({ want, left: () => queue.length + (current ? 1 : 0), paused: () => Date.now() < pausedUntil });
 })();

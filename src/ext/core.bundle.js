@@ -1573,6 +1573,36 @@ function timingBursts(rows, windowSec = WINDOW_SEC, minAccounts = MIN_ACCOUNTS) 
 return { WINDOW_SEC, poissonTail, timingBursts };
 })();
 
+// ---- pace.js
+const M_pace = (() => {
+// Pacing for automatic About lookups, from X's own rate-limit headers.
+// x-rate-limit-remaining and x-rate-limit-reset (epoch seconds) come back on every GraphQL
+// response. Radar spreads what is left over the window and stops RESERVE requests short, so the
+// viewer's own use of X is never the thing that gets limited. Without headers it keeps its base gap.
+
+const BASE_GAP_MS = 1500;
+const RESERVE = 5;
+const MAX_RETRIES = 2;
+const NO_RESET_PAUSE_MS = 5 * 60000;
+const SLACK_MS = 2000;
+
+// { status, remaining?, reset?, now, tries? } -> { delay, retry }
+function nextStep({ status, remaining, reset, now, tries = 0 }) {
+  const resetMs = Number.isFinite(reset) ? reset * 1000 : NaN;
+  const window = resetMs - now;
+  const hasWindow = Number.isFinite(window) && window > 0;
+  const canRetry = tries < MAX_RETRIES;
+  if (status === 429) return { delay: hasWindow ? window + SLACK_MS : NO_RESET_PAUSE_MS, retry: canRetry };
+  if (status === "timeout" || status === "error") return { delay: BASE_GAP_MS * 4, retry: canRetry };
+  if (!hasWindow || !Number.isFinite(remaining)) return { delay: BASE_GAP_MS, retry: false };
+  const usable = remaining - RESERVE;
+  if (usable <= 0) return { delay: window + SLACK_MS, retry: false };
+  return { delay: Math.max(BASE_GAP_MS, Math.ceil(window / usable)), retry: false };
+}
+
+return { BASE_GAP_MS, RESERVE, MAX_RETRIES, nextStep };
+})();
+
 // ---- langs.js
 const M_langs = (() => {
 // Main languages per country, to decide whether "written in X" is worth a chip. A French reply
@@ -1879,5 +1909,5 @@ const HISTORY_DOES_NOT_PROVE = "These totals cover only the threads you opened, 
 return { HISTORY_RETAIN_DAYS, snapshot, addSnapshot, summarize, HISTORY_DOES_NOT_PROVE };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state, ...M_trail, ...M_history });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history });
 })();
