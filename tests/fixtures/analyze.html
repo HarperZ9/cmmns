@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar offline analyser fixture</title>
+<link rel="stylesheet" href="../../src/ext/canon.css">
+<link rel="stylesheet" href="../../src/ext/pages.css">
+<link rel="stylesheet" href="../../src/ext/dashboard.css">
+<link rel="stylesheet" href="../../src/ext/analyze.css">
+</head>
+<body>
+<main></main>
+<script src="chrome-stub.js"></script>
+<script>
+// Load the real page body, then its scripts, so the fixture shows exactly what ships.
+fetch("../../src/ext/analyze.html").then((r) => r.text()).then((html) => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  document.querySelector("main").replaceWith(doc.querySelector("main"));
+  for (const f of ["core.bundle.js", "settings.js", "signing.js", "analyze-view.js", "analyze.js"]) { const s = document.createElement("script"); s.src = "../../src/ext/" + f; s.async = false; document.body.append(s); }
+});
+</script>
+</body>
+</html>

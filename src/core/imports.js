@@ -1,0 +1,46 @@
+// One entry for every file the offline analyser and the CLI read: it decides what the file is from
+// its name and its first bytes, and returns posts in Radar's input shape. Nothing is fetched.
+//   saved page (.html, .htm)            X or Reddit thread, or any page as one text
+//   thread JSON                         Radar's shape, X GraphQL, Bluesky getPostThread, Mastodon context
+//   X archive tweets.js                 the user's own posts
+//   Reddit export comments.csv / posts.csv
+//   Mastodon archive outbox.json
+//   Bluesky repository export (.car)
+
+import { postsFromHtml } from "./import-html.js";
+import { threadFromJson } from "./import-json.js";
+import { xArchivePosts, redditExportPosts, mastodonOutboxPosts } from "./import-exports.js";
+import { blueskyCarPosts } from "./import-car.js";
+
+export const IMPORT_FORMATS = ["saved page", "thread JSON", "X archive tweets.js", "Reddit export CSV", "Mastodon outbox.json", "Bluesky repository .car"];
+export const MAX_IMPORT_POSTS = 20000;
+
+const fail = (reason) => ({ ok: false, reason });
+const asText = (bytes) => (typeof bytes === "string" ? bytes : new TextDecoder("utf-8").decode(bytes));
+const fromExport = (format, r) => (r && r.posts.length ? { ok: true, format, source: "export", site: r.site, input: { site: r.site, root: null, replies: r.posts.slice(0, MAX_IMPORT_POSTS) }, notes: [...r.notes, ...(r.posts.length > MAX_IMPORT_POSTS ? [`Only the first ${MAX_IMPORT_POSTS} posts were read.`] : [])] } : null);
+const fromThread = (format, t, notes = []) => (t && (t.replies.length || t.root) ? { ok: true, format, source: "thread", site: t.site, input: t, notes } : null);
+
+function fromJson(name, text) {
+  let json;
+  try { json = JSON.parse(text); } catch { return fail(`${name} is not valid JSON.`); }
+  if (json && json.kind === "radar-evidence-bundle") return fail("This is a Radar evidence bundle. Use Check a bundle to verify it.");
+  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Radar found no posts it can read in ${name}.`);
+}
+
+function fromBytes(name, bytes) {
+  const lower = String(name || "").toLowerCase();
+  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is not a Bluesky repository export Radar can read.`);
+  const text = asText(bytes).replace(/^﻿/, ""), head = text.slice(0, 400).trimStart();
+  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Radar can read.`);
+  if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} is not a Reddit export with id, permalink and body columns.`);
+  if (/^[[{]/.test(head)) return fromJson(name, text);
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Radar did not recognise a thread on this page, so it read the page as one text."] : [] }; }
+  return fail(`Radar does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
+}
+
+// name: the file name; bytes: Uint8Array, ArrayBuffer or string. Returns { ok: true, format,
+// source: "thread" | "export" | "page", site, input: { site, root, replies }, notes } or
+// { ok: false, reason }.
+export function importFile(name, bytes) {
+  try { return fromBytes(name, bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes); } catch (e) { return fail(`Could not read ${name}: ${e.message}`); }
+}

@@ -85,7 +85,8 @@ profile you installed Radar in. It is not synced to other devices.
 | Thread history (`pb.history.v1`) | One summary per thread you opened: counts, origins, flagged shares, linked sites, Community Note and fact-check counts. No reply text | 60 days by default; 1 to 60 days in options, at most 600 threads |
 | Feed tally (`pb.feed.v1`) | Per site and day: the ids of feed posts counted (so each counts once), how many linked each site, and how many showed strong rhetoric signs, a Community Note or a fact-check match. No post text | 60 days by default; follows the history setting |
 | Media checks (`pb.media.v1`) | For each file you asked Radar to check: a short hash of its address (not the address), the site, the time and the outcome (credentials intact, partly checked, changed, stored online, or none found), for the survival count on the feed page | 60 days by default; follows the history setting; at most 5,000 files |
-| Thread card (session storage) | The card you asked for from a thread panel, held until the card page opens it. It names no account | Until the browser closes |
+| Thread card (session storage) | The card you asked for from a thread panel, and the thread's posts as the page showed them, so the card page can build a signed evidence bundle if you ask for one. The card names no account | Until the browser closes |
+| Bundle key (IndexedDB `radar-keys`) | The ECDSA P-256 key pair Radar makes the first time you save a signed evidence bundle. The private half is stored so that it can sign but cannot be read, exported or sent | Until you remove Radar |
 | Your feedback (`pb.feedback.v1`) | Your "This was right" and "This was wrong" marks: which sign (its kind, the post id and a short hash of its label), the thread, your mark and the time. The post text only for marks where you ticked "include the text" | Until you clear it or remove Radar; at most 2,000 marks, the oldest dropped first |
 | Account details from other sites (`pb.meta.v1`) | What Instagram, Facebook, Bluesky or a Mastodon server showed about accounts you saw: join date, counts, labels, renames | 14 days |
 | Mastodon servers (`pb.instances.v1`) | The servers you turned Radar on for | Until you remove them |
@@ -104,6 +105,12 @@ is gone when you close it.
 - **Save feedback to a file** (options page): writes your marks to a JSON file on your computer
   only when you click it. Radar never sends it. You choose whether to share it, for example by
   attaching it to an issue on Radar's repository. "Clear feedback" deletes your marks.
+- **Analyse a file:** reads a saved page, thread JSON, a platform data export or a media file you
+  choose, on your device. The file is not kept and nothing is sent.
+- **Save signed bundle** (Analyse a file and the thread card page): writes a JSON file to your
+  computer only when you click it. It holds post ids, the evidence with the matched words, Radar's
+  version, a hash of its data tables, the time and your bundle key's public half. Full post text
+  goes in only if you tick the box. Radar never sends it.
 - **Removing Radar** deletes everything it kept.
 
 ## What Radar never does

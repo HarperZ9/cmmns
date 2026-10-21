@@ -97,6 +97,24 @@ everything, reduce motion and enlarge text.
   live structure; TikTok comments are not checked live yet (TikTok asked to sign up first);
   a site redesign can break any adapter until Radar is updated.
 
+## Use Radar outside the browser
+
+Radar's rules also run without the extension, on your own files, with nothing sent anywhere:
+
+```
+node bin/radar.mjs analyze saved-thread.html        # a saved X or Reddit thread, thread JSON,
+node bin/radar.mjs analyze tweets.js --json         # or your X, Reddit, Mastodon or Bluesky export
+node bin/radar.mjs analyze thread.json --bundle out.json
+node bin/radar.mjs verify out.json                  # anyone can check a signed bundle offline
+```
+
+In the extension, the toolbar popup's **Analyse a file** does the same on a file you choose. Code
+can import `src/core/api.js` (radar-core): `analyzeThread`, `analyzeText`, `checkMedia` and
+`siteInfo` return evidence that fits `schema/evidence.v1.json`, each item with what it shows, its
+source and what it does not prove. A signed evidence bundle holds post ids and the matched words,
+not other people's full posts unless you ask. The API, schema, bundle format and stability promise
+are in [project-docs/INTEGRATION.md](project-docs/INTEGRATION.md).
+
 ## Develop
 
 ```

@@ -22,6 +22,8 @@ whether the most extreme replies come mostly from flagged accounts. X first.
 ## Layout
 - `src/core/` pure modules (no DOM): similarity, mismatch, flags, rhetoric, report. Tested in node.
 - `src/ext/` the Manifest V3 extension: content script, styles, popover.
+- `src/core/api.js` radar-core, the public API (project-docs/INTEGRATION.md); `schema/` its JSON Schema;
+  `bin/radar.mjs` the command line tool, local files only.
 - `tests/` `node --test`.
 - `project-docs/` design, evaluation and evidence.
 

@@ -1,0 +1,19 @@
+{
+ "@context": "https://www.w3.org/ns/activitystreams",
+ "type": "OrderedCollection",
+ "orderedItems": [
+  {
+   "type": "Create",
+   "published": "2026-10-01T12:00:00Z",
+   "object": {
+    "id": "https://social.example/users/me/statuses/111",
+    "content": "<p>Library hours are <a href=\"https://news.example.org/a\">here</a> <a href=\"https://social.example/tags/town\" class=\"mention hashtag\">#town</a></p>",
+    "published": "2026-10-01T12:00:00Z"
+   }
+  },
+  {
+   "type": "Announce",
+   "object": "https://other.example/statuses/5"
+  }
+ ]
+}
