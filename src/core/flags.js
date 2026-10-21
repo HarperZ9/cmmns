@@ -134,10 +134,17 @@ export function flagsFor(account, context = {}) {
   return out.map((f) => ({ ...f, doesNotProve: DOES_NOT_PROVE[f.id] }));
 }
 
-// An account counts as "flagged" for the thread report when it has at least one authenticity
-// flag. The weak default-handle signal does not count, and neither does a hate symbol in the name:
-// that is about what the account says, and counting it would make the report circular.
+// An account counts as "flagged" for the thread report when it has one strong authenticity flag
+// or two different weak ones. Weak flags are place and timing context that ordinary expats,
+// diaspora and night owls trip; on a live thread about the riots in France they alone put half
+// the repliers in the flagged group. The default-handle signal never counts, and neither does a
+// hate symbol in the name: that is about what the account says, and counting it would make the
+// report circular.
 const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name", "follow-pattern"]);
+export const WEAK_FLAGS = new Set(["store-elsewhere", "profile-location-elsewhere", "flag-elsewhere", "hours-elsewhere",
+  "fast-replier", "repost-only", "low-karma"]);
 export function isFlagged(flags) {
-  return flags.some((f) => !NOT_AUTHENTICITY.has(f.id));
+  const counted = flags.filter((f) => !NOT_AUTHENTICITY.has(f.id));
+  if (counted.some((f) => !WEAK_FLAGS.has(f.id))) return true;
+  return new Set(counted.map((f) => f.id)).size >= 2;
 }
