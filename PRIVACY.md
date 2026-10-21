@@ -1,5 +1,7 @@
 # Radar privacy policy
 
+Last updated: 2026-10-21.
+
 Radar runs entirely in your browser. It has no server, no account, no analytics and no telemetry.
 Nothing Radar reads or works out is sent to the author or to anyone else.
 
@@ -39,6 +41,7 @@ profile you installed Radar in. It is not synced to other devices.
 | Connections log (`pb.net.v1`) | Which accounts replied in which threads you opened, how many seconds after the post, link domains, and a short hash of each reply's wording (not the wording) | 30 days, or less if you set history shorter |
 | Source trails (`pb.trail.v1`) | Post ids, handles and times that carried the same upload or link | 30 days, or less if you set history shorter |
 | Thread history (`pb.history.v1`) | One summary per thread you opened: counts, origins, flagged shares. No reply text | 60 days by default; 1 to 60 days in options, at most 600 threads |
+| Your feedback (`pb.feedback.v1`) | Your "This was right" and "This was wrong" marks: which sign (its kind, the post id and a short hash of its label), the thread, your mark and the time. The post text only for marks where you ticked "include the text" | Until you clear it or remove Radar; at most 2,000 marks, the oldest dropped first |
 | X request shape (`pb.tpl`) | The shape of X's About request, so Radar can repeat it. It holds no login token; the token is read fresh from X's cookie each time | Until X changes it or you clear Radar's data |
 
 Post data from the page (views, posting app, media upload times) is held in memory for the tab and
@@ -51,6 +54,9 @@ is gone when you close it.
 - **History page:** clear the history, connections and trails on their own.
 - **Save report:** writes a JSON file to your computer only when you click it. It holds the thread
   report, account labels and flags, and leaves reply text out.
+- **Save feedback to a file** (options page): writes your marks to a JSON file on your computer
+  only when you click it. Radar never sends it. You choose whether to share it, for example by
+  attaching it to an issue on Radar's repository. "Clear feedback" deletes your marks.
 - **Removing Radar** deletes everything it kept.
 
 ## What Radar never does

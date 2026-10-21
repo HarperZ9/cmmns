@@ -96,10 +96,12 @@
   // Each signal carries its family's measured accuracy (src/core/measured.js through families.js),
   // or "not measured yet". Areas the user hid in the options page are left out.
   const measured = (fam) => (fam && PB.measuredLine ? PB.measuredLine(fam).text : "not measured yet");
+  // The user's own marks (src/ext/feedback.js) sit under the measured line and never replace it.
+  const feedback = (x, m) => (globalThis.PBFeedback && x.fam ? PBFeedback.rows(x, m) : []);
   function all(m, settings) {
     const shown = (x) => !settings || !PB.areaOn || PB.areaOn(settings, x.cat);
     return [...checks(m), ...language(m), ...links(m), ...post(m), ...account(m)].filter(shown)
-      .map((x) => ({ ...x, rows: [...x.rows, ["Measured", measured(x.fam)]] }))
+      .map((x) => ({ ...x, rows: [...x.rows, ["Measured", measured(x.fam)], ...feedback(x, m)] }))
       .sort((a, b) => ORDER[a.level] - ORDER[b.level]);
   }
 

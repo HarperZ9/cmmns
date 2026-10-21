@@ -44,7 +44,7 @@
     return null;
   }
 
-  // A row value is text, { links }, { action: [label, fn, busyLabel] }, { note }, or a chart.
+  // A row value is text, { links }, { action: [label, fn, busyLabel] }, { feedback }, { note }, or a chart.
   function renderRow(box, h, t) {
     if (!t) return;
     const row = el("div", "pb-row");
@@ -55,6 +55,8 @@
       const v = el("div", "pb-row-v");
       for (const [label, href] of t.links) { const a = el("a", "pb-link", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; v.append(a); }
       row.append(v);
+    } else if (typeof t === "object" && t.feedback && globalThis.PBFeedback) {
+      row.append(PBFeedback.control(t.feedback));
     } else if (typeof t === "object" && t.action) {
       const b = el("button", "pb-btn", t.action[0]); b.type = "button";
       b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); t.action[1](); b.disabled = true; b.textContent = t.action[2] || "Working…"; });

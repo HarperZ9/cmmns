@@ -6,12 +6,17 @@ import { readFileSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildClaimIndex } from "../src/core/claims.js";
+import { joinClaims, CLAIMS_PART_MAX } from "../src/core/claims-parts.js";
 
 const file = join(dirname(fileURLToPath(import.meta.url)), "../src/ext/claims.json");
-const table = JSON.parse(readFileSync(file, "utf8"));
+const main = JSON.parse(readFileSync(file, "utf8"));
+const partFiles = (main.parts || []).map((n) => join(dirname(file), n));
+const table = joinClaims(main, partFiles.map((f) => JSON.parse(readFileSync(f, "utf8"))));
 
-test("claims.json stays within the 6 MB cap", () => {
-  assert.ok(statSync(file).size <= 6000000, `${statSync(file).size} bytes`);
+test("claims.json stays within the 6 MB cap, each file under the add-on linter's 5 MB", () => {
+  const sizes = [file, ...partFiles].map((f) => statSync(f).size);
+  assert.ok(sizes.reduce((a, b) => a + b, 0) <= 6000000 + 1000 * sizes.length, `${sizes} bytes`);
+  for (const s of sizes) assert.ok(s <= CLAIMS_PART_MAX, `${s} bytes`);
 });
 
 test("claims.json names its source and licence", () => {

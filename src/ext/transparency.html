@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Radar is measured</title>
+<meta name="description" content="Every Radar sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.">
+<style>
+@font-face { font-family: "Hanken Grotesk"; src: url("fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Conso"; src: url("fonts/conso-regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+:root { --ink: #14181c; --muted: #4f5b66; --line: #d9dcd6; --ground: #f7f6f2; --raised: #fffefb; --hot: #b93c0a;
+  --sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink: #e8e6e1; --muted: #a3acb5; --line: #2e3439; --ground: #111417; --raised: #181c20; --hot: #fb923c; } }
+:root[data-theme="dark"] { --ink: #e8e6e1; --muted: #a3acb5; --line: #2e3439; --ground: #111417; --raised: #181c20; --hot: #fb923c; }
+* { box-sizing: border-box; }
+html, body { background: var(--ground); }
+body { margin: 0; color: var(--ink); font: 400 16px/1.6 var(--sans); }
+main { max-width: 960px; margin: 0 auto; padding: 48px 16px 64px; }
+h1 { font-size: 2em; line-height: 1.15; margin: 0 0 8px; }
+h2 { font-size: 1.3em; margin: 40px 0 12px; padding-top: 24px; border-top: 1px solid var(--line); }
+h3 { font-size: 1.05em; margin: 24px 0 8px; }
+p, li { max-width: 68ch; }
+a { color: var(--ink); text-underline-offset: 3px; }
+code, .mono { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+.lead { font-size: 1.15em; }
+.muted { color: var(--muted); }
+.hot { color: var(--hot); font-weight: 600; }
+.scroll { overflow-x: auto; margin: 12px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; }
+td.num { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9em; }
+</style>
+</head>
+<body>
+<main>
+<h1>How Radar is measured</h1>
+<p class="muted">Updated 2026-10-21.</p>
+
+<p class="lead">Every sign in Radar's window either shows how often it was right when people checked by hand, or says "not measured yet". This page lists every sign, the data each was checked on and its licence, how evenly the signs work whichever side a post targets, and what the numbers do not prove.</p>
+<h2>How to read the numbers</h2>
+<ul>
+<li><strong>Precision</strong> is the share of signs Radar showed that the human annotators of a public research corpus agreed with. It answers "when Radar shows this, how often is it right?"</li>
+<li><strong>Recall</strong> is the share of the annotated cases that Radar found. Radar is built for precision: a wrong sign on an honest reply is the harm it avoids most, so recall is low.</li>
+<li>Each figure gives the count and a 95% interval (Wilson). A wide interval means few cases were checked.</li>
+<li>All figures come from a held-out test split (seed <code>radar-eval-2026-10-21</code>). Rules were tuned on a separate split, and the test split was read once, after tuning. Measured 2026-10-21.</li>
+</ul>
+<h2>Language signs</h2>
+<p>Checked on three public corpora of comments labelled by people, pooled: Measuring Hate Speech (CC BY 4.0), HateXplain (MIT) and Civil Comments (CC0 1.0). The range runs from the lowest to the highest corpus with at least 20 hits. Recall is against Measuring Hate Speech's own survey item for that sign, where one exists.</p>
+<div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Precision (95% interval)</th><th scope="col">Range across corpora</th><th scope="col">Recall</th><th scope="col">Status</th></tr></thead><tbody>
+<tr><td>Slur or coded hate term</td><td class="num">91.0% (3,995 of 4,392; 90.1% to 91.8%)</td><td class="num">34.0% to 95.3%</td><td class="num">not measured</td><td>Shown with this figure</td></tr>
+<tr><td>Group stereotype</td><td class="num">83.3% (80 of 96; 74.6% to 89.5%)</td><td class="num">91.7%</td><td class="num">0.6% (51 of 8,368; 0.5% to 0.8%)</td><td>Shown with this figure</td></tr>
+<tr><td>Dehumanising language</td><td class="num">92.3% (36 of 39; 79.7% to 97.3%)</td><td class="num">under 20 hits in each corpus</td><td class="num">0.2% (11 of 5,046; 0.1% to 0.4%)</td><td>Shown with this figure</td></tr>
+<tr><td>Call for violence</td><td class="num">87.5% (77 of 88; 79.0% to 92.9%)</td><td class="num">96.7%</td><td class="num">2.1% (39 of 1,819; 1.6% to 2.9%)</td><td>Shown with this figure</td></tr>
+<tr><td>Call for vigilantes</td><td class="num">66.7% (2 of 3; 20.8% to 93.9%)</td><td class="num">under 20 hits in each corpus</td><td class="num">not measured</td><td>Not measured: fewer than 20 hits in the test split</td></tr>
+</tbody></table></div>
+<p class="muted">Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), not on this site's replies. Precision says how often a marker sat on text the annotators judged hostile to a group; it does not say why anyone wrote it, and it can differ on other sites and topics.</p>
+<h3>Weaker signs that count only toward a reply being "extreme"</h3>
+<div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Share on hostile text (95% interval)</th><th scope="col">Range across corpora</th></tr></thead><tbody>
+<tr><td>Context-dependent slur</td><td class="num">65.5% (837 of 1,278; 62.8% to 68.0%)</td><td class="num">20.3% to 91.7%</td></tr>
+<tr><td>Contempt</td><td class="num">92.1% (93 of 101; 85.1% to 95.9%)</td><td class="num">91.5% to 93.1%</td></tr>
+<tr><td>Motive attribution</td><td class="num">72.5% (29 of 40; 57.2% to 83.9%)</td><td class="num">81.8%</td></tr>
+<tr><td>Essentialising</td><td class="num">57.8% (59 of 102; 48.1% to 67.0%)</td><td class="num">25.8% to 75.0%</td></tr>
+<tr><td>Absolutist wording</td><td class="num">50.7% (137 of 270; 44.8% to 56.7%)</td><td class="num">32.9% to 84.2%</td></tr>
+<tr><td>Conspiracy framing</td><td class="num">28.8% (34 of 118; 21.4% to 37.6%)</td><td class="num">3.6%</td></tr>
+<tr><td>Any strong language sign</td><td class="num">90.7% (4,150 of 4,578; 89.8% to 91.5%)</td><td class="num">33.8% to 95.0%</td></tr>
+</tbody></table></div>
+<p class="muted">These describe framing, which the corpora do not label. Their figures against hostility labels are context, not error rates.</p>
+<h3>The thread report's "extreme"</h3>
+<p>Precision against Measuring Hate Speech severity labels: <span class="mono">70.3% (896 of 1,275; 67.7% to 72.7%)</span>. Recall: <span class="mono">17.2% (896 of 5,224; 16.2% to 18.2%)</span>. On HateXplain: precision <span class="mono">60.1% (1,950 of 3,246; 58.4% to 61.7%)</span>. Most severe replies do not count as extreme, so the report undercounts them.</p>
+<h2>Persuasion techniques</h2>
+<p>Checked on the Propaganda Techniques Corpus v2 (CC BY 4.0), news articles labelled span by span. A technique shows in the window only when its 95% interval starts at 70% or above, from at least 20 hits.</p>
+<div class="scroll"><table><thead><tr><th scope="col">Technique</th><th scope="col">Precision (95% interval)</th><th scope="col">Recall</th><th scope="col">Chance</th><th scope="col">Status</th></tr></thead><tbody>
+<tr><td>Loaded language</td><td class="num">60.3% (82 of 136; 51.9% to 68.1%)</td><td class="num">7.9% (80 of 1,015; 6.4% to 9.7%)</td><td class="num">2.3%</td><td>Not shown: interval starts below 70%</td></tr>
+<tr><td>Name calling</td><td class="num">48.8% (21 of 43; 34.6% to 63.2%)</td><td class="num">4.4% (21 of 474; 2.9% to 6.7%)</td><td class="num">1.1%</td><td>Not shown: interval starts below 70%</td></tr>
+<tr><td>Bandwagon</td><td class="num">0.0% (0 of 3; 0.0% to 56.2%)</td><td class="num">0.0% (0 of 32; 0.0% to 10.7%)</td><td class="num">0.3%</td><td>Not shown: fewer than 20 hits</td></tr>
+<tr><td>Appeal to fear</td><td class="num">0.0% (0 of 2; 0.0% to 65.8%)</td><td class="num">0.0% (0 of 134; 0.0% to 2.8%)</td><td class="num">1.3%</td><td>Not shown: fewer than 20 hits</td></tr>
+<tr><td>Flag-waving</td><td class="num">40.7% (11 of 27; 24.5% to 59.3%)</td><td class="num">12.8% (11 of 86; 7.3% to 21.5%)</td><td class="num">0.5%</td><td>Not shown: interval starts below 70%</td></tr>
+<tr><td>Thought-terminating cliche</td><td class="num">0.0% (0 of 1; 0.0% to 79.3%)</td><td class="num">0.0% (0 of 41; 0.0% to 8.6%)</td><td class="num">0.2%</td><td>Not shown: fewer than 20 hits</td></tr>
+<tr><td>Whataboutism</td><td class="num">0.0% (0 of 1; 0.0% to 79.3%)</td><td class="num">0.0% (0 of 65; 0.0% to 5.6%)</td><td class="num">0.6%</td><td>Not shown: fewer than 20 hits</td></tr>
+<tr><td>Black-and-white fallacy</td><td class="num">not measured</td><td class="num">0.0% (0 of 42; 0.0% to 8.4%)</td><td class="num">0.5%</td><td>Not shown: held back</td></tr>
+<tr><td>Doubt</td><td class="num">33.3% (1 of 3; 6.1% to 79.2%)</td><td class="num">0.4% (1 of 244; 0.1% to 2.3%)</td><td class="num">3.1%</td><td>Not shown: fewer than 20 hits</td></tr>
+<tr><td>Appeal to authority</td><td class="num">0.0% (0 of 2; 0.0% to 65.8%)</td><td class="num">0.0% (0 of 72; 0.0% to 5.1%)</td><td class="num">1.2%</td><td>Not shown: fewer than 20 hits</td></tr>
+<tr><td>Exaggeration</td><td class="num">10.0% (1 of 10; 1.8% to 40.4%)</td><td class="num">0.5% (1 of 220; 0.1% to 2.5%)</td><td class="num">1.0%</td><td>Not shown: fewer than 20 hits</td></tr>
+</tbody></table></div>
+<p class="muted">A technique can carry a true claim; it describes how the post argues. "Chance" is the share of words inside a labelled span of that technique.</p>
+<h2>Cases written for the test</h2>
+<p>Same text as other replies: pair precision <span class="mono">97.7% (85 of 87; 92.0% to 99.4%)</span>, recall <span class="mono">100.0% (85 of 85; 95.7% to 100.0%)</span>. Speaks as local, labelled elsewhere: precision <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>, recall <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>. The same author wrote these cases and the rules, so they show the rules do what they say. They are not error rates on real replies.</p>
+<h2>Side balance</h2>
+<p>Political side is never an input to Radar. To check that the signs work alike whichever side a post targets, the strong language signs were measured on hostile text aimed at groups each side is often hostile to. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
+<div class="scroll"><table><thead><tr><th scope="col">Corpus</th><th scope="col">Recall, right's usual targets</th><th scope="col">Recall, left's usual targets</th><th scope="col">Precision, right's usual targets</th><th scope="col">Precision, left's usual targets</th><th scope="col">Result</th></tr></thead><tbody>
+<tr><td>Measuring Hate Speech</td><td class="num">10.1% (765 of 7,584; 9.4% to 10.8%)</td><td class="num">7.9% (198 of 2,499; 6.9% to 9.0%)</td><td class="num">95.6% (765 of 800; 94.0% to 96.8%)</td><td class="num">93.8% (198 of 211; 89.7% to 96.4%)</td><td><span class="hot">Gap remains</span></td></tr>
+<tr><td>HateXplain</td><td class="num">45.2% (1,895 of 4,197; 43.7% to 46.7%)</td><td class="num">43.4% (109 of 251; 37.4% to 49.6%)</td><td class="num">98.0% (1,895 of 1,933; 97.3% to 98.6%)</td><td class="num">97.3% (109 of 112; 92.4% to 99.1%)</td><td>Balanced</td></tr>
+</tbody></table></div>
+<p class="muted">Precision agrees across sides within the intervals. Where a gap remains, the thread report undercounts extreme replies aimed at the side with lower recall.</p>
+<h2>Every sign</h2>
+<div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Kind</th><th scope="col">What the window says</th></tr></thead><tbody>
+<tr><td>Slur or coded hate term</td><td>Language</td><td>Radar's own rule</td><td>precision 91% (95% interval 90 to 92%), 4392 badges checked, held-out test set</td></tr>
+<tr><td>Group stereotype</td><td>Language</td><td>Radar's own rule</td><td>precision 83% (95% interval 75 to 90%), 96 badges checked, held-out test set</td></tr>
+<tr><td>Dehumanising language</td><td>Language</td><td>Radar's own rule</td><td>precision 92% (95% interval 80 to 97%), 39 badges checked, held-out test set</td></tr>
+<tr><td>Call for violence</td><td>Language</td><td>Radar's own rule</td><td>precision 88% (95% interval 79 to 93%), 88 badges checked, held-out test set</td></tr>
+<tr><td>Call for vigilantes</td><td>Language</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Leaked AI text</td><td>Language</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Machine-writing signs</td><td>Language</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Spam pattern</td><td>Language</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>X: probable spam</td><td>Language</td><td>The site's own label</td><td>the site's own label, not a Radar detector</td></tr>
+<tr><td>Hate symbol in name</td><td>Language</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Media older than the post</td><td>Media</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Media from another post</td><td>Media</td><td>The site's own label</td><td>the site's own label, not a Radar detector</td></tr>
+<tr><td>Same upload, many accounts</td><td>Coordination</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Same text as other replies</td><td>Coordination</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Same words in other threads</td><td>Coordination</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Community Note</td><td>Sources</td><td>The site's own label</td><td>the site's own label, not a Radar detector</td></tr>
+<tr><td>Fact-checked claim</td><td>Sources</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Ad label</td><td>Sources</td><td>The site's own label</td><td>the site's own label, not a Radar detector</td></tr>
+<tr><td>State link</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
+<tr><td>Outlet owner</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
+<tr><td>Posting app</td><td>Posting</td><td>The site's own label</td><td>the site's own label, not a Radar detector</td></tr>
+<tr><td>Written in another language</td><td>Place</td><td>The site's own label</td><td>the site's own label, not a Radar detector</td></tr>
+<tr><td>Speaks as local, labelled elsewhere</td><td>Place</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>App store elsewhere</td><td>Place</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Flag of another country</td><td>Place</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Profile says elsewhere</td><td>Place</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Active hours fit elsewhere</td><td>Place</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Replies within a minute</td><td>Posting</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Posts through an automation app</td><td>Posting</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Posts around the clock</td><td>Posting</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Almost only reposts</td><td>Posting</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Very high post rate</td><td>Posting</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>New account</td><td>Account</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Renamed</td><td>Account</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Sign-up handle</td><td>Account</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Follows many, few follow back</td><td>Account</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Low karma for its age</td><td>Account</td><td>Radar's own rule</td><td>not measured yet</td></tr>
+<tr><td>Persuasion: loaded language</td><td>Language</td><td>Persuasion technique</td><td>held back (interval starts below 70%): precision 60% (95% interval 52 to 68%), 136 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: name calling</td><td>Language</td><td>Persuasion technique</td><td>held back (interval starts below 70%): precision 49% (95% interval 35 to 63%), 43 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: bandwagon</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 56%), 3 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: appeal to fear</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 66%), 2 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: flag-waving</td><td>Language</td><td>Persuasion technique</td><td>held back (interval starts below 70%): precision 41% (95% interval 25 to 59%), 27 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: thought-terminating cliche</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 79%), 1 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: whataboutism</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 79%), 1 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: black-and-white fallacy</td><td>Language</td><td>Persuasion technique</td><td>held back: not measured</td></tr>
+<tr><td>Persuasion: doubt</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 33% (95% interval 6 to 79%), 3 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: appeal to authority</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 66%), 2 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: exaggeration</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 10% (95% interval 2 to 40%), 10 spans checked, held-out news articles</td></tr>
+</tbody></table></div>
+<h2>What is not measured</h2>
+<ul><li>Radar's own rules with no measurement yet: Call for vigilantes, Leaked AI text, Machine-writing signs, Spam pattern, Hate symbol in name, Media older than the post, Same upload, many accounts, Same words in other threads, Fact-checked claim, App store elsewhere, Flag of another country, Profile says elsewhere, Active hours fit elsewhere, Replies within a minute, Posts through an automation app, Posts around the clock, Almost only reposts, Very high post rate, New account, Renamed, Sign-up handle, Follows many, few follow back, Low karma for its age. The window says &quot;not measured yet&quot; beside each of them.</li>
+<li>Same text as other replies, and speaks as local, labelled elsewhere: tested only on cases written alongside the rules (below). No error rate on real replies exists yet.</li>
+<li>Live threads: no thread from X, YouTube, Reddit, Facebook, Instagram or Bluesky has been labelled by hand yet, so no figure here comes from those sites.</li>
+<li>French language signs: too few hits in the French corpus to measure. Persuasion cues in French: no corpus Radar may use.</li>
+<li>Call for vigilantes: fewer than 20 hits in the test split.</li>
+<li>Site labels (Community Notes, ads, posting app, X's spam label) and matches against cited tables (outlet owners, state links) are not Radar's judgement. Their evidence is the site or the cited source.</li></ul>
+<h2>Known limits</h2>
+<ul><li><strong>Precision.</strong> The corpora come from Reddit, Twitter, Gab, YouTube and news comments, several years old. Two of them were sampled to be rich in hate speech (about 61% hostile). On Civil Comments, where 8% of comments are hostile, about a third of strong labels (23 of 68) fell on text the raters called toxic. Real reply threads sit somewhere between. Some Civil &quot;false positives&quot; are quoted or ironic uses that raters scored below 0.5, so 34% is a floor more than a point estimate.</li>
+<li><strong>Recall.</strong> Radar is a hand-built lexicon and grammar. It finds a small share of hostile text: MHS item recall is under 3% for every family. A thread with no markers is not a clean thread.</li>
+<li><strong>Weak families.</strong> Conspiracy, absolutist and essentialise describe framing, which these corpora do not label. Their figures against hostility labels are context, not error rates.</li>
+<li><strong>Extreme.</strong> The thread report is only as good as &quot;extreme&quot;. At 17% recall on MHS, most severe replies do not count as extreme.</li>
+<li><strong>Synthetic.</strong> The duplicate and mismatch figures come from cases written alongside the rules. No person other than the rules' author, and no model, labelled them.</li>
+<li>PTC is news articles from 48 outlets, mostly 2017 to 2019. Replies are shorter and blunter, and precision there is not measured. It could be higher or lower.</li>
+<li>PTC's labels are not exhaustive. A true use the annotators did not mark counts as a miss, so precision leans low.</li>
+<li>A technique describes how a post argues. It does not say the post is false, or anything about who wrote it.</li></ul>
+<h2>Your own feedback</h2>
+<p>Each sign in the window has "This was right" and "This was wrong". Your marks stay in your browser. After 10 marks on one kind of sign, the window shows your own count under the measured figure. It never changes the figures on this page. You can save your marks to a file from the options page and choose whether to share it.</p>
+<h2>Data used</h2>
+<div class="scroll"><table><thead><tr><th scope="col">Corpus</th><th scope="col">Licence</th></tr></thead><tbody>
+<tr><td><a href="https://huggingface.co/datasets/ucberkeley-dlab/measuring-hate-speech">Measuring Hate Speech (Kennedy et al. 2020, Sachdeva et al. 2022; UC Berkeley D-Lab)</a></td><td>CC BY 4.0</td></tr>
+<tr><td><a href="https://github.com/punyajoy/HateXplain">HateXplain (Mathew et al. 2021)</a></td><td>MIT</td></tr>
+<tr><td><a href="https://huggingface.co/datasets/google/civil_comments">Civil Comments, test split (Jigsaw / Conversation AI; the corpus behind Jigsaw Unintended Bias)</a></td><td>CC0 1.0</td></tr>
+<tr><td><a href="https://github.com/HKUST-KnowComp/MLMA_hate_speech">MLMA, French part (Ousidhoum et al. 2019)</a></td><td>MIT</td></tr>
+<tr><td><a href="https://zenodo.org/records/3952415">Propaganda Techniques Corpus v2 (Da San Martino et al. 2019; SemEval-2020 Task 11)</a></td><td>CC BY 4.0</td></tr>
+</tbody></table></div>
+<p>No corpus text is in Radar or its repository; only counts, rates and file hashes are. The evaluation scripts in <a href="https://github.com/HarperZ9/radar">Radar's repository</a> reproduce every number here from the downloaded corpora.</p>
+<footer>Radar. Evidence, not verdicts. Nothing leaves your browser. <a href="https://github.com/HarperZ9/radar">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a></footer>
+</main>
+</body>
+</html>

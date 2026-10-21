@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar privacy policy</title>
+<meta name="description" content="Radar runs entirely in your browser: no server, no account, no analytics. What it reads, what it keeps and for how long, and your controls.">
+<style>
+@font-face { font-family: "Hanken Grotesk"; src: url("fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Conso"; src: url("fonts/conso-regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+:root { --ink: #14181c; --muted: #4f5b66; --line: #d9dcd6; --ground: #f7f6f2; --raised: #fffefb; --hot: #b93c0a;
+  --sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink: #e8e6e1; --muted: #a3acb5; --line: #2e3439; --ground: #111417; --raised: #181c20; --hot: #fb923c; } }
+:root[data-theme="dark"] { --ink: #e8e6e1; --muted: #a3acb5; --line: #2e3439; --ground: #111417; --raised: #181c20; --hot: #fb923c; }
+* { box-sizing: border-box; }
+html, body { background: var(--ground); }
+body { margin: 0; color: var(--ink); font: 400 16px/1.6 var(--sans); }
+main { max-width: 960px; margin: 0 auto; padding: 48px 16px 64px; }
+h1 { font-size: 2em; line-height: 1.15; margin: 0 0 8px; }
+h2 { font-size: 1.3em; margin: 40px 0 12px; padding-top: 24px; border-top: 1px solid var(--line); }
+h3 { font-size: 1.05em; margin: 24px 0 8px; }
+p, li { max-width: 68ch; }
+a { color: var(--ink); text-underline-offset: 3px; }
+code, .mono { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+.lead { font-size: 1.15em; }
+.muted { color: var(--muted); }
+.hot { color: var(--hot); font-weight: 600; }
+.scroll { overflow-x: auto; margin: 12px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; }
+td.num { font-family: var(--mono); font-size: 0.92em; font-variant-numeric: tabular-nums; }
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9em; }
+</style>
+</head>
+<body>
+<main>
+<h1>Radar privacy policy</h1>
+<p class="muted">Updated 2026-10-21.</p>
+<p>Radar runs entirely in your browser. It has no server, no account, no analytics and no telemetry. Nothing Radar reads or works out is sent to the author or to anyone else.</p>
+<h2>What Radar reads</h2>
+<p>Radar reads what the site you are on has already shown or loaded for you: the replies on the page, the account details the site discloses (for example X's &quot;About this account&quot; label), and the post data the site's own app downloaded. It reads nothing the site does not show its viewers, and never reads IP addresses.</p>
+<h2>Requests Radar makes</h2>
+<p>Radar sends no data to the author, to analytics services or to any server of its own. It makes these requests, all to the site you are already using, with that site's own session in your browser:</p>
+<div class="scroll"><table><thead><tr><th scope="col">Site</th><th scope="col">Request</th><th scope="col">When</th></tr></thead><tbody>
+<tr><td>X</td><td>The &quot;About this account&quot; data for reply authors, through the same request X's own app makes, at most one account every 1.5 seconds and slower when X says it is busy</td><td>Automatically, unless you switch off &quot;Read account details automatically&quot;</td></tr>
+<tr><td>X</td><td>One account's profile and About page in a minimised window, so Radar can learn X's request the first time, or when you ask Radar to read accounts</td><td>The first time, and when you ask</td></tr>
+<tr><td>Reddit</td><td>Reddit's public account data (<code>/user/&lt;name&gt;/about.json</code>) for comment authors, one account every 2 seconds</td><td>Automatically, unless you switch that setting off</td></tr>
+</tbody></table></div>
+<p>Fact-check matching runs against a table bundled inside Radar, so post text is never sent to a fact-checking service.</p>
+<p>The window offers reverse image search links (Google Lens, TinEye, Bing, Yandex) for media. Those open only when you click one, and then that service receives the image address.</p>
+<h2>What Radar keeps, where, and for how long</h2>
+<p>Everything is kept in <code>chrome.storage.local</code> (Firefox: <code>browser.storage.local</code>) in the browser profile you installed Radar in. It is not synced to other devices.</p>
+<div class="scroll"><table><thead><tr><th scope="col">Store</th><th scope="col">What it holds</th><th scope="col">Kept for</th></tr></thead><tbody>
+<tr><td>Settings (<code>pb.settings</code>)</td><td>Your choices on the options page</td><td>Until you change them or remove Radar</td></tr>
+<tr><td>Account details (<code>pb.about.v1</code>, <code>pb.reddit.v1</code>)</td><td>What X or Reddit disclosed about accounts you saw: location label, join date, counts, name changes, and a summary of posting times and apps</td><td>14 days by default; 1 to 30 days in options</td></tr>
+<tr><td>Connections log (<code>pb.net.v1</code>)</td><td>Which accounts replied in which threads you opened, how many seconds after the post, link domains, and a short hash of each reply's wording (not the wording)</td><td>30 days, or less if you set history shorter</td></tr>
+<tr><td>Source trails (<code>pb.trail.v1</code>)</td><td>Post ids, handles and times that carried the same upload or link</td><td>30 days, or less if you set history shorter</td></tr>
+<tr><td>Thread history (<code>pb.history.v1</code>)</td><td>One summary per thread you opened: counts, origins, flagged shares. No reply text</td><td>60 days by default; 1 to 60 days in options, at most 600 threads</td></tr>
+<tr><td>Your feedback (<code>pb.feedback.v1</code>)</td><td>Your &quot;This was right&quot; and &quot;This was wrong&quot; marks: which sign (its kind, the post id and a short hash of its label), the thread, your mark and the time. The post text only for marks where you ticked &quot;include the text&quot;</td><td>Until you clear it or remove Radar; at most 2,000 marks, the oldest dropped first</td></tr>
+<tr><td>X request shape (<code>pb.tpl</code>)</td><td>The shape of X's About request, so Radar can repeat it. It holds no login token; the token is read fresh from X's cookie each time</td><td>Until X changes it or you clear Radar's data</td></tr>
+</tbody></table></div>
+<p>Post data from the page (views, posting app, media upload times) is held in memory for the tab and is gone when you close it.</p>
+<h2>Your controls</h2>
+<ul><li><strong>Options page:</strong> switch Radar off per site or pause it everywhere, change how long it keeps data, and press &quot;Clear all Radar data&quot; to delete everything above except your settings.</li>
+<li><strong>History page:</strong> clear the history, connections and trails on their own.</li>
+<li><strong>Save report:</strong> writes a JSON file to your computer only when you click it. It holds the thread report, account labels and flags, and leaves reply text out.</li>
+<li><strong>Save feedback to a file</strong> (options page): writes your marks to a JSON file on your computer only when you click it. Radar never sends it. You choose whether to share it, for example by attaching it to an issue on Radar's repository. &quot;Clear feedback&quot; deletes your marks.</li>
+<li><strong>Removing Radar</strong> deletes everything it kept.</li></ul>
+<h2>What Radar never does</h2>
+<ul><li>Sends anything to the author or a third party.</li>
+<li>Sells, shares or uses data for advertising.</li>
+<li>Guesses who runs an account, or anyone's age, gender, ethnicity, religion or politics.</li>
+<li>Links accounts across sites.</li></ul>
+<h2>Changes</h2>
+<p>Changes to this policy are listed in <a href="https://github.com/HarperZ9/radar/blob/main/CHANGELOG.md">Radar's changelog</a> with the version that made them.</p>
+<p>Contact: open an issue on <a href="https://github.com/HarperZ9/radar/issues">Radar's repository</a>.</p>
+<footer>Radar. Evidence, not verdicts. Nothing leaves your browser. <a href="https://github.com/HarperZ9/radar">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a></footer>
+</main>
+</body>
+</html>

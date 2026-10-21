@@ -10,6 +10,7 @@
   $("options").addEventListener("click", () => { chrome.runtime.openOptionsPage(); window.close(); });
 
   document.getElementById("history").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("history.html") }); window.close(); });
+  document.getElementById("transparency").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("transparency.html") }); window.close(); });
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const send = (msg) => (tab && tab.id != null ? chrome.tabs.sendMessage(tab.id, msg).catch(() => null) : Promise.resolve(null));

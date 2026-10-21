@@ -49,10 +49,28 @@
   <section aria-labelledby="h-measured">
     <h2 id="h-measured">How sure each sign is</h2>
     <p class="muted" id="measuredNote"></p>
+    <p><a href="transparency.html">How each sign was measured, and what is not measured</a> · <a href="privacy.html">Privacy policy</a></p>
     <table>
       <thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Measured</th></tr></thead>
       <tbody id="families"></tbody>
     </table>
+  </section>
+
+  <section aria-labelledby="h-feedback">
+    <h2 id="h-feedback">Your feedback on signs</h2>
+    <p class="muted">Every sign in the window has <strong>This was right</strong> and <strong>This was wrong</strong>. Your marks stay in this browser. Radar keeps the sign, its kind, the thread it was in and your mark. It keeps the post text only when you tick "include the text" before marking.</p>
+    <p class="muted" id="fbRule"></p>
+    <p class="status muted mono" id="fbCount" aria-live="polite"></p>
+    <table>
+      <thead><tr><th scope="col">Sign</th><th scope="col">Right</th><th scope="col">Wrong</th></tr></thead>
+      <tbody id="fbFamilies"></tbody>
+    </table>
+    <p class="muted">Saving writes a JSON file to your computer. Radar never sends it. If you want to help measure Radar, you can attach the file to an issue on <a href="https://github.com/HarperZ9/radar/issues" target="_blank" rel="noopener noreferrer">Radar's repository</a>. Read it first: it holds the threads you marked, and the text of any post you chose to include.</p>
+    <div class="row">
+      <button id="fbExport" type="button">Save feedback to a file</button>
+      <button id="fbClear" type="button" class="quiet">Clear feedback</button>
+      <span id="fbStatus" role="status" aria-live="polite"></span>
+    </div>
   </section>
 
   <footer id="foot">Evidence, not verdicts. Nothing leaves this browser.</footer>
@@ -61,5 +79,6 @@
 <script src="settings.js"></script>
 <script src="pages.js"></script>
 <script src="options.js"></script>
+<script src="options-feedback.js"></script>
 </body>
 </html>
