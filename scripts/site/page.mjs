@@ -74,7 +74,7 @@ table { font-size: .92em; }
 td.num { font-size: .92em; text-align: left; }
 footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid var(--line); color: var(--soft); font-size: var(--t-meta); }`;
 
-export function page({ title, description, updated, body }) {
+export function page({ title, description, updated, body, css = "" }) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -83,7 +83,7 @@ export function page({ title, description, updated, body }) {
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <style>
-${CSS}
+${CSS}${css ? "\n" + css : ""}
 </style>
 </head>
 <body>

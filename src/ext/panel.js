@@ -23,12 +23,19 @@
 
   function button(label, title, fn) { const b = el("button", "pb-btn", label); b.type = "button"; b.title = title; b.addEventListener("click", fn); return b; }
 
-  function coordination(report, clusters) {
+  // Each coordination sign is followed by how often it shows up in ordinary threads
+  // (src/core/baselines.js), so the count reads against normal.
+  function coordination(report, clusters, viewed) {
+    const base = (sign, on) => (on ? PB.baselineLine(sign, { replies: report.replies, viewed }) : null);
+    const bursts = report.bursts || [], groups = report.groups || [];
     return [
       report.joinBurst && report.joinBurst.n >= 3 ? `${report.joinBurst.n} of ${report.joinBurst.of} looked-up accounts joined within the same two weeks (${report.joinBurst.from} to ${report.joinBurst.to}).` : null,
-      ...(report.bursts || []).slice(0, 3).map((b) => `${b.authors.length} accounts replied within ${Math.max(1, Math.round((Date.parse(b.to) - Date.parse(b.from)) / 1000))} s at ${b.from.slice(11, 16)} UTC (${b.authors.slice(0, 4).map((a) => "@" + a).join(", ")}). Chance at this thread's pace: p ≈ ${b.p < 1e-6 ? "<0.000001" : b.p.toPrecision(2)}.`),
+      ...bursts.slice(0, 3).map((b) => `${b.authors.length} accounts replied within ${Math.max(1, Math.round((Date.parse(b.to) - Date.parse(b.from)) / 1000))} s at ${b.from.slice(11, 16)} UTC (${b.authors.slice(0, 4).map((a) => "@" + a).join(", ")}). Chance at this thread's pace: p ≈ ${b.p < 1e-6 ? "<0.000001" : b.p.toPrecision(2)}.`),
+      base("burst", bursts.length),
       clusters.length ? `${clusters.length} group${clusters.length === 1 ? "" : "s"} of near-identical replies from different accounts (largest ${clusters[0].ids.length}).` : null,
-      report.groups && report.groups.length ? "Seen together in other threads you viewed: " + report.groups.slice(0, 3).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "." : null,
+      base("same-text", clusters.length),
+      groups.length ? "Seen together in other threads you viewed: " + groups.slice(0, 3).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "." : null,
+      base("together", groups.length),
       report.machine && report.machine.n ? `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text.` : null,
     ];
   }
@@ -45,7 +52,7 @@
     ];
   }
 
-  // stats: { site, pending, scanning, paused, video, pushed, onExport, onCard, onClearHistory }
+  // stats: { site, pending, scanning, paused, video, pushed, viewed, onExport, onCard, onClearHistory }
   function render(report, clusters, stats, onLookupAll) {
     let p = document.getElementById("pb-panel");
     if (!p) { p = el("aside", "pb-panel"); p.id = "pb-panel"; document.body.append(p); }
@@ -77,7 +84,9 @@
       }[stats.site.id] || `${stats.site.name} shows no account location; this view uses coordination signs only.`) : `${report.lookedUp} of ${report.replies} accounts read so far.`,
       stats.paused ? "X is limiting requests; Radar paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
     ]);
-    section(p, "Coordination", coordination(report, clusters));
+    const coord = coordination(report, clusters, stats.viewed);
+    section(p, "Coordination", coord);
+    if (coord.some((t) => t && t.includes(" showed up in "))) p.lastChild.append(el("p", "pb-foot", PB.BASELINE_SOURCE));
     // Persuasion techniques get their own line; they never count toward "flagged".
     section(p, "Persuasion", report.persuasion ? [report.persuasion.sentence] : []);
     const U = report.upstream;

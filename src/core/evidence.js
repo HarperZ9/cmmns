@@ -118,7 +118,9 @@ export async function verifyCard(card) {
 
 const pc = (x) => `${Math.round(x * 100)}%`;
 
-// The card as lines for the PNG: { kind: title | meta | head | body | small | limit | hash, text }.
+// The card as lines for the PNG: { kind: title | meta | head | body | small | limit, text }. The
+// hash stays out of the image, as the author's site keeps hashes out of the default view: it is in
+// the JSON and in a collapsed "Check a copy" on the card page.
 export function cardLines(card) {
   const R = card.report, L = [];
   const push = (kind, text) => { if (text) L.push({ kind, text }); };
@@ -139,6 +141,6 @@ export function cardLines(card) {
   for (const s of card.sources) push("small", s);
   push("head", "What this does not prove");
   for (const s of card.doesNotProve) push("limit", s);
-  if (card.hash) push("hash", `${card.hash.alg} ${card.hash.value}. The JSON saved with this image holds the same content; hash it to check a copy.`);
+  if (card.hash) push("small", "The JSON file saved with this image holds the same content and a hash of it, so anyone can check a copy.");
   return L;
 }

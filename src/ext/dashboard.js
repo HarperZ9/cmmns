@@ -8,7 +8,7 @@
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const pct = (x) => `${Math.round(x * 100)}%`;
   const plural = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : many}`;
-  const KEYS = { reports: "pb.history.v1", feed: "pb.feed.v1", net: "pb.net.v2" };
+  const KEYS = { reports: "pb.history.v1", feed: "pb.feed.v1", net: "pb.net.v2", media: PB.MEDIA_KEY };
   await PBSettings.ready;
   const keep = PBSettings.get().historyDays;
   const store = await chrome.storage.local.get(Object.values(KEYS));
@@ -103,7 +103,23 @@
     tb.replaceChildren();
     for (const e of d.together) { const tr = el("tr"); tr.append(el("td", null, `@${e.a} and @${e.b}`), el("td", "n", String(e.n)), evidence(e.threads)); tb.append(tr); }
     if (!d.together.length) { const tr = el("tr"); const td = el("td", "empty", "No pair has appeared together in three or more threads in this window."); td.colSpan = 3; tr.append(td); tb.append(tr); }
-    $("together-say").textContent = "Pairs of accounts that replied in at least three of the same threads you opened. Friends and fans of the same creator do this too.";
+    $("together-say").textContent = ["Pairs of accounts that replied in at least three of the same threads you opened. Friends and fans of the same creator do this too.", PB.pairsLine(d.threads)].filter(Boolean).join(" ");
+  }
+
+  // Content Credentials survival (src/core/survival.js): the files the user checked, per site.
+  function media(days) {
+    const rows = PB.survival(store[KEYS.media], { days }), tb = $("media").querySelector("tbody");
+    tb.replaceChildren();
+    for (const r of rows) {
+      const tr = el("tr");
+      tr.append(el("td", null, r.site), ...[r.n, r.intact, r.partial, r.changed, r.none + r.remote].map((x) => el("td", "n", x.toLocaleString())));
+      tb.append(tr);
+    }
+    $("media").hidden = !rows.length;
+    const n = rows.reduce((a, r) => a + r.n, 0), k = rows.reduce((a, r) => a + r.intact, 0);
+    $("media-say").textContent = n
+      ? `Of ${plural(n, "file", "files")} you asked Radar to check, ${k.toLocaleString()} carried Content Credentials that were intact. Platforms often strip credentials on upload, so "none found" says nothing about a file either way. Only files you checked count, so this is not a sample of what each site carries.`
+      : "No media checked yet in this window. In a post's window, \"Check this file\" reads a file's Content Credentials and adds it here.";
   }
 
   // The threads behind a pair, linked where the thread key allows it.
@@ -122,7 +138,7 @@
     const d = PB.feedDashboard(store[KEYS.reports], store[KEYS.feed], store[KEYS.net], { days, isState });
     const held = Math.min(days, keep);
     $("scope").textContent = `${plural(d.threads, "thread", "threads")} and ${plural(d.feedPosts, "feed post", "feed posts")}, ${d.from} to ${d.to}.` + (held < days ? ` Radar keeps ${keep} days (Options), so this covers ${keep}.` : "");
-    sites(d); rhetoric(d); techniques(d); checks(d);
+    sites(d); rhetoric(d); techniques(d); checks(d); media(days);
     for (const b of document.querySelectorAll(".window button")) b.setAttribute("aria-pressed", String(+b.dataset.days === days));
   }
 

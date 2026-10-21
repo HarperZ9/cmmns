@@ -12,7 +12,7 @@ import { loadPtc, PTC_ARCHIVE } from "./eval/ptc.mjs";
 import { evaluatePtc } from "./eval/persuasion-eval.mjs";
 import { SEED } from "./eval/corpora.mjs";
 import { writePersuasionRows } from "./eval/summarise-persuasion.mjs";
-import { SHIP_LOW } from "../src/core/persuasion.js";
+import { SHIP_LOW, SHIP_PRECISION } from "../src/core/persuasion.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : dflt; };
@@ -26,7 +26,7 @@ function main() {
   const r = evaluatePtc(items);
   console.log(`== PTC (${SPLIT}): ${r.articles} articles`);
   for (const [t, x] of Object.entries(r.techniques)) {
-    const ship = x.precision.n && x.precision.ci[0] >= SHIP_LOW ? "SHIP" : "off ";
+    const ship = x.precision.n >= 20 && x.precision.value >= SHIP_PRECISION && x.precision.ci[0] >= SHIP_LOW ? "SHIP" : "off ";
     console.log(`  ${ship} ${t.padEnd(20)} P ${pct(x.precision)}  P(any) ${pct(x.precisionAnyTechnique)}  R ${pct(x.recall)}  chance ${pct(x.chance)}`);
   }
   if (process.argv.includes("--cues")) {

@@ -13,6 +13,13 @@ in `project-docs/evidence/eval-results.json`.
 
 Full hashes are in `eval-results.json`.
 
+Organic baselines for the coordination signs (downloaded 2026-10-21 to `<data dir>/pheme/`; see
+`scripts/baselines.mjs`):
+
+| Corpus | File | Source URL | Licence | Size | SHA-256 |
+|---|---|---|---|---|---|
+| PHEME rumour and non-rumour threads (Zubiaga et al. 2016; Kochkina et al. 2018) | `pheme/PHEME_veracity.tar.bz2` (a gzip tar) | https://doi.org/10.6084/m9.figshare.6392078.v1 | CC BY 4.0 | 6,425 Twitter threads, 96,337 replies with an author and a time | `079f6ffd...a9bc58dd` |
+
 Persuasion techniques (downloaded 2026-10-21 to `<data dir>/ptc/`):
 
 | Corpus | File | Source URL | Licence | Size | SHA-256 |

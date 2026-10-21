@@ -26,10 +26,17 @@ export const TECHNIQUES = {
 };
 
 export const PERSUASION_DOES_NOT_PROVE = "A technique can carry a true claim; it describes how the post argues.";
-// Ship rule: a technique shows only when its held-out precision interval starts at 0.7 or above,
-// from at least SHIP_MIN_N hits.
+// Ship rule: a technique shows only when its held-out precision is at least SHIP_PRECISION and its
+// 95% interval starts at SHIP_LOW or above, from at least SHIP_MIN_N hits. Published systems reach
+// F1 of about 30 to 44 on these techniques (SemEval-2023 Task 3; Jose and Greenstadt 2025), where a
+// confident label is wrong more often than right, so the bar is on precision, not on F1.
+export const SHIP_PRECISION = 0.8;
 export const SHIP_LOW = 0.7;
 export const SHIP_MIN_N = 20;
+// Techniques that need the context of a whole exchange (what was said before, what the other side
+// did) are never shown on a single reply, whatever a measurement says. Published detectors score
+// near zero on them.
+export const CONTEXT_ONLY = new Set(["whataboutism"]);
 
 // A cue is a regex fragment, or { cue, caseSensitive } for the few that need capitals.
 const EDGE = { en: ["(?<![\\w'])", "(?![\\w'])", ""], fr: ["(?<![\\p{L}\\p{N}_'])", "(?![\\p{L}\\p{N}_])", "u"] };
@@ -61,20 +68,22 @@ export function techniqueSpans(text) {
 }
 
 const pc = (x) => Math.round(x * 100);
-const ships = (r) => r && r.split === "test" && Number.isInteger(r.n) && r.n >= SHIP_MIN_N && Number.isFinite(r.low) && r.low >= SHIP_LOW;
+const ships = (r) => r && r.split === "test" && Number.isInteger(r.n) && r.n >= SHIP_MIN_N && Number.isFinite(r.low) && r.low >= SHIP_LOW
+  && Number.isFinite(r.precision) && r.precision >= SHIP_PRECISION;
 
 // The techniques the window may show.
 export function shownTechniques(table = MEASURED_PERSUASION) {
-  return Object.keys(TECHNIQUES).filter((t) => ships((table || {})[t]));
+  return Object.keys(TECHNIQUES).filter((t) => !CONTEXT_ONLY.has(t) && ships((table || {})[t]));
 }
 
 // { shown, text } for one technique: its measured line, or why it is held back.
 export function techniqueStatus(id, table = MEASURED_PERSUASION) {
   const r = (table || {})[id];
+  if (CONTEXT_ONLY.has(id)) return { shown: false, text: "held back: needs the whole exchange, so never shown on one reply" };
   if (!r || !Number.isInteger(r.n) || !r.n) return { shown: false, text: "held back: not measured" };
   const m = `precision ${pc(r.precision)}% (95% interval ${pc(r.low)} to ${pc(r.high)}%), ${r.n} spans checked, held-out news articles`;
   if (ships(r)) return { shown: true, text: m };
-  const why = r.n < SHIP_MIN_N ? `fewer than ${SHIP_MIN_N} hits` : `interval starts below ${pc(SHIP_LOW)}%`;
+  const why = r.n < SHIP_MIN_N ? `fewer than ${SHIP_MIN_N} hits` : r.precision < SHIP_PRECISION ? `precision under ${pc(SHIP_PRECISION)}%` : `interval starts below ${pc(SHIP_LOW)}%`;
   return { shown: false, text: `held back (${why}): ${m}` };
 }
 

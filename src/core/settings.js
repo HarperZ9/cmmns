@@ -82,6 +82,8 @@ export function pruneStore(store, settings, now = Date.now()) {
   }
   const F = store["pb.feed.v1"];
   if (F) { const k = keepMap(F, "at", hist); if (size(k) !== size(F)) out["pb.feed.v1"] = k; }
+  const M = store["pb.media.v1"];
+  if (M) { const k = keepMap(M, "at", hist); if (size(k) !== size(M)) out["pb.media.v1"] = k; }
   const T = store["pb.trail.v1"];
   if (T) {
     const media = keepMap(T.media, "seen", hist), links = keepMap(T.links, "seen", hist);
@@ -94,7 +96,7 @@ export function pruneStore(store, settings, now = Date.now()) {
   return out;
 }
 
-export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
+export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.media.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
 // "Clear all Radar data": every Radar key except the settings themselves. The Mastodon servers the
 // user turned on (pb.instances.v1) are settings too, removed in the options page with their access.

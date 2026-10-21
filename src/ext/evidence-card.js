@@ -1,5 +1,6 @@
 // The thread card page: shows the card a thread panel built (src/core/evidence.js), so the user
-// reads it before saving or sharing, then writes it as a PNG and a JSON with the same SHA-256 hash.
+// reads it before saving or sharing, then writes it as a PNG and a JSON. The JSON carries a SHA-256
+// hash of the card; the page shows it only under "Check a copy", and the image never prints it.
 // The image is always drawn light, ink on a calm ground, so a shared copy reads the same anywhere.
 (async () => {
   "use strict";
@@ -10,6 +11,7 @@
   if (!built.ok) { $("say").textContent = built.reason; $("png").hidden = true; return; }
   const card = await PB.sealCard(built.card);
   const lines = PB.cardLines(card);
+  $("hash").textContent = `${card.hash.alg} ${card.hash.value}`;
   $("say").textContent = `A card about one ${card.thread.site} thread with ${card.thread.replyAccounts} reply accounts. It names no account. Read it, then save or share it.`;
 
   for (const l of lines) $("lines").append(Object.assign(document.createElement(l.kind === "title" ? "h3" : "p"), { className: l.kind, textContent: l.text }));
@@ -44,7 +46,6 @@ function draw(canvas, lines) {
     body: { font: `400 23px ${SANS}`, color: "#16130f", lh: 33, before: 6 },
     small: { font: `400 18px ${SANS}`, color: "#4a443b", lh: 26, before: 4 },
     limit: { font: `400 19px ${SANS}`, color: "#16130f", lh: 27, before: 6 },
-    hash: { font: `400 16px ${MONO}`, color: "#4a443b", lh: 24, before: 28 },
   };
   const ctx = canvas.getContext("2d");
   const laid = [];

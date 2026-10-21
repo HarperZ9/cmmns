@@ -122,9 +122,9 @@ light, dim and dark themes, were taken from the fixture pages (`tests/fixtures/p
 
 - **Product pages.** `flywheel.html` leads each measured figure with one plain sentence, draws the
   interval as a figure, and keeps counts and hashes in a collapsed "how we know" detail. Radar's
-  transparency page still gives every figure inline as "precision (k of n; low to high)" in dense
-  tables. Matching the product page means a lead figure per sign family, an interval figure, and
-  the counts in a disclosure. Not done in this pass; it changes the page generator and its tests.
+  transparency page now does the same (2026-10-21, `scripts/site/figures.mjs` and `signs.mjs`): a
+  lead sentence and an interval figure per measured sign, with counts under "How we know" and the
+  dense tables in disclosures. `tests/canon.test.js` holds the shape.
 - **Spec at a glance.** The product pages end with a two-column spec table (bold first column).
   Radar's public pages have none; a short spec table (sites, permissions, data kept, network use)
   would match.
@@ -132,6 +132,8 @@ light, dim and dark themes, were taken from the fixture pages (`tests/fixtures/p
   labels, which the site's own rules ban. Radar follows the site's product pages, not that theme.
 - **Hosting.** `https://harperz9.github.io/radar/` returned 404 on 2026-10-21. The store listing
   and the privacy URL depend on it.
-- **Hashes on the thread card.** The card image prints a SHA-256 hash so a copy can be checked.
-  The site's ruling moves hashes out of the default view. This needs the author's call, since the
-  hash is the card's check.
+- **Hashes on the thread card.** Done 2026-10-21: the image no longer prints the hash. It stays in
+  the JSON file and under a collapsed "Check a copy" on the card page, so a copy can still be checked.
+- **Keyboard hints.** `kbd` now names Conso in `pages.css` and sits at 14px or more (it was 13.5px).
+  A serif fallback was reported; it did not reproduce on the fixture server, where Conso loaded, so
+  the rule now names the face directly and a test holds it.

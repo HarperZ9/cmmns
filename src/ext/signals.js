@@ -89,15 +89,23 @@
     return out;
   }
 
+  // Coordination signs carry what normal looks like: how often the same sign showed up in
+  // ordinary threads of this size (src/core/baselines.js).
+  function baseline(id, m) {
+    const T = m.thread || {}, line = PB.baselineLine(id, { replies: T.replies, viewed: T.viewed });
+    return line ? [["In ordinary threads", line], ["Baseline from", PB.BASELINE_SOURCE]] : [];
+  }
+
   function account(m) {
-    return (m.flags || []).map((f) => ({ label: FLAG_LABEL[f.id] || f.id, fam: PB.familyOf("flag", f.id), cat: FLAG_CAT[f.id] || "account", level: f.id === "based-elsewhere" ? "warn" : WEAK.has(f.id) ? "info" : "flag", rows: [["Evidence", f.evidence], dnp(f.doesNotProve)] }));
+    return (m.flags || []).map((f) => ({ label: FLAG_LABEL[f.id] || f.id, fam: PB.familyOf("flag", f.id), cat: FLAG_CAT[f.id] || "account", level: f.id === "based-elsewhere" ? "warn" : WEAK.has(f.id) ? "info" : "flag", rows: [["Evidence", f.evidence], ...baseline(f.id, m), dnp(f.doesNotProve)] }));
   }
 
   // Shown first: a Community Note X attached to the post, then fact-checks of similar claims. The
   // rating is the fact-checker's own words; Radar adds no verdict of its own.
   function checks(m) {
     const out = [], T = m.tweet || {};
-    if (T.note) out.push({ label: "Community Note", fam: "community-note", level: "warn", cat: "sources", rows: [["Note", T.note], ["Source", "X loaded a Community Note for this post. Notes are written and rated by X users."], dnp("A note shows what X users from different viewpoints rated helpful. It is not a ruling by X or by Radar.")] });
+    const when = T.note ? PB.noteTiming(T) : null;
+    if (T.note) out.push({ label: "Community Note", fam: "community-note", level: "warn", cat: "sources", rows: [["Note", T.note], ...(when ? [["Timing", when.text]] : []), ["Source", "X loaded a Community Note for this post. Notes are written and rated by X users."], dnp("A note shows what X users from different viewpoints rated helpful. It is not a ruling by X or by Radar.")] });
     for (const c of m.claims || []) { const card = PB.claimCard(c); out.push({ label: card.label, fam: "fact-check", level: "warn", cat: "sources", rows: card.rows }); }
     return out;
   }

@@ -86,7 +86,7 @@
     if (!feed && replies.length) recordNet(threadKey, replies, root);
     const cache = site.hasLocation ? await PBStore.all() : {};
     if (site.want && settings.auto) site.want([...new Set(items.map((r) => r.author))], schedule);
-    const clusters = feed ? [] : PB.duplicateClusters(replies);
+    const clusters = feed ? [] : PB.duplicateClusters(replies, { root });
     const clusterOf = new Map();
     for (const c of clusters) for (const id of c.ids) clusterOf.set(id, c);
     const rows = [], models = [];
@@ -105,7 +105,8 @@
     const ages = read.map((r) => r.joinDate && PB.ageDays(r.joinDate)).filter((x) => x != null).sort((a, b) => a - b);
     const places = {};
     for (const r of read) if (r.basedIn) places[r.basedIn] = (places[r.basedIn] || 0) + 1;
-    const thread = { feed: !!feed, n: read.length, medianAgeDays: ages.length ? ages[Math.floor(ages.length / 2)] : null, places, flagged: read.filter((r) => r.flags && PB.isFlagged(r.flags)).length };
+    const viewed = Object.keys((PBLogs.net() || {}).threads || {}).length;
+    const thread = { feed: !!feed, replies: replies.length, viewed, n: read.length, medianAgeDays: ages.length ? ages[Math.floor(ages.length / 2)] : null, places, flagged: read.filter((r) => r.flags && PB.isFlagged(r.flags)).length };
     for (const [, model] of models) model.thread = thread;
     drawn = models;
     drawVisible();
@@ -127,7 +128,7 @@
     report.context = PB.threadContext(items, { noteOf, claimsOf: PBLogs.claimsOf });
     saveSnapshot(threadKey, site.name, report);
     lastSummary = { ...lastSummary, sentence: report.sentence, signs: (report.bursts || []).length + clusters.length + (report.state || []).length, state: report.state };
-    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onCard: () => PBLogs.saveCard({ site, report, items, replies, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
+    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, viewed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onCard: () => PBLogs.saveCard({ site, report, items, replies, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
   }
 
   // Feed dashboard (src/core/feed.js): each feed post once per day, with what it linked and the

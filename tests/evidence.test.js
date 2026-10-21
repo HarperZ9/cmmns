@@ -57,13 +57,14 @@ test("the content hash is stable under key order and changes with the content", 
   assert.equal(await verifyCard(tampered), false);
 });
 
-test("the PNG lines lead with the report and end with the limits and the hash", async () => {
+test("the PNG lines lead with the report and end with the limits; the hash stays in the JSON", async () => {
   const sealed = await sealCard(evidenceCard(input()).card);
   const lines = cardLines(sealed);
   assert.equal(lines[0].kind, "title");
   assert.ok(lines.some((l) => l.text.includes(report.sentence)));
   assert.ok(lines.some((l) => l.kind === "limit"));
-  assert.ok(lines[lines.length - 1].text.includes(sealed.hash.value.slice(0, 16)));
+  assert.ok(lines.every((l) => !l.text.includes(sealed.hash.value.slice(0, 16)) && l.kind !== "hash"), "no hash in the image");
+  assert.match(lines[lines.length - 1].text, /JSON file saved with this image/);
 });
 
 test("checked media goes on the card as credential states, never as a signer's name", async () => {
