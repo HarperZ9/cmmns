@@ -5,7 +5,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { analyzeThread, analyzeText } from "../src/core/api.js";
-import { makeBundle, signBundle, verifyBundle, newBundleKey, publicKeyOf, dataLockOf, bundleConsistency, b64url, fromB64url } from "../src/core/evidence-bundle.js";
+import { makeBundle, signBundle, verifyBundle, newBundleKey, publicKeyOf, dataLockOf, bundleConsistency } from "../src/core/evidence-bundle.js";
+import { b64url, fromB64url } from "../src/core/sig.js";
 import { validate } from "../bin/lib/jsonschema.mjs";
 
 const SCHEMA = JSON.parse(readFileSync(new URL("../schema/evidence.v1.json", import.meta.url), "utf8"));

@@ -86,6 +86,7 @@ export function siteInfoRows(info, opts = {}) {
     ["Founded", facts && facts.founded ? `${facts.founded} (Wikidata)` : null],
     ["Country", facts && facts.country ? `${facts.country} (Wikidata)` : null],
     ...stateRows(info.state),
+    ...packNoteRows(info.notes),
   ];
   if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Radar has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
   rows.push(["Fact-check record", recordLine(record) || "No review in Radar's table lists this site as where a claim appeared."]);
@@ -93,6 +94,15 @@ export function siteInfoRows(info, opts = {}) {
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
   rows.push(["Source", SITE_SOURCES], ["Does not prove", SITE_RECORD_DOES_NOT_PROVE]);
   return rows.filter(([, v]) => v != null);
+}
+
+// Notes from data packs the user imported and trusts (src/core/packs-content.js), each with its
+// pack's name and source, kept apart from Radar's own rows.
+export const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Radar did not write or check it.";
+function packNoteRows(notes) {
+  if (!notes || !notes.length) return [];
+  const rows = notes.slice(0, 5).flatMap((n) => [["Pack note", `${n.note} (pack: ${n.pack})`], ["Read it", { links: [[String(n.url).replace(/^https?:\/\//, "").slice(0, 48), n.url]] }]]);
+  return [...rows, [null, { note: PACK_NOTE_CAVEAT }]];
 }
 
 // Wikidata's owner (P127) where it states one, else the parent organisation (P749) or publisher

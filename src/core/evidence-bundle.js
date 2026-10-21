@@ -10,39 +10,33 @@
 // it. It does not show who holds the key, that the posts said what the spans say, or that the
 // evidence is right. Compare the key id with one you got from its holder some other way.
 
-import { canonicalJSON, MIN_CARD_ACCOUNTS } from "./evidence.js";
+import { MIN_CARD_ACCOUNTS } from "./evidence.js";
+import { canonicalJSON, sha256Hex, lfBytes, jwkId, signText, verifyText, P256 } from "./sig.js";
 
 export const BUNDLE_KIND = "radar-evidence-bundle";
 export const BUNDLE_VERSION = 1;
 export const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
 export const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right.";
-const ALG = { name: "ECDSA", namedCurve: "P-256" }, SIGN = { name: "ECDSA", hash: "SHA-256" };
+// Canonical JSON, hashing, base64url and ECDSA P-256 live in sig.js, shared with data packs.
 const subtle = () => globalThis.crypto.subtle;
-const enc = (s) => new TextEncoder().encode(s);
-const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 
-export function b64url(bytes) {
-  let s = "";
-  for (const b of new Uint8Array(bytes)) s += String.fromCharCode(b);
-  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-export function fromB64url(text) {
-  const s = atob(String(text).replace(/-/g, "+").replace(/_/g, "/") + "===".slice((String(text).length + 3) % 4));
-  return Uint8Array.from(s, (c) => c.charCodeAt(0));
-}
-
-export async function sha256Hex(data) { return hex(await subtle().digest("SHA-256", typeof data === "string" ? enc(data) : data)); }
-
-// The hash of the data tables: SHA-256 over lines "<sha256>  <name>", names sorted.
+// The hash of the data tables: SHA-256 over lines "<sha256>  <name>", names sorted, each file
+// hashed with LF line ends. Those per-file hashes are the ones data/LOCK.json records for the
+// tables and src/ext/radar-data.pack.json signs, so dataLockFromHashes() gives the same value
+// from either (tests/datalock.bundle.test.js).
 export async function dataLockOf(files) {
-  const lines = [];
-  for (const [name, bytes] of [...files].sort((a, b) => (a[0] < b[0] ? -1 : 1))) lines.push(`${await sha256Hex(bytes)}  ${name}`);
-  return { alg: "SHA-256", of: "lines \"<sha256>  <file>\" for each data table, sorted by name", value: await sha256Hex(lines.join("\n") + "\n") };
+  const hashes = {};
+  for (const [name, bytes] of files) hashes[name] = await sha256Hex(lfBytes(bytes));
+  return dataLockFromHashes(hashes);
+}
+export async function dataLockFromHashes(hashes) {
+  const lines = Object.keys(hashes).sort().map((name) => `${hashes[name]}  ${name}`);
+  return { alg: "SHA-256", of: "lines \"<sha256>  <file>\" for each data table, sorted by name; files hashed with LF line ends", value: await sha256Hex(lines.join("\n") + "\n") };
 }
 
 // A new key pair. extractable: false keeps the private key inside the browser's key store.
 export async function newBundleKey({ extractable = false } = {}) {
-  return subtle().generateKey(ALG, extractable, ["sign", "verify"]);
+  return subtle().generateKey(P256, extractable, ["sign", "verify"]);
 }
 
 // The public half as a JWK with only the fields a verifier needs, and its id: the first 16 hex
@@ -50,7 +44,7 @@ export async function newBundleKey({ extractable = false } = {}) {
 export async function publicKeyOf(publicKey) {
   const j = await subtle().exportKey("jwk", publicKey);
   const jwk = { kty: j.kty, crv: j.crv, x: j.x, y: j.y };
-  return { jwk, keyId: (await sha256Hex(canonicalJSON(jwk))).slice(0, 16) };
+  return { jwk, keyId: await jwkId(jwk, 16) };
 }
 
 // result: an analyzeThread or analyzeText envelope. opts: { tool, dataLock, savedAt, page, texts,
@@ -80,8 +74,8 @@ export async function signBundle(bundle, keyPair) {
   const { signature, ...body } = bundle;
   const { jwk, keyId } = await publicKeyOf(keyPair.publicKey);
   const signed = { ...body, signer: { alg: BUNDLE_SIG_ALG, keyId, publicKey: jwk } };
-  const sig = await subtle().sign(SIGN, keyPair.privateKey, enc(canonicalJSON(signed)));
-  return { ...signed, signature: { of: "canonical JSON of this bundle without the signature field (sorted keys, no spaces)", value: b64url(sig) } };
+  const value = await signText(keyPair.privateKey, canonicalJSON(signed));
+  return { ...signed, signature: { of: "canonical JSON of this bundle without the signature field (sorted keys, no spaces)", value } };
 }
 
 // Spans and post references inside the bundle agree with themselves: every post an item names is
@@ -103,11 +97,10 @@ async function signatureOk(bundle) {
   const { signature, ...body } = bundle, S = body.signer;
   if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Radar can check" };
   const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
-  if ((await sha256Hex(canonicalJSON(jwk))).slice(0, 16) !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
-  let key;
-  try { key = await subtle().importKey("jwk", { ...jwk, ext: true }, ALG, true, ["verify"]); } catch { return { ok: false, text: "the public key cannot be read" }; }
-  let good = false;
-  try { good = await subtle().verify(SIGN, key, fromB64url(signature.value), enc(canonicalJSON(body))); } catch { good = false; }
+  let id = null;
+  try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
+  if (id !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
+  const good = await verifyText(jwk, signature.value, canonicalJSON(body));
   return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature does not match: the bundle changed after signing, or was signed with another key" };
 }
 

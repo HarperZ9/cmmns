@@ -4786,7 +4786,9 @@ function opRows(h) {
 const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.";
 function opsTrend(table = TABLE) {
   const years = new Map(), states = new Map();
-  for (const o of table.ops) {
+  // Operations from data packs (src/core/packs-content.js) are shown on matches but never counted here.
+  const own = table.ops.filter((o) => !o.pack);
+  for (const o of own) {
     const y = Number(String(o.first).slice(0, 4));
     const ye = years.get(y) || years.set(y, { year: y, n: 0, byState: {} }).get(y);
     ye.n++; ye.byState[o.state] = (ye.byState[o.state] || 0) + 1;
@@ -4795,7 +4797,7 @@ function opsTrend(table = TABLE) {
     for (const d of o.docs) se.docs.add(d);
   }
   return {
-    total: table.ops.length,
+    total: own.length,
     byYear: [...years.values()].sort((a, b) => a.year - b.year),
     byState: [...states.values()].map((s) => ({ ...s, docs: s.docs.size })).sort((a, b) => b.n - a.n || a.state.localeCompare(b.state)),
   };
@@ -6720,6 +6722,77 @@ const FEED_DOES_NOT_SHOW = "What this does not show: what your feed would carry 
 return { FEED_RETAIN_DAYS, addFeedPosts, threadContext, feedDashboard, FEED_DOES_NOT_SHOW };
 })();
 
+// ---- sig.js
+const M_sig = (() => {
+// The one copy of Radar's hashing and signing primitives, shared by sealed evidence cards
+// (evidence.js), signed evidence bundles (evidence-bundle.js) and signed data packs (packs.js).
+// WebCrypto only, so the same code runs in Chrome, Firefox and node with no dependency.
+//   canonicalJSON: sorted keys at every level, no spacing, undefined object fields dropped and
+//     undefined array items written as null, so the same content always gives the same bytes.
+//   ECDSA P-256 with SHA-256; signatures in IEEE P1363 form (r || s), base64url, as WebCrypto
+//     produces them.
+
+const P256 = { name: "ECDSA", namedCurve: "P-256" };
+const P256_SHA256 = { name: "ECDSA", hash: "SHA-256" };
+const subtle = () => globalThis.crypto.subtle;
+const utf8 = (s) => new TextEncoder().encode(s);
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+
+function canonicalJSON(v) {
+  if (Array.isArray(v)) return "[" + v.map(canonicalJSON).join(",") + "]";
+  if (v && typeof v === "object") return "{" + Object.keys(v).filter((k) => v[k] !== undefined).sort().map((k) => JSON.stringify(k) + ":" + canonicalJSON(v[k])).join(",") + "}";
+  return JSON.stringify(v === undefined ? null : v);
+}
+
+async function sha256Hex(data) { return hex(await subtle().digest("SHA-256", typeof data === "string" ? utf8(data) : data)); }
+
+// File bytes with CRLF line ends turned to LF, so a Windows checkout and a Linux one hash a text
+// table the same. Bytes without a CR come back unchanged.
+function lfBytes(bytes) {
+  const u = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (!u.includes(13)) return u;
+  const out = new Uint8Array(u.length);
+  let n = 0;
+  for (let i = 0; i < u.length; i++) if (!(u[i] === 13 && u[i + 1] === 10)) out[n++] = u[i];
+  return out.subarray(0, n);
+}
+
+function b64url(bytes) {
+  let s = "";
+  for (const b of new Uint8Array(bytes)) s += String.fromCharCode(b);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function fromB64url(text) {
+  const s = atob(String(text).replace(/-/g, "+").replace(/_/g, "/") + "===".slice((String(text).length + 3) % 4));
+  return Uint8Array.from(s, (c) => c.charCodeAt(0));
+}
+
+// Only the public parts of a P-256 key. A key that carries "d" is a private key and is refused.
+function publicJwk(jwk) {
+  if (!jwk || jwk.kty !== "EC" || jwk.crv !== "P-256" || typeof jwk.x !== "string" || typeof jwk.y !== "string") throw new Error("not a P-256 public key");
+  if ("d" in jwk) throw new Error("this is a private key; share only the public key");
+  return { kty: "EC", crv: "P-256", x: jwk.x, y: jwk.y };
+}
+// A key id: the first `length` hex characters of the SHA-256 of the public key's canonical JWK.
+const jwkId = async (jwk, length) => (await sha256Hex(canonicalJSON(publicJwk(jwk)))).slice(0, length);
+
+// Signs text with a CryptoKey (or a private JWK); returns a base64url P1363 signature.
+async function signText(key, text) {
+  const k = key && key.type === "private" ? key : await subtle().importKey("jwk", key, P256, false, ["sign"]);
+  return b64url(await subtle().sign(P256_SHA256, k, utf8(text)));
+}
+
+// True when sig (base64url) is a valid signature of text by the public JWK; never throws.
+async function verifyText(jwk, sig, text) {
+  try {
+    const key = await subtle().importKey("jwk", { ...publicJwk(jwk), ext: true }, P256, true, ["verify"]);
+    return await subtle().verify(P256_SHA256, key, fromB64url(sig), utf8(text));
+  } catch { return false; }
+}
+
+return { P256, P256_SHA256, canonicalJSON, sha256Hex, lfBytes, b64url, fromB64url, publicJwk, jwkId, signText, verifyText };
+})();
+
 // ---- evidence.js
 const M_evidence = (() => {
 // Evidence cards: one thread, as one viewer saw it, in a form to save or share. A card carries the
@@ -6731,6 +6804,7 @@ const M_evidence = (() => {
 // thread with fewer than MIN_CARD_ACCOUNTS distinct reply accounts.
 
 const { REPORT_DOES_NOT_PROVE } = M_report;
+const { canonicalJSON, sha256Hex } = M_sig;
 const { CLAIM_ATTRIBUTION, CLAIM_DOES_NOT_PROVE } = M_claims;
 const { credentialState } = M_c2pa;
 const { CREDENTIALS_DO_NOT_PROVE } = M_mediacheck;
@@ -6817,17 +6891,8 @@ function limitsOf(card) {
   ].filter(Boolean);
 }
 
-// JSON with sorted keys and no spacing, so the same content always gives the same bytes.
-function canonicalJSON(v) {
-  if (Array.isArray(v)) return "[" + v.map(canonicalJSON).join(",") + "]";
-  if (v && typeof v === "object") return "{" + Object.keys(v).filter((k) => v[k] !== undefined).sort().map((k) => JSON.stringify(k) + ":" + canonicalJSON(v[k])).join(",") + "}";
-  return JSON.stringify(v === undefined ? null : v);
-}
-
-async function sha256(text) {
-  const buf = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
+// Canonical JSON and SHA-256 come from sig.js, shared with evidence bundles and data packs.
+const sha256 = sha256Hex;
 
 async function sealCard(card) {
   const { hash, ...body } = card;
@@ -6869,7 +6934,7 @@ function cardLines(card) {
   return L;
 }
 
-return { MIN_CARD_ACCOUNTS, cardPage, evidenceCard, credentialSummary, canonicalJSON, sealCard, verifyCard, cardLines };
+return { MIN_CARD_ACCOUNTS, cardPage, evidenceCard, credentialSummary, sealCard, verifyCard, cardLines };
 })();
 
 // ---- hosts.js
@@ -7024,6 +7089,241 @@ function realLink(href, text = "") {
 return { hostOf, siteKey, hostedKind, unwrapArchive, appearanceSite, reviewSites, realLink };
 })();
 
+// ---- packs.js
+const M_packs = (() => {
+// Signed data packs (project-docs/DATA-SOVEREIGNTY.md). A pack is one JSON file: a manifest, the
+// content it adds (claims, operation indicators, site notes) or, for Radar's own bundled data, the
+// SHA-256 of each bundled file, the signer's public key and an ECDSA P-256 signature over the
+// manifest. WebCrypto only, so the same code verifies in Chrome, Firefox and node with no
+// dependency. A valid signature says who signed the pack and that nothing changed since; it never
+// says the content is true. Packs are never downloaded: the user picks a file.
+
+const { canonicalJSON, sha256Hex, lfBytes, publicJwk, jwkId, signText, verifyText, P256 } = M_sig;
+
+const PACK_FORMAT = "radar-pack/1";
+const PACK_DOES_NOT_PROVE = "A valid signature shows which key signed this pack and that its content has not changed since. It does not show that the content is right, or who holds the key: trust a key only when you know where it came from.";
+const subtle = () => globalThis.crypto.subtle;
+
+// The key id: the first 32 hex characters of the SHA-256 of the public key's canonical JWK.
+const keyIdOf = (jwk) => jwkId(jwk, 32);
+const keyFingerprint = (keyId) => String(keyId || "").match(/.{1,4}/g)?.join(" ") || "";
+
+async function generateKeyPair() {
+  const pair = await subtle().generateKey(P256, true, ["sign", "verify"]);
+  const [priv, pub] = await Promise.all([subtle().exportKey("jwk", pair.privateKey), subtle().exportKey("jwk", pair.publicKey)]);
+  return { privateJwk: priv, publicJwk: publicJwk(pub), keyId: await keyIdOf(pub) };
+}
+
+// Hashes of each content part, as the manifest lists them.
+async function contentHashes(content) {
+  const out = {};
+  for (const k of Object.keys(content || {}).sort()) out[k] = await sha256Hex(canonicalJSON(content[k]));
+  return out;
+}
+
+// meta: { name, version, description, authorName, created }; content: { claims, ops, siteNotes }
+// or files: { "name.json": sha256 }. Returns the pack object, ready to save as JSON.
+async function signPack(meta, privateJwk, { content = null, files = null } = {}) {
+  const pub = publicJwk({ kty: privateJwk.kty, crv: privateJwk.crv, x: privateJwk.x, y: privateJwk.y });
+  const manifest = {
+    name: String(meta.name), version: String(meta.version), description: meta.description ? String(meta.description) : undefined,
+    author: { keyId: await keyIdOf(pub), name: meta.authorName ? String(meta.authorName) : undefined },
+    created: meta.created || new Date().toISOString().slice(0, 10),
+    ...(content ? { hashes: await contentHashes(content), counts: Object.fromEntries(Object.entries(content).map(([k, v]) => [k, Array.isArray(v) ? v.length : 0])) } : {}),
+    ...(files ? { files } : {}),
+  };
+  const signature = await signText(privateJwk, canonicalJSON(manifest));
+  return JSON.parse(JSON.stringify({ format: PACK_FORMAT, manifest, ...(content ? { content } : {}), publicKey: pub, signature }));
+}
+
+const signatureValid = (pack) => verifyText(pack.publicKey, pack.signature, canonicalJSON(pack.manifest));
+
+// Checks the format, the key id, the signature and every content hash. trusted: [{ keyId, label }].
+// Returns { ok, problems, keyId, trusted, label, manifest }. ok means the signature and hashes hold;
+// trusted means the user chose to trust this key. Neither says the content is right.
+async function verifyPack(pack, trusted = []) {
+  const problems = [];
+  if (!pack || pack.format !== PACK_FORMAT) return { ok: false, problems: [`not a ${PACK_FORMAT} file`], keyId: null, trusted: false };
+  const m = pack.manifest || {};
+  let keyId = null;
+  try { keyId = await keyIdOf(pack.publicKey); } catch (e) { problems.push(e.message); }
+  if (keyId && (!m.author || m.author.keyId !== keyId)) problems.push("the manifest names a different key from the one in the pack");
+  if (keyId && !(await signatureValid(pack))) problems.push("the signature does not match the manifest");
+  problems.push(...(await hashProblems(pack)));
+  const t = trusted.find((k) => k.keyId === keyId);
+  return { ok: problems.length === 0, problems, keyId, trusted: !!t && problems.length === 0, label: t ? t.label : null, manifest: m };
+}
+
+async function hashProblems(pack) {
+  const m = pack.manifest || {}, listed = m.hashes || {}, content = pack.content || {}, out = [];
+  if (!pack.content && !m.files) return ["the pack has neither content nor a file list"];
+  for (const k of Object.keys(content)) if (!(k in listed)) out.push(`content part "${k}" is not listed in the signed manifest`);
+  for (const [k, h] of Object.entries(listed)) {
+    if (!(k in content)) out.push(`signed content part "${k}" is missing`);
+    else if ((await sha256Hex(canonicalJSON(content[k]))) !== h) out.push(`content part "${k}" changed after signing`);
+  }
+  return out;
+}
+
+// A file pack (Radar's bundled data): readBytes(name) resolves to the file's bytes. Line ends are
+// hashed as LF (sig.js lfBytes), the same as data/LOCK.json and evidence bundles.
+async function verifyFiles(pack, readBytes) {
+  const out = [];
+  for (const [name, want] of Object.entries((pack.manifest && pack.manifest.files) || {})) {
+    try {
+      if ((await sha256Hex(lfBytes(await readBytes(name)))) !== want) out.push(`${name} differs from the signed copy`);
+    } catch (e) { out.push(`${name} could not be read: ${e.message}`); }
+  }
+  return out;
+}
+
+return { PACK_FORMAT, PACK_DOES_NOT_PROVE, keyIdOf, keyFingerprint, generateKeyPair, contentHashes, signPack, verifyPack, verifyFiles };
+})();
+
+// ---- packs-content.js
+const M_packs_content = (() => {
+// What a signed data pack (src/core/packs.js) may add, and how it joins Radar's own tables. Three
+// parts, each a list: claims (fact-checks: the claim, the rating in the checker's words, the
+// checker, the review URL), ops (a domain or account a cited document names as part of an
+// operation) and siteNotes (a sourced note about a site). Every row must cite an https source.
+// Pack rows are kept apart from Radar's own: each carries the pack's name, and operations from
+// packs never enter the trend counts.
+
+// The same lists as src/core/ops-schema.js (tests/packs-content.test.js keeps them equal); that
+// module is build-time only and is not in the bundle.
+const PACK_INDICATOR_KINDS = ["cloned news domain", "operation site", "operation account"];
+const PACK_OPERATOR_TYPES = ["government", "state media", "contractor", "linked to a state", "commercial firm", "origin only"];
+const PACK_LIMITS = { claims: 50000, ops: 5000, siteNotes: 5000 };
+const PARTS = Object.keys(PACK_LIMITS);
+
+const str = (v, min, max) => typeof v === "string" && v.trim().length >= min && v.length <= max;
+const https = (v) => { try { return new URL(v).protocol === "https:"; } catch { return false; } };
+const day = (v) => v == null || /^\d{4}-\d{2}-\d{2}$/.test(v);
+const DOMAIN = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}$/;
+const HANDLE = /^\w{1,30}$/;
+// Radar shows no em dash anywhere a user reads (tests/canon.test.js); pack text is cleaned the same way.
+const clean = (s) => String(s).replace(/\s*—\s*/g, " - ");
+
+function claimProblems(c) {
+  const out = [];
+  if (!str(c.claim, 12, 600)) out.push("claim must be 12 to 600 characters");
+  if (!str(c.rating, 1, 120)) out.push("rating must be 1 to 120 characters");
+  if (!str(c.checker, 1, 120)) out.push("checker must be 1 to 120 characters");
+  if (!https(c.url)) out.push("url must be an https address");
+  if (!day(c.date)) out.push("date must be YYYY-MM-DD");
+  return out;
+}
+
+function opProblems(o) {
+  const out = [], op = o.operation || {}, s = o.source || {};
+  if (!(o.domain ? DOMAIN.test(o.domain) : HANDLE.test(o.x || ""))) out.push("needs a lower-case domain or an account handle");
+  if (!PACK_INDICATOR_KINDS.includes(o.kind)) out.push(`kind must be one of: ${PACK_INDICATOR_KINDS.join(", ")}`);
+  if (!str(op.id, 3, 80) || !str(op.name, 3, 200) || !str(op.state, 2, 80) || !str(op.operator, 2, 200)) out.push("operation needs id, name, state and operator");
+  if (!PACK_OPERATOR_TYPES.includes(op.operatorType)) out.push(`operatorType must be one of: ${PACK_OPERATOR_TYPES.join(", ")}`);
+  if (!str(s.title, 3, 300) || !https(s.url) || !day(s.date) || !s.date) out.push("source needs a title, an https url and a date");
+  if (s.says != null && !str(s.says, 3, 300)) out.push("source.says must be 3 to 300 characters");
+  return out;
+}
+
+function noteProblems(n) {
+  const out = [];
+  if (!DOMAIN.test(n.domain || "")) out.push("domain must be a lower-case domain");
+  if (!str(n.note, 3, 400)) out.push("note must be 3 to 400 characters");
+  if (!https(n.url)) out.push("url must be an https address for the note's source");
+  return out;
+}
+
+const CHECK = { claims: claimProblems, ops: opProblems, siteNotes: noteProblems };
+// Every problem with a content object, as "part[index]: problem". An empty list means it may load.
+function validatePackContent(content) {
+  if (!content || typeof content !== "object") return ["content is missing"];
+  const out = [];
+  for (const k of Object.keys(content)) {
+    if (!PARTS.includes(k)) { out.push(`unknown content part "${k}"`); continue; }
+    const list = content[k];
+    if (!Array.isArray(list)) { out.push(`${k} must be a list`); continue; }
+    if (list.length > PACK_LIMITS[k]) out.push(`${k} has ${list.length} rows, over the limit of ${PACK_LIMITS[k]}`);
+    list.slice(0, PACK_LIMITS[k]).forEach((row, i) => { for (const p of CHECK[k](row || {})) out.push(`${k}[${i}]: ${p}`); });
+  }
+  return out;
+}
+
+// What a pack adds, in words, for the import screen.
+function packSummary(content = {}) {
+  const n = (k) => (Array.isArray(content[k]) ? content[k].length : 0);
+  const parts = [[n("claims"), "fact-checked claim"], [n("ops"), "operation indicator"], [n("siteNotes"), "site note"]].filter(([c]) => c);
+  return parts.length ? parts.map(([c, w]) => `${c.toLocaleString("en")} ${w}${c === 1 ? "" : "s"}`).join(", ") : "nothing";
+}
+
+// claims.json's packed rows ([claim, rating, checker index, url, date, lang, site]) with the pack
+// claims added. packs: [{ name, content }] already verified and enabled.
+function mergePackClaims(table, packs = []) {
+  const checkers = [...((table && table.checkers) || [])], rows = [...((table && table.rows) || [])];
+  const at = new Map(checkers.map((c, i) => [c, i]));
+  for (const p of packs) {
+    for (const c of (p.content && p.content.claims) || []) {
+      const who = `${clean(c.checker)} (pack: ${clean(p.name)})`;
+      if (!at.has(who)) { at.set(who, checkers.length); checkers.push(who); }
+      rows.push([clean(c.claim), clean(c.rating), at.get(who), c.url, c.date || null, c.lang || null, null]);
+    }
+  }
+  return { ...(table || {}), checkers, rows };
+}
+
+// ops.json ({ docs, ops, indicators }) with pack indicators added. Each pack operation gets its own
+// id ("pack:<key id>:<id>") and a `pack` field, so it never merges into one of Radar's operations.
+function mergePackOps(table, packs = []) {
+  const docs = [...((table && table.docs) || [])], ops = [...((table && table.ops) || [])], indicators = [...((table && table.indicators) || [])];
+  const byId = new Map();
+  for (const p of packs) {
+    for (const o of (p.content && p.content.ops) || []) {
+      const s = o.source, doc = docs.push({ publisher: s.publisher ? clean(s.publisher) : null, title: clean(s.title), url: s.url, date: s.date, kind: null, terms: null }) - 1;
+      const id = `pack:${String(p.keyId || "").slice(0, 8)}:${o.operation.id}`;
+      let op = byId.get(id);
+      if (!op) {
+        op = { id, name: clean(o.operation.name), aliases: [], state: clean(o.operation.state), operator: clean(o.operation.operator), operatorType: o.operation.operatorType, attributions: [], docs: [], first: s.date, pack: clean(p.name) };
+        byId.set(id, op); ops.push(op);
+      }
+      op.attributions.push({ doc, says: clean(s.says || `named ${o.domain || "@" + o.x} as ${o.kind}`) });
+      op.docs.push(doc);
+      if (s.date < op.first) op.first = s.date;
+      indicators.push({ ...(o.domain ? { d: o.domain } : { x: String(o.x).toLowerCase() }), op: id, kind: o.kind, doc });
+    }
+  }
+  return { ...(table || {}), docs, ops, indicators };
+}
+
+// Site notes from enabled packs, by domain. A subdomain finds its parent's notes.
+let NOTES = new Map();
+function setPackNotes(packs = []) {
+  NOTES = new Map();
+  for (const p of packs) for (const n of (p.content && p.content.siteNotes) || []) {
+    (NOTES.get(n.domain) || NOTES.set(n.domain, []).get(n.domain)).push({ note: clean(n.note), url: n.url, pack: clean(p.name) });
+  }
+}
+function siteNotesOf(host) {
+  const parts = String(host || "").toLowerCase().replace(/^www\./, "").split(".");
+  for (let k = 0; k < parts.length - 1; k++) { const got = NOTES.get(parts.slice(k).join(".")); if (got) return got; }
+  return [];
+}
+
+return { PACK_INDICATOR_KINDS, PACK_OPERATOR_TYPES, PACK_LIMITS, validatePackContent, packSummary, mergePackClaims, mergePackOps, setPackNotes, siteNotesOf };
+})();
+
+// ---- pack-keys.js
+const M_pack_keys = (() => {
+// The public half of Radar's project key, which signs the data that ships inside Radar
+// (src/ext/radar-data.pack.json, scripts/pack.mjs bundled). The private half never enters this
+// repository (tests/no-private-keys.test.js). Anyone can check a download against this key id.
+const PROJECT_KEY = {
+  keyId: "0e5e19840565840c977e0f036c9ac021",
+  label: "Radar project key",
+  jwk: { kty: "EC", crv: "P-256", x: "0iyHwn2zRDoP7RfuuxvKGxhRYmAXiS7NelteWFPo8CM", y: "8n431mx6HCqh1hNM1xZmJeDX2ZPckhNUlIBezeKro_k" },
+};
+
+return { PROJECT_KEY };
+})();
+
 // ---- sites.js
 const M_sites = (() => {
 // Site context for a link or the page being read: who owns the site, what kind of owner, when and
@@ -7114,6 +7414,7 @@ function siteInfoRows(info, opts = {}) {
     ["Founded", facts && facts.founded ? `${facts.founded} (Wikidata)` : null],
     ["Country", facts && facts.country ? `${facts.country} (Wikidata)` : null],
     ...stateRows(info.state),
+    ...packNoteRows(info.notes),
   ];
   if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Radar has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
   rows.push(["Fact-check record", recordLine(record) || "No review in Radar's table lists this site as where a claim appeared."]);
@@ -7121,6 +7422,15 @@ function siteInfoRows(info, opts = {}) {
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
   rows.push(["Source", SITE_SOURCES], ["Does not prove", SITE_RECORD_DOES_NOT_PROVE]);
   return rows.filter(([, v]) => v != null);
+}
+
+// Notes from data packs the user imported and trusts (src/core/packs-content.js), each with its
+// pack's name and source, kept apart from Radar's own rows.
+const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Radar did not write or check it.";
+function packNoteRows(notes) {
+  if (!notes || !notes.length) return [];
+  const rows = notes.slice(0, 5).flatMap((n) => [["Pack note", `${n.note} (pack: ${n.pack})`], ["Read it", { links: [[String(n.url).replace(/^https?:\/\//, "").slice(0, 48), n.url]] }]]);
+  return [...rows, [null, { note: PACK_NOTE_CAVEAT }]];
 }
 
 // Wikidata's owner (P127) where it states one, else the parent organisation (P749) or publisher
@@ -7149,7 +7459,7 @@ function siteGlance(info) {
   };
 }
 
-return { setSiteTable, siteFacts, siteRecord, recordSummary, recordLine, SITE_RECORD_DOES_NOT_PROVE, SITE_SOURCES, OWNER_TYPES, ownerType, siteInfoRows, ownerHeading, siteChips, siteGlance };
+return { setSiteTable, siteFacts, siteRecord, recordSummary, recordLine, SITE_RECORD_DOES_NOT_PROVE, SITE_SOURCES, OWNER_TYPES, ownerType, siteInfoRows, PACK_NOTE_CAVEAT, ownerHeading, siteChips, siteGlance };
 })();
 
 // ---- coverage.js
@@ -7337,7 +7647,8 @@ const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "p
 // "Clear all Radar data": every Radar key except the settings themselves. The Mastodon servers the
 // user turned on (pb.instances.v1) are settings too, removed in the options page with their access.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
-const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1"]);
+// Imported data packs and the keys the user trusts (src/ext/packs-bg.js) are choices too.
+const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1", "pb.packs.v1", "pb.packkeys.v1"]);
 const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));
 
 return { SETTINGS_KEY, SITES, SEARCH_ENGINES, AREA_IDS, RETENTION, DEFAULTS, normalizeSettings, siteOn, areaOn, searchOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
@@ -8197,39 +8508,33 @@ const M_evidence_bundle = (() => {
 // it. It does not show who holds the key, that the posts said what the spans say, or that the
 // evidence is right. Compare the key id with one you got from its holder some other way.
 
-const { canonicalJSON, MIN_CARD_ACCOUNTS } = M_evidence;
+const { MIN_CARD_ACCOUNTS } = M_evidence;
+const { canonicalJSON, sha256Hex, lfBytes, jwkId, signText, verifyText, P256 } = M_sig;
 
 const BUNDLE_KIND = "radar-evidence-bundle";
 const BUNDLE_VERSION = 1;
 const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
 const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right.";
-const ALG = { name: "ECDSA", namedCurve: "P-256" }, SIGN = { name: "ECDSA", hash: "SHA-256" };
+// Canonical JSON, hashing, base64url and ECDSA P-256 live in sig.js, shared with data packs.
 const subtle = () => globalThis.crypto.subtle;
-const enc = (s) => new TextEncoder().encode(s);
-const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 
-function b64url(bytes) {
-  let s = "";
-  for (const b of new Uint8Array(bytes)) s += String.fromCharCode(b);
-  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-function fromB64url(text) {
-  const s = atob(String(text).replace(/-/g, "+").replace(/_/g, "/") + "===".slice((String(text).length + 3) % 4));
-  return Uint8Array.from(s, (c) => c.charCodeAt(0));
-}
-
-async function sha256Hex(data) { return hex(await subtle().digest("SHA-256", typeof data === "string" ? enc(data) : data)); }
-
-// The hash of the data tables: SHA-256 over lines "<sha256>  <name>", names sorted.
+// The hash of the data tables: SHA-256 over lines "<sha256>  <name>", names sorted, each file
+// hashed with LF line ends. Those per-file hashes are the ones data/LOCK.json records for the
+// tables and src/ext/radar-data.pack.json signs, so dataLockFromHashes() gives the same value
+// from either (tests/datalock.bundle.test.js).
 async function dataLockOf(files) {
-  const lines = [];
-  for (const [name, bytes] of [...files].sort((a, b) => (a[0] < b[0] ? -1 : 1))) lines.push(`${await sha256Hex(bytes)}  ${name}`);
-  return { alg: "SHA-256", of: "lines \"<sha256>  <file>\" for each data table, sorted by name", value: await sha256Hex(lines.join("\n") + "\n") };
+  const hashes = {};
+  for (const [name, bytes] of files) hashes[name] = await sha256Hex(lfBytes(bytes));
+  return dataLockFromHashes(hashes);
+}
+async function dataLockFromHashes(hashes) {
+  const lines = Object.keys(hashes).sort().map((name) => `${hashes[name]}  ${name}`);
+  return { alg: "SHA-256", of: "lines \"<sha256>  <file>\" for each data table, sorted by name; files hashed with LF line ends", value: await sha256Hex(lines.join("\n") + "\n") };
 }
 
 // A new key pair. extractable: false keeps the private key inside the browser's key store.
 async function newBundleKey({ extractable = false } = {}) {
-  return subtle().generateKey(ALG, extractable, ["sign", "verify"]);
+  return subtle().generateKey(P256, extractable, ["sign", "verify"]);
 }
 
 // The public half as a JWK with only the fields a verifier needs, and its id: the first 16 hex
@@ -8237,7 +8542,7 @@ async function newBundleKey({ extractable = false } = {}) {
 async function publicKeyOf(publicKey) {
   const j = await subtle().exportKey("jwk", publicKey);
   const jwk = { kty: j.kty, crv: j.crv, x: j.x, y: j.y };
-  return { jwk, keyId: (await sha256Hex(canonicalJSON(jwk))).slice(0, 16) };
+  return { jwk, keyId: await jwkId(jwk, 16) };
 }
 
 // result: an analyzeThread or analyzeText envelope. opts: { tool, dataLock, savedAt, page, texts,
@@ -8267,8 +8572,8 @@ async function signBundle(bundle, keyPair) {
   const { signature, ...body } = bundle;
   const { jwk, keyId } = await publicKeyOf(keyPair.publicKey);
   const signed = { ...body, signer: { alg: BUNDLE_SIG_ALG, keyId, publicKey: jwk } };
-  const sig = await subtle().sign(SIGN, keyPair.privateKey, enc(canonicalJSON(signed)));
-  return { ...signed, signature: { of: "canonical JSON of this bundle without the signature field (sorted keys, no spaces)", value: b64url(sig) } };
+  const value = await signText(keyPair.privateKey, canonicalJSON(signed));
+  return { ...signed, signature: { of: "canonical JSON of this bundle without the signature field (sorted keys, no spaces)", value } };
 }
 
 // Spans and post references inside the bundle agree with themselves: every post an item names is
@@ -8290,11 +8595,10 @@ async function signatureOk(bundle) {
   const { signature, ...body } = bundle, S = body.signer;
   if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Radar can check" };
   const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
-  if ((await sha256Hex(canonicalJSON(jwk))).slice(0, 16) !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
-  let key;
-  try { key = await subtle().importKey("jwk", { ...jwk, ext: true }, ALG, true, ["verify"]); } catch { return { ok: false, text: "the public key cannot be read" }; }
-  let good = false;
-  try { good = await subtle().verify(SIGN, key, fromB64url(signature.value), enc(canonicalJSON(body))); } catch { good = false; }
+  let id = null;
+  try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
+  if (id !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
+  const good = await verifyText(jwk, signature.value, canonicalJSON(body));
   return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature does not match: the bundle changed after signing, or was signed with another key" };
 }
 
@@ -8312,7 +8616,7 @@ async function verifyBundle(bundle, opts = {}) {
   return { ok: checks.every((c) => c.ok), keyId, checks };
 }
 
-return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, b64url, fromB64url, sha256Hex, dataLockOf, newBundleKey, publicKeyOf, makeBundle, signBundle, bundleConsistency, verifyBundle };
+return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, dataLockOf, dataLockFromHashes, newBundleKey, publicKeyOf, makeBundle, signBundle, bundleConsistency, verifyBundle };
 })();
 
 // ---- import-html.js
@@ -8722,5 +9026,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

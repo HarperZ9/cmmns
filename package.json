@@ -17,6 +17,10 @@
   "scripts": {
     "test": "node --test \"tests/*.test.js\"",
     "build": "node scripts/build.mjs",
+    "build:offline": "node scripts/build-offline.mjs",
+    "data:check": "node scripts/data-lock.mjs check",
+    "data:guard": "node scripts/upstream-guard.mjs",
+    "pack": "node scripts/pack.mjs",
     "pages": "node scripts/transparency.mjs && node scripts/privacy.mjs",
     "package": "node scripts/package.mjs",
     "eval": "node scripts/eval.mjs",

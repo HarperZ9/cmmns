@@ -100,7 +100,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const S = summarise(threads);
   const sha = existsSync(RAW) ? createHash("sha256").update(readFileSync(RAW)).digest("hex") : null;
   const source = { name: "PHEME rumour and non-rumour threads (Zubiaga et al.)", url: "https://doi.org/10.6084/m9.figshare.6392078.v1", licence: "CC BY 4.0", years: "2014 to 2015", site: "Twitter", threads: threads.length, sha256: sha };
-  const results = { generated: new Date().toISOString().slice(0, 10), seed: SEED, draws: DRAWS, nullRepeats: NULL_REPEATS, source, sizeBins: SIZE_BINS, viewBins: VIEW_BINS, ...S };
+  const results = { generated: (process.env.RADAR_BUILT || new Date().toISOString().slice(0, 10)), seed: SEED, draws: DRAWS, nullRepeats: NULL_REPEATS, source, sizeBins: SIZE_BINS, viewBins: VIEW_BINS, ...S };
   writeFileSync(join(root, "project-docs/evidence/baseline-results.json"), JSON.stringify(results, null, 1) + "\n");
   const keep = { generated: results.generated, source: { name: "PHEME", site: source.site, years: source.years, licence: source.licence, threads: source.threads },
     same: S.same, burst: S.burst, burstDecayNull: S.burstDecayNull, together: S.together, togetherNull: S.togetherNull, pairs3: S.pairs3, pairs3Null: S.pairs3Null, echo: S.echo };

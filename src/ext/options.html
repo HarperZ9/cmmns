@@ -47,6 +47,23 @@
     <p class="status muted" id="coverageStatus" role="status" aria-live="polite"></p>
   </section>
 
+  <section aria-labelledby="h-packs">
+    <h2 id="h-packs">Data packs</h2>
+    <p class="muted">A data pack adds fact-checks, operation indicators or site notes from someone you choose. Radar never downloads one: you pick the file. Radar checks its signature, shows which key signed it and what it adds, and uses it only after you trust that key.</p>
+    <p class="status muted" id="bundled" role="status" aria-live="polite"></p>
+    <div class="row">
+      <button id="packPick" type="button">Import a pack file</button>
+      <button id="bundledCheck" type="button" class="quiet">Check Radar's own data</button>
+      <input id="packFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <div id="packPreview" aria-live="polite"></div>
+    <h3 class="sub" id="h-packlist">Imported packs</h3>
+    <ul id="packList" class="plain" aria-labelledby="h-packlist"></ul>
+    <h3 class="sub" id="h-keylist">Keys you trust</h3>
+    <ul id="keyList" class="plain" aria-labelledby="h-keylist"></ul>
+    <p class="muted" id="packCaveat"></p>
+  </section>
+
   <section aria-labelledby="h-keep">
     <h2 id="h-keep">What Radar keeps</h2>
     <p class="muted">Everything stays in this browser profile. Older entries are deleted on the next start and whenever you change these numbers.</p>
@@ -100,5 +117,6 @@
 <script src="options.js"></script>
 <script src="options-feedback.js"></script>
 <script src="options-sources.js"></script>
+<script src="options-packs.js"></script>
 </body>
 </html>

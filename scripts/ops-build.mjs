@@ -69,7 +69,7 @@ function joinedIndicators(joins, rows, docs) {
   return out;
 }
 
-export function build({ ops = loadSources(), links = JSON.parse(readFileSync(join(SRC, "joins.json"), "utf8")), reports = JSON.parse(readFileSync(join(ROOT, "data/state-reports.json"), "utf8")), built = new Date().toISOString().slice(0, 10) } = {}) {
+export function build({ ops = loadSources(), links = JSON.parse(readFileSync(join(SRC, "joins.json"), "utf8")), reports = JSON.parse(readFileSync(join(ROOT, "data/state-reports.json"), "utf8")), built = (process.env.RADAR_BUILT || new Date().toISOString().slice(0, 10)) } = {}) {
   const joins = links.joins || [], drop = new Set((links.exclude || []).map((e) => e.domain));
   const problems = ops.flatMap(opProblems);
   const ids = new Set(ops.map((o) => o.id));
