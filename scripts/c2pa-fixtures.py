@@ -3,11 +3,12 @@
 # Radar. Every image is drawn here from flat colours, so no one else's media is used. The signer is
 # the test certificate that ships in c2patool's sample folder; it chains to no trusted root.
 #
-#   python scripts/c2pa-fixtures.py <path to c2patool.exe> <c2patool sample folder>
+#   python scripts/c2pa-fixtures.py <path to c2patool.exe> <c2patool sample folder> [only these names]
 import io, json, os, struct, subprocess, sys, tempfile
 from PIL import Image
 
 TOOL, SAMPLE = sys.argv[1], sys.argv[2]
+ONLY = set(sys.argv[3:])   # rebuild just these signed files, leaving the others byte for byte
 OUT = os.path.join(os.path.dirname(__file__), "..", "tests", "fixtures", "c2pa")
 os.makedirs(OUT, exist_ok=True)
 TMP = tempfile.mkdtemp()
@@ -43,6 +44,8 @@ def manifest(source, title, version=2, extra=None):
     return m
 
 def sign(name, raw, man, alg="es256", parent=None):
+    if ONLY and name not in ONLY:
+        return
     src = os.path.join(TMP, "src-" + name)
     open(src, "wb").write(raw)
     cert, key = ("es256_certs.pem", "es256_private.key") if alg == "es256" else ("ps256.pub", "ps256.pem")
@@ -57,10 +60,16 @@ sign("ai.png", image("PNG"), manifest("trainedAlgorithmicMedia", "ai.png"))
 sign("ai.webp", image("WEBP"), manifest("trainedAlgorithmicMedia", "ai.webp"))
 sign("ai.mp4", mp4(), manifest("trainedAlgorithmicMedia", "ai.mp4"))
 sign("camera-v1.jpg", image("JPEG", (120, 60, 30)), manifest("digitalCapture", "camera-v1.jpg", version=1))
+# A version 1 claim in MP4: the form whose agreement with the reference checker is not shown,
+# so Radar must report it as not fully verified.
+sign("camera-v1.mp4", mp4(), manifest("digitalCapture", "camera-v1.mp4", version=1))
 sign("camera-ps256.jpg", image("JPEG", (20, 120, 60)), manifest("digitalCapture", "camera-ps256.jpg"), alg="ps256")
 edit = {"claim_version": 2, "claim_generator_info": [{"name": "Radar fixture builder", "version": "1.0"}], "title": "edited.jpg",
         "assertions": [{"label": "c2pa.actions.v2", "data": {"actions": [{"action": "c2pa.opened"}, {"action": "c2pa.color_adjustments"}]}}]}
 sign("edited.jpg", image("JPEG", (90, 90, 90)), edit, parent=os.path.join(OUT, "ai.jpg"))
+
+if ONLY:
+    sys.exit(0)
 
 # Tampered control: one byte of the image data changed after signing. The data hash must fail.
 t = bytearray(open(os.path.join(OUT, "ai.jpg"), "rb").read())

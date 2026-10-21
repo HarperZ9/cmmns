@@ -8,6 +8,7 @@ import { findManifestStore, parseStore, childByLabel } from "./jumbf.js";
 import { checkAssertions, checkSignature, checkDataHash, checkBmffHash } from "./c2pa-verify.js";
 import { sourceType, aiMetadata } from "./aimeta.js";
 
+export const OLDER_FORMAT = "could not fully verify (older manifest format): Radar has not yet been shown to agree with the reference checker on version 1 manifests in video";
 const content = (box) => (box && box.content && box.content[0]) || null;
 function decodeBox(box) { const c = content(box); if (!c) return null; try { return c.type === "json" ? JSON.parse(new TextDecoder().decode(c.data)) : cborDecode(c.data); } catch { return null; } }
 const assertionsOf = (m) => (childByLabel(m, "c2pa.assertions") || {}).content || [];
@@ -86,6 +87,9 @@ export async function readCredentials(bytes, { complete = true } = {}) {
     assertions: await checkAssertions(store, active, s.claim),
     binding: await binding(file, active, complete, store, found.ranges),
   };
+  // Fail-safe: forms where agreement with the reference checker (c2patool) is not shown are never
+  // reported as unchanged. Version 1 claims in MP4 are one: see project-docs/DESIGN.md.
+  if (found.format === "bmff" && s.version === 1) checks.format = { ok: null, text: OLDER_FORMAT };
   const earlier = [];
   for (const m of store.manifests.slice(0, -1)) {
     const e = summarise(m), es = await signatureOf(store, m, e);

@@ -1,0 +1,199 @@
+{
+ "tool": "c2patool 0.27.22",
+ "source": "github.com/contentauth/c2pa-rs sdk/tests/fixtures at 60f7cbdc69ab7a2554fcc87eb4df77050814b2cf",
+ "files": {
+  "BigBuckBunny_320x180.mp4": {
+   "verdict": "none",
+   "codes": []
+  },
+  "C.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "CA.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "CACA.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "CACAE-uri-CA.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "CA_ct.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "CIE-sig-CA.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "C_with_CAWG_data.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "E-sig-CA.jpg": {
+   "verdict": "fail",
+   "codes": [
+    "claimSignature.mismatch"
+   ]
+  },
+  "IMG_0003.jpg": {
+   "verdict": "none",
+   "codes": []
+  },
+  "P1000827.jpg": {
+   "verdict": "none",
+   "codes": []
+  },
+  "XCA.jpg": {
+   "verdict": "fail",
+   "codes": [
+    "assertion.dataHash.mismatch"
+   ]
+  },
+  "adobe-20220124-E-clm-CAICAI.jpg": {
+   "verdict": "fail",
+   "codes": [
+    "ingredient.manifest.missing",
+    "assertion.hashedURI.mismatch"
+   ]
+  },
+  "boxhash.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "c.mov": {
+   "verdict": "none",
+   "codes": []
+  },
+  "cloud.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "cloudx.jpg": {
+   "verdict": "fail",
+   "codes": [
+    "error: Error: could not fetch the remote manifest an error occurred from the underlying"
+   ]
+  },
+  "dashinit.mp4": {
+   "verdict": "fail",
+   "codes": [
+    "assertion.bmffHash.mismatch"
+   ]
+  },
+  "earth_apollo17.jpg": {
+   "verdict": "none",
+   "codes": []
+  },
+  "exp-test1.png": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "legacy.mp4": {
+   "verdict": "fail",
+   "codes": [
+    "claimSignature.mismatch"
+   ]
+  },
+  "legacy_ingredient_hash.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "libpng-test.png": {
+   "verdict": "none",
+   "codes": []
+  },
+  "libpng-test_with_url.png": {
+   "verdict": "fail",
+   "codes": [
+    "error: Error: could not fetch the remote manifest an error occurred from the underlying"
+   ]
+  },
+  "mars.webp": {
+   "verdict": "none",
+   "codes": []
+  },
+  "nested_moov_1000.mp4": {
+   "verdict": "fail",
+   "codes": [
+    "error: Error: asset could not be parsed: Boxes are too deply nested, unsupported asset"
+   ]
+  },
+  "no_alg.jpg": {
+   "verdict": "fail",
+   "codes": [
+    "error: Error: unknown algorithm"
+   ]
+  },
+  "no_manifest.jpg": {
+   "verdict": "none",
+   "codes": []
+  },
+  "ocsp.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "ocsp_with_assertion.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "prerelease.jpg": {
+   "verdict": "fail",
+   "codes": [
+    "error: Error: Prerelease claim found"
+   ]
+  },
+  "sample1.avif": {
+   "verdict": "none",
+   "codes": []
+  },
+  "sample1.heic": {
+   "verdict": "none",
+   "codes": []
+  },
+  "sample1.m4a": {
+   "verdict": "none",
+   "codes": []
+  },
+  "sample1.png": {
+   "verdict": "none",
+   "codes": []
+  },
+  "sample1.webp": {
+   "verdict": "none",
+   "codes": []
+  },
+  "test.webp": {
+   "verdict": "none",
+   "codes": []
+  },
+  "test_lossless.webp": {
+   "verdict": "none",
+   "codes": []
+  },
+  "test_xmp.webp": {
+   "verdict": "none",
+   "codes": []
+  },
+  "thumbnail.jpg": {
+   "verdict": "none",
+   "codes": []
+  },
+  "update_manifest.jpg": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "video1.mp4": {
+   "verdict": "pass",
+   "codes": []
+  },
+  "video1_no_manifest.mp4": {
+   "verdict": "none",
+   "codes": []
+  }
+ }
+}

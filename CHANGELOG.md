@@ -6,6 +6,9 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- Content Credentials fail-safe: a version 1 manifest in MP4 now reads "could not fully verify
+  (older manifest format)", never "has not changed since it was signed", and a CI property test
+  holds Radar to never giving a more favourable verdict than c2patool on the c2pa-rs test files.
 - Media checks in the window, on click only. "Check this file" reads Content Credentials (C2PA 2.x
   and 1.x manifests) from JPEG, PNG, WebP and MP4 files the page already loaded, with no library
   and no network call beyond re-reading that file. It checks the claim signature (ES256, ES384,
