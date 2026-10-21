@@ -1,7 +1,7 @@
 // Site context in the background worker: the site table (sites.json, src/core/sites.js), the owner
 // and state tables, the review list page, the site card for the page being read (on the toolbar
 // button only), search-result cards (registered only for engines the user turned on) and the
-// opt-in "Other coverage" lookup, the only request Radar makes off the machine.
+// opt-in "Other coverage" lookup, which asks the outlets the user chose for their own feeds.
 (() => {
   "use strict";
   const get = (f) => fetch(chrome.runtime.getURL(f)).then((r) => r.json());
@@ -24,27 +24,19 @@
     return { domain: host, owner: PB.ownerOfDomain(host), state: PB.stateLinksOfDomain(host), facts: PB.siteFacts(host), record: full ? rec : PB.recordSummary(rec), notes: PB.siteNotesOf(host) };
   }
 
-  // Other coverage: at most one request every 5 seconds, as GDELT asks.
-  let lastCall = 0;
+  // Other coverage: on the user's click, each chosen outlet's feed from its own host, in parallel,
+  // and only hosts the browser allowed (src/core/feedfetch.js). The title is matched on this device.
+  const feeds = PB.feedFetcher({ fetch: (u, o) => fetch(u, o), allowed: (origin) => chrome.permissions.contains({ origins: [origin] }) });
   async function coverage(msg) {
     const s = await settings();
-    if (!s.coverage || !s.coverageConsent) return { error: "off" };
-    if (!(await chrome.permissions.contains({ origins: [PB.COVERAGE_ORIGIN] }))) return { error: "no-permission" };
-    const url = PB.coverageUrl(msg.title);
-    if (!url) return { error: "short-title" };
-    const wait = Math.max(0, lastCall + 5000 - Date.now());
-    if (wait) await new Promise((r) => setTimeout(r, wait));
-    lastCall = Date.now();
+    if (!s.coverage || !s.feedConsent) return { error: "off" };
+    const chosen = PB.chosenFeeds(s);
+    if (!chosen.length) return { error: "no-outlets" };
+    if (PB.titleWords(msg.title).length < 2) return { error: "short-title" };
     const t0 = Date.now();
-    // GDELT answers "Please limit requests" when it is busy; one retry after 6 seconds, same words.
-    const ask = async () => (await fetch(url, { credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store" })).text();
-    let text = await ask();
-    if (/^Please limit/.test(text)) { await new Promise((r) => setTimeout(r, 6000)); lastCall = Date.now(); text = await ask(); }
-    let json = null;
-    try { json = JSON.parse(text); } catch { return { error: "gdelt", detail: text.slice(0, 160), ms: Date.now() - t0 }; }
-    await withPacks();
-    const list = PB.coverageList(json, { self: msg.domain, infoOf: (d) => infoOf(d) });
-    return { list, groups: PB.coverageGroups(list), query: PB.coverageTerms(msg.title), ms: Date.now() - t0 };
+    const [results] = await Promise.all([feeds.fetchAll(chosen), withPacks()]);
+    const { words, list } = PB.coverageFromFeeds(msg.title, results, { self: msg.domain, infoOf: (d) => infoOf(d) });
+    return { list, groups: PB.coverageGroups(list), words, status: PB.feedStatus(results), hosts: PB.coveragePlan(chosen), ms: Date.now() - t0 };
   }
 
   // The site card for the tab being read, injected only when the user presses the button.
@@ -52,7 +44,7 @@
     const [probe] = await chrome.scripting.executeScript({ target: { tabId }, func: () => !!globalThis.PBSitePage });
     if (probe && probe.result) { await chrome.scripting.executeScript({ target: { tabId }, func: () => globalThis.PBSitePage.show() }); return; }
     await chrome.scripting.insertCSS({ target: { tabId }, files: ["badges.css"] });
-    await chrome.scripting.executeScript({ target: { tabId }, files: ["core.bundle.js", "settings.js", "pop.js", "linkcard.js", "sitepage.js"] });
+    await chrome.scripting.executeScript({ target: { tabId }, files: ["core.bundle.js", "settings.js", "pop.js", "linkcard.js", "generic-page.js", "sitepage.js"] });
   }
 
   // Search-result cards: one registered script per engine the user turned on and granted.

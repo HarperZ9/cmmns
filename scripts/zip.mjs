@@ -6,6 +6,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
+export const FIREFOX_UPDATE_URL = "https://harperz9.github.io/radar/firefox/updates.json";
 export const EXT = join(dirname(fileURLToPath(import.meta.url)), "..", "src", "ext");
 const DOS_TIME = 0, DOS_DATE = (0 << 9) | (1 << 5) | 1;
 
@@ -64,6 +65,9 @@ export function browserManifest(source, browser) {
     m.background = { scripts: m.background.scripts };
     const gecko = m.browser_specific_settings.gecko;
     if (!(parseFloat(gecko.strict_min_version) >= 128)) gecko.strict_min_version = "128.0";
+    // The self-distributed build checks Radar's own site for updates. AMO-listed builds must not
+    // carry an update address, so only this variant has one.
+    if (browser === "firefox-self") gecko.update_url = FIREFOX_UPDATE_URL;
   }
   return m;
 }

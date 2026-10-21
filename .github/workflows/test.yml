@@ -5,6 +5,8 @@ on:
   pull_request:
 permissions:
   contents: read
+# Every step here is scripts/ci.mjs, so `npm run ci` on any machine runs exactly what this runs and
+# the project can check itself without GitHub (tests/ci.test.js keeps the two the same).
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -17,12 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm test
-      - name: Bundle matches a fresh build
-        shell: bash
-        run: |
-          npm run build
-          git diff --exit-code --ignore-cr-at-eol -- src/ext/core.bundle.js src/ext/ocr.bundle.js
+      - run: node scripts/ci.mjs test
   c2pa-reference:
     # Radar's Content Credentials verdicts must never be more favourable than c2patool's on the
     # c2pa-rs test fixtures (MIT/Apache-2.0), fetched at a pinned commit and never committed here.
@@ -32,16 +29,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Fetch the c2pa-rs fixtures at the pinned commit
-        shell: bash
-        run: |
-          git init -q c2pa-rs && cd c2pa-rs
-          git remote add origin https://github.com/contentauth/c2pa-rs.git
-          git fetch -q --depth 1 --filter=blob:none origin 60f7cbdc69ab7a2554fcc87eb4df77050814b2cf
-          git sparse-checkout set --no-cone $(node -e 'const r=require("../tests/fixtures/c2pa-reference.json");console.log(Object.keys(r.files).map(f=>"/sdk/tests/fixtures/"+f).join(" "))')
-          git checkout -q FETCH_HEAD
-          ls sdk/tests/fixtures | wc -l
-      - name: Property test against the reference verdicts
-        run: node --test tests/c2pa.reference.test.js
-        env:
-          C2PA_FIXTURES: c2pa-rs/sdk/tests/fixtures
+      - run: node scripts/ci.mjs c2pa

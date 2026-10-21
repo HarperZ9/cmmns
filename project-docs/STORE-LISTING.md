@@ -59,7 +59,7 @@ Rest the pointer on a reply on X, YouTube, Reddit, Facebook, Instagram or Bluesk
 - Sources: outlet owners, state links only where a cited report or official document names them, Community Notes, and fact-checks of similar claims with the fact-checker's own rating.
 - Language: slurs, calls for violence and dehumanising language, measured on public research data.
 - Site cards: rest the pointer on a link to see who owns the site, its owner type, founding date and country from Wikidata, any cited state link, and its fact-check record ("N reviews by M fact-checkers since a date"), with every rating in the fact-checker's own words. Press "Site card for this page" for the news site you are reading, and turn on labels under Google, Bing or DuckDuckGo results if you want them.
-- Other coverage, off by default: on a click, Radar asks the GDELT Project for other outlets covering the same story and labels each by owner type (state media, public broadcaster, nonprofit, commercial), never by a left or right score. The options page says exactly what is sent before you turn it on.
+- Other coverage, off by default: on a click, Radar reads the news feeds of outlets you choose, finds the ones covering the same story and labels each by owner and owner type (state media, public broadcaster, nonprofit, commercial), never by a left or right score. Nothing from the page is sent; the options page names every outlet it would ask.
 - A thread report: whether the most extreme replies come mostly from flagged accounts, with intervals, and "skewed" only when the intervals do not overlap.
 
 Tell Radar when it is wrong. Each sign has "This was right" and "This was wrong". Your marks stay in your browser, and after ten on one kind of sign the window shows your own count beside the measured figure. You can save them to a file and choose whether to share it.
@@ -68,7 +68,7 @@ What Radar never does:
 - Call anyone a bot, propagandist or extremist.
 - Use political side as an input. The same words count the same whoever they target, and the transparency page shows how evenly each side is covered.
 - Guess who runs an account, or anyone's age, gender, ethnicity, religion or politics.
-- Send your data anywhere. The one exception is Other coverage, which you turn on yourself and which sends only the main words of an article's title, on your click.
+- Send your data anywhere. Other coverage, which you turn on yourself, requests the public feeds of outlets you chose on your click and sends nothing from the page.
 
 Keyboard: focus a post to open its window, Alt+R to move into it, Esc to close it.
 
@@ -113,7 +113,7 @@ Shows the evidence behind the posts and accounts in the social media threads the
 | `activeTab` | Lets the site card and that one check read the current tab when the user opens the toolbar button, and no other time. |
 | Host `https://www.threads.com/*`, `https://www.threads.net/*` | Reads the posts and replies Threads shows on the page. |
 | Host `https://www.tiktok.com/*` | Reads the comments TikTok shows and the comment list its app already loaded. |
-| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Radar here" on that server; the browser shows its own prompt. Never granted for all sites. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for `https://api.gdeltproject.org/*` only when the user turns on Other coverage, which on the user's click sends the main words of an article's title to the GDELT Project's DOC 2.0 API. |
+| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Radar here" on that server; the browser shows its own prompt. Never granted for all sites. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for one news feed's host at a time (for example `https://feeds.bbci.co.uk/*`) only when the user chooses that outlet or adds that feed for Other coverage, which on the user's click downloads the feed and sends nothing from the page. |
 
 The APIs Radar also calls (`action`, `tabs.create`, `tabs.query`, `tabs.sendMessage`,
 `windows.create`) need no manifest permission. `tests/store-listing.test.js` fails when the
@@ -128,7 +128,7 @@ locally". Tick these, because Radar reads and keeps them in the browser:
 |---|---|---|
 | Website content | Yes | Reads the replies and account details on the page; keeps summaries and, only when the user ticks it, a post's text with a feedback mark |
 | Web browsing activity | Yes | Keeps a summary of each thread the user opened, for the history page |
-| Website content, sent | Only with Other coverage on | On the user's click, the main words of an article's title go to the GDELT Project's API. Off by default |
+| Website content, sent | No | Other coverage downloads the feeds of outlets the user chose and sends nothing from the page; each outlet sees an ordinary request from the user's IP address. Off by default |
 | Personally identifiable information, Health, Financial and payment, Authentication, Personal communications, Location, User activity | No | Radar reads none of these. The location labels are the sites' public labels about other accounts, not the user's location |
 
 Certifications (tick all three): not sold or transferred to third parties outside the approved use
@@ -142,13 +142,14 @@ transferred to determine creditworthiness or for lending.
 | Package | `dist/radar-firefox-<version>.xpi` from `npm run package`; AMO signs it |
 | Add-on ID | `radar@harperz9.github.io`. Permanent: see DESIGN.md, "Add-on identity" |
 | Minimum version | Firefox 128 (main-world content scripts) |
-| Data collection | `"required": ["none"]` and `"optional": ["websiteContent"]`: nothing is sent unless the user turns on Other coverage, which Firefox asks about at that moment; it sends the main words of an article's title to api.gdeltproject.org on a click |
+| Data collection | `"required": ["none"]`: Radar sends no user data. Other coverage, when the user turns it on, downloads public news feeds from hosts the user approved one by one and sends nothing from the page |
 | Lint | `web-ext lint` 8.10.0 on the 2026-10-21 build: 0 errors, 0 warnings, 0 notices |
 | Source code | Upload a source archive (`git archive`) and note: `core.bundle.js` is generated by `npm run build` from `src/core`; nothing is minified |
 | Notes to reviewer | Run `node scripts/serve.mjs` and open `http://127.0.0.1:8742/tests/fixtures/thread.html` to see the window without any account. On a real site, Firefox asks for site access on the first-run page |
 
-Other coverage is declared under `optional` as `websiteContent` (the words of a page's title). Any
-further feature that sends anything must add its own data type there first.
+Radar 2.x declared `websiteContent` under `optional` for the GDELT lookup, which sent title words.
+3.0 removed that lookup and the declaration. Any future feature that sends user data must add
+its data type here first.
 
 ## Screenshots and images
 

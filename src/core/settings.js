@@ -2,6 +2,8 @@
 // and the content scripts, plus the retention prune the background worker runs. Settings live in
 // chrome.storage.local under SETTINGS_KEY, on this machine only.
 
+import { FEED_OUTLETS, cleanFeedUrl, MAX_CUSTOM_FEEDS } from "./outlets.js";
+
 export const SETTINGS_KEY = "pb.settings";
 
 // Sites Radar has an adapter for. A site added later starts on unless the user switches it off.
@@ -23,14 +25,16 @@ export const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1
 export const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
   historyDays: 60, aboutDays: 14, calm: false, large: false, onboarded: false,
-  // Other coverage (src/core/coverage.js): off until the user turns it on; coverageConsent is set
-  // when the user has read what it sends and clicked to send.
-  search: {}, coverage: false, coverageConsent: false,
+  // Other coverage (src/core/coverage.js): off until the user turns it on. outlets are the suggested
+  // feeds the user switched on (src/core/outlets.js), customFeeds the addresses they added, and
+  // feedConsent is set when the user has read which hosts a lookup asks and clicked to ask them.
+  search: {}, coverage: false, feedConsent: false, outlets: {}, customFeeds: [],
   // Read text in images (src/core/imagetext.js, src/ocr): off until the user turns it on; even then
   // it runs only on a click, on this device.
   imageText: false,
 });
 
+const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
 const days = (v, d, r) => (Number.isFinite(Number(v)) && v !== null && v !== "" ? Math.min(r.max, Math.max(r.min, Math.round(Number(v)))) : d);
 const switches = (v, allowed) => {
@@ -47,7 +51,8 @@ export function normalizeSettings(raw) {
     aboutDays: days(s.aboutDays, DEFAULTS.aboutDays, RETENTION.aboutDays),
     calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
     search: switches(s.search, SEARCH_ENGINES.map(([id]) => id)), coverage: bool(s.coverage, DEFAULTS.coverage),
-    coverageConsent: bool(s.coverage, false) && bool(s.coverageConsent, false),
+    feedConsent: bool(s.coverage, false) && bool(s.feedConsent, false),
+    outlets: switches(s.outlets, FEED_OUTLETS.map(([id]) => id)), customFeeds: feedList(s.customFeeds),
     imageText: bool(s.imageText, DEFAULTS.imageText),
   };
 }

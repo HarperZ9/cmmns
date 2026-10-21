@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A synthetic Atom feed for tests. Every name and address is invented. -->
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title type="text">Example Herald</title>
+  <link href="https://herald.example/" rel="alternate"/>
+  <link href="https://herald.example/atom.xml" rel="self"/>
+  <entry>
+    <title type="html">Thousands flee as valley floods worsen</title>
+    <link rel="self" href="https://herald.example/api/1"/>
+    <link rel="alternate" type="text/html" href="https://herald.example/2026/10/valley-floods"/>
+    <published>2026-10-16T11:15:00Z</published>
+    <summary type="html">&lt;p&gt;Homes along the river were evacuated.&lt;/p&gt;</summary>
+  </entry>
+  <entry>
+    <title>Election officials certify count</title>
+    <link href="https://herald.example/2026/10/count"/>
+    <updated>2026-10-15T08:00:00Z</updated>
+    <summary>The count was certified on schedule.</summary>
+  </entry>
+</feed>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- A synthetic RSS 1.0 (RDF) feed for tests. Every name and address is invented. -->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel rdf:about="https://wave.example/rss">
+    <title>Example Wave</title>
+    <link>https://wave.example/</link>
+  </channel>
+  <item rdf:about="https://wave.example/en/valley-floods/a-1">
+    <title>River valley floods: thousands leave their homes</title>
+    <link>https://wave.example/en/valley-floods/a-1</link>
+    <description>Water levels kept rising on Friday.</description>
+    <dc:date>2026-10-16T12:00:00Z</dc:date>
+  </item>
+</rdf:RDF>

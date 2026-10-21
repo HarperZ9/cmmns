@@ -1,56 +1,38 @@
-// Other coverage on a 100-story test set: how often GDELT returns at least 3 other outlets, and how
-// long a lookup takes. Stories are headlines from Google News search feeds across editions and
-// topics; each query is built exactly as the extension builds it (src/core/coverage.js). Requests
-// are 10 s apart (--gap), above GDELT's one every 5 seconds. Raw headlines stay outside the
-// repository (--out).
+// Other coverage with the outlets' own feeds: how many other outlets a lookup finds, and how long
+// asking every suggested feed takes. The test stories are the newest headlines of each suggested
+// outlet; each is matched against every other outlet's feed exactly as the extension does
+// (src/core/feedfetch.js, src/core/coverage.js). One request per feed, made once. Matched pairs go
+// to --out for labelling by hand; precision is not measured by this script.
 //
-//   node scripts/eval/coverage-eval.mjs --out <dir> [--n 100]
-import { writeFileSync, mkdirSync, readFileSync, existsSync } from "node:fs";
-import { coverageUrl, coverageList, coverageGroups } from "../../src/core/coverage.js";
-import { hostOf } from "../../src/core/hosts.js";
+//   node scripts/eval/coverage-eval.mjs [--per 3] [--out <dir>]
+import { writeFileSync, mkdirSync } from "node:fs";
+import { FEED_OUTLETS } from "../../src/core/outlets.js";
+import { feedFetcher } from "../../src/core/feedfetch.js";
+import { coverageFromFeeds } from "../../src/core/coverage.js";
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
-const N = Number(arg("--n", 100)), OUT = arg("--out", null);
-const UA = { "User-Agent": "Radar evaluation (local, manual run)" };
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const EDITIONS = [["en-US", "US", "US:en"], ["en-GB", "GB", "GB:en"], ["en-IN", "IN", "IN:en"], ["en-NG", "NG", "NG:en"], ["en-AU", "AU", "AU:en"], ["fr", "FR", "FR:fr"], ["de", "DE", "DE:de"], ["es-419", "MX", "MX:es-419"], ["pt-BR", "BR", "BR:pt-419"], ["ar", "AE", "AE:ar"]];
-const TOPICS = ["election", "economy", "health", "climate", "court", "football", "technology", "war", "police", "school"];
+const PER = Number(arg("--per", 3)), OUT = arg("--out", null);
+const feeds = FEED_OUTLETS.map(([id, name, url, site, country]) => ({ id, name, url, site, country, custom: false }));
 
-async function stories() {
-  const out = [];
-  for (const q of TOPICS) for (const [hl, gl, ceid] of EDITIONS) {
-    const xml = await (await fetch(`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=${hl}&gl=${gl}&ceid=${encodeURIComponent(ceid)}`, { headers: UA })).text();
-    const item = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)][0];
-    const title = item && (item[1].match(/<title>([\s\S]*?)<\/title>/) || [])[1];
-    const src = item && (item[1].match(/<source url="([^"]+)">/) || [])[1];
-    if (title) out.push({ edition: gl, topic: q, title: title.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'"), self: src ? hostOf(src) : null });
-    await sleep(300);
+const t0 = Date.now();
+const results = await feedFetcher({ fetch, allowed: async () => true }).fetchAll(feeds);
+const askAllMs = Date.now() - t0;
+const failed = results.filter((r) => r.error).map((r) => `${r.feed.id}: ${r.error}`);
+
+const lookups = [];
+for (const r of results.filter((x) => !x.error)) {
+  for (const it of r.items.slice(0, PER)) {
+    const { words, list } = coverageFromFeeds(it.title, results, { self: r.feed.site });
+    if (words.length < 2) continue;
+    lookups.push({ from: r.feed.id, title: it.title, outlets: list.length, matches: list.map((x) => ({ outlet: x.outlet, title: x.title, shared: x.shared })) });
   }
-  return out.slice(0, N);
 }
-
-const cache = OUT && `${OUT}/stories.json`;
-const set = cache && existsSync(cache) ? JSON.parse(readFileSync(cache, "utf8")) : await stories();
-if (cache) { mkdirSync(OUT, { recursive: true }); writeFileSync(cache, JSON.stringify(set, null, 1)); }
-const results = [];
-for (const s of set) {
-  const url = coverageUrl(s.title);
-  if (!url) { results.push({ ...s, error: "short-title" }); continue; }
-  const t0 = Date.now();
-  let r;
-  try {
-    // As the extension does: one retry after 6 seconds when GDELT says it is busy.
-    let text = await (await fetch(url, { headers: UA })).text();
-    if (/^Please limit/.test(text)) { await sleep(6000); text = await (await fetch(url, { headers: UA })).text(); }
-    const ms = Date.now() - t0;
-    try { const list = coverageList(JSON.parse(text), { self: s.self }); r = { ...s, ms, outlets: list.length, groups: coverageGroups(list) }; } catch { r = { ...s, ms, error: text.slice(0, 80) }; }
-  } catch (e) { r = { ...s, ms: Date.now() - t0, error: e.message }; }
-  results.push(r);
-  console.log(results.length, r.edition, r.topic, r.outlets ?? r.error, r.ms);
-  await sleep(Number(arg("--gap", 10000)));
-}
-const ok = results.filter((r) => r.outlets >= 3).length, ms = results.filter((r) => r.ms != null).map((r) => r.ms).sort((a, b) => a - b);
-const pct = (x) => ms[Math.min(ms.length - 1, Math.floor(ms.length * x))];
-const summary = { stories: results.length, atLeast3: ok, share: Math.round((ok / results.length) * 1000) / 10, errors: results.filter((r) => r.error).length, medianMs: pct(0.5), p90Ms: pct(0.9) };
-console.log(JSON.stringify(summary));
-if (OUT) { mkdirSync(OUT, { recursive: true }); writeFileSync(`${OUT}/coverage.json`, JSON.stringify({ summary, results }, null, 1)); }
+const counts = lookups.map((l) => l.outlets).sort((a, b) => a - b);
+const share = (k) => `${lookups.filter((l) => l.outlets >= k).length} of ${lookups.length}`;
+const summary = {
+  date: new Date().toISOString().slice(0, 10), feeds: feeds.length, feedsAnswered: feeds.length - failed.length, failed, askAllMs,
+  lookups: lookups.length, atLeast1: share(1), atLeast3: share(3), medianOutlets: counts.length ? counts[Math.floor(counts.length / 2)] : null, maxOutlets: counts.at(-1) ?? null,
+  precision: "not measured; label the pairs in --out by hand",
+};
+console.log(JSON.stringify(summary, null, 1));
+if (OUT) { mkdirSync(OUT, { recursive: true }); writeFileSync(`${OUT}/coverage-feeds.json`, JSON.stringify({ summary, lookups }, null, 1)); }

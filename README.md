@@ -7,7 +7,7 @@ how the account posts, and how the thread's harshest replies compare with the re
 
 Radar gives evidence, never verdicts. It never calls anyone a bot, a propagandist or an extremist,
 and every sign says where its data came from and what it does not prove. It runs in your browser
-and sends nothing anywhere unless you turn on Other coverage, which says what it sends first.
+and sends nothing anywhere unless you turn on Other coverage, which says which outlets it asks first.
 
 ## Install in a minute
 
@@ -22,7 +22,11 @@ and sends nothing anywhere unless you turn on Other coverage, which says what it
 2. Open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and pick the file.
    Firefox removes temporary add-ons on restart until a signed build is published.
 
-Check a download against `SHA256SUMS` from the same release.
+Check a download against the signed `SHA256SUMS` from the same release: the
+[install page](https://harperz9.github.io/radar/install.html) has a checker that runs in your
+browser, and `node scripts/verify-release.mjs <folder>` does the same offline. Release key id
+`0e5e 1984 0565 840c 977e 0f03 6c9a c021`. Each release also carries a git bundle of the whole
+source, so it can be rebuilt without any code host.
 
 ## What you see
 
@@ -48,10 +52,11 @@ Check a download against `SHA256SUMS` from the same release.
   review. Press **Site card for this page** in the toolbar menu for the news site you are reading,
   and turn on labels under Google, Bing or DuckDuckGo results in the options if you want them.
   No score: each fact names its source, and the record says what a count does not prove.
-- **Other coverage (off by default):** on a click, other outlets covering the same story from the
-  GDELT Project, each labelled by owner type, never by a left or right score. It sends the main
-  words of the article's title to api.gdeltproject.org and nothing else, and says so before you
-  turn it on.
+- **Other coverage (off by default):** on a click, other outlets covering the same story, read
+  from each outlet's own news feed with no aggregator in between. You choose the outlets from a
+  suggested list spanning 18 countries, or add any RSS or Atom address. Radar sends nothing from
+  the page; it matches headlines on your device and labels each outlet by owner and owner type,
+  never by a left or right score.
 - **Fact-checked claims:** when a post's wording closely matches a claim a fact-checker has
   already reviewed, the fact-checker's name, their rating in their own words and a link. About
   20,000 reviews from 328 fact-checkers ship inside Radar, so no post text is sent anywhere.
@@ -75,8 +80,8 @@ options page lists every sign with its figure.
 ## Privacy
 
 No server, no account, no analytics. Radar reads only what the site shows you, and its only
-requests go to the site you are on, for account details that site discloses, plus the GDELT lookup
-if you turn on Other coverage and click. What it keeps stays in
+requests go to the site you are on, for account details that site discloses, plus the feeds of the
+outlets you chose if you turn on Other coverage and click. What it keeps stays in
 your browser: account details for 14 days and thread history for 60 by default, both adjustable,
 with a one-click "Clear all Radar data". Full details in [PRIVACY.md](PRIVACY.md).
 
@@ -120,7 +125,9 @@ are in [project-docs/INTEGRATION.md](project-docs/INTEGRATION.md).
 ```
 npm test                 # every test
 npm run build            # rebuild src/ext/core.bundle.js from src/core
-npm run package          # dist/radar-chrome-<v>.zip, dist/radar-firefox-<v>.xpi, dist/SHA256SUMS
+npm run ci               # exactly what GitHub Actions runs, on any machine
+npm run package          # dist/radar-chrome-<v>.zip, the two Firefox xpis, dist/SHA256SUMS
+npm run release          # a signed release folder with a git bundle (key kept outside the repo)
 node scripts/serve.mjs   # the fixture thread at http://127.0.0.1:8742/tests/fixtures/thread.html
 ```
 

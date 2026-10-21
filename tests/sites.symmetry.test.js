@@ -5,7 +5,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { siteInfoRows, siteGlance, siteChips, ownerType } from "../src/core/sites.js";
-import { coverageList } from "../src/core/coverage.js";
+import { coverageFromFeeds } from "../src/core/coverage.js";
 import { hostedKind, siteKey } from "../src/core/hosts.js";
 
 // Outlets across the spectrum and across countries, by domain only.
@@ -30,11 +30,13 @@ test("the same state basis gives the same owner type in every country", () => {
   }
 });
 
-test("other coverage labels every outlet by the same rule, in GDELT's order", () => {
-  const json = { articles: OUTLETS.map((d, i) => ({ url: `https://${d}/story-${i}`, title: "Story", domain: d, seendate: "20261016T000000Z" })) };
-  const list = coverageList(json, { self: "self.example", infoOf: () => ({ facts: { ownerType: "commercial" }, state: [] }) });
+test("other coverage labels every outlet by the same rule, in the order the feeds were asked", () => {
+  const headline = "Floods force thousands from river valley homes";
+  const results = OUTLETS.map((d, i) => ({ feed: { id: d, name: d, url: `https://${d}/feed`, site: d }, items: [{ title: headline, link: `https://${d}/story-${i}`, summary: "" }], error: null }));
+  const { list } = coverageFromFeeds(headline, results, { self: "self.example", infoOf: () => ({ facts: { ownerType: "commercial" }, state: [] }) });
   assert.deepEqual(list.map((x) => x.site), OUTLETS.map((d) => siteKey(d)));
   assert.ok(list.every((x) => x.type === "commercial"));
+  assert.ok(list.every((x) => x.shared.join() === list[0].shared.join()), "the same headline matches by the same words everywhere");
 });
 
 test("posting services from every direction count as platforms alike", () => {
@@ -42,7 +44,7 @@ test("posting services from every direction count as platforms alike", () => {
 });
 
 test("no site or coverage code reads or names a side", () => {
-  for (const f of ["sites.js", "coverage.js", "hosts.js"]) {
+  for (const f of ["sites.js", "coverage.js", "hosts.js", "outlets.js", "feeds.js", "feedfetch.js", "generic.js", "health.js"]) {
     const src = readFileSync(new URL(`../src/core/${f}`, import.meta.url), "utf8").replace(/^\s*\/\/.*$/gm, "");
     assert.doesNotMatch(src, /\bleft\b|\bright[- ](?:wing|leaning)\b|\b(?:liberal|conservative|progressive|partisan|bias(?:ed)?|centrist)\b/i, f);
   }

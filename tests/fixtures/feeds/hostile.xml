@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- A synthetic hostile feed for tests: script links, markup in titles, credentials in links. -->
+<rss version="2.0"><channel><title>Hostile &lt;script&gt;alert(1)&lt;/script&gt;</title>
+  <item><title>Click me</title><link>javascript:alert(1)</link></item>
+  <item><title>Plain http</title><link>http://hostile.example/a</link></item>
+  <item><title>Credentials</title><link>https://user:pass@hostile.example/b</link></item>
+  <item><title>&lt;img src=x onerror=alert(1)&gt;Valley floods &amp;amp; thousands</title><link>https://hostile.example/c</link><description>&lt;script&gt;steal()&lt;/script&gt;text</description></item>
+  <item><title>Bad entity &#99999999; here</title><link>https://hostile.example/d</link></item>
+</channel></rss>

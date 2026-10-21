@@ -116,6 +116,7 @@
         "auto.js",
         "logs.js",
         "reddit.js",
+        "health.js",
         "content.js"
       ],
       "css": [
@@ -130,9 +131,6 @@
       "data_collection_permissions": {
         "required": [
           "none"
-        ],
-        "optional": [
-          "websiteContent"
         ]
       },
       "strict_min_version": "121.0"

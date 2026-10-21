@@ -7462,70 +7462,364 @@ function siteGlance(info) {
 return { setSiteTable, siteFacts, siteRecord, recordSummary, recordLine, SITE_RECORD_DOES_NOT_PROVE, SITE_SOURCES, OWNER_TYPES, ownerType, siteInfoRows, PACK_NOTE_CAVEAT, ownerHeading, siteChips, siteGlance };
 })();
 
+// ---- outlets.js
+const M_outlets = (() => {
+// The suggested outlets for Other coverage: news organisations that publish their own feed, so
+// Radar can ask each publisher directly with no aggregator in between. The user turns each one on
+// or off and can add any RSS or Atom address. Radar requests a feed only on the user's click.
+//
+// How the list was chosen (project-docs/INDEPENDENCE.md has the full method and its limits):
+//   1. An original newsroom with general or world news in English.
+//   2. A public RSS or Atom feed at a stable https address on the outlet's own host that answered
+//      with entries and without a redirect when checked on 2026-10-21.
+//   3. The outlet's site is in Radar's bundled site tables (src/ext/sites.json), so the card can say
+//      what the tables state about its owner and owner type. Where they state no owner, it says so.
+//   4. Spread: several countries and every owner type the tables give, with the count of outlets
+//      across the range of published media-bias charts kept even by the maintainer at curation.
+//      No rating is stored here or shown anywhere: Radar labels outlets by owner type only.
+// The order is alphabetical by id, so position in the list says nothing.
+
+// [id, name, feed address, site in the tables, country as the outlet states it]
+const FEED_OUTLETS = Object.freeze([
+  ["abc-au", "ABC News (Australia)", "https://www.abc.net.au/news/feed/51120/rss.xml", "abc.net.au", "Australia"],
+  ["aljazeera", "Al Jazeera English", "https://www.aljazeera.com/xml/rss/all.xml", "aljazeera.com", "Qatar"],
+  ["bbc", "BBC News", "https://feeds.bbci.co.uk/news/world/rss.xml", "bbc.co.uk", "United Kingdom"],
+  ["cbc", "CBC News", "https://www.cbc.ca/webfeed/rss/rss-topstories", "cbc.ca", "Canada"],
+  ["dawn", "Dawn", "https://www.dawn.com/feeds/home", "dawn.com", "Pakistan"],
+  ["dw", "Deutsche Welle", "https://rss.dw.com/rdf/rss-en-all", "dw.com", "Germany"],
+  ["elpais", "El País (English)", "https://feeds.elpais.com/mrss-s/pages/ep/site/english.elpais.com/portada", "elpais.com", "Spain"],
+  ["fox", "Fox News", "https://moxie.foxnews.com/google-publisher/latest.xml", "foxnews.com", "United States"],
+  ["france24", "France 24", "https://www.france24.com/en/rss", "france24.com", "France"],
+  ["jacobin", "Jacobin", "https://jacobin.com/feed/", "jacobin.com", "United States"],
+  ["japantimes", "The Japan Times", "https://www.japantimes.co.jp/feed/", "japantimes.co.jp", "Japan"],
+  ["kyivindependent", "The Kyiv Independent", "https://kyivindependent.com/news-archive/rss/", "kyivindependent.com", "Ukraine"],
+  ["lemonde", "Le Monde (English)", "https://www.lemonde.fr/en/rss/une.xml", "lemonde.fr", "France"],
+  ["meduza", "Meduza (English)", "https://meduza.io/rss/en/all", "meduza.io", "Latvia"],
+  ["motherjones", "Mother Jones", "https://www.motherjones.com/feed/", "motherjones.com", "United States"],
+  ["nationalreview", "National Review", "https://www.nationalreview.com/feed/", "nationalreview.com", "United States"],
+  ["npr", "NPR", "https://feeds.npr.org/1001/rss.xml", "npr.org", "United States"],
+  ["nypost", "New York Post", "https://nypost.com/feed/", "nypost.com", "United States"],
+  ["pbs", "PBS News", "https://www.pbs.org/newshour/feeds/rss/headlines", "pbs.org", "United States"],
+  ["premiumtimes", "Premium Times", "https://www.premiumtimesng.com/feed", "premiumtimesng.com", "Nigeria"],
+  ["reason", "Reason", "https://reason.com/feed/", "reason.com", "United States"],
+  ["rnz", "RNZ", "https://www.rnz.co.nz/rss/world.xml", "rnz.co.nz", "New Zealand"],
+  ["scmp", "South China Morning Post", "https://www.scmp.com/rss/91/feed/", "scmp.com", "Hong Kong"],
+  ["straitstimes", "The Straits Times", "https://www.straitstimes.com/news/world/rss.xml", "straitstimes.com", "Singapore"],
+  ["telegraph", "The Telegraph", "https://www.telegraph.co.uk/rss.xml", "telegraph.co.uk", "United Kingdom"],
+  ["theguardian", "The Guardian", "https://www.theguardian.com/world/rss", "theguardian.com", "United Kingdom"],
+  ["thehill", "The Hill", "https://thehill.com/news/feed/", "thehill.com", "United States"],
+  ["thehindu", "The Hindu", "https://www.thehindu.com/news/international/feeder/default.rss", "thehindu.com", "India"],
+  ["theintercept", "The Intercept", "https://theintercept.com/feed/?rss", "theintercept.com", "United States"],
+  ["timesofindia", "The Times of India", "https://timesofindia.indiatimes.com/rssfeedstopstories.cms", "timesofindia.indiatimes.com", "India"],
+  ["timesofisrael", "The Times of Israel", "https://www.timesofisrael.com/feed/", "timesofisrael.com", "Israel"],
+  ["washexaminer", "Washington Examiner", "https://www.washingtonexaminer.com/feed/", "washingtonexaminer.com", "United States"],
+  ["wsj", "The Wall Street Journal (world)", "https://feeds.a.dj.com/rss/RSSWorldNews.xml", "wsj.com", "United States"],
+]);
+
+const OUTLETS_CHECKED = "2026-10-21";
+const MAX_CUSTOM_FEEDS = 30;
+
+// The host the browser is asked to allow for one feed, as an optional host permission.
+function feedOrigin(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" ? `https://${u.hostname}/*` : null;
+  } catch {
+    return null;
+  }
+}
+
+// A feed address the user typed: https only, no credentials, no fragment, at most 500 characters.
+function cleanFeedUrl(text) {
+  const s = String(text || "").trim();
+  if (!s || s.length > 500) return null;
+  try {
+    const u = new URL(s);
+    if (u.protocol !== "https:" || u.username || u.password || !u.hostname.includes(".")) return null;
+    u.hash = "";
+    return u.href;
+  } catch {
+    return null;
+  }
+}
+
+// Every feed the user chose: suggested outlets switched on, then their own addresses.
+// Returns [{ id, name, url, site, country, custom }].
+function chosenFeeds(settings) {
+  const on = (settings && settings.outlets) || {};
+  const list = FEED_OUTLETS.filter(([id]) => on[id] === true).map(([id, name, url, site, country]) => ({ id, name, url, site, country, custom: false }));
+  const custom = ((settings && settings.customFeeds) || []).map(cleanFeedUrl).filter(Boolean).slice(0, MAX_CUSTOM_FEEDS);
+  for (const url of custom) {
+    const host = new URL(url).hostname;
+    list.push({ id: "custom:" + url, name: host, url, site: host, country: null, custom: true });
+  }
+  return list;
+}
+
+return { FEED_OUTLETS, OUTLETS_CHECKED, MAX_CUSTOM_FEEDS, feedOrigin, cleanFeedUrl, chosenFeeds };
+})();
+
+// ---- feeds.js
+const M_feeds = (() => {
+// A small reader for news feeds: RSS 2.0, RSS 1.0 (RDF) and Atom. Radar's background worker has no
+// DOMParser (Chrome's service workers do not offer one), so this reads the text itself. It takes
+// only what Other coverage needs from each entry: the title, the link, the date and a short
+// summary. Everything else in the feed is ignored. Nothing here touches the network.
+//
+// The reader is defensive by design: a feed is text from an outside server. Links must be https;
+// markup inside titles and summaries is stripped; sizes are capped; anything unreadable gives an
+// empty list, never an exception the caller has to catch.
+
+const FEED_MAX_BYTES = 3_000_000;
+const FEED_MAX_ITEMS = 200;
+const SUMMARY_MAX = 400, TITLE_MAX = 300;
+
+const NAMED = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", hellip: "…", mdash: "-", ndash: "-", rsquo: "'", lsquo: "'", rdquo: '"', ldquo: '"' };
+function decode(s) {
+  return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e) => {
+    if (e[0] === "#") {
+      const n = e[1] === "x" || e[1] === "X" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
+      return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : "";
+    }
+    return NAMED[e.toLowerCase()] ?? m;
+  });
+}
+
+// Text content of an element body: CDATA kept as text, tags removed, entities decoded once, then
+// any markup the publisher escaped inside it removed as well.
+function plainText(raw) {
+  const s = String(raw || "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_, c) => c.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+  const once = decode(s.replace(/<[^>]*>/g, " "));
+  return decode(once.replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ").trim();
+}
+
+// The body of the first <name>…</name> child (namespace prefixes allowed), or null.
+function child(block, names) {
+  for (const n of names) {
+    const m = block.match(new RegExp(`<(?:[\\w-]+:)?${n}(?:\\s[^>]*)?>([\\s\\S]*?)</(?:[\\w-]+:)?${n}>`, "i"));
+    if (m) return m[1];
+  }
+  return null;
+}
+
+const attr = (tag, name) => { const m = tag.match(new RegExp(`\\s${name}\\s*=\\s*("([^"]*)"|'([^']*)')`, "i")); return m ? decode(m[2] ?? m[3]) : null; };
+
+function safeLink(u) {
+  try {
+    const url = new URL(String(u || "").trim());
+    return url.protocol === "https:" && !url.username && !url.password ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+// Atom gives the link as <link href=... rel=...>; RSS as <link>text</link>, or a permalink <guid>.
+function linkOf(block) {
+  const tags = block.match(/<link\b[^>]*\/?>/gi) || [];
+  const alt = tags.find((t) => attr(t, "href") && (!attr(t, "rel") || attr(t, "rel") === "alternate"));
+  if (alt) return safeLink(attr(alt, "href"));
+  const text = child(block, ["link"]);
+  if (text && safeLink(plainText(text))) return safeLink(plainText(text));
+  const guid = block.match(/<guid\b([^>]*)>([\s\S]*?)<\/guid>/i);
+  if (guid && !/isPermaLink\s*=\s*["']false/i.test(guid[1])) return safeLink(plainText(guid[2]));
+  const about = block.match(/^<item\b[^>]*\srdf:about\s*=\s*"([^"]+)"/i);
+  return about ? safeLink(decode(about[1])) : null;
+}
+
+function dateOf(block) {
+  const raw = child(block, ["pubDate", "published", "updated", "date", "issued"]);
+  const t = raw ? Date.parse(plainText(raw)) : NaN;
+  return Number.isFinite(t) ? new Date(t).toISOString() : null;
+}
+
+// Feed text to { title, items: [{ title, link, published, summary }] }. kind is "rss", "atom" or
+// null when the text is not a feed Radar can read.
+function parseFeed(text) {
+  const src = String(text || "").slice(0, FEED_MAX_BYTES).replace(/<!--[\s\S]*?-->/g, "");
+  const kind = /<feed\b[^>]*>/i.test(src) && !/<rss\b|<rdf:RDF\b/i.test(src) ? "atom" : /<rss\b|<rdf:RDF\b|<channel\b/i.test(src) ? "rss" : null;
+  if (!kind) return { kind: null, title: null, items: [] };
+  const re = kind === "atom" ? /<entry\b[^>]*>[\s\S]*?<\/entry>/gi : /<item\b[^>]*>[\s\S]*?<\/item>/gi;
+  const items = [];
+  for (const m of src.matchAll(re)) {
+    if (items.length >= FEED_MAX_ITEMS) break;
+    const block = m[0];
+    const title = plainText(child(block, ["title"])).slice(0, TITLE_MAX);
+    const link = linkOf(block);
+    if (!title || !link) continue;
+    const summary = plainText(child(block, ["description", "summary", "content", "encoded"])).slice(0, SUMMARY_MAX);
+    items.push({ title, link, published: dateOf(block), summary });
+  }
+  const head = src.split(re)[0] || "";
+  return { kind, title: plainText(child(head, ["title"])) || null, items };
+}
+
+return { FEED_MAX_BYTES, FEED_MAX_ITEMS, plainText, safeLink, parseFeed };
+})();
+
+// ---- feedfetch.js
+const M_feedfetch = (() => {
+// Requests for Other coverage, run by the background worker only on the user's click. Each request
+// goes to one feed address the user chose, with no cookies, no referrer, no added headers and no
+// body, and Radar does not follow a redirect to another address the user never allowed. The fetch
+// and permission functions are passed in, so tests run without a network.
+
+const { parseFeed, FEED_MAX_BYTES } = M_feeds;
+const { feedOrigin } = M_outlets;
+
+const FEED_TIMEOUT_MS = 10000;
+const FEED_CACHE_MS = 10 * 60 * 1000;
+const FEED_REQUEST = Object.freeze({ method: "GET", credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store", redirect: "manual" });
+
+// The body as text, read no further than the cap. Null when the feed is larger.
+async function cappedText(res, cap) {
+  const len = Number(res.headers && res.headers.get && res.headers.get("content-length"));
+  if (Number.isFinite(len) && len > cap) return null;
+  if (!res.body || !res.body.getReader) { const t = await res.text(); return t.length > cap ? null : t; }
+  const reader = res.body.getReader(), parts = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.length;
+    if (size > cap) { reader.cancel().catch(() => {}); return null; }
+    parts.push(value);
+  }
+  const all = new Uint8Array(size);
+  let at = 0;
+  for (const p of parts) { all.set(p, at); at += p.length; }
+  return new TextDecoder("utf-8").decode(all);
+}
+
+// One feed: { feed, items, error, ms }. error is a key of FEED_ERRORS (src/core/coverage.js).
+async function fetchFeed(feed, { fetch: fetchFn, now = () => Date.now(), timeoutMs = FEED_TIMEOUT_MS } = {}) {
+  const t0 = now();
+  const done = (extra) => ({ feed, items: [], error: null, ms: now() - t0, ...extra });
+  const ctl = typeof AbortController === "function" ? new AbortController() : null;
+  const timer = ctl ? setTimeout(() => ctl.abort(), timeoutMs) : null;
+  try {
+    const res = await fetchFn(feed.url, { ...FEED_REQUEST, ...(ctl ? { signal: ctl.signal } : {}) });
+    if (res.type === "opaqueredirect" || (res.status >= 300 && res.status < 400)) return done({ error: "redirect" });
+    if (!res.ok) return done({ error: "http", status: res.status });
+    const text = await cappedText(res, FEED_MAX_BYTES);
+    if (text == null) return done({ error: "too-large" });
+    const parsed = parseFeed(text);
+    if (!parsed.kind) return done({ error: "not-a-feed" });
+    return done({ items: parsed.items });
+  } catch (e) {
+    return done({ error: e && e.name === "AbortError" ? "timeout" : "network" });
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+// Every chosen feed at once (each to its own host, so they run in parallel). A feed whose host the
+// browser has not allowed is not requested. Answers are kept in memory for ten minutes, so a second
+// click on the same story asks no one again.
+function feedFetcher({ fetch: fetchFn, allowed, now = () => Date.now() }) {
+  const cache = new Map();
+  async function one(feed) {
+    const hit = cache.get(feed.url);
+    if (hit && now() - hit.at < FEED_CACHE_MS) return { ...hit.result, feed, cached: true };
+    const origin = feedOrigin(feed.url);
+    if (!origin || !(await allowed(origin))) return { feed, items: [], error: "no-permission", ms: 0 };
+    const result = await fetchFeed(feed, { fetch: fetchFn, now });
+    if (!result.error) cache.set(feed.url, { at: now(), result });
+    return result;
+  }
+  return { fetchAll: (feeds) => Promise.all((feeds || []).map(one)), clear: () => cache.clear() };
+}
+
+return { FEED_TIMEOUT_MS, FEED_CACHE_MS, FEED_REQUEST, fetchFeed, feedFetcher };
+})();
+
 // ---- coverage.js
 const M_coverage = (() => {
-// "Other coverage": other outlets reporting the same story, from the GDELT Project's DOC 2.0 API.
-// This is Radar's only feature that sends anything off the machine. It is off by default; the
-// user turns it on in the options page, the browser asks for access to api.gdeltproject.org, and
-// each lookup runs only on a click. Radar sends the main words of the article's title and nothing
-// else: not the page address, not the user's history, not any post.
+// "Other coverage": other outlets reporting the same story, read from each outlet's own feed. There
+// is no aggregator in between. The user picks the outlets (src/core/outlets.js) and may add any RSS
+// or Atom address; on the user's click, Radar's background worker requests each chosen feed from
+// its publisher, and this module matches the article's title against the entries on this device.
+// Radar sends nothing from the page: not the title, not the address, not any post. Each publisher
+// sees a plain request for its own feed.
 //
-// Each outlet is labelled by its owner type as the site tables state it (src/core/sites.js):
-// state media, public broadcaster, regional govt, nonprofit, commercial, or not stated. Radar never
-// labels an outlet by a left or right position.
+// Each outlet is labelled by its owner and owner type as the bundled site tables state them
+// (src/core/sites.js). Radar never labels an outlet by a left or right position.
 
 const { ownerType, OWNER_TYPES } = M_sites;
 const { siteKey, hostOf } = M_hosts;
+const { feedOrigin } = M_outlets;
 
-const COVERAGE_HOST = "api.gdeltproject.org";
-const COVERAGE_ORIGIN = `https://${COVERAGE_HOST}/*`;
-const MAX_TERMS = 4;
-const ENDPOINT = `https://${COVERAGE_HOST}/api/v2/doc/doc`;
+const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Radar asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. Radar sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or Radar server is involved. Nothing is requested until you click.";
 
-const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Radar sends the main words of that article's title, and nothing else, to the GDELT Project's public DOC 2.0 API at api.gdeltproject.org. Radar does not send the page address, your history, any post or any account. GDELT receives the request like any web request, so it sees your IP address and the words. Its terms are at gdeltproject.org. Nothing is sent until you click.";
+const COVERAGE_DOES_NOT_PROVE = "Matching is by shared words in headlines, so a match can be a different event with similar words, and a story told in other words is missed. A feed holds only an outlet's latest entries, and only the outlets you chose are asked. Owner and owner type are what the site tables state, not a judgment of the reporting.";
 
 const STOP = new Set(("the a an and or but of to in on at by for with from as is are was were be been it its this that these those their they he she his her we our you your " +
   "not no do does did has have had will would can could should may might than then so if into about over under after before what which who when where why how " +
-  "says said say new news live update updates video watch report reports le la les des du de et un une el los las del y der die das und den ein eine").split(" "));
+  "says said say new news live update updates video watch report reports latest breaking opinion analysis just more most first last also amid " +
+  "le la les des du de et un une el los las del y der die das und den ein eine").split(" "));
 
-// The title's main words, at most MAX_TERMS, lower-case, letters and digits only. Null when fewer than
-// two usable words remain (GDELT rejects short and common words).
-function coverageTerms(title) {
+// A word's plain form: lower case, letters and digits, a plain plural "s" removed.
+const stem = (w) => (w.length > 4 && /[^s]s$/.test(w) ? w.slice(0, -1) : w);
+
+// The main words of a headline, in order, without repeats: four or more letters, or a number of
+// three or more characters, and not a common word. The site name after " | " or " - " is dropped.
+function titleWords(title) {
   const t = String(title || "").split(/\s+[|–—-]\s+/)[0];
   const words = t.toLowerCase().normalize("NFKC").replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/)
-    .filter((w) => w.length >= 4 || (/\d/.test(w) && w.length >= 3)).filter((w) => !STOP.has(w));
-  // GDELT matches all the words, so a long query finds almost nothing. Keep the four longest words
-  // (longer words name the story's people, places and things), in the title's order.
-  const uniq = [...new Set(words)];
-  const keep = new Set([...uniq].sort((a, b) => b.length - a.length).slice(0, MAX_TERMS));
-  const terms = uniq.filter((w) => keep.has(w));
-  return terms.length >= 2 ? terms.join(" ") : null;
+    .filter((w) => w.length >= 4 || (/\d/.test(w) && w.length >= 3)).filter((w) => !STOP.has(w)).map(stem);
+  return [...new Set(words)];
 }
 
-function coverageUrl(title, { timespan = "1w", max = 50 } = {}) {
-  const q = coverageTerms(title);
-  if (!q) return null;
-  const u = new URL(ENDPOINT);
-  for (const [k, v] of [["query", q], ["mode", "ArtList"], ["format", "json"], ["maxrecords", String(max)], ["timespan", timespan], ["sort", "HybridRel"]]) u.searchParams.set(k, v);
-  return u.toString();
-}
-
-const day = (s) => { const m = String(s || "").match(/^(\d{4})(\d\d)(\d\d)/); return m ? `${m[1]}-${m[2]}-${m[3]}` : null; };
-
-// GDELT's article list to one entry per site, without the page's own site. infoOf(site) returns
-// { facts, state } from the site tables.
-function coverageList(json, { self = null, infoOf = () => ({}) } = {}) {
-  const arts = json && Array.isArray(json.articles) ? json.articles : [];
-  const own = self ? siteKey(hostOf("https://" + String(self).replace(/^https?:\/\//, ""))) : null, seen = new Set(), out = [];
-  for (const a of arts) {
-    if (!a || !/^https:\/\//i.test(String(a.url || ""))) continue;
-    const site = siteKey(hostOf(a.url));
-    if (!site || site === own || seen.has(site)) continue;
-    seen.add(site);
-    const info = infoOf(site) || {};
-    out.push({ site, url: a.url, title: String(a.title || "").slice(0, 200), seen: day(a.seendate), language: a.language || null, country: a.sourcecountry || null, type: ownerType(info), name: (info.facts && info.facts.name) || null });
+// The best entry in one feed for this headline, or null. A match needs, in the entry's own
+// headline, at least two of the article's main words and at least a quarter of them, and across
+// headline and summary at least 40% of them. Summaries alone never make a match: long summaries
+// share common words with almost any story.
+function bestMatch(words, items) {
+  const T = new Set(words);
+  if (T.size < 2) return null;
+  const need = Math.max(2, Math.ceil(T.size * 0.4)), needTitle = Math.max(2, Math.ceil(T.size * 0.25));
+  let best = null;
+  for (const it of items || []) {
+    const inTitle = titleWords(it.title).filter((w) => T.has(w));
+    if (inTitle.length < needTitle) continue;
+    const shared = [...new Set([...inTitle, ...titleWords(it.summary).filter((w) => T.has(w))])];
+    if (shared.length < need) continue;
+    const score = shared.length / T.size + inTitle.length / (10 * T.size);
+    if (!best || score > best.score) best = { item: it, shared, score };
   }
-  return out;
+  return best;
+}
+
+const hostOfUrl = (u) => { try { return new URL(u).hostname; } catch { return null; } };
+
+// The hosts a lookup will contact, sorted, for the consent text and the "Requested" row.
+const coveragePlan = (feeds) => [...new Set((feeds || []).map((f) => hostOfUrl(f.url)).filter(Boolean))].sort();
+const feedOrigins = (feeds) => [...new Set((feeds || []).map((f) => feedOrigin(f.url)).filter(Boolean))].sort();
+
+// results: [{ feed: { id, name, url, site, country, custom }, items, error, ms }] from the worker.
+// Returns one entry per outlet that has a match, without the page's own site, each with what the
+// site tables say about its owner. infoOf(site) returns { facts, state, owner }.
+function coverageFromFeeds(title, results, { self = null, infoOf = () => ({}) } = {}) {
+  const words = titleWords(title);
+  const own = self ? siteKey(hostOf("https://" + String(self).replace(/^https?:\/\//, ""))) : null;
+  const list = [], seen = new Set();
+  for (const r of results || []) {
+    if (!r || !r.feed || r.error) continue;
+    const site = siteKey(hostOf("https://" + r.feed.site)) || r.feed.site;
+    if (site === own || seen.has(site)) continue;
+    const m = bestMatch(words, r.items);
+    if (!m || siteKey(hostOf(m.item.link)) === own) continue;
+    seen.add(site);
+    const info = infoOf(r.feed.site) || {};
+    list.push({ site, outlet: r.feed.name, url: m.item.link, title: m.item.title.slice(0, 200), published: m.item.published ? m.item.published.slice(0, 10) : null,
+      shared: m.shared, country: r.feed.country || (info.facts && info.facts.country) || null, type: ownerType(info), owner: (info.owner && info.owner.owner) || null });
+  }
+  return { words, list };
+}
+
+// One line per feed asked: what came back, so a silent or broken feed is visible.
+function feedStatus(results) {
+  return (results || []).map((r) => ({ name: r.feed.name, host: hostOfUrl(r.feed.url), ms: r.ms ?? null,
+    state: r.error ? r.error : (r.items || []).length ? "ok" : "empty", entries: (r.items || []).length }));
 }
 
 // Counts per owner type, in OWNER_TYPES order; types with no outlet are left out.
@@ -7533,9 +7827,153 @@ function coverageGroups(list) {
   return OWNER_TYPES.map((type) => ({ type, n: (list || []).filter((x) => x.type === type).length })).filter((g) => g.n);
 }
 
-const COVERAGE_DOES_NOT_PROVE = "GDELT finds articles by their words, so some may be about a different event, and it covers only the outlets it monitors. Owner type is what the site tables state, not a judgment of the reporting.";
+const FEED_ERRORS = Object.freeze({
+  "no-permission": "The browser has not allowed Radar to reach this feed's host.",
+  redirect: "The feed answered with a redirect to another address, which Radar does not follow. Check the outlet's site for its current feed.",
+  http: "The feed answered with an error.",
+  "not-a-feed": "The answer was not an RSS or Atom feed.",
+  "too-large": "The feed was larger than Radar reads.",
+  timeout: "The feed did not answer within 10 seconds.",
+  network: "The feed could not be reached.",
+});
 
-return { COVERAGE_HOST, COVERAGE_ORIGIN, MAX_TERMS, COVERAGE_PRIVACY, coverageTerms, coverageUrl, coverageList, coverageGroups, COVERAGE_DOES_NOT_PROVE };
+return { COVERAGE_PRIVACY, COVERAGE_DOES_NOT_PROVE, titleWords, bestMatch, coveragePlan, feedOrigins, coverageFromFeeds, feedStatus, coverageGroups, FEED_ERRORS };
+})();
+
+// ---- health.js
+const M_health = (() => {
+// Adapter health: whether Radar's reader for a site still finds what the site shows. Platforms
+// change their page markup without notice, and a reader that finds nothing would otherwise show
+// nothing, which looks the same as a quiet thread. This module turns what a reader found into a
+// plain verdict and the sentence the panel shows. It reads counts only, never post text.
+
+const HEALTH_SETTLE_MS = 8000;
+const HEALTH_STATES = ["idle", "waiting", "ok", "empty", "partial", "changed"];
+
+const what = (page) => (page === "feed" ? "posts" : "replies");
+
+// found: { page: "thread" | "feed" | "other", candidates, read, withText, sinceMs,
+//          structure: { times, articles } } for one site reader { name, hasLocation, rootFirst }.
+// candidates are the boxes the reader picked out, read the ones it could read an author from.
+function adapterHealth(site, found) {
+  const f = found || {}, name = (site && site.name) || "This site";
+  const cand = f.candidates | 0, read = f.read | 0, w = what(f.page);
+  if (!site || f.page === "other" || !f.page) return { state: "idle", say: null };
+  if (cand > 0 && read === 0) return { state: "changed", say: `${name} changed its page; Radar cannot read ${w} here yet.`, reason: "boxes found, none readable" };
+  if (cand >= 6 && read / cand < 0.3) return { state: "partial", say: `${name} changed part of its page; Radar reads ${read} of ${cand} ${w} here.`, reason: "most boxes unreadable" };
+  if (read >= 5 && (f.withText | 0) / read < 0.2) return { state: "partial", say: `${name} changed part of its page; Radar finds ${w} here but cannot read their text.`, reason: "text missing" };
+  if (read > 0) return { state: "ok", say: null };
+  if ((f.sinceMs || 0) < HEALTH_SETTLE_MS) return { state: "waiting", say: null };
+  const s = f.structure || {};
+  // A post page on a site that shows the post itself should always have one; a page with no time
+  // stamp or article box at all is more likely a sign-in wall or a removed post than a redesign.
+  const expectsRoot = f.page === "thread" && !!(site.hasLocation || site.rootFirst) && ((s.times | 0) >= 1 || (s.articles | 0) >= 1);
+  if (expectsRoot || (s.times | 0) >= 3 || (s.articles | 0) >= 3) {
+    return { state: "changed", say: `${name} changed its page; Radar cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was not found" : "the page shows post-like boxes Radar cannot find" };
+  }
+  return { state: "empty", say: null };
+}
+
+// The self-test's report as [label, value] rows, for the toolbar popup.
+function selfTestLines(r) {
+  if (!r) return [["Result", "Radar has no reader for this site. The site card gives site context and text checks here."]];
+  const v = r.verdict || {};
+  const pct = (a, b) => (b ? `${a} of ${b}` : "none");
+  return [
+    ["Site", `${r.site} (${r.page === "feed" ? "feed" : r.page === "thread" ? "post page" : "not a post or feed page"})`],
+    ["Boxes found", String(r.candidates)],
+    ["Read", pct(r.read, r.candidates)],
+    ["With author", pct(r.withAuthor, r.read)],
+    ["With text", pct(r.withText, r.read)],
+    ["With id", pct(r.withId, r.read)],
+    ["Page shape", `${r.structure.times} time stamps, ${r.structure.articles} article boxes`],
+    ["Result", v.say || (v.state === "ok" ? "Radar reads this page." : v.state === "empty" ? "No posts loaded here; nothing points to a change." : v.state === "waiting" ? "The page is still loading." : "Nothing to read on this page.")],
+    ["Checked", r.at],
+  ];
+}
+
+const HEALTH_DOES_NOT_PROVE = "The self-test counts what Radar's reader finds on this page now. A pass does not show every field is right, and a page that loads posts later can fail and then pass. It reads no text and sends nothing.";
+
+return { HEALTH_SETTLE_MS, HEALTH_STATES, adapterHealth, selfTestLines, HEALTH_DOES_NOT_PROVE };
+})();
+
+// ---- generic.js
+const M_generic = (() => {
+// The generic reader, for article and comment pages on sites Radar has no reader for. It runs only
+// when the user opens the site card on a page (src/ext/generic-page.js walks the page and passes
+// plain summaries here). It finds the article body as the block with the most paragraph text, and
+// comments as the largest run of sibling boxes that share a shape and carry an author link or a
+// time stamp. Then it runs the same text checks Radar runs on replies. Nothing leaves the browser.
+//
+// These are structural guesses, not a site reader: they can miss comments, take a list of related
+// links for comments, or read a sidebar as the article. The card says so beside every count.
+
+const { score } = M_rhetoric;
+const { persuasion } = M_persuasion;
+const { machineSigns } = M_machine;
+
+const GENERIC_MAX_COMMENTS = 200;
+const ARTICLE_MIN = 500, PARA_MIN = 40, ARTICLE_MAX = 20000;
+
+const median = (xs) => { const s = [...xs].sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : 0; };
+
+// blocks: [{ paragraphs: [text] }]. The block with the most text in paragraphs of 40 or more
+// characters, if it holds at least 500; its text, capped at 20,000 characters.
+function pickArticle(blocks) {
+  let best = null, bestLen = 0;
+  for (const b of blocks || []) {
+    const paras = (b.paragraphs || []).map((p) => String(p || "").trim()).filter((p) => p.length >= PARA_MIN);
+    const len = paras.reduce((n, p) => n + p.length, 0);
+    if (len > bestLen) { best = paras; bestLen = len; }
+  }
+  return best && bestLen >= ARTICLE_MIN ? best.join("\n\n").slice(0, ARTICLE_MAX) : null;
+}
+
+// groups: [{ items: [{ text, hasTime, author }] }], each a run of siblings with one shape. The
+// comment list is the group with at least three boxes where most carry an author or a time stamp
+// and the typical box holds 15 to 3,000 characters; the largest such group wins.
+function pickComments(groups) {
+  let best = null, bestScore = 0;
+  for (const g of groups || []) {
+    const items = (g.items || []).filter((x) => x && typeof x.text === "string");
+    if (items.length < 3) continue;
+    const marked = items.filter((x) => x.hasTime || x.author).length / items.length;
+    const typical = median(items.map((x) => x.text.trim().length));
+    if (marked < 0.5 || typical < 15 || typical > 3000) continue;
+    const s = items.length * marked;
+    if (s > bestScore) { best = items; bestScore = s; }
+  }
+  return best ? best.slice(0, GENERIC_MAX_COMMENTS).map((x) => ({ text: x.text.trim(), author: x.author || null, hasTime: !!x.hasTime })) : null;
+}
+
+const norm = (t) => t.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+
+// The text checks on what the page offered, as counts. No post text is kept in the result.
+function genericChecks({ article, comments }) {
+  const out = { article: null, comments: null };
+  if (article) {
+    const sc = score(article), pe = persuasion(article), ma = machineSigns(article);
+    out.article = { chars: article.length, markers: sc.markers.map((m) => m.family), techniques: pe.map((h) => h.technique), machineLike: !!ma.machineLike, leak: !!ma.leak };
+  }
+  if (comments && comments.length) {
+    const seen = new Map();
+    let marked = 0, persuasive = 0, machine = 0;
+    for (const c of comments) {
+      if (score(c.text).markers.length) marked++;
+      if (persuasion(c.text).length) persuasive++;
+      if (machineSigns(c.text).machineLike) machine++;
+      const k = norm(c.text);
+      if (k.length >= 20) seen.set(k, (seen.get(k) || 0) + 1);
+    }
+    const repeats = [...seen.values()].filter((n) => n >= 2);
+    out.comments = { n: comments.length, withAuthor: comments.filter((c) => c.author).length, marked, persuasive, machine, repeatedTexts: repeats.length, largestRepeat: repeats.length ? Math.max(...repeats) : 0 };
+  }
+  return out;
+}
+
+const GENERIC_DOES_NOT_PROVE = "Radar has no reader for this site, so it guessed where the article and the comments are from the page's layout. It can miss comments or count a list of links as comments. A marker is a pattern in wording, not a judgment of the writer.";
+
+return { GENERIC_MAX_COMMENTS, pickArticle, pickComments, genericChecks, GENERIC_DOES_NOT_PROVE };
 })();
 
 // ---- settings.js
@@ -7543,6 +7981,8 @@ const M_settings = (() => {
 // Radar's settings, in one normalised shape for the toolbar popup, the first-run and options pages
 // and the content scripts, plus the retention prune the background worker runs. Settings live in
 // chrome.storage.local under SETTINGS_KEY, on this machine only.
+
+const { FEED_OUTLETS, cleanFeedUrl, MAX_CUSTOM_FEEDS } = M_outlets;
 
 const SETTINGS_KEY = "pb.settings";
 
@@ -7565,14 +8005,16 @@ const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 
 const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
   historyDays: 60, aboutDays: 14, calm: false, large: false, onboarded: false,
-  // Other coverage (src/core/coverage.js): off until the user turns it on; coverageConsent is set
-  // when the user has read what it sends and clicked to send.
-  search: {}, coverage: false, coverageConsent: false,
+  // Other coverage (src/core/coverage.js): off until the user turns it on. outlets are the suggested
+  // feeds the user switched on (src/core/outlets.js), customFeeds the addresses they added, and
+  // feedConsent is set when the user has read which hosts a lookup asks and clicked to ask them.
+  search: {}, coverage: false, feedConsent: false, outlets: {}, customFeeds: [],
   // Read text in images (src/core/imagetext.js, src/ocr): off until the user turns it on; even then
   // it runs only on a click, on this device.
   imageText: false,
 });
 
+const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
 const days = (v, d, r) => (Number.isFinite(Number(v)) && v !== null && v !== "" ? Math.min(r.max, Math.max(r.min, Math.round(Number(v)))) : d);
 const switches = (v, allowed) => {
@@ -7589,7 +8031,8 @@ function normalizeSettings(raw) {
     aboutDays: days(s.aboutDays, DEFAULTS.aboutDays, RETENTION.aboutDays),
     calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
     search: switches(s.search, SEARCH_ENGINES.map(([id]) => id)), coverage: bool(s.coverage, DEFAULTS.coverage),
-    coverageConsent: bool(s.coverage, false) && bool(s.coverageConsent, false),
+    feedConsent: bool(s.coverage, false) && bool(s.feedConsent, false),
+    outlets: switches(s.outlets, FEED_OUTLETS.map(([id]) => id)), customFeeds: feedList(s.customFeeds),
     imageText: bool(s.imageText, DEFAULTS.imageText),
   };
 }
@@ -8619,6 +9062,74 @@ async function verifyBundle(bundle, opts = {}) {
 return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, dataLockOf, dataLockFromHashes, newBundleKey, publicKeyOf, makeBundle, signBundle, bundleConsistency, verifyBundle };
 })();
 
+// ---- signing.js
+const M_signing = (() => {
+// Release signatures: detached ECDSA P-256 signatures over a release's SHA256SUMS, made and checked
+// with Radar's one copy of the signing primitives (src/core/sig.js), the same code that signs data
+// packs and evidence bundles. It runs in node (scripts/release.mjs, scripts/verify-release.mjs), in
+// the extension and on the public install page (docs/signing.js, a generated copy). No library, no
+// network.
+//
+// A key is named for people by its key id: the first 32 hex characters of the SHA-256 of its
+// canonical public JWK, in groups of four, the same id data packs show. The RFC 7638 thumbprint
+// (the same hash, base64url) is kept for tools that expect one.
+//
+// What a valid signature proves: whoever held the private key for this public key signed these
+// exact bytes. It does not prove the signer is who they say, that the key was not stolen, or that
+// the signed files are safe. Those rest on how the public key reached you (INSTALL.md).
+
+const { P256, b64url, canonicalJSON, jwkId, signText, verifyText } = M_sig;
+
+// Only the public members, from a public or a private JWK.
+const publicPart = (jwk) => {
+  if (!jwk || jwk.kty !== "EC" || jwk.crv !== "P-256" || !jwk.x || !jwk.y) throw new Error("not a P-256 key");
+  return { kty: "EC", crv: "P-256", x: jwk.x, y: jwk.y };
+};
+
+async function signingKeyId(jwk) {
+  return (await jwkId(publicPart(jwk), 32)).match(/.{4}/g).join(" ");
+}
+
+async function jwkThumbprint(jwk) {
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonicalJSON(publicPart(jwk))));
+  return b64url(new Uint8Array(digest));
+}
+
+// A new key pair as JWKs. The private JWK must be stored outside any repository.
+async function generateSigningKey() {
+  const s = globalThis.crypto.subtle;
+  const pair = await s.generateKey(P256, true, ["sign", "verify"]);
+  const [priv, pub] = await Promise.all([s.exportKey("jwk", pair.privateKey), s.exportKey("jwk", pair.publicKey)]);
+  return { privateJwk: { ...publicPart(priv), d: priv.d }, publicJwk: publicPart(pub) };
+}
+
+async function signSums(privateJwk, text) {
+  if (!privateJwk || !privateJwk.d) throw new Error("not a private key");
+  return signText({ ...publicPart(privateJwk), d: privateJwk.d }, String(text));
+}
+
+// True only for a well-formed signature by this key over this text; never throws.
+async function verifySums(jwk, text, signature) {
+  try { return await verifyText(publicPart(jwk), String(signature || "").trim(), String(text)); } catch { return false; }
+}
+
+// SHA256SUMS lines ("<64 hex>  <name>") to a map, ignoring blank lines; null when a line is malformed.
+function parseSums(text) {
+  const out = {};
+  for (const line of String(text || "").split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    const m = line.match(/^([0-9a-f]{64}) [ *]([^\s/\\][^\\]*)$/);
+    if (!m || m[2].includes("..")) return null;
+    out[m[2]] = m[1];
+  }
+  return out;
+}
+
+const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the files were signed by the holder of this key and not changed since. It does not show who holds the key, that the key was never stolen, or that the code is safe. Compare the key id with one you got another way.";
+
+return { signingKeyId, jwkThumbprint, generateSigningKey, signSums, verifySums, parseSums, SIGNATURE_DOES_NOT_PROVE };
+})();
+
 // ---- import-html.js
 const M_import_html = (() => {
 // Posts from a page the user saved (File > Save page as). No DOM: a few tolerant string readers,
@@ -9026,5 +9537,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_signing, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();
