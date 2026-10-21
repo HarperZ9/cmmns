@@ -27,6 +27,8 @@ const out = {};
 try {
   let [sw] = ctx.serviceWorkers();
   if (!sw) sw = await ctx.waitForEvent("serviceworker");
+  // The worker can answer before its extension APIs are bound; wait until storage is there.
+  for (let i = 0; i < 20 && !(await sw.evaluate(() => !!(globalThis.chrome && chrome.storage))); i++) await new Promise((r) => setTimeout(r, 250));
   await sw.evaluate(() => chrome.storage.local.set({ "pb.settings": { search: { google: true, bing: true, duckduckgo: true } } }));
   await new Promise((r) => setTimeout(r, 1500));
   for (const [host, file] of [["https://www.google.com/search?q=floods", "search-google.html"], ["https://www.bing.com/search?q=floods", "search-bing.html"], ["https://duckduckgo.com/?q=floods", "search-duckduckgo.html"]]) {
