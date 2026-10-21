@@ -74,9 +74,17 @@
       out.push({ label: L.chip, fam: "state-link", cat: "sources", level: h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" || h.basis === "designated" ? "flag" : "info", rows: [["What it is", L.says], ["Source", `${h.source.title}${h.source.date ? ` (${h.source.date})` : ""}`], ["Read it", { links: [[h.source.url.replace(/^https?:\/\//, "").slice(0, 48), h.source.url]] }], h.domainSource ? ["Domain from", { links: [[h.domainSource.title, h.domainSource.url]] }] : null, dnp(PB.STATE_DOES_NOT_PROVE[h.basis])].filter(Boolean) });
     }
     for (const d of m.domains || []) {
+      if (PB.hostedKind(d)) continue;
+      // The full site card when the background has answered (src/ext/linkcard.js), else the owner row.
+      const site = globalThis.PBLinkCard && PBLinkCard.cached(d);
+      if (site && (site.owner || site.facts || site.record)) {
+        const g = PB.siteGlance(site);
+        out.push({ label: `link: ${g.who}`, fam: site.owner ? "owner" : "site-record", level: "info", cat: "sources", rows: PB.siteInfoRows(site, { onList: PBLinkCard.openList(site.domain) }) });
+        continue;
+      }
       const o = PB.ownerOfDomain(d);
-      if (!o || d === "x.com" || d === "twitter.com") continue;
-      out.push({ label: `link: ${o.name}`, fam: "owner", level: "info", cat: "sources", rows: [["Outlet", `${o.name} (${d})`], ["Owned by", o.owner], ["Source", `Wikidata: ${o.source}`], dnp("Ownership is not editorial control, and Wikidata can lag a sale.")] });
+      if (!o) continue;
+      out.push({ label: `link: ${o.name}`, fam: "owner", level: "info", cat: "sources", rows: [["Outlet", `${o.name} (${d})`], [PB.ownerHeading(o), o.owner], ["Source", `Wikidata: ${o.source}`], dnp("Ownership is not editorial control, and Wikidata can lag a sale.")] });
     }
     return out;
   }

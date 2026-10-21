@@ -25,7 +25,7 @@ export const GROUPS = [
   ["Language", LANGUAGE_LESSONS.map((l) => l.id)],
   ["Persuasion techniques", PERSUASION_LESSONS.map((l) => l.id)],
   ["Coordination and media", ["duplicates", "copied-elsewhere", "same-upload", "old-media", "lifted-media", ...MEDIA_LESSONS.map((l) => l.id)]],
-  ["Sources", ["community-note", "fact-check", "ad", "state-link", "owner", "client"]],
+  ["Sources", ["community-note", "fact-check", "ad", "state-link", "owner", "site-record", "client"]],
   ["Place", ["mismatch", "written-in", "store-elsewhere", "flag-elsewhere", "profile-location-elsewhere", "hours-elsewhere"]],
   ["Posting", ["fast-replier", "automation-app", "no-sleep-gap", "repost-only", "high-volume"]],
   ["Account", ["new-account", "name-changes", "default-handle", "follow-pattern", "low-karma"]],

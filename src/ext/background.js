@@ -6,7 +6,7 @@
 //   profiles. The window closes itself when the queue has been empty for IDLE_CLOSE_MS.
 // Chrome runs this file as a service worker and loads the core bundle and the housekeeping here;
 // Firefox lists them before this file in the manifest's background scripts.
-if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js", "instances.js");
+if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js", "instances.js", "sources-bg.js");
 const GAP_MS = 2500, TIMEOUT_MS = 12000, IDLE_CLOSE_MS = 15000;
 const queue = [];
 let busy = false, lastAt = 0, current = null, worker = null, idleTimer = 0, timeoutTimer = 0;

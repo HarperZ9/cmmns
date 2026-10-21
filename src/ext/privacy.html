@@ -106,7 +106,7 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <main>
 <h1>Radar privacy policy</h1>
 <p class="muted">Updated 2026-10-21.</p>
-<p>Radar runs entirely in your browser. It has no server, no account, no analytics and no telemetry. Nothing Radar reads or works out is sent to the author or to anyone else.</p>
+<p>Radar runs entirely in your browser. It has no server, no account, no analytics and no telemetry. Nothing Radar reads or works out is sent to the author. One feature, Other coverage, sends the main words of an article's title to the GDELT Project, and only when you turn it on and click; it is off by default and described below.</p>
 <h2>What Radar reads</h2>
 <p>Radar reads what the site you are on has already shown or loaded for you: the replies on the page, the account details the site discloses (for example X's &quot;About this account&quot; label), and the post data the site's own app downloaded. It reads nothing the site does not show its viewers, and never reads IP addresses.</p>
 <h2>Requests Radar makes</h2>
@@ -118,7 +118,9 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 </tbody></table></div>
 <p>On Bluesky, Threads, TikTok and Mastodon servers Radar makes no request at all: it reads the page and copies responses the site's own app already loaded (on TikTok and Mastodon, the comment and thread lists; Radar never reads request headers or login tokens).</p>
 <p><strong>Mastodon servers.</strong> Radar has no access to any Mastodon server until you turn it on for that server. When you open Radar's toolbar button on a page Radar does not run on, it checks two things on that page only: whether it is the Mastodon web app, and the app's version and domain. If it is, the button offers &quot;Turn on Radar here&quot;, and your browser asks you to allow access to that one server. The list of servers you turned on is kept in <code>pb.instances.v1</code>; Options, Mastodon servers, Remove takes the access back.</p>
-<p>Fact-check matching runs against a table bundled inside Radar, so post text is never sent to a fact-checking service.</p>
+<p>Fact-check matching runs against a table bundled inside Radar, so post text is never sent to a fact-checking service. Site cards (owner, owner type, founding date, country, state links and a site's fact-check record) come from tables bundled inside Radar too, on links, on search results when you turn an engine on, and on the page you are reading when you press &quot;Site card for this page&quot;. None of these send anything.</p>
+<h3>Other coverage (off by default)</h3>
+<p>Other coverage is off unless you turn it on in the options page. When it is on and you click &quot;Find other coverage&quot; on an article's site card, Radar sends the main words of that article's title, and nothing else, to the GDELT Project's public DOC 2.0 API at <code>api.gdeltproject.org</code>. Radar does not send the page address, your history, any post or any account. GDELT receives the request like any web request, so it sees your IP address and the words; its terms are at gdeltproject.org. Before the first request the card shows the exact words it would send and waits for your click. Turning the option off withdraws the browser permission and resets that consent. Firefox also asks you to allow &quot;website content&quot; for this feature when you turn it on.</p>
 <p>The window offers reverse image search links (Google Lens, TinEye, Bing, Yandex) for media. Those open only when you click one, and then that service receives the image address.</p>
 <p><strong>Media checks, only when you click.</strong> &quot;Check this file&quot; re-requests one image or video file the page already loaded, from the exact address the page used (for X, its own media server), without cookies, so the browser usually answers from its cache. Radar reads the file's Content Credentials and metadata in the tab and keeps the result in memory only. &quot;Take 4 frames&quot; copies frames from the page's own video player in the tab; choosing a search service then copies one frame to your clipboard and opens that service, which receives nothing until you paste the frame there. Credentials stored online (a file that points to a remote manifest) are never fetched.</p>
 <h2>What Radar keeps, where, and for how long</h2>
@@ -144,14 +146,14 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <li><strong>Save feedback to a file</strong> (options page): writes your marks to a JSON file on your computer only when you click it. Radar never sends it. You choose whether to share it, for example by attaching it to an issue on Radar's repository. &quot;Clear feedback&quot; deletes your marks.</li>
 <li><strong>Removing Radar</strong> deletes everything it kept.</li></ul>
 <h2>What Radar never does</h2>
-<ul><li>Sends anything to the author or a third party.</li>
+<ul><li>Sends anything to the author, or to a third party except the title words you send through Other coverage.</li>
 <li>Sells, shares or uses data for advertising.</li>
 <li>Guesses who runs an account, or anyone's age, gender, ethnicity, religion or politics.</li>
 <li>Links accounts across sites.</li></ul>
 <h2>Changes</h2>
 <p>Changes to this policy are listed in <a href="https://github.com/HarperZ9/radar/blob/main/CHANGELOG.md">Radar's changelog</a> with the version that made them.</p>
 <p>Contact: open an issue on <a href="https://github.com/HarperZ9/radar/issues">Radar's repository</a>.</p>
-<footer>Radar. Evidence, not verdicts. Nothing leaves your browser. <a href="https://github.com/HarperZ9/radar">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+<footer>Radar. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage. <a href="https://github.com/HarperZ9/radar">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
 </main>
 </body>
 </html>

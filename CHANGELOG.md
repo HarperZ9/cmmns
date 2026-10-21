@@ -5,6 +5,43 @@ were not published to a store.
 
 ## Unreleased
 
+### Added (sources)
+- Site cards on links. Rest the pointer on an outbound link in a post, or focus it, for the linked
+  site's owner, owner type, founding year and country (Wikidata), any cited state link, and its
+  fact-check record: "N reviews by M fact-checkers since <date>, ratings as the checkers wrote
+  them", the three newest reviews and the full list on its own page. The post window's Sources area
+  shows the same card. Redirects from X, Facebook, YouTube, Reddit and the search engines resolve to
+  the real address first.
+- "Site card for this page" in the toolbar menu shows the card for the news site you are reading.
+  Radar runs on that page only when you press it.
+- Labels under Google, Bing and DuckDuckGo results, off until you turn an engine on in the options
+  page; the browser asks for that engine's access then. The labels name the owner and any state
+  link; the review count stays in the card beside its limits.
+- Other coverage, off by default: on a click, other outlets covering the same story from the GDELT
+  Project, each labelled by owner type (state media, public broadcaster, regional govt, nonprofit,
+  commercial, or not stated), never by a left or right score. It sends the four longest words of the
+  article's title to api.gdeltproject.org and nothing else. The options page says so before you turn
+  it on, Firefox asks for the "website content" permission then, and the first use shows the exact
+  words and waits for your click. It is the only feature that sends anything.
+- The fact-check table keeps, for each review, the site where the fact-checker said the claim
+  appeared (domain only; null for posts on platforms, archives, transcripts and aggregators). A new
+  site table holds facts for 48,341 sites and fact-check records for 2,451 (`data/sites.README.md`).
+  The owner table grows from 7,374 to 19,864 domains: where Wikidata names no owner, the parent
+  organisation or publisher, labelled as such.
+
+### Measured (sources)
+- On the feed of 2026-10-20, 66.8% of 87,647 reviews list where the claim appeared and 5.6% name a
+  site; 74.7% of those with an appearance were on platforms only. A hand read of 40 random
+  attributions found 36 correct, 2 citing a site as context, 2 malformed rows now dropped.
+- Every site a shipped review names has a record (100%, tested).
+- Of 500 news links sampled from Google News search feeds in 14 editions, 42.2% resolve to an owner
+  row and 55.4% to any site fact (target 85%: not met).
+- Other coverage on 100 headlines from Google News feeds in 10 editions (2026-10-21, one request
+  every 12 s plus one retry): GDELT answered 24 and refused or dropped 76 (55 "please limit
+  requests", 20 network failures, 1 title too short). 9 of 100 found at least 3 other outlets (9 of
+  the 24 answered); median time 25.5 s overall, 18.6 s when answered. Targets of 70% and 3 s: not
+  met. The limit is GDELT's availability from this machine, not the query.
+
 ### Changed (design)
 - Every Radar surface now uses the design of the author's site: bone and void grounds, ink text,
   Hanken Grotesk for words and Conso for figures, square controls, sections that open on a

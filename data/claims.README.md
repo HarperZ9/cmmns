@@ -19,14 +19,17 @@ published terms allow redistribution; a source with unknown terms is recorded as
 The claim as the fact-checker summarised it (cut at 300 characters), the rating as the
 fact-checker wrote it (rows whose rating runs over 80 characters are dropped, since it would no
 longer read as a rating), the fact-checker's name, the review URL, the date, and a language guess
-from function words (null when unsure; the feed carries no language). The person or account the
-fact-checker says made the claim, and the links to where it appeared, are not kept.
+from function words (null when unsure; the feed carries no language), and the site where the
+fact-checker said the claim appeared: its registrable domain only, or null when the claim appeared
+only on platforms, archives, transcripts or other hosts of other people's words (rules and measured
+rates in `data/sites.README.md`). The person or account the fact-checker says made the claim, and
+the full links to where it appeared, are not kept.
 
 ## Selection
 Newest first, at most 1,500 rows from any one fact-checker (the feed's largest publishers would
-otherwise fill the table), until the file reaches 6 MB. Build of 2026-10-21: 85,043 usable reviews
-in the feed, 19,728 rows kept from 328 fact-checkers, 5,999,409 bytes, dated 2024-03-07 to
-2026-10-20. Language guesses: 36% English, 8% Portuguese, 4% Spanish, 4% French, under 1%
+otherwise fill the table), until the file reaches 6 MB. Build of 2026-10-21: 84,873 usable reviews
+in the feed, 19,379 rows kept from 318 fact-checkers, 5,999,377 bytes, dated 2024-03-18 to
+2026-10-20; 632 rows name a site where the claim appeared. Language guesses: 36% English, 8% Portuguese, 4% Spanish, 4% French, under 1%
 German and Italian, and 49% unsure (most of them in scripts the guesser does not cover).
 
 ## Attribution

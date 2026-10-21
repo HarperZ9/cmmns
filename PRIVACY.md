@@ -3,7 +3,9 @@
 Last updated: 2026-10-21.
 
 Radar runs entirely in your browser. It has no server, no account, no analytics and no telemetry.
-Nothing Radar reads or works out is sent to the author or to anyone else.
+Nothing Radar reads or works out is sent to the author. One feature, Other coverage, sends the main
+words of an article's title to the GDELT Project, and only when you turn it on and click; it is off
+by default and described below.
 
 ## What Radar reads
 
@@ -35,7 +37,21 @@ server. The list of servers you turned on is kept in `pb.instances.v1`; Options,
 Remove takes the access back.
 
 Fact-check matching runs against a table bundled inside Radar, so post text is never sent to a
-fact-checking service.
+fact-checking service. Site cards (owner, owner type, founding date, country, state links and a
+site's fact-check record) come from tables bundled inside Radar too, on links, on search results
+when you turn an engine on, and on the page you are reading when you press "Site card for this
+page". None of these send anything.
+
+### Other coverage (off by default)
+
+Other coverage is off unless you turn it on in the options page. When it is on and you click "Find
+other coverage" on an article's site card, Radar sends the main words of that article's title, and
+nothing else, to the GDELT Project's public DOC 2.0 API at `api.gdeltproject.org`. Radar does not
+send the page address, your history, any post or any account. GDELT receives the request like any
+web request, so it sees your IP address and the words; its terms are at gdeltproject.org. Before
+the first request the card shows the exact words it would send and waits for your click. Turning
+the option off withdraws the browser permission and resets that consent. Firefox also asks you to
+allow "website content" for this feature when you turn it on.
 
 The window offers reverse image search links (Google Lens, TinEye, Bing, Yandex) for media. Those
 open only when you click one, and then that service receives the image address.
@@ -84,7 +100,8 @@ is gone when you close it.
 
 ## What Radar never does
 
-- Sends anything to the author or a third party.
+- Sends anything to the author, or to a third party except the title words you send through Other
+  coverage.
 - Sells, shares or uses data for advertising.
 - Guesses who runs an account, or anyone's age, gender, ethnicity, religion or politics.
 - Links accounts across sites.
