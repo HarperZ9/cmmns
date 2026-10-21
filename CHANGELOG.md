@@ -36,7 +36,11 @@ were not published to a store.
 - Every site a shipped review names has a record (100%, tested).
 - Of 500 news links sampled from Google News search feeds in 14 editions, 42.2% resolve to an owner
   row and 55.4% to any site fact (target 85%: not met).
-COVERAGE_LINE
+- Other coverage on 100 headlines from Google News feeds in 10 editions (2026-10-21, one request
+  every 12 s plus one retry): GDELT answered 24 and refused or dropped 76 (55 "please limit
+  requests", 20 network failures, 1 title too short). 9 of 100 found at least 3 other outlets (9 of
+  the 24 answered); median time 25.5 s overall, 18.6 s when answered. Targets of 70% and 3 s: not
+  met. The limit is GDELT's availability from this machine, not the query.
 
 ### Changed (design)
 - Every Radar surface now uses the design of the author's site: bone and void grounds, ink text,

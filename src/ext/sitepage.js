@@ -35,7 +35,7 @@
       for (const x of state.list.slice(0, 12)) rows.push([x.type, { links: [[`${x.site}: ${x.title || "article"}`.slice(0, 90), x.url]] }]);
       rows.push(["Sent", `"${state.query}" to api.gdeltproject.org, ${state.ms} ms`], ["Does not prove", PB.COVERAGE_DOES_NOT_PROVE]);
     } else if (state && state.error) {
-      rows.push([null, { note: state.error === "short-title" ? "The title has too few words to search for." : state.error === "no-permission" ? "The browser has not granted access to api.gdeltproject.org. Turn Other coverage on again in Radar's options." : `GDELT did not answer with a list${state.detail ? `: ${state.detail}` : ""}.` }]);
+      rows.push([null, { note: state.error === "short-title" ? "The title has too few words to search for." : state.error === "no-permission" ? "The browser has not granted access to api.gdeltproject.org. Turn Other coverage on again in Radar's options." : /^Please limit/.test(state.detail || "") ? "GDELT is busy and did not answer. Try again in a minute." : "GDELT did not answer with a list. Try again later." }]);
     } else if (!s.coverage) {
       rows.push([null, { note: "Other coverage is off. Radar's options explain what it sends and to whom before you turn it on." }]);
       rows.push([null, { action: ["Open Radar's options", () => send({ type: "pb-open-options" }), "Opened"] }]);
