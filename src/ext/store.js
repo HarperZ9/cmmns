@@ -1,5 +1,6 @@
 // Local cache of "About this account" readings, keyed by lower-case handle. Lives in
-// chrome.storage.local on this machine only. Readings older than MAX_AGE_DAYS are refreshed.
+// chrome.storage.local on this machine only. Readings older than the user's About cache setting
+// (options page; MAX_AGE_DAYS by default) are refreshed, and the background worker deletes them.
 (() => {
   "use strict";
   const KEY = "pb.about.v1", MAX_AGE_DAYS = 14, DAY = 86400000;
@@ -16,7 +17,8 @@
   async function get(handle) {
     const rec = (await all())[String(handle).toLowerCase()];
     if (!rec) return null;
-    return Date.now() - rec.at > MAX_AGE_DAYS * DAY ? null : rec;
+    const days = globalThis.PBSettings ? PBSettings.get().aboutDays : MAX_AGE_DAYS;
+    return Date.now() - rec.at > days * DAY ? null : rec;
   }
   // Writes are read-modify-write on one key, so they run one after another; two lookups
   // finishing together would otherwise each overwrite the other's reading.

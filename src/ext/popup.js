@@ -1,13 +1,13 @@
-// Toolbar popup: what Radar sees on the current page, the main actions, and two settings.
+// Toolbar popup: what Radar sees on the current page, the main actions, pause and two settings.
 (async () => {
   "use strict";
   const $ = (id) => document.getElementById(id);
-  const KEY = "pb.settings";
-  const settings = { feeds: true, auto: true, ...((await chrome.storage.local.get(KEY))[KEY] || {}) };
-  for (const k of ["feeds", "auto"]) {
-    $(k).checked = settings[k];
-    $(k).addEventListener("change", async () => { settings[k] = $(k).checked; await chrome.storage.local.set({ [KEY]: settings }); });
+  await PBSettings.ready;
+  for (const k of ["paused", "feeds", "auto"]) {
+    $(k).checked = PBSettings.get()[k];
+    $(k).addEventListener("change", () => PBSettings.save({ [k]: $(k).checked }).catch((e) => console.error("[radar] could not save settings", e)));
   }
+  $("options").addEventListener("click", () => { chrome.runtime.openOptionsPage(); window.close(); });
 
   document.getElementById("history").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("history.html") }); window.close(); });
 

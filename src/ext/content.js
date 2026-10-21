@@ -45,11 +45,18 @@
   // Only posts on or near the screen are wired; the rest are wired as they scroll in.
   const near = (n) => { const b = n.getBoundingClientRect(); return b.bottom > -600 && b.top < window.innerHeight + 900; };
 
-  // User settings (toolbar popup): badges on feeds, automatic About lookups.
-  const SETTINGS_KEY = "pb.settings";
-  let settings = { feeds: true, auto: true };
-  chrome.storage.local.get(SETTINGS_KEY).then((g) => { settings = { ...settings, ...(g[SETTINGS_KEY] || {}) }; schedule(); }).catch(() => {});
-  chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch[SETTINGS_KEY]) { settings = { ...settings, ...(ch[SETTINGS_KEY].newValue || {}) }; schedule(); } });
+  // User settings (popup and options page, src/ext/settings.js): sites, feeds, automatic lookups.
+  let settings = PBSettings.get();
+  PBSettings.onChange((s) => { settings = s; schedule(); });
+  PBSettings.ready.then(() => schedule());
+  const enabled = () => { const site = PBSites.current(); return !!site && PB.siteOn(settings, site.id); };
+  // The toolbar icon follows this tab: paused, reading accounts, or idle. Sent only on change.
+  let iconSent = "";
+  function icon(state) {
+    if (state === iconSent) return;
+    iconSent = state;
+    chrome.runtime.sendMessage({ type: "pb-icon", state }).catch(() => {});
+  }
   let lastSummary = null, lastExport = null;
   // The last computed models, so scrolling only wires posts coming into view (badge() is cheap
   // and skips unchanged posts) instead of rebuilding the whole thread.
@@ -68,6 +75,7 @@
     // Feed mode (timelines, profiles, likes, search): badges on every post, no thread report and
     // nothing added to the connections log, because a feed is not a conversation.
     const feed = !!site && !site.onThread() && settings.feeds && !!(site.onFeed && site.onFeed());
+    if (site && !PB.siteOn(settings, site.id)) { removePanel(); PBUI.closePop(); icon("paused"); return; }
     if (!site || (!site.onThread() && !feed)) { removePanel(); return; }
     const items = site.items().map((n) => site.read(n)).filter(Boolean);
     if (!items.length) return;
@@ -104,6 +112,7 @@
     // Automatic: every author without About data is asked about in the page, at a steady pace.
     if (site.hasLocation && pending.length && globalThis.PBAuto && settings.auto) PBAuto.want(pending, schedule);
     lastPending = pending;
+    icon(PB.iconState({ reading: scanLeft || (globalThis.PBAuto ? PBAuto.left() : 0) }));
     lastSummary = { site: site.name, feed, posts: items.length, lookedUp: rows.filter((r) => r.about).length, flagged: rows.filter((r) => r.flags && PB.isFlagged(r.flags)).length, pending: pending.length, scanning: scanLeft || (globalThis.PBAuto ? PBAuto.left() : 0), origins: PB.threadReport(rows).origins || [] };
     if (feed) { removePanel(); return; }
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
@@ -146,6 +155,7 @@
   const ytVideos = new Map();   // videoId -> info; the page's first data goes stale after in-page navigation
   window.addEventListener("message", (e) => {
     if (e.source !== window || !e.data) return;
+    if (!enabled()) return;
     if (e.data.source === "radar-sniff") {
       const batch = PB.tweetsIn(e.data.json);
       for (const t of batch) tweets.set(t.id, { ...(tweets.get(t.id) || {}), ...t });
@@ -163,7 +173,7 @@
   // Live data: accounts in the responses X's own app already downloaded (src/ext/sniff.js). Each
   // reading is merged into the local cache, so badges fill in as the page loads, with no request.
   window.addEventListener("message", (e) => {
-    if (e.source !== window || !e.data || e.data.source !== "radar-sniff") return;
+    if (e.source !== window || !e.data || e.data.source !== "radar-sniff" || !enabled()) return;
     const users = PB.usersIn(e.data.json);
     // An About response for a handle we asked about: record it even if X showed no location, so
     // the account is not asked again.

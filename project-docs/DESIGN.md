@@ -168,3 +168,17 @@ what fact-checkers chose to check.
 ### The window, reorganised (2026-10-19)
 
 The head shows the account, the key facts, warnings by name, and a strip of seven areas: Place, Account, Posting, Coordination, Language, Sources and Media. Each area's dot is warm when something there is worth a look, ink for a sign, faint for context, and hollow when nothing was found. Clicking an area opens the Overview at that area's evidence. Four tabs follow: **Overview** (the evidence grouped by area, and a comparison with the other accounts read in the thread), **Account** (where, the account record, and how it posts, with a 24-hour posting clock, the last 14 days and the share of posts per app), **This post** (post metadata and the source trail) and **History**. The window remembers the last tab used. The charts are single-series, in one ink hue, with a title on each bar and the same numbers as text below them.
+
+### Product surfaces (2026-10-21)
+
+**Settings** (`src/core/settings.js`, read by `src/ext/settings.js`). One normalised shape for the popup, the first-run page, the options page and the content scripts: per-site switches and a global pause, the window's areas, feeds, automatic reading, retention (history 1 to 60 days, account details 1 to 30), and two accessibility switches (reduced motion, larger text) applied as `pb-calm` and `pb-large` on the page root. The background worker (`src/ext/lifecycle.js`) deletes entries older than the retention on start-up and on every settings change, and the content scripts follow storage changes so an old in-memory copy is never written back.
+
+**Measured accuracy** (`src/core/families.js`, `src/core/measured.js`). Every sign carries a family. Detector families show the precision from `measured.js` with its 95% interval and sample size, or "not measured yet"; a row without a sample size is not shown as a measurement. Families that repeat a site's own label, or match a cited table, say so instead of showing a precision.
+
+**Toolbar states.** The content script reports idle, reading or paused for its tab, and the worker swaps the icon. Icons are drawn by `scripts/render-icons.py` from the SVG sources in `assets/icons/`: the aperture, a luminous orb in fine concentric line-work on an ink disk, with one warm mark for reading and the orb closed to a ring for paused.
+
+**Keyboard.** Focusing a post opens its window; Alt+R moves focus into it; arrow keys move between tabs (tablist, tab and tabpanel roles); Escape closes it and returns focus to the post without reopening it.
+
+**Packaging** (`scripts/package.mjs`, `scripts/zip.mjs`). A dependency-free zip writer with sorted entries, a fixed 1980-01-01 timestamp and deflate level 9; Chrome gets a service worker manifest, Firefox background scripts and a minimum version of 128. The same tree gives the same bytes on the same Node zlib; a different zlib build can change the compressed bytes.
+
+**Type.** Extension pages bundle Hanken Grotesk (SIL OFL 1.1). Conso is named first in the figure stack but not bundled, because its licence permits the author's site and has not been checked for redistribution inside an extension; the system monospace stands in.

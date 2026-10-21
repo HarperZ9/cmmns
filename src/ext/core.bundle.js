@@ -2784,5 +2784,170 @@ function claimCard(m) {
 return { MIN_CLAIM_TOKENS, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION, claimTokens, hasNegation, guessLanguage, buildClaimIndex, matchClaims, claimCard };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims });
+// ---- settings.js
+const M_settings = (() => {
+// Radar's settings, in one normalised shape for the toolbar popup, the first-run and options pages
+// and the content scripts, plus the retention prune the background worker runs. Settings live in
+// chrome.storage.local under SETTINGS_KEY, on this machine only.
+
+const SETTINGS_KEY = "pb.settings";
+
+// Sites Radar has an adapter for. A site added later starts on unless the user switches it off.
+const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"]];
+
+// The areas of the window's strip; each can be hidden from the window.
+const AREA_IDS = ["place", "account", "posting", "coordination", "language", "sources", "media"];
+
+// Retention in days. The upper limits are what the logs keep at most (history.js keeps 60 days;
+// the connections and trail logs keep 30, so a longer history setting leaves those at 30).
+const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 } };
+
+const DEFAULTS = Object.freeze({
+  paused: false, feeds: true, auto: true, sites: {}, areas: {},
+  historyDays: 60, aboutDays: 14, calm: false, large: false, onboarded: false,
+});
+
+const bool = (v, d) => (typeof v === "boolean" ? v : d);
+const days = (v, d, r) => (Number.isFinite(Number(v)) && v !== null && v !== "" ? Math.min(r.max, Math.max(r.min, Math.round(Number(v)))) : d);
+const switches = (v, allowed) => {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return {};
+  return Object.fromEntries(Object.entries(v).filter(([k, x]) => typeof x === "boolean" && (!allowed || allowed.includes(k))));
+};
+
+function normalizeSettings(raw) {
+  const s = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  return {
+    paused: bool(s.paused, DEFAULTS.paused), feeds: bool(s.feeds, DEFAULTS.feeds), auto: bool(s.auto, DEFAULTS.auto),
+    sites: switches(s.sites), areas: switches(s.areas, AREA_IDS),
+    historyDays: days(s.historyDays, DEFAULTS.historyDays, RETENTION.historyDays),
+    aboutDays: days(s.aboutDays, DEFAULTS.aboutDays, RETENTION.aboutDays),
+    calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
+  };
+}
+
+// The fixture harness behaves as an X page, so it follows the X switch.
+function siteOn(s, id) {
+  const key = id === "fixture" ? "x" : id;
+  return !s.paused && s.sites[key] !== false;
+}
+
+const areaOn = (s, area) => s.areas[area] !== false;
+
+// The toolbar icon: paused when Radar is paused or off for this site, reading while it is reading
+// accounts, idle otherwise.
+function iconState({ paused, siteOff, reading } = {}) {
+  if (paused || siteOff) return "paused";
+  return reading ? "reading" : "idle";
+}
+
+const DAY = 86400000;
+const keepMap = (m, field, cutoff) => Object.fromEntries(Object.entries(m || {}).filter(([, v]) => v && (v[field] || 0) >= cutoff));
+const size = (m) => Object.keys(m || {}).length;
+
+// Drop every entry older than the user's retention. Returns only the keys whose value changed.
+function pruneStore(store, settings, now = Date.now()) {
+  const s = normalizeSettings(settings);
+  const hist = now - s.historyDays * DAY, about = now - s.aboutDays * DAY;
+  const out = {};
+  const H = store["pb.history.v1"];
+  if (H) { const k = keepMap(H, "at", hist); if (size(k) !== size(H)) out["pb.history.v1"] = k; }
+  const N = store["pb.net.v1"];
+  if (N && N.threads) { const k = keepMap(N.threads, "at", hist); if (size(k) !== size(N.threads)) out["pb.net.v1"] = { ...N, threads: k }; }
+  const T = store["pb.trail.v1"];
+  if (T) {
+    const media = keepMap(T.media, "seen", hist), links = keepMap(T.links, "seen", hist);
+    if (size(media) !== size(T.media) || size(links) !== size(T.links)) out["pb.trail.v1"] = { ...T, media, links };
+  }
+  for (const key of ["pb.about.v1", "pb.reddit.v1"]) {
+    const A = store[key];
+    if (A) { const k = keepMap(A, "at", about); if (size(k) !== size(A)) out[key] = k; }
+  }
+  return out;
+}
+
+const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
+
+// "Clear all Radar data": every Radar key except the settings themselves.
+const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && k !== SETTINGS_KEY);
+
+return { SETTINGS_KEY, SITES, AREA_IDS, RETENTION, DEFAULTS, normalizeSettings, siteOn, areaOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
+})();
+
+// ---- measured.js
+const M_measured = (() => {
+// Measured accuracy per badge family, from the held-out test split in project-docs/EVALUATION.md.
+// The evaluation fills this table; the window and the options page read it through
+// families.js (measuredLine). A family with no row here shows "not measured yet".
+//
+// Row shape, one per family id from families.js:
+//   { precision, low, high, n, split: "test", recall?, side?, date?, source? }
+//   precision, low, high: 0 to 1 (low and high are the 95% interval); n: badges checked.
+
+const MEASURED_AT = null;
+const MEASURED = {};
+
+return { MEASURED_AT, MEASURED };
+})();
+
+// ---- families.js
+const M_families = (() => {
+// Badge families: every kind of signal the window can show, which area of the strip it sits in, and
+// what sort of evidence it is. A detector is Radar's own rule and can be measured for precision; a
+// platform family repeats the site's own label; a table family is a match against a cited table.
+// measuredLine() gives the line the window and the options page show for a family.
+
+const { MEASURED } = M_measured;
+
+const D = "detector", P = "platform", T = "table";
+const FAMILIES = [
+  ["slur", "Slur or coded hate term", "language", D], ["stereotype", "Group stereotype", "language", D],
+  ["dehumanise", "Dehumanising language", "language", D], ["violence", "Call for violence", "language", D],
+  ["vigilante", "Call for vigilantes", "language", D], ["leaked-ai", "Leaked AI text", "language", D],
+  ["machine-writing", "Machine-writing signs", "language", D], ["spam-pattern", "Spam pattern", "language", D],
+  ["x-spam", "X: probable spam", "language", P], ["hate-symbol-name", "Hate symbol in name", "language", D],
+  ["old-media", "Media older than the post", "media", D], ["lifted-media", "Media from another post", "media", P],
+  ["same-upload", "Same upload, many accounts", "coordination", D], ["duplicates", "Same text as other replies", "coordination", D],
+  ["copied-elsewhere", "Same words in other threads", "coordination", D],
+  ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
+  ["state-link", "State link", "sources", T], ["owner", "Outlet owner", "sources", T],
+  ["client", "Posting app", "posting", P], ["written-in", "Written in another language", "place", P],
+  ["mismatch", "Speaks as local, labelled elsewhere", "place", D], ["store-elsewhere", "App store elsewhere", "place", D],
+  ["flag-elsewhere", "Flag of another country", "place", D], ["profile-location-elsewhere", "Profile says elsewhere", "place", D],
+  ["hours-elsewhere", "Active hours fit elsewhere", "place", D],
+  ["fast-replier", "Replies within a minute", "posting", D], ["automation-app", "Posts through an automation app", "posting", D],
+  ["no-sleep-gap", "Posts around the clock", "posting", D], ["repost-only", "Almost only reposts", "posting", D],
+  ["high-volume", "Very high post rate", "posting", D],
+  ["new-account", "New account", "account", D], ["name-changes", "Renamed", "account", D],
+  ["default-handle", "Sign-up handle", "account", D], ["follow-pattern", "Follows many, few follow back", "account", D],
+  ["low-karma", "Low karma for its age", "account", D],
+].map(([id, name, area, kind]) => ({ id, name, area, kind }));
+
+const BY_ID = new Map(FAMILIES.map((f) => [f.id, f]));
+const FLAG_FAMILY = { "based-elsewhere": "mismatch", "same-text": "duplicates" };
+
+// kind: "flag" (an account flag id from flags.js), "marker" (a rhetoric family) or "family".
+function familyOf(kind, id) {
+  const f = kind === "flag" ? FLAG_FAMILY[id] || id : id;
+  return BY_ID.has(f) ? f : null;
+}
+
+const pc = (x) => Math.round(x * 100);
+const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.precision <= 1 && Number.isInteger(r.n) && r.n > 0;
+
+// { measured, text } for one family. A row without a sample size is not shown as a measurement.
+function measuredLine(id, table = MEASURED) {
+  const f = BY_ID.get(id);
+  if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Radar detector" };
+  if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
+  const r = (table || {})[id];
+  if (!valid(r)) return { measured: false, text: "not measured yet" };
+  const ci = Number.isFinite(r.low) && Number.isFinite(r.high) ? ` (95% interval ${pc(r.low)} to ${pc(r.high)}%)` : "";
+  const split = r.split === "test" ? ", held-out test set" : r.split ? `, ${r.split} set` : "";
+  return { measured: true, text: `precision ${pc(r.precision)}%${ci}, ${r.n} badges checked${split}` };
+}
+
+return { FAMILIES, familyOf, measuredLine };
+})();
+
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_settings, ...M_measured, ...M_families });
 })();
