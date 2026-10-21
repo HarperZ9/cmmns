@@ -1,15 +1,12 @@
-// French grammar for the stance-neutral markers. JavaScript's \b treats accented letters as
-// non-word characters, so every boundary here is a Unicode letter lookaround with the "u" flag.
+// French grammar for the stance-neutral markers. Boundaries are Unicode letter lookarounds
+// (rhetoric-util.js), since JavaScript's \b treats accented letters as non-word characters.
 // These run only for families the English grammar did not already find in the same text.
 
 import * as F from "./lexicon-fr.js";
+import { RX, scoreRules } from "./rhetoric-util.js";
 
-const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const alt = (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|");
-const B = "(?<![\\p{L}\\p{N}_])", E = "(?![\\p{L}\\p{N}_])";
-const re = (src) => new RegExp(src, "iu");
+const { alt, B, E, FILL, re } = RX;
 const G = alt(F.GROUPS_FR), D = alt(F.DEHUMANISE_FR);
-const FILL = "(?:\\s+[\\p{L}']+){0,3}?";
 const ART = "(?:les\\s+|ces\\s+|tous\\s+ces\\s+|des\\s+)?";
 
 export const RE_FR = {
@@ -27,14 +24,16 @@ export const RE_FR = {
 };
 
 // "ne sont pas des animaux", "jamais": the opposite of the marker.
-export const NEGATION_FR = /(?<![\p{L}])(?:ne|n'|pas|jamais|aucun|aucune)(?![\p{L}])/iu;
+export const NEGATION_FR = RX.negation(["ne", "n'", "pas", "jamais", "aucun", "aucune"]);
+
+const RULES = {
+  dehumanise: [[RE_FR.dehumanise, true], [RE_FR.dehumaniseOf, true]],
+  violence: [[RE_FR.violenceCall, true], [RE_FR.violenceDeserve, true], [RE_FR.violenceSlogan, false]],
+  stereotype: [[RE_FR.stereotype, true]],
+  conspiracy: [[RE_FR.conspiracy, false]],
+};
 
 // Adds French markers through `hit(family, regex, negatable)` for families not yet in `have`.
 export function scoreFr(hit, have) {
-  if (!have.has("dehumanise") && !hit("dehumanise", RE_FR.dehumanise, true)) hit("dehumanise", RE_FR.dehumaniseOf, true);
-  if (!have.has("violence") && !hit("violence", RE_FR.violenceCall, true) && !hit("violence", RE_FR.violenceDeserve, true)) {
-    hit("violence", RE_FR.violenceSlogan);
-  }
-  if (!have.has("stereotype")) hit("stereotype", RE_FR.stereotype, true);
-  if (!have.has("conspiracy")) hit("conspiracy", RE_FR.conspiracy);
+  scoreRules(RULES, hit, have);
 }
