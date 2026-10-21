@@ -125,3 +125,22 @@ test("X's account-operation disclosures; payment handles are not read", async ()
   assert.equal(r.creatorSubscriptions, 3);
   assert.ok(!JSON.stringify(r).includes("someone"));
 });
+
+test("Community Note timing: when the note was written, against the post and now", async () => {
+  const { tweetsIn, noteTiming } = await import("../src/core/xdata.js");
+  const id = (iso) => String((BigInt(Date.parse(iso) - 1288834974657)) << 22n);
+  const posted = "Sat Oct 18 08:00:00 +0000 2026";
+  const viaNote = { __typename: "Tweet", rest_id: "7", legacy: { created_at: posted }, birdwatch_pivot: { title: "Readers added context", note: { rest_id: id("2026-10-18T11:00:00Z") } } };
+  const viaLink = { __typename: "Tweet", rest_id: "8", legacy: { created_at: posted }, birdwatch_pivot: { title: "Readers added context", destinationUrl: `https://x.com/i/birdwatch/n/${id("2026-10-20T08:00:00Z")}` } };
+  const [a, b] = tweetsIn({ list: [viaNote, viaLink] }).sort((x, y) => x.id.localeCompare(y.id));
+  const now = Date.parse("2026-10-21T08:00:00Z");
+  const ta = noteTiming(a, now), tb = noteTiming(b, now);
+  assert.equal(ta.afterPost, 3 * 3600);
+  assert.equal(ta.text, "Note written 3 h after the post, 3 days ago. The page does not say when X began to show it.");
+  assert.equal(tb.afterPost, 48 * 3600);
+  assert.match(tb.text, /^Note written 2 days after the post, 24 h ago\./);
+  assert.equal(noteTiming({ note: "x" }, now), null, "no note id, no timing");
+  assert.equal(noteTiming({ noteId: id("2026-10-21T07:30:00Z") }, now).text, "Note written 30 min ago. The page does not say when X began to show it.");
+  const junk = tweetsIn({ __typename: "Tweet", rest_id: "9", legacy: {}, birdwatch_pivot: { destinationUrl: "https://x.com/i/birdwatch/n/abc" } })[0];
+  assert.equal(junk.noteId, undefined);
+});

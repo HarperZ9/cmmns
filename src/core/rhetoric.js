@@ -23,6 +23,7 @@ import { scoreUk, NEGATION_UK } from "./rhetoric-uk.js";
 import { scoreZh, NEGATION_ZH, prepZh } from "./rhetoric-zh.js";
 import { scoreHi, NEGATION_HI, prepHi } from "./rhetoric-hi.js";
 import { mentionedIntl } from "./rhetoric-mention.js";
+import { foldConfusables } from "./confusables.js";
 
 export const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -162,7 +163,8 @@ function scoreEnglish(s, hit) {
 // Returns { score, markers: [{ family, match, lang? }], extreme }. lang: the code of the language
 // grammar that found the marker; absent for English.
 export function score(text) {
-  const s = String(text || "").replace(/[’]/g, "'");
+  // Look-alike letters from other scripts are folded first (src/core/confusables.js).
+  const s = foldConfusables(text).replace(/[’]/g, "'");
   const markers = [];
   const hit = recorder(s, markers);
   scoreEnglish(s, hit);

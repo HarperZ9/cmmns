@@ -118,6 +118,7 @@ export function tweetsIn(json) {
         views: v.views && v.views.count ? Number(v.views.count) : null,
         edits: edits > 1 ? edits - 1 : null,
         note: v.birdwatch_pivot ? pick((v.birdwatch_pivot.subtitle || {}).text, v.birdwatch_pivot.shorttitle, v.birdwatch_pivot.title, "a Community Note is attached") : null,
+        noteId: v.birdwatch_pivot ? noteIdOf(v.birdwatch_pivot) : null,
         posted: Number.isFinite(Date.parse(L.created_at)) ? new Date(Date.parse(L.created_at)).toISOString() : null,
         media: mediaOf(L),
         // the trail: who wrote it, what it quotes, reposts or answers, and where its links go
@@ -141,6 +142,32 @@ function authorOf(v) {
   const u = ((v.core || {}).user_results || {}).result;
   if (!u) return null;
   return pick((u.core || {}).screen_name, (u.legacy || {}).screen_name);
+}
+
+// The note's own id, from the note object or the link to it ("/i/birdwatch/n/<id>"). Note ids are
+// snowflakes like post ids, so the id says when the note was written.
+function noteIdOf(b) {
+  const id = pick(((b.note || {}).rest_id), (String(b.destinationUrl || "").match(/\/birdwatch\/n\/(\d+)/) || [])[1]);
+  return id && /^\d{10,20}$/.test(id) ? id : null;
+}
+
+// When a Community Note was written, against the post and now: { written, afterPost, age, text }
+// in seconds, or null. The page data says when the note was written, not when X began showing it,
+// which comes later, once enough raters from different viewpoints agree.
+export function noteTiming(tweet, now = Date.now()) {
+  if (!tweet || !tweet.noteId) return null;
+  const written = snowflakeTime(tweet.noteId), w = Date.parse(written), p = Date.parse(tweet.posted);
+  if (!Number.isFinite(w)) return null;
+  const afterPost = Number.isFinite(p) ? Math.max(0, Math.round((w - p) / 1000)) : null, age = Math.max(0, Math.round((now - w) / 1000));
+  const text = (afterPost != null ? `Note written ${span(afterPost)} after the post, ${span(age)} ago.` : `Note written ${span(age)} ago.`)
+    + " The page does not say when X began to show it.";
+  return { written, afterPost, age, text };
+}
+
+function span(sec) {
+  if (sec < 3600) return `${Math.max(1, Math.round(sec / 60))} min`;
+  if (sec < 48 * 3600) return `${Math.round(sec / 3600)} h`;
+  return `${Math.round(sec / 86400)} days`;
 }
 
 // X ids are "snowflakes": the top bits are milliseconds since 2010-11-04. A media id therefore

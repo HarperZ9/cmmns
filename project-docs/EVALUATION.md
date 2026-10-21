@@ -208,7 +208,18 @@ Radar looks for eleven techniques from the SemEval-2020 Task 11 and SemEval-2023
 Each is a list of lexical and grammatical cues that name no group, person, party or side
 (`src/core/persuasion-cues.js`). The rule, set before measuring: a technique shows in the window
 only when its held-out span precision has a 95% Wilson lower bound of at least 0.7 from at least 20
-hits. **No technique met it, so none is shown.** The code, the French cues, the window entries and
+hits. On 2026-10-21 the bar was raised: the point precision must also be at least 80%
+(`SHIP_PRECISION`), and whataboutism never shows on one reply (`CONTEXT_ONLY`). **No technique met
+the old bar or the new one, so none is shown.**
+
+Why 80% on precision. Published systems score these techniques at F1 of about 30 to 44: LLMs on
+SemEval-2023 Task 3 reach 41.0 in Bulgarian, 44.4 in Croatian, 41.9 in Polish, 29.3 in Russian and
+29.9 in Slovene, rank below an XLM-R baseline on binary detection, and score near zero on straw man,
+whataboutism and red herring, which need context across paragraphs (Jose and Greenstadt, SlavicNLP
+2025). At that level a confident label on a stranger's post is wrong more often than right. A
+lower bound of 0.7 alone allowed a technique right only 75 times in 100 to show; the point bar of 80%
+closes that, and the lower bound keeps a small lucky sample out. Whataboutism needs what the other
+side did and said, which one reply does not carry, so no reply-level measurement can clear it. The code, the French cues, the window entries and
 the report line are built and tested. They switch on by themselves when a row in `measured.js`
 clears the bar. `node scripts/eval-persuasion.mjs` reproduces every number here and records the
 SHA-256 of the corpus archive in `evidence/persuasion-results.json`.
@@ -273,6 +284,78 @@ Wilson interval. It never changes "flagged", the extreme comparison or the verdi
   precision leans low.
 - A technique describes how a post argues. It does not say the post is false, or anything about
   who wrote it.
+
+## Organic baselines for the coordination signs (2026-10-21)
+Every coordination sign now carries what normal looks like: how often the same sign fired in
+ordinary threads, beside the count observed. The window says the baseline's source in the same row.
+`node scripts/baselines.mjs` reproduces every number here from the PHEME corpus prepared by
+`scripts/eval/prep-pheme.py`, and writes `evidence/baseline-results.json` and
+`src/core/baselines-data.js`.
+
+Data. PHEME (Zubiaga et al.), 6,425 Twitter threads from nine 2014 and 2015 news events (Charlie
+Hebdo, the Sydney siege, Ferguson, the Ottawa shooting, Germanwings and four smaller ones), CC BY 4.0,
+figshare 10.6084/m9.figshare.6392078, archive SHA-256 `079f6ffd...a9bc58dd` (full hash in the results
+file). No text from it is committed. Two null models of independent posting run beside it
+(`scripts/baselines/nulls.mjs`): reply times drawn on their own at the thread's own pace (a smoothed
+bootstrap of its delays), and accounts placed in threads at random with each account's thread count
+and each thread's size kept.
+
+| Sign, thread size | Ordinary threads (95% interval) | Independent-posting null |
+|---|---|---|
+| Same text, 5 to 19 replies | 0.5% (14 of 3,087; 0.3 to 0.8) | |
+| Same text, 20 to 49 | 1.4% (20 of 1,384; 0.9 to 2.2) | |
+| Same text, 50 to 99 | 3.3% (6 of 181; 1.5 to 7.0) | |
+| Same text, 100 or more | 6.7% (4 of 60; 2.6 to 15.9) | |
+| Burst, 5 to 19 replies | 1.3% (39 of 3,087; 0.9 to 1.7) | 2.8% |
+| Burst, 20 to 49 | 2.2% (31 of 1,384; 1.6 to 3.2) | 3.6% |
+| Burst, 50 to 99 | 1.1% (2 of 181; 0.3 to 3.9) | 5.3% |
+| Burst, 100 or more | 3.3% (2 of 60; 0.9 to 11.4) | 12.2% |
+| Seen together, about 10 threads viewed | 0% (0 of 1,600; 0 to 0.2) | 0% |
+| Seen together, about 30 | 0% (0 of 4,800; 0 to 0.1) | 0% |
+| Seen together, about 100 | 0.2% (32 of 14,000; 0.2 to 0.3) | 0% |
+| Same words in another thread, about 100 viewed | 0.8% of replies of 8 words or more | |
+
+"Seen together" draws 20 random samples of W threads from each event with at least 2W threads. Pairs in
+three or more of the same threads, as the feed page lists them: a median of 0 at every W, real and null.
+
+What the baselines changed. Both signs fired far too often on ordinary threads, and both were fixed
+before these figures were taken:
+- Same text fired on 33.2% to 46.7% of threads by size. Almost every group was replies that copied the
+  post they quoted ("RT @outlet: ..." or a quote in curly quotes) or repeated the root post's headline,
+  the pattern Luceri et al. (arXiv 2505.10867) found on TikTok. The sign now sets aside quoted text
+  (`ownWords` in `src/core/similarity.js`) and shingles shared with the root post. The synthetic cases
+  keep 85 of 87 precision and 85 of 85 recall.
+- Bursts fired on 11.6% of threads overall and 39% of threads with 50 or more replies. The test
+  compared each 20-second window with the thread's average rate, and replies rush in after a post.
+  It now compares with the higher of the average and the local pace in the 120 seconds around the
+  window (`LOCAL_SEC` in `src/core/timing.js`): 1.6% of threads overall.
+
+What the baselines do not prove:
+- PHEME is Twitter in 2014 and 2015, when quoting meant pasting text; it is not a sample of today's X.
+- PHEME's threads were not checked for coordination. A baseline is "ordinary as collected", and some
+  of its bursts and copies may themselves be coordinated, which would make normal look busier.
+- The burst rate on ordinary threads is still above the test's nominal 0.1%, and the independent
+  null fires more often than the real threads. A burst is a sign to look at beside its baseline, not
+  a finding.
+- No labelled set of coordinated threads was used here, so no recall for any coordination sign is
+  measured on real data.
+
+## Look-alike letters (2026-10-21)
+Text is folded to the Unicode confusables table (UTS #39, version 18.0.0) before the duplicates sign,
+the cross-thread fingerprint, claim matching and the rhetoric word lists (`src/core/confusables.js`).
+Only words that mix Latin, Cyrillic, Greek, Armenian or Cherokee letters fold, toward the text's main
+script when every letter can be read in it, else toward the word's own majority; styled letters
+(fullwidth, mathematical, circled) read as plain ones, and invisible splitters are removed.
+
+- Seeded set: 100 copies of generated replies with one letter swapped for a Cyrillic or Greek
+  look-alike (`tests/confusables.test.js`). The duplicates sign found 75 of 100 before folding and 100
+  of 100 after; the cross-thread fingerprint matches all 100.
+- Controls: 17 sentences in Russian, Ukrainian, Serbian, Greek, Arabic, Hindi, Chinese, Armenian,
+  Cherokee, Hebrew, Japanese and accented Latin, and mixed English with Russian names, are unchanged.
+- Ordinary text: 6 of 96,337 PHEME replies change at all, by fullwidth digits and letters read as
+  plain ones and one mixed-script word. The synthetic duplicate cases keep their precision.
+- Limit: a lone Russian word quoted inside English text, whose every letter has a Latin look-alike
+  ("сор"), folds to Latin. Folding applies only to the copy Radar matches, never to what it shows.
 
 ## Threads
 At least one event with threads from opposing sides (for example a protest covered by outlets on

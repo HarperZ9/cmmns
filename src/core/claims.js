@@ -17,6 +17,8 @@
 // tests/claims.symmetry.test.js holds the matcher to the same decision for actors from every
 // direction.
 
+import { foldConfusables } from "./confusables.js";
+
 export const MIN_CLAIM_TOKENS = 4, MIN_SHARED = 4, COVER_MIN = 0.85, BIGRAM_MIN = 0.3, MAX_CANDIDATES = 200;
 export const CLAIM_LABEL = "A fact-checker reviewed a similar claim";
 export const CLAIM_DOES_NOT_PROVE = "Similar wording is not the same claim; check the source. The rating is the fact-checker's, about the claim they reviewed, not about this post or the person who wrote it.";
@@ -36,7 +38,7 @@ const NUMBER_WORDS = new Set("one two three four five six seven eight nine ten e
 const NEGATION = /\b(?:not|never|no|none|nobody|nothing|isn'?t|aren'?t|wasn'?t|weren'?t|don'?t|doesn'?t|didn'?t|won'?t|can'?t|pas|jamais|nunca|nicht|kein\w*|non|não)\b|n['’]t\b/i;
 
 function words(text) {
-  return String(text || "")
+  return foldConfusables(text)
     .replace(/https?:\/\/\S+/g, " ")
     .replace(/@\w+/g, " ")
     .replace(/[^\p{L}\p{M}\p{N}\s]/gu, " ")   // keep combining marks: Indic vowel signs are marks

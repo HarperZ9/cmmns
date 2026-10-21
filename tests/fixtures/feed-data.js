@@ -31,5 +31,9 @@
     threads["x:" + (1000 + i)] = { at: now - i * day * 1.5, authors };
   }
   const trail = { media: { m1: { posts: [{ id: "1", handle: "origin_one", at: "2019-05-02T01:00:00Z" }, { id: "2", handle: "relay_a", at: "2026-10-18T10:00:00Z" }, { id: "3", handle: "relay_b", at: "2026-10-18T10:01:00Z" }, { id: "4", handle: "relay_c", at: "2026-10-18T10:02:00Z" }] } } };
-  window.FIXTURE_STORE = { "pb.history.v1": reports, "pb.feed.v1": feed, "pb.net.v2": { threads }, "pb.trail.v1": trail, "pb.settings": { historyDays: 60 } };
+  // Media checks for the survival count: invented outcomes on two sites.
+  const media = {};
+  [["x.com", "intact"], ["x.com", "none"], ["x.com", "none"], ["x.com", "none"], ["x.com", "changed"], ["youtube.com", "partial"], ["youtube.com", "none"]]
+    .forEach(([site, outcome], i) => { media["m" + i] = { at: now - i * day, site, outcome }; });
+  window.FIXTURE_STORE = { "pb.media.v1": media, "pb.history.v1": reports, "pb.feed.v1": feed, "pb.net.v2": { threads }, "pb.trail.v1": trail, "pb.settings": { historyDays: 60 } };
 })();

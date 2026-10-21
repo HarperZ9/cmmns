@@ -100,6 +100,22 @@ code { font-size: .92em; }
 table { font-size: .92em; }
 td.num { font-size: .92em; text-align: left; }
 footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid var(--line); color: var(--soft); font-size: var(--t-meta); }
+.sign { margin: var(--s-6) 0 0; max-width: var(--measure); }
+.sign h3 { margin: 0 0 var(--s-1); }
+.takeaway { margin: 0 0 var(--s-2); font-size: var(--t-dek); line-height: 1.4; }
+.ci-fig { display: block; width: 100%; max-width: 30rem; height: auto; margin: var(--s-2) 0; overflow: visible; }
+.ci-fig .axis { stroke: var(--line-strong); stroke-width: 1; }
+.ci-fig .tick { stroke: var(--line-strong); stroke-width: 1; }
+.ci-fig .bar { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; }
+.ci-fig .band { fill: var(--raised); stroke: var(--ink); stroke-width: 1; }
+.ci-fig .point { stroke: var(--ink); stroke-width: 3; }
+.ci-fig text { fill: var(--soft); font: 400 14px var(--font-mono); }
+details.how-we-know { margin: var(--s-2) 0 0; }
+details.how-we-know > summary { font-size: var(--t-meta); }
+dl.hwk-list { margin: var(--s-2) 0 0; display: grid; grid-template-columns: minmax(8rem, max-content) 1fr; gap: var(--s-1) var(--s-4); font-size: var(--t-meta); }
+dl.hwk-list dt { font-weight: 650; }
+dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
+@media (max-width: 34rem) { dl.hwk-list { grid-template-columns: 1fr; } dl.hwk-list dd { margin-bottom: var(--s-2); } }
 </style>
 </head>
 <body>
@@ -115,8 +131,83 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <li>Each figure gives the count and a 95% interval (Wilson). A wide interval means few cases were checked.</li>
 <li>All figures come from a held-out test split (seed <code>radar-eval-2026-10-21</code>). Rules were tuned on a separate split, and the test split was read once, after tuning. Measured 2026-10-21.</li>
 </ul>
+<h2>One figure per sign</h2>
+<p>Each sign leads with what its measurement means when you see it. The figure draws the 95% interval as a band and the measured value as a mark; a dashed line is the bar a sign must clear to show. Counts, data and limits sit under "How we know".</p>
+<section class="sign">
+<h3>Slur or coded hate term</h3>
+<p class="takeaway">When Radar shows this sign, the people who labelled the test comments agreed 91 times in 100.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Slur or coded hate term, precision: 91%, 95% interval 90.1% to 91.8%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="354.0" y="10" width="6.5" height="12"/><line class="point" x1="357.4" y1="6" x2="357.4" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>3,995 of 4,392; 95% interval 90.1% to 91.8%</dd><dt>Range across corpora</dt><dd>34.0% to 95.3%</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Call for violence</h3>
+<p class="takeaway">When Radar shows this sign, the people who labelled the test comments agreed 88 times in 100.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Call for violence, precision: 87.5%, 95% interval 79% to 92.9%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="311.4" y="10" width="53.4" height="12"/><line class="point" x1="344.0" y1="6" x2="344.0" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>77 of 88; 95% interval 79.0% to 92.9%</dd><dt>Range across corpora</dt><dd>96.7% to 96.7%</dd><dt>Recall</dt><dd>2.1% (39 of 1,819; 95% interval 1.6% to 2.9%). Radar is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Dehumanising language</h3>
+<p class="takeaway">When Radar shows this sign, the people who labelled the test comments agreed 92 times in 100.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Dehumanising language, precision: 92.3%, 95% interval 79.7% to 97.3%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="314.0" y="10" width="67.6" height="12"/><line class="point" x1="362.4" y1="6" x2="362.4" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>36 of 39; 95% interval 79.7% to 97.3%</dd><dt>Recall</dt><dd>0.2% (11 of 5,046; 95% interval 0.1% to 0.4%). Radar is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Group stereotype</h3>
+<p class="takeaway">When Radar shows this sign, the people who labelled the test comments agreed 83 times in 100.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Group stereotype, precision: 83.3%, 95% interval 74.6% to 89.5%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="294.5" y="10" width="57.2" height="12"/><line class="point" x1="327.9" y1="6" x2="327.9" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>80 of 96; 95% interval 74.6% to 89.5%</dd><dt>Range across corpora</dt><dd>91.7% to 91.7%</dd><dt>Recall</dt><dd>0.6% (51 of 8,368; 95% interval 0.5% to 0.8%). Radar is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
+</section>
+<section class="sign">
+<h3>The thread report's &quot;extreme&quot;</h3>
+<p class="takeaway">When the report counts a reply as extreme, the corpus labelled it severe 70 times in 100.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Extreme, precision: 70.3%, 95% interval 67.7% to 72.7%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="268.0" y="10" width="19.2" height="12"/><line class="point" x1="278.0" y1="6" x2="278.0" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>896 of 1,275; 95% interval 67.7% to 72.7%</dd><dt>Recall</dt><dd>896 of 5,224; 95% interval 16.2% to 18.2%</dd><dt>Data</dt><dd>Measuring Hate Speech severity labels</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Same text as other replies</h3>
+<p class="takeaway">In ordinary threads with 20 to 49 replies, a group of near-identical replies shows up in 1.4% of threads.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Same text, ordinary threads of 20 to 49 replies: 1.4%, 95% interval 0.9% to 2.2%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="42.6" y="10" width="49.9" height="12"/><line class="point" x1="61.8" y1="6" x2="61.8" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">10%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>5-19 replies</dt><dd>14 of 3,087; 95% interval 0.3% to 0.8%</dd><dt>20-49 replies</dt><dd>20 of 1,384; 95% interval 0.9% to 2.2%</dd><dt>50-99 replies</dt><dd>6 of 181; 95% interval 1.5% to 7.0%</dd><dt>100+ replies</dt><dd>4 of 60; 95% interval 2.6% to 15.9%</dd><dt>Before quotes were set aside</dt><dd>33% to 47% of these threads, almost all from replies that copied the post they quoted</dd><dt>Source</dt><dd>Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus, not a sample of today's X.</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Burst of replies</h3>
+<p class="takeaway">In ordinary threads with 20 to 49 replies, a burst like those Radar reports shows up in 2.2% of threads.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Bursts, ordinary threads of 20 to 49 replies: 2.2%, 95% interval 1.6% to 3.2%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="69.4" y="10" width="61.4" height="12"/><line class="point" x1="92.5" y1="6" x2="92.5" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">10%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>5-19 replies</dt><dd>39 of 3,087; 95% interval 0.9% to 1.7%</dd><dt>20-49 replies</dt><dd>31 of 1,384; 95% interval 1.6% to 3.2%</dd><dt>50-99 replies</dt><dd>2 of 181; 95% interval 0.3% to 3.9%</dd><dt>100+ replies</dt><dd>2 of 60; 95% interval 0.9% to 11.4%</dd><dt>Independent posting</dt><dd>A simulation where each reply is timed on its own, at the thread's own pace, fires in 2.8%, 3.6%, 5.3%, 12.2% of threads by size.</dd><dt>Source</dt><dd>Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus, not a sample of today's X.</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Accounts seen together</h3>
+<p class="takeaway">For someone who opened about 100 threads on one news story, a pair seen together in two or more other threads shows up in 0.2% of threads.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Accounts seen together, about 100 threads viewed: 0.2%, 95% interval 0.2% to 0.3%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="15.7" y="10" width="3.8" height="12"/><line class="point" x1="15.7" y1="6" x2="15.7" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">10%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>About 10 threads</dt><dd>0 of 1,600; 95% interval 0.0% to 0.2%</dd><dt>About 30 threads</dt><dd>0 of 4,800; 95% interval 0.0% to 0.1%</dd><dt>About 100 threads</dt><dd>32 of 14,000; 95% interval 0.2% to 0.3%</dd><dt>Independent posting</dt><dd>With the same accounts placed in threads at random: 0.0%, 0.0%, 0.0%.</dd><dt>Source</dt><dd>Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus, not a sample of today's X.</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Look-alike letters</h3>
+<p class="takeaway">Copies with one letter swapped for a Cyrillic or Greek look-alike: Radar now finds 100 in 100, up from 75.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Copies found after folding look-alike letters: 100%, 95% interval 96.3% to 100%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="377.8" y="10" width="14.2" height="12"/><line class="point" x1="392.0" y1="6" x2="392.0" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Seeded copies</dt><dd>100 of 100 found after folding, 75 of 100 before</dd><dt>Ordinary text</dt><dd>6 of 96,337 replies in ordinary threads changed at all, mostly fullwidth letters and digits read as plain ones</dd><dt>Test cases</dt><dd>Same text, cases written for the test: 85 of 87; 95% interval 92.0% to 99.4%</dd><dt>Data</dt><dd>Unicode confusables table (UTS #39), Unicode License v3</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Persuasion: loaded language</h3>
+<p class="takeaway">Held back: right 60 times in 100 on news articles, under the bar of 80.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Loaded language, precision: 60.3%, 95% interval 51.9% to 68.1%; the bar is 80%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><line class="bar" x1="315.2" y1="2" x2="315.2" y2="30"/><rect class="band" x="207.3" y="10" width="62.2" height="12"/><line class="point" x1="239.6" y1="6" x2="239.6" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text><text x="315.2" y="42" text-anchor="middle">bar 80%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>82 of 136; 95% interval 51.9% to 68.1%</dd><dt>Recall</dt><dd>7.9%</dd><dt>Chance</dt><dd>2.3% of words sit inside a span of this technique</dd><dt>Data</dt><dd>Propaganda Techniques Corpus v2, held-out articles</dd><dt>Does not prove</dt><dd>A technique can carry a true claim; it describes how a post argues.</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Persuasion: name calling</h3>
+<p class="takeaway">Held back: right 49 times in 100 on news articles, under the bar of 80.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Name calling, precision: 48.8%, 95% interval 34.6% to 63.2%; the bar is 80%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><line class="bar" x1="315.2" y1="2" x2="315.2" y2="30"/><rect class="band" x="140.9" y="10" width="109.8" height="12"/><line class="point" x1="195.4" y1="6" x2="195.4" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text><text x="315.2" y="42" text-anchor="middle">bar 80%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>21 of 43; 95% interval 34.6% to 63.2%</dd><dt>Recall</dt><dd>4.4%</dd><dt>Chance</dt><dd>1.1% of words sit inside a span of this technique</dd><dt>Data</dt><dd>Propaganda Techniques Corpus v2, held-out articles</dd><dt>Does not prove</dt><dd>A technique can carry a true claim; it describes how a post argues.</dd></dl></details>
+</section>
+<section class="sign">
+<h3>Persuasion: flag waving</h3>
+<p class="takeaway">Held back: right 41 times in 100 on news articles, under the bar of 80.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Flag waving, precision: 40.7%, 95% interval 24.5% to 59.3%; the bar is 80%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><line class="bar" x1="315.2" y1="2" x2="315.2" y2="30"/><rect class="band" x="102.1" y="10" width="133.6" height="12"/><line class="point" x1="164.3" y1="6" x2="164.3" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text><text x="315.2" y="42" text-anchor="middle">bar 80%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>11 of 27; 95% interval 24.5% to 59.3%</dd><dt>Recall</dt><dd>12.8%</dd><dt>Chance</dt><dd>0.5% of words sit inside a span of this technique</dd><dt>Data</dt><dd>Propaganda Techniques Corpus v2, held-out articles</dd><dt>Does not prove</dt><dd>A technique can carry a true claim; it describes how a post argues.</dd></dl></details>
+</section>
 <h2>Language signs</h2>
 <p>Checked on three public corpora of comments labelled by people, pooled: Measuring Hate Speech (CC BY 4.0), HateXplain (MIT) and Civil Comments (CC0 1.0). The range runs from the lowest to the highest corpus with at least 20 hits. Recall is against Measuring Hate Speech's own survey item for that sign, where one exists.</p>
+<details class="how-we-know"><summary>Every language sign, with counts</summary>
 <div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Precision (95% interval)</th><th scope="col">Range across corpora</th><th scope="col">Recall</th><th scope="col">Status</th></tr></thead><tbody>
 <tr><td>Slur or coded hate term</td><td class="num">91.0% (3,995 of 4,392; 90.1% to 91.8%)</td><td class="num">34.0% to 95.3%</td><td class="num">not measured</td><td>Shown with this figure</td></tr>
 <tr><td>Group stereotype</td><td class="num">83.3% (80 of 96; 74.6% to 89.5%)</td><td class="num">91.7%</td><td class="num">0.6% (51 of 8,368; 0.5% to 0.8%)</td><td>Shown with this figure</td></tr>
@@ -124,8 +215,10 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <tr><td>Call for violence</td><td class="num">87.5% (77 of 88; 79.0% to 92.9%)</td><td class="num">96.7%</td><td class="num">2.1% (39 of 1,819; 1.6% to 2.9%)</td><td>Shown with this figure</td></tr>
 <tr><td>Call for vigilantes</td><td class="num">66.7% (2 of 3; 20.8% to 93.9%)</td><td class="num">under 20 hits in each corpus</td><td class="num">not measured</td><td>Not measured: fewer than 20 hits in the test split</td></tr>
 </tbody></table></div>
+</details>
 <p class="muted">Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), not on this site's replies. Precision says how often a marker sat on text the annotators judged hostile to a group; it does not say why anyone wrote it, and it can differ on other sites and topics.</p>
 <h3>Weaker signs that count only toward a reply being "extreme"</h3>
+<details class="how-we-know"><summary>Weaker signs, with counts</summary>
 <div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Share on hostile text (95% interval)</th><th scope="col">Range across corpora</th></tr></thead><tbody>
 <tr><td>Context-dependent slur</td><td class="num">65.5% (837 of 1,278; 62.8% to 68.0%)</td><td class="num">20.3% to 91.7%</td></tr>
 <tr><td>Contempt</td><td class="num">92.1% (93 of 101; 85.1% to 95.9%)</td><td class="num">91.5% to 93.1%</td></tr>
@@ -135,24 +228,27 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <tr><td>Conspiracy framing</td><td class="num">28.8% (34 of 118; 21.4% to 37.6%)</td><td class="num">3.6%</td></tr>
 <tr><td>Any strong language sign</td><td class="num">90.7% (4,150 of 4,578; 89.8% to 91.5%)</td><td class="num">33.8% to 95.0%</td></tr>
 </tbody></table></div>
+</details>
 <p class="muted">These describe framing, which the corpora do not label. Their figures against hostility labels are context, not error rates.</p>
 <h3>The thread report's "extreme"</h3>
 <p>Precision against Measuring Hate Speech severity labels: <span class="mono">70.3% (896 of 1,275; 67.7% to 72.7%)</span>. Recall: <span class="mono">17.2% (896 of 5,224; 16.2% to 18.2%)</span>. On HateXplain: precision <span class="mono">60.1% (1,950 of 3,246; 58.4% to 61.7%)</span>. Most severe replies do not count as extreme, so the report undercounts them.</p>
 <h2>Persuasion techniques</h2>
-<p>Checked on the Propaganda Techniques Corpus v2 (CC BY 4.0), news articles labelled span by span. A technique shows in the window only when its 95% interval starts at 70% or above, from at least 20 hits.</p>
+<p>Checked on the Propaganda Techniques Corpus v2 (CC BY 4.0), news articles labelled span by span. A technique shows in the window only when its precision is at least 80% and its 95% interval starts at 70% or above, from at least 20 hits. Published systems reach F1 of about 30 to 44 on these techniques, where a confident label is wrong more often than right. Whataboutism needs the whole exchange, so it never shows on one reply. No technique has cleared the bar.</p>
+<details class="how-we-know"><summary>Every technique, with counts</summary>
 <div class="scroll"><table><thead><tr><th scope="col">Technique</th><th scope="col">Precision (95% interval)</th><th scope="col">Recall</th><th scope="col">Chance</th><th scope="col">Status</th></tr></thead><tbody>
-<tr><td>Loaded language</td><td class="num">60.3% (82 of 136; 51.9% to 68.1%)</td><td class="num">7.9% (80 of 1,015; 6.4% to 9.7%)</td><td class="num">2.3%</td><td>Not shown: interval starts below 70%</td></tr>
-<tr><td>Name calling</td><td class="num">48.8% (21 of 43; 34.6% to 63.2%)</td><td class="num">4.4% (21 of 474; 2.9% to 6.7%)</td><td class="num">1.1%</td><td>Not shown: interval starts below 70%</td></tr>
+<tr><td>Loaded language</td><td class="num">60.3% (82 of 136; 51.9% to 68.1%)</td><td class="num">7.9% (80 of 1,015; 6.4% to 9.7%)</td><td class="num">2.3%</td><td>Not shown: precision under 80%</td></tr>
+<tr><td>Name calling</td><td class="num">48.8% (21 of 43; 34.6% to 63.2%)</td><td class="num">4.4% (21 of 474; 2.9% to 6.7%)</td><td class="num">1.1%</td><td>Not shown: precision under 80%</td></tr>
 <tr><td>Bandwagon</td><td class="num">0.0% (0 of 3; 0.0% to 56.2%)</td><td class="num">0.0% (0 of 32; 0.0% to 10.7%)</td><td class="num">0.3%</td><td>Not shown: fewer than 20 hits</td></tr>
 <tr><td>Appeal to fear</td><td class="num">0.0% (0 of 2; 0.0% to 65.8%)</td><td class="num">0.0% (0 of 134; 0.0% to 2.8%)</td><td class="num">1.3%</td><td>Not shown: fewer than 20 hits</td></tr>
-<tr><td>Flag-waving</td><td class="num">40.7% (11 of 27; 24.5% to 59.3%)</td><td class="num">12.8% (11 of 86; 7.3% to 21.5%)</td><td class="num">0.5%</td><td>Not shown: interval starts below 70%</td></tr>
+<tr><td>Flag-waving</td><td class="num">40.7% (11 of 27; 24.5% to 59.3%)</td><td class="num">12.8% (11 of 86; 7.3% to 21.5%)</td><td class="num">0.5%</td><td>Not shown: precision under 80%</td></tr>
 <tr><td>Thought-terminating cliche</td><td class="num">0.0% (0 of 1; 0.0% to 79.3%)</td><td class="num">0.0% (0 of 41; 0.0% to 8.6%)</td><td class="num">0.2%</td><td>Not shown: fewer than 20 hits</td></tr>
-<tr><td>Whataboutism</td><td class="num">0.0% (0 of 1; 0.0% to 79.3%)</td><td class="num">0.0% (0 of 65; 0.0% to 5.6%)</td><td class="num">0.6%</td><td>Not shown: fewer than 20 hits</td></tr>
+<tr><td>Whataboutism</td><td class="num">0.0% (0 of 1; 0.0% to 79.3%)</td><td class="num">0.0% (0 of 65; 0.0% to 5.6%)</td><td class="num">0.6%</td><td>Not shown: held back</td></tr>
 <tr><td>Black-and-white fallacy</td><td class="num">not measured</td><td class="num">0.0% (0 of 42; 0.0% to 8.4%)</td><td class="num">0.5%</td><td>Not shown: held back</td></tr>
 <tr><td>Doubt</td><td class="num">33.3% (1 of 3; 6.1% to 79.2%)</td><td class="num">0.4% (1 of 244; 0.1% to 2.3%)</td><td class="num">3.1%</td><td>Not shown: fewer than 20 hits</td></tr>
 <tr><td>Appeal to authority</td><td class="num">0.0% (0 of 2; 0.0% to 65.8%)</td><td class="num">0.0% (0 of 72; 0.0% to 5.1%)</td><td class="num">1.2%</td><td>Not shown: fewer than 20 hits</td></tr>
 <tr><td>Exaggeration</td><td class="num">10.0% (1 of 10; 1.8% to 40.4%)</td><td class="num">0.5% (1 of 220; 0.1% to 2.5%)</td><td class="num">1.0%</td><td>Not shown: fewer than 20 hits</td></tr>
 </tbody></table></div>
+</details>
 <p class="muted">A technique can carry a true claim; it describes how the post argues. "Chance" is the share of words inside a labelled span of that technique.</p>
 <h2>Cases written for the test</h2>
 <p>Same text as other replies: pair precision <span class="mono">97.7% (85 of 87; 92.0% to 99.4%)</span>, recall <span class="mono">100.0% (85 of 85; 95.7% to 100.0%)</span>. Speaks as local, labelled elsewhere: precision <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>, recall <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>. The same author wrote these cases and the rules, so they show the rules do what they say. They are not error rates on real replies.</p>
@@ -164,6 +260,8 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 </tbody></table></div>
 <p class="muted">Precision agrees across sides within the intervals. Where a gap remains, the thread report undercounts extreme replies aimed at the side with lower recall.</p>
 <h2>Every sign</h2>
+<p>Each of Radar's 52 signs, with the line its window shows beside it.</p>
+<details class="how-we-know"><summary>Every sign and its measured line</summary>
 <div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Kind</th><th scope="col">What the window says</th></tr></thead><tbody>
 <tr><td>Slur or coded hate term</td><td>Language</td><td>Radar's own rule</td><td>precision 91% (95% interval 90 to 92%), 4392 badges checked, held-out test set</td></tr>
 <tr><td>Group stereotype</td><td>Language</td><td>Radar's own rule</td><td>precision 83% (95% interval 75 to 90%), 96 badges checked, held-out test set</td></tr>
@@ -206,18 +304,19 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <tr><td>Content Credentials</td><td>Media</td><td>file</td><td>what the file itself declares; Radar checks the signature, not the claim</td></tr>
 <tr><td>Credentials do not match</td><td>Media</td><td>file</td><td>what the file itself declares; Radar checks the signature, not the claim</td></tr>
 <tr><td>AI-generation metadata</td><td>Media</td><td>file</td><td>what the file itself declares; Radar checks the signature, not the claim</td></tr>
-<tr><td>Persuasion: loaded language</td><td>Language</td><td>Persuasion technique</td><td>held back (interval starts below 70%): precision 60% (95% interval 52 to 68%), 136 spans checked, held-out news articles</td></tr>
-<tr><td>Persuasion: name calling</td><td>Language</td><td>Persuasion technique</td><td>held back (interval starts below 70%): precision 49% (95% interval 35 to 63%), 43 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: loaded language</td><td>Language</td><td>Persuasion technique</td><td>held back (precision under 80%): precision 60% (95% interval 52 to 68%), 136 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: name calling</td><td>Language</td><td>Persuasion technique</td><td>held back (precision under 80%): precision 49% (95% interval 35 to 63%), 43 spans checked, held-out news articles</td></tr>
 <tr><td>Persuasion: bandwagon</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 56%), 3 spans checked, held-out news articles</td></tr>
 <tr><td>Persuasion: appeal to fear</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 66%), 2 spans checked, held-out news articles</td></tr>
-<tr><td>Persuasion: flag-waving</td><td>Language</td><td>Persuasion technique</td><td>held back (interval starts below 70%): precision 41% (95% interval 25 to 59%), 27 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: flag-waving</td><td>Language</td><td>Persuasion technique</td><td>held back (precision under 80%): precision 41% (95% interval 25 to 59%), 27 spans checked, held-out news articles</td></tr>
 <tr><td>Persuasion: thought-terminating cliche</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 79%), 1 spans checked, held-out news articles</td></tr>
-<tr><td>Persuasion: whataboutism</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 79%), 1 spans checked, held-out news articles</td></tr>
+<tr><td>Persuasion: whataboutism</td><td>Language</td><td>Persuasion technique</td><td>held back: needs the whole exchange, so never shown on one reply</td></tr>
 <tr><td>Persuasion: black-and-white fallacy</td><td>Language</td><td>Persuasion technique</td><td>held back: not measured</td></tr>
 <tr><td>Persuasion: doubt</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 33% (95% interval 6 to 79%), 3 spans checked, held-out news articles</td></tr>
 <tr><td>Persuasion: appeal to authority</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 66%), 2 spans checked, held-out news articles</td></tr>
 <tr><td>Persuasion: exaggeration</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 10% (95% interval 2 to 40%), 10 spans checked, held-out news articles</td></tr>
 </tbody></table></div>
+</details>
 <h2>What is not measured</h2>
 <ul><li>Radar's own rules with no measurement yet: Call for vigilantes, Leaked AI text, Machine-writing signs, Spam pattern, Hate symbol in name, Media older than the post, Same upload, many accounts, Same words in other threads, Fact-checked claim, App store elsewhere, Flag of another country, Profile says elsewhere, Active hours fit elsewhere, Replies within a minute, Posts through an automation app, Posts around the clock, Almost only reposts, Very high post rate, New account, Renamed, Sign-up handle, Follows many, few follow back, Low karma for its age. The window says &quot;not measured yet&quot; beside each of them.</li>
 <li>Same text as other replies, and speaks as local, labelled elsewhere: tested only on cases written alongside the rules (below). No error rate on real replies exists yet.</li>
@@ -242,6 +341,7 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <tr><td><a href="https://github.com/punyajoy/HateXplain">HateXplain (Mathew et al. 2021)</a></td><td>MIT</td></tr>
 <tr><td><a href="https://huggingface.co/datasets/google/civil_comments">Civil Comments, test split (Jigsaw / Conversation AI; the corpus behind Jigsaw Unintended Bias)</a></td><td>CC0 1.0</td></tr>
 <tr><td><a href="https://github.com/HKUST-KnowComp/MLMA_hate_speech">MLMA, French part (Ousidhoum et al. 2019)</a></td><td>MIT</td></tr>
+<tr><td><a href="https://doi.org/10.6084/m9.figshare.6392078.v1">PHEME rumour and non-rumour threads (Zubiaga et al. 2016; Kochkina et al. 2018)</a></td><td>CC BY 4.0</td></tr>
 <tr><td><a href="https://zenodo.org/records/3952415">Propaganda Techniques Corpus v2 (Da San Martino et al. 2019; SemEval-2020 Task 11)</a></td><td>CC BY 4.0</td></tr>
 <tr><td><a href="https://github.com/HKUST-KnowComp/MLMA_hate_speech">MLMA, Arabic part (Ousidhoum et al. 2019)</a></td><td>MIT</td></tr>
 <tr><td><a href="https://huggingface.co/datasets/textdetox/multilingual_toxicity_dataset">TextDetox 2024 multilingual toxicity (Dementieva et al. 2024), splits ar, ru, uk, hi</a></td><td>OpenRAIL++ (the compilation); see below</td></tr>

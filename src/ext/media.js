@@ -52,13 +52,24 @@
     return { bytes: out, complete };
   }
 
+  // The survival count on the feed page (src/core/survival.js): the outcome per file, keyed by a
+  // short hash of its address, never the address itself.
+  async function remember(url, result) {
+    try {
+      const log = (await chrome.storage.local.get(PB.MEDIA_KEY))[PB.MEDIA_KEY] || {};
+      await chrome.storage.local.set({ [PB.MEDIA_KEY]: PB.recordCheck(log, { url, host: location.hostname, result }) });
+    } catch (e) { console.error("[radar] could not save the media check count", e); }
+  }
+
   async function check(url) {
     if (!url || (checks.get(url) || {}).state === "reading") return;
     checks.set(url, { state: "reading" });
     PBPop.refresh();
     try {
       const { bytes, complete } = await readBytes(url);
-      checks.set(url, { state: "done", result: await PB.readCredentials(bytes, { complete }) });
+      const result = await PB.readCredentials(bytes, { complete });
+      checks.set(url, { state: "done", result });
+      remember(url, result);
     } catch (e) {
       console.warn("[radar] media check failed", url, e);
       const msg = e instanceof TypeError ? "the media host did not let Radar read the file from this page" : String(e.message || e);

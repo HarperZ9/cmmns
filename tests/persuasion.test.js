@@ -1,7 +1,7 @@
 // Persuasion techniques: span offsets, the ship gate, and the line the window shows.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { techniqueSpans, persuasion, shownTechniques, techniqueStatus, TECHNIQUES, SHIP_LOW,
+import { techniqueSpans, persuasion, shownTechniques, techniqueStatus, TECHNIQUES, SHIP_LOW, SHIP_PRECISION, CONTEXT_ONLY,
   PERSUASION_DOES_NOT_PROVE } from "../src/core/persuasion.js";
 import { MEASURED_PERSUASION } from "../src/core/measured.js";
 
@@ -35,12 +35,17 @@ test("plain disagreement and reporting find no technique", () => {
   }
 });
 
-test("the ship gate needs a held-out lower bound at 0.7 from at least 20 hits", () => {
-  const row = (low, n, split = "test") => ({ precision: low + 0.05, low, high: low + 0.1, n, split });
-  const table = { "loaded-language": row(0.72, 40), "name-calling": row(0.69, 400), "bandwagon": row(0.9, 10), "doubt": row(0.8, 50, "dev") };
+test("the ship gate needs held-out precision of 80% with an interval from 0.7, from at least 20 hits", () => {
+  const row = (low, n, split = "test", precision = low + 0.1) => ({ precision, low, high: low + 0.15, n, split });
+  const table = { "loaded-language": row(0.72, 40), "name-calling": row(0.69, 400, "test", 0.85), "bandwagon": row(0.9, 10), "doubt": row(0.8, 50, "dev"),
+    "flag-waving": row(0.71, 60, "test", 0.78), "whataboutism": row(0.9, 500) };
   assert.equal(SHIP_LOW, 0.7);
+  assert.equal(SHIP_PRECISION, 0.8);
   assert.deepEqual(shownTechniques(table), ["loaded-language"]);
   assert.equal(techniqueStatus("loaded-language", table).shown, true);
+  assert.match(techniqueStatus("flag-waving", table).text, /^held back \(precision under 80%\)/);
+  assert.match(techniqueStatus("whataboutism", table).text, /never shown on one reply/);
+  assert.ok(CONTEXT_ONLY.has("whataboutism"));
   assert.match(techniqueStatus("name-calling", table).text, /^held back \(interval starts below 70%\)/);
   assert.match(techniqueStatus("bandwagon", table).text, /^held back \(fewer than 20 hits\)/);
   assert.equal(techniqueStatus("exaggeration", table).text, "held back: not measured");
@@ -49,7 +54,7 @@ test("the ship gate needs a held-out lower bound at 0.7 from at least 20 hits", 
 test("the committed measurement decides what ships, and every shown row passes the gate", () => {
   for (const t of shownTechniques()) {
     const r = MEASURED_PERSUASION[t];
-    assert.ok(r.split === "test" && r.n >= 20 && r.low >= SHIP_LOW, t);
+    assert.ok(r.split === "test" && r.n >= 20 && r.low >= SHIP_LOW && r.precision >= SHIP_PRECISION && !CONTEXT_ONLY.has(t), t);
   }
   for (const t of Object.keys(TECHNIQUES).filter((x) => !shownTechniques().includes(x))) {
     assert.equal(persuasion("smear, liars, everyone knows, before it's too late", shownTechniques()).some((e) => e.technique === t), false, t);

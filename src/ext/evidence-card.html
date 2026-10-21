@@ -25,9 +25,10 @@
       <button id="share" type="button" class="quiet" hidden>Share…</button>
       <span id="status" role="status" aria-live="polite" class="muted"></span>
     </div>
+    <details id="check"><summary>Check a copy</summary><p>The JSON file carries a SHA-256 hash of the card's content (sorted keys, no spaces, without the hash field). Hash that content to check a copy: <code id="hash" class="hash"></code></p></details>
     <p class="muted">Saving writes two files to this computer. Share hands the same two files to the app you pick. Radar uploads nothing itself.</p>
   </section>
-  <footer>The card covers one thread and names no account. Its JSON carries a SHA-256 hash of its content, printed on the image too, so anyone can check a copy.</footer>
+  <footer>The card covers one thread and names no account. Its JSON carries a hash of its content, so anyone can check a copy.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>

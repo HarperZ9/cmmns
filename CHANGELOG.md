@@ -42,6 +42,44 @@ were not published to a store.
   the 24 answered); median time 25.5 s overall, 18.6 s when answered. Targets of 70% and 3 s: not
   met. The limit is GDELT's availability from this machine, not the query.
 
+### Added (research)
+- What normal looks like, beside every coordination sign. Near-identical replies, bursts of replies,
+  accounts seen together and wording seen in other threads now show how often the same sign turned
+  up in ordinary threads of the same size, with its interval and source: the PHEME corpus of Twitter
+  threads from 2014 and 2015 news events (CC BY 4.0), with independent-posting simulations beside it
+  in `project-docs/EVALUATION.md`. In threads of 20 to 49 replies, a same-text group shows up in 1.4%
+  of ordinary threads and a burst in 2.2%.
+- Look-alike letters no longer hide a copy. A Cyrillic "а" or a Greek "ο" swapped into an English
+  word, fullwidth or mathematical letters, and invisible splitters are folded before the duplicates
+  sign, the cross-thread fingerprint, claim matching and the word lists, using the Unicode
+  confusables table (UTS #39, Unicode License v3). On 100 seeded copies the duplicates sign finds 100,
+  up from 75. Text written in one script, such as Russian, Greek or Arabic, is never changed.
+- Community Note timing: when X loads a note, the window says when it was written, how long after
+  the post and how long ago, from the note's own id. The page does not say when X began to show it.
+- Content Credentials survival on the feed page: of the files you checked, per site, how many still
+  carried intact credentials, how many were changed and how many had none. Radar keeps a short hash
+  of each file's address, never the address (`pb.media.v1`, pruned with your history setting).
+  A CI conformance test holds the count to c2patool's verdicts on the c2pa-rs test files: they agree
+  on which files carry credentials for 42 of 43, and the one miss is named.
+
+### Changed (research)
+- Near-identical replies no longer count text a reply quotes ("RT @outlet: ..." or a quoted post) or
+  the wording of the post it answers. Before this, the sign fired on a third of ordinary threads.
+- Bursts are tested against the thread's local pace as well as its average. The rush of replies
+  after a post had fired the sign on 39% of ordinary threads with 50 or more replies; it now fires
+  on 1.1% to 3.3% by size.
+- Persuasion techniques show only at 80% measured precision or more, with the interval starting at
+  70%, from at least 20 hits; whataboutism never shows on one reply. Published systems score about
+  30 to 44 F1 on these techniques. No technique clears the bar yet, so none shows, as before.
+
+### Changed (design follow-ups)
+- The transparency page leads with one figure per sign: a plain sentence, the interval drawn as a
+  figure, and the counts under "How we know", as on the author's product pages. The dense tables
+  sit in disclosures.
+- The thread card image no longer prints its SHA-256 hash; the hash stays in the JSON file and under
+  "Check a copy" on the card page.
+- Keyboard hints name Conso directly and never fall below 14px.
+
 ### Changed (design)
 - Every Radar surface now uses the design of the author's site: bone and void grounds, ink text,
   Hanken Grotesk for words and Conso for figures, square controls, sections that open on a

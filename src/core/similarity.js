@@ -4,13 +4,17 @@
 //
 // Method: word 3-gram shingles, a 64-hash MinHash signature, banding (16 bands of 4) to find
 // candidate pairs, then the exact Jaccard similarity of the shingle sets to confirm a pair.
+// Look-alike letters are folded first (src/core/confusables.js), so a Cyrillic "а" swapped into a
+// copied reply does not hide the copy.
+
+import { foldConfusables } from "./confusables.js";
 
 export const MIN_WORDS = 6;
 export const JACCARD_MIN = 0.6;
 const HASHES = 64, BANDS = 16, ROWS = HASHES / BANDS;
 
 export function normalize(text) {
-  return String(text || "")
+  return foldConfusables(text)               // look-alike letters from other scripts
     .toLowerCase()
     .replace(/https?:\/\/\S+/g, " ")        // links differ per copy
     .replace(/@\w+/g, " ")                  // so do the handles replied to
@@ -47,13 +51,33 @@ export function jaccard(a, b) {
   return inter / (a.size + b.size - inter);
 }
 
-function wordCount(text) { return normalize(text).split(" ").filter(Boolean).length; }
+// Text a reply quotes rather than writes: a manual retweet ("nice RT @user: ...", everything after
+// the marker) and a quoted post ("“@user: ...”"). Copying what you quote is not writing the same
+// reply; on ordinary Twitter threads it made a third of threads look coordinated
+// (project-docs/EVALUATION.md, organic baselines).
+export function ownWords(text) {
+  return String(text || "")
+    .replace(/(?:^|\s)(?:RT|MT)\s*:?\s*[“"]?@\w+[\s\S]*$/, " ")
+    .replace(/[“"]\s*@\w+\s*:?[^”"]*(?:[”"]|$)/g, " ");
+}
 
-// replies: [{ id, author, text }]. Returns clusters of two or more replies from two or more
-// distinct authors: [{ ids: [...], authors: [...], similarity }], largest first.
-export function duplicateClusters(replies) {
-  const items = replies.filter((r) => wordCount(r.text) >= MIN_WORDS)
-    .map((r) => { const sh = shingles(r.text); return { ...r, sh, sig: signature(sh) }; });
+// A reply's shingles without those it shares with the post it answers: repeating the headline
+// being replied to is not copying another reply.
+function ownShingles(text, rootSh) {
+  const sh = shingles(ownWords(text));
+  if (rootSh) for (const x of rootSh) sh.delete(x);
+  return sh;
+}
+
+// replies: [{ id, author, text }]; root: the post replied to, { text }, or null. Returns clusters
+// of two or more replies from two or more distinct authors: [{ ids, authors, similarity }],
+// largest first. A reply counts only when it has MIN_WORDS words of its own and keeps at least
+// MIN_WORDS - 2 shingles after the root post's wording is set aside.
+export function duplicateClusters(replies, { root = null } = {}) {
+  const rootSh = root && root.text ? shingles(root.text) : null;
+  const items = replies.filter((r) => normalize(ownWords(r.text)).split(" ").filter(Boolean).length >= MIN_WORDS)
+    .map((r) => ({ ...r, sh: ownShingles(r.text, rootSh) })).filter((r) => r.sh.size >= MIN_WORDS - 2)
+    .map((r) => ({ ...r, sig: signature(r.sh) }));
   const parent = items.map((_, i) => i);
   const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
   const buckets = new Map();

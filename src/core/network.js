@@ -5,6 +5,9 @@
 // that have appeared together before. Entries older than RETAIN_DAYS are dropped; the user can
 // clear the log. Nothing is linked across platforms.
 
+import { foldConfusables } from "./confusables.js";
+import { ownWords } from "./similarity.js";
+
 export const RETAIN_DAYS = 30, MAX_THREADS = 2000;
 const DAY = 86400000;
 
@@ -84,11 +87,12 @@ export function activeHours(times) {
 }
 
 // A short fingerprint of a reply's wording, for spotting the same text in other threads. Links,
-// mentions, case and punctuation are ignored. Short replies ("so true") return null: they repeat
+// mentions, case, punctuation and look-alike letters from other scripts are ignored, and so is
+// text the reply quotes (a manual retweet or a quoted post), as in similarity.js. Short replies ("so true") return null: they repeat
 // by chance.
 export const MIN_FP_WORDS = 8;
 export function fingerprint(text) {
-  const w = String(text || "").toLowerCase().replace(/https?:\/\/\S+|@\w+/g, " ").replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
+  const w = foldConfusables(ownWords(text)).toLowerCase().replace(/https?:\/\/\S+|@\w+/g, " ").replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
   if (w.length < MIN_FP_WORDS) return null;
   const s = w.join(" ");
   let h = 2166136261;

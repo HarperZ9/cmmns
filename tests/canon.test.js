@@ -69,3 +69,32 @@ test("no pill or rounded-card shapes and no tracked uppercase labels", () => {
     assert.doesNotMatch(css, /text-transform:\s*uppercase/, `${p}: labels are mixed case`);
   }
 });
+
+test("keyboard hints are set in Conso, never in a browser's default face, and at 14px or more", () => {
+  const css = read("src/ext/pages.css");
+  const rule = (css.match(/(?:^|\n)kbd\s*\{[^}]*\}/) || [""])[0];
+  assert.match(rule, /font-family:\s*var\(--font-mono\)/);
+  assert.match(rule, /font-size:\s*max\([^)]*14px\)/);
+  assert.match(read("src/ext/canon.css"), /--font-mono:\s*"Conso",[^;]*monospace;/, "the mono stack ends in monospace, never serif");
+  for (const p of list("src/ext", /\.html$/).filter((f) => read(f).includes("<kbd>"))) assert.match(read(p), /href="pages\.css"/, p);
+});
+
+test("the thread card keeps its hash out of the default view", () => {
+  const html = read("src/ext/evidence-card.html");
+  assert.match(html, /<details id="check"><summary>Check a copy<\/summary>[^]*id="hash"/);
+  assert.doesNotMatch(html.replace(/<details id="check">[^]*?<\/details>/, ""), /SHA-256/);
+});
+
+test("the transparency page leads with one figure per sign and keeps counts collapsed", () => {
+  const html = read("docs/transparency.html");
+  const signs = html.match(/<section class="sign">[^]*?<\/section>/g) || [];
+  assert.ok(signs.length >= 10, `${signs.length} sign blocks`);
+  for (const s of signs) {
+    assert.match(s, /<p class="takeaway">/);
+    assert.match(s, /<svg class="ci-fig"[^>]*role="img" aria-label="[^"]*95% interval/);
+    assert.match(s, /<details class="how-we-know"><summary>How we know<\/summary>/);
+    const lead = s.replace(/<details[^]*<\/details>/, "");
+    assert.doesNotMatch(lead, /\d of \d/, "counts sit in the disclosure, not the lead");
+  }
+  assert.ok(html.indexOf('<section class="sign">') < html.indexOf("<h2>Language signs</h2>"), "figures come first");
+});

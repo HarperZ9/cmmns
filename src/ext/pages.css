@@ -36,7 +36,10 @@ table { font-size: .95em; }
 td.mono { white-space: normal; }
 .status { min-height: 1.5em; margin-top: var(--s-3); }
 .done { padding: var(--s-4) var(--s-5); border: 1px solid var(--ink); background: var(--panel); }
-kbd { font-size: .9em; padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: var(--radius-control); background: var(--inset); }
+/* Keyboard hints set in Conso, the canon's face for code, named here so no browser default
+   (a serif in some engines' kbd fallback) can reach them; never below the 14px label floor. */
+kbd { font-family: var(--font-mono); font-weight: 400; font-size: max(.9em, 14px); padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: var(--radius-control); background: var(--inset); }
+code.hash { overflow-wrap: anywhere; }
 footer { margin-top: var(--s-6); padding-top: var(--s-4); border-top: 1px solid var(--line); color: var(--soft); font-size: var(--t-meta); }
 @media (max-width: 640px) { .cols { grid-template-columns: 1fr; gap: 0; } .hero { grid-template-columns: 1fr; } .hero svg { width: 96px; height: 96px; } }
 .pb-calm .switch input::after { transition: none; }

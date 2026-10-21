@@ -98,7 +98,7 @@
     trailLog = {}; netLog = {}; lastRecorded = "";
     if (globalThis.PBMeta) PBMeta.clear().catch((e) => console.error("[radar] could not clear account readings", e));
     feedPending = [];
-    return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY, FEED_KEY]);
+    return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY, FEED_KEY, PB.MEDIA_KEY]);
   }
 
   // A local file the user can keep or share: the report, per-account labels and flags with what
