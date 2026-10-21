@@ -34,8 +34,10 @@
     if (wait) await new Promise((r) => setTimeout(r, wait));
     lastCall = Date.now();
     const t0 = Date.now();
-    const res = await fetch(url, { credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store" });
-    const text = await res.text();
+    // GDELT answers "Please limit requests" when it is busy; one retry after 6 seconds, same words.
+    const ask = async () => (await fetch(url, { credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store" })).text();
+    let text = await ask();
+    if (/^Please limit/.test(text)) { await new Promise((r) => setTimeout(r, 6000)); lastCall = Date.now(); text = await ask(); }
     let json = null;
     try { json = JSON.parse(text); } catch { return { error: "gdelt", detail: text.slice(0, 160), ms: Date.now() - t0 }; }
     await tables();

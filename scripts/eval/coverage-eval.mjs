@@ -39,7 +39,9 @@ for (const s of set) {
   const t0 = Date.now();
   let r;
   try {
-    const text = await (await fetch(url, { headers: UA })).text();
+    // As the extension does: one retry after 6 seconds when GDELT says it is busy.
+    let text = await (await fetch(url, { headers: UA })).text();
+    if (/^Please limit/.test(text)) { await sleep(6000); text = await (await fetch(url, { headers: UA })).text(); }
     const ms = Date.now() - t0;
     try { const list = coverageList(JSON.parse(text), { self: s.self }); r = { ...s, ms, outlets: list.length, groups: coverageGroups(list) }; } catch { r = { ...s, ms, error: text.slice(0, 80) }; }
   } catch (e) { r = { ...s, ms: Date.now() - t0, error: e.message }; }
