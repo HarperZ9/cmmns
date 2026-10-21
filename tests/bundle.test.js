@@ -1,5 +1,6 @@
 // The extension loads src/ext/core.bundle.js, not src/core. This test fails when the bundle is
-// stale, so a core change cannot ship without `npm run build`.
+// stale, so a core change cannot ship without `npm run build`. Line endings are ignored: a Windows
+// checkout can hold CRLF while the build writes LF, and that is not staleness.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, copyFileSync, rmSync } from "node:fs";
@@ -11,12 +12,13 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const bundle = join(root, "src/ext/core.bundle.js");
 
 test("core.bundle.js matches a fresh build of src/core", () => {
+  const lf = (s) => s.split("\r\n").join("\n");
   const before = readFileSync(bundle, "utf8");
   const backup = bundle + ".bak";
   copyFileSync(bundle, backup);
   try {
     execFileSync(process.execPath, [join(root, "scripts/build.mjs")], { stdio: "ignore" });
-    assert.equal(readFileSync(bundle, "utf8"), before, "run `npm run build` and commit the bundle");
+    assert.equal(lf(readFileSync(bundle, "utf8")), lf(before), "run `npm run build` and commit the bundle");
   } finally {
     copyFileSync(backup, bundle);
     rmSync(backup);
