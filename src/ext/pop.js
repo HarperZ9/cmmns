@@ -7,11 +7,12 @@
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const OPEN_MS = 450, CLOSE_MS = 260, FADE_MS = 160;
   const TABS = [["overview", "Overview"], ["account", "Account"], ["post", "This post"], ["history", "History"]];
-  let pop = null, owner = null, pinned = false, openTimer = 0, closeTimer = 0, lastTab = "overview";
+  let pop = null, owner = null, pinned = false, openTimer = 0, closeTimer = 0, lastTab = "overview", uid = 0, quiet = null;
 
-  function close(now) {
+  function close(now, refocus) {
     clearTimeout(openTimer); clearTimeout(closeTimer);
-    const p = pop;
+    const p = pop, o = owner;
+    if (refocus && o && p && (p.contains(document.activeElement) || o.contains(document.activeElement))) { if (document.activeElement !== o) quiet = o; o.focus({ preventScroll: true }); }
     pop = null; owner = null; pinned = false;
     if (!p) return;
     if (now) { p.remove(); return; }
@@ -87,11 +88,12 @@
     if (g.warn && g.warn.length) box.append(el("div", "pb-g-warn", g.warn.join(" · ")));
     if (g.areas) {
       const strip = el("div", "pb-strip");
-      strip.setAttribute("role", "list");
+      strip.setAttribute("role", "group");
+      strip.setAttribute("aria-label", "Areas");
       for (const a of g.areas) {
-        const b = el("button", `pb-area pb-a-${a.level}`); b.type = "button"; b.setAttribute("role", "listitem");
+        const b = el("button", `pb-area pb-a-${a.level}`); b.type = "button";
         b.append(el("i"), el("span", null, a.name));
-        b.title = a.level === "none" ? `${a.name}: nothing found in what the site shows` : `${a.name}: ${a.n} sign${a.n === 1 ? "" : "s"}${a.level === "warn" ? ", worth a look" : ""}`;
+        b.title = b.ariaLabel = a.level === "none" ? `${a.name}: nothing found in what the site shows` : `${a.name}: ${a.n} sign${a.n === 1 ? "" : "s"}${a.level === "warn" ? ", worth a look" : ""}`;
         if (a.n) b.addEventListener("click", (e) => { e.stopPropagation(); select("overview", a.id); });
         else b.disabled = true;
         strip.append(b);
@@ -105,13 +107,18 @@
   function build(sections) {
     const p = el("div", "pb-pop");
     p.setAttribute("role", "dialog");
-    p.setAttribute("aria-label", "Radar");
-    const panes = new Map(TABS.map(([id]) => [id, el("div", "pb-pane")]));
-    const tabbar = el("nav", "pb-tabs");
+    const g = (sections.find((s) => s.glance) || {}).glance;
+    p.setAttribute("aria-label", g && g.who ? `Radar: ${g.who}` : "Radar");
+    p.tabIndex = -1;
+    const n = ++uid;
+    const panes = new Map(TABS.map(([id]) => { const pane = el("div", "pb-pane"); pane.id = `pb-pane-${n}-${id}`; pane.setAttribute("role", "tabpanel"); pane.setAttribute("aria-labelledby", `pb-tab-${n}-${id}`); return [id, pane]; }));
+    const tabbar = el("div", "pb-tabs");
+    tabbar.setAttribute("role", "tablist");
+    tabbar.setAttribute("aria-label", "Radar sections");
     const select = (id, area) => {
       lastTab = id;
       for (const [k, pane] of panes) pane.hidden = k !== id;
-      for (const b of tabbar.children) b.setAttribute("aria-selected", String(b.dataset.tab === id));
+      for (const b of tabbar.children) { const on = b.dataset.tab === id; b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1; }
       if (area) { const sec = panes.get(id).querySelector(`[data-area="${area}"]`); if (sec) { sec.querySelectorAll("details").forEach((d) => (d.open = true)); sec.scrollIntoView({ block: "nearest" }); } }
     };
     for (const s of sections) {
@@ -122,9 +129,19 @@
     for (const [id, name] of TABS) {
       if (!panes.get(id).childNodes.length) continue;
       const b = el("button", "pb-tab", name); b.type = "button"; b.dataset.tab = id; b.setAttribute("role", "tab");
+      b.id = `pb-tab-${n}-${id}`; b.setAttribute("aria-controls", `pb-pane-${n}-${id}`);
       b.addEventListener("click", (e) => { e.stopPropagation(); select(id); });
       tabbar.append(b);
     }
+    // Arrow keys move between tabs, as in any tab list.
+    tabbar.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const tabs = [...tabbar.children], i = tabs.indexOf(document.activeElement);
+      if (i < 0) return;
+      const next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+      e.preventDefault(); select(next.dataset.tab); next.focus();
+    });
+    p.addEventListener("focusin", () => { pinned = true; clearTimeout(closeTimer); });
     p.append(tabbar, ...[...panes.values()].filter((x) => x.childNodes.length));
     select(panes.get(lastTab).childNodes.length ? lastTab : "overview");
     p.addEventListener("pointerenter", () => clearTimeout(closeTimer));
@@ -154,13 +171,24 @@
     requestAnimationFrame(() => p.classList.add("pb-in"));
   }
 
+  // Returns the window, or null when there is nothing to show (Radar is off for the site).
   function show(target, sections) {
     clearTimeout(closeTimer);
-    if (owner === target && pop) return;
+    if (owner === target && pop) return pop;
+    const list = typeof sections === "function" ? sections() : sections;
     close(true);
-    pop = build(typeof sections === "function" ? sections() : sections);
+    if (!list) return null;
+    pop = build(list);
     owner = target;
     place(pop, target);
+    return pop;
+  }
+  // Move keyboard focus into the open window: the selected tab, or the window itself.
+  function enter(p) {
+    if (!p) return;
+    pinned = true;
+    const tab = p.querySelector('.pb-tab[aria-selected="true"]');
+    (tab || p).focus({ preventScroll: true });
   }
 
   // Wire a post. `sections` is a function, so the window is built only when it opens and always
@@ -171,11 +199,19 @@
     target.__pbWired = true;
     target.addEventListener("pointerenter", () => { clearTimeout(openTimer); openTimer = setTimeout(() => show(target, () => target.__pbSections()), OPEN_MS); });
     target.addEventListener("pointerleave", () => { clearTimeout(openTimer); if (!pinned && owner === target) closeTimer = setTimeout(() => close(), CLOSE_MS); });
-    // Keyboard: Alt+R on a focused post opens its window.
-    target.addEventListener("keydown", (e) => { if (e.altKey && (e.key === "r" || e.key === "R")) { e.preventDefault(); show(target, () => target.__pbSections()); pinned = true; } });
+    // Keyboard: focusing the post opens its window; Alt+R moves focus into it; Escape closes it
+    // and returns focus to the post. Focus leaving both the post and the window closes it.
+    target.addEventListener("focusin", (e) => { if (e.target !== target) return; if (quiet === target) { quiet = null; return; } clearTimeout(openTimer); openTimer = setTimeout(() => show(target, () => target.__pbSections()), 150); });
+    target.addEventListener("focusout", (e) => {
+      if (owner !== target || !pop || pop.contains(e.relatedTarget) || target.contains(e.relatedTarget)) return;
+      clearTimeout(openTimer); close();
+    });
+    target.addEventListener("keydown", (e) => { if (e.altKey && (e.key === "r" || e.key === "R")) { e.preventDefault(); enter(show(target, () => target.__pbSections())); } });
   }
 
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); }, true);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pop) close(false, true); }, true);
+  // Focus leaving the window (Tab past its last control) closes it, unless it went back to the post.
+  document.addEventListener("focusin", (e) => { if (pop && !pop.contains(e.target) && !(owner && owner.contains(e.target))) close(); }, true);
   document.addEventListener("pointerdown", (e) => { if (pop && pinned && !pop.contains(e.target)) close(); }, true);
   window.addEventListener("scroll", () => { if (pop && !pinned) close(); }, { passive: true });
 

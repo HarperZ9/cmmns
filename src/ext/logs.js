@@ -17,8 +17,23 @@
     } catch (e) { console.error("[radar] owner lookup failed", e); }
   }
 
+  // Fact-checked claims similar to each post on screen, asked once per post (src/core/claims.js).
+  const askedClaims = new Set(), claimHits = new Map();
+  async function ensureClaims(items) {
+    const posts = items.filter((r) => r.id && r.text && !askedClaims.has(r.id)).map((r) => ({ id: r.id, text: r.text }));
+    if (!posts.length) return;
+    posts.forEach((p) => askedClaims.add(p.id));
+    try {
+      const got = await chrome.runtime.sendMessage({ type: "pb-claims", posts });
+      for (const [id, hits] of Object.entries(got || {})) claimHits.set(id, hits);
+    } catch (e) { console.error("[radar] claim lookup failed", e); }
+  }
+  const claimsOf = (id) => claimHits.get(id) || null;
+
   // Local connections log (src/core/network.js): which accounts replied where, and how fast.
-  const NET_KEY = "pb.net.v1";
+  // v2: threads keyed by post id (src/core/threadkey.js); v1 keyed by path and could count one
+  // thread twice, so its entries are left behind rather than mixed in.
+  const NET_KEY = "pb.net.v2";
   let netLog = {}, lastRecorded = "";
   chrome.storage.local.get(NET_KEY).then((g) => { netLog = g[NET_KEY] || {}; }).catch(() => {});
   function recordNet(threadKey, replies, root) {
@@ -53,8 +68,17 @@
     }, 3000);
   }
 
+  // Another tab, the options page or the background prune can change or clear these logs; keep
+  // the in-memory copies current so an old copy is never written back.
+  if (chrome.storage.onChanged) chrome.storage.onChanged.addListener((ch, area) => {
+    if (area !== "local") return;
+    if (ch[NET_KEY]) { netLog = ch[NET_KEY].newValue || {}; if (!ch[NET_KEY].newValue) lastRecorded = ""; }
+    if (ch[TRAIL_KEY]) trailLog = ch[TRAIL_KEY].newValue || {};
+  });
+
   function clearAll() {
     trailLog = {}; netLog = {}; lastRecorded = "";
+    if (globalThis.PBMeta) PBMeta.clear().catch((e) => console.error("[radar] could not clear account readings", e));
     return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY]);
   }
 
@@ -75,5 +99,5 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   }
 
-  globalThis.PBLogs = Object.freeze({ ensureOwners, recordNet, recordTrail, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
+  globalThis.PBLogs = Object.freeze({ ensureOwners, ensureClaims, claimsOf, recordNet, recordTrail, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
 })();

@@ -132,7 +132,7 @@ function normalize(text) {
     .toLowerCase()
     .replace(/https?:\/\/\S+/g, " ")        // links differ per copy
     .replace(/@\w+/g, " ")                  // so do the handles replied to
-    .replace(/[^\p{L}\p{N}\s]/gu, " ")      // punctuation and emoji
+    .replace(/[^\p{L}\p{M}\p{N}\s]/gu, " ") // punctuation and emoji; combining marks stay in words
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -404,6 +404,9 @@ const HIGH_VOLUME_PER_DAY = 100;
 const DEFAULT_HANDLE = /^[A-Za-z]+_?[0-9]{6,}$/;
 
 const DAY = 86400000;
+// Moderation label values about authenticity. Labels about content (rude, intolerant, nudity)
+// are shown on the card but never flag the account.
+const PLATFORM_AUTH_LABELS = new Set(["spam", "impersonation", "scam", "inauthentic", "engagement-farming"]);
 // X's own apps; posts from anything else came through a third-party or automation tool.
 const COMMON_APP = /^(?:Twitter|X) (?:for (?:iPhone|Android|iPad|Mac)|Web App|Web Client)$/;
 // Self-chosen names that carry documented hate symbols (ADL Hate Symbols database).
@@ -430,6 +433,7 @@ const DOES_NOT_PROVE = {
   "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
   "profile-location-elsewhere": "Profile locations are typed by the user, can be out of date or a joke, and people live abroad.",
   "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
+  "platform-label": "A moderation label is the service's own judgement; labels can be wrong, disputed or applied in bulk.",
   "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
 };
 
@@ -514,6 +518,9 @@ function flagsFor(account, context = {}) {
   if (sym) out.push({ id: "hate-symbol-name", evidence: `name contains "${sym[0].trim()}", a documented hate symbol or slur` });
   // Reddit: little karma after more than a month, and Reddit's suggested sign-up name.
   if (Number.isFinite(account.karma) && age != null && age > NEW_ACCOUNT_DAYS && account.karma < LOW_KARMA) out.push({ id: "low-karma", evidence: `${account.karma} karma after ${age} days` });
+  // Bluesky: moderation labels about how an account behaves, not what it says.
+  const auth = (account.platformLabels || []).filter((l) => PLATFORM_AUTH_LABELS.has(l));
+  if (auth.length) out.push({ id: "platform-label", evidence: `labelled "${auth.join('", "')}" by ${account.labelSource || "the platform's moderation"}` });
   if (account.redditDefaultName) out.push({ id: "default-handle", evidence: "username has the pattern Reddit suggests at sign-up" });
   if (account.handle && DEFAULT_HANDLE.test(account.handle)) out.push({ id: "default-handle", evidence: `handle @${account.handle} has the sign-up pattern` });
   if (context.mismatch && context.mismatch.status === "mismatch") out.push({ id: "based-elsewhere", evidence: context.mismatch.reason + (account.proxyNote ? " (X notes a possible VPN or proxy, so the label may be wrong)" : "") });
@@ -525,15 +532,22 @@ function flagsFor(account, context = {}) {
   return out.map((f) => ({ ...f, doesNotProve: DOES_NOT_PROVE[f.id] }));
 }
 
-// An account counts as "flagged" for the thread report when it has at least one authenticity
-// flag. The weak default-handle signal does not count, and neither does a hate symbol in the name:
-// that is about what the account says, and counting it would make the report circular.
+// An account counts as "flagged" for the thread report when it has one strong authenticity flag
+// or two different weak ones. Weak flags are place and timing context that ordinary expats,
+// diaspora and night owls trip; on a live thread about the riots in France they alone put half
+// the repliers in the flagged group. The default-handle signal never counts, and neither does a
+// hate symbol in the name: that is about what the account says, and counting it would make the
+// report circular.
 const NOT_AUTHENTICITY = new Set(["default-handle", "hate-symbol-name", "follow-pattern"]);
+const WEAK_FLAGS = new Set(["store-elsewhere", "profile-location-elsewhere", "flag-elsewhere", "hours-elsewhere",
+  "fast-replier", "repost-only", "low-karma"]);
 function isFlagged(flags) {
-  return flags.some((f) => !NOT_AUTHENTICITY.has(f.id));
+  const counted = flags.filter((f) => !NOT_AUTHENTICITY.has(f.id));
+  if (counted.some((f) => !WEAK_FLAGS.has(f.id))) return true;
+  return new Set(counted.map((f) => f.id)).size >= 2;
 }
 
-return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, HIGH_VOLUME_PER_DAY, DEFAULT_HANDLE, DOES_NOT_PROVE, ageDays, storeCountry, nameFlags, flagsFor, isFlagged };
+return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, HIGH_VOLUME_PER_DAY, DEFAULT_HANDLE, PLATFORM_AUTH_LABELS, DOES_NOT_PROVE, ageDays, storeCountry, nameFlags, flagsFor, WEAK_FLAGS, isFlagged };
 })();
 
 // ---- lexicon.js
@@ -541,14 +555,15 @@ const M_lexicon = (() => {
 // Radar's word lists, kept apart from the matching code so they can be reviewed and updated in
 // one place. Every list covers targets in every direction; tests/rhetoric.symmetry.test.js holds
 // the scoring to equal treatment. Sources for slurs and coded terms: the ADL Hate Symbols
-// database, Hatebase, GNET and ISD extremism glossaries. Words that people also use innocently
+// database, Hatebase, GNET and ISD extremism glossaries; terms added for side recall on 2026-10-21 cite
+// Wiktionary labels in project-docs/evidence/LEXICON-SOURCES.md. Words that people also use innocently
 // (a jogger, crackers, gypsy as a self-name) go in the SOFT lists, which count for less.
 
 // People named as groups. Matching any of these lets the grammar rules ("X are vermin",
 // "all X are", "X want to destroy") apply.
 const GROUPS = [
   // origin, faith, ethnicity, nationality
-  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "jews", "christians", "hindus", "sikhs", "atheists",
+  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "moslems", "jews", "christians", "hindus", "sikhs", "atheists",
   "arabs", "africans", "blacks", "black people", "whites", "white people", "asians", "latinos", "hispanics", "mexicans", "chinese",
   "indians", "pakistanis", "somalis", "haitians", "russians", "ukrainians", "americans", "europeans", "french", "roma", "natives",
   // faiths named as a whole, so "war on Islam" reads like "war on Muslims"
@@ -563,19 +578,42 @@ const GROUPS = [
   "the rich", "billionaires", "elites", "the elite", "landlords", "bankers", "politicians", "police", "cops", "protesters",
   "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "lesbians", "trans people", "transgenders",
   "feminists", "disabled people", "the disabled", "farmers", "unions",
+  // added 2026-10-21 from the dev split, one per direction where both exist
+  "evangelicals", "catholics", "white men", "white women", "black men", "black women", "straight people", "straights",
+  "gay people", "gay men", "queers", "jewish people", "muslim people", "christian people", "caucasians", "white kids",
+  "black kids", "white guys", "black guys", "white girls", "black girls", "hillbillies", "arab people", "asian people",
+  // added 2026-10-21 for the side-recall fix (project-docs/evidence/LEXICON-SOURCES.md): a self-named group, and
+  // political coinages from both directions, so the grammar reads "trumptards are scum" like "libtards are scum"
+  "incels", "trumptards", "trumpanzees", "rethuglicans", "repugnicans", "demonrats", "conservatards",
 ];
+
+// The dehumanising nouns that stay unambiguous right after a group ("commie filth", "migrant rats").
+// Words with ordinary uses next to a group noun ("police dogs", "women with cancer") are left out.
+const DEHUMANISE_ADJACENT = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "subhuman",
+  "sub-human", "savages", "filth", "scum", "insects", "apes", "monkeys", "beasts", "pigs", "invaders"];
+
+// "An infestation of X", "hordes of X".
+const SWARM = ["infestation", "plague", "swarm", "swarms", "horde", "hordes"];
 
 const DEHUMANISE = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "animals", "savages", "subhuman",
   "sub-human", "infestation", "plague", "disease", "cancer", "filth", "scum", "pigs", "insects", "invaders", "a virus", "apes",
   "monkeys", "beasts", "dogs"];
 
 // Physical harm only: deporting or jailing people under a law is a policy position, not a marker.
-const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed",
-  "lynched", "beaten", "burned alive", "purged", "eliminated"];
+const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed", "genocided",
+  "lynched", "beaten", "burned alive", "purged", "eliminated",
+  "murdered", "tortured"];
 
-const VIOLENT_SLOGANS = ["helicopter rides", "day of the rope", "string them up", "line them up", "round them up",
+// Active calls: "we should exterminate X", "let's kill all the X". Physical harm only, as above.
+const KILL_VERBS = ["exterminate", "kill", "shoot", "hang", "gas", "lynch", "wipe out", "eradicate", "massacre",
+  "slaughter", "execute", "burn", "genocide", "nuke", "murder", "torture"];
+
+// Death wishes after "deserve to", "should all": "X deserve to die".
+const DEATH_WISH = ["die", "rot", "burn in hell", "be put down", "be wiped off the earth"];
+
+const VIOLENT_SLOGANS = ["free helicopter rides", "day of the rope", "string them up", "line them up", "round them up",
   "hang them all", "kill them all", "deport them all", "send them all back", "nuke them", "nuke the bastards", "pull out the guns",
-  "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines", "bash the fash", "punch a nazi", "death to"];
+  "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines", "bash the fash", "punch a nazi"];
 
 const VIGILANTE = ["will deal with them", "deal with them ourselves", "take care of them ourselves",
   "take matters into our own hands", "take matters into their own hands", "bring in the army", "bring their armies in",
@@ -604,7 +642,12 @@ const ESSENTIALISE = ["import third world", "import the third world", "importing
 // Stereotype traits: "<group> are <trait>" names a whole group by a trait.
 const STEREOTYPE_TRAITS = ["lazy", "criminals", "criminal", "thieves", "violent", "dirty", "filthy", "stupid", "dumb",
   "terrorists", "rapists", "savage", "greedy", "inbred", "degenerates", "degenerate", "pedophiles", "paedophiles", "groomers",
-  "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil"];
+  "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil",
+  "disgusting", "worthless", "useless", "ugly", "garbage"];
+
+// Intensifiers allowed between "are" and the trait: "X are fucking stupid", "X are inherently violent".
+const INTENSIFIERS = ["fucking", "so", "too", "really", "damn", "inherently", "naturally", "genetically", "always",
+  "basically", "literally", "very"];
 
 // Invented motives: "<group> want to destroy / replace / ban ..." puts an aim in a whole group's mouth.
 const MOTIVE_VERBS = ["destroy", "replace", "ban", "erase", "kill", "eliminate", "enslave", "take over", "wipe out",
@@ -614,7 +657,7 @@ const MOTIVE_VERBS = ["destroy", "replace", "ban", "erase", "kill", "eliminate",
 const SLURS = [
   // anti-Black
   "nigger", "niggers", "coon", "coons", "jigaboo", "porch monkey", "porch monkeys", "sambo", "darkie", "darkies", "jungle bunny",
-  "spearchucker", "groid", "groids", "sheboon", "pavement ape", "dindu", "dindu nuffin", "chimp out", "chimped out",
+  "spearchucker", "groid", "groids", "sheboon", "pavement ape", "chimp out", "chimped out",
   "black fatigue", "13/50", "despite being 13", "basketball americans", "fatherless behavior", "fatherless behaviour",
   "planet of the apes",
   // anti-Asian
@@ -625,7 +668,7 @@ const SLURS = [
   // anti-Latino
   "wetback", "wetbacks", "beaner", "beaners", "spic", "spics",
   // antisemitic
-  "kike", "kikes", "hymie", "heeb", "heebs", "(((", ")))", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough",
+  "kike", "kikes", "hymie", "heeb", "heebs", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough",
   "oy vey shut it down", "early life section", "the noticing",
   // anti-Arab and anti-Muslim
   "towelhead", "towelheads", "raghead", "ragheads", "sand nigger", "sand niggers", "camel jockey", "mudslime", "mudslimes",
@@ -633,7 +676,14 @@ const SLURS = [
   // anti-Indigenous and anti-Roma
   "redskin", "redskins", "injun", "injuns", "squaw", "gyppo", "gyppos",
   // anti-white
-  "honky", "honkies", "honkey", "whitey", "peckerwood", "white devils", "kill all whites",
+  "whitey", "cracka", "crackas", "white devil", "peckerwood", "white devils", "kill all whites",
+  // added 2026-10-21 (side-recall fix; sources in project-docs/evidence/LEXICON-SOURCES.md)
+  "white trash", "trailer trash", "wigger", "wiggers", "whigger", "whiggers", "mudshark", "mudsharks",
+  // anti-Christian and anti-Catholic
+  "bible thumper", "bible thumpers", "bible-thumper", "bible-thumpers", "fundie", "fundies", "christofascist", "christofascists",
+  "papist", "papists", "christard", "christards",
+  // aimed at men and at conservatives
+  "cuck", "cucks", "cuckservative", "cuckservatives", "soyboy", "soyboys", "soy boy", "soy boys",
   // anti-LGBTQ
   "faggot", "faggots", "tranny", "trannies", "troon", "troons", "shemale", "shemales", "poofter",
   // disability
@@ -645,18 +695,587 @@ const SLURS = [
 ];
 
 // Context-dependent: innocent in many uses (weight 1, counted only beside another marker).
-const SLURS_SOFT = ["leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
+// Moved from SLURS on 2026-10-21: the upper 95% bound of their dev-split precision was under 0.75
+// (project-docs/EVALUATION.md). One anti-white and one anti-Black term; the rule is the same for every list.
+const SLURS_DEMOTED = ["honky", "honkies", "honkey", "dindu", "dindu nuffin"];
+
+const SLURS_SOFT = [...SLURS_DEMOTED, "leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
   "religion of peace", "it's always them", "its always them", "thug", "thugs", "ghetto", "illegals", "dyke", "dykes", "thot",
-  "thots", "fag", "fags", "cripple", "cripples", "white trash", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
+  "thots", "fag", "fags", "cripple", "cripples", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
 
 // Disguised spellings: "n1gg3r", "f@g", "k1ke". Applied before slur matching only.
+// "<identity> bitch", "<identity> whores": a gendered slur fused with an identity word. The same
+// identity words for every direction (tests/rhetoric.symmetry.test.js).
+const IDENTITY_ADJ = ["white", "black", "asian", "mexican", "jewish", "arab", "muslim", "latina", "latino", "brown",
+  "indian", "chinese", "gay", "christian", "hispanic"];
+const GENDERED_SLURS = ["bitch", "bitches", "hoe", "hoes", "whore", "whores", "slut", "sluts", "cunt", "cunts"];
+
 const LEET = { "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a", "$": "s", "!": "i" };
 
 // "They hate beauty / us / the West": a hatred put in a whole group's mouth (counts as motive).
 const HATRED_OBJECTS = ["beauty", "us", "the west", "western civilization", "our way of life", "our culture", "our freedom",
   "freedom", "christians", "jews", "muslims", "white people", "black people", "women", "america", "europe", "france"];
 
-return { GROUPS, DEHUMANISE, VIOLENCE_VERBS, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, MOTIVE_VERBS, SLURS, SLURS_SOFT, LEET, HATRED_OBJECTS };
+// Declared hatred of a whole group ("I hate X", "fuck all the X"). Weight 1: anger counts for
+// little on its own, and it never labels the post.
+const CONTEMPT_VERBS = ["hate", "despise", "loathe", "can't stand", "cant stand"];
+
+return { GROUPS, DEHUMANISE_ADJACENT, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, SLURS_DEMOTED, SLURS_SOFT, IDENTITY_ADJ, GENDERED_SLURS, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
+})();
+
+// ---- rhetoric-util.js
+const M_rhetoric_util = (() => {
+// Regex helpers shared by the non-English rhetoric grammars. JavaScript's \b treats accented
+// letters as non-word characters, so every boundary here is a Unicode letter lookaround and
+// every pattern is compiled with the "u" flag.
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const RX = {
+  // longest first, so "sous-hommes" wins over "hommes"
+  alt: (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|"),
+  B: "(?<![\\p{L}\\p{N}_])",
+  E: "(?![\\p{L}\\p{N}_])",
+  // up to three words between a group and its verb ("les immigrés de ce pays sont ...")
+  FILL: "(?:\\s+[\\p{L}']+){0,3}?",
+  re: (src) => new RegExp(src, "iu"),
+  // a whole-word negation test built from a word list
+  negation: (words) => new RegExp(`(?<![\\p{L}])(?:${words.map(esc).join("|")})(?![\\p{L}])`, "iu"),
+};
+
+// Adds a language's markers through `hit(family, regex, negatable)` for families not yet in
+// `have`. `rules` maps a family to [regex, negatable] pairs, tried in order until one matches.
+function scoreRules(rules, hit, have) {
+  for (const [family, list] of Object.entries(rules)) {
+    if (have.has(family)) continue;
+    for (const [regex, negatable] of list) if (hit(family, regex, negatable)) break;
+  }
+}
+
+return { RX, scoreRules };
+})();
+
+// ---- lexicon-fr.js
+const M_lexicon_fr = (() => {
+// French word lists for the stance-neutral markers in rhetoric-fr.js. Same families and the same
+// rule as lexicon.js: a group named with marker grammar counts, disagreement and policy do not.
+// Accented and unaccented spellings are both listed, since replies often drop accents.
+
+const GROUPS_FR = [
+  // origine, religion, nationalité
+  "immigrés", "immigres", "migrants", "étrangers", "etrangers", "réfugiés", "refugies", "musulmans", "juifs", "chrétiens",
+  "chretiens", "arabes", "africains", "noirs", "blancs", "asiatiques", "maghrébins", "maghrebins", "roms", "gitans",
+  "turcs", "algériens", "algeriens", "marocains", "français", "francais",
+  // politique
+  "gauchistes", "gauchos", "fachos", "fascistes", "communistes", "nationalistes", "macronistes", "wokistes", "islamistes",
+  // classe, rôle, identité
+  "riches", "milliardaires", "patrons", "flics", "policiers", "manifestants", "émeutiers", "emeutiers", "journalistes",
+  "féministes", "feministes", "homosexuels", "trans", "femmes", "hommes",
+];
+
+const DEHUMANISE_FR = ["vermine", "rats", "cafards", "parasites", "animaux", "sauvages", "sous-hommes", "sous-humains",
+  "racaille", "racailles", "ordures", "déchets", "dechets", "porcs", "chiens", "singes", "bêtes", "betes", "cancer", "peste",
+  "gangrène", "gangrene", "cloportes", "nuisibles"];
+
+// Infinitives after "il faut", "on doit": physical harm only. Expelling or jailing is policy.
+const KILL_INF_FR = ["exterminer", "tuer", "fusiller", "pendre", "gazer", "massacrer", "éradiquer", "eradiquer", "buter",
+  "abattre", "brûler", "bruler", "lyncher", "flinguer", "liquider", "exécuter", "executer"];
+
+// Participles after "méritent d'être", "doivent être".
+const KILL_PP_FR = ["fusillés", "fusilles", "pendus", "exterminés", "extermines", "tués", "tues", "gazés", "gazes",
+  "massacrés", "massacres", "éliminés", "elimines", "abattus", "éradiqués", "eradiques", "brûlés", "brules", "lynchés",
+  "lynches", "exécutés", "executes"];
+
+const STEREOTYPE_TRAITS_FR = ["criminels", "voleurs", "violents", "sales", "terroristes", "violeurs", "délinquants",
+  "delinquants", "barbares", "dégénérés", "degeneres", "fainéants", "faineants", "menteurs", "pédophiles", "pedophiles",
+  "envahisseurs", "cons", "débiles", "debiles", "stupides"];
+
+const CONSPIRACY_FR = ["grand remplacement", "faux drapeau", "réveillez-vous", "reveillez-vous", "les médias vous cachent",
+  "les medias vous cachent", "on vous ment", "payés par soros", "payes par soros", "financés par soros", "finances par soros",
+  "financé par soros", "état profond", "etat profond", "nouvel ordre mondial"];
+
+// Pronoun slogans with no group named.
+const SLOGANS_FR = ["tous les buter", "il faut tous les tuer", "on va tous les buter", "tous les fusiller"];
+
+return { GROUPS_FR, DEHUMANISE_FR, KILL_INF_FR, KILL_PP_FR, STEREOTYPE_TRAITS_FR, CONSPIRACY_FR, SLOGANS_FR };
+})();
+
+// ---- rhetoric-fr.js
+const M_rhetoric_fr = (() => {
+// French grammar for the stance-neutral markers. Boundaries are Unicode letter lookarounds
+// (rhetoric-util.js), since JavaScript's \b treats accented letters as non-word characters.
+// These run only for families the English grammar did not already find in the same text.
+
+const F = M_lexicon_fr;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, B, E, FILL, re } = RX;
+const G = alt(F.GROUPS_FR), D = alt(F.DEHUMANISE_FR);
+const ART = "(?:les\\s+|ces\\s+|tous\\s+ces\\s+|des\\s+)?";
+
+const RE_FR = {
+  dehumanise: re(`${B}(?:${G})${E}${FILL}\\s+(?:sont|c'est|ce sont|restent)\\s+(?:tous\\s+|toutes\\s+|que\\s+)?` +
+    `(?:des\\s+|de la\\s+|de l'|du\\s+|une\\s+|un\\s+|d'|de\\s+)?(?:vraies?\\s+|vrais\\s+|sales\\s+)?(?:${D})${E}`),
+  dehumaniseOf: re(`${B}(?:ces|cette|ce|cet)\\s+(?:${D})\\s+(?:de\\s+|d')(?:${G})${E}`),
+  violenceCall: re(`${B}(?:il faut|faut|il faudrait|faudrait|il faudra|on doit|on devrait|on va|allons)\\s+` +
+    `(?:tous\\s+|toutes\\s+)?(?:${alt(F.KILL_INF_FR)})\\s+(?:tous\\s+|toutes\\s+)?${ART}(?:${G})${E}`),
+  violenceDeserve: re(`${B}(?:${G})${E}(?:\\s+[\\p{L}']+){0,4}?\\s+(?:doivent|devraient|méritent|meritent|mériteraient)` +
+    `\\s+(?:tous\\s+|toutes\\s+)?(?:d'être|d'etre|être|etre)\\s+(?:${alt(F.KILL_PP_FR)})${E}`),
+  violenceSlogan: re(`${B}(?:(?:mort aux|à mort les|a mort les)\\s+(?:${G})|${alt(F.SLOGANS_FR)})${E}`),
+  stereotype: re(`${B}(?:${G})${E}\\s+(?:sont|restent)\\s+(?:tous\\s+|toutes\\s+|juste\\s+|que\\s+|rien que\\s+)?` +
+    `(?:des\\s+|de\\s+)?(?:${alt(F.STEREOTYPE_TRAITS_FR)})${E}`),
+  conspiracy: re(`${B}(?:${alt(F.CONSPIRACY_FR)})${E}`),
+};
+
+// "ne sont pas des animaux", "jamais": the opposite of the marker.
+const NEGATION_FR = RX.negation(["ne", "n'", "pas", "jamais", "aucun", "aucune"]);
+
+const RULES = {
+  dehumanise: [[RE_FR.dehumanise, true], [RE_FR.dehumaniseOf, true]],
+  violence: [[RE_FR.violenceCall, true], [RE_FR.violenceDeserve, true], [RE_FR.violenceSlogan, false]],
+  stereotype: [[RE_FR.stereotype, true]],
+  conspiracy: [[RE_FR.conspiracy, false]],
+};
+
+// Adds French markers through `hit(family, regex, negatable)` for families not yet in `have`.
+function scoreFr(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { RE_FR, NEGATION_FR, scoreFr };
+})();
+
+// ---- lexicon-es.js
+const M_lexicon_es = (() => {
+// Spanish word lists for the stance-neutral markers in rhetoric-es.js. Same families and the same
+// rule as lexicon.js: a group named with marker grammar counts, disagreement and policy do not.
+// Accented and unaccented spellings are both listed, since replies often drop accents. Sources:
+// project-docs/evidence/LEXICON-SOURCES.md.
+
+const GROUPS_ES = [
+  // origen, religión, nacionalidad
+  "inmigrantes", "migrantes", "extranjeros", "refugiados", "musulmanes", "judíos", "judios", "cristianos", "católicos",
+  "catolicos", "ateos", "árabes", "arabes", "africanos", "negros", "blancos", "gitanos", "latinos", "sudamericanos",
+  "marroquíes", "marroquies", "rumanos", "chinos", "españoles", "espanoles", "catalanes", "vascos", "mexicanos",
+  "venezolanos", "menas",
+  // política, incluidos los apodos acuñados por cada lado
+  "rojos", "progres", "comunistas", "socialistas", "izquierdistas", "zurdos", "kukas", "chairos", "perroflautas",
+  "podemitas", "feminazis", "fachas", "fachos", "fascistas", "nazis", "derechistas", "conservadores", "liberales",
+  "fifís", "fifis", "peperos", "voxeros", "nacionalistas", "independentistas", "separatistas",
+  // clase, papel, identidad
+  "ricos", "millonarios", "multimillonarios", "empresarios", "banqueros", "políticos", "politicos", "policías",
+  "policias", "maderos", "manifestantes", "periodistas", "feministas", "homosexuales", "gays", "trans", "mujeres",
+  "hombres", "curas", "okupas",
+];
+
+const DEHUMANISE_ES = ["ratas", "cucarachas", "parásitos", "parasitos", "alimañas", "sabandijas", "animales",
+  "bestias", "salvajes", "infrahumanos", "subhumanos", "plaga", "una plaga", "un cáncer", "cáncer", "cancer", "escoria",
+  "basura", "gusanos", "piojos", "cerdos", "monos", "simios", "chusma", "lacra", "garrapatas", "virus"];
+
+// Infinitives after "hay que", "tenemos que": physical harm only. Deporting or jailing is policy.
+const KILL_INF_ES = ["matar", "exterminar", "fusilar", "ahorcar", "colgar", "gasear", "masacrar", "erradicar",
+  "quemar", "linchar", "ejecutar", "liquidar", "pegar un tiro a", "pegarles un tiro a"];
+
+// Participles after "merecen ser", "deberían ser".
+const KILL_PP_ES = ["fusilados", "fusiladas", "ahorcados", "ahorcadas", "colgados", "exterminados", "exterminadas",
+  "asesinados", "asesinadas", "gaseados", "masacrados", "eliminados", "eliminadas", "quemados", "quemadas", "linchados",
+  "ejecutados", "ejecutadas", "aniquilados", "erradicados"];
+
+const STEREOTYPE_TRAITS_ES = ["criminales", "delincuentes", "ladrones", "violadores", "terroristas", "violentos",
+  "vagos", "sucios", "salvajes", "bárbaros", "barbaros", "degenerados", "pedófilos", "pedofilos", "invasores",
+  "mentirosos", "estúpidos", "estupidos", "subnormales", "retrasados"];
+
+const CONSPIRACY_ES = ["gran reemplazo", "gran sustitución", "gran sustitucion", "plan kalergi", "plandemia",
+  "nuevo orden mundial", "estado profundo", "falsa bandera", "despierten, borregos", "despertad, borregos", "despertad borregos",
+  "pagados por soros", "financiados por soros", "pagados por putin", "financiados por putin",
+  "los medios os ocultan", "los medios te ocultan", "los medios nos ocultan"];
+
+// Slogans with the group named ("muerte a los X", "X al paredón") are built in rhetoric-es.js.
+const SLOGANS_ES = ["matarlos a todos", "hay que matarlos a todos", "fusilarlos a todos", "colgarlos a todos"];
+
+// Slurs that read as hateful on their own in Spanish. Context-dependent words (moro, panchito,
+// gitano) are left out; they are group names or snacks as often as slurs.
+const SLURS_ES = ["sudaca", "sudacas", "negrata", "negratas", "moromierda", "moromierdas", "maricón", "maricones",
+  "maricon", "joto", "jotos", "mongoloide", "mongoloides"];
+
+return { GROUPS_ES, DEHUMANISE_ES, KILL_INF_ES, KILL_PP_ES, STEREOTYPE_TRAITS_ES, CONSPIRACY_ES, SLOGANS_ES, SLURS_ES };
+})();
+
+// ---- rhetoric-es.js
+const M_rhetoric_es = (() => {
+// Spanish grammar for the stance-neutral markers, built the way rhetoric-fr.js is. These run only
+// for families the English grammar and earlier languages did not already find in the same text.
+
+const S = M_lexicon_es;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, B, E, FILL, re } = RX;
+const G = alt(S.GROUPS_ES), D = alt(S.DEHUMANISE_ES);
+const DET = "(?:los\\s+|las\\s+|esos\\s+|esas\\s+|estos\\s+|estas\\s+|unos\\s+|unas\\s+)?";
+const ALL = "(?:todos\\s+|todas\\s+)?";
+const COP = "(?:son|siguen siendo|eran|serán|seran)";
+// "no hay que matar": a negation just before the call word
+const NOT_BEFORE = "(?<!(?:no|nunca|jamás|jamas)\\s+)";
+
+const RE_ES = {
+  dehumanise: re(`${B}(?:${G})${E}${FILL}\\s+${COP}\\s+${ALL}(?:unos\\s+|unas\\s+|una\\s+|un\\s+|solo\\s+|sólo\\s+)?` +
+    `(?:${D})${E}`),
+  // "no son más que parásitos": the negation is part of the marker
+  dehumaniseOnly: re(`${B}(?:${G})${E}${FILL}\\s+no\\s+son\\s+(?:más|mas|nada más|nada mas)\\s+que\\s+(?:unos\\s+|unas\\s+)?` +
+    `(?:${D})${E}`),
+  dehumaniseOf: re(`${B}(?:esa|esas|ese|esos|esta|estas|este|estos)\\s+(?:${D})\\s+de\\s+(?:${G})${E}`),
+  violenceCall: re(`${NOT_BEFORE}${B}(?:hay que|habría que|habria que|tenemos que|deberíamos|deberiamos|vamos a|hay q)\\s+` +
+    `(?:${alt(S.KILL_INF_ES)})\\s+(?:a\\s+)?${ALL}${DET}(?:${G})${E}`),
+  violenceDeserve: re(`${B}(?:${G})${E}${FILL}\\s+(?:merecen|deberían|deberian|deben|tienen que|tendrían que)\\s+${ALL}` +
+    `ser\\s+${ALL}(?:${alt(S.KILL_PP_ES)})${E}`),
+  violenceSlogan: re(`${B}(?:muerte a\\s+${DET}(?:${G})|(?:${G})\\s+al\\s+paredón|(?:${G})\\s+al\\s+paredon|` +
+    `${alt(S.SLOGANS_ES)})${E}`),
+  stereotype: re(`${B}(?:${G})${E}${FILL}\\s+${COP}\\s+${ALL}(?:unos\\s+|unas\\s+|solo\\s+|sólo\\s+)?` +
+    `(?:${alt(S.STEREOTYPE_TRAITS_ES)})${E}`),
+  conspiracy: re(`${B}(?:${alt(S.CONSPIRACY_ES)})${E}`),
+  slur: re(`${B}(?:${alt(S.SLURS_ES)})${E}`),
+};
+
+const NEGATION_ES = RX.negation(["no", "nunca", "jamás", "jamas", "nadie", "ningún", "ningun", "ninguna", "ni"]);
+
+const RULES = {
+  dehumanise: [[RE_ES.dehumaniseOnly, false], [RE_ES.dehumanise, true], [RE_ES.dehumaniseOf, true]],
+  violence: [[RE_ES.violenceCall, true], [RE_ES.violenceDeserve, true], [RE_ES.violenceSlogan, false]],
+  stereotype: [[RE_ES.stereotype, true]],
+  conspiracy: [[RE_ES.conspiracy, false]],
+  slur: [[RE_ES.slur, false]],
+};
+
+function scoreEs(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { RE_ES, NEGATION_ES, scoreEs };
+})();
+
+// ---- lexicon-de.js
+const M_lexicon_de = (() => {
+// German word lists for the stance-neutral markers in rhetoric-de.js. Same families and the same
+// rule as lexicon.js: a group named with marker grammar counts, disagreement and policy do not.
+// Spellings with ä, ö, ü, ß and with ae, oe, ue, ss are both listed where replies use both.
+// Sources: project-docs/evidence/LEXICON-SOURCES.md.
+
+const GROUPS_DE = [
+  // Herkunft, Religion, Nationalität
+  "Ausländer", "Auslaender", "Migranten", "Flüchtlinge", "Fluechtlinge", "Asylanten", "Asylbewerber", "Muslime",
+  "Moslems", "Juden", "Christen", "Katholiken", "Araber", "Afrikaner", "Schwarze", "Weiße", "Weisse", "Türken",
+  "Tuerken", "Roma", "Sinti", "Polen", "Russen", "Deutsche", "Deutschen", "Ossis", "Wessis", "Kartoffeln",
+  // Politik, auch die geprägten Spitznamen beider Seiten
+  "Linke", "Linken", "Linksradikale", "Linksextreme", "Kommunisten", "Sozialisten", "Grüne", "Gruene", "Grünen",
+  "Antifa", "Gutmenschen", "Zecken", "Rechte", "Rechten", "Rechtsradikale", "Rechtsextreme", "Nazis", "Faschisten",
+  "AfDler", "Konservative", "Liberale", "Querdenker",
+  // Klasse, Rolle, Identität
+  "Reiche", "Reichen", "Milliardäre", "Milliardaere", "Bonzen", "Banker", "Politiker", "Polizisten", "Bullen",
+  "Demonstranten", "Journalisten", "Feministinnen", "Feministen", "Schwule", "Lesben", "Transfrauen", "Männer",
+  "Maenner", "Frauen",
+];
+
+const DEHUMANISE_DE = ["Ungeziefer", "Ratten", "Kakerlaken", "Parasiten", "Schmarotzer", "Tiere", "Viecher",
+  "Bestien", "Untermenschen", "Abschaum", "Gesindel", "Geschmeiß", "Geschmeiss", "Pack", "Dreck", "Pest", "eine Pest",
+  "Krebsgeschwür", "Krebsgeschwuer", "Schweine", "Affen", "Läuse", "Laeuse", "Zecken", "Volksschädlinge",
+  "Volksschaedlinge", "Müll", "Muell"];
+
+// Compound insults: "Asylantenpack", "Nazipack", "Bullenschweine". Stems from every side.
+const COMPOUND_STEMS_DE = ["Asylanten", "Ausländer", "Auslaender", "Flüchtlings", "Migranten", "Moslem", "Muslim",
+  "Juden", "Türken", "Kanaken", "Nazi", "Nazi-", "Links", "Rechts", "Antifa", "Bullen", "Polizei", "Kommunisten",
+  "Zecken", "Grünen", "Bonzen", "Gutmenschen", "Politiker"];
+const COMPOUND_TAILS_DE = ["pack", "gesindel", "schweine", "abschaum", "ratten", "ungeziefer", "geschmeiß",
+  "geschmeiss", "brut"];
+
+// Infinitives at the end of "man sollte alle X erschießen": physical harm only. Abschieben is policy.
+const KILL_INF_DE = ["erschießen", "erschiessen", "vergasen", "aufhängen", "aufhaengen", "abknallen",
+  "ausrotten", "umbringen", "töten", "toeten", "abschlachten", "lynchen", "hinrichten", "vernichten", "verbrennen",
+  "an die Wand stellen", "aufknüpfen", "aufknuepfen", "totschlagen"];
+
+// Participles after "gehören", "sollten ... werden", "verdienen es, ... zu werden".
+const KILL_PP_DE = ["erschossen", "vergast", "aufgehängt", "aufgehaengt", "abgeknallt", "ausgerottet",
+  "umgebracht", "getötet", "getoetet", "abgeschlachtet", "gelyncht", "hingerichtet", "vernichtet", "verbrannt",
+  "an die Wand gestellt", "aufgeknüpft", "aufgeknuepft", "totgeschlagen"];
+
+const STEREOTYPE_TRAITS_DE = ["kriminell", "Kriminelle", "Verbrecher", "Diebe", "Vergewaltiger", "Terroristen",
+  "gewalttätig", "gewalttaetig", "faul", "dumm", "asozial", "Asoziale", "Schmarotzer", "Sozialschmarotzer", "Lügner",
+  "Luegner", "Messerstecher", "Messermänner", "Barbaren", "Invasoren", "Kinderschänder", "Kinderschaender", "Pädophile",
+  "Paedophile", "degeneriert"];
+
+// "Volksverräter" is absolutist framing, not conspiracy, and is left to a later list.
+const CONSPIRACY_DE = ["Umvolkung", "Bevölkerungsaustausch", "Bevoelkerungsaustausch", "großer Austausch",
+  "großen Austausch", "große Austausch", "grosse Austausch", "grosser Austausch", "grossen Austausch", "Lügenpresse", "Luegenpresse", "Systempresse",
+  "Systemmedien", "Plandemie", "neue Weltordnung", "Kalergi-Plan", "Kalergiplan", "BRD GmbH", "Chemtrails",
+  "von Soros bezahlt", "von Soros finanziert", "Soros-finanziert", "von Putin bezahlt", "von Putin finanziert",
+  "Putin-finanziert", "wacht endlich auf", "Schlafschafe"];
+
+// Death-wish slogans with a fixed target, from the right and from the left. "Tod den X" and
+// "X verrecke" with a named group are built in rhetoric-de.js.
+const SLOGANS_DE = ["Juda verrecke", "Rotfront verrecke", "Deutschland verrecke", "Deutschland verrecken",
+  "Bullen platt wie Stullen", "alle an die Wand", "an die Wand mit ihnen"];
+
+// Slurs that read as hateful on their own in German (Duden marks them as discriminatory).
+const SLURS_DE = ["Neger", "Nigger", "Kanake", "Kanaken", "Kanacke", "Kanacken", "Kümmeltürke", "Kümmeltürken",
+  "Kuemmeltuerke", "Kuemmeltuerken", "Schwuchtel", "Schwuchteln", "Judensau", "Judenschwein"];
+
+return { GROUPS_DE, DEHUMANISE_DE, COMPOUND_STEMS_DE, COMPOUND_TAILS_DE, KILL_INF_DE, KILL_PP_DE, STEREOTYPE_TRAITS_DE, CONSPIRACY_DE, SLOGANS_DE, SLURS_DE };
+})();
+
+// ---- rhetoric-de.js
+const M_rhetoric_de = (() => {
+// German grammar for the stance-neutral markers, built the way rhetoric-fr.js is. German puts the
+// verb last ("man sollte alle X erschießen") and adds -n in the dative plural ("Tod den
+// Ausländern"), so groups take an optional "n". These run only for families not yet found.
+
+const L = M_lexicon_de;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, B, E, FILL, re } = RX;
+const G = `(?:${alt(L.GROUPS_DE)})n?`, D = alt(L.DEHUMANISE_DE);
+const DET = "(?:die\\s+|diese\\s+|alle\\s+|den\\s+|diesen\\s+|allen\\s+)*";
+const ADV = "(?:(?:alle|doch|nur|halt|eben|einfach|echt|wirklich|allesamt|nichts als|nichts anderes als)\\s+)*";
+const COP = "(?:sind|bleiben|waren)";
+
+const RE_DE = {
+  dehumanise: re(`${B}${G}${E}${FILL}\\s+${COP}\\s+${ADV}(?:ein\\s+|eine\\s+)?(?:${D})${E}`),
+  compound: re(`${B}(?:${alt(L.COMPOUND_STEMS_DE)})(?:${alt(L.COMPOUND_TAILS_DE)})${E}` +
+    `|${B}(?:linkes|rechtes|braunes|rotes|grünes|gruenes|linke|rechte)\\s+(?:Pack|Gesindel|Geschmeiß|Geschmeiss)${E}`),
+  violenceCall: re(`${B}(?:man sollte|man müsste|man muesste|man muss|wir sollten|wir müssen|wir muessen|lasst uns)` +
+    `\\s+(?:sie\\s+)?${DET}${G}${E}(?:\\s+[\\p{L}']+){0,2}?\\s+(?:${alt(L.KILL_INF_DE)})${E}`),
+  violenceDeserve: re(`${B}${G}${E}${FILL}\\s+(?:gehören|gehoeren|sollten|sollen|müssten|muessten|müssen|muessen|` +
+    `verdienen es,?)\\s+${ADV}(?:${alt(L.KILL_PP_DE)})${E}`),
+  violenceSlogan: re(`${B}(?:Tod\\s+(?:den|allen)\\s+${G}|${G}\\s+verrecke|${alt(L.SLOGANS_DE)})${E}`),
+  stereotype: re(`${B}${G}${E}${FILL}\\s+${COP}\\s+${ADV}(?:${alt(L.STEREOTYPE_TRAITS_DE)})${E}`),
+  conspiracy: re(`${B}(?:${alt(L.CONSPIRACY_DE)})${E}`),
+  slur: re(`${B}(?:${alt(L.SLURS_DE)})${E}`),
+};
+
+const NEGATION_DE = RX.negation(["nicht", "nie", "niemals", "kein", "keine", "keinen", "keiner", "keines",
+  "niemand"]);
+
+const RULES = {
+  dehumanise: [[RE_DE.dehumanise, true], [RE_DE.compound, false]],
+  violence: [[RE_DE.violenceCall, true], [RE_DE.violenceDeserve, true], [RE_DE.violenceSlogan, false]],
+  stereotype: [[RE_DE.stereotype, true]],
+  conspiracy: [[RE_DE.conspiracy, false]],
+  slur: [[RE_DE.slur, false]],
+};
+
+function scoreDe(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { RE_DE, NEGATION_DE, scoreDe };
+})();
+
+// ---- lexicon-pt.js
+const M_lexicon_pt = (() => {
+// Portuguese word lists (Brazil and Portugal) for the stance-neutral markers in rhetoric-pt.js.
+// Same families and the same rule as lexicon.js: a group named with marker grammar counts,
+// disagreement and policy do not. Accented and unaccented spellings are both listed. Sources:
+// project-docs/evidence/LEXICON-SOURCES.md.
+
+const GROUPS_PT = [
+  // origem, religião, nacionalidade
+  "imigrantes", "migrantes", "estrangeiros", "refugiados", "muçulmanos", "muculmanos", "judeus", "cristãos", "cristaos",
+  "evangélicos", "evangelicos", "católicos", "catolicos", "ateus", "árabes", "arabes", "africanos", "negros", "pretos",
+  "brancos", "ciganos", "nordestinos", "paulistas", "venezuelanos", "haitianos", "bolivianos", "brasileiros",
+  "portugueses", "angolanos", "indígenas", "indigenas",
+  // política, incluídos os apelidos cunhados por cada lado
+  "comunistas", "comunas", "socialistas", "esquerdistas", "esquerdopatas", "petistas", "petralhas", "petralhada",
+  "mortadelas", "lulistas", "bolsonaristas", "bolsominions", "bolsonarada", "coxinhas", "minions", "direitistas",
+  "fascistas", "nazistas", "conservadores", "liberais", "isentões", "isentoes",
+  // classe, papel, identidade
+  "ricos", "milionários", "milionarios", "bilionários", "bilionarios", "empresários", "empresarios", "banqueiros",
+  "políticos", "politicos", "policiais", "polícias", "policias", "manifestantes", "jornalistas", "feministas", "gays",
+  "homossexuais", "trans", "travestis", "mulheres", "homens", "pastores", "padres",
+];
+
+const DEHUMANISE_PT = ["ratos", "baratas", "parasitas", "vermes", "verme", "animais", "bichos", "bestas",
+  "selvagens", "sub-humanos", "subumanos", "praga", "uma praga", "um câncer", "câncer", "cancer", "um cancro", "cancro",
+  "escória", "escoria", "lixo", "porcos", "macacos", "piolhos", "carrapatos", "gado", "chorume", "gentalha", "ralé", "rale"];
+
+// Infinitives after "temos que", "vamos": physical harm only. Deporting or jailing is policy.
+const KILL_INF_PT = ["matar", "exterminar", "fuzilar", "enforcar", "metralhar", "massacrar", "erradicar",
+  "queimar", "linchar", "executar", "chacinar", "dizimar", "passar fogo em", "meter bala em", "meter bala nos"];
+
+// Participles after "merecem ser", "deveriam ser".
+const KILL_PP_PT = ["fuzilados", "fuziladas", "enforcados", "enforcadas", "exterminados", "exterminadas",
+  "mortos", "mortas", "assassinados", "massacrados", "eliminados", "eliminadas", "queimados", "queimadas", "linchados",
+  "executados", "executadas", "metralhados", "chacinados"];
+
+const STEREOTYPE_TRAITS_PT = ["criminosos", "bandidos", "ladrões", "ladroes", "vagabundos", "estupradores",
+  "terroristas", "violentos", "preguiçosos", "preguicosos", "sujos", "burros", "selvagens", "bárbaros", "barbaros",
+  "degenerados", "pedófilos", "pedofilos", "invasores", "mentirosos", "imbecis", "retardados"];
+
+const CONSPIRACY_PT = ["grande substituição", "grande substituicao", "grande reposição", "plano kalergi",
+  "plandemia", "nova ordem mundial", "estado profundo", "falsa bandeira", "marxismo cultural", "globalismo",
+  "pagos pelo soros", "pagos por soros", "financiados pelo soros", "financiados por soros", "pagos pelo putin",
+  "pagos por putin", "financiados pelo putin", "a mídia esconde", "a midia esconde", "a mídia não mostra"];
+
+// Fixed slogans. "morte aos X" with a named group is built in rhetoric-pt.js.
+const SLOGANS_PT = ["bandido bom é bandido morto", "bandido bom e bandido morto", "matar todos eles",
+  "fuzilar todos eles", "tem que matar tudo"];
+
+// Slurs that read as hateful on their own. Context-dependent words (crioulo is also a language
+// name, bicha also a queue, veado also a deer) are left out.
+const SLURS_PT = ["viado", "viados", "paneleiro", "paneleiros", "mongolóide", "mongoloide",
+  "mongolóides", "mongoloides"];
+
+return { GROUPS_PT, DEHUMANISE_PT, KILL_INF_PT, KILL_PP_PT, STEREOTYPE_TRAITS_PT, CONSPIRACY_PT, SLOGANS_PT, SLURS_PT };
+})();
+
+// ---- rhetoric-pt.js
+const M_rhetoric_pt = (() => {
+// Portuguese grammar for the stance-neutral markers, built the way rhetoric-fr.js is. Brazilian
+// speech often uses "é tudo" for "are all" ("esses X é tudo verme"), so it counts as a copula.
+// These run only for families the English grammar and earlier languages did not already find.
+
+const L = M_lexicon_pt;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, B, E, FILL, re } = RX;
+const G = alt(L.GROUPS_PT), D = alt(L.DEHUMANISE_PT);
+const DET = "(?:os\\s+|as\\s+|a\\s+|esses\\s+|essas\\s+|estes\\s+|estas\\s+|esse\\s+|essa\\s+)?";
+const ALL = "(?:todos\\s+|todas\\s+)?";
+const COP = "(?:são|sao|é tudo|e tudo|eram|serão|serao)";
+const NOT_BEFORE = "(?<!(?:não|nao|nunca|jamais)\\s+)";
+
+const RE_PT = {
+  dehumanise: re(`${B}(?:${G})${E}${FILL}\\s+${COP}\\s+${ALL}(?:uns\\s+|umas\\s+|uma\\s+|um\\s+|só\\s+|so\\s+)?(?:${D})${E}`),
+  // "não passam de parasitas": the negation is part of the marker
+  dehumaniseOnly: re(`${B}(?:${G})${E}${FILL}\\s+(?:não|nao)\\s+passam\\s+de\\s+(?:uns\\s+|umas\\s+|uma\\s+)?(?:${D})${E}`),
+  dehumaniseOf: re(`${B}(?:esses|essas|estes|estas|esse|essa)\\s+(?:${D})\\s+(?:de|da|do|dos|das)\\s+(?:${G})${E}`),
+  violenceCall: re(`${NOT_BEFORE}${B}(?:tem que|têm que|temos que|tem de|temos de|vamos|precisamos|é preciso|e preciso|` +
+    `bora|devemos|deveríamos|deveriamos)\\s+(?:${alt(L.KILL_INF_PT)})\\s+${ALL}${DET}(?:${G})${E}`),
+  violenceDeserve: re(`${B}(?:${G})${E}${FILL}\\s+(?:merecem|deveriam|devem|têm que|tem que|precisam)\\s+${ALL}` +
+    `ser\\s+${ALL}(?:${alt(L.KILL_PP_PT)})${E}`),
+  violenceSlogan: re(`${B}(?:morte\\s+(?:aos|às|as|a)\\s+(?:${G})|${alt(L.SLOGANS_PT)})${E}`),
+  stereotype: re(`${B}(?:${G})${E}${FILL}\\s+${COP}\\s+${ALL}(?:uns\\s+|umas\\s+|só\\s+|so\\s+)?` +
+    `(?:${alt(L.STEREOTYPE_TRAITS_PT)})${E}`),
+  conspiracy: re(`${B}(?:${alt(L.CONSPIRACY_PT)})${E}`),
+  slur: re(`${B}(?:${alt(L.SLURS_PT)})${E}`),
+};
+
+const NEGATION_PT = RX.negation(["não", "nao", "nunca", "jamais", "ninguém", "ninguem", "nenhum", "nenhuma", "nem"]);
+
+const RULES = {
+  dehumanise: [[RE_PT.dehumaniseOnly, false], [RE_PT.dehumanise, true], [RE_PT.dehumaniseOf, true]],
+  violence: [[RE_PT.violenceCall, true], [RE_PT.violenceDeserve, true], [RE_PT.violenceSlogan, false]],
+  stereotype: [[RE_PT.stereotype, true]],
+  conspiracy: [[RE_PT.conspiracy, false]],
+  slur: [[RE_PT.slur, false]],
+};
+
+function scorePt(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { RE_PT, NEGATION_PT, scorePt };
+})();
+
+// ---- lexicon-it.js
+const M_lexicon_it = (() => {
+// Italian word lists for the stance-neutral markers in rhetoric-it.js. Same families and the same
+// rule as lexicon.js: a group named with marker grammar counts, disagreement and policy do not.
+// Sources: project-docs/evidence/LEXICON-SOURCES.md.
+
+const GROUPS_IT = [
+  // origine, religione, nazionalità
+  "immigrati", "migranti", "stranieri", "profughi", "clandestini", "musulmani", "ebrei", "cristiani", "cattolici", "atei",
+  "arabi", "africani", "neri", "bianchi", "rom", "zingari", "sinti", "meridionali", "settentrionali", "albanesi",
+  "rumeni", "cinesi", "italiani", "nordafricani",
+  // politica, compresi i soprannomi coniati da ciascuna parte
+  "comunisti", "zecche", "zecche rosse", "piddini", "sinistroidi", "buonisti", "radical chic",
+  "grillini", "fascisti", "fasci", "fasciorazzisti", "leghisti", "sovranisti", "destrorsi", "nazisti", "conservatori",
+  "progressisti", "liberali",
+  // classe, ruolo, identità
+  "ricchi", "milionari", "miliardari", "banchieri", "padroni", "politici", "poliziotti", "sbirri", "carabinieri",
+  "manifestanti", "giornalisti", "femministe", "gay", "omosessuali", "trans", "donne", "uomini", "preti",
+];
+
+const DEHUMANISE_IT = ["ratti", "topi", "scarafaggi", "parassiti", "vermi", "animali", "bestie", "selvaggi",
+  "subumani", "sottouomini", "piaga", "una piaga", "un cancro", "cancro", "feccia", "spazzatura", "immondizia", "porci",
+  "maiali", "scimmie", "pidocchi", "zecche", "letame", "bestiame"];
+
+// Infinitives after "bisogna", "dobbiamo": physical harm only. Expelling or jailing is policy.
+const KILL_INF_IT = ["uccidere", "ammazzare", "sterminare", "fucilare", "impiccare", "gasare", "massacrare",
+  "bruciare", "linciare", "giustiziare", "sparare a", "sparare ai", "sparare agli", "sparare alle",
+  "sopprimere"];
+
+// Participles after "vanno", "meritano di essere", "dovrebbero essere".
+const KILL_PP_IT = ["fucilati", "fucilate", "impiccati", "impiccate", "uccisi", "uccise", "ammazzati",
+  "ammazzate", "sterminati", "sterminate", "gasati", "massacrati", "eliminati", "eliminate", "bruciati", "bruciate",
+  "linciati", "giustiziati", "appesi", "appesi a testa in giù", "soppressi"];
+
+const STEREOTYPE_TRAITS_IT = ["criminali", "delinquenti", "ladri", "stupratori", "terroristi", "violenti",
+  "sporchi", "fannulloni", "scansafatiche", "stupidi", "barbari", "degenerati", "pedofili", "invasori", "bugiardi",
+  "imbecilli", "ritardati"];
+
+const CONSPIRACY_IT = ["grande sostituzione", "sostituzione etnica", "piano kalergi", "plandemia",
+  "nuovo ordine mondiale", "stato profondo", "falsa bandiera", "svegliatevi pecoroni", "svegliatevi, pecoroni",
+  "pagati da soros", "finanziati da soros", "pagati da putin", "finanziati da putin", "i media vi nascondono",
+  "i giornali non ve lo dicono"];
+
+// Fixed slogans. "morte ai X" and "uccidere un X non è reato" are built in rhetoric-it.js.
+const SLOGANS_IT = ["ammazzarli tutti", "fucilarli tutti", "impiccarli tutti", "sterminarli tutti"];
+
+// Slurs that read as hateful on their own in Italian. "negro" is left out because it is the
+// ordinary word for black in Spanish and Portuguese, which share this scorer.
+const SLURS_IT = ["negri", "frocio", "froci", "culattone", "culattoni",
+  "mongoloide", "mongoloidi"];
+
+return { GROUPS_IT, DEHUMANISE_IT, KILL_INF_IT, KILL_PP_IT, STEREOTYPE_TRAITS_IT, CONSPIRACY_IT, SLOGANS_IT, SLURS_IT };
+})();
+
+// ---- rhetoric-it.js
+const M_rhetoric_it = (() => {
+// Italian grammar for the stance-neutral markers, built the way rhetoric-fr.js is. "Vanno
+// fucilati" ("should be shot") is the common Italian form of a call, beside "bisogna" and
+// "meritano di essere". These run only for families not yet found in the same text.
+
+const L = M_lexicon_it;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, B, E, FILL, re } = RX;
+const G = alt(L.GROUPS_IT), D = alt(L.DEHUMANISE_IT);
+const ART = "(?:i\\s+|gli\\s+|le\\s+|questi\\s+|queste\\s+|quei\\s+|quegli\\s+|quelle\\s+)?";
+const ALL = "(?:tutti\\s+|tutte\\s+)?";
+const COP = "(?:sono|restano|erano|saranno)";
+const PART = "(?:dei\\s+|delle\\s+|degli\\s+|solo\\s+|soltanto\\s+|una\\s+|un\\s+)?";
+const NOT_BEFORE = "(?<!(?:non|mai)\\s+)";
+
+const RE_IT = {
+  dehumanise: re(`${B}(?:${G})${E}${FILL}\\s+${COP}\\s+${ALL}${PART}(?:${D})${E}`),
+  // "non sono altro che vermi": the negation is part of the marker
+  dehumaniseOnly: re(`${B}(?:${G})${E}${FILL}\\s+non\\s+sono\\s+(?:altro|nient'altro|niente altro)\\s+che\\s+${PART}(?:${D})${E}`),
+  dehumaniseOf: re(`${B}(?:questi|queste|quei|quegli|quelle|quel|quella|questa)\\s+(?:${D})\\s+(?:di|dei|degli|delle)\\s+(?:${G})${E}`),
+  violenceCall: re(`${NOT_BEFORE}${B}(?:bisogna|bisognerebbe|dobbiamo|dovremmo|andiamo a|si deve|si devono|è ora di|e ora di)` +
+    `\\s+(?:${alt(L.KILL_INF_IT)})\\s+${ALL}${ART}(?:${G})${E}`),
+  violenceDeserve: re(`${B}(?:${G})${E}${FILL}\\s+(?:vanno|andrebbero|devono essere|dovrebbero essere|meritano di essere|` +
+    `meriterebbero di essere)\\s+${ALL}(?:${alt(L.KILL_PP_IT)})${E}`),
+  violenceSlogan: re(`${B}(?:(?:morte|a morte)\\s+(?:ai|agli|alle|a|i|gli|le)\\s+(?:${G})|` +
+    `uccidere\\s+(?:un|una)\\s+[\\p{L}]+\\s+non\\s+(?:è|e)\\s+reato|${alt(L.SLOGANS_IT)})${E}`),
+  stereotype: re(`${B}(?:${G})${E}${FILL}\\s+${COP}\\s+${ALL}${PART}(?:${alt(L.STEREOTYPE_TRAITS_IT)})${E}`),
+  conspiracy: re(`${B}(?:${alt(L.CONSPIRACY_IT)})${E}`),
+  slur: re(`${B}(?:${alt(L.SLURS_IT)})${E}`),
+};
+
+const NEGATION_IT = RX.negation(["non", "mai", "nessuno", "nessuna", "né"]);
+
+const RULES = {
+  dehumanise: [[RE_IT.dehumaniseOnly, false], [RE_IT.dehumanise, true], [RE_IT.dehumaniseOf, true]],
+  violence: [[RE_IT.violenceCall, true], [RE_IT.violenceDeserve, true], [RE_IT.violenceSlogan, false]],
+  stereotype: [[RE_IT.stereotype, true]],
+  conspiracy: [[RE_IT.conspiracy, false]],
+  slur: [[RE_IT.slur, false]],
+};
+
+function scoreIt(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { RE_IT, NEGATION_IT, scoreIt };
 })();
 
 // ---- rhetoric.js
@@ -670,10 +1289,16 @@ const M_rhetoric = (() => {
 //   motive       "<group> want to destroy / replace ...": an aim put in a whole group's mouth
 //   essentialise blanket and replacement claims ("all X are", "violence is cultural")
 //   conspiracy   conspiracy framing; absolutist  us-versus-them framing
+//   contempt     declared hatred of a whole group ("I hate X", "fuck all the X"), weight 1
 // Disagreement, anger and strong opinions score 0; only the marker grammar counts. Scores feed
 // the thread report, and the strong families also label the comment (never the person).
 
 const L = M_lexicon;
+const { scoreFr, NEGATION_FR } = M_rhetoric_fr;
+const { scoreEs, NEGATION_ES } = M_rhetoric_es;
+const { scoreDe, NEGATION_DE } = M_rhetoric_de;
+const { scorePt, NEGATION_PT } = M_rhetoric_pt;
+const { scoreIt, NEGATION_IT } = M_rhetoric_it;
 
 const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -682,11 +1307,45 @@ const word = (list) => new RegExp(`\\b(?:${alt(list)})\\b`, "i");
 // Slurs may start or end with symbols ("(((", "14/88"), so their edges are any non-word character.
 const edged = (list) => new RegExp(`(?:^|[^\\w])(?:${alt(list)})(?:$|[^\\w])`, "i");
 const G = alt(L.GROUPS);
+const CALL = "should|must|need to|needs to|have to|has to|let's|lets|let us|time to|gotta|got to|ought to|we will|we'll" +
+  "|we'd|we would|i'd|i would";
+const DET = "(?:the\\s+|these\\s+|those\\s+|our\\s+|their\\s+|your\\s+)?";
+const FILLERS = "(?:(?:all|just|nothing but|such|literally|basically|like|no better than|worse than|a bunch of|a pack of|" +
+  "a|an|the|fucking|filthy|dirty|disgusting|vile|rabid|stinking|dumb|savage)\\s+){0,4}";
+// For the unambiguous nouns only: up to four words after "are" with no preposition among them
+// ("X are horny useless rats", not "farmers are losing money to rats"), or a coordinated group
+// ("nationalists and fascist scum").
+const ADJ = alt(L.DEHUMANISE_ADJACENT);
+const WINDOW = "(?:(?!(?:to|from|by|with|of|for|about|on|in|at|than|over|against|and|or|not|never)\\b)[\\w']+,?\\s+){0,4}?";
+const LINK = "(?:(?:and|or|&)\\s+[\\w-]+\\s+|(?:fucking|filthy|dirty|disgusting|vile|stinking|rabid|ghetto|lazy|worthless|useless|" +
+  "economic|socioeconomic)\\s+)?";
+const INTENSE =`(?:(?:${alt(L.INTENSIFIERS)})\\s+)?`;
 
 const RE = {
-  dehumanise: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,4}?\\W+(?:${alt(L.DEHUMANISE)})\\b|\\b(?:${alt(L.DEHUMANISE)})\\b(?:\\W+\\w+){0,3}?\\W+(?:like\\s+)?(?:these\\s+|those\\s+|the\\s+)?(?:${G})\\b`, "i"),
+  // "X are (nothing but) (filthy) rats", "commie filth", "an infestation of X". A marker word a few
+  // words away from a group ("women with cancer", "police dogs") is not enough.
+  dehumanise: new RegExp(`\\b(?:${G})(?:\\s+(?:are|is|r)|\\s*[-:=])\\s+${FILLERS}(?:${alt(L.DEHUMANISE)})\\b` +
+    `|\\b(?:${G})\\s+(?:are|is|r)\\s+${WINDOW}(?:${ADJ})\\b` +
+    `|\\b(?:${G})\\s+${LINK}(?:${ADJ})\\b` +
+    `|\\b(?:${ADJ})\\s+like\\s+(?:these\\s+|those\\s+|the\\s+|all\\s+)?(?:${G})\\b` +
+    `|\\b(?:${alt(L.SWARM)})\\s+of\\s+(?:the\\s+)?(?:${G})\\b`, "i"),
   violenceGroup: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,6}?\\W+(?:should|must|need to|needs to|deserve to|ought to|will)\\s+(?:all\\s+)?(?:be\\s+)?(?:${alt(L.VIOLENCE_VERBS)})\\b`, "i"),
   violenceSlogan: word(L.VIOLENT_SLOGANS),
+  // "X deserve to die", "X should all die"
+  deathWish: new RegExp(`\\b(?:${G})\\s+(?:all\\s+)?(?:deserve to|deserves to|should all|must all|should|must|ought to|need to)` +
+    `\\s+(?:just\\s+)?(?:${alt(L.DEATH_WISH)})\\b`, "i"),
+  // "death to X" as a slogan: at the start of a clause, not "beaten to death to make a point"
+  deathTo: /(?:^|[.!?;:\n(]\s*|\s[-–]\s)death to\s+\w+/i,
+  helicopterFor: new RegExp(`\\bhelicopter rides?\\s+for\\s+(?:all\\s+)?${DET}(?:${G})\\b`, "i"),
+  contempt: new RegExp(`\\b(?:i|we)\\s+(?:fucking\\s+|really\\s+|just\\s+|absolutely\\s+)?(?:${alt(L.CONTEMPT_VERBS)})\\s+` +
+    `(?:all\\s+)?${DET}(?:${G})\\b(?!\\s+(?:said|say|says|did|do|think|want|voted|policy|policies))` +
+    `|\\bfuck\\s+(?:all\\s+)?(?:of\\s+)?${DET}(?:${G})\\b|\\b(?:${G})\\s+are\\s+the\\s+worst\\b`, "i"),
+  // the echo: "(((them)))"
+  echo: /\(\(\(\s*[\w\s.'-]{1,40}?\s*\)\)\)/,
+  // "we should exterminate the X", "let's kill all the X": a call with the group as the object
+  violenceCall: new RegExp(`\\b(?:${CALL})\\s+(?:just\\s+)?(?:${alt(L.KILL_VERBS)})\\s+(?:all\\s+(?:of\\s+)?|every one of\\s+|each of\\s+|every\\s+)?${DET}(?:${G})\\b`, "i"),
+  // "... the same fate for our X", counted only when the text names a killing (VIOLENT_STEM)
+  sameFate: new RegExp(`\\bsame fate\\s+(?:for|to|as)\\s+(?:all\\s+)?${DET}(?:${G})\\b`, "i"),
   // "the only good commie is a dead commie": the same word twice, any target
   onlyGoodDead: /\bthe only good (\w+) (?:is|are) (?:a )?dead \1\b/i,
   // "communists aren't people": denying a group is human. Matched before the negation filter,
@@ -696,8 +1355,10 @@ const RE = {
   warOn: new RegExp(`\\b(?:declare|declaring|wage|waging|start)\\s+(?:a\\s+)?(?:holy\\s+)?war\\s+(?:on|against)\\s+(?:the\\s+)?(?:${G})\\b`, "i"),
   vigilante: word(L.VIGILANTE),
   slur: edged(L.SLURS),
+  // "<identity> bitch", "<identity> whores": a gendered slur fused with an identity word
+  slurCompound: new RegExp(`\\b(?:${alt(L.IDENTITY_ADJ)})\\s+(?:ass\\s+)?(?:${alt(L.GENDERED_SLURS)})\\b`, "i"),
   slurSoft: word(L.SLURS_SOFT),
-  stereotype: new RegExp(`\\b(?:${G})\\s+(?:are|is)\\s+(?:all\\s+|just\\s+|nothing but\\s+|such\\s+)?(?:${alt(L.STEREOTYPE_TRAITS)})\\b|\\btypical\\s+(?:${G})\\b`, "i"),
+  stereotype: new RegExp(`\\b(?:${G})\\s+(?:are|is)\\s+(?:all\\s+|just\\s+|nothing but\\s+|such\\s+)?${INTENSE}(?:${alt(L.STEREOTYPE_TRAITS)})\\b|\\btypical\\s+(?:${G})\\b`, "i"),
   motive: new RegExp(`\\b(?:${G})\\s+(?:want|wants|are trying|plan|are planning|intend)\\s+to\\s+(?:${alt(L.MOTIVE_VERBS)})\\b|\\b(?:they|${G})\\s+(?:all\\s+)?hate\\s+(?:${alt(L.HATRED_OBJECTS)})\\b`, "i"),
   essentialise: new RegExp(`\\b(?:${alt(L.ESSENTIALISE)})\\b|\\ball (?:the )?(?:${G}) are\\b|\\b(?:${G}) are all\\b`, "i"),
   conspiracy: word(L.CONSPIRACY),
@@ -706,39 +1367,81 @@ const RE = {
 
 // "Immigrants are not animals" and "nobody should be killed" are the opposite of the marker.
 const NEGATION = /\b(?:not|never|no one|nobody|aren't|arent|isn't|isnt|shouldn't|shouldnt|don't|dont)\b/i;
+const VIOLENT_STEM = /\b(?:extermin|kill|massacr|slaughter|genocid|gass(?:ed|ing)|hang(?:ed|ing)|shoot|shot|lynch|wiped? out|wiping out|eradicat)/i;
+// Reported speech and quoted words are a mention, not the speaker's own use: "he called X vermin",
+// "compared X to rats", "the word "slur"". Group-blind, so it treats every target alike.
+const REPORTED = /\b(?:call(?:s|ed|ing)?|compar(?:e|es|ed|ing)|describ(?:e|es|ed|ing)|label(?:s|ed|led|ing)?|brand(?:s|ed|ing)?|dubb?(?:s|ed|ing)?|refer(?:s|red|ring)? to)\b[^.!?"]{0,40}$/i;
+const QUOTES = /["“”«»]/;
+function mention(s, m) {
+  const at = m.index ?? s.indexOf(m[0]);
+  const start = at + (m[0].length - m[0].trimStart().length), end = at + m[0].trimEnd().length;
+  const before = s.slice(Math.max(0, start - 60), start), after = s.slice(end, end + 2);
+  if (REPORTED.test(before)) return true;
+  const lead = m[0].trim();
+  return QUOTES.test(before.slice(-1)) && QUOTES.test(after.slice(0, 1)) || (QUOTES.test(lead[0]) && QUOTES.test(lead[lead.length - 1]));
+}
 const unleet = (s) => s.replace(/[013457@$!]/g, (c) => L.LEET[c] || c);
 
 const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, slur: 2, slurSoft: 1, stereotype: 2, motive: 1,
-  essentialise: 1, conspiracy: 1, absolutist: 1 };
+  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1 };
 // "Extreme" for the thread report: any strong marker, or two weaker ones together.
 const EXTREME_AT = 2;
 // Families strong enough to label the comment itself.
 const STRONG = new Set(["dehumanise", "violence", "vigilante", "slur", "stereotype"]);
 
-// Returns { score, markers: [{ family, match }], extreme }.
-function score(text) {
-  const s = String(text || "").replace(/[’]/g, "'");
-  const markers = [];
-  const hit = (family, re, negatable = false, on = s) => {
+// Other languages, in order. Each adds only families that English and the languages before it
+// did not find, and negates its matches with its own negation words.
+const LANGUAGES = [
+  { code: "fr", score: scoreFr, negation: NEGATION_FR },
+  { code: "es", score: scoreEs, negation: NEGATION_ES },
+  { code: "de", score: scoreDe, negation: NEGATION_DE },
+  { code: "pt", score: scorePt, negation: NEGATION_PT },
+  { code: "it", score: scoreIt, negation: NEGATION_IT },
+];
+
+// A matcher that records a marker when `re` matches and, if negatable, the match has no negation.
+function recorder(s, markers) {
+  return (family, re, negatable = false, on = s, negation = NEGATION) => {
     const m = on.match(re);
-    if (!m || (negatable && NEGATION.test(m[0]))) return false;
+    if (!m || (negatable && negation.test(m[0])) || mention(s, m)) return false;
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
+}
+
+function scoreEnglish(s, hit) {
   if (!hit("dehumanise", RE.notHuman)) hit("dehumanise", RE.dehumanise, true);
-  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.warOn, true) && !hit("violence", RE.onlyGoodDead)) hit("violence", RE.violenceSlogan);
+  if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.violenceCall, true) && !hit("violence", RE.warOn, true)
+    && !hit("violence", RE.deathWish, true) && !hit("violence", RE.onlyGoodDead)
+    && !(VIOLENT_STEM.test(s) && hit("violence", RE.sameFate, true))) {
+    if (!hit("violence", RE.deathTo) && !hit("violence", RE.helicopterFor)) hit("violence", RE.violenceSlogan);
+  }
   hit("vigilante", RE.vigilante);
-  if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s))) hit("slurSoft", RE.slurSoft);
+  if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)
+    && !hit("slur", RE.slurCompound)) hit("slurSoft", RE.slurSoft);
   hit("stereotype", RE.stereotype, true);
   hit("motive", RE.motive, true);
   hit("essentialise", RE.essentialise, true);
   hit("conspiracy", RE.conspiracy);
   hit("absolutist", RE.absolutist);
+  hit("contempt", RE.contempt, true);
+}
+
+// Returns { score, markers: [{ family, match }], extreme }.
+function score(text) {
+  const s = String(text || "").replace(/[’]/g, "'");
+  const markers = [];
+  const hit = recorder(s, markers);
+  scoreEnglish(s, hit);
+  for (const lang of LANGUAGES) {
+    const have = new Set(markers.map((m) => m.family));
+    lang.score((family, re, negatable = false) => hit(family, re, negatable, s, lang.negation), have);
+  }
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };
 }
 
-return { GROUPS, WEIGHTS, EXTREME_AT, STRONG, score };
+return { GROUPS, WEIGHTS, EXTREME_AT, STRONG, LANGUAGES, score };
 })();
 
 // ---- report.js
@@ -904,6 +1607,173 @@ function parseAbout(text, handle) {
 }
 
 return { parseJoined, parseNameChanges, parseAbout };
+})();
+
+// ---- meta.js
+const M_meta = (() => {
+// Account context Meta shows the viewer on Facebook and Instagram, read from the text the site
+// renders when the viewer opens it. Radar makes no request of its own for it.
+// - Instagram: "About this account" (profile menu): date joined, "Account based in", former
+//   usernames, verified. Layout checked live 2026-10-21: each label on its own line, then its value.
+// - Facebook: "Page transparency" on a Page: creation date, name changes, and the countries of the
+//   people who manage the Page. Wording from Meta's public description; live check open.
+
+const { parseAbout, parseJoined } = M_about;
+
+const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+const MON = "(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\.?";
+const iso = (y, m, d) => new Date(Date.UTC(+y, MONTHS[m.slice(0, 3).toLowerCase()], +d)).toISOString().slice(0, 10);
+const compact = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null && v !== undefined && v !== false && v !== ""));
+const linesOf = (text) => String(text || "").split(/\n+/).map((l) => l.trim()).filter(Boolean);
+
+// "February 8, 2009" or "8 February 2009"; falls back to month and year ("March 2019").
+function parseFullDate(s) {
+  const t = String(s || "");
+  let m = t.match(new RegExp(MON + "\\s+(\\d{1,2}),?\\s+(\\d{4})", "i"));
+  if (m) return iso(m[3], m[1], m[2]);
+  m = t.match(new RegExp("(\\d{1,2})\\s+" + MON + ",?\\s+(\\d{4})", "i"));
+  if (m) return iso(m[3], m[2], m[1]);
+  return parseJoined(t);
+}
+
+const IG_LABEL = /^(?:date joined|account based in|verified|former usernames?|accounts? with shared followers|close|about this account)$/i;
+
+// text: the dialog's innerText. handle: the account, when known from the page; otherwise the line
+// under the dialog's title.
+function igAbout(text, handle) {
+  const lines = linesOf(text);
+  const top = lines.findIndex((l) => /^about this account$/i.test(l));
+  if (top < 0) return null;
+  const who = handle || (lines[top + 1] && /^[A-Za-z0-9._]{1,30}$/.test(lines[top + 1]) ? lines[top + 1] : null);
+  const a = parseAbout(lines.join("\n"), who);
+  const hidden = /^not shared$/i.test(a.basedIn || "");
+  let former;
+  const f = lines.findIndex((l) => /^former usernames?\b/i.test(l));
+  if (f >= 0) {
+    const n = lines[f].match(/(\d+)/);
+    if (n) former = +n[1];
+    else { former = 0; for (let i = f + 1; i < lines.length && !IG_LABEL.test(lines[i]); i++) if (/^@?[A-Za-z0-9._]{1,30}$/.test(lines[i])) former++; }
+  }
+  const r = compact({ handle: who, joinDate: a.joinDate, basedIn: hidden ? null : a.basedIn, basedInHidden: hidden,
+    nameChanges: former, verified: lines.some((l) => /^verified$/i.test(l)), labelSource: "Instagram", aboutRead: true });
+  return r.joinDate || r.basedIn || hidden ? r : null;
+}
+
+// The value on a label's line ("Page created - May 3, 2015") or on the next line.
+function valueAfter(lines, re) {
+  for (let i = 0; i < lines.length; i++) {
+    if (!re.test(lines[i])) continue;
+    const rest = lines[i].replace(re, "").replace(/^[\s:·\-–—]+/, "").trim();
+    return rest || lines[i + 1] || null;
+  }
+  return null;
+}
+
+// "Exampleland (4)" entries after the managers' heading, on one line or one per line.
+function managers(lines) {
+  const at = lines.findIndex((l) => /location for (?:the )?people who manage this page/i.test(l));
+  if (at < 0) return [];
+  const out = [];
+  const take = (s) => { for (const m of s.matchAll(/([^,():]+?)\s*\((\d+)\)/g)) out.push({ country: m[1].replace(/^.*includes\s*/i, "").trim(), people: +m[2] }); };
+  take(lines[at].replace(/^.*?:/, ""));
+  for (let i = at + 1; i < lines.length && /\(\d+\)\s*$/.test(lines[i]); i++) take(lines[i]);
+  return out.filter((x) => x.country);
+}
+
+function pageTransparency(text, handle) {
+  const lines = linesOf(text);
+  if (!lines.some((l) => /^page transparency$/i.test(l))) return null;
+  const created = valueAfter(lines, /^(?:page created|creation date|created)\b/i);
+  const renames = lines.filter((l) => /^changed name to\b/i.test(l)).length;
+  const noRename = lines.some((l) => /(?:has not|hasn't|never) changed its name|^no name changes/i.test(l));
+  const from = managers(lines);
+  const ads = lines.some((l) => /\bcurrently running ads\b/i.test(l) && !/\bnot currently running\b/i.test(l));
+  const r = compact({ handle, joinDate: parseFullDate(created), nameChanges: renames || (noRename ? 0 : null),
+    managedFrom: from.length ? from : null, basedIn: from.length === 1 ? from[0].country : null, runningAds: ads,
+    labelSource: "Facebook Page transparency", aboutRead: true });
+  return r.joinDate || r.managedFrom || r.nameChanges != null ? r : null;
+}
+
+// Paths on facebook.com that are not people or Pages.
+const NOT_ACCOUNT = /^(?:groups|watch|reel|reels|photo|photos|posts|events|marketplace|gaming|stories|story\.php|permalink\.php|photo\.php|hashtag|search|share|login|help|policies|privacy|settings|notifications|messages|friends|bookmarks|pages|l\.php|ads|business)$/i;
+
+// A stable key for the account a Facebook profile link points to: the vanity name, or "id.<n>".
+function fbKey(href) {
+  let u;
+  try { u = new URL(href); } catch (_) { return null; }
+  if (!/(^|\.)facebook\.com$/.test(u.hostname) || /^l\./.test(u.hostname)) return null;
+  const parts = u.pathname.split("/").filter(Boolean);
+  if (parts[0] === "profile.php") return /^\d+$/.test(u.searchParams.get("id") || "") ? "id." + u.searchParams.get("id") : null;
+  if (parts[0] === "people" && /^\d+$/.test(parts[2] || "")) return "id." + parts[2];
+  if (parts.length !== 1 || NOT_ACCOUNT.test(parts[0]) || !/^[A-Za-z0-9.]{3,50}$/.test(parts[0])) return null;
+  return parts[0].toLowerCase();
+}
+
+// The profile URL for a key from fbKey.
+function fbProfile(key) {
+  return key && key.startsWith("id.") ? `https://www.facebook.com/profile.php?id=${key.slice(3)}` : `https://www.facebook.com/${key}`;
+}
+
+return { parseFullDate, igAbout, pageTransparency, fbKey, fbProfile };
+})();
+
+// ---- bsky.js
+const M_bsky = (() => {
+// Bluesky account and post data from the responses the Bluesky web app already loaded for the
+// page (app.bsky.unspecced.getPostThreadV2, app.bsky.feed.getPostThread, getProfile(s), feeds),
+// passed on by src/ext/bskysniff.js. Radar makes no request of its own. Field names follow the
+// public AT Protocol lexicons (app.bsky.actor.defs#profileViewBasic, app.bsky.feed.defs#postView).
+
+function walk(json, visit, limit = 200000) {
+  const stack = [json];
+  let guard = 0;
+  while (stack.length && guard++ < limit) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    visit(v);
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+}
+
+const isProfile = (v) => typeof v.did === "string" && v.did.startsWith("did:") && typeof v.handle === "string";
+
+// handle (lower case) -> what Bluesky loaded about the account. Labels the account put on itself
+// (src equal to its own DID) and system values starting with "!" are left out.
+function bskyAuthors(json) {
+  const out = new Map();
+  if (!json) return out;
+  walk(json, (v) => {
+    if (!isProfile(v)) return;
+    const labels = (Array.isArray(v.labels) ? v.labels : []).filter((l) => l && l.val && l.src !== v.did && !String(l.val).startsWith("!")).map((l) => String(l.val));
+    const r = { handle: v.handle, did: v.did, aboutRead: true, labelSource: "Bluesky moderation" };
+    if (v.displayName) r.display = String(v.displayName).slice(0, 80);
+    if (typeof v.createdAt === "string" && /^\d{4}-\d{2}-\d{2}/.test(v.createdAt)) r.joinDate = v.createdAt.slice(0, 10);
+    if (labels.length) r.platformLabels = [...new Set(labels)];
+    if (v.verification && v.verification.verifiedStatus === "valid") r.verified = true;
+    if (v.verification && v.verification.trustedVerifierStatus === "valid") r.trustedVerifier = true;
+    if (v.handle === "handle.invalid") r.handleInvalid = true;
+    if (Number.isFinite(v.followersCount)) r.followersCount = v.followersCount;
+    if (Number.isFinite(v.followsCount)) r.followingCount = v.followsCount;
+    if (Number.isFinite(v.postsCount)) r.postsCount = v.postsCount;
+    const k = v.handle.toLowerCase();
+    out.set(k, { ...(out.get(k) || {}), ...r });
+  });
+  return out;
+}
+
+// Post record key -> { id, author, posted, langs } for posts in the response.
+function bskyPosts(json) {
+  const out = new Map();
+  if (!json) return out;
+  walk(json, (v) => {
+    if (typeof v.uri !== "string" || !v.author || !isProfile(v.author) || !v.record || typeof v.record.text !== "string") return;
+    const id = v.uri.split("/").pop();
+    out.set(id, { id, author: v.author.handle, posted: v.record.createdAt || null, langs: Array.isArray(v.record.langs) ? v.record.langs : [] });
+  });
+  return out;
+}
+
+return { bskyAuthors, bskyPosts };
 })();
 
 // ---- owners.js
@@ -1177,6 +2047,31 @@ function machineSigns(text) {
 }
 
 return { MIN_WORDS, machineSigns };
+})();
+
+// ---- threadkey.js
+const M_threadkey = (() => {
+// One key per conversation, from the id the site gives it, so the same thread reached by a
+// different path (handle case, media or analytics suffix, a comment permalink) is never
+// counted as a second thread. Unknown shapes fall back to the lower-cased path.
+
+function threadKey(siteId, pathname, search = "") {
+  const path = String(pathname || "");
+  let id = null;
+  if (siteId === "x") id = (path.match(/\/status\/(\d+)/) || [])[1];
+  else if (siteId === "reddit") id = (path.match(/\/comments\/([a-z0-9]+)/i) || [])[1];
+  else if (siteId === "youtube") id = new URLSearchParams(search).get("v") || (path.match(/^\/shorts\/([\w-]+)/) || [])[1];
+  else if (siteId === "instagram") id = (path.match(/\/(?:p|reels?|tv)\/([\w-]+)/) || [])[1];
+  else if (siteId === "bluesky") id = (path.match(/\/post\/([a-z0-9]+)/i) || [])[1];
+  else if (siteId === "facebook") {
+    const q = new URLSearchParams(search);
+    id = (path.match(/\/(?:posts|videos|reel)\/([\w-]+)/) || [])[1] || q.get("story_fbid") || q.get("v") || q.get("fbid");
+  }
+  if (id) return siteId + ":" + (siteId === "reddit" ? id.toLowerCase() : id);   // YouTube ids are case-sensitive
+  return `${siteId}:${path.toLowerCase().replace(/\/+$/, "")}`;
+}
+
+return { threadKey };
 })();
 
 // ---- network.js
@@ -1463,6 +2358,36 @@ function timingBursts(rows, windowSec = WINDOW_SEC, minAccounts = MIN_ACCOUNTS) 
 }
 
 return { WINDOW_SEC, poissonTail, timingBursts };
+})();
+
+// ---- pace.js
+const M_pace = (() => {
+// Pacing for automatic About lookups, from X's own rate-limit headers.
+// x-rate-limit-remaining and x-rate-limit-reset (epoch seconds) come back on every GraphQL
+// response. Radar spreads what is left over the window and stops RESERVE requests short, so the
+// viewer's own use of X is never the thing that gets limited. Without headers it keeps its base gap.
+
+const BASE_GAP_MS = 1500;
+const RESERVE = 5;
+const MAX_RETRIES = 2;
+const NO_RESET_PAUSE_MS = 5 * 60000;
+const SLACK_MS = 2000;
+
+// { status, remaining?, reset?, now, tries? } -> { delay, retry }
+function nextStep({ status, remaining, reset, now, tries = 0 }) {
+  const resetMs = Number.isFinite(reset) ? reset * 1000 : NaN;
+  const window = resetMs - now;
+  const hasWindow = Number.isFinite(window) && window > 0;
+  const canRetry = tries < MAX_RETRIES;
+  if (status === 429) return { delay: hasWindow ? window + SLACK_MS : NO_RESET_PAUSE_MS, retry: canRetry };
+  if (status === "timeout" || status === "error") return { delay: BASE_GAP_MS * 4, retry: canRetry };
+  if (!hasWindow || !Number.isFinite(remaining)) return { delay: BASE_GAP_MS, retry: false };
+  const usable = remaining - RESERVE;
+  if (usable <= 0) return { delay: window + SLACK_MS, retry: false };
+  return { delay: Math.max(BASE_GAP_MS, Math.ceil(window / usable)), retry: false };
+}
+
+return { BASE_GAP_MS, RESERVE, MAX_RETRIES, nextStep };
 })();
 
 // ---- langs.js
@@ -1771,5 +2696,384 @@ const HISTORY_DOES_NOT_PROVE = "These totals cover only the threads you opened, 
 return { HISTORY_RETAIN_DAYS, snapshot, addSnapshot, summarize, HISTORY_DOES_NOT_PROVE };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric, ...M_report, ...M_about, ...M_owners, ...M_xdata, ...M_machine, ...M_network, ...M_ytdata, ...M_timing, ...M_langs, ...M_state, ...M_trail, ...M_history });
+// ---- claims.js
+const M_claims = (() => {
+// Fact-checked claims. A post is matched to a claim a fact-checker has already reviewed, from a
+// table bundled with Radar (src/ext/claims.json, built by scripts/claims-build.mjs from the Data
+// Commons ClaimReview feed). Radar shows the fact-checker's rating in the fact-checker's own
+// words, with a link. It never rates a post itself.
+//
+// Matching is on content words (function words in six languages removed, a light stemmer), each
+// weighted by how rare it is in the table. A claim matches a post only when:
+//   - the claim has at least MIN_CLAIM_TOKENS content words and the post shares MIN_SHARED of them;
+//   - the shared words carry at least COVER_MIN of the claim's weight;
+//   - every name (a capitalised word) and every number in the claim is in the post: a different
+//     place, person, year or count is a different claim;
+//   - at least BIGRAM_MIN of the claim's word pairs appear in the post in the same order, so the
+//     claim's words scattered through a long post do not count;
+//   - no claim word was swapped for another between the same two neighbours ("kill birds every
+//     year" against "kill bats every year").
+// Political side is never an input: no word list here names a side, party or group, and
+// tests/claims.symmetry.test.js holds the matcher to the same decision for actors from every
+// direction.
+
+const MIN_CLAIM_TOKENS = 4, MIN_SHARED = 4, COVER_MIN = 0.85, BIGRAM_MIN = 0.3, MAX_CANDIDATES = 200;
+const CLAIM_LABEL = "A fact-checker reviewed a similar claim";
+const CLAIM_DOES_NOT_PROVE = "Similar wording is not the same claim; check the source. The rating is the fact-checker's, about the claim they reviewed, not about this post or the person who wrote it.";
+const CLAIM_ATTRIBUTION = "ClaimReview markup published by the fact-checker, from the Data Commons fact-check feed (CC BY 4.0).";
+
+const LANG_STOPS = {
+  en: "the a an and or but of to in on at by for with from as is are was were be been being it its this that these those there their they them he she his her we our you your i me my not no do does did has have had will would can could should may might just than then so if into about over under after before through within more most very all any some such only also what which who whom whose when where why how up out off",
+  fr: "le la les un une des du de et ou en dans pour par sur au aux avec est sont été être a ont pas ne que qui ce cette ces son sa ses leur leurs il elle ils elles nous vous on se plus tout toute toutes tous va vont",
+  es: "el la los las un una unos unas de del y o en para por con es son fue ser ha han no que se su sus al lo como más pero este esta estos estas va",
+  de: "der die das den dem des ein eine einen einem und oder in im auf für mit von zu ist sind war wird werden nicht kein keine dass sich es er sie wir auch noch nach bei aus",
+  pt: "o a os as um uma de do da dos das e ou em no na nos nas para por com é são foi ser não que se seu sua ao mais mas como",
+  it: "il lo la i gli le un una di del della dei e o in nel nella per con è sono era non che si suo sua al più ma come",
+};
+const NO_STOPS = new Set();
+const LANG_SETS = Object.fromEntries(Object.entries(LANG_STOPS).map(([k, v]) => [k, new Set(v.split(" "))]));
+const NUMBER_WORDS = new Set("one two three four five six seven eight nine ten eleven twelve twenty thirty forty fifty hundred thousand million billion trillion half dozen".split(" "));
+const NEGATION = /\b(?:not|never|no|none|nobody|nothing|isn'?t|aren'?t|wasn'?t|weren'?t|don'?t|doesn'?t|didn'?t|won'?t|can'?t|pas|jamais|nunca|nicht|kein\w*|non|não)\b|n['’]t\b/i;
+
+function words(text) {
+  return String(text || "")
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/@\w+/g, " ")
+    .replace(/[^\p{L}\p{M}\p{N}\s]/gu, " ")   // keep combining marks: Indic vowel signs are marks
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+// A light stemmer: plurals and the commonest English endings, so "killing", "kills" and "killed"
+// all read as "kill". Words with digits are kept as written.
+function stem(w) {
+  if (/\d/.test(w)) return w;
+  if (w.length > 5 && w.endsWith("ing")) return w.slice(0, -3);
+  if (w.length > 4 && w.endsWith("ied")) return w.slice(0, -3) + "y";
+  if (w.length > 4 && w.endsWith("ed")) return w.slice(0, -2);
+  if (w.length > 4 && w.endsWith("ies")) return w.slice(0, -3) + "y";
+  if (w.length > 3 && w.endsWith("s") && !/(?:ss|us|is)$/.test(w)) return w.slice(0, -1);
+  return w;
+}
+
+// { tokens: content words in order, named: words capitalised in the text, numbers }.
+// An all-capitals word is kept even when it is also a function word ("the WHO", "the US").
+// Function words are dropped only for the guessed language, and none are dropped when the guess
+// is unsure: a word dropped from a claim widens what it matches, so the English "son" must not be
+// dropped as the French or Spanish one.
+function claimTokens(text) {
+  const tokens = [], named = new Set(), numbers = new Set();
+  const lang = guessLanguage(text), STOP = lang ? LANG_SETS[lang] : NO_STOPS;
+  for (const w of words(text)) {
+    const lower = w.toLowerCase();
+    const caps = w.length >= 2 && w === w.toUpperCase() && /\p{Lu}/u.test(w);
+    if (STOP.has(lower) && !caps) continue;
+    if (lower.length < 2 && !/\d/.test(lower)) continue;
+    const s = stem(lower);
+    tokens.push(s);
+    if (/^\p{Lu}/u.test(w)) named.add(s);
+    if (/\d/.test(s) || NUMBER_WORDS.has(s)) numbers.add(s);
+  }
+  return { tokens, named, numbers };
+}
+
+function hasNegation(text) { return NEGATION.test(String(text || "")); }
+
+// A guess from function words; null when no language clearly leads.
+function guessLanguage(text) {
+  const ws = words(text).map((w) => w.toLowerCase());
+  const scores = Object.entries(LANG_SETS).map(([k, set]) => [k, ws.filter((w) => set.has(w)).length]).sort((a, b) => b[1] - a[1]);
+  return scores[0][1] >= 2 && scores[0][1] > scores[1][1] ? scores[0][0] : null;
+}
+
+const pairs = (seq) => { const out = new Set(); for (let i = 1; i < seq.length; i++) out.add(seq[i - 1] + " " + seq[i]); return out; };
+
+// table: { checkers: [name], rows: [[claim, rating, checkerIndex, url, date, lang]] }.
+function buildClaimIndex(table) {
+  const rows = [], postings = new Map();
+  for (const r of (table && table.rows) || []) {
+    const [claim, rating, ci, url, date, lang] = r;
+    const t = claimTokens(claim);
+    const uniq = [...new Set(t.tokens)];
+    if (uniq.length < MIN_CLAIM_TOKENS) continue;
+    const id = rows.length;
+    rows.push({ claim, rating, checker: (table.checkers || [])[ci] || "unknown", url, date: date || null, lang: lang || null, seq: t.tokens, uniq, named: t.named, numbers: t.numbers, neg: hasNegation(claim) });
+    for (const tok of uniq) { if (!postings.has(tok)) postings.set(tok, []); postings.get(tok).push(id); }
+  }
+  return { rows, postings, n: rows.length };
+}
+
+function weight(index, tok) { return Math.log(1 + index.n / ((index.postings.get(tok) || []).length || 1)); }
+
+// A claim word swapped for a different word between the same two neighbours.
+function substituted(row, have, postSeq) {
+  for (let i = 1; i < row.seq.length - 1; i++) {
+    if (have.has(row.seq[i])) continue;
+    const prev = row.seq[i - 1], next = row.seq[i + 1];
+    for (let j = 1; j < postSeq.length - 1; j++) if (postSeq[j - 1] === prev && postSeq[j + 1] === next) return true;
+  }
+  return false;
+}
+
+function verify(index, row, post) {
+  const shared = row.uniq.filter((t) => post.have.has(t));
+  if (shared.length < MIN_SHARED) return null;
+  const total = row.uniq.reduce((s, t) => s + weight(index, t), 0);
+  const coverage = shared.reduce((s, t) => s + weight(index, t), 0) / total;
+  if (coverage < COVER_MIN) return null;
+  for (const t of row.named) if (!post.have.has(t)) return null;
+  for (const t of row.numbers) if (!post.have.has(t)) return null;
+  const claimPairs = pairs(row.seq);
+  if (claimPairs.size) {
+    let inOrder = 0;
+    for (const p of claimPairs) if (post.pairs.has(p)) inOrder++;
+    if (inOrder / claimPairs.size < BIGRAM_MIN) return null;
+  }
+  if (substituted(row, post.have, post.seq)) return null;
+  return { claim: row.claim, rating: row.rating, checker: row.checker, url: row.url, date: row.date, lang: row.lang, coverage: Math.round(coverage * 100) / 100, shared: shared.length, negationDiffers: row.neg !== post.neg };
+}
+
+// The best matches for one post, at most `max`, one per fact-check URL, closest first.
+function matchClaims(index, text, { max = 3 } = {}) {
+  if (!index || !index.n || !text) return [];
+  const t = claimTokens(text);
+  const post = { seq: t.tokens, have: new Set(t.tokens), pairs: pairs(t.tokens), neg: hasNegation(text) };
+  if (post.have.size < MIN_SHARED) return [];
+  const maxDf = Math.max(50, index.n * 0.05), hits = new Map();
+  for (const tok of post.have) {
+    const p = index.postings.get(tok);
+    if (!p || p.length > maxDf) continue;
+    for (const id of p) hits.set(id, (hits.get(id) || 0) + 1);
+  }
+  const cands = [...hits].filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).slice(0, MAX_CANDIDATES);
+  const out = [], seen = new Set();
+  for (const [id] of cands) {
+    const m = verify(index, index.rows[id], post);
+    if (m && !seen.has(m.url)) { seen.add(m.url); out.push(m); }
+  }
+  return out.sort((a, b) => b.coverage - a.coverage || b.shared - a.shared).slice(0, max);
+}
+
+// The card rows for one match. The rating is quoted as the fact-checker wrote it.
+function claimCard(m) {
+  let host = m.url;
+  try { host = new URL(m.url).hostname.replace(/^www\./, ""); } catch { /* keep the raw URL */ }
+  const rows = [
+    ["Fact-checker", m.checker],
+    ["Their rating", `"${m.rating}"`],
+    ["Claim they reviewed", m.claim],
+    ["Reviewed on", m.date || "date not given"],
+    ["Wording overlap", `${Math.round(m.coverage * 100)}% of the claim's words`],
+    m.negationDiffers ? ["Note", "One of the two says \"not\" and the other does not. Read both."] : null,
+    ["Read it", { links: [[host, m.url]] }],
+    ["Source", CLAIM_ATTRIBUTION],
+    ["Does not prove", CLAIM_DOES_NOT_PROVE],
+  ].filter(Boolean);
+  return { label: CLAIM_LABEL, rows };
+}
+
+return { MIN_CLAIM_TOKENS, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION, claimTokens, hasNegation, guessLanguage, buildClaimIndex, matchClaims, claimCard };
+})();
+
+// ---- settings.js
+const M_settings = (() => {
+// Radar's settings, in one normalised shape for the toolbar popup, the first-run and options pages
+// and the content scripts, plus the retention prune the background worker runs. Settings live in
+// chrome.storage.local under SETTINGS_KEY, on this machine only.
+
+const SETTINGS_KEY = "pb.settings";
+
+// Sites Radar has an adapter for. A site added later starts on unless the user switches it off.
+const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"]];
+
+// The areas of the window's strip; each can be hidden from the window.
+const AREA_IDS = ["place", "account", "posting", "coordination", "language", "sources", "media"];
+
+// Retention in days. The upper limits are what the logs keep at most (history.js keeps 60 days;
+// the connections and trail logs keep 30, so a longer history setting leaves those at 30).
+const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 } };
+
+const DEFAULTS = Object.freeze({
+  paused: false, feeds: true, auto: true, sites: {}, areas: {},
+  historyDays: 60, aboutDays: 14, calm: false, large: false, onboarded: false,
+});
+
+const bool = (v, d) => (typeof v === "boolean" ? v : d);
+const days = (v, d, r) => (Number.isFinite(Number(v)) && v !== null && v !== "" ? Math.min(r.max, Math.max(r.min, Math.round(Number(v)))) : d);
+const switches = (v, allowed) => {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return {};
+  return Object.fromEntries(Object.entries(v).filter(([k, x]) => typeof x === "boolean" && (!allowed || allowed.includes(k))));
+};
+
+function normalizeSettings(raw) {
+  const s = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  return {
+    paused: bool(s.paused, DEFAULTS.paused), feeds: bool(s.feeds, DEFAULTS.feeds), auto: bool(s.auto, DEFAULTS.auto),
+    sites: switches(s.sites), areas: switches(s.areas, AREA_IDS),
+    historyDays: days(s.historyDays, DEFAULTS.historyDays, RETENTION.historyDays),
+    aboutDays: days(s.aboutDays, DEFAULTS.aboutDays, RETENTION.aboutDays),
+    calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
+  };
+}
+
+// The fixture harness behaves as an X page, so it follows the X switch.
+function siteOn(s, id) {
+  const key = id === "fixture" ? "x" : id;
+  return !s.paused && s.sites[key] !== false;
+}
+
+const areaOn = (s, area) => s.areas[area] !== false;
+
+// The toolbar icon: paused when Radar is paused or off for this site, reading while it is reading
+// accounts, idle otherwise.
+function iconState({ paused, siteOff, reading } = {}) {
+  if (paused || siteOff) return "paused";
+  return reading ? "reading" : "idle";
+}
+
+const DAY = 86400000;
+const keepMap = (m, field, cutoff) => Object.fromEntries(Object.entries(m || {}).filter(([, v]) => v && (v[field] || 0) >= cutoff));
+const size = (m) => Object.keys(m || {}).length;
+
+// Drop every entry older than the user's retention. Returns only the keys whose value changed.
+function pruneStore(store, settings, now = Date.now()) {
+  const s = normalizeSettings(settings);
+  const hist = now - s.historyDays * DAY, about = now - s.aboutDays * DAY;
+  const out = {};
+  const H = store["pb.history.v1"];
+  if (H) { const k = keepMap(H, "at", hist); if (size(k) !== size(H)) out["pb.history.v1"] = k; }
+  const N = store["pb.net.v1"];
+  if (N && N.threads) { const k = keepMap(N.threads, "at", hist); if (size(k) !== size(N.threads)) out["pb.net.v1"] = { ...N, threads: k }; }
+  const T = store["pb.trail.v1"];
+  if (T) {
+    const media = keepMap(T.media, "seen", hist), links = keepMap(T.links, "seen", hist);
+    if (size(media) !== size(T.media) || size(links) !== size(T.links)) out["pb.trail.v1"] = { ...T, media, links };
+  }
+  for (const key of ["pb.about.v1", "pb.reddit.v1"]) {
+    const A = store[key];
+    if (A) { const k = keepMap(A, "at", about); if (size(k) !== size(A)) out[key] = k; }
+  }
+  return out;
+}
+
+const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
+
+// "Clear all Radar data": every Radar key except the settings themselves.
+const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && k !== SETTINGS_KEY);
+
+return { SETTINGS_KEY, SITES, AREA_IDS, RETENTION, DEFAULTS, normalizeSettings, siteOn, areaOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
+})();
+
+// ---- measured.js
+const M_measured = (() => {
+// Measured accuracy per badge family, from the held-out test split in project-docs/EVALUATION.md.
+// Generated by scripts/eval.mjs; do not edit. The window and the options page read MEASURED through
+// families.js (measuredLine). A family with no row here shows "not measured yet".
+//
+// Row shape, one per family id from families.js:
+//   { precision, low, high, n, split: "test", recall?, side?, date?, source? }
+//   precision, low, high: 0 to 1 (low and high are the 95% interval); n: badges checked.
+//   range: [lowest, highest] precision across corpora with at least 20 hits, or null.
+// MEASURED_DETAIL holds every family (weak ones too), the side comparison and the SYNTHETIC
+// duplicate and mismatch pilots, which are not human-labelled and get no row in MEASURED.
+
+const MEASURED_AT = "2026-10-21";
+const MEASURED = {
+  "dehumanise": {"precision":0.923,"low":0.797,"high":0.973,"n":39,"split":"test","recall":0.002,"range":null,"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "violence": {"precision":0.875,"low":0.79,"high":0.929,"n":88,"split":"test","recall":0.021,"range":[0.967,0.967],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "slur": {"precision":0.91,"low":0.901,"high":0.918,"n":4392,"split":"test","recall":null,"range":[0.34,0.953],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "stereotype": {"precision":0.833,"low":0.746,"high":0.895,"n":96,"split":"test","recall":0.006,"range":[0.917,0.917],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+};
+
+const MEASURED_DETAIL = {
+ "generated": "2026-10-21",
+ "split": "test",
+ "seed": "radar-eval-2026-10-21",
+ "extremeAt": 2,
+ "extreme": {"precision":{"k":896,"n":1275,"value":0.703,"ci":[0.677,0.727]},"recall":{"k":896,"n":5224,"value":0.172,"ci":[0.162,0.182]},"against":"mhs: hate_speech_score > 0.5","byCorpus":{"mhs":{"k":896,"n":1275,"value":0.703,"ci":[0.677,0.727]},"hatexplain":{"k":1950,"n":3246,"value":0.601,"ci":[0.584,0.617]},"civil":{"k":0,"n":0,"value":null,"ci":null},"mlma-fr":{"k":0,"n":9,"value":0,"ci":[0,0.299]}}},
+ "sides": {"mhs":{"right":{"recall":{"k":765,"n":7584,"value":0.101,"ci":[0.094,0.108]},"precision":{"k":765,"n":800,"value":0.956,"ci":[0.94,0.968]}},"left":{"recall":{"k":198,"n":2499,"value":0.079,"ci":[0.069,0.09]},"precision":{"k":198,"n":211,"value":0.938,"ci":[0.897,0.964]}},"gap":{"precision":false,"recall":true}},"hatexplain":{"right":{"recall":{"k":1895,"n":4197,"value":0.452,"ci":[0.437,0.467]},"precision":{"k":1895,"n":1933,"value":0.98,"ci":[0.973,0.986]}},"left":{"recall":{"k":109,"n":251,"value":0.434,"ci":[0.374,0.496]},"precision":{"k":109,"n":112,"value":0.973,"ci":[0.924,0.991]}},"gap":{"precision":false,"recall":false}}},
+ "duplicates": {"synthetic":true,"precision":{"k":85,"n":87,"value":0.977,"ci":[0.92,0.994]},"recall":{"k":85,"n":85,"value":1,"ci":[0.957,1]}},
+ "mismatch": {"synthetic":true,"precision":{"k":14,"n":14,"value":1,"ci":[0.785,1]},"recall":{"k":14,"n":14,"value":1,"ci":[0.785,1]}},
+ families: {
+   "dehumanise": {"precision":{"k":36,"n":39,"value":0.923,"ci":[0.797,0.973]},"precisionRange":null,"byCorpus":{"mhs":{"k":17,"n":19,"value":0.895,"ci":[0.686,0.971]},"hatexplain":{"k":18,"n":18,"value":1,"ci":[0.824,1]},"civil":{"k":1,"n":2,"value":0.5,"ci":[0.095,0.905]}},"specific":{"against":"mhs:dehumanise","precision":{"k":11,"n":19,"value":0.579,"ci":[0.363,0.769]},"recall":{"k":11,"n":5046,"value":0.002,"ci":[0.001,0.004]}},"recall":{"k":11,"n":5046,"value":0.002,"ci":[0.001,0.004]},"measured":true,"note":null},
+   "violence": {"precision":{"k":77,"n":88,"value":0.875,"ci":[0.79,0.929]},"precisionRange":[0.967,0.967],"byCorpus":{"mhs":{"k":59,"n":61,"value":0.967,"ci":[0.888,0.991]},"hatexplain":{"k":15,"n":18,"value":0.833,"ci":[0.608,0.942]},"civil":{"k":3,"n":9,"value":0.333,"ci":[0.121,0.646]}},"specific":{"against":"mhs:violence","precision":{"k":39,"n":61,"value":0.639,"ci":[0.514,0.748]},"recall":{"k":39,"n":1819,"value":0.021,"ci":[0.016,0.029]}},"recall":{"k":39,"n":1819,"value":0.021,"ci":[0.016,0.029]},"measured":true,"note":null},
+   "vigilante": {"precision":{"k":2,"n":3,"value":0.667,"ci":[0.208,0.939]},"precisionRange":null,"byCorpus":{"mhs":{"k":2,"n":2,"value":1,"ci":[0.342,1]},"hatexplain":{"k":0,"n":0,"value":null,"ci":null},"civil":{"k":0,"n":1,"value":0,"ci":[0,0.793]}},"specific":null,"recall":null,"measured":false,"note":"fewer than 20 hits in the test split; not measured"},
+   "slur": {"precision":{"k":3995,"n":4392,"value":0.91,"ci":[0.901,0.918]},"precisionRange":[0.34,0.953],"byCorpus":{"mhs":{"k":1085,"n":1138,"value":0.953,"ci":[0.94,0.964]},"hatexplain":{"k":2894,"n":3207,"value":0.902,"ci":[0.892,0.912]},"civil":{"k":16,"n":47,"value":0.34,"ci":[0.222,0.483]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "slurSoft": {"precision":{"k":837,"n":1278,"value":0.655,"ci":[0.628,0.68]},"precisionRange":[0.203,0.917],"byCorpus":{"mhs":{"k":355,"n":387,"value":0.917,"ci":[0.886,0.941]},"hatexplain":{"k":440,"n":684,"value":0.643,"ci":[0.607,0.678]},"civil":{"k":42,"n":207,"value":0.203,"ci":[0.154,0.263]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "stereotype": {"precision":{"k":80,"n":96,"value":0.833,"ci":[0.746,0.895]},"precisionRange":[0.917,0.917],"byCorpus":{"mhs":{"k":66,"n":72,"value":0.917,"ci":[0.83,0.961]},"hatexplain":{"k":11,"n":15,"value":0.733,"ci":[0.48,0.891]},"civil":{"k":3,"n":9,"value":0.333,"ci":[0.121,0.646]}},"specific":{"against":"mhs:stereotype","precision":{"k":51,"n":72,"value":0.708,"ci":[0.595,0.801]},"recall":{"k":51,"n":8368,"value":0.006,"ci":[0.005,0.008]}},"recall":{"k":51,"n":8368,"value":0.006,"ci":[0.005,0.008]},"measured":true,"note":null},
+   "motive": {"precision":{"k":29,"n":40,"value":0.725,"ci":[0.572,0.839]},"precisionRange":[0.818,0.818],"byCorpus":{"mhs":{"k":18,"n":22,"value":0.818,"ci":[0.615,0.927]},"hatexplain":{"k":9,"n":13,"value":0.692,"ci":[0.424,0.873]},"civil":{"k":2,"n":5,"value":0.4,"ci":[0.118,0.769]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "essentialise": {"precision":{"k":59,"n":102,"value":0.578,"ci":[0.481,0.67]},"precisionRange":[0.258,0.75],"byCorpus":{"mhs":{"k":33,"n":47,"value":0.702,"ci":[0.56,0.813]},"hatexplain":{"k":18,"n":24,"value":0.75,"ci":[0.551,0.88]},"civil":{"k":8,"n":31,"value":0.258,"ci":[0.137,0.432]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "conspiracy": {"precision":{"k":34,"n":118,"value":0.288,"ci":[0.214,0.376]},"precisionRange":[0.036,0.036],"byCorpus":{"mhs":{"k":15,"n":17,"value":0.882,"ci":[0.657,0.967]},"hatexplain":{"k":16,"n":17,"value":0.941,"ci":[0.73,0.99]},"civil":{"k":3,"n":84,"value":0.036,"ci":[0.012,0.1]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "absolutist": {"precision":{"k":137,"n":270,"value":0.507,"ci":[0.448,0.567]},"precisionRange":[0.329,0.842],"byCorpus":{"mhs":{"k":33,"n":43,"value":0.767,"ci":[0.623,0.868]},"hatexplain":{"k":48,"n":57,"value":0.842,"ci":[0.726,0.915]},"civil":{"k":56,"n":170,"value":0.329,"ci":[0.263,0.403]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "contempt": {"precision":{"k":93,"n":101,"value":0.921,"ci":[0.851,0.959]},"precisionRange":[0.915,0.931],"byCorpus":{"mhs":{"k":65,"n":71,"value":0.915,"ci":[0.828,0.961]},"hatexplain":{"k":27,"n":29,"value":0.931,"ci":[0.78,0.981]},"civil":{"k":1,"n":1,"value":1,"ci":[0.207,1]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "strong": {"precision":{"k":4150,"n":4578,"value":0.907,"ci":[0.898,0.915]},"precisionRange":[0.338,0.95],"byCorpus":{"mhs":{"k":1206,"n":1269,"value":0.95,"ci":[0.937,0.961]},"hatexplain":{"k":2921,"n":3241,"value":0.901,"ci":[0.891,0.911]},"civil":{"k":23,"n":68,"value":0.338,"ci":[0.237,0.457]}},"specific":null,"recall":null,"measured":true,"note":null},
+ },
+};
+
+const MEASURED_DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), not on this site's replies. Precision says how often a marker sat on text the annotators judged hostile to a group; it does not say why anyone wrote it, and it can differ on other sites and topics.";
+
+return { MEASURED_AT, MEASURED, MEASURED_DETAIL, MEASURED_DOES_NOT_PROVE };
+})();
+
+// ---- families.js
+const M_families = (() => {
+// Badge families: every kind of signal the window can show, which area of the strip it sits in, and
+// what sort of evidence it is. A detector is Radar's own rule and can be measured for precision; a
+// platform family repeats the site's own label; a table family is a match against a cited table.
+// measuredLine() gives the line the window and the options page show for a family.
+
+const { MEASURED } = M_measured;
+
+const D = "detector", P = "platform", T = "table";
+const FAMILIES = [
+  ["slur", "Slur or coded hate term", "language", D], ["stereotype", "Group stereotype", "language", D],
+  ["dehumanise", "Dehumanising language", "language", D], ["violence", "Call for violence", "language", D],
+  ["vigilante", "Call for vigilantes", "language", D], ["leaked-ai", "Leaked AI text", "language", D],
+  ["machine-writing", "Machine-writing signs", "language", D], ["spam-pattern", "Spam pattern", "language", D],
+  ["x-spam", "X: probable spam", "language", P], ["hate-symbol-name", "Hate symbol in name", "language", D],
+  ["old-media", "Media older than the post", "media", D], ["lifted-media", "Media from another post", "media", P],
+  ["same-upload", "Same upload, many accounts", "coordination", D], ["duplicates", "Same text as other replies", "coordination", D],
+  ["copied-elsewhere", "Same words in other threads", "coordination", D],
+  ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
+  ["state-link", "State link", "sources", T], ["owner", "Outlet owner", "sources", T],
+  ["client", "Posting app", "posting", P], ["written-in", "Written in another language", "place", P],
+  ["mismatch", "Speaks as local, labelled elsewhere", "place", D], ["store-elsewhere", "App store elsewhere", "place", D],
+  ["flag-elsewhere", "Flag of another country", "place", D], ["profile-location-elsewhere", "Profile says elsewhere", "place", D],
+  ["hours-elsewhere", "Active hours fit elsewhere", "place", D],
+  ["fast-replier", "Replies within a minute", "posting", D], ["automation-app", "Posts through an automation app", "posting", D],
+  ["no-sleep-gap", "Posts around the clock", "posting", D], ["repost-only", "Almost only reposts", "posting", D],
+  ["high-volume", "Very high post rate", "posting", D],
+  ["new-account", "New account", "account", D], ["name-changes", "Renamed", "account", D],
+  ["default-handle", "Sign-up handle", "account", D], ["follow-pattern", "Follows many, few follow back", "account", D],
+  ["low-karma", "Low karma for its age", "account", D],
+].map(([id, name, area, kind]) => ({ id, name, area, kind }));
+
+const BY_ID = new Map(FAMILIES.map((f) => [f.id, f]));
+const FLAG_FAMILY = { "based-elsewhere": "mismatch", "same-text": "duplicates" };
+
+// kind: "flag" (an account flag id from flags.js), "marker" (a rhetoric family) or "family".
+function familyOf(kind, id) {
+  const f = kind === "flag" ? FLAG_FAMILY[id] || id : id;
+  return BY_ID.has(f) ? f : null;
+}
+
+const pc = (x) => Math.round(x * 100);
+const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.precision <= 1 && Number.isInteger(r.n) && r.n > 0;
+
+// { measured, text } for one family. A row without a sample size is not shown as a measurement.
+function measuredLine(id, table = MEASURED) {
+  const f = BY_ID.get(id);
+  if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Radar detector" };
+  if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
+  const r = (table || {})[id];
+  if (!valid(r)) return { measured: false, text: "not measured yet" };
+  const ci = Number.isFinite(r.low) && Number.isFinite(r.high) ? ` (95% interval ${pc(r.low)} to ${pc(r.high)}%)` : "";
+  const split = r.split === "test" ? ", held-out test set" : r.split ? `, ${r.split} set` : "";
+  return { measured: true, text: `precision ${pc(r.precision)}%${ci}, ${r.n} badges checked${split}` };
+}
+
+return { FAMILIES, familyOf, measuredLine };
+})();
+
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_settings, ...M_measured, ...M_families });
 })();

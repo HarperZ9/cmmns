@@ -26,9 +26,26 @@ extreme rhetoric so it reads as normal for a group. A reader scrolling replies c
 | Platform | Location signal | Status |
 |---|---|---|
 | X | "About this account": inferred country or region, join date, username changes, how the app was installed (rolled out November 2025) | milestone 1 and 2 |
-| Facebook, Instagram | "Based in" on some high-reach accounts; Page Transparency | milestone 3 |
+| Instagram | "About this account": date joined, "Account based in", former usernames, verified | shipped 2026-10-21, passive only |
+| Facebook | Page transparency: creation date, name changes, countries of the people who manage a Page | shipped 2026-10-21, passive only; wording unconfirmed live |
+| Bluesky | none; join date and moderation labels from the app's own thread data | shipped 2026-10-21 |
 | YouTube | self-declared channel country only | milestone 3, behaviour signals |
 | Reddit | none | milestone 3, behaviour signals |
+
+## How account data is read on Facebook, Instagram and Bluesky
+- **Instagram and Facebook, passive only.** When the viewer opens an account's "About this account"
+  dialog or a Page's transparency view, src/ext/meta.js reads the rendered text and keeps it per site
+  for 14 days. Radar never opens these itself. Instagram delivers the dialog as a Bloks UI payload
+  from `/async/wbloks/fetch/`, not as data, so there is no stable request to repeat the way
+  src/ext/sniff.js repeats X's About request; Facebook shows transparency only for Pages, one Page
+  at a time. Automatic lookups on Meta would need either, and stay out of scope until one is stable.
+- **Facebook manager countries.** A Page lists every country of the people who manage it. Radar
+  uses it as the account's label only when exactly one country is listed; with several, the card
+  lists them and no "speaks as a local" comparison is made.
+- **Bluesky.** src/ext/bskysniff.js copies the thread, profile and feed responses the Bluesky app
+  already requested. Moderation labels about authenticity (spam, impersonation, scam, inauthentic,
+  engagement-farming) raise the "moderation label" flag; labels about content are shown, never
+  flagged, and self-labels are ignored.
 
 ## How account data is read on X
 - **Passive:** whenever the user opens an account's About page, the reading is cached locally.
@@ -42,14 +59,23 @@ extreme rhetoric so it reads as normal for a group. A reader scrolling replies c
   country or region level.
 - **Duplicates** (`src/core/similarity.js`): word 3-gram MinHash with banding, confirmed by exact
   Jaccard of at least 0.6, across distinct authors, ignoring replies under 6 words.
-- **Rhetoric** (`src/core/rhetoric.js`): four marker families (dehumanise, violence, conspiracy,
-  absolutist) with negation handling. Policy positions such as deportation under law score zero.
+- **Rhetoric** (`src/core/rhetoric.js`): strong families (dehumanise, violence, vigilante, slur,
+  stereotype) that label the post, and weak ones (motive, essentialise, conspiracy, absolutist,
+  contempt, context-dependent slurs) that only feed "extreme". Negation, reported speech and quoted
+  words do not count. Policy positions such as deportation under law score zero. Measured precision
+  per family is in `src/core/measured.js` (EVALUATION.md).
+  French, Spanish, German, Portuguese and Italian grammars (`rhetoric-<lang>.js` with
+  `lexicon-<lang>.js`) run after English in the order listed in `LANGUAGES`, and each adds only
+  families not yet found. Each language negates with its own words and has its own symmetry test
+  (`tests/rhetoric.<lang>.test.js`; French in `tests/rhetoric.recall.test.js`). Word-list sources: `evidence/LEXICON-SOURCES.md`.
 - **Report** (`src/core/report.js`): as above; needs at least 10 extreme replies.
 
 ## Known limits
 - X's labels can be wrong; VPNs and travel move them; users can broaden them to a region.
 - The local-claim patterns are English and a little French. Other languages read as "no claim".
-- The rhetoric lexicon is English and hand-built. It needs precision and recall measured on
+- The rhetoric lexicons are hand-built. The non-English ones cover dehumanise, violence,
+  stereotype, conspiracy and (except French) slurs; motive, essentialise, vigilante and
+  absolutist are English only. Every lexicon needs precision and recall measured on
   labelled data before anyone relies on the report (EVALUATION.md).
 - The report sees only the replies X chose to render and the accounts that were looked up.
 
@@ -115,6 +141,47 @@ Radar draws nothing on the page. Resting the pointer on a post for 450 ms fades 
 
 Radar describes how an account operates. It does not try to work out who runs an account: no linking accounts across platforms, no guessing names, employers, ages or homes, no reverse search of profile photos, and no payment or tip-jar handles. Those steps would identify people, most of whom are ordinary users, and they add nothing to the evidence that an operation exists.
 
+### Fact-checked claims (2026-10-21)
+
+`src/core/claims.js` matches each post against claims fact-checkers have already reviewed, from a
+table bundled with Radar (`src/ext/claims.json`, 19,728 reviews from 328 fact-checkers, 6 MB,
+built from the Data Commons ClaimReview feed under CC BY 4.0 by `scripts/claims-build.mjs`). The
+background worker indexes the table once; pages send the text of the posts they show and get back
+only the matches. A match reads "A fact-checker reviewed a similar claim", with the fact-checker's
+name, their rating in their own words, the claim they reviewed, the date and a link. Its
+does-not-prove line: similar wording is not the same claim; check the source. Radar never rates a
+post itself. A Community Note X attached to a post is now the first signal in the window.
+
+A post matches only when it carries at least 85% of the claim's rarity-weighted content words,
+every name and number in the claim, at least 30% of the claim's word pairs in order, and no claim
+word swapped for another between the same neighbours. `tests/claims.test.js` holds the
+false-match controls (same topic, different year, different place, a swapped word, scattered
+words, stock phrases) and `tests/claims.symmetry.test.js` holds the matcher to the same decision
+and score for 24 named actors and 12 groups from every direction. On the built table, each of
+2,000 sampled claims finds its own review (1,998 of 2,000), seven generic posts on politics, health
+and conflict match nothing, and 41 of 3,000 sampled claims match a different review; read by hand,
+those were the same claim reviewed twice in different words.
+
+Sources whose terms are unknown are not bundled: EUvsDisinfo, Community Notes downloads, the Duke
+Reporters' Lab dataset and the IFCN signatory list (`data/claims.README.md`). Known limits: the
+matcher splits words on spaces, so Chinese, Japanese and Thai claims match only near-verbatim; the
+stemmer is English-centred; the table covers 2024-03 to 2026-10; and which claims are in it is
+what fact-checkers chose to check.
+
 ### The window, reorganised (2026-10-19)
 
 The head shows the account, the key facts, warnings by name, and a strip of seven areas: Place, Account, Posting, Coordination, Language, Sources and Media. Each area's dot is warm when something there is worth a look, ink for a sign, faint for context, and hollow when nothing was found. Clicking an area opens the Overview at that area's evidence. Four tabs follow: **Overview** (the evidence grouped by area, and a comparison with the other accounts read in the thread), **Account** (where, the account record, and how it posts, with a 24-hour posting clock, the last 14 days and the share of posts per app), **This post** (post metadata and the source trail) and **History**. The window remembers the last tab used. The charts are single-series, in one ink hue, with a title on each bar and the same numbers as text below them.
+
+### Product surfaces (2026-10-21)
+
+**Settings** (`src/core/settings.js`, read by `src/ext/settings.js`). One normalised shape for the popup, the first-run page, the options page and the content scripts: per-site switches and a global pause, the window's areas, feeds, automatic reading, retention (history 1 to 60 days, account details 1 to 30), and two accessibility switches (reduced motion, larger text) applied as `pb-calm` and `pb-large` on the page root. The background worker (`src/ext/lifecycle.js`) deletes entries older than the retention on start-up and on every settings change, and the content scripts follow storage changes so an old in-memory copy is never written back.
+
+**Measured accuracy** (`src/core/families.js`, `src/core/measured.js`). Every sign carries a family. Detector families show the precision from `measured.js` with its 95% interval and sample size, or "not measured yet"; a row without a sample size is not shown as a measurement. Families that repeat a site's own label, or match a cited table, say so instead of showing a precision.
+
+**Toolbar states.** The content script reports idle, reading or paused for its tab, and the worker swaps the icon. Icons are drawn by `scripts/render-icons.py` from the SVG sources in `assets/icons/`: the aperture, a luminous orb in fine concentric line-work on an ink disk, with one warm mark for reading and the orb closed to a ring for paused.
+
+**Keyboard.** Focusing a post opens its window; Alt+R moves focus into it; arrow keys move between tabs (tablist, tab and tabpanel roles); Escape closes it and returns focus to the post without reopening it.
+
+**Packaging** (`scripts/package.mjs`, `scripts/zip.mjs`). A dependency-free zip writer with sorted entries, a fixed 1980-01-01 timestamp and deflate level 9; Chrome gets a service worker manifest, Firefox background scripts and a minimum version of 128. The same tree gives the same bytes on the same Node zlib; a different zlib build can change the compressed bytes.
+
+**Type.** Extension pages bundle Hanken Grotesk (SIL OFL 1.1). Conso is named first in the figure stack but not bundled, because its licence permits the author's site and has not been checked for redistribution inside an extension; the system monospace stands in.

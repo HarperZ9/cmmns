@@ -1,18 +1,22 @@
-:root { --ink: #0f1419; --muted: #536471; --line: #eff3f4; --ground: #fff; --hot: #c2410c; }
+:root { --ink: #0f1419; --muted: #536471; --line: #eff3f4; --ground: #fff; --hot: #b93c0a; }
 @media (prefers-color-scheme: dark) { :root { --ink: #e7e9ea; --muted: #8b98a5; --line: #2f3336; --ground: #15181c; --hot: #fb923c; } }
-body { margin: 0; width: 320px; font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--ground); }
+@font-face { font-family: "Hanken Grotesk"; src: url("fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+body { margin: 0; width: 320px; font: 13px/1.45 "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--ground); }
 header { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 14px 6px; font-size: 15px; }
 header span { color: var(--muted); font-size: 12px; }
 main { padding: 0 14px 10px; }
 .lead { margin: 4px 0 10px; }
 dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 0 0 12px; }
 dt { color: var(--muted); }
-dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+dd { margin: 0; text-align: right; font-family: "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12px; font-variant-numeric: tabular-nums; }
 dd.hot { color: var(--hot); font-weight: 600; }
 .actions { display: grid; gap: 6px; }
 button { font: inherit; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; text-align: left; }
 button:hover:not(:disabled) { border-color: var(--muted); }
 button:disabled { opacity: 0.45; cursor: default; }
 .settings { display: grid; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+input[type="checkbox"] { accent-color: var(--ink); }
 label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
 footer { padding: 8px 14px 12px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--line); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.pb-large body { font-size: 15px; }

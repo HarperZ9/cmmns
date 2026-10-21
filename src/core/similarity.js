@@ -14,7 +14,7 @@ export function normalize(text) {
     .toLowerCase()
     .replace(/https?:\/\/\S+/g, " ")        // links differ per copy
     .replace(/@\w+/g, " ")                  // so do the handles replied to
-    .replace(/[^\p{L}\p{N}\s]/gu, " ")      // punctuation and emoji
+    .replace(/[^\p{L}\p{M}\p{N}\s]/gu, " ") // punctuation and emoji; combining marks stay in words
     .replace(/\s+/g, " ")
     .trim();
 }

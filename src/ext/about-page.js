@@ -39,6 +39,8 @@
 
   function check() {
     clearTimeout(timer);
+    // X pages only: other sites' paths look like handles too ("/watch", "/nasa/").
+    if (!/(^|\.)(x|twitter)\.com$/.test(location.hostname) && !document.documentElement.dataset.pbFixture) return;
     const about = location.pathname.match(/^\/([A-Za-z0-9_]{1,15})\/about\/?$/);
     const profile = location.pathname.match(/^\/([A-Za-z0-9_]{1,15})\/?$/);
     const m = about || profile;

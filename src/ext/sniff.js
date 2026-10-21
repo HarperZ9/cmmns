@@ -68,7 +68,9 @@
       const csrf = (document.cookie.match(/(?:^|;\s*)ct0=([^;]+)/) || [])[1];
       const res = await origFetch.call(window, u.toString(), { credentials: "include", headers: { ...template.headers, ...(csrf ? { "x-csrf-token": csrf } : {}) } });
       if (res.ok) post({ source: "radar-sniff", json: await res.json(), about: handle });
-      post({ source: "radar-about-done", handle, status: res.status });
+      const num = (h) => { const v = res.headers.get(h); return v == null ? undefined : Number(v); };
+      post({ source: "radar-about-done", handle, status: res.status,
+        remaining: num("x-rate-limit-remaining"), reset: num("x-rate-limit-reset") });
     } catch (err) {
       post({ source: "radar-about-done", handle, status: "error" });
     }

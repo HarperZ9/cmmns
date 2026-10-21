@@ -1,14 +1,15 @@
 // Radar's word lists, kept apart from the matching code so they can be reviewed and updated in
 // one place. Every list covers targets in every direction; tests/rhetoric.symmetry.test.js holds
 // the scoring to equal treatment. Sources for slurs and coded terms: the ADL Hate Symbols
-// database, Hatebase, GNET and ISD extremism glossaries. Words that people also use innocently
+// database, Hatebase, GNET and ISD extremism glossaries; terms added for side recall on 2026-10-21 cite
+// Wiktionary labels in project-docs/evidence/LEXICON-SOURCES.md. Words that people also use innocently
 // (a jogger, crackers, gypsy as a self-name) go in the SOFT lists, which count for less.
 
 // People named as groups. Matching any of these lets the grammar rules ("X are vermin",
 // "all X are", "X want to destroy") apply.
 export const GROUPS = [
   // origin, faith, ethnicity, nationality
-  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "jews", "christians", "hindus", "sikhs", "atheists",
+  "immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "muslims", "moslems", "jews", "christians", "hindus", "sikhs", "atheists",
   "arabs", "africans", "blacks", "black people", "whites", "white people", "asians", "latinos", "hispanics", "mexicans", "chinese",
   "indians", "pakistanis", "somalis", "haitians", "russians", "ukrainians", "americans", "europeans", "french", "roma", "natives",
   // faiths named as a whole, so "war on Islam" reads like "war on Muslims"
@@ -23,19 +24,42 @@ export const GROUPS = [
   "the rich", "billionaires", "elites", "the elite", "landlords", "bankers", "politicians", "police", "cops", "protesters",
   "rioters", "journalists", "the media", "boomers", "men", "women", "gays", "lesbians", "trans people", "transgenders",
   "feminists", "disabled people", "the disabled", "farmers", "unions",
+  // added 2026-10-21 from the dev split, one per direction where both exist
+  "evangelicals", "catholics", "white men", "white women", "black men", "black women", "straight people", "straights",
+  "gay people", "gay men", "queers", "jewish people", "muslim people", "christian people", "caucasians", "white kids",
+  "black kids", "white guys", "black guys", "white girls", "black girls", "hillbillies", "arab people", "asian people",
+  // added 2026-10-21 for the side-recall fix (project-docs/evidence/LEXICON-SOURCES.md): a self-named group, and
+  // political coinages from both directions, so the grammar reads "trumptards are scum" like "libtards are scum"
+  "incels", "trumptards", "trumpanzees", "rethuglicans", "repugnicans", "demonrats", "conservatards",
 ];
+
+// The dehumanising nouns that stay unambiguous right after a group ("commie filth", "migrant rats").
+// Words with ordinary uses next to a group noun ("police dogs", "women with cancer") are left out.
+export const DEHUMANISE_ADJACENT = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "subhuman",
+  "sub-human", "savages", "filth", "scum", "insects", "apes", "monkeys", "beasts", "pigs", "invaders"];
+
+// "An infestation of X", "hordes of X".
+export const SWARM = ["infestation", "plague", "swarm", "swarms", "horde", "hordes"];
 
 export const DEHUMANISE = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "animals", "savages", "subhuman",
   "sub-human", "infestation", "plague", "disease", "cancer", "filth", "scum", "pigs", "insects", "invaders", "a virus", "apes",
   "monkeys", "beasts", "dogs"];
 
 // Physical harm only: deporting or jailing people under a law is a policy position, not a marker.
-export const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed",
-  "lynched", "beaten", "burned alive", "purged", "eliminated"];
+export const VIOLENCE_VERBS = ["shot", "hanged", "hung", "executed", "killed", "exterminated", "eradicated", "wiped out", "gassed", "genocided",
+  "lynched", "beaten", "burned alive", "purged", "eliminated",
+  "murdered", "tortured"];
 
-export const VIOLENT_SLOGANS = ["helicopter rides", "day of the rope", "string them up", "line them up", "round them up",
+// Active calls: "we should exterminate X", "let's kill all the X". Physical harm only, as above.
+export const KILL_VERBS = ["exterminate", "kill", "shoot", "hang", "gas", "lynch", "wipe out", "eradicate", "massacre",
+  "slaughter", "execute", "burn", "genocide", "nuke", "murder", "torture"];
+
+// Death wishes after "deserve to", "should all": "X deserve to die".
+export const DEATH_WISH = ["die", "rot", "burn in hell", "be put down", "be wiped off the earth"];
+
+export const VIOLENT_SLOGANS = ["free helicopter rides", "day of the rope", "string them up", "line them up", "round them up",
   "hang them all", "kill them all", "deport them all", "send them all back", "nuke them", "nuke the bastards", "pull out the guns",
-  "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines", "bash the fash", "punch a nazi", "death to"];
+  "get rid of them all", "guillotine them", "guillotines for", "bring out the guillotines", "bash the fash", "punch a nazi"];
 
 export const VIGILANTE = ["will deal with them", "deal with them ourselves", "take care of them ourselves",
   "take matters into our own hands", "take matters into their own hands", "bring in the army", "bring their armies in",
@@ -64,7 +88,12 @@ export const ESSENTIALISE = ["import third world", "import the third world", "im
 // Stereotype traits: "<group> are <trait>" names a whole group by a trait.
 export const STEREOTYPE_TRAITS = ["lazy", "criminals", "criminal", "thieves", "violent", "dirty", "filthy", "stupid", "dumb",
   "terrorists", "rapists", "savage", "greedy", "inbred", "degenerates", "degenerate", "pedophiles", "paedophiles", "groomers",
-  "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil"];
+  "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil",
+  "disgusting", "worthless", "useless", "ugly", "garbage"];
+
+// Intensifiers allowed between "are" and the trait: "X are fucking stupid", "X are inherently violent".
+export const INTENSIFIERS = ["fucking", "so", "too", "really", "damn", "inherently", "naturally", "genetically", "always",
+  "basically", "literally", "very"];
 
 // Invented motives: "<group> want to destroy / replace / ban ..." puts an aim in a whole group's mouth.
 export const MOTIVE_VERBS = ["destroy", "replace", "ban", "erase", "kill", "eliminate", "enslave", "take over", "wipe out",
@@ -74,7 +103,7 @@ export const MOTIVE_VERBS = ["destroy", "replace", "ban", "erase", "kill", "elim
 export const SLURS = [
   // anti-Black
   "nigger", "niggers", "coon", "coons", "jigaboo", "porch monkey", "porch monkeys", "sambo", "darkie", "darkies", "jungle bunny",
-  "spearchucker", "groid", "groids", "sheboon", "pavement ape", "dindu", "dindu nuffin", "chimp out", "chimped out",
+  "spearchucker", "groid", "groids", "sheboon", "pavement ape", "chimp out", "chimped out",
   "black fatigue", "13/50", "despite being 13", "basketball americans", "fatherless behavior", "fatherless behaviour",
   "planet of the apes",
   // anti-Asian
@@ -85,7 +114,7 @@ export const SLURS = [
   // anti-Latino
   "wetback", "wetbacks", "beaner", "beaners", "spic", "spics",
   // antisemitic
-  "kike", "kikes", "hymie", "heeb", "heebs", "(((", ")))", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough",
+  "kike", "kikes", "hymie", "heeb", "heebs", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough",
   "oy vey shut it down", "early life section", "the noticing",
   // anti-Arab and anti-Muslim
   "towelhead", "towelheads", "raghead", "ragheads", "sand nigger", "sand niggers", "camel jockey", "mudslime", "mudslimes",
@@ -93,7 +122,14 @@ export const SLURS = [
   // anti-Indigenous and anti-Roma
   "redskin", "redskins", "injun", "injuns", "squaw", "gyppo", "gyppos",
   // anti-white
-  "honky", "honkies", "honkey", "whitey", "peckerwood", "white devils", "kill all whites",
+  "whitey", "cracka", "crackas", "white devil", "peckerwood", "white devils", "kill all whites",
+  // added 2026-10-21 (side-recall fix; sources in project-docs/evidence/LEXICON-SOURCES.md)
+  "white trash", "trailer trash", "wigger", "wiggers", "whigger", "whiggers", "mudshark", "mudsharks",
+  // anti-Christian and anti-Catholic
+  "bible thumper", "bible thumpers", "bible-thumper", "bible-thumpers", "fundie", "fundies", "christofascist", "christofascists",
+  "papist", "papists", "christard", "christards",
+  // aimed at men and at conservatives
+  "cuck", "cucks", "cuckservative", "cuckservatives", "soyboy", "soyboys", "soy boy", "soy boys",
   // anti-LGBTQ
   "faggot", "faggots", "tranny", "trannies", "troon", "troons", "shemale", "shemales", "poofter",
   // disability
@@ -105,13 +141,27 @@ export const SLURS = [
 ];
 
 // Context-dependent: innocent in many uses (weight 1, counted only beside another marker).
-export const SLURS_SOFT = ["leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
+// Moved from SLURS on 2026-10-21: the upper 95% bound of their dev-split precision was under 0.75
+// (project-docs/EVALUATION.md). One anti-white and one anti-Black term; the rule is the same for every list.
+export const SLURS_DEMOTED = ["honky", "honkies", "honkey", "dindu", "dindu nuffin"];
+
+export const SLURS_SOFT = [...SLURS_DEMOTED, "leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
   "religion of peace", "it's always them", "its always them", "thug", "thugs", "ghetto", "illegals", "dyke", "dykes", "thot",
-  "thots", "fag", "fags", "cripple", "cripples", "white trash", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
+  "thots", "fag", "fags", "cripple", "cripples", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
 
 // Disguised spellings: "n1gg3r", "f@g", "k1ke". Applied before slur matching only.
+// "<identity> bitch", "<identity> whores": a gendered slur fused with an identity word. The same
+// identity words for every direction (tests/rhetoric.symmetry.test.js).
+export const IDENTITY_ADJ = ["white", "black", "asian", "mexican", "jewish", "arab", "muslim", "latina", "latino", "brown",
+  "indian", "chinese", "gay", "christian", "hispanic"];
+export const GENDERED_SLURS = ["bitch", "bitches", "hoe", "hoes", "whore", "whores", "slut", "sluts", "cunt", "cunts"];
+
 export const LEET = { "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a", "$": "s", "!": "i" };
 
 // "They hate beauty / us / the West": a hatred put in a whole group's mouth (counts as motive).
 export const HATRED_OBJECTS = ["beauty", "us", "the west", "western civilization", "our way of life", "our culture", "our freedom",
   "freedom", "christians", "jews", "muslims", "white people", "black people", "women", "america", "europe", "france"];
+
+// Declared hatred of a whole group ("I hate X", "fuck all the X"). Weight 1: anger counts for
+// little on its own, and it never labels the post.
+export const CONTEMPT_VERBS = ["hate", "despise", "loathe", "can't stand", "cant stand"];

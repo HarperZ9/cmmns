@@ -12,6 +12,8 @@
     const m = getComputedStyle(document.body).backgroundColor.match(/\d+/g);
     const dark = m && (0.299 * m[0] + 0.587 * m[1] + 0.114 * m[2]) < 128;
     document.documentElement.classList.toggle("pb-dark", !!dark);
+    // Dim is X's blue-grey dark theme (#15202b): blue well above red.
+    document.documentElement.classList.toggle("pb-dim", !!(dark && m[2] - m[0] > 12));
   }
 
   // The key facts in one line: where the platform places the account, or its age where the site
@@ -34,7 +36,7 @@
       who: [m.display, "@" + m.handle].filter(Boolean).join("  "),
       fact: fact(m),
       warn,
-      areas: PBSignals.areas(signals),
+      areas: PBSignals.areas(signals).filter((a) => !globalThis.PBSettings || PB.areaOn(PBSettings.get(), a.id)),
     };
   }
 
@@ -44,7 +46,9 @@
     const old = article.querySelector(":scope .pb-bar");
     if (old) old.remove();
     PBPop.hover(article, () => {
-      const signals = PBSignals.all(model);
+      const settings = globalThis.PBSettings ? PBSettings.get() : null;
+      if (settings && model.site && !PB.siteOn(settings, model.site.id)) return null;
+      const signals = PBSignals.all(model, settings);
       return [{ glance: glance(model, signals) }, ...PBCard.sections(model, signals, onLookup)];
     });
   }
