@@ -112,3 +112,14 @@ test("cbor round trip for the Sig_structure subset", () => {
   assert.equal(back[4], -7);
   assert.equal(back[5], 70000);
 });
+
+// Fail-safe: a version 1 claim in MP4 is the form where Radar and c2patool 0.27.22 disagreed
+// (legacy.mp4 in the c2pa-rs fixtures). Until agreement is shown, it is never "unchanged".
+test("a version 1 claim in MP4 reads as not fully verified, never unchanged", async () => {
+  const r = await readCredentials(load("camera-v1.mp4"));
+  assert.equal(r.active.claimVersion, 1);
+  assert.equal(r.checks.signature.ok, true);
+  assert.equal(r.checks.format.ok, null);
+  assert.match(r.checks.format.text, /could not fully verify \(older manifest format\)/);
+  assert.equal(credentialState(r), "unchecked");
+});
