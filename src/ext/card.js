@@ -82,6 +82,9 @@
       let d = l.url; try { d = new URL(l.url).hostname.replace(/^www\./, ""); } catch { /* keep */ }
       rows.push(["Link", l.spread && l.spread.posts > 1 ? `${d}: in ${l.spread.posts} posts by ${l.spread.accounts} accounts; first by @${l.spread.first.handle}` : d]);
     }
+    // The laundering chain (src/core/chain.js): post, intermediaries, the earliest origin seen.
+    const C = m.chain;
+    if (C && C.hops.length > 1) rows.push(["Chain", C.hops.map((h) => `${h.handle ? "@" + h.handle : h.domain} (${h.role === "origin" ? "earliest seen" : h.role})`).join(", then ")]);
     return rows;
   }
 

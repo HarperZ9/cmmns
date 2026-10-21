@@ -16,6 +16,8 @@ export const FAMILIES = [
   ["old-media", "Media older than the post", "media", D], ["lifted-media", "Media from another post", "media", P],
   ["same-upload", "Same upload, many accounts", "coordination", D], ["duplicates", "Same text as other replies", "coordination", D],
   ["copied-elsewhere", "Same words in other threads", "coordination", D],
+  ["cross-language", "Same link or upload in several languages", "coordination", D],
+  ["laundered", "Material passed through other accounts", "sources", D],
   ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
   ["state-link", "State link", "sources", T], ["owner", "Outlet owner", "sources", T], ["site-record", "Site facts and fact-check record", "sources", T],
   ["client", "Posting app", "posting", P], ["written-in", "Written in another language", "place", P],

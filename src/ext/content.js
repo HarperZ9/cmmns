@@ -71,6 +71,20 @@
     return r.writtenIn && !m.leak ? { ...m, signs: [], machineLike: false, translated: true } : m;
   }
 
+  // The technique signs (project-docs/TECHNIQUES.md): one link, upload or reviewed claim across
+  // languages, the account rates the flooding sign reads, and each post's laundering chain.
+  function techniques(site, replies, root, cache) {
+    const row = (r) => { const T = tweets.get(r.id) || {}; return { id: r.id, author: r.author, lang: T.lang || null, text: r.text, links: T.links || [], media: T.media || [], claims: PBLogs.claimsOf(r.id) || [] }; };
+    const groups = PB.crossLanguage(replies.map(row), { root: root && row(root) });
+    const rateOf = (h) => { const rd = cache[h] || (site.reading ? site.reading(h) : null); return rd ? PB.ratePerDay(rd) : null; };
+    const perPost = (m) => {
+      const T = m.tweet, mine = groups.filter((g) => g.ids.includes(m.postId));
+      return { crossLang: T ? [...mine, ...PB.acrossViewed(T, PBLogs.trail()).filter((x) => !mine.some((g) => g.key === x.key))] : mine,
+        chain: T ? PB.launderingChain(T, tweets, PBLogs.trail()) : null };
+    };
+    return { groups, rateOf, perPost };
+  }
+
   async function refresh() {
     const site = PBSites.current();
     // Feed mode (timelines, profiles, likes, search): badges on every post, no thread report and
@@ -108,6 +122,8 @@
     const viewed = Object.keys((PBLogs.net() || {}).threads || {}).length;
     const thread = { feed: !!feed, replies: replies.length, viewed, n: read.length, medianAgeDays: ages.length ? ages[Math.floor(ages.length / 2)] : null, places, flagged: read.filter((r) => r.flags && PB.isFlagged(r.flags)).length };
     for (const [, model] of models) model.thread = thread;
+    const tech = techniques(site, replies, root, cache);
+    for (const [, model] of models) Object.assign(model, tech.perPost(model));
     drawn = models;
     drawVisible();
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.about).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];
@@ -120,6 +136,8 @@
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
     report.bursts = PB.timingBursts(replies);
+    report.flood = PB.floodSign(replies, tech.rateOf, { bursts: report.bursts });
+    report.crossLang = tech.groups;
     report.state = PB.stateSummary(replies);
     report.upstream = PB.upstream(items, tweets, PBLogs.trail());
     const pushed = PB.pushedLinks(PBLogs.net(), items.flatMap((r) => r.domains || []));

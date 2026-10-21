@@ -25,6 +25,25 @@ were not published to a store.
 - project-docs/IMAGE-TEXT.md compares on-device options for reading text inside images and
   recommends a path, with targets and a privacy statement. Nothing ships yet.
 
+### Added (techniques)
+- A technique map, `project-docs/TECHNIQUES.md`: flooding, laundering, cloned outlets, coordinated
+  amplification, repetition across languages, "just asking questions" and demoralisation, and
+  swarming, each mapped from Rauch, RAND's "firehose of falsehood" (Paul and Matthews 2016) and
+  DISARM ids to what Radar can observe, with its status, gap and precision target.
+- Same link, upload or fact-checked claim in several languages: a sign on replies when accounts
+  writing in different languages carry the same item, in one thread or across threads you viewed.
+  The root post's own material is set aside.
+- Flooding: a thread line when three or more accounts posting 100 or more times a day write a
+  quarter of the replies, or a timing burst is made of such accounts. Repeat posters show as context.
+- The laundering chain: the post, the accounts and sites its material passed through, and the
+  earliest origin Radar saw, in the card's trail and as a Sources sign when the post does not point
+  at the origin. Built only from pointers the site records.
+- Lessons for the two new post signs.
+
+### Measured (techniques)
+- On ordinary threads (PHEME), flooding fires on 0.55% to 3.3% of threads by size and
+  cross-language on 0% to 1.1%. Neither has a labelled campaign set, so no precision is claimed.
+
 ## 2.0.0 (2026-10-21)
 
 Radar now answers, in one hover: where a post comes from, who is pushing it, how it argues, whether a
