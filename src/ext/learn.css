@@ -1,0 +1,22 @@
+/* The lessons and self-check pages, on top of pages.css: the same ink on a calm ground, the same
+   two type families. The one warm mark is the does-not-prove reminder. */
+.learn header { margin-bottom: 8px; }
+.learn h1 { margin: 4px 0 8px; }
+.learn section { padding: 20px 0; }
+.learn nav { padding-top: 24px; border-top: 1px solid var(--line); }
+ul.index, ul.examples, ul.sources, ol.items { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+ul.index { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 6px 24px; }
+ul.sources li p { margin: 4px 0 0; font-size: 0.92em; }
+.ex { padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--raised); }
+.ex p { margin: 4px 0 0; }
+.ex-kind { font-size: 0.82em; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted); }
+.ex-sign { border-color: var(--ink); }
+.true-too { font-weight: 600; border-left: 3px solid var(--hot); padding-left: 12px; }
+.item { padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--raised); }
+.item .post { font-size: 1.05em; margin: 0 0 12px; }
+.item .row { margin-bottom: 8px; }
+.item .verdict { margin: 8px 0 0; }
+.item .verdict strong { font-weight: 600; }
+details.mine { margin-top: 16px; }
+details.mine summary { cursor: pointer; font-weight: 600; }
+details.mine summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }

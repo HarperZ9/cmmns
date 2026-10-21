@@ -38,6 +38,11 @@
   });
   chrome.runtime.onMessage.addListener((msg, sender) => {
     if (msg && msg.type === "pb-icon" && sender.tab) setIcon(msg.state, sender.tab.id);
+    // A lesson or the self-check, asked for from a page. Only Radar's own pages pass PB.safePage.
+    if (msg && msg.type === "pb-open-page" && sender.tab) {
+      const path = PB.safePage(msg.path);
+      if (path) chrome.tabs.create({ url: chrome.runtime.getURL(path), index: sender.tab.index + 1 }).catch((e) => console.error("[radar] could not open", path, e));
+    }
   });
   settings().then((s) => { if (s.paused) setIcon("paused"); }).catch(() => {});
   globalThis.PBLife = Object.freeze({ prune, setIcon });

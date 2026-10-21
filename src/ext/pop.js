@@ -44,8 +44,32 @@
     return null;
   }
 
+  // Radar's own pages (a lesson, the self-check) open in a new tab through the worker, which
+  // accepts only those pages (PB.safePage). A content script cannot link to them directly.
+  function openButton(label, path) {
+    const b = el("button", "pb-link pb-open", label); b.type = "button";
+    b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); try { chrome.runtime.sendMessage({ type: "pb-open-page", path }).catch(() => {}); } catch (err) { console.error("[radar] could not open", path, err); } });
+    return b;
+  }
+
+  // A tour tip: its text, "Got it", "No more tips", and an optional page to open.
+  function tipBox(tip) {
+    const box = el("div", "pb-tip");
+    box.setAttribute("role", "note");
+    box.append(el("p", null, tip.text));
+    const row = el("div", "pb-tip-row");
+    if (tip.open) row.append(openButton(tip.open[0], tip.open[1]));
+    const done = el("button", "pb-btn", "Got it"); done.type = "button";
+    done.addEventListener("click", (e) => { e.stopPropagation(); box.remove(); });
+    const stop = el("button", "pb-link pb-open", "No more tips"); stop.type = "button";
+    stop.addEventListener("click", (e) => { e.stopPropagation(); if (globalThis.PBTour) PBTour.stop(); box.remove(); });
+    row.append(done, stop);
+    box.append(row);
+    return box;
+  }
+
   // A row value is text, { links }, { action: [label, fn, busyLabel] }, { actions: [[label, fn]] },
-  // { feedback }, { image: dataUrl } (a frame Radar took from the page's own video), { note }, or a chart.
+  // { feedback }, { open }, { image: dataUrl } (a frame Radar took from the page's own video), { note }, or a chart.
   function renderRow(box, h, t) {
     if (!t) return;
     const row = el("div", "pb-row");
@@ -64,6 +88,8 @@
       const v = el("div", "pb-row-v");
       for (const [label, fn] of t.actions) { const b = el("button", "pb-btn pb-btn-s", label); b.type = "button"; b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); fn(); }); v.append(b); }
       row.append(v);
+    } else if (typeof t === "object" && t.open) {
+      row.append(openButton(t.open[0], t.open[1]));
     } else if (typeof t === "object" && t.action) {
       const b = el("button", "pb-btn", t.action[0]); b.type = "button";
       b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); t.action[1](); b.disabled = true; b.textContent = t.action[2] || "Working…"; });
@@ -73,6 +99,7 @@
   }
 
   function section(s) {
+    if (s.tip) return tipBox(s.tip);
     if (!(s.rows || []).some(([, t]) => t) && !(s.signals || []).length && !(s.foot && !s.title)) return null;
     const sec = el("section", "pb-sec");
     if (s.area) sec.dataset.area = s.area;
@@ -237,4 +264,5 @@
   window.addEventListener("scroll", () => { if (pop && !pinned) close(); }, { passive: true });
 
   globalThis.PBPop = Object.freeze({ hover, show, close, el, refresh });
+  globalThis.PBPop = Object.freeze({ hover, show, close, el, tipBox });
 })();

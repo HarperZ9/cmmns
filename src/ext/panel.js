@@ -8,6 +8,8 @@
   const ci = (c) => `${pct(c[0])} to ${pct(c[1])}`;
   const num = (x) => (x == null ? null : Number(x).toLocaleString());
   let open = false;
+  // The tour's thread-report tip (src/ext/tour.js), taken once per page and kept until dismissed.
+  let tip = null, tipDone = false;
   try { open = sessionStorage.getItem("pb.panel.open") === "1"; } catch (_) { /* storage blocked */ }
 
   function section(p, title, lines) {
@@ -57,6 +59,12 @@
     head.setAttribute("aria-expanded", String(open));
     head.addEventListener("click", () => { open = !open; try { sessionStorage.setItem("pb.panel.open", open ? "1" : "0"); } catch (_) { /* ignore */ } render(report, clusters, stats, onLookupAll); });
     p.append(head);
+    if (!tip && !tipDone && globalThis.PBTour) tip = PBTour.take("panel");
+    if (tip && !tipDone) {
+      const box = PBPop.tipBox({ ...tip, open: ["Lesson: the thread report", "learn.html#thread-report"] });
+      box.addEventListener("click", (e) => { if (e.target.tagName === "BUTTON") tipDone = true; });
+      p.append(box);
+    }
     if (!open) return;
     p.append(el("p", "pb-sentence", report.replies ? report.sentence : "No comments loaded on this page, so there is no reply report. The source details below still apply."));
     section(p, "Flagged accounts", report.verdict === "too-few" ? [] : [`Among the most extreme replies: ${pct(report.extreme.share)} (95% interval ${ci(report.extreme.ci)}).`, `Among the rest: ${pct(report.others.share)} (${ci(report.others.ci)}).`]);

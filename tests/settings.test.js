@@ -78,6 +78,6 @@ test("prune returns only the keys it changed, so nothing is rewritten needlessly
 });
 
 test("clear-all removes every Radar key except the settings", () => {
-  const keys = dataKeys(["pb.settings", "pb.history.v1", "pb.about.v1", "pb.tpl", "other.thing"]);
-  assert.deepEqual(keys.sort(), ["pb.about.v1", "pb.history.v1", "pb.tpl"]);
+  const keys = dataKeys(["pb.settings", "pb.tour", "pb.learn.v1", "pb.history.v1", "pb.about.v1", "pb.tpl", "other.thing"]);
+  assert.deepEqual(keys.sort(), ["pb.about.v1", "pb.history.v1", "pb.learn.v1", "pb.tpl"], "the tour's No more tips is kept; self-check answers are cleared");
 });
