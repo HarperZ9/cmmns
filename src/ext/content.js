@@ -78,7 +78,7 @@
     if (site && !PB.siteOn(settings, site.id)) { removePanel(); PBUI.closePop(); icon("paused"); return; }
     if (!site || (!site.onThread() && !feed)) { removePanel(); return; }
     const items = site.items().map((n) => site.read(n)).filter(Boolean);
-    if (!items.length) return;
+    if (!items.length) { videoOnly(site, feed); return; }
     const [root, replies] = !feed && (site.hasLocation || site.rootFirst) ? [items[0], items.slice(1)] : [null, items];
     await Promise.all([ensureOwners(items), PBLogs.ensureClaims(items)]);
     const threadKey = PB.threadKey(site.id, location.pathname, location.search);
@@ -121,11 +121,25 @@
     report.state = PB.stateSummary(replies);
     report.upstream = PB.upstream(items, tweets, PBLogs.trail());
     const pushed = PB.pushedLinks(PBLogs.net(), items.flatMap((r) => r.domains || []));
-    const video = site.id === "youtube" ? ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null : null;
+    const video = currentVideo(site);
     report.groups = PB.returningGroups(PBLogs.net(), threadKey, replies.map((r) => r.author));
     saveSnapshot(threadKey, site.name, report);
     lastSummary = { ...lastSummary, sentence: report.sentence, signs: (report.bursts || []).length + clusters.length + (report.state || []).length, state: report.state };
     PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)) }, () => lookup(...pending.slice(0, SCAN_MAX)));
+  }
+
+  function currentVideo(site) {
+    if (site.id !== "youtube") return null;
+    return ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null;
+  }
+
+  // A video with no comments (or comments turned off) still has its own context: the channel,
+  // YouTube's funding and paid-promotion labels. Live check 2026-10-21: a state-funded
+  // broadcaster's videos with comments off showed no Radar panel at all.
+  function videoOnly(site, feed) {
+    const video = feed ? null : currentVideo(site);
+    if (!video) { removePanel(); return; }
+    PBUI.panel(PB.threadReport([]), [], { pending: 0, scanning: 0, paused: false, site, video, pushed: [] }, () => {});
   }
 
   function lookup(...handles) {
