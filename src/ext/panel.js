@@ -50,13 +50,15 @@
     p.dataset.open = open ? "1" : "0";
     p.replaceChildren();
     const signs = (report.bursts || []).length + clusters.length + (report.state || []).length;
-    const head = el("button", "pb-panel-head", open ? "Radar" : `Radar · ${report.replies}${signs ? ` · ${signs} sign${signs === 1 ? "" : "s"}` : ""}`);
+    // A platform funding label is source context worth seeing without opening the panel.
+    const funded = stats.video && stats.video.funding ? " · funding label" : "";
+    const head = el("button", "pb-panel-head", open ? "Radar" : `Radar · ${report.replies}${signs ? ` · ${signs} sign${signs === 1 ? "" : "s"}` : ""}${funded}`);
     head.type = "button";
     head.setAttribute("aria-expanded", String(open));
     head.addEventListener("click", () => { open = !open; try { sessionStorage.setItem("pb.panel.open", open ? "1" : "0"); } catch (_) { /* ignore */ } render(report, clusters, stats, onLookupAll); });
     p.append(head);
     if (!open) return;
-    p.append(el("p", "pb-sentence", report.sentence));
+    p.append(el("p", "pb-sentence", report.replies ? report.sentence : "No comments loaded on this page, so there is no reply report. The source details below still apply."));
     section(p, "Flagged accounts", report.verdict === "too-few" ? [] : [`Among the most extreme replies: ${pct(report.extreme.share)} (95% interval ${ci(report.extreme.ci)}).`, `Among the rest: ${pct(report.others.share)} (${ci(report.others.ci)}).`]);
     section(p, "Where accounts are based", [
       report.origins && report.origins.length ? report.origins.slice(0, 6).map((o) => `${o.place} ${o.n}`).join(" · ") : null,
