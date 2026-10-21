@@ -62,6 +62,8 @@
 .pb-link:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; border-radius: 2px; }
 .pb-btn { font: inherit; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--pb-line); background: transparent; color: var(--pb-ink); cursor: pointer; }
 .pb-btn:hover:not(:disabled) { border-color: var(--pb-muted); }
+.pb-btn-s { padding: 2px 9px; margin: 0 4px 4px 0; font-size: 12px; }
+.pb-frame { display: block; max-width: 100%; max-height: 120px; border-radius: 6px; border: 1px solid var(--pb-line); }
 .pb-btn:disabled { opacity: 0.5; cursor: progress; }
 .pb-fb { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .pb-btn[aria-pressed="true"] { border-color: var(--pb-ink); font-weight: 600; }

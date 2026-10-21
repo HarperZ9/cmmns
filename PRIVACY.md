@@ -29,6 +29,14 @@ fact-checking service.
 The window offers reverse image search links (Google Lens, TinEye, Bing, Yandex) for media. Those
 open only when you click one, and then that service receives the image address.
 
+**Media checks, only when you click.** "Check this file" re-requests one image or video file the
+page already loaded, from the exact address the page used (for X, its own media server), without
+cookies, so the browser usually answers from its cache. Radar reads the file's Content Credentials
+and metadata in the tab and keeps the result in memory only. "Take 4 frames" copies frames from
+the page's own video player in the tab; choosing a search service then copies one frame to your
+clipboard and opens that service, which receives nothing until you paste the frame there.
+Credentials stored online (a file that points to a remote manifest) are never fetched.
+
 ## What Radar keeps, where, and for how long
 
 Everything is kept in `chrome.storage.local` (Firefox: `browser.storage.local`) in the browser

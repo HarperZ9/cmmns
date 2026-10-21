@@ -80,6 +80,8 @@
         "about-page.js",
         "platforms.js",
         "pop.js",
+        "media.js",
+        "mediacard.js",
         "signals.js",
         "card.js",
         "panel.js",

@@ -44,7 +44,8 @@
     return null;
   }
 
-  // A row value is text, { links }, { action: [label, fn, busyLabel] }, { feedback }, { note }, or a chart.
+  // A row value is text, { links }, { action: [label, fn, busyLabel] }, { actions: [[label, fn]] },
+  // { feedback }, { image: dataUrl } (a frame Radar took from the page's own video), { note }, or a chart.
   function renderRow(box, h, t) {
     if (!t) return;
     const row = el("div", "pb-row");
@@ -57,6 +58,12 @@
       row.append(v);
     } else if (typeof t === "object" && t.feedback && globalThis.PBFeedback) {
       row.append(PBFeedback.control(t.feedback));
+    } else if (typeof t === "object" && t.image) {
+      const img = el("img", "pb-frame"); img.src = t.image; img.alt = t.alt || ""; row.append(img);
+    } else if (typeof t === "object" && t.actions) {
+      const v = el("div", "pb-row-v");
+      for (const [label, fn] of t.actions) { const b = el("button", "pb-btn pb-btn-s", label); b.type = "button"; b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); fn(); }); v.append(b); }
+      row.append(v);
     } else if (typeof t === "object" && t.action) {
       const b = el("button", "pb-btn", t.action[0]); b.type = "button";
       b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); t.action[1](); b.disabled = true; b.textContent = t.action[2] || "Working…"; });
@@ -211,11 +218,23 @@
     target.addEventListener("keydown", (e) => { if (e.altKey && (e.key === "r" || e.key === "R")) { e.preventDefault(); enter(show(target, () => target.__pbSections())); } });
   }
 
+  // Rebuild the open window in place with the post's latest evidence (after a media check).
+  function refresh() {
+    if (!pop || !owner || !owner.__pbSections) return;
+    const list = owner.__pbSections();
+    if (!list) return;
+    const keep = pinned, old = pop, next = build(list);
+    next.style.left = old.style.left; next.style.top = old.style.top;
+    next.classList.add("pb-in");
+    old.replaceWith(next);
+    pop = next; pinned = keep;
+  }
+
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pop) close(false, true); }, true);
   // Focus leaving the window (Tab past its last control) closes it, unless it went back to the post.
   document.addEventListener("focusin", (e) => { if (pop && !pop.contains(e.target) && !(owner && owner.contains(e.target))) close(); }, true);
   document.addEventListener("pointerdown", (e) => { if (pop && pinned && !pop.contains(e.target)) close(); }, true);
   window.addEventListener("scroll", () => { if (pop && !pinned) close(); }, { passive: true });
 
-  globalThis.PBPop = Object.freeze({ hover, show, close, el });
+  globalThis.PBPop = Object.freeze({ hover, show, close, el, refresh });
 })();

@@ -49,6 +49,7 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line);
 </tbody></table></div>
 <p>Fact-check matching runs against a table bundled inside Radar, so post text is never sent to a fact-checking service.</p>
 <p>The window offers reverse image search links (Google Lens, TinEye, Bing, Yandex) for media. Those open only when you click one, and then that service receives the image address.</p>
+<p><strong>Media checks, only when you click.</strong> &quot;Check this file&quot; re-requests one image or video file the page already loaded, from the exact address the page used (for X, its own media server), without cookies, so the browser usually answers from its cache. Radar reads the file's Content Credentials and metadata in the tab and keeps the result in memory only. &quot;Take 4 frames&quot; copies frames from the page's own video player in the tab; choosing a search service then copies one frame to your clipboard and opens that service, which receives nothing until you paste the frame there. Credentials stored online (a file that points to a remote manifest) are never fetched.</p>
 <h2>What Radar keeps, where, and for how long</h2>
 <p>Everything is kept in <code>chrome.storage.local</code> (Firefox: <code>browser.storage.local</code>) in the browser profile you installed Radar in. It is not synced to other devices.</p>
 <div class="scroll"><table><thead><tr><th scope="col">Store</th><th scope="col">What it holds</th><th scope="col">Kept for</th></tr></thead><tbody>

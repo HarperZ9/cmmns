@@ -11,7 +11,7 @@ test("every family has a name, a known area and a kind", () => {
   for (const f of FAMILIES) {
     assert.ok(f.id && f.name, JSON.stringify(f));
     assert.ok(AREA_IDS.includes(f.area), f.id + " area " + f.area);
-    assert.ok(["detector", "platform", "table", "technique"].includes(f.kind), f.id);
+    assert.ok(["detector", "platform", "table", "technique", "file"].includes(f.kind), f.id);
     assert.ok(!ids.has(f.id), "duplicate " + f.id);
     ids.add(f.id);
   }

@@ -6,7 +6,7 @@
 import { MEASURED } from "./measured.js";
 import { TECHNIQUES, techniqueStatus } from "./persuasion.js";
 
-const D = "detector", P = "platform", T = "table";
+const D = "detector", P = "platform", T = "table", F = "file";
 export const FAMILIES = [
   ["slur", "Slur or coded hate term", "language", D], ["stereotype", "Group stereotype", "language", D],
   ["dehumanise", "Dehumanising language", "language", D], ["violence", "Call for violence", "language", D],
@@ -28,6 +28,8 @@ export const FAMILIES = [
   ["new-account", "New account", "account", D], ["name-changes", "Renamed", "account", D],
   ["default-handle", "Sign-up handle", "account", D], ["follow-pattern", "Follows many, few follow back", "account", D],
   ["low-karma", "Low karma for its age", "account", D],
+  ["c2pa", "Content Credentials", "media", F], ["c2pa-changed", "Credentials do not match", "media", F],
+  ["ai-metadata", "AI-generation metadata", "media", F],
 ].map(([id, name, area, kind]) => ({ id, name, area, kind }));
 // Persuasion techniques sit in the Language area. Their measured line comes from techniqueStatus.
 const TECH = "technique";
@@ -49,6 +51,7 @@ const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.
 export function measuredLine(id, table = MEASURED) {
   const f = BY_ID.get(id);
   if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Radar detector" };
+  if (f && f.kind === F) return { measured: false, text: "what the file itself declares; Radar checks the signature, not the claim" };
   if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
   if (f && f.kind === TECH) { const st = techniqueStatus(id); return { measured: st.shown, text: st.text }; }
   const r = (table || {})[id];
