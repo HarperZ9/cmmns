@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Radar",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Free, no account, nothing leaves your browser unless you opt in. Sourced evidence on posts and links, each sign with its error rate.",
   "icons": {
     "16": "icons/radar-16.png",

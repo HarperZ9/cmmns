@@ -3,7 +3,12 @@
 All notable changes to Radar. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
-## Unreleased
+## 2.1.0 (2026-10-21)
+
+Named in published reports: 98 documented influence operations from 27 countries, with the investigators' own
+attribution wording. Techniques read from behaviour, not wording: flooding, cross-language repetition and
+laundering chains. Named conspiracy theories, brand-borrowing accounts, and Korean and Indonesian markers
+derived from labelled data.
 
 ### Added (derived word lists)
 - Korean and Indonesian slur signs from word lists derived from human-labelled research corpora,
