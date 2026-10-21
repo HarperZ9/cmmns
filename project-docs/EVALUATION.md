@@ -13,14 +13,14 @@
 Precision comes first: a badge on a real person's honest reply is the main harm.
 
 ## How to reproduce
-1. Download the four corpora listed in `evidence/CORPORA.md` to `D:/radar-data/` (or set
+1. Download the four corpora listed in `evidence/CORPORA.md` to a data directory outside the repository, `../radar-data/` by default (or set
    `RADAR_DATA`). Python with pyarrow flattens them on the first run (`scripts/eval/prep.py`).
 2. `node scripts/eval.mjs` prints every number below for the test split and rewrites
    `evidence/eval-results.json` and `src/core/measured.js`. `--split dev` prints the tuning split
    and writes nothing.
 3. The results file records the SHA-256 of every raw and prepared input.
 4. Persuasion techniques: download `datasets-v2.tgz` (`evidence/CORPORA.md`) to
-   `D:/radar-data/ptc/` and extract it into `D:/radar-data/ptc/x/`. `npm run eval:persuasion`
+   `<data dir>/ptc/` and extract it into `<data dir>/ptc/x/`. `npm run eval:persuasion`
    prints the test split and rewrites `evidence/persuasion-results.json` and the persuasion block
    of `src/core/measured.js`. `--split dev --cues` prints per-cue figures for tuning.
 
@@ -228,7 +228,7 @@ the left and the right), reported per side. Not run yet: it needs the author's l
 
 ## Privacy
 Raw captures hold other people's posts and handles. They stay in `project-docs/evidence/raw/`,
-which git ignores. The corpora stay in `D:/radar-data/`. Only counts, rates and hashes are committed.
+which git ignores. The corpora stay in the data directory, outside the repository. Only counts, rates and hashes are committed.
 
 ## Other checks
 | Check | Result |

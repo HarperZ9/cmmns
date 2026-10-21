@@ -6,11 +6,11 @@ import assert from "node:assert/strict";
 import { threadKey } from "../src/core/threadkey.js";
 
 test("X: every path to one post gives one key", () => {
-  const paths = ["/CokYasaaa/status/2112534570943828302", "/cokyasaaa/status/2112534570943828302",
-    "/CokYasaaa/status/2112534570943828302/photo/1", "/CokYasaaa/status/2112534570943828302/analytics",
-    "/i/web/status/2112534570943828302", "/i/status/2112534570943828302"];
+  const paths = ["/SomeAccount/status/1000000000000000001", "/someaccount/status/1000000000000000001",
+    "/SomeAccount/status/1000000000000000001/photo/1", "/SomeAccount/status/1000000000000000001/analytics",
+    "/i/web/status/1000000000000000001", "/i/status/1000000000000000001"];
   const keys = new Set(paths.map((p) => threadKey("x", p, "")));
-  assert.deepEqual([...keys], ["x:2112534570943828302"]);
+  assert.deepEqual([...keys], ["x:1000000000000000001"]);
 });
 
 test("Reddit: the post id, whatever the slug or comment permalink", () => {

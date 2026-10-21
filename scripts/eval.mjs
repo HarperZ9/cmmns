@@ -1,5 +1,5 @@
 // Reproduces every number in project-docs/EVALUATION.md from the downloaded corpora.
-//   node scripts/eval.mjs [--data D:/radar-data] [--split test|dev] [--no-write]
+//   node scripts/eval.mjs [--data <dir>] [--split test|dev] [--no-write]
 // The corpora are downloaded once by hand (project-docs/evidence/CORPORA.md) and flattened by
 // scripts/eval/prep.py, which this script runs when the prepared files are missing. It records the
 // SHA-256 of every raw and prepared input, so a changed download shows up in the results file.
@@ -18,7 +18,7 @@ import { EXTREME_AT } from "../src/core/rhetoric.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > 0 ? process.argv[i + 1] : dflt; };
-const DATA = arg("--data", process.env.RADAR_DATA || "D:/radar-data");
+const DATA = arg("--data", process.env.RADAR_DATA || "../radar-data");
 const SPLIT = arg("--split", "test");
 const WRITE = !process.argv.includes("--no-write") && SPLIT === "test";
 
