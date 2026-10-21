@@ -30,11 +30,12 @@ function stateRows() {
   return stateReady;
 }
 
-// Fact-checked claims (claims.json, src/core/claims.js, about 6 MB): indexed once here. Pages send
+// Fact-checked claims (claims.json and the parts it names, src/core/claims.js, about 6 MB): indexed once here. Pages send
 // the text of the posts they show and get back only the matches. Nothing leaves the browser.
 let claimsReady = null;
 function claimIndex() {
-  if (!claimsReady) claimsReady = fetch(chrome.runtime.getURL("claims.json")).then((r) => r.json()).then((t) => PB.buildClaimIndex(t))
+  const get = (name) => fetch(chrome.runtime.getURL(name)).then((r) => r.json());
+  if (!claimsReady) claimsReady = get("claims.json").then(async (main) => PB.buildClaimIndex(PB.joinClaims(main, await Promise.all((main.parts || []).map(get)))))
     .catch((e) => { console.error("[radar] claims.json failed to load", e); return null; });
   return claimsReady;
 }

@@ -19,6 +19,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { guessLanguage, claimTokens, MIN_CLAIM_TOKENS } from "../src/core/claims.js";
+import { splitClaims } from "../src/core/claims-parts.js";
 
 const FEED = "https://storage.googleapis.com/datacommons-feeds/factcheck/latest/data.json";
 const OPEN_LICENCES = /creativecommons\.org\/(?:licenses\/by\/|licenses\/by-sa\/|publicdomain\/zero\/)|^CC[- ]?BY|^CC0/i;
@@ -102,7 +103,8 @@ const table = {
   rows: picked.rows,
 };
 const json = JSON.stringify(table);
-writeFileSync(join(root, "src/ext/claims.json"), json);
+// In parts under 5 MB each, so the Firefox add-on linter can read them (src/core/claims-parts.js).
+splitClaims(table).forEach((t, i) => writeFileSync(join(root, "src/ext", i ? `claims-${i + 1}.json` : "claims.json"), JSON.stringify(t)));
 const dates = picked.rows.map((r) => r[4]).filter(Boolean).sort();
 console.log(`${rows.length} usable reviews -> ${picked.rows.length} rows from ${picked.checkerCount} fact-checkers, ${Buffer.byteLength(json)} bytes, ${dates[0]} to ${dates[dates.length - 1]}`);
 console.log("dropped:", JSON.stringify(dropped));
