@@ -125,12 +125,14 @@
     if (!C || C.n < 5) return [];
     const age = R.joinDate ? PB.ageDays(R.joinDate) : null;
     const same = R.basedIn ? C.places[R.basedIn] || 0 : null;
+    const scope = C.feed ? "on this page" : "in this thread";   // a timeline is not a conversation
     return [
-      ["Account age", age != null && C.medianAgeDays != null ? `${age.toLocaleString()} days; the thread's median is ${C.medianAgeDays.toLocaleString()} (${C.n} accounts read)` : null],
-      ["Same label", same != null ? `${same} of ${C.n} accounts read here are labelled ${R.basedIn}` : null],
-      ["Flagged here", `${C.flagged} of ${C.n} accounts read in this thread have one strong sign or two weaker ones`],
+      ["Account age", age != null && C.medianAgeDays != null ? `${age.toLocaleString()} days; the median ${scope} is ${C.medianAgeDays.toLocaleString()} (${C.n} accounts read)` : null],
+      ["Same label", same != null ? `${same} of ${C.n} accounts read ${scope} are labelled ${R.basedIn}` : null],
+      ["Flagged here", `${C.flagged} of ${C.n} accounts read ${scope} have one strong sign or two weaker ones`],
     ];
   }
+  const compareTitle = (m) => (m.thread && m.thread.feed ? "Compared with this page" : "Compared with this thread");
 
   // sections for PBPop, by tab; onLookup is offered when X has not given account data yet.
   function sections(m, signals, onLookup) {
@@ -147,7 +149,7 @@
     return [
       { tab: "overview", rows: head },
       ...(groups.length ? groups : [{ tab: "overview", rows: [[null, { note: "Nothing stands out in what the site shows. The other tabs have the details." }]] }]),
-      { tab: "overview", title: "Compared with this thread", rows: compare(m) },
+      { tab: "overview", title: compareTitle(m), rows: compare(m) },
       { tab: "account", title: "Where", rows: where(m) },
       { tab: "account", title: "Account", rows: account(m) },
       { tab: "account", title: "How it posts", rows: posting(m), foot: (m.reading || {}).pattern ? "From the posts X loaded for this account in your browser, not its whole history." : null },
