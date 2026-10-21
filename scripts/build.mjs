@@ -11,6 +11,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ORDER = ["places.js", "confusables-data.js", "confusables.js", "lookalike-outlets.js", "lookalike.js", "brands.js", "similarity.js", "mismatch.js", "reddit.js", "pattern.js", "flags.js", "lexicon.js", "rhetoric-util.js", "lexicon-fr.js", "rhetoric-fr.js", "lexicon-es.js", "rhetoric-es.js", "lexicon-de.js", "rhetoric-de.js", "lexicon-pt.js", "rhetoric-pt.js", "lexicon-it.js", "rhetoric-it.js", "rhetoric-mention.js", "lexicon-ar.js", "rhetoric-ar.js", "lexicon-ru.js", "rhetoric-ru.js", "lexicon-uk.js", "rhetoric-uk.js", "lexicon-zh.js", "rhetoric-zh.js", "lexicon-hi.js", "rhetoric-hi.js", "lexicon-derived.js", "rhetoric-derived.js", "theories.js", "rhetoric.js", "measured.js", "measured-langs.js", "persuasion-cues.js", "persuasion.js", "framing.js", "report.js", "about.js", "meta.js", "bsky.js", "fedi.js", "owners.js", "xdata.js", "machine.js", "threadkey.js", "network.js", "ytdata.js", "timing.js", "baselines-bins.js", "baselines-data.js", "techniques-data.js", "baselines.js", "pace.js", "langs.js", "state.js", "ops.js", "cloned.js", "trail.js", "crosslang.js", "flooding.js", "swarming.js", "chain.js", "history.js", "claims.js", "cbor.js", "jumbf.js", "der.js", "aimeta.js", "c2pa-verify.js", "c2pa.js", "mediacheck.js", "survival.js", "keyframes.js", "graph.js", "feed.js", "evidence.js", "hosts.js", "sites.js", "coverage.js"];
 // Product modules (settings, badge families) come last; they read only measured.js and persuasion.js.
 const PRODUCT = ["settings.js", "families.js", "feedback.js", "claims-parts.js", "learn.js", "imagetext.js"];
+// The integration surface (radar-core, src/core/api.js) and its importers and bundles: they read the
+// modules above and nothing reads them, so they come after everything else.
+const INTEGRATION = ["api-words.js", "api-data.js", "api-site.js", "api-post.js", "api-thread.js", "api-media.js", "api.js", "evidence-bundle.js", "import-html.js", "import-exports.js", "import-json.js", "import-car.js", "imports.js"];
 const OCR = ["charset.js", "image.js", "binarize.js", "components.js", "segment.js", "gemm-wasm.js", "gemm.js", "model.js", "weights.js", "read.js"];
 const ident = (f) => "M_" + f.replace(/\.js$/, "").replace(/-/g, "_");
 
@@ -21,6 +24,8 @@ function bundle(dir, files, global, out) {
     let src = readFileSync(join(root, dir, f), "utf8");
     src = src.replace(/^import \{([^}]*)\} from "\.\/([\w-]+\.js)";$/gm, (_, names, dep) => `const {${names}} = ${ident(dep)};`);
     src = src.replace(/^import \* as (\w+) from "\.\/([\w-]+\.js)";$/gm, (_, name, dep) => `const ${name} = ${ident(dep)};`);
+    // A re-export ("export { a, b };") names functions already on the global, so it is dropped.
+    src = src.replace(/^export {[^}]*};$/gm, "");
     const exported = [];
     src = src.replace(/^export (const|async function|function|let|class) ([A-Za-z_$][\w$]*)/gm, (_, kind, name) => { exported.push(name); return `${kind} ${name}`; });
     body += `\n// ---- ${f}\nconst ${ident(f)} = (() => {\n${src}\nreturn { ${exported.join(", ")} };\n})();\n`;
@@ -31,5 +36,5 @@ function bundle(dir, files, global, out) {
   console.log(`${out}: ${text.length} bytes`);
 }
 
-bundle("src/core", [...ORDER, ...PRODUCT], "PB", "src/ext/core.bundle.js");
+bundle("src/core", [...ORDER, ...PRODUCT, ...INTEGRATION], "PB", "src/ext/core.bundle.js");
 bundle("src/ocr", OCR, "PBOCR", "src/ext/ocr.bundle.js");

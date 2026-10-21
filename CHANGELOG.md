@@ -5,6 +5,26 @@ were not published to a store.
 
 ## Unreleased
 
+### Added (integration surface)
+- radar-core: one ES module, `src/core/api.js`, with `analyzeThread`, `analyzeText`,
+  `checkMedia`, `siteInfo` and `useData`. Pure functions over Radar's core: no DOM, no network,
+  no dependency. Every evidence item states what it shows, its source and what it does not prove,
+  in the window's own words, and points at posts by id; no item names an account. API version
+  1.0.0, versioned separately from the extension.
+- A JSON Schema for the output and for bundles, `schema/evidence.v1.json`, with tests that check
+  real outputs against it and a stability promise in project-docs/INTEGRATION.md.
+- A command line tool, `node bin/radar.mjs`: `analyze`, `verify`, `site` and `media`, reading
+  local files only.
+- Signed evidence bundles: post ids, the evidence with its matched words, the Radar and API
+  versions, a hash of the data tables and the time, signed with a per-install ECDSA P-256 key
+  (WebCrypto; non-extractable in the extension). Anyone can verify one offline with the CLI or the
+  extension. Full post text goes in only when the user ticks the box. Saved from the new Analyse a
+  file page and from the thread card page.
+- Analyse a file, an extension page: a saved X or Reddit thread, thread JSON from X, Bluesky or
+  Mastodon, an X archive's tweets.js, a Reddit export CSV (its ip column is dropped), a Mastodon
+  outbox.json or a Bluesky repository .car, read on the device with nothing sent. Images and video
+  get the Content Credentials check.
+
 ### Added (text in images)
 - Read text in this image. With "Read text in images" turned on in the options page (off by
   default), the window's Media area offers "Read text in this image" under each image of a post. On

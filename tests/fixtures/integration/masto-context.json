@@ -1,0 +1,45 @@
+{
+ "ancestors": [
+  {
+   "id": "500",
+   "content": "<p>Root post</p>",
+   "created_at": "2026-10-01T12:00:00.000Z",
+   "account": {
+    "id": "aroot",
+    "username": "root",
+    "acct": "root@social.example",
+    "url": "https://social.example/@root",
+    "created_at": "2025-01-01T00:00:00Z"
+   },
+   "in_reply_to_id": null
+  }
+ ],
+ "descendants": [
+  {
+   "id": "501",
+   "content": "<p>Reply 1</p>",
+   "created_at": "2026-10-01T12:00:30.000Z",
+   "account": {
+    "id": "au1",
+    "username": "u1",
+    "acct": "u1@social.example",
+    "url": "https://social.example/@u1",
+    "created_at": "2025-01-01T00:00:00Z"
+   },
+   "in_reply_to_id": "500"
+  },
+  {
+   "id": "502",
+   "content": "<p>Reply 2</p>",
+   "created_at": "2026-10-01T12:01:00.000Z",
+   "account": {
+    "id": "au2",
+    "username": "u2",
+    "acct": "u2@social.example",
+    "url": "https://social.example/@u2",
+    "created_at": "2025-01-01T00:00:00Z"
+   },
+   "in_reply_to_id": "500"
+  }
+ ]
+}

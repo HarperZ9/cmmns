@@ -1,0 +1,4 @@
+id,permalink,date,ip,subreddit,gildings,link,parent,body,media
+c1,/r/town/comments/a/b/c1/,2026-10-01 12:00:00 UTC,192.0.2.1,town,0,https://www.reddit.com/r/town/comments/a/,t3_a,"Good question, ""opening hours"" are posted
+on the door",
+c2,/r/town/comments/a/b/c2/,2026-10-02 08:30:00 UTC,192.0.2.1,town,0,https://www.reddit.com/r/town/comments/a/,t1_c1,[deleted],

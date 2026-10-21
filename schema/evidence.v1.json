@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:radar:evidence:v1",
+  "title": "Radar evidence, version 1",
+  "description": "What radar-core returns (analyzeThread, analyzeText, checkMedia, siteInfo) and the signed evidence bundles built from it. Every evidence item states what it shows, its source and what it does not prove. Items point at posts by id and never name an account. project-docs/INTEGRATION.md documents each field and the stability promise.",
+  "anyOf": [{ "$ref": "#/$defs/envelope" }, { "$ref": "#/$defs/bundle" }],
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "postId": { "type": "string", "minLength": 1 },
+    "span": {
+      "type": "object",
+      "description": "The matched text in one post. start and end are character offsets (UTF-16), or null when the match was found after folding look-alike letters.",
+      "required": ["post", "start", "end", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "post": { "$ref": "#/$defs/postId" },
+        "start": { "type": ["integer", "null"], "minimum": 0 },
+        "end": { "type": ["integer", "null"], "minimum": 0 },
+        "text": { "type": "string" }
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": ["id", "kind", "scope", "level", "label", "shows", "source", "doesNotProve", "posts", "spans", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^e[0-9]+$" },
+        "kind": {
+          "type": "string",
+          "enum": ["thread-report", "account-flag", "same-text", "timing-burst", "swarming", "strong-language", "names-theory", "persuasion", "leaked-ai", "machine-writing", "spam-pattern", "fact-check", "lookalike-domain", "state-link", "site-owner", "site-record", "content-credentials", "credentials-ai", "credentials-changed", "ai-metadata", "no-credentials", "remote-credentials"]
+        },
+        "scope": { "type": "string", "enum": ["post", "thread", "file", "site"] },
+        "level": { "type": "string", "enum": ["warn", "flag", "info"], "description": "warn: worth a look on its own; flag: means more alongside others; info: context." },
+        "label": { "$ref": "#/$defs/text" },
+        "shows": { "$ref": "#/$defs/text" },
+        "source": { "$ref": "#/$defs/text" },
+        "doesNotProve": { "$ref": "#/$defs/text" },
+        "posts": { "type": "array", "items": { "$ref": "#/$defs/postId" } },
+        "spans": { "type": "array", "items": { "$ref": "#/$defs/span" } },
+        "data": { "type": "object", "description": "Figures and fields particular to the kind. Keys may be added in a minor version." }
+      }
+    },
+    "envelope": {
+      "type": "object",
+      "required": ["schema", "api", "kind", "evidence", "limits"],
+      "properties": {
+        "schema": { "const": "urn:radar:evidence:v1" },
+        "api": { "type": "string", "pattern": "^1\\.[0-9]+\\.[0-9]+$" },
+        "kind": { "type": "string", "enum": ["thread", "text", "media", "site"] },
+        "site": {},
+        "posts": {
+          "type": "object",
+          "required": ["n", "accounts"],
+          "properties": {
+            "n": { "type": "integer", "minimum": 0 },
+            "accounts": { "type": ["integer", "null"], "minimum": 0 },
+            "ids": { "type": "array", "items": { "$ref": "#/$defs/postId" } }
+          }
+        },
+        "media": {
+          "type": "object",
+          "required": ["state", "ai"],
+          "properties": {
+            "state": { "type": "string", "enum": ["unchanged", "changed", "unchecked", "remote", "none"] },
+            "ai": { "type": "boolean" },
+            "format": { "type": ["string", "null"] }
+          }
+        },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+        "limits": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "bundle": {
+      "type": "object",
+      "required": ["kind", "version", "schema", "api", "tool", "savedAt", "dataLock", "input", "posts", "textIncluded", "evidence", "limits"],
+      "properties": {
+        "kind": { "const": "radar-evidence-bundle" },
+        "version": { "const": 1 },
+        "schema": { "const": "urn:radar:evidence:v1" },
+        "api": { "type": "string", "pattern": "^1\\.[0-9]+\\.[0-9]+$" },
+        "tool": { "$ref": "#/$defs/text" },
+        "savedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "dataLock": {
+          "type": ["object", "null"],
+          "required": ["alg", "value"],
+          "properties": { "alg": { "const": "SHA-256" }, "of": { "type": "string" }, "value": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+        },
+        "input": {
+          "type": "object",
+          "required": ["kind", "source"],
+          "properties": {
+            "kind": { "type": "string", "enum": ["thread", "text"] },
+            "source": { "type": "string", "enum": ["thread", "export"] },
+            "site": { "type": ["string", "null"] },
+            "page": { "type": ["string", "null"] },
+            "accounts": { "type": ["integer", "null"] }
+          }
+        },
+        "posts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "additionalProperties": false,
+            "properties": { "id": { "$ref": "#/$defs/postId" }, "text": { "type": "string" } }
+          }
+        },
+        "textIncluded": { "type": "boolean" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+        "limits": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+        "signer": {
+          "type": "object",
+          "required": ["alg", "keyId", "publicKey"],
+          "properties": {
+            "alg": { "const": "ECDSA P-256 SHA-256" },
+            "keyId": { "type": "string", "pattern": "^[0-9a-f]{16}$" },
+            "publicKey": {
+              "type": "object",
+              "required": ["kty", "crv", "x", "y"],
+              "additionalProperties": false,
+              "properties": { "kty": { "const": "EC" }, "crv": { "const": "P-256" }, "x": { "type": "string" }, "y": { "type": "string" } }
+            }
+          }
+        },
+        "signature": {
+          "type": "object",
+          "required": ["of", "value"],
+          "properties": { "of": { "type": "string" }, "value": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" } }
+        }
+      }
+    }
+  }
+}

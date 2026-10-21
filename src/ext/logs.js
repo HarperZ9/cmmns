@@ -139,7 +139,15 @@
 
   // A thread card (src/core/evidence.js): built here from what is on screen, then shown on the card
   // page (card.html) to read before saving or sharing. Refused for threads with too few accounts.
-  function saveCard({ site, report, items, replies, clusters, media }) {
+  // The posts as radar-core reads them (src/core/api.js), for the signed evidence bundle the card
+  // page offers. Kept in this browser's session storage with the card, never sent anywhere.
+  function bundleInput(site, root, replies, rows) {
+    const flags = new Map((rows || []).map((r) => [r.id, r.flags]));
+    const post = (r) => ({ id: String(r.id), author: r.author, text: r.text || "", posted: r.posted || null, links: (r.domains || []).map((d) => "https://" + d) });
+    return { site: site.name, root: root ? post(root) : null, replies: replies.map((r) => ({ ...post(r), flags: flags.has(r.id) ? flags.get(r.id) : null })) };
+  }
+
+  function saveCard({ site, report, items, replies, rows, root, clusters, media }) {
     const claims = items.flatMap((r) => claimsOf(r.id) || []);
     const sites = (report.context ? report.context.links : []).map((l) => ({
       domain: l.domain, n: l.n, owner: PB.ownerOfDomain(l.domain) ? PB.ownerOfDomain(l.domain).owner : null,
@@ -147,6 +155,7 @@
     }));
     const built = PB.evidenceCard({ tool: "Radar " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), site: site.name, page: location.href, thread: true,
       authors: replies.map((r) => r.author), report, sameText: clusters.length, claims, sites, media });
+    if (built.ok) built.bundleInput = bundleInput(site, root, replies, rows);
     chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => console.error("[radar] could not open the card page", e));
   }
 

@@ -7725,5 +7725,1002 @@ function fromImage(signal, result) {
 return { IMAGE_TEXT_NOTE, IMAGE_TEXT_OFF, IMAGE_TEXT_DOES_NOT_PROVE, imageTextModel, imageTextRows, fromImage };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext });
+// ---- api-words.js
+const M_api_words = (() => {
+// The words the radar-core API puts on evidence items: labels, what a sign shows, where it came
+// from and what it does not prove. They are the same words the extension's window uses
+// (src/ext/signals.js and src/ext/panel.js), kept here so the API needs no DOM and no extension
+// code. Every string is stance-neutral and names no account.
+
+const STRONG_LABEL = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
+
+const STRONG_MEANING = {
+  slur: "A slur, dog whistle or coined term with a documented hateful meaning (ADL Hate Symbols database, Hatebase, GNET, ISD).",
+  stereotype: "Names a whole group of people by a trait, such as criminal, lazy or violent.",
+  dehumanise: "Describes a group of people as vermin, disease, animals or filth.",
+  violence: "Calls for violence or collective punishment against people.",
+  vigilante: "Calls for people outside the law, or soldiers, to act against people.",
+};
+
+const FLAG_LABEL = {
+  "new-account": "new account", "name-changes": "renamed", "default-handle": "sign-up handle",
+  "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name",
+  "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere",
+  "high-volume": "very high post rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute",
+  "copied-elsewhere": "same words in other threads", "low-karma": "low karma for its age", "automation-app": "posts through an automation app",
+  "no-sleep-gap": "posts around the clock", "repost-only": "almost only reposts", "follow-pattern": "follows many, few follow back",
+  "platform-label": "moderation label", "brand-lookalike": "name borrows a brand",
+};
+
+const SRC_RULES = "Radar's own rules, run on this device. Rules and measured error rates: Radar's EVALUATION.md.";
+const SRC_POSTS = "The posts in the input, as given. Radar read them on this device and sent nothing anywhere.";
+const SRC_ACCOUNTS = "Account details given in the input: what each platform discloses on profiles and About pages.";
+const SRC_FILE = "The file's bytes, read on this device: Content Credentials (C2PA) and IPTC or XMP metadata.";
+
+const STRONG_DOES_NOT_PROVE = "Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.";
+const LEAK_DOES_NOT_PROVE = "People quote chatbots, joke, or paste a reply on purpose.";
+const MACHINE_DOES_NOT_PROVE = "No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.";
+const SPAM_DOES_NOT_PROVE = "Real people post giveaways and contact details too. The pattern describes the post, not who sent it.";
+const BURST_DOES_NOT_PROVE = "A post going viral at one moment, or a notification many people get at once, brings replies together too. This describes when the replies arrived, not who sent them or why.";
+const SITE_OWNER_DOES_NOT_PROVE = "Ownership is not editorial control, and Wikidata can lag a sale.";
+const THREAD_LIMIT = "This covers the posts in the input as given, ranked and filtered by the platform before anyone saw them. It names no account and judges no person.";
+const TEXT_LIMIT = "This describes one piece of text. It says nothing about who wrote it, why, or whether it is true.";
+
+return { STRONG_LABEL, STRONG_MEANING, FLAG_LABEL, SRC_RULES, SRC_POSTS, SRC_ACCOUNTS, SRC_FILE, STRONG_DOES_NOT_PROVE, LEAK_DOES_NOT_PROVE, MACHINE_DOES_NOT_PROVE, SPAM_DOES_NOT_PROVE, BURST_DOES_NOT_PROVE, SITE_OWNER_DOES_NOT_PROVE, THREAD_LIMIT, TEXT_LIMIT };
+})();
+
+// ---- api-data.js
+const M_api_data = (() => {
+// The tables the radar-core API reads, handed in by the caller. The API never fetches or opens a
+// file itself: the CLI reads them from disk, the extension from its own package. Each table is
+// optional; evidence that needs a missing table is left out, never guessed.
+//   sites   src/ext/sites.json   (Wikidata facts and fact-check records per site)
+//   owners  src/ext/owners.json  (Wikidata ownership rows)
+//   state   src/ext/state.json   (state links, each citing its source)
+//   claims  src/ext/claims.json, joined with its parts (the fact-check table)
+
+const { setSiteTable } = M_sites;
+const { setOwnerRows } = M_owners;
+const { setStateRows } = M_state;
+const { buildClaimIndex } = M_claims;
+const { joinClaims } = M_claims_parts;
+
+let CLAIM_INDEX = null;
+const rowsOf = (t) => (Array.isArray(t) ? t : (t && t.rows) || []);
+const LOADED = { sites: 0, owners: 0, state: 0, claims: 0 };
+
+// tables: { sites?, owners?, state?, claims?, claimParts? }, each as its file holds it (owners and
+// state may also be plain row arrays). Returns how many rows each table holds.
+function useData(tables = {}) {
+  if (tables.sites) LOADED.sites = setSiteTable(tables.sites);
+  if (tables.owners) LOADED.owners = setOwnerRows(rowsOf(tables.owners));
+  if (tables.state) { setStateRows(rowsOf(tables.state)); LOADED.state = rowsOf(tables.state).length; }
+  if (tables.claims) {
+    CLAIM_INDEX = buildClaimIndex(joinClaims(tables.claims, tables.claimParts || []));
+    LOADED.claims = CLAIM_INDEX.n;
+  }
+  return { ...LOADED };
+}
+
+const claimIndex = () => CLAIM_INDEX;
+const dataLoaded = () => ({ ...LOADED });
+
+return { useData, claimIndex, dataLoaded };
+})();
+
+// ---- api-site.js
+const M_api_site = (() => {
+// Site context as evidence items: who owns a site, any state link a cited source makes, whether
+// its address imitates a listed outlet, and its fact-check record. Every item names its source.
+// Radar adds no score or rating of its own. Reads only the tables handed to useData().
+
+const { siteFacts, siteRecord, recordSummary, recordLine, ownerHeading, ownerType, SITE_SOURCES, SITE_RECORD_DOES_NOT_PROVE } = M_sites;
+const { ownerOfDomain } = M_owners;
+const { stateLinksOfDomain, stateLabel, STATE_DOES_NOT_PROVE } = M_state;
+const { lookalikeOf, LOOKALIKE_DOES_NOT_PROVE } = M_lookalike;
+const { hostOf } = M_hosts;
+const { SITE_OWNER_DOES_NOT_PROVE } = M_api_words;
+
+// "https://www.Example.com/a" or "example.com" -> "example.com", or null.
+function cleanDomain(d) {
+  const s = String(d || "").trim();
+  if (!s) return null;
+  const h = hostOf(/^https?:\/\//i.test(s) ? s : "https://" + s);
+  return h ? h.replace(/^www\./, "").replace(/\.$/, "") : null;
+}
+
+const stateLevel = (h) => (h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" || h.basis === "designated" ? "flag" : "info");
+const sourceLine = (s) => (s ? `${s.title}${s.date ? ` (${s.date})` : ""}${s.url ? `: ${s.url}` : ""}` : "the cited report");
+
+// What Radar's tables hold for one domain: { domain, facts, owner, state, record, lookalike }.
+function siteSummary(domain) {
+  const d = cleanDomain(domain);
+  if (!d) return null;
+  const owner = ownerOfDomain(d);
+  return {
+    domain: d,
+    facts: siteFacts(d),
+    owner: owner ? { name: owner.name, owner: owner.owner, via: owner.via || "owner", source: owner.source || null } : null,
+    state: stateLinksOfDomain(d).map((h) => ({ ...h })),
+    record: recordSummary(siteRecord(d)),
+    lookalike: lookalikeOf(d),
+  };
+}
+
+// Evidence items for one domain linked by the given posts. Items with nothing to say are left out.
+function siteEvidence(domain, posts = [], { quiet = false } = {}) {
+  const S = siteSummary(domain);
+  if (!S) return [];
+  const out = [], base = { scope: posts.length ? "post" : "site", posts, spans: [] };
+  if (S.lookalike) {
+    const L = S.lookalike;
+    out.push({ ...base, kind: "lookalike-domain", level: "flag", label: `look-alike of ${L.official}`,
+      shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "Radar's list of outlet addresses, matched on this device.",
+      doesNotProve: LOOKALIKE_DOES_NOT_PROVE, data: { domain: S.domain, outlet: L.outlet, official: L.official, how: L.how } });
+  }
+  for (const h of S.state) {
+    const L = stateLabel(h);
+    out.push({ ...base, kind: "state-link", level: stateLevel(h), label: L.chip, shows: L.says, source: sourceLine(h.source),
+      doesNotProve: STATE_DOES_NOT_PROVE[h.basis] || STATE_DOES_NOT_PROVE["named-in-report"], data: { domain: S.domain, state: h.state, basis: h.basis, actor: h.actor } });
+  }
+  if (S.owner && S.owner.owner) {
+    out.push({ ...base, kind: "site-owner", level: "info", label: `link: ${S.owner.name || S.domain}`,
+      shows: `${S.owner.name || S.domain} (${S.domain}). ${ownerHeading(S.owner)} ${S.owner.owner}.`, source: `Wikidata${S.owner.source ? `: ${S.owner.source}` : ""}`,
+      doesNotProve: SITE_OWNER_DOES_NOT_PROVE, data: { domain: S.domain, owner: S.owner.owner, ownerType: ownerType({ facts: S.facts, state: S.state }) } });
+  }
+  const line = recordLine(S.record);
+  if (line || (!quiet && S.facts)) {
+    out.push({ ...base, kind: "site-record", level: "info", label: `site record: ${S.domain}`,
+      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "No review in Radar's table lists this site as where a claim appeared."].join(": ") + ".",
+      source: SITE_SOURCES, doesNotProve: SITE_RECORD_DOES_NOT_PROVE,
+      data: { domain: S.domain, reviews: S.record ? S.record.n : 0, checkers: S.record ? S.record.m : 0, since: S.record ? S.record.since : null, founded: S.facts ? S.facts.founded : null, country: S.facts ? S.facts.country : null } });
+  }
+  return out;
+}
+
+return { cleanDomain, siteSummary, siteEvidence };
+})();
+
+// ---- api-post.js
+const M_api_post = (() => {
+// Evidence about one post's text: strong language, named theories, persuasion techniques,
+// machine-writing and spam signs, fact-checked claims and the domains it names. Each item says
+// what it shows, where it came from and what it does not prove, and carries the matched span so
+// anyone holding the post can check it. Pure: no DOM, no network.
+
+const { score } = M_rhetoric;
+const { persuasion, PERSUASION_DOES_NOT_PROVE } = M_persuasion;
+const { machineSigns } = M_machine;
+const { theoryById, THEORY_DOES_NOT_PROVE } = M_theories;
+const { matchClaims, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION } = M_claims;
+const { domainsIn } = M_owners;
+const { cleanDomain } = M_api_site;
+const { STRONG_LABEL, STRONG_MEANING, SRC_RULES, STRONG_DOES_NOT_PROVE, LEAK_DOES_NOT_PROVE, MACHINE_DOES_NOT_PROVE, SPAM_DOES_NOT_PROVE } = M_api_words;
+
+// Where `match` sits in `text`: { post, start, end, text }. start and end are null when the
+// match was found after folding look-alike letters and is not in the text as written.
+function spanOf(post, text, match) {
+  const m = String(match || "");
+  const at = m ? String(text || "").toLowerCase().indexOf(m.toLowerCase()) : -1;
+  return at < 0 ? { post, start: null, end: null, text: m } : { post, start: at, end: at + m.length, text: String(text).slice(at, at + m.length) };
+}
+
+const item = (post, kind, level, label, shows, source, doesNotProve, spans = [], data = {}) =>
+  ({ kind, scope: "post", level, label, shows, source, doesNotProve, posts: [post], spans, data });
+
+function language(id, text) {
+  const out = [], s = score(text);
+  for (const mk of s.markers) {
+    if (STRONG_LABEL[mk.family]) out.push(item(id, "strong-language", "warn", STRONG_LABEL[mk.family], STRONG_MEANING[mk.family], SRC_RULES, STRONG_DOES_NOT_PROVE, [spanOf(id, text, mk.match)], { family: mk.family, lang: mk.lang || "en" }));
+    const t = mk.family === "conspiracy-theory" ? theoryById(mk.theory) : null;
+    if (t) out.push(item(id, "names-theory", "info", `names a theory: ${t.name}`, `${t.claim} What the record shows: ${t.record}`, (t.sources || []).map((x) => `${x.title} (${x.date}): ${x.url}`).join("; ") || SRC_RULES, `${t.dnp ? t.dnp + " " : ""}${THEORY_DOES_NOT_PROVE}`, [spanOf(id, text, mk.match)], { theory: t.id }));
+  }
+  for (const t of persuasion(text)) {
+    out.push(item(id, "persuasion", "info", `persuasion: ${t.name.toLowerCase()}`, t.definition, SRC_RULES, PERSUASION_DOES_NOT_PROVE, [spanOf(id, text, t.match)], { technique: t.technique, lang: t.lang || "en" }));
+  }
+  return { items: out, extreme: s.extreme };
+}
+
+function machine(id, text) {
+  const M = machineSigns(text), out = [];
+  if (M.leak) out.push(item(id, "leaked-ai", "warn", "leaked AI text", "Text a chatbot writes, posted without editing.", SRC_RULES, LEAK_DOES_NOT_PROVE, [spanOf(id, text, M.leak)]));
+  else if (M.machineLike) out.push(item(id, "machine-writing", "flag", "machine-writing signs", `Signs: ${M.signs.join("; ")}. Radar counts three or more independent signs in a post of at least 25 words.`, SRC_RULES, MACHINE_DOES_NOT_PROVE, [], { signs: M.signs }));
+  if (M.spam) out.push(item(id, "spam-pattern", "warn", "spam pattern", "A pattern common in scam and spam posts: giveaways, crypto, contact bait.", SRC_RULES, SPAM_DOES_NOT_PROVE, [spanOf(id, text, M.spam)]));
+  return { items: out, machineLike: !!(M.leak || M.machineLike) };
+}
+
+function claims(id, text, index) {
+  if (!index) return [];
+  return matchClaims(index, text).map((m) => item(id, "fact-check", "warn", CLAIM_LABEL,
+    `${m.checker} rated a similar claim "${m.rating}": ${m.claim} (${m.url}). Wording overlap: ${Math.round(m.coverage * 100)}% of the claim's words.${m.negationDiffers ? " One of the two says \"not\" and the other does not. Read both." : ""}`,
+    CLAIM_ATTRIBUTION, CLAIM_DOES_NOT_PROVE, [], { checker: m.checker, rating: m.rating, claim: m.claim, url: m.url, date: m.date || null, overlap: m.coverage, negationDiffers: !!m.negationDiffers }));
+}
+
+// The domains a post links to or names, lower case, unique.
+function postDomains(post) {
+  const out = new Set();
+  for (const l of post.links || []) { const d = cleanDomain(l); if (d) out.add(d); }
+  for (const d of domainsIn(post.text)) { const c = cleanDomain(d); if (c) out.add(c); }
+  return [...out];
+}
+
+// post: { id, text, links? }. Returns { items, extreme, machineLike, domains }.
+function postEvidence(post, { claimIndex = null } = {}) {
+  const id = String(post.id), text = String(post.text || "");
+  const L = language(id, text), M = machine(id, text);
+  return { items: [...L.items, ...M.items, ...claims(id, text, claimIndex)], extreme: L.extreme, machineLike: M.machineLike, domains: postDomains(post) };
+}
+
+return { spanOf, postDomains, postEvidence };
+})();
+
+// ---- api-thread.js
+const M_api_thread = (() => {
+// Thread-level evidence: the thread norm report, near-identical replies, timing bursts, swarming
+// and account flags. Items refer to posts by id and never name an account, so an export of them
+// cannot become a list of people. Pure: no DOM, no network.
+
+const { threadReport, REPORT_DOES_NOT_PROVE } = M_report;
+const { duplicateClusters } = M_similarity;
+const { timingBursts } = M_timing;
+const { swarmSign, SWARM_DOES_NOT_PROVE } = M_swarming;
+const { flagsFor, isFlagged, ageDays, DOES_NOT_PROVE, NEW_ACCOUNT_DAYS } = M_flags;
+const { baselineLine } = M_baselines;
+const { FLAG_LABEL, SRC_POSTS, SRC_ACCOUNTS, BURST_DOES_NOT_PROVE } = M_api_words;
+
+const thread = (kind, level, label, shows, source, doesNotProve, posts, data = {}) =>
+  ({ kind, scope: "thread", level, label, shows, source, doesNotProve, posts, spans: [], data });
+const withBase = (text, sign, replies) => { const b = baselineLine(sign, { replies }); return b ? `${text} ${b}` : text; };
+
+// Flags for one reply: the input's own list (ids or { id, evidence }), or Radar's rules over the
+// account details given, or null when neither was given (the account was not read).
+function flagsOf(reply, now) {
+  if (Array.isArray(reply.flags)) return reply.flags.map((f) => (typeof f === "string" ? { id: f } : f)).filter((f) => f && f.id);
+  if (reply.account && typeof reply.account === "object") return flagsFor(reply.account, { now });
+  return null;
+}
+
+function flagItems(replies, now) {
+  const byKey = new Map();
+  for (const r of replies) {
+    for (const f of r.flags || []) {
+      const key = f.id + "|" + String(r.author).toLowerCase() + "|" + (f.evidence || "");
+      const e = byKey.get(key) || { f, posts: [] };
+      e.posts.push(r.id);
+      byKey.set(key, e);
+    }
+  }
+  return [...byKey.values()].map(({ f, posts }) => ({
+    kind: "account-flag", scope: "post", level: f.id === "based-elsewhere" ? "warn" : "flag", label: FLAG_LABEL[f.id] || f.id,
+    shows: f.evidence ? `The account behind ${posts.length === 1 ? "this post" : "these posts"}: ${f.evidence}.` : `The input marks the account behind ${posts.length === 1 ? "this post" : "these posts"} with this flag.`,
+    source: SRC_ACCOUNTS, doesNotProve: DOES_NOT_PROVE[f.id] || f.doesNotProve || "A flag is a sign to look at, not a finding about the person.",
+    posts, spans: [], data: { flag: f.id, asOf: new Date(now).toISOString().slice(0, 10) },
+  }));
+}
+
+function reportItem(replies, R) {
+  const ci = (c) => c.map((x) => Math.round(x * 1000) / 1000);
+  return thread("thread-report", R.verdict === "skewed-to-flagged" ? "flag" : "info", "thread report", R.sentence,
+    `${SRC_POSTS} ${SRC_ACCOUNTS}`, REPORT_DOES_NOT_PROVE, replies.map((r) => r.id), {
+      replies: R.replies, accountsRead: R.lookedUp, notRead: R.notLookedUp, verdict: R.verdict,
+      extreme: { n: R.extreme.n, flagged: R.extreme.flagged, ci: ci(R.extreme.ci) },
+      others: { n: R.others.n, flagged: R.others.flagged, ci: ci(R.others.ci) }, machineSigns: R.machine.n,
+    });
+}
+
+function burstItems(replies) {
+  return timingBursts(replies).map((b) => {
+    const who = new Set(b.authors), from = Date.parse(b.from), to = Date.parse(b.to);
+    const posts = replies.filter((r) => who.has(String(r.author).toLowerCase()) && Date.parse(r.posted) >= from && Date.parse(r.posted) <= to).map((r) => r.id);
+    const secs = Math.max(1, Math.round((to - from) / 1000));
+    return thread("timing-burst", "flag", `timing burst, ${b.authors.length} accounts`,
+      withBase(`${b.authors.length} accounts replied within ${secs} s at ${b.from.slice(11, 16)} UTC. Chance at this thread's pace: p ${b.p < 1e-6 ? "< 0.000001" : "= " + b.p.toPrecision(2)}.`, "burst", replies.length),
+      SRC_POSTS, BURST_DOES_NOT_PROVE, posts, { from: b.from, to: b.to, accounts: b.authors.length, p: b.p });
+  });
+}
+
+function sameTextItems(replies, root) {
+  return duplicateClusters(replies, { root }).map((c) => thread("same-text", "flag", `near-identical replies, ${c.authors.length} accounts`,
+    withBase(`${c.ids.length} replies from ${c.authors.length} different accounts share most of their wording (similarity at least ${c.similarity}).`, "same-text", replies.length),
+    SRC_POSTS, DOES_NOT_PROVE["same-text"], c.ids.map(String), { posts: c.ids.length, accounts: c.authors.length, similarity: c.similarity }));
+}
+
+function swarmItem(replies, now) {
+  const by = new Map(replies.map((r) => [String(r.author).toLowerCase(), r]));
+  const markOf = (a, t) => {
+    const r = by.get(a);
+    if (!r || !Array.isArray(r.flags)) return null;
+    const age = r.account && r.account.joinDate ? ageDays(r.account.joinDate, t || now) : null;
+    return { new: age != null && age < NEW_ACCOUNT_DAYS, flagged: isFlagged(r.flags) };
+  };
+  const w = swarmSign(replies, markOf);
+  if (!w) return [];
+  const from = Date.parse(w.from), to = Date.parse(w.to);
+  const posts = replies.filter((r) => { const t = Date.parse(r.posted); return t >= from && t <= to; }).map((r) => r.id);
+  return [thread("swarming", "flag", "swarming", withBase(`${w.marked} of ${w.known} accounts read in a ${Math.round(w.windowSec / 60)}-minute window from ${w.from.slice(11, 16)} UTC were new or flagged (${w.newAccounts} new, ${w.flagged} flagged), all replying to one post.`, "swarm", replies.length),
+    `${SRC_POSTS} ${SRC_ACCOUNTS}`, SWARM_DOES_NOT_PROVE, posts, { from: w.from, to: w.to, known: w.known, marked: w.marked, newAccounts: w.newAccounts, flagged: w.flagged })];
+}
+
+// replies: normalised [{ id, author, text, posted, flags, extreme, machine }]. root: { text } or null.
+function threadItems(replies, root, { now = Date.now() } = {}) {
+  const accounts = new Set(replies.map((r) => String(r.author).toLowerCase())).size;
+  const R = threadReport(replies);
+  // One account (a data export, or a thread with one replier) has nothing to compare.
+  const out = [...(accounts >= 2 ? [reportItem(replies, R)] : []), ...flagItems(replies, now)];
+  if (accounts >= 2) out.push(...sameTextItems(replies, root), ...burstItems(replies));
+  if (root && accounts >= 2) out.push(...swarmItem(replies, now));
+  return { items: out, report: R, accounts };
+}
+
+return { flagsOf, threadItems };
+})();
+
+// ---- api-media.js
+const M_api_media = (() => {
+// A file's Content Credentials (C2PA) and AI-generation metadata as evidence items. The words come
+// from src/core/mediacheck.js, so the API never calls a file authentic or fake.
+
+const { readCredentials, credentialState } = M_c2pa;
+const { credentialSignals, CREDENTIALS_DO_NOT_PROVE, NO_CREDENTIALS } = M_mediacheck;
+const { SRC_FILE } = M_api_words;
+
+const row = (rows, key) => (rows.find((r) => r[0] === key) || [])[1] || null;
+const KIND = { c2pa: "content-credentials", "c2pa-changed": "credentials-changed", "ai-metadata": "ai-metadata" };
+
+// The evidence for one reading from readCredentials().
+function mediaItems(r) {
+  const state = credentialState(r);
+  const out = credentialSignals(r).map((s) => ({
+    kind: s.fam === "c2pa" && /AI/.test(s.label) ? "credentials-ai" : KIND[s.fam] || s.fam,
+    scope: "file", level: s.level, label: s.label,
+    shows: [row(s.rows, "What Radar read") || row(s.rows, "What Radar found"), row(s.rows, "Signed by") ? `Signed by ${row(s.rows, "Signed by")}.` : null].filter(Boolean).join(" "),
+    source: SRC_FILE, doesNotProve: row(s.rows, "Does not prove") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
+  }));
+  if (state === "none") out.push({ kind: "no-credentials", scope: "file", level: "info", label: "no content credentials", shows: NO_CREDENTIALS, source: SRC_FILE, doesNotProve: "A file without credentials can be real or made up; most platforms remove them.", posts: [], spans: [], data: { state } });
+  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online. Radar does not fetch them, so nothing was checked.", source: SRC_FILE, doesNotProve: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
+  return out;
+}
+
+// bytes: Uint8Array or ArrayBuffer of the whole file. Returns { state, ai, items }.
+async function mediaReading(bytes) {
+  const r = await readCredentials(bytes, { complete: true });
+  const ai = !!(r.aiAnywhere || ((r.meta && r.meta.sourceTypes) || []).some((t) => t.kind === "ai") || ((r.meta && r.meta.generators) || []).length);
+  return { state: credentialState(r), ai, format: r.format || null, items: mediaItems(r) };
+}
+
+return { mediaItems, mediaReading };
+})();
+
+// ---- api.js
+const M_api = (() => {
+// radar-core: the public API. One zero-dependency ES module over Radar's pure core, for anyone
+// who wants Radar's evidence without the browser extension. No DOM, no network, no storage: the
+// caller hands in the posts, the file bytes and (optionally) the data tables, and gets back
+// evidence objects that match schema/evidence.v1.json. project-docs/INTEGRATION.md documents it.
+//
+//   analyzeThread({ site, root, replies })   evidence about a thread
+//   analyzeText(text)                        evidence about one piece of text
+//   checkMedia(bytes)                        Content Credentials and AI metadata of a file
+//   siteInfo(domain)                         what Radar's tables hold about a site
+//   useData({ sites, owners, state, claims, claimParts })   load the tables (optional)
+//
+// Every evidence item states what it shows, its source and what it does not prove. None names an
+// account: items point at posts by id.
+
+const { postEvidence } = M_api_post;
+const { threadItems, flagsOf } = M_api_thread;
+const { siteEvidence, siteSummary, cleanDomain } = M_api_site;
+const { mediaReading } = M_api_media;
+const { useData, claimIndex, dataLoaded } = M_api_data;
+const { REPORT_DOES_NOT_PROVE } = M_report;
+const { THREAD_LIMIT, TEXT_LIMIT } = M_api_words;
+
+const API_VERSION = "1.0.0";
+const EVIDENCE_SCHEMA = "urn:radar:evidence:v1";
+
+
+const envelope = (kind, extra) => ({ schema: EVIDENCE_SCHEMA, api: API_VERSION, kind, ...extra });
+const number = (items) => items.map((it, i) => ({ id: "e" + (i + 1), ...it }));
+
+// Adds the site items for every domain the posts link to, one item set per domain.
+function linkItems(byDomain) {
+  return [...byDomain].flatMap(([d, posts]) => siteEvidence(d, posts, { quiet: true }));
+}
+
+// One post in the input: { id?, author?, text, posted?, links?, flags?, account? }.
+function normalise(p, i, now) {
+  const post = { id: p && p.id != null ? String(p.id) : "p" + (i + 1), author: String((p && p.author) || "unknown-" + (i + 1)), text: String((p && p.text) || ""), posted: (p && p.posted) || null, links: (p && p.links) || [] };
+  post.flags = flagsOf(p || {}, now);
+  if (p && p.account) post.account = p.account;
+  return post;
+}
+
+// text: a string. opts: { id, links }. Returns the evidence envelope for one piece of text.
+function analyzeText(text, opts = {}) {
+  const id = opts.id != null ? String(opts.id) : "p1";
+  const P = postEvidence({ id, text, links: opts.links || [] }, { claimIndex: claimIndex() });
+  const links = new Map(P.domains.map((d) => [d, [id]]));
+  return envelope("text", { posts: { n: 1, accounts: null }, evidence: number([...P.items, ...linkItems(links)]), limits: [TEXT_LIMIT] });
+}
+
+// input: { site, root?, replies: [post] }. opts: { now }: the time account ages are measured at.
+function analyzeThread(input, opts = {}) {
+  const now = opts.now || Date.now();
+  const replies = ((input && input.replies) || []).map((p, i) => normalise(p, i, now));
+  const root = input && input.root && input.root.text != null ? normalise({ id: "root", ...input.root }, -1, now) : null;
+  const items = [], links = new Map();
+  for (const post of root ? [root, ...replies] : replies) {
+    const P = postEvidence(post, { claimIndex: claimIndex() });
+    items.push(...P.items);
+    post.extreme = P.extreme; post.machine = P.machineLike;
+    for (const d of P.domains) (links.get(d) || links.set(d, []).get(d)).push(post.id);
+  }
+  const T = threadItems(replies, root, { now });
+  const evidence = number([...T.items, ...items, ...linkItems(links)]);
+  return envelope("thread", {
+    site: (input && input.site) || null,
+    posts: { n: replies.length + (root ? 1 : 0), accounts: T.accounts, ids: [...(root ? [root.id] : []), ...replies.map((r) => r.id)] },
+    evidence, limits: [THREAD_LIMIT, REPORT_DOES_NOT_PROVE],
+  });
+}
+
+// bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
+async function checkMedia(bytes) {
+  const M = await mediaReading(bytes);
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Radar read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
+}
+
+// domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
+function siteInfo(domain) {
+  const d = cleanDomain(domain);
+  if (!d) return null;
+  const loaded = dataLoaded();
+  const limits = ["Every row names its source. Radar adds no score or rating of its own."];
+  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("No site tables were loaded, so only the look-alike check ran.");
+  return envelope("site", { site: siteSummary(d), evidence: number(siteEvidence(d, [])), limits });
+}
+
+return { API_VERSION, EVIDENCE_SCHEMA, analyzeText, analyzeThread, checkMedia, siteInfo };
+})();
+
+// ---- evidence-bundle.js
+const M_evidence_bundle = (() => {
+// Signed evidence bundles: what Radar found on a thread, as a file anyone can check offline. A
+// bundle carries post ids, the evidence with the matched spans needed to check it, the Radar and
+// API versions, a hash of the data tables used, and the time; it is signed with a per-install
+// ECDSA P-256 key through WebCrypto, and the public key travels inside the bundle.
+//
+// Privacy: other people's full post text stays out unless the user opts in (includeText). The
+// bundle names no account, and a thread bundle needs as many reply accounts as a thread card.
+//
+// What a valid signature shows: the bundle has not changed since the holder of that key signed
+// it. It does not show who holds the key, that the posts said what the spans say, or that the
+// evidence is right. Compare the key id with one you got from its holder some other way.
+
+const { canonicalJSON, MIN_CARD_ACCOUNTS } = M_evidence;
+
+const BUNDLE_KIND = "radar-evidence-bundle";
+const BUNDLE_VERSION = 1;
+const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
+const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right.";
+const ALG = { name: "ECDSA", namedCurve: "P-256" }, SIGN = { name: "ECDSA", hash: "SHA-256" };
+const subtle = () => globalThis.crypto.subtle;
+const enc = (s) => new TextEncoder().encode(s);
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+
+function b64url(bytes) {
+  let s = "";
+  for (const b of new Uint8Array(bytes)) s += String.fromCharCode(b);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function fromB64url(text) {
+  const s = atob(String(text).replace(/-/g, "+").replace(/_/g, "/") + "===".slice((String(text).length + 3) % 4));
+  return Uint8Array.from(s, (c) => c.charCodeAt(0));
+}
+
+async function sha256Hex(data) { return hex(await subtle().digest("SHA-256", typeof data === "string" ? enc(data) : data)); }
+
+// The hash of the data tables: SHA-256 over lines "<sha256>  <name>", names sorted.
+async function dataLockOf(files) {
+  const lines = [];
+  for (const [name, bytes] of [...files].sort((a, b) => (a[0] < b[0] ? -1 : 1))) lines.push(`${await sha256Hex(bytes)}  ${name}`);
+  return { alg: "SHA-256", of: "lines \"<sha256>  <file>\" for each data table, sorted by name", value: await sha256Hex(lines.join("\n") + "\n") };
+}
+
+// A new key pair. extractable: false keeps the private key inside the browser's key store.
+async function newBundleKey({ extractable = false } = {}) {
+  return subtle().generateKey(ALG, extractable, ["sign", "verify"]);
+}
+
+// The public half as a JWK with only the fields a verifier needs, and its id: the first 16 hex
+// characters of the SHA-256 of that JWK's canonical JSON.
+async function publicKeyOf(publicKey) {
+  const j = await subtle().exportKey("jwk", publicKey);
+  const jwk = { kty: j.kty, crv: j.crv, x: j.x, y: j.y };
+  return { jwk, keyId: (await sha256Hex(canonicalJSON(jwk))).slice(0, 16) };
+}
+
+// result: an analyzeThread or analyzeText envelope. opts: { tool, dataLock, savedAt, page, texts,
+// includeText, source }. texts: { postId: text }, used only when includeText is true.
+// Returns { ok: true, bundle } or { ok: false, reason }.
+function makeBundle(result, opts = {}) {
+  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "There is no analysis to put in a bundle." };
+  const archive = opts.source === "export";
+  if (result.kind === "thread" && !archive && (result.posts.accounts || 0) < MIN_CARD_ACCOUNTS) {
+    return { ok: false, reason: `This thread has ${result.posts.accounts || 0} accounts. A bundle needs at least ${MIN_CARD_ACCOUNTS}, so it cannot be about one person.` };
+  }
+  const ids = (result.posts && result.posts.ids) || [...new Set(result.evidence.flatMap((e) => e.posts))];
+  const texts = opts.includeText ? opts.texts || {} : {};
+  const bundle = {
+    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "Radar",
+    savedAt: opts.savedAt || new Date().toISOString(), dataLock: opts.dataLock || null,
+    input: { kind: result.kind, site: result.site || null, page: opts.page || null, source: archive ? "export" : "thread", accounts: result.posts ? result.posts.accounts : null },
+    posts: ids.map((id) => (opts.includeText && texts[id] != null ? { id, text: String(texts[id]) } : { id })),
+    textIncluded: !!opts.includeText,
+    evidence: result.evidence, limits: [...(result.limits || []), BUNDLE_DOES_NOT_PROVE],
+  };
+  return { ok: true, bundle };
+}
+
+// Signs a bundle with a key pair from newBundleKey(). Returns a new bundle with `signature`.
+async function signBundle(bundle, keyPair) {
+  const { signature, ...body } = bundle;
+  const { jwk, keyId } = await publicKeyOf(keyPair.publicKey);
+  const signed = { ...body, signer: { alg: BUNDLE_SIG_ALG, keyId, publicKey: jwk } };
+  const sig = await subtle().sign(SIGN, keyPair.privateKey, enc(canonicalJSON(signed)));
+  return { ...signed, signature: { of: "canonical JSON of this bundle without the signature field (sorted keys, no spaces)", value: b64url(sig) } };
+}
+
+// Spans and post references inside the bundle agree with themselves: every post an item names is
+// listed, and when text is included every located span is the text at that place.
+function bundleConsistency(bundle) {
+  const ids = new Set((bundle.posts || []).map((p) => p.id)), text = new Map((bundle.posts || []).filter((p) => p.text != null).map((p) => [p.id, p.text]));
+  const missing = [], wrong = [];
+  for (const e of bundle.evidence || []) {
+    for (const p of e.posts || []) if (!ids.has(p)) missing.push(`${e.id}: ${p}`);
+    for (const s of e.spans || []) {
+      const t = text.get(s.post);
+      if (t != null && s.start != null && t.slice(s.start, s.end) !== s.text) wrong.push(`${e.id}: ${s.post}`);
+    }
+  }
+  return { ok: !missing.length && !wrong.length, missing, wrong };
+}
+
+async function signatureOk(bundle) {
+  const { signature, ...body } = bundle, S = body.signer;
+  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Radar can check" };
+  const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
+  if ((await sha256Hex(canonicalJSON(jwk))).slice(0, 16) !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
+  let key;
+  try { key = await subtle().importKey("jwk", { ...jwk, ext: true }, ALG, true, ["verify"]); } catch { return { ok: false, text: "the public key cannot be read" }; }
+  let good = false;
+  try { good = await subtle().verify(SIGN, key, fromB64url(signature.value), enc(canonicalJSON(body))); } catch { good = false; }
+  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature does not match: the bundle changed after signing, or was signed with another key" };
+}
+
+// opts.keyId: the key id you expect, from the signer by another route. Resolves to
+// { ok, keyId, checks: [{ name, ok, text }] }; ok is true only when every check passes.
+async function verifyBundle(bundle, opts = {}) {
+  const checks = [];
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Radar evidence bundle" }] };
+  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Radar reads` });
+  checks.push({ name: "signature", ...(await signatureOk(bundle)) });
+  const keyId = bundle.signer ? bundle.signer.keyId : null;
+  if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
+  const C = bundleConsistency(bundle);
+  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts not listed (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
+  return { ok: checks.every((c) => c.ok), keyId, checks };
+}
+
+return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, b64url, fromB64url, sha256Hex, dataLockOf, newBundleKey, publicKeyOf, makeBundle, signBundle, bundleConsistency, verifyBundle };
+})();
+
+// ---- import-html.js
+const M_import_html = (() => {
+// Posts from a page the user saved (File > Save page as). No DOM: a few tolerant string readers,
+// so the CLI and the extension's offline analyser read a page the same way. Supported: X threads
+// (article elements with tweetText), new Reddit threads (shreddit-post and shreddit-comment), and
+// any other page as one block of text with its links. Scripts and styles are never run or read.
+
+const ENT = { amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", nbsp: " ", "#39": "'" };
+
+// Entities decoded, tags dropped, line breaks kept where blocks end.
+function htmlText(html) {
+  return String(html || "")
+    .replace(/<(script|style|noscript|template)\b[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<br\s*\/?>/gi, "\n").replace(/<\/?(p|div|li|h\d|blockquote)\b[^>]*>/gi, "\n")
+    .replace(/<img\b[^>]*\balt="([^"]*)"[^>]*>/gi, " $1 ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+|#39);/gi, (m, e) => {
+      if (e[0] === "#") { const n = e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10); return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : m; }
+      return ENT[e.toLowerCase()] ?? m;
+    })
+    .replace(/[ \t ]+/g, " ").replace(/\s*\n\s*/g, "\n").trim();
+}
+
+// The inner HTML of the element whose opening tag starts at `at`, matched on its tag name.
+function innerAt(html, at) {
+  const open = html.slice(at).match(/^<([a-z][\w-]*)\b[^>]*>/i);
+  if (!open) return "";
+  const tag = open[1].toLowerCase(), re = new RegExp(`<(/?)${tag}\\b[^>]*>`, "gi");
+  re.lastIndex = at + open[0].length;
+  let depth = 1, m;
+  while ((m = re.exec(html))) {
+    depth += m[1] ? -1 : 1;
+    if (!depth) return html.slice(at + open[0].length, m.index);
+  }
+  return html.slice(at + open[0].length);
+}
+
+const attr = (tag, name) => { const m = tag.match(new RegExp(`\\s${name}="([^"]*)"`, "i")); return m ? htmlText(m[1]) : null; };
+const hrefs = (html) => [...String(html).matchAll(/<a\b[^>]*\bhref="(https?:\/\/[^"]+)"/gi)].map((m) => htmlText(m[1]));
+const isoOrNull = (s) => { const t = Date.parse(s || ""); return Number.isFinite(t) ? new Date(t).toISOString() : null; };
+
+function xPosts(html) {
+  const out = [];
+  for (const m of html.matchAll(/<article\b[^>]*>/gi)) {
+    const body = innerAt(html, m.index);
+    const status = body.match(/href="(?:https:\/\/(?:x|twitter)\.com)?\/([A-Za-z0-9_]{1,15})\/status\/(\d+)"/);
+    const textAt = body.search(/<div\b[^>]*data-testid="tweetText"/i);
+    if (!status || textAt < 0) continue;
+    const text = innerAt(body, textAt);
+    out.push({ id: status[2], author: status[1], text: htmlText(text), posted: isoOrNull((body.match(/<time\b[^>]*datetime="([^"]+)"/i) || [])[1]), links: hrefs(text).filter((u) => !/^https?:\/\/(x|twitter)\.com\//.test(u)) });
+  }
+  return out;
+}
+
+function redditPosts(html) {
+  const out = [];
+  const post = html.match(/<shreddit-post\b[^>]*>/i);
+  if (post) {
+    const at = html.search(/<div\b[^>]*\bid="t3_[^"]*-post-rtjson-content"/i), body = at >= 0 ? htmlText(innerAt(html, at)) : "";
+    out.push({ id: attr(post[0], "id") || "post", author: attr(post[0], "author") || "unknown", text: [attr(post[0], "post-title"), body].filter(Boolean).join("\n"), posted: isoOrNull(attr(post[0], "created-timestamp")), links: [attr(post[0], "content-href")].filter((u) => u && /^https?:/.test(u)) });
+  }
+  for (const m of html.matchAll(/<shreddit-comment\b[^>]*>/gi)) {
+    const id = attr(m[0], "thingid");
+    if (!id) continue;
+    const at = html.indexOf(`id="${id}-comment-rtjson-content"`), start = at >= 0 ? html.lastIndexOf("<", at) : -1;
+    const inner = start >= 0 ? innerAt(html, start) : "";
+    out.push({ id, author: attr(m[0], "author") || "unknown", text: htmlText(inner), posted: isoOrNull(attr(m[0], "created")), links: hrefs(inner) });
+  }
+  return out;
+}
+
+// Returns { site, root, replies, kind } for a thread, or { site: null, root: null, replies: [one
+// page post], kind: "page" } for any other page.
+function postsFromHtml(html) {
+  const s = String(html || "");
+  const site = /<meta\b[^>]*content="(?:X|Twitter)"|https:\/\/(?:x|twitter)\.com\//i.test(s) && /data-testid="tweetText"/.test(s) ? "X" : /<shreddit-(?:post|comment)\b/i.test(s) ? "Reddit" : null;
+  const posts = site === "X" ? xPosts(s) : site === "Reddit" ? redditPosts(s) : [];
+  if (posts.length) return { site, root: posts[0], replies: posts.slice(1), kind: "thread" };
+  const title = htmlText((s.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || "");
+  const main = s.match(/<(main|article)\b[^>]*>/i), body = main ? innerAt(s, main.index) : s.replace(/^[\s\S]*?<body\b[^>]*>/i, "");
+  return { site: null, root: null, replies: [{ id: "page", author: "page", text: [title, htmlText(body)].filter(Boolean).join("\n").slice(0, 20000), posted: null, links: hrefs(body).slice(0, 200) }], kind: "page" };
+}
+
+return { htmlText, innerAt, postsFromHtml };
+})();
+
+// ---- import-exports.js
+const M_import_exports = (() => {
+// Posts from the data exports platforms give their own users: an X archive's tweets.js, a Reddit
+// data export's comments.csv or posts.csv, and a Mastodon archive's outbox.json. All posts in an
+// export are the user's own, so they come back with one author, "you". Reposts of other people's
+// posts are left out and counted. Reddit's export has an ip column: it is dropped and never shown.
+
+const { htmlText } = M_import_html;
+
+const iso = (s) => { const t = Date.parse(s || ""); return Number.isFinite(t) ? new Date(t).toISOString() : null; };
+const EXPORT_AUTHOR = "you";
+
+// window.YTD.tweets.part0 = [ { tweet: { id_str, full_text, created_at, entities } } ]
+function xArchivePosts(text) {
+  const s = String(text || ""), at = s.indexOf("=");
+  if (!/^\s*window\.YTD\./.test(s) || at < 0) return null;
+  let rows;
+  try { rows = JSON.parse(s.slice(at + 1).trim().replace(/;\s*$/, "")); } catch { return null; }
+  const posts = [];
+  let reposts = 0;
+  for (const r of Array.isArray(rows) ? rows : []) {
+    const t = (r && (r.tweet || r.note_tweet || r)) || {};
+    const body = t.full_text || t.text || (t.core && t.core.text) || "";
+    if (/^RT @\w+:/.test(body)) { reposts++; continue; }
+    if (!body) continue;
+    const links = ((t.entities || {}).urls || []).map((u) => u.expanded_url).filter((u) => u && !/^https?:\/\/(x|twitter)\.com\//.test(u));
+    posts.push({ id: String(t.id_str || t.id || t.noteTweetId || posts.length + 1), author: EXPORT_AUTHOR, text: body, posted: iso(t.created_at || t.createdAt), links });
+  }
+  return { site: "X", posts, notes: reposts ? [`${reposts} repost${reposts === 1 ? "" : "s"} of other people's posts left out.`] : [] };
+}
+
+// RFC 4180: quoted fields, doubled quotes, line breaks inside quotes. Returns rows of strings.
+function parseCsv(text) {
+  const s = String(text || "").replace(/^﻿/, ""), rows = [];
+  let row = [], field = "", quoted = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (quoted) {
+      if (c === "\"" && s[i + 1] === "\"") { field += "\""; i++; } else if (c === "\"") quoted = false; else field += c;
+    } else if (c === "\"" && field === "") quoted = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && s[i + 1] === "\n") i++;
+      row.push(field); rows.push(row); row = []; field = "";
+    } else field += c;
+  }
+  if (field || row.length) { row.push(field); rows.push(row); }
+  return rows.filter((r) => r.length > 1 || r[0]);
+}
+
+// comments.csv: id, permalink, date, ip, subreddit, gildings, link, parent, body, media
+// posts.csv:    id, permalink, date, ip, subreddit, gildings, title, url, body
+function redditExportPosts(text) {
+  const rows = parseCsv(text);
+  if (rows.length < 1) return null;
+  const head = rows[0].map((h) => h.trim().toLowerCase()), col = (n) => head.indexOf(n);
+  if (col("id") < 0 || col("body") < 0 || col("permalink") < 0) return null;
+  const posts = rows.slice(1).map((r) => {
+    const pick = (n) => (col(n) >= 0 ? r[col(n)] || "" : "");
+    const url = pick("url"), text = [pick("title"), pick("body")].filter(Boolean).join("\n");
+    return { id: pick("id"), author: EXPORT_AUTHOR, text, posted: iso(pick("date")), links: /^https?:\/\//.test(url) && !/reddit\.com\//.test(url) ? [url] : [] };
+  }).filter((p) => p.id && p.text && p.text !== "[deleted]" && p.text !== "[removed]");
+  return { site: "Reddit", posts, notes: col("ip") >= 0 ? ["The export's ip column was left out; Radar keeps and shows no IP address."] : [] };
+}
+
+// outbox.json: { orderedItems: [{ type: "Create", object: { id, content, published, tag } }] }.
+function mastodonOutboxPosts(json) {
+  if (!json || !Array.isArray(json.orderedItems)) return null;
+  const posts = [];
+  let boosts = 0;
+  for (const it of json.orderedItems) {
+    if (it && it.type === "Announce") { boosts++; continue; }
+    const o = it && it.type === "Create" ? it.object : null;
+    if (!o || typeof o !== "object" || typeof o.content !== "string") continue;
+    const links = [...o.content.matchAll(/<a\b[^>]*\bhref="(https?:\/\/[^"]+)"[^>]*>/gi)].filter((m) => !/\b(mention|hashtag)\b/.test(m[0])).map((m) => m[1]);
+    posts.push({ id: String(o.id || it.id || posts.length + 1).split("/").pop(), author: EXPORT_AUTHOR, text: htmlText(o.content), posted: iso(o.published || it.published), links });
+  }
+  return { site: "Mastodon", posts, notes: boosts ? [`${boosts} boost${boosts === 1 ? "" : "s"} of other people's posts left out.`] : [] };
+}
+
+return { EXPORT_AUTHOR, xArchivePosts, parseCsv, redditExportPosts, mastodonOutboxPosts };
+})();
+
+// ---- import-json.js
+const M_import_json = (() => {
+// Threads from JSON a platform's own web app or API returned, saved by the user: X's GraphQL
+// TweetDetail, Bluesky's app.bsky.feed.getPostThread, a Mastodon status context, or a thread in
+// Radar's own input shape ({ site, root, replies }). Field names follow each platform's public
+// formats; the readers walk the JSON, so a wrapper around the response does not matter.
+
+const { htmlText } = M_import_html;
+
+const iso = (s) => { const t = Date.parse(s || ""); return Number.isFinite(t) ? new Date(t).toISOString() : null; };
+
+function walk(json, visit, limit = 300000) {
+  const stack = [json];
+  let guard = 0;
+  while (stack.length && guard++ < limit) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    visit(v);
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+}
+
+// The post most others reply to is the root; the rest are replies, oldest first.
+function asThread(site, posts) {
+  if (!posts.length) return null;
+  const counts = new Map();
+  for (const p of posts) if (p.replyTo) counts.set(p.replyTo, (counts.get(p.replyTo) || 0) + 1);
+  const top = [...counts].sort((a, b) => b[1] - a[1])[0];
+  const root = (top && posts.find((p) => p.id === top[0])) || posts.find((p) => !p.replyTo) || null;
+  const replies = posts.filter((p) => p !== root).sort((a, b) => String(a.posted).localeCompare(String(b.posted)));
+  const clean = ({ replyTo, ...p }) => p;
+  return { site, root: root ? clean(root) : null, replies: replies.map(clean) };
+}
+
+function xThread(json) {
+  const posts = new Map();
+  walk(json, (v) => {
+    if (v.__typename !== "Tweet" || !v.rest_id || !v.legacy) return;
+    const L = v.legacy, u = ((v.core || {}).user_results || {}).result || {};
+    const note = (((v.note_tweet || {}).note_tweet_results || {}).result || {}).text;
+    posts.set(v.rest_id, { id: v.rest_id, author: (u.core || {}).screen_name || (u.legacy || {}).screen_name || "unknown", text: note || L.full_text || "", posted: iso(L.created_at),
+      links: ((L.entities || {}).urls || []).map((x) => x.expanded_url).filter((x) => x && !/^https?:\/\/(x|twitter)\.com\//.test(x)), replyTo: L.in_reply_to_status_id_str || null });
+  });
+  return asThread("X", [...posts.values()]);
+}
+
+function bskyThread(json) {
+  const posts = new Map();
+  walk(json, (v) => {
+    if (typeof v.uri !== "string" || !v.uri.startsWith("at://") || !v.author || typeof v.author.handle !== "string" || !v.record || typeof v.record.text !== "string") return;
+    const links = [];
+    for (const f of v.record.facets || []) for (const x of f.features || []) if (x && typeof x.uri === "string") links.push(x.uri);
+    const ext = v.record.embed && v.record.embed.external;
+    if (ext && ext.uri) links.push(ext.uri);
+    const parent = v.record.reply && v.record.reply.parent && v.record.reply.parent.uri;
+    posts.set(v.uri, { id: v.uri.split("/").pop(), author: v.author.handle, text: v.record.text, posted: iso(v.record.createdAt), links, replyTo: parent ? parent.split("/").pop() : null });
+  });
+  return asThread("Bluesky", [...posts.values()]);
+}
+
+function mastoThread(json) {
+  const posts = new Map();
+  walk(json, (v) => {
+    if (typeof v.id !== "string" || typeof v.content !== "string" || !v.account || typeof v.account.acct !== "string") return;
+    const links = [...v.content.matchAll(/<a\b[^>]*\bhref="(https?:\/\/[^"]+)"[^>]*>/gi)].filter((m) => !/\b(mention|hashtag)\b/.test(m[0])).map((m) => m[1]);
+    posts.set(v.id, { id: v.id, author: v.account.acct, text: htmlText(v.content), posted: iso(v.created_at), links, replyTo: v.in_reply_to_id || null });
+  });
+  return asThread("Mastodon", [...posts.values()]);
+}
+
+const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r) => r && typeof r.text === "string");
+
+// Returns { site, root, replies } or null when the JSON holds no thread Radar can read.
+function threadFromJson(json) {
+  if (!json || typeof json !== "object") return null;
+  if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies };
+  const text = JSON.stringify(json).slice(0, 2000000);
+  if (text.includes("\"__typename\":\"Tweet\"")) return xThread(json);
+  if (text.includes("\"at://")) return bskyThread(json);
+  if (text.includes("\"acct\"")) return mastoThread(json);
+  return null;
+}
+
+return { threadFromJson };
+})();
+
+// ---- import-car.js
+const M_import_car = (() => {
+// Posts from a Bluesky repository export (Settings > Export my data gives a .car file). A CAR v1
+// file is a header and a list of blocks, each a CID and DAG-CBOR bytes. Radar decodes every block,
+// keeps the app.bsky.feed.post records, and names each post by its record key, read from the
+// repository's key tree (MST). Everything in the file is the user's own data.
+
+const { cborDecode } = M_cbor;
+const { EXPORT_AUTHOR } = M_import_exports;
+
+const hex = (b) => [...b].map((x) => x.toString(16).padStart(2, "0")).join("");
+const td = new TextDecoder();
+
+// An unsigned LEB128 varint at i: [value, next].
+function varint(b, i) {
+  let v = 0, shift = 0, k = i;
+  while (k < b.length) {
+    const x = b[k++];
+    v += (x & 127) * 2 ** shift;
+    if (!(x & 128)) return [v, k];
+    shift += 7;
+    if (shift > 49) break;
+  }
+  throw new Error("car: bad varint");
+}
+
+// The length in bytes of the CID that starts at i (v0: a bare sha2-256 multihash; v1: version,
+// codec, then the multihash).
+function cidLength(b, i) {
+  if (b[i] === 0x12 && b[i + 1] === 0x20) return 34;
+  let [, k] = varint(b, i);
+  [, k] = varint(b, k);
+  const [, k2] = varint(b, k), [len, k3] = varint(b, k2);
+  return k3 + len - i;
+}
+
+// Blocks of a CAR v1 file: [{ cid (hex), data }]. Throws when the file is not CAR v1.
+function carBlocks(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const [hlen, h] = varint(b, 0);
+  const header = cborDecode(b.subarray(h, h + hlen));
+  if (!header || header.version !== 1) throw new Error("car: not a CAR v1 file");
+  const out = [];
+  for (let i = h + hlen; i < b.length;) {
+    const [len, k] = varint(b, i);
+    const n = cidLength(b, k);
+    out.push({ cid: hex(b.subarray(k, k + n)), data: b.subarray(k + n, k + len) });
+    i = k + len;
+  }
+  return out;
+}
+
+// A DAG-CBOR link (tag 42) as the hex of the CID, without the leading multibase zero.
+const linkHex = (v) => (v && v.tag === 42 && v.value instanceof Uint8Array ? hex(v.value.subarray(1)) : null);
+const str = (v) => (v instanceof Uint8Array ? td.decode(v) : String(v || ""));
+
+// Record CID -> repository key ("app.bsky.feed.post/3k..."), from every MST node in the file.
+function mstKeys(nodes) {
+  const keys = new Map();
+  for (const n of nodes) {
+    let prev = "";
+    for (const e of n.e) {
+      const key = prev.slice(0, e.p || 0) + str(e.k);
+      const cid = linkHex(e.v);
+      if (cid) keys.set(cid, key);
+      prev = key;
+    }
+  }
+  return keys;
+}
+
+function decoded(blocks) {
+  const posts = [], nodes = [];
+  for (const blk of blocks) {
+    let v;
+    try { v = cborDecode(blk.data); } catch { continue; }
+    if (v && v.$type === "app.bsky.feed.post" && typeof v.text === "string") posts.push({ cid: blk.cid, v });
+    else if (v && Array.isArray(v.e) && "l" in v) nodes.push(v);
+  }
+  return { posts, nodes };
+}
+
+const linksOf = (v) => [...(v.facets || []).flatMap((f) => (f.features || []).map((x) => x && x.uri)), v.embed && v.embed.external && v.embed.external.uri].filter((u) => typeof u === "string" && /^https?:/.test(u));
+
+// Returns { site: "Bluesky", posts, notes } or null when the bytes are not a CAR file.
+function blueskyCarPosts(bytes) {
+  let blocks;
+  try { blocks = carBlocks(bytes); } catch { return null; }
+  const { posts, nodes } = decoded(blocks), keys = mstKeys(nodes);
+  const out = posts.map(({ cid, v }, i) => {
+    const key = keys.get(cid);
+    const t = Date.parse(v.createdAt || "");
+    return { id: key ? key.split("/").pop() : "post" + (i + 1), author: EXPORT_AUTHOR, text: v.text, posted: Number.isFinite(t) ? new Date(t).toISOString() : null, links: linksOf(v) };
+  }).sort((a, b) => String(a.posted).localeCompare(String(b.posted)));
+  return { site: "Bluesky", posts: out, notes: [`${blocks.length} blocks read; ${out.length} posts found.`] };
+}
+
+return { varint, carBlocks, blueskyCarPosts };
+})();
+
+// ---- imports.js
+const M_imports = (() => {
+// One entry for every file the offline analyser and the CLI read: it decides what the file is from
+// its name and its first bytes, and returns posts in Radar's input shape. Nothing is fetched.
+//   saved page (.html, .htm)            X or Reddit thread, or any page as one text
+//   thread JSON                         Radar's shape, X GraphQL, Bluesky getPostThread, Mastodon context
+//   X archive tweets.js                 the user's own posts
+//   Reddit export comments.csv / posts.csv
+//   Mastodon archive outbox.json
+//   Bluesky repository export (.car)
+
+const { postsFromHtml } = M_import_html;
+const { threadFromJson } = M_import_json;
+const { xArchivePosts, redditExportPosts, mastodonOutboxPosts } = M_import_exports;
+const { blueskyCarPosts } = M_import_car;
+
+const IMPORT_FORMATS = ["saved page", "thread JSON", "X archive tweets.js", "Reddit export CSV", "Mastodon outbox.json", "Bluesky repository .car"];
+const MAX_IMPORT_POSTS = 20000;
+
+const fail = (reason) => ({ ok: false, reason });
+const asText = (bytes) => (typeof bytes === "string" ? bytes : new TextDecoder("utf-8").decode(bytes));
+const fromExport = (format, r) => (r && r.posts.length ? { ok: true, format, source: "export", site: r.site, input: { site: r.site, root: null, replies: r.posts.slice(0, MAX_IMPORT_POSTS) }, notes: [...r.notes, ...(r.posts.length > MAX_IMPORT_POSTS ? [`Only the first ${MAX_IMPORT_POSTS} posts were read.`] : [])] } : null);
+const fromThread = (format, t, notes = []) => (t && (t.replies.length || t.root) ? { ok: true, format, source: "thread", site: t.site, input: t, notes } : null);
+
+function fromJson(name, text) {
+  let json;
+  try { json = JSON.parse(text); } catch { return fail(`${name} is not valid JSON.`); }
+  if (json && json.kind === "radar-evidence-bundle") return fail("This is a Radar evidence bundle. Use Check a bundle to verify it.");
+  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Radar found no posts it can read in ${name}.`);
+}
+
+function fromBytes(name, bytes) {
+  const lower = String(name || "").toLowerCase();
+  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is not a Bluesky repository export Radar can read.`);
+  const text = asText(bytes).replace(/^﻿/, ""), head = text.slice(0, 400).trimStart();
+  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Radar can read.`);
+  if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} is not a Reddit export with id, permalink and body columns.`);
+  if (/^[[{]/.test(head)) return fromJson(name, text);
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Radar did not recognise a thread on this page, so it read the page as one text."] : [] }; }
+  return fail(`Radar does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
+}
+
+// name: the file name; bytes: Uint8Array, ArrayBuffer or string. Returns { ok: true, format,
+// source: "thread" | "export" | "page", site, input: { site, root, replies }, notes } or
+// { ok: false, reason }.
+function importFile(name, bytes) {
+  try { return fromBytes(name, bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes); } catch (e) { return fail(`Could not read ${name}: ${e.message}`); }
+}
+
+return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
+})();
+
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

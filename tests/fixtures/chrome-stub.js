@@ -16,6 +16,7 @@
     }, onChanged: { addListener: () => {} } },
     runtime: {
       getManifest: () => ({ version: "fixture" }),
+      getURL: (p) => new URL("../../src/ext/" + p, location.href).href,
       onMessage: { addListener: (f) => listeners.push(f) },
       sendMessage: async (msg) => {
         if (msg.type === "pb-owners" || msg.type === "pb-state") return [];

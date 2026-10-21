@@ -3,6 +3,16 @@
   "version": "2.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/core/api.js",
+    "./core": "./src/core/api.js",
+    "./imports": "./src/core/imports.js",
+    "./bundle": "./src/core/evidence-bundle.js",
+    "./schema/evidence.v1.json": "./schema/evidence.v1.json"
+  },
+  "bin": {
+    "radar": "bin/radar.mjs"
+  },
   "description": "Evidence badges for social media replies: where an account is based, coordination signs, and a thread norm report.",
   "scripts": {
     "test": "node --test \"tests/*.test.js\"",

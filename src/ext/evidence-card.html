@@ -28,10 +28,24 @@
     <details id="check"><summary>Check a copy</summary><p>The JSON file carries a SHA-256 hash of the card's content (sorted keys, no spaces, without the hash field). Hash that content to check a copy: <code id="hash" class="hash"></code></p></details>
     <p class="muted">Saving writes two files to this computer. Share hands the same two files to the app you pick. Radar uploads nothing itself.</p>
   </section>
+  <section id="bundle" aria-labelledby="h-bundle" hidden>
+    <h2 id="h-bundle">Signed evidence</h2>
+    <p>A bundle holds this thread's post ids and every evidence item with the matched words, Radar's version, a hash of its data tables and the time, signed with this browser's own Radar key. Anyone can check it offline with Radar's command line tool or its Analyse a file page.</p>
+    <label class="switch">
+      <span>Include the posts' full text<span class="hint">Off by default: the replies are other people's words. Without it, the bundle keeps only the matched words.</span></span>
+      <input type="checkbox" id="bundle-text">
+    </label>
+    <div class="row">
+      <button id="bundle-save" type="button" class="quiet">Save signed bundle</button>
+      <span id="bundle-status" role="status" aria-live="polite" class="muted"></span>
+    </div>
+  </section>
   <footer>The card covers one thread and names no account. Its JSON carries a hash of its content, so anyone can check a copy.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>
+<script src="signing.js"></script>
 <script src="evidence-card.js"></script>
+<script src="evidence-bundle-ui.js"></script>
 </body>
 </html>

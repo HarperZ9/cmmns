@@ -1,0 +1,18 @@
+/* The offline analyser: a drop target and the evidence list. Tokens only, square edges. */
+.drop { display: grid; place-items: center; min-height: 9rem; margin: var(--s-3) 0 var(--s-4); padding: var(--s-5); border: 1px dashed var(--line-strong);
+  background: var(--inset); cursor: pointer; text-align: center; }
+.drop.small-drop { min-height: 5rem; }
+.drop:hover, .drop.over { border-color: var(--ink); background: var(--raised); }
+.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.drop:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+.formats { margin-bottom: var(--s-4); }
+.ev { list-style: none; padding: 0; margin: 0 0 var(--s-5); display: grid; gap: var(--s-4); }
+.ev li { padding: var(--s-3) 0 var(--s-3) var(--s-4); border-left: 3px solid var(--line-strong); }
+.ev li.warn { border-left-color: var(--drift); }
+.ev li.flag { border-left-color: var(--unverifiable); }
+.ev .what { font-weight: 650; }
+.ev .posts, .ev .src { color: var(--soft); font-size: var(--t-meta); overflow-wrap: anywhere; }
+.ev .match { font-family: var(--font-mono); font-size: .95em; overflow-wrap: anywhere; }
+.ev .dnp { margin-top: var(--s-2); }
+.checks-pass { color: var(--verified); font-weight: 650; }
+.checks-fail { color: var(--drift); font-weight: 650; }

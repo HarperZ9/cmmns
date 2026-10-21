@@ -11,6 +11,7 @@
 
   $("dashboard").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") }); window.close(); });
   document.getElementById("history").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("history.html") }); window.close(); });
+  document.getElementById("analyze").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("analyze.html") }); window.close(); });
   document.getElementById("transparency").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("transparency.html") }); window.close(); });
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

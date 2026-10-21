@@ -1,0 +1,78 @@
+{
+ "thread": {
+  "post": {
+   "uri": "at://did:plc:root/app.bsky.feed.post/r0",
+   "author": {
+    "did": "did:plc:root",
+    "handle": "root.bsky.social"
+   },
+   "record": {
+    "$type": "app.bsky.feed.post",
+    "text": "Library budget thread",
+    "createdAt": "2026-10-01T12:00:00.000Z"
+   }
+  },
+  "replies": [
+   {
+    "post": {
+     "uri": "at://did:plc:u1/app.bsky.feed.post/r1",
+     "author": {
+      "did": "did:plc:u1",
+      "handle": "u1.bsky.social"
+     },
+     "record": {
+      "$type": "app.bsky.feed.post",
+      "text": "Reply number 1 about opening hours",
+      "createdAt": "2026-10-01T12:01:00.000Z",
+      "reply": {
+       "parent": {
+        "uri": "at://did:plc:root/app.bsky.feed.post/r0"
+       }
+      }
+     }
+    },
+    "replies": []
+   },
+   {
+    "post": {
+     "uri": "at://did:plc:u2/app.bsky.feed.post/r2",
+     "author": {
+      "did": "did:plc:u2",
+      "handle": "u2.bsky.social"
+     },
+     "record": {
+      "$type": "app.bsky.feed.post",
+      "text": "Reply number 2 about opening hours",
+      "createdAt": "2026-10-01T12:02:00.000Z",
+      "reply": {
+       "parent": {
+        "uri": "at://did:plc:root/app.bsky.feed.post/r0"
+       }
+      }
+     }
+    },
+    "replies": []
+   },
+   {
+    "post": {
+     "uri": "at://did:plc:u3/app.bsky.feed.post/r3",
+     "author": {
+      "did": "did:plc:u3",
+      "handle": "u3.bsky.social"
+     },
+     "record": {
+      "$type": "app.bsky.feed.post",
+      "text": "Reply number 3 about opening hours",
+      "createdAt": "2026-10-01T12:03:00.000Z",
+      "reply": {
+       "parent": {
+        "uri": "at://did:plc:root/app.bsky.feed.post/r0"
+       }
+      }
+     }
+    },
+    "replies": []
+   }
+  ]
+ }
+}
