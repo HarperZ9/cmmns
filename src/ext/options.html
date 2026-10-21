@@ -44,6 +44,16 @@
     <h2 id="h-coverage">Other coverage</h2>
     <p id="coverageText"></p>
     <div id="coverage" class="switches"></div>
+    <div id="feeds" hidden>
+      <h3 class="sub" id="h-outlets">Outlets</h3>
+      <p class="muted" id="outletsText"></p>
+      <div class="row"><button id="outletsAll" type="button" class="quiet">Choose every suggested outlet</button></div>
+      <div id="outlets" class="switches" aria-labelledby="h-outlets"></div>
+      <h3 class="sub" id="h-custom">Your own feeds</h3>
+      <p class="muted">Any RSS or Atom address on https. Adding one asks the browser for access to that feed's host only.</p>
+      <div class="row"><input id="customUrl" type="url" aria-label="Feed address" placeholder="https://example.org/feed.xml" size="40"><button id="customAdd" type="button">Add feed</button></div>
+      <ul id="custom" class="servers" aria-labelledby="h-custom"></ul>
+    </div>
     <p class="status muted" id="coverageStatus" role="status" aria-live="polite"></p>
   </section>
 
@@ -109,7 +119,7 @@
     </div>
   </section>
 
-  <footer id="foot">Evidence, not verdicts. Nothing leaves this browser unless you turn on Other coverage.</footer>
+  <footer id="foot">Evidence, not verdicts. Radar requests nothing off this browser unless you turn on Other coverage.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>

@@ -3,9 +3,9 @@
 Last updated: 2026-10-21.
 
 Radar runs entirely in your browser. It has no server, no account, no analytics and no telemetry.
-Nothing Radar reads or works out is sent to the author. One feature, Other coverage, sends the main
-words of an article's title to the GDELT Project, and only when you turn it on and click; it is off
-by default and described below.
+Nothing Radar reads or works out is sent to the author or to anyone else. One feature, Other
+coverage, requests the public news feeds of outlets you choose, and only when you turn it on and
+click; it sends nothing from the page, is off by default and is described below.
 
 ## What Radar reads
 
@@ -44,14 +44,24 @@ page". None of these send anything.
 
 ### Other coverage (off by default)
 
-Other coverage is off unless you turn it on in the options page. When it is on and you click "Find
-other coverage" on an article's site card, Radar sends the main words of that article's title, and
-nothing else, to the GDELT Project's public DOC 2.0 API at `api.gdeltproject.org`. Radar does not
-send the page address, your history, any post or any account. GDELT receives the request like any
-web request, so it sees your IP address and the words; its terms are at gdeltproject.org. Before
-the first request the card shows the exact words it would send and waits for your click. Turning
-the option off withdraws the browser permission and resets that consent. Firefox also asks you to
-allow "website content" for this feature when you turn it on.
+Other coverage is off unless you turn it on in the options page. When it is on, you choose which
+outlets to ask from a suggested list, and you may add any RSS or Atom feed address. Choosing an
+outlet asks the browser for access to that one feed's host, never to all sites. When you click
+"Find other coverage" on an article's site card, Radar requests each chosen outlet's feed from the
+feed's own address, then compares the article's title with the feed's headlines on your device.
+
+Radar sends nothing from the page: not the title, not the page address, not your history, not any
+post, not any account. Each request is an ordinary download of a public feed, with no cookies, no
+referrer and no header added by Radar, and Radar does not follow a redirect to another address.
+Each outlet receives the request like any web request, so it sees your IP address, the time and
+your browser's standard headers, and could guess that someone was reading news at that moment. No
+aggregator or Radar server is involved. Answers are kept in memory for ten minutes and never
+stored. Before the first request the card lists every host it will ask and waits for your click;
+adding an outlet resets that consent. Turning the option off withdraws every feed host's
+permission and forgets your choices.
+
+Radar 2.x used the GDELT Project's search service for this feature, which received the main words
+of the title. Radar 3.0 removed it and gives back that permission on update.
 
 The window offers reverse image search links (Google Lens, TinEye, Bing, Yandex) for media. Those
 open only when you click one, and then that service receives the image address.

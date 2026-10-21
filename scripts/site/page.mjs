@@ -91,7 +91,7 @@ ${CSS}${css ? "\n" + css : ""}
 <h1>${esc(title)}</h1>
 <p class="muted">Updated ${esc(updated)}.</p>
 ${body}
-<footer>Radar. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage. <a href="${REPO}">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+<footer>Radar. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage, which asks the outlets you choose for their feeds. <a href="${REPO}">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
 </main>
 </body>
 </html>

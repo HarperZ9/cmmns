@@ -108,5 +108,5 @@
   }
 
   siteSwitches(); servers(); windowSwitches(); retention(); clearAll(); access(); families(); usage();
-  $("foot").textContent = `Radar ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Nothing leaves this browser unless you turn on Other coverage.`;
+  $("foot").textContent = `Radar ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Radar requests nothing off this browser unless you turn on Other coverage.`;
 })().catch((e) => console.error("[radar] options page failed", e));

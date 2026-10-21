@@ -21,10 +21,13 @@
     "data:check": "node scripts/data-lock.mjs check",
     "data:guard": "node scripts/upstream-guard.mjs",
     "pack": "node scripts/pack.mjs",
-    "pages": "node scripts/transparency.mjs && node scripts/privacy.mjs",
+    "pages": "node scripts/transparency.mjs && node scripts/privacy.mjs && node scripts/install-page.mjs",
     "package": "node scripts/package.mjs",
     "eval": "node scripts/eval.mjs",
-    "eval:persuasion": "node scripts/eval-persuasion.mjs"
+    "eval:persuasion": "node scripts/eval-persuasion.mjs",
+    "ci": "node scripts/ci.mjs test",
+    "release": "node scripts/release.mjs",
+    "verify-release": "node scripts/verify-release.mjs"
   },
   "license": "FSL-1.1-MIT"
 }

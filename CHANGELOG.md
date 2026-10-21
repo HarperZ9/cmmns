@@ -5,6 +5,42 @@ were not published to a store.
 
 ## Unreleased
 
+### Changed (independence: Other coverage without an aggregator)
+- Other coverage now reads each outlet's own news feed, with no aggregator in between. Turn it on,
+  then choose outlets from 33 suggested feeds across 18 countries and every owner type, or add any
+  https RSS or Atom address. Each choice asks the browser for that one feed host only. On your
+  click, Radar downloads the chosen feeds and matches the article's title against their headlines
+  on your device. Nothing from the page is sent. Every feed asked is listed with its result,
+  including the ones that failed and why. Redirects to another host are not followed.
+- The GDELT lookup is removed, not kept as an option: it was an aggregator Radar could not check,
+  it received the title's words, and it answered 24 of 100 test lookups. On update Radar gives back
+  its permission, and consent given to it does not carry over. Firefox no longer lists
+  `websiteContent` as optional data collection, since Radar no longer sends any.
+- Measured: all 33 feeds answered, all in 1.2 s; of 99 lookups, 34 found at least one other outlet
+  and 17 found three or more. Precision not measured.
+
+### Added (independence: when a site changes)
+- When a platform changes its page so that Radar reads nothing where it should, a notice says so
+  ("Reddit changed its page; Radar cannot read replies here yet") instead of Radar showing nothing.
+  A sign-in wall or a removed post is not called a change.
+- "Self-test on this page" in the toolbar menu: how many boxes Radar's reader found and read here,
+  with authors, text and ids, and the page's shape. Counts only.
+- A generic reader for sites Radar has no reader for: the site card adds "Text on this page", with
+  rhetoric, persuasion and machine-writing counts for the article body and the comments, found from
+  the page's layout. Layout guesses; not measured.
+
+### Added (independence: releases without a store or a code host)
+- Signed, reproducible releases (`npm run release`): the store packages, a self-distribution
+  Firefox build that updates from Radar's own site, the hash of every file inside each package, a
+  git bundle of the source, `SHA256SUMS` and an ECDSA P-256 signature over it. Key id
+  `0e5e 1984 0565 840c 977e 0f03 6c9a c021`, the same project key that signs data packs.
+- An install page on Radar's site: how to check a download (with a checker that runs in the
+  browser), rebuild it, and install it without a store, and where Chrome and Firefox still require
+  their own rules. `node scripts/verify-release.mjs` checks a release offline.
+- `npm run ci` runs exactly what GitHub Actions runs, so the project can check itself anywhere.
+- A test fails if private key material appears anywhere in the tree.
+- Details and what each measure does not prove: project-docs/INDEPENDENCE.md.
+
 ### Added (integration surface)
 - radar-core: one ES module, `src/core/api.js`, with `analyzeThread`, `analyzeText`,
   `checkMedia`, `siteInfo` and `useData`. Pure functions over Radar's core: no DOM, no network,

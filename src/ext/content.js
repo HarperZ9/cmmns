@@ -51,6 +51,7 @@
   PBSettings.onChange((s) => { settings = s; schedule(); });
   PBSettings.ready.then(() => schedule());
   const enabled = () => { const site = PBSites.current(); return !!site && PB.siteOn(settings, site.id); };
+  const feedMode = (site) => !!site && !site.onThread() && settings.feeds && !!(site.onFeed && site.onFeed());
   // The toolbar icon follows this tab: paused, reading accounts, or idle. Sent only on change.
   let iconSent = "";
   function icon(state) {
@@ -89,10 +90,12 @@
     const site = PBSites.current();
     // Feed mode (timelines, profiles, likes, search): badges on every post, no thread report and
     // nothing added to the connections log, because a feed is not a conversation.
-    const feed = !!site && !site.onThread() && settings.feeds && !!(site.onFeed && site.onFeed());
-    if (site && !PB.siteOn(settings, site.id)) { removePanel(); PBUI.closePop(); icon("paused"); return; }
-    if (!site || (!site.onThread() && !feed)) { removePanel(); return; }
-    const items = site.items().map((n) => site.read(n)).filter(Boolean);
+    const feed = feedMode(site);
+    if (site && !PB.siteOn(settings, site.id)) { removePanel(); PBUI.closePop(); icon("paused"); PBHealth.observe(null); return; }
+    if (!site || (!site.onThread() && !feed)) { removePanel(); PBHealth.observe(null); return; }
+    // Adapter health (src/ext/health.js): a reader that finds nothing where it should says so.
+    const nodes = site.items(), items = nodes.map((n) => site.read(n)).filter(Boolean);
+    PBHealth.observe(site, feed, nodes.length, items, () => schedule(0));
     if (!items.length) { videoOnly(site, feed); return; }
     const [root, replies] = !feed && (site.hasLocation || site.rootFirst) ? [items[0], items.slice(1)] : [null, items];
     await Promise.all([ensureOwners(items), PBLogs.ensureClaims(items)]);
@@ -262,6 +265,7 @@
   // The toolbar popup asks for a summary of the current page.
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg && msg.type === "pb-summary") { sendResponse(lastSummary); return false; }
+    if (msg && msg.type === "pb-selftest") { const site = PBSites.current(); sendResponse(site ? PBHealth.selfTest(site, feedMode(site)) : null); return false; }
     return false;
   });
 
