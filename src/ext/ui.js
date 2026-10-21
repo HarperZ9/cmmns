@@ -40,6 +40,14 @@
     };
   }
 
+  // A first-week tip for the window (src/ext/tour.js), at most one, at the top of the Overview.
+  function tour(signals) {
+    const withLesson = signals.find((s) => s.fam && PB.lessonPath(s.fam));
+    const tip = globalThis.PBTour ? PBTour.take("window", { hasSignal: !!withLesson }) : null;
+    if (!tip) return [];
+    return [{ tab: "overview", tip: tip.id === "lesson" ? { ...tip, open: [`Open the lesson: ${withLesson.label}`, PB.lessonPath(withLesson.fam)] } : tip }];
+  }
+
   // model: { site, handle, display, posted, profile, reading, flags, markers, machine, tweet, yt, trail, ... }
   function badge(article, model, onLookup) {
     syncTheme();
@@ -49,7 +57,7 @@
       const settings = globalThis.PBSettings ? PBSettings.get() : null;
       if (settings && model.site && !PB.siteOn(settings, model.site.id)) return null;
       const signals = PBSignals.all(model, settings);
-      return [{ glance: glance(model, signals) }, ...PBCard.sections(model, signals, onLookup)];
+      return [{ glance: glance(model, signals) }, ...tour(signals), ...PBCard.sections(model, signals, onLookup)];
     });
   }
 

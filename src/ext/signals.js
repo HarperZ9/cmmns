@@ -97,13 +97,15 @@
   const ORDER = { warn: 0, flag: 1, info: 2 };
   // Each signal carries its family's measured accuracy (src/core/measured.js through families.js),
   // or "not measured yet". Areas the user hid in the options page are left out.
+  // Every sign links to its lesson (src/ext/learn.html), opened by the worker on click.
+  const learn = (fam) => { const path = fam && PB.lessonPath ? PB.lessonPath(fam) : null; return path ? [["Learn", { open: ["How to spot it yourself, 1 to 2 minutes", path] }]] : []; };
   const measured = (fam) => (fam && PB.measuredLine ? PB.measuredLine(fam).text : "not measured yet");
   // The user's own marks (src/ext/feedback.js) sit under the measured line and never replace it.
   const feedback = (x, m) => (globalThis.PBFeedback && x.fam ? PBFeedback.rows(x, m) : []);
   function all(m, settings) {
     const shown = (x) => !settings || !PB.areaOn || PB.areaOn(settings, x.cat);
     return [...checks(m), ...language(m), ...links(m), ...post(m), ...account(m)].filter(shown)
-      .map((x) => ({ ...x, rows: [...x.rows, ["Measured", measured(x.fam)], ...feedback(x, m)] }))
+      .map((x) => ({ ...x, rows: [...x.rows, ["Measured", measured(x.fam)], ...feedback(x, m), ...learn(x.fam)] }))
       .sort((a, b) => ORDER[a.level] - ORDER[b.level]);
   }
 

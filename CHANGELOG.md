@@ -23,6 +23,23 @@ were not published to a store.
 - "First seen" for each piece of media: the earliest post Radar has seen with the same upload, and
   the "From @account" post X credits it to. Reverse search links now say that a click sends the
   image address to that service.
+- Lessons: every sign and persuasion technique has a local lesson of one to two minutes, opened
+  from the sign's "Learn" link in the window (52 lessons). Each says what the move is, shows
+  made-up examples, explains why it works on people and how to spot it without Radar, gives the
+  counter-move and what the sign does not prove, and says a post with the sign can still be true.
+  Examples come evenly from left, right and centre (a test counts them), and every lesson pairs
+  the sign with a fair use or an ordinary account that trips the same sign.
+- Self-check: eighteen made-up posts, half leaning on a move and half giving real support, hard to
+  easy, with the reason after every answer. It is scored by discernment (hits against false
+  alarms, d') and only when you open "How you are doing", because replications found the Bad
+  News game made players doubt true posts as much as false ones. Answers stay in this browser.
+- First-week tour: three tips over the first uses (the window, the thread report, a lesson), each
+  shown once, at most one an hour, none after the first week, and "No more tips" ends it for good.
+  Clearing Radar's data keeps that choice.
+- Research behind the lessons, read 2026-10-20 and cited with dates on the lessons page:
+  Roozenbeek and van der Linden 2019; Basol et al. 2020 and 2021; Maertens et al. 2021;
+  Roozenbeek et al. 2022 (Science Advances); and the replications Modirrousta-Galian and Higham
+  2023, Graham et al. 2023, Seabrooke et al. 2025 and Modirrousta-Galian et al. 2026.
 - Persuasion techniques: span-level cues for eleven techniques from the SemEval-2020 Task 11 and
   SemEval-2023 Task 3 taxonomy (loaded language, name calling, bandwagon, appeal to fear,
   flag-waving, thought-terminating cliche, whataboutism, black-and-white fallacy, doubt, appeal to

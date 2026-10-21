@@ -1,0 +1,199 @@
+// Lessons for the place, posting and account signs (src/core/flags.js). An empty `dnp` means the
+// lesson uses the badge's own does-not-prove line from DOES_NOT_PROVE, so the two never disagree.
+// Each lesson has a made-up account that shows the sign and a made-up ordinary account that trips
+// the same sign, because the sign alone cannot tell them apart.
+
+export const ACCOUNT_LESSONS = [
+  {
+    id: "mismatch", flag: "based-elsewhere", title: "Speaks as local, labelled elsewhere", research: ["badnews-2019"],
+    what: "The reply speaks as a local of one place, with words like \"here in Ohio\" or \"as a Frenchman\", and the site labels the account as based in another country.",
+    examples: [
+      { side: "none", topic: "health", kind: "sign", text: "\"As a nurse here in Leeds, I can tell you the hospital is lying.\" The account's About page places it on another continent, and it joined last month." },
+      { side: "none", topic: "health", kind: "ordinary", text: "\"Back home in Leeds we did it differently.\" The writer moved abroad ten years ago and says so in the bio." },
+    ],
+    why: "A local voice carries weight, because locals know their own streets. Bad News taught impersonation, borrowing an identity you do not have, as one of its six techniques.",
+    spot: "On X, open the account, then the date it joined, to reach \"About this account\". It shows the country X places the account in and how it connected.",
+    counter: "Read the label yourself and then read the account's other posts. A real local usually talks about more than one hot topic and mentions ordinary local detail.",
+    dnp: "",
+  },
+  {
+    id: "written-in", title: "Written in another language", research: [],
+    what: "X translated this post from a language that does not fit where the account is based. Radar shows the language X reported, next to the account's label.",
+    examples: [
+      { side: "none", topic: "elections", kind: "sign", text: "A reply about a city council vote in Spain, first written in a language rarely spoken there, from an account that never posts about anything else." },
+      { side: "none", topic: "elections", kind: "ordinary", text: "A reply about the same vote, first written in Romanian, from a Romanian family who live in that city." },
+    ],
+    why: "The language a post was first written in can hint at who wrote it. Translation tools make it easy to post in any language, so the hint is easy to miss.",
+    spot: "On X, a translated post shows a \"Translate post\" or \"Translated from\" line. Compare that language with the place the account claims and the place X shows.",
+    counter: "Treat it as context only. Many people write in the language they grew up with. It matters when it lines up with other place signs on the same account.",
+    dnp: "People write in many languages, including ones from where they grew up.",
+  },
+  {
+    id: "store-elsewhere", title: "App store elsewhere", research: [],
+    what: "X says the account connected through an app store in a different country from where the account is labelled.",
+    examples: [
+      { side: "none", topic: "tech", kind: "sign", text: "Labelled as based in Canada, connected via the app store of a country far away, and posting only about Canadian elections." },
+      { side: "none", topic: "tech", kind: "ordinary", text: "Labelled as based in Canada, connected via the German app store, because the owner bought the phone while studying in Berlin." },
+    ],
+    why: "Where an account installed the app is harder to change than a typed location. When it disagrees with the label, that is one more piece of place evidence.",
+    spot: "On X, the \"About this account\" page lists \"Connected via\" with the store and country. You can read it for any account without Radar.",
+    counter: "Weigh it with the other place signs. On its own it is weak, since people move, travel and buy phones abroad. When two or three place signs agree, you have more to go on.",
+    dnp: "",
+  },
+  {
+    id: "flag-elsewhere", title: "Flag of another country", research: [],
+    what: "The display name shows the flag of a country other than the one the site labels the account as based in.",
+    examples: [
+      { side: "none", topic: "war", kind: "sign", text: "A name with one country's flag and \"proud citizen\", from an account labelled in a third country, that joined during the war." },
+      { side: "none", topic: "sport", kind: "ordinary", text: "A name with Brazil's flag during the World Cup, from a fan who lives in Portugal." },
+    ],
+    why: "A flag in a name tells readers which side the account speaks for. It costs nothing to add, and readers take it at face value.",
+    spot: "Compare the flag in the name with the country on the account's About page. On sites without a label, compare it with the posting hours and languages instead.",
+    counter: "Read the flag as a claim the account made about itself. Supporters and diaspora show flags of places they love, so look for other signs before you weigh it.",
+    dnp: "",
+  },
+  {
+    id: "profile-location-elsewhere", title: "Profile says elsewhere", research: [],
+    what: "The location typed into the profile names a different country from the site's own label for the account.",
+    examples: [
+      { side: "none", topic: "elections", kind: "sign", text: "Profile says \"Texas, USA\". The site places the account in another region, and it posts in a burst every evening, Texas time morning." },
+      { side: "none", topic: "local", kind: "ordinary", text: "Profile says \"Texas, USA\". The owner moved to Mexico last year and never updated the bio." },
+    ],
+    why: "A typed location is the account's own claim and costs nothing to write. When the site's label disagrees, at least one of the two is out of date or wrong.",
+    spot: "Read the location under the bio, then open the account's About page. Two different countries is the sign. Also check whether the bio itself talks about moving.",
+    counter: "Trust neither one fully. Look at the account's posting hours and the subjects it posts about for more context, and treat the sign as a reason to look, nothing more.",
+    dnp: "",
+  },
+  {
+    id: "hours-elsewhere", title: "Active hours fit elsewhere", research: [],
+    what: "The account's posting times fit a waking day in a different time zone from where it is labelled. Radar reads the times of the posts the site loaded.",
+    examples: [
+      { side: "none", topic: "economy", kind: "sign", text: "An account labelled in New York posts almost only between 3 and 9 in the morning, New York time, every day for a month." },
+      { side: "none", topic: "economy", kind: "ordinary", text: "A New York nurse on night shifts posts between 2 and 6 in the morning on work days." },
+    ],
+    why: "Accounts run from far away keep the hours of the people who run them. Hours are hard to fake for many weeks, so a clear shifted day says something.",
+    spot: "Scroll the account's posts and note the times. Most sites show a time on each post when you hover over the date. Ten or twenty posts are enough to see a pattern.",
+    counter: "Look at the hour chart in Radar's card, or your own notes. A clear, shifted day is worth noting. A scattered pattern tells you very little.",
+    dnp: "",
+  },
+  {
+    id: "fast-replier", title: "Replies within a minute", research: [],
+    what: "The account often replies within a minute of the post it answers.",
+    examples: [
+      { side: "none", topic: "media", kind: "sign", text: "An account that sits among the first three replies under one news account's posts, every time, within 40 seconds, with a long reply." },
+      { side: "none", topic: "sport", kind: "ordinary", text: "A fan with notifications on for their club, who replies to every team post within seconds with one emoji." },
+    ],
+    why: "The first replies set the tone for everyone who reads later. Being first every time takes alerts, automation or a team watching the account.",
+    spot: "Compare the time on the post with the time on the reply. Do it for a few posts by the same account. A long, polished reply in under a minute is the telling case.",
+    counter: "Read past the first few replies before you judge a thread's mood. The top of a thread is the easiest place to plant a view, so the middle is often a fairer sample.",
+    dnp: "",
+  },
+  {
+    id: "automation-app", title: "Posts through an automation app", research: [],
+    what: "The account's posts come through an app built for automation or bulk posting. X records the app in the data it loads, even though it no longer shows it.",
+    examples: [
+      { side: "none", topic: "tech", kind: "sign", text: "A personal-looking account whose replies to strangers all arrive through a bulk posting service, at a steady rate, day and night." },
+      { side: "none", topic: "media", kind: "ordinary", text: "A local newspaper that schedules its headlines through the same service." },
+    ],
+    why: "Automation lets one operator run many accounts that answer strangers. Readers see the replies as people talking in the moment.",
+    spot: "Without Radar this is hard on X today, since the app name is hidden. Look for the other signs of a schedule instead: exact, even gaps between posts and the same wording.",
+    counter: "Check what the account posts. A brand or news desk using automation is normal. Automated replies to strangers on hot topics deserve a second look.",
+    dnp: "",
+  },
+  {
+    id: "no-sleep-gap", title: "Posts around the clock", research: [],
+    what: "The account posts in nearly every hour of the day, with no gap where a sleeping person would stop.",
+    examples: [
+      { side: "none", topic: "war", kind: "sign", text: "An account posting opinions about the war in 23 of 24 hours, on each of the last ten days." },
+      { side: "none", topic: "local", kind: "ordinary", text: "A city traffic alert account that posts every hour by design." },
+    ],
+    why: "People sleep. An account with no gap is run by a team, by a schedule or by a script, and readers usually picture one person typing.",
+    spot: "Note the times of an account's posts across two or three days. You are looking for the missing night. Most people leave a gap of six hours or more.",
+    counter: "Look at what the account posts. An alert or news account is supposed to run all day. A personal opinion account that never sleeps is the case worth noting.",
+    dnp: "",
+  },
+  {
+    id: "repost-only", title: "Almost only reposts", research: [],
+    what: "Nearly everything the account shares is someone else's post. It writes almost nothing of its own.",
+    examples: [
+      { side: "none", topic: "elections", kind: "sign", text: "Of 200 posts seen, 196 are reposts of the same five accounts, all within minutes of the original." },
+      { side: "none", topic: "science", kind: "ordinary", text: "A retired teacher who reposts science news she likes and rarely writes anything herself." },
+    ],
+    why: "Reposting accounts make a few voices look widely backed, and they cost little to run in bulk. Readers see the repost count and rarely ask who is doing the reposting.",
+    spot: "Open the account and scroll its posts. Count how many it wrote itself. Then see whether the reposts come from many sources or the same few.",
+    counter: "Look at whom the account reposts and how fast. If it is the same few sources within minutes, you are seeing their reach multiplied, and the crowd is smaller than it looks.",
+    dnp: "",
+  },
+  {
+    id: "high-volume", title: "Very high post rate", research: [],
+    what: "The account posts far more each day than most people could, measured over its whole life.",
+    examples: [
+      { side: "none", topic: "health", kind: "sign", text: "A two-month-old account averaging 300 posts a day, nearly all replies about one health policy." },
+      { side: "none", topic: "sport", kind: "ordinary", text: "A sports results account that posts every score from every match automatically." },
+    ],
+    why: "Volume buys visibility. One account posting hundreds of times a day fills feeds and threads, and repetition makes a claim feel familiar, and familiar feels true.",
+    spot: "Divide the post count on the profile by the days since it joined. A number in the hundreds is the sign. The profile shows both figures on most sites.",
+    counter: "Check what the account posts and through which app. A high rate alone is weak evidence. A high rate of replies to strangers on one topic is the stronger pattern.",
+    dnp: "",
+  },
+  {
+    id: "new-account", title: "New account", research: [],
+    what: "The account is only days or weeks old.",
+    examples: [
+      { side: "none", topic: "economy", kind: "sign", text: "An account made four days ago, already with 900 replies about a strike, in a thread where twenty others joined the same week." },
+      { side: "none", topic: "local", kind: "ordinary", text: "A resident who signed up yesterday to follow news about a flood in her town." },
+    ],
+    why: "Accounts that get banned are replaced with new ones, so campaigns lean on fresh accounts. Many new accounts in one thread tell you more than one does.",
+    spot: "The join date is on every profile. Check it for a handful of the loudest replies. If most joined in the same few weeks, write that down.",
+    counter: "Look at Radar's thread report for a join burst. One new account means little, since news events bring real people online. Many joining the same week is the pattern.",
+    dnp: "",
+  },
+  {
+    id: "name-changes", title: "Renamed", research: [],
+    what: "The account has changed its username several times. X counts the changes on the About page.",
+    examples: [
+      { side: "none", topic: "economy", kind: "sign", text: "An account renamed five times, from a fan page to a crypto page to a political commentary account, keeping its 40,000 followers." },
+      { side: "none", topic: "media", kind: "ordinary", text: "A writer who changed her handle twice: once after marriage, once for a new job." },
+    ],
+    why: "Accounts with followers are bought and repurposed. A new name keeps the audience and hides the history, so the followers look like fans of the new topic.",
+    spot: "On X, the About page shows how many times the username changed. Search the old handle if you can find it, or scroll back to old replies that show what the account used to be.",
+    counter: "Ask what the account used to be and whether its followers came for this topic. Old replies under the new name often show its earlier life.",
+    dnp: "",
+  },
+  {
+    id: "default-handle", title: "Sign-up handle", research: [],
+    what: "The handle is still the one the site suggested at sign-up: a name followed by a string of digits.",
+    examples: [
+      { side: "none", topic: "media", kind: "sign", text: "Twelve replies in one thread from handles like \"Name48213907\", all joined the same month." },
+      { side: "none", topic: "local", kind: "ordinary", text: "A grandfather whose handle is still \"Name19570412\", because he never looked at the settings." },
+    ],
+    why: "Accounts made in bulk often keep the suggested handle, because nobody cares to change it. A single one says almost nothing, which is why Radar shows it as faint context.",
+    spot: "Look for a name followed by eight or so digits. Then look at the join dates of those accounts. Many such handles that joined together are more telling than one.",
+    counter: "Treat it as context only. Radar never counts it toward \"flagged\", and you should not read anything into it alone.",
+    dnp: "",
+  },
+  {
+    id: "follow-pattern", title: "Follows many, few follow back", research: [],
+    what: "The account follows many accounts and very few follow it back.",
+    examples: [
+      { side: "none", topic: "tech", kind: "sign", text: "Following 4,900, followed by 31, joined three weeks ago, replying to every post from one company." },
+      { side: "none", topic: "science", kind: "ordinary", text: "Following 2,000 researchers, followed by 40: a student who reads more than she posts." },
+    ],
+    why: "Mass following is a way to collect followers fast, because some people follow back. It is common in growth schemes, and also in people who use the site to read.",
+    spot: "The two numbers sit under every profile. A following count far above the follower count, on a young account, is the sign.",
+    counter: "Treat it as context only. Radar never counts it toward \"flagged\". It matters only next to stronger signs on the same account.",
+    dnp: "",
+  },
+  {
+    id: "low-karma", title: "Low karma for its age", research: [],
+    what: "On Reddit, the account has far less karma than its age would suggest.",
+    examples: [
+      { side: "none", topic: "elections", kind: "sign", text: "A five-year-old account with 12 karma that started posting in political communities last week, many times a day." },
+      { side: "none", topic: "science", kind: "ordinary", text: "A five-year-old account with 12 karma that has read science communities for years and comments once a month." },
+    ],
+    why: "Old, quiet accounts are bought and woken up because age looks trustworthy. Low karma for the age can show a dormant account brought back for a purpose.",
+    spot: "On Reddit, the profile shows the cake day and the karma. Then sort the account's comments by new and see when the activity started.",
+    counter: "Look at when the activity started and on what. A long silence, then a burst on one topic, is the pattern. Quiet readers are common.",
+    dnp: "",
+  },
+];

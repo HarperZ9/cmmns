@@ -80,4 +80,6 @@ export function pruneStore(store, settings, now = Date.now()) {
 export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
 // "Clear all Radar data": every Radar key except the settings themselves.
-export const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && k !== SETTINGS_KEY);
+// The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
+const KEPT = new Set([SETTINGS_KEY, "pb.tour"]);
+export const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));
