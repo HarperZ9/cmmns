@@ -24,6 +24,7 @@ import { scoreZh, NEGATION_ZH, prepZh } from "./rhetoric-zh.js";
 import { scoreHi, NEGATION_HI, prepHi } from "./rhetoric-hi.js";
 import { mentionedIntl } from "./rhetoric-mention.js";
 import { foldConfusables } from "./confusables.js";
+import { theoryMatches } from "./theories.js";
 
 export const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -108,7 +109,9 @@ function mention(s, m) {
 const unleet = (s) => s.replace(/[013457@$!]/g, (c) => L.LEET[c] || c);
 
 export const WEIGHTS = { dehumanise: 2, violence: 3, vigilante: 2, slur: 2, slurSoft: 1, stereotype: 2, motive: 1,
-  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1 };
+  essentialise: 1, conspiracy: 1, absolutist: 1, contempt: 1,
+  // Named theories (theories.js) are not measured yet, so they stay out of "extreme".
+  "conspiracy-theory": 0 };
 // "Extreme" for the thread report: any strong marker, or two weaker ones together.
 export const EXTREME_AT = 2;
 // Families strong enough to label the comment itself.
@@ -168,6 +171,9 @@ export function score(text) {
   const markers = [];
   const hit = recorder(s, markers);
   scoreEnglish(s, hit);
+  for (const t of theoryMatches(s)) {
+    if (!mention(s, Object.assign([t.match], { index: t.index }))) markers.push({ family: "conspiracy-theory", theory: t.theory, match: t.match });
+  }
   for (const lang of LANGUAGES) {
     const have = new Set(markers.map((m) => m.family));
     const on = lang.prep ? lang.prep(s) : s;

@@ -3,6 +3,28 @@
 All notable changes to Radar. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
+## Unreleased
+
+### Added
+- Named conspiracy theories. A post that uses a documented theory by name or by its stock line
+  (chemtrails, adrenochrome, QAnon slogans, satanic ritual abuse, "Great Reset" plot framing, stolen
+  or rigged elections, machine or satellite vote-flipping, staged shootings, 9/11 inside job, 5G and
+  COVID-19, vaccine harm, hidden cures) gets an info sign in the Language area. It names the theory,
+  says what the record shows and links the dated sources. Election and staged-event claims match in
+  both directions, checked by matched pairs. Posts that debunk, mock or report a theory are skipped.
+  Not measured yet: no conspiracy-labelled corpus with a usable licence was found, so the sign
+  never counts toward the thread report.
+- Name borrows a brand. An account whose name or handle borrows a platform's or a major outlet's
+  brand ("X Global", "BBC Breaking") and is not one of its accounts gets a weak account sign on X.
+  X's affiliation badge, an organisation check, or X's parody, commentary or fan label clears it.
+  The brand list names each outlet's Wikidata item. Alone it never counts toward "flagged". Not
+  measured yet.
+- A lesson for each new sign.
+
+### Research
+- project-docs/IMAGE-TEXT.md compares on-device options for reading text inside images and
+  recommends a path, with targets and a privacy statement. Nothing ships yet.
+
 ## 2.0.0 (2026-10-21)
 
 Radar now answers, in one hover: where a post comes from, who is pushing it, how it argues, whether a

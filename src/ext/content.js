@@ -16,7 +16,7 @@
     const mismatch = PB.compare(r.text, reading && reading.basedIn);
     const activity = PB.activity(PBLogs.net(), r.author);
     const echo = PB.echoes(PBLogs.net(), PB.threadKey(site.id, location.pathname, location.search), r.text);
-    if (reading && site.hasLocation) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation, pattern: reading.pattern }, { mismatch, cluster, activity, echo }) };
+    if (reading && site.hasLocation) return { mismatch, activity, flags: PB.flagsFor({ handle: r.author, display: reading.display || r.display, postsCount: reading.postsCount, followersCount: reading.followersCount, followingCount: reading.followingCount, joinDate: reading.joinDate, nameChanges: reading.nameChanges, basedIn: reading.basedIn, connectedVia: reading.connectedVia, proxyNote: reading.proxyNote, profileLocation: reading.profileLocation, pattern: reading.pattern, brandCheck: !!site.hasLocation, verifiedType: reading.verifiedType, affiliate: reading.affiliate || reading.affiliateOf, xLabel: reading.xLabel || r.pageLabel }, { mismatch, cluster, activity, echo }) };
     // Other sites: what each one discloses (src/ext/platforms.js reading()): Reddit's account age,
     // karma and sign-up name; Instagram's and Facebook's join date, label and renames; Bluesky's
     // join date and moderation labels.

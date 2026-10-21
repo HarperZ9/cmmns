@@ -10,7 +10,7 @@ const D = "detector", P = "platform", T = "table", F = "file";
 export const FAMILIES = [
   ["slur", "Slur or coded hate term", "language", D], ["stereotype", "Group stereotype", "language", D],
   ["dehumanise", "Dehumanising language", "language", D], ["violence", "Call for violence", "language", D],
-  ["vigilante", "Call for vigilantes", "language", D], ["leaked-ai", "Leaked AI text", "language", D],
+  ["vigilante", "Call for vigilantes", "language", D], ["conspiracy-theory", "Named conspiracy theory", "language", D], ["leaked-ai", "Leaked AI text", "language", D],
   ["machine-writing", "Machine-writing signs", "language", D], ["spam-pattern", "Spam pattern", "language", D],
   ["x-spam", "X: probable spam", "language", P], ["hate-symbol-name", "Hate symbol in name", "language", D],
   ["old-media", "Media older than the post", "media", D], ["lifted-media", "Media from another post", "media", P],
@@ -27,7 +27,7 @@ export const FAMILIES = [
   ["high-volume", "Very high post rate", "posting", D],
   ["new-account", "New account", "account", D], ["name-changes", "Renamed", "account", D],
   ["default-handle", "Sign-up handle", "account", D], ["follow-pattern", "Follows many, few follow back", "account", D],
-  ["low-karma", "Low karma for its age", "account", D],
+  ["low-karma", "Low karma for its age", "account", D], ["brand-lookalike", "Name borrows a brand", "account", D],
   ["c2pa", "Content Credentials", "media", F], ["c2pa-changed", "Credentials do not match", "media", F],
   ["ai-metadata", "AI-generation metadata", "media", F],
 ].map(([id, name, area, kind]) => ({ id, name, area, kind }));
