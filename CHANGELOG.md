@@ -3,6 +3,22 @@
 All notable changes to Radar. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
+## Unreleased
+
+### Added
+- Persuasion techniques: span-level cues for eleven techniques from the SemEval-2020 Task 11 and
+  SemEval-2023 Task 3 taxonomy (loaded language, name calling, bandwagon, appeal to fear,
+  flag-waving, thought-terminating cliche, whataboutism, black-and-white fallacy, doubt, appeal to
+  authority, exaggeration), in English and French. No cue names a group, person, party or side. A
+  symmetry test checks that across targets from every political direction in both languages.
+- Measured on the held-out split of the Propaganda Techniques Corpus (CC BY 4.0). No technique
+  reached the shipping bar, a precision interval starting at 70%. Loaded language came closest at
+  60.3% (51.9 to 68.1), so none shows yet. The options page lists each technique with its figure
+  and why it is held back. A technique that clears the bar later appears in the Language area with
+  the matched words, a one-line definition, "a technique can carry a true claim; it describes how
+  the post argues", and its precision. It never counts toward "flagged", and the thread report
+  gives it a separate line by flagged and unflagged accounts.
+
 ## 1.0.0 (2026-10-21)
 
 First public-quality release. Every sign either carries a measured error rate from

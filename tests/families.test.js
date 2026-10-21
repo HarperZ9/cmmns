@@ -11,7 +11,7 @@ test("every family has a name, a known area and a kind", () => {
   for (const f of FAMILIES) {
     assert.ok(f.id && f.name, JSON.stringify(f));
     assert.ok(AREA_IDS.includes(f.area), f.id + " area " + f.area);
-    assert.ok(["detector", "platform", "table"].includes(f.kind), f.id);
+    assert.ok(["detector", "platform", "table", "technique"].includes(f.kind), f.id);
     assert.ok(!ids.has(f.id), "duplicate " + f.id);
     ids.add(f.id);
   }
@@ -59,4 +59,13 @@ test("table lookups point at their cited source instead of a precision", () => {
   const line = measuredLine("state-link", {});
   assert.equal(line.measured, false);
   assert.match(line.text, /cited/);
+});
+
+test("persuasion techniques are families in the Language area with a held-back or measured line", async () => {
+  const { TECHNIQUES } = await import("../src/core/persuasion.js");
+  for (const id of Object.keys(TECHNIQUES)) {
+    const f = FAMILIES.find((x) => x.id === id);
+    assert.ok(f && f.kind === "technique" && f.area === "language", id);
+    assert.match(measuredLine(id).text, /^(held back|precision)/, id);
+  }
 });

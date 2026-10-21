@@ -8,7 +8,8 @@
     "test": "node --test \"tests/*.test.js\"",
     "build": "node scripts/build.mjs",
     "package": "node scripts/package.mjs",
-    "eval": "node scripts/eval.mjs"
+    "eval": "node scripts/eval.mjs",
+    "eval:persuasion": "node scripts/eval-persuasion.mjs"
   },
   "license": "FSL-1.1-MIT"
 }

@@ -4,6 +4,7 @@
 // measuredLine() gives the line the window and the options page show for a family.
 
 import { MEASURED } from "./measured.js";
+import { TECHNIQUES, techniqueStatus } from "./persuasion.js";
 
 const D = "detector", P = "platform", T = "table";
 export const FAMILIES = [
@@ -28,6 +29,9 @@ export const FAMILIES = [
   ["default-handle", "Sign-up handle", "account", D], ["follow-pattern", "Follows many, few follow back", "account", D],
   ["low-karma", "Low karma for its age", "account", D],
 ].map(([id, name, area, kind]) => ({ id, name, area, kind }));
+// Persuasion techniques sit in the Language area. Their measured line comes from techniqueStatus.
+const TECH = "technique";
+for (const [id, t] of Object.entries(TECHNIQUES)) FAMILIES.push({ id, name: `Persuasion: ${t.name.toLowerCase()}`, area: "language", kind: TECH });
 
 const BY_ID = new Map(FAMILIES.map((f) => [f.id, f]));
 const FLAG_FAMILY = { "based-elsewhere": "mismatch", "same-text": "duplicates" };
@@ -46,6 +50,7 @@ export function measuredLine(id, table = MEASURED) {
   const f = BY_ID.get(id);
   if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Radar detector" };
   if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
+  if (f && f.kind === TECH) { const st = techniqueStatus(id); return { measured: st.shown, text: st.text }; }
   const r = (table || {})[id];
   if (!valid(r)) return { measured: false, text: "not measured yet" };
   const ci = Number.isFinite(r.low) && Number.isFinite(r.high) ? ` (95% interval ${pc(r.low)} to ${pc(r.high)}%)` : "";

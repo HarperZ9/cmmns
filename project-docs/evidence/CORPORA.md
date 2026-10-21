@@ -13,7 +13,22 @@ in `project-docs/evidence/eval-results.json`.
 
 Full hashes are in `eval-results.json`.
 
+Persuasion techniques (downloaded 2026-10-21 to `D:/radar-data/ptc/`):
+
+| Corpus | File | Source URL | Licence | Size | SHA-256 |
+|---|---|---|---|---|---|
+| Propaganda Techniques Corpus v2 (Da San Martino et al. 2019; SemEval-2020 Task 11) | `ptc/datasets-v2.tgz` | https://zenodo.org/records/3952415 | CC BY 4.0 | 371 labelled training articles (6,129 technique spans), 75 unlabelled dev articles | `fd2d2c35...8a8516bb` |
+
+Only the training articles carry gold labels in this release. Radar splits them by article with the
+seed below (`scripts/eval/ptc.mjs`). The shared task's own dev and test articles have no public gold
+labels and are not used.
+
 Not used:
+- SemEval-2023 Task 3 (persuasion techniques in nine languages, French among them). Access needs a
+  registration form and an organiser-issued passcode. Its terms say the data "may only be used in
+  the context of this shared task, and only for scientific research purposes" and may not be
+  redistributed. Registering and accepting those terms is the author's call, and tuning a shipped
+  product falls outside that use, so it was not requested.
 - The Kaggle release of Jigsaw Unintended Bias (with identity columns) needs a Kaggle account and
   acceptance of competition rules. Accepting terms is the author's call, so the CC0 Civil
   Comments release (same comments, no identity columns) stands in for it.

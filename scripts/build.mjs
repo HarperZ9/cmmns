@@ -7,9 +7,9 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const ORDER = ["places.js", "similarity.js", "mismatch.js", "reddit.js", "pattern.js", "flags.js", "lexicon.js", "rhetoric-util.js", "lexicon-fr.js", "rhetoric-fr.js", "lexicon-es.js", "rhetoric-es.js", "lexicon-de.js", "rhetoric-de.js", "lexicon-pt.js", "rhetoric-pt.js", "lexicon-it.js", "rhetoric-it.js", "rhetoric.js", "report.js", "about.js", "meta.js", "bsky.js", "owners.js", "xdata.js", "machine.js", "threadkey.js", "network.js", "ytdata.js", "timing.js", "pace.js", "langs.js", "state.js", "trail.js", "history.js", "claims.js"];
-// Product modules (settings, measured accuracy, badge families) come last; they read no other core module but measured.js.
-const PRODUCT = ["settings.js", "measured.js", "families.js"];
+const ORDER = ["places.js", "similarity.js", "mismatch.js", "reddit.js", "pattern.js", "flags.js", "lexicon.js", "rhetoric-util.js", "lexicon-fr.js", "rhetoric-fr.js", "lexicon-es.js", "rhetoric-es.js", "lexicon-de.js", "rhetoric-de.js", "lexicon-pt.js", "rhetoric-pt.js", "lexicon-it.js", "rhetoric-it.js", "rhetoric.js", "measured.js", "persuasion-cues.js", "persuasion.js", "report.js", "about.js", "meta.js", "bsky.js", "owners.js", "xdata.js", "machine.js", "threadkey.js", "network.js", "ytdata.js", "timing.js", "pace.js", "langs.js", "state.js", "trail.js", "history.js", "claims.js"];
+// Product modules (settings, badge families) come last; they read only measured.js and persuasion.js.
+const PRODUCT = ["settings.js", "families.js"];
 const ident = (f) => "M_" + f.replace(/\.js$/, "").replace(/-/g, "_");
 
 let body = "";

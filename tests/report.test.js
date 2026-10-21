@@ -58,3 +58,26 @@ test("origins count where looked-up accounts are based", async () => {
   assert.equal(b.n, 3);
   assert.equal(b.from, "2026-10-01");
 });
+
+test("the persuasion line compares flagged and unflagged accounts and never changes flagged counts", async () => {
+  const { persuasionShare } = await import("../src/core/report.js");
+  const rows = [];
+  for (let i = 0; i < 20; i++) rows.push(reply(i, i < 10 ? "what a disgusting smear" : CALM, i < 12 ? flagged : clean));
+  rows.push(reply(99, "what a disgusting smear", null));
+  const base = threadReport(rows);
+  const p = persuasionShare(rows, ["loaded-language"]);
+  assert.equal(p.flagged.n, 12);
+  assert.equal(p.flagged.k, 10);
+  assert.equal(p.unflagged.n, 8);
+  assert.equal(p.unflagged.k, 0);
+  assert.ok(p.flagged.ci[0] > 0 && p.flagged.ci[1] <= 1);
+  assert.match(p.sentence, /^Replies using loaded language: 10 of 12 from flagged accounts \(83%, 95% interval \d+ to \d+%\), 0 of 8 from unflagged accounts/);
+  assert.equal(p.notLookedUp, 1);
+  const after = threadReport(rows);
+  assert.deepEqual([after.extreme, after.others, after.verdict], [base.extreme, base.others, base.verdict]);
+});
+
+test("with no technique shown there is no persuasion line", async () => {
+  const { persuasionShare } = await import("../src/core/report.js");
+  assert.equal(persuasionShare([reply(0, "what a disgusting smear", clean)], []), null);
+});
