@@ -116,7 +116,7 @@ test("invented motives score the same for every target", () => {
 });
 
 test("slurs register in every direction, including disguised spellings", () => {
-  for (const t of ["typical chink behaviour", "go home spic", "kike bankers", "stupid towelhead", "dumb honky", "what a faggot", "such a retard", "n1gg3r", "k1ke"]) {
+  for (const t of ["typical chink behaviour", "go home spic", "kike bankers", "stupid towelhead", "filthy peckerwood", "what a faggot", "such a retard", "n1gg3r", "k1ke"]) {
     assert.ok(families(t).split(",").includes("slur"), t);
   }
 });
