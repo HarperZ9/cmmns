@@ -144,6 +144,7 @@
   // The fixture harness (tests/fixtures/thread.html) behaves as an X post page.
   const FIXTURE = { ...X, id: "fixture", match: () => document.documentElement.dataset.pbFixture === "status", onThread: () => true };
 
-  const ALL = [FIXTURE, X, REDDIT, YOUTUBE, FACEBOOK, INSTAGRAM, BLUESKY];
+  // Threads, Mastodon and TikTok live in platforms-reach.js, loaded first.
+  const ALL = [FIXTURE, X, REDDIT, YOUTUBE, FACEBOOK, INSTAGRAM, BLUESKY, ...(globalThis.PBMoreSites || [])];
   globalThis.PBSites = Object.freeze({ current: () => ALL.find((s) => s.match()) || null });
 })();

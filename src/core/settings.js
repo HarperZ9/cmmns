@@ -5,7 +5,8 @@
 export const SETTINGS_KEY = "pb.settings";
 
 // Sites Radar has an adapter for. A site added later starts on unless the user switches it off.
-export const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"]];
+export const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"], ["threads", "Threads"],
+  ["mastodon", "Mastodon"], ["tiktok", "TikTok"]];
 
 // The areas of the window's strip; each can be hidden from the window.
 export const AREA_IDS = ["place", "account", "posting", "coordination", "language", "sources", "media"];
@@ -84,7 +85,8 @@ export function pruneStore(store, settings, now = Date.now()) {
 
 export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
-// "Clear all Radar data": every Radar key except the settings themselves.
+// "Clear all Radar data": every Radar key except the settings themselves. The Mastodon servers the
+// user turned on (pb.instances.v1) are settings too, removed in the options page with their access.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
-const KEPT = new Set([SETTINGS_KEY, "pb.tour"]);
+const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1"]);
 export const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));

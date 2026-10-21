@@ -35,7 +35,7 @@
   function language(m) {
     const out = [];
     for (const mk of (m.markers || []).filter((x) => STRONG[x.family])) {
-      out.push({ label: STRONG[mk.family], fam: mk.family, level: "warn", cat: "language", rows: [["In this post", `"${mk.match}"`], ["What it is", MEANING[mk.family]], dnp("Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.")] });
+      out.push({ label: STRONG[mk.family], fam: mk.family, lang: mk.lang, level: "warn", cat: "language", rows: [["In this post", `"${mk.match}"`], ["What it is", MEANING[mk.family]], ...(mk.lang ? [["Language", PB.langLine(mk.lang)]] : []), dnp("Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.")] });
     }
     // Persuasion techniques: how the post argues. Info level, and never an account flag.
     for (const t of m.persuasion || []) {
@@ -96,7 +96,8 @@
 
   const ORDER = { warn: 0, flag: 1, info: 2 };
   // Each signal carries its family's measured accuracy (src/core/measured.js through families.js),
-  // or "not measured yet". Areas the user hid in the options page are left out.
+  // or "not measured yet". A marker another language's grammar found says the figure is for English;
+  // its own language's figure is in its "Language" row. Areas the user hid in the options page are left out.
   // Every sign links to its lesson (src/ext/learn.html), opened by the worker on click.
   const learn = (fam) => { const path = fam && PB.lessonPath ? PB.lessonPath(fam) : null; return path ? [["Learn", { open: ["How to spot it yourself, 1 to 2 minutes", path] }]] : []; };
   const measured = (fam) => (fam && PB.measuredLine ? PB.measuredLine(fam).text : "not measured yet");
@@ -105,7 +106,7 @@
   function all(m, settings) {
     const shown = (x) => !settings || !PB.areaOn || PB.areaOn(settings, x.cat);
     return [...checks(m), ...language(m), ...links(m), ...post(m), ...account(m)].filter(shown)
-      .map((x) => ({ ...x, rows: [...x.rows, ["Measured", measured(x.fam)], ...feedback(x, m), ...learn(x.fam)] }))
+      .map((x) => ({ ...x, rows: [...x.rows, ["Measured", (x.lang ? "in English: " : "") + measured(x.fam)], ...feedback(x, m), ...learn(x.fam)] }))
       .sort((a, b) => ORDER[a.level] - ORDER[b.level]);
   }
 

@@ -1,12 +1,16 @@
 // Radar's window: it fades in beside a post when the pointer rests on the post, stays while the
 // pointer is on the post or the window, and fades out when it leaves. Clicking inside the window
-// keeps it open until Escape or a click elsewhere. Nothing is drawn on the page itself. Content is
+// keeps it open until Escape or a click elsewhere. On a touch screen, where nothing hovers, each post
+// gets one small "Radar" button that opens the window on a tap; otherwise nothing is drawn on the
+// page itself. Content is
 // built from data with textContent only, never innerHTML, so nothing a post says can inject markup.
 (() => {
   "use strict";
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const OPEN_MS = 450, CLOSE_MS = 260, FADE_MS = 160;
   const TABS = [["overview", "Overview"], ["account", "Account"], ["post", "This post"], ["history", "History"]];
+  // A device whose main pointer cannot hover (phones, Firefox for Android).
+  const TOUCH = !!(globalThis.matchMedia && matchMedia("(hover: none)").matches);
   let pop = null, owner = null, pinned = false, openTimer = 0, closeTimer = 0, lastTab = "overview", uid = 0, quiet = null;
 
   function close(now, refocus) {
@@ -229,12 +233,13 @@
 
   // Wire a post. `sections` is a function, so the window is built only when it opens and always
   // shows the post's latest evidence. Wired once per element.
-  function hover(target, sections) {
+  function hover(target, sections, anchor) {
     target.__pbSections = sections;
+    if (TOUCH) tap(target, anchor || target);
     if (target.__pbWired) return;
     target.__pbWired = true;
-    target.addEventListener("pointerenter", () => { clearTimeout(openTimer); openTimer = setTimeout(() => show(target, () => target.__pbSections()), OPEN_MS); });
-    target.addEventListener("pointerleave", () => { clearTimeout(openTimer); if (!pinned && owner === target) closeTimer = setTimeout(() => close(), CLOSE_MS); });
+    target.addEventListener("pointerenter", (e) => { if (e.pointerType === "touch") return; clearTimeout(openTimer); openTimer = setTimeout(() => show(target, () => target.__pbSections()), OPEN_MS); });
+    target.addEventListener("pointerleave", (e) => { if (e.pointerType === "touch") return; clearTimeout(openTimer); if (!pinned && owner === target) closeTimer = setTimeout(() => close(), CLOSE_MS); });
     // Keyboard: focusing the post opens its window; Alt+R moves focus into it; Escape closes it
     // and returns focus to the post. Focus leaving both the post and the window closes it.
     target.addEventListener("focusin", (e) => { if (e.target !== target) return; if (quiet === target) { quiet = null; return; } clearTimeout(openTimer); openTimer = setTimeout(() => show(target, () => target.__pbSections()), 150); });
@@ -243,6 +248,22 @@
       clearTimeout(openTimer); close();
     });
     target.addEventListener("keydown", (e) => { if (e.altKey && (e.key === "r" || e.key === "R")) { e.preventDefault(); enter(show(target, () => target.__pbSections())); } });
+  }
+
+  // Touch: a tap on the post's button opens its window, held open until a tap elsewhere. The tap
+  // never reaches the site, so it does not open the post.
+  function tap(target, anchor) {
+    if (!anchor || !anchor.isConnected || anchor.querySelector(":scope > .pb-tap")) return;
+    const b = el("button", "pb-tap", "Radar");
+    b.type = "button";
+    b.setAttribute("aria-label", "Show what Radar knows about this post");
+    b.addEventListener("click", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (owner === target && pop) { close(); return; }
+      if (show(target, () => target.__pbSections())) pinned = true;
+    });
+    for (const t of ["pointerdown", "touchstart", "mousedown"]) b.addEventListener(t, (e) => e.stopPropagation(), { passive: true });
+    anchor.append(b);
   }
 
   // Rebuild the open window in place with the post's latest evidence (after a media check).
@@ -260,9 +281,8 @@
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pop) close(false, true); }, true);
   // Focus leaving the window (Tab past its last control) closes it, unless it went back to the post.
   document.addEventListener("focusin", (e) => { if (pop && !pop.contains(e.target) && !(owner && owner.contains(e.target))) close(); }, true);
-  document.addEventListener("pointerdown", (e) => { if (pop && pinned && !pop.contains(e.target)) close(); }, true);
+  document.addEventListener("pointerdown", (e) => { if (pop && pinned && !pop.contains(e.target) && !(e.target.closest && e.target.closest(".pb-tap"))) close(); }, true);
   window.addEventListener("scroll", () => { if (pop && !pinned) close(); }, { passive: true });
 
-  globalThis.PBPop = Object.freeze({ hover, show, close, el, refresh });
-  globalThis.PBPop = Object.freeze({ hover, show, close, el, tipBox });
+  globalThis.PBPop = Object.freeze({ hover, show, close, el, refresh, tipBox, TOUCH });
 })();

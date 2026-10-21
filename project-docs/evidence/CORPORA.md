@@ -95,3 +95,52 @@ check that.
 Each item's split is the low bit of FNV-1a over `radar-eval-2026-10-21|<corpus>|<id>`: fixed,
 about 50/50, and independent of the labels. Threshold and lexicon changes were tuned on `dev`;
 `test` was read once, after tuning, for the committed numbers.
+
+## Arabic, Russian, Ukrainian, Chinese and Hindi (downloaded 2026-10-21)
+
+Downloaded to `D:/radar-data/{textdetox,cold,mhc}/`, outside the repository, and flattened by
+`scripts/eval/prep-langs.py`. No corpus text is committed. `scripts/eval-langs.mjs` records the
+SHA-256 of each file in `project-docs/evidence/lang-results.json`.
+
+| Corpus | Files | Source URL | Licence | Size | SHA-256 |
+|---|---|---|---|---|---|
+| MLMA, Arabic part (Ousidhoum et al. 2019) | `mlma/hate_speech_mlma.zip` (`ar_dataset.csv`) | https://github.com/HKUST-KnowComp/MLMA_hate_speech | MIT | 3,353 tweets | `56db7efb...1956dc43` |
+| TextDetox 2024 multilingual toxicity (Dementieva et al. 2024), splits ar, ru, uk, hi | `textdetox/{ar,ru,uk,hi}.parquet` | https://huggingface.co/datasets/textdetox/multilingual_toxicity_dataset | OpenRAIL++ (the compilation); see below | 5,000 per language, 2,500 toxic | ar `2e3a3e0b...7709ded9`, ru `6466a13f...7fb3d311`, uk `5eb28962...e10cd798`, hi `36800d82...edc70402` |
+| COLD, test split (Deng et al., EMNLP 2022) | `cold/test.csv` | https://github.com/thu-coai/COLDataset | Apache-2.0 | 5,323 comments | `b06d3148...7fbe78ed` |
+| Multilingual HateCheck (Röttger et al., WOAH 2022), Arabic, Hindi, Mandarin | `mhc/{arabic,hindi,mandarin}.csv` | https://huggingface.co/datasets/Paul/hatecheck-arabic (and -hindi, -mandarin) | CC BY 4.0 | 3,570 / 3,565 / 3,378 cases | `134d39c3...0ece1bee`, `ffebc31d...e5d8bd40`, `d094336d...4a147414` |
+
+**TextDetox licence chain.** The compilers release the compilation under OpenRAIL++, a licence with
+use restrictions and no bar on evaluation. Each split is drawn from earlier corpora with their own
+terms: Russian from two Kaggle datasets (Russian Language Toxic Comments; Toxic Russian Comments),
+Ukrainian from the compilers' own ukr-toxicity-dataset (OpenRAIL), Arabic from OSACT4, Hindi from
+the CONSTRAINT 2021 hostility data and HASOC 2019. HASOC was distributed by registration with its
+organisers. Radar uses the public compilation for counts only and commits no text; whether that
+use sits well with each original's terms is an author item (below). The Chinese split names no
+source on its card, so it is not used.
+
+**Label mapping** (code: `scripts/eval/lang-corpora.mjs`).
+- MLMA Arabic: as the French part. `hostile` unless "normal" is the only label; `severe` when
+  "hateful" is among them.
+- TextDetox: `hostile` is the binary `toxic` label. The splits are balanced 50/50, so precision on
+  them reads higher than it would at a natural base rate, and most toxic items are insults at one
+  person, not at a group, so recall against them says little.
+- COLD: `hostile` is label 1 (offensive). `groupAttack` is fine-grained label 2, "attack group".
+- Multilingual HateCheck: `hostile` is `label_gold` "hateful". `dehumanise` is the functionality
+  `derog_dehum_h`, `violence` is `threat_dir_h` or `threat_norm_h`, `slur` is `slur_h`; each is
+  false on non-hateful cases and unlabelled on other hateful cases. The cases are built from
+  templates and validated by annotators, so they test grammar, not real replies. The dev and test
+  halves share templates, so tuning on dev carries over to test more than it would on real text.
+
+**Not used.**
+- HASOC (Hindi, FIRE 2019 to 2021) and OSACT5 (Arabic fine-grained hate, 2022) direct downloads:
+  both are distributed through the organisers with a registration step. Registering is the
+  author's call.
+- ToxiCN (Chinese, ACL 2023): CC BY-NC-ND 4.0 and "prohibited from commercial use".
+- RuToxic and the Kaggle Russian sets directly: they need a Kaggle account; the TextDetox
+  compilation carries the same comments.
+- No human-labelled Ukrainian hate-speech corpus aimed at groups was found with a usable licence;
+  TextDetox Ukrainian is general toxicity.
+
+**Author items.** (1) Decide whether to register for HASOC and OSACT5, which would give Hindi and
+Arabic group-level labels. (2) Decide whether evaluation-only use of the TextDetox compilation is
+acceptable given its sources' original terms (Kaggle, OSACT4, HASOC 2019).

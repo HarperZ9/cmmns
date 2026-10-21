@@ -1,0 +1,1293 @@
+{
+ "generated": "2026-10-21",
+ "split": "test",
+ "seed": "radar-eval-2026-10-21",
+ "inputs": [
+  {
+   "file": "mlma/hate_speech_mlma.zip",
+   "sha256": "56db7efb1b64a2570f63d0cdb48d119c5e32eccff13f3c22bf17a4331956dc43"
+  },
+  {
+   "file": "cold/test.csv",
+   "sha256": "b06d31481f0d558b6dc8140408938abe8dba8083cd9976b4ba8f5c837fbe78ed"
+  },
+  {
+   "file": "textdetox/ar.parquet",
+   "sha256": "2e3a3e0bc9956066305d46a4957496cea67a5a0d307a98c574507a787709ded9"
+  },
+  {
+   "file": "textdetox/ru.parquet",
+   "sha256": "6466a13f4acb2e7c8db799aece2414cad0167f3fb6fe6f1e4e81b4ce7fb3d311"
+  },
+  {
+   "file": "textdetox/uk.parquet",
+   "sha256": "5eb28962b7e7c019c7f7f54b51cf9668155248352667ec579ab0fa53e10cd798"
+  },
+  {
+   "file": "textdetox/hi.parquet",
+   "sha256": "36800d826a852194a2e3813f387826f4d84200a4151582bc4374c15aedc70402"
+  },
+  {
+   "file": "mhc/arabic.csv",
+   "sha256": "134d39c3b691801e24ab53fb14d3214fea69eb2b3c5288b3f00e31ca0ece1bee"
+  },
+  {
+   "file": "mhc/hindi.csv",
+   "sha256": "ffebc31db02d59f603ac9728aa9b63d7db46de2cdc4c54468aabab82e5d8bd40"
+  },
+  {
+   "file": "mhc/mandarin.csv",
+   "sha256": "d094336d73fb3b2817a04cac226687fcf91cb914deccd4d4096a85cf4a147414"
+  },
+  {
+   "file": "prepared/lang-mlma-ar.jsonl",
+   "sha256": "a50f3b2ee1ba1cad873ee2c70ec7e9d80adc344b9bd47989c39b53df837a75d6"
+  },
+  {
+   "file": "prepared/lang-cold.jsonl",
+   "sha256": "233e194801b5274b835a36cadd50cb1c6c9d0d1ec46257bd9a9e9368eeb58379"
+  },
+  {
+   "file": "prepared/lang-textdetox-ar.jsonl",
+   "sha256": "7955616d20801ee91f9371972bc7aec25d76aabc89083a0c40f14235451b9570"
+  },
+  {
+   "file": "prepared/lang-textdetox-ru.jsonl",
+   "sha256": "ca86e0b3ed2827c37dd2e7024ad42113788bb0374458ff190149999cd14a1605"
+  },
+  {
+   "file": "prepared/lang-textdetox-uk.jsonl",
+   "sha256": "d5c79b333c9c218d03c543d5128488cb43874600dc07064ebd270b7607b47fcc"
+  },
+  {
+   "file": "prepared/lang-textdetox-hi.jsonl",
+   "sha256": "a8428a0ef382c7094294817512d8244b26c15e5ab3a20614ae47ad67b5fc2f38"
+  },
+  {
+   "file": "prepared/lang-mhc-arabic.jsonl",
+   "sha256": "aca4462e9314cf32cc3387ba4ee155b6de6a5c6775edb7a6d4351676f564c5cf"
+  },
+  {
+   "file": "prepared/lang-mhc-hindi.jsonl",
+   "sha256": "bf22f5ba2a1efc3e8318b33a044828839531e55bc34d95810f9039cef8c0e2cc"
+  },
+  {
+   "file": "prepared/lang-mhc-mandarin.jsonl",
+   "sha256": "a2ea3444f20eeb26d4b3f6a17d4e3e292ad8345765576b8b896cd1492404caf4"
+  }
+ ],
+ "corpora": {
+  "mlma-ar": {
+   "n": 1677,
+   "prevalence": {
+    "k": 1212,
+    "n": 1677,
+    "value": 0.723,
+    "ci": [
+     0.701,
+     0.744
+    ]
+   },
+   "families": {
+    "strong": {
+     "hits": 26,
+     "precision": {
+      "k": 25,
+      "n": 26,
+      "value": 0.962,
+      "ci": [
+       0.811,
+       0.993
+      ]
+     },
+     "recall": {
+      "k": 25,
+      "n": 1212,
+      "value": 0.021,
+      "ci": [
+       0.014,
+       0.03
+      ]
+     }
+    },
+    "any": {
+     "hits": 26,
+     "precision": {
+      "k": 25,
+      "n": 26,
+      "value": 0.962,
+      "ci": [
+       0.811,
+       0.993
+      ]
+     },
+     "recall": {
+      "k": 25,
+      "n": 1212,
+      "value": 0.021,
+      "ci": [
+       0.014,
+       0.03
+      ]
+     }
+    },
+    "dehumanise": {
+     "hits": 20,
+     "precision": {
+      "k": 19,
+      "n": 20,
+      "value": 0.95,
+      "ci": [
+       0.764,
+       0.991
+      ]
+     },
+     "recall": {
+      "k": 19,
+      "n": 1212,
+      "value": 0.016,
+      "ci": [
+       0.01,
+       0.024
+      ]
+     }
+    },
+    "slur": {
+     "hits": 6,
+     "precision": {
+      "k": 6,
+      "n": 6,
+      "value": 1,
+      "ci": [
+       0.61,
+       1
+      ]
+     },
+     "recall": {
+      "k": 6,
+      "n": 1212,
+      "value": 0.005,
+      "ci": [
+       0.002,
+       0.011
+      ]
+     }
+    }
+   },
+   "specific": {
+    "severe": {
+     "precision": {
+      "k": 19,
+      "n": 26,
+      "value": 0.731,
+      "ci": [
+       0.539,
+       0.863
+      ]
+     },
+     "recall": {
+      "k": 19,
+      "n": 383,
+      "value": 0.05,
+      "ci": [
+       0.032,
+       0.076
+      ]
+     }
+    }
+   }
+  },
+  "textdetox-ar": {
+   "n": 2500,
+   "prevalence": {
+    "k": 1239,
+    "n": 2500,
+    "value": 0.496,
+    "ci": [
+     0.476,
+     0.515
+    ]
+   },
+   "families": {
+    "strong": {
+     "hits": 3,
+     "precision": {
+      "k": 3,
+      "n": 3,
+      "value": 1,
+      "ci": [
+       0.438,
+       1
+      ]
+     },
+     "recall": {
+      "k": 3,
+      "n": 1239,
+      "value": 0.002,
+      "ci": [
+       0.001,
+       0.007
+      ]
+     }
+    },
+    "any": {
+     "hits": 11,
+     "precision": {
+      "k": 8,
+      "n": 11,
+      "value": 0.727,
+      "ci": [
+       0.434,
+       0.903
+      ]
+     },
+     "recall": {
+      "k": 8,
+      "n": 1239,
+      "value": 0.006,
+      "ci": [
+       0.003,
+       0.013
+      ]
+     }
+    },
+    "dehumanise": {
+     "hits": 1,
+     "precision": {
+      "k": 1,
+      "n": 1,
+      "value": 1,
+      "ci": [
+       0.207,
+       1
+      ]
+     },
+     "recall": {
+      "k": 1,
+      "n": 1239,
+      "value": 0.001,
+      "ci": [
+       0,
+       0.005
+      ]
+     }
+    },
+    "slur": {
+     "hits": 1,
+     "precision": {
+      "k": 1,
+      "n": 1,
+      "value": 1,
+      "ci": [
+       0.207,
+       1
+      ]
+     },
+     "recall": {
+      "k": 1,
+      "n": 1239,
+      "value": 0.001,
+      "ci": [
+       0,
+       0.005
+      ]
+     }
+    },
+    "stereotype": {
+     "hits": 1,
+     "precision": {
+      "k": 1,
+      "n": 1,
+      "value": 1,
+      "ci": [
+       0.207,
+       1
+      ]
+     },
+     "recall": {
+      "k": 1,
+      "n": 1239,
+      "value": 0.001,
+      "ci": [
+       0,
+       0.005
+      ]
+     }
+    },
+    "conspiracy": {
+     "hits": 8,
+     "precision": {
+      "k": 5,
+      "n": 8,
+      "value": 0.625,
+      "ci": [
+       0.306,
+       0.863
+      ]
+     },
+     "recall": {
+      "k": 5,
+      "n": 1239,
+      "value": 0.004,
+      "ci": [
+       0.002,
+       0.009
+      ]
+     }
+    }
+   },
+   "specific": {}
+  },
+  "mhc-ar": {
+   "n": 1786,
+   "prevalence": {
+    "k": 1247,
+    "n": 1786,
+    "value": 0.698,
+    "ci": [
+     0.677,
+     0.719
+    ]
+   },
+   "families": {
+    "strong": {
+     "hits": 77,
+     "precision": {
+      "k": 74,
+      "n": 77,
+      "value": 0.961,
+      "ci": [
+       0.892,
+       0.987
+      ]
+     },
+     "recall": {
+      "k": 74,
+      "n": 1247,
+      "value": 0.059,
+      "ci": [
+       0.048,
+       0.074
+      ]
+     }
+    },
+    "any": {
+     "hits": 77,
+     "precision": {
+      "k": 74,
+      "n": 77,
+      "value": 0.961,
+      "ci": [
+       0.892,
+       0.987
+      ]
+     },
+     "recall": {
+      "k": 74,
+      "n": 1247,
+      "value": 0.059,
+      "ci": [
+       0.048,
+       0.074
+      ]
+     }
+    },
+    "dehumanise": {
+     "hits": 62,
+     "precision": {
+      "k": 62,
+      "n": 62,
+      "value": 1,
+      "ci": [
+       0.942,
+       1
+      ]
+     },
+     "recall": {
+      "k": 62,
+      "n": 1247,
+      "value": 0.05,
+      "ci": [
+       0.039,
+       0.063
+      ]
+     }
+    },
+    "violence": {
+     "hits": 3,
+     "precision": {
+      "k": 3,
+      "n": 3,
+      "value": 1,
+      "ci": [
+       0.438,
+       1
+      ]
+     },
+     "recall": {
+      "k": 3,
+      "n": 1247,
+      "value": 0.002,
+      "ci": [
+       0.001,
+       0.007
+      ]
+     }
+    },
+    "stereotype": {
+     "hits": 12,
+     "precision": {
+      "k": 9,
+      "n": 12,
+      "value": 0.75,
+      "ci": [
+       0.468,
+       0.911
+      ]
+     },
+     "recall": {
+      "k": 9,
+      "n": 1247,
+      "value": 0.007,
+      "ci": [
+       0.004,
+       0.014
+      ]
+     }
+    }
+   },
+   "specific": {
+    "dehumanise": {
+     "precision": {
+      "k": 25,
+      "n": 25,
+      "value": 1,
+      "ci": [
+       0.867,
+       1
+      ]
+     },
+     "recall": {
+      "k": 25,
+      "n": 70,
+      "value": 0.357,
+      "ci": [
+       0.255,
+       0.474
+      ]
+     }
+    },
+    "violence": {
+     "precision": {
+      "k": 3,
+      "n": 3,
+      "value": 1,
+      "ci": [
+       0.438,
+       1
+      ]
+     },
+     "recall": {
+      "k": 3,
+      "n": 140,
+      "value": 0.021,
+      "ci": [
+       0.007,
+       0.061
+      ]
+     }
+    },
+    "slur": {
+     "precision": {
+      "k": 0,
+      "n": 0,
+      "value": null,
+      "ci": null
+     },
+     "recall": {
+      "k": 0,
+      "n": 45,
+      "value": 0,
+      "ci": [
+       0,
+       0.079
+      ]
+     }
+    }
+   }
+  },
+  "textdetox-ru": {
+   "n": 2500,
+   "prevalence": {
+    "k": 1250,
+    "n": 2500,
+    "value": 0.5,
+    "ci": [
+     0.48,
+     0.52
+    ]
+   },
+   "families": {
+    "strong": {
+     "hits": 95,
+     "precision": {
+      "k": 95,
+      "n": 95,
+      "value": 1,
+      "ci": [
+       0.961,
+       1
+      ]
+     },
+     "recall": {
+      "k": 95,
+      "n": 1250,
+      "value": 0.076,
+      "ci": [
+       0.063,
+       0.092
+      ]
+     }
+    },
+    "any": {
+     "hits": 95,
+     "precision": {
+      "k": 95,
+      "n": 95,
+      "value": 1,
+      "ci": [
+       0.961,
+       1
+      ]
+     },
+     "recall": {
+      "k": 95,
+      "n": 1250,
+      "value": 0.076,
+      "ci": [
+       0.063,
+       0.092
+      ]
+     }
+    },
+    "slur": {
+     "hits": 95,
+     "precision": {
+      "k": 95,
+      "n": 95,
+      "value": 1,
+      "ci": [
+       0.961,
+       1
+      ]
+     },
+     "recall": {
+      "k": 95,
+      "n": 1250,
+      "value": 0.076,
+      "ci": [
+       0.063,
+       0.092
+      ]
+     }
+    }
+   },
+   "specific": {}
+  },
+  "textdetox-uk": {
+   "n": 2500,
+   "prevalence": {
+    "k": 1250,
+    "n": 2500,
+    "value": 0.5,
+    "ci": [
+     0.48,
+     0.52
+    ]
+   },
+   "families": {
+    "strong": {
+     "hits": 15,
+     "precision": {
+      "k": 15,
+      "n": 15,
+      "value": 1,
+      "ci": [
+       0.796,
+       1
+      ]
+     },
+     "recall": {
+      "k": 15,
+      "n": 1250,
+      "value": 0.012,
+      "ci": [
+       0.007,
+       0.02
+      ]
+     }
+    },
+    "any": {
+     "hits": 15,
+     "precision": {
+      "k": 15,
+      "n": 15,
+      "value": 1,
+      "ci": [
+       0.796,
+       1
+      ]
+     },
+     "recall": {
+      "k": 15,
+      "n": 1250,
+      "value": 0.012,
+      "ci": [
+       0.007,
+       0.02
+      ]
+     }
+    },
+    "dehumanise": {
+     "hits": 1,
+     "precision": {
+      "k": 1,
+      "n": 1,
+      "value": 1,
+      "ci": [
+       0.207,
+       1
+      ]
+     },
+     "recall": {
+      "k": 1,
+      "n": 1250,
+      "value": 0.001,
+      "ci": [
+       0,
+       0.005
+      ]
+     }
+    },
+    "slur": {
+     "hits": 14,
+     "precision": {
+      "k": 14,
+      "n": 14,
+      "value": 1,
+      "ci": [
+       0.785,
+       1
+      ]
+     },
+     "recall": {
+      "k": 14,
+      "n": 1250,
+      "value": 0.011,
+      "ci": [
+       0.007,
+       0.019
+      ]
+     }
+    }
+   },
+   "specific": {}
+  },
+  "cold": {
+   "n": 2662,
+   "prevalence": {
+    "k": 1051,
+    "n": 2662,
+    "value": 0.395,
+    "ci": [
+     0.376,
+     0.414
+    ]
+   },
+   "families": {
+    "strong": {
+     "hits": 29,
+     "precision": {
+      "k": 22,
+      "n": 29,
+      "value": 0.759,
+      "ci": [
+       0.579,
+       0.878
+      ]
+     },
+     "recall": {
+      "k": 22,
+      "n": 1051,
+      "value": 0.021,
+      "ci": [
+       0.014,
+       0.031
+      ]
+     }
+    },
+    "any": {
+     "hits": 29,
+     "precision": {
+      "k": 22,
+      "n": 29,
+      "value": 0.759,
+      "ci": [
+       0.579,
+       0.878
+      ]
+     },
+     "recall": {
+      "k": 22,
+      "n": 1051,
+      "value": 0.021,
+      "ci": [
+       0.014,
+       0.031
+      ]
+     }
+    },
+    "dehumanise": {
+     "hits": 7,
+     "precision": {
+      "k": 5,
+      "n": 7,
+      "value": 0.714,
+      "ci": [
+       0.359,
+       0.918
+      ]
+     },
+     "recall": {
+      "k": 5,
+      "n": 1051,
+      "value": 0.005,
+      "ci": [
+       0.002,
+       0.011
+      ]
+     }
+    },
+    "violence": {
+     "hits": 5,
+     "precision": {
+      "k": 4,
+      "n": 5,
+      "value": 0.8,
+      "ci": [
+       0.376,
+       0.964
+      ]
+     },
+     "recall": {
+      "k": 4,
+      "n": 1051,
+      "value": 0.004,
+      "ci": [
+       0.001,
+       0.01
+      ]
+     }
+    },
+    "slur": {
+     "hits": 8,
+     "precision": {
+      "k": 6,
+      "n": 8,
+      "value": 0.75,
+      "ci": [
+       0.409,
+       0.929
+      ]
+     },
+     "recall": {
+      "k": 6,
+      "n": 1051,
+      "value": 0.006,
+      "ci": [
+       0.003,
+       0.012
+      ]
+     }
+    },
+    "stereotype": {
+     "hits": 9,
+     "precision": {
+      "k": 7,
+      "n": 9,
+      "value": 0.778,
+      "ci": [
+       0.453,
+       0.937
+      ]
+     },
+     "recall": {
+      "k": 7,
+      "n": 1051,
+      "value": 0.007,
+      "ci": [
+       0.003,
+       0.014
+      ]
+     }
+    }
+   },
+   "specific": {
+    "groupAttack": {
+     "precision": {
+      "k": 22,
+      "n": 29,
+      "value": 0.759,
+      "ci": [
+       0.579,
+       0.878
+      ]
+     },
+     "recall": {
+      "k": 22,
+      "n": 898,
+      "value": 0.024,
+      "ci": [
+       0.016,
+       0.037
+      ]
+     }
+    }
+   }
+  },
+  "mhc-zh": {
+   "n": 1689,
+   "prevalence": {
+    "k": 1132,
+    "n": 1689,
+    "value": 0.67,
+    "ci": [
+     0.647,
+     0.692
+    ]
+   },
+   "families": {
+    "strong": {
+     "hits": 61,
+     "precision": {
+      "k": 58,
+      "n": 61,
+      "value": 0.951,
+      "ci": [
+       0.865,
+       0.983
+      ]
+     },
+     "recall": {
+      "k": 58,
+      "n": 1132,
+      "value": 0.051,
+      "ci": [
+       0.04,
+       0.066
+      ]
+     }
+    },
+    "any": {
+     "hits": 61,
+     "precision": {
+      "k": 58,
+      "n": 61,
+      "value": 0.951,
+      "ci": [
+       0.865,
+       0.983
+      ]
+     },
+     "recall": {
+      "k": 58,
+      "n": 1132,
+      "value": 0.051,
+      "ci": [
+       0.04,
+       0.066
+      ]
+     }
+    },
+    "dehumanise": {
+     "hits": 19,
+     "precision": {
+      "k": 19,
+      "n": 19,
+      "value": 1,
+      "ci": [
+       0.832,
+       1
+      ]
+     },
+     "recall": {
+      "k": 19,
+      "n": 1132,
+      "value": 0.017,
+      "ci": [
+       0.011,
+       0.026
+      ]
+     }
+    },
+    "violence": {
+     "hits": 23,
+     "precision": {
+      "k": 20,
+      "n": 23,
+      "value": 0.87,
+      "ci": [
+       0.679,
+       0.955
+      ]
+     },
+     "recall": {
+      "k": 20,
+      "n": 1132,
+      "value": 0.018,
+      "ci": [
+       0.011,
+       0.027
+      ]
+     }
+    },
+    "slur": {
+     "hits": 19,
+     "precision": {
+      "k": 19,
+      "n": 19,
+      "value": 1,
+      "ci": [
+       0.832,
+       1
+      ]
+     },
+     "recall": {
+      "k": 19,
+      "n": 1132,
+      "value": 0.017,
+      "ci": [
+       0.011,
+       0.026
+      ]
+     }
+    }
+   },
+   "specific": {
+    "dehumanise": {
+     "precision": {
+      "k": 10,
+      "n": 10,
+      "value": 1,
+      "ci": [
+       0.722,
+       1
+      ]
+     },
+     "recall": {
+      "k": 10,
+      "n": 70,
+      "value": 0.143,
+      "ci": [
+       0.079,
+       0.243
+      ]
+     }
+    },
+    "violence": {
+     "precision": {
+      "k": 15,
+      "n": 18,
+      "value": 0.833,
+      "ci": [
+       0.608,
+       0.942
+      ]
+     },
+     "recall": {
+      "k": 15,
+      "n": 141,
+      "value": 0.106,
+      "ci": [
+       0.066,
+       0.168
+      ]
+     }
+    },
+    "slur": {
+     "precision": {
+      "k": 19,
+      "n": 19,
+      "value": 1,
+      "ci": [
+       0.832,
+       1
+      ]
+     },
+     "recall": {
+      "k": 19,
+      "n": 75,
+      "value": 0.253,
+      "ci": [
+       0.169,
+       0.362
+      ]
+     }
+    }
+   }
+  },
+  "textdetox-hi": {
+   "n": 2500,
+   "prevalence": {
+    "k": 1250,
+    "n": 2500,
+    "value": 0.5,
+    "ci": [
+     0.48,
+     0.52
+    ]
+   },
+   "families": {
+    "strong": {
+     "hits": 5,
+     "precision": {
+      "k": 5,
+      "n": 5,
+      "value": 1,
+      "ci": [
+       0.566,
+       1
+      ]
+     },
+     "recall": {
+      "k": 5,
+      "n": 1250,
+      "value": 0.004,
+      "ci": [
+       0.002,
+       0.009
+      ]
+     }
+    },
+    "any": {
+     "hits": 24,
+     "precision": {
+      "k": 23,
+      "n": 24,
+      "value": 0.958,
+      "ci": [
+       0.798,
+       0.993
+      ]
+     },
+     "recall": {
+      "k": 23,
+      "n": 1250,
+      "value": 0.018,
+      "ci": [
+       0.012,
+       0.027
+      ]
+     }
+    },
+    "slur": {
+     "hits": 4,
+     "precision": {
+      "k": 4,
+      "n": 4,
+      "value": 1,
+      "ci": [
+       0.51,
+       1
+      ]
+     },
+     "recall": {
+      "k": 4,
+      "n": 1250,
+      "value": 0.003,
+      "ci": [
+       0.001,
+       0.008
+      ]
+     }
+    },
+    "stereotype": {
+     "hits": 1,
+     "precision": {
+      "k": 1,
+      "n": 1,
+      "value": 1,
+      "ci": [
+       0.207,
+       1
+      ]
+     },
+     "recall": {
+      "k": 1,
+      "n": 1250,
+      "value": 0.001,
+      "ci": [
+       0,
+       0.005
+      ]
+     }
+    },
+    "conspiracy": {
+     "hits": 19,
+     "precision": {
+      "k": 18,
+      "n": 19,
+      "value": 0.947,
+      "ci": [
+       0.754,
+       0.991
+      ]
+     },
+     "recall": {
+      "k": 18,
+      "n": 1250,
+      "value": 0.014,
+      "ci": [
+       0.009,
+       0.023
+      ]
+     }
+    }
+   },
+   "specific": {}
+  },
+  "mhc-hi": {
+   "n": 1783,
+   "prevalence": {
+    "k": 1244,
+    "n": 1783,
+    "value": 0.698,
+    "ci": [
+     0.676,
+     0.719
+    ]
+   },
+   "families": {
+    "strong": {
+     "hits": 13,
+     "precision": {
+      "k": 13,
+      "n": 13,
+      "value": 1,
+      "ci": [
+       0.772,
+       1
+      ]
+     },
+     "recall": {
+      "k": 13,
+      "n": 1244,
+      "value": 0.01,
+      "ci": [
+       0.006,
+       0.018
+      ]
+     }
+    },
+    "any": {
+     "hits": 13,
+     "precision": {
+      "k": 13,
+      "n": 13,
+      "value": 1,
+      "ci": [
+       0.772,
+       1
+      ]
+     },
+     "recall": {
+      "k": 13,
+      "n": 1244,
+      "value": 0.01,
+      "ci": [
+       0.006,
+       0.018
+      ]
+     }
+    },
+    "dehumanise": {
+     "hits": 13,
+     "precision": {
+      "k": 13,
+      "n": 13,
+      "value": 1,
+      "ci": [
+       0.772,
+       1
+      ]
+     },
+     "recall": {
+      "k": 13,
+      "n": 1244,
+      "value": 0.01,
+      "ci": [
+       0.006,
+       0.018
+      ]
+     }
+    }
+   },
+   "specific": {
+    "dehumanise": {
+     "precision": {
+      "k": 10,
+      "n": 10,
+      "value": 1,
+      "ci": [
+       0.722,
+       1
+      ]
+     },
+     "recall": {
+      "k": 10,
+      "n": 70,
+      "value": 0.143,
+      "ci": [
+       0.079,
+       0.243
+      ]
+     }
+    },
+    "violence": {
+     "precision": {
+      "k": 0,
+      "n": 0,
+      "value": null,
+      "ci": null
+     },
+     "recall": {
+      "k": 0,
+      "n": 139,
+      "value": 0,
+      "ci": [
+       0,
+       0.027
+      ]
+     }
+    },
+    "slur": {
+     "precision": {
+      "k": 0,
+      "n": 0,
+      "value": null,
+      "ci": null
+     },
+     "recall": {
+      "k": 0,
+      "n": 45,
+      "value": 0,
+      "ci": [
+       0,
+       0.079
+      ]
+     }
+    }
+   }
+  }
+ }
+}

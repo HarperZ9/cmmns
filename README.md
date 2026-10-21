@@ -1,7 +1,8 @@
 # Radar
 
 See the evidence behind the replies you read. Rest the pointer on a reply on X, YouTube, Reddit,
-Facebook, Instagram or Bluesky and Radar opens a window beside it: where the platform places the account, signs of coordination,
+Facebook, Instagram, Bluesky, Threads, TikTok or any Mastodon server you turn it on for, and Radar
+opens a window beside it (on a phone, tap the post's Radar button): where the platform places the account, signs of coordination,
 how the account posts, and how the thread's harshest replies compare with the rest.
 
 Radar gives evidence, never verdicts. It never calls anyone a bot, a propagandist or an extremist,
@@ -35,7 +36,10 @@ Check a download against `SHA256SUMS` from the same release.
 - **Coordination:** the same text from several accounts, the same upload carried by many, wording
   that turns up in other threads you opened, replies that arrive in bursts.
 - **Language:** slurs, calls for violence, dehumanising language, spam patterns and
-  machine-writing signs, each with the words that matched.
+  machine-writing signs, each with the words that matched. Rhetoric is read in English, French,
+  Spanish, German, Portuguese, Italian, Arabic, Russian, Ukrainian, Chinese and Hindi (Devanagari
+  and Latin spelling); each sign says which language's word list found it and how that language
+  was measured, or that it was not.
 - **Sources:** who owns a linked outlet, and state links only where a cited report or official
   document names the site or account.
 - **Fact-checked claims:** when a post's wording closely matches a claim a fact-checker has
@@ -76,7 +80,10 @@ everything, reduce motion and enlarge text.
 - Platform labels can be wrong; VPNs and travel move them, and users can broaden them to a region.
 - Local-claim patterns cover English and some French; other languages read as "no claim".
 - Radar sees only the replies the site chose to render, in the site's ranked order.
-- Facebook, Instagram and Bluesky are checked against synthetic pages and their live structure;
+- Mastodon: Radar runs on a server only after you open it, click the Radar button and allow it.
+  Options lists the servers and takes access back.
+- Facebook, Instagram, Bluesky, Threads and Mastodon are checked against synthetic pages and their
+  live structure; TikTok comments are not checked live yet (TikTok asked to sign up first);
   a site redesign can break any adapter until Radar is updated.
 
 ## Develop

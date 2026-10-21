@@ -6,7 +6,7 @@
 //   profiles. The window closes itself when the queue has been empty for IDLE_CLOSE_MS.
 // Chrome runs this file as a service worker and loads the core bundle and the housekeeping here;
 // Firefox lists them before this file in the manifest's background scripts.
-if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js");
+if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js", "instances.js");
 const GAP_MS = 2500, TIMEOUT_MS = 12000, IDLE_CLOSE_MS = 15000;
 const queue = [];
 let busy = false, lastAt = 0, current = null, worker = null, idleTimer = 0, timeoutTimer = 0;
@@ -119,6 +119,8 @@ async function ensureWorker() {
   if (worker) {
     try { await chrome.tabs.get(worker.tabId); return worker; } catch { worker = null; }
   }
+  // Firefox for Android has no windows: a background tab does the reading there.
+  if (!chrome.windows) { const tab = await chrome.tabs.create({ url: "about:blank", active: false }); worker = { windowId: null, tabId: tab.id }; return worker; }
   const win = await chrome.windows.create({ url: "about:blank", state: "minimized", focused: false });
   worker = { windowId: win.id, tabId: win.tabs[0].id };
   return worker;
@@ -128,7 +130,7 @@ function scheduleClose() {
   clearTimeout(idleTimer);
   idleTimer = setTimeout(() => {
     if (queue.length || busy || !worker) return;
-    chrome.windows.remove(worker.windowId).catch(() => {});
+    (worker.windowId == null ? chrome.tabs.remove(worker.tabId) : chrome.windows.remove(worker.windowId)).catch(() => {});
     worker = null;
   }, IDLE_CLOSE_MS);
 }

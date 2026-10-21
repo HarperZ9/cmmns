@@ -17,7 +17,7 @@
   const send = (msg) => (tab && tab.id != null ? chrome.tabs.sendMessage(tab.id, msg).catch(() => null) : Promise.resolve(null));
   const s = await send({ type: "pb-summary" });
   const buttons = ["scan", "panel", "export"];
-  if (!s) { buttons.forEach((b) => ($(b).disabled = true)); return; }
+  if (!s) { buttons.forEach((b) => ($(b).disabled = true)); await PBServer.offer(tab); return; }
 
   $("site").textContent = s.site + (s.feed ? " feed" : " thread");
   $("sentence").textContent = s.sentence || (s.feed ? "Rest the pointer on any post to see what Radar knows about it." : "Reading the thread…");

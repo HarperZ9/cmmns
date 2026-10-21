@@ -23,6 +23,17 @@ these requests, all to the site you are already using, with that site's own sess
 | X | One account's profile and About page in a minimised window, so Radar can learn X's request the first time, or when you ask Radar to read accounts | The first time, and when you ask |
 | Reddit | Reddit's public account data (`/user/<name>/about.json`) for comment authors, one account every 2 seconds | Automatically, unless you switch that setting off |
 
+On Bluesky, Threads, TikTok and Mastodon servers Radar makes no request at all: it reads the page and
+copies responses the site's own app already loaded (on TikTok and Mastodon, the comment and thread
+lists; Radar never reads request headers or login tokens).
+
+**Mastodon servers.** Radar has no access to any Mastodon server until you turn it on for that
+server. When you open Radar's toolbar button on a page Radar does not run on, it checks two things
+on that page only: whether it is the Mastodon web app, and the app's version and domain. If it is,
+the button offers "Turn on Radar here", and your browser asks you to allow access to that one
+server. The list of servers you turned on is kept in `pb.instances.v1`; Options, Mastodon servers,
+Remove takes the access back.
+
 Fact-check matching runs against a table bundled inside Radar, so post text is never sent to a
 fact-checking service.
 
@@ -52,6 +63,8 @@ profile you installed Radar in. It is not synced to other devices.
 | Feed tally (`pb.feed.v1`) | Per site and day: the ids of feed posts counted (so each counts once), how many linked each site, and how many showed strong rhetoric signs, a Community Note or a fact-check match. No post text | 60 days by default; follows the history setting |
 | Thread card (session storage) | The card you asked for from a thread panel, held until the card page opens it. It names no account | Until the browser closes |
 | Your feedback (`pb.feedback.v1`) | Your "This was right" and "This was wrong" marks: which sign (its kind, the post id and a short hash of its label), the thread, your mark and the time. The post text only for marks where you ticked "include the text" | Until you clear it or remove Radar; at most 2,000 marks, the oldest dropped first |
+| Account details from other sites (`pb.meta.v1`) | What Instagram, Facebook, Bluesky or a Mastodon server showed about accounts you saw: join date, counts, labels, renames | 14 days |
+| Mastodon servers (`pb.instances.v1`) | The servers you turned Radar on for | Until you remove them |
 | X request shape (`pb.tpl`) | The shape of X's About request, so Radar can repeat it. It holds no login token; the token is read fresh from X's cookie each time | Until X changes it or you clear Radar's data |
 
 Post data from the page (views, posting app, media upload times) is held in memory for the tab and

@@ -17,6 +17,12 @@ import { scoreEs, NEGATION_ES } from "./rhetoric-es.js";
 import { scoreDe, NEGATION_DE } from "./rhetoric-de.js";
 import { scorePt, NEGATION_PT } from "./rhetoric-pt.js";
 import { scoreIt, NEGATION_IT } from "./rhetoric-it.js";
+import { scoreAr, NEGATION_AR, prepAr } from "./rhetoric-ar.js";
+import { scoreRu, NEGATION_RU, prepRu } from "./rhetoric-ru.js";
+import { scoreUk, NEGATION_UK } from "./rhetoric-uk.js";
+import { scoreZh, NEGATION_ZH, prepZh } from "./rhetoric-zh.js";
+import { scoreHi, NEGATION_HI, prepHi } from "./rhetoric-hi.js";
+import { mentionedIntl } from "./rhetoric-mention.js";
 
 export const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -108,20 +114,28 @@ export const EXTREME_AT = 2;
 export const STRONG = new Set(["dehumanise", "violence", "vigilante", "slur", "stereotype"]);
 
 // Other languages, in order. Each adds only families that English and the languages before it
-// did not find, and negates its matches with its own negation words.
+// did not find, and negates its matches with its own negation words. `prep` normalises the text
+// for that language's lists (one alef in Arabic, simplified Chinese, NFC Hindi) before matching.
+// Ukrainian reads the modifier apostrophe as ', as replies type both. `report` adds the reported-
+// speech and quotation cues of rhetoric-mention.js for that language.
 export const LANGUAGES = [
   { code: "fr", score: scoreFr, negation: NEGATION_FR },
   { code: "es", score: scoreEs, negation: NEGATION_ES },
   { code: "de", score: scoreDe, negation: NEGATION_DE },
   { code: "pt", score: scorePt, negation: NEGATION_PT },
   { code: "it", score: scoreIt, negation: NEGATION_IT },
+  { code: "ar", report: true, score: scoreAr, negation: NEGATION_AR, prep: prepAr },
+  { code: "ru", report: true, score: scoreRu, negation: NEGATION_RU, prep: prepRu },
+  { code: "uk", report: true, score: scoreUk, negation: NEGATION_UK, prep: (t) => prepRu(t).replace(/ʼ/g, "'") },
+  { code: "zh", report: true, score: scoreZh, negation: NEGATION_ZH, prep: prepZh },
+  { code: "hi", report: true, score: scoreHi, negation: NEGATION_HI, prep: prepHi },
 ];
 
 // A matcher that records a marker when `re` matches and, if negatable, the match has no negation.
 function recorder(s, markers) {
-  return (family, re, negatable = false, on = s, negation = NEGATION) => {
+  return (family, re, negatable = false, on = s, negation = NEGATION, intl = false) => {
     const m = on.match(re);
-    if (!m || (negatable && negation.test(m[0])) || mention(s, m)) return false;
+    if (!m || (negatable && negation.test(m[0])) || mention(on, m) || (intl && mentionedIntl(on, m))) return false;
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
@@ -145,7 +159,8 @@ function scoreEnglish(s, hit) {
   hit("contempt", RE.contempt, true);
 }
 
-// Returns { score, markers: [{ family, match }], extreme }.
+// Returns { score, markers: [{ family, match, lang? }], extreme }. lang: the code of the language
+// grammar that found the marker; absent for English.
 export function score(text) {
   const s = String(text || "").replace(/[’]/g, "'");
   const markers = [];
@@ -153,7 +168,12 @@ export function score(text) {
   scoreEnglish(s, hit);
   for (const lang of LANGUAGES) {
     const have = new Set(markers.map((m) => m.family));
-    lang.score((family, re, negatable = false) => hit(family, re, negatable, s, lang.negation), have);
+    const on = lang.prep ? lang.prep(s) : s;
+    const from = markers.length;
+    lang.score((family, re, negatable = false) => hit(family, re, negatable, on, lang.negation, !!lang.report), have);
+    // Each marker a language grammar found carries its code, so the window can say which word
+    // list found it and how that language was measured.
+    for (let i = from; i < markers.length; i++) markers[i].lang = lang.code;
   }
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };

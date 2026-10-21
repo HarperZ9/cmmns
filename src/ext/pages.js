@@ -39,11 +39,14 @@
     return label;
   }
 
-  const ORIGINS = { x: ["https://x.com/*", "https://twitter.com/*"], youtube: ["https://www.youtube.com/*"], reddit: ["https://www.reddit.com/*"], facebook: ["https://www.facebook.com/*"], instagram: ["https://www.instagram.com/*"], bluesky: ["https://bsky.app/*"] };
+  const ORIGINS = { x: ["https://x.com/*", "https://twitter.com/*"], youtube: ["https://www.youtube.com/*"], reddit: ["https://www.reddit.com/*"], facebook: ["https://www.facebook.com/*"], instagram: ["https://www.instagram.com/*"], bluesky: ["https://bsky.app/*"],
+    threads: ["https://www.threads.com/*", "https://www.threads.net/*"], tiktok: ["https://www.tiktok.com/*"] };
   // [[id, name, origins]] for the sites this build has host access for.
   function sites() {
     const hosts = (chrome.runtime.getManifest().host_permissions || []);
-    return PB.SITES.map(([id, name]) => [id, name, ORIGINS[id] || []]).filter(([, , o]) => o.some((x) => hosts.includes(x)));
+    // Mastodon has no fixed host: it is listed when the build can ask for servers one by one.
+    const servers = (chrome.runtime.getManifest().optional_host_permissions || []).length > 0;
+    return PB.SITES.map(([id, name]) => [id, name, ORIGINS[id] || []]).filter(([id, , o]) => o.some((x) => hosts.includes(x)) || (id === "mastodon" && servers));
   }
 
   globalThis.PBPages = Object.freeze({ el, aperture, switchRow, sites });

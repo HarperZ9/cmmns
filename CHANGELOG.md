@@ -6,6 +6,22 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- Threads, Mastodon and TikTok comments. Threads and Mastodon were read live (Mastodon 4.x and
+  5.0); TikTok follows its public markup and is not checked live yet. Mastodon works on any server,
+  and only on servers you choose: open the server, click Radar's button, and your browser asks you
+  to allow that one server. Options lists them and takes access back. On Mastodon, Radar shows the
+  account's join date and whether the account marked itself as automated, from the data the
+  server already loaded. No new requests on any of the three.
+- Rhetoric in Arabic, Russian, Ukrainian, Chinese and Hindi (Devanagari and Latin spelling):
+  dehumanising language, calls for violence, stereotypes, slurs and conspiracy framing, with the
+  names each side coins for the other and symmetry tests across 19 to 26 targets per language.
+  Measured on held-out human-labelled text where a usable corpus exists: Arabic 96.6% (82.8 to
+  99.4, 29 signs, MLMA and OSACT4), Russian 100% (96.1 to 100, 95 signs, all slurs), Chinese 75.9%
+  (57.9 to 87.8, 29 signs, COLD). Ukrainian and Hindi show "not measured": too few signs in
+  labelled text. Each sign now says which language's word list found it.
+- Firefox for Android: the same package installs on Firefox 128 or later. On a touch screen each
+  post gets one "Radar" button that opens the window on a tap; the window and the popup fit the
+  screen. Testing steps in `project-docs/ANDROID.md`; not yet run on a phone.
 - Content Credentials fail-safe: a version 1 manifest in MP4 now reads "could not fully verify
   (older manifest format)", never "has not changed since it was signed", and a CI property test
   holds Radar to never giving a more favourable verdict than c2patool on the c2pa-rs test files.
