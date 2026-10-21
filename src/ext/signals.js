@@ -99,11 +99,15 @@
   }
 
   // Look-alike news addresses (src/core/lookalike.js): a weak sign of its own.
+  // A post that names the copied outlet in its own words adds a row (src/core/cloned.js), and an
+  // address a published report named points at that sign.
   function lookalikes(m) {
-    return (m.domains || []).map((d) => [d, PB.lookalikeOf(d)]).filter(([, h]) => h).map(([d, h]) => ({
+    return PB.clonedCitations(m.text, m.domains).map((h) => ({
       label: `look-alike of ${h.official}`, fam: "lookalike-domain", level: "flag", cat: "sources",
-      rows: [["What Radar sees", `This post links to ${d}, which ${h.how === "swapped ending" ? "uses the name of" : h.how === "copies the name" ? "copies the name of" : h.how === "look-alike letters" ? "spells with look-alike letters the name of" : "is one letter away from the name of"} ${h.outlet} (${h.official}).`],
-        ["Why it matters", "Operations such as Doppelganger copied real outlets on addresses like washingtonpost.pm to borrow their trust."], dnp(PB.LOOKALIKE_DOES_NOT_PROVE)],
+      rows: [["What Radar sees", `This post links to ${h.domain}, which ${h.how === "swapped ending" ? "uses the name of" : h.how === "copies the name" ? "copies the name of" : h.how === "look-alike letters" ? "spells with look-alike letters the name of" : "is one letter away from the name of"} ${h.outlet} (${h.official}).`],
+        h.named ? ["In its words", `The post names ${h.outlet} while its link goes to a different address. Open ${h.official} and look for the same story there.`] : null,
+        h.reports.length ? ["Published reports", `A published report named this address as part of ${h.reports.slice(0, 2).join(" and ")}. See the "Named in a published report" sign.`] : null,
+        ["Why it matters", "Operations such as Doppelganger copied real outlets on addresses like washingtonpost.pm to borrow their trust."], dnp(h.named ? PB.CLONED_DOES_NOT_PROVE : PB.LOOKALIKE_DOES_NOT_PROVE)].filter(Boolean),
     }));
   }
 

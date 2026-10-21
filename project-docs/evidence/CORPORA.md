@@ -42,6 +42,15 @@ Not used:
 - CONAN: its hate side was written by NGO operators as seeds for counter-speech, not collected
   from users, and its licence terms need checking. MLMA is the French source.
 
+Framing corpora checked on 2026-10-21 for episodic and thematic framing and not used (none was
+downloaded; see EVALUATION.md, "Framing, hidden motives, swarming and cloned outlets"):
+- Media Frames Corpus (Card et al. 2015): annotations GPL-3.0; text only through LexisNexis
+  Academic (subscription); policy frames, not episodic and thematic.
+- Gun Violence Frame Corpus (Liu et al. 2019): issue frames; reduced copy CC BY 4.0 on Zenodo
+  (record 10822952), full release with no stated licence.
+- Mendelsohn, Budak and Jurgens (2021) immigration tweets: episodic and thematic labels, no
+  licence stated, tweet ids only.
+
 ## Label mapping
 Every decision below lives in code in `scripts/eval/corpora.mjs`.
 

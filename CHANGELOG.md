@@ -36,6 +36,32 @@ attribution wording. Techniques read from behaviour, not wording: flooding, cros
 laundering chains. Named conspiracy theories, brand-borrowing accounts, and Korean and Indonesian markers
 derived from labelled data.
 
+### Added (framing, hidden motives and swarming)
+- Swarming, a thread sign: many new or flagged accounts replying to one post within ten minutes.
+  The window gives counts only, never the accounts, so the report cannot become a list to pile on.
+  On ordinary threads (PHEME) it showed up in 0.04% of threads (2 of 4,712 threads with five or more replies;
+  test half 1 of 2,278, 95% interval 0.01 to 0.25%). No labelled set of harassment threads was
+  available, so it has an organic rate and no precision.
+- Cloned-outlet framing: when a post names an outlet in its own words and links a look-alike of
+  that outlet's address, the look-alike sign says so, and points at the "Named in a published
+  report" sign when a report named the address. Post-level precision is not measured; the address
+  check catches 147 of 1,174 report-named domains and matches none of 52,598 real outlet domains
+  (in-sample regression controls, not a held-out error rate).
+- Two persuasion techniques, held back: hidden motive ("masked as", "the real reason is",
+  "secretly", "textbook move") and just asking questions ("I'm just asking", "is it a
+  coincidence?"). On the PTC test split, scored against its "Doubt" label as the nearest one, they
+  hit 0 of 4 and 0 of 2 spans, far under the 20-hit minimum. Each has a lesson.
+- Episodic and thematic framing (Iyengar 1991), held back: Radar can read whether a post tells an
+  issue only through one person's story or explains it through trends, numbers and policy, with
+  symmetry tests across 20 groups and 10 issues. No labelled corpus with a usable licence exists:
+  the Media Frames Corpus needs LexisNexis access and labels policy frames, the Gun Violence Frame
+  Corpus labels issue frames, and the immigration tweets of Mendelsohn et al. (2021) carry no
+  licence and only tweet ids. On PHEME replies the reading fires on 0.9% as person-stories and
+  1.7% as structural, unlabelled. A lesson explains the frame.
+- "Your feed" has a person-stories and structural explanation section. It stays held, with its
+  reason and no counts, until the reading clears its measurement; the feed log keeps each post's
+  frame (a label, no text) so the shares and their intervals can start at once.
+
 ### Added (derived word lists)
 - Korean and Indonesian slur signs from word lists derived from human-labelled research corpora,
   not typed by hand. A script picks each term on the dev split by weighted log-odds against the

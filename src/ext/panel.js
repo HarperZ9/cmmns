@@ -37,6 +37,7 @@
       groups.length ? "Seen together in other threads you viewed: " + groups.slice(0, 3).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "." : null,
       base("together", groups.length),
       ...flooding(report.flood, base),
+      ...swarming(report.swarm, base),
       ...(report.crossLang || []).slice(0, 2).map((g) => `One ${g.kind === "claim" ? "fact-checked claim" : g.kind === "media" ? "upload" : "link"} carried by ${g.accounts} accounts in ${g.langs.length} languages (${g.langs.map((l) => l.replace("script:", "")).join(", ")}).`),
       base("cross-language", (report.crossLang || []).length),
       report.machine && report.machine.n ? `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text.` : null,
@@ -52,6 +53,18 @@
       f.repeaters.length ? `Context: ${f.repeaters.map((x) => `@${x.handle} replied ${x.n} times`).join(", ")}. Conversations do this too.` : null,
       base("flood", true),
       PB.FLOOD_DOES_NOT_PROVE,
+    ];
+  }
+
+  // The swarming sign (src/core/swarming.js): counts only, never the accounts, so the thread report
+  // cannot become a list to pile on in turn.
+  function swarming(w, base) {
+    if (!w) return [];
+    const parts = [w.newAccounts ? `${w.newAccounts} new` : null, w.flagged ? `${w.flagged} flagged` : null].filter(Boolean).join(", ");
+    return [
+      `${w.marked} of ${w.known} accounts Radar read in a ${Math.round(w.windowSec / 60)}-minute window from ${w.from.slice(11, 16)} UTC were new or flagged (${parts}), all replying to this post.`,
+      base("swarm", true),
+      PB.SWARM_DOES_NOT_PROVE,
     ];
   }
 

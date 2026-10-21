@@ -2921,6 +2921,8 @@ const MEASURED_PERSUASION = {
   "doubt": {"precision":0.333,"low":0.061,"high":0.792,"n":3,"split":"test","recall":0.004,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
   "appeal-to-authority": {"precision":0,"low":0,"high":0.658,"n":2,"split":"test","recall":0,"chance":0.012,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
   "exaggeration": {"precision":0.1,"low":0.018,"high":0.404,"n":10,"split":"test","recall":0.005,"chance":0.01,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "motive-attribution": {"precision":0,"low":0,"high":0.49,"n":4,"split":"test","recall":0,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "just-asking": {"precision":0,"low":0,"high":0.658,"n":2,"split":"test","recall":0,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
 };
 // persuasion:end
 const MEASURED = {
@@ -3108,6 +3110,18 @@ const CUES_EN = {
     "(?:totally|completely|utterly) (?:destroyed|ruined|failed|collapsed)", "the most " + `${W} ${W}` + " in history",
     "a million times", "beyond (?:belief|comprehension)", "of epic proportions",
   ],
+  "motive-attribution": [
+    "(?:masked|disguised|dressed up|masquerading) as", "under the guise of", "the real (?:reason|agenda|motive|goal|aim|purpose|plan)",
+    "(?:hidden|secret|true) (?:agenda|motive|motives|aim|aims|plan)", "secretly (?:want|wants|wanted|plan|plans|planning|working|trying|hoping)",
+    "textbook (?:move|tactic|playbook|strategy|propaganda)", "(?:it|this) (?:was|is) never (?:really )?about", "(?:just|only|merely) a (?:cover|pretext|smokescreen|front) for",
+    "what (?:they|he|she) (?:really|actually) want", "(?:their|his|her) real (?:intention|intentions|motive|motives)",
+  ],
+  "just-asking": [
+    "just asking(?: (?:questions|a question))?", "i'?m just asking", "just a question", "(?:makes|make|should make) you (?:wonder|think)",
+    "isn'?t it (?:strange|odd|funny|interesting|curious|convenient) (?:that|how)", "why (?:is|are) (?:no one|nobody) asking",
+    "ask yourselves? (?:why|who|how)", "is (?:it|this) (?:just )?(?:a )?coincidence", "coincidence\\?", "(?:one|you) (?:has|have) to wonder",
+    "i'?m not saying (?:it|they|he|she|that)[^.?!]{0,40}but",
+  ],
 };
 
 // French cues for the same techniques. SemEval-2023 Task 3 has French data, but its terms allow use
@@ -3197,6 +3211,8 @@ const TECHNIQUES = {
   "doubt": { name: "Doubt", definition: "Questions the credibility of someone or something without giving evidence." },
   "appeal-to-authority": { name: "Appeal to authority", definition: "Says a claim is true because an unnamed or generic authority backs it." },
   "exaggeration": { name: "Exaggeration", definition: "Makes something seem far larger, worse or more extreme than it is." },
+  "motive-attribution": { name: "Hidden motive", definition: "Says someone's real aim is hidden behind what they say, without showing evidence of the aim." },
+  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question, so it is suggested without being claimed." },
 };
 
 const PERSUASION_DOES_NOT_PROVE = "A technique can carry a true claim; it describes how the post argues.";
@@ -3273,6 +3289,87 @@ function persuasion(text, shown = shownTechniques()) {
 }
 
 return { TECHNIQUES, PERSUASION_DOES_NOT_PROVE, SHIP_PRECISION, SHIP_LOW, SHIP_MIN_N, CONTEXT_ONLY, techniqueSpans, shownTechniques, techniqueStatus, persuasion };
+})();
+
+// ---- framing.js
+const M_framing = (() => {
+// Episodic and thematic framing (Iyengar, "Is Anyone Responsible? How Television Frames Political
+// Issues", University of Chicago Press, 1991). An episodic frame tells an issue through one person's
+// case or one event; a thematic frame places it in context: trends, numbers, causes, policies,
+// systems. Iyengar found episodic coverage leads viewers to hold the individual responsible and
+// thematic coverage leads them to hold society or government responsible. The operational split
+// follows the narrative-frame part of the codebook of Mendelsohn, Budak and Jurgens, "Modeling
+// Framing in Immigration Discourse on Social Media" (NAACL 2021), which codes a post episodic when
+// it centres a specific person or event and thematic when it gives broader context. Radar cites
+// that codebook and copies none of its text.
+//
+// A cue names no group, person, party, side or issue: the same sentence reads alike whatever it is
+// about (tests/framing.symmetry.test.js). The person-story sign is a post that tells the issue only
+// through one individual's story, with no structural cue at all. It is held back: no labelled
+// corpus with a usable licence exists to measure it (project-docs/EVALUATION.md), so the window,
+// the report and the dashboard show only that it is held, never a count.
+
+const FRAMING_MIN_WORDS = 12;
+
+const EPISODIC = [
+  "\\d{1,3}[- ]years?[- ]old", "(?:my|our) (?:[\\w-]+ )?(?:mom|mother|dad|father|son|daughter|brother|sister|wife|husband|partner|friend|best friend|neighbou?r|cousin|uncle|aunt|grandmother|grandfather|grandma|grandpa|coworker|colleague|kid|child|baby|boss|landlord)",
+  "(?:this|one|a|the) (?:young |single |elderly |local )?(?:woman|man|mother|father|mom|dad|girl|boy|child|kid|family|teen|teenager|student|veteran|nurse|worker|widow|grandmother|grandfather|toddler) (?:who|was|had|lost|died|says|said|is|has|got|could)",
+  "(?:her|his|their) (?:story|ordeal|family says|mother says|father says)", "(?:he|she) (?:was|had been|got) (?:killed|shot|arrested|fired|laid off|evicted|deported|attacked|beaten|hospitali[sz]ed|denied|detained|stabbed|robbed)",
+  "(?:lost|losing) (?:her|his|my) (?:job|home|house|son|daughter|husband|wife|life|benefits|insurance|business)",
+  "(?:i|we) (?:lost|was|were|got) (?:fired|laid off|evicted|denied|attacked|robbed|turned away|hospitali[sz]ed)", "happened to (?:me|my|her|him)", "when i was (?:a|in|at)",
+  { cue: "Meet [A-Z][a-z]+", caseSensitive: true },
+];
+const THEMATIC = [
+  "\\d+(?:[.,]\\d+)?\\s?(?:%|percent|per cent)", "per capita", "(?:the )?(?:rate|rates|share|number) of", "on average", "nationwide", "nationally", "statewide",
+  "across the (?:country|nation|state|region|world)", "(?:study|studies|survey|census|report|data|statistics|figures) (?:show|shows|showed|found|finds|suggest|suggests)",
+  "polic(?:y|ies)", "legislation", "(?:the |this |a |new )law", "laws", "funding", "budget", "regulations?", "systemic", "structural", "institutional", "the system",
+  "since (?:19|20)\\d\\d", "over the (?:past|last) (?:decade|century|\\d+ years)", "trends?", "(?:root )?causes? of", "(?:millions|thousands|hundreds of thousands) of (?:people|families|workers|children|residents)",
+];
+
+const compile = (c) => { const { cue, caseSensitive } = typeof c === "string" ? { cue: c } : c; return new RegExp(`(?<![\\w'])(?:${cue})(?![\\w'])`, caseSensitive ? "g" : "gi"); };
+const EP = EPISODIC.map(compile), TH = THEMATIC.map(compile);
+const words = (s) => (s.match(/[\p{L}\p{N}][\p{L}\p{N}'-]*/gu) || []).length;
+
+function hits(res, s) {
+  const out = [];
+  for (const re of res) { re.lastIndex = 0; for (const m of s.matchAll(re)) out.push(m[0]); }
+  return out;
+}
+
+// { episodic, thematic, frame, words } for one post. frame: "person-story" (episodic cues only),
+// "structural" (thematic only), "mixed", or null (neither, or too short to read).
+function framingOf(text) {
+  const s = String(text || "").replace(/[’]/g, "'");
+  const n = words(s), episodic = hits(EP, s), thematic = hits(TH, s);
+  let frame = null;
+  if (n >= FRAMING_MIN_WORDS) frame = episodic.length && thematic.length ? "mixed" : episodic.length ? "person-story" : thematic.length ? "structural" : null;
+  return { episodic, thematic, frame, words: n };
+}
+
+// Measurement row for the person-story sign: null until a licensed labelled corpus clears the bar.
+// The bar: a 95% Wilson lower bound of at least 0.7 from at least 20 hits on held-out data.
+const MEASURED_FRAMING = null;
+const FRAMING_SHIP_LOW = 0.7, FRAMING_MIN_N = 20;
+function framingShown(row = MEASURED_FRAMING) {
+  return !!(row && row.split === "test" && Number.isInteger(row.n) && row.n >= FRAMING_MIN_N && Number.isFinite(row.low) && row.low >= FRAMING_SHIP_LOW);
+}
+function framingStatus(row = MEASURED_FRAMING) {
+  if (!row) return { shown: false, text: "held back: not measured. No labelled corpus of episodic and thematic posts with a usable licence was found (checked 2026-10-21)" };
+  const pc = (x) => Math.round(x * 100);
+  const m = `precision ${pc(row.precision)}% (95% interval ${pc(row.low)} to ${pc(row.high)}%), ${row.n} posts checked`;
+  return framingShown(row) ? { shown: true, text: m } : { shown: false, text: `held back (interval starts below ${pc(FRAMING_SHIP_LOW)}% or fewer than ${FRAMING_MIN_N} hits): ${m}` };
+}
+
+const FRAMING_DOES_NOT_PROVE = "A person's story can be true, typical and the best way to explain an issue. This describes how the post explains the issue, not whether it is right or who wrote it.";
+
+// The frame the feed log keeps for one post: framingOf's frame, "none" for a post long enough to
+// read with neither kind of cue, or null for a post too short to read.
+function feedFrame(text) {
+  const f = framingOf(text);
+  return f.frame || (f.words >= FRAMING_MIN_WORDS ? "none" : null);
+}
+
+return { FRAMING_MIN_WORDS, framingOf, MEASURED_FRAMING, FRAMING_SHIP_LOW, framingShown, framingStatus, FRAMING_DOES_NOT_PROVE, feedFrame };
 })();
 
 // ---- report.js
@@ -4398,7 +4495,7 @@ return { BASELINES };
 // ---- techniques-data.js
 const M_techniques_data = (() => {
 // Generated by scripts/techniques-baselines.mjs from project-docs/evidence/technique-baselines.json. Do not edit.
-const TECHNIQUE_BASELINES = {"generated":"2026-10-21","flood":{"5-19":{"k":17,"n":3087,"share":0.0055,"ci":[0.0034,0.0088]},"20-49":{"k":25,"n":1384,"share":0.0181,"ci":[0.0123,0.0265]},"50-99":{"k":4,"n":181,"share":0.0221,"ci":[0.0086,0.0554]},"100+":{"k":2,"n":60,"share":0.0333,"ci":[0.0092,0.1136]}},"cross":{"5-19":{"k":1,"n":3087,"share":0.0003,"ci":[0.0001,0.0018]},"20-49":{"k":2,"n":1384,"share":0.0014,"ci":[0.0004,0.0053]},"50-99":{"k":2,"n":181,"share":0.011,"ci":[0.003,0.0394]},"100+":{"k":0,"n":60,"share":0,"ci":[0,0.0602]}},"multilingual":{"5-19":{"k":992,"n":3087,"share":0.3213,"ci":[0.3051,0.338]},"20-49":{"k":581,"n":1384,"share":0.4198,"ci":[0.3941,0.446]},"50-99":{"k":85,"n":181,"share":0.4696,"ci":[0.3983,0.5422]},"100+":{"k":36,"n":60,"share":0.6,"ci":[0.4737,0.7143]}}};
+const TECHNIQUE_BASELINES = {"generated":"2026-10-21","flood":{"5-19":{"k":17,"n":3087,"share":0.0055,"ci":[0.0034,0.0088]},"20-49":{"k":25,"n":1384,"share":0.0181,"ci":[0.0123,0.0265]},"50-99":{"k":4,"n":181,"share":0.0221,"ci":[0.0086,0.0554]},"100+":{"k":2,"n":60,"share":0.0333,"ci":[0.0092,0.1136]}},"cross":{"5-19":{"k":1,"n":3087,"share":0.0003,"ci":[0.0001,0.0018]},"20-49":{"k":2,"n":1384,"share":0.0014,"ci":[0.0004,0.0053]},"50-99":{"k":2,"n":181,"share":0.011,"ci":[0.003,0.0394]},"100+":{"k":0,"n":60,"share":0,"ci":[0,0.0602]}},"multilingual":{"5-19":{"k":992,"n":3087,"share":0.3213,"ci":[0.3051,0.338]},"20-49":{"k":581,"n":1384,"share":0.4198,"ci":[0.3941,0.446]},"50-99":{"k":85,"n":181,"share":0.4696,"ci":[0.3983,0.5422]},"100+":{"k":36,"n":60,"share":0.6,"ci":[0.4737,0.7143]}},"swarm":{"5-19":{"k":0,"n":3087,"share":0,"ci":[0,0.0012]},"20-49":{"k":1,"n":1384,"share":0.0007,"ci":[0.0001,0.0041]},"50-99":{"k":1,"n":181,"share":0.0055,"ci":[0.001,0.0306]},"100+":{"k":0,"n":60,"share":0,"ci":[0,0.0602]}}};
 
 return { TECHNIQUE_BASELINES };
 })();
@@ -4425,10 +4522,10 @@ const size = (b) => (b.max === Infinity || b.max == null ? `${b.min} or more rep
 // The measured rate for one sign: { k, n, share, ci, bin } or null when the thread falls outside
 // every bin. ctx: { replies } for signs in one thread, { viewed } for signs across threads.
 function baselineFor(sign, ctx = {}) {
-  const inThread = { "same-text": "same", burst: "burst", flood: "flood", "cross-language": "cross" }[sign];
+  const inThread = { "same-text": "same", burst: "burst", flood: "flood", "cross-language": "cross", swarm: "swarm" }[sign];
   const across = { together: "together", "copied-elsewhere": "echo" }[sign];
   const bin = inThread ? sizeBin(ctx.replies || 0) : across ? viewBin(ctx.viewed || 0) : null;
-  const table = sign === "flood" || sign === "cross-language" ? TECHNIQUE_BASELINES : BASELINES;
+  const table = sign === "flood" || sign === "cross-language" || sign === "swarm" ? TECHNIQUE_BASELINES : BASELINES;
   const r = bin && table[inThread || across] && table[inThread || across][bin.id];
   return r && r.n ? { ...r, bin } : null;
 }
@@ -4440,6 +4537,7 @@ const WHAT = {
   "copied-elsewhere": ["wording that turned up in another thread", "replies of 8 words or more"],
   flood: ["a flood of replies from very high-rate accounts", "threads"],
   "cross-language": ["one link or upload carried by replies in different languages", "threads"],
+  swarm: ["many new or flagged accounts replying within ten minutes", "threads"],
 };
 
 // One sentence for the window, or null: "In ordinary threads with 20 to 49 replies, ... showed up
@@ -4704,6 +4802,51 @@ function opsTrend(table = TABLE) {
 }
 
 return { setOpsTable, opsOfDomain, opsOfHandle, opsLookup, profileLinks, OPS_DOES_NOT_PROVE, opRows, OPS_TREND_CAVEAT, opsTrend };
+})();
+
+// ---- cloned.js
+const M_cloned = (() => {
+// Cloned-outlet framing (project-docs/TECHNIQUES.md, technique 3; DISARM T0098 Establish Inauthentic
+// News Sites, T0097.202 News Outlet Persona). A post that names a real outlet ("The Washington Post
+// reports...") while its link goes to a look-alike address borrows the outlet's trust twice: in
+// the words and in the address. Doppelganger posts did this with copied outlets on addresses such as
+// washingtonpost.pm. Radar joins two checks it already has: the look-alike address (lookalike.js)
+// and the published reports that named the address (ops.js). Wording that names the outlet is the
+// only new part, and it is matched on the outlet's own name, never on a topic or side.
+
+const { lookalikeOf } = M_lookalike;
+const { opsOfDomain } = M_ops;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const fold = (s) => String(s || "").normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase();
+
+// True when the text names the outlet: its name with or without a leading "The", or its own address.
+function namesOutlet(text, outlet, official) {
+  const t = fold(text), name = fold(outlet).replace(/^the /, "");
+  if (name.length >= 3 && new RegExp(`(?<![\\p{L}\\p{N}])(?:the )?${esc(name)}(?![\\p{L}\\p{N}])`, "u").test(t)) return true;
+  return !!official && new RegExp(`(?<![\\w.-])${esc(fold(official))}(?![\\w-])`).test(t);
+}
+
+// One entry per look-alike link: { domain, outlet, official, how, named, reports }, where named says
+// the post's own words name the copied outlet and reports lists the operations that named the
+// address. An empty list when no link is a look-alike.
+function clonedCitations(text, domains) {
+  const out = [], seen = new Set();
+  for (const d of domains || []) {
+    const host = String(d || "").toLowerCase().replace(/^www\./, "");
+    if (seen.has(host)) continue;
+    seen.add(host);
+    const h = lookalikeOf(host);
+    if (!h) continue;
+    const reports = [...new Map(opsOfDomain(host).filter((x) => x.op).map((x) => [x.op.id, x.op.name])).values()];
+    out.push({ domain: host, outlet: h.outlet, official: h.official, how: h.how, named: namesOutlet(text, h.outlet, h.official), reports });
+  }
+  return out;
+}
+
+const CLONED_DOES_NOT_PROVE = "People quote an outlet by name and paste whatever link they were sent, and some share a copy to warn others. This shows the words and the address disagree, not who made the copy or why the post links it.";
+
+return { namesOutlet, clonedCitations, CLONED_DOES_NOT_PROVE };
 })();
 
 // ---- trail.js
@@ -4988,6 +5131,50 @@ function floodSign(rows, rateOf, { bursts = [] } = {}) {
 }
 
 return { FLOOD_MIN_ACCOUNTS, FLOOD_DOES_NOT_PROVE, ratePerDay, floodSign };
+})();
+
+// ---- swarming.js
+const M_swarming = (() => {
+// The swarming sign (project-docs/TECHNIQUES.md, technique 7; DISARM T0049.005 Conduct Swarming and
+// T0048 Harass). Rauch describes trolling as a pile-on that manufactures a crowd. In one thread Radar
+// can see one trace of it: many new or flagged accounts converging on one post within minutes.
+// The sign is about the thread, never about an account: it carries counts only, no handles, so it
+// cannot become a list to pile on in turn (DESIGN-MAP R12). Thresholds were set on the dev half of
+// PHEME and read once on the test half (scripts/techniques-baselines.mjs).
+
+const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN_KNOWN = 8;
+const SWARM_DOES_NOT_PROVE = "A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once, and nobody has to organise it. This describes how the replies arrived, not who sent them or why.";
+
+// rows: [{ author, posted }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
+// null when Radar has not read the account. Returns null or { from, to, accounts, known, marked,
+// newAccounts, flagged, windowSec } for the densest window.
+function swarmSign(rows, markOf, { windowSec = SWARM_WINDOW_SEC } = {}) {
+  const xs = (rows || []).map((r) => ({ a: String(r.author || "").toLowerCase(), t: Date.parse(r.posted) })).filter((r) => r.a && Number.isFinite(r.t)).sort((p, q) => p.t - q.t);
+  let best = null;
+  for (let i = 0, j = 0; i < xs.length; i++) {
+    while (xs[i].t - xs[j].t > windowSec * 1000) j++;
+    const w = windowStats(xs.slice(j, i + 1), markOf);
+    if (w.known < SWARM_MIN_KNOWN || w.marked < SWARM_MIN || w.marked / w.known < SWARM_SHARE) continue;
+    if (!best || w.marked > best.marked) best = { from: new Date(xs[j].t).toISOString(), to: new Date(xs[i].t).toISOString(), ...w, windowSec };
+  }
+  return best;
+}
+
+function windowStats(win, markOf) {
+  const seen = new Map();
+  for (const r of win) if (!seen.has(r.a)) seen.set(r.a, markOf(r.a, r.t));
+  let known = 0, marked = 0, fresh = 0, flagged = 0;
+  for (const m of seen.values()) {
+    if (!m) continue;
+    known++;
+    if (m.new || m.flagged) marked++;
+    if (m.new) fresh++;
+    if (m.flagged) flagged++;
+  }
+  return { accounts: seen.size, known, marked, newAccounts: fresh, flagged };
+}
+
+return { SWARM_WINDOW_SEC, SWARM_DOES_NOT_PROVE, swarmSign };
 })();
 
 // ---- chain.js
@@ -6416,16 +6603,18 @@ const M_feed = (() => {
 const { wilson } = M_report;
 const { shownTechniques } = M_persuasion;
 const { coGraph } = M_graph;
+const { framingShown, framingStatus } = M_framing;
 
 const FEED_RETAIN_DAYS = 60, FEED_MAX_IDS = 3000;
 const DAY = 86400000;
 const dayOf = (t) => new Date(t).toISOString().slice(0, 10);
 
-// posts: [{ id, domains, strong, note, claims, techniques }]. Log: { "site|day": entry }.
+// posts: [{ id, domains, strong, note, claims, techniques, frame }]. frame: "person-story",
+// "structural", "mixed", "none" (long enough, neither) or absent (too short). Log: { "site|day": entry }.
 function addFeedPosts(log, site, posts, now = Date.now()) {
   const L = { ...(log || {}) };
   const key = `${site}|${dayOf(now)}`;
-  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {} };
+  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques }, frames: { ...(L[key].frames || {}) } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {}, frames: {} };
   const have = new Set(e.ids);
   for (const p of posts) {
     if (!p || !p.id || have.has(p.id) || e.ids.length >= FEED_MAX_IDS) continue;
@@ -6436,6 +6625,7 @@ function addFeedPosts(log, site, posts, now = Date.now()) {
     if (p.claims) e.claims++;
     for (const d of new Set(p.domains || [])) e.links[d] = (e.links[d] || 0) + 1;
     for (const t of new Set(p.techniques || [])) e.techniques[t] = (e.techniques[t] || 0) + 1;
+    if (p.frame) e.frames[p.frame] = (e.frames[p.frame] || 0) + 1;
   }
   e.at = now;
   L[key] = e;
@@ -6462,12 +6652,12 @@ const add = (m, k, n) => m.set(k, (m.get(k) || 0) + n);
 
 // reports: history snapshots; feedLog: addFeedPosts log; net: connections log.
 // opts: { days, now, isState(domain), shown: technique ids the window may show }.
-function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isState = () => false, shown = shownTechniques() } = {}) {
+function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isState = () => false, shown = shownTechniques(), framingRow } = {}) {
   const since = now - days * DAY;
   const snaps = Object.values(reports || {}).filter((s) => s && s.at >= since);
   const feeds = Object.values(feedLog || {}).filter((f) => f && f.at >= since);
   const T = { strongK: 0, strongN: 0, ctxK: { notes: 0, claims: 0 }, ctxN: 0, looked: 0, flagged: 0 };
-  const sites = new Map(), tech = new Map(), daily = dailyFrame(days, now);
+  const sites = new Map(), tech = new Map(), frames = new Map(), daily = dailyFrame(days, now);
   for (const s of snaps) {
     T.looked += s.lookedUp || 0; T.flagged += s.flaggedK || 0;
     if (s.strong != null) { T.strongK += s.strong; T.strongN += s.replies || 0; }
@@ -6482,6 +6672,7 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
     T.strongK += f.strong; T.strongN += f.posts; T.ctxN += f.posts; T.ctxK.notes += f.notes; T.ctxK.claims += f.claims;
     for (const [d, n] of Object.entries(f.links || {})) add(sites, d, n);
     for (const [t, n] of Object.entries(f.techniques || {})) add(tech, t, n);
+    for (const [t, n] of Object.entries(f.frames || {})) add(frames, t, n);
     dayAdd(daily, f.at, { posts: f.posts, strong: f.strong, strongN: f.posts, feedPosts: f.posts });
   }
   const mentions = [...sites.values()].reduce((a, b) => a + b, 0);
@@ -6496,9 +6687,21 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
     flagged: share(T.flagged, T.looked),
     notes: count(T.ctxK.notes, T.ctxN), claims: count(T.ctxK.claims, T.ctxN),
     techniques: { shown: [...shown], counts: [...tech].filter(([t]) => shown.includes(t)).map(([id, n]) => ({ id, n })).sort((a, b) => b.n - a.n) },
+    framing: framingBalance(frames, framingRow),
     together: coGraph(net, { min: 3, since, maxNodes: 40 }).edges.slice(0, 10),
     daily: [...daily.values()],
   };
+}
+
+// The episodic and thematic balance: of feed posts long enough to read, the share told only through
+// a person's story and the share explained only through structure (trends, numbers, policy), each
+// with its Wilson interval. Held back, with its reason and no counts, until the person-story reading
+// clears its measurement (src/core/framing.js).
+function framingBalance(frames, row) {
+  const status = row === undefined ? framingStatus() : framingStatus(row);
+  if (!(row === undefined ? framingShown() : framingShown(row))) return { shown: false, status: status.text };
+  const g = (k) => frames.get(k) || 0, n = g("person-story") + g("structural") + g("mixed") + g("none");
+  return { shown: true, status: status.text, read: n, personStory: share(g("person-story"), n), structural: share(g("structural"), n), mixed: share(g("mixed"), n) };
 }
 
 function dailyFrame(days, now) {
@@ -7161,6 +7364,7 @@ const FAMILIES = [
   ["same-upload", "Same upload, many accounts", "coordination", D], ["duplicates", "Same text as other replies", "coordination", D],
   ["copied-elsewhere", "Same words in other threads", "coordination", D],
   ["cross-language", "Same link or upload in several languages", "coordination", D],
+  ["person-story", "One person's story, no wider picture", "language", D],
   ["laundered", "Material passed through other accounts", "sources", D],
   ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
   ["state-link", "State link", "sources", T], ["named-in-report", "Named in a published report", "sources", T],
@@ -7521,5 +7725,5 @@ function fromImage(signal, result) {
 return { IMAGE_TEXT_NOTE, IMAGE_TEXT_OFF, IMAGE_TEXT_DOES_NOT_PROVE, imageTextModel, imageTextRows, fromImage };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_trail, ...M_crosslang, ...M_flooding, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext });
 })();
