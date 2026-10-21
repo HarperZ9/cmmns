@@ -96,7 +96,7 @@
     const ages = read.map((r) => r.joinDate && PB.ageDays(r.joinDate)).filter((x) => x != null).sort((a, b) => a - b);
     const places = {};
     for (const r of read) if (r.basedIn) places[r.basedIn] = (places[r.basedIn] || 0) + 1;
-    const thread = { n: read.length, medianAgeDays: ages.length ? ages[Math.floor(ages.length / 2)] : null, places, flagged: read.filter((r) => r.flags && PB.isFlagged(r.flags)).length };
+    const thread = { feed: !!feed, n: read.length, medianAgeDays: ages.length ? ages[Math.floor(ages.length / 2)] : null, places, flagged: read.filter((r) => r.flags && PB.isFlagged(r.flags)).length };
     for (const [, model] of models) model.thread = thread;
     drawn = models;
     drawVisible();

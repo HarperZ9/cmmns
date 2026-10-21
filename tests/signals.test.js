@@ -82,7 +82,18 @@ test("overview groups signals by area; comparison needs five accounts read", () 
   const secs = PBCard.sections({ ...base, thread: { n: 20, medianAgeDays: 2400, places: { France: 12 }, flagged: 3 } }, sig, null);
   assert.deepEqual(secs.filter((s) => s.area).map((s) => s.area), ["account", "posting"]);
   const cmp = secs.find((s) => s.title === "Compared with this thread").rows.map(([h, t]) => `${h}: ${t}`).join(" | ");
-  assert.match(cmp, /11 days; the thread's median is 2,400/);
-  assert.match(cmp, /12 of 20 accounts read here are labelled France/);
+  assert.match(cmp, /11 days; the median in this thread is 2,400/);
+  assert.match(cmp, /12 of 20 accounts read in this thread are labelled France/);
   assert.deepEqual(PBCard.sections({ ...base, thread: { n: 3, medianAgeDays: 1, places: {}, flagged: 0 } }, sig, null).find((s) => s.title === "Compared with this thread").rows, []);
+});
+
+// A home or search timeline is not a conversation: live check 2026-10-21 showed "the thread's
+// median" in the window on x.com/home.
+test("on a feed the comparison speaks of the page, not a thread", () => {
+  const base = { site: X, handle: "a", markers: [], machine: {}, flags: [], reading: { joinDate: "2020-01-01", basedIn: "France" } };
+  const secs = PBCard.sections({ ...base, thread: { feed: true, n: 20, medianAgeDays: 2400, places: { France: 2 }, flagged: 3 } }, [], null);
+  const sec = secs.find((s) => s.title === "Compared with this page");
+  const text = sec.rows.map(([h, t]) => `${h}: ${t}`).join(" | ");
+  assert.match(text, /median on this page/);
+  assert.doesNotMatch(text, /thread/);
 });
