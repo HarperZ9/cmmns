@@ -40,6 +40,23 @@ were not published to a store.
   Roozenbeek and van der Linden 2019; Basol et al. 2020 and 2021; Maertens et al. 2021;
   Roozenbeek et al. 2022 (Science Advances); and the replications Modirrousta-Galian and Higham
   2023, Graham et al. 2023, Seabrooke et al. 2025 and Modirrousta-Galian et al. 2026.
+- "Your feed": a local page, opened from the toolbar popup, of what your feeds and threads carried
+  over the last 7, 30 or 60 days. Sites linked most with their owners, the share of links to
+  state-linked sites, the share of posts and replies with strong rhetoric signs, persuasion
+  techniques (only those that passed their measurement; none yet), the flagged-account share,
+  Community Notes and fact-check matches seen, and accounts that keep appearing together with
+  links to the threads. Every share shows its count, denominator and 95% interval. It says what
+  it does not show, keeps to your retention setting, and makes no network request. No streaks,
+  badges or notifications.
+- Coordination graph on the history page: accounts that replied in two or more of the same threads,
+  as a small force layout with each link labelled by its count. Tab reaches every account; Enter
+  or a click lists the threads behind each link. A table holds the same pairs and threads. 500
+  accounts draw in about 0.1 s.
+- Thread cards: "Save card" in the thread panel opens a card to read, then save or share as a PNG
+  and a JSON with a SHA-256 hash of its content. A card carries the thread report, fact-check
+  matches, linked sites, upload reuse and the Content Credentials states of any files you checked,
+  its sources and what it does not prove. It names no
+  account and is refused for threads with fewer than five reply accounts.
 - Persuasion techniques: span-level cues for eleven techniques from the SemEval-2020 Task 11 and
   SemEval-2023 Task 3 taxonomy (loaded language, name calling, bandwagon, appeal to fear,
   flag-waving, thought-terminating cliche, whataboutism, black-and-white fallacy, doubt, appeal to
@@ -74,6 +91,10 @@ were not published to a store.
 - The fact-check table ships in two files, each under 5 MB, so Firefox's add-on checks can read it.
   The rows are unchanged.
 - The manifest description leads with what Radar is: free, no account, nothing leaves your browser.
+
+### Fixed
+- The history page read the connections log under its old key, so "Accounts that keep appearing"
+  could be empty or stale, and the retention setting did not prune the current log.
 
 ## 1.0.0 (2026-10-21)
 

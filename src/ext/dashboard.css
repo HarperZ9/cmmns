@@ -1,0 +1,34 @@
+/* "Your feed" and the thread card page, on top of pages.css: ink on a calm ground, figures in the
+   monospace, bars in ink. No colour carries meaning here except text. */
+main.wide { max-width: 860px; }
+.window { display: flex; gap: 8px; margin: 20px 0 8px; }
+.window button { padding: 7px 16px; }
+.window button[aria-pressed="true"] { color: var(--ground); background: var(--ink); }
+.bars { display: grid; gap: 8px; margin-top: 8px; }
+.bar { display: grid; grid-template-columns: minmax(120px, 34%) 1fr 4.5em; gap: 12px; align-items: center; }
+.bar .name { overflow-wrap: anywhere; }
+.bar .name small { display: block; color: var(--muted); font-size: 0.8em; }
+.bar .track { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
+.bar .fill { display: block; height: 100%; background: var(--ink); min-width: 2px; }
+.bar .n { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.share { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin: 4px 0 8px; }
+.share .track { height: 14px; background: var(--line); border-radius: 7px; position: relative; overflow: hidden; }
+.share .fill { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
+.share .ci { position: absolute; top: 2px; bottom: 2px; border-left: 1.5px solid var(--muted); border-right: 1.5px solid var(--muted); }
+.share .n { font-family: var(--mono); font-size: 0.9em; }
+.small { font-size: 0.875em; margin: 16px 0 0; }
+.days { display: flex; align-items: flex-end; gap: 3px; height: 72px; margin: 8px 0 8px; border-bottom: 1px solid var(--line); }
+.days i { flex: 1; background: var(--ink); min-height: 1px; border-radius: 2px 2px 0 0; }
+.days i.none { background: var(--line); }
+details { margin-top: 8px; }
+summary { cursor: pointer; color: var(--muted); }
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.limit { border-left: 3px solid var(--ink); padding-left: 14px; }
+.empty { color: var(--muted); }
+/* The card page */
+.card-view canvas { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--raised); }
+.card-lines { margin-top: 20px; }
+.card-lines .head { font-weight: 700; margin-top: 16px; }
+.card-lines .small, .card-lines .meta, .card-lines .hash { color: var(--muted); font-size: 0.875em; overflow-wrap: anywhere; }
+.card-lines .hash { font-family: var(--mono); }
+@media (max-width: 640px) { .bar { grid-template-columns: 1fr 3.5em; } .bar .track { grid-column: 1 / -1; grid-row: 2; } }

@@ -38,3 +38,14 @@ test("an empty history summarises to zeros, not errors", () => {
   assert.equal(s.flaggedShare, null);
   assert.deepEqual(s.funnel.accounts, []);
 });
+
+test("snapshots keep the feed dashboard's fields when the report has them, and null when not", () => {
+  const s = snapshot("t", "X", rep({ strong: { n: 3, of: 20 }, techniques: { "loaded-language": 1 }, context: { posts: 21, notes: 1, claims: 2, links: [{ domain: "a.example", n: 2 }] } }), 1);
+  assert.equal(s.strong, 3);
+  assert.deepEqual(s.techniques, { "loaded-language": 1 });
+  assert.deepEqual(s.context, { posts: 21, notes: 1, claims: 2, links: [{ domain: "a.example", n: 2 }] });
+  const old = snapshot("t", "X", rep(), 1);
+  assert.equal(old.strong, null);
+  assert.equal(old.techniques, null);
+  assert.equal(old.context, null);
+});

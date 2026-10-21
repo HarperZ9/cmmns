@@ -15,6 +15,7 @@
       onMessage: { addListener: (f) => listeners.push(f) },
       sendMessage: async (msg) => {
         if (msg.type === "pb-owners" || msg.type === "pb-state") return [];
+        if (msg.type === "pb-card-open") { globalThis.FIXTURE_CARD = msg.built; return; }
         if (msg.type !== "pb-lookup") return;
         for (const [i, h] of msg.handles.entries()) {
           setTimeout(async () => {

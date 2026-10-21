@@ -40,6 +40,7 @@ function claimIndex() {
   return claimsReady;
 }
 
+const cards = {};   // fallback where storage.session is missing
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.type === "pb-claims") {
     claimIndex().then((index) => {
@@ -63,6 +64,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       sendResponse(hit);
     });
     return true;   // answer asynchronously
+  }
+  // A thread card from a content script: kept for this session only, then shown on card.html.
+  if (msg && msg.type === "pb-card-open") {
+    const id = String(Date.now());
+    const put = chrome.storage.session ? chrome.storage.session.set({ ["pb.card." + id]: msg.built }) : Promise.resolve((cards[id] = msg.built));
+    put.then(() => chrome.tabs.create({ url: chrome.runtime.getURL("card.html#" + id) })).catch((e) => console.error("[radar] could not open the card", e));
+  }
+  if (msg && msg.type === "pb-card-get") {
+    const key = "pb.card." + msg.id;
+    (chrome.storage.session ? chrome.storage.session.get(key).then((g) => g[key]) : Promise.resolve(cards[msg.id])).then((c) => sendResponse(c || null));
+    return true;
   }
   if (msg && msg.type === "pb-lookup" && sender.tab) {
     for (const h of msg.handles || []) if (!queue.some((q) => q.handle === h)) queue.push({ handle: h, replyTo: sender.tab.id });
