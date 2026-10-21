@@ -73,6 +73,8 @@ const RE = {
   warOn: new RegExp(`\\b(?:declare|declaring|wage|waging|start)\\s+(?:a\\s+)?(?:holy\\s+)?war\\s+(?:on|against)\\s+(?:the\\s+)?(?:${G})\\b`, "i"),
   vigilante: word(L.VIGILANTE),
   slur: edged(L.SLURS),
+  // "<identity> bitch", "<identity> whores": a gendered slur fused with an identity word
+  slurCompound: new RegExp(`\\b(?:${alt(L.IDENTITY_ADJ)})\\s+(?:ass\\s+)?(?:${alt(L.GENDERED_SLURS)})\\b`, "i"),
   slurSoft: word(L.SLURS_SOFT),
   stereotype: new RegExp(`\\b(?:${G})\\s+(?:are|is)\\s+(?:all\\s+|just\\s+|nothing but\\s+|such\\s+)?${INTENSE}(?:${alt(L.STEREOTYPE_TRAITS)})\\b|\\btypical\\s+(?:${G})\\b`, "i"),
   motive: new RegExp(`\\b(?:${G})\\s+(?:want|wants|are trying|plan|are planning|intend)\\s+to\\s+(?:${alt(L.MOTIVE_VERBS)})\\b|\\b(?:they|${G})\\s+(?:all\\s+)?hate\\s+(?:${alt(L.HATRED_OBJECTS)})\\b`, "i"),
@@ -133,7 +135,8 @@ function scoreEnglish(s, hit) {
     if (!hit("violence", RE.deathTo) && !hit("violence", RE.helicopterFor)) hit("violence", RE.violenceSlogan);
   }
   hit("vigilante", RE.vigilante);
-  if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)) hit("slurSoft", RE.slurSoft);
+  if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)
+    && !hit("slur", RE.slurCompound)) hit("slurSoft", RE.slurSoft);
   hit("stereotype", RE.stereotype, true);
   hit("motive", RE.motive, true);
   hit("essentialise", RE.essentialise, true);

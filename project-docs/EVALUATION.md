@@ -22,7 +22,7 @@ Precision comes first: a badge on a real person's honest reply is the main harm.
 The split is fixed (seed `radar-eval-2026-10-21`, about 50/50 per corpus). Every lexicon and
 grammar change was tuned on dev. Test was read once, after tuning.
 
-## Results (test split, 2026-10-21, with the Spanish, German, Portuguese and Italian grammars merged)
+## Results (test split, 2026-10-21, with the Spanish, German, Portuguese and Italian grammars and the side-recall terms merged)
 "P(hostile)" is the share of marker hits on text the annotators judged hostile to a group. The
 pooled figure combines Measuring Hate Speech (MHS), HateXplain and Civil Comments. The range runs
 from the lowest to the highest corpus with at least 20 hits. "P(item)" and "R(item)" use MHS's own
@@ -33,10 +33,10 @@ survey item for that family. Intervals are Wilson 95%.
 | dehumanise | 92.3% (36/39; 79.7 to 97.3) | under 20 hits in each corpus | 57.9% (11/19; 36.3 to 76.9) | 0.2% (11/5,046; 0.1 to 0.4) |
 | violence | 87.5% (77/88; 79.0 to 92.9) | MHS 96.7% (59/61); Civil 3/9 | 63.9% (39/61; 51.4 to 74.8) | 2.1% (39/1,819; 1.6 to 2.9) |
 | vigilante | 2 of 3 hits | not measured (3 hits) | no item | no item |
-| slur | 91.8% (3,682/4,009; 91.0 to 92.7) | Civil 35.5% (11/31) to MHS 96.0% | no item | not measured |
+| slur | 91.0% (3,995/4,392; 90.1 to 91.8) | Civil 34.0% (16/47) to MHS 95.3% | no item | not measured |
 | stereotype | 83.3% (80/96; 74.6 to 89.5) | MHS 91.7% (66/72); Civil 3/9 | 70.8% (51/72; 59.5 to 80.1) | 0.6% (51/8,368; 0.5 to 0.8) |
-| any strong family | 91.5% (3,839/4,197; 90.6 to 92.3) | Civil 34.6% (18/52) to MHS 95.6% | | |
-| slurSoft (weak) | 66.6% (908/1,363; 64.1 to 69.1) | Civil 20.6% to MHS 91.9% | | |
+| any strong family | 90.7% (4,150/4,578; 89.8 to 91.5) | Civil 33.8% (23/68) to MHS 95.0% | | |
+| slurSoft (weak) | 65.5% (837/1,278; 62.8 to 68.0) | Civil 20.3% to MHS 91.7% | | |
 | contempt (weak, new) | 92.0% (92/100; 85.0 to 95.9) | HateXplain 93.1%, MHS 91.4% | | |
 | motive (weak) | 72.5% (29/40; 57.2 to 83.9) | MHS 81.8% (18/22) | | |
 | essentialise (weak) | 57.8% (59/102; 48.1 to 67.0) | Civil 25.8% to HateXplain 75.0% | | |
@@ -46,9 +46,9 @@ survey item for that family. Intervals are Wilson 95%.
 Strong families (dehumanise, violence, vigilante, slur, stereotype) label the post. Weak ones only
 count toward "extreme".
 
-**Report "extreme"** (`EXTREME_AT` = 2). Against MHS `hate_speech_score > 0.5`: precision 72.6%
-(794/1,093; 69.9 to 75.2), recall 15.2% (794/5,224; 14.3 to 16.2). Against HateXplain's majority
-"hatespeech": precision 61.9% (1,897/3,063; 60.2 to 63.6), recall 62.9% (1,897/3,016; 61.2 to 64.6).
+**Report "extreme"** (`EXTREME_AT` = 2). Against MHS `hate_speech_score > 0.5`: precision 70.3%
+(896/1,275; 67.7 to 72.7), recall 17.2% (896/5,224; 16.2 to 18.2). Against HateXplain's majority
+"hatespeech": precision 60.1% (1,950/3,246; 58.4 to 61.7), recall 64.7% (1,950/3,016; 62.9 to 66.3).
 Civil Comments has no usable severity label.
 
 **French (MLMA).** 9 strong hits in the test split, 8 of them hostile. The French grammar is not
@@ -63,46 +63,75 @@ was built. They show that the detectors follow their rules. They are not error r
 ### What the numbers do not prove
 - **Precision.** The corpora come from Reddit, Twitter, Gab, YouTube and news comments, several
   years old. Two of them were sampled to be rich in hate speech (about 61% hostile). On Civil
-  Comments, where 8% of comments are hostile, about a third of strong labels fell on text the raters
+  Comments, where 8% of comments are hostile, about a third of strong labels (23 of 68) fell on text the raters
   called toxic. Real reply threads sit somewhere between. Some Civil "false positives" are quoted or
-  ironic uses that raters scored below 0.5, so 35% is a floor more than a point estimate.
+  ironic uses that raters scored below 0.5, so 34% is a floor more than a point estimate.
 - **Recall.** Radar is a hand-built lexicon and grammar. It finds a small share of hostile text: MHS
   item recall is under 3% for every family. A thread with no markers is not a clean thread.
 - **Weak families.** Conspiracy, absolutist and essentialise describe framing, which these corpora
   do not label. Their figures against hostility labels are context, not error rates.
-- **Extreme.** The thread report is only as good as "extreme". At 15% recall on MHS, most severe
+- **Extreme.** The thread report is only as good as "extreme". At 17% recall on MHS, most severe
   replies do not count as extreme.
 - **Synthetic.** The duplicate and mismatch figures come from cases written alongside the rules. No
   person other than the rules' author, and no model, labelled them.
 
-## Side comparison: an open defect
+## Side comparison: closed on HateXplain, open on MHS
 Strong-family recall and precision on hostile text aimed at each side's usual targets (test split;
-group lists in `evidence/CORPORA.md`):
+group lists in `evidence/CORPORA.md`). "Before" is the release with the four language grammars;
+"after" adds the side-recall terms below. Intervals are Wilson 95%.
 
-| Corpus | Right-targets recall | Left-targets recall | Right-targets precision | Left-targets precision |
-|---|---|---|---|---|
-| MHS | 9.3% (702/7,584; 8.6 to 9.9) | 4.3% (107/2,499; 3.6 to 5.1) | 96.2% (702/730; 94.5 to 97.3) | 93.9% (107/114; 87.9 to 97.0) |
-| HateXplain | 43.2% (1,814/4,197; 41.7 to 44.7) | 18.3% (46/251; 14.0 to 23.6) | 98.1% (1,814/1,849; 97.4 to 98.6) | 100% (46/46; 92.3 to 100) |
+| Corpus | | Right-targets recall | Left-targets recall | Right-targets precision | Left-targets precision |
+|---|---|---|---|---|---|
+| MHS | before | 9.3% (702/7,584; 8.6 to 9.9) | 4.3% (107/2,499; 3.6 to 5.1) | 96.2% (702/730; 94.5 to 97.3) | 93.9% (107/114; 87.9 to 97.0) |
+| MHS | after | 10.1% (765/7,584; 9.4 to 10.8) | 7.9% (198/2,499; 6.9 to 9.0) | 95.6% (765/800; 94.0 to 96.8) | 93.8% (198/211; 89.7 to 96.4) |
+| HateXplain | before | 43.2% (1,814/4,197; 41.7 to 44.7) | 18.3% (46/251; 14.0 to 23.6) | 98.1% (1,814/1,849; 97.4 to 98.6) | 100% (46/46; 92.3 to 100) |
+| HateXplain | after | 45.2% (1,895/4,197; 43.7 to 46.7) | 43.4% (109/251; 37.4 to 49.6) | 98.0% (1,895/1,933; 97.3 to 98.6) | 97.3% (109/112; 92.4 to 99.1) |
 
-Precision agrees across sides within the intervals. **Recall does not.** Radar finds hostility aimed
-at white people, men, Christians and conservatives at about half the rate of hostility aimed at the
-right's usual targets. The thread report will undercount extreme replies in a thread hostile to the
-first group.
+The rule for "closed": the side intervals overlap and the point estimates sit within a factor of
+1.25. **HateXplain: closed.** Recall is 45.2% against 43.4% (ratio 1.04), and the intervals overlap.
+**MHS: not closed.** Left-target recall nearly doubled, from 4.3% to 7.9%, but right-target recall is
+still 1.28 times higher, and the intervals (9.4 to 10.8 against 6.9 to 9.0) do not touch. Precision
+agrees across sides within the intervals, before and after.
 
-The slur family causes it. Without slurs, the grammar families find 0.9% (65/7,584) of right-target
-hostility against 1.9% (47/2,499) of left-target hostility on MHS. That is a smaller gap in the other
-direction, and it is also a defect. On HateXplain they find 0.6% against 0% (0/251). Hostility aimed
-at minorities uses established slurs more often, and the lexicon holds more of them. Per-group
-recall is in `evidence/eval-results.json` (for example MHS race_black 11.8%, race_white 5.9%,
-sexuality_gay 29.6%, religion_christian 1.9%, religion_muslim 2.8%).
+What still drives the MHS gap: two slurs, aimed at gay and Black people, account for most strong
+hits on right-target text (MHS dev before this change: sexuality_gay recall 31.5%, race_black 10.7%, gender_women 1.9%). Hostility at the
+left's usual targets in MHS is mostly profanity and personal insult beside a group word, with no
+slur and no group grammar (read on dev; no corpus text is quoted here), and the documented vocabulary aimed
+at Christians, straight people and conservatives is thin and rare in these corpora. Without slurs,
+the grammar families find 0.9% of right-target and 1.9% of left-target hostility on MHS, so the
+grammar runs the other way. The thread report will still undercount extreme replies in an MHS-like
+thread hostile to white people, men, Christians or conservatives, by about a fifth relative to the
+other side.
 
-Changes made on dev to address it: group terms from both sides; a declared-contempt grammar ("I hate
-X", "fuck all the X") as a weak family, the same for every target; death-wish and genocide calls;
-"cracka" and "white devil" added. On test the gap did not close: MHS left-targets recall moved from
-4.4% to 4.3%, and HateXplain stayed at 18.3%. The defect stays open until a change closes it on dev
-and the test split confirms it. The likely next step is a human-reviewed list of slurs and coded
-insults aimed at the left's usual targets, and a check that the grammar gap on MHS is not an
-artefact of the side lists.
+### What was added (tuned on dev, read on test once)
+Sources for every term: `evidence/LEXICON-SOURCES.md`, section "English terms added for side recall".
+- Slurs: white trash (moved up from the weak list), trailer trash, wigger, whigger, mudshark, cuck,
+  cuckservative, soyboy, soy boy, Bible thumper, fundie, Christofascist, papist, Christard.
+- Grammar: an identity word fused with a gendered slur ("white bitch", "black hoes", "christian
+  whores"), the same fifteen identity words for every direction.
+- Group names: incels, and political coinages from both directions (trumptards, trumpanzees,
+  rethuglicans, repugnicans, demonrats), so "X are vermin" reads alike whatever X is. Political
+  coinages stay group names, not slurs: on Civil dev "libtard" sat on toxic text 4 times in 21 and
+  "trumptard" 2 in 6, under the 75% upper-bound rule below. Both directions are treated the same.
+- Each new term passed the demotion rule on dev, pooled across MHS, HateXplain and Civil: the upper
+  95% bound of its precision is at or above 75%. "white trash" pooled 76/93; "trailer trash" 18/29,
+  the closest to the line.
+- Considered and left out: redneck and hillbilly (Civil dev 1/10 and 3/12; both are also
+  self-names), cracker (food), honky (already demoted), beta male (no derogatory label in the
+  dictionary checked), "X are idiots" as a stereotype trait (3 more hits on dev, Civil 2/3).
+
+Precision on Civil, where 8% of comments are hostile: strong-family precision went from 34.6%
+(18/52) to 33.8% (23/68), within the interval. The new terms added 16 strong labels on Civil test,
+5 of them on toxic text.
+
+### Considered and not shipped: mobilising to punish speech
+A stance-neutral family for calls to get someone fired, dox them, find where they work or
+mass-report an account ("get him fired", "everyone report this account"). None of the four corpora
+labels it. On dev, the narrow phrases matched 4 items in 78,575, one of them a request to report an
+account that threatens rape, which is the control case such a family must not flag. "Should be
+fired" matched 21 Civil comments, almost all about officials, coaches and police doing their jobs,
+which is accountability, not punishment for speech. There is no evidence for its precision, so it is
+not in the extension. Status: not measured.
 
 ## Changes tuned on dev (2026-10-21)
 - Reported speech ("he called X vermin", "compared X to rats") and quoted words are mentions, not

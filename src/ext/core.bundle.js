@@ -555,7 +555,8 @@ const M_lexicon = (() => {
 // Radar's word lists, kept apart from the matching code so they can be reviewed and updated in
 // one place. Every list covers targets in every direction; tests/rhetoric.symmetry.test.js holds
 // the scoring to equal treatment. Sources for slurs and coded terms: the ADL Hate Symbols
-// database, Hatebase, GNET and ISD extremism glossaries. Words that people also use innocently
+// database, Hatebase, GNET and ISD extremism glossaries; terms added for side recall on 2026-10-21 cite
+// Wiktionary labels in project-docs/evidence/LEXICON-SOURCES.md. Words that people also use innocently
 // (a jogger, crackers, gypsy as a self-name) go in the SOFT lists, which count for less.
 
 // People named as groups. Matching any of these lets the grammar rules ("X are vermin",
@@ -581,6 +582,9 @@ const GROUPS = [
   "evangelicals", "catholics", "white men", "white women", "black men", "black women", "straight people", "straights",
   "gay people", "gay men", "queers", "jewish people", "muslim people", "christian people", "caucasians", "white kids",
   "black kids", "white guys", "black guys", "white girls", "black girls", "hillbillies", "arab people", "asian people",
+  // added 2026-10-21 for the side-recall fix (project-docs/evidence/LEXICON-SOURCES.md): a self-named group, and
+  // political coinages from both directions, so the grammar reads "trumptards are scum" like "libtards are scum"
+  "incels", "trumptards", "trumpanzees", "rethuglicans", "repugnicans", "demonrats", "conservatards",
 ];
 
 // The dehumanising nouns that stay unambiguous right after a group ("commie filth", "migrant rats").
@@ -673,6 +677,13 @@ const SLURS = [
   "redskin", "redskins", "injun", "injuns", "squaw", "gyppo", "gyppos",
   // anti-white
   "whitey", "cracka", "crackas", "white devil", "peckerwood", "white devils", "kill all whites",
+  // added 2026-10-21 (side-recall fix; sources in project-docs/evidence/LEXICON-SOURCES.md)
+  "white trash", "trailer trash", "wigger", "wiggers", "whigger", "whiggers", "mudshark", "mudsharks",
+  // anti-Christian and anti-Catholic
+  "bible thumper", "bible thumpers", "bible-thumper", "bible-thumpers", "fundie", "fundies", "christofascist", "christofascists",
+  "papist", "papists", "christard", "christards",
+  // aimed at men and at conservatives
+  "cuck", "cucks", "cuckservative", "cuckservatives", "soyboy", "soyboys", "soy boy", "soy boys",
   // anti-LGBTQ
   "faggot", "faggots", "tranny", "trannies", "troon", "troons", "shemale", "shemales", "poofter",
   // disability
@@ -690,9 +701,15 @@ const SLURS_DEMOTED = ["honky", "honkies", "honkey", "dindu", "dindu nuffin"];
 
 const SLURS_SOFT = [...SLURS_DEMOTED, "leftoid", "leftoids", "rightoid", "rightoids", "leftards", "conservatards", "suicidal empathy", "woke mind virus", "mind virus", "w0keism", "wokeism", "the fatigue is real", "fatigue is real", "jogger", "joggers", "cracker", "crackers", "groomers",
   "religion of peace", "it's always them", "its always them", "thug", "thugs", "ghetto", "illegals", "dyke", "dykes", "thot",
-  "thots", "fag", "fags", "cripple", "cripples", "white trash", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
+  "thots", "fag", "fags", "cripple", "cripples", "gypsy", "gypsies", "jap", "japs", "spook", "spooks", "uppity"];
 
 // Disguised spellings: "n1gg3r", "f@g", "k1ke". Applied before slur matching only.
+// "<identity> bitch", "<identity> whores": a gendered slur fused with an identity word. The same
+// identity words for every direction (tests/rhetoric.symmetry.test.js).
+const IDENTITY_ADJ = ["white", "black", "asian", "mexican", "jewish", "arab", "muslim", "latina", "latino", "brown",
+  "indian", "chinese", "gay", "christian", "hispanic"];
+const GENDERED_SLURS = ["bitch", "bitches", "hoe", "hoes", "whore", "whores", "slut", "sluts", "cunt", "cunts"];
+
 const LEET = { "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a", "$": "s", "!": "i" };
 
 // "They hate beauty / us / the West": a hatred put in a whole group's mouth (counts as motive).
@@ -703,7 +720,7 @@ const HATRED_OBJECTS = ["beauty", "us", "the west", "western civilization", "our
 // little on its own, and it never labels the post.
 const CONTEMPT_VERBS = ["hate", "despise", "loathe", "can't stand", "cant stand"];
 
-return { GROUPS, DEHUMANISE_ADJACENT, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, SLURS_DEMOTED, SLURS_SOFT, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
+return { GROUPS, DEHUMANISE_ADJACENT, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, SLURS_DEMOTED, SLURS_SOFT, IDENTITY_ADJ, GENDERED_SLURS, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
 })();
 
 // ---- rhetoric-util.js
@@ -1338,6 +1355,8 @@ const RE = {
   warOn: new RegExp(`\\b(?:declare|declaring|wage|waging|start)\\s+(?:a\\s+)?(?:holy\\s+)?war\\s+(?:on|against)\\s+(?:the\\s+)?(?:${G})\\b`, "i"),
   vigilante: word(L.VIGILANTE),
   slur: edged(L.SLURS),
+  // "<identity> bitch", "<identity> whores": a gendered slur fused with an identity word
+  slurCompound: new RegExp(`\\b(?:${alt(L.IDENTITY_ADJ)})\\s+(?:ass\\s+)?(?:${alt(L.GENDERED_SLURS)})\\b`, "i"),
   slurSoft: word(L.SLURS_SOFT),
   stereotype: new RegExp(`\\b(?:${G})\\s+(?:are|is)\\s+(?:all\\s+|just\\s+|nothing but\\s+|such\\s+)?${INTENSE}(?:${alt(L.STEREOTYPE_TRAITS)})\\b|\\btypical\\s+(?:${G})\\b`, "i"),
   motive: new RegExp(`\\b(?:${G})\\s+(?:want|wants|are trying|plan|are planning|intend)\\s+to\\s+(?:${alt(L.MOTIVE_VERBS)})\\b|\\b(?:they|${G})\\s+(?:all\\s+)?hate\\s+(?:${alt(L.HATRED_OBJECTS)})\\b`, "i"),
@@ -1398,7 +1417,8 @@ function scoreEnglish(s, hit) {
     if (!hit("violence", RE.deathTo) && !hit("violence", RE.helicopterFor)) hit("violence", RE.violenceSlogan);
   }
   hit("vigilante", RE.vigilante);
-  if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)) hit("slurSoft", RE.slurSoft);
+  if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)
+    && !hit("slur", RE.slurCompound)) hit("slurSoft", RE.slurSoft);
   hit("stereotype", RE.stereotype, true);
   hit("motive", RE.motive, true);
   hit("essentialise", RE.essentialise, true);
@@ -2961,7 +2981,7 @@ const MEASURED_AT = "2026-10-21";
 const MEASURED = {
   "dehumanise": {"precision":0.923,"low":0.797,"high":0.973,"n":39,"split":"test","recall":0.002,"range":null,"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
   "violence": {"precision":0.875,"low":0.79,"high":0.929,"n":88,"split":"test","recall":0.021,"range":[0.967,0.967],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "slur": {"precision":0.918,"low":0.91,"high":0.927,"n":4009,"split":"test","recall":null,"range":[0.355,0.96],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "slur": {"precision":0.91,"low":0.901,"high":0.918,"n":4392,"split":"test","recall":null,"range":[0.34,0.953],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
   "stereotype": {"precision":0.833,"low":0.746,"high":0.895,"n":96,"split":"test","recall":0.006,"range":[0.917,0.917],"date":"2026-10-21","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
 };
 
@@ -2970,23 +2990,23 @@ const MEASURED_DETAIL = {
  "split": "test",
  "seed": "radar-eval-2026-10-21",
  "extremeAt": 2,
- "extreme": {"precision":{"k":794,"n":1093,"value":0.726,"ci":[0.699,0.752]},"recall":{"k":794,"n":5224,"value":0.152,"ci":[0.143,0.162]},"against":"mhs: hate_speech_score > 0.5","byCorpus":{"mhs":{"k":794,"n":1093,"value":0.726,"ci":[0.699,0.752]},"hatexplain":{"k":1897,"n":3063,"value":0.619,"ci":[0.602,0.636]},"civil":{"k":0,"n":0,"value":null,"ci":null},"mlma-fr":{"k":0,"n":9,"value":0,"ci":[0,0.299]}}},
- "sides": {"mhs":{"right":{"recall":{"k":702,"n":7584,"value":0.093,"ci":[0.086,0.099]},"precision":{"k":702,"n":730,"value":0.962,"ci":[0.945,0.973]}},"left":{"recall":{"k":107,"n":2499,"value":0.043,"ci":[0.036,0.051]},"precision":{"k":107,"n":114,"value":0.939,"ci":[0.879,0.97]}},"gap":{"precision":false,"recall":true}},"hatexplain":{"right":{"recall":{"k":1814,"n":4197,"value":0.432,"ci":[0.417,0.447]},"precision":{"k":1814,"n":1849,"value":0.981,"ci":[0.974,0.986]}},"left":{"recall":{"k":46,"n":251,"value":0.183,"ci":[0.14,0.236]},"precision":{"k":46,"n":46,"value":1,"ci":[0.923,1]}},"gap":{"precision":false,"recall":true}}},
+ "extreme": {"precision":{"k":896,"n":1275,"value":0.703,"ci":[0.677,0.727]},"recall":{"k":896,"n":5224,"value":0.172,"ci":[0.162,0.182]},"against":"mhs: hate_speech_score > 0.5","byCorpus":{"mhs":{"k":896,"n":1275,"value":0.703,"ci":[0.677,0.727]},"hatexplain":{"k":1950,"n":3246,"value":0.601,"ci":[0.584,0.617]},"civil":{"k":0,"n":0,"value":null,"ci":null},"mlma-fr":{"k":0,"n":9,"value":0,"ci":[0,0.299]}}},
+ "sides": {"mhs":{"right":{"recall":{"k":765,"n":7584,"value":0.101,"ci":[0.094,0.108]},"precision":{"k":765,"n":800,"value":0.956,"ci":[0.94,0.968]}},"left":{"recall":{"k":198,"n":2499,"value":0.079,"ci":[0.069,0.09]},"precision":{"k":198,"n":211,"value":0.938,"ci":[0.897,0.964]}},"gap":{"precision":false,"recall":true}},"hatexplain":{"right":{"recall":{"k":1895,"n":4197,"value":0.452,"ci":[0.437,0.467]},"precision":{"k":1895,"n":1933,"value":0.98,"ci":[0.973,0.986]}},"left":{"recall":{"k":109,"n":251,"value":0.434,"ci":[0.374,0.496]},"precision":{"k":109,"n":112,"value":0.973,"ci":[0.924,0.991]}},"gap":{"precision":false,"recall":false}}},
  "duplicates": {"synthetic":true,"precision":{"k":85,"n":87,"value":0.977,"ci":[0.92,0.994]},"recall":{"k":85,"n":85,"value":1,"ci":[0.957,1]}},
  "mismatch": {"synthetic":true,"precision":{"k":14,"n":14,"value":1,"ci":[0.785,1]},"recall":{"k":14,"n":14,"value":1,"ci":[0.785,1]}},
  families: {
    "dehumanise": {"precision":{"k":36,"n":39,"value":0.923,"ci":[0.797,0.973]},"precisionRange":null,"byCorpus":{"mhs":{"k":17,"n":19,"value":0.895,"ci":[0.686,0.971]},"hatexplain":{"k":18,"n":18,"value":1,"ci":[0.824,1]},"civil":{"k":1,"n":2,"value":0.5,"ci":[0.095,0.905]}},"specific":{"against":"mhs:dehumanise","precision":{"k":11,"n":19,"value":0.579,"ci":[0.363,0.769]},"recall":{"k":11,"n":5046,"value":0.002,"ci":[0.001,0.004]}},"recall":{"k":11,"n":5046,"value":0.002,"ci":[0.001,0.004]},"measured":true,"note":null},
    "violence": {"precision":{"k":77,"n":88,"value":0.875,"ci":[0.79,0.929]},"precisionRange":[0.967,0.967],"byCorpus":{"mhs":{"k":59,"n":61,"value":0.967,"ci":[0.888,0.991]},"hatexplain":{"k":15,"n":18,"value":0.833,"ci":[0.608,0.942]},"civil":{"k":3,"n":9,"value":0.333,"ci":[0.121,0.646]}},"specific":{"against":"mhs:violence","precision":{"k":39,"n":61,"value":0.639,"ci":[0.514,0.748]},"recall":{"k":39,"n":1819,"value":0.021,"ci":[0.016,0.029]}},"recall":{"k":39,"n":1819,"value":0.021,"ci":[0.016,0.029]},"measured":true,"note":null},
    "vigilante": {"precision":{"k":2,"n":3,"value":0.667,"ci":[0.208,0.939]},"precisionRange":null,"byCorpus":{"mhs":{"k":2,"n":2,"value":1,"ci":[0.342,1]},"hatexplain":{"k":0,"n":0,"value":null,"ci":null},"civil":{"k":0,"n":1,"value":0,"ci":[0,0.793]}},"specific":null,"recall":null,"measured":false,"note":"fewer than 20 hits in the test split; not measured"},
-   "slur": {"precision":{"k":3682,"n":4009,"value":0.918,"ci":[0.91,0.927]},"precisionRange":[0.355,0.96],"byCorpus":{"mhs":{"k":916,"n":954,"value":0.96,"ci":[0.946,0.971]},"hatexplain":{"k":2755,"n":3024,"value":0.911,"ci":[0.9,0.921]},"civil":{"k":11,"n":31,"value":0.355,"ci":[0.211,0.531]}},"specific":null,"recall":null,"measured":true,"note":null},
-   "slurSoft": {"precision":{"k":908,"n":1363,"value":0.666,"ci":[0.641,0.691]},"precisionRange":[0.206,0.919],"byCorpus":{"mhs":{"k":397,"n":432,"value":0.919,"ci":[0.889,0.941]},"hatexplain":{"k":468,"n":722,"value":0.648,"ci":[0.613,0.682]},"civil":{"k":43,"n":209,"value":0.206,"ci":[0.156,0.266]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "slur": {"precision":{"k":3995,"n":4392,"value":0.91,"ci":[0.901,0.918]},"precisionRange":[0.34,0.953],"byCorpus":{"mhs":{"k":1085,"n":1138,"value":0.953,"ci":[0.94,0.964]},"hatexplain":{"k":2894,"n":3207,"value":0.902,"ci":[0.892,0.912]},"civil":{"k":16,"n":47,"value":0.34,"ci":[0.222,0.483]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "slurSoft": {"precision":{"k":837,"n":1278,"value":0.655,"ci":[0.628,0.68]},"precisionRange":[0.203,0.917],"byCorpus":{"mhs":{"k":355,"n":387,"value":0.917,"ci":[0.886,0.941]},"hatexplain":{"k":440,"n":684,"value":0.643,"ci":[0.607,0.678]},"civil":{"k":42,"n":207,"value":0.203,"ci":[0.154,0.263]}},"specific":null,"recall":null,"measured":true,"note":null},
    "stereotype": {"precision":{"k":80,"n":96,"value":0.833,"ci":[0.746,0.895]},"precisionRange":[0.917,0.917],"byCorpus":{"mhs":{"k":66,"n":72,"value":0.917,"ci":[0.83,0.961]},"hatexplain":{"k":11,"n":15,"value":0.733,"ci":[0.48,0.891]},"civil":{"k":3,"n":9,"value":0.333,"ci":[0.121,0.646]}},"specific":{"against":"mhs:stereotype","precision":{"k":51,"n":72,"value":0.708,"ci":[0.595,0.801]},"recall":{"k":51,"n":8368,"value":0.006,"ci":[0.005,0.008]}},"recall":{"k":51,"n":8368,"value":0.006,"ci":[0.005,0.008]},"measured":true,"note":null},
    "motive": {"precision":{"k":29,"n":40,"value":0.725,"ci":[0.572,0.839]},"precisionRange":[0.818,0.818],"byCorpus":{"mhs":{"k":18,"n":22,"value":0.818,"ci":[0.615,0.927]},"hatexplain":{"k":9,"n":13,"value":0.692,"ci":[0.424,0.873]},"civil":{"k":2,"n":5,"value":0.4,"ci":[0.118,0.769]}},"specific":null,"recall":null,"measured":true,"note":null},
    "essentialise": {"precision":{"k":59,"n":102,"value":0.578,"ci":[0.481,0.67]},"precisionRange":[0.258,0.75],"byCorpus":{"mhs":{"k":33,"n":47,"value":0.702,"ci":[0.56,0.813]},"hatexplain":{"k":18,"n":24,"value":0.75,"ci":[0.551,0.88]},"civil":{"k":8,"n":31,"value":0.258,"ci":[0.137,0.432]}},"specific":null,"recall":null,"measured":true,"note":null},
    "conspiracy": {"precision":{"k":34,"n":118,"value":0.288,"ci":[0.214,0.376]},"precisionRange":[0.036,0.036],"byCorpus":{"mhs":{"k":15,"n":17,"value":0.882,"ci":[0.657,0.967]},"hatexplain":{"k":16,"n":17,"value":0.941,"ci":[0.73,0.99]},"civil":{"k":3,"n":84,"value":0.036,"ci":[0.012,0.1]}},"specific":null,"recall":null,"measured":true,"note":null},
    "absolutist": {"precision":{"k":137,"n":270,"value":0.507,"ci":[0.448,0.567]},"precisionRange":[0.329,0.842],"byCorpus":{"mhs":{"k":33,"n":43,"value":0.767,"ci":[0.623,0.868]},"hatexplain":{"k":48,"n":57,"value":0.842,"ci":[0.726,0.915]},"civil":{"k":56,"n":170,"value":0.329,"ci":[0.263,0.403]}},"specific":null,"recall":null,"measured":true,"note":null},
-   "contempt": {"precision":{"k":92,"n":100,"value":0.92,"ci":[0.85,0.959]},"precisionRange":[0.914,0.931],"byCorpus":{"mhs":{"k":64,"n":70,"value":0.914,"ci":[0.825,0.96]},"hatexplain":{"k":27,"n":29,"value":0.931,"ci":[0.78,0.981]},"civil":{"k":1,"n":1,"value":1,"ci":[0.207,1]}},"specific":null,"recall":null,"measured":true,"note":null},
-   "strong": {"precision":{"k":3839,"n":4197,"value":0.915,"ci":[0.906,0.923]},"precisionRange":[0.346,0.956],"byCorpus":{"mhs":{"k":1039,"n":1087,"value":0.956,"ci":[0.942,0.967]},"hatexplain":{"k":2782,"n":3058,"value":0.91,"ci":[0.899,0.919]},"civil":{"k":18,"n":52,"value":0.346,"ci":[0.232,0.482]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "contempt": {"precision":{"k":93,"n":101,"value":0.921,"ci":[0.851,0.959]},"precisionRange":[0.915,0.931],"byCorpus":{"mhs":{"k":65,"n":71,"value":0.915,"ci":[0.828,0.961]},"hatexplain":{"k":27,"n":29,"value":0.931,"ci":[0.78,0.981]},"civil":{"k":1,"n":1,"value":1,"ci":[0.207,1]}},"specific":null,"recall":null,"measured":true,"note":null},
+   "strong": {"precision":{"k":4150,"n":4578,"value":0.907,"ci":[0.898,0.915]},"precisionRange":[0.338,0.95],"byCorpus":{"mhs":{"k":1206,"n":1269,"value":0.95,"ci":[0.937,0.961]},"hatexplain":{"k":2921,"n":3241,"value":0.901,"ci":[0.891,0.911]},"civil":{"k":23,"n":68,"value":0.338,"ci":[0.237,0.457]}},"specific":null,"recall":null,"measured":true,"note":null},
  },
 };
 
