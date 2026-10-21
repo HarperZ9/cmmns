@@ -52,7 +52,6 @@
     for (const sp of (m.trail && m.trail.media) || []) {
       if (sp.accounts >= 3) { out.push({ label: `same upload, ${sp.accounts} accounts`, level: "flag", cat: "coordination", rows: [["What Radar sees", `This exact upload appears in ${sp.posts} posts by ${sp.accounts} accounts in what you have viewed, first posted by @${sp.first.handle} (${day(sp.first.at)}).`], ["Who", sp.sharers.map((h) => "@" + h).join(", ")], dnp("Popular videos get reposted widely by ordinary people. Many accounts on one upload shows spread, not who coordinated it.")] }); break; }
     }
-    if (T.note) out.push({ label: "Community Note", level: "flag", cat: "sources", rows: [["Note", T.note], ["Source", "X loaded a Community Note for this post. Notes are written and rated by X users."]] });
     if (T.client && !PB.COMMON_CLIENTS.test(T.client)) out.push({ label: `via ${T.client}`, level: "flag", cat: "posting", rows: [["Source", "The app this post was sent from, in the data X loaded. X no longer shows it."], ["What it is", "Scheduling tools, automation services and custom apps post this way."], dnp("News desks, brands and many people schedule posts with tools like these.")] });
     if (m.paid) out.push({ label: "ad", level: "flag", cat: "sources", rows: [["Source", "X labels this an ad or promoted post: someone paid for it to reach you."]] });
     const place = m.reading && m.reading.basedIn && (PB.parseLabel(m.reading.basedIn) || {}).country;
@@ -79,8 +78,17 @@
     return (m.flags || []).map((f) => ({ label: FLAG_LABEL[f.id] || f.id, cat: FLAG_CAT[f.id] || "account", level: f.id === "based-elsewhere" ? "warn" : WEAK.has(f.id) ? "info" : "flag", rows: [["Evidence", f.evidence], dnp(f.doesNotProve)] }));
   }
 
+  // Shown first: a Community Note X attached to the post, then fact-checks of similar claims. The
+  // rating is the fact-checker's own words; Radar adds no verdict of its own.
+  function checks(m) {
+    const out = [], T = m.tweet || {};
+    if (T.note) out.push({ label: "Community Note", level: "warn", cat: "sources", rows: [["Note", T.note], ["Source", "X loaded a Community Note for this post. Notes are written and rated by X users."], dnp("A note shows what X users from different viewpoints rated helpful. It is not a ruling by X or by Radar.")] });
+    for (const c of m.claims || []) { const card = PB.claimCard(c); out.push({ label: card.label, level: "warn", cat: "sources", rows: card.rows }); }
+    return out;
+  }
+
   const ORDER = { warn: 0, flag: 1, info: 2 };
-  function all(m) { return [...language(m), ...links(m), ...post(m), ...account(m)].sort((a, b) => ORDER[a.level] - ORDER[b.level]); }
+  function all(m) { return [...checks(m), ...language(m), ...links(m), ...post(m), ...account(m)].sort((a, b) => ORDER[a.level] - ORDER[b.level]); }
 
   // One entry per area: the strongest level of its signals, or "none".
   function areas(signals) {

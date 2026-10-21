@@ -15,6 +15,7 @@
   "background": {
     "service_worker": "background.js",
     "scripts": [
+      "core.bundle.js",
       "background.js"
     ]
   },

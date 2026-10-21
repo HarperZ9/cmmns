@@ -17,6 +17,19 @@
     } catch (e) { console.error("[radar] owner lookup failed", e); }
   }
 
+  // Fact-checked claims similar to each post on screen, asked once per post (src/core/claims.js).
+  const askedClaims = new Set(), claimHits = new Map();
+  async function ensureClaims(items) {
+    const posts = items.filter((r) => r.id && r.text && !askedClaims.has(r.id)).map((r) => ({ id: r.id, text: r.text }));
+    if (!posts.length) return;
+    posts.forEach((p) => askedClaims.add(p.id));
+    try {
+      const got = await chrome.runtime.sendMessage({ type: "pb-claims", posts });
+      for (const [id, hits] of Object.entries(got || {})) claimHits.set(id, hits);
+    } catch (e) { console.error("[radar] claim lookup failed", e); }
+  }
+  const claimsOf = (id) => claimHits.get(id) || null;
+
   // Local connections log (src/core/network.js): which accounts replied where, and how fast.
   const NET_KEY = "pb.net.v1";
   let netLog = {}, lastRecorded = "";
@@ -75,5 +88,5 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   }
 
-  globalThis.PBLogs = Object.freeze({ ensureOwners, recordNet, recordTrail, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
+  globalThis.PBLogs = Object.freeze({ ensureOwners, ensureClaims, claimsOf, recordNet, recordTrail, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
 })();

@@ -4,6 +4,9 @@
 //   its "About this account" page in ONE reused tab inside a minimised window, so no tabs flicker open and closed.
 //   One account at a time, at least GAP_MS apart, never faster than a person clicking through
 //   profiles. The window closes itself when the queue has been empty for IDLE_CLOSE_MS.
+// Chrome runs this file as a service worker and loads the core here; Firefox loads it first from
+// the manifest's background scripts.
+if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js");
 const GAP_MS = 2500, TIMEOUT_MS = 12000, IDLE_CLOSE_MS = 15000;
 const queue = [];
 let busy = false, lastAt = 0, current = null, worker = null, idleTimer = 0, timeoutTimer = 0;
@@ -27,7 +30,24 @@ function stateRows() {
   return stateReady;
 }
 
+// Fact-checked claims (claims.json, src/core/claims.js, about 6 MB): indexed once here. Pages send
+// the text of the posts they show and get back only the matches. Nothing leaves the browser.
+let claimsReady = null;
+function claimIndex() {
+  if (!claimsReady) claimsReady = fetch(chrome.runtime.getURL("claims.json")).then((r) => r.json()).then((t) => PB.buildClaimIndex(t))
+    .catch((e) => { console.error("[radar] claims.json failed to load", e); return null; });
+  return claimsReady;
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg && msg.type === "pb-claims") {
+    claimIndex().then((index) => {
+      const out = {};
+      for (const p of msg.posts || []) { const hits = PB.matchClaims(index, p.text); if (hits.length) out[p.id] = hits; }
+      sendResponse(out);
+    });
+    return true;
+  }
   if (msg && msg.type === "pb-state") {
     stateRows().then((rows) => {
       const want = (msg.domains || []).map((d) => d.toLowerCase()), handles = new Set((msg.handles || []).map((h) => h.toLowerCase()));
