@@ -7,12 +7,16 @@ import { score } from "../src/core/rhetoric.js";
 
 export const families = (t) => score(t).markers.map((m) => m.family).sort().join(",");
 
+// A target is a word, or a list of its case forms for inflected languages: "{G}" takes the first
+// form, "{G1}" the second, "{G2}" the third (Russian: nominative, genitive, dative).
+const fill = (tpl, g) => (Array.isArray(g) ? tpl.replace(/\{G(\d?)\}/g, (_, i) => g[+(i || 0)]) : tpl.replace("{G}", g));
+
 // spec: { name, targets, templates: [[tpl, family]], cases: [[text, family]], policy: [text] }
 export function languageSuite(spec) {
   assert.ok(spec.targets.length >= 14, `${spec.name}: at least 14 targets`);
   for (const [tpl, expected] of spec.templates) {
     test(`${spec.name}: same markers for every target: "${tpl}"`, () => {
-      const differing = spec.targets.map((g) => [g, families(tpl.replace("{G}", g))]).filter(([, f]) => f !== expected);
+      const differing = spec.targets.map((g) => [g, families(fill(tpl, g))]).filter(([, f]) => f !== expected);
       assert.deepEqual(differing, [], `targets scored differently from "${expected}"`);
     });
   }

@@ -17,6 +17,11 @@ import { scoreEs, NEGATION_ES } from "./rhetoric-es.js";
 import { scoreDe, NEGATION_DE } from "./rhetoric-de.js";
 import { scorePt, NEGATION_PT } from "./rhetoric-pt.js";
 import { scoreIt, NEGATION_IT } from "./rhetoric-it.js";
+import { scoreAr, NEGATION_AR, prepAr } from "./rhetoric-ar.js";
+import { scoreRu, NEGATION_RU, prepRu } from "./rhetoric-ru.js";
+import { scoreUk, NEGATION_UK } from "./rhetoric-uk.js";
+import { scoreZh, NEGATION_ZH, prepZh } from "./rhetoric-zh.js";
+import { scoreHi, NEGATION_HI, prepHi } from "./rhetoric-hi.js";
 
 export const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -108,20 +113,27 @@ export const EXTREME_AT = 2;
 export const STRONG = new Set(["dehumanise", "violence", "vigilante", "slur", "stereotype"]);
 
 // Other languages, in order. Each adds only families that English and the languages before it
-// did not find, and negates its matches with its own negation words.
+// did not find, and negates its matches with its own negation words. `prep` normalises the text
+// for that language's lists (one alef in Arabic, simplified Chinese, NFC Hindi) before matching.
+// Ukrainian reads the modifier apostrophe as ', as replies type both.
 export const LANGUAGES = [
   { code: "fr", score: scoreFr, negation: NEGATION_FR },
   { code: "es", score: scoreEs, negation: NEGATION_ES },
   { code: "de", score: scoreDe, negation: NEGATION_DE },
   { code: "pt", score: scorePt, negation: NEGATION_PT },
   { code: "it", score: scoreIt, negation: NEGATION_IT },
+  { code: "ar", score: scoreAr, negation: NEGATION_AR, prep: prepAr },
+  { code: "ru", score: scoreRu, negation: NEGATION_RU, prep: prepRu },
+  { code: "uk", score: scoreUk, negation: NEGATION_UK, prep: (t) => prepRu(t).replace(/ʼ/g, "'") },
+  { code: "zh", score: scoreZh, negation: NEGATION_ZH, prep: prepZh },
+  { code: "hi", score: scoreHi, negation: NEGATION_HI, prep: prepHi },
 ];
 
 // A matcher that records a marker when `re` matches and, if negatable, the match has no negation.
 function recorder(s, markers) {
   return (family, re, negatable = false, on = s, negation = NEGATION) => {
     const m = on.match(re);
-    if (!m || (negatable && negation.test(m[0])) || mention(s, m)) return false;
+    if (!m || (negatable && negation.test(m[0])) || mention(on, m)) return false;
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
@@ -153,7 +165,8 @@ export function score(text) {
   scoreEnglish(s, hit);
   for (const lang of LANGUAGES) {
     const have = new Set(markers.map((m) => m.family));
-    lang.score((family, re, negatable = false) => hit(family, re, negatable, s, lang.negation), have);
+    const on = lang.prep ? lang.prep(s) : s;
+    lang.score((family, re, negatable = false) => hit(family, re, negatable, on, lang.negation), have);
   }
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };

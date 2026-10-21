@@ -727,20 +727,21 @@ return { GROUPS, DEHUMANISE_ADJACENT, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VE
 const M_rhetoric_util = (() => {
 // Regex helpers shared by the non-English rhetoric grammars. JavaScript's \b treats accented
 // letters as non-word characters, so every boundary here is a Unicode letter lookaround and
-// every pattern is compiled with the "u" flag.
+// every pattern is compiled with the "u" flag. Combining marks count as part of a word: Hindi
+// vowel signs and Arabic vowel marks are marks, not letters, and a word may end in one.
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const RX = {
   // longest first, so "sous-hommes" wins over "hommes"
-  alt: (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|"),
-  B: "(?<![\\p{L}\\p{N}_])",
-  E: "(?![\\p{L}\\p{N}_])",
+  alt: (list) => [...new Set(list)].map(esc).sort((a, b) => b.length - a.length).join("|"),
+  B: "(?<![\\p{L}\\p{M}\\p{N}_])",
+  E: "(?![\\p{L}\\p{M}\\p{N}_])",
   // up to three words between a group and its verb ("les immigrés de ce pays sont ...")
   FILL: "(?:\\s+[\\p{L}']+){0,3}?",
   re: (src) => new RegExp(src, "iu"),
   // a whole-word negation test built from a word list
-  negation: (words) => new RegExp(`(?<![\\p{L}])(?:${words.map(esc).join("|")})(?![\\p{L}])`, "iu"),
+  negation: (words) => new RegExp(`(?<![\\p{L}\\p{M}])(?:${words.map(esc).join("|")})(?![\\p{L}\\p{M}])`, "iu"),
 };
 
 // Adds a language's markers through `hit(family, regex, negatable)` for families not yet in
@@ -1278,6 +1279,616 @@ function scoreIt(hit, have) {
 return { RE_IT, NEGATION_IT, scoreIt };
 })();
 
+// ---- lexicon-ar.js
+const M_lexicon_ar = (() => {
+// Arabic word lists for the stance-neutral markers in rhetoric-ar.js. Same families and the same
+// rule as lexicon.js: a group named with marker grammar counts, disagreement and policy do not.
+// Words are written without the article ال and without vowel marks; rhetoric-ar.js adds the
+// attached prefixes (و ف ال لل بال) and reads أ إ آ as ا and ى as ي, in the lists and in the text.
+// Sources: project-docs/evidence/LEXICON-SOURCES.md.
+
+const GROUPS_AR = [
+  // الأصل والدين والجنسية
+  "يهود", "مسيحيين", "مسيحيون", "نصارى", "مسلمين", "مسلمون", "شيعة", "سنيين", "سنيون", "دروز", "علويين", "علويون",
+  "أكراد", "عرب", "أعراب", "أفارقة", "سود", "سوريين", "سوريون", "مصريين", "مصريون", "فلسطينيين", "فلسطينيون", "لبنانيين",
+  "عراقيين", "سودانيين", "لاجئين", "لاجئون", "مهاجرين", "مهاجرون", "أجانب", "غربيين", "أمريكان", "أمريكيين", "إيرانيين",
+  "أتراك", "إسرائيليين", "صهاينة", "مجوس",
+  // السياسة، ومنها الألقاب التي يطلقها كل طرف على الآخر
+  "إخوان", "إخوانجية", "خرفان", "عبيد البيادة", "عسكر", "شبيحة", "سلفيين", "إسلاميين", "إسلامجية", "علمانيين", "علمانيون",
+  "ليبراليين", "ليبراليون", "شيوعيين", "ملحدين", "حوثيين", "دواعش", "كيزان", "روافض", "رافضة", "نواصب", "ثوار", "فلول",
+  "مطبلين", "مطبعين", "منبطحين", "ممانعين",
+  // الطبقة والدور والهوية
+  "أغنياء", "فقراء", "شرطة", "صحفيين", "إعلاميين", "نسويات", "نسويين", "نساء", "حريم", "رجال", "مثليين", "شواذ",
+];
+
+const DEHUMANISE_AR = ["حشرات", "صراصير", "صراصر", "جرذان", "فئران", "كلاب", "خنازير", "قردة", "قرود", "حيوانات",
+  "بهائم", "وحوش", "ديدان", "طفيليات", "جراثيم", "فيروس", "وباء", "سرطان", "طاعون", "قمامة", "زبالة", "حثالة", "أنجاس",
+  "نجس", "قذارة", "أوساخ", "حمير", "أفاعي", "ثعابين", "عقارب", "ذباب", "مسوخ", "دواب", "نفايات"];
+// Phrases that dehumanise with no group named (the apes-and-pigs trope).
+const DEHUMANISE_PHRASES_AR = ["أحفاد القردة والخنازير", "أبناء القردة والخنازير", "إخوان القردة والخنازير"];
+
+// Imperatives and verbal nouns of physical harm. Expelling, jailing or banning is policy.
+const KILL_IMP_AR = ["اقتلوا", "اقتل", "اذبحوا", "اذبح", "أبيدوا", "احرقوا", "احرق", "أعدموا", "اسحقوا", "اسحق", "اقتلوهم",
+  "اذبحوهم", "اسحلوا", "ارجموا"];
+const KILL_NOUN_AR = ["قتل", "ذبح", "إبادة", "حرق", "سحق", "إعدام", "تصفية", "نقتل", "نذبح", "نبيد", "نحرق", "نسحق",
+  "نعدم", "نصفي", "سحل", "إبادة جماعية"];
+const DEATH_AR = ["الموت", "القتل", "الذبح", "الإعدام", "الحرق", "الإبادة", "يموتوا", "يموتون", "يذبحوا", "يقتلوا",
+  "يحرقوا", "يبادوا", "يعدموا", "يسحقوا"];
+// A prayer for a group's destruction: "اللهم أهلك ..."
+const CURSE_AR = ["أهلك", "دمر", "أبد", "احرق", "شتت", "عليك", "زلزل"];
+
+const STEREOTYPE_TRAITS_AR = ["إرهابيين", "إرهابيون", "إرهابية", "مجرمين", "مجرمون", "خونة", "كذابين", "كذابون", "لصوص",
+  "حرامية", "أغبياء", "متخلفين", "متخلفون", "جهلة", "منافقين", "عملاء", "قتلة", "مغتصبين", "كفار", "كفرة", "مرتدين", "زنادقة",
+  "وسخين", "همج", "بربر"];
+
+const CONSPIRACY_AR = ["مؤامرة صهيونية", "المؤامرة الصهيونية", "مؤامرة كونية", "المؤامرة الكونية", "الماسونية",
+  "الماسونيين", "الدولة العميقة", "النظام العالمي الجديد", "حكومة العالم الخفية", "الطابور الخامس", "حروب الجيل الرابع",
+  "الاستبدال العظيم", "الذباب الإلكتروني", "ذباب إلكتروني", "اللجان الإلكترونية"];
+// Funders named in "funded by" or "agents of" accusations, from every direction.
+const PAYMASTERS_AR = ["قطر", "الإمارات", "السعودية", "إيران", "أمريكا", "إسرائيل", "الغرب", "تركيا", "روسيا", "سوروس",
+  "السفارات", "الموساد", "المخابرات", "الإخوان", "حزب الله"];
+
+// Recorded as religious slurs (Wiktionary "religious slur": رافضي, ناصبي). One for each sect.
+const SLURS_AR = ["رافضي", "رافضية", "روافض", "رافضة", "ناصبي", "ناصبية", "نواصب", "نواصبي"];
+
+return { GROUPS_AR, DEHUMANISE_AR, DEHUMANISE_PHRASES_AR, KILL_IMP_AR, KILL_NOUN_AR, DEATH_AR, CURSE_AR, STEREOTYPE_TRAITS_AR, CONSPIRACY_AR, PAYMASTERS_AR, SLURS_AR };
+})();
+
+// ---- rhetoric-ar.js
+const M_rhetoric_ar = (() => {
+// Arabic grammar for the stance-neutral markers. Arabic needs no "are" ("اليهود خنازير",
+// "الروافض كلاب"), and attaches "and", "the" and "for" to the word ("وللروافض"), so every group may
+// carry those prefixes. Text and lists are read with one alef, ي for ى, and no vowel marks or
+// tatweel (prepAr); the matched text is that normalised form.
+
+const L = M_lexicon_ar;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, B, E, re } = RX;
+// Same length for the alef and ya swaps; marks and tatweel are removed.
+const prepAr = (s) => s.replace(/[ً-ٰٟـ]/g, "").replace(/[أإآٱ]/g, "ا").replace(/ى/g, "ي");
+const A = (list) => alt(list.map(prepAr));
+const PRE = "(?:و|ف)?(?:ال|لل|بال|كال|ل|ب)?";
+const G = `${PRE}(?:${A(L.GROUPS_AR)})`;
+const NEG = "(?:(?:ليسوا|ليسو|ليس|ليست|مش|مو|مب|ما\\s+هم|ماهم|غير)\\s+)?";
+const ALL = "(?:(?:كل|جميع|كافة|هؤلاء|هذول|هذولا)\\s+)?";
+const HUM = "(?:(?:كلهم|هم|هما|مجرد|عبارة\\s+عن|ليسوا\\s+الا|ما\\s+هم\\s+الا|ماهم\\s+الا|الا)\\s+)*";
+
+const RE_AR = {
+  dehumanise: re(`${B}${ALL}${G}${E}\\s+${HUM}${NEG}${HUM}(?:ال)?(?:${A(L.DEHUMANISE_AR)})${E}`),
+  // construct state: "كلاب الشيعة", "خنازير الصهاينة"
+  dehumaniseOf: re(`${B}(?:و)?(?:${A(L.DEHUMANISE_AR)})\\s+(?:ال|لل)(?:${A(L.GROUPS_AR)})${E}`),
+  phrase: re(`${B}(?:${A(L.DEHUMANISE_PHRASES_AR)})${E}`),
+  violenceImperative: re(`${B}(?:لا\\s+)?(?:${A(L.KILL_IMP_AR)})\\s+${ALL}${G}${E}`),
+  violenceCall: re(`${B}(?:لا\\s+)?(?:يجب|لازم|لابد\\s+من|لا\\s+بد\\s+من|وجب|ينبغي|نريد|خلينا|يلا|الحل)\\s+(?:ان\\s+)?(?:${A(L.KILL_NOUN_AR)})\\s+${ALL}${G}${E}`),
+  violenceDeserve: re(`${B}${ALL}${G}${E}\\s+(?:كلهم\\s+)?(?:لا\\s+)?(?:يستحقون|يستاهلون|يستاهلوا|يستحقوا|لازم|يجب|وجب)\\s+(?:ان\\s+)?(?:${A(L.DEATH_AR)})${E}`),
+  curse: re(`${B}(?:اللهم|يا\\s+رب|يارب)\\s+(?:${A(L.CURSE_AR)})\\s*(?:${G})${E}`),
+  // "الموت لـ ..." at the start of a clause: any word, so every target alike
+  deathTo: re(`(?:^|[.!?؟;:،\\n(]\\s*)الموت\\s+(?:لل|ل)[\\p{L}]+`),
+  stereotype: re(`${B}${ALL}${G}${E}\\s+${HUM}${NEG}${HUM}(?:${A(L.STEREOTYPE_TRAITS_AR)})${E}`),
+  conspiracy: re(`${B}(?:${A(L.CONSPIRACY_AR)})${E}`),
+  paid: re(`${B}(?:ممولين|ممولون|ممول|مدعومين|عملاء|عميل|ذيول|أذناب|مرتزقة)\\s+(?:من\\s+|ل)?(?:${A(L.PAYMASTERS_AR)})${E}`),
+  slur: re(`${B}${PRE}(?:${A(L.SLURS_AR)})${E}`),
+};
+
+// "لا" counts only before a verb ("لا بد", "must", is not a negation), and "ليسوا الا" and "ما هم
+// الا" ("nothing but") are the marker, not its negation.
+const NEGATION_AR = new RegExp("(?<![\\p{L}\\p{M}])(?:(?:ليسوا|ليسو|ليس|ليست|ماهم)(?!\\s+الا)|ما(?=\\s+هم(?!\\s+الا))" +
+  "|لسنا|لم|لن|مش|مو|مب|غير|ابدا|لا(?=\\s+[تينا]))(?![\\p{L}\\p{M}])", "iu");
+
+const RULES = {
+  dehumanise: [[RE_AR.dehumanise, true], [RE_AR.dehumaniseOf, false], [RE_AR.phrase, false]],
+  violence: [[RE_AR.violenceImperative, true], [RE_AR.violenceCall, true], [RE_AR.violenceDeserve, true],
+    [RE_AR.curse, false], [RE_AR.deathTo, false]],
+  stereotype: [[RE_AR.stereotype, true]],
+  conspiracy: [[RE_AR.conspiracy, false], [RE_AR.paid, false]],
+  slur: [[RE_AR.slur, false]],
+};
+
+function scoreAr(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { prepAr, RE_AR, NEGATION_AR, scoreAr };
+})();
+
+// ---- lexicon-ru.js
+const M_lexicon_ru = (() => {
+// Russian word lists for the stance-neutral markers in rhetoric-ru.js. Same families and the same
+// rule as lexicon.js: a group named with marker grammar counts, disagreement and policy do not.
+// Russian inflects, so each group is listed in the nominative, genitive (also the accusative of a
+// plural person) and dative plural. "ё" is read as "е" (rhetoric-ru.js), so only "е" is written.
+// Sources and dictionary labels: project-docs/evidence/LEXICON-SOURCES.md.
+
+// [nominative, genitive/accusative, dative]
+const GROUP_FORMS_RU = [
+  // происхождение, религия, национальность
+  ["евреи", "евреев", "евреям"], ["мусульмане", "мусульман", "мусульманам"], ["христиане", "христиан", "христианам"],
+  ["мигранты", "мигрантов", "мигрантам"], ["беженцы", "беженцев", "беженцам"], ["приезжие", "приезжих", "приезжим"],
+  ["украинцы", "украинцев", "украинцам"], ["русские", "русских", "русским"], ["кавказцы", "кавказцев", "кавказцам"],
+  ["таджики", "таджиков", "таджикам"], ["узбеки", "узбеков", "узбекам"], ["чеченцы", "чеченцев", "чеченцам"],
+  ["цыгане", "цыган", "цыганам"], ["американцы", "американцев", "американцам"], ["европейцы", "европейцев", "европейцам"],
+  ["азиаты", "азиатов", "азиатам"], ["негры", "негров", "неграм"], ["черные", "черных", "черным"],
+  ["белые", "белых", "белым"],
+  // политика, с прозвищами, которые стороны дают друг другу
+  ["либералы", "либералов", "либералам"], ["либерасты", "либерастов", "либерастам"], ["коммунисты", "коммунистов", "коммунистам"],
+  ["патриоты", "патриотов", "патриотам"], ["ватники", "ватников", "ватникам"], ["путинисты", "путинистов", "путинистам"],
+  ["навальнисты", "навальнистов", "навальнистам"], ["рашисты", "рашистов", "рашистам"], ["бандеровцы", "бандеровцев", "бандеровцам"],
+  ["укропы", "укропов", "укропам"], ["колорады", "колорадов", "колорадам"], ["сепаратисты", "сепаратистов", "сепаратистам"],
+  ["националисты", "националистов", "националистам"], ["фашисты", "фашистов", "фашистам"], ["нацисты", "нацистов", "нацистам"],
+  ["единороссы", "единороссов", "единороссам"], ["оппозиционеры", "оппозиционеров", "оппозиционерам"], ["релоканты", "релокантов", "релокантам"],
+  ["кремлеботы", "кремлеботов", "кремлеботам"], ["совки", "совков", "совкам"],
+  // класс, роль, идентичность
+  ["богатые", "богатых", "богатым"], ["олигархи", "олигархов", "олигархам"], ["чиновники", "чиновников", "чиновникам"],
+  ["депутаты", "депутатов", "депутатам"], ["полицейские", "полицейских", "полицейским"], ["менты", "ментов", "ментам"],
+  ["силовики", "силовиков", "силовикам"], ["журналисты", "журналистов", "журналистам"], ["феминистки", "феминисток", "феминисткам"],
+  ["геи", "геев", "геям"], ["женщины", "женщин", "женщинам"], ["бабы", "баб", "бабам"], ["мужчины", "мужчин", "мужчинам"],
+  ["мужики", "мужиков", "мужикам"], ["чурки", "чурок", "чуркам"],
+];
+const GROUPS_RU = GROUP_FORMS_RU.flat();
+
+// Predicate nouns in the nominative: "<группа> — крысы".
+const DEHUMANISE_RU = ["крысы", "тараканы", "паразиты", "животные", "скоты", "скотина", "свиньи", "обезьяны", "макаки",
+  "мрази", "мразь", "нелюди", "твари", "нечисть", "черви", "клопы", "вши", "саранча", "отребье", "мусор", "биомусор",
+  "биомасса", "быдло", "орки", "унтерменши", "недолюди", "недочеловеки", "выродки", "отбросы", "шакалы", "гиены", "стадо",
+  "рак", "чума", "зараза", "гниль", "плесень", "дерьмо"];
+
+// Infinitives after "надо", "пора": physical harm only. Deporting, jailing or banning is policy.
+const KILL_INF_RU = ["убить", "убивать", "перебить", "расстрелять", "расстреливать", "перестрелять", "повесить", "вешать",
+  "перевешать", "резать", "вырезать", "перерезать", "истребить", "истреблять", "уничтожить", "уничтожать", "сжечь", "жечь",
+  "мочить", "замочить", "давить", "передавить", "душить", "ликвидировать", "зачистить", "утопить", "закопать", "гасить"];
+// Imperatives that are calls on their own: "бей ...", "мочи ...".
+const KILL_IMP_RU = ["бей", "бейте", "мочи", "мочите", "режь", "режьте", "вешай", "вешайте", "души", "душите", "убивай",
+  "убивайте", "стреляй", "стреляйте"];
+// After "должны быть", "заслуживают".
+const KILL_PP_RU = ["расстреляны", "уничтожены", "повешены", "сожжены", "истреблены", "вырезаны", "убиты",
+  "ликвидированы", "перебиты", "сдохнуть", "подохнуть", "умереть", "сгореть", "смерти", "расстрела", "виселицы"];
+
+const STEREOTYPE_TRAITS_RU = ["преступники", "воры", "ворье", "бандиты", "террористы", "насильники", "предатели", "лжецы",
+  "вруны", "тупые", "дебилы", "идиоты", "ленивые", "лентяи", "грязные", "педофилы", "алкаши", "алкоголики", "нацисты",
+  "фашисты", "дикари", "варвары", "рабы", "холопы", "убийцы", "мошенники", "жулики", "продажные"];
+
+const CONSPIRACY_RU = ["золотой миллиард", "мировое правительство", "мировая закулиса", "жидомасоны", "жидомасонский",
+  "масонский заговор", "великая замена", "новый мировой порядок", "американские биолаборатории", "биолаборатории сша",
+  "пландемия", "чипирование", "печеньки госдепа", "ольгинские тролли", "фабрика троллей"];
+// Funders named in "paid by ..." accusations, from every direction.
+const PAYMASTERS_RU = ["госдепом", "госдепа", "кремлем", "кремля", "соросом", "сороса", "западом", "запада", "путиным",
+  "путина", "навальным", "фбк", "цру", "фсб", "киевом", "киева", "москвой", "москвы"];
+
+// Recorded as ethnic or homophobic slurs (Wiktionary labels, LEXICON-SOURCES.md). Plural forms
+// only where the singular has an innocent sense ("хохол" is also a tuft of hair).
+const SLURS_RU = ["хохлы", "хохлов", "хохлам", "хохлами", "хохлушки", "хохляцкий", "хохляцкие", "хохляцкая", "кацап",
+  "кацапы", "кацапов", "кацапам", "кацапня", "жид", "жиды", "жидов", "жидам", "жидовка", "жидовский", "жидовские", "жидовня",
+  "хач", "хачи", "хачей", "хачам", "хачик", "хачики", "пидор", "пидоры", "пидоров", "пидорасы", "пидарасы", "пидорас",
+  "русня", "москали", "москалей", "москалям", "москаля"];
+
+return { GROUP_FORMS_RU, GROUPS_RU, DEHUMANISE_RU, KILL_INF_RU, KILL_IMP_RU, KILL_PP_RU, STEREOTYPE_TRAITS_RU, CONSPIRACY_RU, PAYMASTERS_RU, SLURS_RU };
+})();
+
+// ---- rhetoric-ru.js
+const M_rhetoric_ru = (() => {
+// Russian grammar for the stance-neutral markers, built the way rhetoric-fr.js is. Russian has no
+// present-tense "are" ("либералы — крысы", "мигранты это паразиты") and free word order ("надо
+// расстрелять всех X", "всех X надо расстрелять"), so both orders are written out. Groups match in
+// any case form. These run only for families not yet found.
+
+const L = M_lexicon_ru;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, B, E, re } = RX;
+// Slur forms name a group too, so "всех хохлов надо ..." and "москалів треба ..." read as calls.
+const G = `(?:${alt([...L.GROUPS_RU, ...L.SLURS_RU])})`;
+const DASH = "\\s*(?:[—–-]|:)?\\s*(?:это\\s+)?";
+const ADV = "(?:(?:все|просто|лишь|всего лишь|сплошь|одни|настоящие|грязные|вонючие|тупые|мерзкие|поганые|самые)\\s+)*";
+const NOT = "(?:не\\s+)?";
+const ALL = "(?:(?:всех|этих|их|всю|эту)\\s+)*";
+const CALL = "(?:надо|нужно|необходимо|пора|следует|должны|давайте|будем|можно|стоит)";
+const KILL = alt(L.KILL_INF_RU);
+
+const RE_RU = {
+  dehumanise: re(`${B}${G}${E}(?:\\s+[\\p{L}-]+){0,2}?${DASH}${ADV}${NOT}(?:${alt(L.DEHUMANISE_RU)})${E}`),
+  // "либералы не люди", "хохлы — не люди": denying a group is human, matched before negation.
+  notHuman: re(`${B}${G}${E}${DASH}(?:все\\s+)?не\\s+(?:люди|человеки)${E}`),
+  violenceCall: re(`${B}${NOT}${CALL}\\s+${ALL}(?:${KILL})\\s+${ALL}${G}${E}`),
+  violenceObject: re(`${B}${ALL}${G}${E}\\s+${ALL}${NOT}${CALL}\\s+(?:всех\\s+)?(?:${KILL})${E}`),
+  violenceImperative: re(`${B}${NOT}(?:${alt(L.KILL_IMP_RU)})\\s+${ALL}${G}${E}`),
+  violenceDeserve: re(`${B}${G}${E}\\s+(?:все\\s+)?${NOT}(?:должны|заслуживают|достойны|обязаны)\\s+(?:быть\\s+)?(?:${alt(L.KILL_PP_RU)})${E}`),
+  // "смерть врагам" at the start of a clause: any plural dative, so every target alike
+  deathTo: re(`(?:^|[.!?;:\\n(]\\s*|\\s[—–-]\\s)смерть\\s+[\\p{L}]+(?:ам|ям|им|ым)${E}`),
+  onlyGoodDead: re(`${B}хорош(?:ий|ая|ее)\\s+([\\p{L}]+)\\s*[—–-]?\\s*(?:это\\s+)?мертв(?:ый|ая|ое)\\s+\\1${E}`),
+  lynch: re(`${B}${G}${E}\\s+на\\s+(?:гиляку|гилляку|ножи|кол|фонари|виселицу)${E}`),
+  stereotype: re(`${B}(?:все\\s+)?${G}${E}${DASH}${ADV}${NOT}(?:${alt(L.STEREOTYPE_TRAITS_RU)})${E}`),
+  conspiracy: re(`${B}(?:${alt(L.CONSPIRACY_RU)})${E}`),
+  paid: re(`${B}(?:(?:про)?плачен(?:ы|о|а|ные|ный)?|проплаченные|на зарплате у|агенты|методички|на деньги)\\s+(?:${alt(L.PAYMASTERS_RU)})${E}`),
+  slur: re(`${B}(?:${alt(L.SLURS_RU)})${E}`),
+};
+
+const NEGATION_RU = RX.negation(["не", "ни", "нет", "никогда", "никто", "нельзя"]);
+
+const RULES = {
+  dehumanise: [[RE_RU.notHuman, false], [RE_RU.dehumanise, true]],
+  violence: [[RE_RU.violenceCall, true], [RE_RU.violenceObject, true], [RE_RU.violenceImperative, true],
+    [RE_RU.violenceDeserve, true], [RE_RU.deathTo, false], [RE_RU.onlyGoodDead, false], [RE_RU.lynch, false]],
+  stereotype: [[RE_RU.stereotype, true]],
+  conspiracy: [[RE_RU.conspiracy, false], [RE_RU.paid, false]],
+  slur: [[RE_RU.slur, false]],
+};
+
+// ё is written е in the lists; the swap keeps every index in place.
+const prepRu = (s) => s.replace(/ё/g, "е").replace(/Ё/g, "Е");
+
+function scoreRu(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { RE_RU, NEGATION_RU, prepRu, scoreRu };
+})();
+
+// ---- lexicon-uk.js
+const M_lexicon_uk = (() => {
+// Ukrainian word lists for the stance-neutral markers in rhetoric-uk.js, built the way
+// lexicon-ru.js is: each group in the nominative, genitive (also the accusative of a plural person)
+// and dative plural. The coined names both sides of the war and of domestic politics use for each
+// other are group names, so the grammar treats them alike.
+// Sources and dictionary labels: project-docs/evidence/LEXICON-SOURCES.md.
+
+// [nominative, genitive/accusative, dative]
+const GROUP_FORMS_UK = [
+  // походження, релігія, національність
+  ["євреї", "євреїв", "євреям"], ["мусульмани", "мусульман", "мусульманам"], ["християни", "християн", "християнам"],
+  ["мігранти", "мігрантів", "мігрантам"], ["біженці", "біженців", "біженцям"], ["переселенці", "переселенців", "переселенцям"],
+  ["українці", "українців", "українцям"], ["росіяни", "росіян", "росіянам"], ["угорці", "угорців", "угорцям"],
+  ["поляки", "поляків", "полякам"], ["роми", "ромів", "ромам"], ["цигани", "циган", "циганам"],
+  ["американці", "американців", "американцям"], ["європейці", "європейців", "європейцям"], ["негри", "негрів", "неграм"],
+  ["білі", "білих", "білим"], ["кримчани", "кримчан", "кримчанам"], ["донеччани", "донеччан", "донеччанам"],
+  ["західняки", "західняків", "західнякам"],
+  // політика, з прізвиськами, які сторони дають одна одній
+  ["ліберали", "лібералів", "лібералам"], ["комуністи", "комуністів", "комуністам"], ["націоналісти", "націоналістів", "націоналістам"],
+  ["ватники", "ватників", "ватникам"], ["рашисти", "рашистів", "рашистам"], ["бандерівці", "бандерівців", "бандерівцям"],
+  ["порохоботи", "порохоботів", "порохоботам"], ["зеботи", "зеботів", "зеботам"], ["ждуни", "ждунів", "ждунам"],
+  ["сепари", "сепарів", "сепарам"], ["сепаратисти", "сепаратистів", "сепаратистам"], ["укропи", "укропів", "укропам"],
+  ["колаборанти", "колаборантів", "колаборантам"], ["фашисти", "фашистів", "фашистам"], ["нацисти", "нацистів", "нацистам"],
+  ["ухилянти", "ухилянтів", "ухилянтам"], ["тцкашники", "тцкашників", "тцкашникам"], ["орки", "орків", "оркам"],
+  // клас, роль, ідентичність
+  ["багаті", "багатих", "багатим"], ["олігархи", "олігархів", "олігархам"], ["чиновники", "чиновників", "чиновникам"],
+  ["депутати", "депутатів", "депутатам"], ["поліцейські", "поліцейських", "поліцейським"], ["журналісти", "журналістів", "журналістам"],
+  ["феміністки", "феміністок", "феміністкам"], ["геї", "геїв", "геям"], ["жінки", "жінок", "жінкам"],
+  ["чоловіки", "чоловіків", "чоловікам"],
+];
+const GROUPS_UK = GROUP_FORMS_UK.flat();
+
+const DEHUMANISE_UK = ["щури", "пацюки", "таргани", "паразити", "тварини", "худоба", "скоти", "свині", "мавпи",
+  "покидьки", "нелюди", "тварюки", "тварі", "виродки", "черви", "хробаки", "воші", "сарана", "сміття", "біомаса", "орки",
+  "недолюди", "рак", "чума", "зараза", "гниль", "нечисть", "свинособаки", "наволоч", "мразі", "мразь", "гієни", "шакали",
+  "бидло", "стадо", "лайно"];
+
+const KILL_INF_UK = ["вбити", "вбивати", "убити", "убивати", "перебити", "розстріляти", "розстрілювати", "повісити",
+  "вішати", "перевішати", "різати", "вирізати", "перерізати", "знищити", "знищувати", "винищити", "спалити", "палити",
+  "мочити", "замочити", "душити", "ліквідувати", "зачистити", "втопити", "закопати"];
+const KILL_IMP_UK = ["бий", "бийте", "мочи", "мочіть", "ріж", "ріжте", "вішай", "вішайте", "души", "душіть", "вбивай",
+  "вбивайте", "стріляй", "стріляйте"];
+const KILL_PP_UK = ["розстріляні", "знищені", "повішені", "спалені", "винищені", "вирізані", "вбиті", "ліквідовані",
+  "здохнути", "померти", "згоріти", "смерть", "смерті", "розстрілу", "шибениці"];
+
+const STEREOTYPE_TRAITS_UK = ["злочинці", "злодії", "бандити", "терористи", "ґвалтівники", "гвалтівники", "зрадники",
+  "брехуни", "тупі", "дебіли", "ідіоти", "ліниві", "брудні", "педофіли", "алкаші", "нацисти", "фашисти", "дикуни", "варвари",
+  "раби", "холопи", "вбивці", "шахраї", "продажні"];
+
+const CONSPIRACY_UK = ["золотий мільярд", "світовий уряд", "світова закуліса", "жидомасони", "масонська змова",
+  "новий світовий порядок", "американські біолабораторії", "біолабораторії", "ольгінські тролі", "ферма ботів", "ботоферма"];
+const PAYMASTERS_UK = ["держдепом", "держдепу", "кремлем", "кремля", "соросом", "сороса", "заходом", "заходу", "путіним",
+  "путіна", "москвою", "москви", "банковою", "офісом президента", "порошенком", "фсб", "цру"];
+
+// Recorded as ethnic or homophobic slurs (Wiktionary labels, LEXICON-SOURCES.md).
+const SLURS_UK = ["москаль", "москалі", "москалів", "москаля", "москалям", "москаляка", "москальня", "кацапи",
+  "кацапів", "кацапам", "кацапня", "русня", "русні", "хохли", "хохлів", "хохлам", "жиди", "жидів", "жидам", "жидва",
+  "підар", "підари", "підараси", "підарас", "підарів"];
+// Chants calling for lynching, recorded in reporting on the war (LEXICON-SOURCES.md).
+const SLOGANS_UK = ["москаляку на гілляку", "москаляку на гиляку"];
+
+return { GROUP_FORMS_UK, GROUPS_UK, DEHUMANISE_UK, KILL_INF_UK, KILL_IMP_UK, KILL_PP_UK, STEREOTYPE_TRAITS_UK, CONSPIRACY_UK, PAYMASTERS_UK, SLURS_UK, SLOGANS_UK };
+})();
+
+// ---- rhetoric-uk.js
+const M_rhetoric_uk = (() => {
+// Ukrainian grammar for the stance-neutral markers, built the way rhetoric-ru.js is: no present-
+// tense "are" ("ватники — тварини"), free word order, groups matched in any case form. Ukrainian
+// writes the apostrophe inside words; replies type it as ' or ’, and rhetoric.js reads both as '.
+
+const L = M_lexicon_uk;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, B, E, re } = RX;
+// Slur forms name a group too, so "всех хохлов надо ..." and "москалів треба ..." read as calls.
+const G = `(?:${alt([...L.GROUPS_UK, ...L.SLURS_UK])})`;
+const DASH = "\\s*(?:[—–-]|:)?\\s*(?:це\\s+)?";
+const ADV = "(?:(?:всі|усі|просто|лише|тільки|суцільні|одні|справжні|брудні|смердючі|тупі|мерзенні|кляті)\\s+)*";
+const NOT = "(?:не\\s+)?";
+const ALL = "(?:(?:всіх|усіх|цих|їх)\\s+)*";
+const CALL = "(?:треба|потрібно|необхідно|пора|час|слід|варто|мусимо|маємо|давайте|будемо|можна)";
+const KILL = alt(L.KILL_INF_UK);
+
+const RE_UK = {
+  dehumanise: re(`${B}${G}${E}(?:\\s+[\\p{L}'-]+){0,2}?${DASH}${ADV}${NOT}(?:${alt(L.DEHUMANISE_UK)})${E}`),
+  notHuman: re(`${B}${G}${E}${DASH}(?:всі\\s+)?не\\s+(?:люди|людьми)${E}`),
+  violenceCall: re(`${B}${NOT}${CALL}\\s+${ALL}(?:${KILL})\\s+${ALL}${G}${E}`),
+  violenceObject: re(`${B}${ALL}${G}${E}\\s+${ALL}${NOT}${CALL}\\s+(?:всіх\\s+)?(?:${KILL})${E}`),
+  violenceImperative: re(`${B}${NOT}(?:${alt(L.KILL_IMP_UK)})\\s+${ALL}${G}${E}`),
+  violenceDeserve: re(`${B}${G}${E}\\s+(?:всі\\s+)?${NOT}(?:мають|повинні|заслуговують на|заслуговують|мусять)\\s+(?:бути\\s+)?(?:${alt(L.KILL_PP_UK)})${E}`),
+  deathTo: re(`(?:^|[.!?;:\\n(]\\s*|\\s[—–-]\\s)смерть\\s+[\\p{L}]+(?:ам|ям|им)${E}`),
+  lynch: re(`${B}(?:${G}${E}\\s+на\\s+(?:гілляку|гиляку|ножі|кіл|ліхтарі|шибеницю)|${alt(L.SLOGANS_UK)})${E}`),
+  stereotype: re(`${B}(?:всі\\s+|усі\\s+)?${G}${E}${DASH}${ADV}${NOT}(?:${alt(L.STEREOTYPE_TRAITS_UK)})${E}`),
+  conspiracy: re(`${B}(?:${alt(L.CONSPIRACY_UK)})${E}`),
+  paid: re(`${B}(?:проплачен(?:і|о|а|ий)?|оплачен(?:і|о)|на зарплаті у|агенти|методички|на гроші)\\s+(?:${alt(L.PAYMASTERS_UK)})${E}`),
+  slur: re(`${B}(?:${alt(L.SLURS_UK)})${E}`),
+};
+
+const NEGATION_UK = RX.negation(["не", "ні", "ніколи", "ніхто", "жодні", "жоден", "немає"]);
+
+const RULES = {
+  dehumanise: [[RE_UK.notHuman, false], [RE_UK.dehumanise, true]],
+  violence: [[RE_UK.violenceCall, true], [RE_UK.violenceObject, true], [RE_UK.violenceImperative, true],
+    [RE_UK.violenceDeserve, true], [RE_UK.deathTo, false], [RE_UK.lynch, false]],
+  stereotype: [[RE_UK.stereotype, true]],
+  conspiracy: [[RE_UK.conspiracy, false], [RE_UK.paid, false]],
+  slur: [[RE_UK.slur, false]],
+};
+
+function scoreUk(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { RE_UK, NEGATION_UK, scoreUk };
+})();
+
+// ---- lexicon-zh.js
+const M_lexicon_zh = (() => {
+// Chinese word lists for the stance-neutral markers in rhetoric-zh.js, in simplified characters.
+// Traditional text is read through a character map (TRAD_ZH) that keeps every index in place.
+// Same families and the same rule as lexicon.js: a group named with marker grammar counts,
+// disagreement and policy do not. Chinese writes no spaces, so the grammar matches the words
+// next to each other and the lists carry the compounds that would otherwise collide.
+// Sources and dictionary labels: project-docs/evidence/LEXICON-SOURCES.md.
+
+const GROUPS_ZH = [
+  // 出身、宗教、国籍、地域
+  "犹太人", "穆斯林", "回民", "维吾尔人", "维族人", "基督徒", "黑人", "白人", "日本人", "韩国人", "美国人", "印度人", "越南人",
+  "菲律宾人", "外国人", "老外", "河南人", "东北人", "上海人", "广东人", "新疆人", "香港人", "港人", "台湾人", "大陆人",
+  "内地人", "外地人", "农村人", "农民工",
+  // 政治，包括各方互相起的外号
+  "共产党", "中共", "国民党", "民进党", "左派", "右派", "自由派", "白左", "小粉红", "五毛", "美分", "美分党", "公知", "台独",
+  "港独", "废青", "黑警", "汉奸", "精日", "绿绿", "女拳", "田园女权", "直男癌", "蝈蝻", "国男", "爱国贼", "殖人", "神友",
+  // 阶层、角色、身份
+  "警察", "城管", "有钱人", "富人", "穷人", "官员", "记者", "女权", "女权主义者", "同性恋", "基佬", "女人", "男人", "女的",
+  "男的",
+];
+
+// After a group, or "<group>都是一群...". Words with an everyday compound carry a lookahead in
+// rhetoric-zh.js (猪肉, 狗粮, 垃圾分类).
+const DEHUMANISE_ZH = ["蟑螂", "曱甴", "老鼠", "耗子", "畜生", "畜牲", "牲口", "禽兽", "狗东西", "走狗", "蝗虫", "寄生虫",
+  "人渣", "败类", "病毒", "癌症", "毒瘤", "害虫", "杂种", "蛆", "臭虫", "苍蝇", "猴子", "野兽", "劣等人种", "低等人种", "低等生物",
+  "猪狗", "狗杂种", "猪猡"];
+
+// Verbs of physical harm. Expelling, jailing or banning is policy and stays at zero.
+const KILL_ZH = ["杀光", "杀死", "杀掉", "杀了", "杀绝", "屠杀", "屠光", "消灭", "灭了", "灭掉", "干掉", "弄死", "打死",
+  "枪毙", "烧死", "绞死", "活埋", "灭绝", "核平", "宰了", "砍死", "毒死", "杀"];
+const DIE_ZH = ["该死", "去死", "死光", "死绝", "死全家", "全家死光", "都该杀", "该杀", "该被杀", "应该死", "应该去死",
+  "死了活该", "死有余辜", "该被消灭", "应该被消灭", "应该被杀光", "该枪毙", "都该枪毙"];
+
+const STEREOTYPE_TRAITS_ZH = ["罪犯", "小偷", "骗子", "强奸犯", "恐怖分子", "卖国贼", "叛徒", "懒鬼", "蠢货", "傻逼", "脑残",
+  "低素质", "没素质", "素质低", "素质差", "劣等", "野蛮", "贪婪", "虚伪", "暴力狂", "流氓", "土匪", "强盗", "人贩子", "白眼狼"];
+
+const CONSPIRACY_ZH = ["境外势力", "颜色革命", "西方反华势力", "反华势力", "美帝阴谋", "犹太阴谋", "犹太资本控制", "共济会",
+  "光明会", "深层政府", "新世界秩序", "大外宣", "大翻译运动", "人口替代"];
+// Funders named in "paid by ..." accusations, from every direction.
+const PAYMASTERS_ZH = ["美国", "美帝", "中共", "共产党", "党", "台湾", "民进党", "境外", "索罗斯", "西方", "CIA", "日本",
+  "大陆", "国安"];
+
+// Recorded as ethnic slurs or as derogatory and offensive (Wiktionary labels). One for each side
+// of the strait: 支那 and 台巴子.
+const SLURS_ZH = ["支那", "支那人", "支那猪", "黑鬼", "台巴子", "小日本", "日本鬼子", "洋鬼子", "白皮猪", "娘炮", "大陆蝗虫"];
+
+// Traditional to simplified, one character to one character, for the characters in these lists.
+const TRAD_ZH = "猶犹爾尔國国韓韩東东廣广東东灣湾陸陆農农產产黨党進进紅红獨独廢废漢汉綠绿權权蟈蝈義义貪贪記记員员窮穷錢钱" +
+  "戀恋蟲虫豬猪雜杂敗败類类癌癌瘤瘤蒼苍蠅蝇獸兽劣劣種种殺杀滅灭幹干弄弄槍枪斃毙燒烧絞绞埋埋絕绝該该應应須须餘余" +
+  "騙骗強强姦奸恐恐賣卖賊贼叛叛懶懒蠢蠢腦脑殘残質质貧贫偽伪暴暴氓氓匪匪盜盗販贩勢势顏颜革革陰阴謀谋資资濟济會会層层" +
+  "舊旧秩秩譯译運运動动替替這这們们個个們们麼么對对們们這这邊边裏里裡里說说話话鬧闹臺台灣湾護护們们為为";
+
+return { GROUPS_ZH, DEHUMANISE_ZH, KILL_ZH, DIE_ZH, STEREOTYPE_TRAITS_ZH, CONSPIRACY_ZH, PAYMASTERS_ZH, SLURS_ZH, TRAD_ZH };
+})();
+
+// ---- rhetoric-zh.js
+const M_rhetoric_zh = (() => {
+// Chinese grammar for the stance-neutral markers. Chinese has no spaces, so the patterns join words
+// directly: "<group>都是蟑螂", "杀光<group>", "把<group>都杀了", "<group>都该死". A negation written in
+// front ("不应该杀光...") is taken into the match, so the negation test sees it. Traditional text
+// is mapped to simplified first (prepZh); the mapping keeps every index.
+
+const L = M_lexicon_zh;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, re } = RX;
+const MAP = new Map();
+for (let i = 0; i + 1 < L.TRAD_ZH.length; i += 2) MAP.set(L.TRAD_ZH[i], L.TRAD_ZH[i + 1]);
+const prepZh = (s) => s.replace(/[㐀-鿿]/g, (c) => MAP.get(c) || c);
+
+const G = `(?:${alt(L.GROUPS_ZH)})`;
+// Animal and filth words that also start everyday compounds (猪肉 pork, 狗粮 dog food, 垃圾分类 sorting).
+const D = `(?:${alt(L.DEHUMANISE_ZH)}|猪(?!肉|蹄|排|脚|油|皮|圈|场|饲料|队友|头)|狗(?!粮|仔|窝|绳|链|狗|血|屎运)|` +
+  "垃圾(?!分类|桶|袋|站|车|场|处理|食品|短信|邮件|话|堆|食物|回收))";
+const QUANT = "(?:这些|那些|这群|那群|这帮|那帮|所有的?|一切)?";
+const NOTP = "(?:不|并不|绝不|并非|也不|都不)?";
+const COP = "(?:都|全|全都|也|就|真|真的|简直|根本|全部|个个|基本|统统)?(?:是|就是|都是|全是|简直是|=)?";
+const ONE = "(?:一群|一帮|一堆|一窝|一伙|一些)?(?:的)?";
+const NEG = "(?:不应该|不可以|不要|不能|不该|不会|反对|不|别|没|勿|莫)?";
+const MODAL = "(?:应该|必须|就该|该|要|得|一定要|统统|全部|都)?";
+const ANY = "(?:所有的?|全部的?|这些|那些|一切)?";
+const TRAIT = `(?:${alt(L.STEREOTYPE_TRAITS_ZH)}|懒(?!得|散|觉)|脏(?!话|活|水|辫|器|腑)|蠢|笨(?!重|拙))`;
+
+const RE_ZH = {
+  dehumanise: re(`${QUANT}${G}${NOTP}${COP}${ONE}${D}`),
+  notHuman: re(`${G}(?:都|全|根本|简直)?(?:不是人|不算人|不配做人|不配当人|没有人性)`),
+  violenceVerb: re(`${NEG}${MODAL}(?:${alt(L.KILL_ZH)})${ANY}${G}`),
+  violenceBa: re(`${NEG}${MODAL}把${ANY}${G}(?:都|全|全部|统统)?(?:${alt(L.KILL_ZH)})`),
+  violenceDie: re(`${G}(?:都|全|全都|统统)?(?:${alt(L.DIE_ZH)})`),
+  stereotype: re(`(?:所有的?)?${G}${NOTP}(?:都|全|全都|就|个个|基本上|基本|大多)?(?:是|都是|就是)?(?:一群|一帮)?${TRAIT}` +
+    `|${G}(?:的)?素质(?:真|太|就是|都|很|极|普遍)?(?:低|差)`),
+  conspiracy: re(`${alt(L.CONSPIRACY_ZH)}`),
+  paid: re(`(?:拿|收|领|吃)了?(?:${alt(L.PAYMASTERS_ZH)})的?(?:钱|经费|美元|美金|人民币|五毛|津贴|补贴)`),
+  slur: re(`${alt(L.SLURS_ZH)}`),
+};
+
+// "没素质" (no manners) is a trait, not a negation.
+const NEGATION_ZH = /(?:不|没(?!素质|有人性)|别|勿|莫|并非|反对|未)/u;
+
+const RULES = {
+  dehumanise: [[RE_ZH.notHuman, false], [RE_ZH.dehumanise, true]],
+  violence: [[RE_ZH.violenceVerb, true], [RE_ZH.violenceBa, true], [RE_ZH.violenceDie, false]],
+  stereotype: [[RE_ZH.stereotype, true]],
+  conspiracy: [[RE_ZH.conspiracy, false], [RE_ZH.paid, false]],
+  slur: [[RE_ZH.slur, false]],
+};
+
+function scoreZh(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { prepZh, RE_ZH, NEGATION_ZH, scoreZh };
+})();
+
+// ---- lexicon-hi.js
+const M_lexicon_hi = (() => {
+// Hindi word lists for the stance-neutral markers in rhetoric-hi.js, in Devanagari and in the Latin
+// spelling replies often use ("Hinglish"). Same families and the same rule as lexicon.js: a group
+// named with marker grammar counts, disagreement and policy do not. Groups are listed in the
+// direct and the oblique plural ("मुसलमान" / "मुसलमानों को"), with the common spelling variants.
+// Text and lists are read in Unicode NFC, so nukta letters match however they were typed.
+// Sources and dictionary labels: project-docs/evidence/LEXICON-SOURCES.md.
+
+const GROUPS_HI = [
+  // धर्म, जाति, मूल
+  "मुसलमान", "मुसलमानों", "मुस्लिम", "मुस्लिमों", "हिंदू", "हिन्दू", "हिंदुओं", "हिन्दुओं", "ईसाई", "ईसाइयों", "सिख", "सिखों",
+  "दलित", "दलितों", "ब्राह्मण", "ब्राह्मणों", "बिहारी", "बिहारियों", "बंगाली", "बंगालियों", "पाकिस्तानी", "पाकिस्तानियों",
+  "बांग्लादेशी", "बांग्लादेशियों", "रोहिंग्या", "रोहिंग्याओं", "घुसपैठिए", "घुसपैठियों", "कश्मीरी", "कश्मीरियों", "चीनियों",
+  // राजनीति, और वे नाम जो हर पक्ष दूसरे को देता है
+  "संघी", "संघियों", "भक्त", "भक्तों", "अंधभक्त", "अंधभक्तों", "कांग्रेसी", "कांग्रेसियों", "भाजपाई", "भाजपाइयों", "वामपंथी",
+  "वामपंथियों", "लिबरल", "लिबरलों", "सेकुलर", "सेकुलरों", "सिकुलर", "सिकुलरों", "लिबरांडू", "लिबरांडुओं", "जिहादी", "जिहादियों",
+  "नक्सली", "नक्सलियों", "आंदोलनजीवी", "आंदोलनजीवियों", "खालिस्तानी", "खालिस्तानियों", "चड्डीधारी", "चड्डीधारियों", "गद्दार",
+  "गद्दारों", "देशद्रोही", "देशद्रोहियों", "मोदीभक्त", "मोदीभक्तों",
+  // वर्ग, भूमिका, पहचान
+  "औरतें", "औरतों", "महिलाएं", "महिलाओं", "मर्द", "मर्दों", "नारीवादी", "नारीवादियों", "फेमिनिस्ट", "फेमिनिस्टों", "पुलिसवाले",
+  "पुलिसवालों", "अमीर", "अमीरों", "नेता", "नेताओं", "पत्रकार", "पत्रकारों",
+];
+const GROUPS_HI_LATN = ["musalman", "musalmaan", "musalmano", "musalmanon", "musalmaano", "muslim", "muslims", "muslimo",
+  "mulle", "mullo", "hindu", "hindus", "hinduo", "hinduon", "dalit", "daliton", "sikh", "sikho", "isai", "isaiyon", "bihari",
+  "biharion", "pakistani", "bangladeshi", "rohingya", "sanghi", "sanghiyon", "bhakt", "bhakto", "andhbhakt", "andhbhakto",
+  "congressi", "librandu", "librandus", "sickular", "sickulars", "jihadi", "jihadiyo", "naxal", "naxali", "khalistani", "gaddar",
+  "gaddaro", "deshdrohi", "aurat", "aurate", "auraten", "aurato", "auraton", "mard", "mardo", "feminist", "feminists", "hijre",
+  "hijro", "kinnar", "gay log", "neta", "netao", "patrakar"];
+
+const DEHUMANISE_HI = ["कीड़े", "कीड़ा", "कीड़े-मकोड़े", "दीमक", "कुत्ते", "कुत्ता", "सूअर", "सुअर", "जानवर", "कॉकरोच",
+  "तिलचट्टे", "चूहे", "मच्छर", "गंदगी", "कचरा", "कैंसर", "वायरस", "नासूर", "राक्षस", "हैवान", "दानव", "जोंक", "परजीवी",
+  "भेड़ें", "भेड़िये", "सांप", "साँप", "गिद्ध", "कीटाणु", "नाली के कीड़े"];
+const DEHUMANISE_HI_LATN = ["keede", "kide", "keeda", "kida", "keede makode", "deemak", "dimak", "kutte", "kutta", "suar",
+  "suwar", "janwar", "jaanwar", "cockroach", "chuhe", "machhar", "gandagi", "kachra", "nasoor", "rakshas", "haivan", "parjivi",
+  "jonk", "bhediye", "saanp", "gidh"];
+
+// Physical harm after "<group> को". Sending away, jailing or banning is policy and stays at zero.
+const KILL_HI = ["मार डालो", "मार दो", "मार डालना चाहिए", "मार देना चाहिए", "मार देंगे", "मार डालेंगे", "मारो", "काट डालो",
+  "काट दो", "काटो", "काट देना चाहिए", "जला दो", "जला डालो", "जलाओ", "जला देना चाहिए", "जिंदा जला दो", "ज़िंदा जला दो",
+  "गोली मार दो", "गोली मारो", "गोली मार देनी चाहिए", "गोली मार देना चाहिए", "खत्म कर दो", "ख़त्म कर दो", "खत्म कर देना चाहिए",
+  "मिटा दो", "मिटा देना चाहिए", "फांसी दो", "फाँसी दो", "फांसी पर लटका दो", "फाँसी पर लटका दो", "कुचल दो", "कुचल डालो",
+  "लटका दो"];
+const KILL_HI_LATN = ["maar do", "mar do", "maar dalo", "maar daalo", "mar dalo", "maro", "maaro", "kaat do", "kaat dalo",
+  "kato", "jala do", "jala dalo", "zinda jala do", "goli maar do", "goli maaro", "goli maro", "khatam kar do", "khatm kar do",
+  "mita do", "fansi do", "faansi do", "kuchal do", "latka do"];
+
+const STEREOTYPE_TRAITS_HI = ["आतंकवादी", "अपराधी", "चोर", "गद्दार", "देशद्रोही", "बलात्कारी", "जाहिल", "गंवार", "गँवार",
+  "धोखेबाज़", "धोखेबाज", "झूठे", "गंदे", "मूर्ख", "बेवकूफ", "बेवक़ूफ़", "कट्टरपंथी", "दंगाई", "लुटेरे", "निकम्मे", "कामचोर",
+  "भ्रष्ट", "हरामी", "नमकहराम"];
+const STEREOTYPE_TRAITS_HI_LATN = ["aatankwadi", "atankwadi", "terrorist", "terrorists", "apradhi", "chor", "gaddar", "gaddaar", "deshdrohi",
+  "balatkari", "jahil", "gawar", "ganwar", "dhokebaaz", "dhokhebaz", "jhoothe", "jhute", "gande", "murkh", "bewakoof", "bevkoof",
+  "kattar", "dangai", "lutere", "nikamme", "kaamchor", "bhrasht", "harami"];
+
+const CONSPIRACY_HI = ["लव जिहाद", "लैंड जिहाद", "थूक जिहाद", "जनसंख्या जिहाद", "कोरोना जिहाद", "वोट जिहाद", "यूपीएससी जिहाद",
+  "टुकड़े टुकड़े गैंग", "टुकड़े-टुकड़े गैंग", "अर्बन नक्सल", "विदेशी साज़िश", "विदेशी साजिश", "गोदी मीडिया", "बिकाऊ मीडिया",
+  "प्रेस्टीट्यूट", "love jihad", "land jihad", "thook jihad", "corona jihad", "vote jihad", "tukde tukde gang",
+  "tukde-tukde gang", "urban naxal", "urban naxals", "godi media", "bikau media", "presstitute", "presstitutes"];
+// Funders named in "on the money of ..." accusations, from every direction.
+const PAYMASTERS_HI = ["चीन", "पाकिस्तान", "सोरोस", "अमेरिका", "आईएसआई", "भाजपा", "कांग्रेस", "आरएसएस", "विदेश", "अडानी",
+  "china", "pakistan", "soros", "isi", "bjp", "congress", "rss", "adani"];
+
+// Recorded as slurs: कटुआ and its forms (CSOH "Decoding Hate" glossary, LEXICON-SOURCES.md).
+const SLURS_HI = ["कटुआ", "कटुए", "कटुओं", "कटुवे", "कटमुल्ला", "कटमुल्ले", "कटमुल्लों", "katua", "katue", "katuwe",
+  "katuo", "katmulla", "katmulle", "katmullo"];
+// Gendered slur fused with a group: "<group> रंडी" (Wiktionary: derogatory).
+const GENDERED_HI = ["रंडी", "रंडियां", "रंडियाँ", "randi", "randiyan"];
+
+return { GROUPS_HI, GROUPS_HI_LATN, DEHUMANISE_HI, DEHUMANISE_HI_LATN, KILL_HI, KILL_HI_LATN, STEREOTYPE_TRAITS_HI, STEREOTYPE_TRAITS_HI_LATN, CONSPIRACY_HI, PAYMASTERS_HI, SLURS_HI, GENDERED_HI };
+})();
+
+// ---- rhetoric-hi.js
+const M_rhetoric_hi = (() => {
+// Hindi grammar for the stance-neutral markers, written once and built twice: for Devanagari and
+// for the Latin spelling of Hindi. Hindi puts the verb last ("मुसलमान कीड़े हैं", "संघियों को गोली
+// मार दो") and its negation before the verb, so the tail takes an optional "नहीं" / "मत" into the
+// match. A noun phrase alone ("मुसलमान आतंकवादी गिरफ्तार", a Muslim terrorist arrested) is not a
+// claim about a group: a quantifier ("सब", "सारे") or a closing "हैं" is required.
+
+const L = M_lexicon_hi;
+const { RX, scoreRules } = M_rhetoric_util;
+
+const { alt, B, E, re } = RX;
+// NFC, so a nukta letter typed as one code point or two matches the lists.
+const prepHi = (s) => s.normalize("NFC");
+const N = (list) => alt(list.map((w) => w.normalize("NFC")));
+
+function grammar(w) {
+  const G = `(?:${N(w.groups)})`, S = "\\s+";
+  const PRE = `(?:(?:${w.these})${S})?`;
+  const Q = `(?:${w.quant})`, NEG = `(?:${S}(?:${w.not}))?`, COP = `(?:${S}(?:${w.cop}))`;
+  // "<group> सब <noun> (नहीं) (हैं)" or "<group> <noun> (नहीं) हैं"
+  const claim = (nouns) => `${B}${PRE}${G}${E}${S}(?:${Q}${S}(?:${nouns})${E}${NEG}${COP}?|(?:${nouns})${E}${NEG}${COP})${E}`;
+  return {
+    dehumanise: re(claim(N(w.dehumanise))),
+    violence: re(`${B}${PRE}${G}${E}${S}(?:${w.obj})${S}(?:(?:${w.not})${S})?(?:${N(w.kill)})${E}`),
+    stereotype: re(claim(N(w.traits))),
+    gendered: re(`${B}${G}${S}(?:${N(L.GENDERED_HI)})${E}`),
+  };
+}
+
+const DEVA = grammar({ groups: L.GROUPS_HI, dehumanise: L.DEHUMANISE_HI, kill: L.KILL_HI, traits: L.STEREOTYPE_TRAITS_HI,
+  these: "ये|इन|सारे|सभी|सब|उन", quant: "सब|सारे|सभी|तो|बस|सिर्फ|निरे|सब के सब", not: "नहीं|ना|न|मत|कभी नहीं",
+  cop: "हैं|है|हो|होते हैं|होते है|ही हैं", obj: "को" });
+const LATN = grammar({ groups: L.GROUPS_HI_LATN, dehumanise: L.DEHUMANISE_HI_LATN, kill: L.KILL_HI_LATN,
+  traits: L.STEREOTYPE_TRAITS_HI_LATN, these: "ye|yeh|in|saare|sare|sabhi|sab|un", quant: "sab|saare|sare|sabhi|bas|sirf",
+  not: "nahi|nahin|nhi|na|mat|kabhi nahi", cop: "hai|hain|hote hain|hote hai|ho|hi hain", obj: "ko" });
+
+const RE_HI = {
+  deva: DEVA, latn: LATN,
+  slogan: re(`${B}(?:गोली मारो सालों को|goli maaro saalon ko|goli maro saalo ko)${E}`),
+  conspiracy: re(`${B}(?:${N(L.CONSPIRACY_HI)})${E}`),
+  paid: re(`${B}(?:${N(L.PAYMASTERS_HI)})\\s+(?:के|से|ke|se)\\s+(?:पैसे|पैसों|फंडिंग|टुकड़ों|paise|paison|funding|tukdon)\\s+(?:पर|से|पे|par|pe|se)${E}`),
+  slur: re(`${B}(?:${N(L.SLURS_HI)})${E}`),
+};
+
+const NEGATION_HI = RX.negation(["नहीं", "ना", "न", "मत", "nahi", "nahin", "nhi", "mat"]);
+
+const RULES = {
+  dehumanise: [[DEVA.dehumanise, true], [LATN.dehumanise, true]],
+  violence: [[DEVA.violence, true], [LATN.violence, true], [RE_HI.slogan, false]],
+  stereotype: [[DEVA.stereotype, true], [LATN.stereotype, true]],
+  conspiracy: [[RE_HI.conspiracy, false], [RE_HI.paid, false]],
+  slur: [[RE_HI.slur, false], [DEVA.gendered, false], [LATN.gendered, false]],
+};
+
+function scoreHi(hit, have) {
+  scoreRules(RULES, hit, have);
+}
+
+return { prepHi, RE_HI, NEGATION_HI, scoreHi };
+})();
+
 // ---- rhetoric.js
 const M_rhetoric = (() => {
 // Stance-neutral rhetoric markers. The word lists live in lexicon.js; this file holds the grammar.
@@ -1299,6 +1910,11 @@ const { scoreEs, NEGATION_ES } = M_rhetoric_es;
 const { scoreDe, NEGATION_DE } = M_rhetoric_de;
 const { scorePt, NEGATION_PT } = M_rhetoric_pt;
 const { scoreIt, NEGATION_IT } = M_rhetoric_it;
+const { scoreAr, NEGATION_AR, prepAr } = M_rhetoric_ar;
+const { scoreRu, NEGATION_RU, prepRu } = M_rhetoric_ru;
+const { scoreUk, NEGATION_UK } = M_rhetoric_uk;
+const { scoreZh, NEGATION_ZH, prepZh } = M_rhetoric_zh;
+const { scoreHi, NEGATION_HI, prepHi } = M_rhetoric_hi;
 
 const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -1390,20 +2006,27 @@ const EXTREME_AT = 2;
 const STRONG = new Set(["dehumanise", "violence", "vigilante", "slur", "stereotype"]);
 
 // Other languages, in order. Each adds only families that English and the languages before it
-// did not find, and negates its matches with its own negation words.
+// did not find, and negates its matches with its own negation words. `prep` normalises the text
+// for that language's lists (one alef in Arabic, simplified Chinese, NFC Hindi) before matching.
+// Ukrainian reads the modifier apostrophe as ', as replies type both.
 const LANGUAGES = [
   { code: "fr", score: scoreFr, negation: NEGATION_FR },
   { code: "es", score: scoreEs, negation: NEGATION_ES },
   { code: "de", score: scoreDe, negation: NEGATION_DE },
   { code: "pt", score: scorePt, negation: NEGATION_PT },
   { code: "it", score: scoreIt, negation: NEGATION_IT },
+  { code: "ar", score: scoreAr, negation: NEGATION_AR, prep: prepAr },
+  { code: "ru", score: scoreRu, negation: NEGATION_RU, prep: prepRu },
+  { code: "uk", score: scoreUk, negation: NEGATION_UK, prep: (t) => prepRu(t).replace(/ʼ/g, "'") },
+  { code: "zh", score: scoreZh, negation: NEGATION_ZH, prep: prepZh },
+  { code: "hi", score: scoreHi, negation: NEGATION_HI, prep: prepHi },
 ];
 
 // A matcher that records a marker when `re` matches and, if negatable, the match has no negation.
 function recorder(s, markers) {
   return (family, re, negatable = false, on = s, negation = NEGATION) => {
     const m = on.match(re);
-    if (!m || (negatable && negation.test(m[0])) || mention(s, m)) return false;
+    if (!m || (negatable && negation.test(m[0])) || mention(on, m)) return false;
     markers.push({ family, match: m[0].trim().slice(0, 80) });
     return true;
   };
@@ -1435,7 +2058,8 @@ function score(text) {
   scoreEnglish(s, hit);
   for (const lang of LANGUAGES) {
     const have = new Set(markers.map((m) => m.family));
-    lang.score((family, re, negatable = false) => hit(family, re, negatable, s, lang.negation), have);
+    const on = lang.prep ? lang.prep(s) : s;
+    lang.score((family, re, negatable = false) => hit(family, re, negatable, on, lang.negation), have);
   }
   const total = markers.reduce((a, m) => a + WEIGHTS[m.family], 0);
   return { score: total, markers, extreme: total >= EXTREME_AT };
@@ -4907,5 +5531,5 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric, ...M_measured, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+globalThis.PB = Object.freeze({ ...M_places, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_rhetoric, ...M_measured, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_pace, ...M_langs, ...M_state, ...M_trail, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
 })();
