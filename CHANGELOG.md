@@ -3,7 +3,11 @@
 All notable changes to Radar. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
-## Unreleased
+## 2.0.0 (2026-10-21)
+
+Radar now answers, in one hover: where a post comes from, who is pushing it, how it argues, whether a
+fact-checker has reviewed it, and whether its media carries Content Credentials. Every answer is sourced
+and states its limit. Nothing leaves the browser unless you turn on Other coverage and click.
 
 ### Added (sources)
 - Site cards on links. Rest the pointer on an outbound link in a post, or focus it, for the linked
