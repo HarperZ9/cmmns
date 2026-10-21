@@ -5288,10 +5288,41 @@ function verify(index, row, post) {
   return { claim: row.claim, rating: row.rating, checker: row.checker, url: row.url, date: row.date, lang: row.lang, coverage: Math.round(coverage * 100) / 100, shared: shared.length, negationDiffers: row.neg !== post.neg };
 }
 
+// Text read from an image (src/ocr) can carry one wrong letter in a word: "Venezucla", "150o".
+// With fuzzy on, a word of four or more characters that no claim uses is replaced by the one claim
+// word one edit away, when exactly one exists. The index of one-letter deletions is built on first use.
+function deletions(w) { const out = [w]; for (let i = 0; i < w.length; i++) out.push(w.slice(0, i) + w.slice(i + 1)); return out; }
+function nearToken(index, tok) {
+  if (tok.length < 4 || index.postings.has(tok)) return tok;
+  if (!index.dels) {
+    index.dels = new Map();
+    for (const k of index.postings.keys()) if (k.length >= 4) for (const d of deletions(k)) { const s = index.dels.get(d); if (!s) index.dels.set(d, [k]); else if (!s.includes(k)) s.push(k); }
+  }
+  const found = new Set();
+  for (const d of deletions(tok)) for (const k of index.dels.get(d) || []) if (oneEdit(tok, k)) found.add(k);
+  return found.size === 1 ? [...found][0] : tok;
+}
+function oneEdit(a, b) {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, diff = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++diff > 1) return false;
+    if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+  }
+  return diff + (a.length - i) + (b.length - j) <= 1;
+}
+
 // The best matches for one post, at most `max`, one per fact-check URL, closest first.
-function matchClaims(index, text, { max = 3 } = {}) {
+function matchClaims(index, text, { max = 3, fuzzy = false } = {}) {
   if (!index || !index.n || !text) return [];
   const t = claimTokens(text);
+  if (fuzzy) {
+    const near = new Map(t.tokens.map((k) => [k, nearToken(index, k)]));
+    t.tokens = t.tokens.map((k) => near.get(k));
+    t.named = new Set([...t.named].map((k) => near.get(k) || k));
+    t.numbers = new Set([...t.numbers].map((k) => near.get(k) || k));
+  }
   const post = { seq: t.tokens, have: new Set(t.tokens), pairs: pairs(t.tokens), neg: hasNegation(text) };
   if (post.have.size < MIN_SHARED) return [];
   const maxDf = Math.max(50, index.n * 0.05), hits = new Map();
@@ -5327,7 +5358,7 @@ function claimCard(m) {
   return { label: CLAIM_LABEL, rows };
 }
 
-return { MIN_CLAIM_TOKENS, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION, claimTokens, hasNegation, guessLanguage, buildClaimIndex, matchClaims, claimCard };
+return { MIN_CLAIM_TOKENS, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION, claimTokens, hasNegation, guessLanguage, buildClaimIndex, nearToken, matchClaims, claimCard };
 })();
 
 // ---- cbor.js
@@ -7024,6 +7055,9 @@ const DEFAULTS = Object.freeze({
   // Other coverage (src/core/coverage.js): off until the user turns it on; coverageConsent is set
   // when the user has read what it sends and clicked to send.
   search: {}, coverage: false, coverageConsent: false,
+  // Read text in images (src/core/imagetext.js, src/ocr): off until the user turns it on; even then
+  // it runs only on a click, on this device.
+  imageText: false,
 });
 
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
@@ -7043,6 +7077,7 @@ function normalizeSettings(raw) {
     calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
     search: switches(s.search, SEARCH_ENGINES.map(([id]) => id)), coverage: bool(s.coverage, DEFAULTS.coverage),
     coverageConsent: bool(s.coverage, false) && bool(s.coverageConsent, false),
+    imageText: bool(s.imageText, DEFAULTS.imageText),
   };
 }
 
@@ -7433,5 +7468,58 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_trail, ...M_crosslang, ...M_flooding, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+// ---- imagetext.js
+const M_imagetext = (() => {
+// Text read from an image (src/ocr, run in the extension's background on click). The words go
+// through the same rhetoric, theory, persuasion and fact-check matchers as a post's own text, and
+// every sign found that way says it was read from an image, with the recogniser's confidence. These
+// signs are not measured yet and never count toward the thread report.
+const { score } = M_rhetoric;
+const { persuasion } = M_persuasion;
+
+const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Radar's own text recogniser. The image and its text never leave your browser.";
+const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in Radar's options to read the words inside an image on this device.";
+const IMAGE_TEXT_DOES_NOT_PROVE = "The words were read by software and can be misread: a letter can change a word, or a word can be missed. The image can be edited, and reading its text says nothing about whether a post shown in it was real.";
+const MAX_SHOWN = 280;
+
+// The language model of the image's text, in the shape signals.js reads from a post.
+function imageTextModel(result) {
+  const text = (result && result.text) || "";
+  if (!text) return { markers: [], persuasion: [] };
+  return { markers: score(text).markers, persuasion: persuasion(text) };
+}
+
+const percent = (c) => `${Math.round(100 * Math.max(0, Math.min(1, c || 0)))}%`;
+
+// The window's rows once a reading has finished (or failed).
+function imageTextRows(result) {
+  if (!result) return [];
+  if (result.error) return [["Text in the image", `could not read it: ${result.error}`]];
+  if (!result.text) return [["Text in the image", "none found. Radar reads printed Latin-script text, such as English, French or Spanish; handwriting and other scripts are not read yet."]];
+  const shown = result.text.length > MAX_SHOWN ? result.text.slice(0, MAX_SHOWN).replace(/\s+\S*$/, "") + " …" : result.text;
+  const unsure = (result.lines || []).filter((l) => l.low).length;
+  return [
+    ["Text in the image", `"${shown}"`],
+    ["Confidence", `${percent(result.confidence)}, the recogniser's own average over the lines it kept; not a measured accuracy`],
+    ...(unsure ? [["Left out", `${unsure} ${unsure === 1 ? "line" : "lines"} the recogniser was unsure of`]] : []),
+    ["Read by", `Radar's own recogniser on this device, in ${Math.max(1, Math.round(result.ms || 0))} ms`],
+  ];
+}
+
+// A sign from the post's matchers, restated as read from an image: its own label and rows, the
+// recogniser's confidence, and the image line before its own does-not-prove line. Its family
+// becomes "image-text", so its measured line reads "not measured yet".
+function fromImage(signal, result) {
+  const rows = signal.rows.map(([h, v]) => [h === "In this post" ? "Read from the image" : h, v]);
+  const at = rows.findIndex(([h]) => h === "Does not prove");
+  const extra = [["Confidence", `${percent(result && result.confidence)} for the image's text as a whole`]];
+  const dnp = ["Does not prove", IMAGE_TEXT_DOES_NOT_PROVE + (at >= 0 ? " " + rows[at][1] : "")];
+  const body = at >= 0 ? rows.filter((_, i) => i !== at) : rows;
+  return { ...signal, label: `in image: ${signal.label}`, fam: "image-text", of: signal.fam, level: "info", fromImage: true, rows: [...body, ...extra, dnp] };
+}
+
+return { IMAGE_TEXT_NOTE, IMAGE_TEXT_OFF, IMAGE_TEXT_DOES_NOT_PROVE, imageTextModel, imageTextRows, fromImage };
+})();
+
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_trail, ...M_crosslang, ...M_flooding, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext });
 })();

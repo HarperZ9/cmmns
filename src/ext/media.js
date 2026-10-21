@@ -4,7 +4,7 @@
 // from the page's own <video> element and stay in this tab until the user picks a search service.
 (() => {
   "use strict";
-  const MAX_BYTES = 25 * 1024 * 1024, MIN_SIDE = 200;
+  const MAX_BYTES = 25 * 1024 * 1024, MIN_SIDE = 200;   // at least 200 wide and 100 high: posts, screenshots, banners of text
   // Web media only; the loopback address serves the local fixture harness (scripts/serve.mjs).
   const WEB = /^(https:|http:\/\/127\.0\.0\.1[:/])/;
   const checks = new Map();   // url -> { state: "reading" | "done", result }
@@ -23,7 +23,7 @@
         return { i, type: m.type === "photo" ? "image" : m.type, src: img ? img.currentSrc || img.src : directSrc(video), searchUrl: m.url || null, video, media: m };
       });
     }
-    const big = imgs.filter((x) => (x.naturalWidth >= MIN_SIDE && x.naturalHeight >= MIN_SIDE) || (x.width >= MIN_SIDE && x.height >= MIN_SIDE)).slice(0, 4);
+    const big = imgs.filter((x) => (x.naturalWidth >= MIN_SIDE && x.naturalHeight >= MIN_SIDE / 2) || (x.width >= MIN_SIDE && x.height >= MIN_SIDE / 2)).slice(0, 4);
     return [...big.map((x, i) => ({ i, type: "image", src: x.currentSrc || x.src, searchUrl: x.currentSrc || x.src })), ...vids.slice(0, 2).map((v, k) => ({ i: big.length + k, type: "video", src: directSrc(v), searchUrl: v.poster || null, video: v }))];
   }
 
@@ -116,6 +116,34 @@
     window.open(open, "_blank", "noopener,noreferrer");
   }
 
+  // Text in one image, on click: the bytes go to Radar's background worker (src/ext/ocr-bg.js),
+  // which reads them on this device; the text then goes to the fact-check index the same way a
+  // post's text does. Never run on its own.
+  const texts = new Map();   // url -> { state: "reading" | "done", result }
+  const b64 = (u8) => { let s = ""; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode(...u8.subarray(i, i + 0x8000)); return btoa(s); };
+  async function readText(url) {
+    if (!url || (texts.get(url) || {}).state === "reading") return;
+    texts.set(url, { state: "reading" });
+    PBPop.refresh();
+    let result;
+    try {
+      const { bytes, complete } = await readBytes(url);
+      if (!complete) throw new Error("the image is larger than Radar reads");
+      result = await chrome.runtime.sendMessage({ type: "pb-ocr", bytes: b64(bytes) });
+      if (result && result.text) {
+        const key = "img:" + url.length + ":" + url.slice(-24);
+        const hits = await chrome.runtime.sendMessage({ type: "pb-claims", posts: [{ id: key, text: result.text }], fromImage: true });
+        result = { ...result, claims: (hits && hits[key]) || [] };
+      }
+    } catch (e) {
+      console.warn("[radar] reading text in the image failed", url, e);
+      result = { error: e instanceof TypeError ? "the media host did not let Radar read the file from this page" : String(e.message || e) };
+    }
+    texts.set(url, { state: "done", result: result || { error: "no answer from Radar's background worker" } });
+    PBPop.refresh();
+  }
+  const textsFor = (node, tweet) => inPost(node, tweet).map((x) => (texts.get(x.src) || {}).result).filter((r) => r && !r.error);
+
   const resultsFor = (node, tweet) => inPost(node, tweet).map((x) => (checks.get(x.src) || {}).result).filter(Boolean);
-  globalThis.PBMedia = Object.freeze({ inPost, check, takeFrames, searchFrame, checkOf: (u) => checks.get(u) || null, framesOf: (k) => frames.get(k) || null, resultsFor });
+  globalThis.PBMedia = Object.freeze({ inPost, check, takeFrames, searchFrame, checkOf: (u) => checks.get(u) || null, framesOf: (k) => frames.get(k) || null, resultsFor, readText, textOf: (u) => texts.get(u) || null, textsFor });
 })();

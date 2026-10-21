@@ -47,6 +47,7 @@
     $("reading").append(
       switchRow("Radar on feeds and profiles", "Off: Radar reads only the replies under a post you open.", s().feeds, (on) => save({ feeds: on })),
       switchRow("Read account details automatically", "Off: account details are read only when you ask in the window.", s().auto, (on) => save({ auto: on })),
+      switchRow("Read text in images", "Adds \"Read text in this image\" to the window's Media area. Radar reads the words on this device, only when you click, in Latin-script languages; the image and its text never leave your browser.", s().imageText, (on) => save({ imageText: on })),
     );
   }
 

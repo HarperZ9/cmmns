@@ -135,10 +135,41 @@ function verify(index, row, post) {
   return { claim: row.claim, rating: row.rating, checker: row.checker, url: row.url, date: row.date, lang: row.lang, coverage: Math.round(coverage * 100) / 100, shared: shared.length, negationDiffers: row.neg !== post.neg };
 }
 
+// Text read from an image (src/ocr) can carry one wrong letter in a word: "Venezucla", "150o".
+// With fuzzy on, a word of four or more characters that no claim uses is replaced by the one claim
+// word one edit away, when exactly one exists. The index of one-letter deletions is built on first use.
+function deletions(w) { const out = [w]; for (let i = 0; i < w.length; i++) out.push(w.slice(0, i) + w.slice(i + 1)); return out; }
+export function nearToken(index, tok) {
+  if (tok.length < 4 || index.postings.has(tok)) return tok;
+  if (!index.dels) {
+    index.dels = new Map();
+    for (const k of index.postings.keys()) if (k.length >= 4) for (const d of deletions(k)) { const s = index.dels.get(d); if (!s) index.dels.set(d, [k]); else if (!s.includes(k)) s.push(k); }
+  }
+  const found = new Set();
+  for (const d of deletions(tok)) for (const k of index.dels.get(d) || []) if (oneEdit(tok, k)) found.add(k);
+  return found.size === 1 ? [...found][0] : tok;
+}
+function oneEdit(a, b) {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, diff = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++diff > 1) return false;
+    if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+  }
+  return diff + (a.length - i) + (b.length - j) <= 1;
+}
+
 // The best matches for one post, at most `max`, one per fact-check URL, closest first.
-export function matchClaims(index, text, { max = 3 } = {}) {
+export function matchClaims(index, text, { max = 3, fuzzy = false } = {}) {
   if (!index || !index.n || !text) return [];
   const t = claimTokens(text);
+  if (fuzzy) {
+    const near = new Map(t.tokens.map((k) => [k, nearToken(index, k)]));
+    t.tokens = t.tokens.map((k) => near.get(k));
+    t.named = new Set([...t.named].map((k) => near.get(k) || k));
+    t.numbers = new Set([...t.numbers].map((k) => near.get(k) || k));
+  }
   const post = { seq: t.tokens, have: new Set(t.tokens), pairs: pairs(t.tokens), neg: hasNegation(text) };
   if (post.have.size < MIN_SHARED) return [];
   const maxDf = Math.max(50, index.n * 0.05), hits = new Map();

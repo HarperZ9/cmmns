@@ -67,6 +67,14 @@
     if (C && C.originHidden && C.intermediaries >= 1) out.push({ label: `passed through ${C.intermediaries} ${C.intermediaries === 1 ? "step" : "steps"}`, fam: "laundered", level: "info", cat: "sources", rows: [["Chain", C.hops.map((h) => (h.handle ? "@" + h.handle : h.domain) + (h.role === "origin" ? " (earliest Radar saw)" : "")).join(" → ")], C.hoursFromOrigin != null ? ["Time from origin", `${C.hoursFromOrigin} h`] : null, dnp(PB.CHAIN_DOES_NOT_PROVE)].filter(Boolean) });
     // Content Credentials and AI metadata, once the user has checked a file in this post.
     if (globalThis.PBMedia) for (const r of PBMedia.resultsFor(m.node, m.tweet)) out.push(...PB.credentialSignals(r));
+    // Text the user had Radar read from an image in this post: the same language and fact-check
+    // signs, each labelled as read from an image and kept at info level.
+    if (globalThis.PBMedia && PBMedia.textsFor) {
+      for (const r of PBMedia.textsFor(m.node, m.tweet)) {
+        const found = [...language(PB.imageTextModel(r)), ...(r.claims || []).map((c) => { const card = PB.claimCard(c); return { label: card.label, fam: "fact-check", level: "warn", cat: "sources", rows: card.rows }; })];
+        out.push(...found.map((x) => PB.fromImage(x, r)));
+      }
+    }
     if (T.client && !PB.COMMON_CLIENTS.test(T.client)) out.push({ label: `via ${T.client}`, fam: "client", level: "flag", cat: "posting", rows: [["Source", "The app this post was sent from, in the data X loaded. X no longer shows it."], ["What it is", "Scheduling tools, automation services and custom apps post this way."], dnp("News desks, brands and many people schedule posts with tools like these.")] });
     if (m.paid) out.push({ label: "ad", fam: "ad", level: "flag", cat: "sources", rows: [["Source", "X labels this an ad or promoted post: someone paid for it to reach you."]] });
     const place = m.reading && m.reading.basedIn && (PB.parseLabel(m.reading.basedIn) || {}).country;
