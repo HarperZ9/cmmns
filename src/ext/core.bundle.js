@@ -5971,6 +5971,450 @@ function campaignLens(input) {
 return { CAMPAIGN_DOES_NOT_PROVE, CAMPAIGN_LEADS, CAMPAIGN_DISPUTE, actorOf, campaignLens };
 })();
 
+// ---- receipt.js
+const M_receipt = (() => {
+// Evidence receipts (project-docs/EVIDENCE-LAYER.md). Every fact the evidence layer returns comes
+// back as one: what was observed, about what, from which source and address, when, a SHA-256 hash
+// over all of that, and what the fact does not prove. The hash lets anyone holding the receipt see
+// that it was not edited after it was made; it does not show that the source was right.
+
+const RECEIPT_FORMAT = "radar-receipt/1";
+
+// JSON with keys sorted at every level, so the same receipt always hashes the same.
+function canonical(v) {
+  if (Array.isArray(v)) return `[${v.map(canonical).join(",")}]`;
+  if (v && typeof v === "object") return `{${Object.keys(v).sort().filter((k) => v[k] !== undefined).map((k) => `${JSON.stringify(k)}:${canonical(v[k])}`).join(",")}}`;
+  return JSON.stringify(v === undefined ? null : v);
+}
+
+async function sha256Hex(text) {
+  const buf = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(text)));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// The capture method and version of the code that read the fact, kept in every receipt.
+const ADAPTER_VERSION = "radar-evidence/1";
+
+// { kind, subject, observed, source, url, at, dnp, raw?, method?, witness?, cites?, catalogue? } ->
+// the receipt with its hash. raw is the source fragment the fact was read from: only its hash is
+// kept. cites lists the hashes of the observations a finding rests on, catalogue the catalogue
+// version of any definition it uses. For the export profiles (project-docs/EVIDENCE-LAYER.md, "Data
+// model for exports"): subjectKind says whether the subject is an artefact (a repository, a domain,
+// a post), an organisation the platform discloses, or a private account, which is only ever held
+// as a pseudonym (pseudonymFor); labeller and stratum are set on hand-labelled observations.
+const SUBJECT_KINDS = ["artefact", "organisation", "private-pseudonym"];
+async function makeReceipt({ kind, subject, observed, source, url, at = new Date().toISOString(), dnp, raw, method = "fetch", witness, cites, catalogue, subjectKind = "artefact", labeller, stratum }) {
+  if (!SUBJECT_KINDS.includes(subjectKind)) throw new Error(`unknown subject kind ${subjectKind}`);
+  if (!kind || !source || !dnp) throw new Error("a receipt needs a kind, a source and a does-not-prove line");
+  const body = { format: RECEIPT_FORMAT, kind, subject: subject || null, observed, source, url: url || null, at, dnp,
+    capture: { method, adapter: ADAPTER_VERSION, rawHash: raw === undefined ? null : await sha256Hex(canonical(raw)) },
+    subjectKind, content: "features", witness: witness || undefined, cites: cites && cites.length ? [...cites] : undefined, catalogue: catalogue || undefined,
+    labeller: labeller || undefined, stratum: stratum || undefined };
+  return { ...body, hash: await sha256Hex(canonical(body)) };
+}
+
+async function verifyReceipt(r) {
+  if (!r || r.format !== RECEIPT_FORMAT || !r.hash) return false;
+  const { hash, ...body } = r;
+  return (await sha256Hex(canonical(body))) === hash;
+}
+
+// A private account's stable pseudonym inside one export: salted, so exports with different salts
+// cannot be joined, and the handle never appears.
+async function pseudonymFor(salt, handle) {
+  return "acct-" + (await sha256Hex(`${salt}|${String(handle || "").toLowerCase()}`)).slice(0, 16);
+}
+
+return { RECEIPT_FORMAT, canonical, sha256Hex, ADAPTER_VERSION, SUBJECT_KINDS, makeReceipt, verifyReceipt, pseudonymFor };
+})();
+
+// ---- evidence-github.js
+const M_evidence_github = (() => {
+// GitHub facts for the evidence layer (project-docs/EVIDENCE-LAYER.md): a repository's creation
+// date and star count from the public repository endpoint, and star bursts from the stargazers
+// list with timestamps. Checked 2026-10-22: the repository endpoint answers without a login; the
+// stargazers list answers 401 "Requires authentication", so star timestamps need the user's own
+// GitHub token, which Radar keeps on this device and sends only to api.github.com.
+
+const GITHUB_API = "https://api.github.com";
+const STAR_MAX_PAGES = 10, STAR_PER_PAGE = 100;
+const STAR_BURST_FACTOR = 10, STAR_BURST_MIN = 50;
+const REPO_DOES_NOT_PROVE = "A creation date is when this repository was made on GitHub. Work often starts elsewhere or in another repository, so it says nothing about how long a team has been building.";
+const STARS_DOES_NOT_PROVE = "Stars arrive in bursts after a launch, a newsletter or a front-page link. A burst shows when stars came, not who gave them or why.";
+
+// github.com/<owner>/<repo> links in a text or a list of links -> unique [{ owner, repo }].
+function reposIn(textOrLinks) {
+  const s = Array.isArray(textOrLinks) ? textOrLinks.join(" ") : String(textOrLinks || "");
+  const out = new Map();
+  for (const m of s.matchAll(/github\.com\/([A-Za-z0-9-]{1,39})\/([A-Za-z0-9._-]{1,100})/g)) {
+    const owner = m[1], repo = m[2].replace(/\.git$/, "").replace(/[.,;:]+$/, "");
+    if (/^(?:orgs|sponsors|features|topics|marketplace|settings|login|about|pricing)$/i.test(owner)) continue;
+    out.set(`${owner}/${repo}`.toLowerCase(), { owner, repo });
+  }
+  return [...out.values()];
+}
+
+// The repository endpoint's JSON -> the facts Radar keeps.
+function repoFacts(json) {
+  if (!json || !json.full_name) return null;
+  return { repo: json.full_name, created: json.created_at || null, pushed: json.pushed_at || null, stars: Number.isFinite(json.stargazers_count) ? json.stargazers_count : null, forks: Number.isFinite(json.forks_count) ? json.forks_count : null };
+}
+
+// One stargazers page (Accept: application/vnd.github.star+json) -> ISO times.
+const starTimes = (page) => (Array.isArray(page) ? page.map((x) => x && x.starred_at).filter((t) => Number.isFinite(Date.parse(t))) : []);
+
+// The page numbers to read for a repository with `stars` stars: the first STAR_MAX_PAGES / 2 and the
+// last STAR_MAX_PAGES / 2, so a big repository costs at most STAR_MAX_PAGES requests and both its
+// first stars and its latest are seen. The middle is reported as not read.
+function starPages(stars) {
+  const total = Math.max(1, Math.ceil((stars || 0) / STAR_PER_PAGE));
+  if (total <= STAR_MAX_PAGES) return { pages: Array.from({ length: total }, (_, i) => i + 1), total, skipped: 0 };
+  const half = STAR_MAX_PAGES / 2;
+  const pages = [...Array.from({ length: half }, (_, i) => i + 1), ...Array.from({ length: half }, (_, i) => total - half + 1 + i)];
+  return { pages, total, skipped: total - STAR_MAX_PAGES };
+}
+
+// Star times -> stars per UTC day, and the busiest 24 hours against the median day with any stars.
+function starBursts(times) {
+  const t = times.map((x) => Date.parse(x)).filter(Number.isFinite).sort((a, b) => a - b);
+  if (!t.length) return null;
+  const perDay = {};
+  for (const x of t) { const d = new Date(x).toISOString().slice(0, 10); perDay[d] = (perDay[d] || 0) + 1; }
+  const counts = Object.values(perDay).sort((a, b) => a - b);
+  const median = counts[Math.floor(counts.length / 2)];
+  let best = { n: 0, from: null, to: null };
+  for (let i = 0, j = 0; i < t.length; i++) {
+    while (t[i] - t[j] > 86400000) j++;
+    if (i - j + 1 > best.n) best = { n: i - j + 1, from: new Date(t[j]).toISOString(), to: new Date(t[i]).toISOString() };
+  }
+  const factor = median ? best.n / median : null;
+  return { stars: t.length, days: counts.length, medianPerDay: median, busiest: best, factor, burst: best.n >= STAR_BURST_MIN && factor >= STAR_BURST_FACTOR };
+}
+
+return { GITHUB_API, STAR_MAX_PAGES, STAR_BURST_FACTOR, REPO_DOES_NOT_PROVE, STARS_DOES_NOT_PROVE, reposIn, repoFacts, starTimes, starPages, starBursts };
+})();
+
+// ---- evidence-domain.js
+const M_evidence_domain = (() => {
+// Domain facts for the evidence layer (project-docs/EVIDENCE-LAYER.md): registration date from RDAP
+// (rdap.org forwards to the registry's own RDAP server) and the first Internet Archive capture
+// (Wayback CDX). Checked 2026-10-22: both answer without a login and send
+// Access-Control-Allow-Origin: *.
+
+const RDAP_BASE = "https://rdap.org/domain/";
+const CDX_BASE = "https://web.archive.org/cdx/search/cdx";
+const DOMAIN_DOES_NOT_PROVE = "A registration date is when the current registration began. Domains are bought, sold and re-registered, and a young domain can front an old company.";
+const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly. A late first capture means the archive found the site late, not that it did not exist.";
+
+// The registrable part of a host, roughly: the last two labels, or three under a two-letter
+// second-level such as co.uk. Good enough to pick what to ask RDAP about; RDAP itself says no if wrong.
+function registrable(host) {
+  const parts = String(host || "").toLowerCase().replace(/^www\./, "").split(".").filter(Boolean);
+  if (parts.length < 2) return null;
+  const sld = parts[parts.length - 2];
+  return (parts.length >= 3 && /^(?:co|com|org|net|ac|gov|edu)$/.test(sld) && parts[parts.length - 1].length === 2 ? parts.slice(-3) : parts.slice(-2)).join(".");
+}
+
+const rdapUrl = (domain) => RDAP_BASE + encodeURIComponent(domain);
+const cdxUrl = (domain) => `${CDX_BASE}?url=${encodeURIComponent(domain)}&limit=1&output=json&fl=timestamp,original,statuscode`;
+
+// RDAP domain JSON -> { domain, registered, expires, lastChanged, registrar }. The registrar is an
+// organisation; people named in RDAP contacts are never read.
+function rdapFacts(json) {
+  if (!json || json.objectClassName !== "domain") return null;
+  const ev = (a) => ((json.events || []).find((e) => e.eventAction === a) || {}).eventDate || null;
+  const reg = (json.entities || []).find((e) => (e.roles || []).includes("registrar"));
+  const fn = reg && Array.isArray(reg.vcardArray) ? ((reg.vcardArray[1] || []).find((x) => x[0] === "fn") || [])[3] || null : null;
+  return { domain: String(json.ldhName || "").toLowerCase(), registered: ev("registration"), expires: ev("expiration"), lastChanged: ev("last changed"), registrar: fn };
+}
+
+// Wayback CDX JSON ([[header...], [timestamp, original, status]]) -> { first, url } or null.
+function waybackFirst(json) {
+  const row = Array.isArray(json) && json.length > 1 ? json[1] : null;
+  if (!row || !/^\d{14}$/.test(row[0])) return null;
+  const t = row[0];
+  return { first: `${t.slice(0, 4)}-${t.slice(4, 6)}-${t.slice(6, 8)}T${t.slice(8, 10)}:${t.slice(10, 12)}:${t.slice(12, 14)}Z`, url: `https://web.archive.org/web/${t}/${row[1]}` };
+}
+
+// Days between a date and a later moment (the post), or null.
+function daysBefore(iso, atIso) {
+  const a = Date.parse(iso), b = Date.parse(atIso);
+  return Number.isFinite(a) && Number.isFinite(b) ? Math.floor((b - a) / 86400000) : null;
+}
+
+return { RDAP_BASE, CDX_BASE, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE, registrable, rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore };
+})();
+
+// ---- evidence-ads.js
+const M_evidence_ads = (() => {
+// Ad transparency libraries for the evidence layer (project-docs/EVIDENCE-LAYER.md). Radar fetches
+// none of them: each needs a login, an approved key, or has no public API, and their terms limit
+// automated access. Radar builds a search link the user opens in a tab of their own, and says which
+// libraries offer an API and what it needs. Status checked 2026-10-22 (HTTP status of the search
+// page to a script, and each provider's API documentation).
+
+const AD_LIBRARIES = [
+  { id: "meta", name: "Meta Ad Library", covers: "Facebook, Instagram, Messenger; all ads in the EU under the DSA, political and issue ads elsewhere",
+    search: (q) => `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q=${encodeURIComponent(q)}`,
+    api: "Ad Library API (graph.facebook.com ads_archive): needs a Meta developer account, identity confirmation and the user's own access token.", by: "name", checked: "search page answered 403 to a script; opens in a browser" },
+  { id: "google", name: "Google Ads Transparency Center", covers: "Google Search, YouTube, Display; advertiser identity and ad dates",
+    search: (q, domain) => (domain ? `https://adstransparency.google.com/?region=anywhere&domain=${encodeURIComponent(domain)}` : `https://adstransparency.google.com/?region=anywhere`),
+    api: "No public API. Google publishes a political-ads dataset in BigQuery; commercial ads are web only.", by: "domain", checked: "search page answered 200" },
+  { id: "tiktok", name: "TikTok Ad Library", covers: "Ads shown in the EU, the EEA, Switzerland and the UK",
+    search: (q) => `https://library.tiktok.com/ads?region=all&adv_name=${encodeURIComponent(q)}`,
+    api: "Commercial Content API: needs an approved TikTok research or developer application.", by: "name", checked: "search page answered 200" },
+  { id: "linkedin", name: "LinkedIn Ad Library", covers: "Ads on LinkedIn, with EU targeting details under the DSA",
+    search: (q) => `https://www.linkedin.com/ad-library/search?keyword=${encodeURIComponent(q)}`,
+    api: "No public API.", by: "name", checked: "search page answered 403 to a script; opens in a browser" },
+  { id: "x", name: "X Ads Repository", covers: "Ads served in the EU under the DSA",
+    search: () => "https://ads.x.com/ads-repository",
+    api: "No public API; the repository page takes an advertiser and a date range.", by: "none", checked: "page answered 200" },
+];
+const ADS_DOES_NOT_PROVE = "An ad library lists ads a platform chose to record for its own rules. No entry does not mean no paid promotion: influencer payments, agency-run accounts and engagement bought off-platform never appear there.";
+
+// { name, domain } -> [{ id, name, url, covers, api, checked }] for the user to open.
+function adLibraryLinks({ name, domain } = {}) {
+  const q = String(name || domain || "").trim();
+  if (!q) return [];
+  return AD_LIBRARIES.map((l) => ({ id: l.id, name: l.name, url: l.search(q, domain || null), covers: l.covers, api: l.api, checked: l.checked }));
+}
+
+return { AD_LIBRARIES, ADS_DOES_NOT_PROVE, adLibraryLinks };
+})();
+
+// ---- evidence-ledger.js
+const M_evidence_ledger = (() => {
+// The local engagement-history ledger (project-docs/EVIDENCE-LAYER.md): each time the user opens a
+// post, its public counts are written down with the time, on this device only. Over several visits
+// the ledger shows how the counts grew: a repost count that jumps by thousands between two visits an
+// hour apart while likes stay flat is a fact the user saw twice. No account and no text is kept.
+
+const LEDGER_KEY = "pb.ledger.v1", LEDGER_RETAIN_DAYS = 30, LEDGER_MAX_POSTS = 500, LEDGER_MAX_POINTS = 48, LEDGER_MIN_GAP_MS = 10 * 60000;
+const LEDGER_DOES_NOT_PROVE = "Counts are what the platform showed at each visit. Platforms round, delay and recount, and a post can be shared into a large community between two visits.";
+const KEYS = ["reposts", "likes", "replies", "quotes", "bookmarks", "views"];
+const DAY = 86400000;
+
+// Adds one observation of a post's counts. A point closer than LEDGER_MIN_GAP_MS to the last one
+// replaces it, so a page refreshing every few seconds does not fill the ledger.
+function recordCounts(ledger, postId, counts, at = Date.now()) {
+  const L = { ...(ledger || {}) };
+  const point = { at, ...Object.fromEntries(KEYS.filter((k) => Number.isFinite(counts && counts[k])).map((k) => [k, counts[k]])) };
+  if (Object.keys(point).length < 2) return L;
+  const pts = [...((L[postId] || {}).points || [])];
+  if (pts.length && at - pts[pts.length - 1].at < LEDGER_MIN_GAP_MS) pts[pts.length - 1] = point; else pts.push(point);
+  L[postId] = { seen: at, points: pts.slice(-LEDGER_MAX_POINTS) };
+  return pruneLedger(L, at);
+}
+
+function pruneLedger(ledger, now = Date.now()) {
+  const keep = Object.entries(ledger || {}).filter(([, v]) => now - v.seen <= LEDGER_RETAIN_DAYS * DAY).sort((a, b) => b[1].seen - a[1].seen).slice(0, LEDGER_MAX_POSTS);
+  return Object.fromEntries(keep);
+}
+
+// Growth between the first and last visit, and the largest step between two visits, per count.
+function ledgerGrowth(entry) {
+  const pts = (entry && entry.points) || [];
+  if (pts.length < 2) return null;
+  const out = { visits: pts.length, from: new Date(pts[0].at).toISOString(), to: new Date(pts[pts.length - 1].at).toISOString(), counts: {} };
+  for (const k of KEYS) {
+    const xs = pts.filter((p) => Number.isFinite(p[k]));
+    if (xs.length < 2) continue;
+    let step = { by: 0, hours: null };
+    for (let i = 1; i < xs.length; i++) { const by = xs[i][k] - xs[i - 1][k]; if (by > step.by) step = { by, hours: Math.round(((xs[i].at - xs[i - 1].at) / 3600000) * 10) / 10 }; }
+    out.counts[k] = { first: xs[0][k], last: xs[xs.length - 1][k], largestStep: step };
+  }
+  return out;
+}
+
+return { LEDGER_KEY, LEDGER_DOES_NOT_PROVE, recordCounts, pruneLedger, ledgerGrowth };
+})();
+
+// ---- evidence-fetch.js
+const M_evidence_fetch = (() => {
+// The evidence lookups (project-docs/EVIDENCE-LAYER.md): one user click, for the post the user is
+// viewing, asks GitHub, RDAP and the Internet Archive about the repositories and domains that post
+// links to, and returns receipts. The fetch function is passed in, so tests run on fixtures and the
+// extension's background worker passes the browser's fetch.
+//
+// Limits that hold: at most MAX_REPOS repositories and MAX_DOMAINS domains per click; at most
+// STAR_MAX_PAGES stargazer pages per repository, and only with the user's own token; one request at a
+// time per host; a 403 or 429 stops that host for the click and is reported, never retried around.
+
+const { makeReceipt } = M_receipt;
+const { GITHUB_API, repoFacts, starTimes, starPages, starBursts, REPO_DOES_NOT_PROVE, STARS_DOES_NOT_PROVE } = M_evidence_github;
+const { rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE } = M_evidence_domain;
+
+const MAX_REPOS = 2, MAX_DOMAINS = 3, LOOKUP_TIMEOUT_MS = 15000;
+
+async function getJson(fetchFn, url, headers = {}) {
+  const ctrl = typeof AbortController === "function" ? new AbortController() : null;
+  const timer = ctrl ? setTimeout(() => ctrl.abort(), LOOKUP_TIMEOUT_MS) : 0;
+  try {
+    const r = await fetchFn(url, { headers, ...(ctrl ? { signal: ctrl.signal } : {}), credentials: "omit", redirect: "follow" });
+    if (!r.ok) return { status: r.status };
+    return { status: r.status, json: await r.json() };
+  } catch (e) {
+    console.error("[radar] evidence lookup failed", url, e);
+    return { status: "error" };
+  } finally { if (timer) clearTimeout(timer); }
+}
+
+async function github(fetchFn, { owner, repo }, token, postedAt) {
+  const base = `${GITHUB_API}/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
+  const out = [], notes = [];
+  const r = await getJson(fetchFn, base, { Accept: "application/vnd.github+json" });
+  const facts = r.json ? repoFacts(r.json) : null;
+  if (!facts) return { receipts: out, notes: [`GitHub answered ${r.status} for ${owner}/${repo}.`] };
+  const age = daysBefore(facts.created, postedAt);
+  out.push(await makeReceipt({ kind: "github-repo", subject: facts.repo, observed: { ...facts, daysBeforePost: age }, raw: r.json, source: "GitHub REST API, repository endpoint", url: base, dnp: REPO_DOES_NOT_PROVE }));
+  if (!token) return { receipts: out, notes: ["Star timestamps need your own GitHub token (GitHub requires a login for the stargazers list). Add one in Options to see star bursts."] };
+  const plan = starPages(facts.stars), times = [];
+  for (const p of plan.pages) {
+    const s = await getJson(fetchFn, `${base}/stargazers?per_page=100&page=${p}`, { Accept: "application/vnd.github.star+json", Authorization: `Bearer ${token}` });
+    if (!s.json) { notes.push(`GitHub stopped the star list at page ${p} (${s.status}); Radar does not retry around a limit.`); break; }
+    times.push(...starTimes(s.json));
+  }
+  const bursts = starBursts(times);
+  if (bursts) out.push(await makeReceipt({ kind: "github-stars", subject: facts.repo, observed: { ...bursts, pagesRead: plan.pages.length, pagesSkipped: plan.skipped }, source: "GitHub REST API, stargazers with timestamps (your token)", url: `${base}/stargazers`, dnp: STARS_DOES_NOT_PROVE }));
+  return { receipts: out, notes };
+}
+
+async function domain(fetchFn, d, postedAt) {
+  const out = [], notes = [];
+  const r = await getJson(fetchFn, rdapUrl(d), { Accept: "application/rdap+json" });
+  const f = r.json ? rdapFacts(r.json) : null;
+  if (f && f.registered) out.push(await makeReceipt({ kind: "domain-registration", subject: f.domain, observed: { ...f, daysBeforePost: daysBefore(f.registered, postedAt) }, raw: r.json, source: "RDAP via rdap.org", url: rdapUrl(d), dnp: DOMAIN_DOES_NOT_PROVE }));
+  else notes.push(`RDAP answered ${r.status} for ${d}.`);
+  const w = await getJson(fetchFn, cdxUrl(d));
+  const first = w.json ? waybackFirst(w.json) : null;
+  if (first) out.push(await makeReceipt({ kind: "wayback-first", subject: d, observed: { ...first, daysBeforePost: daysBefore(first.first, postedAt) }, raw: w.json, source: "Internet Archive Wayback CDX", url: cdxUrl(d), dnp: WAYBACK_DOES_NOT_PROVE }));
+  else notes.push(w.json ? `The Internet Archive has no capture of ${d}.` : `The Internet Archive answered ${w.status} for ${d}.`);
+  return { receipts: out, notes };
+}
+
+// { repos: [{ owner, repo }], domains: [string], postedAt, token? } -> { receipts, notes }.
+async function lookupEvidence(fetchFn, { repos = [], domains = [], postedAt = null, token = null } = {}) {
+  const receipts = [], notes = [];
+  for (const x of repos.slice(0, MAX_REPOS)) { const g = await github(fetchFn, x, token, postedAt); receipts.push(...g.receipts); notes.push(...g.notes); }
+  for (const d of domains.slice(0, MAX_DOMAINS)) { const g = await domain(fetchFn, d, postedAt); receipts.push(...g.receipts); notes.push(...g.notes); }
+  if (repos.length > MAX_REPOS || domains.length > MAX_DOMAINS) notes.push(`Looked up the first ${MAX_REPOS} repositories and ${MAX_DOMAINS} domains only.`);
+  return { receipts, notes };
+}
+
+return { MAX_REPOS, lookupEvidence };
+})();
+
+// ---- evidence-seal.js
+const M_evidence_seal = (() => {
+// The seal for the evidence layer (project-docs/EVIDENCE-LAYER.md, "Chain of evidence"): an
+// append-only, hash-chained local log of receipts, a Merkle root over it, inclusion proofs for one
+// receipt, a verifier, and the export a journalist or regulator can check offline.
+//
+// The Merkle tree follows RFC 6962 / RFC 9162 with domain separation (leaf = SHA-256(0x00 || data),
+// node = SHA-256(0x01 || left || right)), the same construction as Flywheel's harness/merkle.py, so
+// one verifier reads both. A leaf's data is the receipt's hash as hex text.
+
+const { canonical, sha256Hex, verifyReceipt } = M_receipt;
+
+const SEAL_FORMAT = "radar-seal/1", EXPORT_FORMAT = "radar-evidence-chain/1";
+const SEAL_DOES_NOT_PROVE = "The seal shows that these receipts are the ones this browser recorded, in this order, and that none was changed or removed after the fact. It does not show that a source told the truth, and whoever holds the device could start a new log.";
+const GENESIS = "0".repeat(64);
+
+const hexToBytes = (h) => Uint8Array.from(h.match(/../g).map((x) => parseInt(x, 16)));
+const bytesToHex = (b) => [...b].map((x) => x.toString(16).padStart(2, "0")).join("");
+async function sha(bytes) { return new Uint8Array(await globalThis.crypto.subtle.digest("SHA-256", bytes)); }
+const cat = (...parts) => { const out = new Uint8Array(parts.reduce((a, p) => a + p.length, 0)); let i = 0; for (const p of parts) { out.set(p, i); i += p.length; } return out; };
+const leafHash = (dataText) => sha(cat(Uint8Array.of(0), new TextEncoder().encode(dataText)));
+const nodeHash = (l, r) => sha(cat(Uint8Array.of(1), l, r));
+const pow2Below = (n) => { let k = 1; while (k * 2 < n) k *= 2; return k; };
+
+async function mth(hashes) {
+  if (!hashes.length) return sha(new Uint8Array(0));
+  if (hashes.length === 1) return hashes[0];
+  const k = pow2Below(hashes.length);
+  return nodeHash(await mth(hashes.slice(0, k)), await mth(hashes.slice(k)));
+}
+async function proofOf(hashes, m) {
+  if (hashes.length <= 1) return [];
+  const k = pow2Below(hashes.length);
+  return m < k ? [...(await proofOf(hashes.slice(0, k), m)), await mth(hashes.slice(k))] : [...(await proofOf(hashes.slice(k), m - k)), await mth(hashes.slice(0, k))];
+}
+
+// Receipt hashes (hex) -> the Merkle root (hex).
+async function merkleRoot(receiptHashes) { return bytesToHex(await mth(await Promise.all(receiptHashes.map(leafHash)))); }
+
+// The inclusion proof for receipt m of n: { index, size, path: [hex] }.
+async function inclusionProof(receiptHashes, m) {
+  const leaves = await Promise.all(receiptHashes.map(leafHash));
+  return { index: m, size: leaves.length, path: (await proofOf(leaves, m)).map(bytesToHex) };
+}
+
+// RFC 9162 section 2.1.3.2.
+async function verifyInclusion(receiptHash, { index, size, path }, rootHex) {
+  if (!(index >= 0 && index < size)) return false;
+  let fn = index, sn = size - 1, r = await leafHash(receiptHash);
+  for (const p of path) {
+    if (sn === 0) return false;
+    const pb = hexToBytes(p);
+    if (fn % 2 === 1 || fn === sn) {
+      r = await nodeHash(pb, r);
+      if (fn % 2 === 0) while (fn % 2 === 0 && fn !== 0) { fn >>= 1; sn >>= 1; }
+    } else r = await nodeHash(r, pb);
+    fn >>= 1; sn >>= 1;
+  }
+  return sn === 0 && bytesToHex(r) === rootHex;
+}
+
+const emptySeal = () => ({ format: SEAL_FORMAT, entries: [] });
+
+// Appends one receipt: { seq, prev, receipt, link } where link = SHA-256(canonical({ seq, prev, hash })).
+async function appendSeal(seal, receipt) {
+  const entries = [...((seal && seal.entries) || [])];
+  const seq = entries.length, prev = seq ? entries[seq - 1].link : GENESIS;
+  const link = await sha256Hex(canonical({ seq, prev, hash: receipt.hash }));
+  entries.push({ seq, prev, link, receipt });
+  return { format: SEAL_FORMAT, entries };
+}
+
+// Checks every receipt's own hash and every link. Returns { ok, problems: [string] }.
+async function verifySeal(seal) {
+  const problems = [];
+  const entries = (seal && seal.entries) || [];
+  let prev = GENESIS;
+  for (let i = 0; i < entries.length; i++) {
+    const e = entries[i];
+    if (e.seq !== i) problems.push(`entry ${i}: sequence ${e.seq}`);
+    if (e.prev !== prev) problems.push(`entry ${i}: does not follow entry ${i - 1}`);
+    if (!(await verifyReceipt(e.receipt))) problems.push(`entry ${i}: receipt changed after it was made`);
+    if ((await sha256Hex(canonical({ seq: e.seq, prev: e.prev, hash: e.receipt && e.receipt.hash }))) !== e.link) problems.push(`entry ${i}: link does not match`);
+    prev = e.link;
+  }
+  return { ok: !problems.length, problems };
+}
+
+// The export: the whole seal, its head link, its Merkle root, and an inclusion proof per receipt.
+async function exportSeal(seal, { title = null, at = new Date().toISOString() } = {}) {
+  const hashes = seal.entries.map((e) => e.receipt.hash);
+  const root = await merkleRoot(hashes);
+  const proofs = await Promise.all(hashes.map((_, i) => inclusionProof(hashes, i)));
+  return { format: EXPORT_FORMAT, title, at, head: seal.entries.length ? seal.entries[seal.entries.length - 1].link : GENESIS, root, size: hashes.length, seal, proofs, dnp: SEAL_DOES_NOT_PROVE };
+}
+
+// Offline check of an export: the seal, the head, the root and every proof.
+async function verifyExport(x) {
+  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Radar evidence chain"] };
+  const s = await verifySeal(x.seal), problems = [...s.problems];
+  const hashes = x.seal.entries.map((e) => e.receipt.hash);
+  if ((await merkleRoot(hashes)) !== x.root) problems.push("root does not match the receipts");
+  const head = hashes.length ? x.seal.entries[hashes.length - 1].link : GENESIS;
+  if (head !== x.head) problems.push("head does not match the last entry");
+  for (let i = 0; i < hashes.length; i++) if (!(await verifyInclusion(hashes[i], x.proofs[i] || {}, x.root))) problems.push(`proof ${i} fails`);
+  return { ok: !problems.length, problems };
+}
+
+return { SEAL_FORMAT, SEAL_DOES_NOT_PROVE, merkleRoot, inclusionProof, verifyInclusion, emptySeal, appendSeal, verifySeal, exportSeal, verifyExport };
+})();
+
 // ---- chain.js
 const M_chain = (() => {
 // The laundering chain: a post, the accounts and sites its material passed through, and the
@@ -8808,6 +9252,9 @@ const DEFAULTS = Object.freeze({
   // Read text in images (src/core/imagetext.js, src/ocr): off until the user turns it on; even then
   // it runs only on a click, on this device.
   imageText: false,
+  // Evidence lookups (src/core/evidence-fetch.js): off until the user reads what is sent to GitHub,
+  // RDAP and the Internet Archive and clicks to allow it; even then each lookup is one click.
+  evidence: false,
 });
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
@@ -8830,6 +9277,7 @@ function normalizeSettings(raw) {
     feedConsent: bool(s.coverage, false) && bool(s.feedConsent, false),
     outlets: switches(s.outlets, FEED_OUTLETS.map(([id]) => id)), customFeeds: feedList(s.customFeeds),
     imageText: bool(s.imageText, DEFAULTS.imageText),
+    evidence: bool(s.evidence, DEFAULTS.evidence),
   };
 }
 
@@ -10334,5 +10782,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_signing, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_signing, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

@@ -194,3 +194,18 @@ test("Articulate campaign report: input has no handles, report feeds cues, wrong
   assert.equal(p("this is a game changer").cues[0].source, "radar-local");
   assert.throws(() => providerFromReport({ format: "other/2" }, input), /articulate-campaign-report\/1/);
 });
+
+test("symmetry: the same campaign structure gives the same finding whatever the topic or side", () => {
+  const sides = [
+    ["Join the rally for lower taxes and smaller government this weekend", "sir... they just dropped the plan for lower taxes and smaller government"],
+    ["Join the rally for higher wages and public healthcare this weekend", "sir... they just dropped the plan for higher wages and public healthcare"],
+    ["Our new running shoe is out today, lighter and faster", "sir... they just dropped a running shoe that is lighter and faster"],
+  ];
+  const out = sides.map(([post, quote]) => {
+    const quotes = campaignQuotes(8).map((q) => ({ ...q, text: quote }));
+    const lens = campaignLens({ platform: "x", post: { ...LAUNCH_COUNTS, text: post }, ownPosts: OWN_POSTS, accounts: farmAccounts(30), quotes });
+    return { status: lens.status, families: lens.families, n: lens.indicators.length };
+  });
+  assert.deepEqual(out[1], out[0]);
+  assert.deepEqual(out[2], out[0]);
+});

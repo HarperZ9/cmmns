@@ -11,9 +11,10 @@ whether the most extreme replies come mostly from flagged accounts. X first.
   symmetry test in `tests/rhetoric.symmetry.test.js`.
 - Extremity alone never flags a person. It is used only in the thread-level comparison.
 - Nothing leaves the user's machine unless the user turns on a named feature and clicks; each such
-  feature says what it sends and to whom before the first use, and is off by default. The only one
-  is Other coverage (each chosen outlet's own feed, nothing from the page sent, `src/core/coverage.js`,
-  `src/core/feedfetch.js`). No aggregator, no server, no telemetry, no
+  feature says what it sends and to whom before the first use, and is off by default. There are two:
+  Other coverage (each chosen outlet's own feed, nothing from the page sent, `src/core/coverage.js`,
+  `src/core/feedfetch.js`), and evidence lookups (a post's linked repository names and domains to
+  GitHub, RDAP and the Internet Archive, `src/core/evidence-fetch.js`, project-docs/EVIDENCE-LAYER.md). No aggregator, no server, no telemetry, no
   analytics. Read only what
   the platform shows the viewer. Account lookups are user-initiated and rate-limited.
 - No IP addresses or other data the platform does not disclose.

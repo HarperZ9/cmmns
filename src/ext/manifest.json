@@ -34,6 +34,7 @@
       "instances.js",
       "packs-bg.js",
       "sources-bg.js",
+      "evidence-bg.js",
       "ocr.bundle.js",
       "ocr-bg.js",
       "background.js"
@@ -118,6 +119,7 @@
         "reddit.js",
         "health.js",
         "campaign.js",
+        "evidence-view.js",
         "content.js"
       ],
       "css": [

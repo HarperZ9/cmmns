@@ -8,7 +8,9 @@
   const LIST_PATH = /^\/[A-Za-z0-9_]{1,15}\/status\/(\d+)(?:\/(retweets|reposts|quotes|likes))?/;
   const reposters = new Map();   // launch id -> Map(handle -> account)
   const paidIds = new Set();     // post ids X shows with a Paid partnership label
-  let store = null, loading = null;
+  let store = null, loading = null, ledger = null, ledgerDirty = false;
+  chrome.storage.local.get(PB.LEDGER_KEY).then((r) => { ledger = PB.pruneLedger((r && r[PB.LEDGER_KEY]) || {}); }).catch((e) => { console.error("[radar] could not read the count ledger", e); ledger = {}; });
+  setInterval(() => { if (ledger && ledgerDirty) { ledgerDirty = false; chrome.storage.local.set({ [PB.LEDGER_KEY]: ledger }).catch((e) => console.error("[radar] could not save the count ledger", e)); } }, 30000);
   const saved = new Map();       // launch id -> sample size last saved, so a refresh does not rewrite storage
 
   const launchId = () => { const m = location.pathname.match(LIST_PATH); return m ? m[1] : null; };
@@ -67,7 +69,17 @@
       if (handles.length >= PB.SAMPLE_MIN && saved.get(id) !== handles.length) { store = PB.recordLaunch(store, id, handles); saved.set(id, handles.length); saveStore(); }
     }
     const post = T ? { ...counts(T), followers: reading && reading.followersCount, text: (items.find((r) => r.id === id) || {}).text || "" } : null;
-    return { ...PB.campaignLens({ platform: "x", post, ownPosts, accounts: [...accounts.values()], quotes, overlap, actor: PB.actorOf(reading) }), launchId: id, onForget: forget };
+    return { ...PB.campaignLens({ platform: "x", post, ownPosts, accounts: [...accounts.values()], quotes, overlap, actor: PB.actorOf(reading) }), launchId: id, onForget: forget, evidence: evidenceOf(id, T, post, items, reading) };
+  }
+
+  // The evidence block's inputs (src/ext/evidence-view.js): the local count ledger for this post, and
+  // what a lookup would ask about. Only the post's own links and domains; never an account.
+  function evidenceOf(id, T, post, items, reading) {
+    if (!T) return null;
+    if (ledger) { const before = JSON.stringify(ledger[id] || null); ledger = PB.recordCounts(ledger, id, counts(T)); ledgerDirty = ledgerDirty || JSON.stringify(ledger[id] || null) !== before; }
+    const own = items.find((r) => r.id === id) || {};
+    return { launchId: id, postUrl: T.author ? `https://x.com/${T.author}/status/${id}` : null, ledger: ledger ? PB.ledgerGrowth(ledger[id]) : null,
+      request: { links: T.links || [], domains: [...(own.domains || []), ...(T.links || []).map((u) => { try { return new URL(u).hostname; } catch { return null; } }).filter(Boolean)], text: post && post.text, name: (reading && reading.display) || T.author || null, postedAt: T.posted || null } };
   }
 
   globalThis.PBCampaign = Object.freeze({ lens, forget, onList: () => !!listKind() });

@@ -5,6 +5,19 @@ were not published to a store.
 
 ## Unreleased
 
+### Added (evidence layer)
+- Under a launch campaign section, "Look up evidence" (off until you allow it; one click per post):
+  a linked repository's creation date and, with your own GitHub token, its star bursts; a linked
+  domain's registration date (RDAP) and first Internet Archive capture. Ad library search links to
+  open yourself. Each fact is a receipt with its source, time, a hash of the answer and what it does
+  not prove.
+- Receipts are sealed in an append-only, hash-chained log with Merkle inclusion proofs (the same
+  construction as Flywheel's); "Save evidence chain" downloads it, and the verifier rejects edited,
+  swapped, removed, reordered or re-rooted chains.
+- A local count ledger shows how a launch post's counts moved between your visits.
+- "Save this post to the Internet Archive" opens the archive's save page and records a witness receipt.
+- Design and limits: `project-docs/EVIDENCE-LAYER.md`; direction: `project-docs/VISION.md`.
+
 ### Added (launch campaign lens, not measured)
 - On an X post and its repost and quote lists, the thread panel adds "Launch campaign": the post's
   engagement shape against the account's own posts, the reposter and replier sample (shared bio
