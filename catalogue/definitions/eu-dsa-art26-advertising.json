@@ -1,0 +1,73 @@
+{
+  "id": "eu-dsa-art26-advertising",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "context",
+  "title": "Advertising transparency on online platforms (context)",
+  "jurisdiction": {
+    "code": "EU",
+    "name": "European Union (applies where consumers in the EU are reached)"
+  },
+  "instrument": "Digital Services Act, Regulation (EU) 2022/2065",
+  "section": "Article 26(1) and 26(2)",
+  "kind": "regulation",
+  "binding_note": "A regulation, directly applicable in every Member State. Articles 26 and 39 set duties for platform providers, not for the people who post. Daylight Commons uses them as context: they say what the platform must show, which tells the reader where to look for a disclosure or an ad record.",
+  "in_force": {
+    "status": "in force",
+    "since": "2024-02-17",
+    "note": "Article 93(2): the Regulation applies from 17 February 2024, apart from listed provisions that applied from 16 November 2022. Article 26 is not among them."
+  },
+  "sources": [
+    {
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2065/oj",
+      "retrieved_url": "https://publications.europa.eu/resource/celex/32022R2065",
+      "retrieved_at": "2026-10-22",
+      "sha256": "11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "Publications Office of the European Union (Cellar), Official Journal text",
+      "note": "Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.",
+      "text_sha256": "d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "Article 26(1)(a) to (c)",
+      "text": "Providers of online platforms that present advertisements on their online interfaces shall ensure that, for each specific advertisement presented to each individual recipient, the recipients of the service are able to identify, in a clear, concise and unambiguous manner and in real time, the following: (a) that the information is an advertisement, including through prominent markings, which might follow standards pursuant to Article 44; (b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement if that person is different from the natural or legal person referred to in point (b);"
+    },
+    {
+      "source": 0,
+      "locator": "Article 26(2), first subparagraph",
+      "text": "Providers of online platforms shall provide recipients of the service with a functionality to declare whether the content they provide is or contains commercial communications."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "The platform offers a way to declare commercial content, and some posts carry that declaration",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "disclosed-paid"
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Posts that look commercial carry no such declaration",
+      "observable_from": "page",
+      "required": false,
+      "strength": "indicative",
+      "signals": [
+        "undisclosed-lookalike"
+      ]
+    }
+  ],
+  "does_not_prove": "Context only: Article 26 sets duties for the platform. A missing declaration on a post says nothing on its own about the platform meeting or missing its duty. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "eu-dsa-art39-ad-repository",
+    "x-paid-partnerships"
+  ]
+}

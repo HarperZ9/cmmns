@@ -1,0 +1,84 @@
+{
+  "id": "eu-ucpd-annex1-11-advertorial",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "match",
+  "title": "Paid editorial content not made clear (advertorial)",
+  "jurisdiction": {
+    "code": "EU",
+    "name": "European Union (applies where consumers in the EU are reached)"
+  },
+  "instrument": "Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026",
+  "section": "Annex I, point 11",
+  "kind": "directive",
+  "binding_note": "A directive, applied through each Member State's national law. Annex I lists practices that are unfair in all circumstances, and the text says the same single list applies in all Member States. It covers business-to-consumer practices: the party must be a trader.",
+  "in_force": {
+    "status": "in force",
+    "since": null,
+    "note": "Original Annex I point, in the 2005 text and unchanged in the consolidated version of 27.09.2026."
+  },
+  "sources": [
+    {
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927",
+      "retrieved_url": "https://publications.europa.eu/resource/celex/02005L0029-20260927",
+      "retrieved_at": "2026-10-22",
+      "sha256": "1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "Publications Office of the European Union (Cellar), consolidated text",
+      "note": "EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.",
+      "text_sha256": "c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "Annex I, point 11 (footnote reference omitted)",
+      "text": "Using editorial content in the media to promote a product where a trader has paid for the promotion without making that clear in the content or by images or sounds clearly identifiable by the consumer (advertorial)."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "Content presented as editorial or ordinary content is used to promote a product",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "product-promotion",
+        "promo-cue",
+        "undisclosed-lookalike"
+      ],
+      "note": "Whether a social media post counts as \"editorial content in the media\" is a legal question this entry does not settle."
+    },
+    {
+      "id": "B",
+      "label": "A trader paid for the promotion",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "disclosed-paid"
+      ],
+      "note": "Shown for labelled posts, where the poster disclosed it. For unlabelled posts payment is not visible."
+    },
+    {
+      "id": "C",
+      "label": "The payment is not made clear in the content or by images or sounds the consumer can clearly identify",
+      "observable_from": "page",
+      "required": true,
+      "strength": "indicative",
+      "signals": [
+        "undisclosed-lookalike"
+      ],
+      "note": "Daylight Commons sees a missing platform label, not every way a disclosure could be made."
+    }
+  ],
+  "does_not_prove": "Daylight Commons cannot see payment for unlabelled posts, so element B and C together rest on look-alike evidence. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "uk-dmcc-sch20-12-advertorial",
+    "us-ftc-endorsement-material-connection",
+    "eu-dsa-art26-advertising"
+  ]
+}

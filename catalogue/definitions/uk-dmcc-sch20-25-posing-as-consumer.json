@@ -1,0 +1,89 @@
+{
+  "id": "uk-dmcc-sch20-25-posing-as-consumer",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "match",
+  "title": "Falsely representing oneself as a consumer",
+  "jurisdiction": {
+    "code": "UK",
+    "name": "United Kingdom"
+  },
+  "instrument": "Digital Markets, Competition and Consumers Act 2024",
+  "section": "Schedule 20, paragraph 25",
+  "kind": "statute",
+  "binding_note": "Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders.",
+  "in_force": {
+    "status": "in force",
+    "since": "2025-04-06",
+    "note": "The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."
+  },
+  "sources": [
+    {
+      "url": "https://www.legislation.gov.uk/ukpga/2024/13/schedule/20",
+      "retrieved_url": "https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml",
+      "retrieved_at": "2026-10-22",
+      "sha256": "5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "The National Archives, legislation.gov.uk (revised text)",
+      "note": "Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.",
+      "text_sha256": "c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"
+    },
+    {
+      "url": "https://www.legislation.gov.uk/uksi/2025/272/made",
+      "retrieved_url": "https://www.legislation.gov.uk/uksi/2025/272/made/data.xml",
+      "retrieved_at": "2026-10-22",
+      "sha256": "8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "The National Archives, legislation.gov.uk",
+      "text_sha256": "e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "Schedule 20, paragraph 25",
+      "text": "Falsely claiming or creating the false impression that the trader is not acting for purposes relating to the trader’s business or falsely representing oneself as a consumer."
+    },
+    {
+      "source": 1,
+      "locator": "SI 2025/272, regulation 2(3)",
+      "text": "Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "Posts present the speaker as an ordinary consumer giving their own view",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "undisclosed-lookalike",
+        "promo-cue"
+      ]
+    },
+    {
+      "id": "B",
+      "label": "The speaker is in fact a trader, or acts for one",
+      "observable_from": "public-record",
+      "required": true,
+      "strength": "direct",
+      "signals": []
+    },
+    {
+      "id": "C",
+      "label": "The impression is false",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": []
+    }
+  ],
+  "does_not_prove": "A post that reads like a fan and shares a template with paid posts is not proof that its author was paid. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "eu-ucpd-annex1-22-posing-as-consumer"
+  ]
+}

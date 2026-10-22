@@ -1,0 +1,107 @@
+{
+  "id": "us-ftc-act-s5-deception",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "comparison",
+  "title": "Deceptive acts or practices (general standard)",
+  "jurisdiction": {
+    "code": "US",
+    "name": "United States (federal)"
+  },
+  "instrument": "Federal Trade Commission Act section 5, 15 U.S.C. 45, read with the FTC Policy Statement on Deception (October 14, 1983)",
+  "section": "15 U.S.C. 45(a)(1); Policy Statement on Deception, part I (Summary)",
+  "kind": "statute",
+  "binding_note": "The statute sets the standard. The Policy Statement is the Commission's own account of the elements it applies; courts have their own formulations.",
+  "in_force": {
+    "status": "in force",
+    "since": null,
+    "note": "United States Code, 2024 edition, as published on govinfo."
+  },
+  "sources": [
+    {
+      "url": "https://www.govinfo.gov/link/uscode/15/45",
+      "retrieved_url": "https://www.govinfo.gov/content/pkg/USCODE-2024-title15/html/USCODE-2024-title15-chap2-subchapI-sec45.htm",
+      "retrieved_at": "2026-10-22",
+      "sha256": "28de76e074dde70c74930d24738fda83a837c04bba6304c148051d1600679546",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "US Government Publishing Office, govinfo (United States Code, 2024 edition)",
+      "text_sha256": "6d18041cecfb47e3f97602089881ca7729f09bf9486f205a52875c4466b8df25"
+    },
+    {
+      "url": "https://www.ftc.gov/legal-library/browse/ftc-policy-statement-deception",
+      "retrieved_url": "https://www.ftc.gov/system/files/documents/public_statements/410531/831014deceptionstmt.pdf",
+      "retrieved_at": "2026-10-22",
+      "sha256": "b39a62b96f46f66681f5081242215fe741b2dcb72f26b4b1fbc159a899a5d26f",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "browser",
+      "publisher": "Federal Trade Commission",
+      "note": "ftc.gov answered scripted requests with a 404 page, so the PDF was read in a browser and hashed there (79,535 bytes). Text extracted with pdf.js; line breaks normalised."
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "15 U.S.C. 45(a)(1)",
+      "text": "Unfair methods of competition in or affecting commerce, and unfair or deceptive acts or practices in or affecting commerce, are hereby declared unlawful."
+    },
+    {
+      "source": 1,
+      "locator": "Policy Statement on Deception, I. Summary, closing sentence",
+      "text": "Thus, the Commission will find deception if there is a representation, omission or practice that is likely to mislead the consumer acting reasonably in the circumstances, to the consumer's detriment."
+    },
+    {
+      "source": 1,
+      "locator": "Policy Statement on Deception, I. Summary, third element",
+      "text": "Third, the representation, omission, or practice must be a \"material\" one. The basic question is whether the act or practice is likely to affect the consumer's conduct or decision with regard to a product or service."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "A representation, omission or practice",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "product-promotion",
+        "undisclosed-lookalike",
+        "disclosed-paid"
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Likely to mislead a consumer acting reasonably in the circumstances",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": [],
+      "note": "This is judged from the reasonable consumer's point of view, which a page reading cannot settle."
+    },
+    {
+      "id": "C",
+      "label": "Material: likely to affect the consumer's conduct or decision about a product or service",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": []
+    },
+    {
+      "id": "D",
+      "label": "In or affecting commerce",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "product-promotion",
+        "actor-organisation"
+      ]
+    }
+  ],
+  "does_not_prove": "Section 5 is the general standard behind the more specific entries. Its two central elements, likely to mislead and material, are judgements Daylight Commons does not make. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "us-ftc-endorsement-material-connection",
+    "us-ftc-fake-social-media-indicators"
+  ]
+}

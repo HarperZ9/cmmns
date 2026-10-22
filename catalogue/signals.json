@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "note": "Every signal a catalogue element may cite. A signal is something Daylight Commons can show from the page or from a receipt. Signals in the same family read the same evidence and count once. Context-only signals never evidence any element.",
+  "signals": [
+    { "id": "shape-outlier-own", "family": "shape", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "Reposts per like far above the author's own posts seen on this device." },
+    { "id": "bio-template", "family": "bios", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "Groups of sampled bios cut from one template." },
+    { "id": "stock-persona", "family": "bios", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "A large share of sampled bios combine stock persona cues." },
+    { "id": "join-cluster", "family": "joins", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "Many sampled accounts joined within the same 14 days." },
+    { "id": "topic-mismatch", "family": "topic", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "Sampled bios are dominated by a topic the post does not share." },
+    { "id": "undisclosed-lookalike", "family": "quotes", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "Quote posts without a Paid partnership label share a template with labelled ones, or with each other inside two hours." },
+    { "id": "cross-launch", "family": "overlap", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "Sampled accounts were seen amplifying two or more other launches the viewer opened." },
+    { "id": "disclosed-paid", "family": "disclosure", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "Quote posts carry X's Paid partnership label, the posters' own disclosure." },
+    { "id": "promo-cue", "family": "promotion", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "Quote posts use promotional template phrasing." },
+    { "id": "product-promotion", "family": "promotion", "kind": "context", "source": "src/core/definitions.js (signalsFromCampaign)", "observes": "The viewer opened the launch lens on this post, or quotes carry promotional phrasing or a Paid partnership label." },
+    { "id": "actor-organisation", "family": "actor", "kind": "context", "source": "src/core/campaign.js (actorOf)", "observes": "The platform discloses the launch account as an organisation or official account." },
+    { "id": "online-post", "family": "medium", "kind": "context", "source": "src/core/definitions.js (signalsFromCampaign)", "observes": "The conduct is a post published on an online platform." },
+    { "id": "quote-bunching", "family": "timing", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "Quote posts arrived close together in time.", "context_only": true },
+    { "id": "overlap", "family": "overlap", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "Some sampled accounts were seen on other launches, below the indicator threshold.", "context_only": true },
+    { "id": "random-suffix", "family": "handles", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "Handles ending in a number-and-letter tail. People choose these for privacy too.", "context_only": true },
+    { "id": "default-avatar", "family": "avatar", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "X's own default-image disclosure.", "context_only": true },
+    { "id": "ad-library-link", "family": "ad-library", "kind": "context", "source": "src/core/evidence-ads.js (evidence layer, PR #47)", "observes": "A search link to an advertiser's entries in a public ad repository, opened by the user.", "pending": "Lands with the evidence layer (PR #47), which is not merged into main yet." }
+  ]
+}
