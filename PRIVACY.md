@@ -42,6 +42,21 @@ site's fact-check record) come from tables bundled inside Radar too, on links, o
 when you turn an engine on, and on the page you are reading when you press "Site card for this
 page". None of these send anything.
 
+### Evidence lookups (off by default)
+
+Evidence lookups are off until you allow them, either from the first "Look up evidence" click under
+a launch campaign section or in the options page. Each lookup is one click, for the post you are
+viewing. Radar sends the repository names (`owner/repo`) and web domains that post links to, and
+nothing else: not the post's text, not your account, not anyone's handle. They go to GitHub's API
+(api.github.com), to rdap.org, which forwards to the registry for the domain, and to the Internet
+Archive (web.archive.org). Each receives the request like any web request, so it sees your IP
+address and the time. Requests carry no cookies. If you add your own GitHub token in the options
+page, it is kept in this browser and sent only to api.github.com, to read star timestamps. Radar
+does not query ad libraries; it gives you links to open yourself. "Save this post to the Internet
+Archive" opens the archive's own save page in a tab, and the archive then sees which post you asked
+it to save. Results are kept as sealed receipts in this browser (`pb.seal.v1`) until you clear
+Radar data.
+
 ### Other coverage (off by default)
 
 Other coverage is off unless you turn it on in the options page. When it is on, you choose which
@@ -98,6 +113,9 @@ profile you installed Radar in. It is not synced to other devices.
 | Thread card (session storage) | The card you asked for from a thread panel, and the thread's posts as the page showed them, so the card page can build a signed evidence bundle if you ask for one. The card names no account | Until the browser closes |
 | Bundle key (IndexedDB `radar-keys`) | The ECDSA P-256 key pair Radar makes the first time you save a signed evidence bundle. The private half is stored so that it can sign but cannot be read, exported or sent | Until you remove Radar |
 | Your feedback (`pb.feedback.v1`) | Your "This was right" and "This was wrong" marks: which sign (its kind, the post id and a short hash of its label), the thread, your mark and the time. The post text only for marks where you ticked "include the text" | Until you clear it or remove Radar; at most 2,000 marks, the oldest dropped first |
+| Count ledger (`pb.ledger.v1`) | For each launch post you opened: its post id and the public counts (reposts, likes, replies, quotes, bookmarks, views) at each visit, at most one point per 10 minutes. No accounts, no text | 30 days, at most 48 visits per post and 500 posts |
+| Evidence log (`pb.seal.v1`) | The receipts of evidence lookups you ran: what GitHub, RDAP and the Internet Archive said about a repository or domain, when, a hash of each answer, and the chain that seals them. No accounts | Until you clear Radar data; at most 2,000 receipts |
+| GitHub token (`pb.evidence.github`) | Only if you add one in the options page. Sent only to api.github.com | Until you remove it or clear Radar data |
 | Launch overlap (`pb.campaign.v1`) | For each launch post you opened with enough accounts loaded: its post id and salted hashes of the sampled accounts (a random salt made in your browser, never exported), so the campaign lens can count accounts seen on several launches. No handles, no text. "Forget launches I viewed" in the thread panel clears it | 30 days, at most 200 launches |
 | Account details from other sites (`pb.meta.v1`) | What Instagram, Facebook, Bluesky or a Mastodon server showed about accounts you saw: join date, counts, labels, renames | 14 days |
 | Mastodon servers (`pb.instances.v1`) | The servers you turned Radar on for | Until you remove them |

@@ -47,8 +47,19 @@
     $("reading").append(
       switchRow("Radar on feeds and profiles", "Off: Radar reads only the replies under a post you open.", s().feeds, (on) => save({ feeds: on })),
       switchRow("Read account details automatically", "Off: account details are read only when you ask in the window.", s().auto, (on) => save({ auto: on })),
+      switchRow("Evidence lookups", "Adds \"Look up evidence\" to the launch campaign section. On your click, the repository names and domains a post links to go to GitHub, rdap.org and the Internet Archive; nothing else, and never an account. Each result is sealed in this browser.", s().evidence, (on) => save({ evidence: on })),
       switchRow("Read text in images", "Adds \"Read text in this image\" to the window's Media area. Radar reads the words on this device, only when you click, in Latin-script languages; the image and its text never leave your browser.", s().imageText, (on) => save({ imageText: on })),
     );
+  }
+
+  // The user's own GitHub token for star timestamps (src/ext/evidence-bg.js). Kept in this browser,
+  // sent only to api.github.com, removed by "Clear all Radar data". A read-only token with no scopes is enough.
+  async function tokenField() {
+    const KEY = "pb.evidence.github";
+    const input = el("input", { type: "password", id: "githubToken", autocomplete: "off", spellcheck: "false" });
+    input.value = ((await chrome.storage.local.get(KEY))[KEY]) || "";
+    input.addEventListener("change", () => (input.value.trim() ? chrome.storage.local.set({ [KEY]: input.value.trim() }) : chrome.storage.local.remove(KEY)).catch((e) => console.error("[radar] could not save the token", e)));
+    $("reading").append(el("label", { for: "githubToken" }, "Your GitHub token, for star timestamps (optional). GitHub lists stargazers only to signed-in callers; a token with no scopes is enough. Kept in this browser and sent only to api.github.com. "), input);
   }
 
   function retention() {
@@ -107,6 +118,7 @@
     }
   }
 
-  siteSwitches(); servers(); windowSwitches(); retention(); clearAll(); access(); families(); usage();
+  siteSwitches(); servers(); windowSwitches();
+  tokenField().catch((e) => console.error("[radar] token field failed", e)); retention(); clearAll(); access(); families(); usage();
   $("foot").textContent = `Radar ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Radar requests nothing off this browser unless you turn on Other coverage.`;
 })().catch((e) => console.error("[radar] options page failed", e));

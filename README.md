@@ -7,7 +7,7 @@ how the account posts, and how the thread's harshest replies compare with the re
 
 Radar gives evidence, never verdicts. It never calls anyone a bot, a propagandist or an extremist,
 and every sign says where its data came from and what it does not prove. It runs in your browser
-and sends nothing anywhere unless you turn on Other coverage, which says which outlets it asks first.
+and sends nothing anywhere unless you turn on Other coverage or evidence lookups, each of which says what it sends and to whom first.
 
 ## Install in a minute
 
@@ -86,7 +86,7 @@ options page lists every sign with its figure.
 
 No server, no account, no analytics. Radar reads only what the site shows you, and its only
 requests go to the site you are on, for account details that site discloses, plus the feeds of the
-outlets you chose if you turn on Other coverage and click. What it keeps stays in
+outlets you chose if you turn on Other coverage and click, and, for evidence lookups you allow and click, the repository names and domains a post links to, sent to GitHub, RDAP and the Internet Archive. What it keeps stays in
 your browser: account details for 14 days and thread history for 60 by default, both adjustable,
 with a one-click "Clear all Radar data". Full details in [PRIVACY.md](PRIVACY.md).
 

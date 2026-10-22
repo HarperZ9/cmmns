@@ -91,7 +91,7 @@
 
   // The launch campaign lens (src/core/campaign.js, src/ext/campaign.js): the lead, the ladder's
   // claims, each sign with what it does not prove, then context, the dispute route and the wipe.
-  function campaign(p, c) {
+  function campaign(p, c, rerender) {
     if (!c || c.status === "undefined" || (c.status === "thin" && !c.indicators.length)) return;
     const s = el("section", "pb-psec");
     s.append(el("h3", "pb-sec-h", "Launch campaign"), el("p", "pb-num", c.lead));
@@ -100,6 +100,7 @@
     for (const x of c.context) s.append(el("p", "pb-num", x.text));
     s.append(el("p", "pb-foot", c.dnp), el("p", "pb-foot", c.dispute));
     if (c.onForget) s.append(button("Forget launches I viewed", "Deletes the launch overlap Radar keeps in this browser (hashed accounts only).", () => c.onForget()));
+    if (globalThis.PBEvidenceView) PBEvidenceView.section(s, c.evidence, rerender);
     p.append(s);
   }
 
@@ -136,7 +137,7 @@
       stats.paused ? "X is limiting requests; Radar paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
     ]);
     const coord = coordination(report, clusters, stats.viewed);
-    campaign(p, report.campaign);
+    campaign(p, report.campaign, () => render(report, clusters, stats, onLookupAll));
     section(p, "Coordination", coord);
     if (coord.some((t) => t && t.includes(" showed up in "))) p.lastChild.append(el("p", "pb-foot", PB.BASELINE_SOURCE));
     // Persuasion techniques get their own line; they never count toward "flagged".

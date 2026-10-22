@@ -32,6 +32,9 @@ export const DEFAULTS = Object.freeze({
   // Read text in images (src/core/imagetext.js, src/ocr): off until the user turns it on; even then
   // it runs only on a click, on this device.
   imageText: false,
+  // Evidence lookups (src/core/evidence-fetch.js): off until the user reads what is sent to GitHub,
+  // RDAP and the Internet Archive and clicks to allow it; even then each lookup is one click.
+  evidence: false,
 });
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
@@ -54,6 +57,7 @@ export function normalizeSettings(raw) {
     feedConsent: bool(s.coverage, false) && bool(s.feedConsent, false),
     outlets: switches(s.outlets, FEED_OUTLETS.map(([id]) => id)), customFeeds: feedList(s.customFeeds),
     imageText: bool(s.imageText, DEFAULTS.imageText),
+    evidence: bool(s.evidence, DEFAULTS.evidence),
   };
 }
 
