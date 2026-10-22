@@ -178,6 +178,6 @@ date checked and the reason. The window's last link points there. The same rule 
 
 ## Licence
 
-Records: FSL-1.1-MIT. Wikidata statements: CC0 1.0. US government documents: public domain. EU
+Records: CC BY 4.0. Wikidata statements: CC0 1.0. US government documents: public domain. EU
 sanctions data: EU reuse policy, with attribution. Everything else: facts and short quotes only, with
 their source.

@@ -5,6 +5,15 @@ were not published to a store.
 
 ## Unreleased
 
+### Changed (licence)
+- Radar is now free and open source. Code: GNU AGPL v3.0 only, replacing FSL-1.1-MIT. Data, the
+  definition catalogue, schemas and documentation: CC BY 4.0. `REUSE.toml` maps every file to its
+  licence and `THIRD-PARTY.md` lists what keeps its own terms. Every package now ships
+  `LICENSE.txt`, and the manifest links the source.
+- Added CONTRIBUTING.md (Developer Certificate of Origin, no CLA), CODE_OF_CONDUCT.md
+  (Contributor Covenant 2.1), SECURITY.md (private reporting through GitHub security advisories)
+  and GOVERNANCE.md (purpose, permanence, funding rules and the challenge process).
+
 ### Added (evidence layer)
 - Under a launch campaign section, "Look up evidence" (off until you allow it; one click per post):
   a linked repository's creation date and, with your own GitHub token, its star bursts; a linked
