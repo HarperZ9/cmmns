@@ -1,9 +1,9 @@
 // The site card for the page being read. Injected only when the user presses "Site card for this
-// page" in Radar's toolbar popup (src/ext/sources-bg.js); Radar runs on no news site by default.
+// page" in Daylight Commons' toolbar popup (src/ext/sources-bg.js); Daylight Commons runs on no news site by default.
 // The card shows the site's owner, owner type, founding date, country, state links and fact-check
-// record from Radar's bundled tables. "Other coverage" is the one part that makes a request: to the
+// record from Daylight Commons' bundled tables. "Other coverage" is the one part that makes a request: to the
 // feeds of the outlets the user chose, only after the user turned it on, read which hosts it asks,
-// and clicked. On sites Radar has no reader for, the card adds text checks from the generic reader.
+// and clicked. On sites Daylight Commons has no reader for, the card adds text checks from the generic reader.
 (() => {
   "use strict";
   const el = PBPop.el;
@@ -19,7 +19,7 @@
   }
 
   const send = (msg) => chrome.runtime.sendMessage(msg);
-  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[radar] could not save settings", e));
+  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[daylight-commons] could not save settings", e));
 
   function open(sections) {
     PBPop.close(true);
@@ -36,13 +36,13 @@
     for (const f of state.status.filter((f) => f.state !== "ok")) rows.push([f.name, f.state === "empty" ? "The feed had no entries." : PB.FEED_ERRORS[f.state] || f.state]);
     rows.push(["Asked", `${state.hosts.length} feed host${state.hosts.length === 1 ? "" : "s"}, nothing from this page sent, ${state.ms} ms`], ["Does not prove", PB.COVERAGE_DOES_NOT_PROVE]);
   }
-  const ERR = { "short-title": "The title has too few words to match.", "no-outlets": "No outlets are chosen. Choose them in Radar's options.", off: "Other coverage is off." };
+  const ERR = { "short-title": "The title has too few words to match.", "no-outlets": "No outlets are chosen. Choose them in Daylight Commons' options.", off: "Other coverage is off." };
   function coverageSection(info, state) {
     const s = PBSettings.get(), rows = [], hosts = PB.coveragePlan(PB.chosenFeeds(s));
-    const options = [null, { action: ["Open Radar's options", () => send({ type: "pb-open-options" }), "Opened"] }];
+    const options = [null, { action: ["Open Daylight Commons' options", () => send({ type: "pb-open-options" }), "Opened"] }];
     if (state && state.list) results(state, rows);
     else if (state && state.error) rows.push([null, { note: ERR[state.error] || "The lookup failed. Try again later." }]);
-    else if (!s.coverage) rows.push([null, { note: "Other coverage is off. Radar's options explain what it requests and from whom before you turn it on." }], options);
+    else if (!s.coverage) rows.push([null, { note: "Other coverage is off. Daylight Commons' options explain what it requests and from whom before you turn it on." }], options);
     else if (!hosts.length) rows.push([null, { note: "Other coverage is on, but no outlets are chosen yet." }], options);
     else if (!s.feedConsent) {
       rows.push([null, { note: PB.COVERAGE_PRIVACY }], ["Would ask", hostsLine(hosts)]);
@@ -51,10 +51,10 @@
       rows.push(["Will ask", hostsLine(hosts)]);
       rows.push([null, { action: ["Find other coverage", () => run(info), "Asking the feeds…"] }]);
     }
-    return { tab: "overview", title: "Other coverage", rows, foot: "Outlets are labelled by owner and owner type as Wikidata and Radar's cited state tables state them. Radar gives no left or right score." };
+    return { tab: "overview", title: "Other coverage", rows, foot: "Outlets are labelled by owner and owner type as Wikidata and Daylight Commons' cited state tables state them. Daylight Commons gives no left or right score." };
   }
 
-  // On a site Radar has no reader for, the generic reader's text checks (src/ext/generic-page.js).
+  // On a site Daylight Commons has no reader for, the generic reader's text checks (src/ext/generic-page.js).
   const extra = (info, state) => [coverageSection(info, state), ...(globalThis.PBGenericPage && !(globalThis.PBSites && PBSites.current()) ? [PBGenericPage.section()].filter(Boolean) : [])];
 
   async function run(info) {
@@ -67,11 +67,11 @@
     await PBSettings.ready;
     PBLinkCard.theme();
     let info;
-    try { info = (await send({ type: "pb-sites", domains: [domain] }))[domain]; } catch (e) { console.error("[radar] site lookup failed", e); }
+    try { info = (await send({ type: "pb-sites", domains: [domain] }))[domain]; } catch (e) { console.error("[daylight-commons] site lookup failed", e); }
     info = info || { domain, owner: null, state: [], facts: null, record: null };
     open(PBLinkCard.sections(info, extra(info, null)));
   }
 
   globalThis.PBSitePage = Object.freeze({ show });
-  show().catch((e) => console.error("[radar] site card failed", e));
+  show().catch((e) => console.error("[daylight-commons] site card failed", e));
 })();

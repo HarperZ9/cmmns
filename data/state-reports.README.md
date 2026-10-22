@@ -1,6 +1,6 @@
 # state-reports.json and state-designations.json: sources, counts and gaps
 
-Built 2026-10-18 for Radar. Two files, two kinds of evidence.
+Built 2026-10-18 for Daylight Commons. Two files, two kinds of evidence.
 
 - `state-reports.json`: domains and X handles that a published report ties to a state or to an influence operation. Each domain or handle appears verbatim in the cited document (defanged `[.]` restored).
 - `state-designations.json`: outlets that a government or EU document classifies as state-owned, state-controlled or sanctioned state media. The outlet name appears verbatim in the cited document. A domain is recorded only where the document itself gives one. Matching outlet names to official domains is a separate step with its own citation.
@@ -98,7 +98,7 @@ These were read and gave no usable domain or handle (see the next section for re
 - **Moldova (Meta Q3 2024)**: the only domain, point.md, is a legitimate news site whose articles the network summarized, so it is not the operation's property. Excluded.
 - **China (Meta Q1 2025, Q4 2024)**: the Q1 2025 network lists no handles or domains. Q4 2024 gives one X handle (included) and blogspot pages (platform subdomains, excluded).
 - **Doppelganger redirect domains (Meta Q2 2023)**: several hundred 'redirect domains', many of them apparently unrelated or compromised sites. Excluded on accuracy grounds; only the report's lists of spoofed domains and operation websites are included.
-- **Social platform pages**: Telegram, TikTok, YouTube, Medium, Reddit and Blogspot addresses are not included (Radar matches domains and X handles only).
+- **Social platform pages**: Telegram, TikTok, YouTube, Medium, Reddit and Blogspot addresses are not included (Daylight Commons matches domains and X handles only).
 - **Malware, hacking-forum and registrar domains** named in the same appendices (for example leakzone.net, cracked.io, fastdomains.com) are excluded.
 - **Ghana network, X handle `YamoahFestus` (Meta Q4 2024)**: the report lists it with the network's assets, but the name looks like a real person. Excluded as a possible private individual's account.
 - **Victim accounts**: OpenAI February 2026 names @whyyoutouzhele, @huikezhen and @xu96175836 as targets of harassment by a Chinese operation. They are victims, not operation accounts. Excluded.

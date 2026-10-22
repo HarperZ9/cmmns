@@ -30,7 +30,7 @@
     },
   };
 
-  // Mastodon, on any server the user turned Radar on for (src/ext/instances.js). The web app
+  // Mastodon, on any server the user turned Daylight Commons on for (src/ext/instances.js). The web app
   // renders posts as ".status" (4.x) or "._comp_status__root" (5.0), checked live 2026-10-21 on
   // fosstodon.org (4.x) and mastodon.social (5.0). In both, the time sits in the permalink
   // /@acct/<id>, which gives the author and the id.

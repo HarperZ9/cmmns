@@ -1,6 +1,6 @@
 // Adapter health in the page: after each read, content.js tells this file how many boxes the site
 // reader picked out and how many it could read. When a platform has changed its markup so that
-// Radar reads nothing where it should, a small notice says so plainly instead of Radar showing
+// Daylight Commons reads nothing where it should, a small notice says so plainly instead of Daylight Commons showing
 // nothing (verdicts from src/core/health.js). The toolbar popup can run the same check on demand
 // as a self-test. Counts only; no post text is kept or sent.
 (() => {
@@ -25,7 +25,7 @@
     }
     const p = document.createElement("p"); p.textContent = v.say;
     const help = document.createElement("p"); help.className = "pb-health-sub";
-    help.textContent = "The site's own page still works. Radar's toolbar button has a self-test with the counts.";
+    help.textContent = "The site's own page still works. Daylight Commons' toolbar button has a self-test with the counts.";
     const close = document.createElement("button"); close.type = "button"; close.className = "pb-btn"; close.textContent = "Hide";
     close.addEventListener("click", () => { hidden = location.pathname; n.remove(); });
     n.replaceChildren(p, help, close);
@@ -44,7 +44,7 @@
   function selfTest(site, feed) {
     if (!site) return null;
     const nodes = site.items();
-    const items = nodes.map((n) => { try { return site.read(n); } catch (e) { console.error("[radar] self-test read failed", e); return null; } }).filter(Boolean);
+    const items = nodes.map((n) => { try { return site.read(n); } catch (e) { console.error("[daylight-commons] self-test read failed", e); return null; } }).filter(Boolean);
     const f = found(site, feed, nodes.length, items);
     return { site: site.name, ...f, withAuthor: items.filter((r) => r.author).length, withId: items.filter((r) => r.id).length, verdict: PB.adapterHealth(site, { ...f, sinceMs: Math.max(f.sinceMs, PB.HEALTH_SETTLE_MS) }), at: new Date().toISOString().slice(0, 19).replace("T", " ") + " UTC" };
   }

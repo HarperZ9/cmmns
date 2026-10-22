@@ -1,8 +1,8 @@
-// Toolbar popup, on a page Radar does not run on: if the page is a Mastodon server, offer to turn
-// Radar on for that server. The check runs only when the user opens the popup (the browser's
+// Toolbar popup, on a page Daylight Commons does not run on: if the page is a Mastodon server, offer to turn
+// Daylight Commons on for that server. The check runs only when the user opens the popup (the browser's
 // activeTab grant) and reads two things: whether the Mastodon web app's root element is there, and
 // the version and domain from its initial state. Nothing else on the page is read, no token is
-// touched, and nothing is sent anywhere. Turning Radar on asks the browser for access to that one
+// touched, and nothing is sent anywhere. Turning Daylight Commons on asks the browser for access to that one
 // server; the browser shows its own prompt.
 (() => {
   "use strict";
@@ -33,12 +33,12 @@
     const host = new URL(tab.url).hostname.toLowerCase();
     $("server").hidden = false;
     $("server-text").textContent = `This looks like a Mastodon server (${host}, Mastodon ${found.version.split("+")[0]}). ` +
-      "Radar can read the posts this server shows you here. Your browser will ask you to allow it for this server only.";
+      "Daylight Commons can read the posts this server shows you here. Your browser will ask you to allow it for this server only.";
     const already = await chrome.permissions.contains({ origins: [origin] });
     $("server-on").addEventListener("click", async () => {
       if (already) {
         const r = await chrome.runtime.sendMessage({ type: "pb-instance-add", host, tabId: tab.id });
-        $("server-text").textContent = r && r.ok ? "Radar is on for this server. Reload the page to see it." : "Radar could not turn on here.";
+        $("server-text").textContent = r && r.ok ? "Daylight Commons is on for this server. Reload the page to see it." : "Daylight Commons could not turn on here.";
         return;
       }
       // The request must come straight from the click, with no wait before it. The pending note is
@@ -46,7 +46,7 @@
       // and the background worker finishes the job from the note (src/ext/instances.js).
       chrome.storage.local.set({ "pb.instances.pending": { host, tabId: tab.id, at: Date.now() } }).catch(() => {});
       const ok = await chrome.permissions.request({ origins: [origin] }).catch(() => false);
-      $("server-text").textContent = ok ? "Radar is on for this server. Reload the page to see it." : "Not turned on. Nothing was changed.";
+      $("server-text").textContent = ok ? "Daylight Commons is on for this server. Reload the page to see it." : "Not turned on. Nothing was changed.";
       $("server-on").disabled = true;
     });
   }

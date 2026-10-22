@@ -15,10 +15,10 @@ const DNP_LANG = "Words can be quoted, ironic or reported speech. A sign describ
 function languageSigns(fams) {
   return Object.entries(LANG).filter(([id]) => fams[id] && fams[id].measured).map(([id, name]) => {
     const d = fams[id], r = d.precision;
-    return signBlock({ title: name, takeaway: `When Radar shows this sign, the people who labelled the test comments agreed ${per100(r.value)} times in 100.`,
+    return signBlock({ title: name, takeaway: `When Daylight Commons shows this sign, the people who labelled the test comments agreed ${per100(r.value)} times in 100.`,
       figure: ciFigure({ value: r.value, ci: r.ci, what: `${name}, precision` }),
       details: [["Precision", esc(counts(r))], d.precisionRange ? ["Range across corpora", esc(d.precisionRange.map(pct).join(" to "))] : null,
-        d.recall ? ["Recall", esc(`${pct(d.recall.value)} (${counts(d.recall)}). Radar is built for precision, so it misses most cases.`)] : null,
+        d.recall ? ["Recall", esc(`${pct(d.recall.value)} (${counts(d.recall)}). Daylight Commons is built for precision, so it misses most cases.`)] : null,
         ["Data", "Measuring Hate Speech, HateXplain and Civil Comments, held-out test split"], ["Does not prove", esc(DNP_LANG)]] });
   });
 }
@@ -41,7 +41,7 @@ function coordinationSigns(B) {
     signBlock({ title: "Same text as other replies", takeaway: `In ordinary threads with 20 to 49 replies, a group of near-identical replies shows up in ${pct(same.share)} of threads.`,
       figure: ciFigure({ value: same.share, ci: same.ci, max, what: "Same text, ordinary threads of 20 to 49 replies" }),
       details: [...Object.entries(B.same).map(([b, r]) => [`${b} replies`, esc(counts(r))]), ["Before quotes were set aside", "33% to 47% of these threads, almost all from replies that copied the post they quoted"], ["Source", esc(BASELINE_SOURCE)]] }),
-    signBlock({ title: "Burst of replies", takeaway: `In ordinary threads with 20 to 49 replies, a burst like those Radar reports shows up in ${pct(burst.share)} of threads.`,
+    signBlock({ title: "Burst of replies", takeaway: `In ordinary threads with 20 to 49 replies, a burst like those Daylight Commons reports shows up in ${pct(burst.share)} of threads.`,
       figure: ciFigure({ value: burst.share, ci: burst.ci, max, what: "Bursts, ordinary threads of 20 to 49 replies" }),
       details: [...Object.entries(B.burst).map(([b, r]) => [`${b} replies`, esc(counts(r))]), ["Independent posting", esc(`A simulation where each reply is timed on its own, at the thread's own pace, fires in ${Object.values(B.burstDecayNull).map((r) => pct(r.share)).join(", ")} of threads by size.`)], ["Source", esc(BASELINE_SOURCE)]] }),
     signBlock({ title: "Accounts seen together", takeaway: `For someone who opened about 100 threads on one news story, a pair seen together in two or more other threads shows up in ${pct(tog.share)} of threads.`,
@@ -58,7 +58,7 @@ export function leadSigns({ D, ptc, B, fold }) {
       figure: ciFigure({ value: D.extreme.precision.value, ci: D.extreme.precision.ci, what: "Extreme, precision" }),
       details: [["Precision", esc(counts(D.extreme.precision))], ["Recall", esc(counts(D.extreme.recall))], ["Data", "Measuring Hate Speech severity labels"]] }),
     ...coordinationSigns(B),
-    signBlock({ title: "Look-alike letters", takeaway: `Copies with one letter swapped for a Cyrillic or Greek look-alike: Radar now finds ${f.after} in 100, up from ${f.before}.`,
+    signBlock({ title: "Look-alike letters", takeaway: `Copies with one letter swapped for a Cyrillic or Greek look-alike: Daylight Commons now finds ${f.after} in 100, up from ${f.before}.`,
       figure: ciFigure({ value: f.after / 100, ci: wilson(f.after, 100), what: "Copies found after folding look-alike letters" }),
       details: [["Seeded copies", esc(`${f.after} of 100 found after folding, ${f.before} of 100 before`)], ["Ordinary text", esc(`${f.changed} of ${f.replies.toLocaleString("en")} replies in ordinary threads changed at all, mostly fullwidth letters and digits read as plain ones`)],
         ["Test cases", esc(`Same text, cases written for the test: ${counts(s)}`)], ["Data", "Unicode confusables table (UTS #39), Unicode License v3"]] }),

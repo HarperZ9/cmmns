@@ -1,4 +1,4 @@
-// Radar's checks, run the same way on any machine: GitHub Actions runs exactly these stages
+// Daylight Commons' checks, run the same way on any machine: GitHub Actions runs exactly these stages
 // (.github/workflows/test.yml calls this file), so the project can verify itself without GitHub.
 //   npm run ci                 the "test" stage: every test, then the bundle freshness check
 //   node scripts/ci.mjs c2pa   the Content Credentials reference stage (fetches pinned fixtures)

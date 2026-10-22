@@ -1,12 +1,12 @@
-// radar-core: the public API. One zero-dependency ES module over Radar's pure core, for anyone
-// who wants Radar's evidence without the browser extension. No DOM, no network, no storage: the
+// radar-core: the public API. One zero-dependency ES module over Daylight Commons' pure core, for anyone
+// who wants Daylight Commons' evidence without the browser extension. No DOM, no network, no storage: the
 // caller hands in the posts, the file bytes and (optionally) the data tables, and gets back
 // evidence objects that match schema/evidence.v1.json. project-docs/INTEGRATION.md documents it.
 //
 //   analyzeThread({ site, root, replies })   evidence about a thread
 //   analyzeText(text)                        evidence about one piece of text
 //   checkMedia(bytes)                        Content Credentials and AI metadata of a file
-//   siteInfo(domain)                         what Radar's tables hold about a site
+//   siteInfo(domain)                         what Daylight Commons' tables hold about a site
 //   useData({ sites, owners, state, claims, claimParts })   load the tables (optional)
 //
 // Every evidence item states what it shows, its source and what it does not prove. None names an
@@ -72,7 +72,7 @@ export function analyzeThread(input, opts = {}) {
 // bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
 export async function checkMedia(bytes) {
   const M = await mediaReading(bytes);
-  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Radar read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
 }
 
 // domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
@@ -80,7 +80,7 @@ export function siteInfo(domain) {
   const d = cleanDomain(domain);
   if (!d) return null;
   const loaded = dataLoaded();
-  const limits = ["Every row names its source. Radar adds no score or rating of its own."];
+  const limits = ["Every row names its source. Daylight Commons adds no score or rating of its own."];
   if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("No site tables were loaded, so only the look-alike check ran.");
   return envelope("site", { site: siteSummary(d), evidence: number(siteEvidence(d, [])), limits });
 }

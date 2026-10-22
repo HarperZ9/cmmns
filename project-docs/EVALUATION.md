@@ -71,7 +71,7 @@ was built. They show that the detectors follow their rules. They are not error r
   Comments, where 8% of comments are hostile, about a third of strong labels (23 of 68) fell on text the raters
   called toxic. Real reply threads sit somewhere between. Some Civil "false positives" are quoted or
   ironic uses that raters scored below 0.5, so 34% is a floor more than a point estimate.
-- **Recall.** Radar is a hand-built lexicon and grammar. It finds a small share of hostile text: MHS
+- **Recall.** Daylight Commons is a hand-built lexicon and grammar. It finds a small share of hostile text: MHS
   item recall is under 3% for every family. A thread with no markers is not a clean thread.
 - **Weak families.** Conspiracy, absolutist and essentialise describe framing, which these corpora
   do not label. Their figures against hostility labels are context, not error rates.
@@ -288,7 +288,7 @@ not in the extension. Status: not measured.
   Civil 34.4% to 34.6%. Strong recall MHS 8.8% to 8.4%, HateXplain 46.5% to 45.0%.
 
 ## Persuasion techniques (PTC test split, 2026-10-21): none ship
-Radar looks for eleven techniques from the SemEval-2020 Task 11 and SemEval-2023 Task 3 taxonomy.
+Daylight Commons looks for eleven techniques from the SemEval-2020 Task 11 and SemEval-2023 Task 3 taxonomy.
 Each is a list of lexical and grammatical cues that name no group, person, party or side
 (`src/core/persuasion-cues.js`). The rule, set before measuring: a technique shows in the window
 only when its held-out span precision has a 95% Wilson lower bound of at least 0.7 from at least 20
@@ -309,7 +309,7 @@ clears the bar. `node scripts/eval-persuasion.mjs` reproduces every number here 
 SHA-256 of the corpus archive in `evidence/persuasion-results.json`.
 
 How it is measured. PTC's public release labels only its 371 training articles, so those were split
-by article with the fixed seed (189 dev, 182 test). A Radar span is correct when it overlaps a gold
+by article with the fixed seed (189 dev, 182 test). A Daylight Commons span is correct when it overlaps a gold
 span of the same technique. PTC merges some labels: bandwagon is scored against "Bandwagon,
 Reductio ad hitlerum" and whataboutism against "Whataboutism, Straw men, Red herring". Cues were
 pruned on dev in two rounds. Dev precision of the kept cues was 80.3% for loaded language, 72.2%
@@ -341,7 +341,7 @@ Reading the table:
   gold span of some technique. The cues land on persuasive text more often than on the exact label.
 - Most techniques almost never appear as fixed phrases in news prose. Bandwagon, fear, cliches,
   whataboutism and black-and-white framing may be more phrase-bound in replies than in articles.
-  No labelled reply corpus that Radar may use exists to check that.
+  No labelled reply corpus that Daylight Commons may use exists to check that.
 
 Skipped, because a lexical detector cannot find them without world knowledge: slogans (what counts
 as a slogan depends on who coined it, so a slogan list would be a list of sides), causal
@@ -476,7 +476,7 @@ script when every letter can be read in it, else toward the word's own majority;
 - Ordinary text: 6 of 96,337 PHEME replies change at all, by fullwidth digits and letters read as
   plain ones and one mixed-script word. The synthetic duplicate cases keep their precision.
 - Limit: a lone Russian word quoted inside English text, whose every letter has a Latin look-alike
-  ("сор"), folds to Latin. Folding applies only to the copy Radar matches, never to what it shows.
+  ("сор"), folds to Latin. Folding applies only to the copy Daylight Commons matches, never to what it shows.
 
 ## Named conspiracy theories (2026-10-21): not measured
 `src/core/theories.js` extends the conspiracy family with twelve documented theories (QAnon slogans,
@@ -489,10 +489,10 @@ claim with its left-coded twin (Dominion and Starlink, 2020 and 2016, Sandy Hook
 No corpus was usable for a precision figure, so the family reads "not measured yet", carries weight
 0 and never counts toward "extreme":
 - LOCO (Miani, Hills and Bangerter 2021, 96,743 documents, osf.io/snpcg): the OSF project states no
-  licence (checked 2026-10-21 through the OSF API: `node_license` is null), so Radar may not use it.
+  licence (checked 2026-10-21 through the OSF API: `node_license` is null), so Daylight Commons may not use it.
   Asking the authors for a licence is the author's call.
 - COCO (Langguth et al. 2023, 3,495 tweets with stance labels over 12 COVID-19 conspiracy topics):
-  the release holds tweet IDs only. The text needs hydration through X's API, which Radar does not
+  the release holds tweet IDs only. The text needs hydration through X's API, which Daylight Commons does not
   use, and no licence is stated for the labels.
 - MM-COVID: labels fake and real news, not conspiracy theories. Its Hugging Face mirror says
   Apache-2.0; the original authors' terms were not confirmed.
@@ -513,7 +513,7 @@ reads "not measured yet". Wikidata lists only some of each outlet's accounts, so
 without the badge or a check can trip it.
 
 ## Framing, hidden motives, swarming and cloned outlets (2026-10-21)
-Four signs from `project-docs/TECHNIQUES.md`. None has a labelled corpus Radar may use for
+Four signs from `project-docs/TECHNIQUES.md`. None has a labelled corpus Daylight Commons may use for
 precision, so each has an organic rate, a proxy figure or "not measured". `node
 scripts/framing-baselines.mjs` and `node scripts/techniques-baselines.mjs` reproduce the rates and
 write `evidence/framing-results.json` and `evidence/technique-baselines.json`.
@@ -558,12 +558,12 @@ templates across 26 targets in `tests/persuasion.symmetry.test.js`, plus two con
 question", "the reason they gave") that find nothing.
 
 **Swarming: organic rate only.** `src/core/swarming.js` fires when, within ten minutes, at least
-6 of at least 8 accounts Radar read are new (joined under 30 days before the reply) or flagged,
+6 of at least 8 accounts Daylight Commons read are new (joined under 30 days before the reply) or flagged,
 and they are at least half of those read. The thresholds were fixed before running and checked on
 the PHEME dev half (1 of 2,434 threads), then read on the test half (1 of 2,278; 0.04%, 95%
 interval 0.01 to 0.25%). By size: 0 of 3,087 threads with 5 to 19 replies, 1 of 1,384 at 20 to 49
 (0.07%), 1 of 181 at 50 to 99 (0.55%), 0 of 60 at 100 or more. On PHEME "flagged" can only be
-the very-high-rate flag; in the browser it is any Radar flag, so the browser rate may be higher.
+the very-high-rate flag; in the browser it is any Daylight Commons flag, so the browser rate may be higher.
 No labelled harassment corpus was used, so precision is not measured. The sign carries counts
 only, never handles.
 
@@ -612,9 +612,9 @@ the repository, in the labeller's local folder (for the first cases,
 
 Labels per case:
 - `campaign`: `paid-disclosed` (labelled paid partnerships only), `paid-undisclosed` (evidence
-  outside Radar that promotion was bought without labels: an agency's own case study, a platform
+  outside Daylight Commons that promotion was bought without labels: an agency's own case study, a platform
   enforcement notice, a court or regulator record, the company's own statement), `organic`, or
-  `unsure`. A labeller's impression from the same signals Radar reads is not evidence for
+  `unsure`. A labeller's impression from the same signals Daylight Commons reads is not evidence for
   `paid-undisclosed`, because that would grade the lens against itself. Such cases are `unsure`.
 - Per indicator family, whether the labeller sees it in the page (yes, no, cannot tell), so each
   sign's agreement is measured on its own.

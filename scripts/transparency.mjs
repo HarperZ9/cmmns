@@ -1,4 +1,4 @@
-// Builds Radar's transparency page from the evaluation results: every sign with its measured precision and
+// Builds Daylight Commons' transparency page from the evaluation results: every sign with its measured precision and
 // recall, intervals, corpus and licence; the side-balance table; what is not measured; the known
 // limits; documented influence operations by year and country (data/ops.json). Inputs: project-docs/evidence/eval-results.json and persuasion-results.json (written by
 // scripts/eval.mjs and scripts/eval-persuasion.mjs), families.js, EVALUATION.md and CORPORA.md.
@@ -19,7 +19,7 @@ const read = (p) => readFileSync(join(ROOT, p), "utf8");
 const pct = (x) => `${(x * 100).toFixed(1)}%`;
 const rate = (r) => (r && r.n ? `${pct(r.value)} (${r.k.toLocaleString("en")} of ${r.n.toLocaleString("en")}; ${pct(r.ci[0])} to ${pct(r.ci[1])})` : "not measured");
 const AREA = (a) => a[0].toUpperCase() + a.slice(1);
-const KIND = { detector: "Radar's own rule", platform: "The site's own label", table: "Match against a cited table", technique: "Persuasion technique" };
+const KIND = { detector: "Daylight Commons' own rule", platform: "The site's own label", table: "Match against a cited table", technique: "Persuasion technique" };
 const row = (cells) => `<tr>${cells.map((c) => (typeof c === "object" ? `<td class="${c.cls}">${c.html}</td>` : `<td>${c}</td>`)).join("")}</tr>`;
 const tbl = (head, rows) => `<div class="scroll"><table><thead><tr>${head.map((h) => `<th scope="col">${esc(h)}</th>`).join("")}</tr></thead><tbody>\n${rows.join("\n")}\n</tbody></table></div>`;
 const num = (html) => ({ cls: "num", html });
@@ -88,12 +88,12 @@ function notMeasured(fams) {
   const synthetic = new Set(["duplicates", "mismatch"]);
   const open = FAMILIES.filter((f) => f.kind === "detector" && !measuredLine(f.id).measured && !synthetic.has(f.id)).map((f) => f.name);
   return [
-    `Radar's own rules with no measurement yet: ${open.join(", ")}. The window says "not measured yet" beside each of them.`,
+    `Daylight Commons' own rules with no measurement yet: ${open.join(", ")}. The window says "not measured yet" beside each of them.`,
     "Same text as other replies, and speaks as local, labelled elsewhere: tested only on cases written alongside the rules (below). No error rate on real replies exists yet.",
     "Live threads: no thread from X, YouTube, Reddit, Facebook, Instagram or Bluesky has been labelled by hand yet, so no figure here comes from those sites.",
-    "French language signs: too few hits in the French corpus to measure. Persuasion cues in French: no corpus Radar may use.",
+    "French language signs: too few hits in the French corpus to measure. Persuasion cues in French: no corpus Daylight Commons may use.",
     fams.vigilante && !fams.vigilante.measured ? "Call for vigilantes: fewer than 20 hits in the test split." : null,
-    "Site labels (Community Notes, ads, posting app, X's spam label) and matches against cited tables (outlet owners, state links) are not Radar's judgement. Their evidence is the site or the cited source.",
+    "Site labels (Community Notes, ads, posting app, X's spam label) and matches against cited tables (outlet owners, state links) are not Daylight Commons' judgement. Their evidence is the site or the cited source.",
   ].filter(Boolean);
 }
 
@@ -128,11 +128,11 @@ export function render() {
   const lead = leadSigns({ D, ptc, B, fold: { ...FOLD_SEEDED, ...B.fold } });
   const limits = [...bullets(evalMd, "### What the numbers do not prove"), ...bullets(evalMd, "### What the persuasion numbers do not prove")];
   const body = `
-<p class="lead">Every sign in Radar's window either shows how often it was right when people checked by hand, or says "not measured yet". This page lists every sign, the data each was checked on and its licence, how evenly the signs work whichever side a post targets, and what the numbers do not prove.</p>
+<p class="lead">Every sign in Daylight Commons' window either shows how often it was right when people checked by hand, or says "not measured yet". This page lists every sign, the data each was checked on and its licence, how evenly the signs work whichever side a post targets, and what the numbers do not prove.</p>
 <h2>How to read the numbers</h2>
 <ul>
-<li><strong>Precision</strong> is the share of signs Radar showed that the human annotators of a public research corpus agreed with. It answers "when Radar shows this, how often is it right?"</li>
-<li><strong>Recall</strong> is the share of the annotated cases that Radar found. Radar is built for precision: a wrong sign on an honest reply is the harm it avoids most, so recall is low.</li>
+<li><strong>Precision</strong> is the share of signs Daylight Commons showed that the human annotators of a public research corpus agreed with. It answers "when Daylight Commons shows this, how often is it right?"</li>
+<li><strong>Recall</strong> is the share of the annotated cases that Daylight Commons found. Daylight Commons is built for precision: a wrong sign on an honest reply is the harm it avoids most, so recall is low.</li>
 <li>Each figure gives the count and a 95% interval (Wilson). A wide interval means few cases were checked.</li>
 <li>All figures come from a held-out test split (seed <code>${esc(D.seed)}</code>). Rules were tuned on a separate split, and the test split was read once, after tuning. Measured ${esc(D.generated)}.</li>
 </ul>
@@ -158,11 +158,11 @@ ${more("Every technique, with counts", tbl(["Technique", "Precision (95% interva
 <h2>Cases written for the test</h2>
 <p>Same text as other replies: pair precision <span class="mono">${rate(D.duplicates.precision)}</span>, recall <span class="mono">${rate(D.duplicates.recall)}</span>. Speaks as local, labelled elsewhere: precision <span class="mono">${rate(D.mismatch.precision)}</span>, recall <span class="mono">${rate(D.mismatch.recall)}</span>. The same author wrote these cases and the rules, so they show the rules do what they say. They are not error rates on real replies.</p>
 <h2>Side balance</h2>
-<p>Political side is never an input to Radar. To check that the signs work alike whichever side a post targets, the strong language signs were measured on hostile text aimed at groups each side is often hostile to. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
+<p>Political side is never an input to Daylight Commons. To check that the signs work alike whichever side a post targets, the strong language signs were measured on hostile text aimed at groups each side is often hostile to. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
 ${tbl(["Corpus", "Recall, right's usual targets", "Recall, left's usual targets", "Precision, right's usual targets", "Precision, left's usual targets", "Result"], sideRows(D.sides))}
 <p class="muted">Precision agrees across sides within the intervals. Where a gap remains, the thread report undercounts extreme replies aimed at the side with lower recall.</p>
 <h2>Every sign</h2>
-<p>Each of Radar's ${FAMILIES.length} signs, with the line its window shows beside it.</p>
+<p>Each of Daylight Commons' ${FAMILIES.length} signs, with the line its window shows beside it.</p>
 ${more("Every sign and its measured line", tbl(["Sign", "Area", "Kind", "What the window says"], everySignRows()))}
 ${opsSection(JSON.parse(read("data/ops.json")))}
 <h2>What is not measured</h2>
@@ -173,8 +173,8 @@ ${ul(limits, inline)}
 <p>Each sign in the window has "This was right" and "This was wrong". Your marks stay in your browser. After 10 marks on one kind of sign, the window shows your own count under the measured figure. It never changes the figures on this page. You can save your marks to a file from the options page and choose whether to share it.</p>
 <h2>Data used</h2>
 ${tbl(["Corpus", "Licence"], sources.map((s) => row([`<a href="${esc(s.url)}">${esc(s.name)}</a>`, esc(s.licence)])))}
-<p>No corpus text is in Radar or its repository; only counts, rates and file hashes are. The evaluation scripts in <a href="${REPO}">Radar's repository</a> reproduce every number here from the downloaded corpora.</p>`;
-  return page({ title: "How Radar is measured", description: "Every Radar sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.", updated: D.generated, body, css: FIGURE_CSS });
+<p>No corpus text is in Daylight Commons or its repository; only counts, rates and file hashes are. The evaluation scripts in <a href="${REPO}">Daylight Commons' repository</a> reproduce every number here from the downloaded corpora.</p>`;
+  return page({ title: "How Daylight Commons is measured", description: "Every Daylight Commons sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.", updated: D.generated, body, css: FIGURE_CSS });
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

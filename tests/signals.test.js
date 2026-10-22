@@ -128,7 +128,7 @@ test("cross-language and laundering signs carry their baseline or 'not measured'
   assert.equal(cross.label, "same link in 2 languages");
   assert.ok(cross.rows.some(([h, v]) => h === "In ordinary threads" && /95% interval/.test(v)));
   assert.ok(cross.rows.some(([h, v]) => h === "Does not prove" && v === PB.CROSS_DOES_NOT_PROVE));
-  assert.ok(laund.rows.some(([h, v]) => h === "Chain" && v.includes("@relay") && v.includes("earliest Radar saw")));
+  assert.ok(laund.rows.some(([h, v]) => h === "Chain" && v.includes("@relay") && v.includes("earliest Daylight Commons saw")));
   assert.equal(laund.level, "info");
   const across = PBSignals.all({ site: X, handle: "a", markers: [], machine: {}, flags: [], tweet: {}, crossLang: [{ ...g, across: true }] }).find((s) => s.fam === "cross-language");
   assert.ok(across.rows.some(([, v]) => v === "Not measured across threads yet."));

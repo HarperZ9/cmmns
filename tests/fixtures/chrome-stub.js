@@ -6,7 +6,7 @@
   const listeners = [];
   // The worker's font bytes (background.js), read from src/ext/fonts relative to the fixture.
   const b64 = (buf) => { const u = new Uint8Array(buf); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
-  const fixtureFonts = () => Promise.all([["Radar Hanken", "hanken-grotesk.woff2", "100 900"], ["Radar Conso", "conso-regular.woff2", "400"]]
+  const fixtureFonts = () => Promise.all([["Daylight Commons Hanken", "hanken-grotesk.woff2", "100 900"], ["Daylight Commons Conso", "conso-regular.woff2", "400"]]
     .map(([family, file, weight]) => fetch(new URL("../../src/ext/fonts/" + file, document.currentScript ? document.currentScript.src : location.href)).then((r) => r.arrayBuffer()).then((b) => ({ family, weight, data: b64(b) }))));
   globalThis.chrome = {
     storage: { local: {

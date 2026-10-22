@@ -1,6 +1,6 @@
-# Contributing to Radar
+# Contributing to Daylight Commons
 
-Thank you for helping. Radar is a tool for the commons, so how contributions come in matters as
+Thank you for helping. Daylight Commons is a tool for the commons, so how contributions come in matters as
 much as what they change.
 
 ## Licence of your contribution
@@ -11,7 +11,7 @@ AGPL-3.0-only for code, CC BY 4.0 for data, the catalogue, schemas and documenta
 
 ## Sign off every commit (Developer Certificate of Origin)
 
-Radar uses the Developer Certificate of Origin (DCO) 1.1, printed in full below. Add a sign-off line
+Daylight Commons uses the Developer Certificate of Origin (DCO) 1.1, printed in full below. Add a sign-off line
 to every commit to certify that you wrote the change or have the right to submit it:
 
 ```
@@ -25,8 +25,8 @@ off (`git rebase --signoff main` fixes a whole branch).
 ### Why a DCO and no CLA
 
 A contributor licence agreement usually hands one party the right to relicense everyone's work,
-including under closed terms. Radar has none. Each contributor keeps their copyright and licenses
-it under the AGPL or CC BY 4.0, exactly as everyone else receives it. Changing Radar's licence
+including under closed terms. Daylight Commons has none. Each contributor keeps their copyright and licenses
+it under the AGPL or CC BY 4.0, exactly as everyone else receives it. Changing Daylight Commons' licence
 would need every copyright holder's consent, so no single party, the author included, can take
 contributions closed. The DCO records only that you had the right to contribute.
 

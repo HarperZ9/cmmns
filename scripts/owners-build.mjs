@@ -1,7 +1,7 @@
 // Builds a sourced ownership table from Wikidata and writes src/core/owners.data.js.
 // Rows: news outlets, broadcasters, news websites and the big platforms, each with an official
 // website (P856) and a CURRENT owner (P127 with no end date, not deprecated). Every row links back
-// to its Wikidata item. Radar itself never calls Wikidata from the browser.
+// to its Wikidata item. Daylight Commons itself never calls Wikidata from the browser.
 //   node scripts/owners-build.mjs [--save-raw raw.json]   (network download: run only with the author's approval)
 //   node scripts/owners-build.mjs --in raw.json           (offline, from a saved raw snapshot)
 import { readFileSync, writeFileSync } from "node:fs";
@@ -51,7 +51,7 @@ const argOf = (k) => { const i = process.argv.indexOf(k); return i > 0 ? process
 const raw = argOf("--in") ? JSON.parse(readFileSync(argOf("--in"), "utf8")) : [];
 for (const type of argOf("--in") ? [] : TYPES) {
   const url = "https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(query(type));
-  const res = await fetch(url, { headers: { "User-Agent": "Radar ownership table builder (local, manual run)" } });
+  const res = await fetch(url, { headers: { "User-Agent": "Daylight Commons ownership table builder (local, manual run)" } });
   if (!res.ok) { console.error("Wikidata query failed:", type, res.status, (await res.text()).slice(0, 500)); process.exit(1); }
   raw.push(...(await res.json()).results.bindings);
   await new Promise((r) => setTimeout(r, 1500));

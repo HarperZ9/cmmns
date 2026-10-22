@@ -1,5 +1,5 @@
 // Account lookups and the one-click scan.
-// - Radar's toolbar popup (popup.js) asks the current tab to scan its thread.
+// - Daylight Commons' toolbar popup (popup.js) asks the current tab to scan its thread.
 // - A scan asks for every account on screen. This worker reads each account's profile header and
 //   its "About this account" page in ONE reused tab inside a minimised window, so no tabs flicker open and closed.
 //   One account at a time, at least GAP_MS apart, never faster than a person clicking through
@@ -18,7 +18,7 @@ let ownersReady = null;
 function owners() {
   if (!ownersReady) ownersReady = fetch(chrome.runtime.getURL("owners.json")).then((r) => r.json())
     .then((t) => { globalThis.PB_OWNER_ROWS = t.rows; return t.rows; })
-    .catch((e) => { console.error("[radar] owners.json failed to load", e); return []; });
+    .catch((e) => { console.error("[daylight-commons] owners.json failed to load", e); return []; });
   return ownersReady;
 }
 
@@ -26,7 +26,7 @@ function owners() {
 let stateReady = null;
 function stateRows() {
   if (!stateReady) stateReady = fetch(chrome.runtime.getURL("state.json")).then((r) => r.json()).then((t) => t.rows || [])
-    .catch((e) => { console.error("[radar] state.json failed to load", e); return []; });
+    .catch((e) => { console.error("[daylight-commons] state.json failed to load", e); return []; });
   return stateReady;
 }
 
@@ -36,7 +36,7 @@ let opsReady = null;
 function opsTable() {
   if (!opsReady) opsReady = fetch(chrome.runtime.getURL("ops.json")).then((r) => r.json())
     .then(async (t) => PB.mergePackOps(t, await PBPacks.enabled()))
-    .catch((e) => { console.error("[radar] ops.json failed to load", e); return { docs: [], ops: [], indicators: [] }; });
+    .catch((e) => { console.error("[daylight-commons] ops.json failed to load", e); return { docs: [], ops: [], indicators: [] }; });
   return opsReady;
 }
 
@@ -45,7 +45,7 @@ function opsTable() {
 let backingReady = null;
 function backingTable() {
   if (!backingReady) backingReady = fetch(chrome.runtime.getURL("personalities.json")).then((r) => r.json())
-    .catch((e) => { console.error("[radar] personalities.json failed to load", e); return { people: [] }; });
+    .catch((e) => { console.error("[daylight-commons] personalities.json failed to load", e); return { people: [] }; });
   return backingReady;
 }
 
@@ -55,7 +55,7 @@ let claimsReady = null;
 function claimIndex() {
   const get = (name) => fetch(chrome.runtime.getURL(name)).then((r) => r.json());
   if (!claimsReady) claimsReady = get("claims.json").then(async (main) => PB.buildClaimIndex(PB.mergePackClaims(PB.joinClaims(main, await Promise.all((main.parts || []).map(get))), await PBPacks.enabled())))
-    .catch((e) => { console.error("[radar] claims.json failed to load", e); return null; });
+    .catch((e) => { console.error("[daylight-commons] claims.json failed to load", e); return null; });
   return claimsReady;
 }
 
@@ -65,8 +65,8 @@ let fontsReady = null;
 function fontBytes() {
   const b64 = (buf) => { const u = new Uint8Array(buf); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
   const get = ([family, file, weight]) => fetch(chrome.runtime.getURL("fonts/" + file)).then((r) => r.arrayBuffer()).then((b) => ({ family, weight, data: b64(b) }));
-  if (!fontsReady) fontsReady = Promise.all([["Radar Hanken", "hanken-grotesk.woff2", "100 900"], ["Radar Conso", "conso-regular.woff2", "400"]].map(get))
-    .catch((e) => { console.error("[radar] the window's fonts failed to load", e); fontsReady = null; return []; });
+  if (!fontsReady) fontsReady = Promise.all([["Daylight Commons Hanken", "hanken-grotesk.woff2", "100 900"], ["Daylight Commons Conso", "conso-regular.woff2", "400"]].map(get))
+    .catch((e) => { console.error("[daylight-commons] the window's fonts failed to load", e); fontsReady = null; return []; });
   return fontsReady;
 }
 
@@ -111,7 +111,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.type === "pb-card-open") {
     const id = String(Date.now());
     const put = chrome.storage.session ? chrome.storage.session.set({ ["pb.card." + id]: msg.built }) : Promise.resolve((cards[id] = msg.built));
-    put.then(() => chrome.tabs.create({ url: chrome.runtime.getURL("evidence-card.html#" + id) })).catch((e) => console.error("[radar] could not open the card", e));
+    put.then(() => chrome.tabs.create({ url: chrome.runtime.getURL("evidence-card.html#" + id) })).catch((e) => console.error("[daylight-commons] could not open the card", e));
   }
   if (msg && msg.type === "pb-card-get") {
     const key = "pb.card." + msg.id;
@@ -190,7 +190,7 @@ async function pump() {
     await ensureWorker();
     go(`https://x.com/${encodeURIComponent(current.handle)}#pb-lookup`);
   } catch (e) {
-    console.error("[radar] lookup failed for", current && current.handle, e);
+    console.error("[daylight-commons] lookup failed for", current && current.handle, e);
     finish(null, String(e));
   }
 }

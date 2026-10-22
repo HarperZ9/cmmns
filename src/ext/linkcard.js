@@ -1,6 +1,6 @@
-// Site cards on links. Resting the pointer on an outbound link (or focusing it) opens Radar's
+// Site cards on links. Resting the pointer on an outbound link (or focusing it) opens Daylight Commons'
 // window for the linked site: owner, owner type, founding date, country, state links and the site's
-// fact-check record, each sourced. Lookups go to Radar's background worker and its bundled tables;
+// fact-check record, each sourced. Lookups go to Daylight Commons' background worker and its bundled tables;
 // nothing leaves the browser. Links to the page's own site and to platforms are skipped.
 (() => {
   "use strict";
@@ -29,7 +29,7 @@
       batch.promise = new Promise((resolve) => setTimeout(async () => {
         const b = batch; batch = null;
         let got = {};
-        try { got = (await chrome.runtime.sendMessage({ type: "pb-sites", domains: [...b.domains] })) || {}; } catch (e) { console.error("[radar] site lookup failed", e); }
+        try { got = (await chrome.runtime.sendMessage({ type: "pb-sites", domains: [...b.domains] })) || {}; } catch (e) { console.error("[daylight-commons] site lookup failed", e); }
         for (const d of b.domains) cache.set(d, got[d] || { domain: d, owner: null, state: [], facts: null, record: null });
         resolve();
       }, 30));
@@ -38,12 +38,12 @@
     return batch.promise.then(() => cache.get(domain));
   }
 
-  const openList = (domain) => () => chrome.runtime.sendMessage({ type: "pb-open-sites", domain }).catch((e) => console.error("[radar] could not open the review list", e));
+  const openList = (domain) => () => chrome.runtime.sendMessage({ type: "pb-open-sites", domain }).catch((e) => console.error("[daylight-commons] could not open the review list", e));
   function sections(i, extra = []) {
     return [{ glance: PB.siteGlance(i) }, { tab: "overview", title: "Site", rows: PB.siteInfoRows(i, { onList: openList(i.domain) }) }, ...extra];
   }
 
-  // Dark pages get Radar's dark palette, read from the page's own background. The social sites set
+  // Dark pages get Daylight Commons' dark palette, read from the page's own background. The social sites set
   // it themselves (src/ext/ui.js).
   function theme() {
     const bg = getComputedStyle(document.body || document.documentElement).backgroundColor.match(/\d+/g);
@@ -73,6 +73,6 @@
   const cached = (domain) => { const v = cache.get(domain); return v && !(v instanceof Promise) ? v : null; };
   globalThis.PBLinkCard = Object.freeze({ start, siteOfLink, info, cached, sections, theme, openList });
 
-  // On the social sites Radar reads, cards follow the site switch and the Sources area switch.
+  // On the social sites Daylight Commons reads, cards follow the site switch and the Sources area switch.
   if (globalThis.PBSites && globalThis.PBSettings) start(() => { const s = PBSites.current(), set = PBSettings.get(); return !!s && PB.siteOn(set, s.id) && PB.areaOn(set, "sources"); });
 })();

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// radar: Radar's evidence from the command line, reading local files only. Nothing is fetched.
+// radar: Daylight Commons' evidence from the command line, reading local files only. Nothing is fetched.
 //   radar analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
 //   radar verify <bundle.json> [--key-id id] [--json]
 //   radar site <domain> [--json]
@@ -23,7 +23,7 @@ const USAGE = `Usage:
   radar site <domain> [--json]
   radar media <file> [--json]
 <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
-CSV, a Mastodon outbox.json or a Bluesky repository .car. Radar reads local files only.
+CSV, a Mastodon outbox.json or a Bluesky repository .car. Daylight Commons reads local files only.
 `;
 const SCHEMA = JSON.parse(readFileSync(`${ROOT}/schema/evidence.v1.json`, "utf8"));
 
@@ -52,7 +52,7 @@ async function analyze(file, f) {
 
 async function writeBundle(result, imp, f) {
   const texts = Object.fromEntries([imp.input.root, ...imp.input.replies].filter(Boolean).map((p, i) => [p.id != null ? String(p.id) : "p" + i, p.text]));
-  const built = makeBundle(result, { tool: `Radar ${radarVersion()} (CLI)`, dataLock: await dataLock(), source: imp.source === "export" ? "export" : "thread", includeText: !!f["include-text"], texts });
+  const built = makeBundle(result, { tool: `Daylight Commons ${radarVersion()} (CLI)`, dataLock: await dataLock(), source: imp.source === "export" ? "export" : "thread", includeText: !!f["include-text"], texts });
   if (!built.ok) throw new Error(built.reason);
   const key = await loadOrMakeKey(typeof f.key === "string" ? f.key : DEFAULT_KEY);
   const signed = await signBundle(built.bundle, key.keyPair);

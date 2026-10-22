@@ -1,4 +1,4 @@
-// The one copy of Radar's hashing and signing primitives, shared by sealed evidence cards
+// The one copy of Daylight Commons' hashing and signing primitives, shared by sealed evidence cards
 // (evidence.js), signed evidence bundles (evidence-bundle.js) and signed data packs (packs.js).
 // WebCrypto only, so the same code runs in Chrome, Firefox and node with no dependency.
 //   canonicalJSON: sorted keys at every level, no spacing, undefined object fields dropped and

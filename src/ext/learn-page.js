@@ -45,11 +45,11 @@ function examples(l) {
 
 function measured(id) {
   if (!globalThis.PB || !PB.measuredLine || id === "thread-report") return null;
-  return el("p", { class: "figure muted" }, `How Radar measures it: ${PB.measuredLine(id).text}.`);
+  return el("p", { class: "figure muted" }, `How Daylight Commons measures it: ${PB.measuredLine(id).text}.`);
 }
 
 function showLesson(l) {
-  document.title = `${l.title}: a Radar lesson`;
+  document.title = `${l.title}: a Daylight Commons lesson`;
   const head = el("header");
   head.append(el("p", { class: "muted" }, `Lesson, about ${readSeconds(l, DNP)} seconds`), el("h1", {}, l.title), el("p", { class: "lead" }, l.what));
   const dnp = el("div");
@@ -58,7 +58,7 @@ function showLesson(l) {
     head,
     section("Made-up examples", el("p", { class: "muted" }, "No real person wrote these."), examples(l)),
     section("Why it works on people", el("p", {}, l.why)),
-    section("See it without Radar", el("p", {}, l.spot)),
+    section("See it without Daylight Commons", el("p", {}, l.spot)),
     section("The counter-move", el("p", {}, l.counter)),
     section("What the sign does not prove", dnp),
   ];
@@ -73,10 +73,10 @@ function showLesson(l) {
 }
 
 function showIndex() {
-  document.title = "Radar lessons";
+  document.title = "Daylight Commons lessons";
   const head = el("header");
   head.append(el("h1", {}, "Learn to see it yourself"), el("p", { class: "lead" },
-    "Every sign Radar shows has a lesson of a minute or two: what the move is, a made-up example, why it works on people, how to spot it without Radar, and what it does not prove."));
+    "Every sign Daylight Commons shows has a lesson of a minute or two: what the move is, a made-up example, why it works on people, how to spot it without Daylight Commons, and what it does not prove."));
   const parts = [head];
   for (const [name, ids] of GROUPS) {
     const ul = el("ul", { class: "index" });

@@ -1,6 +1,6 @@
 // Builds src/ext/sites.json, the site table src/core/sites.js reads: founding date, country and
 // owner type from Wikidata (CC0), and each site's fact-check record from the Data Commons
-// ClaimReview feed (CC BY 4.0). Build time only; Radar never calls Wikidata or the feed from the
+// ClaimReview feed (CC BY 4.0). Build time only; Daylight Commons never calls Wikidata or the feed from the
 // browser. Network downloads run only with the author's approval.
 //
 //   node scripts/sites-build.mjs --in feed.json [--wd-cache wd.json] [--per-site 40]
@@ -37,7 +37,7 @@ async function wikidata() {
   if (cache && existsSync(cache)) return JSON.parse(readFileSync(cache, "utf8"));
   const out = [];
   for (const type of Object.keys(TYPES)) {
-    const res = await fetch("https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(query(type)), { headers: { "User-Agent": "Radar sites table builder (local, manual run)", Accept: "application/sparql-results+json" } });
+    const res = await fetch("https://query.wikidata.org/sparql?format=json&query=" + encodeURIComponent(query(type)), { headers: { "User-Agent": "Daylight Commons sites table builder (local, manual run)", Accept: "application/sparql-results+json" } });
     if (!res.ok) throw new Error(`Wikidata ${type} failed: ${res.status} ${(await res.text()).slice(0, 300)}`);
     const b = (await res.json()).results.bindings;
     console.log(`${TYPES[type]}: ${b.length} rows`);

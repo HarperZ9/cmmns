@@ -94,7 +94,7 @@ export async function exportSeal(seal, { title = null, at = new Date().toISOStri
 
 // Offline check of an export: the seal, the head, the root and every proof.
 export async function verifyExport(x) {
-  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Radar evidence chain"] };
+  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Daylight Commons evidence chain"] };
   const s = await verifySeal(x.seal), problems = [...s.problems];
   const hashes = x.seal.entries.map((e) => e.receipt.hash);
   if ((await merkleRoot(hashes)) !== x.root) problems.push("root does not match the receipts");

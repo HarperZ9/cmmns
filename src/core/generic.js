@@ -1,8 +1,8 @@
-// The generic reader, for article and comment pages on sites Radar has no reader for. It runs only
+// The generic reader, for article and comment pages on sites Daylight Commons has no reader for. It runs only
 // when the user opens the site card on a page (src/ext/generic-page.js walks the page and passes
 // plain summaries here). It finds the article body as the block with the most paragraph text, and
 // comments as the largest run of sibling boxes that share a shape and carry an author link or a
-// time stamp. Then it runs the same text checks Radar runs on replies. Nothing leaves the browser.
+// time stamp. Then it runs the same text checks Daylight Commons runs on replies. Nothing leaves the browser.
 //
 // These are structural guesses, not a site reader: they can miss comments, take a list of related
 // links for comments, or read a sidebar as the article. The card says so beside every count.
@@ -70,4 +70,4 @@ export function genericChecks({ article, comments }) {
   return out;
 }
 
-export const GENERIC_DOES_NOT_PROVE = "Radar has no reader for this site, so it guessed where the article and the comments are from the page's layout. It can miss comments or count a list of links as comments. A marker is a pattern in wording, not a judgment of the writer.";
+export const GENERIC_DOES_NOT_PROVE = "Daylight Commons has no reader for this site, so it guessed where the article and the comments are from the page's layout. It can miss comments or count a list of links as comments. A marker is a pattern in wording, not a judgment of the writer.";

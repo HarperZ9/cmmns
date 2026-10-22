@@ -23,21 +23,21 @@
     for (const r of res.receipts || []) box.append(el("p", "pb-num", summary(r)), el("p", "pb-foot", `Source: ${r.source}. Receipt ${r.hash.slice(0, 12)}, ${r.at.slice(0, 16)} UTC. Does not prove: ${r.dnp}`));
     for (const n of res.notes || []) box.append(el("p", "pb-foot", n));
     if ((res.ads || []).length) {
-      const p = el("p", "pb-num", "Ad libraries (open in a tab; Radar does not query them): ");
+      const p = el("p", "pb-num", "Ad libraries (open in a tab; Daylight Commons does not query them): ");
       res.ads.forEach((a, i) => { if (i) p.append(" · "); p.append(link(a.name, a.url)); });
       box.append(p, el("p", "pb-foot", PB.ADS_DOES_NOT_PROVE));
     }
   }
 
   async function run(box, ev, rerender) {
-    const res = await chrome.runtime.sendMessage({ type: "pb-evidence", ...ev.request }).catch((e) => { console.error("[radar] evidence request failed", e); return { error: "failed" }; });
+    const res = await chrome.runtime.sendMessage({ type: "pb-evidence", ...ev.request }).catch((e) => { console.error("[daylight-commons] evidence request failed", e); return { error: "failed" }; });
     results.set(ev.launchId, res || { error: "failed" });
     rerender();
   }
 
   function consent(box, ev, rerender) {
     box.append(el("p", "pb-foot", CONSENT), btn("Allow and look up", "Turns on evidence lookups (you can turn them off in Options) and runs this one.", async () => {
-      await PBSettings.save({ evidence: true }).catch((e) => console.error("[radar] could not save settings", e));
+      await PBSettings.save({ evidence: true }).catch((e) => console.error("[daylight-commons] could not save settings", e));
       run(box, ev, rerender);
     }));
   }
@@ -68,10 +68,10 @@
     const actions = el("p", "pb-num");
     if (ev.postUrl) {
       const save = link("Save this post to the Internet Archive", `https://web.archive.org/save/${ev.postUrl}`);
-      save.addEventListener("click", () => chrome.runtime.sendMessage({ type: "pb-evidence-witness", postUrl: ev.postUrl }).catch((e) => console.error("[radar] witness receipt failed", e)));
+      save.addEventListener("click", () => chrome.runtime.sendMessage({ type: "pb-evidence-witness", postUrl: ev.postUrl }).catch((e) => console.error("[daylight-commons] witness receipt failed", e)));
       actions.append(save, " · ");
     }
-    actions.append(btn("Save evidence chain", "Downloads every receipt Radar sealed in this browser, with the chain and Merkle proofs, to check offline.", saveChain));
+    actions.append(btn("Save evidence chain", "Downloads every receipt Daylight Commons sealed in this browser, with the chain and Merkle proofs, to check offline.", saveChain));
     box.append(actions);
     parent.append(box);
   }

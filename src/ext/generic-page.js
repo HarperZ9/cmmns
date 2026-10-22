@@ -1,5 +1,5 @@
 // The generic reader's page side, injected with the site card only on the user's click, on sites
-// Radar has no reader for (src/ext/sources-bg.js). It walks the page once, passes plain summaries
+// Daylight Commons has no reader for (src/ext/sources-bg.js). It walks the page once, passes plain summaries
 // of paragraph blocks and repeated sibling boxes to src/core/generic.js, and gives the site card a
 // "Text on this page" section with counts only. It reads only what the page shows and sends nothing.
 (() => {
@@ -56,7 +56,7 @@
         ["With persuasion techniques", String(c.persuasive)], ["Machine-like", String(c.machine)],
         ["Repeated texts", c.repeatedTexts ? `${c.repeatedTexts} texts appear more than once (largest ${c.largestRepeat} times)` : "none"]);
     }
-    if (!out.length) out.push([null, { note: "Radar found no article body or comment list on this page." }]);
+    if (!out.length) out.push([null, { note: "Daylight Commons found no article body or comment list on this page." }]);
     out.push(["Does not prove", PB.GENERIC_DOES_NOT_PROVE]);
     return out;
   }
@@ -65,7 +65,7 @@
   function section() {
     const root = document;
     const found = { article: PB.pickArticle(blocks(root)), comments: PB.pickComments(groups(root)) };
-    return { tab: "overview", title: "Text on this page", rows: rows(PB.genericChecks(found)), foot: "Radar has no reader for this site; this is its generic reader, from the page's layout." };
+    return { tab: "overview", title: "Text on this page", rows: rows(PB.genericChecks(found)), foot: "Daylight Commons has no reader for this site; this is its generic reader, from the page's layout." };
   }
 
   globalThis.PBGenericPage = Object.freeze({ section, blocks, groups });

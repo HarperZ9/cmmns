@@ -1,7 +1,7 @@
 // Evidence bundles in the extension's own pages: this install's signing key, the data tables and
 // their hash. The key is an ECDSA P-256 pair made on first use and kept in this extension's
 // IndexedDB as a non-extractable CryptoKey, so the private half can sign but can never be read,
-// exported or sent. The tables are read from Radar's own package; nothing is fetched from the web.
+// exported or sent. The tables are read from Daylight Commons' own package; nothing is fetched from the web.
 (() => {
   "use strict";
   const DB = "radar-keys", STORE = "keys", ID = "bundle-key";
@@ -31,7 +31,7 @@
   const json = (f) => fetch(url(f)).then((r) => { if (!r.ok) throw new Error(`${f}: ${r.status}`); return r.json(); });
 
   let tables = null;
-  // Loads Radar's tables into the core once per page: sites, owners, state links and fact-checks.
+  // Loads Daylight Commons' tables into the core once per page: sites, owners, state links and fact-checks.
   function loadTables() {
     if (!tables) tables = json("claims.json").then(async (claims) => {
       const [sites, owners, state, ...parts] = await Promise.all([json("sites.json"), json("owners.json"), json("state.json"), ...(claims.parts || []).map(json)]);
@@ -49,7 +49,7 @@
   async function sign(bundle) { return PB.signBundle(bundle, await keyPair()); }
   // This browser's key id, or null when no bundle has been signed here yet.
   async function keyId() { const p = await keyPair(false); return p ? (await PB.publicKeyOf(p.publicKey)).keyId : null; }
-  const tool = () => "Radar " + chrome.runtime.getManifest().version;
+  const tool = () => "Daylight Commons " + chrome.runtime.getManifest().version;
 
   function download(name, text) {
     const a = document.createElement("a");

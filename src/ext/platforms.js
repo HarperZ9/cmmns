@@ -1,7 +1,7 @@
 // One adapter per site. Each knows how to find the replies the site has rendered, read their
 // author and text, and where to put the badge. X labels where accounts are based on every
 // reply; Instagram and Facebook show it only when the viewer opens an account's About or
-// Page transparency view (src/ext/meta.js), and Radar then remembers it. `reading(author)` gives
+// Page transparency view (src/ext/meta.js), and Daylight Commons then remembers it. `reading(author)` gives
 // a site's account reading; `rootFirst` means the first item is the post replied to.
 // Selectors are written from each site's public markup and need a live check
 // (project-docs/LIVE-CHECKS.md); a site redesign can break them.

@@ -1,5 +1,5 @@
 // The signed evidence bundle on the thread card page: radar-core analyses the posts the thread
-// panel handed over, with Radar's full tables, and the bundle is signed with this browser's key.
+// panel handed over, with Daylight Commons' full tables, and the bundle is signed with this browser's key.
 // The posts stay in this browser; full text goes into the bundle only when the user ticks the box.
 (async () => {
   "use strict";
@@ -22,8 +22,8 @@
       PBSign.download(name, JSON.stringify(signed, null, 2) + "\n");
       say(`Saved ${name}: ${signed.evidence.length} evidence items, signed with key ${signed.signer.keyId}.`);
     } catch (e) {
-      console.error("[radar] bundle failed", e);
+      console.error("[daylight-commons] bundle failed", e);
       say("Could not make the bundle: " + e.message);
     }
   });
-})().catch((e) => console.error("[radar] bundle section failed", e));
+})().catch((e) => console.error("[daylight-commons] bundle section failed", e));

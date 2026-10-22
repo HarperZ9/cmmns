@@ -1,9 +1,9 @@
-// R&D only: compares Radar's Content Credentials reader with c2patool on a folder of sample files,
+// R&D only: compares Daylight Commons' Content Credentials reader with c2patool on a folder of sample files,
 // such as the test fixtures in the c2pa-rs repository (sdk/tests/fixtures). Nothing here ships.
 //   node scripts/c2pa-crosscheck.mjs <folder> <path to c2patool> [--write]
 // --write saves c2patool's verdicts to tests/fixtures/c2pa-reference.json, which the property test
-// tests/c2pa.reference.test.js holds Radar to. A verdict is "pass" when c2patool logs no failure
-// other than signingCredential.untrusted (Radar does not check trust and says so), "fail" for any
+// tests/c2pa.reference.test.js holds Daylight Commons to. A verdict is "pass" when c2patool logs no failure
+// other than signingCredential.untrusted (Daylight Commons does not check trust and says so), "fail" for any
 // other failure or a c2patool error, and "none" when the file has no manifest.
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";

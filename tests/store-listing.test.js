@@ -45,5 +45,5 @@ test("the Firefox id is the permanent one and declares no data collection", () =
 });
 
 test("the listing points at the public privacy and transparency pages", () => {
-  for (const u of ["https://harperz9.github.io/radar/privacy.html", "https://harperz9.github.io/radar/transparency.html"]) assert.ok(md.includes(u), u);
+  for (const u of ["https://harperz9.github.io/daylight-commons/privacy.html", "https://harperz9.github.io/daylight-commons/transparency.html"]) assert.ok(md.includes(u), u);
 });

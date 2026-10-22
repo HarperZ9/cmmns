@@ -1,11 +1,11 @@
-// Toolbar popup: what Radar sees on the current page, the main actions, pause and two settings.
+// Toolbar popup: what Daylight Commons sees on the current page, the main actions, pause and two settings.
 (async () => {
   "use strict";
   const $ = (id) => document.getElementById(id);
   await PBSettings.ready;
   for (const k of ["paused", "feeds", "auto"]) {
     $(k).checked = PBSettings.get()[k];
-    $(k).addEventListener("change", () => PBSettings.save({ [k]: $(k).checked }).catch((e) => console.error("[radar] could not save settings", e)));
+    $(k).addEventListener("change", () => PBSettings.save({ [k]: $(k).checked }).catch((e) => console.error("[daylight-commons] could not save settings", e)));
   }
   $("options").addEventListener("click", () => { chrome.runtime.openOptionsPage(); window.close(); });
 
@@ -20,10 +20,10 @@
   const web = tab && /^https?:\/\//.test(tab.url || "") || (tab && !tab.url);
   $("sitecard").disabled = !web;
   $("sitecard").addEventListener("click", () => {
-    chrome.runtime.sendMessage({ type: "pb-site-page", tabId: tab.id }).then((r) => { if (r && r.error) console.error("[radar] site card failed", r.error); window.close(); })
-      .catch((e) => console.error("[radar] site card failed", e));
+    chrome.runtime.sendMessage({ type: "pb-site-page", tabId: tab.id }).then((r) => { if (r && r.error) console.error("[daylight-commons] site card failed", r.error); window.close(); })
+      .catch((e) => console.error("[daylight-commons] site card failed", e));
   });
-  // Adapter health on demand (src/ext/health.js): counts what Radar's reader finds here now.
+  // Adapter health on demand (src/ext/health.js): counts what Daylight Commons' reader finds here now.
   $("selftest-run").disabled = !web;
   $("selftest-run").addEventListener("click", async () => {
     const box = $("selftest");
@@ -40,7 +40,7 @@
   if (!s) { buttons.forEach((b) => ($(b).disabled = true)); await PBServer.offer(tab); return; }
 
   $("site").textContent = s.site + (s.feed ? " feed" : " thread");
-  $("sentence").textContent = s.sentence || (s.feed ? "Rest the pointer on any post to see what Radar knows about it." : "Reading the thread…");
+  $("sentence").textContent = s.sentence || (s.feed ? "Rest the pointer on any post to see what Daylight Commons knows about it." : "Reading the thread…");
   const facts = [
     ["Posts on screen", s.posts],
     ["Accounts read", `${s.lookedUp} of ${s.lookedUp + s.pending}`],
@@ -61,4 +61,4 @@
   $("scan").addEventListener("click", () => { send({ type: "pb-scan" }); window.close(); });
   $("panel").addEventListener("click", () => { send({ type: "pb-panel" }); window.close(); });
   $("export").addEventListener("click", () => { send({ type: "pb-export" }); window.close(); });
-})().catch((e) => console.error("[radar] popup failed", e));
+})().catch((e) => console.error("[daylight-commons] popup failed", e));

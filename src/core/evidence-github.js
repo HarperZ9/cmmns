@@ -2,7 +2,7 @@
 // date and star count from the public repository endpoint, and star bursts from the stargazers
 // list with timestamps. Checked 2026-10-22: the repository endpoint answers without a login; the
 // stargazers list answers 401 "Requires authentication", so star timestamps need the user's own
-// GitHub token, which Radar keeps on this device and sends only to api.github.com.
+// GitHub token, which Daylight Commons keeps on this device and sends only to api.github.com.
 
 export const GITHUB_API = "https://api.github.com";
 export const STAR_MAX_PAGES = 10, STAR_PER_PAGE = 100;
@@ -22,7 +22,7 @@ export function reposIn(textOrLinks) {
   return [...out.values()];
 }
 
-// The repository endpoint's JSON -> the facts Radar keeps.
+// The repository endpoint's JSON -> the facts Daylight Commons keeps.
 export function repoFacts(json) {
   if (!json || !json.full_name) return null;
   return { repo: json.full_name, created: json.created_at || null, pushed: json.pushed_at || null, stars: Number.isFinite(json.stargazers_count) ? json.stargazers_count : null, forks: Number.isFinite(json.forks_count) ? json.forks_count : null };

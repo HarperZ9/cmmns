@@ -1,6 +1,6 @@
 # Design canon check
 
-Radar follows the design canon of the author's site, harperz9.github.io. This file turns that canon
+Daylight Commons follows the design canon of the author's site, harperz9.github.io. This file turns that canon
 into values a reviewer can check, records the audit of 2026-10-21, and says what changed.
 
 ## Sources
@@ -78,16 +78,16 @@ Feature first: say what the reader gets, then the limit beside it. No em dashes.
 stay ("not measured yet"). No local paths, gate or operator language on public pages. Every
 public page has a route back to the author's site.
 
-## How Radar applies it
+## How Daylight Commons applies it
 
-- `src/ext/canon.css` holds the site's tokens and base rules. Every Radar page loads it before its
+- `src/ext/canon.css` holds the site's tokens and base rules. Every Daylight Commons page loads it before its
   own stylesheet. The transparency and privacy pages carry it inline, so `docs/` works alone.
 - The window and panel on social sites (`badges.css`) use the same values under `--pb-*` names.
   The ground adapts to the site: a bone sheet (#f1ece1) on X light, the void (#0a0a0d) on X dark,
   and X's own blue-grey (#1e2732) on dim. Type, rules, square shapes and colour logic stay the
   canon's. `--pb-hot` is the canon's drift colour and marks only signs worth a look.
 - The window's two faces reach the page as bytes from the worker (`fonts.js`, `background.js`)
-  under the names "Radar Hanken" and "Radar Conso". The page never loads an extension URL, so no
+  under the names "Daylight Commons Hanken" and "Daylight Commons Conso". The page never loads an extension URL, so no
   resource is web-accessible and the site's own fonts never change. If the fonts fail, the window
   uses the system sans and monospace.
 - `tests/canon.test.js` fails on an em dash in anything a user reads, on a page that skips the
@@ -121,16 +121,16 @@ light, dim and dark themes, were taken from the fixture pages (`tests/fixtures/p
 ## Consistency with the author's other public work
 
 - **Product pages.** `flywheel.html` leads each measured figure with one plain sentence, draws the
-  interval as a figure, and keeps counts and hashes in a collapsed "how we know" detail. Radar's
+  interval as a figure, and keeps counts and hashes in a collapsed "how we know" detail. Daylight Commons'
   transparency page now does the same (2026-10-21, `scripts/site/figures.mjs` and `signs.mjs`): a
   lead sentence and an interval figure per measured sign, with counts under "How we know" and the
   dense tables in disclosures. `tests/canon.test.js` holds the shape.
 - **Spec at a glance.** The product pages end with a two-column spec table (bold first column).
-  Radar's public pages have none; a short spec table (sites, permissions, data kept, network use)
+  Daylight Commons' public pages have none; a short spec table (sites, permissions, data kept, network use)
   would match.
 - **Flywheel docs.** The docs theme at `/flywheel/docs/` uses green links and tracked uppercase nav
-  labels, which the site's own rules ban. Radar follows the site's product pages, not that theme.
-- **Hosting.** `https://harperz9.github.io/radar/` returned 404 on 2026-10-21. The store listing
+  labels, which the site's own rules ban. Daylight Commons follows the site's product pages, not that theme.
+- **Hosting.** `https://harperz9.github.io/daylight-commons/` returned 404 on 2026-10-21. The store listing
   and the privacy URL depend on it.
 - **Hashes on the thread card.** Done 2026-10-21: the image no longer prints the hash. It stays in
   the JSON file and under a collapsed "Check a copy" on the card page, so a copy can still be checked.

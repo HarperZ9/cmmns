@@ -1,6 +1,6 @@
 // Reading text in images, the recogniser (src/ocr/model.js, weights.js): each layer computes what
 // it should on hand-made weights, CTC decoding collapses repeats and drops blanks, and the weight
-// file decoder rejects anything that is not exactly a Radar weight file.
+// file decoder rejects anything that is not exactly a Daylight Commons weight file.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { conv2d, conv1d, maxPool, forward, ctcDecode } from "../src/ocr/model.js";
@@ -77,7 +77,7 @@ test("the weight decoder reads int8 weights with per-channel scales and runs end
 
 test("the weight decoder refuses a wrong magic and a file with unread bytes", () => {
   const bad = tinyFile(); bad[0] = 0x58;
-  assert.throws(() => decodeWeights(bad), /not a Radar OCR weight file/);
+  assert.throws(() => decodeWeights(bad), /not a Daylight Commons OCR weight file/);
   assert.throws(() => decodeWeights(tinyFile({ trailing: 4 })), /unread bytes/);
 });
 

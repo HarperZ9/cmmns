@@ -1,4 +1,4 @@
-"""Write the trained recogniser as Radar's weight file (format in src/ocr/weights.js) and the
+"""Write the trained recogniser as Daylight Commons' weight file (format in src/ocr/weights.js) and the
 fixtures the JavaScript tests compare against. R&D only.
 
     python scripts/ocr/export.py CHECKPOINT OUT.bin FIXTURE_DIR

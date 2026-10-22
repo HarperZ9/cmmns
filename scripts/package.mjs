@@ -1,5 +1,5 @@
-// Package Radar: dist/radar-chrome-<version>.zip and dist/radar-firefox-<version>.xpi (unsigned,
-// for the stores), dist/radar-firefox-self-<version>.xpi (with an update address on Radar's own
+// Package Daylight Commons: dist/radar-chrome-<version>.zip and dist/radar-firefox-<version>.xpi (unsigned,
+// for the stores), dist/radar-firefox-self-<version>.xpi (with an update address on Daylight Commons' own
 // site, for Mozilla's unlisted signing and self-distribution), from src/ext, with dist/SHA256SUMS
 // and dist/FILES-<version>.sha256 (the hash of every file inside each package).
 // Deterministic: the same source tree gives the same bytes and the same hashes on the same zlib;

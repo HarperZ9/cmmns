@@ -1,5 +1,5 @@
 // Account context Meta shows the viewer on Facebook and Instagram, read from the text the site
-// renders when the viewer opens it. Radar makes no request of its own for it.
+// renders when the viewer opens it. Daylight Commons makes no request of its own for it.
 // - Instagram: "About this account" (profile menu): date joined, "Account based in", former
 //   usernames, verified. Layout checked live 2026-10-21: each label on its own line, then its value.
 // - Facebook: "Page transparency" on a Page: creation date, name changes, and the countries of the

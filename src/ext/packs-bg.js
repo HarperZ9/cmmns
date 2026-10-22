@@ -16,7 +16,7 @@
       const v = await PB.verifyPack(entry.pack, keys);
       const problems = [...v.problems, ...PB.validatePackContent((entry.pack && entry.pack.content) || {})];
       if (v.trusted && !problems.length) out.push({ name: entry.pack.manifest.name, keyId: v.keyId, content: entry.pack.content });
-      else console.warn("[radar] left out a data pack:", entry.pack && entry.pack.manifest && entry.pack.manifest.name, v.trusted ? problems : "its key is not trusted");
+      else console.warn("[daylight-commons] left out a data pack:", entry.pack && entry.pack.manifest && entry.pack.manifest.name, v.trusted ? problems : "its key is not trusted");
     }
     PB.setPackNotes(out);
     return out;
@@ -25,7 +25,7 @@
   globalThis.PBPacks = {
     PACKS, KEYS,
     enabled() {
-      if (!ready) ready = load().catch((e) => { console.error("[radar] data packs failed to load", e); ready = null; return []; });
+      if (!ready) ready = load().catch((e) => { console.error("[daylight-commons] data packs failed to load", e); ready = null; return []; });
       return ready;
     },
     onChange(fn) { listeners.push(fn); },

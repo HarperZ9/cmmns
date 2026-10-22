@@ -17,7 +17,7 @@ import { GROUPS } from "./lexicon.js";
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
 const AP_QANON = S("AP, QAnon's 'Save the Children' morphs into popular slogan", "https://www.wsls.com/news/politics/2020/10/28/qanons-save-the-children-morphs-into-popular-slogan/", "2020-10-28");
-const NAMING = "People quote, mock and argue against these claims, and Radar skips only obvious debunking.";
+const NAMING = "People quote, mock and argue against these claims, and Daylight Commons skips only obvious debunking.";
 
 export const THEORY_DOES_NOT_PROVE = `Naming a theory is not believing it. ${NAMING} This describes the post, not who wrote it or why, and a post that names a theory can still contain true statements.`;
 

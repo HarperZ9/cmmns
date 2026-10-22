@@ -1,4 +1,4 @@
-// Write docs/firefox/updates.json, the update manifest a self-distributed Radar in Firefox checks
+// Write docs/firefox/updates.json, the update manifest a self-distributed Daylight Commons in Firefox checks
 // (the update_url in the radar-firefox-self build, scripts/zip.mjs). Run it on the xpi Mozilla
 // signed, since signing changes the file and Firefox checks the hash of what it downloads.
 //   node scripts/firefox-updates.mjs <signed.xpi> [--link <download address>]
@@ -28,7 +28,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (!xpi || !existsSync(xpi)) { console.error("usage: node scripts/firefox-updates.mjs <signed.xpi> [--link <url>]"); process.exit(2); }
   const version = JSON.parse(readFileSync(join(ROOT, "src", "ext", "manifest.json"), "utf8")).version;
   const args = process.argv.slice(2);
-  const link = (args.includes("--link") && args[args.indexOf("--link") + 1]) || `https://github.com/HarperZ9/radar/releases/download/v${version}/${basename(xpi)}`;
+  const link = (args.includes("--link") && args[args.indexOf("--link") + 1]) || `https://github.com/HarperZ9/daylight-commons/releases/download/v${version}/${basename(xpi)}`;
   if (!/^https:\/\//.test(link)) { console.error("the download address must be https"); process.exit(2); }
   const sha256 = createHash("sha256").update(readFileSync(xpi)).digest("hex");
   const current = existsSync(UPDATES) ? JSON.parse(readFileSync(UPDATES, "utf8")) : null;

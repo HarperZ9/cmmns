@@ -1,4 +1,4 @@
-// First-run page: opens once on install. The user picks the sites and starts Radar with one click.
+// First-run page: opens once on install. The user picks the sites and starts Daylight Commons with one click.
 (async () => {
   "use strict";
   const { el, aperture, switchRow, sites } = PBPages;
@@ -22,12 +22,12 @@
     try {
       // Firefox asks the user for site access here; Chrome granted it at install and says yes.
       if (chrome.permissions && on.length) await chrome.permissions.request({ origins: on.flatMap(([, , o]) => o) });
-    } catch (e) { console.error("[radar] site access request failed", e); }
+    } catch (e) { console.error("[daylight-commons] site access request failed", e); }
     await PBSettings.save({ sites: chosen, paused: false, onboarded: true });
-    $("start").textContent = "Radar is on";
+    $("start").textContent = "Daylight Commons is on";
     $("start").disabled = true;
     $("done").replaceChildren(el("p", { class: "done" }, on.length
-      ? `Radar is on for ${on.map(([, n]) => n).join(", ")}. Open any post with replies and rest the pointer on a reply.`
-      : "Every site is switched off. Turn one on in Radar's options when you want it."));
+      ? `Daylight Commons is on for ${on.map(([, n]) => n).join(", ")}. Open any post with replies and rest the pointer on a reply.`
+      : "Every site is switched off. Turn one on in Daylight Commons' options when you want it."));
   });
-})().catch((e) => console.error("[radar] first-run page failed", e));
+})().catch((e) => console.error("[daylight-commons] first-run page failed", e));

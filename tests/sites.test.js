@@ -61,7 +61,7 @@ test("facts resolve for subdomains, records by site key", () => {
   assert.equal(siteFacts("unknown.example"), null);
 });
 
-test("the record line counts reviews and fact-checkers and quotes nothing as Radar's", () => {
+test("the record line counts reviews and fact-checkers and quotes nothing as Daylight Commons'", () => {
   setSiteTable(TABLE);
   assert.equal(recordLine(siteRecord("example-news.com")), "3 reviews by 2 fact-checkers since 2024-05-01, ratings as the checkers wrote them");
   assert.equal(recordLine({ n: 1, m: 1, since: "2025-02-03" }), "1 review by 1 fact-checker since 2025-02-03, ratings as the checkers wrote them");
@@ -84,7 +84,7 @@ test("the site rows show owner, type, founding, country, state links and the rec
 test("a site with nothing on file says so instead of a blank card", () => {
   const rows = siteInfoRows({ domain: "nothing.example", owner: null, state: [], facts: null, record: null });
   assert.ok(rows.some(([, v]) => typeof v === "object" && v.note && /no Wikidata entry/.test(v.note)));
-  assert.ok(rows.some(([h, v]) => h === "Fact-check record" && /No review in Radar's table/.test(v)));
+  assert.ok(rows.some(([h, v]) => h === "Fact-check record" && /No review in Daylight Commons' table/.test(v)));
 });
 
 test("owner type comes from state links first, then what Wikidata states", () => {

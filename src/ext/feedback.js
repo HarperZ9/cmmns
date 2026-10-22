@@ -6,14 +6,14 @@
   const api = (globalThis.chrome && chrome.storage && chrome.storage.local) || null;
   const KEY = PB.FEEDBACK_KEY;
   let mirror = {};
-  const ready = api ? api.get(KEY).then((r) => { mirror = r[KEY] || {}; }).catch((e) => console.error("[radar] could not read feedback", e)) : Promise.resolve();
+  const ready = api ? api.get(KEY).then((r) => { mirror = r[KEY] || {}; }).catch((e) => console.error("[daylight-commons] could not read feedback", e)) : Promise.resolve();
   if (api && chrome.storage.onChanged) chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch[KEY]) mirror = ch[KEY].newValue || {}; });
 
   // Writes are read-modify-write on one key, so they run one after another.
   let chain = Promise.resolve();
   function write(next) {
     mirror = next;
-    chain = chain.then(() => (api ? api.set({ [KEY]: next }) : null)).catch((e) => console.error("[radar] could not save feedback", e));
+    chain = chain.then(() => (api ? api.set({ [KEY]: next }) : null)).catch((e) => console.error("[daylight-commons] could not save feedback", e));
     return chain;
   }
   const record = (entry) => write(PB.addFeedback(mirror, entry));

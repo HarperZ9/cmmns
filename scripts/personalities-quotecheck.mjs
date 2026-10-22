@@ -1,7 +1,7 @@
 // Checks that every quote in the personality records appears on the page it cites. Build-time
 // only: the extension never runs it, and CI does not need the network for it. For each source it
 // fetches the page (GET, no cookies, no referrer, no personal data; a plain browser user agent with a
-// Radar token), turns HTML or PDF into text, and looks for each part of the quote between "...". A
+// Daylight Commons token), turns HTML or PDF into text, and looks for each part of the quote between "...". A
 // page that refuses is tried once through the Internet Archive's raw capture.
 //   node scripts/personalities-quotecheck.mjs [files...] [--out <file>]
 // With no files it reads data/personalities-sources/people-*.json and outlets.json. The result goes

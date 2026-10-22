@@ -1,4 +1,4 @@
-// The generic reader (src/core/generic.js) on summaries of pages Radar has no site reader for: the
+// The generic reader (src/core/generic.js) on summaries of pages Daylight Commons has no site reader for: the
 // article body is the block with the most paragraph text, and comments are the largest run of
 // same-shaped boxes that carry an author or a time stamp. Navigation lists are not comments.
 import test from "node:test";

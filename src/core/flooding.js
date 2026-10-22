@@ -1,6 +1,6 @@
 // The flooding sign. RAND's "firehose of falsehood" (Paul and Matthews 2016) names high volume
 // across many channels and rapid, continuous repetition; Rauch calls the aim "flooding the zone"
-// so that people stop believing anything (project-docs/TECHNIQUES.md). In one thread Radar can see
+// so that people stop believing anything (project-docs/TECHNIQUES.md). In one thread Daylight Commons can see
 // two traces of it: several accounts posting at very high rates carry a large share of the
 // replies (volume), or a timing burst (src/core/timing.js) is made of such accounts (speed).
 // The rate is the account's own post count over its age, the same figure as the "very high post

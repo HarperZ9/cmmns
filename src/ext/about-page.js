@@ -1,4 +1,4 @@
-// Reads the two public pages Radar uses for an account and caches what they show:
+// Reads the two public pages Daylight Commons uses for an account and caches what they show:
 //   /handle        the profile header: bio, self-declared location, website, counts, join date
 //   /handle/about  X's "About this account": where it is based, app store, name changes
 // Ordinary browsing fills the cache with no extra requests. When the background worker opened
@@ -50,8 +50,8 @@
     const tryRead = () => {
       const reading = kind === "about" ? readAbout(handle) : readProfile(handle);
       if (!reading && Date.now() - started < 10000) { timer = setTimeout(tryRead, 400); return; }
-      if (reading) PBStore.put(reading).catch((e) => console.error("[radar] cache write failed", e));
-      else console.warn("[radar] nothing readable on the", kind, "page for", handle, "- the layout may have changed");
+      if (reading) PBStore.put(reading).catch((e) => console.error("[daylight-commons] cache write failed", e));
+      else console.warn("[daylight-commons] nothing readable on the", kind, "page for", handle, "- the layout may have changed");
       if (forLookup) chrome.runtime.sendMessage({ type: "pb-page-read", kind, reading }).catch(() => {});
     };
     timer = setTimeout(tryRead, 600);

@@ -1,5 +1,5 @@
 // Link wiring: every sign in the window carries a Learn link to its own lesson, the window turns
-// it into a button the worker opens, the worker opens only Radar's pages, and the pages are local.
+// it into a button the worker opens, the worker opens only Daylight Commons' pages, and the pages are local.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";

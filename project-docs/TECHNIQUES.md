@@ -1,8 +1,8 @@
 # Technique map: disinformation by behaviour and structure
 
-Radar reads how material moves and how accounts post. It does not take words at face value:
+Daylight Commons reads how material moves and how accounts post. It does not take words at face value:
 the same sentence can inform, joke or mislead, and a campaign can say true things. So each
-technique below is mapped to something Radar can observe in the structure of a thread or the
+technique below is mapped to something Daylight Commons can observe in the structure of a thread or the
 behaviour of accounts, never to a verdict about a claim or a person. Checked 2026-10-21.
 
 ## Sources
@@ -20,22 +20,22 @@ behaviour of accounts, never to a verdict about a claim or a person. Checked 202
   objective reality; no commitment to consistency. The feature wording here is from secondary
   quotation; rand.org refused the fetch on 2026-10-21, so the primary PDF is unchecked.
 - **DISARM.** The DISARM framework, github.com/DISARMFoundation/DISARMframeworks. LICENSE.md is
-  CC BY-SA 4.0 (the README says CC BY 4.0; the licence file governs). Radar cites technique ids
-  and names only and copies no framework text, so no share-alike obligation attaches to Radar's
+  CC BY-SA 4.0 (the README says CC BY 4.0; the licence file governs). Daylight Commons cites technique ids
+  and names only and copies no framework text, so no share-alike obligation attaches to Daylight Commons'
   code. Ids below were read from the repository on 2026-10-21; it has no release tag.
 
 The model is the same whoever runs a campaign. Rauch places trolling mostly on the right and
-cancel campaigns mostly on the left; that is his reading, and Radar does not inherit it. Every
+cancel campaigns mostly on the left; that is his reading, and Daylight Commons does not inherit it. Every
 signal below takes no input about side, party or identity, and every new signal has a symmetry
 test.
 
-## What Radar can see, and what it cannot
+## What Daylight Commons can see, and what it cannot
 
-Radar sees what the site loads for the viewer: posts, their times, links and media ids, the site's
-language code, an account's post count and join date, and Radar's own local log of threads the
+Daylight Commons sees what the site loads for the viewer: posts, their times, links and media ids, the site's
+language code, an account's post count and join date, and Daylight Commons' own local log of threads the
 user opened. It cannot see who runs an account, who paid, what a linked site cites, or any thread
 the user did not open. Rauch's two features "no commitment to objective reality" and "no
-commitment to consistency" concern truth and contradiction across time. Radar does not judge
+commitment to consistency" concern truth and contradiction across time. Daylight Commons does not judge
 truth; it shows fact-checks and Community Notes the platform or a fact-checker published.
 
 ## The techniques
@@ -51,12 +51,12 @@ Pollution.
 - **Signal.** In one thread: three or more accounts posting 100 or more times a day carry at least
   a quarter of the replies whose account rate is known (volume), or a timing burst holds two or
   more such accounts (speed). Accounts replying five or more times are shown as context only.
-- **Radar measures.** `src/core/flooding.js`, new. Timing bursts (`timing.js`) and the per-account
+- **Daylight Commons measures.** `src/core/flooding.js`, new. Timing bursts (`timing.js`) and the per-account
   "very high post rate" flag existed before.
 - **Status.** Organic rate only: 0.6% of ordinary threads with 5 to 19 replies, 1.8% at 20 to 49,
   2.2% at 50 to 99, 3.3% at 100 or more (PHEME, EVALUATION.md). Repeat posting fired on 23% of
   ordinary threads at five replies, which is why it never fires the sign.
-- **Missing.** Many channels at once: Radar sees one site per tab and keeps no cross-site log by
+- **Missing.** Many channels at once: Daylight Commons sees one site per tab and keeps no cross-site log by
   design. No labelled set of flooded threads, so no precision.
 - **Precision target.** Organic rate at or under 2% for threads under 50 replies (met) and under 5%
   above; precision of 0.7 or more against a labelled set of flooded threads once one exists.
@@ -65,15 +65,15 @@ Pollution.
 Rauch, "artificial copies" and the attack on sources; DISARM T0128.004 Launder Information Assets,
 T0100 Co-Opt Trusted Sources, T0084.003 Deceptively Labelled or Translated.
 - **Signal.** The laundering chain: post, then the accounts and linked sites its material passed
-  through, then the earliest origin Radar saw, from quotes, reposts, "media from", the same upload
+  through, then the earliest origin Daylight Commons saw, from quotes, reposts, "media from", the same upload
   and the same link seen earlier. The sign shows when the post does not point at the origin itself
   and at least one step lies between.
-- **Radar measures.** `src/core/chain.js`, new, on the source trail and first-seen log of
+- **Daylight Commons measures.** `src/core/chain.js`, new, on the source trail and first-seen log of
   `trail.js`.
 - **Status.** Not measured. It is a view of recorded pointers, so it is correct where the pointers
   are; how often a chain shown means laundering has no labelled data.
-- **Missing.** What a linked site cites, and anything before the first upload Radar saw. Rewritten
-  text (the same claim in new words) is invisible by design: Radar never infers a source from
+- **Missing.** What a linked site cites, and anything before the first upload Daylight Commons saw. Rewritten
+  text (the same claim in new words) is invisible by design: Daylight Commons never infers a source from
   wording.
 - **Precision target.** Chain correctness 1.0 against platform pointers (tested); laundering
   precision not set until a labelled set exists.
@@ -84,7 +84,7 @@ Sites, T0097.202 News Outlet Persona, T0143.003 Impersonated Persona, T0146.005 
 - **Signal.** A linked domain that imitates a known outlet (a look-alike name or a known outlet's
   name on a new domain), a site with no owner record, or an account name folded to the same letters
   as another.
-- **Radar measures.** Site cards (owner, founding year, state links, fact-check record) and
+- **Daylight Commons measures.** Site cards (owner, founding year, state links, fact-check record) and
   look-alike letter folding (`confusables.js`). Sites without records show as "not covered".
 - **Status.** The look-alike address sign (`lookalike.js`) catches 147 of 1,174 report-named
   domains and matches none of 52,598 real outlet domains (in-sample controls). Cloned-outlet
@@ -100,7 +100,7 @@ Rauch, "pile on to produce hive-mind coordination"; DISARM T0118 Amplify Existin
 T0116.001 Post Inauthentic Social Media Comment, T0049.001 Trolls Amplify and Manipulate.
 - **Signal.** Near-identical replies from different accounts, timing bursts, pairs seen together
   across threads, the same upload from many accounts, links pushed by several accounts.
-- **Radar measures.** `similarity.js`, `timing.js`, `network.js`, `trail.js`, all with organic
+- **Daylight Commons measures.** `similarity.js`, `timing.js`, `network.js`, `trail.js`, all with organic
   baselines (EVALUATION.md).
 - **Status.** Organic rate only: same text 0.5% to 6.7% of threads by size, bursts 1.1% to 3.3%.
 - **Missing.** A labelled set of coordinated threads, so no recall or precision.
@@ -113,12 +113,12 @@ RAND feature 1 (multichannel); DISARM T0084.003 Deceptively Labelled or Translat
   languages from different single-language accounts. The root post's own link and media are set
   aside. Across threads, the trail log's language per post gives the same check. Language comes
   from the site's code; without one, a distinct writing system.
-- **Radar measures.** `src/core/crosslang.js`, new.
+- **Daylight Commons measures.** `src/core/crosslang.js`, new.
 - **Status.** Organic rate only, within one thread: 0.03% of threads with 5 to 19 replies, 0.14% at
   20 to 49, 1.1% at 50 to 99, 0% of 60 at 100 or more. Across threads: not measured. Before the
   root post's material was set aside it fired on 2.3% to 3.4%; 167 of 177 groups were replies
   carrying the post they answered.
-- **Missing.** A translated claim with no shared link, upload or fact-check: Radar does not
+- **Missing.** A translated claim with no shared link, upload or fact-check: Daylight Commons does not
   translate and does not match meaning across languages.
 - **Precision target.** Organic rate under 0.5% below 50 replies (met) and under 2% above; 0.7
   precision on labelled multilingual campaigns.
@@ -129,7 +129,7 @@ epistemic warfare. RAND feature 3. DISARM T0049.008 Generate Information Polluti
 - **Signal.** Insinuating questions and doubt cast on all sources: the persuasion cues for doubt,
   whataboutism and thought-terminating cliches in `persuasion.js`, and the conspiracy marker in
   the rhetoric families.
-- **Radar measures.** Persuasion techniques (SemEval taxonomy) and the conspiracy marker. New: a
+- **Daylight Commons measures.** Persuasion techniques (SemEval taxonomy) and the conspiracy marker. New: a
   "just asking questions" technique for question-form insinuation ("I'm just asking", "is it a
   coincidence?", "makes you wonder", "I'm not saying ..., but").
 - **Status.** Measured and not shipped: no persuasion technique cleared the precision bar on the
@@ -147,14 +147,14 @@ Identities, T0048.004 Dox, T0049.005 Conduct Swarming.
 - **Signal.** Many accounts replying to one person within a short window, with accounts new to
   that person's threads, a timing burst, and hostile markers aimed at the person rather than an
   idea. Shown at thread level only.
-- **Radar measures.** `src/core/swarming.js`, new: within ten minutes, at least 6 of at least 8
-  accounts Radar read are new or flagged, and at least half of those read. Counts only, never
+- **Daylight Commons measures.** `src/core/swarming.js`, new: within ten minutes, at least 6 of at least 8
+  accounts Daylight Commons read are new or flagged, and at least half of those read. Counts only, never
   handles. Bursts, join bursts, returning groups and the thread report existed before. A
   "mobilising to punish speech" sign was tested and not shipped (EVALUATION.md).
 - **Status.** Organic rate only: 0.04% of PHEME threads (2 of 4,712; test half 1 of 2,278, 95%
   interval 0.01 to 0.25%). No labelled harassment corpus, so no precision.
 - **Missing.** Account-directed reply volume against the target's own baseline, and hostile
-  markers aimed at the person. Radar must not
+  markers aimed at the person. Daylight Commons must not
   become a pile-on engine of its own (DESIGN-MAP R12), so this stays a thread-level description and
   is never exported as a list of accounts.
 - **Precision target.** 0.7 on a labelled harassment corpus; organic rate under 1%.
@@ -168,10 +168,10 @@ Mendelsohn, Budak and Jurgens (NAACL 2021) codebook. DISARM has no matching tech
   mother who", "she was evicted") and no structural cue (a percentage, a rate, a year range, data,
   policy, law, funding). Thematic counterpart: structural cues and no person-story cue. The feed
   page gives the balance of the two with intervals.
-- **Radar measures.** `src/core/framing.js`, new; the feed log keeps each post's frame.
+- **Daylight Commons measures.** `src/core/framing.js`, new; the feed log keeps each post's frame.
 - **Status.** Not measured; held. No labelled corpus with a usable licence (EVALUATION.md). Context:
   0.90% of PHEME replies read as person-stories, 1.67% as structural, unlabelled.
-- **Missing.** A labelled episodic and thematic corpus Radar may use; languages other than English.
+- **Missing.** A labelled episodic and thematic corpus Daylight Commons may use; languages other than English.
 - **Precision target.** A Wilson lower bound of 0.7 from at least 20 held-out hits before the sign
   or the feed balance shows.
 
@@ -180,7 +180,7 @@ Rauch's "no personal authority" rule asks that claims be checked, not their spea
 No DISARM id is claimed for this cue.
 - **Signal.** A persuasion cue that asserts a hidden aim: "masked as", "under the guise of", "the
   real reason", "secret agenda", "secretly want", "textbook move", "it was never about".
-- **Radar measures.** A persuasion technique, `motive-attribution`, new.
+- **Daylight Commons measures.** A persuasion technique, `motive-attribution`, new.
 - **Status.** Measured on a proxy and held: 0 of 4 test spans against PTC "Doubt"; 0.02% of PHEME
   replies.
 - **Missing.** Evidence checks: a motive backed by a linked document is a finding, and the cue
@@ -199,7 +199,7 @@ Sources.
   New York (2022; the filing says Viral Nation sourced the influencers and created the content).
 - **Status.** A table lookup: the source is the evidence, so there is no precision to measure. The
   table's coverage is the limit, and its balance is reported in the README.
-- **Missing.** Undisclosed funding that no record or two independent outlets document. Radar never
+- **Missing.** Undisclosed funding that no record or two independent outlets document. Daylight Commons never
   infers backing from association, wording or who someone follows.
 
 ## Lines that hold

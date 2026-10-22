@@ -1,5 +1,5 @@
 // Mastodon and TikTok data from the responses each site's own web app already loaded, passed on by
-// src/ext/fedisniff.js. Radar makes no request of its own. Field names follow Mastodon's public REST
+// src/ext/fedisniff.js. Daylight Commons makes no request of its own. Field names follow Mastodon's public REST
 // API (Account and Status entities) and the comment list TikTok's web app requests.
 
 function walk(json, visit, limit = 200000) {
@@ -62,7 +62,7 @@ export function mastodonProbe(p) {
   return version ? { version, domain } : null;
 }
 
-// The origin pattern Radar asks permission for, from a tab's URL; null for anything but https.
+// The origin pattern Daylight Commons asks permission for, from a tab's URL; null for anything but https.
 export function instanceOrigin(url) {
   let u;
   try { u = new URL(url); } catch (_) { return null; }

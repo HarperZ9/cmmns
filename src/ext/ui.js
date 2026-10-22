@@ -1,5 +1,5 @@
 // Nothing is drawn on the page. Each post is wired so that resting the pointer on it fades in
-// Radar's window beside it (src/ext/pop.js): a glance line with the key facts and the signals worth
+// Daylight Commons' window beside it (src/ext/pop.js): a glance line with the key facts and the signals worth
 // a look, then the full card (src/ext/card.js).
 (() => {
   "use strict";

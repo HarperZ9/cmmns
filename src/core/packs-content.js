@@ -1,8 +1,8 @@
-// What a signed data pack (src/core/packs.js) may add, and how it joins Radar's own tables. Three
+// What a signed data pack (src/core/packs.js) may add, and how it joins Daylight Commons' own tables. Three
 // parts, each a list: claims (fact-checks: the claim, the rating in the checker's words, the
 // checker, the review URL), ops (a domain or account a cited document names as part of an
 // operation) and siteNotes (a sourced note about a site). Every row must cite an https source.
-// Pack rows are kept apart from Radar's own: each carries the pack's name, and operations from
+// Pack rows are kept apart from Daylight Commons' own: each carries the pack's name, and operations from
 // packs never enter the trend counts.
 
 // The same lists as src/core/ops-schema.js (tests/packs-content.test.js keeps them equal); that
@@ -17,7 +17,7 @@ const https = (v) => { try { return new URL(v).protocol === "https:"; } catch { 
 const day = (v) => v == null || /^\d{4}-\d{2}-\d{2}$/.test(v);
 const DOMAIN = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}$/;
 const HANDLE = /^\w{1,30}$/;
-// Radar shows no em dash anywhere a user reads (tests/canon.test.js); pack text is cleaned the same way.
+// Daylight Commons shows no em dash anywhere a user reads (tests/canon.test.js); pack text is cleaned the same way.
 const clean = (s) => String(s).replace(/\s*—\s*/g, " - ");
 
 function claimProblems(c) {
@@ -87,7 +87,7 @@ export function mergePackClaims(table, packs = []) {
 }
 
 // ops.json ({ docs, ops, indicators }) with pack indicators added. Each pack operation gets its own
-// id ("pack:<key id>:<id>") and a `pack` field, so it never merges into one of Radar's operations.
+// id ("pack:<key id>:<id>") and a `pack` field, so it never merges into one of Daylight Commons' operations.
 export function mergePackOps(table, packs = []) {
   const docs = [...((table && table.docs) || [])], ops = [...((table && table.ops) || [])], indicators = [...((table && table.indicators) || [])];
   const byId = new Map();

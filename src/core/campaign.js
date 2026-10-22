@@ -22,7 +22,7 @@ export const CAMPAIGN_LEADS = {
   thin: "Too few accounts loaded to read. Open the post's reposts or quotes to load more.",
   undefined: "The campaign lens is not defined for this site yet.",
 };
-export const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/radar/issues. Corrections are made in the open.";
+export const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/daylight-commons/issues. Corrections are made in the open.";
 
 // The accusation ladder (project-docs/CAMPAIGN-LENS.md, "Accusation ladder"). Only an account the
 // platform itself discloses as an organisation (X's gold Business or grey Government checkmark, or
@@ -75,16 +75,16 @@ function sampleRows(s) {
     "default-avatar": (x) => `Context: ${x.n} of ${x.of} accounts use the default picture.`,
   };
   const row = (x) => ({ id: x.id, text: text[x.id](x), dnp: SAMPLE_DOES_NOT_PROVE[x.id] });
-  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Radar reads only what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
+  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Daylight Commons reads only what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
 }
 
 function quoteRows(q) {
   if (!q || !q.n) return { ind: [], ctx: [] };
   const ind = [], ctx = [];
   if (q.lookalikes) ind.push({ id: "undisclosed-lookalike", text: `${q.lookalikes} quote${q.lookalikes === 1 ? "" : "s"} without a Paid partnership label share a template with labelled quotes or with each other inside two hours.`, dnp: QUOTES_DOES_NOT_PROVE });
-  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Radar cannot see who paid or how much." });
+  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Daylight Commons cannot see who paid or how much." });
   if (q.bunch.kWindowMs != null) ctx.push({ id: "quote-bunching", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
-  for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Radar's local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
+  for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Daylight Commons' local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
   return { ind, ctx };
 }
 

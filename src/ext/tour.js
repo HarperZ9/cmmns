@@ -9,13 +9,13 @@
   let state = null;
 
   if (api) {
-    api.get(KEY).then((g) => { state = PB.normalizeTour(g[KEY]); }).catch((e) => console.error("[radar] could not read the tour state", e));
+    api.get(KEY).then((g) => { state = PB.normalizeTour(g[KEY]); }).catch((e) => console.error("[daylight-commons] could not read the tour state", e));
     if (chrome.storage.onChanged) chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch[KEY]) state = PB.normalizeTour(ch[KEY].newValue); });
   }
 
   function write(next) {
     state = next;
-    if (api) api.set({ [KEY]: next }).catch((e) => console.error("[radar] could not save the tour state", e));
+    if (api) api.set({ [KEY]: next }).catch((e) => console.error("[daylight-commons] could not save the tour state", e));
   }
 
   // The tip for this surface now, marked as shown, or null.

@@ -1,5 +1,5 @@
 // Release signatures: detached ECDSA P-256 signatures over a release's SHA256SUMS, made and checked
-// with Radar's one copy of the signing primitives (src/core/sig.js), the same code that signs data
+// with Daylight Commons' one copy of the signing primitives (src/core/sig.js), the same code that signs data
 // packs and evidence bundles. It runs in node (scripts/release.mjs, scripts/verify-release.mjs), in
 // the extension and on the public install page (docs/signing.js, a generated copy). No library, no
 // network.

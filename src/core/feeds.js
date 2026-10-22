@@ -1,4 +1,4 @@
-// A small reader for news feeds: RSS 2.0, RSS 1.0 (RDF) and Atom. Radar's background worker has no
+// A small reader for news feeds: RSS 2.0, RSS 1.0 (RDF) and Atom. Daylight Commons' background worker has no
 // DOMParser (Chrome's service workers do not offer one), so this reads the text itself. It takes
 // only what Other coverage needs from each entry: the title, the link, the date and a short
 // summary. Everything else in the feed is ignored. Nothing here touches the network.
@@ -70,7 +70,7 @@ function dateOf(block) {
 }
 
 // Feed text to { title, items: [{ title, link, published, summary }] }. kind is "rss", "atom" or
-// null when the text is not a feed Radar can read.
+// null when the text is not a feed Daylight Commons can read.
 export function parseFeed(text) {
   const src = String(text || "").slice(0, FEED_MAX_BYTES).replace(/<!--[\s\S]*?-->/g, "");
   const kind = /<feed\b[^>]*>/i.test(src) && !/<rss\b|<rdf:RDF\b/i.test(src) ? "atom" : /<rss\b|<rdf:RDF\b|<channel\b/i.test(src) ? "rss" : null;

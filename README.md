@@ -1,11 +1,14 @@
-# Radar
+# Daylight Commons
+
+Formerly Radar. The name follows Justice Brandeis: "Sunlight is said to be the best of
+disinfectants."
 
 See the evidence behind the replies you read. Rest the pointer on a reply on X, YouTube, Reddit,
-Facebook, Instagram, Bluesky, Threads, TikTok or any Mastodon server you turn it on for, and Radar
-opens a window beside it (on a phone, tap the post's Radar button): where the platform places the account, signs of coordination,
+Facebook, Instagram, Bluesky, Threads, TikTok or any Mastodon server you turn it on for, and Daylight Commons
+opens a window beside it (on a phone, tap the post's Daylight Commons button): where the platform places the account, signs of coordination,
 how the account posts, and how the thread's harshest replies compare with the rest.
 
-Radar gives evidence, never verdicts. It never calls anyone a bot, a propagandist or an extremist,
+Daylight Commons gives evidence, never verdicts. It never calls anyone a bot, a propagandist or an extremist,
 and every sign says where its data came from and what it does not prove. It runs in your browser
 and sends nothing anywhere unless you turn on Other coverage or evidence lookups, each of which says what it sends and to whom first.
 
@@ -15,7 +18,7 @@ and sends nothing anywhere unless you turn on Other coverage or evidence lookups
 1. Download `radar-chrome-<version>.zip` from the latest release and unzip it.
 2. Open `chrome://extensions` (Edge: `edge://extensions`) and turn on **Developer mode**.
 3. Click **Load unpacked** and choose the unzipped folder.
-4. Radar opens its first-run page. Pick your sites and press **Start Radar**.
+4. Daylight Commons opens its first-run page. Pick your sites and press **Start Daylight Commons**.
 
 **Firefox (128 or later)**
 1. Download `radar-firefox-<version>.xpi` from the latest release.
@@ -23,7 +26,7 @@ and sends nothing anywhere unless you turn on Other coverage or evidence lookups
    Firefox removes temporary add-ons on restart until a signed build is published.
 
 Check a download against the signed `SHA256SUMS` from the same release: the
-[install page](https://harperz9.github.io/radar/install.html) has a checker that runs in your
+[install page](https://harperz9.github.io/daylight-commons/install.html) has a checker that runs in your
 browser, and `node scripts/verify-release.mjs <folder>` does the same offline. Release key id
 `0e5e 1984 0565 840c 977e 0f03 6c9a c021`. Each release also carries a git bundle of the whole
 source, so it can be rebuilt without any code host.
@@ -32,8 +35,8 @@ source, so it can be rebuilt without any code host.
 
 - **Place:** where X labels the account as based, and a sign when a reply speaks as a local of
   somewhere else ("here in France" from an account labelled elsewhere). On Instagram and Facebook,
-  Radar remembers what Meta shows when you open an account's "About this account" or a Page's
-  "Page transparency", and uses it for that account's replies. Bluesky shows no location; Radar
+  Daylight Commons remembers what Meta shows when you open an account's "About this account" or a Page's
+  "Page transparency", and uses it for that account's replies. Bluesky shows no location; Daylight Commons
   shows the join date and the labels Bluesky's own moderation service applied.
 - **Account:** age, renames, sign-up handles, follow patterns, Reddit karma for the account's age.
 - **Posting:** a 24-hour posting clock, the last 14 days, the apps it posts from, reply speed.
@@ -54,13 +57,13 @@ source, so it can be rebuilt without any code host.
   No score: each fact names its source, and the record says what a count does not prove.
 - **Other coverage (off by default):** on a click, other outlets covering the same story, read
   from each outlet's own news feed with no aggregator in between. You choose the outlets from a
-  suggested list spanning 18 countries, or add any RSS or Atom address. Radar sends nothing from
+  suggested list spanning 18 countries, or add any RSS or Atom address. Daylight Commons sends nothing from
   the page; it matches headlines on your device and labels each outlet by owner and owner type,
   never by a left or right score.
 - **Fact-checked claims:** when a post's wording closely matches a claim a fact-checker has
   already reviewed, the fact-checker's name, their rating in their own words and a link. About
-  20,000 reviews from 328 fact-checkers ship inside Radar, so no post text is sent anywhere.
-  Similar wording is not the same claim, and Radar never rates a post itself. A Community Note on
+  20,000 reviews from 328 fact-checkers ship inside Daylight Commons, so no post text is sent anywhere.
+  Similar wording is not the same claim, and Daylight Commons never rates a post itself. A Community Note on
   a post is shown first.
 - **Media:** media first uploaded long before the post that shows it, with reverse image search.
 - **Launch campaigns (X, not measured yet):** on a launch post and its repost and quote lists, how
@@ -78,21 +81,21 @@ between its tabs, <kbd>Esc</kbd> to close it.
 
 ## How sure it is
 
-Each sign shows its measured precision from Radar's evaluation (`project-docs/EVALUATION.md`), or
+Each sign shows its measured precision from Daylight Commons' evaluation (`project-docs/EVALUATION.md`), or
 "not measured yet". Signs that repeat a site's own label, such as X's "Probable spam", say so. The
 options page lists every sign with its figure.
 
 ## Privacy
 
-No server, no account, no analytics. Radar reads only what the site shows you, and its only
+No server, no account, no analytics. Daylight Commons reads only what the site shows you, and its only
 requests go to the site you are on, for account details that site discloses, plus the feeds of the
 outlets you chose if you turn on Other coverage and click, and, for evidence lookups you allow and click, the repository names and domains a post links to, sent to GitHub, RDAP and the Internet Archive. What it keeps stays in
 your browser: account details for 14 days and thread history for 60 by default, both adjustable,
-with a one-click "Clear all Radar data". Full details in [PRIVACY.md](PRIVACY.md).
+with a one-click "Clear all Daylight Commons data". Full details in [PRIVACY.md](PRIVACY.md).
 
 ## Options
 
-Open the toolbar popup and choose **Options**, or right-click the icon. You can switch Radar off per
+Open the toolbar popup and choose **Options**, or right-click the icon. You can switch Daylight Commons off per
 site or pause it everywhere, hide areas of the window, stop automatic reading, set retention, clear
 everything, reduce motion and enlarge text.
 
@@ -100,16 +103,16 @@ everything, reduce motion and enlarge text.
 
 - Platform labels can be wrong; VPNs and travel move them, and users can broaden them to a region.
 - Local-claim patterns cover English and some French; other languages read as "no claim".
-- Radar sees only the replies the site chose to render, in the site's ranked order.
-- Mastodon: Radar runs on a server only after you open it, click the Radar button and allow it.
+- Daylight Commons sees only the replies the site chose to render, in the site's ranked order.
+- Mastodon: Daylight Commons runs on a server only after you open it, click the Daylight Commons button and allow it.
   Options lists the servers and takes access back.
 - Facebook, Instagram, Bluesky, Threads and Mastodon are checked against synthetic pages and their
   live structure; TikTok comments are not checked live yet (TikTok asked to sign up first);
-  a site redesign can break any adapter until Radar is updated.
+  a site redesign can break any adapter until Daylight Commons is updated.
 
-## Use Radar outside the browser
+## Use Daylight Commons outside the browser
 
-Radar's rules also run without the extension, on your own files, with nothing sent anywhere:
+Daylight Commons' rules also run without the extension, on your own files, with nothing sent anywhere:
 
 ```
 node bin/radar.mjs analyze saved-thread.html        # a saved X or Reddit thread, thread JSON,
@@ -141,14 +144,14 @@ To run from source, load `src/ext` as an unpacked extension. Design notes are in
 
 ## Licence
 
-Radar is free and open source software. The code is under the [GNU Affero General Public License
+Daylight Commons is free and open source software. The code is under the [GNU Affero General Public License
 v3.0 only](LICENSE) (AGPL-3.0-only). The data tables, the definition catalogue, the schemas and the
 documentation are under [Creative Commons Attribution 4.0](LICENSES/CC-BY-4.0.txt) (CC BY 4.0).
 `REUSE.toml` maps every file to its licence, and [THIRD-PARTY.md](THIRD-PARTY.md) lists the parts
 that keep their own terms.
 
-Why the AGPL: Radar is a tool for the commons, and the AGPL keeps it there. Anyone may use, study,
-change and share it, and anyone who passes on a changed Radar, or runs one as a service people use
+Why the AGPL: Daylight Commons is a tool for the commons, and the AGPL keeps it there. Anyone may use, study,
+change and share it, and anyone who passes on a changed Daylight Commons, or runs one as a service people use
 over a network, must offer the people they serve the changed source under the same licence. So no
 one can take the commons' tool and close it, whether in a product or behind a server. The grant on
 every released version is irrevocable, contributions come in under the
@@ -156,9 +159,9 @@ every released version is irrevocable, contributions come in under the
 single party, the author included, can relicense them closed. [GOVERNANCE.md](GOVERNANCE.md) sets
 out the permanence commitments, the funding rules and how to challenge an entry.
 
-What this asks of anyone who redistributes Radar, including through a browser store:
+What this asks of anyone who redistributes Daylight Commons, including through a browser store:
 - Ship `LICENSE.txt` with the extension (it is inside every package built by `npm run package`).
-- Offer the complete source for the exact version shipped, with the build scripts. Radar's store
+- Offer the complete source for the exact version shipped, with the build scripts. Daylight Commons' store
   listings and this repository do that: each release is tagged here, and each release carries a git
   bundle of the whole source.
 - Keep the copyright and licence notices, and mark your changes.
@@ -171,10 +174,10 @@ source and the command `npm run build`. That upload is for review only and does 
 offer the source to users, so the listing links here.
 
 Quoted laws, regulations and official guidance in the catalogue keep their own status: many are
-government works, and the rest are quoted for commentary with their source. Radar never
+government works, and the rest are quoted for commentary with their source. Daylight Commons never
 redistributes platform content; captures of other people's posts stay on the user's device. Hanken
 Grotesk is under the SIL Open Font License 1.1. The Conso font is used under the designer's licence
-and is not covered by Radar's licences; a fork must drop it or license it itself. The outlet and
+and is not covered by Daylight Commons' licences; a fork must drop it or license it itself. The outlet and
 state tables come from Wikidata (CC0) and the cited public documents listed in
 `data/state-reports.README.md`. The fact-check table comes from the Data Commons ClaimReview feed
 (CC BY 4.0), credited to each fact-checker in the window.

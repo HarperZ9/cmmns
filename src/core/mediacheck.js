@@ -26,7 +26,7 @@ export function credentialRows(r) {
   if (r.error) return [["Content Credentials", r.error]];
   const rows = [], state = credentialState(r);
   if (state === "none") rows.push(["Content Credentials", NO_CREDENTIALS]);
-  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}. Radar does not fetch them, so nothing was checked.`]);
+  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}. Daylight Commons does not fetch them, so nothing was checked.`]);
   else if (r.broken) rows.push(["Content Credentials", `found, but ${r.broken}`]);
   else {
     rows.push(["Content Credentials", state === "unchanged" ? "found and checked: the file has not changed since it was signed"
@@ -38,7 +38,7 @@ export function credentialRows(r) {
     if (m) rows.push(["Says it was", m]);
     if (r.active.generator) rows.push(["Signing tool", r.active.generator]);
     for (const e of r.earlier || []) if (e.ai) rows.push(["Earlier version", `the credentials say an earlier version${e.title ? ` (${e.title})` : ""} was made with generative AI`]);
-    if (r.active.timestamp) rows.push(["Time-stamp", "attached; Radar does not check the time-stamp authority's signature"]);
+    if (r.active.timestamp) rows.push(["Time-stamp", "attached; Daylight Commons does not check the time-stamp authority's signature"]);
   }
   for (const t of (r.meta && r.meta.sourceTypes) || []) rows.push(["Metadata says", `${t.says} (IPTC ${t.code})`]);
   for (const g of (r.meta && r.meta.generators) || []) rows.push(["Generator metadata", g]);
@@ -54,15 +54,15 @@ export function credentialSignals(r) {
   if (!r || r.error) return [];
   const out = [], state = credentialState(r);
   if (r.found && r.aiAnywhere) {
-    out.push({ label: "credentials: made with AI", fam: "c2pa", level: "warn", cat: "media", rows: [["What Radar read", r.active.ai ? `The file's Content Credentials say it was ${made(r)}.` : "The credentials say an earlier version of this file was made with generative AI."], ["Signed by", who(r.active.cert && r.active.cert.subject)], ["Checks", state === "unchanged" ? "signature, assertions and file bytes all match" : state], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+    out.push({ label: "credentials: made with AI", fam: "c2pa", level: "warn", cat: "media", rows: [["What Daylight Commons read", r.active.ai ? `The file's Content Credentials say it was ${made(r)}.` : "The credentials say an earlier version of this file was made with generative AI."], ["Signed by", who(r.active.cert && r.active.cert.subject)], ["Checks", state === "unchanged" ? "signature, assertions and file bytes all match" : state], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   } else if (r.found && state === "unchanged") {
     const m = made(r);
-    out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What Radar read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+    out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What Daylight Commons read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   }
-  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Radar found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms can break credentials without any intent to mislead.")] });
+  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Daylight Commons found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms can break credentials without any intent to mislead.")] });
   const ai = ((r.meta && r.meta.sourceTypes) || []).find((t) => t.kind === "ai");
   if (ai || ((r.meta && r.meta.generators) || []).length) {
-    out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What Radar read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
+    out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What Daylight Commons read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
   }
   return out;
 }

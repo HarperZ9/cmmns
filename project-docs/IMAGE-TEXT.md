@@ -5,9 +5,9 @@ click. Latin script only.
 
 ## The problem
 Many claims arrive as pictures: a screenshot of a post, a cropped headline, a photographed memo, a
-chart with a caption. Radar reads only the text the page gives it, so the rhetoric markers, named
+chart with a caption. Daylight Commons reads only the text the page gives it, so the rhetoric markers, named
 theories, persuasion cues and fact-check matching never see the words in those images. A reader who
-wants to know "has anyone checked this?" about a screenshot gets nothing from Radar unless it can
+wants to know "has anyone checked this?" about a screenshot gets nothing from Daylight Commons unless it can
 read the picture.
 
 The goal: on a click, read the text in one image the page already loaded, on the device, and run the
@@ -17,7 +17,7 @@ same checks on it, each labelled as read from an image.
 The research below recommended vendoring Tesseract.js. The author chose otherwise on 2026-10-21, in
 answer to "Reading text inside screenshots needs on-device OCR. Your rule is to ship
 dependency-free. Which way?": "Build our own OCR (Recommended)". The standing rule is to use any tool
-for research and to ship no dependency. Radar now ships its own recogniser: its own JavaScript, its
+for research and to ship no dependency. Daylight Commons now ships its own recogniser: its own JavaScript, its
 own WebAssembly kernel and weights it trained. Tesseract stays a research baseline and is not in the
 extension.
 
@@ -32,7 +32,7 @@ headlines, captions), mostly horizontal, in common interface fonts, on flat or s
 | Lines and words | `src/ocr/segment.js` | Groups boxes into lines by height and overlap, joins i-dots and accents, splits lines that touch through descenders, keeps columns apart, orders rows top to bottom. Words split on a two-group gap test. |
 | Two sizes | `src/ocr/read.js` | Small and medium text is found at full size, large text (48 pixels and up) on a half-size copy, where thick strokes behave like small text. |
 | Line image | `src/ocr/image.js` | Crop with a margin, background to 0 and ink to 1 whatever the colours, resize to 32 pixels high with the same triangle filter as Pillow, which the training used. |
-| Recogniser | `src/ocr/model.js`, `gemm.js` | A convolutional network read by CTC (below), 8-bit weights. Convolutions run as a blocked matrix product in a 546-byte WebAssembly SIMD kernel written for Radar (`scripts/ocr/gemm.wat`), with a plain JavaScript kernel where WebAssembly is not allowed. |
+| Recogniser | `src/ocr/model.js`, `gemm.js` | A convolutional network read by CTC (below), 8-bit weights. Convolutions run as a blocked matrix product in a 546-byte WebAssembly SIMD kernel written for Daylight Commons (`scripts/ocr/gemm.wat`), with a plain JavaScript kernel where WebAssembly is not allowed. |
 | Weights | `src/ext/ocr/latin.bin` | 270,032 bytes: 263,568 int8 weights with one scale per output channel, batch norm folded in. Format in `src/ocr/weights.js`. |
 
 The network takes a line 32 pixels high and any width. Four 3x3 convolutions (16, 32, 64 and 96
@@ -44,7 +44,7 @@ character a probability; a line whose mean is under 0.6 is kept in the result bu
 text the matchers see. Lines with no letter or digit (icons, rules, decorations) are dropped.
 
 ### Training (research tools, nothing ships)
-`scripts/ocr/`: `corpus.py` builds text from the author's own documents only (Radar's docs and
+`scripts/ocr/`: `corpus.py` builds text from the author's own documents only (Daylight Commons' docs and
 lessons, the workspace notes); `text.py` adds made-up interface strings (names, handles, times,
 counts, links, prices) and random characters; `synth.py` draws each line in one of 50 font faces on
 light, dark or coloured backgrounds, with neighbouring lines, gradients, noise, rescaling, blur and
@@ -56,8 +56,8 @@ steps of 96 lines (2.4 million lines) with CTC loss on one RTX 4090 in about 35 
 
 ## Measured
 All runs in headless Chrome 155 on a desktop (Intel i7-13700KF), on the shipped code and weights.
-Character error rate (CER) = edit distance between what Radar read and the page's own text, plus
-every character Radar read outside any line of text, over the true characters. Each recognised word
+Character error rate (CER) = edit distance between what Daylight Commons read and the page's own text, plus
+every character Daylight Commons read outside any line of text, over the true characters. Each recognised word
 is scored against the true line its position falls in. Intervals are 95% bootstrap intervals over
 pages.
 
@@ -67,15 +67,15 @@ Test sets (none used in training, none containing anyone's real post):
   held-out documents. Half in faces training never saw (Lato, Trebuchet MS, Candara, Hanken Grotesk,
   Conso), half in system interface faces (Segoe UI, Arial, Verdana, Georgia, Tahoma) drawn by
   Chrome's rasteriser rather than the training renderer. 19,590 characters at 14 px or more.
-- **Real interface screenshots**: 22 screenshots of Radar's own published pages
+- **Real interface screenshots**: 22 screenshots of Daylight Commons' own published pages
   (`docs/privacy.html`, `docs/transparency.html`) at scale 1 and 2: real layout, tables, charts and
   decorations, in Hanken Grotesk and Conso. 24,675 characters. Two pages only, so the screenshots are
   not independent of each other. No licence-clean set of real social media screenshots was found;
   posts from X are never used.
-- **Signs**: 48 made-up posts carrying a named theory's stock line or a claim from Radar's own
+- **Signs**: 48 made-up posts carrying a named theory's stock line or a claim from Daylight Commons' own
   fact-check table, to compare the signs found in the typed text with those found in the image.
 
-| Measure | Target | Radar | Tesseract.js 7.0.0 (eng, defaults, research only) |
+| Measure | Target | Daylight Commons | Tesseract.js 7.0.0 (eng, defaults, research only) |
 |---|---|---|---|
 | CER, synthetic screenshots, text 14 px or more | 5% or less | **1.03%** (0.56 to 1.66) | 5.76% (3.38 to 8.94) |
 | CER, synthetic, unseen faces / system faces | | 0.66% / 1.42% | 6.24% / 5.26% |
@@ -109,19 +109,19 @@ thread report.
   "Read text in this image" under each image of a post. Nothing runs until that click, and never on
   every image.
 - The content script re-reads the image the page already loaded, from the same address, without
-  cookies (as the Content Credentials check does), and sends the bytes to Radar's own background
+  cookies (as the Content Credentials check does), and sends the bytes to Daylight Commons' own background
   worker (`src/ext/ocr-bg.js`). The image is decoded and read there, in the extension's own context,
   which no page can reach. The worker loads `ocr/latin.bin` from inside the extension on first use
   and drops it after a minute idle.
 - The text goes to the same rhetoric, theory and persuasion matchers in the content script and to
   the fact-check index in the worker.
-- The only policy change is `'wasm-unsafe-eval'` for extension pages, to compile Radar's own kernel.
+- The only policy change is `'wasm-unsafe-eval'` for extension pages, to compile Daylight Commons' own kernel.
 
 ## Privacy statement
 Reading text in an image happens only when you click "Read text in this image" on one image, with
-the feature turned on in the options page. Radar reads the image the page already loaded, from the
+the feature turned on in the options page. Daylight Commons reads the image the page already loaded, from the
 same address the page used, with no cookies. The text is read on your device by code shipped inside
-Radar. The image, the text and any hash of either never leave your browser, and no language data is
+Daylight Commons. The image, the text and any hash of either never leave your browser, and no language data is
 downloaded. The text stays in memory for that window and is saved only if you save an evidence card.
 
 ## What this does not settle
@@ -132,13 +132,13 @@ downloaded. The text stays in memory for that window and is saved only if you sa
 - Not read: handwriting, text on photographs, rotated or curved text, text under about 10 pixels
   high, text with less than 40 levels of contrast, emoji, and every script other than Latin.
   Avatars and decorations can still yield a stray character or two.
-- No real social media screenshots were measured. The real set is Radar's own two pages.
+- No real social media screenshots were measured. The real set is Daylight Commons' own two pages.
 
 ## Other scripts: what each would take
 - **Cyrillic** (Russian, Ukrainian, and others): the same network and pipeline. Add about 80 letters
   (with ґ є і ї ў) and train Latin and Cyrillic together, so look-alike letters (а and a) are decided
   by context. Every training face here already covers Cyrillic. Needs Cyrillic text with a clear
-  licence (Radar's own Russian and Ukrainian lexicons are too short alone). About 15 KB more weights;
+  licence (Daylight Commons' own Russian and Ukrainian lexicons are too short alone). About 15 KB more weights;
   about a day of work and a run of training.
 - **Arabic**: right to left and joined, with letter shapes that change by position. Pillow on this
   machine has no text shaping (raqm), so training lines would have to be drawn by Chrome itself.
