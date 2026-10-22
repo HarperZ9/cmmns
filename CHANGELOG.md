@@ -22,6 +22,23 @@ were not published to a store.
   (Contributor Covenant 2.1), SECURITY.md (private reporting through GitHub security advisories)
   and GOVERNANCE.md (purpose, permanence, funding rules and the challenge process).
 
+### Fixed (X live check, 2026-10-22)
+- X's web responses no longer carry a `legacy` block on accounts. Follower, following, post, like and
+  media counts and the website are now read from `relationship_counts`, `tweet_counts`,
+  `action_counts`, `website` and `profile_bio.entities`, with the older fields kept as a fallback.
+  Before this, every account read from live X had no follower count, so the campaign lens could not
+  place a launch in a follower stratum.
+- The campaign lens reads X's Paid partnership mark from the response
+  (`content_disclosure.advertising_disclosure.is_paid_promotion`) as well as from the page, and reads
+  quote text from the response. X keeps only about seven posts in the page at once, so the page alone
+  missed paid marks and text on quotes scrolled past (3 of 10 and 3 of 6 marks on the two threads
+  checked). The mark is recorded as X's claim, never as ground truth.
+- The X readers no longer depend on X's test ids. The in-page adapter falls back to semantic
+  structure and the accessibility tree (`article` or `role="article"` holding a status link with a
+  `<time>`, text in `div[lang][dir="auto"]`, the author from the status link). The saved-page reader
+  does the same, and a test rotates class names, renames or removes test ids, obfuscates attribute
+  names and swaps `article` for `role="article"`.
+
 ### Added (evidence layer)
 - Under a launch campaign section, "Look up evidence" (off until you allow it; one click per post):
   a linked repository's creation date and, with your own GitHub token, its star bursts; a linked

@@ -1,7 +1,10 @@
 // Reads account metadata out of the data X's own web app has already downloaded for the page (its
 // GraphQL responses). Daylight Commons makes no request of its own for this: src/ext/sniff.js passes copies of
 // X's responses to the content script, and this module walks them for User objects.
-// X has moved fields between `legacy` and `core` over time, so both places are read.
+// X has moved fields between `legacy` and `core` over time, so both places are read. Since the
+// live check of 2026-10-22, User objects in X's web responses carry no `legacy` block at all: the
+// counts sit in `relationship_counts`, `tweet_counts` and `action_counts`, and the website in
+// `website` and `profile_bio.entities`. Both shapes are read, the newer first.
 
 const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
 
@@ -15,31 +18,33 @@ export function parseXDate(s) {
 
 const pick = (...vals) => vals.find((v) => v !== undefined && v !== null && v !== "") ?? null;
 const n = (v) => (Number.isFinite(v) ? v : null);
+const pickN = (...vals) => { for (const v of vals) if (Number.isFinite(v)) return v; return null; };
 
 // One X User object -> Daylight Commons' reading (only the fields that are present).
 export function userReading(u) {
   const L = u.legacy || {}, C = u.core || {}, A = u.about_profile || {};
+  const RC = u.relationship_counts || {}, TC = u.tweet_counts || {}, AC = u.action_counts || {};
   const handle = pick(C.screen_name, L.screen_name);
   if (!handle) return null;
-  const url = (((L.entities || {}).url || {}).urls || [])[0];
+  const url = (((((u.profile_bio || {}).entities || {}).url || {}).urls || [])[0]) || (((L.entities || {}).url || {}).urls || [])[0];
   const r = {
     handle,
     display: pick(C.name, L.name),
     joinDate: parseXDate(pick(C.created_at, L.created_at)),
     profileLocation: pick((u.location || {}).location, L.location),
     bio: pick(((u.profile_bio || {}).description), L.description),
-    website: pick(url && url.expanded_url, url && url.display_url),
-    followersCount: n(L.followers_count),
-    followingCount: n(L.friends_count),
-    postsCount: n(L.statuses_count),
+    website: pick(url && url.expanded_url, url && url.display_url, (u.website || {}).url),
+    followersCount: pickN(RC.followers, L.followers_count),
+    followingCount: pickN(RC.following, L.friends_count),
+    postsCount: pickN(TC.tweets, L.statuses_count),
     verifiedType: pick(L.verified_type, (u.verification || {}).verified_type, u.is_blue_verified || (u.verification || {}).is_blue_verified ? "Blue" : null),
     category: pick((((u.professional || {}).category || [])[0] || {}).name),
     affiliate: pick((((u.affiliates_highlighted_label || {}).label) || {}).description),
     xLabel: pick(u.parody_commentary_fan_label && u.parody_commentary_fan_label !== "None" ? u.parody_commentary_fan_label : null),
     defaultAvatar: L.default_profile_image === true || /default_profile_images/.test(pick((u.avatar || {}).image_url, L.profile_image_url_https) || "") ? true : null,
     listedCount: n(L.listed_count),
-    likesCount: n(L.favourites_count),
-    mediaCount: n(L.media_count),
+    likesCount: pickN(AC.favorites_count, L.favourites_count),
+    mediaCount: pickN(TC.media_tweets, L.media_count),
     withheldIn: Array.isArray(L.withheld_in_countries) && L.withheld_in_countries.length ? L.withheld_in_countries.join(", ") : null,
     // X's own disclosures about how the account operates. Payment and tip-jar handles are left
     // out on purpose: they identify people, and Daylight Commons describes accounts.
@@ -129,12 +134,24 @@ export function tweetsIn(json) {
         replyToHandle: L.in_reply_to_screen_name || null,
         links: ((L.entities || {}).urls || []).map((u) => u.expanded_url).filter((u) => u && !/^https?:\/\/(x|twitter)\.com\//.test(u)),
         quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count), bookmarks: n(L.bookmark_count),
+        // X's own Paid partnership mark, as X records it in the response. It is X's claim about the
+        // post, recorded and checked like any other, never ground truth (RADAR-VISION, independence).
+        paidPartnership: (((v.content_disclosure || {}).advertising_disclosure) || {}).is_paid_promotion === true ? true : null,
+        // the text as the response carries it: long posts keep their full text in note_tweet
+        text: textOf(v),
       };
       out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined && !(Array.isArray(x) && !x.length))));
     }
     for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
   }
   return [...out.values()];
+}
+
+// A post's text from the response, capped. Lists the page has scrolled past are no longer in the
+// page, so the campaign lens reads quote text here rather than from the rendered post.
+function textOf(v) {
+  const t = pick(((((v.note_tweet || {}).note_tweet_results || {}).result) || {}).text, (v.legacy || {}).full_text);
+  return t ? String(t).slice(0, 2000) : null;
 }
 
 // The author of a Tweet object, from its embedded user (legacy or core fields).

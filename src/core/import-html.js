@@ -37,13 +37,24 @@ const attr = (tag, name) => { const m = tag.match(new RegExp(`\\s${name}="([^"]*
 const hrefs = (html) => [...String(html).matchAll(/<a\b[^>]*\bhref="(https?:\/\/[^"]+)"/gi)].map((m) => htmlText(m[1]));
 const isoOrNull = (s) => { const t = Date.parse(s || ""); return Number.isFinite(t) ? new Date(t).toISOString() : null; };
 
+// X posts, read by layers so a markup change does not blind the reader (RADAR-VISION,
+// "Independence in perpetuity"): the post box is an <article> or anything with role="article"
+// (the accessibility tree), the author and id come from the post's own status link, and the text
+// is X's tweetText box or, when test ids are renamed or gone, the first block X marks with a
+// language (lang plus dir="auto"). Class names and test ids are never required.
+const POST_BOX = /<(?:article\b[^>]*|[a-z][\w-]*\b[^>]*\brole="article"[^>]*)>/gi;
+const STATUS = /href="(?:https:\/\/(?:x|twitter)\.com)?\/([A-Za-z0-9_]{1,15})\/status\/(\d+)"[^>]*>\s*<time\b/;
+const TEXT_BOX = [/<div\b[^>]*data-testid="tweetText"/i, /<div\b(?=[^>]*\blang="[a-z]{2,3}(?:-[A-Za-z]+)?")(?=[^>]*\bdir="auto")[^>]*>/i];
+
 function xPosts(html) {
-  const out = [];
-  for (const m of html.matchAll(/<article\b[^>]*>/gi)) {
+  const out = [], seen = new Set();
+  for (const m of html.matchAll(POST_BOX)) {
     const body = innerAt(html, m.index);
-    const status = body.match(/href="(?:https:\/\/(?:x|twitter)\.com)?\/([A-Za-z0-9_]{1,15})\/status\/(\d+)"/);
-    const textAt = body.search(/<div\b[^>]*data-testid="tweetText"/i);
-    if (!status || textAt < 0) continue;
+    const status = body.match(STATUS);
+    if (!status || seen.has(status[2])) continue;
+    const textAt = TEXT_BOX.map((re) => body.search(re)).find((i) => i >= 0);
+    if (textAt === undefined) continue;
+    seen.add(status[2]);
     const text = innerAt(body, textAt);
     out.push({ id: status[2], author: status[1], text: htmlText(text), posted: isoOrNull((body.match(/<time\b[^>]*datetime="([^"]+)"/i) || [])[1]), links: hrefs(text).filter((u) => !/^https?:\/\/(x|twitter)\.com\//.test(u)) });
   }
@@ -71,7 +82,7 @@ function redditPosts(html) {
 // page post], kind: "page" } for any other page.
 export function postsFromHtml(html) {
   const s = String(html || "");
-  const site = /<meta\b[^>]*content="(?:X|Twitter)"|https:\/\/(?:x|twitter)\.com\//i.test(s) && /data-testid="tweetText"/.test(s) ? "X" : /<shreddit-(?:post|comment)\b/i.test(s) ? "Reddit" : null;
+  const site = /<meta\b[^>]*content="(?:X|Twitter)"|https:\/\/(?:x|twitter)\.com\//i.test(s) && (/data-testid="tweetText"/.test(s) || STATUS.test(s)) ? "X" : /<shreddit-(?:post|comment)\b/i.test(s) ? "Reddit" : null;
   const posts = site === "X" ? xPosts(s) : site === "Reddit" ? redditPosts(s) : [];
   if (posts.length) return { site, root: posts[0], replies: posts.slice(1), kind: "thread" };
   const title = htmlText((s.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || "");

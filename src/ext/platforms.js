@@ -18,19 +18,33 @@
     onThread: () => /^\/[A-Za-z0-9_]{1,15}\/status\/\d+/.test(location.pathname),
     // Timelines, profiles, likes, lists and search: any other page that shows posts.
     onFeed: () => !/^\/(?:settings|messages|i\/(?:flow|keyboard_shortcuts|display))/.test(location.pathname),
-    items: () => [...document.querySelectorAll('article[data-testid="tweet"]')],
+    // Layered so a redesign does not blind Daylight Commons (RADAR-VISION, "Independence in perpetuity"):
+    // X's test ids first, then semantic structure and the accessibility tree (an <article> or
+    // role="article" holding a status link with a <time>). The same layers are tested against
+    // rotated markup in tests/x-live-shapes.test.js through src/core/import-html.js.
+    items: () => {
+      const byId = [...document.querySelectorAll('article[data-testid="tweet"]')];
+      if (byId.length) return byId;
+      const boxes = [...document.querySelectorAll('article, [role="article"]')].filter((n) => n.querySelector('a[href*="/status/"] time'));
+      return boxes.filter((n) => !boxes.some((o) => o !== n && o.contains(n)));
+    },
     read(node) {
-      const nameBox = node.querySelector('[data-testid="User-Name"]');
-      const link = nameBox && [...nameBox.querySelectorAll('a[href^="/"]')].map((a) => a.getAttribute("href")).find((h) => /^\/[A-Za-z0-9_]{1,15}$/.test(h));
       const time = node.querySelector('a[href*="/status/"] time');
-      const idm = time && time.parentElement.getAttribute("href").match(/\/status\/(\d+)/);
+      const statusHref = time && time.parentElement.getAttribute("href");
+      const idm = statusHref && statusHref.match(/\/([A-Za-z0-9_]{1,15})\/status\/(\d+)/);
+      const nameBox = node.querySelector('[data-testid="User-Name"]') || (time && time.closest("div")) || null;
+      const named = nameBox && [...nameBox.querySelectorAll('a[href^="/"]')].map((a) => a.getAttribute("href")).find((h) => /^\/[A-Za-z0-9_]{1,15}$/.test(h));
+      // The status link names the author too, so a renamed name box does not lose the author.
+      const link = named || (idm ? "/" + idm[1] : null);
       if (!link || !idm) return null;
-      const display = text(nameBox.querySelector("a span")) || null;
-      return { id: idm[1], author: link.slice(1), display, posted: time.getAttribute("datetime"), url: "https://x.com" + time.parentElement.getAttribute("href"),
-        text: text(node.querySelector('[data-testid="tweetText"]')), node, anchor: nameBox,
+      const display = text(nameBox && nameBox.querySelector("a span")) || null;
+      const body = node.querySelector('[data-testid="tweetText"]') || node.querySelector('div[lang][dir="auto"]');
+      return { id: idm[2], author: link.slice(1), display, posted: time.getAttribute("datetime"), url: "https://x.com" + statusHref,
+        text: text(body), node, anchor: nameBox || time.parentElement,
         // X's own paid-placement label, and link domains shown in the post or its card
         paid: [...node.querySelectorAll("span")].some((sp) => /^(Ad|Promoted)$/.test(sp.textContent.trim())),
-        // X's "Paid partnership" label under a post: the poster's own disclosure (campaign lens)
+        // X's "Paid partnership" label under a post: X's record of the poster's own disclosure, a
+        // platform claim Daylight Commons records and checks, never ground truth (campaign lens)
         paidPartnership: [...node.querySelectorAll("span")].some((sp) => sp.textContent.trim() === "Paid partnership"),
         domains: PB.domainsIn(node.innerText),
         // shown by X beside the reply: the language it was written in, and account labels

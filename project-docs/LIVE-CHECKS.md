@@ -92,3 +92,26 @@ repost and quote lists:
 - `bookmark_count` is in the post data (`src/core/xdata.js`);
 - whether X's Human and AI account labels can be read from the page data (not read yet);
 - the panel's "Launch campaign" section on the post page and on the repost list page.
+
+## Campaign lens live check, 2026-10-22 (the author's signed-in Chrome, read-only)
+Two public launch threads: a data-marketplace launch (repost list and quotes) and a local coding
+model launch (quotes), plus each account's own recent posts. 15 page views at human pace, three
+screens per list at most; nothing liked, reposted, followed or saved. Daylight Commons' own reader
+and lens ran in the page on the responses X's app had already loaded; only aggregate results left
+the page, and they stay outside the repository.
+
+| # | Check | Result |
+|---|---|---|
+| 34 | Reply and post DOM test ids, status link with `<time>`, `role="group"` counts label | pass: unchanged |
+| 35 | "Paid partnership" as a span of its own under a quote post | pass; and the same mark is in the response as `content_disclosure.advertising_disclosure.is_paid_promotion` |
+| 36 | X's GraphQL User objects (item 11) | fail, fixed: 0 of 330 User objects had a `legacy` block; counts moved to `relationship_counts`, `tweet_counts`, `action_counts`. `core.screen_name`, `core.created_at`, `profile_bio.description`, `avatar.image_url` unchanged |
+| 37 | Quote lists are complete in the page | fail, fixed: X virtualizes the list (about 7 posts in the page at once); the lens now reads paid marks and text from the responses |
+| 38 | Operation names | `TweetDetail`, `SearchTimeline` (quotes), `Retweeters` (pages of 20), `UserOriginalsTimeline` (profile Posts tab), `UserRepliesTimeline`, `UserByScreenName`. Daylight Commons walks any GraphQL response, so the new names need no change |
+| 39 | X's Human and AI account labels | not seen: no response key and no rendered span on these pages. Still open |
+| 40 | The page's Reposts number | includes quotes: the number shown equals `retweet_count` plus `quote_count`. The lens uses `retweet_count`, so its ratio is lower than one read off the page |
+
+Lens output on the two threads after the fix: both "coordinated" (disclosed paid quotes and quote
+bunching), no sign fired, ladder step 1 only (10 of 20 and 6 of 21 quotes carry X's Paid
+partnership mark). Does not prove: two threads at one moment each; a lens with no sign is not a
+finding that a launch is organic.
+
