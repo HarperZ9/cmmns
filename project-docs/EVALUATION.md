@@ -596,3 +596,79 @@ which git ignores. The corpora stay in the data directory, outside the repositor
 | Symmetry test | the same sentences score identically for every target; coded slogan pairs score alike |
 | Bundle freshness test | fails when `src/core` changes without a rebuild |
 | Live X threads | see LIVE-CHECKS.md |
+
+## Launch campaigns: hand-labelling protocol and fairness audit (2026-10-22)
+The launch campaign lens (`project-docs/CAMPAIGN-LENS.md`) has no measured precision or recall.
+Nothing about its accuracy may be claimed until this protocol has produced the numbers below and
+the fairness bound holds.
+
+### What is labelled
+A case is one launch post as the labeller saw it in their own browser: the post's counts, the
+repost list, the quote list and the replies the page loaded. Labels are stored as structure only:
+counts, shares, time offsets in minutes from the launch post, template group sizes, and the label.
+No handle, display name, bio text or post text is stored, and no screenshot. Labels live outside
+the repository, in the labeller's local folder (for the first cases,
+`mission-control/2026-10-22-campaign-signals/labels.json`, git-ignored).
+
+Labels per case:
+- `campaign`: `paid-disclosed` (labelled paid partnerships only), `paid-undisclosed` (evidence
+  outside Radar that promotion was bought without labels: an agency's own case study, a platform
+  enforcement notice, a court or regulator record, the company's own statement), `organic`, or
+  `unsure`. A labeller's impression from the same signals Radar reads is not evidence for
+  `paid-undisclosed`, because that would grade the lens against itself. Such cases are `unsure`.
+- Per indicator family, whether the labeller sees it in the page (yes, no, cannot tell), so each
+  sign's agreement is measured on its own.
+- Strata: platform; audience size (the four follower strata in `scripts/campaign-baselines.mjs`);
+  topic community (tech, crypto, entertainment, politics, sport, other); the main language of the
+  post; the region the post addresses, when the post says so. Strata describe the post and its
+  audience. They are never an input to the lens.
+
+Two labellers label each case independently; disagreements stay `unsure` and are counted.
+
+### What is reported
+- Precision and recall of the step-2 inference (status `strong`) against `paid-undisclosed` plus
+  `paid-disclosed`, with 95% Wilson intervals, and the false-positive rate on `organic` cases.
+- Per-family agreement with the labellers.
+- All of it per stratum, beside the stratum's case count.
+
+### Minimums before any claim
+- At least 30 `organic` and 30 paid cases on a platform before its numbers are published.
+- **Fairness bound:** the false-positive rate on `organic` cases must not differ by more than 5
+  percentage points between any two language strata or any two region strata with 30 or more
+  organic cases each. A stratum with fewer than 30 organic cases is described only as
+  "insufficient cases". If the bound fails, the lens's lead stays off for the failing strata until
+  a fix is measured on fresh cases. A lower false-positive rate in one stratum counts as a
+  difference too: the known limit on non-Latin bio templates (`CAMPAIGN-LENS.md`) is expected to
+  show here as lower recall, and possibly fewer false positives, for those strata. It is reported,
+  not hidden.
+- Controls: the synthetic controls in `tests/campaign.test.js` and `tests/campaign.fairness.test.js`
+  keep passing, and each labelled `organic` case that reached the lead is written up with the
+  family that fired.
+
+### The engagement-shape baseline
+`python -I scripts/eval/prep-pheme-shape.py <data>/pheme` then `node scripts/campaign-baselines.mjs`
+writes the historical reference: PHEME source posts, 5,920 of 6,425 with 20 or more reposts and
+likes. Reposts per like by follower stratum (median, 95th percentile, posts): under 10,000, 2.53
+and 11.69 (1,451); 10,000 to 100,000, 2.27 and 8.75 (1,703); 100,000 to 1 million, 2.91 and 9.50
+(1,588); 1 million or more, 3.04 and 7.40 (1,178). Counts only, in
+`project-docs/evidence/campaign-baselines.json`.
+
+What it does not prove: this is Twitter breaking news in 2014 and 2015, when reposts routinely
+exceeded likes. It contradicts the common intuition that ordinary posts run likes well above
+reposts. That intuition may hold on X today, but it has not been measured here. So the PHEME line
+ships as a labelled historical reference that never feeds a sign. The current X strata hold 0
+posts. A modern baseline needs at least 200 hand-collected ordinary posts per stratum, collected by
+this protocol (counts only) from accounts across topics and languages, before the platform-baseline
+line says anything.
+
+### First labelled cases (2026-10-22)
+Two threads the author shared as screenshots: a data-marketplace launch, and an AI-model launch
+with its paid quotes. Their structure is in the local labels file. Both are `unsure` for
+`paid-undisclosed`: the evidence is the same kind of page signal the lens reads, plus a third
+party's public allegation, so they cannot grade the lens. They are development cases. In the first,
+the launch post shows the shape family (reposts about 8 times likes) and the bio family
+(slot-filled persona templates in the visible repost list), and no visible reposter's bio matches
+the post's topic. In the second, the launch post's own shape is ordinary (reposts per like 0.05),
+and its two visible quotes carry X's Paid partnership label, three hours old at capture. The paid
+quotes are like-heavy (reposts per like 0.01 and 0.08), so paid quotes and repost inversion are
+separate families. Join dates and cross-launch overlap cannot be read from screenshots.

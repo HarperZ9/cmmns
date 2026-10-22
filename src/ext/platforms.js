@@ -30,6 +30,8 @@
         text: text(node.querySelector('[data-testid="tweetText"]')), node, anchor: nameBox,
         // X's own paid-placement label, and link domains shown in the post or its card
         paid: [...node.querySelectorAll("span")].some((sp) => /^(Ad|Promoted)$/.test(sp.textContent.trim())),
+        // X's "Paid partnership" label under a post: the poster's own disclosure (campaign lens)
+        paidPartnership: [...node.querySelectorAll("span")].some((sp) => sp.textContent.trim() === "Paid partnership"),
         domains: PB.domainsIn(node.innerText),
         // shown by X beside the reply: the language it was written in, and account labels
         writtenIn: ((node.innerText.match(/Translated from (\w+)/) || [])[1]) || null,

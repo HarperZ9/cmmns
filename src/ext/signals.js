@@ -164,6 +164,15 @@
     return out;
   }
 
+  // The launch campaign lens on the launch post itself: the lead and the ladder's claims, with each
+  // sign's does-not-prove line. Shown only when at least one inauthenticity sign fired.
+  function campaign(m) {
+    const c = m.campaign;
+    if (!c || (c.status !== "strong" && c.status !== "one")) return [];
+    return [{ label: c.status === "strong" ? "consistent with purchased amplification" : "one campaign sign", fam: "campaign", level: c.status === "strong" ? "warn" : "info", cat: "coordination",
+      rows: [["Reading", c.lead], ...(c.claims || []).map((x) => [x.step === 1 ? "Documented" : "Inference", x.text]), ...c.indicators.flatMap((x) => [["Sign", x.text], dnp(x.dnp)]), dnp(c.dnp), ["Dispute", c.dispute]] }];
+  }
+
   const ORDER = { warn: 0, flag: 1, info: 2 };
   // Each signal carries its family's measured accuracy (src/core/measured.js through families.js),
   // or "not measured yet". A marker another language's grammar found says the figure is for English;
@@ -175,7 +184,7 @@
   const feedback = (x, m) => (globalThis.PBFeedback && x.fam ? PBFeedback.rows(x, m) : []);
   function all(m, settings) {
     const shown = (x) => !settings || !PB.areaOn || PB.areaOn(settings, x.cat);
-    return [...checks(m), ...language(m), ...links(m), ...post(m), ...account(m)].filter(shown)
+    return [...checks(m), ...campaign(m), ...language(m), ...links(m), ...post(m), ...account(m)].filter(shown)
       .map((x) => ({ ...x, rows: [...x.rows, ["Measured", (x.lang ? "in English: " : "") + measured(x.fam)], ...feedback(x, m), ...learn(x.fam)] }))
       .sort((a, b) => ORDER[a.level] - ORDER[b.level]);
   }

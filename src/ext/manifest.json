@@ -117,6 +117,7 @@
         "logs.js",
         "reddit.js",
         "health.js",
+        "campaign.js",
         "content.js"
       ],
       "css": [

@@ -82,3 +82,13 @@ drawn, touch mode tested at 375 px).
 | 40 | Permission flow: popup offer, browser prompt, scripts registered for that server only, removal in options | Install the build; open a Mastodon server; click the toolbar button | open (author check after reload) |
 | 41 | TikTok comments: `data-e2e="comment-level-1"`, `comment-username-1`; comment list request `/api/comment/list/` | Open a video's comments | blocked 2026-10-21: signed out, TikTok showed a log-in dialog and then a "Create username" sign-up step before any comment loaded. The check stopped there and created nothing. The adapter follows TikTok's public data-e2e attributes and needs the author's check in a signed-in browser |
 | 42 | Firefox for Android: install from file, tap a post's Radar button, popup as a page, a Mastodon server prompt | Steps in `project-docs/ANDROID.md` | open (needs a phone or emulator) |
+
+## Launch campaign lens (2026-10-22, not run)
+Not run: live checks on X need the author's go-ahead in chat. To check, on one launch post and its
+repost and quote lists:
+- the repost list's accounts arrive in X's own response while `/status/<id>/retweets` is open, with
+  bio and join date (`src/ext/campaign.js`);
+- the "Paid partnership" text is a span of its own under labelled quote posts (`src/ext/platforms.js`);
+- `bookmark_count` is in the post data (`src/core/xdata.js`);
+- whether X's Human and AI account labels can be read from the page data (not read yet);
+- the panel's "Launch campaign" section on the post page and on the repost list page.

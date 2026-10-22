@@ -5,6 +5,18 @@ were not published to a store.
 
 ## Unreleased
 
+### Added (launch campaign lens, not measured)
+- On an X post and its repost and quote lists, the thread panel adds "Launch campaign": the post's
+  engagement shape against the account's own posts, the reposter and replier sample (shared bio
+  templates, stock-persona bios, join-date clusters, topic mismatch), the quote cluster (Paid
+  partnership labels, bunching, undisclosed look-alikes) and overlap with other launches you opened.
+  It leads with a named inference only when two or more independent signs agree, names only an
+  account X discloses as an organisation, never names a sampled account, and gives each sign what it
+  does not prove and a dispute route. Design and bounds: `project-docs/CAMPAIGN-LENS.md`.
+- Banned features (language, script, place, name origin, avatar look) are checked by tests.
+- No precision is claimed: `project-docs/EVALUATION.md` has the hand-labelling protocol and the
+  fairness bound that must hold first.
+
 ### Added (backing on record)
 - On the account of a public media personality, the window shows "Backing on record: N sources":
   who employs them, who owns their outlet, investors, licensing deals, FARA filings, court records,

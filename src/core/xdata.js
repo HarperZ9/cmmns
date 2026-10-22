@@ -128,7 +128,7 @@ export function tweetsIn(json) {
         replyTo: L.in_reply_to_status_id_str || null,
         replyToHandle: L.in_reply_to_screen_name || null,
         links: ((L.entities || {}).urls || []).map((u) => u.expanded_url).filter((u) => u && !/^https?:\/\/(x|twitter)\.com\//.test(u)),
-        quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count),
+        quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count), bookmarks: n(L.bookmark_count),
       };
       out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined && !(Array.isArray(x) && !x.length))));
     }

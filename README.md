@@ -63,6 +63,11 @@ source, so it can be rebuilt without any code host.
   Similar wording is not the same claim, and Radar never rates a post itself. A Community Note on
   a post is shown first.
 - **Media:** media first uploaded long before the post that shows it, with reverse image search.
+- **Launch campaigns (X, not measured yet):** on a launch post and its repost and quote lists, how
+  the engagement is shaped against the account's own posts, shared bio templates and join-date
+  waves among the accounts the page loaded, Paid partnership labels and unlabelled look-alike
+  quotes, and accounts seen on other launches you opened. It names a company only when several
+  independent signs agree, and never names an ordinary account.
 - **Thread report:** whether the most extreme replies come mostly from flagged accounts, with 95%
   intervals. It says "skewed" only when the intervals do not overlap.
 - **History page:** across threads you opened, the accounts and sites your threads keep leading

@@ -151,6 +151,8 @@
     if (video && video.channelId) PBLogs.ensureChannel(video.channelId);
     report.groups = PB.returningGroups(PBLogs.net(), threadKey, replies.map((r) => r.author));
     report.context = PB.threadContext(items, { noteOf, claimsOf: PBLogs.claimsOf });
+    report.campaign = globalThis.PBCampaign ? PBCampaign.lens(site, items, tweets, cache) : null;
+    if (root && report.campaign) for (const [, model] of models) if (model.postId === report.campaign.launchId) model.campaign = report.campaign;
     saveSnapshot(threadKey, site.name, report);
     lastSummary = { ...lastSummary, sentence: report.sentence, signs: (report.bursts || []).length + clusters.length + (report.state || []).length, state: report.state };
     PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, viewed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onCard: () => PBLogs.saveCard({ site, report, items, replies, rows, root, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
@@ -187,6 +189,11 @@
   // YouTube's funding and paid-promotion labels. Live check 2026-10-21: a state-funded
   // broadcaster's videos with comments off showed no Radar panel at all.
   function videoOnly(site, feed) {
+    // A repost list shows accounts, not posts: the launch campaign lens still reads it.
+    if (!feed && globalThis.PBCampaign && PBCampaign.onList()) {
+      PBStore.all().then((cache) => { const r = PB.threadReport([]); r.campaign = PBCampaign.lens(site, [], tweets, cache); PBUI.panel(r, [], { pending: 0, scanning: 0, paused: false, site, pushed: [] }, () => {}); }).catch((e) => console.error("[radar] campaign lens failed", e));
+      return;
+    }
     const video = feed ? null : currentVideo(site);
     if (!video) { removePanel(); return; }
     PBUI.panel(PB.threadReport([]), [], { pending: 0, scanning: 0, paused: false, site, video, pushed: [] }, () => {});
