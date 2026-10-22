@@ -26,7 +26,7 @@ Persuasion techniques (downloaded 2026-10-21 to `<data dir>/ptc/`):
 |---|---|---|---|---|---|
 | Propaganda Techniques Corpus v2 (Da San Martino et al. 2019; SemEval-2020 Task 11) | `ptc/datasets-v2.tgz` | https://zenodo.org/records/3952415 | CC BY 4.0 | 371 labelled training articles (6,129 technique spans), 75 unlabelled dev articles | `fd2d2c35...8a8516bb` |
 
-Only the training articles carry gold labels in this release. Radar splits them by article with the
+Only the training articles carry gold labels in this release. Daylight Commons splits them by article with the
 seed below (`scripts/eval/ptc.mjs`). The shared task's own dev and test articles have no public gold
 labels and are not used.
 
@@ -60,7 +60,7 @@ above.
 - `dehumanise`: the `dehumanize` item.
 - `violence`: the `violence` item or the `genocide` item.
 - `stereotype`: the `status` item ("the comment says the group is inferior"). This is the closest
-  item; it is broader than Radar's "<group> are <trait>" grammar.
+  item; it is broader than Daylight Commons' "<group> are <trait>" grammar.
 - `hostile` (the broad label): IRT `hate_speech_score` above 0.5 (the authors' reading of "hate
   speech"), or a median of 3 or more on any of insult, humiliate, status, dehumanize, violence,
   genocide.
@@ -130,7 +130,7 @@ use restrictions and no bar on evaluation. Each split is drawn from earlier corp
 terms: Russian from two Kaggle datasets (Russian Language Toxic Comments; Toxic Russian Comments),
 Ukrainian from the compilers' own ukr-toxicity-dataset (OpenRAIL), Arabic from OSACT4, Hindi from
 the CONSTRAINT 2021 hostility data and HASOC 2019. HASOC was distributed by registration with its
-organisers. Radar uses the public compilation for counts only and commits no text; whether that
+organisers. Daylight Commons uses the public compilation for counts only and commits no text; whether that
 use sits well with each original's terms is an author item (below). The Chinese split names no
 source on its card, so it is not used.
 
@@ -209,7 +209,7 @@ label. `group` is hate aimed at a group, used to derive and to clear the dev bar
   labels on 15,881 tweets, but is CC BY-NC-SA 4.0. The TextDetox Hebrew split is OLaH again.
   HebrewOffensiveLanguageByTaxonomy (CC0) has 450 Facebook comments with target labels in an
   annotation-tool format; small, kept as a next step. The hand-made Hebrew word lists in the OLaH
-  repository are not used, since Radar's lists come from labels only.
+  repository are not used, since Daylight Commons' lists come from labels only.
 - Turkish: Toraman et al.'s large-scale Turkish hate speech sets are CC BY-NC-SA 4.0. The
   nanelimon bullying set gives no annotation method.
 - Japanese: the TextDetox Japanese split was labelled by the Perspective API, not by people.

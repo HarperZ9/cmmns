@@ -10,7 +10,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const UA = { "User-Agent": "Radar designations matcher (local, manual run)" };
+const UA = { "User-Agent": "Daylight Commons designations matcher (local, manual run)" };
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 const norm = (s) => String(s || "").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[’'".,()-]/g, " ").replace(/\s+/g, " ").trim();
 const SAME_COUNTRY = { China: ["People's Republic of China", "China"], Russia: ["Russia"], Iran: ["Iran"], Belarus: ["Belarus"] };

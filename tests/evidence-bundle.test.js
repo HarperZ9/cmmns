@@ -15,7 +15,7 @@ const result = analyzeThread(THREAD, { now: Date.parse("2026-10-02T00:00:00Z") }
 const texts = Object.fromEntries([THREAD.root, ...THREAD.replies].map((p) => [p.id, p.text]));
 const LOCK = { alg: "SHA-256", of: "test", value: "0".repeat(64) };
 const key = await newBundleKey();
-const signed = async (opts = {}) => signBundle(makeBundle(result, { tool: "Radar test", dataLock: LOCK, texts, ...opts }).bundle, key);
+const signed = async (opts = {}) => signBundle(makeBundle(result, { tool: "Daylight Commons test", dataLock: LOCK, texts, ...opts }).bundle, key);
 
 test("a signed bundle verifies offline and fits the schema", async () => {
   const b = await signed();

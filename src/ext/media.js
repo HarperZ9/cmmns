@@ -1,4 +1,4 @@
-// Media checks in the window, only on click and one file at a time. Radar reads media the page
+// Media checks in the window, only on click and one file at a time. Daylight Commons reads media the page
 // already loaded: it re-requests the exact address the page's own <img> or <video> shows, so the
 // browser usually answers from its cache, and sends no cookies. Frames for reverse search are taken
 // from the page's own <video> element and stay in this tab until the user picks a search service.
@@ -58,7 +58,7 @@
     try {
       const log = (await chrome.storage.local.get(PB.MEDIA_KEY))[PB.MEDIA_KEY] || {};
       await chrome.storage.local.set({ [PB.MEDIA_KEY]: PB.recordCheck(log, { url, host: location.hostname, result }) });
-    } catch (e) { console.error("[radar] could not save the media check count", e); }
+    } catch (e) { console.error("[daylight-commons] could not save the media check count", e); }
   }
 
   async function check(url) {
@@ -71,8 +71,8 @@
       checks.set(url, { state: "done", result });
       remember(url, result);
     } catch (e) {
-      console.warn("[radar] media check failed", url, e);
-      const msg = e instanceof TypeError ? "the media host did not let Radar read the file from this page" : String(e.message || e);
+      console.warn("[daylight-commons] media check failed", url, e);
+      const msg = e instanceof TypeError ? "the media host did not let Daylight Commons read the file from this page" : String(e.message || e);
       checks.set(url, { state: "done", result: { error: `could not read the file: ${msg}` } });
     }
     PBPop.refresh();
@@ -101,10 +101,10 @@
       }
       frames.set(key, { state: "done", list, error: list.length ? null : "no frames could be taken from this video" });
     } catch (e) {
-      console.warn("[radar] frames failed", e);
+      console.warn("[daylight-commons] frames failed", e);
       frames.set(key, { state: "done", list, error: e && e.name === "SecurityError" ? "the site's player does not let the page read its frames" : "no frames could be taken from this video" });
     }
-    try { await seek(v, t0); if (!wasPaused) await v.play(); } catch (e) { console.warn("[radar] could not restore playback", e); }
+    try { await seek(v, t0); if (!wasPaused) await v.play(); } catch (e) { console.warn("[daylight-commons] could not restore playback", e); }
     PBPop.refresh();
   }
 
@@ -112,11 +112,11 @@
   // user pastes it there.
   async function searchFrame(frame, open) {
     try { await navigator.clipboard.write([new ClipboardItem({ "image/png": frame.blob })]); }
-    catch (e) { console.warn("[radar] could not copy the frame", e); }
+    catch (e) { console.warn("[daylight-commons] could not copy the frame", e); }
     window.open(open, "_blank", "noopener,noreferrer");
   }
 
-  // Text in one image, on click: the bytes go to Radar's background worker (src/ext/ocr-bg.js),
+  // Text in one image, on click: the bytes go to Daylight Commons' background worker (src/ext/ocr-bg.js),
   // which reads them on this device; the text then goes to the fact-check index the same way a
   // post's text does. Never run on its own.
   const texts = new Map();   // url -> { state: "reading" | "done", result }
@@ -128,7 +128,7 @@
     let result;
     try {
       const { bytes, complete } = await readBytes(url);
-      if (!complete) throw new Error("the image is larger than Radar reads");
+      if (!complete) throw new Error("the image is larger than Daylight Commons reads");
       result = await chrome.runtime.sendMessage({ type: "pb-ocr", bytes: b64(bytes) });
       if (result && result.text) {
         const key = "img:" + url.length + ":" + url.slice(-24);
@@ -136,10 +136,10 @@
         result = { ...result, claims: (hits && hits[key]) || [] };
       }
     } catch (e) {
-      console.warn("[radar] reading text in the image failed", url, e);
-      result = { error: e instanceof TypeError ? "the media host did not let Radar read the file from this page" : String(e.message || e) };
+      console.warn("[daylight-commons] reading text in the image failed", url, e);
+      result = { error: e instanceof TypeError ? "the media host did not let Daylight Commons read the file from this page" : String(e.message || e) };
     }
-    texts.set(url, { state: "done", result: result || { error: "no answer from Radar's background worker" } });
+    texts.set(url, { state: "done", result: result || { error: "no answer from Daylight Commons' background worker" } });
     PBPop.refresh();
   }
   const textsFor = (node, tweet) => inPost(node, tweet).map((x) => (texts.get(x.src) || {}).result).filter((r) => r && !r.error);

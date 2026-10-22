@@ -1,10 +1,10 @@
-// Create, sign and check Radar data packs (src/core/packs.js, project-docs/DATA-SOVEREIGNTY.md).
+// Create, sign and check Daylight Commons data packs (src/core/packs.js, project-docs/DATA-SOVEREIGNTY.md).
 // No network access, no dependencies.
 //   node scripts/pack.mjs keygen <dir> <name>          writes <name>.private.jwk and <name>.public.jwk
 //   node scripts/pack.mjs sign --key <private.jwk> --content <content.json> --name N --version V
 //        [--description D] [--author-name A] [--created YYYY-MM-DD] --out <pack.json>
 //   node scripts/pack.mjs verify <pack.json> [--trust <public.jwk>]
-//   node scripts/pack.mjs bundled [--key <private.jwk>]  re-signs Radar's own data (src/ext/radar-data.pack.json)
+//   node scripts/pack.mjs bundled [--key <private.jwk>]  re-signs Daylight Commons' own data (src/ext/radar-data.pack.json)
 // A private key is never written inside the repository, and keygen refuses a path there.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, dirname, resolve, relative, isAbsolute } from "node:path";
@@ -36,7 +36,7 @@ export async function keygen(dir, name) {
   return k;
 }
 
-// Radar's own data as a file pack: the SHA-256 of each bundled table, signed by the project key.
+// Daylight Commons' own data as a file pack: the SHA-256 of each bundled table, signed by the project key.
 export async function bundledManifestFiles() {
   const files = {};
   for (const f of BUNDLED_FILES) files[f] = await sha256Hex(lfBytes(readFileSync(join(ROOT, "src/ext", f))));
@@ -45,7 +45,7 @@ export async function bundledManifestFiles() {
 
 async function signBundled(keyPath) {
   const priv = json(keyPath), created = process.env.RADAR_BUILT || new Date().toISOString().slice(0, 10);
-  const meta = { name: "Radar bundled data", version: created.replace(/-/g, "."), description: "The tables that ship inside Radar: fact-checked claims, documented operations, outlet owners, documented backing of public media personalities, site facts and state links.", authorName: "Radar project key", created };
+  const meta = { name: "Daylight Commons bundled data", version: created.replace(/-/g, "."), description: "The tables that ship inside Daylight Commons: fact-checked claims, documented operations, outlet owners, documented backing of public media personalities, site facts and state links.", authorName: "Daylight Commons project key", created };
   const pack = await signPack(meta, priv, { files: await bundledManifestFiles() });
   writeFileSync(BUNDLED_PACK, JSON.stringify(pack, null, 1) + "\n");
   console.log(`src/ext/radar-data.pack.json signed by ${keyFingerprint(pack.manifest.author.keyId)} over ${BUNDLED_FILES.length} files`);

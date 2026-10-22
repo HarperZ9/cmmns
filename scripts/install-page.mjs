@@ -1,6 +1,6 @@
-// Builds the public install page from INSTALL.md: docs/install.html on Radar's site only (not inside
+// Builds the public install page from INSTALL.md: docs/install.html on Daylight Commons' site only (not inside
 // the extension), with an in-browser release checker (docs/verify.js) that loads docs/signing.js,
-// Radar's own signing code joined into one file. The key id comes from docs/release-key.json.
+// Daylight Commons' own signing code joined into one file. The key id comes from docs/release-key.json.
 //   node scripts/install-page.mjs
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -15,7 +15,7 @@ const CHECKER = `<h2>Check a release here</h2>
 const CSS = `#verify-out .good { color: var(--ink); } #verify-out .bad { color: var(--drift); font-weight: 600; }`;
 
 // The page's signing code: src/core/sig.js (no imports) followed by src/core/signing.js without its
-// import line, so the page runs Radar's own signing code and nothing else.
+// import line, so the page runs Daylight Commons' own signing code and nothing else.
 export function signingForPage() {
   const sig = readFileSync(join(ROOT, "src", "core", "sig.js"), "utf8");
   const src = readFileSync(join(ROOT, "src", "core", "signing.js"), "utf8");
@@ -30,7 +30,7 @@ export function render(md = readFileSync(join(ROOT, "INSTALL.md"), "utf8"), key 
   if (!updated) throw new Error('INSTALL.md needs a "Last updated: YYYY-MM-DD." line');
   if (!key.keyId) throw new Error("docs/release-key.json has no keyId");
   const text = md.replace(/^Last updated: .*\n\n?/m, "").replace("{{KEY_ID}}", key.keyId);
-  return page({ title: "Install Radar without a store", description: "Download, check and install Radar without a browser store, and rebuild it from source without a code host.", updated, body: markdown(text) + "\n" + CHECKER, css: CSS });
+  return page({ title: "Install Daylight Commons without a store", description: "Download, check and install Daylight Commons without a browser store, and rebuild it from source without a code host.", updated, body: markdown(text) + "\n" + CHECKER, css: CSS });
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

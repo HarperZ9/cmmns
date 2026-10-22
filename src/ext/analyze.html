@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Analyse a file · Radar</title>
+<title>Analyse a file · Daylight Commons</title>
 <link rel="stylesheet" href="canon.css">
 <link rel="stylesheet" href="pages.css">
 <link rel="stylesheet" href="dashboard.css">
@@ -13,7 +13,7 @@
 <main class="wide">
   <header>
     <h1>Analyse a file</h1>
-    <p class="lead">Choose a saved page, a thread's JSON or a data export from your own account. Radar reads it on this device. Nothing is sent anywhere, and no platform needs to be open.</p>
+    <p class="lead">Choose a saved page, a thread's JSON or a data export from your own account. Daylight Commons reads it on this device. Nothing is sent anywhere, and no platform needs to be open.</p>
   </header>
   <section aria-labelledby="h-file">
     <h2 id="h-file">Choose a file</h2>
@@ -23,14 +23,14 @@
     </label>
     <ul class="plain formats">
       <li><strong>Saved page</strong>: an X or Reddit thread saved with your browser's Save page as. Any other page is read as one text.</li>
-      <li><strong>Thread JSON</strong>: X's TweetDetail response, Bluesky's getPostThread, a Mastodon status context, or Radar's own thread shape.</li>
+      <li><strong>Thread JSON</strong>: X's TweetDetail response, Bluesky's getPostThread, a Mastodon status context, or Daylight Commons' own thread shape.</li>
       <li><strong>Your data export</strong>: an X archive's tweets.js, a Reddit export's comments.csv or posts.csv, a Mastodon archive's outbox.json, a Bluesky repository .car file.</li>
       <li><strong>An image or video</strong>: its Content Credentials and AI-generation metadata.</li>
     </ul>
     <p id="status" class="status muted" role="status" aria-live="polite"></p>
   </section>
   <section id="result" aria-labelledby="h-result" hidden>
-    <h2 id="h-result">What Radar found</h2>
+    <h2 id="h-result">What Daylight Commons found</h2>
     <p id="summary" class="lead"></p>
     <ul id="notes" class="plain muted"></ul>
     <div id="groups"></div>
@@ -39,7 +39,7 @@
   </section>
   <section id="bundle" aria-labelledby="h-bundle" hidden>
     <h2 id="h-bundle">Save signed evidence</h2>
-    <p>A bundle holds the post ids, the evidence above with the matched words, Radar's version, a hash of its data tables and the time, signed with this browser's own Radar key. Anyone can check it offline with Radar's command line tool or on this page.</p>
+    <p>A bundle holds the post ids, the evidence above with the matched words, Daylight Commons' version, a hash of its data tables and the time, signed with this browser's own Daylight Commons key. Anyone can check it offline with Daylight Commons' command line tool or on this page.</p>
     <label class="switch">
       <span>Include the posts' full text<span class="hint">Off by default: the posts are other people's words. Without it, the bundle keeps only the matched words.</span></span>
       <input type="checkbox" id="text">
@@ -52,7 +52,7 @@
   </section>
   <section aria-labelledby="h-check">
     <h2 id="h-check">Check a bundle</h2>
-    <p>Choose a Radar evidence bundle to check its signature and that its evidence matches its own posts.</p>
+    <p>Choose a Daylight Commons evidence bundle to check its signature and that its evidence matches its own posts.</p>
     <label class="drop small-drop"><input type="file" id="check" accept=".json"><span>Choose a bundle.</span></label>
     <ul id="checks" class="plain"></ul>
   </section>

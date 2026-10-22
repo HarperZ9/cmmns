@@ -18,7 +18,7 @@ export const ACCOUNT_LESSONS = [
   },
   {
     id: "written-in", title: "Written in another language", research: [],
-    what: "X translated this post from a language that does not fit where the account is based. Radar shows the language X reported, next to the account's label.",
+    what: "X translated this post from a language that does not fit where the account is based. Daylight Commons shows the language X reported, next to the account's label.",
     examples: [
       { side: "none", topic: "elections", kind: "sign", text: "A reply about a city council vote in Spain, first written in a language rarely spoken there, from an account that never posts about anything else." },
       { side: "none", topic: "elections", kind: "ordinary", text: "A reply about the same vote, first written in Romanian, from a Romanian family who live in that city." },
@@ -36,7 +36,7 @@ export const ACCOUNT_LESSONS = [
       { side: "none", topic: "tech", kind: "ordinary", text: "Labelled as based in Canada, connected via the German app store, because the owner bought the phone while studying in Berlin." },
     ],
     why: "Where an account installed the app is harder to change than a typed location. When it disagrees with the label, that is one more piece of place evidence.",
-    spot: "On X, the \"About this account\" page lists \"Connected via\" with the store and country. You can read it for any account without Radar.",
+    spot: "On X, the \"About this account\" page lists \"Connected via\" with the store and country. You can read it for any account without Daylight Commons.",
     counter: "Weigh it with the other place signs. On its own it is weak, since people move, travel and buy phones abroad. When two or three place signs agree, you have more to go on.",
     dnp: "",
   },
@@ -66,14 +66,14 @@ export const ACCOUNT_LESSONS = [
   },
   {
     id: "hours-elsewhere", title: "Active hours fit elsewhere", research: [],
-    what: "The account's posting times fit a waking day in a different time zone from where it is labelled. Radar reads the times of the posts the site loaded.",
+    what: "The account's posting times fit a waking day in a different time zone from where it is labelled. Daylight Commons reads the times of the posts the site loaded.",
     examples: [
       { side: "none", topic: "economy", kind: "sign", text: "An account labelled in New York posts almost only between 3 and 9 in the morning, New York time, every day for a month." },
       { side: "none", topic: "economy", kind: "ordinary", text: "A New York nurse on night shifts posts between 2 and 6 in the morning on work days." },
     ],
     why: "Accounts run from far away keep the hours of the people who run them. Hours are hard to fake for many weeks, so a clear shifted day says something.",
     spot: "Scroll the account's posts and note the times. Most sites show a time on each post when you hover over the date. Ten or twenty posts are enough to see a pattern.",
-    counter: "Look at the hour chart in Radar's card, or your own notes. A clear, shifted day is worth noting. A scattered pattern tells you very little.",
+    counter: "Look at the hour chart in Daylight Commons' card, or your own notes. A clear, shifted day is worth noting. A scattered pattern tells you very little.",
     dnp: "",
   },
   {
@@ -96,7 +96,7 @@ export const ACCOUNT_LESSONS = [
       { side: "none", topic: "media", kind: "ordinary", text: "A local newspaper that schedules its headlines through the same service." },
     ],
     why: "Automation lets one operator run many accounts that answer strangers. Readers see the replies as people talking in the moment.",
-    spot: "Without Radar this is hard on X today, since the app name is hidden. Look for the other signs of a schedule instead: exact, even gaps between posts and the same wording.",
+    spot: "Without Daylight Commons this is hard on X today, since the app name is hidden. Look for the other signs of a schedule instead: exact, even gaps between posts and the same wording.",
     counter: "Check what the account posts. A brand or news desk using automation is normal. Automated replies to strangers on hot topics deserve a second look.",
     dnp: "",
   },
@@ -145,7 +145,7 @@ export const ACCOUNT_LESSONS = [
     ],
     why: "Accounts that get banned are replaced with new ones, so campaigns lean on fresh accounts. Many new accounts in one thread tell you more than one does.",
     spot: "The join date is on every profile. Check it for a handful of the loudest replies. If most joined in the same few weeks, write that down.",
-    counter: "Look at Radar's thread report for a join burst. One new account means little, since news events bring real people online. Many joining the same week is the pattern.",
+    counter: "Look at Daylight Commons' thread report for a join burst. One new account means little, since news events bring real people online. Many joining the same week is the pattern.",
     dnp: "",
   },
   {
@@ -167,9 +167,9 @@ export const ACCOUNT_LESSONS = [
       { side: "none", topic: "media", kind: "sign", text: "Twelve replies in one thread from handles like \"Name48213907\", all joined the same month." },
       { side: "none", topic: "local", kind: "ordinary", text: "A grandfather whose handle is still \"Name19570412\", because he never looked at the settings." },
     ],
-    why: "Accounts made in bulk often keep the suggested handle, because nobody cares to change it. A single one says almost nothing, which is why Radar shows it as faint context.",
+    why: "Accounts made in bulk often keep the suggested handle, because nobody cares to change it. A single one says almost nothing, which is why Daylight Commons shows it as faint context.",
     spot: "Look for a name followed by eight or so digits. Then look at the join dates of those accounts. Many such handles that joined together are more telling than one.",
-    counter: "Treat it as context only. Radar never counts it toward \"flagged\", and you should not read anything into it alone.",
+    counter: "Treat it as context only. Daylight Commons never counts it toward \"flagged\", and you should not read anything into it alone.",
     dnp: "",
   },
   {
@@ -181,7 +181,7 @@ export const ACCOUNT_LESSONS = [
     ],
     why: "Mass following is a way to collect followers fast, because some people follow back. It is common in growth schemes, and also in people who use the site to read.",
     spot: "The two numbers sit under every profile. A following count far above the follower count, on a young account, is the sign.",
-    counter: "Treat it as context only. Radar never counts it toward \"flagged\". It matters only next to stronger signs on the same account.",
+    counter: "Treat it as context only. Daylight Commons never counts it toward \"flagged\". It matters only next to stronger signs on the same account.",
     dnp: "",
   },
   {

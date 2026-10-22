@@ -1,5 +1,5 @@
-// Signed evidence bundles: what Radar found on a thread, as a file anyone can check offline. A
-// bundle carries post ids, the evidence with the matched spans needed to check it, the Radar and
+// Signed evidence bundles: what Daylight Commons found on a thread, as a file anyone can check offline. A
+// bundle carries post ids, the evidence with the matched spans needed to check it, the Daylight Commons and
 // API versions, a hash of the data tables used, and the time; it is signed with a per-install
 // ECDSA P-256 key through WebCrypto, and the public key travels inside the bundle.
 //
@@ -59,7 +59,7 @@ export function makeBundle(result, opts = {}) {
   const ids = (result.posts && result.posts.ids) || [...new Set(result.evidence.flatMap((e) => e.posts))];
   const texts = opts.includeText ? opts.texts || {} : {};
   const bundle = {
-    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "Radar",
+    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "Daylight Commons",
     savedAt: opts.savedAt || new Date().toISOString(), dataLock: opts.dataLock || null,
     input: { kind: result.kind, site: result.site || null, page: opts.page || null, source: archive ? "export" : "thread", accounts: result.posts ? result.posts.accounts : null },
     posts: ids.map((id) => (opts.includeText && texts[id] != null ? { id, text: String(texts[id]) } : { id })),
@@ -95,7 +95,7 @@ export function bundleConsistency(bundle) {
 
 async function signatureOk(bundle) {
   const { signature, ...body } = bundle, S = body.signer;
-  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Radar can check" };
+  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Daylight Commons can check" };
   const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
   let id = null;
   try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
@@ -108,8 +108,8 @@ async function signatureOk(bundle) {
 // { ok, keyId, checks: [{ name, ok, text }] }; ok is true only when every check passes.
 export async function verifyBundle(bundle, opts = {}) {
   const checks = [];
-  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Radar evidence bundle" }] };
-  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Radar reads` });
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Daylight Commons evidence bundle" }] };
+  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Daylight Commons reads` });
   checks.push({ name: "signature", ...(await signatureOk(bundle)) });
   const keyId = bundle.signer ? bundle.signer.keyId : null;
   if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });

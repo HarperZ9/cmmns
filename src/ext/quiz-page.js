@@ -16,10 +16,10 @@ const store = globalThis.chrome && chrome.storage && chrome.storage.local;
 let state = { answers: {} };
 
 async function load() {
-  try { state = PB.normalizeLearn(store ? (await store.get(KEY))[KEY] : null); } catch (e) { console.error("[radar] could not read self-check answers", e); }
+  try { state = PB.normalizeLearn(store ? (await store.get(KEY))[KEY] : null); } catch (e) { console.error("[daylight-commons] could not read self-check answers", e); }
 }
 async function save() {
-  try { if (store) await store.set({ [KEY]: state }); } catch (e) { console.error("[radar] could not save a self-check answer", e); }
+  try { if (store) await store.set({ [KEY]: state }); } catch (e) { console.error("[daylight-commons] could not save a self-check answer", e); }
 }
 
 function verdict(item, said) {
@@ -77,10 +77,10 @@ async function start() {
   renderMine();
   document.getElementById("clear").addEventListener("click", async () => {
     state = { answers: {} };
-    try { if (store) await store.remove(KEY); } catch (e) { console.error("[radar] could not clear self-check answers", e); }
+    try { if (store) await store.remove(KEY); } catch (e) { console.error("[daylight-commons] could not clear self-check answers", e); }
     list.replaceChildren(...ORDERED.map((item, i) => card(item, i + 1)));
     renderMine();
   });
 }
 
-start().catch((e) => console.error("[radar] self-check page failed", e));
+start().catch((e) => console.error("[daylight-commons] self-check page failed", e));

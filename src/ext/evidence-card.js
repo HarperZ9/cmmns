@@ -7,7 +7,7 @@
   const $ = (id) => document.getElementById(id);
   const id = location.hash.slice(1);
   const built = id ? await chrome.runtime.sendMessage({ type: "pb-card-get", id }) : null;
-  if (!built) { $("say").textContent = "This card is no longer here. Open the thread again and choose Save card in Radar's panel."; return; }
+  if (!built) { $("say").textContent = "This card is no longer here. Open the thread again and choose Save card in Daylight Commons' panel."; return; }
   if (!built.ok) { $("say").textContent = built.reason; $("png").hidden = true; return; }
   const card = await PB.sealCard(built.card);
   const lines = PB.cardLines(card);
@@ -25,7 +25,7 @@
   $("save").addEventListener("click", () => { for (const f of files) download(f); $("status").textContent = `Saved ${base}.png and ${base}.json.`; });
   if (navigator.canShare && navigator.canShare({ files })) {
     $("share").hidden = false;
-    $("share").addEventListener("click", () => navigator.share({ files, title: "Radar thread card" }).catch((e) => { if (e.name !== "AbortError") { console.error("[radar] share failed", e); $("status").textContent = "Could not share: " + e.message; } }));
+    $("share").addEventListener("click", () => navigator.share({ files, title: "Daylight Commons thread card" }).catch((e) => { if (e.name !== "AbortError") { console.error("[daylight-commons] share failed", e); $("status").textContent = "Could not share: " + e.message; } }));
   }
 
   function download(file) {
@@ -33,7 +33,7 @@
     a.href = URL.createObjectURL(file); a.download = file.name; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   }
-})().catch((e) => { console.error("[radar] card page failed", e); document.getElementById("say").textContent = "Could not build the card: " + e.message; });
+})().catch((e) => { console.error("[daylight-commons] card page failed", e); document.getElementById("say").textContent = "Could not build the card: " + e.message; });
 
 // Paints the lines onto the canvas and resolves to a PNG blob.
 function draw(canvas, lines) {

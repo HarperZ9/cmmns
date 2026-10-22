@@ -27,33 +27,33 @@
     const domains = [...new Set((msg.domains || []).map(PB.registrable).filter(Boolean))].filter((d) => d !== "github.com");
     const out = await PB.lookupEvidence((u, o) => fetch(u, o), { repos, domains, postedAt: msg.postedAt || null, token });
     const sealed = out.receipts.length ? await seal(out.receipts) : { size: null };
-    if (sealed.full) out.notes.push("The evidence log is full. Save the evidence chain and clear Radar data to start a new one.");
+    if (sealed.full) out.notes.push("The evidence log is full. Save the evidence chain and clear Daylight Commons data to start a new one.");
     return { ...out, sealed: sealed.size, ads: PB.adLibraryLinks({ name: msg.name, domain: domains[0] }) };
   }
 
   async function exportChain() {
     const cur = (await chrome.storage.local.get(SEAL_KEY))[SEAL_KEY] || PB.emptySeal();
     const check = await PB.verifySeal(cur);
-    return { chain: await PB.exportSeal(cur, { title: "Radar evidence chain" }), check };
+    return { chain: await PB.exportSeal(cur, { title: "Daylight Commons evidence chain" }), check };
   }
 
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg && msg.type === "pb-evidence") {
-      queue = queue.then(() => lookup(msg)).then(sendResponse, (e) => { console.error("[radar] evidence lookup failed", e); sendResponse({ error: "failed" }); });
+      queue = queue.then(() => lookup(msg)).then(sendResponse, (e) => { console.error("[daylight-commons] evidence lookup failed", e); sendResponse({ error: "failed" }); });
       return true;
     }
     // Witness: the user opened the Internet Archive's save page for a public post. The receipt keeps
-    // where the archived copy can be looked up; Radar does not fetch it or check the save worked.
+    // where the archived copy can be looked up; Daylight Commons does not fetch it or check the save worked.
     if (msg && msg.type === "pb-evidence-witness" && /^https:\/\/x\.com\/[A-Za-z0-9_]{1,15}\/status\/\d+$/.test(msg.postUrl || "")) {
       queue = queue.then(async () => {
         if (!(await settings()).evidence) return { error: "off" };
         const r = await PB.makeReceipt({ kind: "witness-request", subject: msg.postUrl, observed: { requested: true }, source: "Internet Archive Save Page Now, opened by you", url: `https://web.archive.org/save/${msg.postUrl}`, method: "user-opened", witness: { lookup: `https://web.archive.org/web/*/${msg.postUrl}` }, dnp: "This records that you asked the Internet Archive to save the page. The archive may refuse or save a login wall instead of the post; open the lookup address to see what it kept." });
         return seal([r]);
-      }).then(sendResponse, (e) => { console.error("[radar] witness receipt failed", e); sendResponse({ error: "failed" }); });
+      }).then(sendResponse, (e) => { console.error("[daylight-commons] witness receipt failed", e); sendResponse({ error: "failed" }); });
       return true;
     }
     if (msg && msg.type === "pb-evidence-export") {
-      exportChain().then(sendResponse, (e) => { console.error("[radar] evidence export failed", e); sendResponse({ error: "failed" }); });
+      exportChain().then(sendResponse, (e) => { console.error("[daylight-commons] evidence export failed", e); sendResponse({ error: "failed" }); });
       return true;
     }
     return false;

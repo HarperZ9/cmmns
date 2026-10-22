@@ -1,16 +1,16 @@
 // The suggested outlets for Other coverage: news organisations that publish their own feed, so
-// Radar can ask each publisher directly with no aggregator in between. The user turns each one on
-// or off and can add any RSS or Atom address. Radar requests a feed only on the user's click.
+// Daylight Commons can ask each publisher directly with no aggregator in between. The user turns each one on
+// or off and can add any RSS or Atom address. Daylight Commons requests a feed only on the user's click.
 //
 // How the list was chosen (project-docs/INDEPENDENCE.md has the full method and its limits):
 //   1. An original newsroom with general or world news in English.
 //   2. A public RSS or Atom feed at a stable https address on the outlet's own host that answered
 //      with entries and without a redirect when checked on 2026-10-21.
-//   3. The outlet's site is in Radar's bundled site tables (src/ext/sites.json), so the card can say
+//   3. The outlet's site is in Daylight Commons' bundled site tables (src/ext/sites.json), so the card can say
 //      what the tables state about its owner and owner type. Where they state no owner, it says so.
 //   4. Spread: several countries and every owner type the tables give, with the count of outlets
 //      across the range of published media-bias charts kept even by the maintainer at curation.
-//      No rating is stored here or shown anywhere: Radar labels outlets by owner type only.
+//      No rating is stored here or shown anywhere: Daylight Commons labels outlets by owner type only.
 // The order is alphabetical by id, so position in the list says nothing.
 
 // [id, name, feed address, site in the tables, country as the outlet states it]

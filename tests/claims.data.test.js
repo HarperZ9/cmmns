@@ -1,5 +1,5 @@
 // The bundled fact-check table (src/ext/claims.json): within its size cap, sourced, licensed, and
-// carrying only the fields Radar shows. The person a fact-checker says made a claim is not kept.
+// carrying only the fields Daylight Commons shows. The person a fact-checker says made a claim is not kept.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, statSync } from "node:fs";

@@ -1,5 +1,5 @@
 // The personalities table (src/ext/personalities.json, scripts/personalities-build.mjs): it fits its
-// schema, every row has a source with a checked quote, no private field appears anywhere, Radar's own
+// schema, every row has a source with a checked quote, no private field appears anywhere, Daylight Commons' own
 // words carry no loaded label and no association-as-backing, and a rebuild gives the same table.
 // Each lint has a control that shows it fails what it should.
 import test from "node:test";
@@ -70,7 +70,7 @@ test("control: the private-field lint catches nested private fields", () => {
   assert.ok(personProblems(bad).some((x) => /private field/.test(x)));
 });
 
-test("Radar's own words carry no loaded label and no association-as-backing; amounts only where a filing is the backing", () => {
+test("Daylight Commons' own words carry no loaded label and no association-as-backing; amounts only where a filing is the backing", () => {
   for (const p of table.people) {
     assert.doesNotMatch(p.role, LOADED, p.id);
     for (const r of p.rows) for (const k of ["who", "summary", "doesNotProve"]) assert.doesNotMatch(r[k], LOADED, `${p.id} ${k}`);

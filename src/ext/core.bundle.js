@@ -148,7 +148,7 @@ const M_confusables = (() => {
 // Styled letters that stand for plain ones (fullwidth "Ｈｅｌｌｏ", mathematical bold "𝐇𝐞𝐥𝐥𝐨",
 // circled letters) are read as the plain letters, and invisible characters used to split words
 // (zero-width space, soft hyphen, word joiner) are removed. The text shown to the user never
-// changes; folding applies to the copy Radar matches against.
+// changes; folding applies to the copy Daylight Commons matches against.
 
 const { TO_LATIN, TO_CYRILLIC, TO_GREEK } = M_confusables_data;
 
@@ -508,7 +508,7 @@ const LONG_CUES = { outlet: CUES.outlet.filter((c) => c.length >= 5), platform: 
 const SAYS_UNOFFICIAL = /\b(?:fan|fans|parody|satire|unofficial|critic|critics|commentary)\b|not\s*affiliated/i;
 const ORG_CHECK = new Set(["Business", "Government"]);
 
-const BRAND_DOES_NOT_PROVE = "Fans, critics, reporters and local partners put outlet and platform names in their profiles, and the list of official accounts Radar checks against is incomplete. A brand in a name does not show who runs the account or that anyone meant to deceive.";
+const BRAND_DOES_NOT_PROVE = "Fans, critics, reporters and local partners put outlet and platform names in their profiles, and the list of official accounts Daylight Commons checks against is incomplete. A brand in a name does not show who runs the account or that anyone meant to deceive.";
 
 const at = (hay, needle) => { for (let i = 0; i + needle.length <= hay.length; i++) if (needle.every((t, j) => hay[i + j] === t)) return i; return -1; };
 
@@ -957,7 +957,7 @@ function flagsFor(account, context = {}) {
   if (Number.isFinite(account.followingCount) && Number.isFinite(account.followersCount) && account.followingCount >= 2000 && account.followersCount < 100) {
     out.push({ id: "follow-pattern", evidence: `follows ${account.followingCount.toLocaleString()} accounts; ${account.followersCount} follow back` });
   }
-  // Inferred: when the account posts (from threads Radar has seen) against where it is labelled.
+  // Inferred: when the account posts (from threads Daylight Commons has seen) against where it is labelled.
   const act = context.activity && context.activity.activeHours;
   const range = account.basedIn && REGION_OFFSETS[(parseLabel(account.basedIn) || {}).region];
   if (act && range && act.fit >= 0.8 && (act.utcOffset < range[0] - 2 || act.utcOffset > range[1] + 2)) {
@@ -1033,7 +1033,7 @@ return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, HIGH_VOLUME_PER_DAY, DEFAULT_HANDL
 
 // ---- lexicon.js
 const M_lexicon = (() => {
-// Radar's word lists, kept apart from the matching code so they can be reviewed and updated in
+// Daylight Commons' word lists, kept apart from the matching code so they can be reviewed and updated in
 // one place. Every list covers targets in every direction; tests/rhetoric.symmetry.test.js holds
 // the scoring to equal treatment. Sources for slurs and coded terms: the ADL Hate Symbols
 // database, Hatebase, GNET and ISD extremism glossaries; terms added for side recall on 2026-10-21 cite
@@ -2579,7 +2579,7 @@ const { GROUPS } = M_lexicon;
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
 const AP_QANON = S("AP, QAnon's 'Save the Children' morphs into popular slogan", "https://www.wsls.com/news/politics/2020/10/28/qanons-save-the-children-morphs-into-popular-slogan/", "2020-10-28");
-const NAMING = "People quote, mock and argue against these claims, and Radar skips only obvious debunking.";
+const NAMING = "People quote, mock and argue against these claims, and Daylight Commons skips only obvious debunking.";
 
 const THEORY_DOES_NOT_PROVE = `Naming a theory is not believing it. ${NAMING} This describes the post, not who wrote it or why, and a post that names a theory can still contain true statements.`;
 
@@ -3016,7 +3016,7 @@ function langLine(code) {
   const r = MEASURED_LANGS[code];
   if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;
   if (r.n < MIN_N) return `Found by the ${name} word list. Not measured in ${name}: only ${r.n} of these signs in labelled text.`;
-  return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of the strong signs Radar found were on text people labelled ` +
+  return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of the strong signs Daylight Commons found were on text people labelled ` +
     `hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
 }
 
@@ -3300,7 +3300,7 @@ const M_framing = (() => {
 // thematic coverage leads them to hold society or government responsible. The operational split
 // follows the narrative-frame part of the codebook of Mendelsohn, Budak and Jurgens, "Modeling
 // Framing in Immigration Discourse on Social Media" (NAACL 2021), which codes a post episodic when
-// it centres a specific person or event and thematic when it gives broader context. Radar cites
+// it centres a specific person or event and thematic when it gives broader context. Daylight Commons cites
 // that codebook and copies none of its text.
 //
 // A cue names no group, person, party, side or issue: the same sentence reads alike whatever it is
@@ -3575,7 +3575,7 @@ return { parseJoined, parseNameChanges, parseAbout };
 // ---- meta.js
 const M_meta = (() => {
 // Account context Meta shows the viewer on Facebook and Instagram, read from the text the site
-// renders when the viewer opens it. Radar makes no request of its own for it.
+// renders when the viewer opens it. Daylight Commons makes no request of its own for it.
 // - Instagram: "About this account" (profile menu): date joined, "Account based in", former
 //   usernames, verified. Layout checked live 2026-10-21: each label on its own line, then its value.
 // - Facebook: "Page transparency" on a Page: creation date, name changes, and the countries of the
@@ -3684,7 +3684,7 @@ return { parseFullDate, igAbout, pageTransparency, fbKey, fbProfile };
 const M_bsky = (() => {
 // Bluesky account and post data from the responses the Bluesky web app already loaded for the
 // page (app.bsky.unspecced.getPostThreadV2, app.bsky.feed.getPostThread, getProfile(s), feeds),
-// passed on by src/ext/bskysniff.js. Radar makes no request of its own. Field names follow the
+// passed on by src/ext/bskysniff.js. Daylight Commons makes no request of its own. Field names follow the
 // public AT Protocol lexicons (app.bsky.actor.defs#profileViewBasic, app.bsky.feed.defs#postView).
 
 function walk(json, visit, limit = 200000) {
@@ -3742,7 +3742,7 @@ return { bskyAuthors, bskyPosts };
 // ---- fedi.js
 const M_fedi = (() => {
 // Mastodon and TikTok data from the responses each site's own web app already loaded, passed on by
-// src/ext/fedisniff.js. Radar makes no request of its own. Field names follow Mastodon's public REST
+// src/ext/fedisniff.js. Daylight Commons makes no request of its own. Field names follow Mastodon's public REST
 // API (Account and Status entities) and the comment list TikTok's web app requests.
 
 function walk(json, visit, limit = 200000) {
@@ -3805,7 +3805,7 @@ function mastodonProbe(p) {
   return version ? { version, domain } : null;
 }
 
-// The origin pattern Radar asks permission for, from a tab's URL; null for anything but https.
+// The origin pattern Daylight Commons asks permission for, from a tab's URL; null for anything but https.
 function instanceOrigin(url) {
   let u;
   try { u = new URL(url); } catch (_) { return null; }
@@ -3837,7 +3837,7 @@ const M_owners = (() => {
 // so nothing about what the user reads leaves the browser.
 //
 // What this does not show: who funds an individual creator. Sponsors, investors and donors are
-// mostly undisclosed; Radar shows them only where a platform labels it on the page (ad, paid
+// mostly undisclosed; Daylight Commons shows them only where a platform labels it on the page (ad, paid
 // partnership) or a public record is in the table.
 
 let BY_DOMAIN = new Map(), BY_HANDLE = new Map();
@@ -3845,8 +3845,8 @@ let BY_DOMAIN = new Map(), BY_HANDLE = new Map();
 // A row corrected by data/owner-corrections.json (scripts/owner-corrections.mjs) carries
 // `correction`: { source, checked, reason, upstream, factsWrong? }. The window says so, with the
 // correction's own source, instead of crediting Wikidata.
-const ownerSourceShort = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}` : "Wikidata");
-const ownerSource = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}: ${o.correction.source}. Wikidata said "${o.correction.upstream.owner}". ${o.correction.reason}`
+const ownerSourceShort = (o) => (o && o.correction ? `Daylight Commons correction, checked ${o.correction.checked}` : "Wikidata");
+const ownerSource = (o) => (o && o.correction ? `Daylight Commons correction, checked ${o.correction.checked}: ${o.correction.source}. Wikidata said "${o.correction.upstream.owner}". ${o.correction.reason}`
   : `Wikidata${o && o.source ? `: ${o.source}` : ""}`);
 
 // rows: [{ name, domain, owner, source, x? }]
@@ -3880,7 +3880,7 @@ return { ownerSourceShort, ownerSource, setOwnerRows, ownerOfDomain, ownerOfHand
 // ---- xdata.js
 const M_xdata = (() => {
 // Reads account metadata out of the data X's own web app has already downloaded for the page (its
-// GraphQL responses). Radar makes no request of its own for this: src/ext/sniff.js passes copies of
+// GraphQL responses). Daylight Commons makes no request of its own for this: src/ext/sniff.js passes copies of
 // X's responses to the content script, and this module walks them for User objects.
 // X has moved fields between `legacy` and `core` over time, so both places are read.
 
@@ -3897,7 +3897,7 @@ function parseXDate(s) {
 const pick = (...vals) => vals.find((v) => v !== undefined && v !== null && v !== "") ?? null;
 const n = (v) => (Number.isFinite(v) ? v : null);
 
-// One X User object -> Radar's reading (only the fields that are present).
+// One X User object -> Daylight Commons' reading (only the fields that are present).
 function userReading(u) {
   const L = u.legacy || {}, C = u.core || {}, A = u.about_profile || {};
   const handle = pick(C.screen_name, L.screen_name);
@@ -3923,7 +3923,7 @@ function userReading(u) {
     mediaCount: n(L.media_count),
     withheldIn: Array.isArray(L.withheld_in_countries) && L.withheld_in_countries.length ? L.withheld_in_countries.join(", ") : null,
     // X's own disclosures about how the account operates. Payment and tip-jar handles are left
-    // out on purpose: they identify people, and Radar describes accounts.
+    // out on purpose: they identify people, and Daylight Commons describes accounts.
     identityVerified: ((u.verification_info || {}).is_identity_verified === true) ? true : null,
     verifiedReason: pick((((((u.verification_info || {}).reason || {}).description) || {}).text)),
     professionalType: pick((u.professional || {}).professional_type),
@@ -3941,7 +3941,7 @@ function userReading(u) {
   return Object.fromEntries(Object.entries(r).filter(([, v]) => v !== null && v !== undefined));
 }
 
-// The "About this account" block anywhere in a response (X's AboutAccountQuery), as Radar's
+// The "About this account" block anywhere in a response (X's AboutAccountQuery), as Daylight Commons'
 // fields, or null. location_accurate false means X suspects a VPN or proxy.
 function aboutIn(json) {
   const stack = [json];
@@ -4163,9 +4163,9 @@ return { threadKey };
 
 // ---- network.js
 const M_network = (() => {
-// Connections and activity across the threads the user has viewed. Radar keeps a small local log
+// Connections and activity across the threads the user has viewed. Daylight Commons keeps a small local log
 // (chrome.storage.local, this browser only): which accounts replied in which thread, and how many
-// seconds after the original post. From it Radar shows, per account, how often it turns up, which
+// seconds after the original post. From it Daylight Commons shows, per account, how often it turns up, which
 // accounts it keeps turning up alongside, and how fast it replies; per thread, groups of accounts
 // that have appeared together before. Entries older than RETAIN_DAYS are dropped; the user can
 // clear the log. Nothing is linked across platforms.
@@ -4229,7 +4229,7 @@ function returningGroups(log, threadKey, handles, min = 2) {
   return pairs.sort((x, y) => y.n - x.n).slice(0, 10);
 }
 
-// Inferred from posting times Radar has seen: the UTC offset whose waking day (08:00 to 24:00 local)
+// Inferred from posting times Daylight Commons has seen: the UTC offset whose waking day (08:00 to 24:00 local)
 // holds the most posts. Needs MIN_POSTS posts over MIN_DAYS days; otherwise null. This is an
 // inference about when the account is operated, not where anyone lives: shift workers, night
 // owls, schedulers and teams across time zones all break it.
@@ -4292,7 +4292,7 @@ return { RETAIN_DAYS, recordThread, activity, returningGroups, MIN_POSTS, active
 const M_ytdata = (() => {
 // Reads metadata out of the data YouTube's own web app has already downloaded for the page
 // (ytInitialData, ytInitialPlayerResponse and its /youtubei/v1 responses), passed on by
-// src/ext/ytsniff.js. Radar makes no request of its own. YouTube renames these structures often,
+// src/ext/ytsniff.js. Daylight Commons makes no request of its own. YouTube renames these structures often,
 // so every field is optional and the walkers look for both the old and new comment shapes.
 
 const txt = (v) => (!v ? null : typeof v === "string" ? v : v.simpleText || v.content || (Array.isArray(v.runs) ? v.runs.map((r) => r.text).join("") : null));
@@ -4572,7 +4572,7 @@ return { BASELINE_SOURCE, baselineFor, baselineLine, pairsLine };
 const M_pace = (() => {
 // Pacing for automatic About lookups, from X's own rate-limit headers.
 // x-rate-limit-remaining and x-rate-limit-reset (epoch seconds) come back on every GraphQL
-// response. Radar spreads what is left over the window and stops RESERVE requests short, so the
+// response. Daylight Commons spreads what is left over the window and stops RESERVE requests short, so the
 // viewer's own use of X is never the thing that gets limited. Without headers it keeps its base gap.
 
 const BASE_GAP_MS = 1500;
@@ -4644,7 +4644,7 @@ const M_state = (() => {
 //   state-owned       the outlet's ownership chain on Wikidata ends at a government or state body
 //   named-in-report   a platform or government report named the domain or account in an influence
 //                     operation it took down or attributed (each row cites the report)
-// The same rule applies to every country. Radar does not attribute a reply, an account or a
+// The same rule applies to every country. Daylight Commons does not attribute a reply, an account or a
 // narrative to a state from what it says or how it behaves: that would be a guess presented as a
 // finding. It shows a link or an account that a cited source ties to a state, and nothing more.
 
@@ -4835,7 +4835,7 @@ function setBackingTable(table) {
   }
 }
 
-// Radar's site ids are the platform names the table uses ("fixture" behaves as X).
+// Daylight Commons' site ids are the platform names the table uses ("fixture" behaves as X).
 const PLATFORM_OF = { fixture: "x" };
 const backingOf = (site, handle) => BY_HANDLE.get(key(PLATFORM_OF[site] || site, handle)) || null;
 const backingOfChannel = (id) => (id && BY_CHANNEL.get(id)) || null;
@@ -4851,7 +4851,7 @@ const sourceCount = (p) => new Set((p.rows || []).flatMap((r) => r.sources.map((
 const backingLabel = (p) => { const n = sourceCount(p); return `Backing on record: ${n} source${n === 1 ? "" : "s"}`; };
 
 const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person says nothing on its own about whether a given post is true, or that the backer chose its words. Allegations in court records are unproven. Records go out of date; each row gives the date it was read.";
-const CORRECTIONS_PATH = "https://github.com/HarperZ9/radar/blob/dev/data/owner-corrections.json";
+const CORRECTIONS_PATH = "https://github.com/HarperZ9/daylight-commons/blob/dev/data/owner-corrections.json";
 
 const STATUS_WORDS = { documented: "documented in a primary record", reported: "reported by the press", alleged: "alleged, not proven" };
 const quoteLine = (s) => `${s.publisher}${s.date ? ` (${s.date})` : ""}, read ${s.read}: "${s.quote}"`;
@@ -4881,7 +4881,7 @@ const M_cloned = (() => {
 // News Sites, T0097.202 News Outlet Persona). A post that names a real outlet ("The Washington Post
 // reports...") while its link goes to a look-alike address borrows the outlet's trust twice: in
 // the words and in the address. Doppelganger posts did this with copied outlets on addresses such as
-// washingtonpost.pm. Radar joins two checks it already has: the look-alike address (lookalike.js)
+// washingtonpost.pm. Daylight Commons joins two checks it already has: the look-alike address (lookalike.js)
 // and the published reports that named the address (ops.js). Wording that names the outlet is the
 // only new part, and it is matched on the outlet's own name, never on a topic or side.
 
@@ -4925,7 +4925,7 @@ const M_trail = (() => {
 // Source trails: where a post's material came from, and how it spread across the posts the user has
 // viewed. Downstream copies point upstream through data X itself records: a quote points to the
 // quoted post, lifted media points to the post it came from, a media id stays the same wherever
-// that exact upload is reposted, and a link's real address survives X's t.co shortener. Radar
+// that exact upload is reposted, and a link's real address survives X's t.co shortener. Daylight Commons
 // follows those pointers back. It never guesses a source from wording or behaviour, and it cannot
 // see past the first upload (who filmed it, who paid for it).
 
@@ -5013,9 +5013,9 @@ function upstream(items, tweets, log) {
   return { accounts: rank(acc).map((x) => ({ handle: x.k, n: x.n })), domains: rank(dom).map((x) => ({ domain: x.k, n: x.n })), uploads, recycled };
 }
 
-// "First seen" for each piece of media on a post: the earliest post Radar has seen carrying the same
+// "First seen" for each piece of media on a post: the earliest post Daylight Commons has seen carrying the same
 // upload (same media id, so the same file X stores), and the post X credits it to ("From @account").
-// The earliest of the two leads. Radar sees only what the user viewed; X's upload time comes from
+// The earliest of the two leads. Daylight Commons sees only what the user viewed; X's upload time comes from
 // the media id. [{ type, uploaded, from, seen, first }], where first is { handle, at, id, how }.
 function firstSeen(t, tweets, log) {
   const table = (log && log.media) || {};
@@ -5039,7 +5039,7 @@ const M_crosslang = (() => {
 // different languages from different accounts. RAND's "firehose" model and Rauch's account of
 // flooding both describe one claim pushed through many channels at once; a campaign that reaches
 // several language communities with the same material leaves this trace (project-docs/TECHNIQUES.md).
-// Radar matches the material, never the wording: a translation of a claim matches only when a
+// Daylight Commons matches the material, never the wording: a translation of a claim matches only when a
 // fact-checker reviewed the claim and both posts match that review. Language comes from the
 // platform's own code (X's "lang"); without one, a distinct writing system stands in, and Latin
 // text without a code counts as unknown. The rule is the same for every language and account.
@@ -5149,7 +5149,7 @@ return { MIN_ACCOUNTS, CROSS_DOES_NOT_PROVE, scriptOf, langOf, crossLanguage, ac
 const M_flooding = (() => {
 // The flooding sign. RAND's "firehose of falsehood" (Paul and Matthews 2016) names high volume
 // across many channels and rapid, continuous repetition; Rauch calls the aim "flooding the zone"
-// so that people stop believing anything (project-docs/TECHNIQUES.md). In one thread Radar can see
+// so that people stop believing anything (project-docs/TECHNIQUES.md). In one thread Daylight Commons can see
 // two traces of it: several accounts posting at very high rates carry a large share of the
 // replies (volume), or a timing burst (src/core/timing.js) is made of such accounts (speed).
 // The rate is the account's own post count over its age, the same figure as the "very high post
@@ -5207,7 +5207,7 @@ return { FLOOD_MIN_ACCOUNTS, FLOOD_DOES_NOT_PROVE, ratePerDay, floodSign };
 // ---- swarming.js
 const M_swarming = (() => {
 // The swarming sign (project-docs/TECHNIQUES.md, technique 7; DISARM T0049.005 Conduct Swarming and
-// T0048 Harass). Rauch describes trolling as a pile-on that manufactures a crowd. In one thread Radar
+// T0048 Harass). Rauch describes trolling as a pile-on that manufactures a crowd. In one thread Daylight Commons
 // can see one trace of it: many new or flagged accounts converging on one post within minutes.
 // The sign is about the thread, never about an account: it carries counts only, no handles, so it
 // cannot become a list to pile on in turn (DESIGN-MAP R12). Thresholds were set on the dev half of
@@ -5217,7 +5217,7 @@ const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN_KNOWN 
 const SWARM_DOES_NOT_PROVE = "A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once, and nobody has to organise it. This describes how the replies arrived, not who sent them or why.";
 
 // rows: [{ author, posted }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
-// null when Radar has not read the account. Returns null or { from, to, accounts, known, marked,
+// null when Daylight Commons has not read the account. Returns null or { from, to, accounts, known, marked,
 // newAccounts, flagged, windowSec } for the densest window.
 function swarmSign(rows, markOf, { windowSec = SWARM_WINDOW_SEC } = {}) {
   const xs = (rows || []).map((r) => ({ a: String(r.author || "").toLowerCase(), t: Date.parse(r.posted) })).filter((r) => r.a && Number.isFinite(r.t)).sort((p, q) => p.t - q.t);
@@ -5488,7 +5488,7 @@ let provider = null;
 function setPromoTemplateProvider(fn) { provider = typeof fn === "function" ? fn : null; }
 function promoCues(text) {
   if (provider) {
-    try { return provider(text).cues || []; } catch (e) { console.error("[radar] promo-template provider failed; using the local list", e); }
+    try { return provider(text).cues || []; } catch (e) { console.error("[daylight-commons] promo-template provider failed; using the local list", e); }
   }
   return localProvider(text).cues;
 }
@@ -5841,7 +5841,7 @@ const CAMPAIGN_PLATFORMS = {
   },
   instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, so no shape." },
   tiktok: { status: "not defined", notes: "Not defined yet." },
-  linkedin: { status: "not defined", notes: "Engagement pods. Radar does not run on LinkedIn." },
+  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons does not run on LinkedIn." },
 };
 
 function campaignPlatform(id) {
@@ -5878,7 +5878,7 @@ const CAMPAIGN_LEADS = {
   thin: "Too few accounts loaded to read. Open the post's reposts or quotes to load more.",
   undefined: "The campaign lens is not defined for this site yet.",
 };
-const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/radar/issues. Corrections are made in the open.";
+const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/daylight-commons/issues. Corrections are made in the open.";
 
 // The accusation ladder (project-docs/CAMPAIGN-LENS.md, "Accusation ladder"). Only an account the
 // platform itself discloses as an organisation (X's gold Business or grey Government checkmark, or
@@ -5931,16 +5931,16 @@ function sampleRows(s) {
     "default-avatar": (x) => `Context: ${x.n} of ${x.of} accounts use the default picture.`,
   };
   const row = (x) => ({ id: x.id, text: text[x.id](x), dnp: SAMPLE_DOES_NOT_PROVE[x.id] });
-  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Radar reads only what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
+  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Daylight Commons reads only what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
 }
 
 function quoteRows(q) {
   if (!q || !q.n) return { ind: [], ctx: [] };
   const ind = [], ctx = [];
   if (q.lookalikes) ind.push({ id: "undisclosed-lookalike", text: `${q.lookalikes} quote${q.lookalikes === 1 ? "" : "s"} without a Paid partnership label share a template with labelled quotes or with each other inside two hours.`, dnp: QUOTES_DOES_NOT_PROVE });
-  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Radar cannot see who paid or how much." });
+  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Daylight Commons cannot see who paid or how much." });
   if (q.bunch.kWindowMs != null) ctx.push({ id: "quote-bunching", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
-  for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Radar's local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
+  for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Daylight Commons' local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
   return { ind, ctx };
 }
 
@@ -6034,7 +6034,7 @@ const M_evidence_github = (() => {
 // date and star count from the public repository endpoint, and star bursts from the stargazers
 // list with timestamps. Checked 2026-10-22: the repository endpoint answers without a login; the
 // stargazers list answers 401 "Requires authentication", so star timestamps need the user's own
-// GitHub token, which Radar keeps on this device and sends only to api.github.com.
+// GitHub token, which Daylight Commons keeps on this device and sends only to api.github.com.
 
 const GITHUB_API = "https://api.github.com";
 const STAR_MAX_PAGES = 10, STAR_PER_PAGE = 100;
@@ -6054,7 +6054,7 @@ function reposIn(textOrLinks) {
   return [...out.values()];
 }
 
-// The repository endpoint's JSON -> the facts Radar keeps.
+// The repository endpoint's JSON -> the facts Daylight Commons keeps.
 function repoFacts(json) {
   if (!json || !json.full_name) return null;
   return { repo: json.full_name, created: json.created_at || null, pushed: json.pushed_at || null, stars: Number.isFinite(json.stargazers_count) ? json.stargazers_count : null, forks: Number.isFinite(json.forks_count) ? json.forks_count : null };
@@ -6147,9 +6147,9 @@ return { RDAP_BASE, CDX_BASE, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE, reg
 
 // ---- evidence-ads.js
 const M_evidence_ads = (() => {
-// Ad transparency libraries for the evidence layer (project-docs/EVIDENCE-LAYER.md). Radar fetches
+// Ad transparency libraries for the evidence layer (project-docs/EVIDENCE-LAYER.md). Daylight Commons fetches
 // none of them: each needs a login, an approved key, or has no public API, and their terms limit
-// automated access. Radar builds a search link the user opens in a tab of their own, and says which
+// automated access. Daylight Commons builds a search link the user opens in a tab of their own, and says which
 // libraries offer an API and what it needs. Status checked 2026-10-22 (HTTP status of the search
 // page to a script, and each provider's API documentation).
 
@@ -6254,7 +6254,7 @@ async function getJson(fetchFn, url, headers = {}) {
     if (!r.ok) return { status: r.status };
     return { status: r.status, json: await r.json() };
   } catch (e) {
-    console.error("[radar] evidence lookup failed", url, e);
+    console.error("[daylight-commons] evidence lookup failed", url, e);
     return { status: "error" };
   } finally { if (timer) clearTimeout(timer); }
 }
@@ -6271,7 +6271,7 @@ async function github(fetchFn, { owner, repo }, token, postedAt) {
   const plan = starPages(facts.stars), times = [];
   for (const p of plan.pages) {
     const s = await getJson(fetchFn, `${base}/stargazers?per_page=100&page=${p}`, { Accept: "application/vnd.github.star+json", Authorization: `Bearer ${token}` });
-    if (!s.json) { notes.push(`GitHub stopped the star list at page ${p} (${s.status}); Radar does not retry around a limit.`); break; }
+    if (!s.json) { notes.push(`GitHub stopped the star list at page ${p} (${s.status}); Daylight Commons does not retry around a limit.`); break; }
     times.push(...starTimes(s.json));
   }
   const bursts = starBursts(times);
@@ -6402,7 +6402,7 @@ async function exportSeal(seal, { title = null, at = new Date().toISOString() } 
 
 // Offline check of an export: the seal, the head, the root and every proof.
 async function verifyExport(x) {
-  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Radar evidence chain"] };
+  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Daylight Commons evidence chain"] };
   const s = await verifySeal(x.seal), problems = [...s.problems];
   const hashes = x.seal.entries.map((e) => e.receipt.hash);
   if ((await merkleRoot(hashes)) !== x.root) problems.push("root does not match the receipts");
@@ -6418,16 +6418,16 @@ return { SEAL_FORMAT, SEAL_DOES_NOT_PROVE, merkleRoot, inclusionProof, verifyInc
 // ---- chain.js
 const M_chain = (() => {
 // The laundering chain: a post, the accounts and sites its material passed through, and the
-// earliest origin Radar can see. Laundering is what makes one source look like many independent
+// earliest origin Daylight Commons can see. Laundering is what makes one source look like many independent
 // ones (Rauch's "artificial copies"; DISARM T0128.004, Launder Information Assets). The chain uses
-// only pointers the platform records and Radar's own first-seen log (src/core/trail.js): a quote
+// only pointers the platform records and Daylight Commons' own first-seen log (src/core/trail.js): a quote
 // or repost points upstream, "media from" names the post the media came from, the same upload or
 // the same link seen earlier names an earlier sharer. It never infers a source from wording, and
 // it stops where the platform's pointers stop.
 
 const { trailFor, firstSeen, normLink } = M_trail;
 
-const CHAIN_DOES_NOT_PROVE = "Radar cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.";
+const CHAIN_DOES_NOT_PROVE = "Daylight Commons cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.";
 
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return null; } };
 const hours = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 360000) / 10;
@@ -6577,8 +6577,8 @@ return { HISTORY_RETAIN_DAYS, snapshot, addSnapshot, summarize, HISTORY_DOES_NOT
 // ---- claims.js
 const M_claims = (() => {
 // Fact-checked claims. A post is matched to a claim a fact-checker has already reviewed, from a
-// table bundled with Radar (src/ext/claims.json, built by scripts/claims-build.mjs from the Data
-// Commons ClaimReview feed). Radar shows the fact-checker's rating in the fact-checker's own
+// table bundled with Daylight Commons (src/ext/claims.json, built by scripts/claims-build.mjs from the Data
+// Commons ClaimReview feed). Daylight Commons shows the fact-checker's rating in the fact-checker's own
 // words, with a link. It never rates a post itself.
 //
 // Matching is on content words (function words in six languages removed, a light stemmer), each
@@ -7262,7 +7262,7 @@ const M_c2pa_verify = (() => {
 // Checks a C2PA manifest without a network call: the claim signature (COSE_Sign1 over the claim,
 // with the key in the signer's certificate), the hash of every assertion the claim lists, and the
 // hard binding that ties the claim to the file's bytes (c2pa.hash.data, or c2pa.hash.bmff for MP4).
-// Each check is { ok: true | false | null, text }: null means Radar could not check it here.
+// Each check is { ok: true | false | null, text }: null means Daylight Commons could not check it here.
 // Not checked here: whether the certificate chains to a trusted issuer, revocation, and the
 // time-stamp authority's signature.
 
@@ -7411,7 +7411,7 @@ async function checkBmffHash(file, a, label, complete) {
   if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
   const rules = a.exclusions || [];
   if (!a.hash || a.merkle || rules.some((r) => !/^(\/[\w ]{4})+$/.test(r.xpath || ""))) {
-    return { ok: null, text: "this video uses a hash layout Radar does not check yet (fragments or partial exclusions)" };
+    return { ok: null, text: "this video uses a hash layout Daylight Commons does not check yet (fragments or partial exclusions)" };
   }
   const withOffsets = /\.v[2-9]$/.test(label), ex = exclusionRanges(file, rules);
   const top = new Set(ex.filter((e) => e[2] === 0 && e[3]).map((e) => e[0]));
@@ -7434,7 +7434,7 @@ return { resolveUri, checkAssertions, checkSignature, checkDataHash, checkBmffHa
 // ---- c2pa.js
 const M_c2pa = (() => {
 // Reads Content Credentials (C2PA 2.x manifests) from a media file's bytes and says what they claim
-// and which parts Radar could check. It never calls a file authentic: a valid credential shows who
+// and which parts Daylight Commons could check. It never calls a file authentic: a valid credential shows who
 // signed a claim and that the file has not changed since, not that the claim is true. A missing
 // credential is the common case, because most platforms strip metadata on upload.
 
@@ -7443,7 +7443,7 @@ const { findManifestStore, parseStore, childByLabel } = M_jumbf;
 const { checkAssertions, checkSignature, checkDataHash, checkBmffHash } = M_c2pa_verify;
 const { sourceType, aiMetadata } = M_aimeta;
 
-const OLDER_FORMAT = "could not fully verify (older manifest format): Radar has not yet been shown to agree with the reference checker on version 1 manifests in video";
+const OLDER_FORMAT = "could not fully verify (older manifest format): Daylight Commons has not yet been shown to agree with the reference checker on version 1 manifests in video";
 const content = (box) => (box && box.content && box.content[0]) || null;
 function decodeBox(box) { const c = content(box); if (!c) return null; try { return c.type === "json" ? JSON.parse(new TextDecoder().decode(c.data)) : cborDecode(c.data); } catch { return null; } }
 const assertionsOf = (m) => (childByLabel(m, "c2pa.assertions") || {}).content || [];
@@ -7491,7 +7491,7 @@ async function binding(file, m, complete, store, ranges, depth = 0) {
     const label = base(a.label), v = decodeBox(a);
     if (label === "c2pa.hash.data" && v) return checkDataHash(file, v, complete);
     if (/^c2pa\.hash\.bmff/.test(label) && v) return checkBmffHash(file, v, label, complete);
-    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is not checked by Radar yet` };
+    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is not checked by Daylight Commons yet` };
   }
   return { ok: false, text: "the manifest has no hard binding to the file's bytes" };
 }
@@ -7537,7 +7537,7 @@ async function readCredentials(bytes, { complete = true } = {}) {
   };
 }
 
-// The overall state, in words Radar can stand behind: "unchanged", "changed", "unchecked", "remote" or "none".
+// The overall state, in words Daylight Commons can stand behind: "unchanged", "changed", "unchecked", "remote" or "none".
 function credentialState(r) {
   if (r && !r.found && r.remote) return "remote";
   if (!r || !r.found) return "none";
@@ -7580,7 +7580,7 @@ function credentialRows(r) {
   if (r.error) return [["Content Credentials", r.error]];
   const rows = [], state = credentialState(r);
   if (state === "none") rows.push(["Content Credentials", NO_CREDENTIALS]);
-  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}. Radar does not fetch them, so nothing was checked.`]);
+  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}. Daylight Commons does not fetch them, so nothing was checked.`]);
   else if (r.broken) rows.push(["Content Credentials", `found, but ${r.broken}`]);
   else {
     rows.push(["Content Credentials", state === "unchanged" ? "found and checked: the file has not changed since it was signed"
@@ -7592,7 +7592,7 @@ function credentialRows(r) {
     if (m) rows.push(["Says it was", m]);
     if (r.active.generator) rows.push(["Signing tool", r.active.generator]);
     for (const e of r.earlier || []) if (e.ai) rows.push(["Earlier version", `the credentials say an earlier version${e.title ? ` (${e.title})` : ""} was made with generative AI`]);
-    if (r.active.timestamp) rows.push(["Time-stamp", "attached; Radar does not check the time-stamp authority's signature"]);
+    if (r.active.timestamp) rows.push(["Time-stamp", "attached; Daylight Commons does not check the time-stamp authority's signature"]);
   }
   for (const t of (r.meta && r.meta.sourceTypes) || []) rows.push(["Metadata says", `${t.says} (IPTC ${t.code})`]);
   for (const g of (r.meta && r.meta.generators) || []) rows.push(["Generator metadata", g]);
@@ -7608,15 +7608,15 @@ function credentialSignals(r) {
   if (!r || r.error) return [];
   const out = [], state = credentialState(r);
   if (r.found && r.aiAnywhere) {
-    out.push({ label: "credentials: made with AI", fam: "c2pa", level: "warn", cat: "media", rows: [["What Radar read", r.active.ai ? `The file's Content Credentials say it was ${made(r)}.` : "The credentials say an earlier version of this file was made with generative AI."], ["Signed by", who(r.active.cert && r.active.cert.subject)], ["Checks", state === "unchanged" ? "signature, assertions and file bytes all match" : state], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+    out.push({ label: "credentials: made with AI", fam: "c2pa", level: "warn", cat: "media", rows: [["What Daylight Commons read", r.active.ai ? `The file's Content Credentials say it was ${made(r)}.` : "The credentials say an earlier version of this file was made with generative AI."], ["Signed by", who(r.active.cert && r.active.cert.subject)], ["Checks", state === "unchanged" ? "signature, assertions and file bytes all match" : state], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   } else if (r.found && state === "unchanged") {
     const m = made(r);
-    out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What Radar read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+    out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What Daylight Commons read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   }
-  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Radar found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms can break credentials without any intent to mislead.")] });
+  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Daylight Commons found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms can break credentials without any intent to mislead.")] });
   const ai = ((r.meta && r.meta.sourceTypes) || []).find((t) => t.kind === "ai");
   if (ai || ((r.meta && r.meta.generators) || []).length) {
-    out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What Radar read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
+    out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What Daylight Commons read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
   }
   return out;
 }
@@ -7626,10 +7626,10 @@ return { CREDENTIALS_DO_NOT_PROVE, NO_CREDENTIALS, credentialRows, credentialSig
 
 // ---- survival.js
 const M_survival = (() => {
-// Content Credentials survival: of the media files Radar checked (on the user's click), how many
+// Content Credentials survival: of the media files Daylight Commons checked (on the user's click), how many
 // still carried intact credentials, per platform. Platforms often strip credentials on upload; a
 // count of what survived tells the user how much the credentials check can do on each site.
-// Radar keeps one entry per file: a short hash of its address (not the address), the site, the
+// Daylight Commons keeps one entry per file: a short hash of its address (not the address), the site, the
 // outcome and the time, in chrome.storage.local ("pb.media.v1"), pruned with the history setting.
 
 const { credentialState } = M_c2pa;
@@ -7639,7 +7639,7 @@ const MEDIA_KEY = "pb.media.v1", MAX_MEDIA = 5000;
 
 // The outcome of one check: intact (found and every check passed), partial (found, not every part
 // could be checked), changed, remote (the file points to credentials online), none, or null for a
-// file Radar could not read, which counts nowhere.
+// file Daylight Commons could not read, which counts nowhere.
 function outcomeOf(result) {
   if (!result || result.error) return null;
   return { unchanged: "intact", unchecked: "partial", changed: "changed", remote: "remote", none: "none" }[credentialState(result)] || null;
@@ -7953,14 +7953,14 @@ function dayAdd(m, at, v) {
   e.posts += v.posts; e.strong += v.strong || 0; e.strongN += v.strongN; e.threads += v.threads || 0; e.feedPosts += v.feedPosts || 0;
 }
 
-const FEED_DOES_NOT_SHOW = "What this does not show: what your feed would carry for anyone else, or what a platform carries overall. These counts cover only posts and threads you opened with Radar on, in the order each platform chose to show them. A site's share says how often it was linked, not whether it is accurate, and a strong-rhetoric sign is about wording, not about the person who wrote it.";
+const FEED_DOES_NOT_SHOW = "What this does not show: what your feed would carry for anyone else, or what a platform carries overall. These counts cover only posts and threads you opened with Daylight Commons on, in the order each platform chose to show them. A site's share says how often it was linked, not whether it is accurate, and a strong-rhetoric sign is about wording, not about the person who wrote it.";
 
 return { FEED_RETAIN_DAYS, addFeedPosts, threadContext, feedDashboard, FEED_DOES_NOT_SHOW };
 })();
 
 // ---- sig.js
 const M_sig = (() => {
-// The one copy of Radar's hashing and signing primitives, shared by sealed evidence cards
+// The one copy of Daylight Commons' hashing and signing primitives, shared by sealed evidence cards
 // (evidence.js), signed evidence bundles (evidence-bundle.js) and signed data packs (packs.js).
 // WebCrypto only, so the same code runs in Chrome, Firefox and node with no dependency.
 //   canonicalJSON: sorted keys at every level, no spacing, undefined object fields dropped and
@@ -8106,10 +8106,10 @@ function dedupe(claims) { const seen = new Set(); return claims.filter((c) => c 
 function sourcesOf(card, input) {
   const day = String(input.savedAt || "").slice(0, 10);
   return [
-    `Replies and posts as ${card.thread.site} showed them to this viewer on ${day}, read by Radar in this browser.`,
-    "Account flags: what each platform discloses on profiles and About pages, read by Radar in this browser. Rules and measured error rates: Radar's EVALUATION.md.",
+    `Replies and posts as ${card.thread.site} showed them to this viewer on ${day}, read by Daylight Commons in this browser.`,
+    "Account flags: what each platform discloses on profiles and About pages, read by Daylight Commons in this browser. Rules and measured error rates: Daylight Commons' EVALUATION.md.",
     card.claims.length ? CLAIM_ATTRIBUTION : null,
-    card.sites.some((s) => s.owner) ? "Outlet owners: Radar's ownership table, built from Wikidata; each row links its Wikidata item." : null,
+    card.sites.some((s) => s.owner) ? "Outlet owners: Daylight Commons' ownership table, built from Wikidata; each row links its Wikidata item." : null,
     card.sites.some((s) => s.state.length) ? "State links: Wikidata ownership chains, and the platform or government reports each link cites." : null,
     "Media: whether an upload was first posted by another account, from the posts this viewer's page loaded.",
     card.media.credentials ? "Content Credentials: C2PA manifests read and checked in this browser from files the viewer chose to check." : null,
@@ -8149,7 +8149,7 @@ const pc = (x) => `${Math.round(x * 100)}%`;
 function cardLines(card) {
   const R = card.report, L = [];
   const push = (kind, text) => { if (text) L.push({ kind, text }); };
-  push("title", "Radar thread card");
+  push("title", "Daylight Commons thread card");
   push("meta", `${card.thread.site} thread · ${card.thread.page} · saved ${String(card.savedAt).slice(0, 16).replace("T", " ")} UTC`);
   push("head", "Thread report");
   push("body", R.sentence);
@@ -8182,7 +8182,7 @@ const M_hosts = (() => {
 // archives pages, it shortens links), with the same treatment for services of every country and
 // every direction.
 
-// Two-part public suffixes Radar meets in the feed and in links. Not the full Public Suffix List:
+// Two-part public suffixes Daylight Commons meets in the feed and in links. Not the full Public Suffix List:
 // a missing suffix files "x.co.zz" under "co.zz", which matches no table row and shows nothing.
 const SUFFIX2 = new Set(("co.uk org.uk gov.uk ac.uk me.uk com.au net.au org.au gov.au edu.au co.nz govt.nz org.nz co.in gov.in org.in net.in nic.in " +
   "co.jp or.jp ne.jp go.jp com.br gov.br org.br jus.br leg.br co.za gov.za org.za com.mx gob.mx org.mx com.ar gob.ar com.tr gov.tr org.tr " +
@@ -8328,7 +8328,7 @@ return { hostOf, siteKey, hostedKind, unwrapArchive, appearanceSite, reviewSites
 // ---- packs.js
 const M_packs = (() => {
 // Signed data packs (project-docs/DATA-SOVEREIGNTY.md). A pack is one JSON file: a manifest, the
-// content it adds (claims, operation indicators, site notes) or, for Radar's own bundled data, the
+// content it adds (claims, operation indicators, site notes) or, for Daylight Commons' own bundled data, the
 // SHA-256 of each bundled file, the signer's public key and an ECDSA P-256 signature over the
 // manifest. WebCrypto only, so the same code verifies in Chrome, Firefox and node with no
 // dependency. A valid signature says who signed the pack and that nothing changed since; it never
@@ -8401,7 +8401,7 @@ async function hashProblems(pack) {
   return out;
 }
 
-// A file pack (Radar's bundled data): readBytes(name) resolves to the file's bytes. Line ends are
+// A file pack (Daylight Commons' bundled data): readBytes(name) resolves to the file's bytes. Line ends are
 // hashed as LF (sig.js lfBytes), the same as data/LOCK.json and evidence bundles.
 async function verifyFiles(pack, readBytes) {
   const out = [];
@@ -8418,11 +8418,11 @@ return { PACK_FORMAT, PACK_DOES_NOT_PROVE, keyIdOf, keyFingerprint, generateKeyP
 
 // ---- packs-content.js
 const M_packs_content = (() => {
-// What a signed data pack (src/core/packs.js) may add, and how it joins Radar's own tables. Three
+// What a signed data pack (src/core/packs.js) may add, and how it joins Daylight Commons' own tables. Three
 // parts, each a list: claims (fact-checks: the claim, the rating in the checker's words, the
 // checker, the review URL), ops (a domain or account a cited document names as part of an
 // operation) and siteNotes (a sourced note about a site). Every row must cite an https source.
-// Pack rows are kept apart from Radar's own: each carries the pack's name, and operations from
+// Pack rows are kept apart from Daylight Commons' own: each carries the pack's name, and operations from
 // packs never enter the trend counts.
 
 // The same lists as src/core/ops-schema.js (tests/packs-content.test.js keeps them equal); that
@@ -8437,7 +8437,7 @@ const https = (v) => { try { return new URL(v).protocol === "https:"; } catch { 
 const day = (v) => v == null || /^\d{4}-\d{2}-\d{2}$/.test(v);
 const DOMAIN = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}$/;
 const HANDLE = /^\w{1,30}$/;
-// Radar shows no em dash anywhere a user reads (tests/canon.test.js); pack text is cleaned the same way.
+// Daylight Commons shows no em dash anywhere a user reads (tests/canon.test.js); pack text is cleaned the same way.
 const clean = (s) => String(s).replace(/\s*—\s*/g, " - ");
 
 function claimProblems(c) {
@@ -8507,7 +8507,7 @@ function mergePackClaims(table, packs = []) {
 }
 
 // ops.json ({ docs, ops, indicators }) with pack indicators added. Each pack operation gets its own
-// id ("pack:<key id>:<id>") and a `pack` field, so it never merges into one of Radar's operations.
+// id ("pack:<key id>:<id>") and a `pack` field, so it never merges into one of Daylight Commons' operations.
 function mergePackOps(table, packs = []) {
   const docs = [...((table && table.docs) || [])], ops = [...((table && table.ops) || [])], indicators = [...((table && table.indicators) || [])];
   const byId = new Map();
@@ -8548,12 +8548,12 @@ return { PACK_INDICATOR_KINDS, PACK_OPERATOR_TYPES, PACK_LIMITS, validatePackCon
 
 // ---- pack-keys.js
 const M_pack_keys = (() => {
-// The public half of Radar's project key, which signs the data that ships inside Radar
+// The public half of Daylight Commons' project key, which signs the data that ships inside Daylight Commons
 // (src/ext/radar-data.pack.json, scripts/pack.mjs bundled). The private half never enters this
 // repository (tests/no-private-keys.test.js). Anyone can check a download against this key id.
 const PROJECT_KEY = {
   keyId: "0e5e19840565840c977e0f036c9ac021",
-  label: "Radar project key",
+  label: "Daylight Commons project key",
   jwk: { kty: "EC", crv: "P-256", x: "0iyHwn2zRDoP7RfuuxvKGxhRYmAXiS7NelteWFPo8CM", y: "8n431mx6HCqh1hNM1xZmJeDX2ZPckhNUlIBezeKro_k" },
 };
 
@@ -8564,7 +8564,7 @@ return { PROJECT_KEY };
 const M_sites = (() => {
 // Site context for a link or the page being read: who owns the site, what kind of owner, when and
 // where it was founded, any state link, and the site's fact-check record. Every row names its
-// source. Radar adds no score or rating of its own.
+// source. Daylight Commons adds no score or rating of its own.
 //
 // The table (src/ext/sites.json, built by scripts/sites-build.mjs) has two parts:
 //   facts    from Wikidata (CC0): name, founding date, country, and the owner type Wikidata states
@@ -8641,7 +8641,7 @@ const typeSource = (info) => ((info.state || []).some((h) => h.basis !== "named-
 // One line per state link, in the source's own terms.
 const stateRows = (rows) => (rows || []).map((h) => ["State link", `${stateLabel(h).says} Source: ${h.source && h.source.title}${h.source && h.source.date ? ` (${h.source.date})` : ""}.`]);
 
-// The rows for one site, for Radar's window. info: { domain, owner, state, facts, record }.
+// The rows for one site, for Daylight Commons' window. info: { domain, owner, state, facts, record }.
 // opts.onList opens the full list of reviews.
 function siteInfoRows(info, opts = {}) {
   const { domain, owner, facts, record } = info;
@@ -8656,8 +8656,8 @@ function siteInfoRows(info, opts = {}) {
     ...stateRows(info.state),
     ...packNoteRows(info.notes),
   ];
-  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Radar has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
-  rows.push(["Fact-check record", recordLine(record) || "No review in Radar's table lists this site as where a claim appeared."]);
+  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Daylight Commons has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
+  rows.push(["Fact-check record", recordLine(record) || "No review in Daylight Commons' table lists this site as where a claim appeared."]);
   for (const r of (record && (record.latest || record.reviews.slice(0, 3))) || []) rows.push(["Review", `"${r.rating}": ${r.checker}, ${r.date || "date not given"}`]);
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
   rows.push(["Source", SITE_SOURCES], ["Does not prove", SITE_RECORD_DOES_NOT_PROVE]);
@@ -8665,8 +8665,8 @@ function siteInfoRows(info, opts = {}) {
 }
 
 // Notes from data packs the user imported and trusts (src/core/packs-content.js), each with its
-// pack's name and source, kept apart from Radar's own rows.
-const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Radar did not write or check it.";
+// pack's name and source, kept apart from Daylight Commons' own rows.
+const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Daylight Commons did not write or check it.";
 function packNoteRows(notes) {
   if (!notes || !notes.length) return [];
   const rows = notes.slice(0, 5).flatMap((n) => [["Pack note", `${n.note} (pack: ${n.pack})`], ["Read it", { links: [[String(n.url).replace(/^https?:\/\//, "").slice(0, 48), n.url]] }]]);
@@ -8705,18 +8705,18 @@ return { setSiteTable, siteFacts, siteRecord, recordSummary, recordLine, SITE_RE
 // ---- outlets.js
 const M_outlets = (() => {
 // The suggested outlets for Other coverage: news organisations that publish their own feed, so
-// Radar can ask each publisher directly with no aggregator in between. The user turns each one on
-// or off and can add any RSS or Atom address. Radar requests a feed only on the user's click.
+// Daylight Commons can ask each publisher directly with no aggregator in between. The user turns each one on
+// or off and can add any RSS or Atom address. Daylight Commons requests a feed only on the user's click.
 //
 // How the list was chosen (project-docs/INDEPENDENCE.md has the full method and its limits):
 //   1. An original newsroom with general or world news in English.
 //   2. A public RSS or Atom feed at a stable https address on the outlet's own host that answered
 //      with entries and without a redirect when checked on 2026-10-21.
-//   3. The outlet's site is in Radar's bundled site tables (src/ext/sites.json), so the card can say
+//   3. The outlet's site is in Daylight Commons' bundled site tables (src/ext/sites.json), so the card can say
 //      what the tables state about its owner and owner type. Where they state no owner, it says so.
 //   4. Spread: several countries and every owner type the tables give, with the count of outlets
 //      across the range of published media-bias charts kept even by the maintainer at curation.
-//      No rating is stored here or shown anywhere: Radar labels outlets by owner type only.
+//      No rating is stored here or shown anywhere: Daylight Commons labels outlets by owner type only.
 // The order is alphabetical by id, so position in the list says nothing.
 
 // [id, name, feed address, site in the tables, country as the outlet states it]
@@ -8801,7 +8801,7 @@ return { FEED_OUTLETS, OUTLETS_CHECKED, MAX_CUSTOM_FEEDS, feedOrigin, cleanFeedU
 
 // ---- feeds.js
 const M_feeds = (() => {
-// A small reader for news feeds: RSS 2.0, RSS 1.0 (RDF) and Atom. Radar's background worker has no
+// A small reader for news feeds: RSS 2.0, RSS 1.0 (RDF) and Atom. Daylight Commons' background worker has no
 // DOMParser (Chrome's service workers do not offer one), so this reads the text itself. It takes
 // only what Other coverage needs from each entry: the title, the link, the date and a short
 // summary. Everything else in the feed is ignored. Nothing here touches the network.
@@ -8873,7 +8873,7 @@ function dateOf(block) {
 }
 
 // Feed text to { title, items: [{ title, link, published, summary }] }. kind is "rss", "atom" or
-// null when the text is not a feed Radar can read.
+// null when the text is not a feed Daylight Commons can read.
 function parseFeed(text) {
   const src = String(text || "").slice(0, FEED_MAX_BYTES).replace(/<!--[\s\S]*?-->/g, "");
   const kind = /<feed\b[^>]*>/i.test(src) && !/<rss\b|<rdf:RDF\b/i.test(src) ? "atom" : /<rss\b|<rdf:RDF\b|<channel\b/i.test(src) ? "rss" : null;
@@ -8900,7 +8900,7 @@ return { FEED_MAX_BYTES, FEED_MAX_ITEMS, plainText, safeLink, parseFeed };
 const M_feedfetch = (() => {
 // Requests for Other coverage, run by the background worker only on the user's click. Each request
 // goes to one feed address the user chose, with no cookies, no referrer, no added headers and no
-// body, and Radar does not follow a redirect to another address the user never allowed. The fetch
+// body, and Daylight Commons does not follow a redirect to another address the user never allowed. The fetch
 // and permission functions are passed in, so tests run without a network.
 
 const { parseFeed, FEED_MAX_BYTES } = M_feeds;
@@ -8976,19 +8976,19 @@ return { FEED_TIMEOUT_MS, FEED_CACHE_MS, FEED_REQUEST, fetchFeed, feedFetcher };
 const M_coverage = (() => {
 // "Other coverage": other outlets reporting the same story, read from each outlet's own feed. There
 // is no aggregator in between. The user picks the outlets (src/core/outlets.js) and may add any RSS
-// or Atom address; on the user's click, Radar's background worker requests each chosen feed from
+// or Atom address; on the user's click, Daylight Commons' background worker requests each chosen feed from
 // its publisher, and this module matches the article's title against the entries on this device.
-// Radar sends nothing from the page: not the title, not the address, not any post. Each publisher
+// Daylight Commons sends nothing from the page: not the title, not the address, not any post. Each publisher
 // sees a plain request for its own feed.
 //
 // Each outlet is labelled by its owner and owner type as the bundled site tables state them
-// (src/core/sites.js). Radar never labels an outlet by a left or right position.
+// (src/core/sites.js). Daylight Commons never labels an outlet by a left or right position.
 
 const { ownerType, OWNER_TYPES } = M_sites;
 const { siteKey, hostOf } = M_hosts;
 const { feedOrigin } = M_outlets;
 
-const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Radar asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. Radar sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or Radar server is involved. Nothing is requested until you click.";
+const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Daylight Commons asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. Daylight Commons sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or Daylight Commons server is involved. Nothing is requested until you click.";
 
 const COVERAGE_DOES_NOT_PROVE = "Matching is by shared words in headlines, so a match can be a different event with similar words, and a story told in other words is missed. A feed holds only an outlet's latest entries, and only the outlets you chose are asked. Owner and owner type are what the site tables state, not a judgment of the reporting.";
 
@@ -9068,11 +9068,11 @@ function coverageGroups(list) {
 }
 
 const FEED_ERRORS = Object.freeze({
-  "no-permission": "The browser has not allowed Radar to reach this feed's host.",
-  redirect: "The feed answered with a redirect to another address, which Radar does not follow. Check the outlet's site for its current feed.",
+  "no-permission": "The browser has not allowed Daylight Commons to reach this feed's host.",
+  redirect: "The feed answered with a redirect to another address, which Daylight Commons does not follow. Check the outlet's site for its current feed.",
   http: "The feed answered with an error.",
   "not-a-feed": "The answer was not an RSS or Atom feed.",
-  "too-large": "The feed was larger than Radar reads.",
+  "too-large": "The feed was larger than Daylight Commons reads.",
   timeout: "The feed did not answer within 10 seconds.",
   network: "The feed could not be reached.",
 });
@@ -9082,7 +9082,7 @@ return { COVERAGE_PRIVACY, COVERAGE_DOES_NOT_PROVE, titleWords, bestMatch, cover
 
 // ---- health.js
 const M_health = (() => {
-// Adapter health: whether Radar's reader for a site still finds what the site shows. Platforms
+// Adapter health: whether Daylight Commons' reader for a site still finds what the site shows. Platforms
 // change their page markup without notice, and a reader that finds nothing would otherwise show
 // nothing, which looks the same as a quiet thread. This module turns what a reader found into a
 // plain verdict and the sentence the panel shows. It reads counts only, never post text.
@@ -9099,9 +9099,9 @@ function adapterHealth(site, found) {
   const f = found || {}, name = (site && site.name) || "This site";
   const cand = f.candidates | 0, read = f.read | 0, w = what(f.page);
   if (!site || f.page === "other" || !f.page) return { state: "idle", say: null };
-  if (cand > 0 && read === 0) return { state: "changed", say: `${name} changed its page; Radar cannot read ${w} here yet.`, reason: "boxes found, none readable" };
-  if (cand >= 6 && read / cand < 0.3) return { state: "partial", say: `${name} changed part of its page; Radar reads ${read} of ${cand} ${w} here.`, reason: "most boxes unreadable" };
-  if (read >= 5 && (f.withText | 0) / read < 0.2) return { state: "partial", say: `${name} changed part of its page; Radar finds ${w} here but cannot read their text.`, reason: "text missing" };
+  if (cand > 0 && read === 0) return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: "boxes found, none readable" };
+  if (cand >= 6 && read / cand < 0.3) return { state: "partial", say: `${name} changed part of its page; Daylight Commons reads ${read} of ${cand} ${w} here.`, reason: "most boxes unreadable" };
+  if (read >= 5 && (f.withText | 0) / read < 0.2) return { state: "partial", say: `${name} changed part of its page; Daylight Commons finds ${w} here but cannot read their text.`, reason: "text missing" };
   if (read > 0) return { state: "ok", say: null };
   if ((f.sinceMs || 0) < HEALTH_SETTLE_MS) return { state: "waiting", say: null };
   const s = f.structure || {};
@@ -9109,14 +9109,14 @@ function adapterHealth(site, found) {
   // stamp or article box at all is more likely a sign-in wall or a removed post than a redesign.
   const expectsRoot = f.page === "thread" && !!(site.hasLocation || site.rootFirst) && ((s.times | 0) >= 1 || (s.articles | 0) >= 1);
   if (expectsRoot || (s.times | 0) >= 3 || (s.articles | 0) >= 3) {
-    return { state: "changed", say: `${name} changed its page; Radar cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was not found" : "the page shows post-like boxes Radar cannot find" };
+    return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was not found" : "the page shows post-like boxes Daylight Commons cannot find" };
   }
   return { state: "empty", say: null };
 }
 
 // The self-test's report as [label, value] rows, for the toolbar popup.
 function selfTestLines(r) {
-  if (!r) return [["Result", "Radar has no reader for this site. The site card gives site context and text checks here."]];
+  if (!r) return [["Result", "Daylight Commons has no reader for this site. The site card gives site context and text checks here."]];
   const v = r.verdict || {};
   const pct = (a, b) => (b ? `${a} of ${b}` : "none");
   return [
@@ -9127,23 +9127,23 @@ function selfTestLines(r) {
     ["With text", pct(r.withText, r.read)],
     ["With id", pct(r.withId, r.read)],
     ["Page shape", `${r.structure.times} time stamps, ${r.structure.articles} article boxes`],
-    ["Result", v.say || (v.state === "ok" ? "Radar reads this page." : v.state === "empty" ? "No posts loaded here; nothing points to a change." : v.state === "waiting" ? "The page is still loading." : "Nothing to read on this page.")],
+    ["Result", v.say || (v.state === "ok" ? "Daylight Commons reads this page." : v.state === "empty" ? "No posts loaded here; nothing points to a change." : v.state === "waiting" ? "The page is still loading." : "Nothing to read on this page.")],
     ["Checked", r.at],
   ];
 }
 
-const HEALTH_DOES_NOT_PROVE = "The self-test counts what Radar's reader finds on this page now. A pass does not show every field is right, and a page that loads posts later can fail and then pass. It reads no text and sends nothing.";
+const HEALTH_DOES_NOT_PROVE = "The self-test counts what Daylight Commons' reader finds on this page now. A pass does not show every field is right, and a page that loads posts later can fail and then pass. It reads no text and sends nothing.";
 
 return { HEALTH_SETTLE_MS, HEALTH_STATES, adapterHealth, selfTestLines, HEALTH_DOES_NOT_PROVE };
 })();
 
 // ---- generic.js
 const M_generic = (() => {
-// The generic reader, for article and comment pages on sites Radar has no reader for. It runs only
+// The generic reader, for article and comment pages on sites Daylight Commons has no reader for. It runs only
 // when the user opens the site card on a page (src/ext/generic-page.js walks the page and passes
 // plain summaries here). It finds the article body as the block with the most paragraph text, and
 // comments as the largest run of sibling boxes that share a shape and carry an author link or a
-// time stamp. Then it runs the same text checks Radar runs on replies. Nothing leaves the browser.
+// time stamp. Then it runs the same text checks Daylight Commons runs on replies. Nothing leaves the browser.
 //
 // These are structural guesses, not a site reader: they can miss comments, take a list of related
 // links for comments, or read a sidebar as the article. The card says so beside every count.
@@ -9211,14 +9211,14 @@ function genericChecks({ article, comments }) {
   return out;
 }
 
-const GENERIC_DOES_NOT_PROVE = "Radar has no reader for this site, so it guessed where the article and the comments are from the page's layout. It can miss comments or count a list of links as comments. A marker is a pattern in wording, not a judgment of the writer.";
+const GENERIC_DOES_NOT_PROVE = "Daylight Commons has no reader for this site, so it guessed where the article and the comments are from the page's layout. It can miss comments or count a list of links as comments. A marker is a pattern in wording, not a judgment of the writer.";
 
 return { GENERIC_MAX_COMMENTS, pickArticle, pickComments, genericChecks, GENERIC_DOES_NOT_PROVE };
 })();
 
 // ---- settings.js
 const M_settings = (() => {
-// Radar's settings, in one normalised shape for the toolbar popup, the first-run and options pages
+// Daylight Commons' settings, in one normalised shape for the toolbar popup, the first-run and options pages
 // and the content scripts, plus the retention prune the background worker runs. Settings live in
 // chrome.storage.local under SETTINGS_KEY, on this machine only.
 
@@ -9226,11 +9226,11 @@ const { FEED_OUTLETS, cleanFeedUrl, MAX_CUSTOM_FEEDS } = M_outlets;
 
 const SETTINGS_KEY = "pb.settings";
 
-// Sites Radar has an adapter for. A site added later starts on unless the user switches it off.
+// Sites Daylight Commons has an adapter for. A site added later starts on unless the user switches it off.
 const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"], ["threads", "Threads"],
   ["mastodon", "Mastodon"], ["tiktok", "TikTok"]];
 
-// Search engines where Radar can show site cards on result links. Each is off until the user turns
+// Search engines where Daylight Commons can show site cards on result links. Each is off until the user turns
 // it on in the options page, which asks the browser for access to that engine's result pages.
 // [id, name, result-page matches, origin the browser grants]
 const SEARCH_ENGINES = [["google", "Google", ["https://www.google.com/search*"], "https://www.google.com/*"], ["bing", "Bing", ["https://www.bing.com/search*"], "https://www.bing.com/*"], ["duckduckgo", "DuckDuckGo", ["https://duckduckgo.com/*"], "https://duckduckgo.com/*"]];
@@ -9290,7 +9290,7 @@ function siteOn(s, id) {
 const areaOn = (s, area) => s.areas[area] !== false;
 const searchOn = (s, id) => !s.paused && s.search[id] === true;
 
-// The toolbar icon: paused when Radar is paused or off for this site, reading while it is reading
+// The toolbar icon: paused when Daylight Commons is paused or off for this site, reading while it is reading
 // accounts, idle otherwise.
 function iconState({ paused, siteOff, reading } = {}) {
   if (paused || siteOff) return "paused";
@@ -9331,7 +9331,7 @@ function pruneStore(store, settings, now = Date.now()) {
 
 const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.media.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
-// "Clear all Radar data": every Radar key except the settings themselves. The Mastodon servers the
+// "Clear all Daylight Commons data": every Daylight Commons key except the settings themselves. The Mastodon servers the
 // user turned on (pb.instances.v1) are settings too, removed in the options page with their access.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
 // Imported data packs and the keys the user trusts (src/ext/packs-bg.js) are choices too.
@@ -9344,7 +9344,7 @@ return { SETTINGS_KEY, SITES, SEARCH_ENGINES, AREA_IDS, RETENTION, DEFAULTS, nor
 // ---- families.js
 const M_families = (() => {
 // Badge families: every kind of signal the window can show, which area of the strip it sits in, and
-// what sort of evidence it is. A detector is Radar's own rule and can be measured for precision; a
+// what sort of evidence it is. A detector is Daylight Commons' own rule and can be measured for precision; a
 // platform family repeats the site's own label; a table family is a match against a cited table.
 // measuredLine() gives the line the window and the options page show for a family.
 
@@ -9400,8 +9400,8 @@ const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.
 // { measured, text } for one family. A row without a sample size is not shown as a measurement.
 function measuredLine(id, table = MEASURED) {
   const f = BY_ID.get(id);
-  if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Radar detector" };
-  if (f && f.kind === F) return { measured: false, text: "what the file itself declares; Radar checks the signature, not the claim" };
+  if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Daylight Commons detector" };
+  if (f && f.kind === F) return { measured: false, text: "what the file itself declares; Daylight Commons checks the signature, not the claim" };
   if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
   if (f && f.kind === TECH) { const st = techniqueStatus(id); return { measured: st.shown, text: st.text }; }
   const r = (table || {})[id];
@@ -9495,7 +9495,7 @@ function calibrationLine(store, family, min = CALIBRATION_MIN) {
   return c ? `Your feedback: ${c.right} of ${c.total} right` : null;
 }
 
-const FEEDBACK_ABOUT = "Your marks on Radar's signs, saved from this browser. This file is not sent anywhere by Radar. You choose whether to send it, for example as an attachment to an issue on Radar's repository. Post text appears only for marks where you ticked \"include the text\".";
+const FEEDBACK_ABOUT = "Your marks on Daylight Commons' signs, saved from this browser. This file is not sent anywhere by Daylight Commons. You choose whether to send it, for example as an attachment to an issue on Daylight Commons' repository. Post text appears only for marks where you ticked \"include the text\".";
 
 // The opt-in export: a JSON object the options page saves as a file when the user clicks.
 function buildExport(store, { version = null, now = Date.now() } = {}) {
@@ -9563,7 +9563,7 @@ function lessonPath(fam) {
   return typeof fam === "string" && ID.test(fam) ? `learn.html#${fam}` : null;
 }
 
-// A content script asks the worker to open one of Radar's own pages. Only these pages, with an
+// A content script asks the worker to open one of Daylight Commons' own pages. Only these pages, with an
 // optional lesson id, pass; anything else is refused, so a page cannot be made to open other URLs.
 function safePage(path) {
   if (typeof path !== "string") return null;
@@ -9578,7 +9578,7 @@ const TIPS = [
   { id: "hover", where: "window", step: 1,
     text: "Tip 1 of 3. This window opens when you rest the pointer on a post. The dots at the top are areas. Click one to open its evidence." },
   { id: "report", where: "panel", step: 2,
-    text: "Tip 2 of 3. The Radar button opens a report on the whole thread. It compares the harshest replies with the rest and shows the interval." },
+    text: "Tip 2 of 3. The Daylight Commons button opens a report on the whole thread. It compares the harshest replies with the rest and shows the interval." },
   { id: "lesson", where: "window", step: 3,
     text: "Tip 3 of 3. Every sign has a Learn link. Each lesson takes about a minute and shows how to spot the move yourself." },
 ];
@@ -9680,8 +9680,8 @@ const M_imagetext = (() => {
 const { score } = M_rhetoric;
 const { persuasion } = M_persuasion;
 
-const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Radar's own text recogniser. The image and its text never leave your browser.";
-const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in Radar's options to read the words inside an image on this device.";
+const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Daylight Commons' own text recogniser. The image and its text never leave your browser.";
+const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in Daylight Commons' options to read the words inside an image on this device.";
 const IMAGE_TEXT_DOES_NOT_PROVE = "The words were read by software and can be misread: a letter can change a word, or a word can be missed. The image can be edited, and reading its text says nothing about whether a post shown in it was real.";
 const MAX_SHOWN = 280;
 
@@ -9698,14 +9698,14 @@ const percent = (c) => `${Math.round(100 * Math.max(0, Math.min(1, c || 0)))}%`;
 function imageTextRows(result) {
   if (!result) return [];
   if (result.error) return [["Text in the image", `could not read it: ${result.error}`]];
-  if (!result.text) return [["Text in the image", "none found. Radar reads printed Latin-script text, such as English, French or Spanish; handwriting and other scripts are not read yet."]];
+  if (!result.text) return [["Text in the image", "none found. Daylight Commons reads printed Latin-script text, such as English, French or Spanish; handwriting and other scripts are not read yet."]];
   const shown = result.text.length > MAX_SHOWN ? result.text.slice(0, MAX_SHOWN).replace(/\s+\S*$/, "") + " …" : result.text;
   const unsure = (result.lines || []).filter((l) => l.low).length;
   return [
     ["Text in the image", `"${shown}"`],
     ["Confidence", `${percent(result.confidence)}, the recogniser's own average over the lines it kept; not a measured accuracy`],
     ...(unsure ? [["Left out", `${unsure} ${unsure === 1 ? "line" : "lines"} the recogniser was unsure of`]] : []),
-    ["Read by", `Radar's own recogniser on this device, in ${Math.max(1, Math.round(result.ms || 0))} ms`],
+    ["Read by", `Daylight Commons' own recogniser on this device, in ${Math.max(1, Math.round(result.ms || 0))} ms`],
   ];
 }
 
@@ -9751,8 +9751,8 @@ const FLAG_LABEL = {
   "platform-label": "moderation label", "brand-lookalike": "name borrows a brand",
 };
 
-const SRC_RULES = "Radar's own rules, run on this device. Rules and measured error rates: Radar's EVALUATION.md.";
-const SRC_POSTS = "The posts in the input, as given. Radar read them on this device and sent nothing anywhere.";
+const SRC_RULES = "Daylight Commons' own rules, run on this device. Rules and measured error rates: Daylight Commons' EVALUATION.md.";
+const SRC_POSTS = "The posts in the input, as given. Daylight Commons read them on this device and sent nothing anywhere.";
 const SRC_ACCOUNTS = "Account details given in the input: what each platform discloses on profiles and About pages.";
 const SRC_FILE = "The file's bytes, read on this device: Content Credentials (C2PA) and IPTC or XMP metadata.";
 
@@ -9811,7 +9811,7 @@ return { useData, claimIndex, dataLoaded };
 const M_api_site = (() => {
 // Site context as evidence items: who owns a site, any state link a cited source makes, whether
 // its address imitates a listed outlet, and its fact-check record. Every item names its source.
-// Radar adds no score or rating of its own. Reads only the tables handed to useData().
+// Daylight Commons adds no score or rating of its own. Reads only the tables handed to useData().
 
 const { siteFacts, siteRecord, recordSummary, recordLine, ownerHeading, ownerType, SITE_SOURCES, SITE_RECORD_DOES_NOT_PROVE } = M_sites;
 const { ownerOfDomain, ownerSource } = M_owners;
@@ -9831,7 +9831,7 @@ function cleanDomain(d) {
 const stateLevel = (h) => (h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" || h.basis === "designated" ? "flag" : "info");
 const sourceLine = (s) => (s ? `${s.title}${s.date ? ` (${s.date})` : ""}${s.url ? `: ${s.url}` : ""}` : "the cited report");
 
-// What Radar's tables hold for one domain: { domain, facts, owner, state, record, lookalike }.
+// What Daylight Commons' tables hold for one domain: { domain, facts, owner, state, record, lookalike }.
 function siteSummary(domain) {
   const d = cleanDomain(domain);
   if (!d) return null;
@@ -9854,7 +9854,7 @@ function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   if (S.lookalike) {
     const L = S.lookalike;
     out.push({ ...base, kind: "lookalike-domain", level: "flag", label: `look-alike of ${L.official}`,
-      shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "Radar's list of outlet addresses, matched on this device.",
+      shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "Daylight Commons' list of outlet addresses, matched on this device.",
       doesNotProve: LOOKALIKE_DOES_NOT_PROVE, data: { domain: S.domain, outlet: L.outlet, official: L.official, how: L.how } });
   }
   for (const h of S.state) {
@@ -9870,7 +9870,7 @@ function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   const line = recordLine(S.record);
   if (line || (!quiet && S.facts)) {
     out.push({ ...base, kind: "site-record", level: "info", label: `site record: ${S.domain}`,
-      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "No review in Radar's table lists this site as where a claim appeared."].join(": ") + ".",
+      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "No review in Daylight Commons' table lists this site as where a claim appeared."].join(": ") + ".",
       source: SITE_SOURCES, doesNotProve: SITE_RECORD_DOES_NOT_PROVE,
       data: { domain: S.domain, reviews: S.record ? S.record.n : 0, checkers: S.record ? S.record.m : 0, since: S.record ? S.record.since : null, founded: S.facts ? S.facts.founded : null, country: S.facts ? S.facts.country : null } });
   }
@@ -9923,7 +9923,7 @@ function language(id, text) {
 function machine(id, text) {
   const M = machineSigns(text), out = [];
   if (M.leak) out.push(item(id, "leaked-ai", "warn", "leaked AI text", "Text a chatbot writes, posted without editing.", SRC_RULES, LEAK_DOES_NOT_PROVE, [spanOf(id, text, M.leak)]));
-  else if (M.machineLike) out.push(item(id, "machine-writing", "flag", "machine-writing signs", `Signs: ${M.signs.join("; ")}. Radar counts three or more independent signs in a post of at least 25 words.`, SRC_RULES, MACHINE_DOES_NOT_PROVE, [], { signs: M.signs }));
+  else if (M.machineLike) out.push(item(id, "machine-writing", "flag", "machine-writing signs", `Signs: ${M.signs.join("; ")}. Daylight Commons counts three or more independent signs in a post of at least 25 words.`, SRC_RULES, MACHINE_DOES_NOT_PROVE, [], { signs: M.signs }));
   if (M.spam) out.push(item(id, "spam-pattern", "warn", "spam pattern", "A pattern common in scam and spam posts: giveaways, crypto, contact bait.", SRC_RULES, SPAM_DOES_NOT_PROVE, [spanOf(id, text, M.spam)]));
   return { items: out, machineLike: !!(M.leak || M.machineLike) };
 }
@@ -9971,7 +9971,7 @@ const thread = (kind, level, label, shows, source, doesNotProve, posts, data = {
   ({ kind, scope: "thread", level, label, shows, source, doesNotProve, posts, spans: [], data });
 const withBase = (text, sign, replies) => { const b = baselineLine(sign, { replies }); return b ? `${text} ${b}` : text; };
 
-// Flags for one reply: the input's own list (ids or { id, evidence }), or Radar's rules over the
+// Flags for one reply: the input's own list (ids or { id, evidence }), or Daylight Commons' rules over the
 // account details given, or null when neither was given (the account was not read).
 function flagsOf(reply, now) {
   if (Array.isArray(reply.flags)) return reply.flags.map((f) => (typeof f === "string" ? { id: f } : f)).filter((f) => f && f.id);
@@ -10072,11 +10072,11 @@ function mediaItems(r) {
   const out = credentialSignals(r).map((s) => ({
     kind: s.fam === "c2pa" && /AI/.test(s.label) ? "credentials-ai" : KIND[s.fam] || s.fam,
     scope: "file", level: s.level, label: s.label,
-    shows: [row(s.rows, "What Radar read") || row(s.rows, "What Radar found"), row(s.rows, "Signed by") ? `Signed by ${row(s.rows, "Signed by")}.` : null].filter(Boolean).join(" "),
+    shows: [row(s.rows, "What Daylight Commons read") || row(s.rows, "What Daylight Commons found"), row(s.rows, "Signed by") ? `Signed by ${row(s.rows, "Signed by")}.` : null].filter(Boolean).join(" "),
     source: SRC_FILE, doesNotProve: row(s.rows, "Does not prove") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
   }));
   if (state === "none") out.push({ kind: "no-credentials", scope: "file", level: "info", label: "no content credentials", shows: NO_CREDENTIALS, source: SRC_FILE, doesNotProve: "A file without credentials can be real or made up; most platforms remove them.", posts: [], spans: [], data: { state } });
-  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online. Radar does not fetch them, so nothing was checked.", source: SRC_FILE, doesNotProve: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
+  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online. Daylight Commons does not fetch them, so nothing was checked.", source: SRC_FILE, doesNotProve: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
   return out;
 }
 
@@ -10092,15 +10092,15 @@ return { mediaItems, mediaReading };
 
 // ---- api.js
 const M_api = (() => {
-// radar-core: the public API. One zero-dependency ES module over Radar's pure core, for anyone
-// who wants Radar's evidence without the browser extension. No DOM, no network, no storage: the
+// radar-core: the public API. One zero-dependency ES module over Daylight Commons' pure core, for anyone
+// who wants Daylight Commons' evidence without the browser extension. No DOM, no network, no storage: the
 // caller hands in the posts, the file bytes and (optionally) the data tables, and gets back
 // evidence objects that match schema/evidence.v1.json. project-docs/INTEGRATION.md documents it.
 //
 //   analyzeThread({ site, root, replies })   evidence about a thread
 //   analyzeText(text)                        evidence about one piece of text
 //   checkMedia(bytes)                        Content Credentials and AI metadata of a file
-//   siteInfo(domain)                         what Radar's tables hold about a site
+//   siteInfo(domain)                         what Daylight Commons' tables hold about a site
 //   useData({ sites, owners, state, claims, claimParts })   load the tables (optional)
 //
 // Every evidence item states what it shows, its source and what it does not prove. None names an
@@ -10166,7 +10166,7 @@ function analyzeThread(input, opts = {}) {
 // bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
 async function checkMedia(bytes) {
   const M = await mediaReading(bytes);
-  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Radar read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
 }
 
 // domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
@@ -10174,7 +10174,7 @@ function siteInfo(domain) {
   const d = cleanDomain(domain);
   if (!d) return null;
   const loaded = dataLoaded();
-  const limits = ["Every row names its source. Radar adds no score or rating of its own."];
+  const limits = ["Every row names its source. Daylight Commons adds no score or rating of its own."];
   if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("No site tables were loaded, so only the look-alike check ran.");
   return envelope("site", { site: siteSummary(d), evidence: number(siteEvidence(d, [])), limits });
 }
@@ -10184,8 +10184,8 @@ return { API_VERSION, EVIDENCE_SCHEMA, analyzeText, analyzeThread, checkMedia, s
 
 // ---- evidence-bundle.js
 const M_evidence_bundle = (() => {
-// Signed evidence bundles: what Radar found on a thread, as a file anyone can check offline. A
-// bundle carries post ids, the evidence with the matched spans needed to check it, the Radar and
+// Signed evidence bundles: what Daylight Commons found on a thread, as a file anyone can check offline. A
+// bundle carries post ids, the evidence with the matched spans needed to check it, the Daylight Commons and
 // API versions, a hash of the data tables used, and the time; it is signed with a per-install
 // ECDSA P-256 key through WebCrypto, and the public key travels inside the bundle.
 //
@@ -10245,7 +10245,7 @@ function makeBundle(result, opts = {}) {
   const ids = (result.posts && result.posts.ids) || [...new Set(result.evidence.flatMap((e) => e.posts))];
   const texts = opts.includeText ? opts.texts || {} : {};
   const bundle = {
-    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "Radar",
+    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "Daylight Commons",
     savedAt: opts.savedAt || new Date().toISOString(), dataLock: opts.dataLock || null,
     input: { kind: result.kind, site: result.site || null, page: opts.page || null, source: archive ? "export" : "thread", accounts: result.posts ? result.posts.accounts : null },
     posts: ids.map((id) => (opts.includeText && texts[id] != null ? { id, text: String(texts[id]) } : { id })),
@@ -10281,7 +10281,7 @@ function bundleConsistency(bundle) {
 
 async function signatureOk(bundle) {
   const { signature, ...body } = bundle, S = body.signer;
-  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Radar can check" };
+  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Daylight Commons can check" };
   const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
   let id = null;
   try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
@@ -10294,8 +10294,8 @@ async function signatureOk(bundle) {
 // { ok, keyId, checks: [{ name, ok, text }] }; ok is true only when every check passes.
 async function verifyBundle(bundle, opts = {}) {
   const checks = [];
-  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Radar evidence bundle" }] };
-  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Radar reads` });
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Daylight Commons evidence bundle" }] };
+  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Daylight Commons reads` });
   checks.push({ name: "signature", ...(await signatureOk(bundle)) });
   const keyId = bundle.signer ? bundle.signer.keyId : null;
   if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
@@ -10310,7 +10310,7 @@ return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, dat
 // ---- signing.js
 const M_signing = (() => {
 // Release signatures: detached ECDSA P-256 signatures over a release's SHA256SUMS, made and checked
-// with Radar's one copy of the signing primitives (src/core/sig.js), the same code that signs data
+// with Daylight Commons' one copy of the signing primitives (src/core/sig.js), the same code that signs data
 // packs and evidence bundles. It runs in node (scripts/release.mjs, scripts/verify-release.mjs), in
 // the extension and on the public install page (docs/signing.js, a generated copy). No library, no
 // network.
@@ -10523,7 +10523,7 @@ function redditExportPosts(text) {
     const url = pick("url"), text = [pick("title"), pick("body")].filter(Boolean).join("\n");
     return { id: pick("id"), author: EXPORT_AUTHOR, text, posted: iso(pick("date")), links: /^https?:\/\//.test(url) && !/reddit\.com\//.test(url) ? [url] : [] };
   }).filter((p) => p.id && p.text && p.text !== "[deleted]" && p.text !== "[removed]");
-  return { site: "Reddit", posts, notes: col("ip") >= 0 ? ["The export's ip column was left out; Radar keeps and shows no IP address."] : [] };
+  return { site: "Reddit", posts, notes: col("ip") >= 0 ? ["The export's ip column was left out; Daylight Commons keeps and shows no IP address."] : [] };
 }
 
 // outbox.json: { orderedItems: [{ type: "Create", object: { id, content, published, tag } }] }.
@@ -10548,7 +10548,7 @@ return { EXPORT_AUTHOR, xArchivePosts, parseCsv, redditExportPosts, mastodonOutb
 const M_import_json = (() => {
 // Threads from JSON a platform's own web app or API returned, saved by the user: X's GraphQL
 // TweetDetail, Bluesky's app.bsky.feed.getPostThread, a Mastodon status context, or a thread in
-// Radar's own input shape ({ site, root, replies }). Field names follow each platform's public
+// Daylight Commons' own input shape ({ site, root, replies }). Field names follow each platform's public
 // formats; the readers walk the JSON, so a wrapper around the response does not matter.
 
 const { htmlText } = M_import_html;
@@ -10616,7 +10616,7 @@ function mastoThread(json) {
 
 const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r) => r && typeof r.text === "string");
 
-// Returns { site, root, replies } or null when the JSON holds no thread Radar can read.
+// Returns { site, root, replies } or null when the JSON holds no thread Daylight Commons can read.
 function threadFromJson(json) {
   if (!json || typeof json !== "object") return null;
   if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies };
@@ -10633,7 +10633,7 @@ return { threadFromJson };
 // ---- import-car.js
 const M_import_car = (() => {
 // Posts from a Bluesky repository export (Settings > Export my data gives a .car file). A CAR v1
-// file is a header and a list of blocks, each a CID and DAG-CBOR bytes. Radar decodes every block,
+// file is a header and a list of blocks, each a CID and DAG-CBOR bytes. Daylight Commons decodes every block,
 // keeps the app.bsky.feed.post records, and names each post by its record key, read from the
 // repository's key tree (MST). Everything in the file is the user's own data.
 
@@ -10733,9 +10733,9 @@ return { varint, carBlocks, blueskyCarPosts };
 // ---- imports.js
 const M_imports = (() => {
 // One entry for every file the offline analyser and the CLI read: it decides what the file is from
-// its name and its first bytes, and returns posts in Radar's input shape. Nothing is fetched.
+// its name and its first bytes, and returns posts in Daylight Commons' input shape. Nothing is fetched.
 //   saved page (.html, .htm)            X or Reddit thread, or any page as one text
-//   thread JSON                         Radar's shape, X GraphQL, Bluesky getPostThread, Mastodon context
+//   thread JSON                         Daylight Commons' shape, X GraphQL, Bluesky getPostThread, Mastodon context
 //   X archive tweets.js                 the user's own posts
 //   Reddit export comments.csv / posts.csv
 //   Mastodon archive outbox.json
@@ -10757,19 +10757,19 @@ const fromThread = (format, t, notes = []) => (t && (t.replies.length || t.root)
 function fromJson(name, text) {
   let json;
   try { json = JSON.parse(text); } catch { return fail(`${name} is not valid JSON.`); }
-  if (json && json.kind === "radar-evidence-bundle") return fail("This is a Radar evidence bundle. Use Check a bundle to verify it.");
-  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Radar found no posts it can read in ${name}.`);
+  if (json && json.kind === "radar-evidence-bundle") return fail("This is a Daylight Commons evidence bundle. Use Check a bundle to verify it.");
+  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Daylight Commons found no posts it can read in ${name}.`);
 }
 
 function fromBytes(name, bytes) {
   const lower = String(name || "").toLowerCase();
-  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is not a Bluesky repository export Radar can read.`);
+  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is not a Bluesky repository export Daylight Commons can read.`);
   const text = asText(bytes).replace(/^﻿/, ""), head = text.slice(0, 400).trimStart();
-  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Radar can read.`);
+  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Daylight Commons can read.`);
   if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} is not a Reddit export with id, permalink and body columns.`);
   if (/^[[{]/.test(head)) return fromJson(name, text);
-  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Radar did not recognise a thread on this page, so it read the page as one text."] : [] }; }
-  return fail(`Radar does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons did not recognise a thread on this page, so it read the page as one text."] : [] }; }
+  return fail(`Daylight Commons does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
 }
 
 // name: the file name; bytes: Uint8Array, ArrayBuffer or string. Returns { ok: true, format,

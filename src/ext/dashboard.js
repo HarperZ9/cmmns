@@ -21,7 +21,7 @@
     const ask = { domains: [...domains], handles: [] };
     const [owners, states] = await Promise.all([chrome.runtime.sendMessage({ type: "pb-owners", ...ask }), chrome.runtime.sendMessage({ type: "pb-state", ...ask })]);
     PB.setOwnerRows(owners || []); PB.setStateRows(states || []);
-  } catch (e) { console.error("[radar] label lookup failed", e); }
+  } catch (e) { console.error("[daylight-commons] label lookup failed", e); }
   const isState = (d) => PB.stateLinksOfDomain(d).length > 0;
   const known = (d) => [PB.ownerOfDomain(d) ? `owned by ${PB.ownerOfDomain(d).owner}` : null, ...new Set(PB.stateLinksOfDomain(d).map((h) => PB.stateLabel(h).chip))].filter(Boolean).join("; ");
 
@@ -65,12 +65,12 @@
 
   // Documented operations: the whole table's counts, and which of the logged sites a report named.
   let opsAll = null;
-  try { opsAll = await chrome.runtime.sendMessage({ type: "pb-ops", all: true }); } catch (e) { console.error("[radar] ops table failed", e); }
+  try { opsAll = await chrome.runtime.sendMessage({ type: "pb-ops", all: true }); } catch (e) { console.error("[daylight-commons] ops table failed", e); }
   function operations() {
     if (!opsAll || !opsAll.ops || !opsAll.ops.length) { $("ops-say").textContent = "The operations table did not load."; return; }
     const T = PB.opsTrend(opsAll), named = PB.opsLookup(opsAll, { domains: [...domains] });
     const sites = new Set(named.indicators.map((i) => i.d));
-    $("ops-say").textContent = `Radar carries ${plural(T.total, "operation", "operations")} from ${plural(T.byState.length, "attributed country", "attributed countries")}, each cited to the reports that found it. ` +
+    $("ops-say").textContent = `Daylight Commons carries ${plural(T.total, "operation", "operations")} from ${plural(T.byState.length, "attributed country", "attributed countries")}, each cited to the reports that found it. ` +
       (sites.size ? `${plural(sites.size, "site", "sites")} in your logs ${sites.size === 1 ? "was" : "were"} named in one of those reports: ${[...sites].slice(0, 5).join(", ")}.` : "No site in your logs was named in one of those reports.");
     $("ops-caveat").textContent = PB.OPS_TREND_CAVEAT;
     bars($("ops-years"), T.byYear.map((y) => ({ ...y, label: String(y.year) })), (r) => r.label);
@@ -110,7 +110,7 @@
   function framing(d) {
     const F = d.framing || { shown: false, status: "held back: not measured" };
     $("framing-say").textContent = !F.shown
-      ? `Not shown yet. Radar can read whether a feed post tells an issue through one person's story or explains it through trends, numbers and policy, but that reading is ${F.status.replace(/^held back: /, "")}. It starts here once it passes the same bar as every other sign.`
+      ? `Not shown yet. Daylight Commons can read whether a feed post tells an issue through one person's story or explains it through trends, numbers and policy, but that reading is ${F.status.replace(/^held back: /, "")}. It starts here once it passes the same bar as every other sign.`
       : F.read ? `Of ${plural(F.read, "feed post", "feed posts")} long enough to read, these told an issue only through one person's story, and these explained it only through structure. The rest did both or neither. ${PB.FRAMING_DOES_NOT_PROVE}` : "No feed posts long enough to read in this window.";
     shareBar($("framing-person"), F.shown ? F.personStory : null, "posts told only as a person's story");
     shareBar($("framing-structure"), F.shown ? F.structural : null, "posts explained only through structure");
@@ -143,7 +143,7 @@
     $("media").hidden = !rows.length;
     const n = rows.reduce((a, r) => a + r.n, 0), k = rows.reduce((a, r) => a + r.intact, 0);
     $("media-say").textContent = n
-      ? `Of ${plural(n, "file", "files")} you asked Radar to check, ${k.toLocaleString()} carried Content Credentials that were intact. Platforms often strip credentials on upload, so "none found" says nothing about a file either way. Only files you checked count, so this is not a sample of what each site carries.`
+      ? `Of ${plural(n, "file", "files")} you asked Daylight Commons to check, ${k.toLocaleString()} carried Content Credentials that were intact. Platforms often strip credentials on upload, so "none found" says nothing about a file either way. Only files you checked count, so this is not a sample of what each site carries.`
       : "No media checked yet in this window. In a post's window, \"Check this file\" reads a file's Content Credentials and adds it here.";
   }
 
@@ -162,13 +162,13 @@
   function render(days) {
     const d = PB.feedDashboard(store[KEYS.reports], store[KEYS.feed], store[KEYS.net], { days, isState });
     const held = Math.min(days, keep);
-    $("scope").textContent = `${plural(d.threads, "thread", "threads")} and ${plural(d.feedPosts, "feed post", "feed posts")}, ${d.from} to ${d.to}.` + (held < days ? ` Radar keeps ${keep} days (Options), so this covers ${keep}.` : "");
+    $("scope").textContent = `${plural(d.threads, "thread", "threads")} and ${plural(d.feedPosts, "feed post", "feed posts")}, ${d.from} to ${d.to}.` + (held < days ? ` Daylight Commons keeps ${keep} days (Options), so this covers ${keep}.` : "");
     sites(d); operations(); rhetoric(d); techniques(d); framing(d); checks(d); media(days);
     for (const b of document.querySelectorAll(".window button")) b.setAttribute("aria-pressed", String(+b.dataset.days === days));
   }
 
   for (const b of document.querySelectorAll(".window button")) b.addEventListener("click", () => render(+b.dataset.days));
   $("not-show").textContent = PB.FEED_DOES_NOT_SHOW;
-  $("foot").textContent = `Radar ${chrome.runtime.getManifest().version}. Kept ${keep} days in this browser; accounts seen together, 30 days at most. Evidence, not verdicts.`;
+  $("foot").textContent = `Daylight Commons ${chrome.runtime.getManifest().version}. Kept ${keep} days in this browser; accounts seen together, 30 days at most. Evidence, not verdicts.`;
   render(7);
-})().catch((e) => { console.error("[radar] feed page failed", e); document.getElementById("scope").textContent = "Could not read the logs: " + e.message; });
+})().catch((e) => { console.error("[daylight-commons] feed page failed", e); document.getElementById("scope").textContent = "Could not read the logs: " + e.message; });

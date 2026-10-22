@@ -91,7 +91,7 @@ const LONG_CUES = { outlet: CUES.outlet.filter((c) => c.length >= 5), platform: 
 const SAYS_UNOFFICIAL = /\b(?:fan|fans|parody|satire|unofficial|critic|critics|commentary)\b|not\s*affiliated/i;
 const ORG_CHECK = new Set(["Business", "Government"]);
 
-export const BRAND_DOES_NOT_PROVE = "Fans, critics, reporters and local partners put outlet and platform names in their profiles, and the list of official accounts Radar checks against is incomplete. A brand in a name does not show who runs the account or that anyone meant to deceive.";
+export const BRAND_DOES_NOT_PROVE = "Fans, critics, reporters and local partners put outlet and platform names in their profiles, and the list of official accounts Daylight Commons checks against is incomplete. A brand in a name does not show who runs the account or that anyone meant to deceive.";
 
 const at = (hay, needle) => { for (let i = 0; i + needle.length <= hay.length; i++) if (needle.every((t, j) => hay[i + j] === t)) return i; return -1; };
 

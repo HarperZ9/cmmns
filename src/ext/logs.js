@@ -1,4 +1,4 @@
-// Radar's local logs and lookups, shared by the content script: the owner and state tables for
+// Daylight Commons' local logs and lookups, shared by the content script: the owner and state tables for
 // what is on screen, the connections log, source trails, per-thread history snapshots, and the
 // report export. Everything stays in chrome.storage.local on this machine.
 (() => {
@@ -28,14 +28,14 @@
     for (const p of got.people) backingParts.set(p.id, p);
     PB.setBackingTable({ people: [...backingParts.values()] });
   }
-  // Websites, bio domains and bio @handles of the accounts Radar has read, asked once each.
+  // Websites, bio domains and bio @handles of the accounts Daylight Commons has read, asked once each.
   async function ensureProfiles(readings) {
     const all = readings.map(PB.profileLinks);
     const domains = [...new Set(all.flatMap((p) => p.domains))].filter((d) => !askedOwners.has(d));
     const handles = [...new Set(all.flatMap((p) => p.handles))].filter((h) => !askedOwners.has("@" + h));
     if (!domains.length && !handles.length) return;
     domains.forEach((d) => askedOwners.add(d)); handles.forEach((h) => askedOwners.add("@" + h));
-    try { await askOps(domains, handles); } catch (e) { console.error("[radar] profile lookup failed", e); }
+    try { await askOps(domains, handles); } catch (e) { console.error("[daylight-commons] profile lookup failed", e); }
   }
   async function ensureOwners(items) {
     const domains = [...new Set(items.flatMap((r) => r.domains || []))].filter((d) => !askedOwners.has(d));
@@ -43,14 +43,14 @@
     if (!domains.length && !handles.length) return;
     domains.forEach((d) => askedOwners.add(d)); handles.forEach((h) => askedOwners.add("@" + h));
     // Site cards for the same domains, so the window's Sources area can show the whole card.
-    if (globalThis.PBLinkCard) await Promise.all(domains.map((d) => PBLinkCard.info(d))).catch((e) => console.error("[radar] site lookup failed", e));
+    if (globalThis.PBLinkCard) await Promise.all(domains.map((d) => PBLinkCard.info(d))).catch((e) => console.error("[daylight-commons] site lookup failed", e));
     try {
       const [rows, srows] = await Promise.all([chrome.runtime.sendMessage({ type: "pb-owners", domains, handles }), chrome.runtime.sendMessage({ type: "pb-state", domains, handles })]);
       if (Array.isArray(rows) && rows.length) { ownerRows.push(...rows); PB.setOwnerRows(ownerRows); }
       if (Array.isArray(srows) && srows.length) { stateRows.push(...srows); PB.setStateRows(stateRows); }
       await askOps(domains, handles);
       await askBacking(handles);
-    } catch (e) { console.error("[radar] owner lookup failed", e); }
+    } catch (e) { console.error("[daylight-commons] owner lookup failed", e); }
   }
 
   // Fact-checked claims similar to each post on screen, asked once per post (src/core/claims.js).
@@ -62,7 +62,7 @@
     try {
       const got = await chrome.runtime.sendMessage({ type: "pb-claims", posts });
       for (const [id, hits] of Object.entries(got || {})) claimHits.set(id, hits);
-    } catch (e) { console.error("[radar] claim lookup failed", e); }
+    } catch (e) { console.error("[daylight-commons] claim lookup failed", e); }
   }
   const claimsOf = (id) => claimHits.get(id) || null;
 
@@ -77,7 +77,7 @@
     if (sig === lastRecorded) return;
     lastRecorded = sig;
     netLog = PB.recordThread(netLog, threadKey, replies.map((r) => ({ author: r.author, posted: r.posted, text: r.text, domains: r.domains })), root && root.posted);
-    chrome.storage.local.set({ [NET_KEY]: netLog }).catch((e) => console.error("[radar] could not save the connections log", e));
+    chrome.storage.local.set({ [NET_KEY]: netLog }).catch((e) => console.error("[daylight-commons] could not save the connections log", e));
   }
 
   // Source trails (src/core/trail.js): which posts carried each upload and link, kept 30 days.
@@ -87,7 +87,7 @@
   function recordTrail(batch) {
     trailLog = PB.recordSpread(trailLog, batch);
     clearTimeout(trailSave);
-    trailSave = setTimeout(() => chrome.storage.local.set({ [TRAIL_KEY]: trailLog }).catch((e) => console.error("[radar] could not save trails", e)), 2000);
+    trailSave = setTimeout(() => chrome.storage.local.set({ [TRAIL_KEY]: trailLog }).catch((e) => console.error("[daylight-commons] could not save trails", e)), 2000);
   }
 
   // One snapshot per thread for the history page (src/core/history.js), saved a moment after the
@@ -100,7 +100,7 @@
       try {
         const log = (await chrome.storage.local.get(HISTORY_KEY))[HISTORY_KEY] || {};
         await chrome.storage.local.set({ [HISTORY_KEY]: PB.addSnapshot(log, PB.snapshot(key, siteName, report)) });
-      } catch (e) { console.error("[radar] could not save the thread snapshot", e); }
+      } catch (e) { console.error("[daylight-commons] could not save the thread snapshot", e); }
     }, 3000);
   }
 
@@ -116,7 +116,7 @@
       try {
         const log = (await chrome.storage.local.get(FEED_KEY))[FEED_KEY] || {};
         await chrome.storage.local.set({ [FEED_KEY]: PB.addFeedPosts(log, siteName, batch) });
-      } catch (e) { console.error("[radar] could not save the feed tally", e); }
+      } catch (e) { console.error("[daylight-commons] could not save the feed tally", e); }
     }, 3000);
   }
 
@@ -130,7 +130,7 @@
 
   function clearAll() {
     trailLog = {}; netLog = {}; lastRecorded = "";
-    if (globalThis.PBMeta) PBMeta.clear().catch((e) => console.error("[radar] could not clear account readings", e));
+    if (globalThis.PBMeta) PBMeta.clear().catch((e) => console.error("[daylight-commons] could not clear account readings", e));
     feedPending = [];
     return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY, FEED_KEY, PB.MEDIA_KEY, PB.OVERLAP_KEY]);
   }
@@ -139,7 +139,7 @@
   // each does not prove, and where the data came from. Reply text is left out.
   function exportReport(site, report, clusters, rows, video, pushed) {
     const out = {
-      tool: "Radar " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), page: location.href, site: site.name,
+      tool: "Daylight Commons " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), page: location.href, site: site.name,
       report, video, pushedLinks: pushed,
       sameTextGroups: clusters.map((c) => ({ size: c.ids.length, authors: c.authors })),
       accounts: rows.map((r) => ({ handle: r.author, basedIn: r.basedIn || null, joinDate: r.joinDate || null, machineSigns: r.machine, flags: (r.flags || []).map((f) => ({ id: f.id, evidence: f.evidence, doesNotProve: f.doesNotProve })) })),
@@ -168,12 +168,12 @@
       domain: l.domain, n: l.n, owner: PB.ownerOfDomain(l.domain) ? PB.ownerOfDomain(l.domain).owner : null,
       state: [...new Set(PB.stateLinksOfDomain(l.domain).map((h) => PB.stateLabel(h).chip))],
     }));
-    const built = PB.evidenceCard({ tool: "Radar " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), site: site.name, page: location.href, thread: true,
+    const built = PB.evidenceCard({ tool: "Daylight Commons " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), site: site.name, page: location.href, thread: true,
       authors: replies.map((r) => r.author), report, sameText: clusters.length, claims, sites, media });
     if (built.ok) built.bundleInput = bundleInput(site, root, replies, rows);
-    chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => console.error("[radar] could not open the card page", e));
+    chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => console.error("[daylight-commons] could not open the card page", e));
   }
 
-  const ensureChannel = (id) => askBacking([], [id]).catch((e) => console.error("[radar] channel backing lookup failed", e));
+  const ensureChannel = (id) => askBacking([], [id]).catch((e) => console.error("[daylight-commons] channel backing lookup failed", e));
   globalThis.PBLogs = Object.freeze({ ensureOwners, ensureChannel, ensureProfiles, ensureClaims, claimsOf, recordNet, recordTrail, recordFeed, saveCard, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
 })();

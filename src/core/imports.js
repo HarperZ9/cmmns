@@ -1,7 +1,7 @@
 // One entry for every file the offline analyser and the CLI read: it decides what the file is from
-// its name and its first bytes, and returns posts in Radar's input shape. Nothing is fetched.
+// its name and its first bytes, and returns posts in Daylight Commons' input shape. Nothing is fetched.
 //   saved page (.html, .htm)            X or Reddit thread, or any page as one text
-//   thread JSON                         Radar's shape, X GraphQL, Bluesky getPostThread, Mastodon context
+//   thread JSON                         Daylight Commons' shape, X GraphQL, Bluesky getPostThread, Mastodon context
 //   X archive tweets.js                 the user's own posts
 //   Reddit export comments.csv / posts.csv
 //   Mastodon archive outbox.json
@@ -23,19 +23,19 @@ const fromThread = (format, t, notes = []) => (t && (t.replies.length || t.root)
 function fromJson(name, text) {
   let json;
   try { json = JSON.parse(text); } catch { return fail(`${name} is not valid JSON.`); }
-  if (json && json.kind === "radar-evidence-bundle") return fail("This is a Radar evidence bundle. Use Check a bundle to verify it.");
-  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Radar found no posts it can read in ${name}.`);
+  if (json && json.kind === "radar-evidence-bundle") return fail("This is a Daylight Commons evidence bundle. Use Check a bundle to verify it.");
+  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Daylight Commons found no posts it can read in ${name}.`);
 }
 
 function fromBytes(name, bytes) {
   const lower = String(name || "").toLowerCase();
-  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is not a Bluesky repository export Radar can read.`);
+  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is not a Bluesky repository export Daylight Commons can read.`);
   const text = asText(bytes).replace(/^﻿/, ""), head = text.slice(0, 400).trimStart();
-  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Radar can read.`);
+  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Daylight Commons can read.`);
   if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} is not a Reddit export with id, permalink and body columns.`);
   if (/^[[{]/.test(head)) return fromJson(name, text);
-  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Radar did not recognise a thread on this page, so it read the page as one text."] : [] }; }
-  return fail(`Radar does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons did not recognise a thread on this page, so it read the page as one text."] : [] }; }
+  return fail(`Daylight Commons does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
 }
 
 // name: the file name; bytes: Uint8Array, ArrayBuffer or string. Returns { ok: true, format,

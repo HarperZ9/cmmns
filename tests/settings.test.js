@@ -29,7 +29,7 @@ test("old settings keep working: feeds and auto survive normalising", () => {
   assert.equal(s.paused, false);
 });
 
-test("a site is on unless switched off or Radar is paused; the fixture follows X", () => {
+test("a site is on unless switched off or Daylight Commons is paused; the fixture follows X", () => {
   assert.ok(SITES.some(([id]) => id === "x"));
   const s = normalizeSettings({ sites: { reddit: false } });
   assert.equal(siteOn(s, "x"), true);
@@ -81,7 +81,7 @@ test("prune returns only the keys it changed, so nothing is rewritten needlessly
   assert.deepEqual(Object.keys(out), ["pb.about.v1"]);
 });
 
-test("clear-all removes every Radar key except the settings", () => {
+test("clear-all removes every Daylight Commons key except the settings", () => {
   const keys = dataKeys(["pb.settings", "pb.tour", "pb.learn.v1", "pb.history.v1", "pb.about.v1", "pb.tpl", "other.thing"]);
   assert.deepEqual(keys.sort(), ["pb.about.v1", "pb.history.v1", "pb.learn.v1", "pb.tpl"], "the tour's No more tips is kept; self-check answers are cleared");
 });

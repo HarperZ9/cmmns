@@ -5,7 +5,7 @@ import { nextStep, RESERVE, BASE_GAP_MS, MAX_RETRIES } from "../src/core/pace.js
 const NOW = 1_800_000_000_000;
 const reset = (s) => Math.floor(NOW / 1000) + s;
 
-test("with no rate headers Radar keeps its base gap", () => {
+test("with no rate headers Daylight Commons keeps its base gap", () => {
   assert.deepEqual(nextStep({ status: 200, now: NOW }), { delay: BASE_GAP_MS, retry: false });
 });
 
@@ -20,7 +20,7 @@ test("a spread never goes faster than the base gap", () => {
   assert.equal(s.delay, BASE_GAP_MS);
 });
 
-test("at the reserve Radar waits for the window to reset, leaving X's own requests room", () => {
+test("at the reserve Daylight Commons waits for the window to reset, leaving X's own requests room", () => {
   const s = nextStep({ status: 200, remaining: RESERVE, reset: reset(120), now: NOW });
   assert.equal(s.delay, 122_000);
 });

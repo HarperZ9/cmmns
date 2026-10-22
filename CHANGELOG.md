@@ -1,9 +1,17 @@
 # Changelog
 
-All notable changes to Radar. Dates are UTC. Versions before 1.0.0 were development builds and
+All notable changes to Daylight Commons, named Radar before 2026-10-22. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
 ## Unreleased
+
+### Changed (name)
+- Radar is now Daylight Commons. The name follows Justice Brandeis: "Sunlight is said to be the
+  best of disinfectants." The repository moved to github.com/HarperZ9/daylight-commons (the old
+  address redirects) and the pages to harperz9.github.io/daylight-commons. The display name,
+  docs and messages changed. Kept for compatibility: the Firefox add-on id, storage keys, the
+  `urn:radar:` schema names, the `RADAR_*` environment variables, `~/.radar`, the icon and
+  package file names, and the `radar` command, which `daylight-commons` now also runs.
 
 ### Changed (licence)
 - Radar is now free and open source. Code: GNU AGPL v3.0 only, replacing FSL-1.1-MIT. Data, the

@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Radar",
+  "name": "Daylight Commons",
   "version": "2.1.0",
   "description": "Free, no account, nothing leaves your browser unless you opt in. Sourced evidence on posts and links, each sign with its error rate.",
-  "homepage_url": "https://github.com/HarperZ9/radar",
+  "homepage_url": "https://github.com/HarperZ9/daylight-commons",
   "icons": {
     "16": "icons/radar-16.png",
     "32": "icons/radar-32.png",
@@ -144,7 +144,7 @@
     }
   },
   "action": {
-    "default_title": "Radar",
+    "default_title": "Daylight Commons",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/radar-16.png",

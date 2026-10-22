@@ -2,8 +2,8 @@
 
 Last updated: 2026-10-21. Stream S3 of the 3.0 plan (runtime and distribution).
 
-The design rule: no outside party's behaviour can change what Radar tells a user without the change
-being visible and reversible. Radar does not need to judge anyone's honesty for that. It needs to
+The design rule: no outside party's behaviour can change what Daylight Commons tells a user without the change
+being visible and reversible. Daylight Commons does not need to judge anyone's honesty for that. It needs to
 depend on as few parties as it can, pin what it takes in, and say plainly where a dependency remains.
 
 This file covers the runtime and distribution layers. Build-time data (Wikidata, the ClaimReview
@@ -14,10 +14,10 @@ signed evidence bundles are stream S2.
 
 | Dependency | Before | What we did | What remains |
 |---|---|---|---|
-| GDELT (Other coverage) | the only off-machine request; GDELT chose which outlets exist and saw every query | removed; Radar asks each outlet's own feed | each outlet sees a feed request from your IP |
-| Platform markup (X, Reddit, YouTube, Facebook, Instagram, Bluesky, Threads, Mastodon, TikTok) | a redesign made Radar silently show nothing | adapter health notice and a self-test | Radar still cannot read a changed page until its reader is updated |
-| Sites with no Radar reader | no text checks | generic reader from page structure | structural guesses, not a reader |
-| Chrome Web Store, AMO | the only install paths | signed, reproducible packages and an install page on Radar's own site | Chrome blocks off-store installs except Developer mode or enterprise policy; Firefox requires Mozilla's signature |
+| GDELT (Other coverage) | the only off-machine request; GDELT chose which outlets exist and saw every query | removed; Daylight Commons asks each outlet's own feed | each outlet sees a feed request from your IP |
+| Platform markup (X, Reddit, YouTube, Facebook, Instagram, Bluesky, Threads, Mastodon, TikTok) | a redesign made Daylight Commons silently show nothing | adapter health notice and a self-test | Daylight Commons still cannot read a changed page until its reader is updated |
+| Sites with no Daylight Commons reader | no text checks | generic reader from page structure | structural guesses, not a reader |
+| Chrome Web Store, AMO | the only install paths | signed, reproducible packages and an install page on Daylight Commons' own site | Chrome blocks off-store installs except Developer mode or enterprise policy; Firefox requires Mozilla's signature |
 | GitHub (code host, CI, Pages) | the only copy of the source and the only CI | a git bundle in every release, `npm run ci` runs exactly what CI runs | the repository, releases and the install page are hosted on GitHub today |
 
 ## Other coverage: direct feeds, no aggregator
@@ -25,14 +25,14 @@ signed evidence bundles are stream S2.
 **Decision: GDELT is removed, not kept as a legacy option.** Reasons:
 
 - It was an aggregator in the middle: GDELT decided which outlets were monitored and which articles
-  matched, and Radar could not check either. Every lookup sent the title's main words to it.
-- It did not work well. On 100 headlines on 2026-10-21 (Radar 2.1, `scripts/eval/coverage-eval.mjs`
+  matched, and Daylight Commons could not check either. Every lookup sent the title's main words to it.
+- It did not work well. On 100 headlines on 2026-10-21 (Daylight Commons 2.1, `scripts/eval/coverage-eval.mjs`
   at that version), GDELT answered 24 lookups and refused or dropped 76; 9 found three or more other
   outlets; the median lookup took 25.5 s.
 - Keeping it as an off-by-default option would keep its code path, its permission, its privacy text
   and its review burden for a feature the direct feeds replace.
 
-On update, Radar gives back the `api.gdeltproject.org` permission (`src/ext/lifecycle.js`), and the
+On update, Daylight Commons gives back the `api.gdeltproject.org` permission (`src/ext/lifecycle.js`), and the
 old consent (`coverageConsent`) does not carry over to the feeds (`feedConsent`).
 
 **How it works now.** The user turns Other coverage on and chooses outlets from a suggested list
@@ -52,7 +52,7 @@ Every feed asked appears in the card, including the ones that failed and why.
 2. A public feed on https on the outlet's own host, which answered with entries and no redirect on
    2026-10-21. This excluded Breitbart (its feed is only on feedburner.com, a Google service), The
    Spectator (feed address answered 404) and Mail & Guardian (404).
-3. The outlet's site is in Radar's bundled site tables. 27 of 33 have a named owner there; for six
+3. The outlet's site is in Daylight Commons' bundled site tables. 27 of 33 have a named owner there; for six
    (Kyiv Independent, National Review, NPR, PBS, The Hill, Times of Israel) the tables state no
    owner and the card says so. The Federalist was excluded because it is not in the tables.
 4. Spread: 18 countries; every owner type the tables give (public broadcaster, state media,
@@ -60,7 +60,7 @@ Every feed asked appears in the card, including the ones that failed and why.
 
 The spread across editorial positions was kept even by the maintainer's reading of published
 media-bias charts at curation time. That is a judgement, not a measurement: no rating is stored in
-Radar, shown to users or used by any code, and the symmetry test (`tests/sites.symmetry.test.js`)
+Daylight Commons, shown to users or used by any code, and the symmetry test (`tests/sites.symmetry.test.js`)
 checks that every outlet gets the same rows from the same facts. `tests/outlets.test.js` checks
 criteria 2 to 4.
 
@@ -79,7 +79,7 @@ chosen is never asked, so "no other coverage" means none among the chosen feeds'
 
 **What remains.** Each chosen outlet receives a request from the user's IP address at the moment
 they click, with the browser's standard headers, and could infer that someone was reading news
-then. Radar cannot hide that without a proxy, which would be a new third party.
+then. Daylight Commons cannot hide that without a proxy, which would be a new third party.
 
 ## Adapter health
 
@@ -88,7 +88,7 @@ nothing, which looked the same as a quiet thread. Now, after each read, `src/ext
 counts (boxes found, boxes read, boxes with text, time stamps and article boxes on the page) to
 `src/core/health.js`, which gives one of: ok, waiting (under 8 s since the page changed), empty,
 partial, changed. On partial or changed, a small notice says, for example, "Reddit changed its page;
-Radar cannot read replies here yet." The toolbar popup's "Self-test on this page" runs the reader
+Daylight Commons cannot read replies here yet." The toolbar popup's "Self-test on this page" runs the reader
 on demand and shows the counts.
 
 A post page with no time stamp and no article box at all (a sign-in wall, a removed post) is not
@@ -98,10 +98,10 @@ called a change. Only counts are read; no text is kept or sent.
 
 ## Generic reader
 
-On a site Radar has no reader for, the site card adds "Text on this page"
+On a site Daylight Commons has no reader for, the site card adds "Text on this page"
 (`src/ext/generic-page.js`, `src/core/generic.js`): the article body is the block with the most
 paragraph text; comments are the largest run of same-shaped sibling boxes where most carry an
-author link or a time stamp. Radar runs its rhetoric, persuasion and machine-writing checks on
+author link or a time stamp. Daylight Commons runs its rhetoric, persuasion and machine-writing checks on
 them and shows counts only, plus repeated comment texts. It runs only on the user's click on the
 site card and sends nothing.
 
@@ -112,7 +112,7 @@ comments. Not measured against labelled pages.
 
 **Reproducible, signed releases** (`scripts/release.mjs`). One command builds
 `dist/release-<version>/`: the Chrome zip, the AMO xpi, a self-distribution xpi whose manifest has
-`update_url` on Radar's own site, `FILES-<version>.sha256` (every file inside each package, which
+`update_url` on Daylight Commons' own site, `FILES-<version>.sha256` (every file inside each package, which
 does not depend on the zlib build), a `git bundle` of HEAD, `SOURCE` (commit and Node version), the
 public key, `SHA256SUMS` over all of them and `SHA256SUMS.sig`, an ECDSA P-256 signature made with
 WebCrypto (`src/core/signing.js` over `src/core/sig.js`). The release refuses a dirty tree, a key inside the repository,
@@ -123,7 +123,7 @@ and a key that does not match `docs/release-key.json`. It verifies itself before
 thumbprint hash, the same id S1 shows. The private key is kept outside the repository and never
 copied; `tests/no-private-keys.test.js` (S1) fails if any tracked or addable file holds private key
 material. `src/core/signing.js` makes and checks signatures with `src/core/sig.js`, the one copy of
-Radar's signing primitives that data packs and evidence bundles also use.
+Daylight Commons' signing primitives that data packs and evidence bundles also use.
 
 **Checking without the code host.** `node scripts/verify-release.mjs <folder>` checks the signature,
 every hash and the bundle with no network. The install page (`INSTALL.md`, built to

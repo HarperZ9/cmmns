@@ -5,7 +5,7 @@
 export const TECHNIQUE_LESSONS = [
   {
     id: "cross-language", title: "Same link or upload in several languages", research: [],
-    what: "Replies in different languages, from different accounts, carry the same link, the same uploaded file or a claim the same fact-checker reviewed. Radar reads the language the site itself assigns, and it leaves out the material of the post being answered.",
+    what: "Replies in different languages, from different accounts, carry the same link, the same uploaded file or a claim the same fact-checker reviewed. Daylight Commons reads the language the site itself assigns, and it leaves out the material of the post being answered.",
     examples: [
       { side: "none", topic: "health", kind: "sign", text: "Within an hour, one video about a clinic appears under a news story in Turkish, Indonesian and Korean replies, each from an account with no other posts in that language." },
       { side: "none", topic: "climate", kind: "ordinary", text: "A weather agency's storm map is shared by people in English, Spanish and French along a coast that speaks all three." },
@@ -17,7 +17,7 @@ export const TECHNIQUE_LESSONS = [
   },
   {
     id: "laundered", title: "Material passed through other accounts", research: [],
-    what: "The post's material reached it through other accounts or a linked site, and the post does not point at the earliest source Radar has seen. Radar follows only what the site records: quotes, reposts, \"media from\", and the same upload or link seen earlier.",
+    what: "The post's material reached it through other accounts or a linked site, and the post does not point at the earliest source Daylight Commons has seen. Daylight Commons follows only what the site records: quotes, reposts, \"media from\", and the same upload or link seen earlier.",
     examples: [
       { side: "none", topic: "economy", kind: "sign", text: "A chart first posted by an anonymous account is quoted by a mid-sized account, then shared by a large one as \"reports say\", with no trace of the first post." },
       { side: "none", topic: "science", kind: "ordinary", text: "A teacher shares a science magazine's post, which quotes the university that ran the study." },
@@ -25,11 +25,11 @@ export const TECHNIQUE_LESSONS = [
     why: "A claim gains weight each time it passes through a voice people trust. After two or three steps the original source drops out of sight, and one source looks like several independent ones.",
     spot: "Open the origin in the chain. Ask who said it first, what they based it on, and whether each step added evidence or only reach.",
     counter: "If every step adds a source or a check, the chain is reporting. If each step only repeats the one before, you are looking at a single claim with many voices.",
-    dnp: "Radar cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.",
+    dnp: "Daylight Commons cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.",
   },
   {
     id: "person-story", title: "One person's story, no wider picture", research: [],
-    what: "The post explains an issue only through one person's case: a name, an age, what happened to them. It gives no numbers, trends, causes or policies. Iyengar called this episodic framing, and its opposite, which places the issue in context, thematic framing. Radar does not show this sign yet: it has no labelled check.",
+    what: "The post explains an issue only through one person's case: a name, an age, what happened to them. It gives no numbers, trends, causes or policies. Iyengar called this episodic framing, and its opposite, which places the issue in context, thematic framing. Daylight Commons does not show this sign yet: it has no labelled check.",
     examples: [
       { side: "left", topic: "housing", kind: "sign", text: "A 71-year-old widow was evicted on Tuesday after 30 years in her flat. This is what the new rules do." },
       { side: "right", topic: "immigration", kind: "sign", text: "This father lost his son to a driver who had been told to leave. Meet the family the system forgot." },

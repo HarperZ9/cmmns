@@ -14,7 +14,7 @@
 // Styled letters that stand for plain ones (fullwidth "Ｈｅｌｌｏ", mathematical bold "𝐇𝐞𝐥𝐥𝐨",
 // circled letters) are read as the plain letters, and invisible characters used to split words
 // (zero-width space, soft hyphen, word joiner) are removed. The text shown to the user never
-// changes; folding applies to the copy Radar matches against.
+// changes; folding applies to the copy Daylight Commons matches against.
 
 import { TO_LATIN, TO_CYRILLIC, TO_GREEK } from "./confusables-data.js";
 

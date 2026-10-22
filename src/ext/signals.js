@@ -48,7 +48,7 @@
     }
     const M = m.machine;
     if (M && M.leak) out.push({ label: "leaked AI text", fam: "leaked-ai", level: "warn", cat: "language", rows: [["In this post", `"${M.leak}"`], ["What it is", "Text a chatbot writes, posted without editing."], dnp("People quote chatbots, joke, or paste a reply on purpose.")] });
-    else if (M && M.machineLike) out.push({ label: "machine-writing signs", fam: "machine-writing", level: "flag", cat: "language", rows: [["Signs", M.signs.join("; ")], ["How Radar decides", "Three or more independent signs in a post of at least 25 words, using Articulate's word lists."], dnp("No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.")] });
+    else if (M && M.machineLike) out.push({ label: "machine-writing signs", fam: "machine-writing", level: "flag", cat: "language", rows: [["Signs", M.signs.join("; ")], ["How Daylight Commons decides", "Three or more independent signs in a post of at least 25 words, using Articulate's word lists."], dnp("No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.")] });
     if (M && M.spam) out.push({ label: "spam pattern", fam: "spam-pattern", level: "warn", cat: "language", rows: [["In this post", `"${M.spam}"`], ["What it is", "A pattern common in scam and spam posts: giveaways, crypto, contact bait."]] });
     if (m.xSpam) out.push({ label: "X: probable spam", fam: "x-spam", level: "warn", cat: "language", rows: [["Source", "X itself filed this reply under \"Probable spam\"."], dnp("X's spam filter makes mistakes in both directions.")] });
     return out;
@@ -57,17 +57,17 @@
   function post(m) {
     const out = [], T = m.tweet || {};
     const old = PB.olderMedia(T);
-    if (old.length) out.push({ label: `media from ${day(old[0].uploaded)}`, fam: "old-media", level: "warn", cat: "media", rows: [["What Radar sees", `This post was made ${day(T.posted)}, but its ${old[0].type === "photo" ? "image" : old[0].type} was first uploaded to X on ${day(old[0].uploaded)}, ${old[0].days} days earlier.`], ["Check it", "Open the card's media search links to find earlier copies, often with the real date and place."], dnp("An old upload can be honest, such as a labelled archive photo.")] });
-    else if ((T.media || []).some((x) => x.fromPost)) out.push({ label: "media from another post", fam: "lifted-media", level: "flag", cat: "media", rows: [["What Radar sees", `The media was taken from an earlier post made ${day((T.media.find((x) => x.fromPost) || {}).fromPostTime)}.`], dnp("Sharing someone else's video with credit is normal.")] });
+    if (old.length) out.push({ label: `media from ${day(old[0].uploaded)}`, fam: "old-media", level: "warn", cat: "media", rows: [["What Daylight Commons sees", `This post was made ${day(T.posted)}, but its ${old[0].type === "photo" ? "image" : old[0].type} was first uploaded to X on ${day(old[0].uploaded)}, ${old[0].days} days earlier.`], ["Check it", "Open the card's media search links to find earlier copies, often with the real date and place."], dnp("An old upload can be honest, such as a labelled archive photo.")] });
+    else if ((T.media || []).some((x) => x.fromPost)) out.push({ label: "media from another post", fam: "lifted-media", level: "flag", cat: "media", rows: [["What Daylight Commons sees", `The media was taken from an earlier post made ${day((T.media.find((x) => x.fromPost) || {}).fromPostTime)}.`], dnp("Sharing someone else's video with credit is normal.")] });
     for (const sp of (m.trail && m.trail.media) || []) {
-      if (sp.accounts >= 3) { out.push({ label: `same upload, ${sp.accounts} accounts`, fam: "same-upload", level: "flag", cat: "coordination", rows: [["What Radar sees", `This exact upload appears in ${sp.posts} posts by ${sp.accounts} accounts in what you have viewed, first posted by @${sp.first.handle} (${day(sp.first.at)}).`], ["Who", sp.sharers.map((h) => "@" + h).join(", ")], dnp("Popular videos get reposted widely by ordinary people. Many accounts on one upload shows spread, not who coordinated it.")] }); break; }
+      if (sp.accounts >= 3) { out.push({ label: `same upload, ${sp.accounts} accounts`, fam: "same-upload", level: "flag", cat: "coordination", rows: [["What Daylight Commons sees", `This exact upload appears in ${sp.posts} posts by ${sp.accounts} accounts in what you have viewed, first posted by @${sp.first.handle} (${day(sp.first.at)}).`], ["Who", sp.sharers.map((h) => "@" + h).join(", ")], dnp("Popular videos get reposted widely by ordinary people. Many accounts on one upload shows spread, not who coordinated it.")] }); break; }
     }
-    for (const g of (m.crossLang || []).slice(0, 1)) out.push({ label: `same ${g.kind === "claim" ? "claim" : g.kind === "media" ? "upload" : "link"} in ${g.langs.length} languages`, fam: "cross-language", level: "flag", cat: "coordination", rows: [["What Radar sees", `This ${g.kind === "claim" ? "fact-checked claim" : g.kind === "media" ? "upload" : "link"} is carried by ${g.accounts} accounts writing in ${g.langs.map((l) => l.replace("script:", "") + (l.startsWith("script:") ? " script" : "")).join(", ")}${g.across ? ", across threads you viewed" : " in this thread"}.`], ["Language from", g.basis === "script" ? "the writing system, since the site gave no language" : "the language the site assigns each post"], ...(g.across ? [["In ordinary threads", "Not measured across threads yet."]] : baseline("cross-language", m)), dnp(PB.CROSS_DOES_NOT_PROVE)] });
+    for (const g of (m.crossLang || []).slice(0, 1)) out.push({ label: `same ${g.kind === "claim" ? "claim" : g.kind === "media" ? "upload" : "link"} in ${g.langs.length} languages`, fam: "cross-language", level: "flag", cat: "coordination", rows: [["What Daylight Commons sees", `This ${g.kind === "claim" ? "fact-checked claim" : g.kind === "media" ? "upload" : "link"} is carried by ${g.accounts} accounts writing in ${g.langs.map((l) => l.replace("script:", "") + (l.startsWith("script:") ? " script" : "")).join(", ")}${g.across ? ", across threads you viewed" : " in this thread"}.`], ["Language from", g.basis === "script" ? "the writing system, since the site gave no language" : "the language the site assigns each post"], ...(g.across ? [["In ordinary threads", "Not measured across threads yet."]] : baseline("cross-language", m)), dnp(PB.CROSS_DOES_NOT_PROVE)] });
     const C = m.chain;
-    if (C && C.originHidden && C.intermediaries >= 1) out.push({ label: `passed through ${C.intermediaries} ${C.intermediaries === 1 ? "step" : "steps"}`, fam: "laundered", level: "info", cat: "sources", rows: [["Chain", C.hops.map((h) => (h.handle ? "@" + h.handle : h.domain) + (h.role === "origin" ? " (earliest Radar saw)" : "")).join(" → ")], C.hoursFromOrigin != null ? ["Time from origin", `${C.hoursFromOrigin} h`] : null, dnp(PB.CHAIN_DOES_NOT_PROVE)].filter(Boolean) });
+    if (C && C.originHidden && C.intermediaries >= 1) out.push({ label: `passed through ${C.intermediaries} ${C.intermediaries === 1 ? "step" : "steps"}`, fam: "laundered", level: "info", cat: "sources", rows: [["Chain", C.hops.map((h) => (h.handle ? "@" + h.handle : h.domain) + (h.role === "origin" ? " (earliest Daylight Commons saw)" : "")).join(" → ")], C.hoursFromOrigin != null ? ["Time from origin", `${C.hoursFromOrigin} h`] : null, dnp(PB.CHAIN_DOES_NOT_PROVE)].filter(Boolean) });
     // Content Credentials and AI metadata, once the user has checked a file in this post.
     if (globalThis.PBMedia) for (const r of PBMedia.resultsFor(m.node, m.tweet)) out.push(...PB.credentialSignals(r));
-    // Text the user had Radar read from an image in this post: the same language and fact-check
+    // Text the user had Daylight Commons read from an image in this post: the same language and fact-check
     // signs, each labelled as read from an image and kept at info level.
     if (globalThis.PBMedia && PBMedia.textsFor) {
       for (const r of PBMedia.textsFor(m.node, m.tweet)) {
@@ -93,7 +93,7 @@
       if (!h.op || seen.has(h.op.id)) continue;
       seen.add(h.op.id);
       const shown = h.indicator.x ? "@" + h.indicator.x : h.indicator.d;
-      out.push({ label: "Named in a published report", fam: "named-in-report", level: "warn", cat: "sources", rows: [["What Radar sees", `${how} ${shown}${what && what.toLowerCase() !== shown.replace(/^@/, "") ? ` (${what})` : ""}.`], ...PB.opRows(h)] });
+      out.push({ label: "Named in a published report", fam: "named-in-report", level: "warn", cat: "sources", rows: [["What Daylight Commons sees", `${how} ${shown}${what && what.toLowerCase() !== shown.replace(/^@/, "") ? ` (${what})` : ""}.`], ...PB.opRows(h)] });
     }
     return { out, domains: new Set(where.filter(([, , h]) => h && h.length).map(([d]) => String(d).toLowerCase())) };
   }
@@ -111,7 +111,7 @@
   function lookalikes(m) {
     return PB.clonedCitations(m.text, m.domains).map((h) => ({
       label: `look-alike of ${h.official}`, fam: "lookalike-domain", level: "flag", cat: "sources",
-      rows: [["What Radar sees", `This post links to ${h.domain}, which ${h.how === "swapped ending" ? "uses the name of" : h.how === "copies the name" ? "copies the name of" : h.how === "look-alike letters" ? "spells with look-alike letters the name of" : "is one letter away from the name of"} ${h.outlet} (${h.official}).`],
+      rows: [["What Daylight Commons sees", `This post links to ${h.domain}, which ${h.how === "swapped ending" ? "uses the name of" : h.how === "copies the name" ? "copies the name of" : h.how === "look-alike letters" ? "spells with look-alike letters the name of" : "is one letter away from the name of"} ${h.outlet} (${h.official}).`],
         h.named ? ["In its words", `The post names ${h.outlet} while its link goes to a different address. Open ${h.official} and look for the same story there.`] : null,
         h.reports.length ? ["Published reports", `A published report named this address as part of ${h.reports.slice(0, 2).join(" and ")}. See the "Named in a published report" sign.`] : null,
         ["Why it matters", "Operations such as Doppelganger copied real outlets on addresses like washingtonpost.pm to borrow their trust."], dnp(h.named ? PB.CLONED_DOES_NOT_PROVE : PB.LOOKALIKE_DOES_NOT_PROVE)].filter(Boolean),
@@ -155,11 +155,11 @@
   }
 
   // Shown first: a Community Note X attached to the post, then fact-checks of similar claims. The
-  // rating is the fact-checker's own words; Radar adds no verdict of its own.
+  // rating is the fact-checker's own words; Daylight Commons adds no verdict of its own.
   function checks(m) {
     const out = [], T = m.tweet || {};
     const when = T.note ? PB.noteTiming(T) : null;
-    if (T.note) out.push({ label: "Community Note", fam: "community-note", level: "warn", cat: "sources", rows: [["Note", T.note], ...(when ? [["Timing", when.text]] : []), ["Source", "X loaded a Community Note for this post. Notes are written and rated by X users."], dnp("A note shows what X users from different viewpoints rated helpful. It is not a ruling by X or by Radar.")] });
+    if (T.note) out.push({ label: "Community Note", fam: "community-note", level: "warn", cat: "sources", rows: [["Note", T.note], ...(when ? [["Timing", when.text]] : []), ["Source", "X loaded a Community Note for this post. Notes are written and rated by X users."], dnp("A note shows what X users from different viewpoints rated helpful. It is not a ruling by X or by Daylight Commons.")] });
     for (const c of m.claims || []) { const card = PB.claimCard(c); out.push({ label: card.label, fam: "fact-check", level: "warn", cat: "sources", rows: card.rows }); }
     return out;
   }

@@ -1,4 +1,4 @@
-# CLAUDE.md: Radar
+# CLAUDE.md: Daylight Commons
 
 A browser extension that adds evidence badges to social media replies. It shows where an
 account says or is labelled to be based, signs of coordination, and a per-thread report on
@@ -41,7 +41,7 @@ whether the most extreme replies come mostly from flagged accounts. X first.
   clause that lets one party relicense contributions.
 - Third-party data or code keeps its licence: record it in `THIRD-PARTY.md` and `REUSE.toml`
   before committing it. Nothing under a non-commercial or no-derivatives licence ships.
-- The Conso font is not under Radar's licences; never present it as reusable.
+- The Conso font is not under Daylight Commons' licences; never present it as reusable.
 
 ## Quality gates
 No file over 300 lines, no function over 50. Commit on a branch, never on main. Push nothing

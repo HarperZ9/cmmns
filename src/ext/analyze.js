@@ -1,7 +1,7 @@
-// The offline analyser: the user chooses a file, Radar reads it on this device with radar-core
+// The offline analyser: the user chooses a file, Daylight Commons reads it on this device with radar-core
 // (src/core/api.js and src/core/imports.js) and shows the evidence. A signed bundle of it can be
 // saved, and any bundle can be checked. No request leaves the browser: the data tables come from
-// Radar's own package and the file never leaves the page.
+// Daylight Commons' own package and the file never leaves the page.
 (() => {
   "use strict";
   const $ = (id) => document.getElementById(id);
@@ -22,7 +22,7 @@
     }
     const imp = PB.importFile(file.name, bytes);
     if (!imp.ok) { say(imp.reason); return; }
-    say("Loading Radar's tables…");
+    say("Loading Daylight Commons' tables…");
     await PBSign.loadTables();
     const result = imp.source === "page" ? PB.analyzeText(imp.input.replies[0].text, { id: "page", links: imp.input.replies[0].links }) : PB.analyzeThread(imp.input);
     PBAnalyzeView.show(document, result, [`Read as ${imp.format}${imp.site ? ` from ${imp.site}` : ""}.`, ...imp.notes]);
@@ -55,7 +55,7 @@
     PBAnalyzeView.checks($("checks"), await PB.verifyBundle(bundle));
   }
 
-  const fail = (where) => (e) => { console.error(`[radar] ${where} failed`, e); say(`Could not ${where}: ${e.message}`); };
+  const fail = (where) => (e) => { console.error(`[daylight-commons] ${where} failed`, e); say(`Could not ${where}: ${e.message}`); };
   $("file").addEventListener("change", () => { const f = $("file").files[0]; if (f) analyse(f).catch(fail("read the file")); });
   $("check").addEventListener("change", () => { const f = $("check").files[0]; if (f) check(f).catch(fail("check the bundle")); });
   $("save").addEventListener("click", () => saveBundle().catch(fail("save the bundle")));
@@ -63,6 +63,6 @@
   drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
   drop.addEventListener("dragleave", () => drop.classList.remove("over"));
   drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); const f = e.dataTransfer.files[0]; if (f) analyse(f).catch(fail("read the file")); });
-  const showKey = () => PBSign.keyId().then((id) => { $("key").textContent = id || "none yet; Radar makes one the first time you save a bundle"; }, fail("read this browser's Radar key"));
+  const showKey = () => PBSign.keyId().then((id) => { $("key").textContent = id || "none yet; Daylight Commons makes one the first time you save a bundle"; }, fail("read this browser's Daylight Commons key"));
   showKey();
 })();

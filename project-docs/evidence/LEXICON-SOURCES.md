@@ -7,8 +7,8 @@ Checked 2026-10-21. The English list cites its own sources in `lexicon.js`.
 ## How the lists were built
 
 - **No list is copied from a database.** Hurtlex is CC BY-NC-SA 4.0 (not CC BY-SA), and the
-  SINAI Spanish lexicons state no licence, and neither fits Radar's CC BY 4.0 data, so both were used only to
-  check single words: is this word recorded as a slur, and with which sense. A word in Radar's
+  SINAI Spanish lexicons state no licence, and neither fits Daylight Commons' CC BY 4.0 data, so both were used only to
+  check single words: is this word recorded as a slur, and with which sense. A word in Daylight Commons'
   list is a fact about usage, typed in by hand, with no rows, ids or scores taken.
 - **Slurs** are only words recorded as offensive by at least one source below and with no
   common innocent sense in any of the five languages, since every language's grammar runs on

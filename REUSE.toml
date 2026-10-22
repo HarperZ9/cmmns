@@ -1,6 +1,6 @@
 version = 1
-SPDX-PackageName = "Radar"
-SPDX-PackageDownloadLocation = "https://github.com/HarperZ9/radar"
+SPDX-PackageName = "Daylight Commons"
+SPDX-PackageDownloadLocation = "https://github.com/HarperZ9/daylight-commons"
 
 # Which licence covers which files. When several entries match a file, the last one wins.
 # Code is AGPL-3.0-only. Data, the catalogue, schemas and documentation are CC BY 4.0.
@@ -8,7 +8,7 @@ SPDX-PackageDownloadLocation = "https://github.com/HarperZ9/radar"
 
 [[annotations]]
 path = "**"
-SPDX-FileCopyrightText = "2026 Zain Dana Harper and the Radar contributors"
+SPDX-FileCopyrightText = "2026 Zain Dana Harper and the Daylight Commons contributors"
 SPDX-License-Identifier = "AGPL-3.0-only"
 
 [[annotations]]
@@ -23,12 +23,12 @@ path = [
   "src/ext/*.json",
   "assets/**",
 ]
-SPDX-FileCopyrightText = "2026 Zain Dana Harper and the Radar contributors"
+SPDX-FileCopyrightText = "2026 Zain Dana Harper and the Daylight Commons contributors"
 SPDX-License-Identifier = "CC-BY-4.0"
 
 [[annotations]]
 path = ["src/ext/manifest.json", "package.json", "src/ext/LICENSE.txt", "LICENSE"]
-SPDX-FileCopyrightText = "2026 Zain Dana Harper and the Radar contributors"
+SPDX-FileCopyrightText = "2026 Zain Dana Harper and the Daylight Commons contributors"
 SPDX-License-Identifier = "AGPL-3.0-only"
 
 [[annotations]]

@@ -21,7 +21,7 @@ async function getJson(fetchFn, url, headers = {}) {
     if (!r.ok) return { status: r.status };
     return { status: r.status, json: await r.json() };
   } catch (e) {
-    console.error("[radar] evidence lookup failed", url, e);
+    console.error("[daylight-commons] evidence lookup failed", url, e);
     return { status: "error" };
   } finally { if (timer) clearTimeout(timer); }
 }
@@ -38,7 +38,7 @@ async function github(fetchFn, { owner, repo }, token, postedAt) {
   const plan = starPages(facts.stars), times = [];
   for (const p of plan.pages) {
     const s = await getJson(fetchFn, `${base}/stargazers?per_page=100&page=${p}`, { Accept: "application/vnd.github.star+json", Authorization: `Bearer ${token}` });
-    if (!s.json) { notes.push(`GitHub stopped the star list at page ${p} (${s.status}); Radar does not retry around a limit.`); break; }
+    if (!s.json) { notes.push(`GitHub stopped the star list at page ${p} (${s.status}); Daylight Commons does not retry around a limit.`); break; }
     times.push(...starTimes(s.json));
   }
   const bursts = starBursts(times);

@@ -7,7 +7,7 @@ export const MAGIC = "RDOCR1\n";
 export function decodeWeights(buf) {
   const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
   const magic = String.fromCharCode(...bytes.subarray(0, MAGIC.length));
-  if (magic !== MAGIC) throw new Error("not a Radar OCR weight file");
+  if (magic !== MAGIC) throw new Error("not a Daylight Commons OCR weight file");
   const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const hlen = dv.getUint32(MAGIC.length, true), base = MAGIC.length + 4;
   const header = JSON.parse(new TextDecoder().decode(bytes.subarray(base, base + hlen)));

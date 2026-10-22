@@ -1,6 +1,6 @@
 // Threads from JSON a platform's own web app or API returned, saved by the user: X's GraphQL
 // TweetDetail, Bluesky's app.bsky.feed.getPostThread, a Mastodon status context, or a thread in
-// Radar's own input shape ({ site, root, replies }). Field names follow each platform's public
+// Daylight Commons' own input shape ({ site, root, replies }). Field names follow each platform's public
 // formats; the readers walk the JSON, so a wrapper around the response does not matter.
 
 import { htmlText } from "./import-html.js";
@@ -68,7 +68,7 @@ function mastoThread(json) {
 
 const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r) => r && typeof r.text === "string");
 
-// Returns { site, root, replies } or null when the JSON holds no thread Radar can read.
+// Returns { site, root, replies } or null when the JSON holds no thread Daylight Commons can read.
 export function threadFromJson(json) {
   if (!json || typeof json !== "object") return null;
   if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies };

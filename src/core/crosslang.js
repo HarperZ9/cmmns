@@ -2,7 +2,7 @@
 // different languages from different accounts. RAND's "firehose" model and Rauch's account of
 // flooding both describe one claim pushed through many channels at once; a campaign that reaches
 // several language communities with the same material leaves this trace (project-docs/TECHNIQUES.md).
-// Radar matches the material, never the wording: a translation of a claim matches only when a
+// Daylight Commons matches the material, never the wording: a translation of a claim matches only when a
 // fact-checker reviewed the claim and both posts match that review. Language comes from the
 // platform's own code (X's "lang"); without one, a distinct writing system stands in, and Latin
 // text without a code counts as unknown. The rule is the same for every language and account.

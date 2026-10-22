@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:radar:evidence:v1",
-  "title": "Radar evidence, version 1",
+  "title": "Daylight Commons evidence, version 1",
   "description": "What radar-core returns (analyzeThread, analyzeText, checkMedia, siteInfo) and the signed evidence bundles built from it. Every evidence item states what it shows, its source and what it does not prove. Items point at posts by id and never name an account. project-docs/INTEGRATION.md documents each field and the stability promise.",
   "anyOf": [{ "$ref": "#/$defs/envelope" }, { "$ref": "#/$defs/bundle" }],
   "$defs": {

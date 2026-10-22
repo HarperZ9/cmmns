@@ -1,11 +1,11 @@
-/* Radar's window, panel and lesson links on social sites. They carry the canon of the author's site
-   (canon.css): Hanken Grotesk for words and Conso for figures (loaded by fonts.js under Radar's own
+/* Daylight Commons' window, panel and lesson links on social sites. They carry the canon of the author's site
+   (canon.css): Hanken Grotesk for words and Conso for figures (loaded by fonts.js under Daylight Commons' own
    names), ink text, hairline rules, square controls, and colour only for a verdict. The ground
    adapts to X's light, dim and dark themes (.pb-dark and .pb-dim on the root): a bone sheet on
    light, the void on dark, and X's own blue-grey on dim. --pb-hot is the canon's drift colour and
    marks only signs worth a look, always beside their words. */
 :root { --pb-ink: #16130f; --pb-muted: #4a443b; --pb-line: #c9bfab; --pb-rule: #7b7262; --pb-ground: #f1ece1; --pb-hot: #8f3a19; --pb-hot-bg: rgba(143, 58, 25, 0.08); --pb-focus: #16130f; --pb-shadow: 0 10px 30px rgba(22, 19, 15, 0.16), 0 0 0 1px rgba(123, 114, 98, 0.55); --pb-size: 13px; --pb-lh: 19px;
-  --pb-sans: "Radar Hanken", "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --pb-mono: "Radar Conso", "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  --pb-sans: "Daylight Commons Hanken", "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --pb-mono: "Daylight Commons Conso", "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace; }
 .pb-dark { --pb-ink: #ece5d6; --pb-muted: #b8b0a0; --pb-line: #38363b; --pb-rule: #6f6a61; --pb-ground: #0a0a0d; --pb-hot: #e29472; --pb-hot-bg: rgba(226, 148, 114, 0.1); --pb-focus: #ece5d6; --pb-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(111, 106, 97, 0.9); }
 /* X's dim theme: a blue-grey ground, so the window sits on the same calm ground as the page. */
 .pb-dark.pb-dim { --pb-muted: #b8b0a0; --pb-ground: #1e2732; --pb-line: #3a4550; }
@@ -95,7 +95,7 @@
 .pb-psec .pb-num { margin: 2px 0; color: var(--pb-ink); font-variant-numeric: tabular-nums; }
 .pb-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 0; border-top: 1px solid var(--pb-line); }
 .pb-panel .pb-foot { padding: 8px 14px 0; }
-/* Adapter health: one plain notice when the site's markup changed and Radar reads nothing. */
+/* Adapter health: one plain notice when the site's markup changed and Daylight Commons reads nothing. */
 .pb-health { position: fixed; left: 16px; bottom: 16px; z-index: 2147482998; max-width: 320px; padding: 10px 14px; border-left: 3px solid var(--pb-hot);
   border-radius: 2px; background: var(--pb-ground); color: var(--pb-ink); box-shadow: var(--pb-shadow); font-family: var(--pb-sans); font-size: var(--pb-size); line-height: var(--pb-lh); }
 .pb-health p { margin: 0 0 6px; font-weight: 600; }
@@ -135,7 +135,7 @@
 .pb-legend { font-size: 0.92em; margin-top: 3px; }
 
 /* Lesson links and first-week tips. A lesson link is a button styled as a link, since the worker
-   opens Radar's own pages; a tip is a quiet boxed note at the top of the window or the panel. */
+   opens Daylight Commons' own pages; a tip is a quiet boxed note at the top of the window or the panel. */
 .pb-open { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
 .pb-open:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; }
 .pb-tip { margin: 6px 10px; padding: 8px 10px; border: 1px solid var(--pb-line); border-left: 3px solid var(--pb-ink); border-radius: 0; }

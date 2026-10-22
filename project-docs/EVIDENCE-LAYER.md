@@ -19,23 +19,23 @@ first click on "Look up evidence" shows what is sent and to whom. "Allow and loo
 `evidence` setting, which can be switched off in Options. Bulk crawling and rate-limit evasion are
 out. The limits:
 
-| Source | What Radar sends | Login | Limits |
+| Source | What Daylight Commons sends | Login | Limits |
 |---|---|---|---|
 | GitHub REST, repository endpoint | `owner/repo` from the post's links | none (checked 2026-10-22: 200) | 2 repositories per click |
 | GitHub REST, stargazers with timestamps | the same, plus the user's own token | required (checked 2026-10-22: 401 "Requires authentication" without one) | 10 pages per repository: the first 5 and the last 5, the rest reported as not read |
 | RDAP via rdap.org | the registrable domain of each linked host | none (302 to the registry, both with `Access-Control-Allow-Origin: *`) | 3 domains per click |
 | Internet Archive Wayback CDX | the same domain | none | one request per domain |
-| Ad libraries (Meta, Google, TikTok, LinkedIn, X) | nothing: Radar builds a search link the user opens | the APIs need keys or approval, or do not exist | links only |
-| Internet Archive Save Page Now | nothing from Radar: the user opens the save page | none | one click per post |
+| Ad libraries (Meta, Google, TikTok, LinkedIn, X) | nothing: Daylight Commons builds a search link the user opens | the APIs need keys or approval, or do not exist | links only |
+| Internet Archive Save Page Now | nothing from Daylight Commons: the user opens the save page | none | one click per post |
 
-A 403 or 429 stops that source for the click and is reported. Radar never retries around a limit.
+A 403 or 429 stops that source for the click and is reported. Daylight Commons never retries around a limit.
 Lookups run one at a time. Credentials are omitted. The user's GitHub token is set in Options and
 kept in `chrome.storage.local` (`pb.evidence.github`), and it is sent only to `api.github.com`; a
-test checks that no other request carries it. "Clear all Radar data" removes the token too.
+test checks that no other request carries it. "Clear all Daylight Commons data" removes the token too.
 
-Each API's terms: Radar uses the GitHub REST API within its documented rate limits. RDAP is a public
+Each API's terms: Daylight Commons uses the GitHub REST API within its documented rate limits. RDAP is a public
 protocol (RFC 9083) for this purpose. The Internet Archive asks for moderate request rates, which
-one request per domain per click keeps. Radar does not query the ad libraries. Their terms limit
+one request per domain per click keeps. Daylight Commons does not query the ad libraries. Their terms limit
 automated access, and their APIs need the user's own approved key, which this phase does not take.
 What each would need is listed in `src/core/evidence-ads.js`.
 
@@ -69,7 +69,7 @@ Optional fields:
   reject five tamperings: an edited receipt, a valid receipt swapped in, a removed entry,
   reordered entries and a replaced root.
 - **Witness.** "Save this post to the Internet Archive" opens Save Page Now in a tab. A
-  `witness-request` receipt keeps the lookup address. Radar does not check that the save worked:
+  `witness-request` receipt keeps the lookup address. Daylight Commons does not check that the save worked:
   X pages often archive as a login wall, and the receipt says so.
 - **Export.** "Save evidence chain" downloads `radar-evidence-chain/1`: the seal, its head, the
   Merkle root and a proof per receipt, with the seal's "does not prove" note.
@@ -112,7 +112,7 @@ always readily visible and challengeable."
 - Each catalogue definition (planned set in `CAMPAIGN-LENS.md`, "Definition matching") carries its
   jurisdiction, source URL, version and retrieval date. No definition text ships before it has been
   checked against the official source.
-- Every jurisdiction that applies is shown: the actor's, the platform's and the audience's. Radar
+- Every jurisdiction that applies is shown: the actor's, the platform's and the audience's. Daylight Commons
   never shows only the harshest one. When the actor's location is not public, the window says so
   and shows the audience's jurisdiction as the user's own.
 - The catalogue is public data in this repository, versioned with a changelog. Every badge names

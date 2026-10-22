@@ -5,7 +5,7 @@
 // thematic coverage leads them to hold society or government responsible. The operational split
 // follows the narrative-frame part of the codebook of Mendelsohn, Budak and Jurgens, "Modeling
 // Framing in Immigration Discourse on Social Media" (NAACL 2021), which codes a post episodic when
-// it centres a specific person or event and thematic when it gives broader context. Radar cites
+// it centres a specific person or event and thematic when it gives broader context. Daylight Commons cites
 // that codebook and copies none of its text.
 //
 // A cue names no group, person, party, side or issue: the same sentence reads alike whatever it is

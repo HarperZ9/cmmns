@@ -21,7 +21,7 @@ export const CAMPAIGN_PLATFORMS = {
   },
   instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, so no shape." },
   tiktok: { status: "not defined", notes: "Not defined yet." },
-  linkedin: { status: "not defined", notes: "Engagement pods. Radar does not run on LinkedIn." },
+  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons does not run on LinkedIn." },
 };
 
 export function campaignPlatform(id) {

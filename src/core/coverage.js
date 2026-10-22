@@ -1,18 +1,18 @@
 // "Other coverage": other outlets reporting the same story, read from each outlet's own feed. There
 // is no aggregator in between. The user picks the outlets (src/core/outlets.js) and may add any RSS
-// or Atom address; on the user's click, Radar's background worker requests each chosen feed from
+// or Atom address; on the user's click, Daylight Commons' background worker requests each chosen feed from
 // its publisher, and this module matches the article's title against the entries on this device.
-// Radar sends nothing from the page: not the title, not the address, not any post. Each publisher
+// Daylight Commons sends nothing from the page: not the title, not the address, not any post. Each publisher
 // sees a plain request for its own feed.
 //
 // Each outlet is labelled by its owner and owner type as the bundled site tables state them
-// (src/core/sites.js). Radar never labels an outlet by a left or right position.
+// (src/core/sites.js). Daylight Commons never labels an outlet by a left or right position.
 
 import { ownerType, OWNER_TYPES } from "./sites.js";
 import { siteKey, hostOf } from "./hosts.js";
 import { feedOrigin } from "./outlets.js";
 
-export const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Radar asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. Radar sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or Radar server is involved. Nothing is requested until you click.";
+export const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Daylight Commons asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. Daylight Commons sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or Daylight Commons server is involved. Nothing is requested until you click.";
 
 export const COVERAGE_DOES_NOT_PROVE = "Matching is by shared words in headlines, so a match can be a different event with similar words, and a story told in other words is missed. A feed holds only an outlet's latest entries, and only the outlets you chose are asked. Owner and owner type are what the site tables state, not a judgment of the reporting.";
 
@@ -92,11 +92,11 @@ export function coverageGroups(list) {
 }
 
 export const FEED_ERRORS = Object.freeze({
-  "no-permission": "The browser has not allowed Radar to reach this feed's host.",
-  redirect: "The feed answered with a redirect to another address, which Radar does not follow. Check the outlet's site for its current feed.",
+  "no-permission": "The browser has not allowed Daylight Commons to reach this feed's host.",
+  redirect: "The feed answered with a redirect to another address, which Daylight Commons does not follow. Check the outlet's site for its current feed.",
   http: "The feed answered with an error.",
   "not-a-feed": "The answer was not an RSS or Atom feed.",
-  "too-large": "The feed was larger than Radar reads.",
+  "too-large": "The feed was larger than Daylight Commons reads.",
   timeout: "The feed did not answer within 10 seconds.",
   network: "The feed could not be reached.",
 });

@@ -2,7 +2,7 @@
 //   state-owned       the outlet's ownership chain on Wikidata ends at a government or state body
 //   named-in-report   a platform or government report named the domain or account in an influence
 //                     operation it took down or attributed (each row cites the report)
-// The same rule applies to every country. Radar does not attribute a reply, an account or a
+// The same rule applies to every country. Daylight Commons does not attribute a reply, an account or a
 // narrative to a state from what it says or how it behaves: that would be a guess presented as a
 // finding. It shows a link or an account that a cited source ties to a state, and nothing more.
 

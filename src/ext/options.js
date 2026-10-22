@@ -7,15 +7,15 @@
   const $ = (id) => document.getElementById(id);
   await PBSettings.ready;
   const s = () => PBSettings.get();
-  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[radar] could not save settings", e));
+  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[daylight-commons] could not save settings", e));
   $("art").append(aperture(false));
 
   function siteSwitches() {
-    $("sites").append(switchRow("Pause Radar everywhere", "Stops reading and hides the window on every site until you switch it back.", s().paused, (on) => save({ paused: on })));
+    $("sites").append(switchRow("Pause Daylight Commons everywhere", "Stops reading and hides the window on every site until you switch it back.", s().paused, (on) => save({ paused: on })));
     for (const [id, name] of sites()) $("sites").append(switchRow(name, null, PB.siteOn({ ...s(), paused: false }, id), (on) => save({ sites: { ...s().sites, [id]: on } })));
   }
 
-  // Mastodon servers the user turned Radar on for (src/ext/instances.js).
+  // Mastodon servers the user turned Daylight Commons on for (src/ext/instances.js).
   async function servers() {
     const list = (await chrome.runtime.sendMessage({ type: "pb-instance-list" }).catch(() => null)) || [];
     const ul = $("servers");
@@ -24,7 +24,7 @@
     for (const host of list) {
       const li = el("li", {}, host + " ");
       const b = el("button", { type: "button", class: "btn" }, "Remove");
-      b.addEventListener("click", () => chrome.runtime.sendMessage({ type: "pb-instance-remove", host }).then(servers).catch((e) => console.error("[radar] could not remove", host, e)));
+      b.addEventListener("click", () => chrome.runtime.sendMessage({ type: "pb-instance-remove", host }).then(servers).catch((e) => console.error("[daylight-commons] could not remove", host, e)));
       li.append(b);
       ul.append(li);
     }
@@ -45,20 +45,20 @@
       $("areas").append(switchRow(name, AREA_HINTS[id], PB.areaOn(s(), id), (on) => save({ areas: { ...s().areas, [id]: on } })));
     }
     $("reading").append(
-      switchRow("Radar on feeds and profiles", "Off: Radar reads only the replies under a post you open.", s().feeds, (on) => save({ feeds: on })),
+      switchRow("Daylight Commons on feeds and profiles", "Off: Daylight Commons reads only the replies under a post you open.", s().feeds, (on) => save({ feeds: on })),
       switchRow("Read account details automatically", "Off: account details are read only when you ask in the window.", s().auto, (on) => save({ auto: on })),
       switchRow("Evidence lookups", "Adds \"Look up evidence\" to the launch campaign section. On your click, the repository names and domains a post links to go to GitHub, rdap.org and the Internet Archive; nothing else, and never an account. Each result is sealed in this browser.", s().evidence, (on) => save({ evidence: on })),
-      switchRow("Read text in images", "Adds \"Read text in this image\" to the window's Media area. Radar reads the words on this device, only when you click, in Latin-script languages; the image and its text never leave your browser.", s().imageText, (on) => save({ imageText: on })),
+      switchRow("Read text in images", "Adds \"Read text in this image\" to the window's Media area. Daylight Commons reads the words on this device, only when you click, in Latin-script languages; the image and its text never leave your browser.", s().imageText, (on) => save({ imageText: on })),
     );
   }
 
   // The user's own GitHub token for star timestamps (src/ext/evidence-bg.js). Kept in this browser,
-  // sent only to api.github.com, removed by "Clear all Radar data". A read-only token with no scopes is enough.
+  // sent only to api.github.com, removed by "Clear all Daylight Commons data". A read-only token with no scopes is enough.
   async function tokenField() {
     const KEY = "pb.evidence.github";
     const input = el("input", { type: "password", id: "githubToken", autocomplete: "off", spellcheck: "false" });
     input.value = ((await chrome.storage.local.get(KEY))[KEY]) || "";
-    input.addEventListener("change", () => (input.value.trim() ? chrome.storage.local.set({ [KEY]: input.value.trim() }) : chrome.storage.local.remove(KEY)).catch((e) => console.error("[radar] could not save the token", e)));
+    input.addEventListener("change", () => (input.value.trim() ? chrome.storage.local.set({ [KEY]: input.value.trim() }) : chrome.storage.local.remove(KEY)).catch((e) => console.error("[daylight-commons] could not save the token", e)));
     $("reading").append(el("label", { for: "githubToken" }, "Your GitHub token, for star timestamps (optional). GitHub lists stargazers only to signed-in callers; a token with no scopes is enough. Kept in this browser and sent only to api.github.com. "), input);
   }
 
@@ -76,22 +76,22 @@
       const all = await chrome.storage.local.get(null);
       const keys = PB.dataKeys(Object.keys(all));
       const bytes = keys.reduce((a, k) => a + JSON.stringify(all[k]).length, 0);
-      $("usage").textContent = keys.length ? `About ${Math.max(1, Math.round(bytes / 1024))} KB kept in ${keys.length} store${keys.length === 1 ? "" : "s"}.` : "Radar keeps nothing yet.";
-    } catch (e) { console.error("[radar] could not measure storage", e); }
+      $("usage").textContent = keys.length ? `About ${Math.max(1, Math.round(bytes / 1024))} KB kept in ${keys.length} store${keys.length === 1 ? "" : "s"}.` : "Daylight Commons keeps nothing yet.";
+    } catch (e) { console.error("[daylight-commons] could not measure storage", e); }
   }
 
   // Two steps, so one stray click cannot delete everything.
   function clearAll() {
     const b = $("clear");
     let armed = false;
-    const disarm = () => { armed = false; b.textContent = "Clear all Radar data"; b.classList.remove("hot"); };
+    const disarm = () => { armed = false; b.textContent = "Clear all Daylight Commons data"; b.classList.remove("hot"); };
     b.addEventListener("click", async () => {
       if (!armed) { armed = true; b.textContent = "Click again to delete everything"; b.classList.add("hot"); return; }
       try {
         const all = await chrome.storage.local.get(null);
         await chrome.storage.local.remove(PB.dataKeys(Object.keys(all)));
         $("clearStatus").textContent = "Cleared. Your settings are kept.";
-      } catch (e) { console.error("[radar] clear failed", e); $("clearStatus").textContent = "Could not clear: " + e.message; }
+      } catch (e) { console.error("[daylight-commons] clear failed", e); $("clearStatus").textContent = "Could not clear: " + e.message; }
       disarm();
       usage();
     });
@@ -101,7 +101,7 @@
   function access() {
     $("access").append(
       switchRow("Reduce motion", "The window appears and disappears without fading or sliding.", s().calm, (on) => save({ calm: on })),
-      switchRow("Larger text", "Larger text in Radar's window and pages.", s().large, (on) => save({ large: on })),
+      switchRow("Larger text", "Larger text in Daylight Commons' window and pages.", s().large, (on) => save({ large: on })),
     );
   }
 
@@ -119,6 +119,6 @@
   }
 
   siteSwitches(); servers(); windowSwitches();
-  tokenField().catch((e) => console.error("[radar] token field failed", e)); retention(); clearAll(); access(); families(); usage();
-  $("foot").textContent = `Radar ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Radar requests nothing off this browser unless you turn on Other coverage.`;
-})().catch((e) => console.error("[radar] options page failed", e));
+  tokenField().catch((e) => console.error("[daylight-commons] token field failed", e)); retention(); clearAll(); access(); families(); usage();
+  $("foot").textContent = `Daylight Commons ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Daylight Commons requests nothing off this browser unless you turn on Other coverage.`;
+})().catch((e) => console.error("[daylight-commons] options page failed", e));

@@ -1,4 +1,4 @@
-// Check a downloaded Radar release with no network and no code host: the signature over SHA256SUMS
+// Check a downloaded Daylight Commons release with no network and no code host: the signature over SHA256SUMS
 // against a public key, then every listed file's hash, then the git bundle.
 //   node scripts/verify-release.mjs <release directory> [--key <release-key.json>]
 // Without --key it uses docs/release-key.json from this checkout. A key that came in the same

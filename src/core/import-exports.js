@@ -58,7 +58,7 @@ export function redditExportPosts(text) {
     const url = pick("url"), text = [pick("title"), pick("body")].filter(Boolean).join("\n");
     return { id: pick("id"), author: EXPORT_AUTHOR, text, posted: iso(pick("date")), links: /^https?:\/\//.test(url) && !/reddit\.com\//.test(url) ? [url] : [] };
   }).filter((p) => p.id && p.text && p.text !== "[deleted]" && p.text !== "[removed]");
-  return { site: "Reddit", posts, notes: col("ip") >= 0 ? ["The export's ip column was left out; Radar keeps and shows no IP address."] : [] };
+  return { site: "Reddit", posts, notes: col("ip") >= 0 ? ["The export's ip column was left out; Daylight Commons keeps and shows no IP address."] : [] };
 }
 
 // outbox.json: { orderedItems: [{ type: "Create", object: { id, content, published, tag } }] }.

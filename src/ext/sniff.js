@@ -1,6 +1,6 @@
 // Runs in the page's own context on X (manifest: world MAIN, document_start). Two jobs:
-// 1. Copies the JSON of GraphQL responses X's web app already requested and posts it to Radar's
-//    content script (account data for every reply, with no request of Radar's own).
+// 1. Copies the JSON of GraphQL responses X's web app already requested and posts it to Daylight Commons'
+//    content script (account data for every reply, with no request of Daylight Commons' own).
 // 2. Learns the shape of X's own "About this account" request (AboutAccountQuery) the first time
 //    X makes it, then, when the content script asks, makes that same request for other accounts,
 //    exactly as X does when you open their About page. The CSRF token is read fresh from X's own

@@ -2,7 +2,7 @@
 // The page-world script (sniff.js) learns X's own AboutAccountQuery request the first time X
 // makes it and repeats it for each handle this script asks about. The learned request shape is
 // kept in chrome.storage.local (no CSRF token; that is read fresh from X's cookie each time).
-// If Radar has never seen X make that request, it opens the About page of ONE account once in the
+// If Daylight Commons has never seen X make that request, it opens the About page of ONE account once in the
 // minimised worker window so X makes it; after that everything happens in the page.
 // Pace: from X's rate-limit headers (PB.nextStep in src/core/pace.js), never faster than one
 // account every 1.5 s. A 429 waits for X's reset and retries the handle. A 400/404 means X

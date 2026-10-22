@@ -1,5 +1,5 @@
 // The user-visible view of each table, for scripts/upstream-guard.mjs: a map from a stable key (a
-// domain, an account, a claim's review URL) to the fields Radar shows for it. Comparing views,
+// domain, an account, a claim's review URL) to the fields Daylight Commons shows for it. Comparing views,
 // not raw bytes, means a reordered download raises nothing and a changed owner always does.
 
 const domainOf = (k) => String(k).split("|")[0];

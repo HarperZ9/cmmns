@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Install Radar without a store</title>
-<meta name="description" content="Download, check and install Radar without a browser store, and rebuild it from source without a code host.">
+<title>Install Daylight Commons without a store</title>
+<meta name="description" content="Download, check and install Daylight Commons without a browser store, and rebuild it from source without a code host.">
 <style>
 @font-face { font-family: "Hanken Grotesk"; src: url("fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
 @font-face { font-family: "Conso"; src: url("fonts/conso-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
@@ -105,9 +105,9 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 </head>
 <body>
 <main>
-<h1>Install Radar without a store</h1>
+<h1>Install Daylight Commons without a store</h1>
 <p class="muted">Updated 2026-10-21.</p>
-<p>Every Radar release can be downloaded, checked and installed without a browser store, and its source can be rebuilt without any code host. This page says how, and says plainly where a browser maker still stands in the way.</p>
+<p>Every Daylight Commons release can be downloaded, checked and installed without a browser store, and its source can be rebuilt without any code host. This page says how, and says plainly where a browser maker still stands in the way.</p>
 <h2>What a release holds</h2>
 <ul><li><code>radar-chrome-&lt;version&gt;.zip</code>: the Chrome, Edge and Brave build.</li>
 <li><code>radar-firefox-&lt;version&gt;.xpi</code>: the Firefox build sent to Mozilla's add-on store.</li>
@@ -115,10 +115,10 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <li><code>FILES-&lt;version&gt;.sha256</code>: the hash of every file inside each package.</li>
 <li><code>radar-&lt;version&gt;.bundle</code>: the whole source history at the release commit, as one git file.</li>
 <li><code>SOURCE</code>: the commit and the Node version the release was built with.</li>
-<li><code>release-key.json</code>: Radar's public signing key.</li>
-<li><code>SHA256SUMS</code> and <code>SHA256SUMS.sig</code>: the hash of every file above, and Radar's signature over that list.</li></ul>
+<li><code>release-key.json</code>: Daylight Commons' public signing key.</li>
+<li><code>SHA256SUMS</code> and <code>SHA256SUMS.sig</code>: the hash of every file above, and Daylight Commons' signature over that list.</li></ul>
 <h2>Check a download</h2>
-<p>Radar signs <code>SHA256SUMS</code> with its project key, an ECDSA P-256 key whose private half never enters the repository or any server. The key id is:</p>
+<p>Daylight Commons signs <code>SHA256SUMS</code> with its project key, an ECDSA P-256 key whose private half never enters the repository or any server. The key id is:</p>
 <p><strong>0e5e 1984 0565 840c 977e 0f03 6c9a c021</strong></p>
 <p>Compare that id with one you got another way: this site, the repository's <code>docs/release-key.json</code>, a mirror, or a person you trust. A key that arrives in the same download as the files proves nothing on its own.</p>
 <p>To check in this browser, use the checker at the end of this page. It runs on your device and sends nothing. To check with Node 22 from a copy of the source, run <code>node scripts/verify-release.mjs &lt;folder&gt;</code>; it prints the key id, checks the signature, then every file's hash, then the bundle.</p>
@@ -131,21 +131,21 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <h2>Install in Chrome, Edge or Brave</h2>
 <p>Chrome installs extensions from outside the Chrome Web Store only in two ways, both set by Google:</p>
 <ul><li><strong>Developer mode.</strong> Unzip the package, open <code>chrome://extensions</code>, turn on Developer mode, press Load unpacked and pick the folder. Chrome may show a warning about developer-mode extensions, and this copy does not update itself: install each new release the same way.</li>
-<li><strong>Enterprise policy.</strong> A managed computer can force-install Radar from a self-hosted address with the <code>ExtensionInstallForcelist</code> policy. This needs an administrator.</li></ul>
-<p>There is no other way around the store for an ordinary Chrome install. That is Google's rule, and Radar cannot change it.</p>
+<li><strong>Enterprise policy.</strong> A managed computer can force-install Daylight Commons from a self-hosted address with the <code>ExtensionInstallForcelist</code> policy. This needs an administrator.</li></ul>
+<p>There is no other way around the store for an ordinary Chrome install. That is Google's rule, and Daylight Commons cannot change it.</p>
 <h2>Install in Firefox</h2>
 <p>Release versions of Firefox install only add-ons that Mozilla has signed, even when the file comes from somewhere other than Mozilla's store. Mozilla signs <code>radar-firefox-self</code> without listing it in its store; once signed, open the file in Firefox to install it, and Firefox checks <code>firefox/updates.json</code> on this site for new versions. Firefox Developer Edition, Nightly and unbranded builds can turn signing checks off; <code>about:debugging</code> can load any build until Firefox restarts.</p>
-<p>That signature is Mozilla's requirement. Radar cannot remove it, and a Mozilla signature says only that Mozilla's automated review passed.</p>
+<p>That signature is Mozilla's requirement. Daylight Commons cannot remove it, and a Mozilla signature says only that Mozilla's automated review passed.</p>
 <h2>If the code host goes away</h2>
-<p>Radar's source is hosted on GitHub today. Each release's bundle holds the whole history, so the project survives without it: clone the bundle, then push it to any git host. Any mirror that serves the same bundle and the same signed <code>SHA256SUMS</code> is as good as the original, because the signature, not the host, is what you check.</p>
+<p>Daylight Commons' source is hosted on GitHub today. Each release's bundle holds the whole history, so the project survives without it: clone the bundle, then push it to any git host. Any mirror that serves the same bundle and the same signed <code>SHA256SUMS</code> is as good as the original, because the signature, not the host, is what you check.</p>
 <h2>What this does not prove</h2>
-<p>A valid signature shows the files were signed by the holder of Radar's key and have not changed since. It does not show who holds the key, that the key was never stolen, or that the code is safe. A reproducible build shows the package came from the published source; it does not show the source is free of mistakes. Read the source, or ask someone you trust who has.</p>
+<p>A valid signature shows the files were signed by the holder of Daylight Commons' key and have not changed since. It does not show who holds the key, that the key was never stolen, or that the code is safe. A reproducible build shows the package came from the published source; it does not show the source is free of mistakes. Read the source, or ask someone you trust who has.</p>
 <h2>Check a release here</h2>
 <p>Pick <code>SHA256SUMS</code>, <code>SHA256SUMS.sig</code> and the files you downloaded. They are read on this device and sent nowhere.</p>
 <p><input type="file" id="verify-files" multiple aria-label="Release files"></p>
 <ul id="verify-out" aria-live="polite"></ul>
 <script type="module" src="verify.js"></script>
-<footer>Radar. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage, which asks the outlets you choose for their feeds. <a href="https://github.com/HarperZ9/radar">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+<footer>Daylight Commons. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage, which asks the outlets you choose for their feeds. <a href="https://github.com/HarperZ9/daylight-commons">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
 </main>
 </body>
 </html>

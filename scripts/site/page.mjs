@@ -1,4 +1,4 @@
-// Shared by scripts/transparency.mjs and scripts/privacy.mjs: the page shell for Radar's public
+// Shared by scripts/transparency.mjs and scripts/privacy.mjs: the page shell for Daylight Commons' public
 // pages, a small Markdown reader for the subset the project's docs use, and the writer that puts
 // each page both inside the extension (src/ext) and in docs/ for the public site.
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -6,8 +6,8 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-export const REPO = "https://github.com/HarperZ9/radar";
-export const SITE = "https://harperz9.github.io/radar";
+export const REPO = "https://github.com/HarperZ9/daylight-commons";
+export const SITE = "https://harperz9.github.io/daylight-commons";
 
 export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -91,7 +91,7 @@ ${CSS}${css ? "\n" + css : ""}
 <h1>${esc(title)}</h1>
 <p class="muted">Updated ${esc(updated)}.</p>
 ${body}
-<footer>Radar. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage, which asks the outlets you choose for their feeds. <a href="${REPO}">Source</a> · <a href="transparency.html">How Radar is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+<footer>Daylight Commons. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage, which asks the outlets you choose for their feeds. <a href="${REPO}">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
 </main>
 </body>
 </html>

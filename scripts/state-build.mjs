@@ -40,7 +40,7 @@ const REGIONAL_CLASSES = ["Q20857085"];
 // A government's own websites (nasa.gov, gov.uk) are not media; they are left out.
 const GOV_DOMAIN = /(^|\.)(gov|mil|gouv|gob|govt|gc|go|admin|bund|regjeringen)\.[a-z.]+$|\.(gov|mil)$|(^|\.)gov\.[a-z]{2}$/;
 const STATE_ROOTS = ["Q7188", "Q327333", "Q3624078", "Q6256", "Q270791"];
-const UA = { "User-Agent": "Radar state-links builder (local, manual run)" };
+const UA = { "User-Agent": "Daylight Commons state-links builder (local, manual run)" };
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Fetched entities are cached on disk (.cache/, git-ignored) so an interrupted or rate-limited run

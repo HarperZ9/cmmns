@@ -1,5 +1,5 @@
 // Reads Content Credentials (C2PA 2.x manifests) from a media file's bytes and says what they claim
-// and which parts Radar could check. It never calls a file authentic: a valid credential shows who
+// and which parts Daylight Commons could check. It never calls a file authentic: a valid credential shows who
 // signed a claim and that the file has not changed since, not that the claim is true. A missing
 // credential is the common case, because most platforms strip metadata on upload.
 
@@ -8,7 +8,7 @@ import { findManifestStore, parseStore, childByLabel } from "./jumbf.js";
 import { checkAssertions, checkSignature, checkDataHash, checkBmffHash } from "./c2pa-verify.js";
 import { sourceType, aiMetadata } from "./aimeta.js";
 
-export const OLDER_FORMAT = "could not fully verify (older manifest format): Radar has not yet been shown to agree with the reference checker on version 1 manifests in video";
+export const OLDER_FORMAT = "could not fully verify (older manifest format): Daylight Commons has not yet been shown to agree with the reference checker on version 1 manifests in video";
 const content = (box) => (box && box.content && box.content[0]) || null;
 function decodeBox(box) { const c = content(box); if (!c) return null; try { return c.type === "json" ? JSON.parse(new TextDecoder().decode(c.data)) : cborDecode(c.data); } catch { return null; } }
 const assertionsOf = (m) => (childByLabel(m, "c2pa.assertions") || {}).content || [];
@@ -56,7 +56,7 @@ async function binding(file, m, complete, store, ranges, depth = 0) {
     const label = base(a.label), v = decodeBox(a);
     if (label === "c2pa.hash.data" && v) return checkDataHash(file, v, complete);
     if (/^c2pa\.hash\.bmff/.test(label) && v) return checkBmffHash(file, v, label, complete);
-    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is not checked by Radar yet` };
+    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is not checked by Daylight Commons yet` };
   }
   return { ok: false, text: "the manifest has no hard binding to the file's bytes" };
 }
@@ -102,7 +102,7 @@ export async function readCredentials(bytes, { complete = true } = {}) {
   };
 }
 
-// The overall state, in words Radar can stand behind: "unchanged", "changed", "unchecked", "remote" or "none".
+// The overall state, in words Daylight Commons can stand behind: "unchanged", "changed", "unchecked", "remote" or "none".
 export function credentialState(r) {
   if (r && !r.found && r.remote) return "remote";
   if (!r || !r.found) return "none";

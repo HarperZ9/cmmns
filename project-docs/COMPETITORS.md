@@ -1,6 +1,6 @@
 # Competitors and 2.0 targets
 
-Radar 2.0.0 stream 0. Every figure below was read on 2026-10-20 from the source linked beside it.
+Daylight Commons 2.0.0 stream 0. Every figure below was read on 2026-10-20 from the source linked beside it.
 Store figures come from the Chrome Web Store (CWS) listing page and the Firefox Add-ons (AMO) API.
 Anything we could not confirm says "unknown". Review themes come from the most recent reviews with
 text on AMO (up to 25 per add-on). That sample is small and self-selected, so read the counts as
@@ -42,14 +42,14 @@ themes, not rates. CWS review text loads by script and was not collected.
 | Bot Sentinel | not found | | | 1,198 (last update 2022-12-05) | Free |
 
 No misinformation extension we found passes 100,000 Chrome users, and the leader is a toolkit for
-journalists. Newer AI "fact checker" extensions sit under 500 users each. Radar 1.0.0 has no store
+journalists. Newer AI "fact checker" extensions sit under 500 users each. Daylight Commons 1.0.0 has no store
 listing, so its store user count is zero by construction.
 
 ## Feature matrix
 
-Y = has it. P = partial. - = no. Radar 1.0.0 per `README.md` and `CHANGELOG.md`.
+Y = has it. P = partial. - = no. Daylight Commons 1.0.0 per `README.md` and `CHANGELOG.md`.
 
-| Feature | Radar 1.0.0 | NewsGuard | Ground News | InVID | Bot Sentinel / Botometer | Community Notes | MBFC ext. | Prebunking games |
+| Feature | Daylight Commons 1.0.0 | NewsGuard | Ground News | InVID | Bot Sentinel / Botometer | Community Notes | MBFC ext. | Prebunking games |
 |---|---|---|---|---|---|---|---|---|
 | One-click store install | - | Y | Y | Y | P | n/a | Y | n/a |
 | Free, no account | Y | - | P | P | Y | Y | Y | Y |
@@ -82,7 +82,7 @@ cover it with under 1,100 Chrome users between them.
 
 ## Gaps and 2.0 targets
 
-Each row is a feature a competitor has and Radar 1.0.0 lacks or covers only in part. A target
+Each row is a feature a competitor has and Daylight Commons 1.0.0 lacks or covers only in part. A target
 passes only when the named check passes. Rows are in order of expected effect on adoption.
 
 | # | Gap (who has it) | 2.0 target | Check | Stream |
@@ -140,14 +140,14 @@ false items alike [19].
 ## The three differentiators that matter most
 
 1. **Nothing leaves the browser, free, no account.** The two most common uninstall causes above are
-   payment and data over-reach. Radar already answers both, and no rater in the table does. Every
+   payment and data over-reach. Daylight Commons already answers both, and no rater in the table does. Every
    2.0 network feature stays opt-in and says what it sends before first use, so the claim stays true.
 2. **Sourced evidence with a measured error rate on every sign, and no score.** Ratings and scores
-   draw the bias attack that dominates NewsGuard, Bot Sentinel and MBFC reviews. Radar shows the
+   draw the bias attack that dominates NewsGuard, Bot Sentinel and MBFC reviews. Daylight Commons shows the
    owner, the cited report, the checker's own words and the sign's precision with its interval, and
    publishes symmetry tests across sides. A reader can check each claim, and nothing rests on our say.
 3. **The reply and account layer, tied to a lesson.** Site raters stop at the domain, and the games
-   sit apart from the feed. Radar works on the replies and accounts where coordination happens, and
+   sit apart from the feed. Daylight Commons works on the replies and accounts where coordination happens, and
    2.0 links each sign to a short lesson on the exact technique in front of the user, measured for
    discernment so it avoids the games' known failure.
 

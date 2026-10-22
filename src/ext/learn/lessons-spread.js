@@ -5,7 +5,7 @@
 export const SPREAD_LESSONS = [
   {
     id: "duplicates", flag: "same-text", title: "Same text as other replies", research: ["badnews-2019"],
-    what: "Several accounts in one thread posted the same or nearly the same words. Radar compares replies word by word and needs a close match from different accounts.",
+    what: "Several accounts in one thread posted the same or nearly the same words. Daylight Commons compares replies word by word and needs a close match from different accounts.",
     examples: [
       { side: "none", topic: "tech", kind: "sign", text: "Five replies under a phone review read \"Switched last month, battery lasts two days, never going back\", from five accounts that joined the same week." },
       { side: "none", topic: "sport", kind: "ordinary", text: "Forty fans reply \"What a goal!\" under the same clip." },
@@ -17,7 +17,7 @@ export const SPREAD_LESSONS = [
   },
   {
     id: "copied-elsewhere", title: "Same words in other threads", research: [],
-    what: "This account posted the same words in other threads you have viewed. Radar keeps a local log of what it has seen, in this browser only.",
+    what: "This account posted the same words in other threads you have viewed. Daylight Commons keeps a local log of what it has seen, in this browser only.",
     examples: [
       { side: "none", topic: "health", kind: "sign", text: "One account posts \"My cousin had the same reaction, nobody talks about this\" under six different health stories in a day." },
       { side: "none", topic: "local", kind: "ordinary", text: "A charity posts the same appeal for blood donors under several local news stories." },
@@ -65,7 +65,7 @@ export const SPREAD_LESSONS = [
   },
   {
     id: "community-note", title: "Community Note", research: [],
-    what: "A note X users wrote and rated as helpful, attached to this post. Radar shows it first because people from different viewpoints agreed on it.",
+    what: "A note X users wrote and rated as helpful, attached to this post. Daylight Commons shows it first because people from different viewpoints agreed on it.",
     examples: [
       { side: "none", topic: "science", kind: "sign", text: "A note under a chart: \"The chart cuts off before 2010, which hides the earlier peak. Full data: link.\"" },
       { side: "none", topic: "health", kind: "ordinary", text: "A note that adds a missing date to an accurate post." },
@@ -73,11 +73,11 @@ export const SPREAD_LESSONS = [
     why: "A note travels with the post and is often the fastest context available. X shows a note only when raters who usually disagree find it helpful.",
     spot: "Notes appear under the post as \"Readers added context\". On X you can rate notes yourself after you join the program.",
     counter: "Open the note's source links. A note is a summary by other users, and the links are the evidence. Some notes only add context to a true post.",
-    dnp: "A note shows what X users from different viewpoints rated helpful. It is not a ruling by X or by Radar.",
+    dnp: "A note shows what X users from different viewpoints rated helpful. It is not a ruling by X or by Daylight Commons.",
   },
   {
     id: "fact-check", title: "Fact-checked claim", research: [],
-    what: "A fact-checker has reviewed a claim worded like this one. Radar shows their rating in their own words, with the date and a link.",
+    what: "A fact-checker has reviewed a claim worded like this one. Daylight Commons shows their rating in their own words, with the date and a link.",
     examples: [
       { side: "none", topic: "health", kind: "sign", text: "A post says a common painkiller was banned in Europe. A fact-checker rated a near-identical claim false in March." },
       { side: "none", topic: "health", kind: "ordinary", text: "A post reports that a painkiller was recalled in one country, which is a different claim from a ban, and true." },
@@ -149,7 +149,7 @@ export const SPREAD_LESSONS = [
   },
   {
     id: "thread-report", title: "The thread report", research: [],
-    what: "Radar's report compares the harshest replies in a thread with the rest. It asks whether flagged accounts make up more of the harshest group, and shows a 95% interval for each share.",
+    what: "Daylight Commons' report compares the harshest replies in a thread with the rest. It asks whether flagged accounts make up more of the harshest group, and shows a 95% interval for each share.",
     examples: [
       { side: "none", topic: "local", kind: "sign", text: "In a thread about a bus lane, 40% of the harshest replies come from flagged accounts, against 8% of the rest. The intervals do not overlap." },
       { side: "none", topic: "local", kind: "ordinary", text: "In another thread, the shares are 12% and 10% and the intervals overlap. The harsh replies look like everyone else." },

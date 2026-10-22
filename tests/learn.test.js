@@ -12,7 +12,7 @@ test("lesson paths are learn.html#<id>, and odd ids give none", () => {
   for (const bad of [null, "", "A", "x", "../options", "a b", "javascript:alert(1)"]) assert.equal(lessonPath(bad), null, String(bad));
 });
 
-test("the worker opens only Radar's lesson and self-check pages", () => {
+test("the worker opens only Daylight Commons' lesson and self-check pages", () => {
   assert.equal(safePage("learn.html#same-upload"), "learn.html#same-upload");
   assert.equal(safePage("quiz.html"), "quiz.html");
   assert.equal(safePage("learn.html#"), "learn.html");

@@ -1,4 +1,4 @@
-// Radar's settings, in one normalised shape for the toolbar popup, the first-run and options pages
+// Daylight Commons' settings, in one normalised shape for the toolbar popup, the first-run and options pages
 // and the content scripts, plus the retention prune the background worker runs. Settings live in
 // chrome.storage.local under SETTINGS_KEY, on this machine only.
 
@@ -6,11 +6,11 @@ import { FEED_OUTLETS, cleanFeedUrl, MAX_CUSTOM_FEEDS } from "./outlets.js";
 
 export const SETTINGS_KEY = "pb.settings";
 
-// Sites Radar has an adapter for. A site added later starts on unless the user switches it off.
+// Sites Daylight Commons has an adapter for. A site added later starts on unless the user switches it off.
 export const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"], ["threads", "Threads"],
   ["mastodon", "Mastodon"], ["tiktok", "TikTok"]];
 
-// Search engines where Radar can show site cards on result links. Each is off until the user turns
+// Search engines where Daylight Commons can show site cards on result links. Each is off until the user turns
 // it on in the options page, which asks the browser for access to that engine's result pages.
 // [id, name, result-page matches, origin the browser grants]
 export const SEARCH_ENGINES = [["google", "Google", ["https://www.google.com/search*"], "https://www.google.com/*"], ["bing", "Bing", ["https://www.bing.com/search*"], "https://www.bing.com/*"], ["duckduckgo", "DuckDuckGo", ["https://duckduckgo.com/*"], "https://duckduckgo.com/*"]];
@@ -70,7 +70,7 @@ export function siteOn(s, id) {
 export const areaOn = (s, area) => s.areas[area] !== false;
 export const searchOn = (s, id) => !s.paused && s.search[id] === true;
 
-// The toolbar icon: paused when Radar is paused or off for this site, reading while it is reading
+// The toolbar icon: paused when Daylight Commons is paused or off for this site, reading while it is reading
 // accounts, idle otherwise.
 export function iconState({ paused, siteOff, reading } = {}) {
   if (paused || siteOff) return "paused";
@@ -111,7 +111,7 @@ export function pruneStore(store, settings, now = Date.now()) {
 
 export const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.media.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
-// "Clear all Radar data": every Radar key except the settings themselves. The Mastodon servers the
+// "Clear all Daylight Commons data": every Daylight Commons key except the settings themselves. The Mastodon servers the
 // user turned on (pb.instances.v1) are settings too, removed in the options page with their access.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
 // Imported data packs and the keys the user trusts (src/ext/packs-bg.js) are choices too.

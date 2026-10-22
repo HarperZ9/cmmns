@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Radar options</title>
+<title>Daylight Commons options</title>
 <link rel="stylesheet" href="canon.css">
 <link rel="stylesheet" href="pages.css">
 </head>
@@ -12,8 +12,8 @@
   <header class="hero">
     <div id="art"></div>
     <div>
-      <h1>Radar options</h1>
-      <p class="lead">Choose where Radar runs, what its window shows and how long it keeps what it has read. Changes apply at once.</p>
+      <h1>Daylight Commons options</h1>
+      <p class="lead">Choose where Daylight Commons runs, what its window shows and how long it keeps what it has read. Changes apply at once.</p>
     </div>
   </header>
 
@@ -21,7 +21,7 @@
     <h2 id="h-sites">Sites</h2>
     <div id="sites" class="switches"></div>
     <h3 id="h-servers">Mastodon servers</h3>
-    <p class="hint">Radar runs on a Mastodon server only after you open it, click the Radar button and allow it. Removing a server here takes the access back.</p>
+    <p class="hint">Daylight Commons runs on a Mastodon server only after you open it, click the Daylight Commons button and allow it. Removing a server here takes the access back.</p>
     <ul id="servers" class="servers" aria-labelledby="h-servers"></ul>
   </section>
 
@@ -34,9 +34,9 @@
 
   <section aria-labelledby="h-sitecards">
     <h2 id="h-sitecards">Site cards</h2>
-    <p class="muted">Rest the pointer on a link in a post to see who owns the site, what kind of owner it has, when and where it was founded, any state link, and its fact-check record. To see the same card for a news site you are reading, press <strong>Site card for this page</strong> in Radar's toolbar menu. Radar runs on no news site until you press it.</p>
+    <p class="muted">Rest the pointer on a link in a post to see who owns the site, what kind of owner it has, when and where it was founded, any state link, and its fact-check record. To see the same card for a news site you are reading, press <strong>Site card for this page</strong> in Daylight Commons' toolbar menu. Daylight Commons runs on no news site until you press it.</p>
     <h3 class="sub">Search results</h3>
-    <p class="muted">Off by default. Turning an engine on asks the browser for access to its result pages; Radar then adds a line of labels under each result and sends nothing anywhere.</p>
+    <p class="muted">Off by default. Turning an engine on asks the browser for access to its result pages; Daylight Commons then adds a line of labels under each result and sends nothing anywhere.</p>
     <div id="search" class="switches"></div>
   </section>
 
@@ -59,11 +59,11 @@
 
   <section aria-labelledby="h-packs">
     <h2 id="h-packs">Data packs</h2>
-    <p class="muted">A data pack adds fact-checks, operation indicators or site notes from someone you choose. Radar never downloads one: you pick the file. Radar checks its signature, shows which key signed it and what it adds, and uses it only after you trust that key.</p>
+    <p class="muted">A data pack adds fact-checks, operation indicators or site notes from someone you choose. Daylight Commons never downloads one: you pick the file. Daylight Commons checks its signature, shows which key signed it and what it adds, and uses it only after you trust that key.</p>
     <p class="status muted" id="bundled" role="status" aria-live="polite"></p>
     <div class="row">
       <button id="packPick" type="button">Import a pack file</button>
-      <button id="bundledCheck" type="button" class="quiet">Check Radar's own data</button>
+      <button id="bundledCheck" type="button" class="quiet">Check Daylight Commons' own data</button>
       <input id="packFile" type="file" accept=".json,application/json" hidden>
     </div>
     <div id="packPreview" aria-live="polite"></div>
@@ -75,13 +75,13 @@
   </section>
 
   <section aria-labelledby="h-keep">
-    <h2 id="h-keep">What Radar keeps</h2>
+    <h2 id="h-keep">What Daylight Commons keeps</h2>
     <p class="muted">Everything stays in this browser profile. Older entries are deleted on the next start and whenever you change these numbers.</p>
     <div class="field"><label for="historyDays">History, connections and source trails, in days<span class="hint muted" id="historyHint"></span></label><input id="historyDays" type="number" inputmode="numeric"></div>
     <div class="field"><label for="aboutDays">Account details read from About pages, in days</label><input id="aboutDays" type="number" inputmode="numeric"></div>
     <p class="status muted figure" id="usage" aria-live="polite"></p>
     <div class="row">
-      <button id="clear" type="button" class="quiet">Clear all Radar data</button>
+      <button id="clear" type="button" class="quiet">Clear all Daylight Commons data</button>
       <span id="clearStatus" role="status" aria-live="polite"></span>
     </div>
   </section>
@@ -104,14 +104,14 @@
 
   <section aria-labelledby="h-feedback">
     <h2 id="h-feedback">Your feedback on signs</h2>
-    <p class="muted">Every sign in the window has <strong>This was right</strong> and <strong>This was wrong</strong>. Your marks stay in this browser. Radar keeps the sign, its kind, the thread it was in and your mark. It keeps the post text only when you tick "include the text" before marking.</p>
+    <p class="muted">Every sign in the window has <strong>This was right</strong> and <strong>This was wrong</strong>. Your marks stay in this browser. Daylight Commons keeps the sign, its kind, the thread it was in and your mark. It keeps the post text only when you tick "include the text" before marking.</p>
     <p class="muted" id="fbRule"></p>
     <p class="status muted figure" id="fbCount" aria-live="polite"></p>
     <table>
       <thead><tr><th scope="col">Sign</th><th scope="col">Right</th><th scope="col">Wrong</th></tr></thead>
       <tbody id="fbFamilies"></tbody>
     </table>
-    <p class="muted">Saving writes a JSON file to your computer. Radar never sends it. If you want to help measure Radar, you can attach the file to an issue on <a href="https://github.com/HarperZ9/radar/issues" target="_blank" rel="noopener noreferrer">Radar's repository</a>. Read it first: it holds the threads you marked, and the text of any post you chose to include.</p>
+    <p class="muted">Saving writes a JSON file to your computer. Daylight Commons never sends it. If you want to help measure Daylight Commons, you can attach the file to an issue on <a href="https://github.com/HarperZ9/daylight-commons/issues" target="_blank" rel="noopener noreferrer">Daylight Commons' repository</a>. Read it first: it holds the threads you marked, and the text of any post you chose to include.</p>
     <div class="row">
       <button id="fbExport" type="button">Save feedback to a file</button>
       <button id="fbClear" type="button" class="quiet">Clear feedback</button>
@@ -119,7 +119,7 @@
     </div>
   </section>
 
-  <footer id="foot">Evidence, not verdicts. Radar requests nothing off this browser unless you turn on Other coverage.</footer>
+  <footer id="foot">Evidence, not verdicts. Daylight Commons requests nothing off this browser unless you turn on Other coverage.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>

@@ -4,7 +4,7 @@
 // so nothing about what the user reads leaves the browser.
 //
 // What this does not show: who funds an individual creator. Sponsors, investors and donors are
-// mostly undisclosed; Radar shows them only where a platform labels it on the page (ad, paid
+// mostly undisclosed; Daylight Commons shows them only where a platform labels it on the page (ad, paid
 // partnership) or a public record is in the table.
 
 let BY_DOMAIN = new Map(), BY_HANDLE = new Map();
@@ -12,8 +12,8 @@ let BY_DOMAIN = new Map(), BY_HANDLE = new Map();
 // A row corrected by data/owner-corrections.json (scripts/owner-corrections.mjs) carries
 // `correction`: { source, checked, reason, upstream, factsWrong? }. The window says so, with the
 // correction's own source, instead of crediting Wikidata.
-export const ownerSourceShort = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}` : "Wikidata");
-export const ownerSource = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}: ${o.correction.source}. Wikidata said "${o.correction.upstream.owner}". ${o.correction.reason}`
+export const ownerSourceShort = (o) => (o && o.correction ? `Daylight Commons correction, checked ${o.correction.checked}` : "Wikidata");
+export const ownerSource = (o) => (o && o.correction ? `Daylight Commons correction, checked ${o.correction.checked}: ${o.correction.source}. Wikidata said "${o.correction.upstream.owner}". ${o.correction.reason}`
   : `Wikidata${o && o.source ? `: ${o.source}` : ""}`);
 
 // rows: [{ name, domain, owner, source, x? }]

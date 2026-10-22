@@ -1,6 +1,6 @@
 // Site context for a link or the page being read: who owns the site, what kind of owner, when and
 // where it was founded, any state link, and the site's fact-check record. Every row names its
-// source. Radar adds no score or rating of its own.
+// source. Daylight Commons adds no score or rating of its own.
 //
 // The table (src/ext/sites.json, built by scripts/sites-build.mjs) has two parts:
 //   facts    from Wikidata (CC0): name, founding date, country, and the owner type Wikidata states
@@ -77,7 +77,7 @@ const typeSource = (info) => ((info.state || []).some((h) => h.basis !== "named-
 // One line per state link, in the source's own terms.
 const stateRows = (rows) => (rows || []).map((h) => ["State link", `${stateLabel(h).says} Source: ${h.source && h.source.title}${h.source && h.source.date ? ` (${h.source.date})` : ""}.`]);
 
-// The rows for one site, for Radar's window. info: { domain, owner, state, facts, record }.
+// The rows for one site, for Daylight Commons' window. info: { domain, owner, state, facts, record }.
 // opts.onList opens the full list of reviews.
 export function siteInfoRows(info, opts = {}) {
   const { domain, owner, facts, record } = info;
@@ -92,8 +92,8 @@ export function siteInfoRows(info, opts = {}) {
     ...stateRows(info.state),
     ...packNoteRows(info.notes),
   ];
-  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Radar has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
-  rows.push(["Fact-check record", recordLine(record) || "No review in Radar's table lists this site as where a claim appeared."]);
+  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Daylight Commons has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
+  rows.push(["Fact-check record", recordLine(record) || "No review in Daylight Commons' table lists this site as where a claim appeared."]);
   for (const r of (record && (record.latest || record.reviews.slice(0, 3))) || []) rows.push(["Review", `"${r.rating}": ${r.checker}, ${r.date || "date not given"}`]);
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
   rows.push(["Source", SITE_SOURCES], ["Does not prove", SITE_RECORD_DOES_NOT_PROVE]);
@@ -101,8 +101,8 @@ export function siteInfoRows(info, opts = {}) {
 }
 
 // Notes from data packs the user imported and trusts (src/core/packs-content.js), each with its
-// pack's name and source, kept apart from Radar's own rows.
-export const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Radar did not write or check it.";
+// pack's name and source, kept apart from Daylight Commons' own rows.
+export const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Daylight Commons did not write or check it.";
 function packNoteRows(notes) {
   if (!notes || !notes.length) return [];
   const rows = notes.slice(0, 5).flatMap((n) => [["Pack note", `${n.note} (pack: ${n.pack})`], ["Read it", { links: [[String(n.url).replace(/^https?:\/\//, "").slice(0, 48), n.url]] }]]);

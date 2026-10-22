@@ -3,10 +3,10 @@
 | File | Font | Designer | Terms |
 |---|---|---|---|
 | `hanken-grotesk.woff2` | Hanken Grotesk | The Hanken Grotesk Project Authors | SIL Open Font License 1.1, full text in `OFL-hanken-grotesk.txt` |
-| `conso-regular.woff2` | Conso | Pavel Larin | The designer's licence, held by the author and kept on file privately. Not covered by Radar's licence; do not reuse it outside Radar. |
+| `conso-regular.woff2` | Conso | Pavel Larin | The designer's licence, held by the author and kept on file privately. Not covered by Daylight Commons' licence; do not reuse it outside Daylight Commons. |
 
 Hanken Grotesk sets the words and Conso sets figures and code, the two faces of the design rules
-on the author's site. Radar's pages use them; the window on social sites takes the site's own font.
+on the author's site. Daylight Commons' pages use them; the window on social sites takes the site's own font.
 
 Conso was added with the author's approval, verbatim, 2026-10-21: "Yes, on Conso." The file is
 the copy the author's site already ships (`system/fonts/conso-regular.woff2` in the site

@@ -1,4 +1,4 @@
-// One identity for Radar's data tables: the hash an evidence bundle carries (dataLock), the
+// One identity for Daylight Commons' data tables: the hash an evidence bundle carries (dataLock), the
 // per-table hashes in data/LOCK.json and the hashes the project key signs in
 // src/ext/radar-data.pack.json all agree, so a bundle names exactly the locked, signed tables.
 import test from "node:test";

@@ -25,7 +25,7 @@ test("flood and cross-language lines read against ordinary threads", () => {
 
 test("the technique map covers every technique with signal, status, gap and target", () => {
   for (const t of ["Flooding", "Laundering", "Cloned or imitation outlets", "Coordinated amplification", "Repetition across languages", "Just asking questions", "Demoralisation", "Swarming"]) assert.ok(map.includes(t), t);
-  for (const s of ["Signal", "Radar measures", "Missing", "Precision target"]) assert.ok(map.includes(s), s);
+  for (const s of ["Signal", "Daylight Commons measures", "Missing", "Precision target"]) assert.ok(map.includes(s), s);
   assert.match(map, /Paul and Matthews/);
   assert.match(map, /DISARM/);
   assert.match(map, /CC BY-SA 4\.0/);

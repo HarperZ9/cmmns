@@ -50,7 +50,7 @@ test("spans locate the matched words in the post", () => {
   for (const s of spans) assert.equal(byId.get(s.post).slice(s.start, s.end), s.text);
 });
 
-test("account details given as data become flags through Radar's own rules", () => {
+test("account details given as data become flags through Daylight Commons' own rules", () => {
   const r = analyzeThread({ site: "X", replies: [{ id: "1", author: "a", text: "hello there", account: { joinDate: "2026-09-25", handle: "a" } }] }, { now: NOW });
   fits(r);
   assert.ok(r.evidence.some((e) => e.kind === "account-flag" && e.data.flag === "new-account"));

@@ -24,11 +24,11 @@ test("two builds of the same tree give byte-identical packages and per-file hash
   assert.match(list, /^[0-9a-f]{64} {2}radar-chrome-[\d.]+\.zip\/a\.js$/m, "the per-file list names every file inside each package");
 });
 
-test("only the self-distributed Firefox build carries an update address, and it is https on Radar's site", () => {
+test("only the self-distributed Firefox build carries an update address, and it is https on Daylight Commons' site", () => {
   assert.equal(browserManifest(manifest, "firefox").browser_specific_settings.gecko.update_url, undefined, "AMO-listed builds must not carry one");
   assert.equal(browserManifest(manifest, "chrome").browser_specific_settings, undefined);
   assert.equal(browserManifest(manifest, "firefox-self").browser_specific_settings.gecko.update_url, FIREFOX_UPDATE_URL);
-  assert.match(FIREFOX_UPDATE_URL, /^https:\/\/harperz9\.github\.io\/radar\//);
+  assert.match(FIREFOX_UPDATE_URL, /^https:\/\/harperz9\.github\.io\/daylight-commons\//);
 });
 
 test("a signed release directory verifies; a changed file, changed sums or another key do not", async () => {

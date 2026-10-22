@@ -1,7 +1,7 @@
 // Checks a C2PA manifest without a network call: the claim signature (COSE_Sign1 over the claim,
 // with the key in the signer's certificate), the hash of every assertion the claim lists, and the
 // hard binding that ties the claim to the file's bytes (c2pa.hash.data, or c2pa.hash.bmff for MP4).
-// Each check is { ok: true | false | null, text }: null means Radar could not check it here.
+// Each check is { ok: true | false | null, text }: null means Daylight Commons could not check it here.
 // Not checked here: whether the certificate chains to a trusted issuer, revocation, and the
 // time-stamp authority's signature.
 
@@ -150,7 +150,7 @@ export async function checkBmffHash(file, a, label, complete) {
   if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
   const rules = a.exclusions || [];
   if (!a.hash || a.merkle || rules.some((r) => !/^(\/[\w ]{4})+$/.test(r.xpath || ""))) {
-    return { ok: null, text: "this video uses a hash layout Radar does not check yet (fragments or partial exclusions)" };
+    return { ok: null, text: "this video uses a hash layout Daylight Commons does not check yet (fragments or partial exclusions)" };
   }
   const withOffsets = /\.v[2-9]$/.test(label), ex = exclusionRanges(file, rules);
   const top = new Set(ex.filter((e) => e[2] === 0 && e[3]).map((e) => e[0]));

@@ -33,7 +33,7 @@
       map[key] = { ...old, ...fresh, at: Date.now() };
       mirror = map;
       await api.set({ [KEY]: map });
-    }).catch((e) => console.error("[radar] cache write failed", e));
+    }).catch((e) => console.error("[daylight-commons] cache write failed", e));
     return chain;
   }
   async function clear() { mirror = {}; if (api) await api.remove(KEY); }

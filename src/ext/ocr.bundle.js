@@ -391,7 +391,7 @@ function kernel() {
   try {
     const bin = Uint8Array.from(atob(GEMM_WASM), (c) => c.charCodeAt(0)), memory = new WebAssembly.Memory({ initial: 64 });
     simd = { gemm: new WebAssembly.Instance(new WebAssembly.Module(bin), { env: { memory } }).exports.gemm, memory };
-  } catch (e) { simd = null; console.warn("[radar] WebAssembly SIMD is not available here; reading text in plain JavaScript", e && e.message); }
+  } catch (e) { simd = null; console.warn("[daylight-commons] WebAssembly SIMD is not available here; reading text in plain JavaScript", e && e.message); }
   return simd;
 }
 
@@ -548,7 +548,7 @@ const MAGIC = "RDOCR1\n";
 function decodeWeights(buf) {
   const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
   const magic = String.fromCharCode(...bytes.subarray(0, MAGIC.length));
-  if (magic !== MAGIC) throw new Error("not a Radar OCR weight file");
+  if (magic !== MAGIC) throw new Error("not a Daylight Commons OCR weight file");
   const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const hlen = dv.getUint32(MAGIC.length, true), base = MAGIC.length + 4;
   const header = JSON.parse(new TextDecoder().decode(bytes.subarray(base, base + hlen)));
@@ -653,7 +653,7 @@ function findAllLines(gray, w, h) {
 function readImage(model, image, { now = () => Date.now() } = {}) {
   const t0 = now();
   const { width: w, height: h } = image;
-  if (w > MAX_SIDE || h > MAX_SIDE) throw new Error(`image is ${w} by ${h}; Radar reads images up to ${MAX_SIDE} pixels a side`);
+  if (w > MAX_SIDE || h > MAX_SIDE) throw new Error(`image is ${w} by ${h}; Daylight Commons reads images up to ${MAX_SIDE} pixels a side`);
   const gray = luminance(image.data, w, h);
   const lines = [];
   for (const l of findAllLines(gray, w, h).slice(0, MAX_LINES)) {

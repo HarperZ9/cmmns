@@ -11,7 +11,7 @@ const changed = { found: true, checks: { sig: { ok: false, text: "x" } } };
 const none = { found: false };
 const remote = { found: false, remote: "https://example.org/m" };
 
-test("each check's outcome; a file Radar could not read counts nowhere", () => {
+test("each check's outcome; a file Daylight Commons could not read counts nowhere", () => {
   assert.equal(outcomeOf(ok), "intact");
   assert.equal(outcomeOf(partial), "partial");
   assert.equal(outcomeOf(changed), "changed");

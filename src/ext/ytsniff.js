@@ -1,6 +1,6 @@
 // Runs in the page's own context on YouTube (manifest: world MAIN, document_start). Copies the data
 // YouTube's web app already has for the page (ytInitialData, ytInitialPlayerResponse, and the JSON
-// of its own /youtubei/v1 requests) and posts it to Radar's content script. Radar makes no request
+// of its own /youtubei/v1 requests) and posts it to Daylight Commons' content script. Daylight Commons makes no request
 // of its own. Errors are swallowed so YouTube itself never breaks.
 (() => {
   "use strict";

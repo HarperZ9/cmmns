@@ -1,4 +1,4 @@
-// Radar's data tables for the CLI, read from the extension's own package on disk (src/ext). The
+// Daylight Commons' data tables for the CLI, read from the extension's own package on disk (src/ext). The
 // CLI never fetches anything. The data lock is the same hash the extension puts on a bundle.
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";

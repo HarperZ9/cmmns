@@ -1,9 +1,9 @@
 # Data sovereignty: pinned inputs, offline builds and signed packs
 
-Radar's tables come from outside sources: Wikidata, the Data Commons fact-check feed, the Unicode
+Daylight Commons' tables come from outside sources: Wikidata, the Data Commons fact-check feed, the Unicode
 confusables table and the PHEME corpus. Any of them can change, or be changed by one editor, between
-two builds. The goal here is narrow. No outside party's change can alter what Radar tells a user
-unless the change is visible, reviewed and reversible. Radar does not judge whether a source is
+two builds. The goal here is narrow. No outside party's change can alter what Daylight Commons tells a user
+unless the change is visible, reviewed and reversible. Daylight Commons does not judge whether a source is
 honest; it pins what it took in and makes every change show up as a diff.
 
 Four parts do this:
@@ -13,7 +13,7 @@ Four parts do this:
    blocked and fails on any hash mismatch.
 3. An upstream-change guard, `scripts/upstream-guard.mjs`, that diffs a fresh fetch against the
    locked table and flags suspicious changes.
-4. Signed data packs: Radar's own data ships signed by the project key, and a user can import packs
+4. Signed data packs: Daylight Commons' own data ships signed by the project key, and a user can import packs
    from keys they choose. Nothing is downloaded; a pack is a file the user picks.
 
 ## What is pinned
@@ -28,7 +28,7 @@ and the SHA-256 and size of each raw snapshot file.
 | `unicode-confusables` | `data/snapshots/unicode-confusables.txt` (UTS #39 18.0.0) | yes; the Unicode License v3 allows it, and its hash equals the one recorded in `src/core/confusables-data.js` |
 | `ops-sources` | `data/ops-sources/*.json` | yes; hand-kept, every record cites its own documents |
 | `state-reports` | `data/state-reports.json`, `data/state-designations*.json` | yes; hand-kept |
-| `datacommons-factcheck` | `$RADAR_DATA/feed/data.json` | no: 207 MB, and it names the people each fact-checker says made a claim; Radar drops those names and does not republish them |
+| `datacommons-factcheck` | `$RADAR_DATA/feed/data.json` | no: 207 MB, and it names the people each fact-checker says made a claim; Daylight Commons drops those names and does not republish them |
 | `wikidata-site-facts` | `$RADAR_DATA/wd-facts.json` | no: 24 MB |
 | `pheme-veracity`, `pheme-prepared` | `$RADAR_DATA/pheme/...` | no: other people's posts |
 | `wikidata-owners`, `wikidata-state` | none | the raw answers behind the current tables were not kept; see below |
@@ -43,7 +43,7 @@ the same diff, for a reviewer to see.
 
 External snapshots live under `RADAR_DATA` (default `../radar-data` beside the repository). Each
 entry says why it is not committed and how to fetch it again; the hash says whether the copy you
-fetched is the one Radar was built from.
+fetched is the one Daylight Commons was built from.
 
 Honest gap: the Wikidata part of the owner table (`src/ext/owners.json`) and the state table (`src/ext/state.json`) were
 built before this lockfile existed, and their raw Wikidata answers were not kept. Both tables are
@@ -81,7 +81,7 @@ rebuilt one ships, and from here the table is the one its pinned snapshot produc
    committed copy; `--old <file>` picks another; `--json` prints everything).
 4. Read every flag. The guard exits 1 while any flag is high.
 5. When the changes are understood, `node scripts/data-lock.mjs refresh <dataset ids>` writes the
-   new hashes, `node scripts/pack.mjs bundled` re-signs Radar's own data, and both go into the same
+   new hashes, `node scripts/pack.mjs bundled` re-signs Daylight Commons' own data, and both go into the same
    commit as the tables.
 
 ## What the guard flags
@@ -117,7 +117,7 @@ item; the site card then hides them.
 
 `scripts/owner-corrections.mjs` applies the corrections to `src/ext/owners.json`, and
 `owners-build.mjs` applies them after every fetch. A corrected row keeps what Wikidata said
-(`correction.upstream`), and the window credits "Radar correction, checked <date>" with its source
+(`correction.upstream`), and the window credits "Daylight Commons correction, checked <date>" with its source
 instead of Wikidata. The step is idempotent and runs in the offline build. The guard reports
 "correction can be retired" when Wikidata comes to say the same, and "upstream changed under a
 correction" when Wikidata changes again. `owner-corrections.mjs --check` exits 1 in either case or
@@ -164,27 +164,27 @@ is hashed the same way, and the hashes sit inside the signed manifest. Verificat
 Content rules (`src/core/packs-content.js`): every claim cites an https review URL; every operation
 indicator names a lower-case domain or a handle, an indicator kind and an operator type from the
 same lists as `src/core/ops-schema.js`, and a dated https source; every site note cites an https
-source. Limits: 50,000 claims, 5,000 indicators and 5,000 notes. Pack rows stay apart from Radar's
+source. Limits: 50,000 claims, 5,000 indicators and 5,000 notes. Pack rows stay apart from Daylight Commons'
 own. A pack claim shows its checker as "Checker (pack: Pack name)"; a pack operation gets the id
-`pack:<key id>:<id>`, never merges into Radar's operations and never counts in the trend view; a
-site note shows its pack's name and the line "From a data pack you imported and trust. Radar did not
+`pack:<key id>:<id>`, never merges into Daylight Commons' operations and never counts in the trend view; a
+site note shows its pack's name and the line "From a data pack you imported and trust. Daylight Commons did not
 write or check it."
 
-In the options page, under Data packs, the user picks a file. Radar shows the pack's name, the key
+In the options page, under Data packs, the user picks a file. Daylight Commons shows the pack's name, the key
 that signed it (key id, and the name the signer gave, labelled as such), what it adds and every
 problem it found. A pack with any problem cannot be added. A pack from an untrusted key can be added
 only with "Trust this key and add the pack". Trusted keys and packs are kept in this browser
-profile (`pb.packkeys.v1`, `pb.packs.v1`), survive "Clear all Radar data", and can be turned off,
+profile (`pb.packkeys.v1`, `pb.packs.v1`), survive "Clear all Daylight Commons data", and can be turned off,
 removed or distrusted; distrusting a key turns its packs off. The background worker verifies every
 enabled pack again each time it loads them, and leaves out any that fail.
 
-Radar's own data ships as a file pack, `src/ext/radar-data.pack.json`: the SHA-256 of each bundled
+Daylight Commons' own data ships as a file pack, `src/ext/radar-data.pack.json`: the SHA-256 of each bundled
 table, signed by the project key, whose public half is in `src/core/pack-keys.js` (key id
-`0e5e 1984 0565 840c 977e 0f03 6c9a c021`). "Check Radar's own data" in the options page checks the
+`0e5e 1984 0565 840c 977e 0f03 6c9a c021`). "Check Daylight Commons' own data" in the options page checks the
 installed tables against it. `tests/packs-bundled.test.js` fails when a table changes without being
 signed again.
 
-The six bundled tables have one identity across Radar. `data/LOCK.json` pins their SHA-256 (hashed
+The six bundled tables have one identity across Daylight Commons. `data/LOCK.json` pins their SHA-256 (hashed
 with LF line ends), the project key signs the same hashes in `radar-data.pack.json`, and the
 `dataLock` an evidence bundle carries (project-docs/INTEGRATION.md) is the SHA-256 of those hashes
 listed as `<sha256>  <file>` lines. `tests/datalock.bundle.test.js` checks that all three agree.
@@ -218,19 +218,19 @@ change is true; it says only that something changed.
 
 **A hostile pack author** signs false claims, invented operations or misleading notes.
 Defence: no pack loads without the user's explicit choice to trust its key; every pack row cites a
-source and carries the pack's name; pack operations never enter Radar's trend counts; a pack can be
+source and carries the pack's name; pack operations never enter Daylight Commons' trend counts; a pack can be
 turned off or removed, and its key distrusted.
 Does not prove: anything about the content. A valid signature shows which key signed and that
 nothing changed since. It does not show the content is right, or who holds the key. The name in a
 pack is whatever the signer wrote.
 
-**A tampered download**: a modified copy of Radar or of a pack.
+**A tampered download**: a modified copy of Daylight Commons or of a pack.
 Defence: a pack with any changed byte in its manifest or content fails its signature or a hash; a
-changed bundled table fails "Check Radar's own data" and the bundled-pack test; the packaging script
+changed bundled table fails "Check Daylight Commons' own data" and the bundled-pack test; the packaging script
 writes SHA-256 sums for each release archive.
 Does not prove: that an installed copy is genuine. A tampered install can carry a different project
 key and a pack signed by it; the in-browser check runs code from the same install. Compare the key id
-with the one published in Radar's repository, and verify a downloaded release with
+with the one published in Daylight Commons' repository, and verify a downloaded release with
 `node scripts/pack.mjs verify src/ext/radar-data.pack.json --trust <published public key>`.
 
 **Key loss or theft.** The project key has one copy, outside the repository. If it is lost, the

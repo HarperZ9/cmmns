@@ -91,7 +91,7 @@ export function flagsFor(account, context = {}) {
   if (Number.isFinite(account.followingCount) && Number.isFinite(account.followersCount) && account.followingCount >= 2000 && account.followersCount < 100) {
     out.push({ id: "follow-pattern", evidence: `follows ${account.followingCount.toLocaleString()} accounts; ${account.followersCount} follow back` });
   }
-  // Inferred: when the account posts (from threads Radar has seen) against where it is labelled.
+  // Inferred: when the account posts (from threads Daylight Commons has seen) against where it is labelled.
   const act = context.activity && context.activity.activeHours;
   const range = account.basedIn && REGION_OFFSETS[(parseLabel(account.basedIn) || {}).region];
   if (act && range && act.fit >= 0.8 && (act.utcOffset < range[0] - 2 || act.utcOffset > range[1] + 2)) {

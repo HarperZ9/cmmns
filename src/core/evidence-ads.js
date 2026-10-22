@@ -1,6 +1,6 @@
-// Ad transparency libraries for the evidence layer (project-docs/EVIDENCE-LAYER.md). Radar fetches
+// Ad transparency libraries for the evidence layer (project-docs/EVIDENCE-LAYER.md). Daylight Commons fetches
 // none of them: each needs a login, an approved key, or has no public API, and their terms limit
-// automated access. Radar builds a search link the user opens in a tab of their own, and says which
+// automated access. Daylight Commons builds a search link the user opens in a tab of their own, and says which
 // libraries offer an API and what it needs. Status checked 2026-10-22 (HTTP status of the search
 // page to a script, and each provider's API documentation).
 

@@ -1,4 +1,4 @@
-"""Draw Radar's icons: the aperture, a luminous orb inside fine concentric line-work on a void disk,
+"""Draw Daylight Commons' icons: the aperture, a luminous orb inside fine concentric line-work on a void disk,
 in the bone and void of the author's site (DESIGN-CANON-CHECK.md).
 
 Writes the SVG sources to assets/icons/ and PNG renders at 16, 32, 48 and 128 px to src/ext/icons/,

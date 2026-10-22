@@ -14,7 +14,7 @@ const thread = (kind, level, label, shows, source, doesNotProve, posts, data = {
   ({ kind, scope: "thread", level, label, shows, source, doesNotProve, posts, spans: [], data });
 const withBase = (text, sign, replies) => { const b = baselineLine(sign, { replies }); return b ? `${text} ${b}` : text; };
 
-// Flags for one reply: the input's own list (ids or { id, evidence }), or Radar's rules over the
+// Flags for one reply: the input's own list (ids or { id, evidence }), or Daylight Commons' rules over the
 // account details given, or null when neither was given (the account was not read).
 export function flagsOf(reply, now) {
   if (Array.isArray(reply.flags)) return reply.flags.map((f) => (typeof f === "string" ? { id: f } : f)).filter((f) => f && f.id);

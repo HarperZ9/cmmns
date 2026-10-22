@@ -23,8 +23,8 @@ export const FLAG_LABEL = {
   "platform-label": "moderation label", "brand-lookalike": "name borrows a brand",
 };
 
-export const SRC_RULES = "Radar's own rules, run on this device. Rules and measured error rates: Radar's EVALUATION.md.";
-export const SRC_POSTS = "The posts in the input, as given. Radar read them on this device and sent nothing anywhere.";
+export const SRC_RULES = "Daylight Commons' own rules, run on this device. Rules and measured error rates: Daylight Commons' EVALUATION.md.";
+export const SRC_POSTS = "The posts in the input, as given. Daylight Commons read them on this device and sent nothing anywhere.";
 export const SRC_ACCOUNTS = "Account details given in the input: what each platform discloses on profiles and About pages.";
 export const SRC_FILE = "The file's bytes, read on this device: Content Credentials (C2PA) and IPTC or XMP metadata.";
 

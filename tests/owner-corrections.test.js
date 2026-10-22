@@ -61,13 +61,13 @@ test("the window credits the correction, not Wikidata, and hides facts from the 
   setOwnerRows(owners.rows);
   setSiteTable({ facts: { "redeglobo.globo.com": ["RBS TV Porto Alegre", null, "Brazil", null, "Q536440"], "dw.com": ["Deutsche Welle", "1953", "Germany", "public broadcaster", "Q153770"] } });
   const globo = ownerOfDomain("redeglobo.globo.com");
-  assert.match(ownerSource(globo), /^Radar correction, checked 2026-10-21: https:\/\/redeglobo\.globo\.com\/\. Wikidata said "O Diário de Mogi"/);
+  assert.match(ownerSource(globo), /^Daylight Commons correction, checked 2026-10-21: https:\/\/redeglobo\.globo\.com\/\. Wikidata said "O Diário de Mogi"/);
   assert.equal(siteFacts("redeglobo.globo.com"), null);
   assert.equal(siteFacts("dw.com").founded, "1953");
   const rows = siteInfoRows({ domain: "dw.com", owner: ownerOfDomain("dw.com"), facts: siteFacts("dw.com"), state: [] });
-  assert.ok(rows.some(([h, v]) => h === "Owned by" && v === "Deutsche Welle, a public-law broadcaster under German federal law (Radar correction, checked 2026-10-21)"));
+  assert.ok(rows.some(([h, v]) => h === "Owned by" && v === "Deutsche Welle, a public-law broadcaster under German federal law (Daylight Commons correction, checked 2026-10-21)"));
   const ev = siteEvidence("dw.com").find((e) => e.kind === "site-owner");
-  assert.match(ev.source, /^Radar correction/);
+  assert.match(ev.source, /^Daylight Commons correction/);
   setOwnerRows([]); setSiteTable(null);
 });
 

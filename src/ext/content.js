@@ -26,7 +26,7 @@
   }
 
   const { ensureOwners, recordNet, recordTrail, saveSnapshot, exportReport } = PBLogs;
-  const clearNet = () => PBLogs.clearAll().then(refresh).catch((e) => console.error("[radar] could not clear history", e));
+  const clearNet = () => PBLogs.clearAll().then(refresh).catch((e) => console.error("[daylight-commons] could not clear history", e));
 
   function removePanel() { PBPanel.remove(); }
 
@@ -117,7 +117,7 @@
       rows.push({ id: r.id, author: r.author, text: r.text, extreme: an.extreme, techniques: an.persuasion.map((h) => h.technique), machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
     if (root) models.push([root.node, { site, node: root.node, tweets, postId: root.id, threadKey, text: root.text, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, PBLogs.trail()), claims: PBLogs.claimsOf(root.id), reading: cache[root.author.toLowerCase()] || (site.reading ? site.reading(root.author) : null), flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
-    PBLogs.ensureProfiles(readings).catch((e) => console.error("[radar] profile lookup failed", e));
+    PBLogs.ensureProfiles(readings).catch((e) => console.error("[daylight-commons] profile lookup failed", e));
     // Thread context for the window's comparison: median account age, labels and flags among the
     // accounts read here.
     const read = rows.filter((r) => r.about || r.joinDate);
@@ -159,7 +159,7 @@
   }
 
   // The swarming sign's marks (src/core/swarming.js): an account is new when it joined under
-  // NEW_ACCOUNT_DAYS before its reply, flagged when Radar flagged it. Unread accounts are unknown.
+  // NEW_ACCOUNT_DAYS before its reply, flagged when Daylight Commons flagged it. Unread accounts are unknown.
   function swarmMarks(rows) {
     const by = new Map(rows.filter((r) => r.joinDate || r.flags).map((r) => [String(r.author).toLowerCase(), r]));
     return (h, at) => {
@@ -171,7 +171,7 @@
   }
 
   // Feed dashboard (src/core/feed.js): each feed post once per day, with what it linked and the
-  // signs Radar read in it. Post ids and counts only; no text is kept.
+  // signs Daylight Commons read in it. Post ids and counts only; no text is kept.
   const noteOf = (id) => (tweets.get(id) || {}).note || null;
   function recordFeed(site, items) {
     PBLogs.recordFeed(site.name, items.map((r) => {
@@ -187,11 +187,11 @@
 
   // A video with no comments (or comments turned off) still has its own context: the channel,
   // YouTube's funding and paid-promotion labels. Live check 2026-10-21: a state-funded
-  // broadcaster's videos with comments off showed no Radar panel at all.
+  // broadcaster's videos with comments off showed no Daylight Commons panel at all.
   function videoOnly(site, feed) {
     // A repost list shows accounts, not posts: the launch campaign lens still reads it.
     if (!feed && globalThis.PBCampaign && PBCampaign.onList()) {
-      PBStore.all().then((cache) => { const r = PB.threadReport([]); r.campaign = PBCampaign.lens(site, [], tweets, cache); PBUI.panel(r, [], { pending: 0, scanning: 0, paused: false, site, pushed: [] }, () => {}); }).catch((e) => console.error("[radar] campaign lens failed", e));
+      PBStore.all().then((cache) => { const r = PB.threadReport([]); r.campaign = PBCampaign.lens(site, [], tweets, cache); PBUI.panel(r, [], { pending: 0, scanning: 0, paused: false, site, pushed: [] }, () => {}); }).catch((e) => console.error("[daylight-commons] campaign lens failed", e));
       return;
     }
     const video = feed ? null : currentVideo(site);
@@ -203,7 +203,7 @@
     const fresh = handles.filter((h) => !lookingUp.has(h) && !failed.has(h));
     if (!fresh.length) return;
     fresh.forEach((h) => lookingUp.add(h));
-    chrome.runtime.sendMessage({ type: "pb-lookup", handles: fresh }).catch((e) => console.error("[radar] lookup request failed", e));
+    chrome.runtime.sendMessage({ type: "pb-lookup", handles: fresh }).catch((e) => console.error("[daylight-commons] lookup request failed", e));
     schedule();
   }
 
@@ -217,7 +217,7 @@
       const list = [...all.values()].slice(-200);
       authorPosts.set(k, list);
       const pattern = PB.postingPattern(list);
-      if (pattern) PBStore.put({ handle: posts[0].author, pattern }).catch((e) => console.error("[radar] could not save a posting pattern", e));
+      if (pattern) PBStore.put({ handle: posts[0].author, pattern }).catch((e) => console.error("[daylight-commons] could not save a posting pattern", e));
     }
   }
 
@@ -250,7 +250,7 @@
     // the account is not asked again.
     if (e.data.about) users.push({ handle: e.data.about, aboutRead: true, ...(PB.aboutIn(e.data.json) || {}) });
     if (!users.length) return;
-    Promise.all(users.map((u) => PBStore.put(u))).then(schedule).catch((err) => console.error("[radar] live data cache failed", err));
+    Promise.all(users.map((u) => PBStore.put(u))).then(schedule).catch((err) => console.error("[daylight-commons] live data cache failed", err));
   });
 
   chrome.runtime.onMessage.addListener((msg) => {
@@ -258,14 +258,14 @@
     if (msg && msg.type === "pb-scan") {
       const p = document.getElementById("pb-panel");
       if (p) p.dataset.collapsed = "0";
-      refresh().then(() => lookup(...lastPending.slice(0, SCAN_MAX))).catch((e) => console.error("[radar] scan failed", e));
+      refresh().then(() => lookup(...lastPending.slice(0, SCAN_MAX))).catch((e) => console.error("[daylight-commons] scan failed", e));
     }
     if (msg && msg.type === "pb-progress") { scanLeft = msg.left; schedule(); }
     if (msg && msg.type === "pb-panel") { PBPanel.setOpen(true); schedule(0); }
     if (msg && msg.type === "pb-export" && lastExport) lastExport();
     if (msg && msg.type === "pb-about-result") {
       lookingUp.delete(msg.handle);
-      if (!msg.reading) { failed.add(msg.handle); console.warn("[radar] lookup gave no reading for", msg.handle, msg.error || ""); }
+      if (!msg.reading) { failed.add(msg.handle); console.warn("[daylight-commons] lookup gave no reading for", msg.handle, msg.error || ""); }
       schedule();
     }
   });
@@ -277,7 +277,7 @@
     return false;
   });
 
-  function schedule(ms = 250) { clearTimeout(timer); timer = setTimeout(() => refresh().catch((e) => console.error("[radar] refresh failed", e)), ms); }
+  function schedule(ms = 250) { clearTimeout(timer); timer = setTimeout(() => refresh().catch((e) => console.error("[daylight-commons] refresh failed", e)), ms); }
   let scrollFrame = 0;
   window.addEventListener("scroll", () => { if (!scrollFrame) scrollFrame = requestAnimationFrame(() => { scrollFrame = 0; drawVisible(); }); }, { passive: true });
 
