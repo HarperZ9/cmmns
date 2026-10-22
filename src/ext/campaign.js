@@ -58,7 +58,8 @@
     const quotes = [];
     for (const t of tweets.values()) {
       if (!t.author || t.author.toLowerCase() === author) continue;
-      if (t.quotedId === id) quotes.push({ id: t.id, author: t.author, text: (items.find((r) => r.id === t.id) || {}).text || "", posted: t.posted, paidPartnership: paidIds.has(t.id) });
+      // The page's own label and the response's mark are both X's claim; either one counts as X saying so.
+      if (t.quotedId === id) quotes.push({ id: t.id, author: t.author, text: (items.find((r) => r.id === t.id) || {}).text || t.text || "", posted: t.posted, paidPartnership: paidIds.has(t.id) || t.paidPartnership === true });
       if (t.quotedId === id || t.replyTo === id) { const rd = reading_(t.author); accounts.set(t.author.toLowerCase(), { handle: t.author, bio: rd.bio, joinDate: rd.joinDate, defaultAvatar: rd.defaultAvatar }); }
     }
     const ownPosts = author ? [...tweets.values()].filter((t) => t.id !== id && t.author && t.author.toLowerCase() === author && !t.repostOf).map(counts) : [];
