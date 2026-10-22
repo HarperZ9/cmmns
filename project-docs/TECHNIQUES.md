@@ -188,6 +188,20 @@ No DISARM id is claimed for this cue.
 - **Precision target.** The persuasion bar: 80% point precision and a lower bound of 0.7 from 20
   hits.
 
+### 10. A borrowed voice: funding hidden behind a personality
+Rauch's "no personal authority" rule: a claim stands on its evidence, and a campaign that hides its
+money borrows a speaker who seems independent to skip the checking. DISARM T0100 Co-Opt Trusted
+Sources.
+- **Signal.** Not a detector. "Backing on record" (`src/core/backing.js`) matches a post's author
+  against a table of documented backing (`data/personalities.README.md`). Two documented campaigns
+  carry this technique: the Tenet Media indictment (SDNY, September 2024; the Justice Department's
+  words "co-opted online commentators"), and Vippi Media's FARA filings for the Chinese consulate in
+  New York (2022; the filing says Viral Nation sourced the influencers and created the content).
+- **Status.** A table lookup: the source is the evidence, so there is no precision to measure. The
+  table's coverage is the limit, and its balance is reported in the README.
+- **Missing.** Undisclosed funding that no record or two independent outlets document. Radar never
+  infers backing from association, wording or who someone follows.
+
 ## Lines that hold
 
 - A sign describes content or behaviour, never a person's identity or side.

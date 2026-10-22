@@ -1,0 +1,770 @@
+[
+ {
+  "id": "daily-wire",
+  "name": "The Daily Wire",
+  "backing": [
+   {
+    "id": "daily-wire-owner-bentkey",
+    "kind": "outlet owner",
+    "who": "Bentkey Ventures, LLC",
+    "summary": "The Daily Wire's About page says The Daily Wire, LLC is wholly owned by Bentkey Ventures, LLC, which it says remains majority owned by the original co-founders.",
+    "period": "current",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "The Daily Wire",
+      "title": "About",
+      "url": "https://www.dailywire.com/about",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "The Daily Wire, LLC is wholly owned by Bentkey Ventures, LLC (formerly Forward Publishing, LLC) which remains majority owned by the original co-founders."
+     }
+    ],
+    "doesNotProve": "The page does not name minority owners or show their influence over content. Wikipedia's infobox names a different entity (DailyWire Ventures, LLC); the company's own statement is used here."
+   },
+   {
+    "id": "knowles-wilks-investor",
+    "kind": "investor",
+    "who": "Farris Wilks",
+    "summary": "NewsGuard and Slate report that the Daily Wire was founded in 2015 with investment from Farris Wilks; the Daily Wire's own About page also credits Wilks with the initial investment.",
+    "period": "since 2015",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "NewsGuard",
+      "title": "dailywire.com (Nutrition Label, December 2020 update)",
+      "url": "https://www.newsguardtech.com/wp-content/uploads/2021/07/NG-dailywire.com-Dec2020update.pdf",
+      "date": "2020-12-10",
+      "read": "2026-10-21",
+      "kind": "researcher",
+      "quote": "Shapiro founded the Daily Wire in 2015 with an initial investment from Farris Wilks."
+     },
+     {
+      "publisher": "Slate",
+      "title": "The Many Faces of Ben Shapiro",
+      "url": "https://slate.com/news-and-politics/2018/01/is-ben-shapiro-a-conservative-liberals-can-count-on.html",
+      "date": "2018-01-24",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "...with investment from the Texas fracking billionaire Wilks brothers..."
+     }
+    ],
+    "doesNotProve": "This is an investment in the company, not in Knowles's show. Daily Wire co-CEO Jeremy Boreing told NewsGuard that Wilks has no influence on editorial decisions."
+   }
+  ]
+ },
+ {
+  "id": "fox-news",
+  "name": "FOX News",
+  "backing": [
+   {
+    "id": "fox-news-owner-fox-corp",
+    "kind": "outlet owner",
+    "who": "Fox Corporation",
+    "summary": "Fox Corporation's FY2026 Form 10-K lists FOX News Media among its brands and says FOX News Media includes the FOX News network.",
+    "period": "current (FY2026 10-K)",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Fox Corporation (SEC EDGAR)",
+      "title": "Form 10-K for fiscal year ended June 30, 2026",
+      "url": "https://www.sec.gov/Archives/edgar/data/0001754301/000162828026053960/fox-20260630.htm",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "FOX News Media includes the FOX News and FOX Business networks and their related properties."
+     },
+     {
+      "publisher": "Fox Corporation (SEC EDGAR)",
+      "title": "Form 10-K for fiscal year ended June 30, 2026",
+      "url": "https://www.sec.gov/Archives/edgar/data/0001754301/000162828026053960/fox-20260630.htm",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "FOX produces and delivers compelling news, sports and entertainment content through its iconic brands, including FOX News Media..."
+     }
+    ],
+    "doesNotProve": "Corporate ownership does not show that the parent company directs this host's content."
+   },
+   {
+    "id": "fox-corp-owner",
+    "kind": "outlet owner",
+    "who": "FOX Corporation",
+    "summary": "Fox Corporation's careers site says FOX News Media, the unit that airs Gutfeld's shows, is owned by FOX Corporation.",
+    "period": "current",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "FOX Careers (Fox Corporation)",
+      "title": "FOX News Channel – Our Brands",
+      "url": "https://foxcareers.com/OurBrands/FoxNewsChannel",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Owned by FOX Corporation, FOX News Media reaches 200 million people each month."
+     }
+    ],
+    "doesNotProve": "Shows corporate ownership of the network. It does not show the owner's direct involvement in Gutfeld's content."
+   }
+  ]
+ },
+ {
+  "id": "ms-now",
+  "name": "MS NOW",
+  "backing": [
+   {
+    "id": "ms-now-owner-versant",
+    "kind": "outlet owner",
+    "who": "Versant Media",
+    "summary": "MS NOW's own site carries a Versant Media, LLC copyright line, and The Desk reports that Comcast completed the spin-off of MS NOW and its other cable networks into Versant in January 2026.",
+    "period": "since 2026-01",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "MS NOW",
+      "title": "The Last Word with Lawrence O'Donnell",
+      "url": "https://www.ms.now/the-last-word",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "2026 Versant Media, LLC"
+     },
+     {
+      "publisher": "The Desk",
+      "title": "Comcast completes spin-out of cable networks into Versant",
+      "url": "https://thedesk.net/2026/01/comcast-completes-spin-out-of-cable-networks-into-versant/",
+      "date": "2026-01-05",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Versant now houses national cable networks including CNBC, MS NOW (formerly MSNBC), USA Network, Golf Channel, E!, Syfy and Oxygen..."
+     },
+     {
+      "publisher": "The Desk",
+      "title": "Comcast completes spin-out of cable networks into Versant",
+      "url": "https://thedesk.net/2026/01/comcast-completes-spin-out-of-cable-networks-into-versant/",
+      "date": "2026-01-05",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Comcast has formally completed the spin-off of its cable television networks and related digital assets into a new publicly-traded company called Versant..."
+     }
+    ],
+    "doesNotProve": "Corporate ownership does not show that the owner directs this host's editorial content. Before January 2026 the network belonged to Comcast's NBCUniversal; this row covers only the current owner."
+   }
+  ]
+ },
+ {
+  "id": "cnn",
+  "name": "CNN",
+  "backing": [
+   {
+    "id": "tapper-cnn-owner-skydance",
+    "kind": "outlet owner",
+    "who": "Skydance Corporation (formerly Paramount Skydance Corporation)",
+    "summary": "Skydance's 8-K exhibit says it completed its acquisition of Warner Bros. Discovery on 6 October 2026 and lists CNN among the combined company's brands.",
+    "period": "since 2026-10-06",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "US SEC (Skydance Corporation Form 8-K, Exhibit 99.1)",
+      "title": "Paramount completes acquisition of Warner Bros. Discovery",
+      "url": "https://www.sec.gov/Archives/edgar/data/0002041610/000110465926113913/tm2626659d7_ex99-1.htm",
+      "date": "2026-10-06",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "...CNN, CBS Sports, TNT Sports, Nickelodeon, Cartoon Network, MTV, Food Network, BET, HGTV, and Comedy Central."
+     }
+    ],
+    "doesNotProve": "Corporate ownership of CNN does not show that the owner directs Tapper's coverage."
+   }
+  ]
+ },
+ {
+  "id": "hbo",
+  "name": "HBO",
+  "backing": [
+   {
+    "id": "hbo-owner-skydance",
+    "kind": "outlet owner",
+    "who": "Skydance (the combined Paramount and Warner Bros. Discovery)",
+    "summary": "AP and TechCrunch report that Paramount completed its takeover of Warner Bros. Discovery on 6 October 2026, putting HBO Max and the Warner networks under the new company Skydance.",
+    "period": "since 2026-10-06",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Associated Press (via KSAT)",
+      "title": "Paramount completes its takeover of Warner Bros to become one Hollywood giant known as Skydance",
+      "url": "https://www.ksat.com/news/politics/2026/10/06/paramount-closes-on-81-billion-takeover-of-warner-bros-discovery-joining-two-of-americas-oldest-hollywood-studios/",
+      "date": "2026-10-06",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "HBO Max, titles ranging from “Harry Potter” to “Sinners” and networks such as CNN now also find themselves under the same roof as Paramount+, CBS..."
+     },
+     {
+      "publisher": "TechCrunch",
+      "title": "Paramount closes historic Warner Bros. merger to form Skydance",
+      "url": "https://techcrunch.com/?p=3174329",
+      "date": "2026-10-06",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "The deal, which is one of the biggest mergers of all time, brings together two major streaming platforms, Paramount+ and HBO Max..."
+     }
+    ],
+    "doesNotProve": "Neither report names Real Time or says the new owner changed the show's terms or content. AP also reports FCC approval for large indirect, non-voting Gulf state investment in Skydance; that is a fact about the parent company, not about Maher."
+   }
+  ]
+ },
+ {
+  "id": "comedy-central",
+  "name": "Comedy Central",
+  "backing": [
+   {
+    "id": "stewart-comedy-central-owner-skydance",
+    "kind": "outlet owner",
+    "who": "Skydance Corporation (formerly Paramount Skydance Corporation)",
+    "summary": "Skydance's 8-K exhibit of 6 October 2026 lists Comedy Central among the brands of the combined company.",
+    "period": "since 2025 (Paramount Skydance); combined company since 2026-10-06",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "US SEC (Skydance Corporation Form 8-K, Exhibit 99.1)",
+      "title": "Paramount completes acquisition of Warner Bros. Discovery",
+      "url": "https://www.sec.gov/Archives/edgar/data/0002041610/000110465926113913/tm2626659d7_ex99-1.htm",
+      "date": "2026-10-06",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "...CNN, CBS Sports, TNT Sports, Nickelodeon, Cartoon Network, MTV, Food Network, BET, HGTV, and Comedy Central."
+     }
+    ],
+    "doesNotProve": "Corporate ownership does not show the owner controls the show's content."
+   }
+  ]
+ },
+ {
+  "id": "al-jazeera",
+  "name": "Al Jazeera Media Network",
+  "backing": [
+   {
+    "id": "qassem-al-jazeera-qatar-funding",
+    "kind": "state funding",
+    "who": "Government of Qatar (per a US Justice Department letter)",
+    "summary": "Al Jazeera and Mother Jones report that a September 2020 US Justice Department letter said the Qatari government funds Al Jazeera and appoints its board; Al Jazeera condemned the related FARA order for AJ+.",
+    "period": "letter dated 2020-09-14",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Al Jazeera",
+      "title": "Al Jazeera condemns AJ+ FARA registration order in US",
+      "url": "https://www.aljazeera.com/news/2020/09/17/al-jazeera-condemns-aj-fara-registration-order-in-us/",
+      "date": "2020-09-17",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "...the Qatari government provides Al Jazeera’s funding and appoints its board of directors."
+     },
+     {
+      "publisher": "Mother Jones",
+      "title": "(title not captured; URL slug: trump-doj-al-jazeera-fara-uae-qatar)",
+      "url": "https://www.motherjones.com/politics/2020/09/trump-doj-al-jazeera-fara-uae-qatar/",
+      "date": "2020-09-15",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "...controlled and funded by the Government of Qatar..."
+     }
+    ],
+    "doesNotProve": "The DOJ determination concerned AJ+, the US social media unit, not al-Qassem or the Arabic channel's programmes; Al Jazeera disputes that it is controlled by Qatar. The DOJ letter itself was not read here."
+   },
+   {
+    "id": "al-jazeera-owner-qatar",
+    "kind": "state funding",
+    "who": "Al Jazeera Media Network, a private foundation for public benefit under Qatari law, part-funded by the Qatari government",
+    "summary": "Al Jazeera says it is a private foundation for public benefit not owned by Qatar, and State Media Monitor says AJMN states publicly that the Qatari government funds it in part.",
+    "period": "current",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Al Jazeera Media Network",
+      "title": "FAQ",
+      "url": "https://network.aljazeera.net/en/more/faq",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Al Jazeera Media Network is a Private Foundation for Public Benefit under Qatari law; it is not owned by Qatar,"
+     },
+     {
+      "publisher": "State Media Monitor",
+      "title": "Al Jazeera Media Network (AJMN)",
+      "url": "https://statemediamonitor.com/2024/07/al-jazeera-media-network-ajmn/",
+      "date": "2026-06-17",
+      "read": "2026-10-21",
+      "kind": "researcher",
+      "quote": "AJMN states publicly that it is funded in part by the Qatari government."
+     }
+    ],
+    "doesNotProve": "Al Jazeera states its content is not directed or controlled by the Qatari government; the share of state funding is an outside estimate. It does not show Al-Fares's own posts are state-directed."
+   }
+  ]
+ },
+ {
+  "id": "rumble",
+  "name": "Rumble",
+  "backing": [
+   {
+    "id": "tether-rumble-stake",
+    "kind": "investor",
+    "who": "Tether (shareholder in Rumble Inc.)",
+    "summary": "Crypto Briefing and ForkLog report that the stablecoin issuer Tether agreed in December 2024 to buy a large block of Rumble Class A shares.",
+    "period": "since 2024-12",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Crypto Briefing",
+      "title": "Rumble secures $775 million investment from Tether",
+      "url": "https://cryptobriefing.com/rumble-tether-investment-growth/",
+      "date": "2024-12-20",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "As part of the deal, Tether will purchase 103,333,333 shares of Rumble Class A Common Stock at $7.50 per share."
+     },
+     {
+      "publisher": "ForkLog",
+      "title": "Tether Commits $775 Million to Rival YouTube",
+      "url": "https://forklog.com/en/news/tether-commits-775-million-to-rival-youtube",
+      "date": "2024-12-21",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "...the issuer of the popular stablecoin USDT, has announced a strategic investment of $775 million in the Canadian video hosting and cloud storage platform Rumble"
+     }
+    ],
+    "doesNotProve": "This concerns the platform that carries Greenwald's show, not Greenwald or the show itself. It does not show any Tether role in his content."
+   }
+  ]
+ },
+ {
+  "id": "bbc",
+  "name": "BBC",
+  "backing": [
+   {
+    "id": "kuenssberg-bbc-licence-fee",
+    "kind": "public funding",
+    "who": "British Broadcasting Corporation, a body corporate under Royal Charter funded through the licence fee",
+    "summary": "The BBC Charter and Framework Agreement published on GOV.UK say the BBC is a body corporate and that the Secretary of State pays it sums equal to net licence revenue.",
+    "period": null,
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "GOV.UK (Department for Culture, Media and Sport)",
+      "title": "BBC Charter",
+      "url": "https://www.gov.uk/government/publications/bbc-charter-and-framework-agreement/bbc-charter",
+      "date": "2025-12-16",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "The BBC shall continue to be a body corporate by the name of the British Broadcasting Corporation."
+     },
+     {
+      "publisher": "GOV.UK (Department for Culture, Media and Sport)",
+      "title": "BBC Framework Agreement",
+      "url": "https://www.gov.uk/government/publications/bbc-charter-and-framework-agreement/bbc-framework-agreement",
+      "date": "2025-12-16",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "The Secretary of State must pay to the BBC out of money provided by Parliament sums equal to the whole of the net Licence Revenue..."
+     }
+    ],
+    "doesNotProve": "Public funding through the licence fee does not show government direction of editorial content; the Charter sets out separate governance and regulation. The date given is the page's last update."
+   }
+  ]
+ },
+ {
+  "id": "mbc",
+  "name": "MBC Group",
+  "backing": [
+   {
+    "id": "mbc-group-saudi-state",
+    "kind": "outlet owner",
+    "who": "MBC Group, majority-owned by the Saudi government through Istedamah Holding Company",
+    "summary": "MBC Group's IPO prospectus, published by Saudi Arabia's Capital Market Authority, says MBC MASR is a Group channel, that the Group is ultimately owned by the Saudi government, and that the government funds some Group projects.",
+    "period": "as of 2023-11-21",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Capital Market Authority (MBC Group prospectus)",
+      "title": "MBC Group Prospectus",
+      "url": "https://cma.org.sa/en/Market/Prospectuses/Documents/MBC_en.pdf",
+      "date": "2023-11-21",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "The Group expanded its Egyptian operation by launching a dedicated TV channel, MBC MASR."
+     },
+     {
+      "publisher": "Capital Market Authority (MBC Group prospectus)",
+      "title": "MBC Group Prospectus",
+      "url": "https://cma.org.sa/en/Market/Prospectuses/Documents/MBC_en.pdf",
+      "date": "2023-11-21",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "...as the Group is ultimately owned by the Government."
+     },
+     {
+      "publisher": "Capital Market Authority (MBC Group prospectus)",
+      "title": "MBC Group Prospectus",
+      "url": "https://cma.org.sa/en/Market/Prospectuses/Documents/MBC_en.pdf",
+      "date": "2023-11-21",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "The Group receives funding for these Expansion Projects from the government (represented by its majority shareholder Istedamah Holding Company (\"Istedamah\"), a KSA government-owned company)..."
+     }
+    ],
+    "doesNotProve": "The prospectus describes ownership before the IPO; Wikipedia, citing Arab News (not readable here), says the state stake later moved to the Public Investment Fund. Ownership does not show that the owner scripts Adib's programme."
+   }
+  ]
+ },
+ {
+  "id": "geo-news",
+  "name": "Geo News",
+  "backing": [
+   {
+    "id": "mir-geo-owner",
+    "kind": "outlet owner",
+    "who": "Independent Media Corporation (Private) Limited, majority-owned by Mir Shakil-ur-Rahman (Jang Group)",
+    "summary": "The Media Ownership Monitor Pakistan (RSF and Global Media Registry) says Geo.tv is owned by Independent Media Corporation, majority-owned by Jang Group head Mir Shakil-ur-Rahman.",
+    "period": null,
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Media Ownership Monitor Pakistan (Global Media Registry / RSF)",
+      "title": "Geo TV",
+      "url": "https://pakistan.mom-gmr.org/en/media/detail/outlet/geotv/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "researcher",
+      "quote": "Geo.tv is owned by Independent Media Corporation (Private) Limited, 75% shares of which are owned by Mir Shakil-ur-Rahman."
+     }
+    ],
+    "doesNotProve": "This is a researcher database, not the company filing itself, and its date is not shown. Ownership does not show that the owner directs Mir's programme."
+   }
+  ]
+ },
+ {
+  "id": "india-tv",
+  "name": "India TV",
+  "backing": [
+   {
+    "id": "independent-news-service-owner",
+    "kind": "outlet owner",
+    "who": "Independent News Service",
+    "summary": "Media Ownership Monitor India says India TV is owned and managed by Independent News Service, a company Sharma co-founded.",
+    "period": "current",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Media Ownership Monitor India (RSF / Global Media Registry)",
+      "title": "India TV",
+      "url": "https://india.mom-gmr.org/en/media/detail/outlet/india-tv/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "researcher",
+      "quote": "India TV is owned and managed by Independent News Service which holds 100% control of the channel."
+     }
+    ],
+    "doesNotProve": "The monitor's data may be dated; no company filing was read, and the current shareholder list is not confirmed."
+   }
+  ]
+ },
+ {
+  "id": "india-today",
+  "name": "India Today Group",
+  "backing": [
+   {
+    "id": "living-media-india",
+    "kind": "outlet owner",
+    "who": "Living Media India Limited",
+    "summary": "The India Today Group website carries a Living Media India Limited copyright line, which points to the corporate owner of the group's sites.",
+    "period": null,
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "India Today Group",
+      "title": "India Today Group website",
+      "url": "https://www.indiatodaygroup.com/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Copyright © Living Media India Limited."
+     }
+    ],
+    "doesNotProve": "A copyright notice is an ambiguous ownership signal; it does not show shareholding, and the TV channels he anchors on are run by a listed company (TV Today Network) whose shareholders were not read."
+   }
+  ]
+ },
+ {
+  "id": "hurriyet",
+  "name": "Hürriyet",
+  "backing": [
+   {
+    "id": "demiroren-owns-hurriyet",
+    "kind": "outlet owner",
+    "who": "Demirören Media Group",
+    "summary": "RSF's Media Ownership Monitor says Demirören Media Group owns 79 percent of Hürriyet's publisher after a 2018 sale, and BirGün reported in March 2018 that the Doğan Media Group was sold to Erdoğan Demirören.",
+    "period": "since 2018",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Media Ownership Monitor Turkey (RSF)",
+      "title": "Hürriyet",
+      "url": "https://turkey.mom-rsf.org/en/media/detail/outlet/huerriyet/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "researcher",
+      "quote": "79 percent of the shares of Hürriyet Gazetecilik ve Matbaacılık A.Ş are owned by Demirören Media Group."
+     },
+     {
+      "publisher": "BirGün",
+      "title": "The Doğan Media Group sold to pro-government media company",
+      "url": "https://birgun.net/haber/the-dogan-media-group-sold-to-pro-government-media-company-208910",
+      "date": "2018-03-21",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "...has been sold to pro-government businessman Erdoğan Demirören."
+     }
+    ],
+    "doesNotProve": "The MOM ownership figures are undated and may not reflect 2026. Ownership does not show the owner directs his columns; 'pro-government' is the sources' own description."
+   }
+  ]
+ },
+ {
+  "id": "globo",
+  "name": "TV Globo",
+  "backing": [
+   {
+    "id": "grupo-globo-marinho",
+    "kind": "outlet owner",
+    "who": "Grupo Globo (Marinho family)",
+    "summary": "The Media Ownership Monitor Brazil says Rede Globo belongs to Grupo Globo, which is owned by the Marinho family.",
+    "period": null,
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Media Ownership Monitor Brazil",
+      "title": "Rede Globo",
+      "url": "https://brazil.mom-gmr.org/en/media/detail/outlet/rede-globo/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "researcher",
+      "quote": "The TV network Rede Globo belongs to Grupo Globo. The group is owned by the Marinho family."
+     }
+    ],
+    "doesNotProve": "The MOM page is undated and does not show owner direction of news content."
+   }
+  ]
+ },
+ {
+  "id": "grupo-formula",
+  "name": "Grupo Fórmula",
+  "backing": [
+   {
+    "id": "lopezdoriga-formula-owner",
+    "kind": "outlet owner",
+    "who": "Grupo Fórmula, led by Jaime Azcárraga",
+    "summary": "El CEO reported in 2024 that Jaime Azcárraga owns Grupo Fórmula, and the Media Ownership Monitor Mexico says Radio Fórmula XERFR belongs to Grupo Fórmula.",
+    "period": "since 2022",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "El CEO",
+      "title": "¿Quién es el dueño de Grupo Fórmula?",
+      "url": "https://elceo.com/liderazgo/quien-es-el-dueno-de-grupo-formula/",
+      "date": "2024-09-18",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Jaime Azcárraga es hoy el dueño de Grupo Fórmula"
+     },
+     {
+      "publisher": "Media Ownership Monitor Mexico (RSF / Global Media Registry)",
+      "title": "Radio Fórmula (XERFR 970 AM)",
+      "url": "https://mexico.mom-gmr.org/en/media/detail/outlet/radio-formula-xerfr-970-am-1/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "researcher",
+      "quote": "The station Radio Fórmula XERFR 970 AM belongs to the conglomerate Grupo Fórmula."
+     }
+    ],
+    "doesNotProve": "The monitor page is undated and still names the late Rogerio Azcárraga Madero as president, so its shareholder data may be stale; ownership does not show editorial direction."
+   }
+  ]
+ },
+ {
+  "id": "times-radio",
+  "name": "Times Radio",
+  "backing": [
+   {
+    "id": "times-radio-owner-news-uk",
+    "kind": "outlet owner",
+    "who": "News UK",
+    "summary": "News UK's brands page lists Times Radio among its brands.",
+    "period": null,
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "News UK",
+      "title": "OUR BRANDS - News UK",
+      "url": "https://www.news.co.uk/our-brands/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "View talkSPORT View Times Radio View Virgin Radio"
+     }
+    ],
+    "doesNotProve": "Shows News UK owns the station; it does not show News UK or its parent directs Neil's commentary."
+   }
+  ]
+ },
+ {
+  "id": "rt",
+  "name": "RT",
+  "backing": [
+   {
+    "id": "rt-state-funded",
+    "kind": "state funding",
+    "who": "Government of Russia",
+    "summary": "The SDNY indictment, as summarized by the US Attorney's Office, alleges RT is funded and directed by the Government of Russia, and Treasury calls RT state-funded.",
+    "period": null,
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "U.S. Department of the Treasury",
+      "title": "Treasury Takes Action as Part of a U.S. Government Response to Russia's Foreign Malign Influence Operations",
+      "url": "https://home.treasury.gov/news/press-releases/jy2559",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Beginning in early 2024, executives at RT - Russia’s state-funded news media outlet - began an even more nefarious effort..."
+     }
+    ],
+    "doesNotProve": "These are US government statements; they do not name RT's legal owner entity or detail its budget."
+   }
+  ]
+ },
+ {
+  "id": "russia-1",
+  "name": "Russia-1",
+  "backing": [
+   {
+    "id": "rossiya-1-state-owned",
+    "kind": "outlet owner",
+    "who": "The Russian state",
+    "summary": "The EU sanctions listing describes Rossiya-1 as state-owned.",
+    "period": null,
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "European Commission",
+      "title": "Consolidated list of persons, groups and entities subject to EU financial sanctions (CSV, list dated 2026-10-15)",
+      "url": "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
+      "date": "2026-10-15",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Journalist of the state-owned TV Rossiya-1, leading a political talk-show"
+     },
+     {
+      "publisher": "Official Journal of the European Union",
+      "title": "Council Implementing Regulation (EU) 2022/336",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0336",
+      "date": "2022-02-28",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Ms. Olga Skabeyeva is a journalist of the state-owned TV station Rossiya-1.",
+      "readBy": "browser"
+     }
+    ],
+    "doesNotProve": "Ownership is not the same as directing a programme's words. The EU describes ownership; it does not quote a corporate filing."
+   }
+  ]
+ },
+ {
+  "id": "global-times",
+  "name": "Global Times",
+  "backing": [
+   {
+    "id": "global-times-owner",
+    "kind": "outlet owner",
+    "who": "People's Daily",
+    "summary": "The Guardian reports the Global Times is owned by the People's Daily, the Communist Party's flagship newspaper; the China Media Project calls it state-run.",
+    "period": null,
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "The Guardian",
+      "title": "Outspoken editor of Chinese state tabloid Global Times retires",
+      "url": "https://www.theguardian.com/world/2021/dec/16/editor-of-chinese-state-tabloid-global-times-retires",
+      "date": "2021-12-16",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "...the Global Times, which is owned by the ruling Communist party’s flagship newspaper the People’s Daily."
+     },
+     {
+      "publisher": "China Media Project",
+      "title": "Hu Xijin Quietly Returns",
+      "url": "https://chinamediaproject.org/2024/11/08/hu-xijin-quietly-returns/",
+      "date": "2024-11-08",
+      "read": "2026-10-21",
+      "kind": "researcher",
+      "quote": "...the once outspoken former editor-in-chief of China’s state-run Global Times tabloid..."
+     }
+    ],
+    "doesNotProve": "Only one fetched outlet states the People's Daily ownership; the Global Times' own about page does not state its owner. It does not show who directs his current commentary."
+   }
+  ]
+ },
+ {
+  "id": "real-americas-voice",
+  "name": "Real America's Voice",
+  "backing": [
+   {
+    "id": "rav-owner",
+    "kind": "outlet owner",
+    "who": "Performance One Media LLC (chairman Robert Sigg, per RAV)",
+    "summary": "Real America's Voice's about page says it is a wholly owned subsidiary of Performance One Media LLC and lists Robert Sigg as chairman.",
+    "period": "current",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Real America's Voice",
+      "title": "About",
+      "url": "https://americasvoice.news/about",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Real America’s Voice is a wholly owned subsidiary of Performance One Media LLC."
+     }
+    ],
+    "doesNotProve": "This is the network's ownership, not Bannon's own production company; it does not show any payment to Bannon."
+   }
+  ]
+ },
+ {
+  "id": "human-events",
+  "name": "Human Events",
+  "backing": [
+   {
+    "id": "posobiec-jtn-owns-human-events",
+    "kind": "outlet owner",
+    "who": "JTN Network (parent of Just the News)",
+    "summary": "JTN Network's own announcement says it acquired Human Events, the outlet where Posobiec is listed as senior editor.",
+    "period": "since 2025",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Just the News",
+      "title": "Just the News parent company acquires The Post Millennial, Human Events",
+      "url": "https://justthenews.com/accountability/media/jtn-network-acquires-post-millennial-human-events",
+      "date": "2025-11-10",
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "JTN Network, the parent company of Just the News, announced Monday that it has acquired the news brands Human Events..."
+     }
+    ],
+    "doesNotProve": "The announcement does not name Posobiec or say whether Human Events Daily continues under the new owner."
+   }
+  ]
+ }
+]

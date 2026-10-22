@@ -4813,6 +4813,68 @@ function opsTrend(table = TABLE) {
 return { setOpsTable, opsOfDomain, opsOfHandle, opsLookup, profileLinks, OPS_DOES_NOT_PROVE, opRows, OPS_TREND_CAVEAT, opsTrend };
 })();
 
+// ---- backing.js
+const M_backing = (() => {
+// Documented backing of public media personalities (src/ext/personalities.json, built by
+// scripts/personalities-build.mjs): the matcher behind "Backing on record", and the window's rows.
+// An account matches when the table lists that exact handle on that platform, or that YouTube
+// channel id. Every row is the sources' own words with dates, quotes and what it does not prove.
+// The same rows and the same level for everyone: no input here is a person's side, country or name.
+
+let PEOPLE = [];
+const BY_HANDLE = new Map(), BY_CHANNEL = new Map();
+const key = (platform, handle) => `${String(platform || "").toLowerCase()}:${String(handle || "").replace(/^@/, "").toLowerCase()}`;
+
+// table: { people } as personalities.json has it, or a part of it from the background worker.
+function setBackingTable(table) {
+  PEOPLE = (table && table.people) || [];
+  BY_HANDLE.clear(); BY_CHANNEL.clear();
+  for (const p of PEOPLE) {
+    for (const [platform, handle] of p.accounts || []) BY_HANDLE.set(key(platform, handle), p);
+    for (const c of p.channels || []) BY_CHANNEL.set(c, p);
+  }
+}
+
+// Radar's site ids are the platform names the table uses ("fixture" behaves as X).
+const PLATFORM_OF = { fixture: "x" };
+const backingOf = (site, handle) => BY_HANDLE.get(key(PLATFORM_OF[site] || site, handle)) || null;
+const backingOfChannel = (id) => (id && BY_CHANNEL.get(id)) || null;
+
+// The part of a full table a page needs: the people behind these [site, handle] pairs and channel ids.
+function backingLookup(table, { accounts = [], channels = [] } = {}) {
+  const want = new Set(accounts.map(([s, h]) => key(PLATFORM_OF[s] || s, h))), ch = new Set(channels);
+  return { ...table, people: ((table && table.people) || []).filter((p) => (p.accounts || []).some(([s, h]) => want.has(key(s, h))) || (p.channels || []).some((c) => ch.has(c))) };
+}
+
+// Distinct documents behind a person's rows (Wikidata is shown apart and not counted).
+const sourceCount = (p) => new Set((p.rows || []).flatMap((r) => r.sources.map((s) => s.url))).size;
+const backingLabel = (p) => { const n = sourceCount(p); return `Backing on record: ${n} source${n === 1 ? "" : "s"}`; };
+
+const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person says nothing on its own about whether a given post is true, or that the backer chose its words. Allegations in court records are unproven. Records go out of date; each row gives the date it was read.";
+const CORRECTIONS_PATH = "https://github.com/HarperZ9/radar/blob/dev/data/owner-corrections.json";
+
+const STATUS_WORDS = { documented: "documented in a primary record", reported: "reported by the press", alleged: "alleged, not proven" };
+const quoteLine = (s) => `${s.publisher}${s.date ? ` (${s.date})` : ""}, read ${s.read}: "${s.quote}"`;
+
+// The window's rows for one person, in the sources' own words.
+function backingRows(p) {
+  const rows = [["Backing on record", `${p.name}, ${p.role}. ${sourceCount(p)} documents in ${p.rows.length} record${p.rows.length === 1 ? "" : "s"}.`]];
+  for (const r of p.rows) {
+    rows.push([r.kind[0].toUpperCase() + r.kind.slice(1), `${r.who}${r.via ? ` (as owner or backer of ${r.via})` : ""}${r.period ? `, ${r.period}` : ""}. ${r.summary} Status: ${STATUS_WORDS[r.status]}; confidence ${r.confidence}.`]);
+    rows.push(["Sources say", r.sources.slice(0, 3).map(quoteLine).join(" ")]);
+    rows.push(["Read it", { links: r.sources.slice(0, 3).map((s) => [String(s.url).replace(/^https?:\/\//, "").slice(0, 48), s.url]) }]);
+    if (r.campaign) rows.push(["Documented campaign", `${r.campaign.name}: ${r.campaign.contentType}${r.campaign.dates ? `, ${r.campaign.dates}` : ""}.${(r.campaign.techniques || []).length ? ` Techniques the source supports: ${r.campaign.techniques.join("; ")}.` : ""}`]);
+    rows.push(["This does not prove", r.doesNotProve]);
+  }
+  if (p.wikidata && p.wikidata.employers && p.wikidata.employers.length) rows.push(["Wikidata lists", `Employer (P108): ${p.wikidata.employers.map((e) => e.label + (e.end ? ` (to ${e.end.slice(0, 4)})` : "")).join("; ")}. Fetched ${p.wikidata.fetched}; Wikidata can lag a move.`]);
+  rows.push(["Wrong or out of date?", { links: [["Send a sourced correction", CORRECTIONS_PATH]] }]);
+  rows.push(["Does not prove", BACKING_DOES_NOT_PROVE]);
+  return rows;
+}
+
+return { setBackingTable, backingOf, backingOfChannel, backingLookup, sourceCount, backingLabel, BACKING_DOES_NOT_PROVE, CORRECTIONS_PATH, backingRows };
+})();
+
 // ---- cloned.js
 const M_cloned = (() => {
 // Cloned-outlet framing (project-docs/TECHNIQUES.md, technique 3; DISARM T0098 Establish Inauthentic
@@ -8133,6 +8195,7 @@ const FAMILIES = [
   ["laundered", "Material passed through other accounts", "sources", D],
   ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
   ["state-link", "State link", "sources", T], ["named-in-report", "Named in a published report", "sources", T],
+  ["backing-record", "Backing on record", "sources", T],
   ["lookalike-domain", "Look-alike news address", "sources", D], ["owner", "Outlet owner", "sources", T], ["site-record", "Site facts and fact-check record", "sources", T],
   ["client", "Posting app", "posting", P], ["written-in", "Written in another language", "place", P],
   ["mismatch", "Speaks as local, labelled elsewhere", "place", D], ["store-elsewhere", "App store elsewhere", "place", D],
@@ -9548,5 +9611,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_signing, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_signing, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

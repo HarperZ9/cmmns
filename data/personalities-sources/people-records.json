@@ -1,0 +1,1301 @@
+[
+ {
+  "id": "lauren-southern",
+  "name": "Lauren Southern",
+  "qid": "Q24078962",
+  "role": "YouTuber and documentary filmmaker",
+  "country": "Canada",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": {
+   "platform": "x",
+   "followers": 718000,
+   "asOf": "2025-03-30",
+   "source": "Wikidata P8687"
+  },
+  "accounts": [
+   {
+    "platform": "youtube",
+    "handle": "LaurenSouthern",
+    "channelId": "UCU4AI156JLH5VTJNVjg-T6Q",
+    "url": "https://www.youtube.com/@LaurenSouthern"
+   }
+  ],
+  "backing": [
+   {
+    "id": "tenet-media-contributor",
+    "kind": "employer",
+    "who": "Tenet Media (U.S. Company-1 in the indictment)",
+    "summary": "Tenet Media's own website listed Lauren Southern under 'Meet the talent', and NBC News, Washingtonian and Southern's own November 2024 testimony to a Canadian House of Commons committee say she made videos for Tenet.",
+    "period": "2023 to 2024",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Tenet Media (archived by the Wayback Machine)",
+      "title": "TENET MEDIA | Fearless Voices Live Here",
+      "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Tenet Media is a network of heterodox commentators that focus on Western political and cultural issues."
+     },
+     {
+      "publisher": "NBC News",
+      "title": "Russian money was funneled to right-wing creators through a pro-Trump media outlet, prosecutors say",
+      "url": "https://www.nbcnews.com/news/amp/rcna169611",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Tenet has partnered with six commentators: Lauren Southern, Tim Pool, Tayler Hansen, Matt Christiansen, Dave Rubin and Benny Johnson."
+     },
+     {
+      "publisher": "Washingtonian",
+      "title": "These Are the Conservative Commentators Who Allegedly Got Hoodwinked (and Indirectly Paid!) by Russia",
+      "url": "https://washingtonian.com/2024/09/05/these-are-the-conservative-commentators-who-allegedly-got-hoodwinked-and-indirectly-paid-by-russia/",
+      "date": "2024-09-05",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Benny Johnson, Dave Rubin, and Lauren Southern worked for Tenet Media."
+     },
+     {
+      "publisher": "openparliament.ca (House of Commons Standing Committee on Public Safety and National Security transcript)",
+      "title": "Public Safety Committee on Nov. 21st, 2024",
+      "url": "https://openparliament.ca/committees/public-safety/44-1/130/?page=2",
+      "date": "2024-11-21",
+      "read": "2026-10-21",
+      "kind": "self",
+      "quote": "In late 2023, I was contracted to make weekly videos by a start-up company called Tenet Media."
+     }
+    ],
+    "doesNotProve": "Being listed as Tenet talent does not show that Lauren Southern knew who funded Tenet. Tenet shut down in September 2024, so this role has ended."
+   },
+   {
+    "id": "tenet-rt-indictment",
+    "kind": "court record",
+    "who": "RT, via employees Kostiantyn Kalashnikov and Elena Afanasyeva (as alleged)",
+    "summary": "The SDNY indictment alleges that RT covertly financed and directed U.S. Company-1, which press reports identify as Tenet Media, the outlet Lauren Southern made videos for; the indictment uses descriptions, not names, and does not accuse Lauren Southern of wrongdoing or say Lauren Southern knew of the RT funding. Southern told a Canadian parliamentary committee she had no knowledge of the allegations while at Tenet.",
+    "period": "2023 to 2024",
+    "status": "alleged",
+    "sources": [
+     {
+      "publisher": "U.S. District Court, Southern District of New York (via justice.gov)",
+      "title": "United States v. Kalashnikov and Afanasyeva, Indictment",
+      "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "court",
+      "quote": "...also worked together to deceive two U.S. online commentators..."
+     },
+     {
+      "publisher": "U.S. District Court, Southern District of New York (via justice.gov)",
+      "title": "United States v. Kalashnikov and Afanasyeva, Indictment",
+      "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "court",
+      "quote": "with an initial lineup of six content creators"
+     },
+     {
+      "publisher": "openparliament.ca (House of Commons Standing Committee on Public Safety and National Security transcript)",
+      "title": "Public Safety Committee on Nov. 21st, 2024",
+      "url": "https://openparliament.ca/committees/public-safety/44-1/130/?page=2",
+      "date": "2024-11-21",
+      "read": "2026-10-21",
+      "kind": "self",
+      "quote": "First, at no point during my involvement with Tenet did I ever have knowledge of the allegations in the indictment."
+     },
+     {
+      "publisher": "CBC News",
+      "title": "Meet the right-wing Canadian influencers accused of collaborating with an alleged Russian propaganda scheme",
+      "url": "https://www.cbc.ca/news/investigates/russian-influence-election-tenet-media-chen-southern-1.7314976",
+      "date": "2024-09-09",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Neither Chen, Donovan nor Southern are the subject of criminal charges, and none are named in the indictment."
+     }
+    ],
+    "doesNotProve": "The indictment does not name Lauren Southern and charges no commentator; it says two unnamed commentators (Commentator-1 and Commentator-2) were deceived about the funding and does not say what the other commentators knew. It does not show that RT controlled Lauren Southern's own content, and the allegations are unproven.",
+    "campaign": {
+     "name": "RT covert funding and direction of U.S. Company-1 (reported as Tenet Media), as alleged in US v. Kalashnikov and Afanasyeva",
+     "contentType": "commentator videos produced under contract for license and publication by U.S. Company-1 on YouTube, X, TikTok and Instagram",
+     "dates": "2023-10 to 2024-08",
+     "techniques": [
+      "T0100 Co-Opt Trusted Sources"
+     ]
+    }
+   }
+  ],
+  "leads": [
+   {
+    "claim": "Which numbered commentator (Commentator-3 to Commentator-6) in the indictment corresponds to Southern.",
+    "searched": "Read the indictment text, NBC News, CBC, Washingtonian, Mother Jones.",
+    "result": "No fetched source maps Southern to a numbered commentator; left unassigned."
+   },
+   {
+    "claim": "Southern posted a statement on X claiming full editorial control after the indictment.",
+    "searched": "Web search summary pointed to press reports; the X post itself was not fetched.",
+    "result": "Unverified from the original post; her parliamentary testimony (recorded above) is used instead."
+   },
+   {
+    "claim": "Other sponsors, investors, grants, FARA, sanctions or campaign-finance records.",
+    "searched": "Brief search for each kind; web search budget for this session ran out before a full sweep.",
+    "result": "Nothing found in fetched pages; not checked exhaustively."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "tayler-hansen",
+  "name": "Tayler Hansen",
+  "qid": null,
+  "role": "field reporter and video journalist",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [
+   {
+    "platform": "youtube",
+    "handle": "TaylerHansenUSA",
+    "channelId": "UCrtCUansKzMxD8N2Vqbydew",
+    "url": "https://www.youtube.com/@TaylerHansenUSA"
+   }
+  ],
+  "backing": [
+   {
+    "id": "tenet-media-contributor",
+    "kind": "employer",
+    "who": "Tenet Media (U.S. Company-1 in the indictment)",
+    "summary": "Tenet Media's own website listed Tayler Hansen under 'Meet the talent', and NBC News, Mother Jones and The New Republic name him as a Tenet field reporter.",
+    "period": "2023 to 2024",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Tenet Media (archived by the Wayback Machine)",
+      "title": "TENET MEDIA | Fearless Voices Live Here",
+      "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Tenet Media is a network of heterodox commentators that focus on Western political and cultural issues."
+     },
+     {
+      "publisher": "Tenet Media (archived by the Wayback Machine)",
+      "title": "TENET MEDIA | Fearless Voices Live Here",
+      "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Tayler Hansen is a Field Reporter for TENET Media."
+     },
+     {
+      "publisher": "NBC News",
+      "title": "Russian money was funneled to right-wing creators through a pro-Trump media outlet, prosecutors say",
+      "url": "https://www.nbcnews.com/news/amp/rcna169611",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Tenet has partnered with six commentators: Lauren Southern, Tim Pool, Tayler Hansen, Matt Christiansen, Dave Rubin and Benny Johnson."
+     },
+     {
+      "publisher": "Mother Jones",
+      "title": "Tenet Media Shutters After Being Accused of Taking $10 Million in Covert Kremlin Funding",
+      "url": "https://www.motherjones.com/politics/2024/09/tenet-media-closed/",
+      "date": "2024-09-06",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Tayler Hansen, a self-described “field reporter” for the outlet, wrote that Tenet “has ended after the DOJ indictment.”"
+     },
+     {
+      "publisher": "The New Republic",
+      "title": "Pro-Trump Media Firm Abruptly Folds After Russia Scheme Exposed",
+      "url": "https://newrepublic.com/post/185686/donald-trump-tenet-media-russia-scheme",
+      "date": "2024-09-06",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "...according to Tenet Media field reporter Tayler Hansen."
+     }
+    ],
+    "doesNotProve": "Being listed as Tenet talent does not show that Tayler Hansen knew who funded Tenet. Tenet shut down in September 2024, so this role has ended."
+   },
+   {
+    "id": "tenet-rt-indictment",
+    "kind": "court record",
+    "who": "RT, via employees Kostiantyn Kalashnikov and Elena Afanasyeva (as alleged)",
+    "summary": "The SDNY indictment alleges that RT covertly financed and directed U.S. Company-1, which press reports identify as Tenet Media, the outlet Tayler Hansen made videos for; the indictment uses descriptions, not names, and does not accuse Tayler Hansen of wrongdoing or say Tayler Hansen knew of the RT funding. Hansen said on X, as quoted by NBC News, that the allegations were a complete shock to him.",
+    "period": "2023 to 2024",
+    "status": "alleged",
+    "sources": [
+     {
+      "publisher": "U.S. District Court, Southern District of New York (via justice.gov)",
+      "title": "United States v. Kalashnikov and Afanasyeva, Indictment",
+      "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "court",
+      "quote": "...also worked together to deceive two U.S. online commentators..."
+     },
+     {
+      "publisher": "U.S. District Court, Southern District of New York (via justice.gov)",
+      "title": "United States v. Kalashnikov and Afanasyeva, Indictment",
+      "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "court",
+      "quote": "with an initial lineup of six content creators"
+     },
+     {
+      "publisher": "NBC News",
+      "title": "Russian money was funneled to right-wing creators through a pro-Trump media outlet, prosecutors say",
+      "url": "https://www.nbcnews.com/news/amp/rcna169611",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "These allegations come as a complete shock to me and the other hosts at TENET Media."
+     }
+    ],
+    "doesNotProve": "The indictment does not name Tayler Hansen and charges no commentator; it says two unnamed commentators (Commentator-1 and Commentator-2) were deceived about the funding and does not say what the other commentators knew. It does not show that RT controlled Tayler Hansen's own content, and the allegations are unproven.",
+    "campaign": {
+     "name": "RT covert funding and direction of U.S. Company-1 (reported as Tenet Media), as alleged in US v. Kalashnikov and Afanasyeva",
+     "contentType": "commentator videos produced under contract for license and publication by U.S. Company-1 on YouTube, X, TikTok and Instagram",
+     "dates": "2023-10 to 2024-08",
+     "techniques": [
+      "T0100 Co-Opt Trusted Sources"
+     ]
+    }
+   }
+  ],
+  "leads": [
+   {
+    "claim": "Which numbered commentator in the indictment corresponds to Hansen.",
+    "searched": "Read the indictment text and NBC News, Mother Jones, The New Republic.",
+    "result": "No fetched source maps Hansen to a numbered commentator."
+   },
+   {
+    "claim": "Other sponsors, investors, grants, FARA, sanctions or campaign-finance records.",
+    "searched": "Brief search for each kind; web search budget ran out before a full sweep.",
+    "result": "Nothing found in fetched pages; not checked exhaustively."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "matt-christiansen",
+  "name": "Matt Christiansen",
+  "qid": null,
+  "role": "political commentator and YouTuber",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [],
+  "backing": [
+   {
+    "id": "tenet-media-contributor",
+    "kind": "employer",
+    "who": "Tenet Media (U.S. Company-1 in the indictment)",
+    "summary": "Tenet Media's own website listed Matt Christiansen under 'Meet the talent', and NBC News and Washingtonian report his statements about his videos for Tenet.",
+    "period": "2023 to 2024",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Tenet Media (archived by the Wayback Machine)",
+      "title": "TENET MEDIA | Fearless Voices Live Here",
+      "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Tenet Media is a network of heterodox commentators that focus on Western political and cultural issues."
+     },
+     {
+      "publisher": "Tenet Media (archived by the Wayback Machine)",
+      "title": "TENET MEDIA | Fearless Voices Live Here",
+      "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Matt Christiansen is a political commentator from Bozeman, Montana."
+     },
+     {
+      "publisher": "NBC News",
+      "title": "Russian money was funneled to right-wing creators through a pro-Trump media outlet, prosecutors say",
+      "url": "https://www.nbcnews.com/news/amp/rcna169611",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Tenet has partnered with six commentators: Lauren Southern, Tim Pool, Tayler Hansen, Matt Christiansen, Dave Rubin and Benny Johnson."
+     },
+     {
+      "publisher": "NBC News",
+      "title": "Russian money was funneled to right-wing creators through a pro-Trump media outlet, prosecutors say",
+      "url": "https://www.nbcnews.com/news/amp/rcna169611",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "My videos and streams for Tenet are exactly the same as my videos and streams on my personal channels."
+     },
+     {
+      "publisher": "Washingtonian",
+      "title": "These Are the Conservative Commentators Who Allegedly Got Hoodwinked (and Indirectly Paid!) by Russia",
+      "url": "https://washingtonian.com/2024/09/05/these-are-the-conservative-commentators-who-allegedly-got-hoodwinked-and-indirectly-paid-by-russia/",
+      "date": "2024-09-05",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "“At no point has anyone ever directed me what to say or not to say, and I would never agree to anything otherwise.”"
+     }
+    ],
+    "doesNotProve": "Being listed as Tenet talent does not show that Matt Christiansen knew who funded Tenet. Tenet shut down in September 2024, so this role has ended."
+   },
+   {
+    "id": "tenet-rt-indictment",
+    "kind": "court record",
+    "who": "RT, via employees Kostiantyn Kalashnikov and Elena Afanasyeva (as alleged)",
+    "summary": "The SDNY indictment alleges that RT covertly financed and directed U.S. Company-1, which press reports identify as Tenet Media, the outlet Matt Christiansen made videos for; the indictment uses descriptions, not names, and does not accuse Matt Christiansen of wrongdoing or say Matt Christiansen knew of the RT funding. Christiansen said on X, as quoted by NBC News and Washingtonian, that no one directed what he said.",
+    "period": "2023 to 2024",
+    "status": "alleged",
+    "sources": [
+     {
+      "publisher": "U.S. District Court, Southern District of New York (via justice.gov)",
+      "title": "United States v. Kalashnikov and Afanasyeva, Indictment",
+      "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "court",
+      "quote": "...also worked together to deceive two U.S. online commentators..."
+     },
+     {
+      "publisher": "U.S. District Court, Southern District of New York (via justice.gov)",
+      "title": "United States v. Kalashnikov and Afanasyeva, Indictment",
+      "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "court",
+      "quote": "with an initial lineup of six content creators"
+     }
+    ],
+    "doesNotProve": "The indictment does not name Matt Christiansen and charges no commentator; it says two unnamed commentators (Commentator-1 and Commentator-2) were deceived about the funding and does not say what the other commentators knew. It does not show that RT controlled Matt Christiansen's own content, and the allegations are unproven.",
+    "campaign": {
+     "name": "RT covert funding and direction of U.S. Company-1 (reported as Tenet Media), as alleged in US v. Kalashnikov and Afanasyeva",
+     "contentType": "commentator videos produced under contract for license and publication by U.S. Company-1 on YouTube, X, TikTok and Instagram",
+     "dates": "2023-10 to 2024-08",
+     "techniques": [
+      "T0100 Co-Opt Trusted Sources"
+     ]
+    }
+   }
+  ],
+  "leads": [
+   {
+    "claim": "Christiansen said the founders recruited him by promising more viewers for his content.",
+    "searched": "Web search summary only; source page not fetched.",
+    "result": "Unverified."
+   },
+   {
+    "claim": "Which numbered commentator in the indictment corresponds to Christiansen.",
+    "searched": "Read the indictment text and NBC News, Washingtonian.",
+    "result": "No fetched source maps him to a numbered commentator."
+   },
+   {
+    "claim": "Main YouTube and X handles.",
+    "searched": "Probed youtube.com/@MattChristiansen and two variants (404).",
+    "result": "Handle not confirmed from a platform page; omitted."
+   },
+   {
+    "claim": "Other sponsors, investors, grants, FARA, sanctions or campaign-finance records.",
+    "searched": "Brief search for each kind; web search budget ran out before a full sweep.",
+    "result": "Nothing found in fetched pages; not checked exhaustively."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "margarita-simonyan",
+  "name": "Margarita Simonyan",
+  "qid": "Q4419809",
+  "role": "editor-in-chief of RT",
+  "country": "Russia",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": {
+   "platform": "x",
+   "followers": 559875,
+   "asOf": "2023-02-06",
+   "source": "Wikidata P8687"
+  },
+  "accounts": [],
+  "backing": [
+   {
+    "id": "rt-editor-in-chief",
+    "kind": "employer",
+    "who": "RT (Russia Today)",
+    "summary": "The EU sanctions listing and the US Treasury both describe Simonyan as editor-in-chief of RT.",
+    "period": "current at the 2022 EU and 2024 US listing dates",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "European Commission",
+      "title": "Consolidated list of persons, groups and entities subject to EU financial sanctions (CSV, list dated 2026-10-15)",
+      "url": "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
+      "date": "2026-10-15",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Editor-in-chief of the English language television news network RT (Russia Today)"
+     },
+     {
+      "publisher": "U.S. Department of the Treasury",
+      "title": "Treasury Takes Action as Part of a U.S. Government Response to Russia's Foreign Malign Influence Operations",
+      "url": "https://home.treasury.gov/news/press-releases/jy2559",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Margarita Simonovna Simonyan (Simonyan) is the Editor-in-Chief of RT and a central figure in Russian government malign influence efforts."
+     }
+    ],
+    "doesNotProve": "The listings state her role at their dates; they do not by themselves show the role is current today.",
+    "outlet": "rt",
+    "current": true
+   },
+   {
+    "id": "eu-sanction-2022",
+    "kind": "sanction",
+    "who": "Council of the European Union",
+    "summary": "The EU's consolidated sanctions list carries Simonyan, first listed on 23 February 2022 under the Russia and Ukraine measures, and names her function as editor-in-chief of RT.",
+    "period": "since 2022-02-23",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "European Commission",
+      "title": "Consolidated list of persons, groups and entities subject to EU financial sanctions (CSV, list dated 2026-10-15)",
+      "url": "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
+      "date": "2026-10-15",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Editor-in-chief of the English language television news network RT (Russia Today)"
+     },
+     {
+      "publisher": "Official Journal of the European Union",
+      "title": "Council Implementing Regulation (EU) 2022/260",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0260",
+      "date": "2022-02-23",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "...She is also editor-in-chief of the English language television news network RT (Russia Today).",
+      "readBy": "browser"
+     }
+    ],
+    "doesNotProve": "A sanctions listing is a government's decision about a person's role, not a court finding. It does not show what any particular broadcast said."
+   },
+   {
+    "id": "ofac-designation-2024",
+    "kind": "sanction",
+    "who": "US Treasury Office of Foreign Assets Control (OFAC)",
+    "summary": "Treasury says OFAC designated Simonyan under E.O. 14024 on 4 September 2024, alleging she allowed a front company to operate under RT's cover.",
+    "period": "since 2024",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "U.S. Department of the Treasury",
+      "title": "Treasury Takes Action as Part of a U.S. Government Response to Russia's Foreign Malign Influence Operations",
+      "url": "https://home.treasury.gov/news/press-releases/jy2559",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Today, OFAC designated Simonyan, Brodskaia, Anisimov, Kiyashko, Kalashnikov, Afanasyeva, Garashchenko, Yermoshkina, and Nezhentsev pursuant to E.O. 14024..."
+     },
+     {
+      "publisher": "U.S. Department of the Treasury",
+      "title": "Treasury Takes Action as Part of a U.S. Government Response to Russia's Foreign Malign Influence Operations",
+      "url": "https://home.treasury.gov/news/press-releases/jy2559",
+      "date": "2024-09-04",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "She allowed the operations of a front company to occur under the cover of RT."
+     }
+    ],
+    "doesNotProve": "A designation is an executive action, not a court judgment; Treasury does not name the front company in this sentence."
+   }
+  ],
+  "leads": [
+   {
+    "claim": "UK sanctions listing naming Simonyan.",
+    "searched": "Not fetched; web search budget ran out.",
+    "result": "Unverified in this session."
+   },
+   {
+    "claim": "Editor-in-chief of Rossiya Segodnya / Sputnik.",
+    "searched": "Not in the fetched EU and Treasury text.",
+    "result": "Unverified in this session."
+   },
+   {
+    "claim": "Platform labels (X, YouTube, Meta state-media labels) on her accounts.",
+    "searched": "No platform page fetched.",
+    "result": "Unverified."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "vladimir-solovyov",
+  "name": "Vladimir Solovyov",
+  "qid": "Q278625",
+  "role": "television and radio presenter",
+  "country": "Russia",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [],
+  "backing": [
+   {
+    "id": "russia-1-presenter",
+    "kind": "employer",
+    "who": "Russia-1 and Rossiya 24",
+    "summary": "The EU Official Journal's 2022 listing describes Solovyov as a presenter on the Russia-1 channel and Rossiya 24.",
+    "period": "current at the 2022 listing",
+    "status": "documented",
+    "outlet": "russia-1",
+    "current": true,
+    "sources": [
+     {
+      "publisher": "Official Journal of the European Union",
+      "title": "Council Implementing Regulation (EU) 2022/260",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0260",
+      "date": "2022-02-23",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "...Presenter of the Russia-1 channel and Rossia 24.",
+      "readBy": "browser"
+     }
+    ],
+    "doesNotProve": "The listing dates from 2022; it does not show his role today."
+   },
+   {
+    "id": "eu-sanction-2022",
+    "kind": "sanction",
+    "who": "Council of the European Union",
+    "summary": "The EU's consolidated sanctions list carries Solovyov, first listed on 23 February 2022 under the Russia and Ukraine measures.",
+    "period": "since 2022-02-23",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "European Commission",
+      "title": "Consolidated list of persons, groups and entities subject to EU financial sanctions (CSV, list dated 2026-10-15)",
+      "url": "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
+      "date": "2026-10-15",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Vladimir Solovyev"
+     },
+     {
+      "publisher": "Official Journal of the European Union",
+      "title": "Council Implementing Regulation (EU) 2022/260",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0260",
+      "date": "2022-02-23",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "...Presenter of the Russia-1 channel and Rossia 24.",
+      "readBy": "browser"
+     }
+    ],
+    "doesNotProve": "A sanctions listing is a government's decision about a person's role, not a court finding. It does not show what any particular broadcast said."
+   }
+  ],
+  "leads": [
+   {
+    "claim": "US Treasury and UK sanctions listings naming Solovyov.",
+    "searched": "Not fetched; web search budget ran out.",
+    "result": "Unverified in this session."
+   },
+   {
+    "claim": "YouTube channel 'СОЛОВЬЁВ LIVE' (@SolovievLive, UCXhfZtyUbn1lDqtXWxx6gyg) is his show channel.",
+    "searched": "Fetched the YouTube channel page; title only.",
+    "result": "Not confirmed from his own site; not listed as an account."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "olga-skabeeva",
+  "name": "Olga Skabeeva",
+  "qid": "Q24706934",
+  "role": "television talk-show host",
+  "country": "Russia",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [],
+  "backing": [
+   {
+    "id": "rossiya-1-host",
+    "kind": "employer",
+    "who": "Rossiya-1",
+    "summary": "The EU sanctions listing describes Skabeyeva as a journalist of the state-owned Rossiya-1 who leads the talk show 60 Minutes.",
+    "period": "current at the 2022 listing",
+    "status": "documented",
+    "outlet": "russia-1",
+    "current": true,
+    "sources": [
+     {
+      "publisher": "European Commission",
+      "title": "Consolidated list of persons, groups and entities subject to EU financial sanctions (CSV, list dated 2026-10-15)",
+      "url": "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
+      "date": "2026-10-15",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Journalist of the state-owned TV Rossiya-1, leading a political talk-show"
+     },
+     {
+      "publisher": "Official Journal of the European Union",
+      "title": "Council Implementing Regulation (EU) 2022/336",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0336",
+      "date": "2022-02-28",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Ms. Olga Skabeyeva is a journalist of the state-owned TV station Rossiya-1.",
+      "readBy": "browser"
+     }
+    ],
+    "doesNotProve": "The listing dates from 2022; it does not show her role today."
+   },
+   {
+    "id": "eu-sanction-2022",
+    "kind": "sanction",
+    "who": "Council of the European Union",
+    "summary": "The EU's consolidated sanctions list carries Skabeyeva, listed on 28 February 2022 under the Russia and Ukraine measures, citing her Rossiya-1 talk show.",
+    "period": "since 2022-02-28",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "European Commission",
+      "title": "Consolidated list of persons, groups and entities subject to EU financial sanctions (CSV, list dated 2026-10-15)",
+      "url": "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
+      "date": "2026-10-15",
+      "read": "2026-10-21",
+      "kind": "government",
+      "quote": "Journalist of the state-owned TV Rossiya-1, leading a political talk-show"
+     }
+    ],
+    "doesNotProve": "A sanctions listing is a government's decision about a person's role, not a court finding. It does not show what any particular broadcast said."
+   }
+  ],
+  "leads": [
+   {
+    "claim": "UK and other national sanctions listings.",
+    "searched": "Not fetched; web search budget ran out.",
+    "result": "Unverified in this session."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "hu-xijin",
+  "name": "Hu Xijin",
+  "qid": "Q5924784",
+  "role": "former Global Times editor-in-chief, commentator",
+  "country": "China",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [],
+  "backing": [
+   {
+    "id": "global-times-editor",
+    "kind": "employer",
+    "who": "Global Times",
+    "summary": "The Guardian and The Diplomat report Hu stepped down as Global Times editor-in-chief in December 2021; the Guardian reports he said he would stay on as a special commentator.",
+    "period": "2005 to 2021 as editor-in-chief; commentator after",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "The Guardian",
+      "title": "Outspoken editor of Chinese state tabloid Global Times retires",
+      "url": "https://www.theguardian.com/world/2021/dec/16/editor-of-chinese-state-tabloid-global-times-retires",
+      "date": "2021-12-16",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "In a social media post on Thursday, Hu announced he had stepped down as editor-in-chief of the Global Times..."
+     },
+     {
+      "publisher": "The Guardian",
+      "title": "Outspoken editor of Chinese state tabloid Global Times retires",
+      "url": "https://www.theguardian.com/world/2021/dec/16/editor-of-chinese-state-tabloid-global-times-retires",
+      "date": "2021-12-16",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "He said he would continue to be a special commentator for the paper."
+     },
+     {
+      "publisher": "The Diplomat",
+      "title": "Is China Putting ‘Wolf Warriors’ on a Leash?",
+      "url": "https://thediplomat.com/2022/01/is-china-putting-wolf-warriors-on-a-leash/",
+      "date": "2022-01-22",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "While Hu announced that he was retiring on Weibo in mid-December, some sources claim his departure was directed by Beijing..."
+     }
+    ],
+    "doesNotProve": "Press reports of his own announcement; the commentator role is reported by one outlet and may not be current.",
+    "outlet": "global-times",
+    "current": true
+   }
+  ],
+  "leads": [
+   {
+    "claim": "X labelled Hu's account 'China state-affiliated media' (2020 to 2023).",
+    "searched": "Fetched Guardian, CNN, Diplomat, CMP pages; none state the label. Web search budget ran out before a press report on the label could be found.",
+    "result": "Unverified in this session."
+   },
+   {
+    "claim": "Hu told the Guardian the English edition received government funding.",
+    "searched": "Guardian 16 Dec 2021 article (one outlet).",
+    "result": "Single outlet report; kept as a lead."
+   },
+   {
+    "claim": "Hu's X handle (reported as @HuXijin_GT).",
+    "searched": "No platform page fetched.",
+    "result": "Not confirmed; omitted from accounts."
+   },
+   {
+    "claim": "US State Department designated Global Times a foreign mission in June 2020.",
+    "searched": "Reference seen in Wikipedia wikitext (NPR, NYT links); pages not fetched.",
+    "result": "Unverified in this session."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "li-jingjing",
+  "name": "Li Jingjing",
+  "qid": null,
+  "role": "CGTN presenter (as stated in the task; not confirmed from a fetched page)",
+  "country": "China",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [],
+  "backing": [],
+  "leads": [
+   {
+    "claim": "Li Jingjing works for CGTN as a presenter or reporter.",
+    "searched": "Probed cgtn.com host pages (404) and YouTube handles (@Li_Jingjing belongs to an empty channel, not confirmed as hers). Wikipedia disambiguation lists 'Li Jingjing, CGTN reporter and YouTuber' without a source. Web search budget ran out.",
+    "result": "Employer not documented from a fetched page, so no CGTN rows are attached to her."
+   },
+   {
+    "claim": "CGTN America was required to register under FARA as an agent of the Chinese government, CCP, China Media Group and CCTV.",
+    "searched": "Read the DOJ FARA Unit determination letter of 20 December 2018 (justice.gov/nsd-fara/page/file/1282146/download), BuzzFeed News (2019-02-05) and SCMP (2019-02-06) on the registration.",
+    "result": "Documented for CGTN America; not attached to Li Jingjing because her employment by CGTN or CGTN America is not confirmed here, and CGTN America is the Washington bureau, not CGTN as a whole."
+   },
+   {
+    "claim": "CGTN is part of state-run China Media Group / CCTV.",
+    "searched": "CGTN about page (states launch and headquarters only); DOJ FARA letter describes CGTN as a division of CCTV, merged into China Media Group in 2018.",
+    "result": "Usable once her CGTN role is documented."
+   },
+   {
+    "claim": "X or YouTube state-affiliated labels on her accounts.",
+    "searched": "No platform page confirmed as hers.",
+    "result": "Unverified."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "steve-bannon",
+  "name": "Steve Bannon",
+  "qid": "Q16146870",
+  "role": "host of War Room (podcast and TV)",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [],
+  "backing": [
+   {
+    "id": "rav-war-room",
+    "kind": "employer",
+    "who": "Real America's Voice",
+    "summary": "Real America's Voice's own show listing carries The War Room and describes it as hosted by Steve Bannon.",
+    "period": "current as read",
+    "status": "documented",
+    "outlet": "real-americas-voice",
+    "current": true,
+    "sources": [
+     {
+      "publisher": "Real America's Voice",
+      "title": "Shows",
+      "url": "https://americasvoice.news/shows",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "company",
+      "quote": "Welcome to the War Room. Steve Bannon and special guests bring you the most important news from around the world."
+     }
+    ],
+    "doesNotProve": "Carriage on a network does not show who pays for the show's production or whether the network directs its content."
+   }
+  ],
+  "leads": [
+   {
+    "claim": "A Guo Wengui-linked company contracted with Bannon for \"strategic consulting services\" from August 2018; a Guo spokesman said it was for media investment and other consulting.",
+    "searched": "ProPublica (2020-02-26) relays an Axios report; Axios and any court record not fetched.",
+    "result": "One reporting chain, not tied to his media work by a court record; kept as a lead. Contract amount omitted per brief."
+   },
+   {
+    "claim": "Bannon served on the board of Guo Media / was involved with GTV Media Group fundraising.",
+    "searched": "Seen in Wikipedia wikitext citing WSJ and Deutsche Welle; pages not fetched.",
+    "result": "Unverified in this session."
+   },
+   {
+    "claim": "Washington Post (2022-01-24) on RAV owner Robert Sigg keeping Bannon on air.",
+    "searched": "Fetch attempted; it did not complete.",
+    "result": "Not read."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "alex-jones",
+  "name": "Alex Jones",
+  "qid": "Q319121",
+  "role": "Infowars host",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [],
+  "backing": [
+   {
+    "id": "fss-owner",
+    "kind": "outlet owner",
+    "who": "Free Speech Systems LLC (owned by Jones, per reports)",
+    "summary": "CBS News and The Texas Tribune report that Infowars and Free Speech Systems are companies owned by Jones, citing bankruptcy filings.",
+    "period": "until the 2024-2025 bankruptcy proceedings",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "CBS News",
+      "title": "Alex Jones' Infowars files for bankruptcy in wake of defamation suits over his assertions that the Sandy Hook massacre was a hoax",
+      "url": "https://www.cbsnews.com/news/alex-jones-infowars-bankruptcy-filing-sandy-hook-massacre/",
+      "date": "2022-04-18",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Far-right website Infowars and two other companies owned by radio host Alex Jones have filed for Chapter 11 bankruptcy protection..."
+     },
+     {
+      "publisher": "The Texas Tribune",
+      "title": "Alex Jones files for bankruptcy after Sandy Hook judgments",
+      "url": "https://www.texastribune.org/2022/12/02/alex-jones-bankruptcy/",
+      "date": "2022-12-02",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Jones’ main company, Free Speech Systems, filed for bankruptcy in July, during the Sandy Hooks damages trial in Texas."
+     }
+    ],
+    "doesNotProve": "These reports do not show current ownership after the bankruptcy and auction proceedings."
+   },
+   {
+    "id": "store-revenue-court-records",
+    "kind": "court record",
+    "who": "Infowars online store (product sales)",
+    "summary": "AP reports court records show the Infowars store, which sells supplements and survival gear, brought in large revenue from 2015 to 2018; NPR reports the supplement store was listed among Free Speech Systems assets in the bankruptcy auction.",
+    "period": "2015 to 2018 (AP); bankruptcy 2022 to 2025",
+    "status": "alleged",
+    "sources": [
+     {
+      "publisher": "Associated Press",
+      "title": "EXPLAINER: What does Infowars’ bankruptcy filing mean?",
+      "url": "https://apnews.com/article/alex-jones-infowars-bankruptcy-filing-1a3b51946cb06c5f90c341d3118947cf",
+      "date": "2022-04-18",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Court records show that Jones’ Infowars store, which sells nutritional supplements and survival gear, made more than $165 million between 2015 and 2018."
+     },
+     {
+      "publisher": "NPR",
+      "title": "Judge denies deal for a new auction of Alex Jones' Infowars",
+      "url": "https://www.npr.org/2025/02/05/g-s1-46738/infowars-alex-jones-onion-bankruptcy-judge-sandy-hook",
+      "date": "2025-02-05",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "...listed for sale in the first bankruptcy auction, such as Infowars' recording equipment, domain names and its vitamin and supplement online store."
+     }
+    ],
+    "doesNotProve": "Shows the company sold its own products; it does not show an outside backer, and the court filings themselves were not read in this session."
+   }
+  ],
+  "leads": [
+   {
+    "claim": "Free Speech Systems bought supplements from PQPR Holdings, another Jones-linked company, which claimed a large debt in the bankruptcy.",
+    "searched": "AP report syndicated on NBC News (2024-09-25); one reporting source.",
+    "result": "Single outlet; kept as a lead."
+   },
+   {
+    "claim": "Free Speech Systems bankruptcy monthly operating reports listing revenue by source.",
+    "searched": "Filings not fetched; Reuters page did not load (401).",
+    "result": "Primary filings not read."
+   }
+  ],
+  "batch": "b9"
+ },
+ {
+  "id": "anna-sitar",
+  "name": "Anna Sitar",
+  "qid": null,
+  "role": "social media influencer (Instagram, TikTok)",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [],
+  "backing": [
+   {
+    "id": "vippi-fara-olympics-2022",
+    "kind": "FARA filing",
+    "who": "Consulate General of the People's Republic of China in New York, through Vippi Media Inc. (FARA registrant 7057) and Viral Nation",
+    "summary": "Vippi Media's April 2022 FARA supplemental statement lists Anna Sitar as a 'social media promotion' contact in its Beijing 2022 Olympics campaign for the Chinese Consulate in New York, and Axios reports she was among the influencers enlisted.",
+    "period": "2022-01 to 2022-03",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Supplemental Statement, Vippi Media Inc., received 04/04/2022",
+      "url": "https://efile.fara.gov/docs/7057-Supplemental-Statement-20220404-1.pdf",
+      "date": "2022-04-04",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "Anna Sitar Instagram | Tik Tok Impressions: 2,237,114"
+     },
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Supplemental Statement, Vippi Media Inc., received 04/04/2022",
+      "url": "https://efile.fara.gov/docs/7057-Supplemental-Statement-20220404-1.pdf",
+      "date": "2022-04-04",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "Engaged the services of Viral Nation to procure social media influencers to promote the 2022 Winter Olympics and Paralympics."
+     },
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Exhibit A/B to Registration Statement, Vippi Media Inc., received 12/10/2021",
+      "url": "https://efile.fara.gov/docs/7057-Exhibit-AB-20211210-1.pdf",
+      "date": "2021-12-10",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "The Client will approve in writing all Influencers and distribution channels related to this Agreement prior to VMI contracting the Influencers and distribution channels."
+     },
+     {
+      "publisher": "Axios (Lachlan Markay)",
+      "title": "How China used influencers to promote the Beijing Olympics",
+      "url": "https://www.axios.com/2022/04/08/inside-chinas-olympic-influencer-campaign",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "They included U.S. Paralympics swimmer Jessica Long, \"Real Housewives of Beverly Hills\" star Crystal Kung Minkoff and prominent influencer Anna Sitar."
+     },
+     {
+      "publisher": "Axios (Lachlan Markay)",
+      "title": "How China used influencers to promote the Beijing Olympics",
+      "url": "https://www.axios.com/2022/04/08/inside-chinas-olympic-influencer-campaign",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "None of the other creators mentioned in Vippi Media's filing responded to requests for comment."
+     }
+    ],
+    "doesNotProve": "The filing lists the creator as a contact in a campaign whose influencers Viral Nation sourced; it does not state what the creator was paid, and no source shows the creator knew the end client was the Chinese consulate, since AP reports the posts did not name the sponsor. The content promoted the Olympics, and the filing does not show the consulate wrote the creator's words. Axios reports Sitar did not respond to a request for comment.",
+    "campaign": {
+     "name": "Beijing Winter Olympics & Paralympic 2022 Influencer Marketing Campaign (Vippi Media for the Consulate General of the People's Republic of China in New York)",
+     "contentType": "sponsored Instagram and TikTok posts promoting the Beijing 2022 Winter Olympics",
+     "dates": "2022-01 to 2022-03",
+     "techniques": [
+      "T0100 Co-Opt Trusted Sources"
+     ]
+    }
+   }
+  ],
+  "leads": [
+   {
+    "claim": "Main Instagram and TikTok handles",
+    "searched": "Fetched tiktok.com/@annasitar (page unavailable) and tiktok.com/@anna.sitar (32 followers, not her); Instagram profile pages returned a login page.",
+    "result": "No handle confirmed from her own site or a platform page, so none is listed."
+   }
+  ],
+  "batch": "b10"
+ },
+ {
+  "id": "jessica-long",
+  "name": "Jessica Long",
+  "qid": "Q1763188",
+  "role": "Paralympic swimmer and Instagram personality",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [],
+  "backing": [
+   {
+    "id": "vippi-fara-olympics-2022",
+    "kind": "FARA filing",
+    "who": "Consulate General of the People's Republic of China in New York, through Vippi Media Inc. (FARA registrant 7057) and Viral Nation",
+    "summary": "Vippi Media's April 2022 FARA supplemental statement lists Jessica Long as a 'social media promotion' contact in its Olympics campaign for the Chinese Consulate in New York; AP and Axios report her posts, and her representative told Axios why she took part.",
+    "period": "2022-01 to 2022-03",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Supplemental Statement, Vippi Media Inc., received 04/04/2022",
+      "url": "https://efile.fara.gov/docs/7057-Supplemental-Statement-20220404-1.pdf",
+      "date": "2022-04-04",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "Jessica Long Instagram | Tik Tok Impressions: 62,713 Deliverables: 1 IG Story 1 IG Reel 1 Tik Tok 1 IG Grid Post"
+     },
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Supplemental Statement, Vippi Media Inc., received 04/04/2022",
+      "url": "https://efile.fara.gov/docs/7057-Supplemental-Statement-20220404-1.pdf",
+      "date": "2022-04-04",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "Engaged the services of Viral Nation to procure social media influencers to promote the 2022 Winter Olympics and Paralympics."
+     },
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Exhibit A/B to Registration Statement, Vippi Media Inc., received 12/10/2021",
+      "url": "https://efile.fara.gov/docs/7057-Exhibit-AB-20211210-1.pdf",
+      "date": "2021-12-10",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "The Client will approve in writing all Influencers and distribution channels related to this Agreement prior to VMI contracting the Influencers and distribution channels."
+     },
+     {
+      "publisher": "Associated Press via CBS News",
+      "title": "China discreetly paid for U.S. social media influencers to tout Beijing Winter Olympics",
+      "url": "https://www.cbsnews.com/news/china-us-social-media-influencers-tiktok-instagram-beijing-winter-olympics/",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Jessica Long, a decorated Paralympic swimmer and popular Instagram personality, celebrated the upcoming Olympics in a Jan. 27 post to her nearly 100,000 followers."
+     },
+     {
+      "publisher": "Associated Press via CBS News",
+      "title": "China discreetly paid for U.S. social media influencers to tout Beijing Winter Olympics",
+      "url": "https://www.cbsnews.com/news/china-us-social-media-influencers-tiktok-instagram-beijing-winter-olympics/",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Minkoff, Long and Dubs used #partner in their posts, but did not directly identify who sponsored the content."
+     },
+     {
+      "publisher": "Axios (Lachlan Markay)",
+      "title": "How China used influencers to promote the Beijing Olympics",
+      "url": "https://www.axios.com/2022/04/08/inside-chinas-olympic-influencer-campaign",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "A representative for Long told Axios she participated as a way of promoting fellow U.S. Olympic and Paralympic athletes."
+     }
+    ],
+    "doesNotProve": "The filing lists the creator as a contact in a campaign whose influencers Viral Nation sourced; it does not state what the creator was paid, and no source shows the creator knew the end client was the Chinese consulate, since AP reports the posts did not name the sponsor. The content promoted the Olympics, and the filing does not show the consulate wrote the creator's words. Her representative described the posts as support for fellow U.S. Olympic and Paralympic athletes.",
+    "campaign": {
+     "name": "Beijing Winter Olympics & Paralympic 2022 Influencer Marketing Campaign (Vippi Media for the Consulate General of the People's Republic of China in New York)",
+     "contentType": "sponsored Instagram and TikTok posts promoting the Beijing 2022 Winter Olympics",
+     "dates": "2022-01 to 2022-03",
+     "techniques": [
+      "T0100 Co-Opt Trusted Sources"
+     ]
+    }
+   }
+  ],
+  "leads": [
+   {
+    "claim": "Main Instagram and TikTok handles",
+    "searched": "Fetched tiktok.com/@jessicalong (an unverified account with about 2,500 followers, not confirmed as hers); Instagram profile pages returned a login page.",
+    "result": "No handle confirmed from her own site or a platform page, so none is listed."
+   }
+  ],
+  "batch": "b10"
+ },
+ {
+  "id": "ryan-dubs",
+  "name": "Ryan Dubs",
+  "qid": null,
+  "role": "TikTok and Instagram influencer",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [
+   {
+    "platform": "tiktok",
+    "handle": "ryandubs",
+    "url": "https://www.tiktok.com/@ryandubs"
+   }
+  ],
+  "backing": [
+   {
+    "id": "vippi-fara-olympics-2022",
+    "kind": "FARA filing",
+    "who": "Consulate General of the People's Republic of China in New York, through Vippi Media Inc. (FARA registrant 7057) and Viral Nation",
+    "summary": "Vippi Media's April 2022 FARA supplemental statement lists Ryan Dubs as a contact in its Olympics campaign for the Chinese Consulate in New York, and AP reports he posted an interview with the consul general.",
+    "period": "2022-01 to 2022-03",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Supplemental Statement, Vippi Media Inc., received 04/04/2022",
+      "url": "https://efile.fara.gov/docs/7057-Supplemental-Statement-20220404-1.pdf",
+      "date": "2022-04-04",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "Ryan Dubs Instagram | Tik Tok Impressions: 296,409 Deliverables: 3 Tik Toks"
+     },
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Supplemental Statement, Vippi Media Inc., received 04/04/2022",
+      "url": "https://efile.fara.gov/docs/7057-Supplemental-Statement-20220404-1.pdf",
+      "date": "2022-04-04",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "Engaged the services of Viral Nation to procure social media influencers to promote the 2022 Winter Olympics and Paralympics."
+     },
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Exhibit A/B to Registration Statement, Vippi Media Inc., received 12/10/2021",
+      "url": "https://efile.fara.gov/docs/7057-Exhibit-AB-20211210-1.pdf",
+      "date": "2021-12-10",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "The Client will approve in writing all Influencers and distribution channels related to this Agreement prior to VMI contracting the Influencers and distribution channels."
+     },
+     {
+      "publisher": "Associated Press via CBS News",
+      "title": "China discreetly paid for U.S. social media influencers to tout Beijing Winter Olympics",
+      "url": "https://www.cbsnews.com/news/china-us-social-media-influencers-tiktok-instagram-beijing-winter-olympics/",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Dubs posted a 3-minute-long interview with China's Consul General in New York, Huang Ping, who spoke with the Chinese and U.S. flags behind him."
+     },
+     {
+      "publisher": "Associated Press via CBS News",
+      "title": "China discreetly paid for U.S. social media influencers to tout Beijing Winter Olympics",
+      "url": "https://www.cbsnews.com/news/china-us-social-media-influencers-tiktok-instagram-beijing-winter-olympics/",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Minkoff, Long and Dubs used #partner in their posts, but did not directly identify who sponsored the content."
+     }
+    ],
+    "doesNotProve": "The filing lists the creator as a contact in a campaign whose influencers Viral Nation sourced; it does not state what the creator was paid, and no source shows the creator knew the end client was the Chinese consulate, since AP reports the posts did not name the sponsor. The content promoted the Olympics, and the filing does not show the consulate wrote the creator's words. AP reports Dubs did not respond to a request for comment. The TikTok handle was matched to a verified account named 'Ryan Dubs', not taken from a source that links it to the filing.",
+    "campaign": {
+     "name": "Beijing Winter Olympics & Paralympic 2022 Influencer Marketing Campaign (Vippi Media for the Consulate General of the People's Republic of China in New York)",
+     "contentType": "sponsored Instagram and TikTok posts promoting the Beijing 2022 Winter Olympics",
+     "dates": "2022-01 to 2022-03",
+     "techniques": [
+      "T0100 Co-Opt Trusted Sources"
+     ]
+    }
+   }
+  ],
+  "leads": [],
+  "batch": "b10"
+ },
+ {
+  "id": "crystal-kung-minkoff",
+  "name": "Crystal Kung Minkoff",
+  "qid": "Q56441854",
+  "role": "reality TV personality and podcaster",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named in a primary record",
+  "audience": null,
+  "accounts": [
+   {
+    "platform": "tiktok",
+    "handle": "crystalkungminkoff",
+    "url": "https://www.tiktok.com/@crystalkungminkoff"
+   }
+  ],
+  "backing": [
+   {
+    "id": "vippi-fara-olympics-2022",
+    "kind": "FARA filing",
+    "who": "Consulate General of the People's Republic of China in New York, through Vippi Media Inc. (FARA registrant 7057) and Viral Nation",
+    "summary": "Vippi Media's April 2022 FARA supplemental statement lists 'crystal mink off' as a contact in its Olympics campaign for the Chinese Consulate in New York; AP and Axios identify her as Crystal Kung Minkoff.",
+    "period": "2022-01 to 2022-03",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Supplemental Statement, Vippi Media Inc., received 04/04/2022",
+      "url": "https://efile.fara.gov/docs/7057-Supplemental-Statement-20220404-1.pdf",
+      "date": "2022-04-04",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "Crystal Minkoff Instagram"
+     },
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Supplemental Statement, Vippi Media Inc., received 04/04/2022",
+      "url": "https://efile.fara.gov/docs/7057-Supplemental-Statement-20220404-1.pdf",
+      "date": "2022-04-04",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "Engaged the services of Viral Nation to procure social media influencers to promote the 2022 Winter Olympics and Paralympics."
+     },
+     {
+      "publisher": "U.S. Department of Justice, FARA Unit (filed by Vippi Media Inc., registration 7057)",
+      "title": "Exhibit A/B to Registration Statement, Vippi Media Inc., received 12/10/2021",
+      "url": "https://efile.fara.gov/docs/7057-Exhibit-AB-20211210-1.pdf",
+      "date": "2021-12-10",
+      "read": "2026-10-21",
+      "kind": "filing",
+      "quote": "The Client will approve in writing all Influencers and distribution channels related to this Agreement prior to VMI contracting the Influencers and distribution channels."
+     },
+     {
+      "publisher": "Associated Press via CBS News",
+      "title": "China discreetly paid for U.S. social media influencers to tout Beijing Winter Olympics",
+      "url": "https://www.cbsnews.com/news/china-us-social-media-influencers-tiktok-instagram-beijing-winter-olympics/",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Crystal Kung Minkoff, a cast member of Bravo's \"Real Housewives of Beverly Hills\" who was listed as one of the influencers hired by Vippi Media"
+     },
+     {
+      "publisher": "Associated Press via CBS News",
+      "title": "China discreetly paid for U.S. social media influencers to tout Beijing Winter Olympics",
+      "url": "https://www.cbsnews.com/news/china-us-social-media-influencers-tiktok-instagram-beijing-winter-olympics/",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "Minkoff, Long and Dubs used #partner in their posts, but did not directly identify who sponsored the content."
+     },
+     {
+      "publisher": "Axios (Lachlan Markay)",
+      "title": "How China used influencers to promote the Beijing Olympics",
+      "url": "https://www.axios.com/2022/04/08/inside-chinas-olympic-influencer-campaign",
+      "date": "2022-04-08",
+      "read": "2026-10-21",
+      "kind": "press",
+      "quote": "They included U.S. Paralympics swimmer Jessica Long, \"Real Housewives of Beverly Hills\" star Crystal Kung Minkoff and prominent influencer Anna Sitar."
+     }
+    ],
+    "doesNotProve": "The filing lists the creator as a contact in a campaign whose influencers Viral Nation sourced; it does not state what the creator was paid, and no source shows the creator knew the end client was the Chinese consulate, since AP reports the posts did not name the sponsor. The content promoted the Olympics, and the filing does not show the consulate wrote the creator's words. AP reports a message left with Minkoff was not immediately answered. The TikTok handle was matched to a verified account with her name, not taken from a source that links it to the filing.",
+    "campaign": {
+     "name": "Beijing Winter Olympics & Paralympic 2022 Influencer Marketing Campaign (Vippi Media for the Consulate General of the People's Republic of China in New York)",
+     "contentType": "sponsored Instagram and TikTok posts promoting the Beijing 2022 Winter Olympics",
+     "dates": "2022-01 to 2022-03",
+     "techniques": [
+      "T0100 Co-Opt Trusted Sources"
+     ]
+    }
+   }
+  ],
+  "leads": [
+   {
+    "claim": "Main Instagram handle",
+    "searched": "Instagram profile pages returned a login page.",
+    "result": "Not confirmed, so not listed."
+   }
+  ],
+  "batch": "b10"
+ }
+]

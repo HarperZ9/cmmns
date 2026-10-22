@@ -148,6 +148,7 @@
     report.upstream = PB.upstream(items, tweets, PBLogs.trail());
     const pushed = PB.pushedLinks(PBLogs.net(), items.flatMap((r) => r.domains || []));
     const video = currentVideo(site);
+    if (video && video.channelId) PBLogs.ensureChannel(video.channelId);
     report.groups = PB.returningGroups(PBLogs.net(), threadKey, replies.map((r) => r.author));
     report.context = PB.threadContext(items, { noteOf, claimsOf: PBLogs.claimsOf });
     saveSnapshot(threadKey, site.name, report);

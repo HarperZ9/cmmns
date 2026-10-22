@@ -98,6 +98,13 @@
     return { out, domains: new Set(where.filter(([, , h]) => h && h.length).map(([d]) => String(d).toLowerCase())) };
   }
 
+  // Documented backing of a public media personality (src/core/backing.js), for the post's own author
+  // only. Info level for every kind of record and every person: an allegation never escalates it.
+  function backing(m) {
+    const p = PB.backingOf && m.site ? PB.backingOf(m.site.id, m.handle) : null;
+    return p ? [{ label: PB.backingLabel(p), fam: "backing-record", level: "info", cat: "sources", rows: PB.backingRows(p) }] : [];
+  }
+
   // Look-alike news addresses (src/core/lookalike.js): a weak sign of its own.
   // A post that names the copied outlet in its own words adds a row (src/core/cloned.js), and an
   // address a published report named points at that sign.
@@ -112,7 +119,7 @@
   }
 
   function links(m) {
-    const rep = reports(m), out = [...rep.out, ...lookalikes(m)];
+    const rep = reports(m), out = [...rep.out, ...backing(m), ...lookalikes(m)];
     // A report hit replaces the older state-table chip for the same domain or account.
     const covered = (h) => h.basis === "named-in-report" && (rep.domains.has(String(h.domain || "").toLowerCase()) || rep.domains.has(String(h.x || "").toLowerCase()));
     const hits = [...(m.domains || []).flatMap(PB.stateLinksOfDomain), ...PB.stateLinksOfHandle(m.handle)].filter((h) => !covered(h));

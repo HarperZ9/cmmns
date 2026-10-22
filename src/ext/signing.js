@@ -35,7 +35,7 @@
   function loadTables() {
     if (!tables) tables = json("claims.json").then(async (claims) => {
       const [sites, owners, state, ...parts] = await Promise.all([json("sites.json"), json("owners.json"), json("state.json"), ...(claims.parts || []).map(json)]);
-      return { names: ["claims.json", ...(claims.parts || []), "ops.json", "owners.json", "sites.json", "state.json"], loaded: PB.useData({ sites, owners, state, claims, claimParts: parts }) };
+      return { names: ["claims.json", ...(claims.parts || []), "ops.json", "owners.json", "personalities.json", "sites.json", "state.json"], loaded: PB.useData({ sites, owners, state, claims, claimParts: parts }) };
     });
     return tables;
   }

@@ -14,7 +14,7 @@ import { sha256Hex, lfBytes, publicJwk } from "../src/core/sig.js";
 import { validatePackContent, packSummary } from "../src/core/packs-content.js";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-export const BUNDLED_FILES = ["claims.json", "claims-2.json", "ops.json", "owners.json", "sites.json", "state.json"];
+export const BUNDLED_FILES = ["claims.json", "claims-2.json", "ops.json", "owners.json", "personalities.json", "sites.json", "state.json"];
 export const BUNDLED_PACK = join(ROOT, "src/ext/radar-data.pack.json");
 const DEFAULT_KEY = process.env.RADAR_PACK_KEY || "D:/radar-keys/radar-project.private.jwk";
 const arg = (k, d = null) => { const i = process.argv.indexOf(k); return i > 0 && process.argv[i + 1] ? process.argv[i + 1] : d; };
@@ -45,7 +45,7 @@ export async function bundledManifestFiles() {
 
 async function signBundled(keyPath) {
   const priv = json(keyPath), created = process.env.RADAR_BUILT || new Date().toISOString().slice(0, 10);
-  const meta = { name: "Radar bundled data", version: created.replace(/-/g, "."), description: "The tables that ship inside Radar: fact-checked claims, documented operations, outlet owners, site facts and state links.", authorName: "Radar project key", created };
+  const meta = { name: "Radar bundled data", version: created.replace(/-/g, "."), description: "The tables that ship inside Radar: fact-checked claims, documented operations, outlet owners, documented backing of public media personalities, site facts and state links.", authorName: "Radar project key", created };
   const pack = await signPack(meta, priv, { files: await bundledManifestFiles() });
   writeFileSync(BUNDLED_PACK, JSON.stringify(pack, null, 1) + "\n");
   console.log(`src/ext/radar-data.pack.json signed by ${keyFingerprint(pack.manifest.author.keyId)} over ${BUNDLED_FILES.length} files`);

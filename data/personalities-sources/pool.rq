@@ -1,0 +1,9 @@
+SELECT ?p (SAMPLE(?lab) AS ?name) (MAX(?followers) AS ?max) (MAX(?when) AS ?latest) (SAMPLE(?handle) AS ?x) WHERE {
+  VALUES ?occ { wd:Q11499163 wd:Q1642960 wd:Q270389 wd:Q15077007 wd:Q13590141 wd:Q1930187 }
+  ?p wdt:P106 ?occ.
+  ?p p:P8687 ?st. ?st ps:P8687 ?followers. 
+  OPTIONAL { ?st pq:P585 ?when }
+  ?p wdt:P2002 ?handle.
+  ?p rdfs:label ?lab. FILTER(LANG(?lab)="en")
+  FILTER(?followers > 400000)
+} GROUP BY ?p ORDER BY DESC(?max)

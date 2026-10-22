@@ -68,12 +68,21 @@
     ];
   }
 
+  // The channel's documented backing (src/core/backing.js), in brief: the window on any of the
+  // channel's own comments shows every record with its sources.
+  function channelBacking(video) {
+    const p = video && video.channelId && PB.backingOfChannel ? PB.backingOfChannel(video.channelId) : null;
+    if (!p) return null;
+    return `${PB.backingLabel(p)} for this channel (${p.name}): ${p.rows.slice(0, 3).map((r) => `${r.kind}, ${r.who} (${r.status})`).join("; ")}. ${PB.BACKING_DOES_NOT_PROVE}`;
+  }
+
   function sources(report, video, pushed) {
     return [
       ...(report.state || []).map((st) => `${st.replies} repl${st.replies === 1 ? "y" : "ies"}: ${PB.stateLabel(st).says} (${st.names.slice(0, 2).join(", ")})`),
       ...(pushed || []).slice(0, 3).map((x) => `${x.domain} pushed by ${x.authors} accounts across ${x.threads} threads you viewed.`),
       video ? [video.channel, video.subscribers, video.channelBadges].filter(Boolean).join(" · ") : null,
       video && video.funding ? `Funding: ${video.funding}` : null,
+      channelBacking(video),
       video && video.paidPromotion ? video.paidPromotion : null,
       video && video.synthetic ? `Uploader says: ${video.synthetic}` : null,
       video && video.published ? [video.published, video.category, video.views != null ? `${num(video.views)} views` : null].filter(Boolean).join(" · ") : null,
