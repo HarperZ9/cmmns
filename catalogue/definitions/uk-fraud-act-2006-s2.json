@@ -1,0 +1,98 @@
+{
+  "id": "uk-fraud-act-2006-s2",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "comparison",
+  "title": "Fraud by false representation (for comparison)",
+  "jurisdiction": {
+    "code": "UK-EW-NI",
+    "name": "England and Wales, and Northern Ireland"
+  },
+  "instrument": "Fraud Act 2006",
+  "section": "Section 2(1) and 2(2)",
+  "kind": "statute",
+  "binding_note": "A criminal provision. Only a court decides whether it applies. The extent recorded on legislation.gov.uk is England and Wales and Northern Ireland; Scotland is not covered by this section.",
+  "in_force": {
+    "status": "in force",
+    "since": "2007-01-15",
+    "note": "Start date as recorded in the legislation.gov.uk XML for section 2."
+  },
+  "sources": [
+    {
+      "url": "https://www.legislation.gov.uk/ukpga/2006/35/section/2",
+      "retrieved_url": "https://www.legislation.gov.uk/ukpga/2006/35/section/2/data.xml",
+      "retrieved_at": "2026-10-22",
+      "sha256": "8158f865b2b975a0a84a907b74abb3686d57145d1b9f19c4186ad6853c0c7aaf",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "The National Archives, legislation.gov.uk (revised text)",
+      "note": "The XML gives section 2 an extent of England and Wales and Northern Ireland, from 2007-01-15.",
+      "text_sha256": "60421b98c1cbe52a652ce2db9f744fb758ef4e035aaa7accd77e8a1a41d2c158"
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "Section 2(1)",
+      "text": "(1) A person is in breach of this section if he— (a) dishonestly makes a false representation, and (b) intends, by making the representation— (i) to make a gain for himself or another, or (ii) to cause loss to another or to expose another to a risk of loss."
+    },
+    {
+      "source": 0,
+      "locator": "Section 2(2)",
+      "text": "(2) A representation is false if— (a) it is untrue or misleading, and (b) the person making it knows that it is, or might be, untrue or misleading."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "A representation is made (express or implied)",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "product-promotion",
+        "undisclosed-lookalike",
+        "disclosed-paid"
+      ]
+    },
+    {
+      "id": "B",
+      "label": "The representation is untrue or misleading",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": [],
+      "note": "Whether the engagement or the posts misled anyone is a finding about facts behind the page."
+    },
+    {
+      "id": "C",
+      "label": "The person making it knows it is, or might be, untrue or misleading",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": []
+    },
+    {
+      "id": "D",
+      "label": "Made dishonestly",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": []
+    },
+    {
+      "id": "E",
+      "label": "With intent to make a gain, or to cause loss or risk of loss",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": []
+    }
+  ],
+  "does_not_prove": "Shown for comparison only. Four of the five elements are about falsity, knowledge, dishonesty and intent, and none of them is visible on a page, so Daylight Commons never presents this definition as met. The section does not require that anyone relied on the representation or lost anything; it turns on intent. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "us-wire-fraud-18usc1343",
+    "uk-dmcc-sch20-13-fake-reviews"
+  ]
+}

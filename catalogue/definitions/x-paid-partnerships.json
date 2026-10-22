@@ -1,0 +1,84 @@
+{
+  "id": "x-paid-partnerships",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "match",
+  "title": "X's Paid Partnerships policy: undisclosed paid partnership",
+  "jurisdiction": {
+    "code": "platform:x",
+    "name": "X's own rules (applies on X wherever the user is)"
+  },
+  "instrument": "X Help Center, Paid Partnerships Policy",
+  "section": "What are Paid Partnerships?; Rules for Paid Partnerships",
+  "kind": "platform-policy",
+  "binding_note": "X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.",
+  "in_force": {
+    "status": "published",
+    "since": null,
+    "note": "The page carries no date. Recorded as read on 2026-10-22."
+  },
+  "sources": [
+    {
+      "url": "https://help.x.com/en/rules-and-policies/paid-partnerships-policy",
+      "retrieved_url": "https://help.x.com/en/rules-and-policies/paid-partnerships-policy",
+      "retrieved_at": "2026-10-22",
+      "sha256": "06403ae56a3966a359c4c494aba9b4125958a65dcb873b34995809f636cf92ac",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "browser",
+      "publisher": "X Corp., X Help Center",
+      "note": "help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 233,829 bytes. The page shows no revision date."
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "What are Paid Partnerships?",
+      "text": "[X] defines paid partnerships as the involvement of a third-party brand providing compensation or incentives to a user, such as an influencer or content creator, to promote their product or service."
+    },
+    {
+      "source": 0,
+      "locator": "Rules for Paid Partnerships, second rule",
+      "text": "Posts that are part of a Paid Partnership published as an organic Post must have the “Paid Partnership” disclosure on."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "The post is part of a paid partnership: a brand gave the poster compensation or incentives to promote its product",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "disclosed-paid"
+      ],
+      "note": "Shown for labelled posts, by the poster's own disclosure. For unlabelled posts a partnership is not visible."
+    },
+    {
+      "id": "B",
+      "label": "It was published as an organic post",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "online-post"
+      ]
+    },
+    {
+      "id": "C",
+      "label": "The \"Paid Partnership\" disclosure is not on",
+      "observable_from": "page",
+      "required": true,
+      "strength": "indicative",
+      "signals": [
+        "undisclosed-lookalike"
+      ],
+      "note": "Daylight Commons sees unlabelled posts that share a template with labelled ones. That is consistent with a missing disclosure, and it is also what fans copying a paid post look like."
+    }
+  ],
+  "does_not_prove": "A platform policy is the platform's own rule, not law. A match on visible elements is a comparison with the published policy text; only X decides whether its policy was broken, and the policy can change after the retrieval date.",
+  "related": [
+    "us-ftc-endorsement-material-connection",
+    "eu-dsa-art26-advertising"
+  ]
+}

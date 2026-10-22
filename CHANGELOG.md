@@ -52,6 +52,21 @@ were not published to a store.
 - "Save this post to the Internet Archive" opens the archive's save page and records a witness receipt.
 - Design and limits: `project-docs/EVIDENCE-LAYER.md`; direction: `project-docs/VISION.md`.
 
+### Added (definition catalogue, not in the window yet)
+- `catalogue/`: 15 published definitions, each quoted word for word from its official source with
+  the URL, the retrieval date and a SHA-256 of the page: the FTC Endorsement Guides (16 CFR 255.5),
+  the fake social media indicators rule (16 CFR 465.8), FTC Act section 5 with the Policy Statement
+  on Deception, EU UCPD Annex I points 11, 22 and 23c, DSA Articles 26 and 39 as context, UK DMCC Act
+  2024 Schedule 20 paragraphs 12, 13 and 25, fraud definitions for comparison (18 U.S.C. 1343, Fraud
+  Act 2006 section 2), and X's Paid Partnerships and Authenticity policies.
+- Each definition is split into elements marked observable from the page, from the public record,
+  or not observable. `src/core/definitions.js` builds the element table for a finding: "matches
+  elements A and B of [definition]", with the evidence for each, and never a verdict word (tested).
+- Every jurisdiction that applies is shown in a fixed order. A symmetry test checks the tables do
+  not change with the post's topic or side. Challenges go through `.github/ISSUE_TEMPLATE/challenge.yml`.
+- `npm run catalogue:refetch` re-reads every source and reports drift. Not legal advice; a media
+  lawyer reviews the wording before public release.
+
 ### Added (launch campaign lens, not measured)
 - On an X post and its repost and quote lists, the thread panel adds "Launch campaign": the post's
   engagement shape against the account's own posts, the reposter and replier sample (shared bio

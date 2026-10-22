@@ -167,7 +167,14 @@ identity. Tests check that the output contains no handle of a sampled account an
 this lens ships in a public release. UK and EU defamation law is stricter than US law, and "consistent
 with purchased amplification" about a named company is a statement a court could read as fact.
 
-## Definition matching (designed, not built)
+## Definition matching (data and library built, not in the window yet)
+
+Built on 2026-10-22 as the definition catalogue: `catalogue/`, `src/core/definitions.js` and
+`project-docs/DEFINITION-CATALOGUE.md`. Fifteen entries, each verified against its official source
+with the retrieval date and a SHA-256 of the page. `signalsFromCampaign(lens)` turns this lens's
+rows into the signals the element tables cite. The design notes below are kept as written; where
+they differ, the catalogue document governs (the data lives in `catalogue/definitions/`, not
+`data/campaign-definitions.json`).
 
 The author, verbatim, 2026-10-22: "this could be highlighted honestly as 'What could be considered
 fraud, if looking at the definition rather than the judgement.' If an action is visible, and it
@@ -260,8 +267,8 @@ reason this was caught; it is kept as a regression test.
 - The modern X baseline (200 ordinary posts per stratum) and the labelled cases the evaluation needs.
 - Reddit thresholds, after labelled Reddit cases.
 - Legal review of the ladder's wording before a public release.
-- Definition matching: verify each definition against its official source, then build the data file
-  and the element table.
+- Definition matching: the catalogue and the element tables are built
+  (`project-docs/DEFINITION-CATALOGUE.md`); showing them in the window remains.
 
 ## What it does not prove
 

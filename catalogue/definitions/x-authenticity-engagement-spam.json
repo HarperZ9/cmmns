@@ -1,0 +1,95 @@
+{
+  "id": "x-authenticity-engagement-spam",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "match",
+  "title": "X's Authenticity policy: engagement spam and account metric inflation",
+  "jurisdiction": {
+    "code": "platform:x",
+    "name": "X's own rules (applies on X wherever the user is)"
+  },
+  "instrument": "X Help Center, Authenticity (formerly the platform manipulation and spam policy)",
+  "section": "Inauthentic Behaviors: Engagement Spam; Inauthentic Accounts: Fake personas",
+  "kind": "platform-policy",
+  "binding_note": "X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.",
+  "in_force": {
+    "status": "published",
+    "since": null,
+    "note": "The page is headed \"April 2025\". Recorded as read on 2026-10-22."
+  },
+  "sources": [
+    {
+      "url": "https://help.x.com/en/rules-and-policies/authenticity",
+      "retrieved_url": "https://help.x.com/en/rules-and-policies/authenticity",
+      "retrieved_at": "2026-10-22",
+      "sha256": "075e496e31a9ff197727f23d0d9efe007edaab31695a4482190734cf58a90f22",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "browser",
+      "publisher": "X Corp., X Help Center",
+      "note": "help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 260,886 bytes. The older address help.x.com/en/rules-and-policies/platform-manipulation redirects here."
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "Inauthentic Behaviors, Engagement Spam",
+      "text": "Engagement Spam: We prohibit inauthentic use of [X] engagement features to artificially impact traffic or disrupt people’s experience."
+    },
+    {
+      "source": 0,
+      "locator": "Engagement Spam, Not Allowed, third item",
+      "text": "coordinating with and/or compensating others to conduct account metric inflation in any [X] features, including Likes, Polls, Replies, Reposts, Lists, Views, or Follows;"
+    },
+    {
+      "source": 0,
+      "locator": "Inauthentic Accounts, Fake personas",
+      "text": "Fake personas: You may not use manufactured identities to engage in disruptive or deceptive behavior. This may include using stock, stolen or AI-generated profile photos, copied or stolen profile bios, and/or misleading profile information for the purpose of deceiving others."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "Account metrics (likes, replies, reposts, views, follows) on the post are inflated",
+      "observable_from": "page",
+      "required": true,
+      "strength": "indicative",
+      "signals": [
+        "shape-outlier-own",
+        "bio-template",
+        "stock-persona",
+        "join-cluster",
+        "topic-mismatch",
+        "cross-launch"
+      ],
+      "min_families": 2,
+      "note": "Page signals are consistent with inflation. Two independent signal families are needed before this element is shown as matched."
+    },
+    {
+      "id": "B",
+      "label": "Accounts with copied or templated profile bios take part",
+      "observable_from": "page",
+      "required": false,
+      "strength": "indicative",
+      "signals": [
+        "bio-template",
+        "stock-persona"
+      ],
+      "note": "The policy names copied bios as one possible sign of a fake persona, for the purpose of deceiving others. Daylight Commons never uses avatars, names, languages or places."
+    },
+    {
+      "id": "C",
+      "label": "Someone coordinated with or compensated others to conduct the inflation",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": [],
+      "note": "Who arranged the engagement, and whether anyone was paid, is not on the page."
+    }
+  ],
+  "does_not_prove": "Templated bios and bursts of reposts also come from real communities and from vendors acting without the poster's knowledge. A platform policy is the platform's own rule, not law. A match on visible elements is a comparison with the published policy text; only X decides whether its policy was broken, and the policy can change after the retrieval date.",
+  "related": [
+    "us-ftc-fake-social-media-indicators",
+    "eu-ucpd-annex1-23c-false-reviews-endorsements"
+  ]
+}

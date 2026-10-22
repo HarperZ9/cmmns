@@ -1,0 +1,63 @@
+{
+  "id": "eu-dsa-art39-ad-repository",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "context",
+  "title": "Advertisement repositories of very large platforms (context)",
+  "jurisdiction": {
+    "code": "EU",
+    "name": "European Union (applies where consumers in the EU are reached)"
+  },
+  "instrument": "Digital Services Act, Regulation (EU) 2022/2065",
+  "section": "Article 39(1) and 39(2)",
+  "kind": "regulation",
+  "binding_note": "A regulation, directly applicable in every Member State. Articles 26 and 39 set duties for platform providers, not for the people who post. Daylight Commons uses them as context: they say what the platform must show, which tells the reader where to look for a disclosure or an ad record.",
+  "in_force": {
+    "status": "in force",
+    "since": null,
+    "note": "Article 93(2) sets general application from 17 February 2024. Article 33(6): obligations in the very-large-platform section apply from four months after the designation is notified to the provider, so the date depends on the designation of each platform, which this entry did not check."
+  },
+  "sources": [
+    {
+      "url": "https://eur-lex.europa.eu/eli/reg/2022/2065/oj",
+      "retrieved_url": "https://publications.europa.eu/resource/celex/32022R2065",
+      "retrieved_at": "2026-10-22",
+      "sha256": "11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "Publications Office of the European Union (Cellar), Official Journal text",
+      "note": "Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.",
+      "text_sha256": "d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "Article 39(1), first sentence",
+      "text": "Providers of very large online platforms or of very large online search engines that present advertisements on their online interfaces shall compile and make publicly available in a specific section of their online interface, through a searchable and reliable tool that allows multicriteria queries and through application programming interfaces, a repository containing the information referred to in paragraph 2, for the entire period during which they present an advertisement and until one year after the advertisement was presented for the last time on their online interfaces."
+    },
+    {
+      "source": 0,
+      "locator": "Article 39(2)(b), (c) and (f)",
+      "text": "(b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement, if that person is different from the person referred to in point (b); (f) the commercial communications published on the very large online platforms and identified pursuant to Article 26(2);"
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "An ad repository exists where the advertiser and payer of an ad can be looked up",
+      "observable_from": "public-record",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "ad-library-link"
+      ],
+      "note": "Daylight Commons builds a search link to the repository; the user opens it. Daylight Commons does not read the repository itself."
+    }
+  ],
+  "does_not_prove": "Context only. An empty repository search does not show that no ads ran, and an entry does not show anything about organic posts. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "eu-dsa-art26-advertising"
+  ]
+}

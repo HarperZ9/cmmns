@@ -26,6 +26,8 @@ whether the most extreme replies come mostly from flagged accounts. X first.
 - `src/ext/` the Manifest V3 extension: content script, styles, popover.
 - `src/core/api.js` radar-core, the public API (project-docs/INTEGRATION.md); `schema/` its JSON Schema;
   `bin/radar.mjs` the command line tool, local files only.
+- `catalogue/` published definitions by jurisdiction, versioned, with `src/core/definitions.js`
+  building element tables (project-docs/DEFINITION-CATALOGUE.md). Quotes only from official sources.
 - `tests/` `node --test`.
 - `project-docs/` design, evaluation and evidence.
 

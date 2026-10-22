@@ -1,0 +1,98 @@
+{
+  "id": "us-wire-fraud-18usc1343",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "comparison",
+  "title": "Fraud by wire, radio, or television (for comparison)",
+  "jurisdiction": {
+    "code": "US",
+    "name": "United States (federal)"
+  },
+  "instrument": "18 U.S.C. 1343, with the elements as summarised in the DOJ Criminal Resource Manual 941 (archived)",
+  "section": "18 U.S.C. 1343",
+  "kind": "statute",
+  "binding_note": "A criminal statute. Only a court decides whether it applies. The circuits state the elements in different words; the DOJ page lists several formulations.",
+  "in_force": {
+    "status": "in force",
+    "since": null,
+    "note": "United States Code, 2024 edition, as published on govinfo."
+  },
+  "sources": [
+    {
+      "url": "https://www.govinfo.gov/link/uscode/18/1343",
+      "retrieved_url": "https://www.govinfo.gov/content/pkg/USCODE-2024-title18/html/USCODE-2024-title18-partI-chap63-sec1343.htm",
+      "retrieved_at": "2026-10-22",
+      "sha256": "1a43985c3f9ca2e28680336d3889d8801a87db2afa7bf16231fde4c0fdfb1594",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "US Government Publishing Office, govinfo (United States Code, 2024 edition)",
+      "text_sha256": "d9243b2adbea08b7838d4ad1d13b99f523741cf930ae8539a98a729ad45d6785"
+    },
+    {
+      "url": "https://www.justice.gov/archives/jm/criminal-resource-manual-941-18-usc-1343-elements-wire-fraud",
+      "retrieved_url": "https://www.justice.gov/archives/jm/criminal-resource-manual-941-18-usc-1343-elements-wire-fraud",
+      "retrieved_at": "2026-10-22",
+      "sha256": "08b307acc432d022471e05252e68bd66ccc2b464364a8920b898bf09fc9cd769",
+      "hash_method": "rendered-text",
+      "retrieved_with": "browser",
+      "publisher": "US Department of Justice (archived Criminal Resource Manual)",
+      "note": "Scripted fetches got a changing 2.7 KB challenge page, so the hash is SHA-256 over the UTF-8 text of the rendered <main> element (2,585 bytes). The page is marked archived and may be outdated."
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "18 U.S.C. 1343, first sentence (penalty clause omitted)",
+      "text": "Whoever, having devised or intending to devise any scheme or artifice to defraud, or for obtaining money or property by means of false or fraudulent pretenses, representations, or promises, transmits or causes to be transmitted by means of wire, radio, or television communication in interstate or foreign commerce, any writings, signs, signals, pictures, or sounds for the purpose of executing such scheme or artifice,"
+    },
+    {
+      "source": 1,
+      "locator": "CRM 941, quoting United States v. Maxwell, 920 F.2d 1028, 1035 (D.C. Cir. 1990)",
+      "text": "Wire fraud requires proof of (1) a scheme to defraud; and (2) the use of an interstate wire communication to further the scheme."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "A scheme or artifice to defraud, or to obtain money or property by false pretenses",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": [],
+      "note": "A scheme is a plan. Visible posts can be part of one, but the plan itself is not on the page."
+    },
+    {
+      "id": "B",
+      "label": "Intent to defraud",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": []
+    },
+    {
+      "id": "C",
+      "label": "Use of an interstate wire communication (an online post is a communication sent by wire)",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "online-post"
+      ],
+      "note": "Almost any online conduct shows this element, which is why it says little on its own."
+    },
+    {
+      "id": "D",
+      "label": "The communication was made to further the scheme",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": []
+    }
+  ],
+  "does_not_prove": "Shown for comparison only. The elements that give this definition its meaning (the scheme and the intent) are not observable from any page, so Daylight Commons never presents it as met. Reliance and harm elements belong to other fraud definitions, such as common-law fraud, which this catalogue does not hold yet. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "uk-fraud-act-2006-s2",
+    "us-ftc-act-s5-deception"
+  ]
+}

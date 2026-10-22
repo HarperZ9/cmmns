@@ -1,0 +1,102 @@
+{
+  "id": "uk-dmcc-sch20-13-fake-reviews",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "match",
+  "title": "Fake or concealed-incentive consumer reviews",
+  "jurisdiction": {
+    "code": "UK",
+    "name": "United Kingdom"
+  },
+  "instrument": "Digital Markets, Competition and Consumers Act 2024",
+  "section": "Schedule 20, paragraph 13 (banned practice), with the definitions in paragraph 13(5)",
+  "kind": "statute",
+  "binding_note": "Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders. Whether a repost, like or quote post is a \"consumer review\" under paragraph 13(5)(a) is a legal question; the definition covers \"a review of a product, a trader or any other matter relevant to a transactional decision\".",
+  "in_force": {
+    "status": "in force",
+    "since": "2025-04-06",
+    "note": "The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."
+  },
+  "sources": [
+    {
+      "url": "https://www.legislation.gov.uk/ukpga/2024/13/schedule/20",
+      "retrieved_url": "https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml",
+      "retrieved_at": "2026-10-22",
+      "sha256": "5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "The National Archives, legislation.gov.uk (revised text)",
+      "note": "Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.",
+      "text_sha256": "c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"
+    },
+    {
+      "url": "https://www.legislation.gov.uk/uksi/2025/272/made",
+      "retrieved_url": "https://www.legislation.gov.uk/uksi/2025/272/made/data.xml",
+      "retrieved_at": "2026-10-22",
+      "sha256": "8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "The National Archives, legislation.gov.uk",
+      "text_sha256": "e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "Schedule 20, paragraph 13(1)",
+      "text": "(1) Submitting, or commissioning another person to submit or write— (a) a fake consumer review, or (b) a consumer review that conceals the fact it has been incentivised."
+    },
+    {
+      "source": 0,
+      "locator": "Schedule 20, paragraph 13(5)(a) to (c)",
+      "text": "(a) “consumer review” means a review of a product, a trader or any other matter relevant to a transactional decision; (b) “fake consumer review” means a consumer review that purports to be, but is not, based on a person’s genuine experience; (c) a consumer review conceals the fact it has been incentivised if— (i) a person has been commissioned to submit or write the review, and (ii) that fact is not made apparent (whether through the contents of the review or otherwise);"
+    },
+    {
+      "source": 1,
+      "locator": "SI 2025/272, regulation 2(3)",
+      "text": "Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "A consumer review: a review of a product or trader relevant to a buying decision (here, quote posts praising a launch)",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "promo-cue",
+        "undisclosed-lookalike",
+        "disclosed-paid"
+      ],
+      "note": "Treating a quote post as a consumer review is this entry's reading, not a settled one."
+    },
+    {
+      "id": "B",
+      "label": "The review purports to be, but is not, based on genuine experience; or it was commissioned and that fact is not made apparent",
+      "observable_from": "page",
+      "required": true,
+      "strength": "indicative",
+      "signals": [
+        "undisclosed-lookalike"
+      ],
+      "note": "A missing label next to labelled look-alikes is consistent with a concealed incentive. It does not show that the author was commissioned."
+    },
+    {
+      "id": "C",
+      "label": "The trader submitted it or commissioned another person to submit or write it",
+      "observable_from": "public-record",
+      "required": true,
+      "strength": "direct",
+      "signals": [],
+      "note": "Commissioning is shown by contracts, briefs or payments, not by the page."
+    }
+  ],
+  "does_not_prove": "Look-alike posts can be fans copying a paid post. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "eu-ucpd-annex1-23c-false-reviews-endorsements",
+    "us-ftc-fake-social-media-indicators",
+    "us-ftc-endorsement-material-connection"
+  ]
+}

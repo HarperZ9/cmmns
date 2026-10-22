@@ -1,0 +1,67 @@
+name: Challenge a definition or a badge
+description: Dispute a catalogue entry, an element match or a badge Daylight Commons showed. Every challenge gets a public decision with its reasons.
+title: "Challenge: "
+labels: ["challenge"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Daylight Commons compares visible conduct with published definitions, element by element. It never decides
+        that anyone broke a law or a rule. If an entry quotes its source wrongly, splits it into the wrong
+        elements, cites the wrong signals, or a badge matched an element it should not have, tell us here.
+
+        Anyone can file this, including an organisation named by a badge. Each challenge is answered in
+        the open: accepted or rejected, with the reasoning, and a dated line in `catalogue/CHANGELOG.md`
+        when an entry changes.
+
+        Please do not post private information about any person. A link to the public post is enough.
+  - type: dropdown
+    id: target
+    attributes:
+      label: What are you challenging?
+      options:
+        - A catalogue entry (its quote, source, elements or signals)
+        - A badge or element table Daylight Commons showed on a page
+        - A missing definition or jurisdiction
+    validations:
+      required: true
+  - type: input
+    id: entry
+    attributes:
+      label: Catalogue entry and version
+      description: As shown on the badge, for example us-ftc-fake-social-media-indicators@1.0.0.
+      placeholder: id@version
+    validations:
+      required: false
+  - type: input
+    id: element
+    attributes:
+      label: Element
+      description: The element letter, if the challenge is about one element.
+      placeholder: B
+  - type: input
+    id: page
+    attributes:
+      label: Public link to the post or page (badges only)
+      placeholder: https://
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong
+      description: Quote the text or the result you dispute, and say what it should be.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Your evidence
+      description: An official source (with a link), a disclosure Daylight Commons missed, or anything else that shows the entry or the badge is wrong.
+    validations:
+      required: true
+  - type: checkboxes
+    id: role
+    attributes:
+      label: Who you are (optional)
+      options:
+        - label: I represent an organisation named by this badge.
+        - label: I am the author of the post.

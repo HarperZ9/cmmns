@@ -1,0 +1,117 @@
+{
+  "id": "eu-ucpd-annex1-23c-false-reviews-endorsements",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "match",
+  "title": "False consumer reviews or endorsements, or misrepresented social endorsements",
+  "jurisdiction": {
+    "code": "EU",
+    "name": "European Union (applies where consumers in the EU are reached)"
+  },
+  "instrument": "Unfair Commercial Practices Directive 2005/29/EC as amended by Directive (EU) 2019/2161 (the Omnibus Directive), consolidated text of 27.09.2026",
+  "section": "Annex I, point 23c",
+  "kind": "directive",
+  "binding_note": "A directive, applied through each Member State's national law. Annex I lists practices that are unfair in all circumstances, and the text says the same single list applies in all Member States. It covers business-to-consumer practices: the party must be a trader. Recital 49 of Directive 2019/2161 gives 'likes' on social media as an example of an endorsement.",
+  "in_force": {
+    "status": "in force",
+    "since": "2022-05-28",
+    "note": "Inserted by Article 3 of Directive (EU) 2019/2161. Article 7 of that Directive: Member States \"shall apply those measures from 28 May 2022\"."
+  },
+  "sources": [
+    {
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927",
+      "retrieved_url": "https://publications.europa.eu/resource/celex/02005L0029-20260927",
+      "retrieved_at": "2026-10-22",
+      "sha256": "1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "Publications Office of the European Union (Cellar), consolidated text",
+      "note": "EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.",
+      "text_sha256": "c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"
+    },
+    {
+      "url": "https://eur-lex.europa.eu/eli/dir/2019/2161/oj",
+      "retrieved_url": "https://publications.europa.eu/resource/celex/32019L2161",
+      "retrieved_at": "2026-10-22",
+      "sha256": "4f2987a941a32c9fae499098554b206e93b26365fea60353e2f886084174b1ac",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "Publications Office of the European Union (Cellar), Official Journal text",
+      "text_sha256": "90f61e53584b248a1e560458561a916da4aa68be17c69a25de69313df2b64570"
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "Annex I, point 23c",
+      "text": "Submitting or commissioning another legal or natural person to submit false consumer reviews or endorsements, or misrepresenting consumer reviews or social endorsements, in order to promote products."
+    },
+    {
+      "source": 1,
+      "locator": "Directive (EU) 2019/2161, recital 49, first sentence",
+      "text": "Traders should also be prohibited from submitting fake consumer reviews and endorsements, such as ‘likes’ on social media, or commissioning others to do so in order to promote their products, as well as from manipulating consumer reviews and endorsements, such as publishing only positive reviews and deleting the negative ones."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "Consumer reviews or social endorsements are involved (likes, reposts, quote posts)",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "shape-outlier-own",
+        "bio-template",
+        "stock-persona",
+        "join-cluster",
+        "topic-mismatch",
+        "cross-launch",
+        "undisclosed-lookalike"
+      ]
+    },
+    {
+      "id": "B",
+      "label": "They are false, or are misrepresented",
+      "observable_from": "page",
+      "required": true,
+      "strength": "indicative",
+      "signals": [
+        "shape-outlier-own",
+        "bio-template",
+        "stock-persona",
+        "join-cluster",
+        "topic-mismatch",
+        "cross-launch",
+        "undisclosed-lookalike"
+      ],
+      "min_families": 2,
+      "note": "Page signals are consistent with false endorsements; they do not show that any single account is not a real consumer."
+    },
+    {
+      "id": "C",
+      "label": "A trader submitted them or commissioned another person to submit them",
+      "observable_from": "public-record",
+      "required": true,
+      "strength": "direct",
+      "signals": [],
+      "note": "Who commissioned the engagement is not visible on the page."
+    },
+    {
+      "id": "D",
+      "label": "In order to promote products",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "product-promotion"
+      ]
+    }
+  ],
+  "does_not_prove": "Bought-looking engagement can come from parties other than the trader, including rivals and vendors acting on their own. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "us-ftc-fake-social-media-indicators",
+    "uk-dmcc-sch20-13-fake-reviews",
+    "x-authenticity-engagement-spam"
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "id": "us-ftc-endorsement-material-connection",
+  "version": "1.0.0",
+  "status": "active",
+  "verification": "verified",
+  "role": "match",
+  "title": "Undisclosed material connection in an endorsement",
+  "jurisdiction": {
+    "code": "US",
+    "name": "United States (federal)"
+  },
+  "instrument": "FTC Guides Concerning Use of Endorsements and Testimonials in Advertising, 16 CFR Part 255",
+  "section": "16 CFR 255.5(a), with the definition in 255.0(b)",
+  "kind": "agency-guides",
+  "binding_note": "The Guides are the FTC's administrative interpretation of section 5 of the FTC Act (16 CFR 255.0(a)). They guide how the Commission applies section 5; they are not a separate rule.",
+  "in_force": {
+    "status": "in force",
+    "since": "2023-07-26",
+    "note": "Current text from 88 FR 48102, July 26, 2023, per the eCFR source note. The date is the Federal Register publication date, not a verified effective date."
+  },
+  "sources": [
+    {
+      "url": "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255",
+      "retrieved_url": "https://www.ecfr.gov/api/versioner/v1/full/2026-10-19/title-16.xml?part=255",
+      "retrieved_at": "2026-10-22",
+      "sha256": "feb1c8cfee82158c16c4210ef320bc93ffb2f414aa2bdce6e6772a77064180ea",
+      "hash_method": "raw-bytes",
+      "retrieved_with": "curl",
+      "publisher": "Office of the Federal Register and GPO, eCFR",
+      "note": "eCFR point-in-time XML for 2026-10-19, the latest issue date eCFR listed for Title 16 on the retrieval date. eCFR is an editorial compilation; the official annual edition is on govinfo.",
+      "text_sha256": "bf8ee515e45bdc40dd4269b73ec61e3790c762688a197eb9537d891225663b07"
+    }
+  ],
+  "quotes": [
+    {
+      "source": 0,
+      "locator": "16 CFR 255.5(a), first two sentences and the significant-minority sentence",
+      "text": "When there exists a connection between the endorser and the seller of the advertised product that might materially affect the weight or credibility of the endorsement, and that connection is not reasonably expected by the audience, such connection must be disclosed clearly and conspicuously. Material connections can include a business, family, or personal relationship. … A material connection needs to be disclosed when a significant minority of the audience for an endorsement does not understand or expect the connection."
+    },
+    {
+      "source": 0,
+      "locator": "16 CFR 255.0(b), first sentence",
+      "text": "For purposes of this part, an “endorsement” means any advertising, marketing, or promotional message for a product that consumers are likely to believe reflects the opinions, beliefs, findings, or experiences of a party other than the sponsoring advertiser, even if the views expressed by that party are identical to those of the sponsoring advertiser."
+    }
+  ],
+  "elements": [
+    {
+      "id": "A",
+      "label": "An endorsement: a promotional message for a product that readers are likely to take as a third party's own view",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "disclosed-paid",
+        "undisclosed-lookalike",
+        "promo-cue"
+      ]
+    },
+    {
+      "id": "B",
+      "label": "A connection between the endorser and the seller",
+      "observable_from": "page",
+      "required": true,
+      "strength": "direct",
+      "signals": [
+        "disclosed-paid"
+      ],
+      "note": "The Paid partnership label shows a connection for the labelled posts only. For unlabelled look-alikes the connection is an inference from shared template and timing, and the public record (contracts, agency rosters) is where it would be shown."
+    },
+    {
+      "id": "C",
+      "label": "The connection might materially affect the weight or credibility of the endorsement",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": [],
+      "note": "Materiality turns on how the audience weighs the message. Daylight Commons cannot see that."
+    },
+    {
+      "id": "D",
+      "label": "The connection is not reasonably expected by the audience",
+      "observable_from": "not-observable",
+      "required": true,
+      "strength": "direct",
+      "signals": [],
+      "note": "Audience expectation is a question about readers, usually answered with evidence Daylight Commons does not have."
+    },
+    {
+      "id": "E",
+      "label": "The connection is not disclosed clearly and conspicuously",
+      "observable_from": "page",
+      "required": true,
+      "strength": "indicative",
+      "signals": [
+        "undisclosed-lookalike"
+      ],
+      "note": "Daylight Commons sees that a quote carries no Paid partnership label. It cannot see a disclosure made elsewhere, such as in an image or a linked page."
+    }
+  ],
+  "does_not_prove": "Daylight Commons sees labels and look-alike posts. It does not see contracts, payments or what the audience expected. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.",
+  "related": [
+    "us-ftc-act-s5-deception",
+    "x-paid-partnerships",
+    "eu-ucpd-annex1-11-advertorial",
+    "uk-dmcc-sch20-12-advertorial"
+  ]
+}
