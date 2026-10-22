@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Media stage: element tables</title>
+<link rel="stylesheet" href="../../src/ext/canon.css">
+<!--
+  The film stage for the definition catalogue (scripts/media/README.md). The extension does not draw
+  element tables yet, so this page draws the real tables that src/core/definitions.js builds for the
+  synthetic launch (the same lens input as stage-launch.html), in the extension's canon. ?entry=<id>
+  picks the table; the default is the FTC endorsement entry.
+-->
+<style>
+  @font-face { font-family: "Hanken Grotesk"; src: url("../../src/ext/fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "Conso"; src: url("../../src/ext/fonts/conso-regular.woff2") format("woff2"); }
+  main { max-width: 64rem; margin: 0 auto; padding: 2.5rem 2rem 3rem; }
+  .kicker { font: 400 .95rem/1.4 var(--font-mono); color: var(--soft); margin: 0 0 .4rem; }
+  h1 { font-size: 2.1rem; line-height: 1.15; margin: 0 0 .6rem; font-weight: 720; }
+  .cite { font: 400 .95rem/1.5 var(--font-mono); color: var(--soft); margin: 0 0 1.4rem; }
+  blockquote { margin: 0 0 1.6rem; padding: .2rem 0 .2rem 1.1rem; border-left: 3px solid var(--ink); font-size: 1.05rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 1.02rem; }
+  td.id { font: 650 1rem var(--font-mono); width: 2.5rem; }
+  td.st { width: 12.5rem; }
+  .chip { display: inline-block; padding: .2rem .55rem; font: 650 .85rem/1.3 var(--font-sans); border: 1.5px solid currentColor; }
+  .matched { color: var(--ink); } .indicative { color: var(--drift); } .unseen { color: var(--unverifiable); } .none { color: var(--muted); }
+  tr[data-status="not-observable"] td { background: color-mix(in srgb, var(--unverifiable) 7%, transparent); }
+  .ev { display: block; margin-top: .25rem; color: var(--soft); font-size: .9rem; }
+  .summary { margin-top: 1.5rem; font-size: 1.05rem; }
+  .foot { margin-top: .8rem; color: var(--soft); font-size: .92rem; }
+</style>
+</head>
+<body>
+<main id="m"><p class="kicker">Loading…</p></main>
+<script type="module">
+  import { campaignLens, actorOf } from "../../src/core/campaign.js";
+  import { elementTables, signalsFromCampaign } from "../../src/core/definitions.js";
+  import { farmAccounts, organicAccounts, campaignQuotes, organicQuotes, OWN_POSTS, LAUNCH_COUNTS } from "../../tests/fixtures/campaign-fixtures.js";
+  const FILES = ["eu-dsa-art26-advertising", "eu-dsa-art39-ad-repository", "eu-ucpd-annex1-11-advertorial", "eu-ucpd-annex1-22-posing-as-consumer",
+    "eu-ucpd-annex1-23c-false-reviews-endorsements", "uk-dmcc-sch20-12-advertorial", "uk-dmcc-sch20-13-fake-reviews", "uk-dmcc-sch20-25-posing-as-consumer",
+    "uk-fraud-act-2006-s2", "us-ftc-act-s5-deception", "us-ftc-endorsement-material-connection", "us-ftc-fake-social-media-indicators",
+    "us-wire-fraud-18usc1343", "x-authenticity-engagement-spam", "x-paid-partnerships"];
+  const get = (p) => fetch(p).then((r) => r.json());
+  const entries = await Promise.all(FILES.map((f) => get(`../../catalogue/definitions/${f}.json`)));
+  const registry = await get("../../catalogue/signals.json");
+  const actor = actorOf({ handle: "examplelabs", professionalType: "Business" });
+  const lens = campaignLens({ platform: "x", post: LAUNCH_COUNTS, ownPosts: OWN_POSTS, accounts: [...farmAccounts(38), ...organicAccounts(12)],
+                              quotes: [...campaignQuotes(8), ...organicQuotes(4)], actor });
+  const tables = elementTables(entries, signalsFromCampaign(lens, { actor }), registry);
+  const want = new URLSearchParams(location.search).get("entry") || "us-ftc-endorsement-material-connection";
+  const t = tables.find((x) => x.entry === want) || tables[0];
+  const status = (r) => r.status === "matched" ? (r.strength === "indicative" ? ["indicative", "matched, indicative"] : ["matched", "matched"])
+    : r.status === "not-observable" ? ["unseen", "not observable"] : ["none", "no evidence here"];
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  document.getElementById("m").innerHTML = `
+    <p class="kicker">${esc(t.jurisdiction.name)} · ${esc(t.catalogue)} · ${t.role === "comparison" ? "for comparison" : "definition"}</p>
+    <h1>${esc(t.title)}</h1>
+    <p class="cite">${esc(t.citation)} · retrieved ${esc(t.source.retrieved_at.slice(0, 10))} · sha256 ${esc(t.source.sha256.slice(0, 12))}…</p>
+    <blockquote>${esc(t.quotes[0].text.length > 320 ? t.quotes[0].text.slice(0, 317) + "…" : t.quotes[0].text)}</blockquote>
+    <table><thead><tr><th>El.</th><th>What the definition needs</th><th>On this launch</th></tr></thead><tbody>
+    ${t.rows.map((r) => { const [cls, word] = status(r); return `<tr data-status="${r.status}" data-el="${r.id}"><td class="id">${r.id}</td><td>${esc(r.label)}${r.evidence.length ? `<span class="ev">${r.evidence.map((e) => esc(e.signal)).join(" · ")}</span>` : ""}</td><td class="st"><span class="chip ${cls}">${word}</span></td></tr>`; }).join("")}
+    </tbody></table>
+    <p class="summary">${esc(t.summary)}</p>
+    <p class="foot">${esc(t.dnp)}</p>`;
+  window.STAGE_READY = true;
+</script>
+</body>
+</html>

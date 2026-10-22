@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" data-pb-fixture="status">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Media stage: a synthetic launch thread</title>
+<link rel="stylesheet" href="../../src/ext/badges.css">
+<!--
+  The film stage (scripts/media/README.md). Every account, post and company here is invented.
+  The page has the structure of an X post page, like tests/fixtures/thread.html, but carries no
+  platform name or logo. The extension's own scripts run on it unchanged. One part is staged: X's
+  network responses do not exist here, so the launch campaign lens is computed by the real core
+  (src/core/campaign.js) from the synthetic campaign fixtures and handed to the page in place of
+  src/ext/campaign.js, which reads those responses on X.
+-->
+<style>
+  :root { --ink: #16181c; --soft: #5b6470; --line: #e6e8eb; }
+  html { background: #f3f4f5; }
+  body { margin: 0; color: var(--ink); font: 16px/1.45 system-ui, "Segoe UI", sans-serif; }
+  main { max-width: 640px; margin: 0 auto; background: #fff; border-inline: 1px solid var(--line); min-height: 100vh; }
+  .bar { position: sticky; top: 0; z-index: 2; padding: 14px 18px; background: rgba(255,255,255,.94); border-bottom: 1px solid var(--line); font-weight: 700; font-size: 19px; }
+  .bar small { display: block; font-weight: 400; font-size: 13px; color: var(--soft); }
+  article { position: relative; padding: 14px 18px 14px 74px; border-bottom: 1px solid var(--line); }
+  article::before { content: ""; position: absolute; left: 18px; top: 16px; width: 42px; height: 42px; border-radius: 50%; background: var(--av, #c9ced6); }
+  article.root { padding-top: 18px; }
+  article.root [data-testid="tweetText"] { font-size: 21px; line-height: 1.4; }
+  [data-testid="User-Name"] { font-weight: 700; }
+  [data-testid="User-Name"] a { color: var(--ink); text-decoration: none; }
+  [data-testid="User-Name"] span, [data-testid="User-Name"] span a { color: var(--soft); font-weight: 400; }
+  .paid { display: inline-block; margin-top: 6px; font-size: 13px; color: var(--soft); }
+  .quoted { margin-top: 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; color: var(--soft); font-size: 14px; }
+  .counts { margin-top: 10px; color: var(--soft); font-size: 14px; display: flex; gap: 22px; }
+  .note { padding: 8px 18px; color: var(--soft); font-size: 12px; background: #fafafa; border-bottom: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar">Post<small>A synthetic thread for a film. Every account here is invented.</small></div>
+  <div id="thread"></div>
+</main>
+<script type="module">
+  import { campaignLens, actorOf } from "../../src/core/campaign.js";
+  import { farmAccounts, organicAccounts, campaignQuotes, organicQuotes, OWN_POSTS, LAUNCH_COUNTS, LAUNCH_TEXT } from "../../tests/fixtures/campaign-fixtures.js";
+
+  const ORG = "examplelabs";
+  // Generated handles get a demo_ prefix, so no stand-in can be read as a real account.
+  const demo = (h) => ("demo_" + h).slice(0, 15);
+  const farm = farmAccounts(38).map((a) => ({ ...a, handle: demo(a.handle) })), organic = organicAccounts(12).map((a) => ({ ...a, handle: demo(a.handle) }));
+  const quotes = [...campaignQuotes(8), ...organicQuotes(4)].map((q) => ({ ...q, author: demo(q.author) }));
+  const lens = campaignLens({ platform: "x", post: LAUNCH_COUNTS, ownPosts: OWN_POSTS, accounts: [...farm, ...organic], quotes,
+                              actor: actorOf({ handle: ORG, professionalType: "Business" }) });
+  globalThis.STAGE = { lens, farm, organic, quotes };
+
+  // The page: the launch post, then the quote posts as replies, in posting order. Avatars are flat
+  // tones, never faces.
+  const tones = ["#c9ced6", "#d8cbb8", "#bfcabd", "#cfc3cf", "#c4ccd6", "#d6d0c2"];
+  const rows = [{ id: "100", h: ORG, text: LAUNCH_TEXT, root: true }, ...quotes.map((q, i) => ({ id: String(101 + i), h: q.author, text: q.text, paid: q.paidPartnership }))];
+  const box = document.getElementById("thread");
+  rows.forEach((r, i) => {
+    const a = document.createElement("article");
+    a.setAttribute("data-testid", "tweet");
+    a.tabIndex = 0;
+    if (r.root) a.className = "root";
+    a.style.setProperty("--av", r.root ? "#20242b" : tones[i % tones.length]);
+    a.innerHTML = `<div data-testid="User-Name"><a href="/${r.h}">${r.root ? "Example Labs" : r.h}</a> <span>@${r.h} · <a href="/${r.h}/status/${r.id}"><time>${r.root ? "3h" : (i * 6) + "m"}</time></a></span></div><div data-testid="tweetText"></div>`;
+    a.querySelector('[data-testid="tweetText"]').textContent = r.text;
+    if (!r.root) a.insertAdjacentHTML("beforeend", `<div class="quoted">Example Labs @${ORG}: We are announcing the public beta…</div>`);
+    if (r.paid) a.insertAdjacentHTML("beforeend", `<span class="paid">Paid partnership</span>`);
+    if (r.root) a.insertAdjacentHTML("beforeend", `<div class="counts"><span>131 replies</span><span>5.2K reposts</span><span>631 likes</span><span>211K views</span></div>`);
+    box.append(a);
+  });
+  // What each account's About page would say, for the reply windows (synthetic, like the fixture's).
+  const about = {};
+  for (const q of quotes) {
+    const f = farm.find((x) => x.handle === q.author);
+    about[q.author] = q.author.startsWith("demo_reader") ? { basedIn: "United Kingdom", joinDate: "2015-03-01", nameChanges: 0 }
+      : { basedIn: ["South Asia", "Eastern Europe", "West Africa"][q.author.length % 3], joinDate: f ? f.joinDate : "2026-04-24", nameChanges: 2 };
+  }
+  about[ORG] = { basedIn: "United States", joinDate: "2019-06-01", nameChanges: 0 };
+  window.FIXTURE_ABOUT = about;
+  window.FIXTURE_PRELOAD = Object.entries(about).map(([handle, r]) => ({ handle, ...r }));
+  window.FIXTURE_STORE = { "pb.settings": {} };
+
+  // The staged campaign lens, in place of src/ext/campaign.js (see the note in the head).
+  globalThis.PBCampaign = Object.freeze({ lens: () => ({ ...lens, launchId: "100" }), forget: () => Promise.resolve(), onList: () => false });
+
+  const load = (src) => new Promise((ok, bad) => { const s = document.createElement("script"); s.src = src; s.async = false; s.onload = ok; s.onerror = () => bad(new Error("could not load " + src)); document.body.append(s); });
+  const EXT = ["core.bundle.js", "settings.js", "fonts.js", "store.js", "feedback.js"];
+  const AFTER = ["about-page.js", "platforms.js", "pop.js", "media.js", "mediacard.js", "signals.js", "card.js", "panel.js", "ui.js", "logs.js", "health.js", "content.js"];
+  await load("../../tests/fixtures/chrome-stub.js");
+  for (const f of EXT) await load("../../src/ext/" + f);
+  await Promise.all(window.FIXTURE_PRELOAD.map((r) => PBStore.put(r)));
+  window.FIXTURE_READY = true;
+  for (const f of AFTER) await load("../../src/ext/" + f);
+  window.STAGE_READY = true;
+</script>
+</body>
+</html>
