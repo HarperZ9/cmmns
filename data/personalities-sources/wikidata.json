@@ -1,0 +1,1883 @@
+{
+ "about": "Wikidata statements for the people in this dataset: employer (P108, with start P580 and end P582 qualifiers), X username (P2002), YouTube channel ID (P2397), YouTube handle (P11245) and TikTok username (P7085). Fetched from https://query.wikidata.org/sparql. CC0 1.0.",
+ "fetched": "2026-10-21",
+ "licence": "CC0 1.0",
+ "people": {
+  "Q100417135": {
+   "employers": [
+    {
+     "qid": "Q7711621",
+     "label": "Blaze Media",
+     "start": "2014-10-01",
+     "end": "http://www"
+    },
+    {
+     "qid": "Q18049522",
+     "label": "HuffPost",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q25094513",
+     "label": "The Daily Wire",
+     "start": "2017-10-01",
+     "end": null
+    },
+    {
+     "qid": "Q7949822",
+     "label": "WGMD",
+     "start": "2011-01-01",
+     "end": "2012-01-01"
+    },
+    {
+     "qid": "Q7952105",
+     "label": "WLAP",
+     "start": "2012-01-01",
+     "end": "2013-01-01"
+    },
+    {
+     "qid": "Q7958245",
+     "label": "WZBH",
+     "start": "2010-01-01",
+     "end": "2011-01-01"
+    }
+   ],
+   "x": [
+    "MattWalshBlog"
+   ],
+   "youtubeChannel": [
+    "UCO01ytfzgXYy4glnPJm4PPQ"
+   ],
+   "youtubeHandle": [
+    "mattwalsh"
+   ],
+   "tiktok": []
+  },
+  "Q100699801": {
+   "employers": [],
+   "x": [
+    "briantylercohen"
+   ],
+   "youtubeChannel": [
+    "UCQANb2YPwAtK-IQJrLaaUFw"
+   ],
+   "youtubeHandle": [
+    "briantylercohen"
+   ],
+   "tiktok": [
+    "briantylercohen"
+   ]
+  },
+  "Q104777484": {
+   "employers": [],
+   "x": [
+    "iqrarulhassan"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q10971418": {
+   "employers": [],
+   "x": [
+    "Amradib"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q116009742": {
+   "employers": [
+    {
+     "qid": "Q186068",
+     "label": "Fox News",
+     "start": "2025-06-25",
+     "end": null
+    },
+    {
+     "qid": "Q25094513",
+     "label": "The Daily Wire",
+     "start": "2022-01-01",
+     "end": "2024-12-10"
+    }
+   ],
+   "x": [
+    "imbrettcooper"
+   ],
+   "youtubeChannel": [
+    "UCdFcGPb4xQ6X4QOoRU6ROYw"
+   ],
+   "youtubeHandle": [
+    "bbrettcooper",
+    "thecommentssection"
+   ],
+   "tiktok": [
+    "brettcooper_"
+   ]
+  },
+  "Q1226328": {
+   "employers": [
+    {
+     "qid": "Q3521483",
+     "label": "The King's College",
+     "start": "2010-01-01",
+     "end": "2012-01-01"
+    }
+   ],
+   "x": [
+    "DineshDSouza"
+   ],
+   "youtubeChannel": [
+    "UC8GAOCAJxBL4bExaUCvwL4Q"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q1280288": {
+   "employers": [
+    {
+     "qid": "Q13973",
+     "label": "MS NOW",
+     "start": "2003-01-01",
+     "end": null
+    }
+   ],
+   "x": [
+    "JoeNBC"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q131112": {
+   "employers": [
+    {
+     "qid": "Q378372",
+     "label": "Banco de Portugal",
+     "start": "1976-01-01",
+     "end": "1976-01-01"
+    },
+    {
+     "qid": "Q1024543",
+     "label": "CUNY Graduate School and University Center",
+     "start": "2015-06-01",
+     "end": null
+    },
+    {
+     "qid": "Q1137023",
+     "label": "Council of Economic Advisers",
+     "start": "1982-01-01",
+     "end": "1983-01-01"
+    },
+    {
+     "qid": "Q282690",
+     "label": "Group of Thirty",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q174570",
+     "label": "London School of Economics and Political Science",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q49108",
+     "label": "Massachusetts Institute of Technology",
+     "start": "1979-01-01",
+     "end": "1982-01-01"
+    },
+    {
+     "qid": "Q49108",
+     "label": "Massachusetts Institute of Technology",
+     "start": "1984-01-01",
+     "end": "http://www"
+    },
+    {
+     "qid": "Q475424",
+     "label": "National Bureau of Economic Research",
+     "start": "1979-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q21578",
+     "label": "Princeton University",
+     "start": "2000-01-01",
+     "end": "2015-06-01"
+    },
+    {
+     "qid": "Q41506",
+     "label": "Stanford University",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q9684",
+     "label": "The New York Times",
+     "start": "2000-01-01",
+     "end": "2024-01-01"
+    },
+    {
+     "qid": "Q49112",
+     "label": "Yale University",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q49112",
+     "label": "Yale University",
+     "start": "1977-09-01",
+     "end": "http://www"
+    }
+   ],
+   "x": [
+    "paulkrugman"
+   ],
+   "youtubeChannel": [
+    "UCjY8KAGllKyZZd2FYF1vbPw"
+   ],
+   "youtubeHandle": [
+    "paulkrugman-n1y"
+   ],
+   "tiktok": []
+  },
+  "Q1544916": {
+   "employers": [
+    {
+     "qid": "Q186068",
+     "label": "Fox News",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "greggutfeld",
+    "GregGutfeld"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q16146870": {
+   "employers": [
+    {
+     "qid": "Q28585715",
+     "label": "Bannon & Co.",
+     "start": "1990-01-01",
+     "end": "1998-01-01"
+    },
+    {
+     "qid": "Q4960434",
+     "label": "Breitbart News",
+     "start": null,
+     "end": "2016-08-01"
+    },
+    {
+     "qid": "Q24083484",
+     "label": "Cambridge Analytica",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q20121517",
+     "label": "Donald Trump 2016 presidential campaign",
+     "start": "2016-08-17",
+     "end": "2016-11-09"
+    },
+    {
+     "qid": "Q193326",
+     "label": "Goldman Sachs",
+     "start": "1984-01-01",
+     "end": "1990-01-01"
+    },
+    {
+     "qid": "Q60583871",
+     "label": "Q60583871",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q11220",
+     "label": "United States Navy",
+     "start": "1976-01-01",
+     "end": "1983-01-01"
+    }
+   ],
+   "x": [],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q16217194": {
+   "employers": [],
+   "x": [
+    "patrickbetdavid"
+   ],
+   "youtubeChannel": [
+    "UCGX7nGXpz-CmO_Arg-cgJ7A",
+    "UCIHdDJ0tjn_3j-FS7s_X1kQ"
+   ],
+   "youtubeHandle": [
+    "valuetainment",
+    "pbdpodcast"
+   ],
+   "tiktok": []
+  },
+  "Q16336339": {
+   "employers": [],
+   "x": [
+    "alexandregarcia"
+   ],
+   "youtubeChannel": [
+    "UCitie-To0pWGe5Qyk9SjWRA"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q16499823": {
+   "employers": [
+    {
+     "qid": "Q13973",
+     "label": "MS NOW",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q617433",
+     "label": "Syracuse University",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "JoyAnnReid"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q1701254": {
+   "employers": [
+    {
+     "qid": "Q23633",
+     "label": "HBO",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "iamjohnoliver"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q17385739": {
+   "employers": [],
+   "x": [
+    "sudhirchaudhary"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q17430684": {
+   "employers": [],
+   "x": [
+    "fatihportakal"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q174908": {
+   "employers": [],
+   "x": [
+    "MMFlint"
+   ],
+   "youtubeChannel": [
+    "UCU_nlLzlVPFLJxB_iEwtwBw"
+   ],
+   "youtubeHandle": [
+    "mmflint"
+   ],
+   "tiktok": []
+  },
+  "Q18314": {
+   "employers": [
+    {
+     "qid": "Q2713068",
+     "label": "Band",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q3587",
+     "label": "TV Globo",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "realwbonner"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q18637166": {
+   "employers": [],
+   "x": [
+    "Cobratate"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q20711172": {
+   "employers": [
+    {
+     "qid": "Q7735102",
+     "label": "Fox Nation",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q186068",
+     "label": "Fox News",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q465749",
+     "label": "Kristi Noem",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q17107494",
+     "label": "One America News Network",
+     "start": "2014-08-01",
+     "end": "2015-08-01"
+    },
+    {
+     "qid": "Q15864013",
+     "label": "TheBlaze",
+     "start": "2015-10-01",
+     "end": null
+    }
+   ],
+   "x": [
+    "TomiLahren"
+   ],
+   "youtubeChannel": [
+    "UC2SlbD8lPp3HllSl-Fu-pXw"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q211987": {
+   "employers": [],
+   "x": [
+    "jonstewart"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q22277745": {
+   "employers": [
+    {
+     "qid": "Q310172",
+     "label": "Al Arabiya",
+     "start": "2004-01-01",
+     "end": "2007-01-01"
+    },
+    {
+     "qid": "Q13477",
+     "label": "Al Jazeera",
+     "start": "2019-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q1543823",
+     "label": "MBC Group",
+     "start": "2007-01-01",
+     "end": "2019-01-01"
+    }
+   ],
+   "x": [
+    "OlaAlfares"
+   ],
+   "youtubeChannel": [
+    "UCpBkvuq1STqJQa4yh0-RNBA"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q24078962": {
+   "employers": [],
+   "x": [
+    "lauren_southern",
+    "Lauren_Southern"
+   ],
+   "youtubeChannel": [
+    "UCla6APLHX6W3FeNLc8PYuvg"
+   ],
+   "youtubeHandle": [
+    "laurensouthernofficial"
+   ],
+   "tiktok": []
+  },
+  "Q24706934": {
+   "employers": [
+    {
+     "qid": "Q211511",
+     "label": "Russia-1",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q2537294",
+     "label": "VGTRK",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "oskabeeva"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q266863": {
+   "employers": [
+    {
+     "qid": "Q186068",
+     "label": "Fox News",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q5476834",
+     "label": "Fox News Radio",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "IngrahamAngle"
+   ],
+   "youtubeChannel": [
+    "UCEwEdN3ob8OChyAlzWF62XQ"
+   ],
+   "youtubeHandle": [
+    "laura_ingraham"
+   ],
+   "tiktok": []
+  },
+  "Q2718421": {
+   "employers": [],
+   "x": [
+    "joerogan"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [
+    "joerogandotnet"
+   ],
+   "tiktok": []
+  },
+  "Q278625": {
+   "employers": [
+    {
+     "qid": "Q330067",
+     "label": "Channel One Russia",
+     "start": "1999-01-01",
+     "end": "2001-01-01"
+    },
+    {
+     "qid": "Q8478",
+     "label": "Euronews",
+     "start": "2022-04-07",
+     "end": null
+    },
+    {
+     "qid": "Q1665033",
+     "label": "Institute of World Economy and International Relations",
+     "start": "1989-01-01",
+     "end": "1990-01-01"
+    },
+    {
+     "qid": "Q574625",
+     "label": "NTV",
+     "start": "2003-01-01",
+     "end": "2009-01-01"
+    },
+    {
+     "qid": "Q211511",
+     "label": "Russia-1",
+     "start": "2010-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q3651046",
+     "label": "Silver Rain Radio",
+     "start": "1998-07-10",
+     "end": "2010-07-29"
+    },
+    {
+     "qid": "Q1975145",
+     "label": "TNT",
+     "start": "1999-01-01",
+     "end": "2002-01-01"
+    },
+    {
+     "qid": "Q2386094",
+     "label": "TV-6",
+     "start": "2001-01-01",
+     "end": "2002-01-01"
+    },
+    {
+     "qid": "Q2386107",
+     "label": "TVS",
+     "start": "2002-01-01",
+     "end": "2003-01-01"
+    },
+    {
+     "qid": "Q492318",
+     "label": "University of Alabama",
+     "start": "1990-01-01",
+     "end": "1992-01-01"
+    },
+    {
+     "qid": "Q4109601",
+     "label": "Vesti FM",
+     "start": "2010-01-01",
+     "end": null
+    }
+   ],
+   "x": [
+    "VRSoloviev"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": [
+    "soloviev_live"
+   ]
+  },
+  "Q287099": {
+   "employers": [
+    {
+     "qid": "Q3651046",
+     "label": "Silver Rain Radio",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q60413669",
+     "label": "Subbota!",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q1975145",
+     "label": "TNT",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q155172",
+     "label": "TV Rain",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "xenia_sobchak"
+   ],
+   "youtubeChannel": [
+    "UCvQXaJTjA3jRucTKN4CGiwg"
+   ],
+   "youtubeHandle": [],
+   "tiktok": [
+    "xenia_sobchak"
+   ]
+  },
+  "Q28911590": {
+   "employers": [],
+   "x": [
+    "PrisonPlanet"
+   ],
+   "youtubeChannel": [
+    "UCittVh8imKanO_5KohzDbpg"
+   ],
+   "youtubeHandle": [
+    "prisonplanetlive"
+   ],
+   "tiktok": []
+  },
+  "Q293260": {
+   "employers": [
+    {
+     "qid": "Q186068",
+     "label": "Fox News",
+     "start": "2004-01-01",
+     "end": "2017-01-01"
+    },
+    {
+     "qid": "Q13974",
+     "label": "NBC",
+     "start": "2017-01-01",
+     "end": "2019-01-01"
+    },
+    {
+     "qid": "Q3277465",
+     "label": "Sirius XM Rad",
+     "start": "2021-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q7951257",
+     "label": "WJLA-TV",
+     "start": "2003-01-01",
+     "end": "2004-01-01"
+    }
+   ],
+   "x": [
+    "megynkelly"
+   ],
+   "youtubeChannel": [
+    "UCzJXNzqz6VMHSNInQt_7q6w"
+   ],
+   "youtubeHandle": [
+    "MegynKelly"
+   ],
+   "tiktok": []
+  },
+  "Q29477300": {
+   "employers": [],
+   "x": [
+    "yurydud"
+   ],
+   "youtubeChannel": [
+    "UCMCgOm8GZkHp8zJ6l7_hIuA"
+   ],
+   "youtubeHandle": [
+    "vdud"
+   ],
+   "tiktok": [
+    "yurybudettut"
+   ]
+  },
+  "Q29833619": {
+   "employers": [],
+   "x": [
+    "kylekulinski"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q30322608": {
+   "employers": [
+    {
+     "qid": "Q46997916",
+     "label": "Infowars",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q43939946",
+     "label": "Project Veritas",
+     "start": null,
+     "end": "2017-06-01"
+    },
+    {
+     "qid": "Q19866755",
+     "label": "Rebel News",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "LauraLoomer"
+   ],
+   "youtubeChannel": [
+    "UCsWnDtLWKEMJHKYCc9647yQ"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q30323688": {
+   "employers": [
+    {
+     "qid": "Q1025062",
+     "label": "Human Events",
+     "start": "2021-05-01",
+     "end": null
+    },
+    {
+     "qid": "Q17107494",
+     "label": "One America News Network",
+     "start": "2018-01-01",
+     "end": "2021-05-01"
+    },
+    {
+     "qid": "Q27941549",
+     "label": "Turning Point USA",
+     "start": "2021-05-01",
+     "end": null
+    }
+   ],
+   "x": [
+    "JackPosobiec"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q30602441": {
+   "employers": [
+    {
+     "qid": "Q7711621",
+     "label": "Blaze Media",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q4960434",
+     "label": "Breitbart News",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q5003490",
+     "label": "BuzzFeed",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q22909173",
+     "label": "Independent Journal Review",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q1699649",
+     "label": "National Review",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q7728625",
+     "label": "The Daily Caller",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q27941549",
+     "label": "Turning Point USA",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "bennyjohnson"
+   ],
+   "youtubeChannel": [
+    "UCLdP3jmBYe9lAZQbY6OSYjw"
+   ],
+   "youtubeHandle": [
+    "bennyjohnson"
+   ],
+   "tiktok": [
+    "bennyjohnson"
+   ]
+  },
+  "Q310618": {
+   "employers": [],
+   "x": [
+    "glennbeck"
+   ],
+   "youtubeChannel": [
+    "UCvqtzdcURSqNjY9RQEK4XmQ"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q310953": {
+   "employers": [
+    {
+     "qid": "Q186068",
+     "label": "Fox News",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q100976339",
+     "label": "The First TV",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "billoreilly",
+    "BillOReilly"
+   ],
+   "youtubeChannel": [
+    "UC4OvD2yIbofl9l4dIlqSNMw"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q316997": {
+   "employers": [
+    {
+     "qid": "Q287171",
+     "label": "ABC News",
+     "start": "1995-01-01",
+     "end": "2000-01-01"
+    },
+    {
+     "qid": "Q48340",
+     "label": "CNN",
+     "start": "2001-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q5072438",
+     "label": "Channel One News",
+     "start": "1990-01-01",
+     "end": "1995-01-01"
+    }
+   ],
+   "x": [
+    "andersoncooper"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q319121": {
+   "employers": [],
+   "x": [
+    "RealAlexJones"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q3423047": {
+   "employers": [],
+   "x": [
+    "lopezdoriga"
+   ],
+   "youtubeChannel": [
+    "UCM-GvgUy0EAZU7ZwXKLarkg"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q3521617": {
+   "employers": [],
+   "x": [
+    "sardesairajdeep"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q3634855": {
+   "employers": [],
+   "x": [
+    "bdutt",
+    "BDUTT"
+   ],
+   "youtubeChannel": [
+    "UCrdPiSPVW0rtRsI002BX8iw"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q3671642": {
+   "employers": [],
+   "x": [
+    "ahmethc"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q3695603": {
+   "employers": [],
+   "x": [
+    "HamidMirPAK"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q390072": {
+   "employers": [],
+   "x": [
+    "kasimf"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q39798788": {
+   "employers": [
+    {
+     "qid": "Q25094513",
+     "label": "The Daily Wire",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "michaeljknowles"
+   ],
+   "youtubeChannel": [
+    "UCr4kgAUTFkGIwlWSodg43QA"
+   ],
+   "youtubeHandle": [
+    "michaelknowles"
+   ],
+   "tiktok": [
+    "notmichaelknowles"
+   ]
+  },
+  "Q4103885": {
+   "employers": [],
+   "x": [
+    "varlamov"
+   ],
+   "youtubeChannel": [
+    "UC101o-vQ2iOj9vr00JUlyKw"
+   ],
+   "youtubeHandle": [
+    "varlamov",
+    "VarlamovMoments"
+   ],
+   "tiktok": [
+    "varlamov_news"
+   ]
+  },
+  "Q4143897": {
+   "employers": [],
+   "x": [
+    "dmitry_gordon"
+   ],
+   "youtubeChannel": [
+    "UCCcprrrcbdaj14kYPjcbj9w",
+    "UCZIFo5MmrUJS5JbLOxgnHuQ"
+   ],
+   "youtubeHandle": [
+    "dmytriygordon",
+    "gordonua"
+   ],
+   "tiktok": [
+    "gordondmytro"
+   ]
+  },
+  "Q43302090": {
+   "employers": [
+    {
+     "qid": "Q7711621",
+     "label": "Blaze Media",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q30094954",
+     "label": "PragerU",
+     "start": "2019-01-01",
+     "end": "2021-01-01"
+    },
+    {
+     "qid": "Q25094513",
+     "label": "The Daily Wire",
+     "start": "2021-03-09",
+     "end": "2024-03-22"
+    },
+    {
+     "qid": "Q27941549",
+     "label": "Turning Point USA",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "RealCandaceO"
+   ],
+   "youtubeChannel": [
+    "UCL0u5uz7KZ9q-pe-VC8TY-w"
+   ],
+   "youtubeHandle": [
+    "CandaceOwensPodcast",
+    "RealCandaceO",
+    "channelname456"
+   ],
+   "tiktok": [
+    "candaceoshow"
+   ]
+  },
+  "Q4419809": {
+   "employers": [
+    {
+     "qid": "Q22868",
+     "label": "RT",
+     "start": "2005-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q15294742",
+     "label": "Rossiya Segodnya",
+     "start": "2013-12-31",
+     "end": null
+    },
+    {
+     "qid": "Q211511",
+     "label": "Russia-1",
+     "start": "2002-01-01",
+     "end": "http://www"
+    }
+   ],
+   "x": [
+    "m_simonyan"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": [
+    "simonyan.m"
+   ]
+  },
+  "Q4758108": {
+   "employers": [
+    {
+     "qid": "Q9531",
+     "label": "British Broadcasting Corporation",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q5163090",
+     "label": "Conservative Research Department",
+     "start": "1971-01-01",
+     "end": "1972-01-01"
+    },
+    {
+     "qid": "Q185278",
+     "label": "News Corporation",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q7241618",
+     "label": "Press Holdings",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q180089",
+     "label": "The Economist",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q221986",
+     "label": "The Sunday Times",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q158283",
+     "label": "Vanity Fair",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "afneil"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q47778": {
+   "employers": [
+    {
+     "qid": "Q9531",
+     "label": "British Broadcasting Corporation",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "GaryLineker"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q4886439": {
+   "employers": [
+    {
+     "qid": "Q4960434",
+     "label": "Breitbart News",
+     "start": "2012-01-01",
+     "end": "2016-01-01"
+    },
+    {
+     "qid": "Q5183619",
+     "label": "Creators Syndicate",
+     "start": "2001-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q5583689",
+     "label": "Goodwin",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q6336823",
+     "label": "KRLA",
+     "start": "2012-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q25094513",
+     "label": "The Daily Wire",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "benshapiro"
+   ],
+   "youtubeChannel": [
+    "UCnQC_G5Xsjhp9fEJKuIcrSw"
+   ],
+   "youtubeHandle": [],
+   "tiktok": [
+    "real.benshapiro"
+   ]
+  },
+  "Q489": {
+   "employers": [
+    {
+     "qid": "Q5051683",
+     "label": "Catch a Rising Star",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "billmaher"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q5229737": {
+   "employers": [],
+   "x": [
+    "RubinReport"
+   ],
+   "youtubeChannel": [
+    "UCJdKr0Bgd_5saZYqLCa9mng"
+   ],
+   "youtubeHandle": [
+    "rubinreport"
+   ],
+   "tiktok": [
+    "officialrubinreport"
+   ]
+  },
+  "Q528664": {
+   "employers": [
+    {
+     "qid": "Q1665236",
+     "label": "Instituto Tecnológico Autónomo de México",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "DeniseDresserG"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q541742": {
+   "employers": [],
+   "x": [
+    "chrislhayes"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q555": {
+   "employers": [
+    {
+     "qid": "Q2828179",
+     "label": "Air America",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q13973",
+     "label": "MS NOW",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "maddow"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q5568842": {
+   "employers": [
+    {
+     "qid": "Q1150423",
+     "label": "Salon.com",
+     "start": "2007-01-01",
+     "end": "2012-01-01"
+    },
+    {
+     "qid": "Q11148",
+     "label": "The Guardian",
+     "start": "2012-08-01",
+     "end": "2013-10-01"
+    },
+    {
+     "qid": "Q15725297",
+     "label": "The Intercept",
+     "start": "2014-02-01",
+     "end": "2020-10-01"
+    },
+    {
+     "qid": "Q7958775",
+     "label": "Wachtell, Lipton, Rosen & Katz",
+     "start": "1994-01-01",
+     "end": "1995-01-01"
+    }
+   ],
+   "x": [
+    "ggreenwald"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q557623": {
+   "employers": [],
+   "x": [
+    "nedimsener2010"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q5704606": {
+   "employers": [],
+   "x": [
+    "jimmy_dore"
+   ],
+   "youtubeChannel": [
+    "UC3M7l8ved_rYQ45AVzS0RGA"
+   ],
+   "youtubeHandle": [
+    "thejimmydoreshow"
+   ],
+   "tiktok": []
+  },
+  "Q581607": {
+   "employers": [],
+   "x": [
+    "jonfavs"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q589149": {
+   "employers": [],
+   "x": [
+    "pedroferriz",
+    "PedroFerriz"
+   ],
+   "youtubeChannel": [
+    "UCNur4MCV_o4NV2tS6lS_5vg"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q5924784": {
+   "employers": [
+    {
+     "qid": "Q970443",
+     "label": "Global Times",
+     "start": "1997-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q54340",
+     "label": "People's Daily",
+     "start": "1989-01-01",
+     "end": "1997-01-01"
+    }
+   ],
+   "x": [
+    "HuXijin_GT",
+    "HuXijin_huanqiu"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q605": {
+   "employers": [
+    {
+     "qid": "Q13977",
+     "label": "Bloomberg L.P.",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q13973",
+     "label": "MS NOW",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q188413",
+     "label": "Newsweek",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q9684",
+     "label": "The New York Times",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "ezraklein"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q6081653": {
+   "employers": [],
+   "x": [
+    "cuneytozdemir"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q6125032": {
+   "employers": [],
+   "x": [
+    "jaketapper"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q6276882": {
+   "employers": [
+    {
+     "qid": "Q13371",
+     "label": "Harvard University",
+     "start": "1993-01-01",
+     "end": "1998-01-01"
+    },
+    {
+     "qid": "Q201492",
+     "label": "McGill University",
+     "start": "1985-01-01",
+     "end": "1993-01-01"
+    },
+    {
+     "qid": "Q180865",
+     "label": "University of Toronto",
+     "start": "1998-01-01",
+     "end": null
+    }
+   ],
+   "x": [
+    "jordanbpeterson"
+   ],
+   "youtubeChannel": [
+    "UCL_f53ZEJxp8TtlOkHwMV9Q"
+   ],
+   "youtubeHandle": [
+    "JordanBPeterson"
+   ],
+   "tiktok": [
+    "dr.jordan.b.peterson"
+   ]
+  },
+  "Q6439744": {
+   "employers": [
+    {
+     "qid": "Q1798370",
+     "label": "CGI Group",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q1542536",
+     "label": "The Atlantic",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "krystalball"
+   ],
+   "youtubeChannel": [
+    "UCDRIjKy6eZOvKtOELtTdeUA"
+   ],
+   "youtubeHandle": [
+    "breakingpoints"
+   ],
+   "tiktok": []
+  },
+  "Q6499096": {
+   "employers": [
+    {
+     "qid": "Q9531",
+     "label": "British Broadcasting Corporation",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "bbclaurak"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q6809310": {
+   "employers": [
+    {
+     "qid": "Q4296040",
+     "label": "Al Jazeera English",
+     "start": "2012-01-01",
+     "end": "2018-01-01"
+    },
+    {
+     "qid": "Q18049522",
+     "label": "HuffPost",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q13973",
+     "label": "MS NOW",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q13974",
+     "label": "NBC",
+     "start": "2020-01-01",
+     "end": null
+    },
+    {
+     "qid": "Q1566255",
+     "label": "New Statesman",
+     "start": "2009-01-01",
+     "end": "2012-01-01"
+    },
+    {
+     "qid": "Q67765302",
+     "label": "Q67765302",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q15725297",
+     "label": "The Intercept",
+     "start": "2018-01-01",
+     "end": "2020-01-01"
+    }
+   ],
+   "x": [
+    "mehdirhasan"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": [
+    "mehdirhasan"
+   ]
+  },
+  "Q6930882": {
+   "employers": [
+    {
+     "qid": "Q4653979",
+     "label": "ARY News",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "mubasherlucman"
+   ],
+   "youtubeChannel": [
+    "UCslugpmYWJiZK5rbvtcaV7Q"
+   ],
+   "youtubeHandle": [
+    "mubasherlucmanofficial"
+   ],
+   "tiktok": []
+  },
+  "Q72219322": {
+   "employers": [
+    {
+     "qid": "Q18049522",
+     "label": "HuffPost",
+     "start": "2016-01-01",
+     "end": "2018-01-01"
+    },
+    {
+     "qid": "Q19655",
+     "label": "The Young Turks",
+     "start": "2013-01-01",
+     "end": "2020-01-01"
+    }
+   ],
+   "x": [
+    "hasanthehun",
+    "nothasanabi"
+   ],
+   "youtubeChannel": [
+    "UCoatplmazYmGMPe-3LRCeyg",
+    "UCtoaZpBnrd0lhycxYJ4MNOQ",
+    "UCUw7GKmOEMmBrMs9rIFfgmw"
+   ],
+   "youtubeHandle": [
+    "hasan",
+    "hasanabi",
+    "hasanabigaming"
+   ],
+   "tiktok": [
+    "hasandpiker"
+   ]
+  },
+  "Q7285875": {
+   "employers": [],
+   "x": [
+    "RajatSharmaLive"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q7348850": {
+   "employers": [
+    {
+     "qid": "Q9531",
+     "label": "British Broadcasting Corporation",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "peston",
+    "Peston"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q7408131": {
+   "employers": [
+    {
+     "qid": "Q2828179",
+     "label": "Air America",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q13973",
+     "label": "MS NOW",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "SamSeder"
+   ],
+   "youtubeChannel": [
+    "UC-3jIAlnQmbbVMV6gR7K8aQ"
+   ],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q743162": {
+   "employers": [
+    {
+     "qid": "Q48340",
+     "label": "CNN",
+     "start": "2000-01-01",
+     "end": "2005-01-01"
+    },
+    {
+     "qid": "Q186068",
+     "label": "Fox News",
+     "start": "2009-01-01",
+     "end": "2023-01-01"
+    },
+    {
+     "qid": "Q13973",
+     "label": "MS NOW",
+     "start": "2005-01-01",
+     "end": "2008-01-01"
+    },
+    {
+     "qid": "Q215616",
+     "label": "PBS",
+     "start": "2004-01-01",
+     "end": "2005-01-01"
+    },
+    {
+     "qid": "Q7728625",
+     "label": "The Daily Caller",
+     "start": "2010-01-11",
+     "end": "2020-06-01"
+    }
+   ],
+   "x": [
+    "tuckercarlson"
+   ],
+   "youtubeChannel": [
+    "UCjjBjVc0b1cIpNGEeZtS2lg",
+    "UCGttrUON87gWfU6dMWm1fcA"
+   ],
+   "youtubeHandle": [],
+   "tiktok": [
+    "tuckercarlson"
+   ]
+  },
+  "Q7614597": {
+   "employers": [
+    {
+     "qid": "Q186068",
+     "label": "Fox News",
+     "start": null,
+     "end": null
+    }
+   ],
+   "x": [
+    "scrowder"
+   ],
+   "youtubeChannel": [
+    "UCIveFvW-ARp_B_RckhweNJw"
+   ],
+   "youtubeHandle": [
+    "StevenCrowder"
+   ],
+   "tiktok": []
+  },
+  "Q76448707": {
+   "employers": [
+    {
+     "qid": "Q95",
+     "label": "Google",
+     "start": null,
+     "end": null
+    },
+    {
+     "qid": "Q49108",
+     "label": "Massachusetts Institute of Technology",
+     "start": null,
+     "end": "2019-01-01"
+    }
+   ],
+   "x": [
+    "lexfridman"
+   ],
+   "youtubeChannel": [
+    "UCSHZKyawb77ixDdsGog4iWA"
+   ],
+   "youtubeHandle": [
+    "lexfridman"
+   ],
+   "tiktok": [
+    "lexfridman"
+   ]
+  },
+  "Q7781503": {
+   "employers": [],
+   "x": [
+    "theovon",
+    "TheoVon"
+   ],
+   "youtubeChannel": [
+    "UC5AQEUAwCh1sGDvkQtkDWUQ"
+   ],
+   "youtubeHandle": [],
+   "tiktok": [
+    "theovon"
+   ]
+  },
+  "Q7804121": {
+   "employers": [],
+   "x": [
+    "Timcast"
+   ],
+   "youtubeChannel": [
+    "UCG749Dj4V2fKa143f8sE60Q"
+   ],
+   "youtubeHandle": [
+    "timcast",
+    "Timcasts"
+   ],
+   "tiktok": []
+  },
+  "Q962974": {
+   "employers": [],
+   "x": [
+    "Lawrence",
+    "lawrence"
+   ],
+   "youtubeChannel": [],
+   "youtubeHandle": [],
+   "tiktok": []
+  },
+  "Q96376333": {
+   "employers": [],
+   "x": [
+    "dhruv_rathee"
+   ],
+   "youtubeChannel": [
+    "UC-CSyyi47VX1lD9zyeABW3w",
+    "UChCizwDapR8d7VkJ6xcopkg",
+    "UCjNgqJ_FMLntYVzq7daw1TQ",
+    "UCw4IHIMsDO5wpIiprOSXiEA"
+   ],
+   "youtubeHandle": [
+    "website",
+    "dhruvrathee",
+    "dhruvratheevlogs",
+    "drshorts"
+   ],
+   "tiktok": []
+  }
+ }
+}

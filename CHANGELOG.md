@@ -5,6 +5,18 @@ were not published to a store.
 
 ## Unreleased
 
+### Added (backing on record)
+- On the account of a public media personality, the window shows "Backing on record: N sources":
+  who employs them, who owns their outlet, investors, licensing deals, FARA filings, court records,
+  sanctions and government labels. Each record quotes its sources with the date read, gives a status
+  (documented, reported or alleged) and a confidence, and says what it does not prove. On YouTube the
+  panel names a channel's records. Every window links to the corrections file.
+- 90 people researched, chosen by audience and topic, not by side, plus 14 named in primary records;
+  162 records ship for 78 people. Every quote was checked against its page, and a record whose quote
+  or underlying filing could not be confirmed is held back. `data/personalities.README.md` reports
+  the method, the side balance of the dataset and of the findings, and the gaps.
+- The table is local data in the signed data pack; nothing is fetched live.
+
 ### Fixed (outlet owners)
 - Six outlet owner rows that were wrong in the Wikidata-built table now show a sourced correction,
   marked "Radar correction" with its date and source, instead of Wikidata's row:

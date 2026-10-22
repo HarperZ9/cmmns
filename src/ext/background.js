@@ -40,6 +40,15 @@ function opsTable() {
   return opsReady;
 }
 
+// Documented backing of public media personalities (personalities.json, src/core/backing.js):
+// loaded once here; pages get only the people whose accounts or channels they show.
+let backingReady = null;
+function backingTable() {
+  if (!backingReady) backingReady = fetch(chrome.runtime.getURL("personalities.json")).then((r) => r.json())
+    .catch((e) => { console.error("[radar] personalities.json failed to load", e); return { people: [] }; });
+  return backingReady;
+}
+
 // Fact-checked claims (claims.json and the parts it names, src/core/claims.js, about 6 MB): indexed once here. Pages send
 // the text of the posts they show and get back only the matches. Nothing leaves the browser.
 let claimsReady = null;
@@ -84,6 +93,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   if (msg && msg.type === "pb-ops") {
     opsTable().then((t) => sendResponse(msg.all ? t : PB.opsLookup(t, { domains: msg.domains || [], handles: msg.handles || [] })));
+    return true;
+  }
+  if (msg && msg.type === "pb-backing") {
+    backingTable().then((t) => sendResponse(PB.backingLookup(t, { accounts: msg.accounts || [], channels: msg.channels || [] })));
     return true;
   }
   if (msg && msg.type === "pb-owners") {

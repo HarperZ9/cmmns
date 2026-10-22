@@ -14,7 +14,7 @@ const json = (name) => JSON.parse(read(name).toString("utf8"));
 // The data table names: the fixed tables plus the claims parts claims.json names.
 export function dataFiles() {
   const main = json("claims.json");
-  return ["claims.json", ...(main.parts || []), "ops.json", "owners.json", "sites.json", "state.json"].filter((f) => existsSync(join(EXT, f))).sort();
+  return ["claims.json", ...(main.parts || []), "ops.json", "owners.json", "personalities.json", "sites.json", "state.json"].filter((f) => existsSync(join(EXT, f))).sort();
 }
 
 // Loads every table into radar-core. claims: false skips the fact-check table (faster).

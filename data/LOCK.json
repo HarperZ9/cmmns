@@ -86,8 +86,8 @@
     "committed": true,
     "files": {
      "data/owner-corrections.json": {
-      "sha256": "ba0a5a73ddf597b5f9b22160b472192aa2c93111eaa1d6256b95f664d904c80d",
-      "bytes": 4517
+      "sha256": "523cab4d9b43c1863ee346a8105f7a9cbf7f19bbc6f5d06c6ea4d3ee2e3565e8",
+      "bytes": 5012
      }
     }
    },
@@ -218,6 +218,40 @@
    "rows": {
     "count": 1220,
     "unit": "rows across the three files (1121 report rows, 52 designations, 47 matched domains)"
+   }
+  },
+  "personalities-sources": {
+   "source": "hand-kept in this repository; every row cites its own documents with a quote and the date read (data/personalities.README.md). Wikidata statements fetched from https://query.wikidata.org/sparql; quote checks by scripts/personalities-quotecheck.mjs",
+   "retrieved": "2026-10-21",
+   "licence": "FSL-1.1-MIT (the records); Wikidata statements CC0 1.0; each cited document keeps its own terms",
+   "snapshot": {
+    "committed": true,
+    "files": {
+     "data/personalities-sources/people-audience.json": {
+      "sha256": "12679b1fb8f2f7d90c6e2d34d9953407176982871b060c5e4ef963983d020da2",
+      "bytes": 221461
+     },
+     "data/personalities-sources/people-records.json": {
+      "sha256": "198c4b1f397e1dc4816533b26572bfdbf306461014b88660024fc240f6dd361f",
+      "bytes": 61443
+     },
+     "data/personalities-sources/outlets.json": {
+      "sha256": "ae393cfa8f18439bada0d734ebbc2eb845911f131f80e4ab7466ee367efe5573",
+      "bytes": 31588
+     },
+     "data/personalities-sources/wikidata.json": {
+      "sha256": "4dd91de69e0bf3ae61d2efef73cb59751bc4a95d784c94ee254c08c8d13cc503",
+      "bytes": 31842
+     },
+     "project-docs/evidence/personalities-quotecheck.json": {
+      "sha256": "7f4cfcaf305030b11a11185c142d374051ec0cb52904e140bdc4b20672cff26d",
+      "bytes": 58553
+     }
+    }
+   },
+   "rows": {
+    "count": 90,
+    "unit": "people researched (78 with at least one shipped record)"
    }
   }
  },
@@ -362,6 +396,19 @@
    "outputs": [
     "src/ext/state.json"
    ]
+  },
+  {
+   "id": "personalities",
+   "script": "scripts/personalities-build.mjs",
+   "args": [],
+   "built": "2026-10-21",
+   "inputs": [
+    "personalities-sources",
+    "owner-corrections"
+   ],
+   "outputs": [
+    "src/ext/personalities.json"
+   ]
   }
  ],
  "outputs": {
@@ -377,6 +424,7 @@
   "src/core/techniques-data.js": "151675d776656c90ce334e6c828e0a00df580b1c6e79535a4ee0f36cc9d06d27",
   "project-docs/evidence/framing-results.json": "7f91f25fece092caf2510df0dc1f27f8f54aa2d96bb5db03a687783c10c7c67b",
   "src/ext/owners.json": "bac5475d6aaa8aa21c33e4fe2e97335a7696a7471bdf8172694eb0ceb810ecab",
-  "src/ext/state.json": "6c28778e5e46b31cd2a01c91915110818fd433d0544e450f1f366beb0883621d"
+  "src/ext/state.json": "6c28778e5e46b31cd2a01c91915110818fd433d0544e450f1f366beb0883621d",
+  "src/ext/personalities.json": "b6c4840d7f50059be62901c57d6073898b46e8f7f412dead09a7882206ad7cd6"
  }
 }

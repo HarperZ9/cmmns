@@ -21,6 +21,7 @@ export const FAMILIES = [
   ["laundered", "Material passed through other accounts", "sources", D],
   ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
   ["state-link", "State link", "sources", T], ["named-in-report", "Named in a published report", "sources", T],
+  ["backing-record", "Backing on record", "sources", T],
   ["lookalike-domain", "Look-alike news address", "sources", D], ["owner", "Outlet owner", "sources", T], ["site-record", "Site facts and fact-check record", "sources", T],
   ["client", "Posting app", "posting", P], ["written-in", "Written in another language", "place", P],
   ["mismatch", "Speaks as local, labelled elsewhere", "place", D], ["store-elsewhere", "App store elsewhere", "place", D],

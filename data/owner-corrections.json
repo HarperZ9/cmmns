@@ -61,5 +61,7 @@
    "reason": "The row came from CNC World, a Xinhua television channel whose Wikidata entry gives xinhuanet.com as its website, so the channel's parent company was shown as the site's parent. The site itself names Xinhua News Agency and Xinhuanet Co., Ltd.",
    "factsWrong": true
   }
- ]
+ ],
+ "personalitiesAbout": "Corrections to the personalities table (src/ext/personalities.json), applied by scripts/personalities-build.mjs. Each entry names the person id and row id, an action (\"retract\" removes the row; \"amend\" replaces the fields in \"set\"), a primary source or two independent outlets, the date checked and the reason. The same rule applies to every person. Anyone can propose one: open an issue or a pull request against this file with the source.",
+ "personalities": []
 }

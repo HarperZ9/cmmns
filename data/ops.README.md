@@ -87,7 +87,9 @@ DOJ press releases about them are filed as `government`.
   person. Also held back: @YamoahFestus (looks like a real person), @manon_bergers (persona), and
   news360.com (a generic name that Wikidata records as a real news service).
 - Never included: real outlets that were impersonated or carried paid placements, victims and
-  targets, real influencers (none of the US commentators in the Tenet Media case), private
+  targets, real influencers (none of the US commentators in the Tenet Media case; since 2026-10-21
+  they appear only in the separate personalities table, `data/personalities.README.md`, under its own
+  rules, with the indictment's wording that commentators were deceived), private
   individuals, compromised third-party sites, redirect domains, and platform hosts.
 - `dcleaks.com` is on Wikidata as a website; it stays because the July 2018 indictment names it as
   a GRU front (`joins.json`, `realOutletFronts`).
