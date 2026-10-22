@@ -141,9 +141,40 @@ To run from source, load `src/ext` as an unpacked extension. Design notes are in
 
 ## Licence
 
-Radar is source-available under the [Functional Source License 1.1, MIT Future
-License](LICENSE) (FSL-1.1-MIT): each version becomes MIT two years after release. Hanken Grotesk
-is under the SIL Open Font License 1.1 (`src/ext/fonts/OFL-hanken-grotesk.txt`). The outlet and
+Radar is free and open source software. The code is under the [GNU Affero General Public License
+v3.0 only](LICENSE) (AGPL-3.0-only). The data tables, the definition catalogue, the schemas and the
+documentation are under [Creative Commons Attribution 4.0](LICENSES/CC-BY-4.0.txt) (CC BY 4.0).
+`REUSE.toml` maps every file to its licence, and [THIRD-PARTY.md](THIRD-PARTY.md) lists the parts
+that keep their own terms.
+
+Why the AGPL: Radar is a tool for the commons, and the AGPL keeps it there. Anyone may use, study,
+change and share it, and anyone who passes on a changed Radar, or runs one as a service people use
+over a network, must offer the people they serve the changed source under the same licence. So no
+one can take the commons' tool and close it, whether in a product or behind a server. The grant on
+every released version is irrevocable, contributions come in under the
+[Developer Certificate of Origin](CONTRIBUTING.md) with no contributor licence agreement, and no
+single party, the author included, can relicense them closed. [GOVERNANCE.md](GOVERNANCE.md) sets
+out the permanence commitments, the funding rules and how to challenge an entry.
+
+What this asks of anyone who redistributes Radar, including through a browser store:
+- Ship `LICENSE.txt` with the extension (it is inside every package built by `npm run package`).
+- Offer the complete source for the exact version shipped, with the build scripts. Radar's store
+  listings and this repository do that: each release is tagged here, and each release carries a git
+  bundle of the whole source.
+- Keep the copyright and licence notices, and mark your changes.
+
+Store notes (checked 2026-10-22): the Chrome Web Store's policies say nothing against GPL-family
+licences and ask only that code is not obfuscated. Firefox Add-ons lists AGPL-3.0-only as a
+licence choice. Firefox reviewers rebuild any built or bundled files from the submitted source and
+expect no differences, so a store upload of `core.bundle.js` or `ocr.bundle.js` goes with the
+source and the command `npm run build`. That upload is for review only and does not by itself
+offer the source to users, so the listing links here.
+
+Quoted laws, regulations and official guidance in the catalogue keep their own status: many are
+government works, and the rest are quoted for commentary with their source. Radar never
+redistributes platform content; captures of other people's posts stay on the user's device. Hanken
+Grotesk is under the SIL Open Font License 1.1. The Conso font is used under the designer's licence
+and is not covered by Radar's licences; a fork must drop it or license it itself. The outlet and
 state tables come from Wikidata (CC0) and the cited public documents listed in
 `data/state-reports.README.md`. The fact-check table comes from the Data Commons ClaimReview feed
 (CC BY 4.0), credited to each fact-checker in the window.

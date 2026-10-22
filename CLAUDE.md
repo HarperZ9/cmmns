@@ -33,6 +33,16 @@ whether the most extreme replies come mostly from flagged accounts. X first.
 - `npm test` runs every test.
 - Load `src/ext/` as an unpacked extension in Chrome (chrome://extensions, Developer mode).
 
+## Licence
+- Code: AGPL-3.0-only (`LICENSE`, also shipped as `src/ext/LICENSE.txt`; `tests/licence.test.js`
+  keeps the copies identical). Data, catalogue, schemas and docs: CC BY 4.0. `REUSE.toml` maps
+  every file; `THIRD-PARTY.md` lists what keeps its own terms.
+- Contributions come in under the DCO (`Signed-off-by`), never a CLA. Do not add a CLA or any
+  clause that lets one party relicense contributions.
+- Third-party data or code keeps its licence: record it in `THIRD-PARTY.md` and `REUSE.toml`
+  before committing it. Nothing under a non-commercial or no-derivatives licence ships.
+- The Conso font is not under Radar's licences; never present it as reusable.
+
 ## Quality gates
 No file over 300 lines, no function over 50. Commit on a branch, never on main. Push nothing
 without the author's go.

@@ -1,0 +1,9 @@
+Conso (conso-regular.woff2), by Pavel Larin.
+
+This font is used in Radar under the designer's licence, which the author of
+Radar holds. It is not covered by Radar's licences (AGPL-3.0-only for code,
+CC BY 4.0 for data and documentation), and it is not offered for reuse outside
+Radar. A fork or redistribution of Radar must remove both copies of the file
+(src/ext/fonts/conso-regular.woff2 and docs/fonts/conso-regular.woff2) or hold
+its own licence for the font. Radar's style sheets list system monospace fonts
+as the fallback; a fork that removes the file should check the pages it uses.

@@ -81,7 +81,7 @@
   "owner-corrections": {
    "source": "hand-kept in this repository; every row cites a primary source and says why the Wikidata row is wrong (data/owner-corrections.json)",
    "retrieved": "2026-10-21",
-   "licence": "FSL-1.1-MIT (the records); each cited source keeps its own terms",
+   "licence": "CC BY 4.0 (the records); each cited source keeps its own terms",
    "snapshot": {
     "committed": true,
     "files": {
@@ -159,7 +159,7 @@
   "ops-sources": {
    "source": "hand-kept in this repository; every record cites its own documents (data/ops.README.md)",
    "retrieved": "2026-10-21",
-   "licence": "FSL-1.1-MIT (the records); each cited document keeps its own terms",
+   "licence": "CC BY 4.0 (the records); each cited document keeps its own terms",
    "snapshot": {
     "committed": true,
     "files": {
@@ -197,7 +197,7 @@
   "state-reports": {
    "source": "hand-kept in this repository from published reports (data/state-reports.README.md)",
    "retrieved": "2026-10-18",
-   "licence": "FSL-1.1-MIT (the records); each cited report keeps its own terms",
+   "licence": "CC BY 4.0 (the records); each cited report keeps its own terms",
    "snapshot": {
     "committed": true,
     "files": {
@@ -223,7 +223,7 @@
   "personalities-sources": {
    "source": "hand-kept in this repository; every row cites its own documents with a quote and the date read (data/personalities.README.md). Wikidata statements fetched from https://query.wikidata.org/sparql; quote checks by scripts/personalities-quotecheck.mjs",
    "retrieved": "2026-10-21",
-   "licence": "FSL-1.1-MIT (the records); Wikidata statements CC0 1.0; each cited document keeps its own terms",
+   "licence": "CC BY 4.0 (the records); Wikidata statements CC0 1.0; each cited document keeps its own terms",
    "snapshot": {
     "committed": true,
     "files": {

@@ -86,7 +86,7 @@ Source code: https://github.com/HarperZ9/radar
 | Support | https://github.com/HarperZ9/radar/issues | https://github.com/HarperZ9/radar/issues |
 | Privacy policy | https://harperz9.github.io/radar/privacy.html | https://harperz9.github.io/radar/privacy.html |
 | Mature content | Off | n/a |
-| Licence | n/a | Other: FSL-1.1-MIT, link https://github.com/HarperZ9/radar/blob/main/LICENSE |
+| Licence | n/a | GNU Affero General Public License v3.0 only (AGPL-3.0-only) |
 | Tags (AMO) | n/a | misinformation, fact-check, privacy, social media, transparency |
 
 The privacy and transparency URLs go live when GitHub Pages serves `/docs` from `main`.
