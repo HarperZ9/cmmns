@@ -14,6 +14,20 @@
     for (const i of got.indicators) opsParts.indicators.set((i.d || "@" + i.x) + "|" + i.op, i);
     PB.setOpsTable({ docs: opsParts.docs, ops: [...opsParts.ops.values()], indicators: [...opsParts.indicators.values()] });
   }
+  // Documented backing (src/core/backing.js) for the accounts on screen and a video's channel, asked
+  // once each. The worker answers with only the matching people; the table never enters the page.
+  const backingParts = new Map(), askedBacking = new Set();
+  async function askBacking(handles, channels = []) {
+    const site = globalThis.PBSites && PBSites.current();
+    const accounts = site ? handles.map((h) => [site.id, h]).filter(([s, h]) => !askedBacking.has(s + ":" + h)) : [];
+    const ch = channels.filter((c) => c && !askedBacking.has("channel:" + c));
+    if (!accounts.length && !ch.length) return;
+    accounts.forEach(([s, h]) => askedBacking.add(s + ":" + h)); ch.forEach((c) => askedBacking.add("channel:" + c));
+    const got = await chrome.runtime.sendMessage({ type: "pb-backing", accounts, channels: ch });
+    if (!got || !got.people || !got.people.length) return;
+    for (const p of got.people) backingParts.set(p.id, p);
+    PB.setBackingTable({ people: [...backingParts.values()] });
+  }
   // Websites, bio domains and bio @handles of the accounts Radar has read, asked once each.
   async function ensureProfiles(readings) {
     const all = readings.map(PB.profileLinks);
@@ -35,6 +49,7 @@
       if (Array.isArray(rows) && rows.length) { ownerRows.push(...rows); PB.setOwnerRows(ownerRows); }
       if (Array.isArray(srows) && srows.length) { stateRows.push(...srows); PB.setStateRows(stateRows); }
       await askOps(domains, handles);
+      await askBacking(handles);
     } catch (e) { console.error("[radar] owner lookup failed", e); }
   }
 
@@ -117,7 +132,7 @@
     trailLog = {}; netLog = {}; lastRecorded = "";
     if (globalThis.PBMeta) PBMeta.clear().catch((e) => console.error("[radar] could not clear account readings", e));
     feedPending = [];
-    return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY, FEED_KEY, PB.MEDIA_KEY]);
+    return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY, FEED_KEY, PB.MEDIA_KEY, PB.OVERLAP_KEY]);
   }
 
   // A local file the user can keep or share: the report, per-account labels and flags with what
@@ -139,7 +154,15 @@
 
   // A thread card (src/core/evidence.js): built here from what is on screen, then shown on the card
   // page (card.html) to read before saving or sharing. Refused for threads with too few accounts.
-  function saveCard({ site, report, items, replies, clusters, media }) {
+  // The posts as radar-core reads them (src/core/api.js), for the signed evidence bundle the card
+  // page offers. Kept in this browser's session storage with the card, never sent anywhere.
+  function bundleInput(site, root, replies, rows) {
+    const flags = new Map((rows || []).map((r) => [r.id, r.flags]));
+    const post = (r) => ({ id: String(r.id), author: r.author, text: r.text || "", posted: r.posted || null, links: (r.domains || []).map((d) => "https://" + d) });
+    return { site: site.name, root: root ? post(root) : null, replies: replies.map((r) => ({ ...post(r), flags: flags.has(r.id) ? flags.get(r.id) : null })) };
+  }
+
+  function saveCard({ site, report, items, replies, rows, root, clusters, media }) {
     const claims = items.flatMap((r) => claimsOf(r.id) || []);
     const sites = (report.context ? report.context.links : []).map((l) => ({
       domain: l.domain, n: l.n, owner: PB.ownerOfDomain(l.domain) ? PB.ownerOfDomain(l.domain).owner : null,
@@ -147,8 +170,10 @@
     }));
     const built = PB.evidenceCard({ tool: "Radar " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), site: site.name, page: location.href, thread: true,
       authors: replies.map((r) => r.author), report, sameText: clusters.length, claims, sites, media });
+    if (built.ok) built.bundleInput = bundleInput(site, root, replies, rows);
     chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => console.error("[radar] could not open the card page", e));
   }
 
-  globalThis.PBLogs = Object.freeze({ ensureOwners, ensureProfiles, ensureClaims, claimsOf, recordNet, recordTrail, recordFeed, saveCard, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
+  const ensureChannel = (id) => askBacking([], [id]).catch((e) => console.error("[radar] channel backing lookup failed", e));
+  globalThis.PBLogs = Object.freeze({ ensureOwners, ensureChannel, ensureProfiles, ensureClaims, claimsOf, recordNet, recordTrail, recordFeed, saveCard, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
 })();

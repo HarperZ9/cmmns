@@ -1,0 +1,67 @@
+{
+ "about": "Hand-kept corrections to the Wikidata ownership table (src/ext/owners.json). A correction wins over Wikidata and is shown as a Radar correction with its source and the date it was checked. Each row says why the upstream row is wrong. scripts/owner-corrections.mjs applies them; scripts/upstream-guard.mjs reports when upstream agrees again, so the correction can be retired. The same rules apply to every outlet: a primary source (the outlet's own site, a statute, a company filing), never Wikipedia alone. factsWrong: the Wikidata site facts for this domain describe another item, so the site card hides them.",
+ "rows": [
+  {
+   "domain": "asahi.com",
+   "owner": "Asahi Shimbun Company",
+   "via": "owner",
+   "source": "https://www.asahi.com/",
+   "sourceSays": "Page title: \"朝日新聞社のニュースサイト\" (the Asahi Shimbun Company's news site); footer: \"Copyright The Asahi Shimbun Company.\"",
+   "checked": "2026-10-21",
+   "reason": "Wikidata now states the company only as publisher (P123), so the card said \"Published by\". The company's own site names it as the site's operator and copyright holder, so \"Owned by\" is the accurate heading."
+  },
+  {
+   "domain": "bloomberg.com",
+   "owner": "Bloomberg L.P.",
+   "name": "Bloomberg",
+   "via": "owner",
+   "source": "https://www.sec.gov/Archives/edgar/data/0000065100/000095012309003322/y74695e10vk.htm",
+   "sourceSays": "Merrill Lynch 10-K for 2008: \"On July 17, 2008, we sold our 20% ownership stake in Bloomberg, L.P. to Bloomberg Inc., for $4.4 billion.\" The site's terms (https://www.bloomberg.com/notices/tos/) say it is operated by Bloomberg L.P.",
+   "checked": "2026-10-21",
+   "reason": "The row lists Bank of America, which acquired Merrill Lynch, as an owner. Merrill sold its stake in July 2008; Bank of America bought Merrill later. The row also came from the Bloomberg Television item, not the company that runs the site.",
+   "factsWrong": true
+  },
+  {
+   "domain": "dw.com",
+   "owner": "Deutsche Welle, a public-law broadcaster under German federal law",
+   "via": "owner",
+   "source": "https://www.gesetze-im-internet.de/dwg/BJNR309410997.html",
+   "sourceSays": "Deutsche-Welle-Gesetz § 1: \"Die Rundfunkanstalt des Bundesrechts Deutsche Welle ist eine gemeinnützige Anstalt des öffentlichen Rechts\"; § 45: it is financed from \"dem jährlichen Zuschuss sowie Zuwendungen des Bundes\", set by the federal budget act.",
+   "checked": "2026-10-21",
+   "reason": "Wikidata lists ARD as owner. ARD is an association of public broadcasters that DW belongs to; it does not own DW. DW is its own public-law body, funded by the federal budget, not by the licence fee that funds the ARD regional broadcasters."
+  },
+  {
+   "domain": "france24.com",
+   "owner": "France Médias Monde",
+   "via": "owner",
+   "source": "https://www.francemediasmonde.com/en/?p=182",
+   "sourceSays": "France Médias Monde describes itself as \"the group in charge of French international broadcasting\", comprising \"the news channel France 24\", and as public service media financed by French citizens.",
+   "checked": "2026-10-21",
+   "reason": "The row names the website's own channel, France 24, as its owner, which says nothing. France 24 is a channel of the public company France Médias Monde."
+  },
+  {
+   "domain": "redeglobo.globo.com",
+   "owner": "Globo Comunicação e Participações S.A.",
+   "name": "TV Globo",
+   "via": "owner",
+   "source": "https://redeglobo.globo.com/",
+   "sourceSays": "Site footer: \"© Copyright 2000-2026 Globo Comunicação e Participações S.A.\"",
+   "checked": "2026-10-21",
+   "reason": "The row came from TV Diário, a regional Globo affiliate whose Wikidata entry gives Globo's national site as its website, so the affiliate's owner, O Diário de Mogi, was shown for all of Globo's site.",
+   "factsWrong": true
+  },
+  {
+   "domain": "xinhuanet.com",
+   "owner": "Xinhuanet Co., Ltd., run by Xinhua News Agency",
+   "name": "Xinhuanet",
+   "via": "owner",
+   "source": "https://www.xinhuanet.com/",
+   "sourceSays": "Site footer: \"新华社主办 版权所有：新华网股份有限公司\" (run by Xinhua News Agency; copyright Xinhuanet Co., Ltd.).",
+   "checked": "2026-10-21",
+   "reason": "The row came from CNC World, a Xinhua television channel whose Wikidata entry gives xinhuanet.com as its website, so the channel's parent company was shown as the site's parent. The site itself names Xinhua News Agency and Xinhuanet Co., Ltd.",
+   "factsWrong": true
+  }
+ ],
+ "personalitiesAbout": "Corrections to the personalities table (src/ext/personalities.json), applied by scripts/personalities-build.mjs. Each entry names the person id and row id, an action (\"retract\" removes the row; \"amend\" replaces the fields in \"set\"), a primary source or two independent outlets, the date checked and the reason. The same rule applies to every person. Anyone can propose one: open an issue or a pull request against this file with the source.",
+ "personalities": []
+}

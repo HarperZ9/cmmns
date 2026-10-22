@@ -3,9 +3,9 @@
 Last updated: 2026-10-21.
 
 Radar runs entirely in your browser. It has no server, no account, no analytics and no telemetry.
-Nothing Radar reads or works out is sent to the author. One feature, Other coverage, sends the main
-words of an article's title to the GDELT Project, and only when you turn it on and click; it is off
-by default and described below.
+Nothing Radar reads or works out is sent to the author or to anyone else. One feature, Other
+coverage, requests the public news feeds of outlets you choose, and only when you turn it on and
+click; it sends nothing from the page, is off by default and is described below.
 
 ## What Radar reads
 
@@ -44,14 +44,24 @@ page". None of these send anything.
 
 ### Other coverage (off by default)
 
-Other coverage is off unless you turn it on in the options page. When it is on and you click "Find
-other coverage" on an article's site card, Radar sends the main words of that article's title, and
-nothing else, to the GDELT Project's public DOC 2.0 API at `api.gdeltproject.org`. Radar does not
-send the page address, your history, any post or any account. GDELT receives the request like any
-web request, so it sees your IP address and the words; its terms are at gdeltproject.org. Before
-the first request the card shows the exact words it would send and waits for your click. Turning
-the option off withdraws the browser permission and resets that consent. Firefox also asks you to
-allow "website content" for this feature when you turn it on.
+Other coverage is off unless you turn it on in the options page. When it is on, you choose which
+outlets to ask from a suggested list, and you may add any RSS or Atom feed address. Choosing an
+outlet asks the browser for access to that one feed's host, never to all sites. When you click
+"Find other coverage" on an article's site card, Radar requests each chosen outlet's feed from the
+feed's own address, then compares the article's title with the feed's headlines on your device.
+
+Radar sends nothing from the page: not the title, not the page address, not your history, not any
+post, not any account. Each request is an ordinary download of a public feed, with no cookies, no
+referrer and no header added by Radar, and Radar does not follow a redirect to another address.
+Each outlet receives the request like any web request, so it sees your IP address, the time and
+your browser's standard headers, and could guess that someone was reading news at that moment. No
+aggregator or Radar server is involved. Answers are kept in memory for ten minutes and never
+stored. Before the first request the card lists every host it will ask and waits for your click;
+adding an outlet resets that consent. Turning the option off withdraws every feed host's
+permission and forgets your choices.
+
+Radar 2.x used the GDELT Project's search service for this feature, which received the main words
+of the title. Radar 3.0 removed it and gives back that permission on update.
 
 The window offers reverse image search links (Google Lens, TinEye, Bing, Yandex) for media. Those
 open only when you click one, and then that service receives the image address.
@@ -63,6 +73,13 @@ and metadata in the tab and keeps the result in memory only. "Take 4 frames" cop
 the page's own video player in the tab; choosing a search service then copies one frame to your
 clipboard and opens that service, which receives nothing until you paste the frame there.
 Credentials stored online (a file that points to a remote manifest) are never fetched.
+
+**Reading text in an image, off by default, only when you click.** With "Read text in images"
+turned on in the options page, "Read text in this image" re-requests that one image the same way,
+from the address the page used and without cookies, and hands its bytes to Radar's own background
+worker in your browser. The words are read there by code and weights shipped inside Radar; nothing
+is downloaded for it. The image, the text and any hash of either never leave your browser. The text
+is kept in memory for that window only.
 
 ## What Radar keeps, where, and for how long
 
@@ -78,10 +95,13 @@ profile you installed Radar in. It is not synced to other devices.
 | Thread history (`pb.history.v1`) | One summary per thread you opened: counts, origins, flagged shares, linked sites, Community Note and fact-check counts. No reply text | 60 days by default; 1 to 60 days in options, at most 600 threads |
 | Feed tally (`pb.feed.v1`) | Per site and day: the ids of feed posts counted (so each counts once), how many linked each site, and how many showed strong rhetoric signs, a Community Note or a fact-check match. No post text | 60 days by default; follows the history setting |
 | Media checks (`pb.media.v1`) | For each file you asked Radar to check: a short hash of its address (not the address), the site, the time and the outcome (credentials intact, partly checked, changed, stored online, or none found), for the survival count on the feed page | 60 days by default; follows the history setting; at most 5,000 files |
-| Thread card (session storage) | The card you asked for from a thread panel, held until the card page opens it. It names no account | Until the browser closes |
+| Thread card (session storage) | The card you asked for from a thread panel, and the thread's posts as the page showed them, so the card page can build a signed evidence bundle if you ask for one. The card names no account | Until the browser closes |
+| Bundle key (IndexedDB `radar-keys`) | The ECDSA P-256 key pair Radar makes the first time you save a signed evidence bundle. The private half is stored so that it can sign but cannot be read, exported or sent | Until you remove Radar |
 | Your feedback (`pb.feedback.v1`) | Your "This was right" and "This was wrong" marks: which sign (its kind, the post id and a short hash of its label), the thread, your mark and the time. The post text only for marks where you ticked "include the text" | Until you clear it or remove Radar; at most 2,000 marks, the oldest dropped first |
+| Launch overlap (`pb.campaign.v1`) | For each launch post you opened with enough accounts loaded: its post id and salted hashes of the sampled accounts (a random salt made in your browser, never exported), so the campaign lens can count accounts seen on several launches. No handles, no text. "Forget launches I viewed" in the thread panel clears it | 30 days, at most 200 launches |
 | Account details from other sites (`pb.meta.v1`) | What Instagram, Facebook, Bluesky or a Mastodon server showed about accounts you saw: join date, counts, labels, renames | 14 days |
 | Mastodon servers (`pb.instances.v1`) | The servers you turned Radar on for | Until you remove them |
+| Data packs (`pb.packs.v1`, `pb.packkeys.v1`) | Pack files you imported on the options page, whether each is on, and the public keys you chose to trust. Radar never downloads a pack and sends none anywhere | Until you remove them |
 | X request shape (`pb.tpl`) | The shape of X's About request, so Radar can repeat it. It holds no login token; the token is read fresh from X's cookie each time | Until X changes it or you clear Radar's data |
 
 Post data from the page (views, posting app, media upload times) is held in memory for the tab and
@@ -97,6 +117,12 @@ is gone when you close it.
 - **Save feedback to a file** (options page): writes your marks to a JSON file on your computer
   only when you click it. Radar never sends it. You choose whether to share it, for example by
   attaching it to an issue on Radar's repository. "Clear feedback" deletes your marks.
+- **Analyse a file:** reads a saved page, thread JSON, a platform data export or a media file you
+  choose, on your device. The file is not kept and nothing is sent.
+- **Save signed bundle** (Analyse a file and the thread card page): writes a JSON file to your
+  computer only when you click it. It holds post ids, the evidence with the matched words, Radar's
+  version, a hash of its data tables, the time and your bundle key's public half. Full post text
+  goes in only if you tick the box. Radar never sends it.
 - **Removing Radar** deletes everything it kept.
 
 ## What Radar never does

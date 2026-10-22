@@ -29,4 +29,16 @@ export const REPORT_LESSONS = [
     counter: "Open the outlet's real site yourself, not through the link, and search for the story there. If it is not there, the outlet did not publish it.",
     dnp: "A similar address is not proof of a fake: outlets use other addresses, and unrelated sites share common words. Open the outlet's own site and compare.",
   },
+  {
+    id: "backing-record", title: "Backing on record", research: [],
+    what: "A public media personality's documented backing: who employs them, who owns their outlet, investors, licensing deals, filings, court records, sanctions and government labels. Each record quotes its source, gives the date it was read and says what it does not prove.",
+    examples: [
+      { side: "none", topic: "funding", kind: "sign", text: "A commentator's videos about a war came through a company that, an indictment alleges, was secretly funded by a foreign state broadcaster. The record says the indictment does not accuse the commentator, who says they did not know." },
+      { side: "none", topic: "funding", kind: "fair", text: "A cable host works for a network owned by a listed company. The record names the owner from the company's own annual filing. That is ordinary employment, shown so a reader knows who pays." },
+    ],
+    why: "Rauch's rule of no personal authority means a claim stands on its evidence, not on who says it. Knowing who pays a speaker does not settle whether they are right, but it tells you where to look harder. A campaign that hides its money borrows a voice that seems independent. Records are kept to one standard for every side and country, and anything that cannot be documented stays out.",
+    spot: "Read the status: documented, reported or alleged. An allegation is not a finding. Check the date read, and whether the role is current.",
+    counter: "Judge the post by its evidence. Then ask whether the backer gains from it, and look for the same claim from sources with other backers.",
+    dnp: "A record of who employs, owns or funds a person does not show that a given post is false, or that the backer chose its words. Allegations in court records are unproven.",
+  },
 ];

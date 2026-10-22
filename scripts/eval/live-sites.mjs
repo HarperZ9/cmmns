@@ -66,15 +66,16 @@ try {
   out.card = await page.$$eval(".pb-pop .pb-row", (n) => n.map((x) => x.textContent).slice(0, 14));
   await page.waitForTimeout(600);
   await page.screenshot({ path: join(arg("--shots", tmpdir()), "radar-sitecard.png") });
-  // Other coverage: turn it on as the options page would, then read and accept the consent step.
-  await sw.evaluate(() => chrome.storage.local.set({ "pb.settings": { coverage: true } }));
+  // Other coverage: turn it on with two outlets as the options page would (the browser grants each
+  // feed host there), then read and accept the consent step.
+  await sw.evaluate(() => chrome.storage.local.set({ "pb.settings": { coverage: true, outlets: { bbc: true, npr: true } } }));
   await page.waitForTimeout(400);
   await sw.evaluate(async (tabId) => chrome.scripting.executeScript({ target: { tabId }, func: () => globalThis.PBSitePage.show() }), tab);
   await page.waitForTimeout(600);
-  out.consent = await page.$$eval(".pb-pop .pb-row", (n) => n.map((x) => x.textContent).filter((x) => /GDELT|send/i.test(x)));
+  out.consent = await page.$$eval(".pb-pop .pb-row", (n) => n.map((x) => x.textContent).filter((x) => /Would ask|sends nothing/i.test(x)));
   const c0 = Date.now();
-  await page.getByRole("button", { name: "Send these words to GDELT" }).click();
-  await page.waitForFunction(() => [...document.querySelectorAll(".pb-pop .pb-row")].some((r) => /^Sent/.test(r.textContent) || /GDELT (found|did)/.test(r.textContent)), null, { timeout: 30000 });
+  await page.getByRole("button", { name: "Ask these outlets" }).click();
+  await page.waitForFunction(() => [...document.querySelectorAll(".pb-pop .pb-row")].some((r) => /^Asked/.test(r.textContent)), null, { timeout: 30000 });
   out.coverageMs = Date.now() - c0;
   out.coverage = await page.$$eval(".pb-pop .pb-row", (n) => n.map((x) => x.textContent).filter((x) => !/^Review|^Site|^Owned|^Founded|^Country|^Fact-check|^Source|^Does not/.test(x)).slice(0, 16));
   await page.waitForTimeout(600);

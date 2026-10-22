@@ -32,7 +32,10 @@
       "core.bundle.js",
       "lifecycle.js",
       "instances.js",
+      "packs-bg.js",
       "sources-bg.js",
+      "ocr.bundle.js",
+      "ocr-bg.js",
       "background.js"
     ]
   },
@@ -113,6 +116,8 @@
         "auto.js",
         "logs.js",
         "reddit.js",
+        "health.js",
+        "campaign.js",
         "content.js"
       ],
       "css": [
@@ -127,9 +132,6 @@
       "data_collection_permissions": {
         "required": [
           "none"
-        ],
-        "optional": [
-          "websiteContent"
         ]
       },
       "strict_min_version": "121.0"
@@ -149,6 +151,9 @@
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
   "optional_host_permissions": [
     "https://*/*"

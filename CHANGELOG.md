@@ -3,12 +3,197 @@
 All notable changes to Radar. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
+## Unreleased
+
+### Added (launch campaign lens, not measured)
+- On an X post and its repost and quote lists, the thread panel adds "Launch campaign": the post's
+  engagement shape against the account's own posts, the reposter and replier sample (shared bio
+  templates, stock-persona bios, join-date clusters, topic mismatch), the quote cluster (Paid
+  partnership labels, bunching, undisclosed look-alikes) and overlap with other launches you opened.
+  It leads with a named inference only when two or more independent signs agree, names only an
+  account X discloses as an organisation, never names a sampled account, and gives each sign what it
+  does not prove and a dispute route. Design and bounds: `project-docs/CAMPAIGN-LENS.md`.
+- Banned features (language, script, place, name origin, avatar look) are checked by tests.
+- No precision is claimed: `project-docs/EVALUATION.md` has the hand-labelling protocol and the
+  fairness bound that must hold first.
+
+### Added (backing on record)
+- On the account of a public media personality, the window shows "Backing on record: N sources":
+  who employs them, who owns their outlet, investors, licensing deals, FARA filings, court records,
+  sanctions and government labels. Each record quotes its sources with the date read, gives a status
+  (documented, reported or alleged) and a confidence, and says what it does not prove. On YouTube the
+  panel names a channel's records. Every window links to the corrections file.
+- 90 people researched, chosen by audience and topic, not by side, plus 14 named in primary records;
+  162 records ship for 78 people. Every quote was checked against its page, and a record whose quote
+  or underlying filing could not be confirmed is held back. `data/personalities.README.md` reports
+  the method, the side balance of the dataset and of the findings, and the gaps.
+- The table is local data in the signed data pack; nothing is fetched live.
+
+### Fixed (outlet owners)
+- Six outlet owner rows that were wrong in the Wikidata-built table now show a sourced correction,
+  marked "Radar correction" with its date and source, instead of Wikidata's row:
+  - bloomberg.com no longer lists Bank of America, whose Merrill Lynch stake was sold in 2008.
+  - dw.com is no longer "owned by ARD": DW is its own public-law broadcaster under federal law.
+  - france24.com shows France Médias Monde.
+  - redeglobo.globo.com shows Globo, not a regional affiliate's owner.
+  - xinhuanet.com shows Xinhuanet Co., Ltd., run by Xinhua News Agency.
+  - asahi.com shows "Owned by" again.
+
+  Where Wikidata's site facts came from another item, the site card hides them.
+- `data/owner-corrections.json` holds these corrections by hand. Each row cites a primary source and
+  says why the upstream row is wrong. The upstream guard reports when Wikidata agrees again, so a
+  correction can be retired.
+
+### Changed (independence: Other coverage without an aggregator)
+- Other coverage now reads each outlet's own news feed, with no aggregator in between. Turn it on,
+  then choose outlets from 33 suggested feeds across 18 countries and every owner type, or add any
+  https RSS or Atom address. Each choice asks the browser for that one feed host only. On your
+  click, Radar downloads the chosen feeds and matches the article's title against their headlines
+  on your device. Nothing from the page is sent. Every feed asked is listed with its result,
+  including the ones that failed and why. Redirects to another host are not followed.
+- The GDELT lookup is removed, not kept as an option: it was an aggregator Radar could not check,
+  it received the title's words, and it answered 24 of 100 test lookups. On update Radar gives back
+  its permission, and consent given to it does not carry over. Firefox no longer lists
+  `websiteContent` as optional data collection, since Radar no longer sends any.
+- Measured: all 33 feeds answered, all in 1.2 s; of 99 lookups, 34 found at least one other outlet
+  and 17 found three or more. Precision not measured.
+
+### Added (independence: when a site changes)
+- When a platform changes its page so that Radar reads nothing where it should, a notice says so
+  ("Reddit changed its page; Radar cannot read replies here yet") instead of Radar showing nothing.
+  A sign-in wall or a removed post is not called a change.
+- "Self-test on this page" in the toolbar menu: how many boxes Radar's reader found and read here,
+  with authors, text and ids, and the page's shape. Counts only.
+- A generic reader for sites Radar has no reader for: the site card adds "Text on this page", with
+  rhetoric, persuasion and machine-writing counts for the article body and the comments, found from
+  the page's layout. Layout guesses; not measured.
+
+### Added (independence: releases without a store or a code host)
+- Signed, reproducible releases (`npm run release`): the store packages, a self-distribution
+  Firefox build that updates from Radar's own site, the hash of every file inside each package, a
+  git bundle of the source, `SHA256SUMS` and an ECDSA P-256 signature over it. Key id
+  `0e5e 1984 0565 840c 977e 0f03 6c9a c021`, the same project key that signs data packs.
+- An install page on Radar's site: how to check a download (with a checker that runs in the
+  browser), rebuild it, and install it without a store, and where Chrome and Firefox still require
+  their own rules. `node scripts/verify-release.mjs` checks a release offline.
+- `npm run ci` runs exactly what GitHub Actions runs, so the project can check itself anywhere.
+- A test fails if private key material appears anywhere in the tree.
+- Details and what each measure does not prove: project-docs/INDEPENDENCE.md.
+
+### Added (integration surface)
+- radar-core: one ES module, `src/core/api.js`, with `analyzeThread`, `analyzeText`,
+  `checkMedia`, `siteInfo` and `useData`. Pure functions over Radar's core: no DOM, no network,
+  no dependency. Every evidence item states what it shows, its source and what it does not prove,
+  in the window's own words, and points at posts by id; no item names an account. API version
+  1.0.0, versioned separately from the extension.
+- A JSON Schema for the output and for bundles, `schema/evidence.v1.json`, with tests that check
+  real outputs against it and a stability promise in project-docs/INTEGRATION.md.
+- A command line tool, `node bin/radar.mjs`: `analyze`, `verify`, `site` and `media`, reading
+  local files only.
+- Signed evidence bundles: post ids, the evidence with its matched words, the Radar and API
+  versions, a hash of the data tables and the time, signed with a per-install ECDSA P-256 key
+  (WebCrypto; non-extractable in the extension). Anyone can verify one offline with the CLI or the
+  extension. Full post text goes in only when the user ticks the box. Saved from the new Analyse a
+  file page and from the thread card page.
+- Analyse a file, an extension page: a saved X or Reddit thread, thread JSON from X, Bluesky or
+  Mastodon, an X archive's tweets.js, a Reddit export CSV (its ip column is dropped), a Mastodon
+  outbox.json or a Bluesky repository .car, read on the device with nothing sent. Images and video
+  get the Content Credentials check.
+
+### Added (data sovereignty)
+- A dataset lockfile, `data/LOCK.json`: every input the data build reads (Wikidata tables, the
+  Data Commons fact-check feed, the Unicode confusables table, the PHEME corpus, the hand-kept
+  operation and state sources) with its source, retrieval date, licence, row count and the SHA-256
+  of its raw snapshot, plus the SHA-256 of every table the build writes. A table that changes
+  without its lock entry fails the tests.
+- `npm run build:offline`: rebuilds every table it has a pinned snapshot for with the network
+  blocked, and fails when a snapshot or a rebuilt table differs from the lock. With every snapshot
+  present, all seven rebuildable steps reproduce the committed tables byte for byte.
+- The Unicode confusables snapshot is committed (`data/snapshots/`). Larger snapshots, and those
+  holding other people's posts or names, stay outside the repository and are pinned by hash.
+- An upstream-change guard, `scripts/upstream-guard.mjs`: diffs a fresh table against the locked
+  one and flags mass removals, bulk edits, an owner or state label flipped or a site dropped among
+  97 high-reach sites (`data/high-reach.json`), any state label change, and a fact-checker whose
+  rows vanish.
+- Signed data packs. A pack is a JSON file signed with ECDSA P-256 through WebCrypto, adding
+  fact-checked claims, operation indicators or site notes, each citing an https source. In the
+  options page, under Data packs, you pick a file; Radar shows which key signed it and what it adds,
+  and uses it only after you trust that key. Packs can be turned off, removed or distrusted. Radar
+  never downloads a pack. Pack rows carry their pack's name and never count in the operations trend.
+- Radar's own data ships as a pack signed by the project key (`src/ext/radar-data.pack.json`);
+  "Check Radar's own data" in the options page checks the installed tables against it.
+  `scripts/pack.mjs` creates keys, signs and verifies packs.
+- A test that fails when any file in the tree holds private key material, and `.gitignore` rules
+  for key files. Method and threat model: project-docs/DATA-SOVEREIGNTY.md.
+
+### Changed (data sovereignty)
+- One copy of canonical JSON, SHA-256, base64url and ECDSA P-256, `src/core/sig.js`, now serves
+  sealed evidence cards, evidence bundles and data packs. A bundle's `dataLock` hashes each table
+  with LF line ends and equals the hash of the table hashes pinned in `data/LOCK.json` and signed in
+  `radar-data.pack.json`.
+- The fact-check table is rebuilt from its pinned feed snapshot: 19,387 claims, 8 more than 2.1.0
+  shipped (39 in, 31 out, at the size cap's edge). The 2.1.0 copy could not be rebuilt from any
+  snapshot on hand.
+- `scripts/owners-build.mjs` can keep its raw Wikidata answers (`--save-raw`) and rebuild from them
+  offline (`--in`), and lists each outlet's owners in a stable order. Data builders take the date
+  they write from `RADAR_BUILT`, so a rebuild is reproducible.
+
+### Added (text in images)
+- Read text in this image. With "Read text in images" turned on in the options page (off by
+  default), the window's Media area offers "Read text in this image" under each image of a post. On
+  that click only, Radar reads the words in the image on your device with its own recogniser and runs
+  the same theory, rhetoric, persuasion and fact-check checks on them. Each sign found that way is
+  labelled "in image:", stays at info level, shows the recogniser's confidence, reads "not measured
+  yet" and never counts toward the thread report. The image and its text never leave the browser.
+  Latin-script text only.
+- Radar's own recogniser, with no third-party code: an ink mask, line and word finding, and a small
+  convolutional network read by CTC, in JavaScript with a 546-byte WebAssembly SIMD kernel (plain
+  JavaScript where WebAssembly is not allowed). Weights 270 KB, trained by Radar on synthetic lines.
+  It runs in the background worker, never in the page.
+- Fact-check matching for image text mends one misread letter in a word when exactly one claim
+  word is one edit away. Typed text is matched as before.
+- A lesson, "Words inside a picture".
+
+### Measured (text in images)
+- Character error rate 1.03% (95% interval 0.56 to 1.66) on 120 synthetic screenshots rendered by
+  Chrome, and 3.00% (2.13 to 4.20) on 22 screenshots of Radar's own published pages; target 5%.
+  Tesseract.js, as a research baseline only: 5.76% and 4.03%.
+- Median time from bytes to text 0.16 s on synthetic screenshots and 0.50 s on dense text pages on
+  a desktop; 0.72 s and 2.58 s with the CPU slowed four times, where dense pages miss the 1.5 s
+  target. Details and limits in project-docs/IMAGE-TEXT.md.
+
 ## 2.1.0 (2026-10-21)
 
 Named in published reports: 98 documented influence operations from 27 countries, with the investigators' own
 attribution wording. Techniques read from behaviour, not wording: flooding, cross-language repetition and
 laundering chains. Named conspiracy theories, brand-borrowing accounts, and Korean and Indonesian markers
 derived from labelled data.
+
+### Added (framing, hidden motives and swarming)
+- Swarming, a thread sign: many new or flagged accounts replying to one post within ten minutes.
+  The window gives counts only, never the accounts, so the report cannot become a list to pile on.
+  On ordinary threads (PHEME) it showed up in 0.04% of threads (2 of 4,712 threads with five or more replies;
+  test half 1 of 2,278, 95% interval 0.01 to 0.25%). No labelled set of harassment threads was
+  available, so it has an organic rate and no precision.
+- Cloned-outlet framing: when a post names an outlet in its own words and links a look-alike of
+  that outlet's address, the look-alike sign says so, and points at the "Named in a published
+  report" sign when a report named the address. Post-level precision is not measured; the address
+  check catches 147 of 1,174 report-named domains and matches none of 52,598 real outlet domains
+  (in-sample regression controls, not a held-out error rate).
+- Two persuasion techniques, held back: hidden motive ("masked as", "the real reason is",
+  "secretly", "textbook move") and just asking questions ("I'm just asking", "is it a
+  coincidence?"). On the PTC test split, scored against its "Doubt" label as the nearest one, they
+  hit 0 of 4 and 0 of 2 spans, far under the 20-hit minimum. Each has a lesson.
+- Episodic and thematic framing (Iyengar 1991), held back: Radar can read whether a post tells an
+  issue only through one person's story or explains it through trends, numbers and policy, with
+  symmetry tests across 20 groups and 10 issues. No labelled corpus with a usable licence exists:
+  the Media Frames Corpus needs LexisNexis access and labels policy frames, the Gun Violence Frame
+  Corpus labels issue frames, and the immigration tweets of Mendelsohn et al. (2021) carry no
+  licence and only tweet ids. On PHEME replies the reading fires on 0.9% as person-stories and
+  1.7% as structural, unlabelled. A lesson explains the frame.
+- "Your feed" has a person-stories and structural explanation section. It stays held, with its
+  reason and no counts, until the reading clears its measurement; the feed log keeps each post's
+  frame (a label, no text) so the shares and their intervals can start at once.
 
 ### Added (derived word lists)
 - Korean and Indonesian slur signs from word lists derived from human-labelled research corpora,

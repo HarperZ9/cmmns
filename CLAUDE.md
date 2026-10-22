@@ -12,7 +12,8 @@ whether the most extreme replies come mostly from flagged accounts. X first.
 - Extremity alone never flags a person. It is used only in the thread-level comparison.
 - Nothing leaves the user's machine unless the user turns on a named feature and clicks; each such
   feature says what it sends and to whom before the first use, and is off by default. The only one
-  is Other coverage (title words to GDELT, `src/core/coverage.js`). No server, no telemetry, no
+  is Other coverage (each chosen outlet's own feed, nothing from the page sent, `src/core/coverage.js`,
+  `src/core/feedfetch.js`). No aggregator, no server, no telemetry, no
   analytics. Read only what
   the platform shows the viewer. Account lookups are user-initiated and rate-limited.
 - No IP addresses or other data the platform does not disclose.
@@ -22,6 +23,8 @@ whether the most extreme replies come mostly from flagged accounts. X first.
 ## Layout
 - `src/core/` pure modules (no DOM): similarity, mismatch, flags, rhetoric, report. Tested in node.
 - `src/ext/` the Manifest V3 extension: content script, styles, popover.
+- `src/core/api.js` radar-core, the public API (project-docs/INTEGRATION.md); `schema/` its JSON Schema;
+  `bin/radar.mjs` the command line tool, local files only.
 - `tests/` `node --test`.
 - `project-docs/` design, evaluation and evidence.
 

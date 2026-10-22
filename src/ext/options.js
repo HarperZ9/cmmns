@@ -47,6 +47,7 @@
     $("reading").append(
       switchRow("Radar on feeds and profiles", "Off: Radar reads only the replies under a post you open.", s().feeds, (on) => save({ feeds: on })),
       switchRow("Read account details automatically", "Off: account details are read only when you ask in the window.", s().auto, (on) => save({ auto: on })),
+      switchRow("Read text in images", "Adds \"Read text in this image\" to the window's Media area. Radar reads the words on this device, only when you click, in Latin-script languages; the image and its text never leave your browser.", s().imageText, (on) => save({ imageText: on })),
     );
   }
 
@@ -107,5 +108,5 @@
   }
 
   siteSwitches(); servers(); windowSwitches(); retention(); clearAll(); access(); families(); usage();
-  $("foot").textContent = `Radar ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Nothing leaves this browser unless you turn on Other coverage.`;
+  $("foot").textContent = `Radar ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Radar requests nothing off this browser unless you turn on Other coverage.`;
 })().catch((e) => console.error("[radar] options page failed", e));

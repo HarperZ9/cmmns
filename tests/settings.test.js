@@ -89,14 +89,35 @@ test("clear-all removes every Radar key except the settings", () => {
 test("search-result cards and other coverage are off until the user turns them on", () => {
   const s = normalizeSettings({});
   assert.equal(s.coverage, false);
-  assert.equal(s.coverageConsent, false);
+  assert.equal(s.feedConsent, false);
+  assert.deepEqual(s.outlets, {}, "no outlet is chosen until the user chooses it");
+  assert.deepEqual(s.customFeeds, []);
   for (const [id] of SEARCH_ENGINES) assert.equal(searchOn(s, id), false, id);
   assert.equal(searchOn(normalizeSettings({ search: { google: true } }), "google"), true);
   assert.equal(searchOn(normalizeSettings({ search: { google: true }, paused: true }), "google"), false);
   assert.deepEqual(normalizeSettings({ search: { evil: true } }).search, {});
 });
 
-test("consent to send does not outlive turning other coverage off", () => {
-  assert.equal(normalizeSettings({ coverage: false, coverageConsent: true }).coverageConsent, false);
-  assert.equal(normalizeSettings({ coverage: true, coverageConsent: true }).coverageConsent, true);
+test("consent to ask the feeds does not outlive turning other coverage off", () => {
+  assert.equal(normalizeSettings({ coverage: false, feedConsent: true }).feedConsent, false);
+  assert.equal(normalizeSettings({ coverage: true, feedConsent: true }).feedConsent, true);
+});
+
+test("consent given to the old GDELT lookup does not carry over to the feeds", () => {
+  const s = normalizeSettings({ coverage: true, coverageConsent: true });
+  assert.equal(s.feedConsent, false);
+  assert.equal("coverageConsent" in s, false);
+});
+
+test("only known outlets and clean https feed addresses survive normalising", () => {
+  const s = normalizeSettings({ outlets: { bbc: true, evil: true, npr: "yes" }, customFeeds: ["https://example.org/feed.xml", "http://plain.example/rss", "javascript:alert(1)", "https://u:p@x.example/f", "https://example.org/feed.xml#top", 7] });
+  assert.deepEqual(s.outlets, { bbc: true });
+  assert.deepEqual(s.customFeeds, ["https://example.org/feed.xml"]);
+  assert.equal(normalizeSettings({ customFeeds: Array.from({ length: 50 }, (_, i) => `https://f${i}.example/rss`) }).customFeeds.length, 30);
+});
+
+test("reading text in images is off until the user turns it on", () => {
+  assert.equal(normalizeSettings({}).imageText, false);
+  assert.equal(normalizeSettings({ imageText: "yes" }).imageText, false);
+  assert.equal(normalizeSettings({ imageText: true }).imageText, true);
 });

@@ -37,6 +37,7 @@
       groups.length ? "Seen together in other threads you viewed: " + groups.slice(0, 3).map((g) => `@${g.a} and @${g.b} (${g.n})`).join("; ") + "." : null,
       base("together", groups.length),
       ...flooding(report.flood, base),
+      ...swarming(report.swarm, base),
       ...(report.crossLang || []).slice(0, 2).map((g) => `One ${g.kind === "claim" ? "fact-checked claim" : g.kind === "media" ? "upload" : "link"} carried by ${g.accounts} accounts in ${g.langs.length} languages (${g.langs.map((l) => l.replace("script:", "")).join(", ")}).`),
       base("cross-language", (report.crossLang || []).length),
       report.machine && report.machine.n ? `${report.machine.n} of ${report.replies} replies show machine-writing signs or leaked AI text.` : null,
@@ -55,16 +56,51 @@
     ];
   }
 
+  // The swarming sign (src/core/swarming.js): counts only, never the accounts, so the thread report
+  // cannot become a list to pile on in turn.
+  function swarming(w, base) {
+    if (!w) return [];
+    const parts = [w.newAccounts ? `${w.newAccounts} new` : null, w.flagged ? `${w.flagged} flagged` : null].filter(Boolean).join(", ");
+    return [
+      `${w.marked} of ${w.known} accounts Radar read in a ${Math.round(w.windowSec / 60)}-minute window from ${w.from.slice(11, 16)} UTC were new or flagged (${parts}), all replying to this post.`,
+      base("swarm", true),
+      PB.SWARM_DOES_NOT_PROVE,
+    ];
+  }
+
+  // The channel's documented backing (src/core/backing.js), in brief: the window on any of the
+  // channel's own comments shows every record with its sources.
+  function channelBacking(video) {
+    const p = video && video.channelId && PB.backingOfChannel ? PB.backingOfChannel(video.channelId) : null;
+    if (!p) return null;
+    return `${PB.backingLabel(p)} for this channel (${p.name}): ${p.rows.slice(0, 3).map((r) => `${r.kind}, ${r.who} (${r.status})`).join("; ")}. ${PB.BACKING_DOES_NOT_PROVE}`;
+  }
+
   function sources(report, video, pushed) {
     return [
       ...(report.state || []).map((st) => `${st.replies} repl${st.replies === 1 ? "y" : "ies"}: ${PB.stateLabel(st).says} (${st.names.slice(0, 2).join(", ")})`),
       ...(pushed || []).slice(0, 3).map((x) => `${x.domain} pushed by ${x.authors} accounts across ${x.threads} threads you viewed.`),
       video ? [video.channel, video.subscribers, video.channelBadges].filter(Boolean).join(" · ") : null,
       video && video.funding ? `Funding: ${video.funding}` : null,
+      channelBacking(video),
       video && video.paidPromotion ? video.paidPromotion : null,
       video && video.synthetic ? `Uploader says: ${video.synthetic}` : null,
       video && video.published ? [video.published, video.category, video.views != null ? `${num(video.views)} views` : null].filter(Boolean).join(" · ") : null,
     ];
+  }
+
+  // The launch campaign lens (src/core/campaign.js, src/ext/campaign.js): the lead, the ladder's
+  // claims, each sign with what it does not prove, then context, the dispute route and the wipe.
+  function campaign(p, c) {
+    if (!c || c.status === "undefined" || (c.status === "thin" && !c.indicators.length)) return;
+    const s = el("section", "pb-psec");
+    s.append(el("h3", "pb-sec-h", "Launch campaign"), el("p", "pb-num", c.lead));
+    for (const x of c.claims || []) s.append(el("p", "pb-num", x.text));
+    for (const x of c.indicators) s.append(el("p", "pb-num", x.text), el("p", "pb-foot", `Does not prove: ${x.dnp}`));
+    for (const x of c.context) s.append(el("p", "pb-num", x.text));
+    s.append(el("p", "pb-foot", c.dnp), el("p", "pb-foot", c.dispute));
+    if (c.onForget) s.append(button("Forget launches I viewed", "Deletes the launch overlap Radar keeps in this browser (hashed accounts only).", () => c.onForget()));
+    p.append(s);
   }
 
   // stats: { site, pending, scanning, paused, video, pushed, viewed, onExport, onCard, onClearHistory }
@@ -100,6 +136,7 @@
       stats.paused ? "X is limiting requests; Radar paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
     ]);
     const coord = coordination(report, clusters, stats.viewed);
+    campaign(p, report.campaign);
     section(p, "Coordination", coord);
     if (coord.some((t) => t && t.includes(" showed up in "))) p.lastChild.append(el("p", "pb-foot", PB.BASELINE_SOURCE));
     // Persuasion techniques get their own line; they never count toward "flagged".

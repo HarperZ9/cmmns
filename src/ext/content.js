@@ -51,6 +51,7 @@
   PBSettings.onChange((s) => { settings = s; schedule(); });
   PBSettings.ready.then(() => schedule());
   const enabled = () => { const site = PBSites.current(); return !!site && PB.siteOn(settings, site.id); };
+  const feedMode = (site) => !!site && !site.onThread() && settings.feeds && !!(site.onFeed && site.onFeed());
   // The toolbar icon follows this tab: paused, reading accounts, or idle. Sent only on change.
   let iconSent = "";
   function icon(state) {
@@ -89,10 +90,12 @@
     const site = PBSites.current();
     // Feed mode (timelines, profiles, likes, search): badges on every post, no thread report and
     // nothing added to the connections log, because a feed is not a conversation.
-    const feed = !!site && !site.onThread() && settings.feeds && !!(site.onFeed && site.onFeed());
-    if (site && !PB.siteOn(settings, site.id)) { removePanel(); PBUI.closePop(); icon("paused"); return; }
-    if (!site || (!site.onThread() && !feed)) { removePanel(); return; }
-    const items = site.items().map((n) => site.read(n)).filter(Boolean);
+    const feed = feedMode(site);
+    if (site && !PB.siteOn(settings, site.id)) { removePanel(); PBUI.closePop(); icon("paused"); PBHealth.observe(null); return; }
+    if (!site || (!site.onThread() && !feed)) { removePanel(); PBHealth.observe(null); return; }
+    // Adapter health (src/ext/health.js): a reader that finds nothing where it should says so.
+    const nodes = site.items(), items = nodes.map((n) => site.read(n)).filter(Boolean);
+    PBHealth.observe(site, feed, nodes.length, items, () => schedule(0));
     if (!items.length) { videoOnly(site, feed); return; }
     const [root, replies] = !feed && (site.hasLocation || site.rootFirst) ? [items[0], items.slice(1)] : [null, items];
     await Promise.all([ensureOwners(items), PBLogs.ensureClaims(items)]);
@@ -140,15 +143,31 @@
     report.bursts = PB.timingBursts(replies);
     report.flood = PB.floodSign(replies, tech.rateOf, { bursts: report.bursts });
     report.crossLang = tech.groups;
+    report.swarm = root ? PB.swarmSign(replies, swarmMarks(rows)) : null;
     report.state = PB.stateSummary(replies);
     report.upstream = PB.upstream(items, tweets, PBLogs.trail());
     const pushed = PB.pushedLinks(PBLogs.net(), items.flatMap((r) => r.domains || []));
     const video = currentVideo(site);
+    if (video && video.channelId) PBLogs.ensureChannel(video.channelId);
     report.groups = PB.returningGroups(PBLogs.net(), threadKey, replies.map((r) => r.author));
     report.context = PB.threadContext(items, { noteOf, claimsOf: PBLogs.claimsOf });
+    report.campaign = globalThis.PBCampaign ? PBCampaign.lens(site, items, tweets, cache) : null;
+    if (root && report.campaign) for (const [, model] of models) if (model.postId === report.campaign.launchId) model.campaign = report.campaign;
     saveSnapshot(threadKey, site.name, report);
     lastSummary = { ...lastSummary, sentence: report.sentence, signs: (report.bursts || []).length + clusters.length + (report.state || []).length, state: report.state };
-    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, viewed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onCard: () => PBLogs.saveCard({ site, report, items, replies, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
+    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, viewed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onCard: () => PBLogs.saveCard({ site, report, items, replies, rows, root, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
+  }
+
+  // The swarming sign's marks (src/core/swarming.js): an account is new when it joined under
+  // NEW_ACCOUNT_DAYS before its reply, flagged when Radar flagged it. Unread accounts are unknown.
+  function swarmMarks(rows) {
+    const by = new Map(rows.filter((r) => r.joinDate || r.flags).map((r) => [String(r.author).toLowerCase(), r]));
+    return (h, at) => {
+      const r = by.get(h);
+      if (!r) return null;
+      const age = r.joinDate ? PB.ageDays(r.joinDate, at) : null;
+      return { new: age != null && age < PB.NEW_ACCOUNT_DAYS, flagged: !!(r.flags && PB.isFlagged(r.flags)) };
+    };
   }
 
   // Feed dashboard (src/core/feed.js): each feed post once per day, with what it linked and the
@@ -157,7 +176,7 @@
   function recordFeed(site, items) {
     PBLogs.recordFeed(site.name, items.map((r) => {
       const an = analyse(r), c = PBLogs.claimsOf(r.id);
-      return { id: r.id, domains: r.domains || [], strong: an.extreme, note: !!noteOf(r.id), claims: c ? c.length : 0, techniques: an.persuasion.map((h) => h.technique) };
+      return { id: r.id, domains: r.domains || [], strong: an.extreme, note: !!noteOf(r.id), claims: c ? c.length : 0, techniques: an.persuasion.map((h) => h.technique), frame: PB.feedFrame(r.text) };
     }));
   }
 
@@ -170,6 +189,11 @@
   // YouTube's funding and paid-promotion labels. Live check 2026-10-21: a state-funded
   // broadcaster's videos with comments off showed no Radar panel at all.
   function videoOnly(site, feed) {
+    // A repost list shows accounts, not posts: the launch campaign lens still reads it.
+    if (!feed && globalThis.PBCampaign && PBCampaign.onList()) {
+      PBStore.all().then((cache) => { const r = PB.threadReport([]); r.campaign = PBCampaign.lens(site, [], tweets, cache); PBUI.panel(r, [], { pending: 0, scanning: 0, paused: false, site, pushed: [] }, () => {}); }).catch((e) => console.error("[radar] campaign lens failed", e));
+      return;
+    }
     const video = feed ? null : currentVideo(site);
     if (!video) { removePanel(); return; }
     PBUI.panel(PB.threadReport([]), [], { pending: 0, scanning: 0, paused: false, site, video, pushed: [] }, () => {});
@@ -249,6 +273,7 @@
   // The toolbar popup asks for a summary of the current page.
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg && msg.type === "pb-summary") { sendResponse(lastSummary); return false; }
+    if (msg && msg.type === "pb-selftest") { const site = PBSites.current(); sendResponse(site ? PBHealth.selfTest(site, feedMode(site)) : null); return false; }
     return false;
   });
 

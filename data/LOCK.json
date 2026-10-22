@@ -1,0 +1,430 @@
+{
+ "about": "Every dataset Radar's data build reads, pinned by SHA-256, and every table it writes. scripts/build-offline.mjs rebuilds from these snapshots with the network blocked and fails on any mismatch. project-docs/DATA-SOVEREIGNTY.md explains each field.",
+ "version": 1,
+ "datasets": {
+  "unicode-confusables": {
+   "source": "https://www.unicode.org/Public/security/latest/confusables.txt",
+   "upstreamVersion": "UTS #39 18.0.0, dated 2026-08-06",
+   "retrieved": "2026-10-21",
+   "licence": "Unicode License v3",
+   "licenceUrl": "https://www.unicode.org/license.txt",
+   "snapshot": {
+    "committed": true,
+    "files": {
+     "data/snapshots/unicode-confusables.txt": {
+      "sha256": "6ed3ee967c9dfdf6677d563c9985182fbc50a2efb7d6059cd57b2e2ce18f5b92",
+      "bytes": 763128
+     }
+    }
+   },
+   "rows": {
+    "count": 6712,
+    "unit": "confusable mappings (lines that are not comments)"
+   }
+  },
+  "datacommons-factcheck": {
+   "source": "https://datacommons.org/factcheck/download",
+   "upstreamVersion": "feed dateModified 2026-10-21T06:05:21Z",
+   "retrieved": "2026-10-21",
+   "licence": "CC BY 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+   "snapshot": {
+    "committed": false,
+    "why": "207 MB, and it names the people and accounts each fact-checker says made a claim; Radar drops those names and does not republish them.",
+    "refetch": "Download the feed from the source URL to $RADAR_DATA/feed/data.json, then run scripts/upstream-guard.mjs on the rebuilt tables before refreshing the lock.",
+    "files": {
+     "$RADAR_DATA/feed/data.json": {
+      "sha256": "fba1a935018fe77c48ad44d855d764dba206d4f72da6ee042e704ea2a97bb572",
+      "bytes": 207564407
+     }
+    }
+   },
+   "rows": {
+    "count": 93934,
+    "unit": "feed elements"
+   }
+  },
+  "wikidata-site-facts": {
+   "source": "https://query.wikidata.org/sparql (queries in scripts/sites-build.mjs)",
+   "retrieved": "2026-10-21",
+   "licence": "CC0 1.0",
+   "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "snapshot": {
+    "committed": false,
+    "why": "24 MB; the built table src/ext/sites.json is pinned below and is enough to ship.",
+    "refetch": "node scripts/sites-build.mjs --in <feed> --wd-cache $RADAR_DATA/wd-facts.json after moving the old cache aside; the script fetches when the cache file is missing.",
+    "files": {
+     "$RADAR_DATA/wd-facts.json": {
+      "sha256": "381ea3858be9434ae0e3602b77c2f5b5055d4cdaf90f5b032e1555d2caa05f0d",
+      "bytes": 24717900
+     }
+    }
+   },
+   "rows": {
+    "count": 108404,
+    "unit": "SPARQL result rows"
+   }
+  },
+  "wikidata-owners": {
+   "source": "https://query.wikidata.org/sparql (queries in scripts/owners-build.mjs)",
+   "retrieved": "2026-10-18",
+   "licence": "CC0 1.0",
+   "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "snapshot": null,
+   "rawRetained": false,
+   "note": "The raw SPARQL answers behind the current src/ext/owners.json were not kept, so this table can be checked against its pinned hash but not rebuilt offline. The next fetch keeps them: node scripts/owners-build.mjs --save-raw $RADAR_DATA/wikidata-owners.json.",
+   "rows": {
+    "count": 19864,
+    "unit": "outlet rows in src/ext/owners.json"
+   }
+  },
+  "owner-corrections": {
+   "source": "hand-kept in this repository; every row cites a primary source and says why the Wikidata row is wrong (data/owner-corrections.json)",
+   "retrieved": "2026-10-21",
+   "licence": "FSL-1.1-MIT (the records); each cited source keeps its own terms",
+   "snapshot": {
+    "committed": true,
+    "files": {
+     "data/owner-corrections.json": {
+      "sha256": "523cab4d9b43c1863ee346a8105f7a9cbf7f19bbc6f5d06c6ea4d3ee2e3565e8",
+      "bytes": 5012
+     }
+    }
+   },
+   "rows": {
+    "count": 6,
+    "unit": "corrected domains"
+   }
+  },
+  "wikidata-state": {
+   "source": "https://www.wikidata.org/w/api.php and https://query.wikidata.org/sparql (scripts/state-build.mjs)",
+   "retrieved": "2026-10-20",
+   "licence": "CC0 1.0",
+   "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "snapshot": null,
+   "rawRetained": false,
+   "note": "scripts/state-build.mjs keeps fetched entities in a local cache but not its two SPARQL answers, so the state table is pinned by hash and not rebuilt offline.",
+   "rows": {
+    "count": 2029,
+    "unit": "rows in src/ext/state.json (both bases)"
+   }
+  },
+  "pheme-veracity": {
+   "source": "https://doi.org/10.6084/m9.figshare.6392078.v1",
+   "upstreamVersion": "PHEME rumour and non-rumour threads (Zubiaga et al.), 2014 to 2015",
+   "retrieved": "2026-10-21",
+   "licence": "CC BY 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+   "snapshot": {
+    "committed": false,
+    "why": "46 MB of other people's posts; raw captures never enter the repository.",
+    "refetch": "Download PHEME_veracity.tar.bz2 from the DOI to $RADAR_DATA/pheme/ and check its SHA-256 against this entry.",
+    "files": {
+     "$RADAR_DATA/pheme/PHEME_veracity.tar.bz2": {
+      "sha256": "079f6ffdbc0b367399262f101774372e5d19dd8278c33d6c97a84461a9bc58dd",
+      "bytes": 46529729
+     }
+    }
+   },
+   "rows": {
+    "count": 6425,
+    "unit": "threads"
+   }
+  },
+  "pheme-prepared": {
+   "source": "derived from pheme-veracity by scripts/eval/prep-pheme.py and scripts/eval/prep-pheme-techniques.py",
+   "retrieved": "2026-10-21",
+   "licence": "CC BY 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+   "snapshot": {
+    "committed": false,
+    "why": "Holds the text of other people's posts.",
+    "refetch": "python -I scripts/eval/prep-pheme.py $RADAR_DATA/pheme and python -I scripts/eval/prep-pheme-techniques.py $RADAR_DATA/pheme",
+    "files": {
+     "$RADAR_DATA/pheme/prepared/pheme-threads.jsonl": {
+      "sha256": "77a306f9816d761c51e72e2029e145a5b7d63f8f8134ff4fb65d70dd6e54f0b3",
+      "bytes": 16396304
+     },
+     "$RADAR_DATA/pheme/prepared/pheme-techniques.jsonl": {
+      "sha256": "1d7a2de896cc43c20be2b1baebfeb54b3f052414eea95eda9e8ed5d586943aaf",
+      "bytes": 14802717
+     }
+    }
+   },
+   "rows": {
+    "count": 6425,
+    "unit": "threads in each file"
+   }
+  },
+  "ops-sources": {
+   "source": "hand-kept in this repository; every record cites its own documents (data/ops.README.md)",
+   "retrieved": "2026-10-21",
+   "licence": "FSL-1.1-MIT (the records); each cited document keeps its own terms",
+   "snapshot": {
+    "committed": true,
+    "files": {
+     "data/ops-sources/china.json": {
+      "sha256": "7c77150b8b0b5a47588866f95b5853686f2751cf504aea115f76bd7190254d71",
+      "bytes": 85835
+     },
+     "data/ops-sources/israel-iran.json": {
+      "sha256": "468dfe456ea0fdf92108a011a74bce39a326e14c1d64af65415fe463e05b25b5",
+      "bytes": 86291
+     },
+     "data/ops-sources/joins.json": {
+      "sha256": "9df72fbd837c7e0a1c60946d09f5c09d1208921ff761dfa054828ad58afbe073",
+      "bytes": 2199
+     },
+     "data/ops-sources/others.json": {
+      "sha256": "60d5f74b47f13e91d69b45b9c70ac0bb034a397e056e28ec2416ebd2d50843ee",
+      "bytes": 68775
+     },
+     "data/ops-sources/russia-belarus.json": {
+      "sha256": "742c789cd3c0514d1d89d43b62260339041daf44acaba7361c479f94e7bdffff",
+      "bytes": 133102
+     },
+     "data/ops-sources/us-gulf.json": {
+      "sha256": "27bbda9c4e64fd0d94b504759a1dba0e9bc84cde0fc2f68ee99b700712ec2a85",
+      "bytes": 44585
+     }
+    }
+   },
+   "rows": {
+    "count": 98,
+    "unit": "operations"
+   }
+  },
+  "state-reports": {
+   "source": "hand-kept in this repository from published reports (data/state-reports.README.md)",
+   "retrieved": "2026-10-18",
+   "licence": "FSL-1.1-MIT (the records); each cited report keeps its own terms",
+   "snapshot": {
+    "committed": true,
+    "files": {
+     "data/state-reports.json": {
+      "sha256": "6559f1a402e3a83ebc13ab8e076cb5611cad8c68cc4760a9c5ad5c549fb184bd",
+      "bytes": 545088
+     },
+     "data/state-designations.json": {
+      "sha256": "e0974e25029f53787ca02f64e31676d23a7eb6dc846556f6e095f872819e2e87",
+      "bytes": 23774
+     },
+     "data/state-designations.domains.json": {
+      "sha256": "eddf6a8bcf2fe08c6e9f2961e23e22e24d140b48829be6f78eacc58a0f813650",
+      "bytes": 8847
+     }
+    }
+   },
+   "rows": {
+    "count": 1220,
+    "unit": "rows across the three files (1121 report rows, 52 designations, 47 matched domains)"
+   }
+  },
+  "personalities-sources": {
+   "source": "hand-kept in this repository; every row cites its own documents with a quote and the date read (data/personalities.README.md). Wikidata statements fetched from https://query.wikidata.org/sparql; quote checks by scripts/personalities-quotecheck.mjs",
+   "retrieved": "2026-10-21",
+   "licence": "FSL-1.1-MIT (the records); Wikidata statements CC0 1.0; each cited document keeps its own terms",
+   "snapshot": {
+    "committed": true,
+    "files": {
+     "data/personalities-sources/people-audience.json": {
+      "sha256": "12679b1fb8f2f7d90c6e2d34d9953407176982871b060c5e4ef963983d020da2",
+      "bytes": 221461
+     },
+     "data/personalities-sources/people-records.json": {
+      "sha256": "198c4b1f397e1dc4816533b26572bfdbf306461014b88660024fc240f6dd361f",
+      "bytes": 61443
+     },
+     "data/personalities-sources/outlets.json": {
+      "sha256": "ae393cfa8f18439bada0d734ebbc2eb845911f131f80e4ab7466ee367efe5573",
+      "bytes": 31588
+     },
+     "data/personalities-sources/wikidata.json": {
+      "sha256": "4dd91de69e0bf3ae61d2efef73cb59751bc4a95d784c94ee254c08c8d13cc503",
+      "bytes": 31842
+     },
+     "project-docs/evidence/personalities-quotecheck.json": {
+      "sha256": "7f4cfcaf305030b11a11185c142d374051ec0cb52904e140bdc4b20672cff26d",
+      "bytes": 58553
+     }
+    }
+   },
+   "rows": {
+    "count": 90,
+    "unit": "people researched (78 with at least one shipped record)"
+   }
+  }
+ },
+ "builds": [
+  {
+   "id": "confusables",
+   "script": "scripts/confusables-build.mjs",
+   "args": [
+    "data/snapshots/unicode-confusables.txt"
+   ],
+   "inputs": [
+    "unicode-confusables"
+   ],
+   "outputs": [
+    "src/core/confusables-data.js"
+   ]
+  },
+  {
+   "id": "ops",
+   "script": "scripts/ops-build.mjs",
+   "args": [],
+   "built": "2026-10-21",
+   "inputs": [
+    "ops-sources",
+    "state-reports"
+   ],
+   "outputs": [
+    "data/ops.json",
+    "src/ext/ops.json"
+   ]
+  },
+  {
+   "id": "claims",
+   "script": "scripts/claims-build.mjs",
+   "args": [
+    "--in",
+    "$RADAR_DATA/feed/data.json"
+   ],
+   "built": "2026-10-21",
+   "inputs": [
+    "datacommons-factcheck"
+   ],
+   "outputs": [
+    "src/ext/claims.json",
+    "src/ext/claims-2.json"
+   ]
+  },
+  {
+   "id": "sites",
+   "script": "scripts/sites-build.mjs",
+   "args": [
+    "--in",
+    "$RADAR_DATA/feed/data.json",
+    "--wd-cache",
+    "$RADAR_DATA/wd-facts.json"
+   ],
+   "built": "2026-10-21",
+   "inputs": [
+    "datacommons-factcheck",
+    "wikidata-site-facts"
+   ],
+   "outputs": [
+    "src/ext/sites.json"
+   ]
+  },
+  {
+   "id": "baselines",
+   "script": "scripts/baselines.mjs",
+   "args": [
+    "--data",
+    "$RADAR_DATA"
+   ],
+   "built": "2026-10-21",
+   "inputs": [
+    "pheme-veracity",
+    "pheme-prepared"
+   ],
+   "outputs": [
+    "project-docs/evidence/baseline-results.json",
+    "src/core/baselines-data.js"
+   ]
+  },
+  {
+   "id": "techniques",
+   "script": "scripts/techniques-baselines.mjs",
+   "args": [
+    "--data",
+    "$RADAR_DATA"
+   ],
+   "inputs": [
+    "pheme-veracity",
+    "pheme-prepared"
+   ],
+   "outputs": [
+    "project-docs/evidence/technique-baselines.json",
+    "src/core/techniques-data.js"
+   ]
+  },
+  {
+   "id": "framing",
+   "script": "scripts/framing-baselines.mjs",
+   "args": [
+    "--data",
+    "$RADAR_DATA"
+   ],
+   "inputs": [
+    "pheme-veracity",
+    "pheme-prepared"
+   ],
+   "outputs": [
+    "project-docs/evidence/framing-results.json"
+   ]
+  },
+  {
+   "id": "owners",
+   "script": null,
+   "inputs": [
+    "wikidata-owners"
+   ],
+   "outputs": [
+    "src/ext/owners.json"
+   ]
+  },
+  {
+   "id": "owner-corrections",
+   "script": "scripts/owner-corrections.mjs",
+   "args": [],
+   "inputs": [
+    "owner-corrections"
+   ],
+   "outputs": [
+    "src/ext/owners.json"
+   ]
+  },
+  {
+   "id": "state",
+   "script": null,
+   "inputs": [
+    "wikidata-state",
+    "state-reports"
+   ],
+   "outputs": [
+    "src/ext/state.json"
+   ]
+  },
+  {
+   "id": "personalities",
+   "script": "scripts/personalities-build.mjs",
+   "args": [],
+   "built": "2026-10-21",
+   "inputs": [
+    "personalities-sources",
+    "owner-corrections"
+   ],
+   "outputs": [
+    "src/ext/personalities.json"
+   ]
+  }
+ ],
+ "outputs": {
+  "src/core/confusables-data.js": "2f37ef68c5f1bbd3c0d086ed0bf1b14b9b94c8f48e2b9e6030da6c7c837d4aae",
+  "data/ops.json": "4f322b11336479fd353bcd13af49720d0b4cceb26fd24379d6713d38d05bab9a",
+  "src/ext/ops.json": "4f322b11336479fd353bcd13af49720d0b4cceb26fd24379d6713d38d05bab9a",
+  "src/ext/claims.json": "960a6220450b2eaa51439e364e0f9113b24c8c5469c841fc4e22d18d589889bd",
+  "src/ext/claims-2.json": "5c5c4cedce0d08793ec21cfc7f3b2e85646d099e8fa9e94ba0150c1d9202636d",
+  "src/ext/sites.json": "42c86e31911eb431b12ad20ccc2561abda605fb7452694b51db44218aef001f1",
+  "project-docs/evidence/baseline-results.json": "b70f48a4a8fd73acf6f8628ff605ceda72da006f39a402681ba7325da4b05e51",
+  "src/core/baselines-data.js": "e9293365d8d0baab5a8682e87cf2bba6b450ff7831b574e2c328b02707a34171",
+  "project-docs/evidence/technique-baselines.json": "7f68a944078830053cccb2704abc97ed4d37ab995a62320a947946baa1e83728",
+  "src/core/techniques-data.js": "151675d776656c90ce334e6c828e0a00df580b1c6e79535a4ee0f36cc9d06d27",
+  "project-docs/evidence/framing-results.json": "7f91f25fece092caf2510df0dc1f27f8f54aa2d96bb5db03a687783c10c7c67b",
+  "src/ext/owners.json": "bac5475d6aaa8aa21c33e4fe2e97335a7696a7471bdf8172694eb0ceb810ecab",
+  "src/ext/state.json": "6c28778e5e46b31cd2a01c91915110818fd433d0544e450f1f366beb0883621d",
+  "src/ext/personalities.json": "b6c4840d7f50059be62901c57d6073898b46e8f7f412dead09a7882206ad7cd6"
+ }
+}

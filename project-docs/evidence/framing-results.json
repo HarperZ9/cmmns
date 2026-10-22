@@ -1,0 +1,111 @@
+{
+ "generated": "2026-10-21",
+ "source": {
+  "name": "PHEME rumour and non-rumour threads (Zubiaga et al.)",
+  "url": "https://doi.org/10.6084/m9.figshare.6392078.v1",
+  "licence": "CC BY 4.0",
+  "years": "2014 to 2015",
+  "site": "Twitter",
+  "threads": 6425,
+  "sha256": "079f6ffdbc0b367399262f101774372e5d19dd8278c33d6c97a84461a9bc58dd"
+ },
+ "note": "Rates on unlabelled posts. Not precision: nobody checked whether a person-story read is one.",
+ "roots": {
+  "posts": 6425,
+  "longEnough": 5968,
+  "personStory": {
+   "k": 66,
+   "n": 5968,
+   "share": 0.0111,
+   "ci": [
+    0.0087,
+    0.014
+   ]
+  },
+  "structural": {
+   "k": 60,
+   "n": 5968,
+   "share": 0.0101,
+   "ci": [
+    0.0078,
+    0.0129
+   ]
+  },
+  "mixed": {
+   "k": 0,
+   "n": 5968,
+   "share": 0,
+   "ci": [
+    0,
+    0.0006
+   ]
+  },
+  "motive": {
+   "k": 0,
+   "n": 6425,
+   "share": 0,
+   "ci": [
+    0,
+    0.0006
+   ]
+  },
+  "justAsking": {
+   "k": 3,
+   "n": 6425,
+   "share": 0.0005,
+   "ci": [
+    0.0002,
+    0.0014
+   ]
+  }
+ },
+ "replies": {
+  "posts": 98929,
+  "longEnough": 64858,
+  "personStory": {
+   "k": 582,
+   "n": 64858,
+   "share": 0.009,
+   "ci": [
+    0.0083,
+    0.0097
+   ]
+  },
+  "structural": {
+   "k": 1080,
+   "n": 64858,
+   "share": 0.0167,
+   "ci": [
+    0.0157,
+    0.0177
+   ]
+  },
+  "mixed": {
+   "k": 6,
+   "n": 64858,
+   "share": 0.0001,
+   "ci": [
+    0,
+    0.0002
+   ]
+  },
+  "motive": {
+   "k": 19,
+   "n": 98929,
+   "share": 0.0002,
+   "ci": [
+    0.0001,
+    0.0003
+   ]
+  },
+  "justAsking": {
+   "k": 43,
+   "n": 98929,
+   "share": 0.0004,
+   "ci": [
+    0.0003,
+    0.0006
+   ]
+  }
+ }
+}

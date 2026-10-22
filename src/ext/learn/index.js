@@ -25,9 +25,9 @@ export const MAX_SECONDS = 120;
 // Groups for the lesson index, in the window's area order, with the thread report last.
 export const GROUPS = [
   ["Language", LANGUAGE_LESSONS.map((l) => l.id)],
-  ["Persuasion techniques", PERSUASION_LESSONS.map((l) => l.id)],
+  ["Persuasion techniques", [...PERSUASION_LESSONS.map((l) => l.id), "person-story"]],
   ["Coordination and media", ["duplicates", "copied-elsewhere", "cross-language", "same-upload", "old-media", "lifted-media", ...MEDIA_LESSONS.map((l) => l.id)]],
-  ["Sources", ["community-note", "fact-check", "ad", "state-link", "named-in-report", "lookalike-domain", "owner", "site-record", "laundered", "client"]],
+  ["Sources", ["community-note", "fact-check", "ad", "state-link", "named-in-report", "backing-record", "lookalike-domain", "owner", "site-record", "laundered", "client"]],
   ["Place", ["mismatch", "written-in", "store-elsewhere", "flag-elsewhere", "profile-location-elsewhere", "hours-elsewhere"]],
   ["Posting", ["fast-replier", "automation-app", "no-sleep-gap", "repost-only", "high-volume"]],
   ["Account", ["new-account", "name-changes", "default-handle", "follow-pattern", "low-karma", "brand-lookalike"]],

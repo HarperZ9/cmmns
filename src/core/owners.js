@@ -9,6 +9,13 @@
 
 let BY_DOMAIN = new Map(), BY_HANDLE = new Map();
 
+// A row corrected by data/owner-corrections.json (scripts/owner-corrections.mjs) carries
+// `correction`: { source, checked, reason, upstream, factsWrong? }. The window says so, with the
+// correction's own source, instead of crediting Wikidata.
+export const ownerSourceShort = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}` : "Wikidata");
+export const ownerSource = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}: ${o.correction.source}. Wikidata said "${o.correction.upstream.owner}". ${o.correction.reason}`
+  : `Wikidata${o && o.source ? `: ${o.source}` : ""}`);
+
 // rows: [{ name, domain, owner, source, x? }]
 export function setOwnerRows(rows) {
   BY_DOMAIN = new Map(); BY_HANDLE = new Map();

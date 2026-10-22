@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Radar OCR bench</title>
+<!-- R&D only: the evaluation page scripts/ocr/eval.mjs drives in headless Chrome. It runs the
+     shipped reader (src/ocr) on one image at a time and reports the text, boxes and timings. -->
+<script type="module">
+  import { decodeWeights } from "/src/ocr/weights.js";
+  import { readImage } from "/src/ocr/read.js";
+  let model = null;
+  window.loadModel = async () => {
+    const t0 = performance.now();
+    model = decodeWeights(await (await fetch("/src/ext/ocr/latin.bin")).arrayBuffer());
+    return performance.now() - t0;
+  };
+  window.ocr = async (url) => {
+    const bytes = await (await fetch(url)).arrayBuffer();
+    const t0 = performance.now();
+    const bmp = await createImageBitmap(new Blob([bytes]));
+    const c = new OffscreenCanvas(bmp.width, bmp.height), g = c.getContext("2d", { willReadFrequently: true });
+    g.drawImage(bmp, 0, 0);
+    const img = g.getImageData(0, 0, bmp.width, bmp.height);
+    const t1 = performance.now();
+    const r = readImage(model, { data: img.data, width: img.width, height: img.height }, { now: () => performance.now() });
+    return { lines: r.lines, text: r.text, confidence: r.confidence, readMs: r.ms, decodeMs: t1 - t0, totalMs: performance.now() - t0 };
+  };
+  window.ready = true;
+</script>

@@ -1,0 +1,63 @@
+{
+  "input": "pheme-shape.jsonl",
+  "rows": 6425,
+  "used": 5920,
+  "strata": [
+    {
+      "label": "under 10,000 followers",
+      "min": 0,
+      "max": 10000,
+      "n": 1451,
+      "repostsPerLike": {
+        "q05": 0.98,
+        "q25": 1.7,
+        "q50": 2.53,
+        "q75": 4.14,
+        "q95": 11.69,
+        "q99": 181
+      }
+    },
+    {
+      "label": "10,000 to 100,000 followers",
+      "min": 10000,
+      "max": 100000,
+      "n": 1703,
+      "repostsPerLike": {
+        "q05": 0.89,
+        "q25": 1.57,
+        "q50": 2.27,
+        "q75": 3.84,
+        "q95": 8.75,
+        "q99": 22.13
+      }
+    },
+    {
+      "label": "100,000 to 1 million followers",
+      "min": 100000,
+      "max": 1000000,
+      "n": 1588,
+      "repostsPerLike": {
+        "q05": 0.73,
+        "q25": 1.66,
+        "q50": 2.91,
+        "q75": 4.78,
+        "q95": 9.5,
+        "q99": 16.4
+      }
+    },
+    {
+      "label": "1 million followers or more",
+      "min": 1000000,
+      "max": "inf",
+      "n": 1178,
+      "repostsPerLike": {
+        "q05": 0.93,
+        "q25": 1.96,
+        "q50": 3.04,
+        "q75": 4.53,
+        "q95": 7.4,
+        "q99": 12.52
+      }
+    }
+  ]
+}

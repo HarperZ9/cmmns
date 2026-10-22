@@ -27,4 +27,18 @@ export const TECHNIQUE_LESSONS = [
     counter: "If every step adds a source or a check, the chain is reporting. If each step only repeats the one before, you are looking at a single claim with many voices.",
     dnp: "Radar cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.",
   },
+  {
+    id: "person-story", title: "One person's story, no wider picture", research: [],
+    what: "The post explains an issue only through one person's case: a name, an age, what happened to them. It gives no numbers, trends, causes or policies. Iyengar called this episodic framing, and its opposite, which places the issue in context, thematic framing. Radar does not show this sign yet: it has no labelled check.",
+    examples: [
+      { side: "left", topic: "housing", kind: "sign", text: "A 71-year-old widow was evicted on Tuesday after 30 years in her flat. This is what the new rules do." },
+      { side: "right", topic: "immigration", kind: "sign", text: "This father lost his son to a driver who had been told to leave. Meet the family the system forgot." },
+      { side: "centre", topic: "economy", kind: "sign", text: "My neighbour lost her job when the plant moved, and now she drives for three apps to pay the rent." },
+      { side: "none", topic: "local", kind: "fair", text: "Evictions in the county rose 14% since 2023, court data show. One of them was a 71-year-old tenant who had lived there 30 years." },
+    ],
+    why: "A single story is vivid and easy to remember. Iyengar found that viewers shown episodic coverage tended to blame the person in it, and viewers shown thematic coverage tended to hold government or society responsible. The choice of frame moves the blame before any argument is made.",
+    spot: "Ask how common the case is, and what causes it. Look for one number or one cause beyond the person.",
+    counter: "A story beside the figures, like the fair example, shows both the person and the pattern. A story alone tells you about one life.",
+    dnp: "A person's story can be true, typical and the best way to explain an issue. This describes how the post explains the issue, not whether it is right or who wrote it.",
+  },
 ];

@@ -2921,6 +2921,8 @@ const MEASURED_PERSUASION = {
   "doubt": {"precision":0.333,"low":0.061,"high":0.792,"n":3,"split":"test","recall":0.004,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
   "appeal-to-authority": {"precision":0,"low":0,"high":0.658,"n":2,"split":"test","recall":0,"chance":0.012,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
   "exaggeration": {"precision":0.1,"low":0.018,"high":0.404,"n":10,"split":"test","recall":0.005,"chance":0.01,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "motive-attribution": {"precision":0,"low":0,"high":0.49,"n":4,"split":"test","recall":0,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
+  "just-asking": {"precision":0,"low":0,"high":0.658,"n":2,"split":"test","recall":0,"chance":0.031,"date":"2026-10-21","source":"Propaganda Techniques Corpus (SemEval-2020 Task 11), news articles, held-out split; see project-docs/EVALUATION.md"},
 };
 // persuasion:end
 const MEASURED = {
@@ -3108,6 +3110,18 @@ const CUES_EN = {
     "(?:totally|completely|utterly) (?:destroyed|ruined|failed|collapsed)", "the most " + `${W} ${W}` + " in history",
     "a million times", "beyond (?:belief|comprehension)", "of epic proportions",
   ],
+  "motive-attribution": [
+    "(?:masked|disguised|dressed up|masquerading) as", "under the guise of", "the real (?:reason|agenda|motive|goal|aim|purpose|plan)",
+    "(?:hidden|secret|true) (?:agenda|motive|motives|aim|aims|plan)", "secretly (?:want|wants|wanted|plan|plans|planning|working|trying|hoping)",
+    "textbook (?:move|tactic|playbook|strategy|propaganda)", "(?:it|this) (?:was|is) never (?:really )?about", "(?:just|only|merely) a (?:cover|pretext|smokescreen|front) for",
+    "what (?:they|he|she) (?:really|actually) want", "(?:their|his|her) real (?:intention|intentions|motive|motives)",
+  ],
+  "just-asking": [
+    "just asking(?: (?:questions|a question))?", "i'?m just asking", "just a question", "(?:makes|make|should make) you (?:wonder|think)",
+    "isn'?t it (?:strange|odd|funny|interesting|curious|convenient) (?:that|how)", "why (?:is|are) (?:no one|nobody) asking",
+    "ask yourselves? (?:why|who|how)", "is (?:it|this) (?:just )?(?:a )?coincidence", "coincidence\\?", "(?:one|you) (?:has|have) to wonder",
+    "i'?m not saying (?:it|they|he|she|that)[^.?!]{0,40}but",
+  ],
 };
 
 // French cues for the same techniques. SemEval-2023 Task 3 has French data, but its terms allow use
@@ -3197,6 +3211,8 @@ const TECHNIQUES = {
   "doubt": { name: "Doubt", definition: "Questions the credibility of someone or something without giving evidence." },
   "appeal-to-authority": { name: "Appeal to authority", definition: "Says a claim is true because an unnamed or generic authority backs it." },
   "exaggeration": { name: "Exaggeration", definition: "Makes something seem far larger, worse or more extreme than it is." },
+  "motive-attribution": { name: "Hidden motive", definition: "Says someone's real aim is hidden behind what they say, without showing evidence of the aim." },
+  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question, so it is suggested without being claimed." },
 };
 
 const PERSUASION_DOES_NOT_PROVE = "A technique can carry a true claim; it describes how the post argues.";
@@ -3273,6 +3289,87 @@ function persuasion(text, shown = shownTechniques()) {
 }
 
 return { TECHNIQUES, PERSUASION_DOES_NOT_PROVE, SHIP_PRECISION, SHIP_LOW, SHIP_MIN_N, CONTEXT_ONLY, techniqueSpans, shownTechniques, techniqueStatus, persuasion };
+})();
+
+// ---- framing.js
+const M_framing = (() => {
+// Episodic and thematic framing (Iyengar, "Is Anyone Responsible? How Television Frames Political
+// Issues", University of Chicago Press, 1991). An episodic frame tells an issue through one person's
+// case or one event; a thematic frame places it in context: trends, numbers, causes, policies,
+// systems. Iyengar found episodic coverage leads viewers to hold the individual responsible and
+// thematic coverage leads them to hold society or government responsible. The operational split
+// follows the narrative-frame part of the codebook of Mendelsohn, Budak and Jurgens, "Modeling
+// Framing in Immigration Discourse on Social Media" (NAACL 2021), which codes a post episodic when
+// it centres a specific person or event and thematic when it gives broader context. Radar cites
+// that codebook and copies none of its text.
+//
+// A cue names no group, person, party, side or issue: the same sentence reads alike whatever it is
+// about (tests/framing.symmetry.test.js). The person-story sign is a post that tells the issue only
+// through one individual's story, with no structural cue at all. It is held back: no labelled
+// corpus with a usable licence exists to measure it (project-docs/EVALUATION.md), so the window,
+// the report and the dashboard show only that it is held, never a count.
+
+const FRAMING_MIN_WORDS = 12;
+
+const EPISODIC = [
+  "\\d{1,3}[- ]years?[- ]old", "(?:my|our) (?:[\\w-]+ )?(?:mom|mother|dad|father|son|daughter|brother|sister|wife|husband|partner|friend|best friend|neighbou?r|cousin|uncle|aunt|grandmother|grandfather|grandma|grandpa|coworker|colleague|kid|child|baby|boss|landlord)",
+  "(?:this|one|a|the) (?:young |single |elderly |local )?(?:woman|man|mother|father|mom|dad|girl|boy|child|kid|family|teen|teenager|student|veteran|nurse|worker|widow|grandmother|grandfather|toddler) (?:who|was|had|lost|died|says|said|is|has|got|could)",
+  "(?:her|his|their) (?:story|ordeal|family says|mother says|father says)", "(?:he|she) (?:was|had been|got) (?:killed|shot|arrested|fired|laid off|evicted|deported|attacked|beaten|hospitali[sz]ed|denied|detained|stabbed|robbed)",
+  "(?:lost|losing) (?:her|his|my) (?:job|home|house|son|daughter|husband|wife|life|benefits|insurance|business)",
+  "(?:i|we) (?:lost|was|were|got) (?:fired|laid off|evicted|denied|attacked|robbed|turned away|hospitali[sz]ed)", "happened to (?:me|my|her|him)", "when i was (?:a|in|at)",
+  { cue: "Meet [A-Z][a-z]+", caseSensitive: true },
+];
+const THEMATIC = [
+  "\\d+(?:[.,]\\d+)?\\s?(?:%|percent|per cent)", "per capita", "(?:the )?(?:rate|rates|share|number) of", "on average", "nationwide", "nationally", "statewide",
+  "across the (?:country|nation|state|region|world)", "(?:study|studies|survey|census|report|data|statistics|figures) (?:show|shows|showed|found|finds|suggest|suggests)",
+  "polic(?:y|ies)", "legislation", "(?:the |this |a |new )law", "laws", "funding", "budget", "regulations?", "systemic", "structural", "institutional", "the system",
+  "since (?:19|20)\\d\\d", "over the (?:past|last) (?:decade|century|\\d+ years)", "trends?", "(?:root )?causes? of", "(?:millions|thousands|hundreds of thousands) of (?:people|families|workers|children|residents)",
+];
+
+const compile = (c) => { const { cue, caseSensitive } = typeof c === "string" ? { cue: c } : c; return new RegExp(`(?<![\\w'])(?:${cue})(?![\\w'])`, caseSensitive ? "g" : "gi"); };
+const EP = EPISODIC.map(compile), TH = THEMATIC.map(compile);
+const words = (s) => (s.match(/[\p{L}\p{N}][\p{L}\p{N}'-]*/gu) || []).length;
+
+function hits(res, s) {
+  const out = [];
+  for (const re of res) { re.lastIndex = 0; for (const m of s.matchAll(re)) out.push(m[0]); }
+  return out;
+}
+
+// { episodic, thematic, frame, words } for one post. frame: "person-story" (episodic cues only),
+// "structural" (thematic only), "mixed", or null (neither, or too short to read).
+function framingOf(text) {
+  const s = String(text || "").replace(/[’]/g, "'");
+  const n = words(s), episodic = hits(EP, s), thematic = hits(TH, s);
+  let frame = null;
+  if (n >= FRAMING_MIN_WORDS) frame = episodic.length && thematic.length ? "mixed" : episodic.length ? "person-story" : thematic.length ? "structural" : null;
+  return { episodic, thematic, frame, words: n };
+}
+
+// Measurement row for the person-story sign: null until a licensed labelled corpus clears the bar.
+// The bar: a 95% Wilson lower bound of at least 0.7 from at least 20 hits on held-out data.
+const MEASURED_FRAMING = null;
+const FRAMING_SHIP_LOW = 0.7, FRAMING_MIN_N = 20;
+function framingShown(row = MEASURED_FRAMING) {
+  return !!(row && row.split === "test" && Number.isInteger(row.n) && row.n >= FRAMING_MIN_N && Number.isFinite(row.low) && row.low >= FRAMING_SHIP_LOW);
+}
+function framingStatus(row = MEASURED_FRAMING) {
+  if (!row) return { shown: false, text: "held back: not measured. No labelled corpus of episodic and thematic posts with a usable licence was found (checked 2026-10-21)" };
+  const pc = (x) => Math.round(x * 100);
+  const m = `precision ${pc(row.precision)}% (95% interval ${pc(row.low)} to ${pc(row.high)}%), ${row.n} posts checked`;
+  return framingShown(row) ? { shown: true, text: m } : { shown: false, text: `held back (interval starts below ${pc(FRAMING_SHIP_LOW)}% or fewer than ${FRAMING_MIN_N} hits): ${m}` };
+}
+
+const FRAMING_DOES_NOT_PROVE = "A person's story can be true, typical and the best way to explain an issue. This describes how the post explains the issue, not whether it is right or who wrote it.";
+
+// The frame the feed log keeps for one post: framingOf's frame, "none" for a post long enough to
+// read with neither kind of cue, or null for a post too short to read.
+function feedFrame(text) {
+  const f = framingOf(text);
+  return f.frame || (f.words >= FRAMING_MIN_WORDS ? "none" : null);
+}
+
+return { FRAMING_MIN_WORDS, framingOf, MEASURED_FRAMING, FRAMING_SHIP_LOW, framingShown, framingStatus, FRAMING_DOES_NOT_PROVE, feedFrame };
 })();
 
 // ---- report.js
@@ -3745,6 +3842,13 @@ const M_owners = (() => {
 
 let BY_DOMAIN = new Map(), BY_HANDLE = new Map();
 
+// A row corrected by data/owner-corrections.json (scripts/owner-corrections.mjs) carries
+// `correction`: { source, checked, reason, upstream, factsWrong? }. The window says so, with the
+// correction's own source, instead of crediting Wikidata.
+const ownerSourceShort = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}` : "Wikidata");
+const ownerSource = (o) => (o && o.correction ? `Radar correction, checked ${o.correction.checked}: ${o.correction.source}. Wikidata said "${o.correction.upstream.owner}". ${o.correction.reason}`
+  : `Wikidata${o && o.source ? `: ${o.source}` : ""}`);
+
 // rows: [{ name, domain, owner, source, x? }]
 function setOwnerRows(rows) {
   BY_DOMAIN = new Map(); BY_HANDLE = new Map();
@@ -3770,7 +3874,7 @@ function domainsIn(text) {
   return [...out];
 }
 
-return { setOwnerRows, ownerOfDomain, ownerOfHandle, domainsIn };
+return { ownerSourceShort, ownerSource, setOwnerRows, ownerOfDomain, ownerOfHandle, domainsIn };
 })();
 
 // ---- xdata.js
@@ -3905,7 +4009,7 @@ function tweetsIn(json) {
         replyTo: L.in_reply_to_status_id_str || null,
         replyToHandle: L.in_reply_to_screen_name || null,
         links: ((L.entities || {}).urls || []).map((u) => u.expanded_url).filter((u) => u && !/^https?:\/\/(x|twitter)\.com\//.test(u)),
-        quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count),
+        quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count), bookmarks: n(L.bookmark_count),
       };
       out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined && !(Array.isArray(x) && !x.length))));
     }
@@ -4398,7 +4502,7 @@ return { BASELINES };
 // ---- techniques-data.js
 const M_techniques_data = (() => {
 // Generated by scripts/techniques-baselines.mjs from project-docs/evidence/technique-baselines.json. Do not edit.
-const TECHNIQUE_BASELINES = {"generated":"2026-10-21","flood":{"5-19":{"k":17,"n":3087,"share":0.0055,"ci":[0.0034,0.0088]},"20-49":{"k":25,"n":1384,"share":0.0181,"ci":[0.0123,0.0265]},"50-99":{"k":4,"n":181,"share":0.0221,"ci":[0.0086,0.0554]},"100+":{"k":2,"n":60,"share":0.0333,"ci":[0.0092,0.1136]}},"cross":{"5-19":{"k":1,"n":3087,"share":0.0003,"ci":[0.0001,0.0018]},"20-49":{"k":2,"n":1384,"share":0.0014,"ci":[0.0004,0.0053]},"50-99":{"k":2,"n":181,"share":0.011,"ci":[0.003,0.0394]},"100+":{"k":0,"n":60,"share":0,"ci":[0,0.0602]}},"multilingual":{"5-19":{"k":992,"n":3087,"share":0.3213,"ci":[0.3051,0.338]},"20-49":{"k":581,"n":1384,"share":0.4198,"ci":[0.3941,0.446]},"50-99":{"k":85,"n":181,"share":0.4696,"ci":[0.3983,0.5422]},"100+":{"k":36,"n":60,"share":0.6,"ci":[0.4737,0.7143]}}};
+const TECHNIQUE_BASELINES = {"generated":"2026-10-21","flood":{"5-19":{"k":17,"n":3087,"share":0.0055,"ci":[0.0034,0.0088]},"20-49":{"k":25,"n":1384,"share":0.0181,"ci":[0.0123,0.0265]},"50-99":{"k":4,"n":181,"share":0.0221,"ci":[0.0086,0.0554]},"100+":{"k":2,"n":60,"share":0.0333,"ci":[0.0092,0.1136]}},"cross":{"5-19":{"k":1,"n":3087,"share":0.0003,"ci":[0.0001,0.0018]},"20-49":{"k":2,"n":1384,"share":0.0014,"ci":[0.0004,0.0053]},"50-99":{"k":2,"n":181,"share":0.011,"ci":[0.003,0.0394]},"100+":{"k":0,"n":60,"share":0,"ci":[0,0.0602]}},"multilingual":{"5-19":{"k":992,"n":3087,"share":0.3213,"ci":[0.3051,0.338]},"20-49":{"k":581,"n":1384,"share":0.4198,"ci":[0.3941,0.446]},"50-99":{"k":85,"n":181,"share":0.4696,"ci":[0.3983,0.5422]},"100+":{"k":36,"n":60,"share":0.6,"ci":[0.4737,0.7143]}},"swarm":{"5-19":{"k":0,"n":3087,"share":0,"ci":[0,0.0012]},"20-49":{"k":1,"n":1384,"share":0.0007,"ci":[0.0001,0.0041]},"50-99":{"k":1,"n":181,"share":0.0055,"ci":[0.001,0.0306]},"100+":{"k":0,"n":60,"share":0,"ci":[0,0.0602]}}};
 
 return { TECHNIQUE_BASELINES };
 })();
@@ -4425,10 +4529,10 @@ const size = (b) => (b.max === Infinity || b.max == null ? `${b.min} or more rep
 // The measured rate for one sign: { k, n, share, ci, bin } or null when the thread falls outside
 // every bin. ctx: { replies } for signs in one thread, { viewed } for signs across threads.
 function baselineFor(sign, ctx = {}) {
-  const inThread = { "same-text": "same", burst: "burst", flood: "flood", "cross-language": "cross" }[sign];
+  const inThread = { "same-text": "same", burst: "burst", flood: "flood", "cross-language": "cross", swarm: "swarm" }[sign];
   const across = { together: "together", "copied-elsewhere": "echo" }[sign];
   const bin = inThread ? sizeBin(ctx.replies || 0) : across ? viewBin(ctx.viewed || 0) : null;
-  const table = sign === "flood" || sign === "cross-language" ? TECHNIQUE_BASELINES : BASELINES;
+  const table = sign === "flood" || sign === "cross-language" || sign === "swarm" ? TECHNIQUE_BASELINES : BASELINES;
   const r = bin && table[inThread || across] && table[inThread || across][bin.id];
   return r && r.n ? { ...r, bin } : null;
 }
@@ -4440,6 +4544,7 @@ const WHAT = {
   "copied-elsewhere": ["wording that turned up in another thread", "replies of 8 words or more"],
   flood: ["a flood of replies from very high-rate accounts", "threads"],
   "cross-language": ["one link or upload carried by replies in different languages", "threads"],
+  swarm: ["many new or flagged accounts replying within ten minutes", "threads"],
 };
 
 // One sentence for the window, or null: "In ordinary threads with 20 to 49 replies, ... showed up
@@ -4688,7 +4793,9 @@ function opRows(h) {
 const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.";
 function opsTrend(table = TABLE) {
   const years = new Map(), states = new Map();
-  for (const o of table.ops) {
+  // Operations from data packs (src/core/packs-content.js) are shown on matches but never counted here.
+  const own = table.ops.filter((o) => !o.pack);
+  for (const o of own) {
     const y = Number(String(o.first).slice(0, 4));
     const ye = years.get(y) || years.set(y, { year: y, n: 0, byState: {} }).get(y);
     ye.n++; ye.byState[o.state] = (ye.byState[o.state] || 0) + 1;
@@ -4697,13 +4804,120 @@ function opsTrend(table = TABLE) {
     for (const d of o.docs) se.docs.add(d);
   }
   return {
-    total: table.ops.length,
+    total: own.length,
     byYear: [...years.values()].sort((a, b) => a.year - b.year),
     byState: [...states.values()].map((s) => ({ ...s, docs: s.docs.size })).sort((a, b) => b.n - a.n || a.state.localeCompare(b.state)),
   };
 }
 
 return { setOpsTable, opsOfDomain, opsOfHandle, opsLookup, profileLinks, OPS_DOES_NOT_PROVE, opRows, OPS_TREND_CAVEAT, opsTrend };
+})();
+
+// ---- backing.js
+const M_backing = (() => {
+// Documented backing of public media personalities (src/ext/personalities.json, built by
+// scripts/personalities-build.mjs): the matcher behind "Backing on record", and the window's rows.
+// An account matches when the table lists that exact handle on that platform, or that YouTube
+// channel id. Every row is the sources' own words with dates, quotes and what it does not prove.
+// The same rows and the same level for everyone: no input here is a person's side, country or name.
+
+let PEOPLE = [];
+const BY_HANDLE = new Map(), BY_CHANNEL = new Map();
+const key = (platform, handle) => `${String(platform || "").toLowerCase()}:${String(handle || "").replace(/^@/, "").toLowerCase()}`;
+
+// table: { people } as personalities.json has it, or a part of it from the background worker.
+function setBackingTable(table) {
+  PEOPLE = (table && table.people) || [];
+  BY_HANDLE.clear(); BY_CHANNEL.clear();
+  for (const p of PEOPLE) {
+    for (const [platform, handle] of p.accounts || []) BY_HANDLE.set(key(platform, handle), p);
+    for (const c of p.channels || []) BY_CHANNEL.set(c, p);
+  }
+}
+
+// Radar's site ids are the platform names the table uses ("fixture" behaves as X).
+const PLATFORM_OF = { fixture: "x" };
+const backingOf = (site, handle) => BY_HANDLE.get(key(PLATFORM_OF[site] || site, handle)) || null;
+const backingOfChannel = (id) => (id && BY_CHANNEL.get(id)) || null;
+
+// The part of a full table a page needs: the people behind these [site, handle] pairs and channel ids.
+function backingLookup(table, { accounts = [], channels = [] } = {}) {
+  const want = new Set(accounts.map(([s, h]) => key(PLATFORM_OF[s] || s, h))), ch = new Set(channels);
+  return { ...table, people: ((table && table.people) || []).filter((p) => (p.accounts || []).some(([s, h]) => want.has(key(s, h))) || (p.channels || []).some((c) => ch.has(c))) };
+}
+
+// Distinct documents behind a person's rows (Wikidata is shown apart and not counted).
+const sourceCount = (p) => new Set((p.rows || []).flatMap((r) => r.sources.map((s) => s.url))).size;
+const backingLabel = (p) => { const n = sourceCount(p); return `Backing on record: ${n} source${n === 1 ? "" : "s"}`; };
+
+const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person says nothing on its own about whether a given post is true, or that the backer chose its words. Allegations in court records are unproven. Records go out of date; each row gives the date it was read.";
+const CORRECTIONS_PATH = "https://github.com/HarperZ9/radar/blob/dev/data/owner-corrections.json";
+
+const STATUS_WORDS = { documented: "documented in a primary record", reported: "reported by the press", alleged: "alleged, not proven" };
+const quoteLine = (s) => `${s.publisher}${s.date ? ` (${s.date})` : ""}, read ${s.read}: "${s.quote}"`;
+
+// The window's rows for one person, in the sources' own words.
+function backingRows(p) {
+  const rows = [["Backing on record", `${p.name}, ${p.role}. ${sourceCount(p)} documents in ${p.rows.length} record${p.rows.length === 1 ? "" : "s"}.`]];
+  for (const r of p.rows) {
+    rows.push([r.kind[0].toUpperCase() + r.kind.slice(1), `${r.who}${r.via ? ` (as owner or backer of ${r.via})` : ""}${r.period ? `, ${r.period}` : ""}. ${r.summary} Status: ${STATUS_WORDS[r.status]}; confidence ${r.confidence}.`]);
+    rows.push(["Sources say", r.sources.slice(0, 3).map(quoteLine).join(" ")]);
+    rows.push(["Read it", { links: r.sources.slice(0, 3).map((s) => [String(s.url).replace(/^https?:\/\//, "").slice(0, 48), s.url]) }]);
+    if (r.campaign) rows.push(["Documented campaign", `${r.campaign.name}: ${r.campaign.contentType}${r.campaign.dates ? `, ${r.campaign.dates}` : ""}.${(r.campaign.techniques || []).length ? ` Techniques the source supports: ${r.campaign.techniques.join("; ")}.` : ""}`]);
+    rows.push(["This does not prove", r.doesNotProve]);
+  }
+  if (p.wikidata && p.wikidata.employers && p.wikidata.employers.length) rows.push(["Wikidata lists", `Employer (P108): ${p.wikidata.employers.map((e) => e.label + (e.end ? ` (to ${e.end.slice(0, 4)})` : "")).join("; ")}. Fetched ${p.wikidata.fetched}; Wikidata can lag a move.`]);
+  rows.push(["Wrong or out of date?", { links: [["Send a sourced correction", CORRECTIONS_PATH]] }]);
+  rows.push(["Does not prove", BACKING_DOES_NOT_PROVE]);
+  return rows;
+}
+
+return { setBackingTable, backingOf, backingOfChannel, backingLookup, sourceCount, backingLabel, BACKING_DOES_NOT_PROVE, CORRECTIONS_PATH, backingRows };
+})();
+
+// ---- cloned.js
+const M_cloned = (() => {
+// Cloned-outlet framing (project-docs/TECHNIQUES.md, technique 3; DISARM T0098 Establish Inauthentic
+// News Sites, T0097.202 News Outlet Persona). A post that names a real outlet ("The Washington Post
+// reports...") while its link goes to a look-alike address borrows the outlet's trust twice: in
+// the words and in the address. Doppelganger posts did this with copied outlets on addresses such as
+// washingtonpost.pm. Radar joins two checks it already has: the look-alike address (lookalike.js)
+// and the published reports that named the address (ops.js). Wording that names the outlet is the
+// only new part, and it is matched on the outlet's own name, never on a topic or side.
+
+const { lookalikeOf } = M_lookalike;
+const { opsOfDomain } = M_ops;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const fold = (s) => String(s || "").normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase();
+
+// True when the text names the outlet: its name with or without a leading "The", or its own address.
+function namesOutlet(text, outlet, official) {
+  const t = fold(text), name = fold(outlet).replace(/^the /, "");
+  if (name.length >= 3 && new RegExp(`(?<![\\p{L}\\p{N}])(?:the )?${esc(name)}(?![\\p{L}\\p{N}])`, "u").test(t)) return true;
+  return !!official && new RegExp(`(?<![\\w.-])${esc(fold(official))}(?![\\w-])`).test(t);
+}
+
+// One entry per look-alike link: { domain, outlet, official, how, named, reports }, where named says
+// the post's own words name the copied outlet and reports lists the operations that named the
+// address. An empty list when no link is a look-alike.
+function clonedCitations(text, domains) {
+  const out = [], seen = new Set();
+  for (const d of domains || []) {
+    const host = String(d || "").toLowerCase().replace(/^www\./, "");
+    if (seen.has(host)) continue;
+    seen.add(host);
+    const h = lookalikeOf(host);
+    if (!h) continue;
+    const reports = [...new Map(opsOfDomain(host).filter((x) => x.op).map((x) => [x.op.id, x.op.name])).values()];
+    out.push({ domain: host, outlet: h.outlet, official: h.official, how: h.how, named: namesOutlet(text, h.outlet, h.official), reports });
+  }
+  return out;
+}
+
+const CLONED_DOES_NOT_PROVE = "People quote an outlet by name and paste whatever link they were sent, and some share a copy to warn others. This shows the words and the address disagree, not who made the copy or why the post links it.";
+
+return { namesOutlet, clonedCitations, CLONED_DOES_NOT_PROVE };
 })();
 
 // ---- trail.js
@@ -4988,6 +5202,773 @@ function floodSign(rows, rateOf, { bursts = [] } = {}) {
 }
 
 return { FLOOD_MIN_ACCOUNTS, FLOOD_DOES_NOT_PROVE, ratePerDay, floodSign };
+})();
+
+// ---- swarming.js
+const M_swarming = (() => {
+// The swarming sign (project-docs/TECHNIQUES.md, technique 7; DISARM T0049.005 Conduct Swarming and
+// T0048 Harass). Rauch describes trolling as a pile-on that manufactures a crowd. In one thread Radar
+// can see one trace of it: many new or flagged accounts converging on one post within minutes.
+// The sign is about the thread, never about an account: it carries counts only, no handles, so it
+// cannot become a list to pile on in turn (DESIGN-MAP R12). Thresholds were set on the dev half of
+// PHEME and read once on the test half (scripts/techniques-baselines.mjs).
+
+const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN_KNOWN = 8;
+const SWARM_DOES_NOT_PROVE = "A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once, and nobody has to organise it. This describes how the replies arrived, not who sent them or why.";
+
+// rows: [{ author, posted }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
+// null when Radar has not read the account. Returns null or { from, to, accounts, known, marked,
+// newAccounts, flagged, windowSec } for the densest window.
+function swarmSign(rows, markOf, { windowSec = SWARM_WINDOW_SEC } = {}) {
+  const xs = (rows || []).map((r) => ({ a: String(r.author || "").toLowerCase(), t: Date.parse(r.posted) })).filter((r) => r.a && Number.isFinite(r.t)).sort((p, q) => p.t - q.t);
+  let best = null;
+  for (let i = 0, j = 0; i < xs.length; i++) {
+    while (xs[i].t - xs[j].t > windowSec * 1000) j++;
+    const w = windowStats(xs.slice(j, i + 1), markOf);
+    if (w.known < SWARM_MIN_KNOWN || w.marked < SWARM_MIN || w.marked / w.known < SWARM_SHARE) continue;
+    if (!best || w.marked > best.marked) best = { from: new Date(xs[j].t).toISOString(), to: new Date(xs[i].t).toISOString(), ...w, windowSec };
+  }
+  return best;
+}
+
+function windowStats(win, markOf) {
+  const seen = new Map();
+  for (const r of win) if (!seen.has(r.a)) seen.set(r.a, markOf(r.a, r.t));
+  let known = 0, marked = 0, fresh = 0, flagged = 0;
+  for (const m of seen.values()) {
+    if (!m) continue;
+    known++;
+    if (m.new || m.flagged) marked++;
+    if (m.new) fresh++;
+    if (m.flagged) flagged++;
+  }
+  return { accounts: seen.size, known, marked, newAccounts: fresh, flagged };
+}
+
+return { SWARM_WINDOW_SEC, SWARM_DOES_NOT_PROVE, swarmSign };
+})();
+
+// ---- campaign-baselines-data.js
+const M_campaign_baselines_data = (() => {
+// Generated by scripts/campaign-baselines.mjs. Do not edit. Counts and quantiles only.
+const CAMPAIGN_BASELINES = {
+  "x": {
+    "strata": [
+      {
+        "label": "under 10,000 followers",
+        "min": 0,
+        "max": 10000,
+        "current": {
+          "n": 0,
+          "source": "hand-collected X posts, 2026 (not collected yet)"
+        }
+      },
+      {
+        "label": "10,000 to 100,000 followers",
+        "min": 10000,
+        "max": 100000,
+        "current": {
+          "n": 0,
+          "source": "hand-collected X posts, 2026 (not collected yet)"
+        }
+      },
+      {
+        "label": "100,000 to 1 million followers",
+        "min": 100000,
+        "max": 1000000,
+        "current": {
+          "n": 0,
+          "source": "hand-collected X posts, 2026 (not collected yet)"
+        }
+      },
+      {
+        "label": "1 million followers or more",
+        "min": 1000000,
+        "max": 1000000000000000,
+        "current": {
+          "n": 0,
+          "source": "hand-collected X posts, 2026 (not collected yet)"
+        }
+      }
+    ],
+    "historical": {
+      "source": "PHEME source posts, Twitter 2014 and 2015 breaking news, 5920 of 6425 posts with 20 or more reposts and likes (Zubiaga et al., CC BY 4.0)",
+      "strata": [
+        {
+          "label": "under 10,000 followers",
+          "min": 0,
+          "max": 10000,
+          "n": 1451,
+          "repostsPerLike": {
+            "q05": 0.98,
+            "q25": 1.7,
+            "q50": 2.53,
+            "q75": 4.14,
+            "q95": 11.69,
+            "q99": 181
+          }
+        },
+        {
+          "label": "10,000 to 100,000 followers",
+          "min": 10000,
+          "max": 100000,
+          "n": 1703,
+          "repostsPerLike": {
+            "q05": 0.89,
+            "q25": 1.57,
+            "q50": 2.27,
+            "q75": 3.84,
+            "q95": 8.75,
+            "q99": 22.13
+          }
+        },
+        {
+          "label": "100,000 to 1 million followers",
+          "min": 100000,
+          "max": 1000000,
+          "n": 1588,
+          "repostsPerLike": {
+            "q05": 0.73,
+            "q25": 1.66,
+            "q50": 2.91,
+            "q75": 4.78,
+            "q95": 9.5,
+            "q99": 16.4
+          }
+        },
+        {
+          "label": "1 million followers or more",
+          "min": 1000000,
+          "max": 1000000000000000,
+          "n": 1178,
+          "repostsPerLike": {
+            "q05": 0.93,
+            "q25": 1.96,
+            "q50": 3.04,
+            "q75": 4.53,
+            "q95": 7.4,
+            "q99": 12.52
+          }
+        }
+      ]
+    }
+  },
+  "reddit": {
+    "strata": [],
+    "historical": null
+  }
+};
+
+return { CAMPAIGN_BASELINES };
+})();
+
+// ---- campaign-text.js
+const M_campaign_text = (() => {
+// Text tools for the launch campaign lens (project-docs/CAMPAIGN-LENS.md): bio and quote skeletons,
+// template groups, stock-persona cues, topic families and the promo-template provider interface.
+//
+// Banned features: nothing here reads the language or script of a text, a place, or a name's
+// origin. A skeleton masks capitalised words (names, places), numbers, cashtags and runs of
+// non-Latin letters, so two bios cut from one template group together whatever place or script
+// fills their slots, and a bio naming a country is treated exactly like one naming any other.
+
+// Runs of letters in non-Latin scripts become the same slot token as a capitalised word, so a slot
+// filled in any script reads the same and the template's fixed words carry the match.
+const NON_LATIN = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Arabic}\p{Script=Hebrew}\p{Script=Devanagari}\p{Script=Thai}\p{Script=Cyrillic}\p{Script=Greek}]+/gu;
+
+// A bio or quote -> its skeleton tokens. A token with no Latin letter is a slot, whatever its
+// script (this also catches marks such as the katakana length mark, which belong to no one script).
+// Known limit: a template whose fixed words are not in Latin script is not grouped. That lowers
+// recall for those bios and is reported per stratum in the fairness audit (EVALUATION.md).
+function skeleton(text) {
+  const s = String(text || "")
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/\$[A-Za-z]{2,10}\b/g, " TOKEN ")
+    .replace(/@\w+/g, " HANDLE ")
+    .replace(NON_LATIN, " WORD ")
+    .replace(/\d+/g, " NUM ");
+  const toks = s.match(/[\p{L}\p{N}]+/gu) || [];
+  return toks.map((t) => (t === "TOKEN" || t === "HANDLE" || t === "NUM" ? t : t === "WORD" || !/\p{Script=Latin}/u.test(t) || /^\p{Lu}/u.test(t) ? "SLOT" : t.toLowerCase()));
+}
+
+// Word 3-shingles of a skeleton; slot-only shingles are dropped, so two bios match on the
+// template's fixed words, not on the slots they share by chance.
+const SLOTS = new Set(["TOKEN", "HANDLE", "NUM", "SLOT"]);
+function skeletonShingles(text, k = 3) {
+  const t = skeleton(text), out = new Set();
+  for (let i = 0; i + k <= t.length; i++) {
+    const g = t.slice(i, i + k);
+    if (g.some((w) => !SLOTS.has(w))) out.add(g.join(" "));
+  }
+  return out;
+}
+
+function jaccardSets(a, b) {
+  if (!a.size || !b.size) return 0;
+  let inter = 0;
+  for (const x of a) if (b.has(x)) inter++;
+  return inter / (a.size + b.size - inter);
+}
+
+const TEMPLATE_JACCARD = 0.5, TEMPLATE_MIN_GROUP = 3, TEMPLATE_MIN_SHINGLES = 3;
+
+// items: [{ id, text }] -> groups of ids whose skeletons share a template: [{ ids, size }],
+// largest first. Single linkage over pairs at TEMPLATE_JACCARD or more.
+function templateGroups(items, { min = TEMPLATE_MIN_GROUP, jaccard = TEMPLATE_JACCARD } = {}) {
+  const xs = (items || []).map((it) => ({ id: it.id, sh: skeletonShingles(it.text) })).filter((x) => x.sh.size >= TEMPLATE_MIN_SHINGLES);
+  const parent = xs.map((_, i) => i);
+  const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
+  for (let i = 0; i < xs.length; i++) for (let j = i + 1; j < xs.length; j++) if (jaccardSets(xs[i].sh, xs[j].sh) >= jaccard) parent[find(i)] = find(j);
+  const by = new Map();
+  xs.forEach((x, i) => { const r = find(i); by.set(r, [...(by.get(r) || []), x.id]); });
+  return [...by.values()].filter((ids) => ids.length >= min).map((ids) => ({ ids, size: ids.length })).sort((a, b) => b.size - a.size);
+}
+
+// Stock-persona cue families (English phrases). A bio in another language matches none of them,
+// which lowers recall and never raises suspicion.
+const PERSONA_CUES = {
+  age: /\b(?:age\s*\d{2}|\d{2}\s*(?:years?|yrs?)[\s-]*old|\d{2}\s*y\/?o)\b/i,
+  passion: /\b(?:passionate about|obsessed with|in love with|addicted to|enthusiast|lover of)\b/i,
+  crypto: /\$[A-Za-z]{2,10}\b|\b(?:crypto(?:currency)? is the future|hodl(?:ing|er)?|stacking (?:sats|[A-Z]{2,6})|web3|degen|to the moon|wbtc|btc|eth|nft)\b/i,
+  pet: /\b(?:cat|dog) (?:person|lover|mom|dad|parent)\b/i,
+  filler: /\b(?:here for the memes|like a pro|chasing dreams|still young at heart|enjoying life|living my best life|just vibing|dreamer|hustling)\b/i,
+};
+const PERSONA_MIN_FAMILIES = 3;
+
+function personaCues(bio) {
+  const s = String(bio || "");
+  return Object.keys(PERSONA_CUES).filter((k) => PERSONA_CUES[k].test(s));
+}
+
+// Topic families a bio or post can be dominated by. "unknown" when none matches: the lens never
+// counts an unknown topic as a mismatch.
+const CAMPAIGN_TOPICS = {
+  crypto: /\$[A-Za-z]{2,10}\b|\b(?:crypto|bitcoin|btc|eth|wbtc|solana|memecoin|airdrop|defi|web3|nft|token|hodl)\b/i,
+  gambling: /\b(?:casino|betting|slots|jackpot|sportsbook)\b/i,
+  adult: /\b(?:onlyfans|18\+|nsfw|spicy content)\b/i,
+  tech: /\b(?:ai|llm|model|coding|developer|software|open[- ]source|gpu|benchmark|agent|startup|api|machine learning|data)\b/i,
+};
+
+function topicsOf(text) {
+  const s = String(text || "");
+  return Object.keys(CAMPAIGN_TOPICS).filter((k) => CAMPAIGN_TOPICS[k].test(s));
+}
+
+// Promo-template cues. A provider maps a text to { cues: [{ id, match, source }] }. Articulate's
+// promo-template detector is expected to ship its list as a JSON pack (providerFromPack); without
+// one, LOCAL_PROMO runs.
+const LOCAL_PROMO = [
+  ["sir-opener", /^\s*sir\s*(?:\.{2,}|…)/i],
+  ["just-dropped", /\b(?:they|[A-Z]\w+) just (?:dropped|released|launched|shipped)\b/i],
+  ["changes-everything", /\b(?:this|it) changes everything\b/i],
+  ["game-changer", /\bgame[- ]?changer\b/i],
+  ["is-insane", /\b(?:is|are|looks) (?:insane|wild|unreal|crazy)\b/i],
+  ["need-to-try", /\byou (?:need|have) to try\b/i],
+  ["not-talking-enough", /\bnobody is talking about\b|\bwhy is no ?one talking about\b/i],
+];
+
+function localProvider(text) {
+  const s = String(text || "");
+  return { cues: LOCAL_PROMO.map(([id, re]) => { const m = s.match(re); return m ? { id, match: m[0].trim(), source: "radar-local" } : null; }).filter(Boolean) };
+}
+
+// A JSON pack { version, templates: [{ id, pattern, flags?, source? }] } -> a provider. Patterns
+// that do not compile are skipped and listed, never thrown, so one bad entry cannot stop the lens.
+function providerFromPack(pack) {
+  const bad = [], list = [];
+  for (const t of (pack && pack.templates) || []) {
+    try { list.push([String(t.id), new RegExp(t.pattern, String(t.flags || "i").replace(/[^imsu]/g, "")), String(t.source || "articulate")]); } catch (e) { bad.push(t && t.id); }
+  }
+  const fn = (text) => { const s = String(text || ""); return { cues: list.map(([id, re, source]) => { const m = s.match(re); return m ? { id, match: m[0].trim(), source } : null; }).filter(Boolean) }; };
+  fn.skipped = bad;
+  return fn;
+}
+
+let provider = null;
+function setPromoTemplateProvider(fn) { provider = typeof fn === "function" ? fn : null; }
+function promoCues(text) {
+  if (provider) {
+    try { return provider(text).cues || []; } catch (e) { console.error("[radar] promo-template provider failed; using the local list", e); }
+  }
+  return localProvider(text).cues;
+}
+
+// Articulate's campaign detectors (HarperZ9/articulate PR #40, `articulate campaign FILE --platform x
+// --json`, report format articulate-campaign-report/1, first in the release after 0.12.0). Articulate
+// is Python and does not run in the browser, so the route is by file, on the user's machine:
+// articulateInput() writes the input list (texts only, no handles), Articulate writes the report,
+// and providerFromReport() turns it into a promo-template provider. Without a report, LOCAL_PROMO runs.
+const ARTICULATE_REPORT_FORMAT = "articulate-campaign-report/1";
+
+// quotes: [{ id, text }], bios: [string] -> the schema's input list.
+function articulateInput({ quotes = [], bios = [] } = {}, platform = "x") {
+  return [
+    ...quotes.filter((q) => q && q.text).map((q) => ({ id: `q:${q.id}`, text: String(q.text), kind: "post", platform })),
+    ...bios.filter(Boolean).map((b, i) => ({ id: `b:${i}`, text: String(b), kind: "bio", platform })),
+  ];
+}
+
+// report: the parsed Articulate report; input: the list it was run on. Returns a provider keyed by
+// exact text, with .personaTemplates (bio items Articulate scored as templates) and .clusters, or
+// throws on a report of another format so a mismatch is never read silently.
+function providerFromReport(report, input) {
+  if (!report || report.format !== ARTICULATE_REPORT_FORMAT) throw new Error(`expected ${ARTICULATE_REPORT_FORMAT}, got ${report && report.format}`);
+  const textOf = new Map((input || []).map((x) => [String(x.id), x.text]));
+  const byText = new Map();
+  for (const it of report.items || []) {
+    const t = textOf.get(String(it.id));
+    if (t == null) continue;
+    const cues = (it.findings || []).filter((f) => f.category === "promo").map((f) => ({ id: f.rule_id || f.label, match: f.match, source: "articulate", tier: f.tier }));
+    byText.set(t, cues);
+  }
+  const fn = (text) => ({ cues: byText.get(String(text)) || localProvider(text).cues });
+  fn.personaTemplates = (report.items || []).filter((it) => it.kind === "bio" && it.template).length;
+  fn.clusters = (report.clusters || []).map((c) => ({ size: c.size, kind: c.kind, skeleton: c.skeleton }));
+  fn.doesNotProve = report.does_not_prove || null;
+  return fn;
+}
+
+return { skeleton, skeletonShingles, jaccardSets, TEMPLATE_JACCARD, templateGroups, PERSONA_CUES, PERSONA_MIN_FAMILIES, personaCues, CAMPAIGN_TOPICS, topicsOf, LOCAL_PROMO, localProvider, providerFromPack, setPromoTemplateProvider, promoCues, ARTICULATE_REPORT_FORMAT, articulateInput, providerFromReport };
+})();
+
+// ---- campaign-shape.js
+const M_campaign_shape = (() => {
+// Engagement shape for the launch campaign lens (project-docs/CAMPAIGN-LENS.md, signal 1): the
+// ratios between a post's reposts, likes, replies, bookmarks and views, and where the post sits
+// against three references: the author's own posts, a stratified platform baseline, and a
+// labelled historical reference. It shows a position, never a verdict.
+
+const { CAMPAIGN_BASELINES } = M_campaign_baselines_data;
+
+const SHAPE_MIN_INTERACTIONS = 20, OWN_MIN_POSTS = 5, OWN_OUTLIER_FACTOR = 5, STRATUM_MIN = 200;
+const SHAPE_DOES_NOT_PROVE = "A post can travel through repost-heavy communities (news, giveaways, art shares), and a launch is unusual for an account by nature. A ratio describes how the engagement is shaped, not who made it.";
+
+const num = (v) => (Number.isFinite(v) && v >= 0 ? v : null);
+const ratio = (a, b) => (a != null && b != null && b > 0 ? a / b : null);
+
+// counts: { reposts, likes, replies, quotes, bookmarks, views } -> ratios (null where unknown).
+function shapeOf(counts) {
+  const c = Object.fromEntries(["reposts", "likes", "replies", "quotes", "bookmarks", "views"].map((k) => [k, num((counts || {})[k])]));
+  const interactions = (c.reposts || 0) + (c.likes || 0) + (c.replies || 0) + (c.quotes || 0);
+  return {
+    counts: c, interactions,
+    repostsPerLike: c.likes === 0 && c.reposts > 0 ? Infinity : ratio(c.reposts, c.likes),
+    repliesPerLike: ratio(c.replies, c.likes),
+    bookmarksPerLike: ratio(c.bookmarks, c.likes),
+    likesPerThousandViews: c.views ? ratio(c.likes, c.views / 1000) : null,
+    repostsPerThousandViews: c.views ? ratio(c.reposts, c.views / 1000) : null,
+  };
+}
+
+const median = (xs) => { const s = [...xs].sort((a, b) => a - b); return s.length ? (s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2) : null; };
+
+// The author's own other posts (counts only) as the reference. Only posts with enough interactions
+// to make a ratio stable count. Returns { n, median, max, outlier, factor } or { n, insufficient }.
+function ownBaseline(post, others) {
+  const me = shapeOf(post).repostsPerLike;
+  const refs = (others || []).map((o) => shapeOf(o)).filter((s) => s.interactions >= SHAPE_MIN_INTERACTIONS && Number.isFinite(s.repostsPerLike)).map((s) => s.repostsPerLike);
+  if (refs.length < OWN_MIN_POSTS || me == null) return { n: refs.length, insufficient: true };
+  const med = median(refs), max = Math.max(...refs);
+  const factor = med > 0 ? me / med : me > 0 ? Infinity : 1;
+  return { n: refs.length, median: med, max, value: me, factor, outlier: me > max && factor >= OWN_OUTLIER_FACTOR };
+}
+
+// Audience stratum by follower count. Strata are per platform (no shared thresholds).
+function stratumOf(platform, followers) {
+  const def = CAMPAIGN_BASELINES[platform];
+  if (!def || !Number.isFinite(followers)) return null;
+  return def.strata.find((s) => followers >= s.min && followers < s.max) || null;
+}
+
+// Where a value sits in a quantile table { q05, q25, q50, q75, q95, q99 } -> a phrase key.
+function position(value, q) {
+  if (value == null || !q) return null;
+  if (value > q.q99) return "above the 99th percentile";
+  if (value > q.q95) return "between the 95th and 99th percentiles";
+  if (value > q.q75) return "between the 75th and 95th percentiles";
+  if (value >= q.q25) return "in the middle half";
+  if (value >= q.q05) return "between the 5th and 25th percentiles";
+  return "below the 5th percentile";
+}
+
+// The full engagement-shape reading for one post on one platform.
+// post: counts plus { followers? }; others: the author's other posts (counts) seen on this device.
+function engagementShape(platform, post, others) {
+  const shape = shapeOf(post);
+  if (shape.interactions < SHAPE_MIN_INTERACTIONS) return { platform, shape, tooFew: true };
+  const own = ownBaseline(post, others);
+  const def = CAMPAIGN_BASELINES[platform] || null;
+  const st = stratumOf(platform, post && post.followers);
+  const current = st && st.current && st.current.n >= STRATUM_MIN ? { ...st.current, position: position(shape.repostsPerLike, st.current.repostsPerLike) } : null;
+  const historical = def && def.historical ? (() => {
+    const h = def.historical.strata.find((s) => Number.isFinite(post && post.followers) && post.followers >= s.min && post.followers < s.max) || null;
+    return h ? { source: def.historical.source, label: h.label, n: h.n, q: h.repostsPerLike, position: position(shape.repostsPerLike, h.repostsPerLike) } : { source: def.historical.source, noStratum: true };
+  })() : null;
+  return { platform, shape, own, current, currentInsufficient: !current, stratum: st ? st.label : null, historical, outlier: !!own.outlier };
+}
+
+return { SHAPE_MIN_INTERACTIONS, SHAPE_DOES_NOT_PROVE, shapeOf, ownBaseline, stratumOf, position, engagementShape };
+})();
+
+// ---- campaign-sample.js
+const M_campaign_sample = (() => {
+// Reposter and replier sample analysis for the launch campaign lens (project-docs/CAMPAIGN-LENS.md,
+// signal 2). Input is the accounts the viewer's page loaded (repost list, quote list, replies), as
+// the platform disclosed them. Output is counts and shares about the sample, never a per-account
+// verdict and never a list of handles.
+//
+// Banned features: language, script, place, name origin and avatar appearance are never read.
+// `bio` is used only through skeletons, cue phrases and topic families (src/core/campaign-text.js).
+
+const { templateGroups, personaCues, PERSONA_MIN_FAMILIES, topicsOf } = M_campaign_text;
+
+const SAMPLE_MIN = 12;
+const PERSONA_SHARE = 0.25, JOIN_WINDOW_DAYS = 14, JOIN_MIN = 5, JOIN_SHARE = 0.3, MISMATCH_SHARE = 0.4, MISMATCH_MIN = 4;
+const SAMPLE_DOES_NOT_PROVE = {
+  "bio-template": "Friends, colleagues and fan accounts copy each other's bios, and some sites suggest bio wording.",
+  "stock-persona": "Real people write short, list-like bios, and these phrases are common.",
+  "join-cluster": "Accounts join in waves after news, an event or a platform change.",
+  "topic-mismatch": "People follow and reshare outside their own interests, and a bio says little about what someone reads.",
+  "random-suffix": "Many people choose a handle with numbers and letters for privacy or safety. This is context only.",
+  "default-avatar": "Many real people never upload a picture. This is context only.",
+};
+
+// A handle ending in a digit-and-letter tail ("_x5", "8t9", "c8s", "38"). Context only.
+function randomSuffix(handle) {
+  const h = String(handle || "").toLowerCase();
+  const tail = (h.match(/[a-z0-9]{3,6}$/) || [""])[0];
+  const digits = (tail.match(/\d/g) || []).length;
+  const switches = (tail.match(/(?<=\d)[a-z]|(?<=[a-z])\d/g) || []).length;
+  return /\d{2,}$/.test(h) || (digits >= 1 && switches >= 2) || /_[a-z0-9]{1,3}_?[a-z]?\d/.test(h);
+}
+
+const dayOf = (iso) => { const t = Date.parse(iso); return Number.isFinite(t) ? Math.floor(t / 86400000) : null; };
+
+// The densest JOIN_WINDOW_DAYS window of join dates: { n, of, from, to }.
+function joinCluster(dates) {
+  const d = dates.map(dayOf).filter((x) => x != null).sort((a, b) => a - b);
+  let best = { n: 0, of: d.length, from: null, to: null };
+  for (let i = 0, j = 0; i < d.length; i++) {
+    while (d[i] - d[j] > JOIN_WINDOW_DAYS) j++;
+    if (i - j + 1 > best.n) best = { n: i - j + 1, of: d.length, from: new Date(d[j] * 86400000).toISOString().slice(0, 10), to: new Date(d[i] * 86400000).toISOString().slice(0, 10) };
+  }
+  return best;
+}
+
+// accounts: [{ handle, bio?, joinDate?, defaultAvatar? }]; postText: the launch post's text.
+// Returns { n, enough, indicators: [{ id, ... }], context: [{ id, ... }] }.
+function sampleSigns(accounts, postText) {
+  const seen = new Map();
+  for (const a of accounts || []) { const k = String(a.handle || "").toLowerCase(); if (k && !seen.has(k)) seen.set(k, a); }
+  const xs = [...seen.values()], n = xs.length;
+  if (n < SAMPLE_MIN) return { n, enough: false, indicators: [], context: [] };
+  const indicators = [], context = [];
+  const bios = xs.filter((a) => a.bio && String(a.bio).trim());
+
+  const groups = templateGroups(bios.map((a, i) => ({ id: i, text: a.bio })));
+  const inGroups = groups.reduce((s, g) => s + g.size, 0);
+  if (groups.length) indicators.push({ id: "bio-template", groups: groups.length, largest: groups[0].size, accounts: inGroups, of: bios.length });
+
+  const persona = bios.filter((a) => personaCues(a.bio).length >= PERSONA_MIN_FAMILIES).length;
+  if (bios.length && persona >= 3 && persona / n >= PERSONA_SHARE) indicators.push({ id: "stock-persona", n: persona, of: n, share: persona / n });
+
+  const jc = joinCluster(xs.map((a) => a.joinDate).filter(Boolean));
+  if (jc.n >= JOIN_MIN && jc.of && jc.n / jc.of >= JOIN_SHARE) indicators.push({ id: "join-cluster", ...jc, share: jc.n / jc.of });
+
+  const postTopics = new Set(topicsOf(postText));
+  const withTopic = bios.map((a) => topicsOf(a.bio)).filter((t) => t.length);
+  const off = withTopic.filter((t) => !t.some((x) => postTopics.has(x)));
+  if (off.length >= MISMATCH_MIN && off.length / withTopic.length >= MISMATCH_SHARE) {
+    const fam = {};
+    for (const t of off) for (const x of t) fam[x] = (fam[x] || 0) + 1;
+    indicators.push({ id: "topic-mismatch", n: off.length, of: withTopic.length, share: off.length / withTopic.length, families: Object.entries(fam).sort((a, b) => b[1] - a[1]).map(([k]) => k), postTopics: [...postTopics] });
+  }
+
+  const suffix = xs.filter((a) => randomSuffix(a.handle)).length;
+  if (suffix) context.push({ id: "random-suffix", n: suffix, of: n });
+  const avatars = xs.filter((a) => a.defaultAvatar === true).length;
+  if (avatars) context.push({ id: "default-avatar", n: avatars, of: n });
+  return { n, enough: true, bios: bios.length, indicators, context };
+}
+
+return { SAMPLE_MIN, PERSONA_SHARE, SAMPLE_DOES_NOT_PROVE, randomSuffix, joinCluster, sampleSigns };
+})();
+
+// ---- campaign-quotes.js
+const M_campaign_quotes = (() => {
+// The quote cluster for the launch campaign lens (project-docs/CAMPAIGN-LENS.md, signal 3): quote
+// posts of a launch split by X's "Paid partnership" label, how tightly they bunch in time, and how
+// much wording they share. Disclosed paid partnerships are context: disclosure is the honest path.
+// Unlabelled quotes that share a template with labelled ones, or form their own template group
+// inside a short window, are the indicator ("undisclosed look-alikes").
+
+const { templateGroups, promoCues } = M_campaign_text;
+const { ownWords } = M_similarity;
+
+const BUNCH_K = 5, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
+const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour because it is news, and common phrases spread by imitation. A shared opener does not show payment, and a missing label does not show that anyone hid one.";
+
+const at = (q) => Date.parse(q.posted);
+
+// The narrowest window holding k quotes, and the busiest hour: { kWindowMs, k, hourMax }.
+function bunching(quotes, k = BUNCH_K) {
+  const t = quotes.map(at).filter(Number.isFinite).sort((a, b) => a - b);
+  let kWindowMs = null, hourMax = 0;
+  for (let i = 0, j = 0; i < t.length; i++) {
+    if (i >= k - 1) { const w = t[i] - t[i - k + 1]; if (kWindowMs == null || w < kWindowMs) kWindowMs = w; }
+    while (t[i] - t[j] > 3600000) j++;
+    hourMax = Math.max(hourMax, i - j + 1);
+  }
+  return { k, kWindowMs, hourMax, n: t.length };
+}
+
+// quotes: [{ id, author, text, posted, paidPartnership }]. Returns
+// { n, disclosed, undisclosed, bunch, groups: [{ size, disclosed, undisclosed, spanMs }], lookalikes, cues }.
+function quoteCluster(quotes) {
+  const qs = (quotes || []).filter((q) => q && q.id);
+  const own = qs.map((q) => ({ id: q.id, text: ownWords(q.text || "") || q.text || "" }));
+  const byId = new Map(qs.map((q) => [q.id, q]));
+  const groups = templateGroups(own, { min: 2, jaccard: QUOTE_TEMPLATE_JACCARD }).map((g) => {
+    const members = g.ids.map((id) => byId.get(id)), times = members.map(at).filter(Number.isFinite);
+    const disclosed = members.filter((m) => m.paidPartnership).length;
+    return { size: g.size, disclosed, undisclosed: g.size - disclosed, spanMs: times.length > 1 ? Math.max(...times) - Math.min(...times) : 0, ids: g.ids };
+  });
+  // Shared promo cues count as a template too: the same cue id across several quotes.
+  const cueIds = {};
+  for (const q of qs) for (const c of promoCues(q.text)) (cueIds[c.id] = cueIds[c.id] || { id: c.id, source: c.source, ids: [] }).ids.push(q.id);
+  for (const c of Object.values(cueIds)) {
+    if (c.ids.length < 2 || groups.some((g) => c.ids.every((id) => g.ids.includes(id)))) continue;
+    const members = c.ids.map((id) => byId.get(id)), times = members.map(at).filter(Number.isFinite);
+    const disclosed = members.filter((m) => m.paidPartnership).length;
+    groups.push({ size: c.ids.length, disclosed, undisclosed: c.ids.length - disclosed, spanMs: times.length > 1 ? Math.max(...times) - Math.min(...times) : 0, ids: c.ids, cue: c.id, source: c.source });
+  }
+  const look = new Set();
+  for (const g of groups) {
+    const und = g.ids.filter((id) => !byId.get(id).paidPartnership);
+    if (g.disclosed && und.length) und.forEach((id) => look.add(id));
+    else if (!g.disclosed && und.length >= LOOKALIKE_MIN && g.spanMs <= LOOKALIKE_WINDOW_MS) und.forEach((id) => look.add(id));
+  }
+  return {
+    n: qs.length,
+    disclosed: qs.filter((q) => q.paidPartnership).length,
+    undisclosed: qs.filter((q) => !q.paidPartnership).length,
+    bunch: bunching(qs),
+    groups: groups.map(({ ids, ...g }) => g).sort((a, b) => b.size - a.size),
+    lookalikes: look.size,
+    cues: Object.values(cueIds).filter((c) => c.ids.length >= 2).map((c) => ({ id: c.id, source: c.source, n: c.ids.length })),
+  };
+}
+
+return { BUNCH_K, QUOTES_DOES_NOT_PROVE, bunching, quoteCluster };
+})();
+
+// ---- campaign-overlap.js
+const M_campaign_overlap = (() => {
+// Cross-launch overlap for the launch campaign lens (project-docs/CAMPAIGN-LENS.md, signal 4): how
+// many accounts sampled on this launch were already seen amplifying other launches the viewer
+// opened. Pure functions over a store the extension keeps in chrome.storage.local only.
+//
+// Accounts are stored as salted hashes, never as handles. The salt is made on the device and never
+// exported, so the store cannot be read back as a list of accounts, and two users' stores cannot be
+// joined. The viewer can wipe it at any time ("Forget launches I viewed").
+
+const OVERLAP_KEY = "pb.campaign.v1", OVERLAP_RETAIN_DAYS = 30, OVERLAP_MAX_LAUNCHES = 200, OVERLAP_MAX_ACCOUNTS = 500;
+const OVERLAP_OTHER_MIN = 2, OVERLAP_MIN = 5, OVERLAP_SHARE = 0.2;
+const OVERLAP_DOES_NOT_PROVE = "Fans of a field, employees and investors reshare each other's launches. Overlap says these launches drew some of the same accounts, not why.";
+const DAY = 86400000;
+
+// FNV-1a over salt + handle, as a short hex string. Not cryptographic; its job is to keep handles
+// out of storage on this device, not to resist someone holding the salt.
+function hashHandle(salt, handle) {
+  const s = String(salt) + "|" + String(handle || "").toLowerCase();
+  let h1 = 0x811c9dc5, h2 = 0x01000193;
+  for (let i = 0; i < s.length; i++) { h1 = Math.imul(h1 ^ s.charCodeAt(i), 16777619) >>> 0; h2 = Math.imul(h2 ^ s.charCodeAt(i), 2246822519) >>> 0; }
+  return h1.toString(16).padStart(8, "0") + h2.toString(16).padStart(8, "0");
+}
+
+function emptyStore(salt) { return { v: 1, salt, launches: {} }; }
+
+// Records the sampled accounts of one launch (by post id). Returns a new store.
+function recordLaunch(store, launchId, handles, now = Date.now()) {
+  const S = { ...store, launches: { ...(store.launches || {}) } };
+  const prev = S.launches[launchId] || { seen: now, a: [] };
+  const set = new Set(prev.a);
+  for (const h of handles || []) if (set.size < OVERLAP_MAX_ACCOUNTS) set.add(hashHandle(S.salt, h));
+  S.launches[launchId] = { seen: now, a: [...set] };
+  return pruneLaunches(S, now);
+}
+
+function pruneLaunches(store, now = Date.now()) {
+  const keep = Object.entries(store.launches || {}).filter(([, l]) => now - l.seen <= OVERLAP_RETAIN_DAYS * DAY).sort((a, b) => b[1].seen - a[1].seen).slice(0, OVERLAP_MAX_LAUNCHES);
+  return { ...store, launches: Object.fromEntries(keep) };
+}
+
+// For this launch's sample: { n, repeat, share, launches } where repeat counts sampled accounts seen
+// on OVERLAP_OTHER_MIN or more other launches, and launches is how many other launches are stored.
+function overlapOf(store, launchId, handles) {
+  const others = Object.entries((store && store.launches) || {}).filter(([id]) => id !== launchId).map(([, l]) => new Set(l.a));
+  const hs = [...new Set((handles || []).map((h) => hashHandle(store.salt, h)))];
+  let repeat = 0;
+  for (const h of hs) if (others.filter((s) => s.has(h)).length >= OVERLAP_OTHER_MIN) repeat++;
+  return { n: hs.length, repeat, share: hs.length ? repeat / hs.length : 0, launches: others.length, indicator: repeat >= OVERLAP_MIN && hs.length && repeat / hs.length >= OVERLAP_SHARE };
+}
+
+return { OVERLAP_KEY, OVERLAP_OTHER_MIN, OVERLAP_DOES_NOT_PROVE, hashHandle, emptyStore, recordLaunch, pruneLaunches, overlapOf };
+})();
+
+// ---- campaign-platforms.js
+const M_campaign_platforms = (() => {
+// One launch-campaign definition per platform (project-docs/CAMPAIGN-LENS.md, "Platforms"). The
+// author's requirement (2026-10-22): campaigns look and behave differently on different platforms
+// and in different communities, so no threshold is shared between platforms. A platform without a
+// definition gets "not defined for this site yet", never X's rules.
+
+const CAMPAIGN_PLATFORMS = {
+  x: {
+    status: "built",
+    shapeCounts: ["reposts", "likes", "replies", "quotes", "bookmarks", "views"],
+    sampleFrom: ["repost list", "quote list", "replies"],
+    signs: ["shape-outlier-own", "bio-template", "stock-persona", "join-cluster", "topic-mismatch", "undisclosed-lookalike", "cross-launch"],
+    disclosure: "Paid partnership",
+    notes: "X shows repost lists, quote lists, join dates, bios and a Paid partnership label on quote posts.",
+  },
+  reddit: {
+    status: "definitions only",
+    shapeCounts: ["score", "comments", "upvoteRatio"],
+    sampleFrom: ["commenters"],
+    signs: ["join-cluster", "karma-for-age", "arrival-burst"],
+    notes: "Vote rings, karma farming, aged accounts bought for posting, and brigading from another community. Reddit fuzzes vote counts and shows no repost list. Thresholds are not set until labelled Reddit cases exist.",
+  },
+  instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, so no shape." },
+  tiktok: { status: "not defined", notes: "Not defined yet." },
+  linkedin: { status: "not defined", notes: "Engagement pods. Radar does not run on LinkedIn." },
+};
+
+function campaignPlatform(id) {
+  const p = CAMPAIGN_PLATFORMS[id];
+  return p && p.status === "built" ? p : null;
+}
+
+return { CAMPAIGN_PLATFORMS, campaignPlatform };
+})();
+
+// ---- campaign.js
+const M_campaign = (() => {
+// The launch campaign lens (project-docs/CAMPAIGN-LENS.md): combines the engagement shape, the
+// reposter and replier sample, the quote cluster and cross-launch overlap into a lead line and
+// evidence rows, each with what it does not prove.
+//
+// The lead names inauthenticity indicators only. Coordination on its own is neutral context:
+// fandoms, mutual aid, protest hashtags and diaspora communities coordinate in the open. Sampled
+// accounts are never named: no handle of theirs is ever returned, and the lens never says "bot".
+// The launch's own account is named only when the platform discloses it as an organisation.
+
+const { engagementShape, SHAPE_DOES_NOT_PROVE } = M_campaign_shape;
+const { sampleSigns, SAMPLE_DOES_NOT_PROVE, SAMPLE_MIN } = M_campaign_sample;
+const { quoteCluster, QUOTES_DOES_NOT_PROVE } = M_campaign_quotes;
+const { OVERLAP_DOES_NOT_PROVE } = M_campaign_overlap;
+const { campaignPlatform, CAMPAIGN_PLATFORMS } = M_campaign_platforms;
+
+const CAMPAIGN_DOES_NOT_PROVE = "These signs describe how this post's engagement looks in what your page loaded. They do not say who paid, whether the product is good, or that any one account is fake. Real people also write stock bios, join in waves and reshare launches.";
+const CAMPAIGN_LEADS = {
+  strong: "This engagement is consistent with purchased amplification, and here is why.",
+  one: "One sign of paid or fake-account amplification. One sign is weak evidence, so this is context, not an accusation.",
+  coordinated: "The engagement looks coordinated. Coordination alone is common and often organic.",
+  none: "No campaign signs in what this page loaded.",
+  thin: "Too few accounts loaded to read. Open the post's reposts or quotes to load more.",
+  undefined: "The campaign lens is not defined for this site yet.",
+};
+const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/radar/issues. Corrections are made in the open.";
+
+// The accusation ladder (project-docs/CAMPAIGN-LENS.md, "Accusation ladder"). Only an account the
+// platform itself discloses as an organisation (X's gold Business or grey Government checkmark, or
+// a Business professional profile) is ever named. Ordinary accounts are never named: they appear
+// only inside counts. The ladder never claims a crime.
+function actorOf(reading) {
+  const R = reading || {};
+  const org = R.verifiedType === "Business" || R.verifiedType === "Government" || R.professionalType === "Business";
+  return org && R.handle ? { handle: R.handle, kind: R.verifiedType === "Government" ? "official account" : "organisation" } : null;
+}
+
+// Ladder step 1 (documented fact) and step 2 (named inference), as lines above the evidence.
+function ladder(status, families, qc, actor) {
+  const who = actor ? `@${actor.handle}'s launch` : "this launch";
+  const out = [];
+  if (qc.disclosed) out.push({ step: 1, text: `Documented: ${qc.disclosed} quote post${qc.disclosed === 1 ? "" : "s"} promoting ${who} carry X's Paid partnership label, the posters' own disclosure.` });
+  if (status === "strong") {
+    out.push({ step: 2, text: `Inference: the engagement on ${who} is consistent with purchased amplification (${families.length} independent signs below).` });
+    if (families.includes("quotes")) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Quotes without the label share the paid quotes' template and timing.` });
+  }
+  return out;
+}
+
+// Indicator id -> independent family. bio-template and stock-persona both read bios, so they count once.
+const FAMILY = { "shape-outlier-own": "shape", "bio-template": "bios", "stock-persona": "bios", "join-cluster": "joins", "topic-mismatch": "topic", "undisclosed-lookalike": "quotes", "cross-launch": "overlap" };
+const pct = (x) => `${Math.round(x * 100)}%`;
+const r2 = (x) => (x === Infinity ? "no likes" : Math.round(x * 100) / 100);
+const mins = (ms) => (ms < 3600000 ? `${Math.max(1, Math.round(ms / 60000))} minutes` : `${Math.round(ms / 360000) / 10} hours`);
+
+function shapeRows(sh) {
+  if (!sh || sh.tooFew) return { ind: [], ctx: [] };
+  const v = sh.shape.repostsPerLike, ind = [], ctx = [];
+  const own = sh.own.insufficient ? `Not enough of this account's own posts seen on this device to compare (${sh.own.n} of 5).` : `This account's other posts: median ${r2(sh.own.median)} reposts per like, highest ${r2(sh.own.max)} (${sh.own.n} posts).`;
+  const line = `Reposts per like: ${r2(v)} (${sh.shape.counts.reposts} reposts, ${sh.shape.counts.likes} likes). ${own}`;
+  (sh.outlier ? ind : ctx).push({ id: sh.outlier ? "shape-outlier-own" : "shape", text: line, dnp: SHAPE_DOES_NOT_PROVE });
+  ctx.push({ id: "shape-baseline", text: sh.current ? `Against ${sh.current.n} ordinary posts in the ${sh.stratum} stratum: ${sh.current.position}.` : `Insufficient baseline for this platform today${sh.stratum ? ` (${sh.stratum})` : ""}: no labelled modern sample yet.`, dnp: "A baseline describes posts that were collected as ordinary; it is not a test." });
+  const h = sh.historical;
+  if (h && !h.noStratum) ctx.push({ id: "shape-historical", text: `Historical reference only: ${h.source}, ${h.label}: ${h.position} (median ${h.q.q50}, 95th percentile ${h.q.q95}).`, dnp: "Breaking news in 2014 and 2015 was reposted more than liked; today's platform and topics differ, so this line never counts as a sign." });
+  return { ind, ctx };
+}
+
+function sampleRows(s) {
+  if (!s || !s.enough) return { ind: [], ctx: [] };
+  const text = {
+    "bio-template": (x) => `${x.accounts} of ${x.of} bios fall into ${x.groups} shared template${x.groups === 1 ? "" : "s"} (largest ${x.largest}).`,
+    "stock-persona": (x) => `${x.n} of ${x.of} accounts (${pct(x.share)}) have stock-persona bios: age, passion, crypto slogan, pet or filler phrases together.`,
+    "join-cluster": (x) => `${x.n} of ${x.of} accounts with a join date joined within 14 days (${x.from} to ${x.to}).`,
+    "topic-mismatch": (x) => `${x.n} of ${x.of} bios with a clear topic are about ${x.families.slice(0, 2).join(" and ")}, which this post is not.`,
+    "random-suffix": (x) => `Context: ${x.n} of ${x.of} handles end in a number-and-letter tail. People choose these for privacy too; this never counts as a sign.`,
+    "default-avatar": (x) => `Context: ${x.n} of ${x.of} accounts use the default picture.`,
+  };
+  const row = (x) => ({ id: x.id, text: text[x.id](x), dnp: SAMPLE_DOES_NOT_PROVE[x.id] });
+  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Radar reads only what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
+}
+
+function quoteRows(q) {
+  if (!q || !q.n) return { ind: [], ctx: [] };
+  const ind = [], ctx = [];
+  if (q.lookalikes) ind.push({ id: "undisclosed-lookalike", text: `${q.lookalikes} quote${q.lookalikes === 1 ? "" : "s"} without a Paid partnership label share a template with labelled quotes or with each other inside two hours.`, dnp: QUOTES_DOES_NOT_PROVE });
+  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Radar cannot see who paid or how much." });
+  if (q.bunch.kWindowMs != null) ctx.push({ id: "quote-bunching", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
+  for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Radar's local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
+  return { ind, ctx };
+}
+
+function overlapRows(o) {
+  if (!o || !o.launches) return { ind: [], ctx: [] };
+  const row = { id: o.indicator ? "cross-launch" : "overlap", text: `${o.repeat} of ${o.n} sampled accounts were seen amplifying 2 or more of the ${o.launches} other launches you opened (stored on this device only).`, dnp: OVERLAP_DOES_NOT_PROVE };
+  return o.indicator ? { ind: [row], ctx: [] } : { ind: [], ctx: o.repeat ? [row] : [] };
+}
+
+// input: { platform, post: counts + { followers, text }, ownPosts, accounts, quotes, overlap, actor }
+// actor: actorOf(the launch author's reading), or null; only a disclosed organisation is named.
+function campaignLens(input) {
+  const def = campaignPlatform(input && input.platform);
+  if (!def) return { status: "undefined", lead: CAMPAIGN_LEADS.undefined, notes: (CAMPAIGN_PLATFORMS[input && input.platform] || {}).notes || null, indicators: [], context: [], dnp: CAMPAIGN_DOES_NOT_PROVE };
+  const sh = input.post ? engagementShape(input.platform, input.post, input.ownPosts) : null;
+  const sm = sampleSigns(input.accounts, input.post && input.post.text);
+  const qc = quoteCluster(input.quotes);
+  const parts = [shapeRows(sh), sampleRows(sm), quoteRows(qc), overlapRows(input.overlap)];
+  const indicators = parts.flatMap((p) => p.ind), context = parts.flatMap((p) => p.ctx);
+  const families = [...new Set(indicators.map((i) => FAMILY[i.id]))];
+  const coordinated = context.some((c) => ["quote-bunching", "overlap", "promo-cue", "disclosed-paid"].includes(c.id));
+  const thin = sm.n < SAMPLE_MIN && !qc.n;
+  const status = families.length >= 2 ? "strong" : families.length === 1 ? "one" : thin ? "thin" : coordinated ? "coordinated" : "none";
+  const claims = ladder(status, families, qc, input.actor || null);
+  return { status, lead: CAMPAIGN_LEADS[status], claims, families, indicators, context, sample: sm.n, quotes: qc.n, dnp: CAMPAIGN_DOES_NOT_PROVE, dispute: CAMPAIGN_DISPUTE };
+}
+
+return { CAMPAIGN_DOES_NOT_PROVE, CAMPAIGN_LEADS, CAMPAIGN_DISPUTE, actorOf, campaignLens };
 })();
 
 // ---- chain.js
@@ -5288,10 +6269,41 @@ function verify(index, row, post) {
   return { claim: row.claim, rating: row.rating, checker: row.checker, url: row.url, date: row.date, lang: row.lang, coverage: Math.round(coverage * 100) / 100, shared: shared.length, negationDiffers: row.neg !== post.neg };
 }
 
+// Text read from an image (src/ocr) can carry one wrong letter in a word: "Venezucla", "150o".
+// With fuzzy on, a word of four or more characters that no claim uses is replaced by the one claim
+// word one edit away, when exactly one exists. The index of one-letter deletions is built on first use.
+function deletions(w) { const out = [w]; for (let i = 0; i < w.length; i++) out.push(w.slice(0, i) + w.slice(i + 1)); return out; }
+function nearToken(index, tok) {
+  if (tok.length < 4 || index.postings.has(tok)) return tok;
+  if (!index.dels) {
+    index.dels = new Map();
+    for (const k of index.postings.keys()) if (k.length >= 4) for (const d of deletions(k)) { const s = index.dels.get(d); if (!s) index.dels.set(d, [k]); else if (!s.includes(k)) s.push(k); }
+  }
+  const found = new Set();
+  for (const d of deletions(tok)) for (const k of index.dels.get(d) || []) if (oneEdit(tok, k)) found.add(k);
+  return found.size === 1 ? [...found][0] : tok;
+}
+function oneEdit(a, b) {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, diff = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++diff > 1) return false;
+    if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+  }
+  return diff + (a.length - i) + (b.length - j) <= 1;
+}
+
 // The best matches for one post, at most `max`, one per fact-check URL, closest first.
-function matchClaims(index, text, { max = 3 } = {}) {
+function matchClaims(index, text, { max = 3, fuzzy = false } = {}) {
   if (!index || !index.n || !text) return [];
   const t = claimTokens(text);
+  if (fuzzy) {
+    const near = new Map(t.tokens.map((k) => [k, nearToken(index, k)]));
+    t.tokens = t.tokens.map((k) => near.get(k));
+    t.named = new Set([...t.named].map((k) => near.get(k) || k));
+    t.numbers = new Set([...t.numbers].map((k) => near.get(k) || k));
+  }
   const post = { seq: t.tokens, have: new Set(t.tokens), pairs: pairs(t.tokens), neg: hasNegation(text) };
   if (post.have.size < MIN_SHARED) return [];
   const maxDf = Math.max(50, index.n * 0.05), hits = new Map();
@@ -5327,7 +6339,7 @@ function claimCard(m) {
   return { label: CLAIM_LABEL, rows };
 }
 
-return { MIN_CLAIM_TOKENS, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION, claimTokens, hasNegation, guessLanguage, buildClaimIndex, matchClaims, claimCard };
+return { MIN_CLAIM_TOKENS, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION, claimTokens, hasNegation, guessLanguage, buildClaimIndex, nearToken, matchClaims, claimCard };
 })();
 
 // ---- cbor.js
@@ -6385,16 +7397,18 @@ const M_feed = (() => {
 const { wilson } = M_report;
 const { shownTechniques } = M_persuasion;
 const { coGraph } = M_graph;
+const { framingShown, framingStatus } = M_framing;
 
 const FEED_RETAIN_DAYS = 60, FEED_MAX_IDS = 3000;
 const DAY = 86400000;
 const dayOf = (t) => new Date(t).toISOString().slice(0, 10);
 
-// posts: [{ id, domains, strong, note, claims, techniques }]. Log: { "site|day": entry }.
+// posts: [{ id, domains, strong, note, claims, techniques, frame }]. frame: "person-story",
+// "structural", "mixed", "none" (long enough, neither) or absent (too short). Log: { "site|day": entry }.
 function addFeedPosts(log, site, posts, now = Date.now()) {
   const L = { ...(log || {}) };
   const key = `${site}|${dayOf(now)}`;
-  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {} };
+  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques }, frames: { ...(L[key].frames || {}) } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {}, frames: {} };
   const have = new Set(e.ids);
   for (const p of posts) {
     if (!p || !p.id || have.has(p.id) || e.ids.length >= FEED_MAX_IDS) continue;
@@ -6405,6 +7419,7 @@ function addFeedPosts(log, site, posts, now = Date.now()) {
     if (p.claims) e.claims++;
     for (const d of new Set(p.domains || [])) e.links[d] = (e.links[d] || 0) + 1;
     for (const t of new Set(p.techniques || [])) e.techniques[t] = (e.techniques[t] || 0) + 1;
+    if (p.frame) e.frames[p.frame] = (e.frames[p.frame] || 0) + 1;
   }
   e.at = now;
   L[key] = e;
@@ -6431,12 +7446,12 @@ const add = (m, k, n) => m.set(k, (m.get(k) || 0) + n);
 
 // reports: history snapshots; feedLog: addFeedPosts log; net: connections log.
 // opts: { days, now, isState(domain), shown: technique ids the window may show }.
-function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isState = () => false, shown = shownTechniques() } = {}) {
+function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isState = () => false, shown = shownTechniques(), framingRow } = {}) {
   const since = now - days * DAY;
   const snaps = Object.values(reports || {}).filter((s) => s && s.at >= since);
   const feeds = Object.values(feedLog || {}).filter((f) => f && f.at >= since);
   const T = { strongK: 0, strongN: 0, ctxK: { notes: 0, claims: 0 }, ctxN: 0, looked: 0, flagged: 0 };
-  const sites = new Map(), tech = new Map(), daily = dailyFrame(days, now);
+  const sites = new Map(), tech = new Map(), frames = new Map(), daily = dailyFrame(days, now);
   for (const s of snaps) {
     T.looked += s.lookedUp || 0; T.flagged += s.flaggedK || 0;
     if (s.strong != null) { T.strongK += s.strong; T.strongN += s.replies || 0; }
@@ -6451,6 +7466,7 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
     T.strongK += f.strong; T.strongN += f.posts; T.ctxN += f.posts; T.ctxK.notes += f.notes; T.ctxK.claims += f.claims;
     for (const [d, n] of Object.entries(f.links || {})) add(sites, d, n);
     for (const [t, n] of Object.entries(f.techniques || {})) add(tech, t, n);
+    for (const [t, n] of Object.entries(f.frames || {})) add(frames, t, n);
     dayAdd(daily, f.at, { posts: f.posts, strong: f.strong, strongN: f.posts, feedPosts: f.posts });
   }
   const mentions = [...sites.values()].reduce((a, b) => a + b, 0);
@@ -6465,9 +7481,21 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
     flagged: share(T.flagged, T.looked),
     notes: count(T.ctxK.notes, T.ctxN), claims: count(T.ctxK.claims, T.ctxN),
     techniques: { shown: [...shown], counts: [...tech].filter(([t]) => shown.includes(t)).map(([id, n]) => ({ id, n })).sort((a, b) => b.n - a.n) },
+    framing: framingBalance(frames, framingRow),
     together: coGraph(net, { min: 3, since, maxNodes: 40 }).edges.slice(0, 10),
     daily: [...daily.values()],
   };
+}
+
+// The episodic and thematic balance: of feed posts long enough to read, the share told only through
+// a person's story and the share explained only through structure (trends, numbers, policy), each
+// with its Wilson interval. Held back, with its reason and no counts, until the person-story reading
+// clears its measurement (src/core/framing.js).
+function framingBalance(frames, row) {
+  const status = row === undefined ? framingStatus() : framingStatus(row);
+  if (!(row === undefined ? framingShown() : framingShown(row))) return { shown: false, status: status.text };
+  const g = (k) => frames.get(k) || 0, n = g("person-story") + g("structural") + g("mixed") + g("none");
+  return { shown: true, status: status.text, read: n, personStory: share(g("person-story"), n), structural: share(g("structural"), n), mixed: share(g("mixed"), n) };
 }
 
 function dailyFrame(days, now) {
@@ -6486,6 +7514,77 @@ const FEED_DOES_NOT_SHOW = "What this does not show: what your feed would carry 
 return { FEED_RETAIN_DAYS, addFeedPosts, threadContext, feedDashboard, FEED_DOES_NOT_SHOW };
 })();
 
+// ---- sig.js
+const M_sig = (() => {
+// The one copy of Radar's hashing and signing primitives, shared by sealed evidence cards
+// (evidence.js), signed evidence bundles (evidence-bundle.js) and signed data packs (packs.js).
+// WebCrypto only, so the same code runs in Chrome, Firefox and node with no dependency.
+//   canonicalJSON: sorted keys at every level, no spacing, undefined object fields dropped and
+//     undefined array items written as null, so the same content always gives the same bytes.
+//   ECDSA P-256 with SHA-256; signatures in IEEE P1363 form (r || s), base64url, as WebCrypto
+//     produces them.
+
+const P256 = { name: "ECDSA", namedCurve: "P-256" };
+const P256_SHA256 = { name: "ECDSA", hash: "SHA-256" };
+const subtle = () => globalThis.crypto.subtle;
+const utf8 = (s) => new TextEncoder().encode(s);
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+
+function canonicalJSON(v) {
+  if (Array.isArray(v)) return "[" + v.map(canonicalJSON).join(",") + "]";
+  if (v && typeof v === "object") return "{" + Object.keys(v).filter((k) => v[k] !== undefined).sort().map((k) => JSON.stringify(k) + ":" + canonicalJSON(v[k])).join(",") + "}";
+  return JSON.stringify(v === undefined ? null : v);
+}
+
+async function sha256Hex(data) { return hex(await subtle().digest("SHA-256", typeof data === "string" ? utf8(data) : data)); }
+
+// File bytes with CRLF line ends turned to LF, so a Windows checkout and a Linux one hash a text
+// table the same. Bytes without a CR come back unchanged.
+function lfBytes(bytes) {
+  const u = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (!u.includes(13)) return u;
+  const out = new Uint8Array(u.length);
+  let n = 0;
+  for (let i = 0; i < u.length; i++) if (!(u[i] === 13 && u[i + 1] === 10)) out[n++] = u[i];
+  return out.subarray(0, n);
+}
+
+function b64url(bytes) {
+  let s = "";
+  for (const b of new Uint8Array(bytes)) s += String.fromCharCode(b);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function fromB64url(text) {
+  const s = atob(String(text).replace(/-/g, "+").replace(/_/g, "/") + "===".slice((String(text).length + 3) % 4));
+  return Uint8Array.from(s, (c) => c.charCodeAt(0));
+}
+
+// Only the public parts of a P-256 key. A key that carries "d" is a private key and is refused.
+function publicJwk(jwk) {
+  if (!jwk || jwk.kty !== "EC" || jwk.crv !== "P-256" || typeof jwk.x !== "string" || typeof jwk.y !== "string") throw new Error("not a P-256 public key");
+  if ("d" in jwk) throw new Error("this is a private key; share only the public key");
+  return { kty: "EC", crv: "P-256", x: jwk.x, y: jwk.y };
+}
+// A key id: the first `length` hex characters of the SHA-256 of the public key's canonical JWK.
+const jwkId = async (jwk, length) => (await sha256Hex(canonicalJSON(publicJwk(jwk)))).slice(0, length);
+
+// Signs text with a CryptoKey (or a private JWK); returns a base64url P1363 signature.
+async function signText(key, text) {
+  const k = key && key.type === "private" ? key : await subtle().importKey("jwk", key, P256, false, ["sign"]);
+  return b64url(await subtle().sign(P256_SHA256, k, utf8(text)));
+}
+
+// True when sig (base64url) is a valid signature of text by the public JWK; never throws.
+async function verifyText(jwk, sig, text) {
+  try {
+    const key = await subtle().importKey("jwk", { ...publicJwk(jwk), ext: true }, P256, true, ["verify"]);
+    return await subtle().verify(P256_SHA256, key, fromB64url(sig), utf8(text));
+  } catch { return false; }
+}
+
+return { P256, P256_SHA256, canonicalJSON, sha256Hex, lfBytes, b64url, fromB64url, publicJwk, jwkId, signText, verifyText };
+})();
+
 // ---- evidence.js
 const M_evidence = (() => {
 // Evidence cards: one thread, as one viewer saw it, in a form to save or share. A card carries the
@@ -6497,6 +7596,7 @@ const M_evidence = (() => {
 // thread with fewer than MIN_CARD_ACCOUNTS distinct reply accounts.
 
 const { REPORT_DOES_NOT_PROVE } = M_report;
+const { canonicalJSON, sha256Hex } = M_sig;
 const { CLAIM_ATTRIBUTION, CLAIM_DOES_NOT_PROVE } = M_claims;
 const { credentialState } = M_c2pa;
 const { CREDENTIALS_DO_NOT_PROVE } = M_mediacheck;
@@ -6583,17 +7683,8 @@ function limitsOf(card) {
   ].filter(Boolean);
 }
 
-// JSON with sorted keys and no spacing, so the same content always gives the same bytes.
-function canonicalJSON(v) {
-  if (Array.isArray(v)) return "[" + v.map(canonicalJSON).join(",") + "]";
-  if (v && typeof v === "object") return "{" + Object.keys(v).filter((k) => v[k] !== undefined).sort().map((k) => JSON.stringify(k) + ":" + canonicalJSON(v[k])).join(",") + "}";
-  return JSON.stringify(v === undefined ? null : v);
-}
-
-async function sha256(text) {
-  const buf = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
+// Canonical JSON and SHA-256 come from sig.js, shared with evidence bundles and data packs.
+const sha256 = sha256Hex;
 
 async function sealCard(card) {
   const { hash, ...body } = card;
@@ -6635,7 +7726,7 @@ function cardLines(card) {
   return L;
 }
 
-return { MIN_CARD_ACCOUNTS, cardPage, evidenceCard, credentialSummary, canonicalJSON, sealCard, verifyCard, cardLines };
+return { MIN_CARD_ACCOUNTS, cardPage, evidenceCard, credentialSummary, sealCard, verifyCard, cardLines };
 })();
 
 // ---- hosts.js
@@ -6790,6 +7881,241 @@ function realLink(href, text = "") {
 return { hostOf, siteKey, hostedKind, unwrapArchive, appearanceSite, reviewSites, realLink };
 })();
 
+// ---- packs.js
+const M_packs = (() => {
+// Signed data packs (project-docs/DATA-SOVEREIGNTY.md). A pack is one JSON file: a manifest, the
+// content it adds (claims, operation indicators, site notes) or, for Radar's own bundled data, the
+// SHA-256 of each bundled file, the signer's public key and an ECDSA P-256 signature over the
+// manifest. WebCrypto only, so the same code verifies in Chrome, Firefox and node with no
+// dependency. A valid signature says who signed the pack and that nothing changed since; it never
+// says the content is true. Packs are never downloaded: the user picks a file.
+
+const { canonicalJSON, sha256Hex, lfBytes, publicJwk, jwkId, signText, verifyText, P256 } = M_sig;
+
+const PACK_FORMAT = "radar-pack/1";
+const PACK_DOES_NOT_PROVE = "A valid signature shows which key signed this pack and that its content has not changed since. It does not show that the content is right, or who holds the key: trust a key only when you know where it came from.";
+const subtle = () => globalThis.crypto.subtle;
+
+// The key id: the first 32 hex characters of the SHA-256 of the public key's canonical JWK.
+const keyIdOf = (jwk) => jwkId(jwk, 32);
+const keyFingerprint = (keyId) => String(keyId || "").match(/.{1,4}/g)?.join(" ") || "";
+
+async function generateKeyPair() {
+  const pair = await subtle().generateKey(P256, true, ["sign", "verify"]);
+  const [priv, pub] = await Promise.all([subtle().exportKey("jwk", pair.privateKey), subtle().exportKey("jwk", pair.publicKey)]);
+  return { privateJwk: priv, publicJwk: publicJwk(pub), keyId: await keyIdOf(pub) };
+}
+
+// Hashes of each content part, as the manifest lists them.
+async function contentHashes(content) {
+  const out = {};
+  for (const k of Object.keys(content || {}).sort()) out[k] = await sha256Hex(canonicalJSON(content[k]));
+  return out;
+}
+
+// meta: { name, version, description, authorName, created }; content: { claims, ops, siteNotes }
+// or files: { "name.json": sha256 }. Returns the pack object, ready to save as JSON.
+async function signPack(meta, privateJwk, { content = null, files = null } = {}) {
+  const pub = publicJwk({ kty: privateJwk.kty, crv: privateJwk.crv, x: privateJwk.x, y: privateJwk.y });
+  const manifest = {
+    name: String(meta.name), version: String(meta.version), description: meta.description ? String(meta.description) : undefined,
+    author: { keyId: await keyIdOf(pub), name: meta.authorName ? String(meta.authorName) : undefined },
+    created: meta.created || new Date().toISOString().slice(0, 10),
+    ...(content ? { hashes: await contentHashes(content), counts: Object.fromEntries(Object.entries(content).map(([k, v]) => [k, Array.isArray(v) ? v.length : 0])) } : {}),
+    ...(files ? { files } : {}),
+  };
+  const signature = await signText(privateJwk, canonicalJSON(manifest));
+  return JSON.parse(JSON.stringify({ format: PACK_FORMAT, manifest, ...(content ? { content } : {}), publicKey: pub, signature }));
+}
+
+const signatureValid = (pack) => verifyText(pack.publicKey, pack.signature, canonicalJSON(pack.manifest));
+
+// Checks the format, the key id, the signature and every content hash. trusted: [{ keyId, label }].
+// Returns { ok, problems, keyId, trusted, label, manifest }. ok means the signature and hashes hold;
+// trusted means the user chose to trust this key. Neither says the content is right.
+async function verifyPack(pack, trusted = []) {
+  const problems = [];
+  if (!pack || pack.format !== PACK_FORMAT) return { ok: false, problems: [`not a ${PACK_FORMAT} file`], keyId: null, trusted: false };
+  const m = pack.manifest || {};
+  let keyId = null;
+  try { keyId = await keyIdOf(pack.publicKey); } catch (e) { problems.push(e.message); }
+  if (keyId && (!m.author || m.author.keyId !== keyId)) problems.push("the manifest names a different key from the one in the pack");
+  if (keyId && !(await signatureValid(pack))) problems.push("the signature does not match the manifest");
+  problems.push(...(await hashProblems(pack)));
+  const t = trusted.find((k) => k.keyId === keyId);
+  return { ok: problems.length === 0, problems, keyId, trusted: !!t && problems.length === 0, label: t ? t.label : null, manifest: m };
+}
+
+async function hashProblems(pack) {
+  const m = pack.manifest || {}, listed = m.hashes || {}, content = pack.content || {}, out = [];
+  if (!pack.content && !m.files) return ["the pack has neither content nor a file list"];
+  for (const k of Object.keys(content)) if (!(k in listed)) out.push(`content part "${k}" is not listed in the signed manifest`);
+  for (const [k, h] of Object.entries(listed)) {
+    if (!(k in content)) out.push(`signed content part "${k}" is missing`);
+    else if ((await sha256Hex(canonicalJSON(content[k]))) !== h) out.push(`content part "${k}" changed after signing`);
+  }
+  return out;
+}
+
+// A file pack (Radar's bundled data): readBytes(name) resolves to the file's bytes. Line ends are
+// hashed as LF (sig.js lfBytes), the same as data/LOCK.json and evidence bundles.
+async function verifyFiles(pack, readBytes) {
+  const out = [];
+  for (const [name, want] of Object.entries((pack.manifest && pack.manifest.files) || {})) {
+    try {
+      if ((await sha256Hex(lfBytes(await readBytes(name)))) !== want) out.push(`${name} differs from the signed copy`);
+    } catch (e) { out.push(`${name} could not be read: ${e.message}`); }
+  }
+  return out;
+}
+
+return { PACK_FORMAT, PACK_DOES_NOT_PROVE, keyIdOf, keyFingerprint, generateKeyPair, contentHashes, signPack, verifyPack, verifyFiles };
+})();
+
+// ---- packs-content.js
+const M_packs_content = (() => {
+// What a signed data pack (src/core/packs.js) may add, and how it joins Radar's own tables. Three
+// parts, each a list: claims (fact-checks: the claim, the rating in the checker's words, the
+// checker, the review URL), ops (a domain or account a cited document names as part of an
+// operation) and siteNotes (a sourced note about a site). Every row must cite an https source.
+// Pack rows are kept apart from Radar's own: each carries the pack's name, and operations from
+// packs never enter the trend counts.
+
+// The same lists as src/core/ops-schema.js (tests/packs-content.test.js keeps them equal); that
+// module is build-time only and is not in the bundle.
+const PACK_INDICATOR_KINDS = ["cloned news domain", "operation site", "operation account"];
+const PACK_OPERATOR_TYPES = ["government", "state media", "contractor", "linked to a state", "commercial firm", "origin only"];
+const PACK_LIMITS = { claims: 50000, ops: 5000, siteNotes: 5000 };
+const PARTS = Object.keys(PACK_LIMITS);
+
+const str = (v, min, max) => typeof v === "string" && v.trim().length >= min && v.length <= max;
+const https = (v) => { try { return new URL(v).protocol === "https:"; } catch { return false; } };
+const day = (v) => v == null || /^\d{4}-\d{2}-\d{2}$/.test(v);
+const DOMAIN = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}$/;
+const HANDLE = /^\w{1,30}$/;
+// Radar shows no em dash anywhere a user reads (tests/canon.test.js); pack text is cleaned the same way.
+const clean = (s) => String(s).replace(/\s*—\s*/g, " - ");
+
+function claimProblems(c) {
+  const out = [];
+  if (!str(c.claim, 12, 600)) out.push("claim must be 12 to 600 characters");
+  if (!str(c.rating, 1, 120)) out.push("rating must be 1 to 120 characters");
+  if (!str(c.checker, 1, 120)) out.push("checker must be 1 to 120 characters");
+  if (!https(c.url)) out.push("url must be an https address");
+  if (!day(c.date)) out.push("date must be YYYY-MM-DD");
+  return out;
+}
+
+function opProblems(o) {
+  const out = [], op = o.operation || {}, s = o.source || {};
+  if (!(o.domain ? DOMAIN.test(o.domain) : HANDLE.test(o.x || ""))) out.push("needs a lower-case domain or an account handle");
+  if (!PACK_INDICATOR_KINDS.includes(o.kind)) out.push(`kind must be one of: ${PACK_INDICATOR_KINDS.join(", ")}`);
+  if (!str(op.id, 3, 80) || !str(op.name, 3, 200) || !str(op.state, 2, 80) || !str(op.operator, 2, 200)) out.push("operation needs id, name, state and operator");
+  if (!PACK_OPERATOR_TYPES.includes(op.operatorType)) out.push(`operatorType must be one of: ${PACK_OPERATOR_TYPES.join(", ")}`);
+  if (!str(s.title, 3, 300) || !https(s.url) || !day(s.date) || !s.date) out.push("source needs a title, an https url and a date");
+  if (s.says != null && !str(s.says, 3, 300)) out.push("source.says must be 3 to 300 characters");
+  return out;
+}
+
+function noteProblems(n) {
+  const out = [];
+  if (!DOMAIN.test(n.domain || "")) out.push("domain must be a lower-case domain");
+  if (!str(n.note, 3, 400)) out.push("note must be 3 to 400 characters");
+  if (!https(n.url)) out.push("url must be an https address for the note's source");
+  return out;
+}
+
+const CHECK = { claims: claimProblems, ops: opProblems, siteNotes: noteProblems };
+// Every problem with a content object, as "part[index]: problem". An empty list means it may load.
+function validatePackContent(content) {
+  if (!content || typeof content !== "object") return ["content is missing"];
+  const out = [];
+  for (const k of Object.keys(content)) {
+    if (!PARTS.includes(k)) { out.push(`unknown content part "${k}"`); continue; }
+    const list = content[k];
+    if (!Array.isArray(list)) { out.push(`${k} must be a list`); continue; }
+    if (list.length > PACK_LIMITS[k]) out.push(`${k} has ${list.length} rows, over the limit of ${PACK_LIMITS[k]}`);
+    list.slice(0, PACK_LIMITS[k]).forEach((row, i) => { for (const p of CHECK[k](row || {})) out.push(`${k}[${i}]: ${p}`); });
+  }
+  return out;
+}
+
+// What a pack adds, in words, for the import screen.
+function packSummary(content = {}) {
+  const n = (k) => (Array.isArray(content[k]) ? content[k].length : 0);
+  const parts = [[n("claims"), "fact-checked claim"], [n("ops"), "operation indicator"], [n("siteNotes"), "site note"]].filter(([c]) => c);
+  return parts.length ? parts.map(([c, w]) => `${c.toLocaleString("en")} ${w}${c === 1 ? "" : "s"}`).join(", ") : "nothing";
+}
+
+// claims.json's packed rows ([claim, rating, checker index, url, date, lang, site]) with the pack
+// claims added. packs: [{ name, content }] already verified and enabled.
+function mergePackClaims(table, packs = []) {
+  const checkers = [...((table && table.checkers) || [])], rows = [...((table && table.rows) || [])];
+  const at = new Map(checkers.map((c, i) => [c, i]));
+  for (const p of packs) {
+    for (const c of (p.content && p.content.claims) || []) {
+      const who = `${clean(c.checker)} (pack: ${clean(p.name)})`;
+      if (!at.has(who)) { at.set(who, checkers.length); checkers.push(who); }
+      rows.push([clean(c.claim), clean(c.rating), at.get(who), c.url, c.date || null, c.lang || null, null]);
+    }
+  }
+  return { ...(table || {}), checkers, rows };
+}
+
+// ops.json ({ docs, ops, indicators }) with pack indicators added. Each pack operation gets its own
+// id ("pack:<key id>:<id>") and a `pack` field, so it never merges into one of Radar's operations.
+function mergePackOps(table, packs = []) {
+  const docs = [...((table && table.docs) || [])], ops = [...((table && table.ops) || [])], indicators = [...((table && table.indicators) || [])];
+  const byId = new Map();
+  for (const p of packs) {
+    for (const o of (p.content && p.content.ops) || []) {
+      const s = o.source, doc = docs.push({ publisher: s.publisher ? clean(s.publisher) : null, title: clean(s.title), url: s.url, date: s.date, kind: null, terms: null }) - 1;
+      const id = `pack:${String(p.keyId || "").slice(0, 8)}:${o.operation.id}`;
+      let op = byId.get(id);
+      if (!op) {
+        op = { id, name: clean(o.operation.name), aliases: [], state: clean(o.operation.state), operator: clean(o.operation.operator), operatorType: o.operation.operatorType, attributions: [], docs: [], first: s.date, pack: clean(p.name) };
+        byId.set(id, op); ops.push(op);
+      }
+      op.attributions.push({ doc, says: clean(s.says || `named ${o.domain || "@" + o.x} as ${o.kind}`) });
+      op.docs.push(doc);
+      if (s.date < op.first) op.first = s.date;
+      indicators.push({ ...(o.domain ? { d: o.domain } : { x: String(o.x).toLowerCase() }), op: id, kind: o.kind, doc });
+    }
+  }
+  return { ...(table || {}), docs, ops, indicators };
+}
+
+// Site notes from enabled packs, by domain. A subdomain finds its parent's notes.
+let NOTES = new Map();
+function setPackNotes(packs = []) {
+  NOTES = new Map();
+  for (const p of packs) for (const n of (p.content && p.content.siteNotes) || []) {
+    (NOTES.get(n.domain) || NOTES.set(n.domain, []).get(n.domain)).push({ note: clean(n.note), url: n.url, pack: clean(p.name) });
+  }
+}
+function siteNotesOf(host) {
+  const parts = String(host || "").toLowerCase().replace(/^www\./, "").split(".");
+  for (let k = 0; k < parts.length - 1; k++) { const got = NOTES.get(parts.slice(k).join(".")); if (got) return got; }
+  return [];
+}
+
+return { PACK_INDICATOR_KINDS, PACK_OPERATOR_TYPES, PACK_LIMITS, validatePackContent, packSummary, mergePackClaims, mergePackOps, setPackNotes, siteNotesOf };
+})();
+
+// ---- pack-keys.js
+const M_pack_keys = (() => {
+// The public half of Radar's project key, which signs the data that ships inside Radar
+// (src/ext/radar-data.pack.json, scripts/pack.mjs bundled). The private half never enters this
+// repository (tests/no-private-keys.test.js). Anyone can check a download against this key id.
+const PROJECT_KEY = {
+  keyId: "0e5e19840565840c977e0f036c9ac021",
+  label: "Radar project key",
+  jwk: { kty: "EC", crv: "P-256", x: "0iyHwn2zRDoP7RfuuxvKGxhRYmAXiS7NelteWFPo8CM", y: "8n431mx6HCqh1hNM1xZmJeDX2ZPckhNUlIBezeKro_k" },
+};
+
+return { PROJECT_KEY };
+})();
+
 // ---- sites.js
 const M_sites = (() => {
 // Site context for a link or the page being read: who owns the site, what kind of owner, when and
@@ -6806,6 +8132,7 @@ const M_sites = (() => {
 
 const { siteKey, hostOf } = M_hosts;
 const { stateLabel } = M_state;
+const { ownerOfDomain, ownerSourceShort } = M_owners;
 
 let FACTS = {}, RECORDS = {}, CHECKERS = [];
 
@@ -6825,6 +8152,9 @@ function siteFacts(host) {
   const top = siteKey(h);
   while (h) {
     const f = FACTS[h];
+    // An owner correction can mark the Wikidata facts for this host as another item's.
+    const o = f && ownerOfDomain(h);
+    if (o && o.domain === h && o.correction && o.correction.factsWrong) return null;
     if (f) return { name: f[0], founded: f[1] || null, country: f[2] || null, ownerType: f[3] || null, source: f[4] ? `https://www.wikidata.org/wiki/${f[4]}` : null };
     if (h === top || !h.includes(".")) break;
     h = h.slice(h.indexOf(".") + 1);
@@ -6875,11 +8205,12 @@ function siteInfoRows(info, opts = {}) {
   const type = ownerType(info);
   const rows = [
     ["Site", name ? `${name} (${domain})` : domain],
-    [ownerHeading(owner), owner && owner.owner ? `${owner.owner} (Wikidata)` : null],
+    [ownerHeading(owner), owner && owner.owner ? `${owner.owner} (${ownerSourceShort(owner)})` : null],
     ["Owner type", type !== "not stated" ? `${type}, ${typeSource(info)}` : null],
     ["Founded", facts && facts.founded ? `${facts.founded} (Wikidata)` : null],
     ["Country", facts && facts.country ? `${facts.country} (Wikidata)` : null],
     ...stateRows(info.state),
+    ...packNoteRows(info.notes),
   ];
   if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Radar has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
   rows.push(["Fact-check record", recordLine(record) || "No review in Radar's table lists this site as where a claim appeared."]);
@@ -6887,6 +8218,15 @@ function siteInfoRows(info, opts = {}) {
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
   rows.push(["Source", SITE_SOURCES], ["Does not prove", SITE_RECORD_DOES_NOT_PROVE]);
   return rows.filter(([, v]) => v != null);
+}
+
+// Notes from data packs the user imported and trusts (src/core/packs-content.js), each with its
+// pack's name and source, kept apart from Radar's own rows.
+const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Radar did not write or check it.";
+function packNoteRows(notes) {
+  if (!notes || !notes.length) return [];
+  const rows = notes.slice(0, 5).flatMap((n) => [["Pack note", `${n.note} (pack: ${n.pack})`], ["Read it", { links: [[String(n.url).replace(/^https?:\/\//, "").slice(0, 48), n.url]] }]]);
+  return [...rows, [null, { note: PACK_NOTE_CAVEAT }]];
 }
 
 // Wikidata's owner (P127) where it states one, else the parent organisation (P749) or publisher
@@ -6915,73 +8255,367 @@ function siteGlance(info) {
   };
 }
 
-return { setSiteTable, siteFacts, siteRecord, recordSummary, recordLine, SITE_RECORD_DOES_NOT_PROVE, SITE_SOURCES, OWNER_TYPES, ownerType, siteInfoRows, ownerHeading, siteChips, siteGlance };
+return { setSiteTable, siteFacts, siteRecord, recordSummary, recordLine, SITE_RECORD_DOES_NOT_PROVE, SITE_SOURCES, OWNER_TYPES, ownerType, siteInfoRows, PACK_NOTE_CAVEAT, ownerHeading, siteChips, siteGlance };
+})();
+
+// ---- outlets.js
+const M_outlets = (() => {
+// The suggested outlets for Other coverage: news organisations that publish their own feed, so
+// Radar can ask each publisher directly with no aggregator in between. The user turns each one on
+// or off and can add any RSS or Atom address. Radar requests a feed only on the user's click.
+//
+// How the list was chosen (project-docs/INDEPENDENCE.md has the full method and its limits):
+//   1. An original newsroom with general or world news in English.
+//   2. A public RSS or Atom feed at a stable https address on the outlet's own host that answered
+//      with entries and without a redirect when checked on 2026-10-21.
+//   3. The outlet's site is in Radar's bundled site tables (src/ext/sites.json), so the card can say
+//      what the tables state about its owner and owner type. Where they state no owner, it says so.
+//   4. Spread: several countries and every owner type the tables give, with the count of outlets
+//      across the range of published media-bias charts kept even by the maintainer at curation.
+//      No rating is stored here or shown anywhere: Radar labels outlets by owner type only.
+// The order is alphabetical by id, so position in the list says nothing.
+
+// [id, name, feed address, site in the tables, country as the outlet states it]
+const FEED_OUTLETS = Object.freeze([
+  ["abc-au", "ABC News (Australia)", "https://www.abc.net.au/news/feed/51120/rss.xml", "abc.net.au", "Australia"],
+  ["aljazeera", "Al Jazeera English", "https://www.aljazeera.com/xml/rss/all.xml", "aljazeera.com", "Qatar"],
+  ["bbc", "BBC News", "https://feeds.bbci.co.uk/news/world/rss.xml", "bbc.co.uk", "United Kingdom"],
+  ["cbc", "CBC News", "https://www.cbc.ca/webfeed/rss/rss-topstories", "cbc.ca", "Canada"],
+  ["dawn", "Dawn", "https://www.dawn.com/feeds/home", "dawn.com", "Pakistan"],
+  ["dw", "Deutsche Welle", "https://rss.dw.com/rdf/rss-en-all", "dw.com", "Germany"],
+  ["elpais", "El País (English)", "https://feeds.elpais.com/mrss-s/pages/ep/site/english.elpais.com/portada", "elpais.com", "Spain"],
+  ["fox", "Fox News", "https://moxie.foxnews.com/google-publisher/latest.xml", "foxnews.com", "United States"],
+  ["france24", "France 24", "https://www.france24.com/en/rss", "france24.com", "France"],
+  ["jacobin", "Jacobin", "https://jacobin.com/feed/", "jacobin.com", "United States"],
+  ["japantimes", "The Japan Times", "https://www.japantimes.co.jp/feed/", "japantimes.co.jp", "Japan"],
+  ["kyivindependent", "The Kyiv Independent", "https://kyivindependent.com/news-archive/rss/", "kyivindependent.com", "Ukraine"],
+  ["lemonde", "Le Monde (English)", "https://www.lemonde.fr/en/rss/une.xml", "lemonde.fr", "France"],
+  ["meduza", "Meduza (English)", "https://meduza.io/rss/en/all", "meduza.io", "Latvia"],
+  ["motherjones", "Mother Jones", "https://www.motherjones.com/feed/", "motherjones.com", "United States"],
+  ["nationalreview", "National Review", "https://www.nationalreview.com/feed/", "nationalreview.com", "United States"],
+  ["npr", "NPR", "https://feeds.npr.org/1001/rss.xml", "npr.org", "United States"],
+  ["nypost", "New York Post", "https://nypost.com/feed/", "nypost.com", "United States"],
+  ["pbs", "PBS News", "https://www.pbs.org/newshour/feeds/rss/headlines", "pbs.org", "United States"],
+  ["premiumtimes", "Premium Times", "https://www.premiumtimesng.com/feed", "premiumtimesng.com", "Nigeria"],
+  ["reason", "Reason", "https://reason.com/feed/", "reason.com", "United States"],
+  ["rnz", "RNZ", "https://www.rnz.co.nz/rss/world.xml", "rnz.co.nz", "New Zealand"],
+  ["scmp", "South China Morning Post", "https://www.scmp.com/rss/91/feed/", "scmp.com", "Hong Kong"],
+  ["straitstimes", "The Straits Times", "https://www.straitstimes.com/news/world/rss.xml", "straitstimes.com", "Singapore"],
+  ["telegraph", "The Telegraph", "https://www.telegraph.co.uk/rss.xml", "telegraph.co.uk", "United Kingdom"],
+  ["theguardian", "The Guardian", "https://www.theguardian.com/world/rss", "theguardian.com", "United Kingdom"],
+  ["thehill", "The Hill", "https://thehill.com/news/feed/", "thehill.com", "United States"],
+  ["thehindu", "The Hindu", "https://www.thehindu.com/news/international/feeder/default.rss", "thehindu.com", "India"],
+  ["theintercept", "The Intercept", "https://theintercept.com/feed/?rss", "theintercept.com", "United States"],
+  ["timesofindia", "The Times of India", "https://timesofindia.indiatimes.com/rssfeedstopstories.cms", "timesofindia.indiatimes.com", "India"],
+  ["timesofisrael", "The Times of Israel", "https://www.timesofisrael.com/feed/", "timesofisrael.com", "Israel"],
+  ["washexaminer", "Washington Examiner", "https://www.washingtonexaminer.com/feed/", "washingtonexaminer.com", "United States"],
+  ["wsj", "The Wall Street Journal (world)", "https://feeds.a.dj.com/rss/RSSWorldNews.xml", "wsj.com", "United States"],
+]);
+
+const OUTLETS_CHECKED = "2026-10-21";
+const MAX_CUSTOM_FEEDS = 30;
+
+// The host the browser is asked to allow for one feed, as an optional host permission.
+function feedOrigin(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" ? `https://${u.hostname}/*` : null;
+  } catch {
+    return null;
+  }
+}
+
+// A feed address the user typed: https only, no credentials, no fragment, at most 500 characters.
+function cleanFeedUrl(text) {
+  const s = String(text || "").trim();
+  if (!s || s.length > 500) return null;
+  try {
+    const u = new URL(s);
+    if (u.protocol !== "https:" || u.username || u.password || !u.hostname.includes(".")) return null;
+    u.hash = "";
+    return u.href;
+  } catch {
+    return null;
+  }
+}
+
+// Every feed the user chose: suggested outlets switched on, then their own addresses.
+// Returns [{ id, name, url, site, country, custom }].
+function chosenFeeds(settings) {
+  const on = (settings && settings.outlets) || {};
+  const list = FEED_OUTLETS.filter(([id]) => on[id] === true).map(([id, name, url, site, country]) => ({ id, name, url, site, country, custom: false }));
+  const custom = ((settings && settings.customFeeds) || []).map(cleanFeedUrl).filter(Boolean).slice(0, MAX_CUSTOM_FEEDS);
+  for (const url of custom) {
+    const host = new URL(url).hostname;
+    list.push({ id: "custom:" + url, name: host, url, site: host, country: null, custom: true });
+  }
+  return list;
+}
+
+return { FEED_OUTLETS, OUTLETS_CHECKED, MAX_CUSTOM_FEEDS, feedOrigin, cleanFeedUrl, chosenFeeds };
+})();
+
+// ---- feeds.js
+const M_feeds = (() => {
+// A small reader for news feeds: RSS 2.0, RSS 1.0 (RDF) and Atom. Radar's background worker has no
+// DOMParser (Chrome's service workers do not offer one), so this reads the text itself. It takes
+// only what Other coverage needs from each entry: the title, the link, the date and a short
+// summary. Everything else in the feed is ignored. Nothing here touches the network.
+//
+// The reader is defensive by design: a feed is text from an outside server. Links must be https;
+// markup inside titles and summaries is stripped; sizes are capped; anything unreadable gives an
+// empty list, never an exception the caller has to catch.
+
+const FEED_MAX_BYTES = 3_000_000;
+const FEED_MAX_ITEMS = 200;
+const SUMMARY_MAX = 400, TITLE_MAX = 300;
+
+const NAMED = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", hellip: "…", mdash: "-", ndash: "-", rsquo: "'", lsquo: "'", rdquo: '"', ldquo: '"' };
+function decode(s) {
+  return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e) => {
+    if (e[0] === "#") {
+      const n = e[1] === "x" || e[1] === "X" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
+      return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : "";
+    }
+    return NAMED[e.toLowerCase()] ?? m;
+  });
+}
+
+// Text content of an element body: CDATA kept as text, tags removed, entities decoded once, then
+// any markup the publisher escaped inside it removed as well.
+function plainText(raw) {
+  const s = String(raw || "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_, c) => c.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+  const once = decode(s.replace(/<[^>]*>/g, " "));
+  return decode(once.replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ").trim();
+}
+
+// The body of the first <name>…</name> child (namespace prefixes allowed), or null.
+function child(block, names) {
+  for (const n of names) {
+    const m = block.match(new RegExp(`<(?:[\\w-]+:)?${n}(?:\\s[^>]*)?>([\\s\\S]*?)</(?:[\\w-]+:)?${n}>`, "i"));
+    if (m) return m[1];
+  }
+  return null;
+}
+
+const attr = (tag, name) => { const m = tag.match(new RegExp(`\\s${name}\\s*=\\s*("([^"]*)"|'([^']*)')`, "i")); return m ? decode(m[2] ?? m[3]) : null; };
+
+function safeLink(u) {
+  try {
+    const url = new URL(String(u || "").trim());
+    return url.protocol === "https:" && !url.username && !url.password ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+// Atom gives the link as <link href=... rel=...>; RSS as <link>text</link>, or a permalink <guid>.
+function linkOf(block) {
+  const tags = block.match(/<link\b[^>]*\/?>/gi) || [];
+  const alt = tags.find((t) => attr(t, "href") && (!attr(t, "rel") || attr(t, "rel") === "alternate"));
+  if (alt) return safeLink(attr(alt, "href"));
+  const text = child(block, ["link"]);
+  if (text && safeLink(plainText(text))) return safeLink(plainText(text));
+  const guid = block.match(/<guid\b([^>]*)>([\s\S]*?)<\/guid>/i);
+  if (guid && !/isPermaLink\s*=\s*["']false/i.test(guid[1])) return safeLink(plainText(guid[2]));
+  const about = block.match(/^<item\b[^>]*\srdf:about\s*=\s*"([^"]+)"/i);
+  return about ? safeLink(decode(about[1])) : null;
+}
+
+function dateOf(block) {
+  const raw = child(block, ["pubDate", "published", "updated", "date", "issued"]);
+  const t = raw ? Date.parse(plainText(raw)) : NaN;
+  return Number.isFinite(t) ? new Date(t).toISOString() : null;
+}
+
+// Feed text to { title, items: [{ title, link, published, summary }] }. kind is "rss", "atom" or
+// null when the text is not a feed Radar can read.
+function parseFeed(text) {
+  const src = String(text || "").slice(0, FEED_MAX_BYTES).replace(/<!--[\s\S]*?-->/g, "");
+  const kind = /<feed\b[^>]*>/i.test(src) && !/<rss\b|<rdf:RDF\b/i.test(src) ? "atom" : /<rss\b|<rdf:RDF\b|<channel\b/i.test(src) ? "rss" : null;
+  if (!kind) return { kind: null, title: null, items: [] };
+  const re = kind === "atom" ? /<entry\b[^>]*>[\s\S]*?<\/entry>/gi : /<item\b[^>]*>[\s\S]*?<\/item>/gi;
+  const items = [];
+  for (const m of src.matchAll(re)) {
+    if (items.length >= FEED_MAX_ITEMS) break;
+    const block = m[0];
+    const title = plainText(child(block, ["title"])).slice(0, TITLE_MAX);
+    const link = linkOf(block);
+    if (!title || !link) continue;
+    const summary = plainText(child(block, ["description", "summary", "content", "encoded"])).slice(0, SUMMARY_MAX);
+    items.push({ title, link, published: dateOf(block), summary });
+  }
+  const head = src.split(re)[0] || "";
+  return { kind, title: plainText(child(head, ["title"])) || null, items };
+}
+
+return { FEED_MAX_BYTES, FEED_MAX_ITEMS, plainText, safeLink, parseFeed };
+})();
+
+// ---- feedfetch.js
+const M_feedfetch = (() => {
+// Requests for Other coverage, run by the background worker only on the user's click. Each request
+// goes to one feed address the user chose, with no cookies, no referrer, no added headers and no
+// body, and Radar does not follow a redirect to another address the user never allowed. The fetch
+// and permission functions are passed in, so tests run without a network.
+
+const { parseFeed, FEED_MAX_BYTES } = M_feeds;
+const { feedOrigin } = M_outlets;
+
+const FEED_TIMEOUT_MS = 10000;
+const FEED_CACHE_MS = 10 * 60 * 1000;
+const FEED_REQUEST = Object.freeze({ method: "GET", credentials: "omit", referrerPolicy: "no-referrer", cache: "no-store", redirect: "manual" });
+
+// The body as text, read no further than the cap. Null when the feed is larger.
+async function cappedText(res, cap) {
+  const len = Number(res.headers && res.headers.get && res.headers.get("content-length"));
+  if (Number.isFinite(len) && len > cap) return null;
+  if (!res.body || !res.body.getReader) { const t = await res.text(); return t.length > cap ? null : t; }
+  const reader = res.body.getReader(), parts = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.length;
+    if (size > cap) { reader.cancel().catch(() => {}); return null; }
+    parts.push(value);
+  }
+  const all = new Uint8Array(size);
+  let at = 0;
+  for (const p of parts) { all.set(p, at); at += p.length; }
+  return new TextDecoder("utf-8").decode(all);
+}
+
+// One feed: { feed, items, error, ms }. error is a key of FEED_ERRORS (src/core/coverage.js).
+async function fetchFeed(feed, { fetch: fetchFn, now = () => Date.now(), timeoutMs = FEED_TIMEOUT_MS } = {}) {
+  const t0 = now();
+  const done = (extra) => ({ feed, items: [], error: null, ms: now() - t0, ...extra });
+  const ctl = typeof AbortController === "function" ? new AbortController() : null;
+  const timer = ctl ? setTimeout(() => ctl.abort(), timeoutMs) : null;
+  try {
+    const res = await fetchFn(feed.url, { ...FEED_REQUEST, ...(ctl ? { signal: ctl.signal } : {}) });
+    if (res.type === "opaqueredirect" || (res.status >= 300 && res.status < 400)) return done({ error: "redirect" });
+    if (!res.ok) return done({ error: "http", status: res.status });
+    const text = await cappedText(res, FEED_MAX_BYTES);
+    if (text == null) return done({ error: "too-large" });
+    const parsed = parseFeed(text);
+    if (!parsed.kind) return done({ error: "not-a-feed" });
+    return done({ items: parsed.items });
+  } catch (e) {
+    return done({ error: e && e.name === "AbortError" ? "timeout" : "network" });
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+// Every chosen feed at once (each to its own host, so they run in parallel). A feed whose host the
+// browser has not allowed is not requested. Answers are kept in memory for ten minutes, so a second
+// click on the same story asks no one again.
+function feedFetcher({ fetch: fetchFn, allowed, now = () => Date.now() }) {
+  const cache = new Map();
+  async function one(feed) {
+    const hit = cache.get(feed.url);
+    if (hit && now() - hit.at < FEED_CACHE_MS) return { ...hit.result, feed, cached: true };
+    const origin = feedOrigin(feed.url);
+    if (!origin || !(await allowed(origin))) return { feed, items: [], error: "no-permission", ms: 0 };
+    const result = await fetchFeed(feed, { fetch: fetchFn, now });
+    if (!result.error) cache.set(feed.url, { at: now(), result });
+    return result;
+  }
+  return { fetchAll: (feeds) => Promise.all((feeds || []).map(one)), clear: () => cache.clear() };
+}
+
+return { FEED_TIMEOUT_MS, FEED_CACHE_MS, FEED_REQUEST, fetchFeed, feedFetcher };
 })();
 
 // ---- coverage.js
 const M_coverage = (() => {
-// "Other coverage": other outlets reporting the same story, from the GDELT Project's DOC 2.0 API.
-// This is Radar's only feature that sends anything off the machine. It is off by default; the
-// user turns it on in the options page, the browser asks for access to api.gdeltproject.org, and
-// each lookup runs only on a click. Radar sends the main words of the article's title and nothing
-// else: not the page address, not the user's history, not any post.
+// "Other coverage": other outlets reporting the same story, read from each outlet's own feed. There
+// is no aggregator in between. The user picks the outlets (src/core/outlets.js) and may add any RSS
+// or Atom address; on the user's click, Radar's background worker requests each chosen feed from
+// its publisher, and this module matches the article's title against the entries on this device.
+// Radar sends nothing from the page: not the title, not the address, not any post. Each publisher
+// sees a plain request for its own feed.
 //
-// Each outlet is labelled by its owner type as the site tables state it (src/core/sites.js):
-// state media, public broadcaster, regional govt, nonprofit, commercial, or not stated. Radar never
-// labels an outlet by a left or right position.
+// Each outlet is labelled by its owner and owner type as the bundled site tables state them
+// (src/core/sites.js). Radar never labels an outlet by a left or right position.
 
 const { ownerType, OWNER_TYPES } = M_sites;
 const { siteKey, hostOf } = M_hosts;
+const { feedOrigin } = M_outlets;
 
-const COVERAGE_HOST = "api.gdeltproject.org";
-const COVERAGE_ORIGIN = `https://${COVERAGE_HOST}/*`;
-const MAX_TERMS = 4;
-const ENDPOINT = `https://${COVERAGE_HOST}/api/v2/doc/doc`;
+const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Radar asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. Radar sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or Radar server is involved. Nothing is requested until you click.";
 
-const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Radar sends the main words of that article's title, and nothing else, to the GDELT Project's public DOC 2.0 API at api.gdeltproject.org. Radar does not send the page address, your history, any post or any account. GDELT receives the request like any web request, so it sees your IP address and the words. Its terms are at gdeltproject.org. Nothing is sent until you click.";
+const COVERAGE_DOES_NOT_PROVE = "Matching is by shared words in headlines, so a match can be a different event with similar words, and a story told in other words is missed. A feed holds only an outlet's latest entries, and only the outlets you chose are asked. Owner and owner type are what the site tables state, not a judgment of the reporting.";
 
 const STOP = new Set(("the a an and or but of to in on at by for with from as is are was were be been it its this that these those their they he she his her we our you your " +
   "not no do does did has have had will would can could should may might than then so if into about over under after before what which who when where why how " +
-  "says said say new news live update updates video watch report reports le la les des du de et un une el los las del y der die das und den ein eine").split(" "));
+  "says said say new news live update updates video watch report reports latest breaking opinion analysis just more most first last also amid " +
+  "le la les des du de et un une el los las del y der die das und den ein eine").split(" "));
 
-// The title's main words, at most MAX_TERMS, lower-case, letters and digits only. Null when fewer than
-// two usable words remain (GDELT rejects short and common words).
-function coverageTerms(title) {
+// A word's plain form: lower case, letters and digits, a plain plural "s" removed.
+const stem = (w) => (w.length > 4 && /[^s]s$/.test(w) ? w.slice(0, -1) : w);
+
+// The main words of a headline, in order, without repeats: four or more letters, or a number of
+// three or more characters, and not a common word. The site name after " | " or " - " is dropped.
+function titleWords(title) {
   const t = String(title || "").split(/\s+[|–—-]\s+/)[0];
   const words = t.toLowerCase().normalize("NFKC").replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/)
-    .filter((w) => w.length >= 4 || (/\d/.test(w) && w.length >= 3)).filter((w) => !STOP.has(w));
-  // GDELT matches all the words, so a long query finds almost nothing. Keep the four longest words
-  // (longer words name the story's people, places and things), in the title's order.
-  const uniq = [...new Set(words)];
-  const keep = new Set([...uniq].sort((a, b) => b.length - a.length).slice(0, MAX_TERMS));
-  const terms = uniq.filter((w) => keep.has(w));
-  return terms.length >= 2 ? terms.join(" ") : null;
+    .filter((w) => w.length >= 4 || (/\d/.test(w) && w.length >= 3)).filter((w) => !STOP.has(w)).map(stem);
+  return [...new Set(words)];
 }
 
-function coverageUrl(title, { timespan = "1w", max = 50 } = {}) {
-  const q = coverageTerms(title);
-  if (!q) return null;
-  const u = new URL(ENDPOINT);
-  for (const [k, v] of [["query", q], ["mode", "ArtList"], ["format", "json"], ["maxrecords", String(max)], ["timespan", timespan], ["sort", "HybridRel"]]) u.searchParams.set(k, v);
-  return u.toString();
-}
-
-const day = (s) => { const m = String(s || "").match(/^(\d{4})(\d\d)(\d\d)/); return m ? `${m[1]}-${m[2]}-${m[3]}` : null; };
-
-// GDELT's article list to one entry per site, without the page's own site. infoOf(site) returns
-// { facts, state } from the site tables.
-function coverageList(json, { self = null, infoOf = () => ({}) } = {}) {
-  const arts = json && Array.isArray(json.articles) ? json.articles : [];
-  const own = self ? siteKey(hostOf("https://" + String(self).replace(/^https?:\/\//, ""))) : null, seen = new Set(), out = [];
-  for (const a of arts) {
-    if (!a || !/^https:\/\//i.test(String(a.url || ""))) continue;
-    const site = siteKey(hostOf(a.url));
-    if (!site || site === own || seen.has(site)) continue;
-    seen.add(site);
-    const info = infoOf(site) || {};
-    out.push({ site, url: a.url, title: String(a.title || "").slice(0, 200), seen: day(a.seendate), language: a.language || null, country: a.sourcecountry || null, type: ownerType(info), name: (info.facts && info.facts.name) || null });
+// The best entry in one feed for this headline, or null. A match needs, in the entry's own
+// headline, at least two of the article's main words and at least a quarter of them, and across
+// headline and summary at least 40% of them. Summaries alone never make a match: long summaries
+// share common words with almost any story.
+function bestMatch(words, items) {
+  const T = new Set(words);
+  if (T.size < 2) return null;
+  const need = Math.max(2, Math.ceil(T.size * 0.4)), needTitle = Math.max(2, Math.ceil(T.size * 0.25));
+  let best = null;
+  for (const it of items || []) {
+    const inTitle = titleWords(it.title).filter((w) => T.has(w));
+    if (inTitle.length < needTitle) continue;
+    const shared = [...new Set([...inTitle, ...titleWords(it.summary).filter((w) => T.has(w))])];
+    if (shared.length < need) continue;
+    const score = shared.length / T.size + inTitle.length / (10 * T.size);
+    if (!best || score > best.score) best = { item: it, shared, score };
   }
-  return out;
+  return best;
+}
+
+const hostOfUrl = (u) => { try { return new URL(u).hostname; } catch { return null; } };
+
+// The hosts a lookup will contact, sorted, for the consent text and the "Requested" row.
+const coveragePlan = (feeds) => [...new Set((feeds || []).map((f) => hostOfUrl(f.url)).filter(Boolean))].sort();
+const feedOrigins = (feeds) => [...new Set((feeds || []).map((f) => feedOrigin(f.url)).filter(Boolean))].sort();
+
+// results: [{ feed: { id, name, url, site, country, custom }, items, error, ms }] from the worker.
+// Returns one entry per outlet that has a match, without the page's own site, each with what the
+// site tables say about its owner. infoOf(site) returns { facts, state, owner }.
+function coverageFromFeeds(title, results, { self = null, infoOf = () => ({}) } = {}) {
+  const words = titleWords(title);
+  const own = self ? siteKey(hostOf("https://" + String(self).replace(/^https?:\/\//, ""))) : null;
+  const list = [], seen = new Set();
+  for (const r of results || []) {
+    if (!r || !r.feed || r.error) continue;
+    const site = siteKey(hostOf("https://" + r.feed.site)) || r.feed.site;
+    if (site === own || seen.has(site)) continue;
+    const m = bestMatch(words, r.items);
+    if (!m || siteKey(hostOf(m.item.link)) === own) continue;
+    seen.add(site);
+    const info = infoOf(r.feed.site) || {};
+    list.push({ site, outlet: r.feed.name, url: m.item.link, title: m.item.title.slice(0, 200), published: m.item.published ? m.item.published.slice(0, 10) : null,
+      shared: m.shared, country: r.feed.country || (info.facts && info.facts.country) || null, type: ownerType(info), owner: (info.owner && info.owner.owner) || null });
+  }
+  return { words, list };
+}
+
+// One line per feed asked: what came back, so a silent or broken feed is visible.
+function feedStatus(results) {
+  return (results || []).map((r) => ({ name: r.feed.name, host: hostOfUrl(r.feed.url), ms: r.ms ?? null,
+    state: r.error ? r.error : (r.items || []).length ? "ok" : "empty", entries: (r.items || []).length }));
 }
 
 // Counts per owner type, in OWNER_TYPES order; types with no outlet are left out.
@@ -6989,9 +8623,153 @@ function coverageGroups(list) {
   return OWNER_TYPES.map((type) => ({ type, n: (list || []).filter((x) => x.type === type).length })).filter((g) => g.n);
 }
 
-const COVERAGE_DOES_NOT_PROVE = "GDELT finds articles by their words, so some may be about a different event, and it covers only the outlets it monitors. Owner type is what the site tables state, not a judgment of the reporting.";
+const FEED_ERRORS = Object.freeze({
+  "no-permission": "The browser has not allowed Radar to reach this feed's host.",
+  redirect: "The feed answered with a redirect to another address, which Radar does not follow. Check the outlet's site for its current feed.",
+  http: "The feed answered with an error.",
+  "not-a-feed": "The answer was not an RSS or Atom feed.",
+  "too-large": "The feed was larger than Radar reads.",
+  timeout: "The feed did not answer within 10 seconds.",
+  network: "The feed could not be reached.",
+});
 
-return { COVERAGE_HOST, COVERAGE_ORIGIN, MAX_TERMS, COVERAGE_PRIVACY, coverageTerms, coverageUrl, coverageList, coverageGroups, COVERAGE_DOES_NOT_PROVE };
+return { COVERAGE_PRIVACY, COVERAGE_DOES_NOT_PROVE, titleWords, bestMatch, coveragePlan, feedOrigins, coverageFromFeeds, feedStatus, coverageGroups, FEED_ERRORS };
+})();
+
+// ---- health.js
+const M_health = (() => {
+// Adapter health: whether Radar's reader for a site still finds what the site shows. Platforms
+// change their page markup without notice, and a reader that finds nothing would otherwise show
+// nothing, which looks the same as a quiet thread. This module turns what a reader found into a
+// plain verdict and the sentence the panel shows. It reads counts only, never post text.
+
+const HEALTH_SETTLE_MS = 8000;
+const HEALTH_STATES = ["idle", "waiting", "ok", "empty", "partial", "changed"];
+
+const what = (page) => (page === "feed" ? "posts" : "replies");
+
+// found: { page: "thread" | "feed" | "other", candidates, read, withText, sinceMs,
+//          structure: { times, articles } } for one site reader { name, hasLocation, rootFirst }.
+// candidates are the boxes the reader picked out, read the ones it could read an author from.
+function adapterHealth(site, found) {
+  const f = found || {}, name = (site && site.name) || "This site";
+  const cand = f.candidates | 0, read = f.read | 0, w = what(f.page);
+  if (!site || f.page === "other" || !f.page) return { state: "idle", say: null };
+  if (cand > 0 && read === 0) return { state: "changed", say: `${name} changed its page; Radar cannot read ${w} here yet.`, reason: "boxes found, none readable" };
+  if (cand >= 6 && read / cand < 0.3) return { state: "partial", say: `${name} changed part of its page; Radar reads ${read} of ${cand} ${w} here.`, reason: "most boxes unreadable" };
+  if (read >= 5 && (f.withText | 0) / read < 0.2) return { state: "partial", say: `${name} changed part of its page; Radar finds ${w} here but cannot read their text.`, reason: "text missing" };
+  if (read > 0) return { state: "ok", say: null };
+  if ((f.sinceMs || 0) < HEALTH_SETTLE_MS) return { state: "waiting", say: null };
+  const s = f.structure || {};
+  // A post page on a site that shows the post itself should always have one; a page with no time
+  // stamp or article box at all is more likely a sign-in wall or a removed post than a redesign.
+  const expectsRoot = f.page === "thread" && !!(site.hasLocation || site.rootFirst) && ((s.times | 0) >= 1 || (s.articles | 0) >= 1);
+  if (expectsRoot || (s.times | 0) >= 3 || (s.articles | 0) >= 3) {
+    return { state: "changed", say: `${name} changed its page; Radar cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was not found" : "the page shows post-like boxes Radar cannot find" };
+  }
+  return { state: "empty", say: null };
+}
+
+// The self-test's report as [label, value] rows, for the toolbar popup.
+function selfTestLines(r) {
+  if (!r) return [["Result", "Radar has no reader for this site. The site card gives site context and text checks here."]];
+  const v = r.verdict || {};
+  const pct = (a, b) => (b ? `${a} of ${b}` : "none");
+  return [
+    ["Site", `${r.site} (${r.page === "feed" ? "feed" : r.page === "thread" ? "post page" : "not a post or feed page"})`],
+    ["Boxes found", String(r.candidates)],
+    ["Read", pct(r.read, r.candidates)],
+    ["With author", pct(r.withAuthor, r.read)],
+    ["With text", pct(r.withText, r.read)],
+    ["With id", pct(r.withId, r.read)],
+    ["Page shape", `${r.structure.times} time stamps, ${r.structure.articles} article boxes`],
+    ["Result", v.say || (v.state === "ok" ? "Radar reads this page." : v.state === "empty" ? "No posts loaded here; nothing points to a change." : v.state === "waiting" ? "The page is still loading." : "Nothing to read on this page.")],
+    ["Checked", r.at],
+  ];
+}
+
+const HEALTH_DOES_NOT_PROVE = "The self-test counts what Radar's reader finds on this page now. A pass does not show every field is right, and a page that loads posts later can fail and then pass. It reads no text and sends nothing.";
+
+return { HEALTH_SETTLE_MS, HEALTH_STATES, adapterHealth, selfTestLines, HEALTH_DOES_NOT_PROVE };
+})();
+
+// ---- generic.js
+const M_generic = (() => {
+// The generic reader, for article and comment pages on sites Radar has no reader for. It runs only
+// when the user opens the site card on a page (src/ext/generic-page.js walks the page and passes
+// plain summaries here). It finds the article body as the block with the most paragraph text, and
+// comments as the largest run of sibling boxes that share a shape and carry an author link or a
+// time stamp. Then it runs the same text checks Radar runs on replies. Nothing leaves the browser.
+//
+// These are structural guesses, not a site reader: they can miss comments, take a list of related
+// links for comments, or read a sidebar as the article. The card says so beside every count.
+
+const { score } = M_rhetoric;
+const { persuasion } = M_persuasion;
+const { machineSigns } = M_machine;
+
+const GENERIC_MAX_COMMENTS = 200;
+const ARTICLE_MIN = 500, PARA_MIN = 40, ARTICLE_MAX = 20000;
+
+const median = (xs) => { const s = [...xs].sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : 0; };
+
+// blocks: [{ paragraphs: [text] }]. The block with the most text in paragraphs of 40 or more
+// characters, if it holds at least 500; its text, capped at 20,000 characters.
+function pickArticle(blocks) {
+  let best = null, bestLen = 0;
+  for (const b of blocks || []) {
+    const paras = (b.paragraphs || []).map((p) => String(p || "").trim()).filter((p) => p.length >= PARA_MIN);
+    const len = paras.reduce((n, p) => n + p.length, 0);
+    if (len > bestLen) { best = paras; bestLen = len; }
+  }
+  return best && bestLen >= ARTICLE_MIN ? best.join("\n\n").slice(0, ARTICLE_MAX) : null;
+}
+
+// groups: [{ items: [{ text, hasTime, author }] }], each a run of siblings with one shape. The
+// comment list is the group with at least three boxes where most carry an author or a time stamp
+// and the typical box holds 15 to 3,000 characters; the largest such group wins.
+function pickComments(groups) {
+  let best = null, bestScore = 0;
+  for (const g of groups || []) {
+    const items = (g.items || []).filter((x) => x && typeof x.text === "string");
+    if (items.length < 3) continue;
+    const marked = items.filter((x) => x.hasTime || x.author).length / items.length;
+    const typical = median(items.map((x) => x.text.trim().length));
+    if (marked < 0.5 || typical < 15 || typical > 3000) continue;
+    const s = items.length * marked;
+    if (s > bestScore) { best = items; bestScore = s; }
+  }
+  return best ? best.slice(0, GENERIC_MAX_COMMENTS).map((x) => ({ text: x.text.trim(), author: x.author || null, hasTime: !!x.hasTime })) : null;
+}
+
+const norm = (t) => t.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+
+// The text checks on what the page offered, as counts. No post text is kept in the result.
+function genericChecks({ article, comments }) {
+  const out = { article: null, comments: null };
+  if (article) {
+    const sc = score(article), pe = persuasion(article), ma = machineSigns(article);
+    out.article = { chars: article.length, markers: sc.markers.map((m) => m.family), techniques: pe.map((h) => h.technique), machineLike: !!ma.machineLike, leak: !!ma.leak };
+  }
+  if (comments && comments.length) {
+    const seen = new Map();
+    let marked = 0, persuasive = 0, machine = 0;
+    for (const c of comments) {
+      if (score(c.text).markers.length) marked++;
+      if (persuasion(c.text).length) persuasive++;
+      if (machineSigns(c.text).machineLike) machine++;
+      const k = norm(c.text);
+      if (k.length >= 20) seen.set(k, (seen.get(k) || 0) + 1);
+    }
+    const repeats = [...seen.values()].filter((n) => n >= 2);
+    out.comments = { n: comments.length, withAuthor: comments.filter((c) => c.author).length, marked, persuasive, machine, repeatedTexts: repeats.length, largestRepeat: repeats.length ? Math.max(...repeats) : 0 };
+  }
+  return out;
+}
+
+const GENERIC_DOES_NOT_PROVE = "Radar has no reader for this site, so it guessed where the article and the comments are from the page's layout. It can miss comments or count a list of links as comments. A marker is a pattern in wording, not a judgment of the writer.";
+
+return { GENERIC_MAX_COMMENTS, pickArticle, pickComments, genericChecks, GENERIC_DOES_NOT_PROVE };
 })();
 
 // ---- settings.js
@@ -6999,6 +8777,8 @@ const M_settings = (() => {
 // Radar's settings, in one normalised shape for the toolbar popup, the first-run and options pages
 // and the content scripts, plus the retention prune the background worker runs. Settings live in
 // chrome.storage.local under SETTINGS_KEY, on this machine only.
+
+const { FEED_OUTLETS, cleanFeedUrl, MAX_CUSTOM_FEEDS } = M_outlets;
 
 const SETTINGS_KEY = "pb.settings";
 
@@ -7021,11 +8801,16 @@ const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 
 const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
   historyDays: 60, aboutDays: 14, calm: false, large: false, onboarded: false,
-  // Other coverage (src/core/coverage.js): off until the user turns it on; coverageConsent is set
-  // when the user has read what it sends and clicked to send.
-  search: {}, coverage: false, coverageConsent: false,
+  // Other coverage (src/core/coverage.js): off until the user turns it on. outlets are the suggested
+  // feeds the user switched on (src/core/outlets.js), customFeeds the addresses they added, and
+  // feedConsent is set when the user has read which hosts a lookup asks and clicked to ask them.
+  search: {}, coverage: false, feedConsent: false, outlets: {}, customFeeds: [],
+  // Read text in images (src/core/imagetext.js, src/ocr): off until the user turns it on; even then
+  // it runs only on a click, on this device.
+  imageText: false,
 });
 
+const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
 const days = (v, d, r) => (Number.isFinite(Number(v)) && v !== null && v !== "" ? Math.min(r.max, Math.max(r.min, Math.round(Number(v)))) : d);
 const switches = (v, allowed) => {
@@ -7042,7 +8827,9 @@ function normalizeSettings(raw) {
     aboutDays: days(s.aboutDays, DEFAULTS.aboutDays, RETENTION.aboutDays),
     calm: bool(s.calm, DEFAULTS.calm), large: bool(s.large, DEFAULTS.large), onboarded: bool(s.onboarded, DEFAULTS.onboarded),
     search: switches(s.search, SEARCH_ENGINES.map(([id]) => id)), coverage: bool(s.coverage, DEFAULTS.coverage),
-    coverageConsent: bool(s.coverage, false) && bool(s.coverageConsent, false),
+    feedConsent: bool(s.coverage, false) && bool(s.feedConsent, false),
+    outlets: switches(s.outlets, FEED_OUTLETS.map(([id]) => id)), customFeeds: feedList(s.customFeeds),
+    imageText: bool(s.imageText, DEFAULTS.imageText),
   };
 }
 
@@ -7099,7 +8886,8 @@ const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "p
 // "Clear all Radar data": every Radar key except the settings themselves. The Mastodon servers the
 // user turned on (pb.instances.v1) are settings too, removed in the options page with their access.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
-const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1"]);
+// Imported data packs and the keys the user trusts (src/ext/packs-bg.js) are choices too.
+const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1", "pb.packs.v1", "pb.packkeys.v1"]);
 const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));
 
 return { SETTINGS_KEY, SITES, SEARCH_ENGINES, AREA_IDS, RETENTION, DEFAULTS, normalizeSettings, siteOn, areaOn, searchOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
@@ -7126,9 +8914,11 @@ const FAMILIES = [
   ["same-upload", "Same upload, many accounts", "coordination", D], ["duplicates", "Same text as other replies", "coordination", D],
   ["copied-elsewhere", "Same words in other threads", "coordination", D],
   ["cross-language", "Same link or upload in several languages", "coordination", D],
+  ["person-story", "One person's story, no wider picture", "language", D],
   ["laundered", "Material passed through other accounts", "sources", D],
   ["community-note", "Community Note", "sources", P], ["fact-check", "Fact-checked claim", "sources", D], ["ad", "Ad label", "sources", P],
   ["state-link", "State link", "sources", T], ["named-in-report", "Named in a published report", "sources", T],
+  ["backing-record", "Backing on record", "sources", T],
   ["lookalike-domain", "Look-alike news address", "sources", D], ["owner", "Outlet owner", "sources", T], ["site-record", "Site facts and fact-check record", "sources", T],
   ["client", "Posting app", "posting", P], ["written-in", "Written in another language", "place", P],
   ["mismatch", "Speaks as local, labelled elsewhere", "place", D], ["store-elsewhere", "App store elsewhere", "place", D],
@@ -7433,5 +9223,1116 @@ function discernment(items, raw) {
 return { TOUR_KEY, LEARN_KEY, TOUR_DAYS, TOUR_GAP_MS, lessonPath, safePage, TIPS, normalizeTour, nextTip, markShown, stopTips, normalizeLearn, recordAnswer, discernment };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_trail, ...M_crosslang, ...M_flooding, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_evidence, ...M_hosts, ...M_sites, ...M_coverage, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn });
+// ---- imagetext.js
+const M_imagetext = (() => {
+// Text read from an image (src/ocr, run in the extension's background on click). The words go
+// through the same rhetoric, theory, persuasion and fact-check matchers as a post's own text, and
+// every sign found that way says it was read from an image, with the recogniser's confidence. These
+// signs are not measured yet and never count toward the thread report.
+const { score } = M_rhetoric;
+const { persuasion } = M_persuasion;
+
+const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Radar's own text recogniser. The image and its text never leave your browser.";
+const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in Radar's options to read the words inside an image on this device.";
+const IMAGE_TEXT_DOES_NOT_PROVE = "The words were read by software and can be misread: a letter can change a word, or a word can be missed. The image can be edited, and reading its text says nothing about whether a post shown in it was real.";
+const MAX_SHOWN = 280;
+
+// The language model of the image's text, in the shape signals.js reads from a post.
+function imageTextModel(result) {
+  const text = (result && result.text) || "";
+  if (!text) return { markers: [], persuasion: [] };
+  return { markers: score(text).markers, persuasion: persuasion(text) };
+}
+
+const percent = (c) => `${Math.round(100 * Math.max(0, Math.min(1, c || 0)))}%`;
+
+// The window's rows once a reading has finished (or failed).
+function imageTextRows(result) {
+  if (!result) return [];
+  if (result.error) return [["Text in the image", `could not read it: ${result.error}`]];
+  if (!result.text) return [["Text in the image", "none found. Radar reads printed Latin-script text, such as English, French or Spanish; handwriting and other scripts are not read yet."]];
+  const shown = result.text.length > MAX_SHOWN ? result.text.slice(0, MAX_SHOWN).replace(/\s+\S*$/, "") + " …" : result.text;
+  const unsure = (result.lines || []).filter((l) => l.low).length;
+  return [
+    ["Text in the image", `"${shown}"`],
+    ["Confidence", `${percent(result.confidence)}, the recogniser's own average over the lines it kept; not a measured accuracy`],
+    ...(unsure ? [["Left out", `${unsure} ${unsure === 1 ? "line" : "lines"} the recogniser was unsure of`]] : []),
+    ["Read by", `Radar's own recogniser on this device, in ${Math.max(1, Math.round(result.ms || 0))} ms`],
+  ];
+}
+
+// A sign from the post's matchers, restated as read from an image: its own label and rows, the
+// recogniser's confidence, and the image line before its own does-not-prove line. Its family
+// becomes "image-text", so its measured line reads "not measured yet".
+function fromImage(signal, result) {
+  const rows = signal.rows.map(([h, v]) => [h === "In this post" ? "Read from the image" : h, v]);
+  const at = rows.findIndex(([h]) => h === "Does not prove");
+  const extra = [["Confidence", `${percent(result && result.confidence)} for the image's text as a whole`]];
+  const dnp = ["Does not prove", IMAGE_TEXT_DOES_NOT_PROVE + (at >= 0 ? " " + rows[at][1] : "")];
+  const body = at >= 0 ? rows.filter((_, i) => i !== at) : rows;
+  return { ...signal, label: `in image: ${signal.label}`, fam: "image-text", of: signal.fam, level: "info", fromImage: true, rows: [...body, ...extra, dnp] };
+}
+
+return { IMAGE_TEXT_NOTE, IMAGE_TEXT_OFF, IMAGE_TEXT_DOES_NOT_PROVE, imageTextModel, imageTextRows, fromImage };
+})();
+
+// ---- api-words.js
+const M_api_words = (() => {
+// The words the radar-core API puts on evidence items: labels, what a sign shows, where it came
+// from and what it does not prove. They are the same words the extension's window uses
+// (src/ext/signals.js and src/ext/panel.js), kept here so the API needs no DOM and no extension
+// code. Every string is stance-neutral and names no account.
+
+const STRONG_LABEL = { slur: "slur or coded hate term", stereotype: "group stereotype", dehumanise: "dehumanising language", violence: "call for violence", vigilante: "call for vigilantes" };
+
+const STRONG_MEANING = {
+  slur: "A slur, dog whistle or coined term with a documented hateful meaning (ADL Hate Symbols database, Hatebase, GNET, ISD).",
+  stereotype: "Names a whole group of people by a trait, such as criminal, lazy or violent.",
+  dehumanise: "Describes a group of people as vermin, disease, animals or filth.",
+  violence: "Calls for violence or collective punishment against people.",
+  vigilante: "Calls for people outside the law, or soldiers, to act against people.",
+};
+
+const FLAG_LABEL = {
+  "new-account": "new account", "name-changes": "renamed", "default-handle": "sign-up handle",
+  "based-elsewhere": "speaks as local, labelled elsewhere", "same-text": "same text as others", "hate-symbol-name": "hate symbol in name",
+  "store-elsewhere": "app store elsewhere", "flag-elsewhere": "flag of another country", "profile-location-elsewhere": "profile says elsewhere",
+  "high-volume": "very high post rate", "hours-elsewhere": "active hours fit elsewhere", "fast-replier": "replies within a minute",
+  "copied-elsewhere": "same words in other threads", "low-karma": "low karma for its age", "automation-app": "posts through an automation app",
+  "no-sleep-gap": "posts around the clock", "repost-only": "almost only reposts", "follow-pattern": "follows many, few follow back",
+  "platform-label": "moderation label", "brand-lookalike": "name borrows a brand",
+};
+
+const SRC_RULES = "Radar's own rules, run on this device. Rules and measured error rates: Radar's EVALUATION.md.";
+const SRC_POSTS = "The posts in the input, as given. Radar read them on this device and sent nothing anywhere.";
+const SRC_ACCOUNTS = "Account details given in the input: what each platform discloses on profiles and About pages.";
+const SRC_FILE = "The file's bytes, read on this device: Content Credentials (C2PA) and IPTC or XMP metadata.";
+
+const STRONG_DOES_NOT_PROVE = "Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.";
+const LEAK_DOES_NOT_PROVE = "People quote chatbots, joke, or paste a reply on purpose.";
+const MACHINE_DOES_NOT_PROVE = "No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.";
+const SPAM_DOES_NOT_PROVE = "Real people post giveaways and contact details too. The pattern describes the post, not who sent it.";
+const BURST_DOES_NOT_PROVE = "A post going viral at one moment, or a notification many people get at once, brings replies together too. This describes when the replies arrived, not who sent them or why.";
+const SITE_OWNER_DOES_NOT_PROVE = "Ownership is not editorial control, and Wikidata can lag a sale.";
+const THREAD_LIMIT = "This covers the posts in the input as given, ranked and filtered by the platform before anyone saw them. It names no account and judges no person.";
+const TEXT_LIMIT = "This describes one piece of text. It says nothing about who wrote it, why, or whether it is true.";
+
+return { STRONG_LABEL, STRONG_MEANING, FLAG_LABEL, SRC_RULES, SRC_POSTS, SRC_ACCOUNTS, SRC_FILE, STRONG_DOES_NOT_PROVE, LEAK_DOES_NOT_PROVE, MACHINE_DOES_NOT_PROVE, SPAM_DOES_NOT_PROVE, BURST_DOES_NOT_PROVE, SITE_OWNER_DOES_NOT_PROVE, THREAD_LIMIT, TEXT_LIMIT };
+})();
+
+// ---- api-data.js
+const M_api_data = (() => {
+// The tables the radar-core API reads, handed in by the caller. The API never fetches or opens a
+// file itself: the CLI reads them from disk, the extension from its own package. Each table is
+// optional; evidence that needs a missing table is left out, never guessed.
+//   sites   src/ext/sites.json   (Wikidata facts and fact-check records per site)
+//   owners  src/ext/owners.json  (Wikidata ownership rows)
+//   state   src/ext/state.json   (state links, each citing its source)
+//   claims  src/ext/claims.json, joined with its parts (the fact-check table)
+
+const { setSiteTable } = M_sites;
+const { setOwnerRows } = M_owners;
+const { setStateRows } = M_state;
+const { buildClaimIndex } = M_claims;
+const { joinClaims } = M_claims_parts;
+
+let CLAIM_INDEX = null;
+const rowsOf = (t) => (Array.isArray(t) ? t : (t && t.rows) || []);
+const LOADED = { sites: 0, owners: 0, state: 0, claims: 0 };
+
+// tables: { sites?, owners?, state?, claims?, claimParts? }, each as its file holds it (owners and
+// state may also be plain row arrays). Returns how many rows each table holds.
+function useData(tables = {}) {
+  if (tables.sites) LOADED.sites = setSiteTable(tables.sites);
+  if (tables.owners) LOADED.owners = setOwnerRows(rowsOf(tables.owners));
+  if (tables.state) { setStateRows(rowsOf(tables.state)); LOADED.state = rowsOf(tables.state).length; }
+  if (tables.claims) {
+    CLAIM_INDEX = buildClaimIndex(joinClaims(tables.claims, tables.claimParts || []));
+    LOADED.claims = CLAIM_INDEX.n;
+  }
+  return { ...LOADED };
+}
+
+const claimIndex = () => CLAIM_INDEX;
+const dataLoaded = () => ({ ...LOADED });
+
+return { useData, claimIndex, dataLoaded };
+})();
+
+// ---- api-site.js
+const M_api_site = (() => {
+// Site context as evidence items: who owns a site, any state link a cited source makes, whether
+// its address imitates a listed outlet, and its fact-check record. Every item names its source.
+// Radar adds no score or rating of its own. Reads only the tables handed to useData().
+
+const { siteFacts, siteRecord, recordSummary, recordLine, ownerHeading, ownerType, SITE_SOURCES, SITE_RECORD_DOES_NOT_PROVE } = M_sites;
+const { ownerOfDomain, ownerSource } = M_owners;
+const { stateLinksOfDomain, stateLabel, STATE_DOES_NOT_PROVE } = M_state;
+const { lookalikeOf, LOOKALIKE_DOES_NOT_PROVE } = M_lookalike;
+const { hostOf } = M_hosts;
+const { SITE_OWNER_DOES_NOT_PROVE } = M_api_words;
+
+// "https://www.Example.com/a" or "example.com" -> "example.com", or null.
+function cleanDomain(d) {
+  const s = String(d || "").trim();
+  if (!s) return null;
+  const h = hostOf(/^https?:\/\//i.test(s) ? s : "https://" + s);
+  return h ? h.replace(/^www\./, "").replace(/\.$/, "") : null;
+}
+
+const stateLevel = (h) => (h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" || h.basis === "designated" ? "flag" : "info");
+const sourceLine = (s) => (s ? `${s.title}${s.date ? ` (${s.date})` : ""}${s.url ? `: ${s.url}` : ""}` : "the cited report");
+
+// What Radar's tables hold for one domain: { domain, facts, owner, state, record, lookalike }.
+function siteSummary(domain) {
+  const d = cleanDomain(domain);
+  if (!d) return null;
+  const owner = ownerOfDomain(d);
+  return {
+    domain: d,
+    facts: siteFacts(d),
+    owner: owner ? { name: owner.name, owner: owner.owner, via: owner.via || "owner", source: owner.source || null, ...(owner.correction ? { correction: owner.correction } : {}) } : null,
+    state: stateLinksOfDomain(d).map((h) => ({ ...h })),
+    record: recordSummary(siteRecord(d)),
+    lookalike: lookalikeOf(d),
+  };
+}
+
+// Evidence items for one domain linked by the given posts. Items with nothing to say are left out.
+function siteEvidence(domain, posts = [], { quiet = false } = {}) {
+  const S = siteSummary(domain);
+  if (!S) return [];
+  const out = [], base = { scope: posts.length ? "post" : "site", posts, spans: [] };
+  if (S.lookalike) {
+    const L = S.lookalike;
+    out.push({ ...base, kind: "lookalike-domain", level: "flag", label: `look-alike of ${L.official}`,
+      shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "Radar's list of outlet addresses, matched on this device.",
+      doesNotProve: LOOKALIKE_DOES_NOT_PROVE, data: { domain: S.domain, outlet: L.outlet, official: L.official, how: L.how } });
+  }
+  for (const h of S.state) {
+    const L = stateLabel(h);
+    out.push({ ...base, kind: "state-link", level: stateLevel(h), label: L.chip, shows: L.says, source: sourceLine(h.source),
+      doesNotProve: STATE_DOES_NOT_PROVE[h.basis] || STATE_DOES_NOT_PROVE["named-in-report"], data: { domain: S.domain, state: h.state, basis: h.basis, actor: h.actor } });
+  }
+  if (S.owner && S.owner.owner) {
+    out.push({ ...base, kind: "site-owner", level: "info", label: `link: ${S.owner.name || S.domain}`,
+      shows: `${S.owner.name || S.domain} (${S.domain}). ${ownerHeading(S.owner)} ${S.owner.owner}.`, source: ownerSource(S.owner),
+      doesNotProve: SITE_OWNER_DOES_NOT_PROVE, data: { domain: S.domain, owner: S.owner.owner, ownerType: ownerType({ facts: S.facts, state: S.state }) } });
+  }
+  const line = recordLine(S.record);
+  if (line || (!quiet && S.facts)) {
+    out.push({ ...base, kind: "site-record", level: "info", label: `site record: ${S.domain}`,
+      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "No review in Radar's table lists this site as where a claim appeared."].join(": ") + ".",
+      source: SITE_SOURCES, doesNotProve: SITE_RECORD_DOES_NOT_PROVE,
+      data: { domain: S.domain, reviews: S.record ? S.record.n : 0, checkers: S.record ? S.record.m : 0, since: S.record ? S.record.since : null, founded: S.facts ? S.facts.founded : null, country: S.facts ? S.facts.country : null } });
+  }
+  return out;
+}
+
+return { cleanDomain, siteSummary, siteEvidence };
+})();
+
+// ---- api-post.js
+const M_api_post = (() => {
+// Evidence about one post's text: strong language, named theories, persuasion techniques,
+// machine-writing and spam signs, fact-checked claims and the domains it names. Each item says
+// what it shows, where it came from and what it does not prove, and carries the matched span so
+// anyone holding the post can check it. Pure: no DOM, no network.
+
+const { score } = M_rhetoric;
+const { persuasion, PERSUASION_DOES_NOT_PROVE } = M_persuasion;
+const { machineSigns } = M_machine;
+const { theoryById, THEORY_DOES_NOT_PROVE } = M_theories;
+const { matchClaims, CLAIM_LABEL, CLAIM_DOES_NOT_PROVE, CLAIM_ATTRIBUTION } = M_claims;
+const { domainsIn } = M_owners;
+const { cleanDomain } = M_api_site;
+const { STRONG_LABEL, STRONG_MEANING, SRC_RULES, STRONG_DOES_NOT_PROVE, LEAK_DOES_NOT_PROVE, MACHINE_DOES_NOT_PROVE, SPAM_DOES_NOT_PROVE } = M_api_words;
+
+// Where `match` sits in `text`: { post, start, end, text }. start and end are null when the
+// match was found after folding look-alike letters and is not in the text as written.
+function spanOf(post, text, match) {
+  const m = String(match || "");
+  const at = m ? String(text || "").toLowerCase().indexOf(m.toLowerCase()) : -1;
+  return at < 0 ? { post, start: null, end: null, text: m } : { post, start: at, end: at + m.length, text: String(text).slice(at, at + m.length) };
+}
+
+const item = (post, kind, level, label, shows, source, doesNotProve, spans = [], data = {}) =>
+  ({ kind, scope: "post", level, label, shows, source, doesNotProve, posts: [post], spans, data });
+
+function language(id, text) {
+  const out = [], s = score(text);
+  for (const mk of s.markers) {
+    if (STRONG_LABEL[mk.family]) out.push(item(id, "strong-language", "warn", STRONG_LABEL[mk.family], STRONG_MEANING[mk.family], SRC_RULES, STRONG_DOES_NOT_PROVE, [spanOf(id, text, mk.match)], { family: mk.family, lang: mk.lang || "en" }));
+    const t = mk.family === "conspiracy-theory" ? theoryById(mk.theory) : null;
+    if (t) out.push(item(id, "names-theory", "info", `names a theory: ${t.name}`, `${t.claim} What the record shows: ${t.record}`, (t.sources || []).map((x) => `${x.title} (${x.date}): ${x.url}`).join("; ") || SRC_RULES, `${t.dnp ? t.dnp + " " : ""}${THEORY_DOES_NOT_PROVE}`, [spanOf(id, text, mk.match)], { theory: t.id }));
+  }
+  for (const t of persuasion(text)) {
+    out.push(item(id, "persuasion", "info", `persuasion: ${t.name.toLowerCase()}`, t.definition, SRC_RULES, PERSUASION_DOES_NOT_PROVE, [spanOf(id, text, t.match)], { technique: t.technique, lang: t.lang || "en" }));
+  }
+  return { items: out, extreme: s.extreme };
+}
+
+function machine(id, text) {
+  const M = machineSigns(text), out = [];
+  if (M.leak) out.push(item(id, "leaked-ai", "warn", "leaked AI text", "Text a chatbot writes, posted without editing.", SRC_RULES, LEAK_DOES_NOT_PROVE, [spanOf(id, text, M.leak)]));
+  else if (M.machineLike) out.push(item(id, "machine-writing", "flag", "machine-writing signs", `Signs: ${M.signs.join("; ")}. Radar counts three or more independent signs in a post of at least 25 words.`, SRC_RULES, MACHINE_DOES_NOT_PROVE, [], { signs: M.signs }));
+  if (M.spam) out.push(item(id, "spam-pattern", "warn", "spam pattern", "A pattern common in scam and spam posts: giveaways, crypto, contact bait.", SRC_RULES, SPAM_DOES_NOT_PROVE, [spanOf(id, text, M.spam)]));
+  return { items: out, machineLike: !!(M.leak || M.machineLike) };
+}
+
+function claims(id, text, index) {
+  if (!index) return [];
+  return matchClaims(index, text).map((m) => item(id, "fact-check", "warn", CLAIM_LABEL,
+    `${m.checker} rated a similar claim "${m.rating}": ${m.claim} (${m.url}). Wording overlap: ${Math.round(m.coverage * 100)}% of the claim's words.${m.negationDiffers ? " One of the two says \"not\" and the other does not. Read both." : ""}`,
+    CLAIM_ATTRIBUTION, CLAIM_DOES_NOT_PROVE, [], { checker: m.checker, rating: m.rating, claim: m.claim, url: m.url, date: m.date || null, overlap: m.coverage, negationDiffers: !!m.negationDiffers }));
+}
+
+// The domains a post links to or names, lower case, unique.
+function postDomains(post) {
+  const out = new Set();
+  for (const l of post.links || []) { const d = cleanDomain(l); if (d) out.add(d); }
+  for (const d of domainsIn(post.text)) { const c = cleanDomain(d); if (c) out.add(c); }
+  return [...out];
+}
+
+// post: { id, text, links? }. Returns { items, extreme, machineLike, domains }.
+function postEvidence(post, { claimIndex = null } = {}) {
+  const id = String(post.id), text = String(post.text || "");
+  const L = language(id, text), M = machine(id, text);
+  return { items: [...L.items, ...M.items, ...claims(id, text, claimIndex)], extreme: L.extreme, machineLike: M.machineLike, domains: postDomains(post) };
+}
+
+return { spanOf, postDomains, postEvidence };
+})();
+
+// ---- api-thread.js
+const M_api_thread = (() => {
+// Thread-level evidence: the thread norm report, near-identical replies, timing bursts, swarming
+// and account flags. Items refer to posts by id and never name an account, so an export of them
+// cannot become a list of people. Pure: no DOM, no network.
+
+const { threadReport, REPORT_DOES_NOT_PROVE } = M_report;
+const { duplicateClusters } = M_similarity;
+const { timingBursts } = M_timing;
+const { swarmSign, SWARM_DOES_NOT_PROVE } = M_swarming;
+const { flagsFor, isFlagged, ageDays, DOES_NOT_PROVE, NEW_ACCOUNT_DAYS } = M_flags;
+const { baselineLine } = M_baselines;
+const { FLAG_LABEL, SRC_POSTS, SRC_ACCOUNTS, BURST_DOES_NOT_PROVE } = M_api_words;
+
+const thread = (kind, level, label, shows, source, doesNotProve, posts, data = {}) =>
+  ({ kind, scope: "thread", level, label, shows, source, doesNotProve, posts, spans: [], data });
+const withBase = (text, sign, replies) => { const b = baselineLine(sign, { replies }); return b ? `${text} ${b}` : text; };
+
+// Flags for one reply: the input's own list (ids or { id, evidence }), or Radar's rules over the
+// account details given, or null when neither was given (the account was not read).
+function flagsOf(reply, now) {
+  if (Array.isArray(reply.flags)) return reply.flags.map((f) => (typeof f === "string" ? { id: f } : f)).filter((f) => f && f.id);
+  if (reply.account && typeof reply.account === "object") return flagsFor(reply.account, { now });
+  return null;
+}
+
+function flagItems(replies, now) {
+  const byKey = new Map();
+  for (const r of replies) {
+    for (const f of r.flags || []) {
+      const key = f.id + "|" + String(r.author).toLowerCase() + "|" + (f.evidence || "");
+      const e = byKey.get(key) || { f, posts: [] };
+      e.posts.push(r.id);
+      byKey.set(key, e);
+    }
+  }
+  return [...byKey.values()].map(({ f, posts }) => ({
+    kind: "account-flag", scope: "post", level: f.id === "based-elsewhere" ? "warn" : "flag", label: FLAG_LABEL[f.id] || f.id,
+    shows: f.evidence ? `The account behind ${posts.length === 1 ? "this post" : "these posts"}: ${f.evidence}.` : `The input marks the account behind ${posts.length === 1 ? "this post" : "these posts"} with this flag.`,
+    source: SRC_ACCOUNTS, doesNotProve: DOES_NOT_PROVE[f.id] || f.doesNotProve || "A flag is a sign to look at, not a finding about the person.",
+    posts, spans: [], data: { flag: f.id, asOf: new Date(now).toISOString().slice(0, 10) },
+  }));
+}
+
+function reportItem(replies, R) {
+  const ci = (c) => c.map((x) => Math.round(x * 1000) / 1000);
+  return thread("thread-report", R.verdict === "skewed-to-flagged" ? "flag" : "info", "thread report", R.sentence,
+    `${SRC_POSTS} ${SRC_ACCOUNTS}`, REPORT_DOES_NOT_PROVE, replies.map((r) => r.id), {
+      replies: R.replies, accountsRead: R.lookedUp, notRead: R.notLookedUp, verdict: R.verdict,
+      extreme: { n: R.extreme.n, flagged: R.extreme.flagged, ci: ci(R.extreme.ci) },
+      others: { n: R.others.n, flagged: R.others.flagged, ci: ci(R.others.ci) }, machineSigns: R.machine.n,
+    });
+}
+
+function burstItems(replies) {
+  return timingBursts(replies).map((b) => {
+    const who = new Set(b.authors), from = Date.parse(b.from), to = Date.parse(b.to);
+    const posts = replies.filter((r) => who.has(String(r.author).toLowerCase()) && Date.parse(r.posted) >= from && Date.parse(r.posted) <= to).map((r) => r.id);
+    const secs = Math.max(1, Math.round((to - from) / 1000));
+    return thread("timing-burst", "flag", `timing burst, ${b.authors.length} accounts`,
+      withBase(`${b.authors.length} accounts replied within ${secs} s at ${b.from.slice(11, 16)} UTC. Chance at this thread's pace: p ${b.p < 1e-6 ? "< 0.000001" : "= " + b.p.toPrecision(2)}.`, "burst", replies.length),
+      SRC_POSTS, BURST_DOES_NOT_PROVE, posts, { from: b.from, to: b.to, accounts: b.authors.length, p: b.p });
+  });
+}
+
+function sameTextItems(replies, root) {
+  return duplicateClusters(replies, { root }).map((c) => thread("same-text", "flag", `near-identical replies, ${c.authors.length} accounts`,
+    withBase(`${c.ids.length} replies from ${c.authors.length} different accounts share most of their wording (similarity at least ${c.similarity}).`, "same-text", replies.length),
+    SRC_POSTS, DOES_NOT_PROVE["same-text"], c.ids.map(String), { posts: c.ids.length, accounts: c.authors.length, similarity: c.similarity }));
+}
+
+function swarmItem(replies, now) {
+  const by = new Map(replies.map((r) => [String(r.author).toLowerCase(), r]));
+  const markOf = (a, t) => {
+    const r = by.get(a);
+    if (!r || !Array.isArray(r.flags)) return null;
+    const age = r.account && r.account.joinDate ? ageDays(r.account.joinDate, t || now) : null;
+    return { new: age != null && age < NEW_ACCOUNT_DAYS, flagged: isFlagged(r.flags) };
+  };
+  const w = swarmSign(replies, markOf);
+  if (!w) return [];
+  const from = Date.parse(w.from), to = Date.parse(w.to);
+  const posts = replies.filter((r) => { const t = Date.parse(r.posted); return t >= from && t <= to; }).map((r) => r.id);
+  return [thread("swarming", "flag", "swarming", withBase(`${w.marked} of ${w.known} accounts read in a ${Math.round(w.windowSec / 60)}-minute window from ${w.from.slice(11, 16)} UTC were new or flagged (${w.newAccounts} new, ${w.flagged} flagged), all replying to one post.`, "swarm", replies.length),
+    `${SRC_POSTS} ${SRC_ACCOUNTS}`, SWARM_DOES_NOT_PROVE, posts, { from: w.from, to: w.to, known: w.known, marked: w.marked, newAccounts: w.newAccounts, flagged: w.flagged })];
+}
+
+// replies: normalised [{ id, author, text, posted, flags, extreme, machine }]. root: { text } or null.
+function threadItems(replies, root, { now = Date.now() } = {}) {
+  const accounts = new Set(replies.map((r) => String(r.author).toLowerCase())).size;
+  const R = threadReport(replies);
+  // One account (a data export, or a thread with one replier) has nothing to compare.
+  const out = [...(accounts >= 2 ? [reportItem(replies, R)] : []), ...flagItems(replies, now)];
+  if (accounts >= 2) out.push(...sameTextItems(replies, root), ...burstItems(replies));
+  if (root && accounts >= 2) out.push(...swarmItem(replies, now));
+  return { items: out, report: R, accounts };
+}
+
+return { flagsOf, threadItems };
+})();
+
+// ---- api-media.js
+const M_api_media = (() => {
+// A file's Content Credentials (C2PA) and AI-generation metadata as evidence items. The words come
+// from src/core/mediacheck.js, so the API never calls a file authentic or fake.
+
+const { readCredentials, credentialState } = M_c2pa;
+const { credentialSignals, CREDENTIALS_DO_NOT_PROVE, NO_CREDENTIALS } = M_mediacheck;
+const { SRC_FILE } = M_api_words;
+
+const row = (rows, key) => (rows.find((r) => r[0] === key) || [])[1] || null;
+const KIND = { c2pa: "content-credentials", "c2pa-changed": "credentials-changed", "ai-metadata": "ai-metadata" };
+
+// The evidence for one reading from readCredentials().
+function mediaItems(r) {
+  const state = credentialState(r);
+  const out = credentialSignals(r).map((s) => ({
+    kind: s.fam === "c2pa" && /AI/.test(s.label) ? "credentials-ai" : KIND[s.fam] || s.fam,
+    scope: "file", level: s.level, label: s.label,
+    shows: [row(s.rows, "What Radar read") || row(s.rows, "What Radar found"), row(s.rows, "Signed by") ? `Signed by ${row(s.rows, "Signed by")}.` : null].filter(Boolean).join(" "),
+    source: SRC_FILE, doesNotProve: row(s.rows, "Does not prove") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
+  }));
+  if (state === "none") out.push({ kind: "no-credentials", scope: "file", level: "info", label: "no content credentials", shows: NO_CREDENTIALS, source: SRC_FILE, doesNotProve: "A file without credentials can be real or made up; most platforms remove them.", posts: [], spans: [], data: { state } });
+  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online. Radar does not fetch them, so nothing was checked.", source: SRC_FILE, doesNotProve: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
+  return out;
+}
+
+// bytes: Uint8Array or ArrayBuffer of the whole file. Returns { state, ai, items }.
+async function mediaReading(bytes) {
+  const r = await readCredentials(bytes, { complete: true });
+  const ai = !!(r.aiAnywhere || ((r.meta && r.meta.sourceTypes) || []).some((t) => t.kind === "ai") || ((r.meta && r.meta.generators) || []).length);
+  return { state: credentialState(r), ai, format: r.format || null, items: mediaItems(r) };
+}
+
+return { mediaItems, mediaReading };
+})();
+
+// ---- api.js
+const M_api = (() => {
+// radar-core: the public API. One zero-dependency ES module over Radar's pure core, for anyone
+// who wants Radar's evidence without the browser extension. No DOM, no network, no storage: the
+// caller hands in the posts, the file bytes and (optionally) the data tables, and gets back
+// evidence objects that match schema/evidence.v1.json. project-docs/INTEGRATION.md documents it.
+//
+//   analyzeThread({ site, root, replies })   evidence about a thread
+//   analyzeText(text)                        evidence about one piece of text
+//   checkMedia(bytes)                        Content Credentials and AI metadata of a file
+//   siteInfo(domain)                         what Radar's tables hold about a site
+//   useData({ sites, owners, state, claims, claimParts })   load the tables (optional)
+//
+// Every evidence item states what it shows, its source and what it does not prove. None names an
+// account: items point at posts by id.
+
+const { postEvidence } = M_api_post;
+const { threadItems, flagsOf } = M_api_thread;
+const { siteEvidence, siteSummary, cleanDomain } = M_api_site;
+const { mediaReading } = M_api_media;
+const { useData, claimIndex, dataLoaded } = M_api_data;
+const { REPORT_DOES_NOT_PROVE } = M_report;
+const { THREAD_LIMIT, TEXT_LIMIT } = M_api_words;
+
+const API_VERSION = "1.0.0";
+const EVIDENCE_SCHEMA = "urn:radar:evidence:v1";
+
+
+const envelope = (kind, extra) => ({ schema: EVIDENCE_SCHEMA, api: API_VERSION, kind, ...extra });
+const number = (items) => items.map((it, i) => ({ id: "e" + (i + 1), ...it }));
+
+// Adds the site items for every domain the posts link to, one item set per domain.
+function linkItems(byDomain) {
+  return [...byDomain].flatMap(([d, posts]) => siteEvidence(d, posts, { quiet: true }));
+}
+
+// One post in the input: { id?, author?, text, posted?, links?, flags?, account? }.
+function normalise(p, i, now) {
+  const post = { id: p && p.id != null ? String(p.id) : "p" + (i + 1), author: String((p && p.author) || "unknown-" + (i + 1)), text: String((p && p.text) || ""), posted: (p && p.posted) || null, links: (p && p.links) || [] };
+  post.flags = flagsOf(p || {}, now);
+  if (p && p.account) post.account = p.account;
+  return post;
+}
+
+// text: a string. opts: { id, links }. Returns the evidence envelope for one piece of text.
+function analyzeText(text, opts = {}) {
+  const id = opts.id != null ? String(opts.id) : "p1";
+  const P = postEvidence({ id, text, links: opts.links || [] }, { claimIndex: claimIndex() });
+  const links = new Map(P.domains.map((d) => [d, [id]]));
+  return envelope("text", { posts: { n: 1, accounts: null }, evidence: number([...P.items, ...linkItems(links)]), limits: [TEXT_LIMIT] });
+}
+
+// input: { site, root?, replies: [post] }. opts: { now }: the time account ages are measured at.
+function analyzeThread(input, opts = {}) {
+  const now = opts.now || Date.now();
+  const replies = ((input && input.replies) || []).map((p, i) => normalise(p, i, now));
+  const root = input && input.root && input.root.text != null ? normalise({ id: "root", ...input.root }, -1, now) : null;
+  const items = [], links = new Map();
+  for (const post of root ? [root, ...replies] : replies) {
+    const P = postEvidence(post, { claimIndex: claimIndex() });
+    items.push(...P.items);
+    post.extreme = P.extreme; post.machine = P.machineLike;
+    for (const d of P.domains) (links.get(d) || links.set(d, []).get(d)).push(post.id);
+  }
+  const T = threadItems(replies, root, { now });
+  const evidence = number([...T.items, ...items, ...linkItems(links)]);
+  return envelope("thread", {
+    site: (input && input.site) || null,
+    posts: { n: replies.length + (root ? 1 : 0), accounts: T.accounts, ids: [...(root ? [root.id] : []), ...replies.map((r) => r.id)] },
+    evidence, limits: [THREAD_LIMIT, REPORT_DOES_NOT_PROVE],
+  });
+}
+
+// bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
+async function checkMedia(bytes) {
+  const M = await mediaReading(bytes);
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Radar read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
+}
+
+// domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
+function siteInfo(domain) {
+  const d = cleanDomain(domain);
+  if (!d) return null;
+  const loaded = dataLoaded();
+  const limits = ["Every row names its source. Radar adds no score or rating of its own."];
+  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("No site tables were loaded, so only the look-alike check ran.");
+  return envelope("site", { site: siteSummary(d), evidence: number(siteEvidence(d, [])), limits });
+}
+
+return { API_VERSION, EVIDENCE_SCHEMA, analyzeText, analyzeThread, checkMedia, siteInfo };
+})();
+
+// ---- evidence-bundle.js
+const M_evidence_bundle = (() => {
+// Signed evidence bundles: what Radar found on a thread, as a file anyone can check offline. A
+// bundle carries post ids, the evidence with the matched spans needed to check it, the Radar and
+// API versions, a hash of the data tables used, and the time; it is signed with a per-install
+// ECDSA P-256 key through WebCrypto, and the public key travels inside the bundle.
+//
+// Privacy: other people's full post text stays out unless the user opts in (includeText). The
+// bundle names no account, and a thread bundle needs as many reply accounts as a thread card.
+//
+// What a valid signature shows: the bundle has not changed since the holder of that key signed
+// it. It does not show who holds the key, that the posts said what the spans say, or that the
+// evidence is right. Compare the key id with one you got from its holder some other way.
+
+const { MIN_CARD_ACCOUNTS } = M_evidence;
+const { canonicalJSON, sha256Hex, lfBytes, jwkId, signText, verifyText, P256 } = M_sig;
+
+const BUNDLE_KIND = "radar-evidence-bundle";
+const BUNDLE_VERSION = 1;
+const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
+const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right.";
+// Canonical JSON, hashing, base64url and ECDSA P-256 live in sig.js, shared with data packs.
+const subtle = () => globalThis.crypto.subtle;
+
+// The hash of the data tables: SHA-256 over lines "<sha256>  <name>", names sorted, each file
+// hashed with LF line ends. Those per-file hashes are the ones data/LOCK.json records for the
+// tables and src/ext/radar-data.pack.json signs, so dataLockFromHashes() gives the same value
+// from either (tests/datalock.bundle.test.js).
+async function dataLockOf(files) {
+  const hashes = {};
+  for (const [name, bytes] of files) hashes[name] = await sha256Hex(lfBytes(bytes));
+  return dataLockFromHashes(hashes);
+}
+async function dataLockFromHashes(hashes) {
+  const lines = Object.keys(hashes).sort().map((name) => `${hashes[name]}  ${name}`);
+  return { alg: "SHA-256", of: "lines \"<sha256>  <file>\" for each data table, sorted by name; files hashed with LF line ends", value: await sha256Hex(lines.join("\n") + "\n") };
+}
+
+// A new key pair. extractable: false keeps the private key inside the browser's key store.
+async function newBundleKey({ extractable = false } = {}) {
+  return subtle().generateKey(P256, extractable, ["sign", "verify"]);
+}
+
+// The public half as a JWK with only the fields a verifier needs, and its id: the first 16 hex
+// characters of the SHA-256 of that JWK's canonical JSON.
+async function publicKeyOf(publicKey) {
+  const j = await subtle().exportKey("jwk", publicKey);
+  const jwk = { kty: j.kty, crv: j.crv, x: j.x, y: j.y };
+  return { jwk, keyId: await jwkId(jwk, 16) };
+}
+
+// result: an analyzeThread or analyzeText envelope. opts: { tool, dataLock, savedAt, page, texts,
+// includeText, source }. texts: { postId: text }, used only when includeText is true.
+// Returns { ok: true, bundle } or { ok: false, reason }.
+function makeBundle(result, opts = {}) {
+  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "There is no analysis to put in a bundle." };
+  const archive = opts.source === "export";
+  if (result.kind === "thread" && !archive && (result.posts.accounts || 0) < MIN_CARD_ACCOUNTS) {
+    return { ok: false, reason: `This thread has ${result.posts.accounts || 0} accounts. A bundle needs at least ${MIN_CARD_ACCOUNTS}, so it cannot be about one person.` };
+  }
+  const ids = (result.posts && result.posts.ids) || [...new Set(result.evidence.flatMap((e) => e.posts))];
+  const texts = opts.includeText ? opts.texts || {} : {};
+  const bundle = {
+    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "Radar",
+    savedAt: opts.savedAt || new Date().toISOString(), dataLock: opts.dataLock || null,
+    input: { kind: result.kind, site: result.site || null, page: opts.page || null, source: archive ? "export" : "thread", accounts: result.posts ? result.posts.accounts : null },
+    posts: ids.map((id) => (opts.includeText && texts[id] != null ? { id, text: String(texts[id]) } : { id })),
+    textIncluded: !!opts.includeText,
+    evidence: result.evidence, limits: [...(result.limits || []), BUNDLE_DOES_NOT_PROVE],
+  };
+  return { ok: true, bundle };
+}
+
+// Signs a bundle with a key pair from newBundleKey(). Returns a new bundle with `signature`.
+async function signBundle(bundle, keyPair) {
+  const { signature, ...body } = bundle;
+  const { jwk, keyId } = await publicKeyOf(keyPair.publicKey);
+  const signed = { ...body, signer: { alg: BUNDLE_SIG_ALG, keyId, publicKey: jwk } };
+  const value = await signText(keyPair.privateKey, canonicalJSON(signed));
+  return { ...signed, signature: { of: "canonical JSON of this bundle without the signature field (sorted keys, no spaces)", value } };
+}
+
+// Spans and post references inside the bundle agree with themselves: every post an item names is
+// listed, and when text is included every located span is the text at that place.
+function bundleConsistency(bundle) {
+  const ids = new Set((bundle.posts || []).map((p) => p.id)), text = new Map((bundle.posts || []).filter((p) => p.text != null).map((p) => [p.id, p.text]));
+  const missing = [], wrong = [];
+  for (const e of bundle.evidence || []) {
+    for (const p of e.posts || []) if (!ids.has(p)) missing.push(`${e.id}: ${p}`);
+    for (const s of e.spans || []) {
+      const t = text.get(s.post);
+      if (t != null && s.start != null && t.slice(s.start, s.end) !== s.text) wrong.push(`${e.id}: ${s.post}`);
+    }
+  }
+  return { ok: !missing.length && !wrong.length, missing, wrong };
+}
+
+async function signatureOk(bundle) {
+  const { signature, ...body } = bundle, S = body.signer;
+  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Radar can check" };
+  const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
+  let id = null;
+  try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
+  if (id !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
+  const good = await verifyText(jwk, signature.value, canonicalJSON(body));
+  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature does not match: the bundle changed after signing, or was signed with another key" };
+}
+
+// opts.keyId: the key id you expect, from the signer by another route. Resolves to
+// { ok, keyId, checks: [{ name, ok, text }] }; ok is true only when every check passes.
+async function verifyBundle(bundle, opts = {}) {
+  const checks = [];
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Radar evidence bundle" }] };
+  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Radar reads` });
+  checks.push({ name: "signature", ...(await signatureOk(bundle)) });
+  const keyId = bundle.signer ? bundle.signer.keyId : null;
+  if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
+  const C = bundleConsistency(bundle);
+  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts not listed (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
+  return { ok: checks.every((c) => c.ok), keyId, checks };
+}
+
+return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, dataLockOf, dataLockFromHashes, newBundleKey, publicKeyOf, makeBundle, signBundle, bundleConsistency, verifyBundle };
+})();
+
+// ---- signing.js
+const M_signing = (() => {
+// Release signatures: detached ECDSA P-256 signatures over a release's SHA256SUMS, made and checked
+// with Radar's one copy of the signing primitives (src/core/sig.js), the same code that signs data
+// packs and evidence bundles. It runs in node (scripts/release.mjs, scripts/verify-release.mjs), in
+// the extension and on the public install page (docs/signing.js, a generated copy). No library, no
+// network.
+//
+// A key is named for people by its key id: the first 32 hex characters of the SHA-256 of its
+// canonical public JWK, in groups of four, the same id data packs show. The RFC 7638 thumbprint
+// (the same hash, base64url) is kept for tools that expect one.
+//
+// What a valid signature proves: whoever held the private key for this public key signed these
+// exact bytes. It does not prove the signer is who they say, that the key was not stolen, or that
+// the signed files are safe. Those rest on how the public key reached you (INSTALL.md).
+
+const { P256, b64url, canonicalJSON, jwkId, signText, verifyText } = M_sig;
+
+// Only the public members, from a public or a private JWK.
+const publicPart = (jwk) => {
+  if (!jwk || jwk.kty !== "EC" || jwk.crv !== "P-256" || !jwk.x || !jwk.y) throw new Error("not a P-256 key");
+  return { kty: "EC", crv: "P-256", x: jwk.x, y: jwk.y };
+};
+
+async function signingKeyId(jwk) {
+  return (await jwkId(publicPart(jwk), 32)).match(/.{4}/g).join(" ");
+}
+
+async function jwkThumbprint(jwk) {
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonicalJSON(publicPart(jwk))));
+  return b64url(new Uint8Array(digest));
+}
+
+// A new key pair as JWKs. The private JWK must be stored outside any repository.
+async function generateSigningKey() {
+  const s = globalThis.crypto.subtle;
+  const pair = await s.generateKey(P256, true, ["sign", "verify"]);
+  const [priv, pub] = await Promise.all([s.exportKey("jwk", pair.privateKey), s.exportKey("jwk", pair.publicKey)]);
+  return { privateJwk: { ...publicPart(priv), d: priv.d }, publicJwk: publicPart(pub) };
+}
+
+async function signSums(privateJwk, text) {
+  if (!privateJwk || !privateJwk.d) throw new Error("not a private key");
+  return signText({ ...publicPart(privateJwk), d: privateJwk.d }, String(text));
+}
+
+// True only for a well-formed signature by this key over this text; never throws.
+async function verifySums(jwk, text, signature) {
+  try { return await verifyText(publicPart(jwk), String(signature || "").trim(), String(text)); } catch { return false; }
+}
+
+// SHA256SUMS lines ("<64 hex>  <name>") to a map, ignoring blank lines; null when a line is malformed.
+function parseSums(text) {
+  const out = {};
+  for (const line of String(text || "").split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    const m = line.match(/^([0-9a-f]{64}) [ *]([^\s/\\][^\\]*)$/);
+    if (!m || m[2].includes("..")) return null;
+    out[m[2]] = m[1];
+  }
+  return out;
+}
+
+const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the files were signed by the holder of this key and not changed since. It does not show who holds the key, that the key was never stolen, or that the code is safe. Compare the key id with one you got another way.";
+
+return { signingKeyId, jwkThumbprint, generateSigningKey, signSums, verifySums, parseSums, SIGNATURE_DOES_NOT_PROVE };
+})();
+
+// ---- import-html.js
+const M_import_html = (() => {
+// Posts from a page the user saved (File > Save page as). No DOM: a few tolerant string readers,
+// so the CLI and the extension's offline analyser read a page the same way. Supported: X threads
+// (article elements with tweetText), new Reddit threads (shreddit-post and shreddit-comment), and
+// any other page as one block of text with its links. Scripts and styles are never run or read.
+
+const ENT = { amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", nbsp: " ", "#39": "'" };
+
+// Entities decoded, tags dropped, line breaks kept where blocks end.
+function htmlText(html) {
+  return String(html || "")
+    .replace(/<(script|style|noscript|template)\b[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<br\s*\/?>/gi, "\n").replace(/<\/?(p|div|li|h\d|blockquote)\b[^>]*>/gi, "\n")
+    .replace(/<img\b[^>]*\balt="([^"]*)"[^>]*>/gi, " $1 ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+|#39);/gi, (m, e) => {
+      if (e[0] === "#") { const n = e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10); return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : m; }
+      return ENT[e.toLowerCase()] ?? m;
+    })
+    .replace(/[ \t ]+/g, " ").replace(/\s*\n\s*/g, "\n").trim();
+}
+
+// The inner HTML of the element whose opening tag starts at `at`, matched on its tag name.
+function innerAt(html, at) {
+  const open = html.slice(at).match(/^<([a-z][\w-]*)\b[^>]*>/i);
+  if (!open) return "";
+  const tag = open[1].toLowerCase(), re = new RegExp(`<(/?)${tag}\\b[^>]*>`, "gi");
+  re.lastIndex = at + open[0].length;
+  let depth = 1, m;
+  while ((m = re.exec(html))) {
+    depth += m[1] ? -1 : 1;
+    if (!depth) return html.slice(at + open[0].length, m.index);
+  }
+  return html.slice(at + open[0].length);
+}
+
+const attr = (tag, name) => { const m = tag.match(new RegExp(`\\s${name}="([^"]*)"`, "i")); return m ? htmlText(m[1]) : null; };
+const hrefs = (html) => [...String(html).matchAll(/<a\b[^>]*\bhref="(https?:\/\/[^"]+)"/gi)].map((m) => htmlText(m[1]));
+const isoOrNull = (s) => { const t = Date.parse(s || ""); return Number.isFinite(t) ? new Date(t).toISOString() : null; };
+
+function xPosts(html) {
+  const out = [];
+  for (const m of html.matchAll(/<article\b[^>]*>/gi)) {
+    const body = innerAt(html, m.index);
+    const status = body.match(/href="(?:https:\/\/(?:x|twitter)\.com)?\/([A-Za-z0-9_]{1,15})\/status\/(\d+)"/);
+    const textAt = body.search(/<div\b[^>]*data-testid="tweetText"/i);
+    if (!status || textAt < 0) continue;
+    const text = innerAt(body, textAt);
+    out.push({ id: status[2], author: status[1], text: htmlText(text), posted: isoOrNull((body.match(/<time\b[^>]*datetime="([^"]+)"/i) || [])[1]), links: hrefs(text).filter((u) => !/^https?:\/\/(x|twitter)\.com\//.test(u)) });
+  }
+  return out;
+}
+
+function redditPosts(html) {
+  const out = [];
+  const post = html.match(/<shreddit-post\b[^>]*>/i);
+  if (post) {
+    const at = html.search(/<div\b[^>]*\bid="t3_[^"]*-post-rtjson-content"/i), body = at >= 0 ? htmlText(innerAt(html, at)) : "";
+    out.push({ id: attr(post[0], "id") || "post", author: attr(post[0], "author") || "unknown", text: [attr(post[0], "post-title"), body].filter(Boolean).join("\n"), posted: isoOrNull(attr(post[0], "created-timestamp")), links: [attr(post[0], "content-href")].filter((u) => u && /^https?:/.test(u)) });
+  }
+  for (const m of html.matchAll(/<shreddit-comment\b[^>]*>/gi)) {
+    const id = attr(m[0], "thingid");
+    if (!id) continue;
+    const at = html.indexOf(`id="${id}-comment-rtjson-content"`), start = at >= 0 ? html.lastIndexOf("<", at) : -1;
+    const inner = start >= 0 ? innerAt(html, start) : "";
+    out.push({ id, author: attr(m[0], "author") || "unknown", text: htmlText(inner), posted: isoOrNull(attr(m[0], "created")), links: hrefs(inner) });
+  }
+  return out;
+}
+
+// Returns { site, root, replies, kind } for a thread, or { site: null, root: null, replies: [one
+// page post], kind: "page" } for any other page.
+function postsFromHtml(html) {
+  const s = String(html || "");
+  const site = /<meta\b[^>]*content="(?:X|Twitter)"|https:\/\/(?:x|twitter)\.com\//i.test(s) && /data-testid="tweetText"/.test(s) ? "X" : /<shreddit-(?:post|comment)\b/i.test(s) ? "Reddit" : null;
+  const posts = site === "X" ? xPosts(s) : site === "Reddit" ? redditPosts(s) : [];
+  if (posts.length) return { site, root: posts[0], replies: posts.slice(1), kind: "thread" };
+  const title = htmlText((s.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || "");
+  const main = s.match(/<(main|article)\b[^>]*>/i), body = main ? innerAt(s, main.index) : s.replace(/^[\s\S]*?<body\b[^>]*>/i, "");
+  return { site: null, root: null, replies: [{ id: "page", author: "page", text: [title, htmlText(body)].filter(Boolean).join("\n").slice(0, 20000), posted: null, links: hrefs(body).slice(0, 200) }], kind: "page" };
+}
+
+return { htmlText, innerAt, postsFromHtml };
+})();
+
+// ---- import-exports.js
+const M_import_exports = (() => {
+// Posts from the data exports platforms give their own users: an X archive's tweets.js, a Reddit
+// data export's comments.csv or posts.csv, and a Mastodon archive's outbox.json. All posts in an
+// export are the user's own, so they come back with one author, "you". Reposts of other people's
+// posts are left out and counted. Reddit's export has an ip column: it is dropped and never shown.
+
+const { htmlText } = M_import_html;
+
+const iso = (s) => { const t = Date.parse(s || ""); return Number.isFinite(t) ? new Date(t).toISOString() : null; };
+const EXPORT_AUTHOR = "you";
+
+// window.YTD.tweets.part0 = [ { tweet: { id_str, full_text, created_at, entities } } ]
+function xArchivePosts(text) {
+  const s = String(text || ""), at = s.indexOf("=");
+  if (!/^\s*window\.YTD\./.test(s) || at < 0) return null;
+  let rows;
+  try { rows = JSON.parse(s.slice(at + 1).trim().replace(/;\s*$/, "")); } catch { return null; }
+  const posts = [];
+  let reposts = 0;
+  for (const r of Array.isArray(rows) ? rows : []) {
+    const t = (r && (r.tweet || r.note_tweet || r)) || {};
+    const body = t.full_text || t.text || (t.core && t.core.text) || "";
+    if (/^RT @\w+:/.test(body)) { reposts++; continue; }
+    if (!body) continue;
+    const links = ((t.entities || {}).urls || []).map((u) => u.expanded_url).filter((u) => u && !/^https?:\/\/(x|twitter)\.com\//.test(u));
+    posts.push({ id: String(t.id_str || t.id || t.noteTweetId || posts.length + 1), author: EXPORT_AUTHOR, text: body, posted: iso(t.created_at || t.createdAt), links });
+  }
+  return { site: "X", posts, notes: reposts ? [`${reposts} repost${reposts === 1 ? "" : "s"} of other people's posts left out.`] : [] };
+}
+
+// RFC 4180: quoted fields, doubled quotes, line breaks inside quotes. Returns rows of strings.
+function parseCsv(text) {
+  const s = String(text || "").replace(/^﻿/, ""), rows = [];
+  let row = [], field = "", quoted = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (quoted) {
+      if (c === "\"" && s[i + 1] === "\"") { field += "\""; i++; } else if (c === "\"") quoted = false; else field += c;
+    } else if (c === "\"" && field === "") quoted = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && s[i + 1] === "\n") i++;
+      row.push(field); rows.push(row); row = []; field = "";
+    } else field += c;
+  }
+  if (field || row.length) { row.push(field); rows.push(row); }
+  return rows.filter((r) => r.length > 1 || r[0]);
+}
+
+// comments.csv: id, permalink, date, ip, subreddit, gildings, link, parent, body, media
+// posts.csv:    id, permalink, date, ip, subreddit, gildings, title, url, body
+function redditExportPosts(text) {
+  const rows = parseCsv(text);
+  if (rows.length < 1) return null;
+  const head = rows[0].map((h) => h.trim().toLowerCase()), col = (n) => head.indexOf(n);
+  if (col("id") < 0 || col("body") < 0 || col("permalink") < 0) return null;
+  const posts = rows.slice(1).map((r) => {
+    const pick = (n) => (col(n) >= 0 ? r[col(n)] || "" : "");
+    const url = pick("url"), text = [pick("title"), pick("body")].filter(Boolean).join("\n");
+    return { id: pick("id"), author: EXPORT_AUTHOR, text, posted: iso(pick("date")), links: /^https?:\/\//.test(url) && !/reddit\.com\//.test(url) ? [url] : [] };
+  }).filter((p) => p.id && p.text && p.text !== "[deleted]" && p.text !== "[removed]");
+  return { site: "Reddit", posts, notes: col("ip") >= 0 ? ["The export's ip column was left out; Radar keeps and shows no IP address."] : [] };
+}
+
+// outbox.json: { orderedItems: [{ type: "Create", object: { id, content, published, tag } }] }.
+function mastodonOutboxPosts(json) {
+  if (!json || !Array.isArray(json.orderedItems)) return null;
+  const posts = [];
+  let boosts = 0;
+  for (const it of json.orderedItems) {
+    if (it && it.type === "Announce") { boosts++; continue; }
+    const o = it && it.type === "Create" ? it.object : null;
+    if (!o || typeof o !== "object" || typeof o.content !== "string") continue;
+    const links = [...o.content.matchAll(/<a\b[^>]*\bhref="(https?:\/\/[^"]+)"[^>]*>/gi)].filter((m) => !/\b(mention|hashtag)\b/.test(m[0])).map((m) => m[1]);
+    posts.push({ id: String(o.id || it.id || posts.length + 1).split("/").pop(), author: EXPORT_AUTHOR, text: htmlText(o.content), posted: iso(o.published || it.published), links });
+  }
+  return { site: "Mastodon", posts, notes: boosts ? [`${boosts} boost${boosts === 1 ? "" : "s"} of other people's posts left out.`] : [] };
+}
+
+return { EXPORT_AUTHOR, xArchivePosts, parseCsv, redditExportPosts, mastodonOutboxPosts };
+})();
+
+// ---- import-json.js
+const M_import_json = (() => {
+// Threads from JSON a platform's own web app or API returned, saved by the user: X's GraphQL
+// TweetDetail, Bluesky's app.bsky.feed.getPostThread, a Mastodon status context, or a thread in
+// Radar's own input shape ({ site, root, replies }). Field names follow each platform's public
+// formats; the readers walk the JSON, so a wrapper around the response does not matter.
+
+const { htmlText } = M_import_html;
+
+const iso = (s) => { const t = Date.parse(s || ""); return Number.isFinite(t) ? new Date(t).toISOString() : null; };
+
+function walk(json, visit, limit = 300000) {
+  const stack = [json];
+  let guard = 0;
+  while (stack.length && guard++ < limit) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    visit(v);
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+}
+
+// The post most others reply to is the root; the rest are replies, oldest first.
+function asThread(site, posts) {
+  if (!posts.length) return null;
+  const counts = new Map();
+  for (const p of posts) if (p.replyTo) counts.set(p.replyTo, (counts.get(p.replyTo) || 0) + 1);
+  const top = [...counts].sort((a, b) => b[1] - a[1])[0];
+  const root = (top && posts.find((p) => p.id === top[0])) || posts.find((p) => !p.replyTo) || null;
+  const replies = posts.filter((p) => p !== root).sort((a, b) => String(a.posted).localeCompare(String(b.posted)));
+  const clean = ({ replyTo, ...p }) => p;
+  return { site, root: root ? clean(root) : null, replies: replies.map(clean) };
+}
+
+function xThread(json) {
+  const posts = new Map();
+  walk(json, (v) => {
+    if (v.__typename !== "Tweet" || !v.rest_id || !v.legacy) return;
+    const L = v.legacy, u = ((v.core || {}).user_results || {}).result || {};
+    const note = (((v.note_tweet || {}).note_tweet_results || {}).result || {}).text;
+    posts.set(v.rest_id, { id: v.rest_id, author: (u.core || {}).screen_name || (u.legacy || {}).screen_name || "unknown", text: note || L.full_text || "", posted: iso(L.created_at),
+      links: ((L.entities || {}).urls || []).map((x) => x.expanded_url).filter((x) => x && !/^https?:\/\/(x|twitter)\.com\//.test(x)), replyTo: L.in_reply_to_status_id_str || null });
+  });
+  return asThread("X", [...posts.values()]);
+}
+
+function bskyThread(json) {
+  const posts = new Map();
+  walk(json, (v) => {
+    if (typeof v.uri !== "string" || !v.uri.startsWith("at://") || !v.author || typeof v.author.handle !== "string" || !v.record || typeof v.record.text !== "string") return;
+    const links = [];
+    for (const f of v.record.facets || []) for (const x of f.features || []) if (x && typeof x.uri === "string") links.push(x.uri);
+    const ext = v.record.embed && v.record.embed.external;
+    if (ext && ext.uri) links.push(ext.uri);
+    const parent = v.record.reply && v.record.reply.parent && v.record.reply.parent.uri;
+    posts.set(v.uri, { id: v.uri.split("/").pop(), author: v.author.handle, text: v.record.text, posted: iso(v.record.createdAt), links, replyTo: parent ? parent.split("/").pop() : null });
+  });
+  return asThread("Bluesky", [...posts.values()]);
+}
+
+function mastoThread(json) {
+  const posts = new Map();
+  walk(json, (v) => {
+    if (typeof v.id !== "string" || typeof v.content !== "string" || !v.account || typeof v.account.acct !== "string") return;
+    const links = [...v.content.matchAll(/<a\b[^>]*\bhref="(https?:\/\/[^"]+)"[^>]*>/gi)].filter((m) => !/\b(mention|hashtag)\b/.test(m[0])).map((m) => m[1]);
+    posts.set(v.id, { id: v.id, author: v.account.acct, text: htmlText(v.content), posted: iso(v.created_at), links, replyTo: v.in_reply_to_id || null });
+  });
+  return asThread("Mastodon", [...posts.values()]);
+}
+
+const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r) => r && typeof r.text === "string");
+
+// Returns { site, root, replies } or null when the JSON holds no thread Radar can read.
+function threadFromJson(json) {
+  if (!json || typeof json !== "object") return null;
+  if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies };
+  const text = JSON.stringify(json).slice(0, 2000000);
+  if (text.includes("\"__typename\":\"Tweet\"")) return xThread(json);
+  if (text.includes("\"at://")) return bskyThread(json);
+  if (text.includes("\"acct\"")) return mastoThread(json);
+  return null;
+}
+
+return { threadFromJson };
+})();
+
+// ---- import-car.js
+const M_import_car = (() => {
+// Posts from a Bluesky repository export (Settings > Export my data gives a .car file). A CAR v1
+// file is a header and a list of blocks, each a CID and DAG-CBOR bytes. Radar decodes every block,
+// keeps the app.bsky.feed.post records, and names each post by its record key, read from the
+// repository's key tree (MST). Everything in the file is the user's own data.
+
+const { cborDecode } = M_cbor;
+const { EXPORT_AUTHOR } = M_import_exports;
+
+const hex = (b) => [...b].map((x) => x.toString(16).padStart(2, "0")).join("");
+const td = new TextDecoder();
+
+// An unsigned LEB128 varint at i: [value, next].
+function varint(b, i) {
+  let v = 0, shift = 0, k = i;
+  while (k < b.length) {
+    const x = b[k++];
+    v += (x & 127) * 2 ** shift;
+    if (!(x & 128)) return [v, k];
+    shift += 7;
+    if (shift > 49) break;
+  }
+  throw new Error("car: bad varint");
+}
+
+// The length in bytes of the CID that starts at i (v0: a bare sha2-256 multihash; v1: version,
+// codec, then the multihash).
+function cidLength(b, i) {
+  if (b[i] === 0x12 && b[i + 1] === 0x20) return 34;
+  let [, k] = varint(b, i);
+  [, k] = varint(b, k);
+  const [, k2] = varint(b, k), [len, k3] = varint(b, k2);
+  return k3 + len - i;
+}
+
+// Blocks of a CAR v1 file: [{ cid (hex), data }]. Throws when the file is not CAR v1.
+function carBlocks(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const [hlen, h] = varint(b, 0);
+  const header = cborDecode(b.subarray(h, h + hlen));
+  if (!header || header.version !== 1) throw new Error("car: not a CAR v1 file");
+  const out = [];
+  for (let i = h + hlen; i < b.length;) {
+    const [len, k] = varint(b, i);
+    const n = cidLength(b, k);
+    out.push({ cid: hex(b.subarray(k, k + n)), data: b.subarray(k + n, k + len) });
+    i = k + len;
+  }
+  return out;
+}
+
+// A DAG-CBOR link (tag 42) as the hex of the CID, without the leading multibase zero.
+const linkHex = (v) => (v && v.tag === 42 && v.value instanceof Uint8Array ? hex(v.value.subarray(1)) : null);
+const str = (v) => (v instanceof Uint8Array ? td.decode(v) : String(v || ""));
+
+// Record CID -> repository key ("app.bsky.feed.post/3k..."), from every MST node in the file.
+function mstKeys(nodes) {
+  const keys = new Map();
+  for (const n of nodes) {
+    let prev = "";
+    for (const e of n.e) {
+      const key = prev.slice(0, e.p || 0) + str(e.k);
+      const cid = linkHex(e.v);
+      if (cid) keys.set(cid, key);
+      prev = key;
+    }
+  }
+  return keys;
+}
+
+function decoded(blocks) {
+  const posts = [], nodes = [];
+  for (const blk of blocks) {
+    let v;
+    try { v = cborDecode(blk.data); } catch { continue; }
+    if (v && v.$type === "app.bsky.feed.post" && typeof v.text === "string") posts.push({ cid: blk.cid, v });
+    else if (v && Array.isArray(v.e) && "l" in v) nodes.push(v);
+  }
+  return { posts, nodes };
+}
+
+const linksOf = (v) => [...(v.facets || []).flatMap((f) => (f.features || []).map((x) => x && x.uri)), v.embed && v.embed.external && v.embed.external.uri].filter((u) => typeof u === "string" && /^https?:/.test(u));
+
+// Returns { site: "Bluesky", posts, notes } or null when the bytes are not a CAR file.
+function blueskyCarPosts(bytes) {
+  let blocks;
+  try { blocks = carBlocks(bytes); } catch { return null; }
+  const { posts, nodes } = decoded(blocks), keys = mstKeys(nodes);
+  const out = posts.map(({ cid, v }, i) => {
+    const key = keys.get(cid);
+    const t = Date.parse(v.createdAt || "");
+    return { id: key ? key.split("/").pop() : "post" + (i + 1), author: EXPORT_AUTHOR, text: v.text, posted: Number.isFinite(t) ? new Date(t).toISOString() : null, links: linksOf(v) };
+  }).sort((a, b) => String(a.posted).localeCompare(String(b.posted)));
+  return { site: "Bluesky", posts: out, notes: [`${blocks.length} blocks read; ${out.length} posts found.`] };
+}
+
+return { varint, carBlocks, blueskyCarPosts };
+})();
+
+// ---- imports.js
+const M_imports = (() => {
+// One entry for every file the offline analyser and the CLI read: it decides what the file is from
+// its name and its first bytes, and returns posts in Radar's input shape. Nothing is fetched.
+//   saved page (.html, .htm)            X or Reddit thread, or any page as one text
+//   thread JSON                         Radar's shape, X GraphQL, Bluesky getPostThread, Mastodon context
+//   X archive tweets.js                 the user's own posts
+//   Reddit export comments.csv / posts.csv
+//   Mastodon archive outbox.json
+//   Bluesky repository export (.car)
+
+const { postsFromHtml } = M_import_html;
+const { threadFromJson } = M_import_json;
+const { xArchivePosts, redditExportPosts, mastodonOutboxPosts } = M_import_exports;
+const { blueskyCarPosts } = M_import_car;
+
+const IMPORT_FORMATS = ["saved page", "thread JSON", "X archive tweets.js", "Reddit export CSV", "Mastodon outbox.json", "Bluesky repository .car"];
+const MAX_IMPORT_POSTS = 20000;
+
+const fail = (reason) => ({ ok: false, reason });
+const asText = (bytes) => (typeof bytes === "string" ? bytes : new TextDecoder("utf-8").decode(bytes));
+const fromExport = (format, r) => (r && r.posts.length ? { ok: true, format, source: "export", site: r.site, input: { site: r.site, root: null, replies: r.posts.slice(0, MAX_IMPORT_POSTS) }, notes: [...r.notes, ...(r.posts.length > MAX_IMPORT_POSTS ? [`Only the first ${MAX_IMPORT_POSTS} posts were read.`] : [])] } : null);
+const fromThread = (format, t, notes = []) => (t && (t.replies.length || t.root) ? { ok: true, format, source: "thread", site: t.site, input: t, notes } : null);
+
+function fromJson(name, text) {
+  let json;
+  try { json = JSON.parse(text); } catch { return fail(`${name} is not valid JSON.`); }
+  if (json && json.kind === "radar-evidence-bundle") return fail("This is a Radar evidence bundle. Use Check a bundle to verify it.");
+  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Radar found no posts it can read in ${name}.`);
+}
+
+function fromBytes(name, bytes) {
+  const lower = String(name || "").toLowerCase();
+  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is not a Bluesky repository export Radar can read.`);
+  const text = asText(bytes).replace(/^﻿/, ""), head = text.slice(0, 400).trimStart();
+  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Radar can read.`);
+  if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} is not a Reddit export with id, permalink and body columns.`);
+  if (/^[[{]/.test(head)) return fromJson(name, text);
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Radar did not recognise a thread on this page, so it read the page as one text."] : [] }; }
+  return fail(`Radar does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
+}
+
+// name: the file name; bytes: Uint8Array, ArrayBuffer or string. Returns { ok: true, format,
+// source: "thread" | "export" | "page", site, input: { site, root, replies }, notes } or
+// { ok: false, reason }.
+function importFile(name, bytes) {
+  try { return fromBytes(name, bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes); } catch (e) { return fail(`Could not read ${name}: ${e.message}`); }
+}
+
+return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
+})();
+
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_signing, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

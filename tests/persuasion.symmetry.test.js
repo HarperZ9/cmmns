@@ -24,11 +24,17 @@ const SUITES = [
       ["{G} made the worst decision in history", "exaggeration"],
       ["{G} won the vote, it is what it is", "thought-terminating"],
       ["can we really trust {G} on this", "doubt"],
+      ["the real reason {G} backed the plan is money", "motive-attribution"],
+      ["{G} call it reform, but it is masked as reform and it was never about the vote", "motive-attribution"],
+      ["isn't it strange that {G} said nothing? I'm just asking", "just-asking"],
+      ["{G} met the minister twice. Is it just a coincidence?", "just-asking"],
       ["the smear against {G} is disgusting, everyone knows it", "bandwagon,loaded-language"],
       // controls: disagreement without a technique cue
       ["I disagree with {G} about taxes", ""],
       ["{G} are wrong about the economy and I will vote against them", ""],
       ["{G} held a meeting on Tuesday", ""],
+      ["{G} asked the council a question about the budget", ""],
+      ["the reason {G} gave was the cost of fuel", ""],
     ],
   },
   {

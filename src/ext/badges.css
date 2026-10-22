@@ -95,7 +95,12 @@
 .pb-psec .pb-num { margin: 2px 0; color: var(--pb-ink); font-variant-numeric: tabular-nums; }
 .pb-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 0; border-top: 1px solid var(--pb-line); }
 .pb-panel .pb-foot { padding: 8px 14px 0; }
-@media (max-width: 600px) { .pb-panel { left: 8px; right: 8px; bottom: 64px; } .pb-panel[data-open="1"] { width: auto; } .pb-pop { width: calc(100vw - 16px); } }
+/* Adapter health: one plain notice when the site's markup changed and Radar reads nothing. */
+.pb-health { position: fixed; left: 16px; bottom: 16px; z-index: 2147482998; max-width: 320px; padding: 10px 14px; border-left: 3px solid var(--pb-hot);
+  border-radius: 2px; background: var(--pb-ground); color: var(--pb-ink); box-shadow: var(--pb-shadow); font-family: var(--pb-sans); font-size: var(--pb-size); line-height: var(--pb-lh); }
+.pb-health p { margin: 0 0 6px; font-weight: 600; }
+.pb-health .pb-health-sub { font-weight: 400; color: var(--pb-muted); }
+@media (max-width: 600px) { .pb-health { left: 8px; right: 8px; max-width: none; } .pb-panel { left: 8px; right: 8px; bottom: 64px; } .pb-panel[data-open="1"] { width: auto; } .pb-pop { width: calc(100vw - 16px); } }
 
 /* The window's head strip: one mark per area. Drift for worth a look, ink for a sign, an outline for context. */
 .pb-strip { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 8px; }

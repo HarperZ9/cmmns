@@ -51,7 +51,7 @@ dropped["claim too short to match"] = all.rows.length - rows.length;
 const picked = select(rows, maxBytes, perChecker);
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const table = {
-  built: new Date().toISOString().slice(0, 10),
+  built: (process.env.RADAR_BUILT || new Date().toISOString().slice(0, 10)),
   feedModified: feed.dateModified || null,
   source: { name: "Data Commons fact-check feed", url: "https://datacommons.org/factcheck/download", licence: "CC BY 4.0", licenceUrl: "https://creativecommons.org/licenses/by/4.0/", attribution: "ClaimReview markup published by each fact-checker, collected by Google Fact Check Tools and Data Commons." },
   fields: ["claim", "rating", "checker", "url", "date", "langGuess", "appearedOn"],

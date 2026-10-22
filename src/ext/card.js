@@ -134,7 +134,7 @@
   function sections(m, signals, onLookup) {
     const owner = PB.ownerOfHandle(m.handle);
     const head = [
-      [PB.ownerHeading(owner), owner ? `${owner.owner} (Wikidata)` : null],
+      [PB.ownerHeading(owner), owner ? `${owner.owner} (${PB.ownerSourceShort(owner)})` : null],
       ["Profile", m.profile ? { links: [[m.profile.replace(/^https?:\/\/(www\.)?/, ""), m.profile]] } : null],
     ];
     if (m.site && m.site.hasLocation && !(m.reading && (m.reading.aboutRead || m.reading.basedIn)) && onLookup) {

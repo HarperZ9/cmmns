@@ -23,6 +23,8 @@ export const TECHNIQUES = {
   "doubt": { name: "Doubt", definition: "Questions the credibility of someone or something without giving evidence." },
   "appeal-to-authority": { name: "Appeal to authority", definition: "Says a claim is true because an unnamed or generic authority backs it." },
   "exaggeration": { name: "Exaggeration", definition: "Makes something seem far larger, worse or more extreme than it is." },
+  "motive-attribution": { name: "Hidden motive", definition: "Says someone's real aim is hidden behind what they say, without showing evidence of the aim." },
+  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question, so it is suggested without being claimed." },
 };
 
 export const PERSUASION_DOES_NOT_PROVE = "A technique can carry a true claim; it describes how the post argues.";

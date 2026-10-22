@@ -67,6 +67,14 @@
     if (C && C.originHidden && C.intermediaries >= 1) out.push({ label: `passed through ${C.intermediaries} ${C.intermediaries === 1 ? "step" : "steps"}`, fam: "laundered", level: "info", cat: "sources", rows: [["Chain", C.hops.map((h) => (h.handle ? "@" + h.handle : h.domain) + (h.role === "origin" ? " (earliest Radar saw)" : "")).join(" → ")], C.hoursFromOrigin != null ? ["Time from origin", `${C.hoursFromOrigin} h`] : null, dnp(PB.CHAIN_DOES_NOT_PROVE)].filter(Boolean) });
     // Content Credentials and AI metadata, once the user has checked a file in this post.
     if (globalThis.PBMedia) for (const r of PBMedia.resultsFor(m.node, m.tweet)) out.push(...PB.credentialSignals(r));
+    // Text the user had Radar read from an image in this post: the same language and fact-check
+    // signs, each labelled as read from an image and kept at info level.
+    if (globalThis.PBMedia && PBMedia.textsFor) {
+      for (const r of PBMedia.textsFor(m.node, m.tweet)) {
+        const found = [...language(PB.imageTextModel(r)), ...(r.claims || []).map((c) => { const card = PB.claimCard(c); return { label: card.label, fam: "fact-check", level: "warn", cat: "sources", rows: card.rows }; })];
+        out.push(...found.map((x) => PB.fromImage(x, r)));
+      }
+    }
     if (T.client && !PB.COMMON_CLIENTS.test(T.client)) out.push({ label: `via ${T.client}`, fam: "client", level: "flag", cat: "posting", rows: [["Source", "The app this post was sent from, in the data X loaded. X no longer shows it."], ["What it is", "Scheduling tools, automation services and custom apps post this way."], dnp("News desks, brands and many people schedule posts with tools like these.")] });
     if (m.paid) out.push({ label: "ad", fam: "ad", level: "flag", cat: "sources", rows: [["Source", "X labels this an ad or promoted post: someone paid for it to reach you."]] });
     const place = m.reading && m.reading.basedIn && (PB.parseLabel(m.reading.basedIn) || {}).country;
@@ -90,17 +98,28 @@
     return { out, domains: new Set(where.filter(([, , h]) => h && h.length).map(([d]) => String(d).toLowerCase())) };
   }
 
+  // Documented backing of a public media personality (src/core/backing.js), for the post's own author
+  // only. Info level for every kind of record and every person: an allegation never escalates it.
+  function backing(m) {
+    const p = PB.backingOf && m.site ? PB.backingOf(m.site.id, m.handle) : null;
+    return p ? [{ label: PB.backingLabel(p), fam: "backing-record", level: "info", cat: "sources", rows: PB.backingRows(p) }] : [];
+  }
+
   // Look-alike news addresses (src/core/lookalike.js): a weak sign of its own.
+  // A post that names the copied outlet in its own words adds a row (src/core/cloned.js), and an
+  // address a published report named points at that sign.
   function lookalikes(m) {
-    return (m.domains || []).map((d) => [d, PB.lookalikeOf(d)]).filter(([, h]) => h).map(([d, h]) => ({
+    return PB.clonedCitations(m.text, m.domains).map((h) => ({
       label: `look-alike of ${h.official}`, fam: "lookalike-domain", level: "flag", cat: "sources",
-      rows: [["What Radar sees", `This post links to ${d}, which ${h.how === "swapped ending" ? "uses the name of" : h.how === "copies the name" ? "copies the name of" : h.how === "look-alike letters" ? "spells with look-alike letters the name of" : "is one letter away from the name of"} ${h.outlet} (${h.official}).`],
-        ["Why it matters", "Operations such as Doppelganger copied real outlets on addresses like washingtonpost.pm to borrow their trust."], dnp(PB.LOOKALIKE_DOES_NOT_PROVE)],
+      rows: [["What Radar sees", `This post links to ${h.domain}, which ${h.how === "swapped ending" ? "uses the name of" : h.how === "copies the name" ? "copies the name of" : h.how === "look-alike letters" ? "spells with look-alike letters the name of" : "is one letter away from the name of"} ${h.outlet} (${h.official}).`],
+        h.named ? ["In its words", `The post names ${h.outlet} while its link goes to a different address. Open ${h.official} and look for the same story there.`] : null,
+        h.reports.length ? ["Published reports", `A published report named this address as part of ${h.reports.slice(0, 2).join(" and ")}. See the "Named in a published report" sign.`] : null,
+        ["Why it matters", "Operations such as Doppelganger copied real outlets on addresses like washingtonpost.pm to borrow their trust."], dnp(h.named ? PB.CLONED_DOES_NOT_PROVE : PB.LOOKALIKE_DOES_NOT_PROVE)].filter(Boolean),
     }));
   }
 
   function links(m) {
-    const rep = reports(m), out = [...rep.out, ...lookalikes(m)];
+    const rep = reports(m), out = [...rep.out, ...backing(m), ...lookalikes(m)];
     // A report hit replaces the older state-table chip for the same domain or account.
     const covered = (h) => h.basis === "named-in-report" && (rep.domains.has(String(h.domain || "").toLowerCase()) || rep.domains.has(String(h.x || "").toLowerCase()));
     const hits = [...(m.domains || []).flatMap(PB.stateLinksOfDomain), ...PB.stateLinksOfHandle(m.handle)].filter((h) => !covered(h));
@@ -119,7 +138,7 @@
       }
       const o = PB.ownerOfDomain(d);
       if (!o) continue;
-      out.push({ label: `link: ${o.name}`, fam: "owner", level: "info", cat: "sources", rows: [["Outlet", `${o.name} (${d})`], [PB.ownerHeading(o), o.owner], ["Source", `Wikidata: ${o.source}`], dnp("Ownership is not editorial control, and Wikidata can lag a sale.")] });
+      out.push({ label: `link: ${o.name}`, fam: "owner", level: "info", cat: "sources", rows: [["Outlet", `${o.name} (${d})`], [PB.ownerHeading(o), o.owner], ["Source", PB.ownerSource(o)], dnp("Ownership is not editorial control, and Wikidata can lag a sale.")] });
     }
     return out;
   }
@@ -145,6 +164,15 @@
     return out;
   }
 
+  // The launch campaign lens on the launch post itself: the lead and the ladder's claims, with each
+  // sign's does-not-prove line. Shown only when at least one inauthenticity sign fired.
+  function campaign(m) {
+    const c = m.campaign;
+    if (!c || (c.status !== "strong" && c.status !== "one")) return [];
+    return [{ label: c.status === "strong" ? "consistent with purchased amplification" : "one campaign sign", fam: "campaign", level: c.status === "strong" ? "warn" : "info", cat: "coordination",
+      rows: [["Reading", c.lead], ...(c.claims || []).map((x) => [x.step === 1 ? "Documented" : "Inference", x.text]), ...c.indicators.flatMap((x) => [["Sign", x.text], dnp(x.dnp)]), dnp(c.dnp), ["Dispute", c.dispute]] }];
+  }
+
   const ORDER = { warn: 0, flag: 1, info: 2 };
   // Each signal carries its family's measured accuracy (src/core/measured.js through families.js),
   // or "not measured yet". A marker another language's grammar found says the figure is for English;
@@ -156,7 +184,7 @@
   const feedback = (x, m) => (globalThis.PBFeedback && x.fam ? PBFeedback.rows(x, m) : []);
   function all(m, settings) {
     const shown = (x) => !settings || !PB.areaOn || PB.areaOn(settings, x.cat);
-    return [...checks(m), ...language(m), ...links(m), ...post(m), ...account(m)].filter(shown)
+    return [...checks(m), ...campaign(m), ...language(m), ...links(m), ...post(m), ...account(m)].filter(shown)
       .map((x) => ({ ...x, rows: [...x.rows, ["Measured", (x.lang ? "in English: " : "") + measured(x.fam)], ...feedback(x, m), ...learn(x.fam)] }))
       .sort((a, b) => ORDER[a.level] - ORDER[b.level]);
   }

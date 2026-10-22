@@ -38,4 +38,16 @@ export const MEDIA_LESSONS = [
     counter: "Use it as a strong hint and keep checking. Look for the scene from other sources, at the same place and time, before you share it.",
     dnp: "Metadata is unsigned: anyone can add, copy or remove it.",
   },
+  {
+    id: "image-text", title: "Words inside a picture", research: [],
+    what: "A claim posted as a screenshot, a cropped headline or a caption burned into an image. Radar can read the words on your device when you click, and runs the same checks on them as on a post's own text.",
+    examples: [
+      { side: "none", topic: "health", kind: "sign", text: "A screenshot of a made-up headline about a cure, posted as an image so that searches for its words find nothing." },
+      { side: "none", topic: "sport", kind: "ordinary", text: "A photo of a stadium scoreboard shared after a match, with the final score in the picture." },
+    ],
+    why: "Text in a picture escapes search, fact-check matching and most filters, and a screenshot looks like a record even when nothing stands behind it. Posting a claim as an image is common for honest reasons too: it is quick and keeps the layout.",
+    spot: "Ask where the words in the picture first appeared. Search for a distinctive phrase from it, and look for the post or article the screenshot claims to show, on the site that supposedly published it.",
+    counter: "Read the words as a claim, not as proof that someone said them. If the original cannot be found, treat the screenshot as unconfirmed, and say so if you share it.",
+    dnp: "Software reads the words and can misread them, and a screenshot can be edited. A sign found in an image's text describes the words Radar read, not who wrote them or whether the post in the picture was real.",
+  },
 ];

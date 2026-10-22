@@ -9,3 +9,10 @@ CLAUDE.local.md
 *.zip
 project-docs/evidence/raw/
 .cache/
+*.jwk
+# Private signing keys never enter the repository (tests/no-private-keys.test.js).
+*.private.jwk
+*.pem
+*.key
+*.p12
+radar-keys/

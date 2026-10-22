@@ -21,17 +21,20 @@
     <button id="export" type="button">Save report</button>
     <button id="dashboard" type="button">Your feed</button>
     <button id="sitecard" type="button">Site card for this page</button>
+    <button id="selftest-run" type="button">Self-test on this page</button>
     <button id="history" type="button">Open history</button>
+    <button id="analyze" type="button">Analyse a file</button>
     <button id="options" type="button">Options</button>
     <button id="transparency" type="button">How Radar is measured</button>
   </div>
+  <dl id="selftest" class="selftest" hidden></dl>
   <section class="settings bare">
     <label><input type="checkbox" id="paused"> Pause Radar</label>
     <label><input type="checkbox" id="feeds"> Radar on feeds and profiles</label>
     <label><input type="checkbox" id="auto"> Read About pages automatically</label>
   </section>
 </main>
-<footer>Evidence, not verdicts. Nothing leaves this browser unless you turn on Other coverage.</footer>
+<footer>Evidence, not verdicts. Radar requests nothing off this browser unless you turn on Other coverage.</footer>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>
 <script src="popup-server.js"></script>

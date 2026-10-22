@@ -4,7 +4,8 @@
 // more than one person.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { evidenceCard, canonicalJSON, sealCard, verifyCard, cardLines, MIN_CARD_ACCOUNTS } from "../src/core/evidence.js";
+import { canonicalJSON } from "../src/core/sig.js";
+import { evidenceCard, sealCard, verifyCard, cardLines, MIN_CARD_ACCOUNTS } from "../src/core/evidence.js";
 
 const report = { replies: 40, lookedUp: 30, notLookedUp: 10, verdict: "no-clear-difference", sentence: "3 of 12 extreme replies (25%) come from flagged accounts, against 4 of 18 other replies (22%). The difference is within the uncertainty.",
   extreme: { n: 12, flagged: 3, share: 0.25, ci: [0.09, 0.53] }, others: { n: 18, flagged: 4, share: 0.22, ci: [0.09, 0.45] },

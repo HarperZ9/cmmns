@@ -25,6 +25,10 @@ export const GOLD_OF = {
   "doubt": ["Doubt"],
   "appeal-to-authority": ["Appeal_to_Authority"],
   "exaggeration": ["Exaggeration,Minimisation"],
+  // No PTC label names hidden-motive claims or question-form insinuation. Both are scored against
+  // "Doubt" (questioning credibility), the nearest label, so their figures are proxy measurements.
+  "motive-attribution": ["Doubt"],
+  "just-asking": ["Doubt"],
   "slogans": ["Slogans"],
   "causal-oversimplification": ["Causal_Oversimplification"],
 };

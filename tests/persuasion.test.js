@@ -23,6 +23,7 @@ test("each named technique has cues that find it", () => {
     "whataboutism": "But what about the other scandal?", "black-and-white": "You're either with us or against us.",
     "doubt": "Can we really trust this report?", "appeal-to-authority": "Experts say the plan works.",
     "exaggeration": "The worst deal in history.",
+    "motive-attribution": "The bill is masked as safety; the real reason is control.", "just-asking": "Isn't it strange that the files vanished? Just asking.",
   };
   assert.deepEqual(Object.keys(cases).sort(), Object.keys(TECHNIQUES).sort());
   for (const [t, text] of Object.entries(cases)) assert.ok(kinds(text).split(",").includes(t), `${t}: ${text}`);

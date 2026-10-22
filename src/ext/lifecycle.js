@@ -27,6 +27,8 @@
 
   chrome.runtime.onInstalled.addListener((d) => {
     if (d.reason === "install") chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") }).catch((e) => console.error("[radar] could not open the first-run page", e));
+    // 3.0 replaced the GDELT lookup with the outlets' own feeds: give back any access granted for it.
+    if (d.reason === "update") chrome.permissions.remove({ origins: ["https://api.gdeltproject.org/*"] }).catch(() => {});
     prune();
   });
   if (chrome.runtime.onStartup) chrome.runtime.onStartup.addListener(prune);

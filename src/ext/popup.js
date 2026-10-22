@@ -11,6 +11,7 @@
 
   $("dashboard").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") }); window.close(); });
   document.getElementById("history").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("history.html") }); window.close(); });
+  document.getElementById("analyze").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("analyze.html") }); window.close(); });
   document.getElementById("transparency").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("transparency.html") }); window.close(); });
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -21,6 +22,18 @@
   $("sitecard").addEventListener("click", () => {
     chrome.runtime.sendMessage({ type: "pb-site-page", tabId: tab.id }).then((r) => { if (r && r.error) console.error("[radar] site card failed", r.error); window.close(); })
       .catch((e) => console.error("[radar] site card failed", e));
+  });
+  // Adapter health on demand (src/ext/health.js): counts what Radar's reader finds here now.
+  $("selftest-run").disabled = !web;
+  $("selftest-run").addEventListener("click", async () => {
+    const box = $("selftest");
+    box.replaceChildren();
+    for (const [k, v] of PB.selfTestLines(await send({ type: "pb-selftest" }))) {
+      const dt = document.createElement("dt"); dt.textContent = k;
+      const dd = document.createElement("dd"); dd.textContent = v;
+      box.append(dt, dd);
+    }
+    box.hidden = false;
   });
   const s = await send({ type: "pb-summary" });
   const buttons = ["scan", "panel", "export"];

@@ -44,7 +44,34 @@
     <h2 id="h-coverage">Other coverage</h2>
     <p id="coverageText"></p>
     <div id="coverage" class="switches"></div>
+    <div id="feeds" hidden>
+      <h3 class="sub" id="h-outlets">Outlets</h3>
+      <p class="muted" id="outletsText"></p>
+      <div class="row"><button id="outletsAll" type="button" class="quiet">Choose every suggested outlet</button></div>
+      <div id="outlets" class="switches" aria-labelledby="h-outlets"></div>
+      <h3 class="sub" id="h-custom">Your own feeds</h3>
+      <p class="muted">Any RSS or Atom address on https. Adding one asks the browser for access to that feed's host only.</p>
+      <div class="row"><input id="customUrl" type="url" aria-label="Feed address" placeholder="https://example.org/feed.xml" size="40"><button id="customAdd" type="button">Add feed</button></div>
+      <ul id="custom" class="servers" aria-labelledby="h-custom"></ul>
+    </div>
     <p class="status muted" id="coverageStatus" role="status" aria-live="polite"></p>
+  </section>
+
+  <section aria-labelledby="h-packs">
+    <h2 id="h-packs">Data packs</h2>
+    <p class="muted">A data pack adds fact-checks, operation indicators or site notes from someone you choose. Radar never downloads one: you pick the file. Radar checks its signature, shows which key signed it and what it adds, and uses it only after you trust that key.</p>
+    <p class="status muted" id="bundled" role="status" aria-live="polite"></p>
+    <div class="row">
+      <button id="packPick" type="button">Import a pack file</button>
+      <button id="bundledCheck" type="button" class="quiet">Check Radar's own data</button>
+      <input id="packFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <div id="packPreview" aria-live="polite"></div>
+    <h3 class="sub" id="h-packlist">Imported packs</h3>
+    <ul id="packList" class="plain" aria-labelledby="h-packlist"></ul>
+    <h3 class="sub" id="h-keylist">Keys you trust</h3>
+    <ul id="keyList" class="plain" aria-labelledby="h-keylist"></ul>
+    <p class="muted" id="packCaveat"></p>
   </section>
 
   <section aria-labelledby="h-keep">
@@ -92,7 +119,7 @@
     </div>
   </section>
 
-  <footer id="foot">Evidence, not verdicts. Nothing leaves this browser unless you turn on Other coverage.</footer>
+  <footer id="foot">Evidence, not verdicts. Radar requests nothing off this browser unless you turn on Other coverage.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>
@@ -100,5 +127,6 @@
 <script src="options.js"></script>
 <script src="options-feedback.js"></script>
 <script src="options-sources.js"></script>
+<script src="options-packs.js"></script>
 </body>
 </html>

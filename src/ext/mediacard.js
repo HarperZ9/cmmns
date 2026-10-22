@@ -33,6 +33,17 @@
     return PB.credentialRows(c.result);
   }
 
+  // Text in the image: off until the user turns it on; then one click reads it on this device.
+  function textRows(x) {
+    if (x.type !== "image" || !x.src) return [];
+    const on = globalThis.PBSettings && PBSettings.get().imageText;
+    if (!on) return [["Text in the image", { note: PB.IMAGE_TEXT_OFF }]];
+    const t = PBMedia.textOf ? PBMedia.textOf(x.src) : null;
+    if (!t) return [["Text in the image", { action: ["Read text in this image", () => PBMedia.readText(x.src), "Reading the text…"] }], ["", { note: PB.IMAGE_TEXT_NOTE }]];
+    if (t.state === "reading") return [["Text in the image", { note: "Reading the text…" }]];
+    return PB.imageTextRows(t.result);
+  }
+
   function frameRows(x, key) {
     if (!x.video) return [];
     const f = PBMedia.framesOf(key);
@@ -57,7 +68,7 @@
       out.push([`${list.length > 1 ? `Media ${x.i + 1}` : "Media"}: ${x.type}`, md.uploaded ? `first uploaded to X ${day(md.uploaded)}` + (md.fromPost ? `, taken from a post of ${day(md.fromPostTime)}` : "") : "on this page"]);
       out.push(...seenRows(seen[x.i]));
       if (x.searchUrl) out.push(["Find earlier copies", { links: SEARCH.map(([label, f]) => [label, f(x.searchUrl)]) }], ["", { note: SEARCH_NOTE }]);
-      out.push(...credentialRows(x), ...frameRows(x, `${T.id || "post"}:${x.i}`));
+      out.push(...credentialRows(x), ...textRows(x), ...frameRows(x, `${T.id || "post"}:${x.i}`));
     }
     return out;
   }

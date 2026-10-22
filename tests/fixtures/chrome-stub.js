@@ -16,11 +16,22 @@
     }, onChanged: { addListener: () => {} } },
     runtime: {
       getManifest: () => ({ version: "fixture" }),
+      getURL: (p) => new URL("../../src/ext/" + p, location.href).href,
       onMessage: { addListener: (f) => listeners.push(f) },
       sendMessage: async (msg) => {
         if (msg.type === "pb-owners" || msg.type === "pb-state") return [];
         if (msg.type === "pb-fonts") return fixtureFonts();
         if (msg.type === "pb-card-open") { globalThis.FIXTURE_CARD = msg.built; return; }
+        // Reading text in an image: the fixture runs the background's reader in the page itself.
+        if (msg.type === "pb-claims") return {};
+        if (msg.type === "pb-ocr" && globalThis.PBOCR) {
+          const model = PBOCR.decodeWeights(await (await fetch(new URL("../../src/ext/ocr/latin.bin", location.href))).arrayBuffer());
+          const bytes = Uint8Array.from(atob(msg.bytes), (c) => c.charCodeAt(0)), bmp = await createImageBitmap(new Blob([bytes]));
+          const c = new OffscreenCanvas(bmp.width, bmp.height), g = c.getContext("2d");
+          g.drawImage(bmp, 0, 0);
+          const img = g.getImageData(0, 0, bmp.width, bmp.height), r = PBOCR.readImage(model, img, { now: () => performance.now() });
+          return { text: r.text, confidence: r.confidence, ms: r.ms, lines: r.lines.map((l) => ({ text: l.text, confidence: l.confidence, low: l.low })) };
+        }
         if (msg.type !== "pb-lookup") return;
         for (const [i, h] of msg.handles.entries()) {
           setTimeout(async () => {

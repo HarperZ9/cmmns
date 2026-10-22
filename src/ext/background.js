@@ -6,7 +6,7 @@
 //   profiles. The window closes itself when the queue has been empty for IDLE_CLOSE_MS.
 // Chrome runs this file as a service worker and loads the core bundle and the housekeeping here;
 // Firefox lists them before this file in the manifest's background scripts.
-if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js", "instances.js", "sources-bg.js");
+if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js", "instances.js", "packs-bg.js", "sources-bg.js", "ocr.bundle.js", "ocr-bg.js");
 const GAP_MS = 2500, TIMEOUT_MS = 12000, IDLE_CLOSE_MS = 15000;
 const queue = [];
 let busy = false, lastAt = 0, current = null, worker = null, idleTimer = 0, timeoutTimer = 0;
@@ -35,8 +35,18 @@ function stateRows() {
 let opsReady = null;
 function opsTable() {
   if (!opsReady) opsReady = fetch(chrome.runtime.getURL("ops.json")).then((r) => r.json())
+    .then(async (t) => PB.mergePackOps(t, await PBPacks.enabled()))
     .catch((e) => { console.error("[radar] ops.json failed to load", e); return { docs: [], ops: [], indicators: [] }; });
   return opsReady;
+}
+
+// Documented backing of public media personalities (personalities.json, src/core/backing.js):
+// loaded once here; pages get only the people whose accounts or channels they show.
+let backingReady = null;
+function backingTable() {
+  if (!backingReady) backingReady = fetch(chrome.runtime.getURL("personalities.json")).then((r) => r.json())
+    .catch((e) => { console.error("[radar] personalities.json failed to load", e); return { people: [] }; });
+  return backingReady;
 }
 
 // Fact-checked claims (claims.json and the parts it names, src/core/claims.js, about 6 MB): indexed once here. Pages send
@@ -44,7 +54,7 @@ function opsTable() {
 let claimsReady = null;
 function claimIndex() {
   const get = (name) => fetch(chrome.runtime.getURL(name)).then((r) => r.json());
-  if (!claimsReady) claimsReady = get("claims.json").then(async (main) => PB.buildClaimIndex(PB.joinClaims(main, await Promise.all((main.parts || []).map(get)))))
+  if (!claimsReady) claimsReady = get("claims.json").then(async (main) => PB.buildClaimIndex(PB.mergePackClaims(PB.joinClaims(main, await Promise.all((main.parts || []).map(get))), await PBPacks.enabled())))
     .catch((e) => { console.error("[radar] claims.json failed to load", e); return null; });
   return claimsReady;
 }
@@ -60,13 +70,16 @@ function fontBytes() {
   return fontsReady;
 }
 
+// A pack enabled, disabled or removed in the options page: rebuild the tables that include packs.
+PBPacks.onChange(() => { claimsReady = null; opsReady = null; });
+
 const cards = {};   // fallback where storage.session is missing
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.type === "pb-fonts") { fontBytes().then(sendResponse); return true; }
   if (msg && msg.type === "pb-claims") {
     claimIndex().then((index) => {
       const out = {};
-      for (const p of msg.posts || []) { const hits = PB.matchClaims(index, p.text); if (hits.length) out[p.id] = hits; }
+      for (const p of msg.posts || []) { const hits = PB.matchClaims(index, p.text, { fuzzy: !!msg.fromImage }); if (hits.length) out[p.id] = hits; }
       sendResponse(out);
     });
     return true;
@@ -80,6 +93,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   if (msg && msg.type === "pb-ops") {
     opsTable().then((t) => sendResponse(msg.all ? t : PB.opsLookup(t, { domains: msg.domains || [], handles: msg.handles || [] })));
+    return true;
+  }
+  if (msg && msg.type === "pb-backing") {
+    backingTable().then((t) => sendResponse(PB.backingLookup(t, { accounts: msg.accounts || [], channels: msg.channels || [] })));
     return true;
   }
   if (msg && msg.type === "pb-owners") {

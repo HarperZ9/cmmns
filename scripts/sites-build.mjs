@@ -107,7 +107,7 @@ const F = facts(await wikidata());
 const { checkers, records: R } = records(rows, perSite);
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const table = {
-  built: new Date().toISOString().slice(0, 10), feedModified: feed.dateModified || null,
+  built: (process.env.RADAR_BUILT || new Date().toISOString().slice(0, 10)), feedModified: feed.dateModified || null,
   sources: {
     facts: { name: "Wikidata", url: "https://www.wikidata.org/", licence: "CC0 1.0" },
     records: { name: "Data Commons fact-check feed", url: "https://datacommons.org/factcheck/download", licence: "CC BY 4.0", licenceUrl: "https://creativecommons.org/licenses/by/4.0/", attribution: "ClaimReview markup published by each fact-checker, collected by Google Fact Check Tools and Data Commons." },
