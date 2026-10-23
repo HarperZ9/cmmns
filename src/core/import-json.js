@@ -18,8 +18,9 @@ function walk(json, visit, limit = 300000) {
   }
 }
 
-// The post most others reply to is the root; the rest are replies, oldest first.
-function asThread(site, posts) {
+// The post most others reply to is the root; the rest are replies, oldest first. timePrecision: how
+// precise the platform's own timestamps are (src/core/precision.js).
+function asThread(site, posts, timePrecision) {
   if (!posts.length) return null;
   const counts = new Map();
   for (const p of posts) if (p.replyTo) counts.set(p.replyTo, (counts.get(p.replyTo) || 0) + 1);
@@ -27,7 +28,7 @@ function asThread(site, posts) {
   const root = (top && posts.find((p) => p.id === top[0])) || posts.find((p) => !p.replyTo) || null;
   const replies = posts.filter((p) => p !== root).sort((a, b) => String(a.posted).localeCompare(String(b.posted)));
   const clean = ({ replyTo, ...p }) => p;
-  return { site, root: root ? clean(root) : null, replies: replies.map(clean) };
+  return { site, root: root ? clean(root) : null, replies: replies.map(clean), timePrecision };
 }
 
 function xThread(json) {
@@ -39,7 +40,7 @@ function xThread(json) {
     posts.set(v.rest_id, { id: v.rest_id, author: (u.core || {}).screen_name || (u.legacy || {}).screen_name || "unknown", text: note || L.full_text || "", posted: iso(L.created_at),
       links: ((L.entities || {}).urls || []).map((x) => x.expanded_url).filter((x) => x && !/^https?:\/\/(x|twitter)\.com\//.test(x)), replyTo: L.in_reply_to_status_id_str || null });
   });
-  return asThread("X", [...posts.values()]);
+  return asThread("X", [...posts.values()], "second");
 }
 
 function bskyThread(json) {
@@ -53,7 +54,7 @@ function bskyThread(json) {
     const parent = v.record.reply && v.record.reply.parent && v.record.reply.parent.uri;
     posts.set(v.uri, { id: v.uri.split("/").pop(), author: v.author.handle, text: v.record.text, posted: iso(v.record.createdAt), links, replyTo: parent ? parent.split("/").pop() : null });
   });
-  return asThread("Bluesky", [...posts.values()]);
+  return asThread("Bluesky", [...posts.values()], "exact");
 }
 
 function mastoThread(json) {
@@ -63,7 +64,7 @@ function mastoThread(json) {
     const links = [...v.content.matchAll(/<a\b[^>]*\bhref="(https?:\/\/[^"]+)"[^>]*>/gi)].filter((m) => !/\b(mention|hashtag)\b/.test(m[0])).map((m) => m[1]);
     posts.set(v.id, { id: v.id, author: v.account.acct, text: htmlText(v.content), posted: iso(v.created_at), links, replyTo: v.in_reply_to_id || null });
   });
-  return asThread("Mastodon", [...posts.values()]);
+  return asThread("Mastodon", [...posts.values()], "second");
 }
 
 const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r) => r && typeof r.text === "string");
@@ -71,7 +72,9 @@ const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r)
 // Returns { site, root, replies } or null when the JSON holds no thread Daylight Commons can read.
 export function threadFromJson(json) {
   if (!json || typeof json !== "object") return null;
-  if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies, ...(Array.isArray(json.quoted) ? { quoted: json.quoted } : {}) };
+  // Daylight Commons' own shape is typed or assembled by hand: its timePrecision is kept as given, and
+  // when it is missing the times are not assumed to be second-precise (precision.js infers it).
+  if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies, ...(Array.isArray(json.quoted) ? { quoted: json.quoted } : {}), ...(json.timePrecision ? { timePrecision: json.timePrecision } : {}) };
   const text = JSON.stringify(json).slice(0, 2000000);
   if (text.includes("\"__typename\":\"Tweet\"")) return xThread(json);
   if (text.includes("\"at://")) return bskyThread(json);

@@ -1,5 +1,6 @@
 {
  "site": "X",
+ "timePrecision": "second",
  "root": {
   "id": "1",
   "author": "council",

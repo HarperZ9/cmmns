@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "note": "Every signal a catalogue element may cite. A signal is something Daylight Commons can show from the page or from a receipt. Signals in the same family read the same evidence and count once. Context-only signals never evidence any element.",
   "signals": [
     { "id": "shape-outlier-own", "family": "shape", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "Reposts per like far above the author's own posts seen on this device." },
@@ -14,7 +14,8 @@
     { "id": "product-promotion", "family": "promotion", "kind": "context", "source": "src/core/definitions.js (signalsFromCampaign)", "observes": "The viewer opened the launch lens on this post, or quotes carry promotional phrasing or a Paid partnership label." },
     { "id": "actor-organisation", "family": "actor", "kind": "context", "source": "src/core/campaign.js (actorOf)", "observes": "The platform discloses the launch account as an organisation or official account." },
     { "id": "online-post", "family": "medium", "kind": "context", "source": "src/core/definitions.js (signalsFromCampaign)", "observes": "The conduct is a post published on an online platform." },
-    { "id": "quote-bunching", "family": "timing", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "Quote posts arrived close together in time.", "context_only": true },
+    { "id": "quote-bunching", "family": "timing", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "Quote posts arrived close together in time. Needs times to the minute; with coarser times it is not observable at this time precision and never shows.", "needs_precision": "minute", "context_only": true },
+    { "id": "timing-burst", "family": "timing", "kind": "context", "source": "src/core/timing.js (thread evidence)", "observes": "Several accounts replied within seconds, tighter than the thread's pace explains. Needs times to the second; times worked out from rounded ages such as 14h or 1d share one second by construction, so with coarser times it is not observable at this time precision and never fires.", "needs_precision": "second", "context_only": true },
     { "id": "overlap", "family": "overlap", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "Some sampled accounts were seen on other launches, below the indicator threshold.", "context_only": true },
     { "id": "random-suffix", "family": "handles", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "Handles ending in a number-and-letter tail. People choose these for privacy too.", "context_only": true },
     { "id": "default-avatar", "family": "avatar", "kind": "context", "source": "src/core/campaign.js (campaign lens)", "observes": "X's own default-image disclosure.", "context_only": true },

@@ -7,6 +7,54 @@ were not published to a store.
 
 Nothing yet.
 
+## 3.2.1 (2026-10-23)
+
+A fix for a false alarm. The timing-burst signal reported bursts such as "6 accounts replied within
+1 s ... p < 0.000001" on threads whose post times were placeholders worked out from rounded ages
+shown on screen ("14h", "1d"). Rounded times put many replies on the same second, so the signal fired
+on every screenshot-based run of 2026-10-23. Every timing signal now checks how precise the times
+are and, below what it needs, says the signal is not observable at this time precision and never
+fires. The integration API goes to 1.1.0: one new evidence kind and one new envelope field.
+
+Read these limits before relying on this release:
+- Inference from the times is a rule of thumb: at least half the distinct times, and at least
+  three, on the same point of the minute, hour or day. A thread that mixes rounded and exact times
+  is treated as rounded, which can hide a real burst. A thread with fewer than three distinct times
+  has unknown precision and no timing signal.
+- A precision the input declares is trusted as given.
+- The burst baselines in `EVALUATION.md` were measured on second-precise data and are unchanged. No
+  measured precision for bursts on real coordinated threads exists yet.
+
+### Fixed
+- Timing bursts on coarse times. `analyze` no longer reports a burst when the post times are given
+  to the minute, hour or day. One `timing-not-observable` item names the signals that did not run,
+  the precision found and what each signal needs. Five fixtures in
+  `tests/fixtures/coarse-times` keep the timing of the three runs where this happened (two feed
+  tests and a case study), with the text replaced and the accounts renamed; on 3.2.0 all five fired,
+  and none fires now (`tests/precision.test.js`).
+
+### Added
+- `timePrecision` in the thread format, on the thread or on a post: `exact`, `second`, `minute`,
+  `hour` or `day`. When it is missing, the importer sets it for platform formats (X, Reddit and
+  Mastodon give seconds, Bluesky milliseconds) and Daylight Commons infers it from the times for a
+  typed thread. Typed times are not taken as second-precise without evidence
+  (`src/core/precision.js`, `project-docs/INTEGRATION.md`, "Time precision").
+- What each timing signal needs: timing bursts and the fast-replier flag need seconds, swarming and
+  quote bunching need minutes, active hours and the posts-around-the-clock flag need hours. The
+  extension reads machine-readable times to the second and passes that precision explicitly, so a
+  scheduler posting on the hour is not mistaken for rounded times. The connections log records each
+  thread's precision; entries written before 3.2.1 were recorded from page datetime attributes and
+  count as second-precise.
+- `posts.timePrecision` (`{ value, basis }`) on thread envelopes, the `timing-not-observable` kind
+  in `schema/evidence.v1.json`, and API 1.1.0. Bundles from 3.2.0 still verify.
+- The signal registry (`catalogue/signals.json` 1.1.0) lists `timing-burst` as a context-only
+  signal and states the precision it and `quote-bunching` need.
+
+### Changed
+- The timing-burst "does not prove" text now says it holds only for times given to the second.
+- `tests/fixtures/integration/thread.json` declares `"timePrecision": "second"`: its hand-typed
+  times fall mostly on whole minutes and would otherwise read as rounded.
+
 ## 3.2.0 (2026-10-23)
 
 The first three resilience increments and the fixes from the 2026-10-23 feed test. A release now

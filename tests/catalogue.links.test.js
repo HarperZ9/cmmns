@@ -47,7 +47,7 @@ test("every badge, cited or not, links to the dispute template with its signal f
   }
   assert.match(challengeUrl("x-paid-partnerships@1.0.0"), /template=challenge\.yml&entry=x-paid-partnerships%401\.0\.0$/);
   const ctx = badgeLinks("random-suffix", list, registry);
-  assert.match(badgeLine(ctx), /No catalogue entry cites this sign; it is listed in signals\.json@1\.0\.0/);
+  assert.ok(badgeLine(ctx).includes(`No catalogue entry cites this sign; it is listed in signals.json@${registry.version}`), badgeLine(ctx));
   assert.match(badgeLine(badgeLinks("sample", list, registry)), /context and cites no catalogue entry/);
 });
 

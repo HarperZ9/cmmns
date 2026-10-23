@@ -20,7 +20,7 @@ import { useData, claimIndex, dataLoaded } from "./api-data.js";
 import { REPORT_DOES_NOT_PROVE } from "./report.js";
 import { THREAD_LIMIT, TEXT_LIMIT } from "./api-words.js";
 
-export const API_VERSION = "1.0.0";
+export const API_VERSION = "1.1.0";
 export const EVIDENCE_SCHEMA = "urn:radar:evidence:v1";
 export { useData, dataLoaded };
 
@@ -32,11 +32,12 @@ function linkItems(byDomain) {
   return [...byDomain].flatMap(([d, posts]) => siteEvidence(d, posts, { quiet: true }));
 }
 
-// One post in the input: { id?, author?, text, posted?, links?, flags?, account? }.
+// One post in the input: { id?, author?, text, posted?, timePrecision?, links?, flags?, account? }.
 function normalise(p, i, now) {
   const post = { id: p && p.id != null ? String(p.id) : "p" + (i + 1), author: String((p && p.author) || "unknown-" + (i + 1)), text: String((p && p.text) || ""), posted: (p && p.posted) || null, links: (p && p.links) || [] };
   post.flags = flagsOf(p || {}, now);
   if (p && p.account) post.account = p.account;
+  if (p && p.timePrecision) post.timePrecision = p.timePrecision;
   return post;
 }
 
@@ -62,7 +63,9 @@ function quotedPosts(input, now) {
   return out;
 }
 
-// input: { site, root?, replies: [post], quoted?: [post] }. opts: { now }: the time account ages are measured at.
+// input: { site, root?, replies: [post], quoted?: [post], timePrecision? }. opts: { now }: the time account
+// ages are measured at. timePrecision ("exact", "second", "minute", "hour" or "day") says how precise the
+// post times are, for the whole thread; a post's own timePrecision overrides it (src/core/precision.js).
 export function analyzeThread(input, opts = {}) {
   const now = opts.now || Date.now();
   const replies = ((input && input.replies) || []).map((p, i) => normalise(p, i, now));
@@ -75,9 +78,9 @@ export function analyzeThread(input, opts = {}) {
     post.extreme = P.extreme; post.machine = P.machineLike;
     for (const d of P.domains) (links.get(d) || links.set(d, []).get(d)).push(post.id);
   }
-  const T = threadItems(replies, root, { now });
+  const T = threadItems(replies, root, { now, timePrecision: input && input.timePrecision });
   const evidence = number([...T.items, ...items, ...linkItems(links)]);
-  const posts = { n: replies.length + (root ? 1 : 0), accounts: T.accounts, ids: [...(root ? [root.id] : []), ...replies.map((r) => r.id)] };
+  const posts = { n: replies.length + (root ? 1 : 0), accounts: T.accounts, ids: [...(root ? [root.id] : []), ...replies.map((r) => r.id)], timePrecision: T.timePrecision };
   if (quoted.length) posts.quoted = quoted.map((q) => q.id);
   return envelope("thread", { site: (input && input.site) || null, posts, evidence, limits: [THREAD_LIMIT, REPORT_DOES_NOT_PROVE] });
 }

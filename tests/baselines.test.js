@@ -73,5 +73,5 @@ test("the rush after a post is not a burst, and a burst inside a quiet stretch s
   assert.deepEqual(timingBursts([...rush, ...tail]), []);
   const quiet = Array.from({ length: 30 }, (_, i) => ({ author: "q" + i, posted: new Date(t0 + i * 120000).toISOString() }));
   const burst = ["x", "y", "z", "w", "v"].map((a, i) => ({ author: a, posted: new Date(t0 + 1830000 + i * 2000).toISOString() }));
-  assert.equal(timingBursts([...quiet, ...burst]).length, 1);
+  assert.equal(timingBursts([...quiet, ...burst], { precision: "second" }).length, 1, "synthetic times, exact to the second");
 });

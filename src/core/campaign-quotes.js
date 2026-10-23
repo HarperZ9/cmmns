@@ -6,6 +6,7 @@
 
 import { templateGroups, promoCues } from "./campaign-text.js";
 import { ownWords } from "./similarity.js";
+import { timePrecision, observable } from "./precision.js";
 
 // BUNCH_TIGHT_MS: 5 quotes inside an hour count as coordination; a wider bunch is shown, not counted.
 export const BUNCH_K = 5, BUNCH_TIGHT_MS = 3600000, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
@@ -13,21 +14,23 @@ export const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour bec
 
 const at = (q) => Date.parse(q.posted);
 
-// The narrowest window holding k quotes, and the busiest hour: { kWindowMs, k, hourMax }.
-export function bunching(quotes, k = BUNCH_K) {
+// The narrowest window holding k quotes, and the busiest hour: { kWindowMs, k, hourMax }. Bunching
+// needs times to the minute (precision.js); coarser times give kWindowMs null and observable false.
+export function bunching(quotes, k = BUNCH_K, precision) {
   const t = quotes.map(at).filter(Number.isFinite).sort((a, b) => a - b);
+  if (!observable(timePrecision(quotes, precision).precision, "quote-bunching")) return { k, kWindowMs: null, hourMax: null, n: t.length, observable: false };
   let kWindowMs = null, hourMax = 0;
   for (let i = 0, j = 0; i < t.length; i++) {
     if (i >= k - 1) { const w = t[i] - t[i - k + 1]; if (kWindowMs == null || w < kWindowMs) kWindowMs = w; }
     while (t[i] - t[j] > 3600000) j++;
     hourMax = Math.max(hourMax, i - j + 1);
   }
-  return { k, kWindowMs, hourMax, n: t.length };
+  return { k, kWindowMs, hourMax, n: t.length, observable: true };
 }
 
 // quotes: [{ id, author, text, posted, paidPartnership }]. Returns
 // { n, disclosed, undisclosed, bunch, groups: [{ size, disclosed, undisclosed, spanMs }], lookalikes, cues }.
-export function quoteCluster(quotes) {
+export function quoteCluster(quotes, { precision } = {}) {
   const qs = (quotes || []).filter((q) => q && q.id);
   const own = qs.map((q) => ({ id: q.id, text: ownWords(q.text || "") || q.text || "" }));
   const byId = new Map(qs.map((q) => [q.id, q]));
@@ -55,7 +58,7 @@ export function quoteCluster(quotes) {
     n: qs.length,
     disclosed: qs.filter((q) => q.paidPartnership).length,
     undisclosed: qs.filter((q) => !q.paidPartnership).length,
-    bunch: bunching(qs),
+    bunch: bunching(qs, BUNCH_K, precision),
     groups: groups.map(({ ids, ...g }) => g).sort((a, b) => b.size - a.size),
     lookalikes: look.size,
     cues: Object.values(cueIds).filter((c) => c.ids.length >= 2).map((c) => ({ id: c.id, source: c.source, n: c.ids.length })),

@@ -1,0 +1,89 @@
+{
+ "note": "Timing pattern from a thread transcribed from phone screenshots on 2026-10-23 (feed test 1). Post times are placeholders worked out from ages shown on screen such as 14h and 1d. Text is replaced and accounts renamed.",
+ "site": "X",
+ "root": {
+  "id": "r1",
+  "author": "acct-01",
+  "text": "The original post, about a news story.",
+  "posted": "2026-10-22T08:30:00.000Z"
+ },
+ "replies": [
+  {
+   "id": "c01",
+   "author": "acct-02",
+   "text": "A reply that agrees with the post.",
+   "posted": "2026-10-23T07:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c02",
+   "author": "acct-03",
+   "text": "A reply that disagrees and gives a reason.",
+   "posted": "2026-10-23T05:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c03",
+   "author": "acct-04",
+   "text": "A reply asking for a source.",
+   "posted": "2026-10-23T06:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c04",
+   "author": "acct-05",
+   "text": "A reply with a short joke about the topic.",
+   "posted": "2026-10-23T08:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c05",
+   "author": "acct-06",
+   "text": "A reply sharing a related personal view.",
+   "posted": "2026-10-23T06:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c06",
+   "author": "acct-07",
+   "text": "A reply that questions the numbers in the post.",
+   "posted": "2026-10-23T08:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c07",
+   "author": "acct-08",
+   "text": "A reply thanking the author.",
+   "posted": "2026-10-23T13:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c08",
+   "author": "acct-09",
+   "text": "A reply adding context from a news report.",
+   "posted": "2026-10-23T11:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c09",
+   "author": "acct-10",
+   "text": "A reply criticising a public figure named in the post.",
+   "posted": "2026-10-23T07:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c10",
+   "author": "acct-11",
+   "text": "A reply with a one-word reaction.",
+   "posted": "2026-10-23T05:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c11",
+   "author": "acct-12",
+   "text": "A reply restating the post in other words.",
+   "posted": "2026-10-23T07:10:00.000Z",
+   "flags": []
+  }
+ ]
+}

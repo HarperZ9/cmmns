@@ -76,7 +76,8 @@
     const sig = threadKey + ":" + replies.length;
     if (sig === lastRecorded) return;
     lastRecorded = sig;
-    netLog = PB.recordThread(netLog, threadKey, replies.map((r) => ({ author: r.author, posted: r.posted, text: r.text, domains: r.domains })), root && root.posted);
+    // Rows come from the page's machine-readable times (datetime attributes), which give seconds.
+    netLog = PB.recordThread(netLog, threadKey, replies.map((r) => ({ author: r.author, posted: r.posted, text: r.text, domains: r.domains })), root && root.posted, Date.now(), "second");
     chrome.storage.local.set({ [NET_KEY]: netLog }).catch((e) => console.error("[daylight-commons] could not save the connections log", e));
   }
 

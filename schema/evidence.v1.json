@@ -7,6 +7,11 @@
   "$defs": {
     "text": { "type": "string", "minLength": 1 },
     "postId": { "type": "string", "minLength": 1 },
+    "timePrecision": {
+      "type": ["string", "null"],
+      "enum": ["exact", "second", "minute", "hour", "day", null],
+      "description": "How precise the post times are. An input gives it as timePrecision on the thread or on a post; an importer sets it for a platform format; otherwise it is inferred from the times, and typed times are never taken as second-precise without evidence. null: unknown. Timing bursts need second, swarming needs minute; below that a timing-not-observable item says so and the signal never fires."
+    },
     "span": {
       "type": "object",
       "description": "The matched text in one post. start and end are character offsets (UTF-16), or null when the match was found after folding look-alike letters.",
@@ -27,7 +32,7 @@
         "id": { "type": "string", "pattern": "^e[0-9]+$" },
         "kind": {
           "type": "string",
-          "enum": ["thread-report", "account-flag", "same-text", "timing-burst", "swarming", "strong-language", "names-theory", "persuasion", "leaked-ai", "machine-writing", "spam-pattern", "fact-check", "lookalike-domain", "state-link", "site-owner", "site-record", "content-credentials", "credentials-ai", "credentials-changed", "ai-metadata", "no-credentials", "remote-credentials"]
+          "enum": ["thread-report", "account-flag", "same-text", "timing-burst", "timing-not-observable", "swarming", "strong-language", "names-theory", "persuasion", "leaked-ai", "machine-writing", "spam-pattern", "fact-check", "lookalike-domain", "state-link", "site-owner", "site-record", "content-credentials", "credentials-ai", "credentials-changed", "ai-metadata", "no-credentials", "remote-credentials"]
         },
         "scope": { "type": "string", "enum": ["post", "thread", "file", "site"] },
         "level": { "type": "string", "enum": ["warn", "flag", "info"], "description": "warn: worth a look on its own; flag: means more alongside others; info: context." },
@@ -54,7 +59,16 @@
           "properties": {
             "n": { "type": "integer", "minimum": 0 },
             "accounts": { "type": ["integer", "null"], "minimum": 0 },
-            "ids": { "type": "array", "items": { "$ref": "#/$defs/postId" } }
+            "ids": { "type": "array", "items": { "$ref": "#/$defs/postId" } },
+            "timePrecision": {
+              "type": "object",
+              "description": "Thread envelopes only (API 1.1.0 on): the coarsest precision of the reply times, and whether it was declared, inferred, both or unknown.",
+              "required": ["value", "basis"],
+              "properties": {
+                "value": { "$ref": "#/$defs/timePrecision" },
+                "basis": { "type": "string", "enum": ["declared", "inferred", "declared and inferred", "unknown"] }
+              }
+            }
           }
         },
         "media": {
