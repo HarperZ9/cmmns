@@ -58,7 +58,7 @@
     try {
       const log = (await chrome.storage.local.get(PB.MEDIA_KEY))[PB.MEDIA_KEY] || {};
       await chrome.storage.local.set({ [PB.MEDIA_KEY]: PB.recordCheck(log, { url, host: location.hostname, result }) });
-    } catch (e) { console.error("[daylight-commons] could not save the media check count", e); }
+    } catch (e) { PBGuard.report("could not save the media check count", e); }
   }
 
   async function check(url) {

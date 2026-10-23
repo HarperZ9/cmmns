@@ -99,6 +99,7 @@
       ],
       "js": [
         "core.bundle.js",
+        "guard.js",
         "settings.js",
         "lens-inline.js",
         "fonts.js",

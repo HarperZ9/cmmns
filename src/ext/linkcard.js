@@ -29,7 +29,7 @@
       batch.promise = new Promise((resolve) => setTimeout(async () => {
         const b = batch; batch = null;
         let got = {};
-        try { got = (await chrome.runtime.sendMessage({ type: "pb-sites", domains: [...b.domains] })) || {}; } catch (e) { console.error("[daylight-commons] site lookup failed", e); }
+        try { got = (await chrome.runtime.sendMessage({ type: "pb-sites", domains: [...b.domains] })) || {}; } catch (e) { PBGuard.report("site lookup failed", e); }
         for (const d of b.domains) cache.set(d, got[d] || { domain: d, owner: null, state: [], facts: null, record: null });
         resolve();
       }, 30));
@@ -38,7 +38,7 @@
     return batch.promise.then(() => cache.get(domain));
   }
 
-  const openList = (domain) => () => chrome.runtime.sendMessage({ type: "pb-open-sites", domain }).catch((e) => console.error("[daylight-commons] could not open the review list", e));
+  const openList = (domain) => () => chrome.runtime.sendMessage({ type: "pb-open-sites", domain }).catch((e) => PBGuard.report("could not open the review list", e));
   function sections(i, extra = []) {
     return [{ glance: PB.siteGlance(i) }, { tab: "overview", title: "Site", rows: PB.siteInfoRows(i, { onList: openList(i.domain) }) }, ...extra];
   }

@@ -52,7 +52,7 @@
   // accepts only those pages (PB.safePage). A content script cannot link to them directly.
   function openButton(label, path) {
     const b = el("button", "pb-link pb-open", label); b.type = "button";
-    b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); try { chrome.runtime.sendMessage({ type: "pb-open-page", path }).catch(() => {}); } catch (err) { console.error("[daylight-commons] could not open", path, err); } });
+    b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); try { chrome.runtime.sendMessage({ type: "pb-open-page", path }).catch(() => {}); } catch (err) { PBGuard.report("could not open", path, err); } });
     return b;
   }
 

@@ -9,8 +9,8 @@
   const reposters = new Map();   // launch id -> Map(handle -> account)
   const paidIds = new Set();     // post ids X shows with a Paid partnership label
   let store = null, loading = null, ledger = null, ledgerDirty = false;
-  chrome.storage.local.get(PB.LEDGER_KEY).then((r) => { ledger = PB.pruneLedger((r && r[PB.LEDGER_KEY]) || {}); }).catch((e) => { console.error("[daylight-commons] could not read the count ledger", e); ledger = {}; });
-  setInterval(() => { if (ledger && ledgerDirty) { ledgerDirty = false; chrome.storage.local.set({ [PB.LEDGER_KEY]: ledger }).catch((e) => console.error("[daylight-commons] could not save the count ledger", e)); } }, 30000);
+  chrome.storage.local.get(PB.LEDGER_KEY).then((r) => { ledger = PB.pruneLedger((r && r[PB.LEDGER_KEY]) || {}); }).catch((e) => { PBGuard.report("could not read the count ledger", e); ledger = {}; });
+  setInterval(() => { if (ledger && ledgerDirty) { ledgerDirty = false; chrome.storage.local.set({ [PB.LEDGER_KEY]: ledger }).catch((e) => PBGuard.report("could not save the count ledger", e)); } }, 30000);
   const saved = new Map();       // launch id -> sample size last saved, so a refresh does not rewrite storage
 
   const launchId = () => { const m = location.pathname.match(LIST_PATH); return m ? m[1] : null; };
@@ -31,15 +31,15 @@
     loading = chrome.storage.local.get(PB.OVERLAP_KEY).then((r) => {
       const s = r && r[PB.OVERLAP_KEY];
       store = s && s.salt ? PB.pruneLaunches(s) : PB.emptyStore(Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, "0")).join(""));
-    }).catch((e) => { console.error("[daylight-commons] could not read the launch store", e); store = PB.emptyStore("unsaved-" + Math.random()); });
+    }).catch((e) => { PBGuard.report("could not read the launch store", e); store = PB.emptyStore("unsaved-" + Math.random()); });
     return loading;
   }
   loadStore();
 
-  const saveStore = () => chrome.storage.local.set({ [PB.OVERLAP_KEY]: store }).catch((e) => console.error("[daylight-commons] could not save the launch store", e));
+  const saveStore = () => chrome.storage.local.set({ [PB.OVERLAP_KEY]: store }).catch((e) => PBGuard.report("could not save the launch store", e));
   function forget() {
     store = null; loading = null; saved.clear();
-    return chrome.storage.local.remove(PB.OVERLAP_KEY).then(loadStore).catch((e) => console.error("[daylight-commons] could not clear the launch store", e));
+    return chrome.storage.local.remove(PB.OVERLAP_KEY).then(loadStore).catch((e) => PBGuard.report("could not clear the launch store", e));
   }
 
   const counts = (t) => ({ reposts: t.reposts, likes: t.likes, replies: t.replies, quotes: t.quotes, bookmarks: t.bookmarks, views: t.views });

@@ -44,7 +44,7 @@
   function selfTest(site, feed) {
     if (!site) return null;
     const nodes = site.items();
-    const items = nodes.map((n) => { try { return site.read(n); } catch (e) { console.error("[daylight-commons] self-test read failed", e); return null; } }).filter(Boolean);
+    const items = nodes.map((n) => { try { return site.read(n); } catch (e) { PBGuard.report("self-test read failed", e); return null; } }).filter(Boolean);
     const f = found(site, feed, nodes.length, items);
     return { site: site.name, ...f, withAuthor: items.filter((r) => r.author).length, withId: items.filter((r) => r.id).length, verdict: PB.adapterHealth(site, { ...f, sinceMs: Math.max(f.sinceMs, PB.HEALTH_SETTLE_MS) }), at: new Date().toISOString().slice(0, 19).replace("T", " ") + " UTC" };
   }

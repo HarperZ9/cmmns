@@ -35,7 +35,7 @@
     const handles = [...new Set(all.flatMap((p) => p.handles))].filter((h) => !askedOwners.has("@" + h));
     if (!domains.length && !handles.length) return;
     domains.forEach((d) => askedOwners.add(d)); handles.forEach((h) => askedOwners.add("@" + h));
-    try { await askOps(domains, handles); } catch (e) { console.error("[daylight-commons] profile lookup failed", e); }
+    try { await askOps(domains, handles); } catch (e) { PBGuard.report("profile lookup failed", e); }
   }
   async function ensureOwners(items) {
     const domains = [...new Set(items.flatMap((r) => r.domains || []))].filter((d) => !askedOwners.has(d));
@@ -43,14 +43,14 @@
     if (!domains.length && !handles.length) return;
     domains.forEach((d) => askedOwners.add(d)); handles.forEach((h) => askedOwners.add("@" + h));
     // Site cards for the same domains, so the window's Sources area can show the whole card.
-    if (globalThis.PBLinkCard) await Promise.all(domains.map((d) => PBLinkCard.info(d))).catch((e) => console.error("[daylight-commons] site lookup failed", e));
+    if (globalThis.PBLinkCard) await Promise.all(domains.map((d) => PBLinkCard.info(d))).catch((e) => PBGuard.report("site lookup failed", e));
     try {
       const [rows, srows] = await Promise.all([chrome.runtime.sendMessage({ type: "pb-owners", domains, handles }), chrome.runtime.sendMessage({ type: "pb-state", domains, handles })]);
       if (Array.isArray(rows) && rows.length) { ownerRows.push(...rows); PB.setOwnerRows(ownerRows); }
       if (Array.isArray(srows) && srows.length) { stateRows.push(...srows); PB.setStateRows(stateRows); }
       await askOps(domains, handles);
       await askBacking(handles);
-    } catch (e) { console.error("[daylight-commons] owner lookup failed", e); }
+    } catch (e) { PBGuard.report("owner lookup failed", e); }
   }
 
   // Fact-checked claims similar to each post on screen, asked once per post (src/core/claims.js).
@@ -62,7 +62,7 @@
     try {
       const got = await chrome.runtime.sendMessage({ type: "pb-claims", posts });
       for (const [id, hits] of Object.entries(got || {})) claimHits.set(id, hits);
-    } catch (e) { console.error("[daylight-commons] claim lookup failed", e); }
+    } catch (e) { PBGuard.report("claim lookup failed", e); }
   }
   const claimsOf = (id) => claimHits.get(id) || null;
 
@@ -78,7 +78,7 @@
     lastRecorded = sig;
     // Rows come from the page's machine-readable times (datetime attributes), which give seconds.
     netLog = PB.recordThread(netLog, threadKey, replies.map((r) => ({ author: r.author, posted: r.posted, text: r.text, domains: r.domains })), root && root.posted, Date.now(), "second");
-    chrome.storage.local.set({ [NET_KEY]: netLog }).catch((e) => console.error("[daylight-commons] could not save the connections log", e));
+    chrome.storage.local.set({ [NET_KEY]: netLog }).catch((e) => PBGuard.report("could not save the connections log", e));
   }
 
   // Source trails (src/core/trail.js): which posts carried each upload and link, kept 30 days.
@@ -88,7 +88,7 @@
   function recordTrail(batch) {
     trailLog = PB.recordSpread(trailLog, batch);
     clearTimeout(trailSave);
-    trailSave = setTimeout(() => chrome.storage.local.set({ [TRAIL_KEY]: trailLog }).catch((e) => console.error("[daylight-commons] could not save trails", e)), 2000);
+    trailSave = setTimeout(() => chrome.storage.local.set({ [TRAIL_KEY]: trailLog }).catch((e) => PBGuard.report("could not save trails", e)), 2000);
   }
 
   // One snapshot per thread for the history page (src/core/history.js), saved a moment after the
@@ -101,7 +101,7 @@
       try {
         const log = (await chrome.storage.local.get(HISTORY_KEY))[HISTORY_KEY] || {};
         await chrome.storage.local.set({ [HISTORY_KEY]: PB.addSnapshot(log, PB.snapshot(key, siteName, report)) });
-      } catch (e) { console.error("[daylight-commons] could not save the thread snapshot", e); }
+      } catch (e) { PBGuard.report("could not save the thread snapshot", e); }
     }, 3000);
   }
 
@@ -117,7 +117,7 @@
       try {
         const log = (await chrome.storage.local.get(FEED_KEY))[FEED_KEY] || {};
         await chrome.storage.local.set({ [FEED_KEY]: PB.addFeedPosts(log, siteName, batch) });
-      } catch (e) { console.error("[daylight-commons] could not save the feed tally", e); }
+      } catch (e) { PBGuard.report("could not save the feed tally", e); }
     }, 3000);
   }
 
@@ -131,7 +131,7 @@
 
   function clearAll() {
     trailLog = {}; netLog = {}; lastRecorded = "";
-    if (globalThis.PBMeta) PBMeta.clear().catch((e) => console.error("[daylight-commons] could not clear account readings", e));
+    if (globalThis.PBMeta) PBMeta.clear().catch((e) => PBGuard.report("could not clear account readings", e));
     feedPending = [];
     return chrome.storage.local.remove([HISTORY_KEY, TRAIL_KEY, NET_KEY, FEED_KEY, PB.MEDIA_KEY, PB.OVERLAP_KEY]);
   }
@@ -172,9 +172,9 @@
     const built = PB.evidenceCard({ tool: "Daylight Commons " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), site: site.name, page: location.href, thread: true,
       authors: replies.map((r) => r.author), report, sameText: clusters.length, claims, sites, media });
     if (built.ok) built.bundleInput = bundleInput(site, root, replies, rows);
-    chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => console.error("[daylight-commons] could not open the card page", e));
+    chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => PBGuard.report("could not open the card page", e));
   }
 
-  const ensureChannel = (id) => askBacking([], [id]).catch((e) => console.error("[daylight-commons] channel backing lookup failed", e));
+  const ensureChannel = (id) => askBacking([], [id]).catch((e) => PBGuard.report("channel backing lookup failed", e));
   globalThis.PBLogs = Object.freeze({ ensureOwners, ensureChannel, ensureProfiles, ensureClaims, claimsOf, recordNet, recordTrail, recordFeed, saveCard, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
 })();

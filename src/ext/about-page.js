@@ -50,7 +50,7 @@
     const tryRead = () => {
       const reading = kind === "about" ? readAbout(handle) : readProfile(handle);
       if (!reading && Date.now() - started < 10000) { timer = setTimeout(tryRead, 400); return; }
-      if (reading) PBStore.put(reading).catch((e) => console.error("[daylight-commons] cache write failed", e));
+      if (reading) PBStore.put(reading).catch((e) => PBGuard.report("cache write failed", e));
       else console.warn("[daylight-commons] nothing readable on the", kind, "page for", handle, "- the layout may have changed");
       if (forLookup) chrome.runtime.sendMessage({ type: "pb-page-read", kind, reading }).catch(() => {});
     };
