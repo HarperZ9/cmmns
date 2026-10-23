@@ -121,6 +121,7 @@ profile you installed Daylight Commons in. It is not synced to other devices.
 | Launch overlap (`pb.campaign.v1`) | For each launch post you opened with enough accounts loaded: its post id and salted hashes of the sampled accounts (a random salt made in your browser, never exported), so the campaign lens can count accounts seen on several launches. No handles, no text. "Forget launches I viewed" in the thread panel clears it | 30 days, at most 200 launches |
 | Account details from other sites (`pb.meta.v1`) | What Instagram, Facebook, Bluesky or a Mastodon server showed about accounts you saw: join date, counts, labels, renames | 14 days |
 | Mastodon servers (`pb.instances.v1`) | The servers you turned Daylight Commons on for | Until you remove them |
+| Catalogue age (`pb.head.v1`) | After you check a signed head on the options page: its version, a hash of it, its signed time and expiry, the catalogue version and how many signatures it carried. Used to refuse an older head and to show how old the catalogue is. No accounts, no posts | Until you remove Daylight Commons |
 | Data packs (`pb.packs.v1`, `pb.packkeys.v1`) | Pack files you imported on the options page, whether each is on, and the public keys you chose to trust. Daylight Commons never downloads a pack and sends none anywhere | Until you remove them |
 | X request shape (`pb.tpl`) | The shape of X's About request, so Daylight Commons can repeat it. It holds no login token; the token is read fresh from X's cookie each time | Until X changes it or you clear Daylight Commons' data |
 

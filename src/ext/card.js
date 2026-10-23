@@ -133,6 +133,12 @@
   // The launch post's element tables (src/ext/definitions-view.js), every applicable jurisdiction.
   const definitions = (m) => (m.campaign && globalThis.PBDefinitionsView ? PBDefinitionsView.rows(PBDefinitionsView.model(m.campaign)) : []);
 
+  // How old the catalogue is (src/ext/freshness.js). Expired changes the wording, never the findings.
+  const catalogue = () => {
+    const F = globalThis.PBFreshness && globalThis.PBFreshness.view;
+    return F ? [{ tab: "overview", title: "Catalogue", rows: [["Catalogue", `${F.label}. ${F.line}`]] }] : [];
+  };
+
   // sections for PBPop, by tab; onLookup is offered when X has not given account data yet.
   function sections(m, signals, onLookup) {
     const owner = PB.ownerOfHandle(m.handle);
@@ -150,6 +156,7 @@
       { tab: "overview", rows: head },
       ...(groups.length ? groups : [{ tab: "overview", rows: [[null, { note: "Nothing stands out in what the site shows. The other tabs have the details." }]] }]),
       { tab: "overview", title: compareTitle(m), rows: compare(m) },
+      ...catalogue(),
       { tab: "account", title: "Where", rows: where(m) },
       { tab: "account", title: "Account", rows: account(m) },
       { tab: "account", title: "How it posts", rows: posting(m), foot: (m.reading || {}).pattern ? "From the posts X loaded for this account in your browser, not its whole history." : null },

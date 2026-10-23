@@ -5,7 +5,23 @@ were not published to a store.
 
 ## Unreleased
 
-Nothing yet.
+### Added
+- The signed head. A release now carries `HEAD.json` and `HEAD.sig`: a document of under 1 KB that
+  names `SHA256SUMS` and the catalogue by hash, with a version that only goes up, the time it was
+  signed and an expiry. `scripts/verify-release.mjs` and the options page check it before anything
+  else and refuse an older head, a different head under a version already accepted, a head over
+  4 KB, a head no trusted key signed, and a head whose catalogue or `SHA256SUMS` hash does not
+  match. Each refusal names its rule in one sentence. Until now an old signed release verified
+  forever (`src/core/head.js`, `scripts/head-lib.mjs`).
+- How old the catalogue is, on the account card and in the toolbar popup: the catalogue date, when a
+  signed head was last seen, its expiry and its signature count, as Current, Aging or Expired. An
+  expired catalogue keeps every finding and says "Newer campaigns may be missing."
+
+### Does not prove
+- A valid head shows the signer chose these files at that time. It does not show the files are
+  safe. Releases carry one signature, so a stolen project key can still sign a newer head. Several
+  signers are designed on paper only (`project-docs/K-OF-N-SIGNING.md`). The head format has had no
+  independent audit.
 
 ## 3.1.0 (2026-10-23)
 

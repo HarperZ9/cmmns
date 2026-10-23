@@ -7,6 +7,8 @@
     $(k).checked = PBSettings.get()[k];
     $(k).addEventListener("change", () => PBSettings.save({ [k]: $(k).checked }).catch((e) => console.error("[daylight-commons] could not save settings", e)));
   }
+  // How old the catalogue is: always shown, calm wording, never an alarm (src/ext/freshness.js).
+  PBFreshness.ready.then((v) => { if (v) $("freshness").textContent = `Catalogue: ${v.label}. ${v.line}`; });
   $("options").addEventListener("click", () => { chrome.runtime.openOptionsPage(); window.close(); });
 
   $("dashboard").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") }); window.close(); });
