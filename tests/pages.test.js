@@ -34,7 +34,7 @@ test("the transparency page names every sign, with intervals, corpora and licenc
   for (const f of FAMILIES) assert.ok(plain.includes(f.name), f.name);
   assert.match(html, /91\.0% \(3,996 of 4,393; 90\.1% to 91\.8%\)/, "slur precision with its interval");
   for (const l of ["CC BY 4.0", "MIT", "CC0 1.0"]) assert.ok(html.includes(l), l);
-  for (const h of ["Side balance", "What is not measured", "Known limits"]) assert.ok(html.includes(`<h2>${h}</h2>`), h);
+  for (const h of ["Side balance", "Still to measure", "Known limits"]) assert.ok(html.includes(`<h2>${h}</h2>`), h);
   assert.match(html, /Gap remains/, "the open MHS side gap is reported, not hidden");
 });
 

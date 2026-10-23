@@ -16,7 +16,7 @@
   function grant(on, input, perms, patch, status) {
     if (!on) { chrome.permissions.remove(perms).catch(() => {}); save(patch(false)); if (status) status(""); return; }
     chrome.permissions.request(perms).then((ok) => {
-      if (!ok) { input.checked = false; if (status) status("The browser did not grant access, so this stays off."); return; }
+      if (!ok) { input.checked = false; if (status) status("This needs the browser's access. Turn it on again and choose Allow."); return; }
       save(patch(true)); if (status) status("");
     }).catch((e) => { asked(e); input.checked = false; });
   }
@@ -63,11 +63,11 @@
 
   $("customAdd").addEventListener("click", () => {
     const url = PB.cleanFeedUrl($("customUrl").value);
-    if (!url) { say("That is not an https address Daylight Commons can use."); return; }
+    if (!url) { say("Enter an https feed address, such as https://example.org/feed.xml."); return; }
     if (s().customFeeds.includes(url)) { say("That feed is already on the list."); return; }
     if (s().customFeeds.length >= PB.MAX_CUSTOM_FEEDS) { say(`Daylight Commons keeps at most ${PB.MAX_CUSTOM_FEEDS} of your own feeds.`); return; }
     chrome.permissions.request({ origins: [PB.feedOrigin(url)] }).then(async (ok) => {
-      if (!ok) { say("The browser did not grant access, so the feed was not added."); return; }
+      if (!ok) { say("The feed needs the browser's access to its host. Add it again and choose Allow."); return; }
       await save({ customFeeds: [...s().customFeeds, url], feedConsent: false });
       $("customUrl").value = ""; say(""); custom();
     }, asked);
@@ -76,7 +76,7 @@
   $("outletsAll").addEventListener("click", () => {
     const origins = PB.feedOrigins(PB.FEED_OUTLETS.map((o) => ({ url: o[2] })));
     chrome.permissions.request({ origins }).then(async (ok) => {
-      if (!ok) { say("The browser did not grant access, so no outlet was added."); return; }
+      if (!ok) { say("The outlets need the browser's access to their hosts. Press the button again and choose Allow."); return; }
       await save({ outlets: Object.fromEntries(PB.FEED_OUTLETS.map((o) => [o[0], true])), feedConsent: false });
       say(""); outlets();
     }, asked);
@@ -92,7 +92,7 @@
   function show() { $("feeds").hidden = !s().coverage; if (s().coverage) { outlets(); custom(); } }
 
   $("coverageText").textContent = PB.COVERAGE_PRIVACY;
-  $("outletsText").textContent = `Suggested outlets publish their own feed on their own host, have an owner on record in Daylight Commons' tables, and together span several countries, owner types and editorial positions. None is on until you choose it. Feeds checked ${PB.OUTLETS_CHECKED}.`;
-  $("coverage").append(switchRow("Find other coverage on click", "Asks the feeds of the outlets you choose, only when you click, on a page where you opened Daylight Commons' site card. Sends nothing from the page.", s().coverage, (on) => switched(on)));
+  $("outletsText").textContent = `Suggested outlets publish their own feed on their own host, have an owner on record in Daylight Commons' tables, and together span several countries, owner types and editorial positions. Each one starts off, and you choose which to use. Feeds checked ${PB.OUTLETS_CHECKED}.`;
+  $("coverage").append(switchRow("Find other coverage on click", "When you click on a page where you opened the site card, Daylight Commons downloads the public feeds of the outlets you choose. Each request is a plain download of the feed address.", s().coverage, (on) => switched(on)));
   show();
 })().catch((e) => console.error("[daylight-commons] site options failed", e));

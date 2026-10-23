@@ -34,9 +34,9 @@
 
   <section aria-labelledby="h-sitecards">
     <h2 id="h-sitecards">Site cards</h2>
-    <p class="muted">Rest the pointer on a link in a post to see who owns the site, what kind of owner it has, when and where it was founded, any state link, and its fact-check record. To see the same card for a news site you are reading, press <strong>Site card for this page</strong> in Daylight Commons' toolbar menu. Daylight Commons runs on no news site until you press it.</p>
+    <p class="muted">Rest the pointer on a link in a post to see who owns the site, what kind of owner it has, when and where it was founded, any state link, and its fact-check record. To see the same card for a news site you are reading, press <strong>Site card for this page</strong> in Daylight Commons' toolbar menu. On news sites, the card appears when you press that button.</p>
     <h3 class="sub">Search results</h3>
-    <p class="muted">Off by default. Turning an engine on asks the browser for access to its result pages; Daylight Commons then adds a line of labels under each result and sends nothing anywhere.</p>
+    <p class="muted">Turn an engine on to add a line of labels under each of its results. The browser asks for access to that engine's result pages, and the labels are worked out in this browser.</p>
     <div id="search" class="switches"></div>
   </section>
 
@@ -50,7 +50,7 @@
       <div class="row"><button id="outletsAll" type="button" class="quiet">Choose every suggested outlet</button></div>
       <div id="outlets" class="switches" aria-labelledby="h-outlets"></div>
       <h3 class="sub" id="h-custom">Your own feeds</h3>
-      <p class="muted">Any RSS or Atom address on https. Adding one asks the browser for access to that feed's host only.</p>
+      <p class="muted">Paste any https RSS or Atom address. Adding it asks the browser for access to that feed's host.</p>
       <div class="row"><input id="customUrl" type="url" aria-label="Feed address" placeholder="https://example.org/feed.xml" size="40"><button id="customAdd" type="button">Add feed</button></div>
       <ul id="custom" class="servers" aria-labelledby="h-custom"></ul>
     </div>
@@ -59,7 +59,7 @@
 
   <section aria-labelledby="h-packs">
     <h2 id="h-packs">Data packs</h2>
-    <p class="muted">A data pack adds fact-checks, operation indicators or site notes from someone you choose. Daylight Commons never downloads one: you pick the file. Daylight Commons checks its signature, shows which key signed it and what it adds, and uses it only after you trust that key.</p>
+    <p class="muted">A data pack adds fact-checks, operation indicators or site notes from someone you choose. Pick the file, and Daylight Commons checks its signature and shows which key signed it and what it adds. The pack takes effect once you trust that key.</p>
     <p class="status muted" id="bundled" role="status" aria-live="polite"></p>
     <div class="row">
       <button id="packPick" type="button">Import a pack file</button>
@@ -103,7 +103,7 @@
   <section aria-labelledby="h-measured">
     <h2 id="h-measured">How sure each sign is</h2>
     <p class="muted" id="measuredNote"></p>
-    <p><a href="transparency.html">How each sign was measured, and what is not measured</a> · <a href="privacy.html">Privacy policy</a></p>
+    <p><a href="transparency.html">How each sign was measured</a> · <a href="privacy.html">Privacy policy</a></p>
     <table>
       <thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Measured</th></tr></thead>
       <tbody id="families"></tbody>
@@ -127,7 +127,7 @@
     </div>
   </section>
 
-  <footer id="foot">Evidence, not verdicts. Daylight Commons asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups.</footer>
+  <footer id="foot">Daylight Commons reads the site you are on. Other coverage and evidence lookups reach further once you turn them on.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>

@@ -6,7 +6,7 @@
   const KEY = PB.FEEDBACK_KEY;
   const read = async () => (await chrome.storage.local.get(KEY))[KEY] || {};
   const name = (fam) => (PB.FAMILIES.find((f) => f.id === fam) || { name: fam }).name;
-  $("fbRule").textContent = `After ${PB.CALIBRATION_MIN} marks on one kind of sign, the window shows "Your feedback: N of M right" under that sign's measured figure. It is your own count, not a measurement, and it never replaces the measured figure.`;
+  $("fbRule").textContent = `After ${PB.CALIBRATION_MIN} marks on one kind of sign, the window shows "Your feedback: N of M right" under that sign's measured figure. It is your own count, shown beside the measured figure.`;
 
   async function paint() {
     const store = await read();

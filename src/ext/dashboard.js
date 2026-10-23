@@ -71,7 +71,7 @@
     const T = PB.opsTrend(opsAll), named = PB.opsLookup(opsAll, { domains: [...domains] });
     const sites = new Set(named.indicators.map((i) => i.d));
     $("ops-say").textContent = `Daylight Commons carries ${plural(T.total, "operation", "operations")} from ${plural(T.byState.length, "attributed country", "attributed countries")}, each cited to the reports that found it. ` +
-      (sites.size ? `${plural(sites.size, "site", "sites")} in your logs ${sites.size === 1 ? "was" : "were"} named in one of those reports: ${[...sites].slice(0, 5).join(", ")}.` : "No site in your logs was named in one of those reports.");
+      (sites.size ? `${plural(sites.size, "site", "sites")} in your logs ${sites.size === 1 ? "was" : "were"} named in one of those reports: ${[...sites].slice(0, 5).join(", ")}.` : "Sites in your logs that those reports name are listed here.");
     $("ops-caveat").textContent = PB.OPS_TREND_CAVEAT;
     bars($("ops-years"), T.byYear.map((y) => ({ ...y, label: String(y.year) })), (r) => r.label);
     bars($("ops-states"), T.byState, (r) => r.state, (r) => `${plural(r.docs, "document", "documents")}`);
@@ -80,7 +80,7 @@
   function rhetoric(d) {
     $("strong-say").textContent = d.strong
       ? `${plural(d.strong.k, "post or reply", "posts and replies")} of ${d.strong.n.toLocaleString()} showed strong rhetoric signs: dehumanising words, calls for violence, slurs, or two weaker signs together.`
-      : "No posts or replies counted yet in this window.";
+      : "Open a thread with Daylight Commons on, and its posts and replies are counted here.";
     shareBar($("strong"), d.strong, "posts and replies with strong signs");
     const box = $("days"), tb = $("days-table").querySelector("tbody");
     box.replaceChildren(); tb.replaceChildren();
@@ -101,8 +101,8 @@
     const T = d.techniques;
     bars($("tech"), T.counts, (r) => PB.TECHNIQUES[r.id].name);
     $("tech-say").textContent = !T.shown.length
-      ? "No technique has passed its measurement yet, so none is counted here. The options page lists each technique with its measured figure; one that clears the bar starts counting here."
-      : T.counts.length ? `Counted only for techniques that passed their measurement: ${T.shown.map((t) => PB.TECHNIQUES[t].name.toLowerCase()).join(", ")}.` : "None of the measured techniques was seen in this window.";
+      ? "Techniques start counting here once they pass their measurement. The options page lists each technique with its measured figure."
+      : T.counts.length ? `Counted for the techniques that passed their measurement: ${T.shown.map((t) => PB.TECHNIQUES[t].name.toLowerCase()).join(", ")}.` : "Measured techniques are counted here when a post you open uses one.";
   }
 
   // The episodic and thematic balance (src/core/feed.js framingBalance): held with its reason and no
@@ -110,8 +110,8 @@
   function framing(d) {
     const F = d.framing || { shown: false, status: "held back: not measured" };
     $("framing-say").textContent = !F.shown
-      ? `Not shown yet. Daylight Commons can read whether a feed post tells an issue through one person's story or explains it through trends, numbers and policy, but that reading is ${F.status.replace(/^held back: /, "")}. It starts here once it passes the same bar as every other sign.`
-      : F.read ? `Of ${plural(F.read, "feed post", "feed posts")} long enough to read, these told an issue only through one person's story, and these explained it only through structure. The rest did both or neither. ${PB.FRAMING_DOES_NOT_PROVE}` : "No feed posts long enough to read in this window.";
+      ? `Daylight Commons can read whether a feed post tells an issue through one person's story or explains it through trends, numbers and policy. That reading is ${F.status.replace(/^held back: /, "")}, and it starts here once it passes the same bar as every other sign.`
+      : F.read ? `Of ${plural(F.read, "feed post", "feed posts")} long enough to read, the first bar shows those told purely through one person's story and the second those explained purely through structure. The rest mixed the two or took another form. ${PB.FRAMING_DOES_NOT_PROVE}` : "Feed posts long enough to read are counted here.";
     shareBar($("framing-person"), F.shown ? F.personStory : null, "posts told only as a person's story");
     shareBar($("framing-structure"), F.shown ? F.structural : null, "posts explained only through structure");
   }
@@ -119,15 +119,15 @@
   function checks(d) {
     $("flag-say").textContent = d.flagged
       ? `${plural(d.flagged.k, "account", "accounts")} of ${d.flagged.n.toLocaleString()} read were flagged: one strong sign, such as a very new account or a reply that speaks as a local from somewhere else, or two different weaker signs.`
-      : "No accounts read yet in this window.";
+      : "Accounts Daylight Commons reads in this window are counted here.";
     shareBar($("flag"), d.flagged, "accounts read with a flag");
     $("checks-say").textContent = d.notes
       ? `${plural(d.notes.k, "post", "posts")} of ${d.notes.n.toLocaleString()} carried a Community Note, and ${plural(d.claims.k, "post", "posts")} closely matched a claim a fact-checker had already reviewed.`
-      : "No posts counted yet in this window.";
+      : "Posts you open in this window are counted here.";
     const tb = $("together").querySelector("tbody");
     tb.replaceChildren();
     for (const e of d.together) { const tr = el("tr"); tr.append(el("td", null, `@${e.a} and @${e.b}`), el("td", "n", String(e.n)), evidence(e.threads)); tb.append(tr); }
-    if (!d.together.length) { const tr = el("tr"); const td = el("td", "empty", "No pair has appeared together in three or more threads in this window."); td.colSpan = 3; tr.append(td); tb.append(tr); }
+    if (!d.together.length) { const tr = el("tr"); const td = el("td", "empty", "A pair appears here once two accounts reply in three or more of the same threads."); td.colSpan = 3; tr.append(td); tb.append(tr); }
     $("together-say").textContent = ["Pairs of accounts that replied in at least three of the same threads you opened. Friends and fans of the same creator do this too.", PB.pairsLine(d.threads)].filter(Boolean).join(" ");
   }
 
@@ -143,8 +143,8 @@
     $("media").hidden = !rows.length;
     const n = rows.reduce((a, r) => a + r.n, 0), k = rows.reduce((a, r) => a + r.intact, 0);
     $("media-say").textContent = n
-      ? `Of ${plural(n, "file", "files")} you asked Daylight Commons to check, ${k.toLocaleString()} carried Content Credentials that were intact. Platforms often strip credentials on upload, so "none found" says nothing about a file either way. Only files you checked count, so this is not a sample of what each site carries.`
-      : "No media checked yet in this window. In a post's window, \"Check this file\" reads a file's Content Credentials and adds it here.";
+      ? `Of ${plural(n, "file", "files")} you asked Daylight Commons to check, ${k.toLocaleString()} carried Content Credentials that were intact. Platforms often strip credentials on upload, so read "none found" as missing data about the file. The count covers the files you checked.`
+      : "In a post's window, \"Check this file\" reads a file's Content Credentials and adds it here.";
   }
 
   // The threads behind a pair, linked where the thread key allows it.
@@ -169,6 +169,6 @@
 
   for (const b of document.querySelectorAll(".window button")) b.addEventListener("click", () => render(+b.dataset.days));
   $("not-show").textContent = PB.FEED_DOES_NOT_SHOW;
-  $("foot").textContent = `Daylight Commons ${chrome.runtime.getManifest().version}. Kept ${keep} days in this browser; accounts seen together, 30 days at most. Evidence, not verdicts.`;
+  $("foot").textContent = `Daylight Commons ${chrome.runtime.getManifest().version}. Kept ${keep} days in this browser; accounts seen together, 30 days at most.`;
   render(7);
 })().catch((e) => { console.error("[daylight-commons] feed page failed", e); document.getElementById("scope").textContent = "Could not read the logs: " + e.message; });

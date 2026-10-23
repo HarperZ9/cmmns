@@ -71,14 +71,14 @@ was built. They show that the detectors follow their rules. They are not error r
   Comments, where 8% of comments are hostile, about a third of strong labels (23 of 68) fell on text the raters
   called toxic. Real reply threads sit somewhere between. Some Civil "false positives" are quoted or
   ironic uses that raters scored below 0.5, so 34% is a floor more than a point estimate.
-- **Recall.** Daylight Commons is a hand-built lexicon and grammar. It finds a small share of hostile text: MHS
-  item recall is under 3% for every family. A thread with no markers is not a clean thread.
-- **Weak families.** Conspiracy, absolutist and essentialise describe framing, which these corpora
-  do not label. Their figures against hostility labels are context, not error rates.
-- **Extreme.** The thread report is only as good as "extreme". At 17% recall on MHS, most severe
-  replies do not count as extreme.
-- **Synthetic.** The duplicate and mismatch figures come from cases written alongside the rules. No
-  person other than the rules' author, and no model, labelled them.
+- **Recall.** Daylight Commons is a hand-built lexicon and grammar, tuned for precision. It finds a small share
+  of hostile text: MHS item recall is under 3% for every family. A quiet thread can still hold hostile replies.
+- **Weak families.** Conspiracy, absolutist and essentialise describe framing. The corpora label hostility,
+  so their figures show how often the framing lands on hostile text, as context.
+- **Extreme.** The thread report's extreme count finds about one severe reply in six (17% recall on
+  MHS). Treat it as a floor.
+- **Synthetic.** The duplicate and mismatch figures come from cases the rules' author wrote and
+  labelled alongside the rules.
 
 ## Arabic, Russian, Ukrainian, Chinese and Hindi (test split, 2026-10-21)
 
@@ -474,11 +474,10 @@ Wilson interval. It never changes "flagged", the extreme comparison or the verdi
 
 ### What the persuasion numbers do not prove
 - PTC is news articles from 48 outlets, mostly 2017 to 2019. Replies are shorter and blunter, and
-  precision there is not measured. It could be higher or lower.
-- PTC's labels are not exhaustive. A true use the annotators did not mark counts as a miss, so
-  precision leans low.
-- A technique describes how a post argues. It does not say the post is false, or anything about
-  who wrote it.
+  precision on them is still to be measured. It could be higher or lower.
+- PTC's annotators marked most uses and missed some. A true use they missed counts against Daylight
+  Commons, so precision leans low.
+- A technique describes how a post argues, and true claims use techniques too.
 
 ## Organic baselines for the coordination signs (2026-10-21)
 Every coordination sign now carries what normal looks like: how often the same sign fired in

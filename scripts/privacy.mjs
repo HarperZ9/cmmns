@@ -12,7 +12,7 @@ export function render(target = "ext", md = readFileSync(join(ROOT, "PRIVACY.md"
   const text = md.replace(/^Last updated: .*\n\n?/m, "")
     .replace("are listed in CHANGELOG.md", `are listed in [Daylight Commons' changelog](${REPO}/blob/main/CHANGELOG.md)`)
     .replace("open an issue on the project's repository", `open an issue on [Daylight Commons' repository](${REPO}/issues)`);
-  const description = "Daylight Commons runs in your browser: no server, no account, no analytics. What it reads, what it keeps and for how long, and your controls.";
+  const description = "Daylight Commons runs in your browser. What it reads, what it sends and to whom, what it keeps and for how long, and your controls.";
   if (target === "site") return sitePage({ file: "privacy.html", title: "Privacy policy", role: "What Daylight Commons reads, what it sends and to whom, what it keeps and for how long, and your controls.", description, updated, body: markdown(text) });
   return page({ title: "Daylight Commons privacy policy", description, updated, body: markdown(text) });
 }

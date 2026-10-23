@@ -52,7 +52,7 @@ export function bullets(md, heading) {
 function languageRows(fams) {
   return FAMILIES.filter((f) => fams[f.id]).map((f) => {
     const d = fams[f.id];
-    return row([esc(f.name), num(rate(d.precision)), num(span(d.precisionRange, "under 20 hits in each corpus")), num(rate(d.recall)), d.measured ? "Shown with this figure" : esc(`Not measured: ${String(d.note).replace(/; not measured$/, "")}`)]);
+    return row([esc(f.name), num(rate(d.precision)), num(span(d.precisionRange, "under 20 hits in each corpus")), num(rate(d.recall)), d.measured ? "Shown with this figure" : esc(`Held back: ${String(d.note).replace(/; not measured$/, "")}`)]);
   });
 }
 
@@ -88,12 +88,12 @@ function notMeasured(fams) {
   const synthetic = new Set(["duplicates", "mismatch"]);
   const open = FAMILIES.filter((f) => f.kind === "detector" && !measuredLine(f.id).measured && !synthetic.has(f.id)).map((f) => f.name);
   return [
-    `Daylight Commons' own rules with no measurement yet: ${open.join(", ")}. The window says "not measured yet" beside each of them.`,
-    "Same text as other replies, and speaks as local, labelled elsewhere: tested only on cases written alongside the rules (below). No error rate on real replies exists yet.",
-    "Live threads: no thread from X, YouTube, Reddit, Facebook, Instagram or Bluesky has been labelled by hand yet, so no figure here comes from those sites.",
-    "French language signs: too few hits in the French corpus to measure. Persuasion cues in French: no corpus Daylight Commons may use.",
-    fams.vigilante && !fams.vigilante.measured ? "Call for vigilantes: fewer than 20 hits in the test split." : null,
-    "Site labels (Community Notes, ads, posting app, X's spam label) and matches against cited tables (outlet owners, state links) are not Daylight Commons' judgement. Their evidence is the site or the cited source.",
+    `Daylight Commons' own rules still to measure: ${open.join(", ")}. The window marks each of them as waiting for a measurement.`,
+    "Same text as other replies, and speaks as local, labelled elsewhere: tested on cases written alongside the rules (below). Measuring them on real replies needs live threads labelled by hand.",
+    "Live threads: every figure here comes from public research corpora. Threads from X, YouTube, Reddit, Facebook, Instagram and Bluesky still need labelling by hand.",
+    "French language signs: the French corpus has too few hits to measure. Persuasion cues in French: waiting for a corpus whose licence Daylight Commons can use.",
+    fams.vigilante && !fams.vigilante.measured ? "Call for vigilantes: under the 20 hits in the test split that a measurement needs." : null,
+    "Site labels (Community Notes, ads, posting app, X's spam label) and matches against cited tables (outlet owners, state links) carry the site's or the cited source's own judgement, and their evidence is that site or source.",
   ].filter(Boolean);
 }
 
@@ -111,8 +111,8 @@ function derivedRows(R) {
     esc(l.sources), esc(l.ship ? "Shows in the window" : `Held back: ${heldWhy(l)}`)]));
 }
 function heldWhy(l) {
-  if (!l.terms) return "no term passed the check on the training half";
-  if (l.basis !== "group") return "its corpora mark offensive or not, not hate at a group, so the list holds insults";
+  if (!l.terms) return "every candidate term failed the check on the training half";
+  if (l.basis !== "group") return "its corpora label general offensiveness, so the list holds insults";
   return l.gate.n < 20 ? "fewer than 20 signs to measure" : "the interval starts below 70%";
 }
 
@@ -145,18 +145,17 @@ ${more("Every language sign, with counts", tbl(["Sign", "Precision (95% interval
 <p class="muted">${esc(MEASURED_DOES_NOT_PROVE)}</p>
 <h3>Weaker signs that count only toward a reply being "extreme"</h3>
 ${more("Weaker signs, with counts", tbl(["Sign", "Share on hostile text (95% interval)", "Range across corpora"], weakRows(fams)))}
-<p class="muted">These describe framing, which the corpora do not label. Their figures against hostility labels are context, not error rates.</p>
 <h3>The thread report's "extreme"</h3>
-<p>Precision against Measuring Hate Speech severity labels: <span class="mono">${rate(D.extreme.precision)}</span>. Recall: <span class="mono">${rate(D.extreme.recall)}</span>. On HateXplain: precision <span class="mono">${rate(D.extreme.byCorpus.hatexplain)}</span>. Most severe replies do not count as extreme, so the report undercounts them.</p>
+<p>Precision against Measuring Hate Speech severity labels: <span class="mono">${rate(D.extreme.precision)}</span>. Recall: <span class="mono">${rate(D.extreme.recall)}</span>. On HateXplain: precision <span class="mono">${rate(D.extreme.byCorpus.hatexplain)}</span>.</p>
 <h3>Word lists derived from labelled data</h3>
-<p>For Hebrew, Turkish, Korean, Japanese, Persian, Indonesian and Hindi, a script picks each slur term from the training half of public corpora labelled by people, and the other half measures it. A language shows signs only when its list was derived against labels of hate aimed at a group and the 95% interval of its precision starts at 70% or above, from at least 20 signs. Held-back lists never run.</p>
+<p>For Hebrew, Turkish, Korean, Japanese, Persian, Indonesian and Hindi, a script picks each slur term from the training half of public corpora labelled by people, and the other half measures it. A language shows signs only when its list was derived against labels of hate aimed at a group and the 95% interval of its precision starts at 70% or above, from at least 20 signs. Held-back lists stay off.</p>
 ${more("Every derived list, with counts", tbl(["Language", "Terms", "Precision on hostile text (95% interval)", "Data", "Status"], derivedRows(R)))}
 <h2>Persuasion techniques</h2>
-<p>Checked on the Propaganda Techniques Corpus v2 (CC BY 4.0), news articles labelled span by span. A technique shows in the window only when its precision is at least 80% and its 95% interval starts at 70% or above, from at least 20 hits. Published systems reach F1 of about 30 to 44 on these techniques, where a confident label is wrong more often than right. Whataboutism needs the whole exchange, so it never shows on one reply. No technique has cleared the bar.</p>
+<p>Checked on the Propaganda Techniques Corpus v2 (CC BY 4.0), news articles labelled span by span. A technique shows in the window only when its precision is at least 80% and its 95% interval starts at 70% or above, from at least 20 hits. Published systems reach F1 of about 30 to 44 on these techniques, where a confident label is wrong more often than right. Whataboutism needs the whole exchange to judge, so it stays off single replies. Every technique so far sits under the bar.</p>
 ${more("Every technique, with counts", tbl(["Technique", "Precision (95% interval)", "Recall", "Chance", "Status"], persuasionRows(ptc)))}
 <p class="muted">${esc(PERSUASION_DOES_NOT_PROVE)} "Chance" is the share of words inside a labelled span of that technique.</p>
 <h2>Cases written for the test</h2>
-<p>Same text as other replies: pair precision <span class="mono">${rate(D.duplicates.precision)}</span>, recall <span class="mono">${rate(D.duplicates.recall)}</span>. Speaks as local, labelled elsewhere: precision <span class="mono">${rate(D.mismatch.precision)}</span>, recall <span class="mono">${rate(D.mismatch.recall)}</span>. One author wrote both these cases and the rules. Read the figures as a check that the rules fire where they should; real replies have no error rate yet.</p>
+<p>Same text as other replies: pair precision <span class="mono">${rate(D.duplicates.precision)}</span>, recall <span class="mono">${rate(D.duplicates.recall)}</span>. Speaks as local, labelled elsewhere: precision <span class="mono">${rate(D.mismatch.precision)}</span>, recall <span class="mono">${rate(D.mismatch.recall)}</span>. One author wrote both these cases and the rules. Read the figures as a check that the rules fire where they should.</p>
 <h2>Side balance</h2>
 <p>The strong language signs were run on hostile text aimed at groups each side is often hostile to, and recall was compared. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
 ${tbl(["Corpus", "Recall, right's usual targets", "Recall, left's usual targets", "Precision, right's usual targets", "Precision, left's usual targets", "Result"], sideRows(D.sides))}
@@ -165,15 +164,15 @@ ${tbl(["Corpus", "Recall, right's usual targets", "Recall, left's usual targets"
 <p>Each of Daylight Commons' ${FAMILIES.length} signs, with the line its window shows beside it.</p>
 ${more("Every sign and its measured line", tbl(["Sign", "Area", "Kind", "What the window says"], everySignRows()))}
 ${opsSection(JSON.parse(read("data/ops.json")))}
-<h2>What is not measured</h2>
+<h2>Still to measure</h2>
 ${ul(notMeasured(fams))}
 <h2>Known limits</h2>
 ${ul(limits, inline)}
 <h2>Your own feedback</h2>
-<p>Each sign in the window has "This was right" and "This was wrong". Your marks stay in your browser. After 10 marks on one kind of sign, the window shows your own count under the measured figure. It never changes the figures on this page. You can save your marks to a file from the options page and choose whether to share it.</p>
+<p>Each sign in the window has "This was right" and "This was wrong". Your marks stay in your browser. After 10 marks on one kind of sign, the window shows your own count under the measured figure. The figures on this page stay as measured. You can save your marks to a file from the options page and choose whether to share it.</p>
 <h2>Data used</h2>
 ${tbl(["Corpus", "Licence"], sources.map((s) => row([`<a href="${esc(s.url)}">${esc(s.name)}</a>`, esc(s.licence)])))}
-<p>The repository holds counts, rates and file hashes, and none of the corpus text. Download the corpora, run the evaluation scripts in <a href="${REPO}">Daylight Commons' repository</a>, and every number on this page comes back.</p>`;
+<p>The repository holds counts, rates and file hashes; the corpus text stays with each publisher. Download the corpora, run the evaluation scripts in <a href="${REPO}">Daylight Commons' repository</a>, and every number on this page comes back.</p>`;
   const description = "Every Daylight Commons sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.";
   if (target === "site") return sitePage({ file: "transparency.html", title: "How Daylight Commons is measured", role: "Each sign's measured precision and recall with its interval, the data behind it, the side-balance check and the known limits.", description, updated: D.generated, body, css: FIGURE_CSS });
   return page({ title: "How Daylight Commons is measured", description, updated: D.generated, body, css: FIGURE_CSS });

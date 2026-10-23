@@ -65,7 +65,7 @@
     try { pack = JSON.parse(await file.text()); } catch { throw new Error("the file is not JSON"); }
     const { keys } = await store();
     const v = await PB.verifyPack(pack, keys);
-    const problems = [...v.problems, ...(pack && pack.content ? PB.validatePackContent(pack.content) : ["the pack has no content Daylight Commons can add"])];
+    const problems = [...v.problems, ...(pack && pack.content ? PB.validatePackContent(pack.content) : ["the pack needs a content section Daylight Commons can add"])];
     const m = (pack && pack.manifest) || {}, box = $("packPreview");
     box.replaceChildren(el("h3", { class: "sub" }, `${m.name || "Unnamed pack"} ${m.version || ""}`));
     if (m.description) box.append(el("p", {}, m.description));
@@ -93,8 +93,8 @@
     const v = await PB.verifyPack(pack, [PB.PROJECT_KEY]);
     const files = await PB.verifyFiles(pack, async (n) => (await get(n)).arrayBuffer());
     const n = Object.keys(pack.manifest.files || {}).length;
-    say(v.trusted && !files.length ? `Daylight Commons' own data: signed by the Daylight Commons project key ${PB.keyFingerprint(v.keyId)}; all ${n} tables match the signed copy (${pack.manifest.created}). This checks the files against each other; it cannot rule out a tampered install, which could carry a different key. Compare the key with the one published in Daylight Commons' repository.`
-      : `Daylight Commons' own data does not match its signature: ${[...v.problems, ...files].join("; ") || "the key is not the project key"}. Reinstall Daylight Commons from a source you trust.`);
+    say(v.trusted && !files.length ? `Daylight Commons' own data: signed by the Daylight Commons project key ${PB.keyFingerprint(v.keyId)}; all ${n} tables match the signed copy (${pack.manifest.created}). This checks the files against each other. A tampered install could carry a different key, so compare the key with the one published in Daylight Commons' repository.`
+      : `Daylight Commons' own data fails its signature check: ${[...v.problems, ...files].join("; ") || "the key differs from the project key"}. Reinstall Daylight Commons from a source you trust.`);
   }
 
   $("packCaveat").textContent = PB.PACK_DOES_NOT_PROVE;
