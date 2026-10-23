@@ -84,6 +84,8 @@ test("a changed export file or bundle fails verification", () => {
   const r = spawnSync(process.execPath, [CLI, "case", "verify-export", v, "--case", CASE], { encoding: "utf8", env });
   assert.equal(r.status, 1);
   assert.match(r.stdout, /FAIL DOSSIER\.md: DOES NOT MATCH/);
+  const elsewhere = spawnSync(process.execPath, [CLI, "case", "verify-export", join(CASE, "exports", "legal", "v001")], { encoding: "utf8", env, cwd: dir });
+  assert.match(elsewhere.stdout, /Export verified/, "an export checks from outside its case folder");
   const verify = spawnSync(process.execPath, [CLI, "verify", join(CASE, "exports", "research", "v001", "case.evidence-bundle.json")], { encoding: "utf8" });
   assert.equal(verify.status, 0, verify.stdout);
 });
