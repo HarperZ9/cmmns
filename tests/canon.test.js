@@ -43,7 +43,8 @@ test("every Daylight Commons page loads the shared tokens before its own styles"
     assert.ok(canon > 0, `${p} links canon.css`);
     for (const m of html.matchAll(/href="([\w-]+\.css)"/g)) assert.ok(m.index >= canon, `${p}: canon.css comes before ${m[1]}`);
   }
-  for (const p of ["src/ext/transparency.html", "src/ext/privacy.html", "docs/transparency.html", "docs/privacy.html"]) {
+  // docs/ copies use the author's site cascade instead (tests/pages.test.js).
+  for (const p of ["src/ext/transparency.html", "src/ext/privacy.html"]) {
     assert.match(read(p), /--paper: #ebe5d8;/, `${p} carries the canon tokens`);
   }
 });
@@ -96,5 +97,5 @@ test("the transparency page leads with one figure per sign and keeps counts coll
     const lead = s.replace(/<details[^]*<\/details>/, "");
     assert.doesNotMatch(lead, /\d of \d/, "counts sit in the disclosure, not the lead");
   }
-  assert.ok(html.indexOf('<section class="sign">') < html.indexOf("<h2>Language signs</h2>"), "figures come first");
+  assert.ok(html.indexOf('<section class="sign">') < html.search(/<h2[^>]*>Language signs<\/h2>/), "figures come first");
 });

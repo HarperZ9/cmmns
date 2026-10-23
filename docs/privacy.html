@@ -3,115 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Daylight Commons privacy policy</title>
-<meta name="description" content="Daylight Commons runs entirely in your browser: no server, no account, no analytics. What it reads, what it keeps and for how long, and your controls.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>Privacy policy | Daylight Commons</title>
+<meta name="description" content="Daylight Commons runs in your browser: no server, no account, no analytics. What it reads, what it keeps and for how long, and your controls.">
+<link rel="canonical" href="https://harperz9.github.io/daylight-commons/privacy.html">
+<link rel="preload" href="/system/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/system/doc.css">
+<link rel="stylesheet" href="/system/art.css">
 <style>
-@font-face { font-family: "Hanken Grotesk"; src: url("fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
-@font-face { font-family: "JetBrains Mono"; src: url("fonts/jetbrains-mono-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
-
-:root {
-  color-scheme: light;
-  --font-sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
-  --paper: #ebe5d8; --inset: #e4ddcd; --panel: #e2dac9; --raised: #d8cfbc;
-  --ink: #16130f; --soft: #4a443b; --muted: #5f584d; --line: #c9bfab; --line-strong: #7b7262; --on-ink: #ebe5d8;
-  --verified: #0a6b61; --drift: #8f3a19; --unverifiable: #4e4d85;
-  --hot: var(--ink); --focus: var(--ink);
-  --field-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M48 43v10M43 48h10' stroke='%23c9bea7' stroke-width='1'/%3E%3C/svg%3E");
-  --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4.5rem;
-  --gutter: clamp(1rem, 4vw, 2.5rem); --measure: 38rem; --wide: 58rem;
-  --radius: 0; --radius-control: 2px;
-  --t-display: clamp(2.4rem, 1.3rem + 4vw, 4.75rem);
-  --t-h2: clamp(1.6rem, 1.15rem + 1.6vw, 2.6rem);
-  --t-h3: 1.25rem; --t-dek: 1.25rem; --t-body: 1.0625rem; --t-label: .875rem; --t-meta: .9375rem;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --paper: #060608; --inset: #0c0c0f; --panel: #111114; --raised: #1a1a1e;
-    --ink: #ece5d6; --soft: #b8b0a0; --muted: #958e80; --line: #29282c; --line-strong: #6f6a61; --on-ink: #060608;
-    --verified: #63d4ce; --drift: #e29472; --unverifiable: #b3b1e6;
-    --field-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M48 43v10M43 48h10' stroke='%23232226' stroke-width='1'/%3E%3C/svg%3E");
-  }
-}
-@media (forced-colors: active) {
-  :root { --paper: Canvas; --inset: Canvas; --panel: Canvas; --raised: Canvas; --ink: CanvasText; --soft: CanvasText; --muted: CanvasText;
-    --line: GrayText; --line-strong: CanvasText; --on-ink: Canvas; --verified: CanvasText; --drift: CanvasText; --unverifiable: CanvasText; --hot: Highlight; --focus: Highlight; }
-}
-@media print {
-  :root { color-scheme: light; --paper: #fff; --inset: #fff; --panel: #fff; --raised: #fff; --ink: #000; --soft: #333; --muted: #444; --line: #aaa; --line-strong: #555;
-    --verified: #006b73; --drift: #8a3219; --unverifiable: #4b4b7a; --field-mark: none; }
-}
-
-* { box-sizing: border-box; }
-html { font-synthesis: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; background: var(--paper); }
-body { margin: 0; background-color: var(--paper); background-image: var(--field-mark); background-size: 96px 96px; background-attachment: fixed;
-  color: var(--ink); font: 400 var(--t-body)/1.6 var(--font-sans); }
-main { background: var(--paper); }
-::selection { background: var(--ink); color: var(--paper); }
-h1, h2, h3 { font-family: var(--font-sans); text-wrap: balance; }
-h1 { font-weight: 780; letter-spacing: -.035em; line-height: .98; }
-h2 { font-weight: 720; letter-spacing: -.022em; line-height: 1.1; }
-h3 { font-weight: 680; letter-spacing: -.012em; }
-a { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; }
-a:hover { text-decoration-thickness: 2px; }
-code, kbd, samp, pre, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.figure { font-variant-numeric: tabular-nums; }
-:is(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-
-button { font: 650 1rem/1.2 var(--font-sans); color: var(--on-ink); background: var(--ink); border: 1px solid var(--ink);
-  border-radius: var(--radius-control); padding: .7rem 1.2rem; min-height: 44px; cursor: pointer; }
-button.quiet { color: var(--ink); background: transparent; border-color: var(--line-strong); }
-button.quiet:hover:not(:disabled) { border-color: var(--ink); background: var(--raised); }
-button:disabled { opacity: .5; cursor: default; }
-
-main section:not(.bare), .cross { position: relative; padding-top: var(--s-5); background: linear-gradient(var(--line), var(--line)) top left / 100% 1px no-repeat; }
-main section:not(.bare)::before, .cross::before { content: ""; position: absolute; top: -7px; left: -7px; width: 15px; height: 15px; pointer-events: none;
-  background: linear-gradient(var(--ink), var(--ink)) center / 1px 100% no-repeat, linear-gradient(var(--ink), var(--ink)) center / 100% 1px no-repeat; }
-
-table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; vertical-align: top; padding: .55rem .75rem .55rem 0; border-bottom: 1px solid var(--line); }
-thead th { font-weight: 650; color: var(--ink); border-bottom: 2px solid var(--ink); }
-td.n, th.n, td.num { text-align: right; font-variant-numeric: tabular-nums; }
-td.n, td.num { font-family: var(--font-mono); }
-
-summary { cursor: pointer; font-weight: 650; list-style: none; }
-summary::-webkit-details-marker { display: none; }
-summary::before { content: "+"; display: inline-block; width: 1.1em; font-weight: 500; }
-details[open] > summary::before { content: "\2212"; }
-
-.v-verified { color: var(--verified); font-weight: 700; }
-.v-drift, .hot { color: var(--drift); font-weight: 650; }
-.v-unverifiable { color: var(--unverifiable); font-weight: 700; }
-
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
-main { max-width: 60rem; margin: 0 auto; padding: var(--s-7) var(--gutter) var(--s-8); }
-h1 { font-size: var(--t-display); margin: 0 0 var(--s-3); }
-h2 { font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); margin: var(--s-7) 0 var(--s-3); }
-h2:not(.bare) { position: relative; padding-top: var(--s-5); background: linear-gradient(var(--line), var(--line)) top left / 100% 1px no-repeat; }
-h2:not(.bare)::before { content: ""; position: absolute; top: -7px; left: -7px; width: 15px; height: 15px; pointer-events: none;
-  background: linear-gradient(var(--ink), var(--ink)) center / 1px 100% no-repeat, linear-gradient(var(--ink), var(--ink)) center / 100% 1px no-repeat; }
-h3 { font-size: var(--t-h3); margin: var(--s-5) 0 var(--s-2); }
-p, li { max-width: var(--measure); }
-code { font-size: .92em; }
-.lead { font-size: var(--t-dek); }
-.muted { color: var(--soft); }
-.scroll { overflow-x: auto; margin: var(--s-3) 0; }
-table { font-size: .92em; }
-td.num { font-size: .92em; text-align: left; }
-footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid var(--line); color: var(--soft); font-size: var(--t-meta); }
+.sheet{--soft:var(--ink-muted);--line:var(--rule);--line-strong:var(--rule-strong);--raised:var(--page-sunk);--s-1:.25rem;--s-2:.5rem;--s-4:1rem;--s-6:2rem;--t-dek:1.12rem;--t-meta:.875rem}
+.dc-updated{color:var(--ink-muted);font-size:.9rem}
+.dc-local{display:flex;flex-wrap:wrap;gap:.35rem 1.15rem;margin:0 0 1.6rem;font-size:.9rem}
+.dc-local a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
+.scroll{overflow-x:auto;margin:.4rem 0 .9rem}
+.sheet p,.sheet li{max-width:var(--measure)}
+.dc-foot{margin-top:2.4rem;padding-top:1rem;border-top:1px solid var(--rule);color:var(--ink-muted);font-size:.9rem}
 </style>
 </head>
-<body>
-<main>
-<h1>Daylight Commons privacy policy</h1>
-<p class="muted">Updated 2026-10-22.</p>
+<body class="doc">
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="site-nav" class="site-nav"></div>
+<noscript><nav class="site-nav" aria-label="Primary"><a href="/index.html">Home</a> <a href="/research.html">Research</a> <a href="/hire.html">Work</a></nav></noscript>
+<script type="module" src="/system/nav.js"></script>
+<main id="main">
+<article class="sheet doc-rail">
+<header class="mast">
+<h1>Privacy policy</h1>
+<p class="role">What Daylight Commons reads, what it sends and to whom, what it keeps and for how long, and your controls.</p>
+</header>
+<nav class="dc-local" aria-label="Daylight Commons"><a href="how-it-works.html">How it works</a> <a href="install.html">Install</a> <a href="privacy.html" aria-current="page">Privacy</a> <a href="transparency.html">How it is measured</a> <a href="https://github.com/HarperZ9/daylight-commons">Source</a></nav>
+<p class="dc-updated">Updated 2026-10-22.</p>
 <p>Daylight Commons runs entirely in your browser. It has no server, no account, no analytics and no telemetry. Nothing Daylight Commons reads or works out is sent to the author. Apart from the site you are on, two features make requests, each off by default and only after you turn it on and click: Other coverage requests the public news feeds of outlets you choose and sends nothing from the page; evidence lookups send the repository names and web domains a post links to GitHub, rdap.org and the Internet Archive. Both are described below.</p>
-<h2>What Daylight Commons reads</h2>
+<section aria-labelledby="what-daylight-commons-reads">
+<h2 id="what-daylight-commons-reads">What Daylight Commons reads</h2>
 <p>Daylight Commons reads what the site you are on has already shown or loaded for you: the replies on the page, the account details the site discloses (for example X's &quot;About this account&quot; label), and the post data the site's own app downloaded. It reads nothing the site does not show its viewers, and never reads IP addresses.</p>
-<h2>Requests Daylight Commons makes</h2>
+</section>
+<section aria-labelledby="requests-daylight-commons-makes">
+<h2 id="requests-daylight-commons-makes">Requests Daylight Commons makes</h2>
 <p>Daylight Commons sends no data to the author, to analytics services or to any server of its own. It makes these requests, all to the site you are already using, with that site's own session in your browser:</p>
-<div class="scroll"><table><thead><tr><th scope="col">Site</th><th scope="col">Request</th><th scope="col">When</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Site</th><th scope="col">Request</th><th scope="col">When</th></tr></thead><tbody>
 <tr><td>X</td><td>The &quot;About this account&quot; data for reply authors, through the same request X's own app makes, at most one account every 1.5 seconds and slower when X says it is busy</td><td>Automatically, unless you switch off &quot;Read account details automatically&quot;</td></tr>
 <tr><td>X</td><td>One account's profile and About page in a minimised window, so Daylight Commons can learn X's request the first time, or when you ask Daylight Commons to read accounts</td><td>The first time, and when you ask</td></tr>
 <tr><td>Reddit</td><td>Reddit's public account data (<code>/user/&lt;name&gt;/about.json</code>) for comment authors, one account every 2 seconds</td><td>Automatically, unless you switch that setting off</td></tr>
@@ -128,9 +58,11 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <p>The window offers reverse image search links (Google Lens, TinEye, Bing, Yandex) for media. Those open only when you click one, and then that service receives the image address.</p>
 <p><strong>Media checks, only when you click.</strong> &quot;Check this file&quot; re-requests one image or video file the page already loaded, from the exact address the page used (for X, its own media server), without cookies, so the browser usually answers from its cache. Daylight Commons reads the file's Content Credentials and metadata in the tab and keeps the result in memory only. &quot;Take 4 frames&quot; copies frames from the page's own video player in the tab; choosing a search service then copies one frame to your clipboard and opens that service, which receives nothing until you paste the frame there. Credentials stored online (a file that points to a remote manifest) are never fetched.</p>
 <p><strong>Reading text in an image, off by default, only when you click.</strong> With &quot;Read text in images&quot; turned on in the options page, &quot;Read text in this image&quot; re-requests that one image the same way, from the address the page used and without cookies, and hands its bytes to Daylight Commons' own background worker in your browser. The words are read there by code and weights shipped inside Daylight Commons; nothing is downloaded for it. The image, the text and any hash of either never leave your browser. The text is kept in memory for that window only.</p>
-<h2>What Daylight Commons keeps, where, and for how long</h2>
+</section>
+<section aria-labelledby="what-daylight-commons-keeps-where-and-for-how-long">
+<h2 id="what-daylight-commons-keeps-where-and-for-how-long">What Daylight Commons keeps, where, and for how long</h2>
 <p>Everything is kept in <code>chrome.storage.local</code> (Firefox: <code>browser.storage.local</code>) in the browser profile you installed Daylight Commons in. It is not synced to other devices.</p>
-<div class="scroll"><table><thead><tr><th scope="col">Store</th><th scope="col">What it holds</th><th scope="col">Kept for</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Store</th><th scope="col">What it holds</th><th scope="col">Kept for</th></tr></thead><tbody>
 <tr><td>Settings (<code>pb.settings</code>)</td><td>Your choices on the options page</td><td>Until you change them or remove Daylight Commons</td></tr>
 <tr><td>Account details (<code>pb.about.v1</code>, <code>pb.reddit.v1</code>)</td><td>What X or Reddit disclosed about accounts you saw: location label, join date, counts, name changes, and a summary of posting times and apps</td><td>14 days by default; 1 to 30 days in options</td></tr>
 <tr><td>Connections log (<code>pb.net.v2</code>)</td><td>Which accounts replied in which threads you opened, how many seconds after the post, link domains, and a short hash of each reply's wording (not the wording)</td><td>30 days, or less if you set history shorter</td></tr>
@@ -151,7 +83,9 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <tr><td>X request shape (<code>pb.tpl</code>)</td><td>The shape of X's About request, so Daylight Commons can repeat it. It holds no login token; the token is read fresh from X's cookie each time</td><td>Until X changes it or you clear Daylight Commons' data</td></tr>
 </tbody></table></div>
 <p>Post data from the page (views, posting app, media upload times) is held in memory for the tab and is gone when you close it.</p>
-<h2>Your controls</h2>
+</section>
+<section aria-labelledby="your-controls">
+<h2 id="your-controls">Your controls</h2>
 <ul><li><strong>Options page:</strong> switch Daylight Commons off per site or pause it everywhere, change how long it keeps data, and press &quot;Clear all Daylight Commons data&quot;, then confirm, to delete everything above except your choices: your settings, the Mastodon servers you turned on, your data packs and the keys you trust, and the tour's &quot;No more tips&quot;. The bundle signing key stays too, so bundles you already shared still check as yours.</li>
 <li><strong>History page:</strong> clear the history, connections and trails on their own.</li>
 <li><strong>Save report:</strong> writes a JSON file to your computer only when you click it. It holds the thread report, account labels and flags, and leaves reply text out.</li>
@@ -159,15 +93,22 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <li><strong>Analyse a file:</strong> reads a saved page, thread JSON, a platform data export or a media file you choose, on your device. The file is not kept and nothing is sent.</li>
 <li><strong>Save signed bundle</strong> (Analyse a file and the thread card page): writes a JSON file to your computer only when you click it. It holds post ids, the evidence with the matched words, Daylight Commons' version, a hash of its data tables, the time and your bundle key's public half. Full post text goes in only if you tick the box. Daylight Commons never sends it.</li>
 <li><strong>Removing Daylight Commons</strong> deletes everything it kept.</li></ul>
-<h2>What Daylight Commons never does</h2>
+</section>
+<section aria-labelledby="what-daylight-commons-never-does">
+<h2 id="what-daylight-commons-never-does">What Daylight Commons never does</h2>
 <ul><li>Sends anything to the author, or to a third party except what evidence lookups send when you turn them on and click: the repository names and web domains a post links to.</li>
 <li>Sells, shares or uses data for advertising.</li>
 <li>Guesses who runs an account, or anyone's age, gender, ethnicity, religion or politics.</li>
 <li>Links accounts across sites.</li></ul>
-<h2>Changes</h2>
+</section>
+<section aria-labelledby="changes">
+<h2 id="changes">Changes</h2>
 <p>Changes to this policy are listed in <a href="https://github.com/HarperZ9/daylight-commons/blob/main/CHANGELOG.md">Daylight Commons' changelog</a> with the version that made them.</p>
 <p>Contact: open an issue on <a href="https://github.com/HarperZ9/daylight-commons/issues">Daylight Commons' repository</a>.</p>
-<footer>Daylight Commons. Evidence, not verdicts. It asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups. <a href="https://github.com/HarperZ9/daylight-commons">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+</section>
+
+<p class="dc-foot">Daylight Commons gives evidence, not verdicts. It asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups. Free and open source under the AGPL-3.0.</p>
+</article>
 </main>
 </body>
 </html>

@@ -11,16 +11,17 @@ import { FAMILIES } from "../src/core/families.js";
 
 const lf = (s) => s.split("\r\n").join("\n");
 const pages = { "transparency.html": transparency(), "privacy.html": privacy() };
+const sitePages = { "transparency.html": transparency("site"), "privacy.html": privacy("site") };
 
 test("the committed pages match a fresh build, inside the extension and in docs/", () => {
-  for (const dir of TARGETS) for (const [name, html] of Object.entries(pages)) {
+  for (const dir of TARGETS) for (const [name, html] of Object.entries(dir.endsWith("docs") ? sitePages : pages)) {
     assert.equal(lf(readFileSync(join(dir, name), "utf8")), html, `run \`npm run pages\` (${name} in ${dir})`);
   }
   for (const f of FONT_FILES) assert.ok(existsSync(join(ROOT, "docs", "fonts", f)), f);
 });
 
 test("no page carries a local path, a placeholder or an em dash", () => {
-  for (const [name, html] of Object.entries(pages)) {
+  for (const [name, html] of [...Object.entries(pages), ...Object.entries(sitePages)]) {
     assert.doesNotMatch(html, /\b[A-Z]:[\\/]/, name);
     assert.doesNotMatch(html, /radar-data|project-docs|src\/(core|ext)|scripts\//, name);
     assert.doesNotMatch(html, /AUTHOR|TODO|—/, name);
@@ -52,11 +53,22 @@ test("the privacy page is dated and links the changelog and issues", () => {
   assert.match(html, /Updated \d{4}-\d{2}-\d{2}\./);
   assert.match(html, /github\.com\/HarperZ9\/daylight-commons\/issues/);
   assert.match(html, /pb\.feedback\.v1/);
-  assert.throws(() => privacy("# Daylight Commons privacy policy\n\nNo date here.\n"));
+  assert.throws(() => privacy("ext", "# Daylight Commons privacy policy\n\nNo date here.\n"));
 });
 
 test("the Markdown reader handles the shapes the docs use", () => {
   const html = markdown("# T\n\nA **b** `c`\nd.\n\n- one\n  two\n- three\n\n| A | B |\n|---|---|\n| 1 | 2 |\n");
   assert.equal(html, '<p>A <strong>b</strong> <code>c</code> d.</p>\n<ul><li>one two</li>\n<li>three</li></ul>\n<div class="scroll"><table><thead><tr><th scope="col">A</th><th scope="col">B</th></tr></thead><tbody>\n<tr><td>1</td><td>2</td></tr>\n</tbody></table></div>');
   assert.equal(markdown("<script>"), "<p>&lt;script&gt;</p>");
+});
+
+// The public site's copies follow the author's site canon (DESIGN-RULES.md on the author's site):
+// the shared document cascade and navigation, the mast, the heading rail. The extension's copies
+// cannot load those and keep their own shell.
+test("the public site's pages use the site's shared cascade, navigation and mast", () => {
+  for (const [name, html] of Object.entries(sitePages)) {
+    for (const want of ['<link rel="stylesheet" href="/system/doc.css">', '<script type="module" src="/system/nav.js"></script>', '<body class="doc">', '<article class="sheet doc-rail">', '<header class="mast">', '<section aria-labelledby=']) assert.ok(html.includes(want), `${name}: ${want}`);
+    assert.doesNotMatch(html, /conso-regular|@font-face/, `${name} takes its fonts from the site cascade`);
+  }
+  for (const html of Object.values(pages)) assert.doesNotMatch(html, /\/system\//, "the extension's copy loads nothing from the site");
 });
