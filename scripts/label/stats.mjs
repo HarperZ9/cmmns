@@ -1,9 +1,13 @@
-// Statistics for the campaign-lens labelling run: two-labeller agreement (Cohen's kappa with a 95%
-// interval), the consensus label per case, precision and recall of the lens's "strong" status with
-// Wilson intervals, and the organic false-positive rate per language and per region stratum with
-// the fairness bound (project-docs/EVALUATION.md, "Minimums before any claim"). Pure functions.
+// Statistics for the campaign-lens labelling run: agreement between labeller A (Claude) and labeller
+// B (an open-weight model of another family) as Cohen's kappa with a 95% interval; precision and
+// recall of the lens's "strong" status against the final labels with Wilson intervals; and the
+// organic false-positive rate per language and per region stratum with the fairness bound
+// (project-docs/EVALUATION.md, "Minimums before any claim"). Joining and the method statement are
+// in join.mjs. Pure functions.
 import { wilson } from "../../src/core/report.js";
 import { CAMPAIGN, PAID } from "./format.mjs";
+export { joinCases, statement, METHOD, DOES_NOT_PROVE } from "./join.mjs";
+import { joinCases, statement, DOES_NOT_PROVE, spotCheckOf } from "./join.mjs";
 
 export const MIN_STRATUM = 30;   // organic cases a stratum needs before its rate is reported
 export const MIN_CLASS = 30;     // organic and paid cases a platform needs before any claim
@@ -51,23 +55,6 @@ export function kappaInterval(pairs, cats = CAMPAIGN, boot = BOOT, seed = SEED) 
   return { ...k, approx: [k.kappa - 1.96 * se, k.kappa + 1.96 * se], interval: ks.length ? [at(0.025), at(0.975)] : null, resamples: ks.length };
 }
 
-// Group label rows by case. A case counts when exactly two labellers read it. The consensus is the
-// shared label; a disagreement is "unsure" and is counted (EVALUATION.md). Strata come from the
-// first labeller and must match the second's.
-export function consensus(labels) {
-  const byCase = new Map();
-  for (const r of labels) (byCase.get(r.case) || byCase.set(r.case, []).get(r.case)).push(r);
-  const cases = [], skipped = [];
-  for (const [id, rows] of byCase) {
-    const who = new Set(rows.map((r) => r.labeller));
-    if (rows.length !== 2 || who.size !== 2) { skipped.push({ case: id, rows: rows.length }); continue; }
-    const [a, b] = rows;
-    const sameStrata = JSON.stringify(a.strata) === JSON.stringify(b.strata);
-    cases.push({ case: id, a: a.campaign, b: b.campaign, label: a.campaign === b.campaign ? a.campaign : "unsure", disagreed: a.campaign !== b.campaign, strata: a.strata, sameStrata });
-  }
-  return { cases, skipped };
-}
-
 const rate = (k, n) => ({ k, n, rate: n ? k / n : null, interval: n ? wilson(k, n) : null });
 
 // Organic false-positive rate per value of one stratum dimension, with the 5-point bound read
@@ -92,27 +79,24 @@ export function strataRates(organic, dim, min = MIN_STRATUM, bound = BOUND) {
   return { dimension: dim, rows, gap: shown.length < 2 ? null : gap, pair: verdict === "fails" ? pair : null, bound: verdict, failing: verdict === "fails" ? pair : [] };
 }
 
-// The whole results object for one labels file.
-export function results({ labels, lens }, opts = {}) {
+// The whole results object for one run. input: { cases, a, b, resolution, lens, spotCheck }.
+export function results(input, opts = {}) {
   const min = opts.minStratum ?? MIN_STRATUM;
-  const { cases, skipped } = consensus(labels);
-  const status = new Map(lens.map((r) => [r.case, r.lens]));
-  for (const c of cases) c.lens = status.get(c.case) ?? null;
+  const cases = joinCases(input);
   const agreement = kappaInterval(cases.map((c) => [c.a, c.b]), CAMPAIGN, opts.boot ?? BOOT);
-  const organic = cases.filter((c) => c.label === "organic" && c.lens);
-  const paid = cases.filter((c) => PAID.has(c.label) && c.lens);
+  const organic = cases.filter((c) => c.label === "organic");
+  const paid = cases.filter((c) => PAID.has(c.label));
   const strong = cases.filter((c) => c.lens === "strong" && (c.label === "organic" || PAID.has(c.label)));
-  const tp = strong.filter((c) => PAID.has(c.label)).length;
   const platforms = [...new Set(cases.map((c) => c.strata.platform))].sort();
   return {
-    format: "dc-label-results/1",
-    cases: cases.length, skipped: skipped.length,
+    format: "dc-label-results/2",
+    statement: statement(agreement.kappa, cases.length),
+    cases: cases.length,
     disagreements: cases.filter((c) => c.disagreed).length,
-    strataMismatch: cases.filter((c) => !c.sameStrata).map((c) => c.case),
-    missingLens: cases.filter((c) => !c.lens).map((c) => c.case),
+    resolvedToB: cases.filter((c) => c.disagreed && c.label === c.b).length,
     counts: Object.fromEntries(CAMPAIGN.map((l) => [l, cases.filter((c) => c.label === l).length])),
-    agreement: { measure: "Cohen's kappa, campaign label, 4 categories", ...agreement },
-    precision: rate(tp, strong.length),
+    agreement: { measure: "Cohen's kappa between labeller A (Claude) and labeller B (open-weight model), campaign label, 4 categories", ...agreement },
+    precision: rate(strong.filter((c) => PAID.has(c.label)).length, strong.length),
     recall: rate(paid.filter((c) => c.lens === "strong").length, paid.length),
     organicFalsePositive: rate(organic.filter((c) => c.lens === "strong").length, organic.length),
     strata: { language: strataRates(organic, "language", min), region: strataRates(organic, "region", min) },
@@ -120,6 +104,7 @@ export function results({ labels, lens }, opts = {}) {
       const o = organic.filter((c) => c.strata.platform === p).length, q = paid.filter((c) => c.strata.platform === p).length;
       return { platform: p, organic: o, paid: q, enough: o >= MIN_CLASS && q >= MIN_CLASS };
     }),
-    doesNotProve: "Agreement between two labellers is not ground truth, and a held fairness bound on these strata says nothing about strata with fewer than 30 organic cases.",
+    spotCheck: spotCheckOf(input.spotCheck, cases.length),
+    doesNotProve: DOES_NOT_PROVE,
   };
 }

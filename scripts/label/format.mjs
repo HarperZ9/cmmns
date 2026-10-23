@@ -1,12 +1,17 @@
-// The labels file format, dc-label/1, for the campaign-lens labelling protocol
-// (project-docs/EVALUATION.md, "Launch campaigns"; project-docs/LABELLING.md).
+// The labelling formats, dc-label/2, for the campaign-lens labelling protocol
+// (project-docs/LABELLING.md, docs/LABELLING-RUN.md).
 //
-// One JSON object per line. A row is one labeller's reading of one case, or the lens's own status
-// for one case, written by the coordinator. Rows hold structure only: an opaque case id, closed
-// label sets, strata codes. A row with any other key, or a value outside its set, is refused, so a
-// handle, a name, a bio, a link or post text cannot travel in a labels file by accident.
+// Four JSON-lines files, each refused on the first bad line:
+// - the case file: one row per case, an opaque id, the post's URL, an archive copy's URL, strata
+//   codes and the SHA-256 of the page text captured for that case (the capture itself stays outside
+//   the repository, with the raw captures);
+// - one labels file per labeller: A is Claude, B an open-weight model of another family;
+// - the resolution file: Claude's final label and written reason for each case where A and B differ;
+// - the lens file: the detector's status per case, joined only after the labels are hashed.
+// Rows hold structure only. Any key outside a row's set is refused, so post text, a handle or a
+// name cannot travel in these files by accident.
 
-export const FORMAT = "dc-label/1";
+export const FORMAT = "dc-label/2";
 export const CAMPAIGN = ["paid-disclosed", "paid-undisclosed", "organic", "unsure"];
 export const PAID = new Set(["paid-disclosed", "paid-undisclosed"]);
 export const SEEN = ["yes", "no", "cannot-tell"];
@@ -15,21 +20,27 @@ export const LENS = ["strong", "one", "thin", "coordinated", "none", "undefined"
 export const PLATFORMS = ["x", "reddit", "youtube", "instagram", "tiktok", "bluesky", "threads", "facebook", "linkedin"];
 export const AUDIENCE = ["under-10k", "10k-100k", "100k-1m", "1m-plus"];
 export const TOPICS = ["tech", "crypto", "entertainment", "politics", "sport", "other"];
-// Paid-undisclosed needs evidence from outside Daylight Commons. The kind is recorded, never the
-// document itself (the coordinator keeps that outside the repository).
 export const EVIDENCE = ["agency-case-study", "platform-notice", "court-or-regulator", "company-statement"];
+export const LABELLERS = { A: "claude", B: "open-weight" };
 
 const CASE_ID = /^[a-z0-9][a-z0-9-]{0,31}$/;
-const LABELLER_ID = /^L[0-9]{1,2}$/;
-const LANGUAGE = /^[a-z]{2,3}$/; // ISO 639-1 or 639-3
-const REGION = /^([A-Z]{2}|[0-9]{3}|unstated)$/; // ISO 3166-1 alpha-2, UN M49 area, or unstated
+const MODEL_ID = /^[A-Za-z0-9][A-Za-z0-9.:_/-]{0,63}$/;
+const SHA256 = /^[0-9a-f]{64}$/;
+const LANGUAGE = /^[a-z]{2,3}$/;
+const REGION = /^([A-Z]{2}|[0-9]{3}|unstated)$/;
+const HTTPS = /^https:\/\/[^\s"<>]{3,2000}$/;
+const ARCHIVE = /^https:\/\/(web\.archive\.org|archive\.(ph|today|is|org))\/[^\s"<>]+$/;
 
-const LABEL_KEYS = new Set(["format", "kind", "case", "labeller", "campaign", "evidence", "families", "strata"]);
-const LENS_KEYS = new Set(["format", "kind", "case", "lens"]);
+const KEYS = {
+  case: new Set(["format", "kind", "case", "url", "archive", "capture", "strata"]),
+  label: new Set(["format", "kind", "case", "labeller", "model", "campaign", "evidence", "families"]),
+  resolution: new Set(["format", "kind", "case", "final", "evidence", "reason"]),
+  lens: new Set(["format", "kind", "case", "lens"]),
+};
 const STRATA_KEYS = new Set(["platform", "audience", "topic", "language", "region"]);
 
-function fail(line, why) {
-  throw new Error(`labels line ${line}: ${why}`);
+export function fail(line, why) {
+  throw new Error(`line ${line}: ${why}`);
 }
 
 function oneOf(line, name, value, set) {
@@ -37,7 +48,7 @@ function oneOf(line, name, value, set) {
 }
 
 function onlyKeys(line, obj, allowed, where) {
-  for (const k of Object.keys(obj)) if (!allowed.has(k)) fail(line, `${where} key "${k}" is not part of ${FORMAT}; rows hold structure only, never text, handles or links`);
+  for (const k of Object.keys(obj)) if (!allowed.has(k)) fail(line, `${where} key "${k}" is not part of ${FORMAT}; rows hold structure only, never post text, handles or names`);
 }
 
 function checkStrata(line, s) {
@@ -50,33 +61,59 @@ function checkStrata(line, s) {
   if (!REGION.test(s.region || "")) fail(line, "region must be an ISO 3166 code, a UN M49 area or unstated");
 }
 
-function checkLabel(line, r) {
-  onlyKeys(line, r, LABEL_KEYS, "row");
-  if (!LABELLER_ID.test(r.labeller || "")) fail(line, "labeller must be an opaque id such as L1");
-  oneOf(line, "campaign", r.campaign, CAMPAIGN);
-  if (r.campaign === "paid-undisclosed") oneOf(line, "evidence", r.evidence, EVIDENCE);
-  else if (r.evidence !== undefined) fail(line, "evidence is recorded only for paid-undisclosed");
-  const fam = r.families || {};
-  onlyKeys(line, fam, new Set(FAMILIES), "families");
-  for (const [k, v] of Object.entries(fam)) oneOf(line, `families.${k}`, v, SEEN);
-  checkStrata(line, r.strata);
+function checkEvidence(line, campaign, evidence) {
+  if (campaign === "paid-undisclosed") oneOf(line, "evidence", evidence, EVIDENCE);
+  else if (evidence !== undefined) fail(line, "evidence is recorded only for paid-undisclosed");
 }
 
-// Parse a dc-label/1 file. Returns { labels, lens } or throws on the first bad line.
-export function parseLabels(text) {
-  const labels = [], lens = [];
-  const lines = String(text).split(/\r?\n/);
-  lines.forEach((raw, i) => {
+// A reason is Claude's own words about the evidence. It may not quote a handle or a link.
+export function checkReason(line, reason) {
+  if (typeof reason !== "string" || reason.trim().length < 20) fail(line, "a resolution needs a written reason of at least 20 characters");
+  if (reason.length > 800) fail(line, "a reason is at most 800 characters; it explains, it does not quote");
+  if (/@[A-Za-z0-9_]{2,}|https?:\/\/|www\./.test(reason)) fail(line, "a reason may not carry a handle or a link");
+}
+
+const CHECK = {
+  case(line, r) {
+    if (!HTTPS.test(r.url || "")) fail(line, "url must be an https link to the public post");
+    if (!ARCHIVE.test(r.archive || "")) fail(line, "archive must be an https link to an archive copy (Wayback Machine or archive.today)");
+    if (!SHA256.test(r.capture || "")) fail(line, "capture must be the SHA-256 of the page text captured for this case");
+    checkStrata(line, r.strata);
+  },
+  label(line, r) {
+    if (!(r.labeller in LABELLERS)) fail(line, "labeller must be A (Claude) or B (the open-weight model)");
+    if (!MODEL_ID.test(r.model || "")) fail(line, "model must name the labelling model, such as claude-opus-5-5 or qwen3:8b");
+    oneOf(line, "campaign", r.campaign, CAMPAIGN);
+    checkEvidence(line, r.campaign, r.evidence);
+    const fam = r.families || {};
+    onlyKeys(line, fam, new Set(FAMILIES), "families");
+    for (const [k, v] of Object.entries(fam)) oneOf(line, `families.${k}`, v, SEEN);
+  },
+  resolution(line, r) {
+    oneOf(line, "final", r.final, CAMPAIGN);
+    checkEvidence(line, r.final, r.evidence);
+    checkReason(line, r.reason);
+  },
+  lens(line, r) { oneOf(line, "lens", r.lens, LENS); },
+};
+
+// Parse one dc-label/2 file whose rows must all be of `kind`. Returns the rows.
+export function parseRows(text, kind) {
+  const rows = [], seen = new Set();
+  String(text).split(/\r?\n/).forEach((raw, i) => {
     const line = i + 1;
     if (!raw.trim()) return;
     let r;
     try { r = JSON.parse(raw); } catch { fail(line, "not JSON"); }
     if (!r || typeof r !== "object" || Array.isArray(r)) fail(line, "not an object");
     if (r.format !== FORMAT) fail(line, `format must be ${FORMAT}`);
+    if (r.kind !== kind) fail(line, `this file holds ${kind} rows, not ${r.kind}`);
     if (!CASE_ID.test(r.case || "")) fail(line, "case must be an opaque id (lower-case letters, digits, hyphens)");
-    if (r.kind === "label") { checkLabel(line, r); labels.push(r); }
-    else if (r.kind === "lens") { onlyKeys(line, r, LENS_KEYS, "row"); oneOf(line, "lens", r.lens, LENS); lens.push(r); }
-    else fail(line, 'kind must be "label" or "lens"');
+    onlyKeys(line, r, KEYS[kind], "row");
+    CHECK[kind](line, r);
+    if (seen.has(r.case)) fail(line, `case ${r.case} appears twice`);
+    seen.add(r.case);
+    rows.push(r);
   });
-  return { labels, lens };
+  return rows;
 }

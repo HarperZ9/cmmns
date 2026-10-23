@@ -26,13 +26,17 @@ were not published to a store.
   Croissant metadata and a datasheet. Each refuses a chain that fails its check, post text and a
   private account without a pseudonym, and ships the chain so a reader can run `radar verify`.
   The command line release file now carries the definition catalogue.
-- The campaign-lens labelling kit (`scripts/label/`): a blind labelling page that runs from a file,
-  stores structure only and sends nothing; the `dc-label/1` labels format, which refuses text,
-  handles and links; and `node scripts/label/results.mjs`, which reports Cohen's kappa with a 95%
-  interval, precision and recall with Wilson intervals, and the organic false-positive rate per
-  language and region stratum against the 5-point fairness bound. The guide is
-  `project-docs/LABELLING.md`; `docs/LABELLING-RUN.md` lists the labellers and time the run needs.
-  Nothing has been labelled yet.
+- The campaign-lens labelling kit (`scripts/label/`), on the author's method of 2026-10-23: Claude
+  labels, and an open-weight model of a different family cross-checks through Flywheel's local lane
+  (`labeller-b.mjs`). The case set is fixed and hashed before labelling; each labels file is hashed
+  in an ordered ledger before the detector output is joined (`ledger.mjs`), and scoring refuses a
+  file that changed or came out of order. Claude resolves each disagreement with a written reason,
+  and scoring refuses one without. `results.mjs` reports Cohen's kappa between the two labellers
+  with a 95% interval, precision and recall with Wilson intervals, the organic false-positive rate
+  per language and region stratum against the 5-point bound, and an optional author spot-check.
+  The method sentence is fixed and never says "human-labelled". Files hold structure only and
+  refuse post text, handles and names. Guide: `project-docs/LABELLING.md`; steps:
+  `docs/LABELLING-RUN.md`. Nothing has been labelled yet.
 - The definition catalogue as a public page, `docs/catalogue.html`: every entry with its
   jurisdiction, version, sources, retrieval dates and elements, and the source hashes and quoted
   text in a details section. Each entry has an anchor a badge can link to. The page is built from
