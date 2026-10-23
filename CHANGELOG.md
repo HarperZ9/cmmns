@@ -51,8 +51,8 @@ claim, is `docs/RELEASE-AUDIT.md`.
 - A "How Daylight Commons works" page: the path a reply takes, each finding type with a still of the
   installed extension and its does-not-prove line read from the same constants the window shows,
   receipts and the offline check, and the limits.
-- `docs/demo/`: stills of every finding type, the extension's pages in light and dark, a one-minute
-  recording of install, a reply's window, a lookup and the offline check, and a diagram. All made from the release package on
+- `docs/demo/`: stills of every finding type, the extension's pages in light and dark, a recording
+  of under two minutes showing install, a reply's window, a lookup and the offline check, and a diagram. All made from the release package on
   synthetic pages (`scripts/demo/`).
 - `docs/store/`: the listing text, six screenshots, the promo tile and the submission steps.
 

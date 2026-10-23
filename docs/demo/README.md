@@ -8,7 +8,7 @@ own repository and site, and GitHub and the Internet Archive answered for real.
 
 | File | What it shows |
 |---|---|
-| `demo-install-to-verify.webm`, `.gif` | One minute: the install page, first run, a synthetic thread, a reply's window and its evidence, a lookup's receipts, the saved chain passing the offline check, then a copy with one number changed failing it |
+| `demo-install-to-verify.webm`, `.gif` | Under two minutes: the install page, first run, a synthetic thread, a reply's window and its evidence, a lookup's receipts, the saved chain passing the offline check, then a copy with one number changed failing it |
 | `finding-place.png` | A reply that speaks as a local of France from an account the platform labels Nigeria |
 | `finding-account.png` | A new account with renames |
 | `finding-posting.png` | A post sent from an automation app |

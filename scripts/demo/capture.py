@@ -109,6 +109,12 @@ async def stills(s, out):
     pg = await s.page()
     await pg.goto(s.stages["thread"]["url"])
     await settle(pg, 3500)
+    # Warm up on the first reply and dismiss the first-use tips, so each still shows only its finding.
+    await open_window(pg, 1)
+    tips = pg.get_by_role("button", name="No more tips")
+    if await tips.count():
+        await tips.first.click()
+        await settle(pg, 500)
     for name, row, words in FINDINGS:
         await open_window(pg, row)
         log[name] = await expand(pg, words)
@@ -136,7 +142,7 @@ async def stills(s, out):
     await pg.screenshot(path=str(out / "finding-evidence.png"))
     async with pg.expect_download() as d:
         await pg.get_by_role("button", name="Save evidence chain").first.click()
-    chain = out / "demo-evidence-chain.json"
+    chain = s.stage_dir / "still-evidence-chain.json"   # the film's chain in out/ stays the one verified
     await (await d.value).save_as(str(chain))
     await pg.goto(s.url("analyze.html"))
     await settle(pg, 800)

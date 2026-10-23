@@ -170,8 +170,8 @@ requires and AMO recommends; use the same files for both stores, in this order.
 
 Small promo tile (CWS, 440x280, required): `promo-tile.png` (source `promo-tile.svg`). Marquee
 (1400x560): optional, skip. Icon: `src/ext/icons/radar-128.png` inside the package. Video: the CWS
-dashboard lists a YouTube link among the listing items; `docs/demo/demo-install-to-verify.webm` is a
-one-minute recording the author can upload to their own channel if the dashboard asks for one.
+dashboard lists a YouTube link among the listing items; `docs/demo/demo-install-to-verify.webm` is a recording
+of under two minutes the author can upload to their own channel if the dashboard asks for one.
 
 ## Submission steps for the author
 

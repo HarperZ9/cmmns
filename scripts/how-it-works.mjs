@@ -47,7 +47,7 @@ export function render(md = readFileSync(join(ROOT, "HOW-IT-WORKS.md"), "utf8"))
   const [intro, ...rest] = markdown(text).split(/(?=<h2>)/);
   const diagram = `<figure class="art dc-fig"><img class="art-light" src="demo/how-it-works-light.svg" width="1600" height="970" alt="A reply goes from the page to the reader, the rules and the window, all inside your browser. Evidence lookups leave the browser only on your click; their answers become receipts in a chain you can save, and anyone can check that chain offline." loading="lazy" decoding="async"><img class="art-dark" src="demo/how-it-works-dark.svg" width="1600" height="970" alt="" loading="lazy" decoding="async"><figcaption>Inside the line stays on your device. The dashed paths run only after you turn a feature on and click.</figcaption></figure>`;
   const film = `<h2>Watch it</h2>
-<p>Install, a page, a reply's window, its evidence, a lookup's receipts, and the saved chain checked offline: one minute, on synthetic pages where every account is invented.</p>
+<p>Install, a page, a reply's window, its evidence, a lookup's receipts, and the saved chain checked offline, in under two minutes, on synthetic pages where every account is invented.</p>
 <video controls preload="metadata" width="1280" height="800" poster="demo/finding-place.png" src="demo/demo-install-to-verify.webm"></video>`;
   const findings = `<h2>What each finding shows</h2>
 <p>Every still below is the installed extension on a synthetic page. Every account in them is invented.</p>
