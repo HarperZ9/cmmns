@@ -5,6 +5,25 @@ were not published to a store.
 
 ## Unreleased
 
+Nothing yet.
+
+## 3.2.0 (2026-10-23)
+
+The first three resilience increments and the fixes from the 2026-10-23 feed test. A release now
+carries a signed head that refuses an older release, and an offline kit that a person can check in a
+browser with the network off. Evidence bundles gain a carrier-safe profile for handing to someone
+else. The language detector finds more of what people flagged on a live feed. The integration API
+stays at 1.0.0.
+
+Read these limits before relying on this release:
+- Recall on the 82 feed-test posts went from 1 of 21 consensus findings to 14 of 21. Those posts are
+  the development set the new rules were written against, so that figure is not held out.
+- Held-out precision for any strong family is 90.6% (89.8 to 91.5, 95% interval), inside its
+  earlier interval.
+- Verifiers older than 3.2.0 reject carrier-safe bundles at the schema step.
+- No security audit has been done of the head, the offline checker or the carrier-safe profile, and
+  the kit guide (`KIT-GUIDE.txt`) is a draft.
+
 ### Fixed
 - Quoted posts are read. `analyzeThread` and `radar analyze` skipped a thread file's `quoted` list,
   so words in a quoted post got no evidence. They now get the same post evidence as any post and are
