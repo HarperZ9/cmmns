@@ -3,103 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How Daylight Commons is measured</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>How Daylight Commons is measured | Daylight Commons</title>
 <meta name="description" content="Every Daylight Commons sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.">
+<link rel="canonical" href="https://harperz9.github.io/daylight-commons/transparency.html">
+<link rel="preload" href="/system/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/system/doc.css">
+<link rel="stylesheet" href="/system/art.css">
 <style>
-@font-face { font-family: "Hanken Grotesk"; src: url("fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
-@font-face { font-family: "Conso"; src: url("fonts/conso-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
-
-:root {
-  color-scheme: light;
-  --font-sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace;
-  --paper: #ebe5d8; --inset: #e4ddcd; --panel: #e2dac9; --raised: #d8cfbc;
-  --ink: #16130f; --soft: #4a443b; --muted: #5f584d; --line: #c9bfab; --line-strong: #7b7262; --on-ink: #ebe5d8;
-  --verified: #0a6b61; --drift: #8f3a19; --unverifiable: #4e4d85;
-  --hot: var(--ink); --focus: var(--ink);
-  --field-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M48 43v10M43 48h10' stroke='%23c9bea7' stroke-width='1'/%3E%3C/svg%3E");
-  --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4.5rem;
-  --gutter: clamp(1rem, 4vw, 2.5rem); --measure: 38rem; --wide: 58rem;
-  --radius: 0; --radius-control: 2px;
-  --t-display: clamp(2.4rem, 1.3rem + 4vw, 4.75rem);
-  --t-h2: clamp(1.6rem, 1.15rem + 1.6vw, 2.6rem);
-  --t-h3: 1.25rem; --t-dek: 1.25rem; --t-body: 1.0625rem; --t-label: .875rem; --t-meta: .9375rem;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --paper: #060608; --inset: #0c0c0f; --panel: #111114; --raised: #1a1a1e;
-    --ink: #ece5d6; --soft: #b8b0a0; --muted: #958e80; --line: #29282c; --line-strong: #6f6a61; --on-ink: #060608;
-    --verified: #63d4ce; --drift: #e29472; --unverifiable: #b3b1e6;
-    --field-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M48 43v10M43 48h10' stroke='%23232226' stroke-width='1'/%3E%3C/svg%3E");
-  }
-}
-@media (forced-colors: active) {
-  :root { --paper: Canvas; --inset: Canvas; --panel: Canvas; --raised: Canvas; --ink: CanvasText; --soft: CanvasText; --muted: CanvasText;
-    --line: GrayText; --line-strong: CanvasText; --on-ink: Canvas; --verified: CanvasText; --drift: CanvasText; --unverifiable: CanvasText; --hot: Highlight; --focus: Highlight; }
-}
-@media print {
-  :root { color-scheme: light; --paper: #fff; --inset: #fff; --panel: #fff; --raised: #fff; --ink: #000; --soft: #333; --muted: #444; --line: #aaa; --line-strong: #555;
-    --verified: #006b73; --drift: #8a3219; --unverifiable: #4b4b7a; --field-mark: none; }
-}
-
-* { box-sizing: border-box; }
-html { font-synthesis: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; background: var(--paper); }
-body { margin: 0; background-color: var(--paper); background-image: var(--field-mark); background-size: 96px 96px; background-attachment: fixed;
-  color: var(--ink); font: 400 var(--t-body)/1.6 var(--font-sans); }
-main { background: var(--paper); }
-::selection { background: var(--ink); color: var(--paper); }
-h1, h2, h3 { font-family: var(--font-sans); text-wrap: balance; }
-h1 { font-weight: 780; letter-spacing: -.035em; line-height: .98; }
-h2 { font-weight: 720; letter-spacing: -.022em; line-height: 1.1; }
-h3 { font-weight: 680; letter-spacing: -.012em; }
-a { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; }
-a:hover { text-decoration-thickness: 2px; }
-code, kbd, samp, pre, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.figure { font-variant-numeric: tabular-nums; }
-:is(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-
-button { font: 650 1rem/1.2 var(--font-sans); color: var(--on-ink); background: var(--ink); border: 1px solid var(--ink);
-  border-radius: var(--radius-control); padding: .7rem 1.2rem; min-height: 44px; cursor: pointer; }
-button.quiet { color: var(--ink); background: transparent; border-color: var(--line-strong); }
-button.quiet:hover:not(:disabled) { border-color: var(--ink); background: var(--raised); }
-button:disabled { opacity: .5; cursor: default; }
-
-main section:not(.bare), .cross { position: relative; padding-top: var(--s-5); background: linear-gradient(var(--line), var(--line)) top left / 100% 1px no-repeat; }
-main section:not(.bare)::before, .cross::before { content: ""; position: absolute; top: -7px; left: -7px; width: 15px; height: 15px; pointer-events: none;
-  background: linear-gradient(var(--ink), var(--ink)) center / 1px 100% no-repeat, linear-gradient(var(--ink), var(--ink)) center / 100% 1px no-repeat; }
-
-table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; vertical-align: top; padding: .55rem .75rem .55rem 0; border-bottom: 1px solid var(--line); }
-thead th { font-weight: 650; color: var(--ink); border-bottom: 2px solid var(--ink); }
-td.n, th.n, td.num { text-align: right; font-variant-numeric: tabular-nums; }
-td.n, td.num { font-family: var(--font-mono); }
-
-summary { cursor: pointer; font-weight: 650; list-style: none; }
-summary::-webkit-details-marker { display: none; }
-summary::before { content: "+"; display: inline-block; width: 1.1em; font-weight: 500; }
-details[open] > summary::before { content: "\2212"; }
-
-.v-verified { color: var(--verified); font-weight: 700; }
-.v-drift, .hot { color: var(--drift); font-weight: 650; }
-.v-unverifiable { color: var(--unverifiable); font-weight: 700; }
-
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
-main { max-width: 60rem; margin: 0 auto; padding: var(--s-7) var(--gutter) var(--s-8); }
-h1 { font-size: var(--t-display); margin: 0 0 var(--s-3); }
-h2 { font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); margin: var(--s-7) 0 var(--s-3); }
-h2:not(.bare) { position: relative; padding-top: var(--s-5); background: linear-gradient(var(--line), var(--line)) top left / 100% 1px no-repeat; }
-h2:not(.bare)::before { content: ""; position: absolute; top: -7px; left: -7px; width: 15px; height: 15px; pointer-events: none;
-  background: linear-gradient(var(--ink), var(--ink)) center / 1px 100% no-repeat, linear-gradient(var(--ink), var(--ink)) center / 100% 1px no-repeat; }
-h3 { font-size: var(--t-h3); margin: var(--s-5) 0 var(--s-2); }
-p, li { max-width: var(--measure); }
-code { font-size: .92em; }
-.lead { font-size: var(--t-dek); }
-.muted { color: var(--soft); }
-.scroll { overflow-x: auto; margin: var(--s-3) 0; }
-table { font-size: .92em; }
-td.num { font-size: .92em; text-align: left; }
-footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid var(--line); color: var(--soft); font-size: var(--t-meta); }
+.sheet{--soft:var(--ink-muted);--line:var(--rule);--line-strong:var(--rule-strong);--raised:var(--page-sunk);--s-1:.25rem;--s-2:.5rem;--s-4:1rem;--s-6:2rem;--t-dek:1.12rem;--t-meta:.875rem}
+.dc-updated{color:var(--ink-muted);font-size:.9rem}
+.dc-local{display:flex;flex-wrap:wrap;gap:.35rem 1.15rem;margin:0 0 1.6rem;font-size:.9rem}
+.dc-local a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
+.scroll{overflow-x:auto;margin:.4rem 0 .9rem}
+.sheet p,.sheet li{max-width:var(--measure)}
+.dc-foot{margin-top:2.4rem;padding-top:1rem;border-top:1px solid var(--rule);color:var(--ink-muted);font-size:.9rem}
 .sign { margin: var(--s-6) 0 0; max-width: var(--measure); }
 .sign h3 { margin: 0 0 var(--s-1); }
 .takeaway { margin: 0 0 var(--s-2); font-size: var(--t-dek); line-height: 1.4; }
@@ -118,20 +36,32 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 @media (max-width: 34rem) { dl.hwk-list { grid-template-columns: 1fr; } dl.hwk-list dd { margin-bottom: var(--s-2); } }
 </style>
 </head>
-<body>
-<main>
+<body class="doc">
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="site-nav" class="site-nav"></div>
+<noscript><nav class="site-nav" aria-label="Primary"><a href="/index.html">Home</a> <a href="/research.html">Research</a> <a href="/hire.html">Work</a></nav></noscript>
+<script type="module" src="/system/nav.js"></script>
+<main id="main">
+<article class="sheet doc-rail">
+<header class="mast">
 <h1>How Daylight Commons is measured</h1>
-<p class="muted">Updated 2026-10-21.</p>
+<p class="role">Each sign's measured precision and recall with its interval, the data behind it, the side-balance check and the known limits.</p>
+</header>
+<nav class="dc-local" aria-label="Daylight Commons"><a href="how-it-works.html">How it works</a> <a href="install.html">Install</a> <a href="privacy.html">Privacy</a> <a href="transparency.html" aria-current="page">How it is measured</a> <a href="https://github.com/HarperZ9/daylight-commons">Source</a></nav>
+<p class="dc-updated">Updated 2026-10-21.</p>
 
 <p class="lead">Every sign in Daylight Commons' window either shows how often it was right when people checked by hand, or says "not measured yet". This page lists every sign, the data each was checked on and its licence, how evenly the signs work whichever side a post targets, and what the numbers do not prove.</p>
-<h2>How to read the numbers</h2>
+<section aria-labelledby="how-to-read-the-numbers">
+<h2 id="how-to-read-the-numbers">How to read the numbers</h2>
 <ul>
 <li><strong>Precision</strong> is the share of signs Daylight Commons showed that the human annotators of a public research corpus agreed with. It answers "when Daylight Commons shows this, how often is it right?"</li>
 <li><strong>Recall</strong> is the share of the annotated cases that Daylight Commons found. Daylight Commons is built for precision: a wrong sign on an honest reply is the harm it avoids most, so recall is low.</li>
 <li>Each figure gives the count and a 95% interval (Wilson). A wide interval means few cases were checked.</li>
 <li>All figures come from a held-out test split (seed <code>radar-eval-2026-10-21</code>). Rules were tuned on a separate split, and the test split was read once, after tuning. Measured 2026-10-21.</li>
 </ul>
-<h2>One figure per sign</h2>
+</section>
+<section aria-labelledby="one-figure-per-sign">
+<h2 id="one-figure-per-sign">One figure per sign</h2>
 <p>Each sign leads with what its measurement means when you see it. The figure draws the 95% interval as a band and the measured value as a mark; a dashed line is the bar a sign must clear to show. Counts, data and limits sit under "How we know".</p>
 <section class="sign">
 <h3>Slur or coded hate term</h3>
@@ -205,10 +135,12 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Flag waving, precision: 40.7%, 95% interval 24.5% to 59.3%; the bar is 80%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><line class="bar" x1="315.2" y1="2" x2="315.2" y2="30"/><rect class="band" x="102.1" y="10" width="133.6" height="12"/><line class="point" x1="164.3" y1="6" x2="164.3" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text><text x="315.2" y="42" text-anchor="middle">bar 80%</text></svg>
 <details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>11 of 27; 95% interval 24.5% to 59.3%</dd><dt>Recall</dt><dd>12.8%</dd><dt>Chance</dt><dd>0.5% of words sit inside a span of this technique</dd><dt>Data</dt><dd>Propaganda Techniques Corpus v2, held-out articles</dd><dt>Does not prove</dt><dd>A technique can carry a true claim; it describes how a post argues.</dd></dl></details>
 </section>
-<h2>Language signs</h2>
+</section>
+<section aria-labelledby="language-signs">
+<h2 id="language-signs">Language signs</h2>
 <p>Checked on three public corpora of comments labelled by people, pooled: Measuring Hate Speech (CC BY 4.0), HateXplain (MIT) and Civil Comments (CC0 1.0). The range runs from the lowest to the highest corpus with at least 20 hits. Recall is against Measuring Hate Speech's own survey item for that sign, where one exists.</p>
 <details class="how-we-know"><summary>Every language sign, with counts</summary>
-<div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Precision (95% interval)</th><th scope="col">Range across corpora</th><th scope="col">Recall</th><th scope="col">Status</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Sign</th><th scope="col">Precision (95% interval)</th><th scope="col">Range across corpora</th><th scope="col">Recall</th><th scope="col">Status</th></tr></thead><tbody>
 <tr><td>Slur or coded hate term</td><td class="num">91.0% (3,995 of 4,392; 90.1% to 91.8%)</td><td class="num">34.0% to 95.3%</td><td class="num">not measured</td><td>Shown with this figure</td></tr>
 <tr><td>Group stereotype</td><td class="num">83.3% (80 of 96; 74.6% to 89.5%)</td><td class="num">91.7%</td><td class="num">0.6% (51 of 8,368; 0.5% to 0.8%)</td><td>Shown with this figure</td></tr>
 <tr><td>Dehumanising language</td><td class="num">92.3% (36 of 39; 79.7% to 97.3%)</td><td class="num">under 20 hits in each corpus</td><td class="num">0.2% (11 of 5,046; 0.1% to 0.4%)</td><td>Shown with this figure</td></tr>
@@ -219,7 +151,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <p class="muted">Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), not on this site's replies. Precision says how often a marker sat on text the annotators judged hostile to a group; it does not say why anyone wrote it, and it can differ on other sites and topics.</p>
 <h3>Weaker signs that count only toward a reply being "extreme"</h3>
 <details class="how-we-know"><summary>Weaker signs, with counts</summary>
-<div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Share on hostile text (95% interval)</th><th scope="col">Range across corpora</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Sign</th><th scope="col">Share on hostile text (95% interval)</th><th scope="col">Range across corpora</th></tr></thead><tbody>
 <tr><td>Context-dependent slur</td><td class="num">65.5% (837 of 1,278; 62.8% to 68.0%)</td><td class="num">20.3% to 91.7%</td></tr>
 <tr><td>Contempt</td><td class="num">92.1% (93 of 101; 85.1% to 95.9%)</td><td class="num">91.5% to 93.1%</td></tr>
 <tr><td>Motive attribution</td><td class="num">72.5% (29 of 40; 57.2% to 83.9%)</td><td class="num">81.8%</td></tr>
@@ -235,7 +167,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <h3>Word lists derived from labelled data</h3>
 <p>For Hebrew, Turkish, Korean, Japanese, Persian, Indonesian and Hindi, a script picks each slur term from the training half of public corpora labelled by people, and the other half measures it. A language shows signs only when its list was derived against labels of hate aimed at a group and the 95% interval of its precision starts at 70% or above, from at least 20 signs. Held-back lists never run.</p>
 <details class="how-we-know"><summary>Every derived list, with counts</summary>
-<div class="scroll"><table><thead><tr><th scope="col">Language</th><th scope="col">Terms</th><th scope="col">Precision on hostile text (95% interval)</th><th scope="col">Data</th><th scope="col">Status</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Language</th><th scope="col">Terms</th><th scope="col">Precision on hostile text (95% interval)</th><th scope="col">Data</th><th scope="col">Status</th></tr></thead><tbody>
 <tr><td>Hebrew</td><td>3</td><td><span class="mono">96.0% (95 of 99; 90.1% to 98.4%)</span></td><td>OLaH</td><td>Held back: its corpora mark offensive or not, not hate at a group, so the list holds insults</td></tr>
 <tr><td>Turkish</td><td>0</td><td>not measured</td><td>OffensEval 2020 Turkish and TurkishHateMap</td><td>Held back: no term passed the check on the training half</td></tr>
 <tr><td>Korean</td><td>54</td><td><span class="mono">93.8% (8,102 of 8,635; 93.3% to 94.3%)</span></td><td>K-MHaS and BEEP!</td><td>Shows in the window</td></tr>
@@ -245,10 +177,12 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td>Hindi</td><td>4</td><td><span class="mono">97.9% (183 of 187; 94.6% to 99.2%)</span></td><td>TextDetox</td><td>Held back: its corpora mark offensive or not, not hate at a group, so the list holds insults</td></tr>
 </tbody></table></div>
 </details>
-<h2>Persuasion techniques</h2>
+</section>
+<section aria-labelledby="persuasion-techniques">
+<h2 id="persuasion-techniques">Persuasion techniques</h2>
 <p>Checked on the Propaganda Techniques Corpus v2 (CC BY 4.0), news articles labelled span by span. A technique shows in the window only when its precision is at least 80% and its 95% interval starts at 70% or above, from at least 20 hits. Published systems reach F1 of about 30 to 44 on these techniques, where a confident label is wrong more often than right. Whataboutism needs the whole exchange, so it never shows on one reply. No technique has cleared the bar.</p>
 <details class="how-we-know"><summary>Every technique, with counts</summary>
-<div class="scroll"><table><thead><tr><th scope="col">Technique</th><th scope="col">Precision (95% interval)</th><th scope="col">Recall</th><th scope="col">Chance</th><th scope="col">Status</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Technique</th><th scope="col">Precision (95% interval)</th><th scope="col">Recall</th><th scope="col">Chance</th><th scope="col">Status</th></tr></thead><tbody>
 <tr><td>Loaded language</td><td class="num">60.3% (82 of 136; 51.9% to 68.1%)</td><td class="num">7.9% (80 of 1,015; 6.4% to 9.7%)</td><td class="num">2.3%</td><td>Not shown: precision under 80%</td></tr>
 <tr><td>Name calling</td><td class="num">48.8% (21 of 43; 34.6% to 63.2%)</td><td class="num">4.4% (21 of 474; 2.9% to 6.7%)</td><td class="num">1.1%</td><td>Not shown: precision under 80%</td></tr>
 <tr><td>Bandwagon</td><td class="num">0.0% (0 of 3; 0.0% to 56.2%)</td><td class="num">0.0% (0 of 32; 0.0% to 10.7%)</td><td class="num">0.3%</td><td>Not shown: fewer than 20 hits</td></tr>
@@ -265,19 +199,25 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </tbody></table></div>
 </details>
 <p class="muted">A technique can carry a true claim; it describes how the post argues. "Chance" is the share of words inside a labelled span of that technique.</p>
-<h2>Cases written for the test</h2>
+</section>
+<section aria-labelledby="cases-written-for-the-test">
+<h2 id="cases-written-for-the-test">Cases written for the test</h2>
 <p>Same text as other replies: pair precision <span class="mono">97.7% (85 of 87; 92.0% to 99.4%)</span>, recall <span class="mono">100.0% (85 of 85; 95.7% to 100.0%)</span>. Speaks as local, labelled elsewhere: precision <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>, recall <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>. The same author wrote these cases and the rules, so they show the rules do what they say. They are not error rates on real replies.</p>
-<h2>Side balance</h2>
+</section>
+<section aria-labelledby="side-balance">
+<h2 id="side-balance">Side balance</h2>
 <p>Political side is never an input to Daylight Commons. To check that the signs work alike whichever side a post targets, the strong language signs were measured on hostile text aimed at groups each side is often hostile to. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
-<div class="scroll"><table><thead><tr><th scope="col">Corpus</th><th scope="col">Recall, right's usual targets</th><th scope="col">Recall, left's usual targets</th><th scope="col">Precision, right's usual targets</th><th scope="col">Precision, left's usual targets</th><th scope="col">Result</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Corpus</th><th scope="col">Recall, right's usual targets</th><th scope="col">Recall, left's usual targets</th><th scope="col">Precision, right's usual targets</th><th scope="col">Precision, left's usual targets</th><th scope="col">Result</th></tr></thead><tbody>
 <tr><td>Measuring Hate Speech</td><td class="num">10.1% (765 of 7,584; 9.4% to 10.8%)</td><td class="num">7.9% (198 of 2,499; 6.9% to 9.0%)</td><td class="num">95.6% (765 of 800; 94.0% to 96.8%)</td><td class="num">93.8% (198 of 211; 89.7% to 96.4%)</td><td><span class="hot">Gap remains</span></td></tr>
 <tr><td>HateXplain</td><td class="num">45.2% (1,895 of 4,197; 43.7% to 46.7%)</td><td class="num">43.4% (109 of 251; 37.4% to 49.6%)</td><td class="num">98.0% (1,895 of 1,933; 97.3% to 98.6%)</td><td class="num">97.3% (109 of 112; 92.4% to 99.1%)</td><td>Balanced</td></tr>
 </tbody></table></div>
 <p class="muted">Precision agrees across sides within the intervals. Where a gap remains, the thread report undercounts extreme replies aimed at the side with lower recall.</p>
-<h2>Every sign</h2>
+</section>
+<section aria-labelledby="every-sign">
+<h2 id="every-sign">Every sign</h2>
 <p>Each of Daylight Commons' 62 signs, with the line its window shows beside it.</p>
 <details class="how-we-know"><summary>Every sign and its measured line</summary>
-<div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Kind</th><th scope="col">What the window says</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Kind</th><th scope="col">What the window says</th></tr></thead><tbody>
 <tr><td>Slur or coded hate term</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 91% (95% interval 90 to 92%), 4392 badges checked, held-out test set</td></tr>
 <tr><td>Group stereotype</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 83% (95% interval 75 to 90%), 96 badges checked, held-out test set</td></tr>
 <tr><td>Dehumanising language</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 92% (95% interval 80 to 97%), 39 badges checked, held-out test set</td></tr>
@@ -342,13 +282,14 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td>Persuasion: just asking questions</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 66%), 2 spans checked, held-out news articles</td></tr>
 </tbody></table></div>
 </details>
-
-<h2>Documented influence operations</h2>
+</section>
+<section aria-labelledby="documented-influence-operations">
+<h2 id="documented-influence-operations">Documented influence operations</h2>
 <p>Daylight Commons carries 98 influence operations from 27 attributed countries, first published between 2018 and 2026, and 1,237 domains and accounts their sources named (1,194 domains). A link or account that a report named shows "Named in a published report", with who the sources say ran it, in each source's own words.</p>
 <p><strong>What the counts mean.</strong> These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.</p>
 <p>Every operation meets the same bar, whatever the country: at least one primary source that was read (a platform report, a research lab, a court or government document, or reporting that names its sources), an operator type that a source itself states, and a cited source for every field. A test enforces this on the data.</p>
 <h3>By year of first report</h3>
-<div class="scroll"><table><thead><tr><th scope="col">Year</th><th scope="col">Operations</th><th scope="col">By attributed country</th><th scope="col">Bar</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Year</th><th scope="col">Operations</th><th scope="col">By attributed country</th><th scope="col">Bar</th></tr></thead><tbody>
 <tr><td>2018</td><td class="num">4</td><td class="num">Russia 2, Iran 1, Myanmar 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮</span></td></tr>
 <tr><td>2019</td><td class="num">22</td><td class="num">Russia 5, United Arab Emirates 4, India 3, Saudi Arabia 3, China 2, Egypt 1, Iran 1, Israel 1, Pakistan 1, Venezuela 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮▮</span></td></tr>
 <tr><td>2020</td><td class="num">14</td><td class="num">Russia 5, Azerbaijan 1, Belarus 1, Honduras 1, Iran 1, Philippines 1, Saudi Arabia 1, Serbia 1, Thailand 1, Türkiye 1</td><td class="num"><span class="mono" aria-hidden="true">▮▮▮▮▮▮▮▮▮▮▮▮</span></td></tr>
@@ -361,7 +302,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </tbody></table></div>
 <h3>By attributed country</h3>
 <p>Operator type follows the source's own words. "Linked to a state" means a source says linked to or associated with a government without saying it ran the operation; "origin only" means the source names a country and no operator.</p>
-<div class="scroll"><table><thead><tr><th scope="col">Country</th><th scope="col">Operations</th><th scope="col">Documents cited</th><th scope="col">Government</th><th scope="col">State media</th><th scope="col">Contractor</th><th scope="col">Linked to a state</th><th scope="col">Firm, no state named</th><th scope="col">Origin only</th></tr></thead><tbody>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Country</th><th scope="col">Operations</th><th scope="col">Documents cited</th><th scope="col">Government</th><th scope="col">State media</th><th scope="col">Contractor</th><th scope="col">Linked to a state</th><th scope="col">Firm, no state named</th><th scope="col">Origin only</th></tr></thead><tbody>
 <tr><td>Russia</td><td class="num">25</td><td class="num">49</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">11</td><td class="num">2</td><td class="num">7</td></tr>
 <tr><td>China</td><td class="num">17</td><td class="num">27</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">2</td><td class="num">4</td><td class="num">10</td></tr>
 <tr><td>Iran</td><td class="num">14</td><td class="num">24</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">8</td></tr>
@@ -390,14 +331,18 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td>Türkiye</td><td class="num">1</td><td class="num">2</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
 <tr><td>Uganda</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
 </tbody></table></div>
-<h2>What is not measured</h2>
+</section>
+<section aria-labelledby="what-is-not-measured">
+<h2 id="what-is-not-measured">What is not measured</h2>
 <ul><li>Daylight Commons' own rules with no measurement yet: Call for vigilantes, Named conspiracy theory, Leaked AI text, Machine-writing signs, Spam pattern, Hate symbol in name, Media older than the post, Same upload, many accounts, Same words in other threads, Same link or upload in several languages, One person's story, no wider picture, Material passed through other accounts, Fact-checked claim, Look-alike news address, App store elsewhere, Flag of another country, Profile says elsewhere, Active hours fit elsewhere, Replies within a minute, Posts through an automation app, Posts around the clock, Almost only reposts, Very high post rate, New account, Renamed, Sign-up handle, Follows many, few follow back, Low karma for its age, Name borrows a brand. The window says &quot;not measured yet&quot; beside each of them.</li>
 <li>Same text as other replies, and speaks as local, labelled elsewhere: tested only on cases written alongside the rules (below). No error rate on real replies exists yet.</li>
 <li>Live threads: no thread from X, YouTube, Reddit, Facebook, Instagram or Bluesky has been labelled by hand yet, so no figure here comes from those sites.</li>
 <li>French language signs: too few hits in the French corpus to measure. Persuasion cues in French: no corpus Daylight Commons may use.</li>
 <li>Call for vigilantes: fewer than 20 hits in the test split.</li>
 <li>Site labels (Community Notes, ads, posting app, X's spam label) and matches against cited tables (outlet owners, state links) are not Daylight Commons' judgement. Their evidence is the site or the cited source.</li></ul>
-<h2>Known limits</h2>
+</section>
+<section aria-labelledby="known-limits">
+<h2 id="known-limits">Known limits</h2>
 <ul><li><strong>Precision.</strong> The corpora come from Reddit, Twitter, Gab, YouTube and news comments, several years old. Two of them were sampled to be rich in hate speech (about 61% hostile). On Civil Comments, where 8% of comments are hostile, about a third of strong labels (23 of 68) fell on text the raters called toxic. Real reply threads sit somewhere between. Some Civil &quot;false positives&quot; are quoted or ironic uses that raters scored below 0.5, so 34% is a floor more than a point estimate.</li>
 <li><strong>Recall.</strong> Daylight Commons is a hand-built lexicon and grammar. It finds a small share of hostile text: MHS item recall is under 3% for every family. A thread with no markers is not a clean thread.</li>
 <li><strong>Weak families.</strong> Conspiracy, absolutist and essentialise describe framing, which these corpora do not label. Their figures against hostility labels are context, not error rates.</li>
@@ -406,10 +351,14 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <li>PTC is news articles from 48 outlets, mostly 2017 to 2019. Replies are shorter and blunter, and precision there is not measured. It could be higher or lower.</li>
 <li>PTC's labels are not exhaustive. A true use the annotators did not mark counts as a miss, so precision leans low.</li>
 <li>A technique describes how a post argues. It does not say the post is false, or anything about who wrote it.</li></ul>
-<h2>Your own feedback</h2>
+</section>
+<section aria-labelledby="your-own-feedback">
+<h2 id="your-own-feedback">Your own feedback</h2>
 <p>Each sign in the window has "This was right" and "This was wrong". Your marks stay in your browser. After 10 marks on one kind of sign, the window shows your own count under the measured figure. It never changes the figures on this page. You can save your marks to a file from the options page and choose whether to share it.</p>
-<h2>Data used</h2>
-<div class="scroll"><table><thead><tr><th scope="col">Corpus</th><th scope="col">Licence</th></tr></thead><tbody>
+</section>
+<section aria-labelledby="data-used">
+<h2 id="data-used">Data used</h2>
+<div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Corpus</th><th scope="col">Licence</th></tr></thead><tbody>
 <tr><td><a href="https://huggingface.co/datasets/ucberkeley-dlab/measuring-hate-speech">Measuring Hate Speech (Kennedy et al. 2020, Sachdeva et al. 2022; UC Berkeley D-Lab)</a></td><td>CC BY 4.0</td></tr>
 <tr><td><a href="https://github.com/punyajoy/HateXplain">HateXplain (Mathew et al. 2021)</a></td><td>MIT</td></tr>
 <tr><td><a href="https://huggingface.co/datasets/google/civil_comments">Civil Comments, test split (Jigsaw / Conversation AI; the corpus behind Jigsaw Unintended Bias)</a></td><td>CC0 1.0</td></tr>
@@ -433,7 +382,10 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td><a href="https://github.com/ialfina/id-hatespeech-detection">IDHSD (Alfina et al., ICACSIS 2017), Indonesian</a></td><td>Free use without permission; no public copies (README)</td></tr>
 </tbody></table></div>
 <p>No corpus text is in Daylight Commons or its repository; only counts, rates and file hashes are. The evaluation scripts in <a href="https://github.com/HarperZ9/daylight-commons">Daylight Commons' repository</a> reproduce every number here from the downloaded corpora.</p>
-<footer>Daylight Commons. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage, which asks the outlets you choose for their feeds. <a href="https://github.com/HarperZ9/daylight-commons">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+</section>
+
+<p class="dc-foot">Daylight Commons gives evidence, not verdicts. It asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups. Free and open source under the AGPL-3.0.</p>
+</article>
 </main>
 </body>
 </html>

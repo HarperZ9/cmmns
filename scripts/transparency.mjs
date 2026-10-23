@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { ROOT, REPO, esc, inline, page, writePage } from "./site/page.mjs";
+import { ROOT, REPO, esc, inline, page, sitePage, writePage } from "./site/page.mjs";
 import { FAMILIES, measuredLine } from "../src/core/families.js";
 import { MEASURED_DOES_NOT_PROVE } from "../src/core/measured.js";
 import { TECHNIQUES, PERSUASION_DOES_NOT_PROVE } from "../src/core/persuasion.js";
@@ -118,7 +118,7 @@ function heldWhy(l) {
 
 const ul = (items, fmt = esc) => `<ul>${items.map((x) => `<li>${fmt(x)}</li>`).join("\n")}</ul>`;
 
-export function render() {
+export function render(target = "ext") {
   const evalMd = read("project-docs/EVALUATION.md");
   const ptc = JSON.parse(read("project-docs/evidence/persuasion-results.json"));
   const D = JSON.parse(read("project-docs/evidence/eval-results.json")), fams = D.families;
@@ -174,10 +174,12 @@ ${ul(limits, inline)}
 <h2>Data used</h2>
 ${tbl(["Corpus", "Licence"], sources.map((s) => row([`<a href="${esc(s.url)}">${esc(s.name)}</a>`, esc(s.licence)])))}
 <p>No corpus text is in Daylight Commons or its repository; only counts, rates and file hashes are. The evaluation scripts in <a href="${REPO}">Daylight Commons' repository</a> reproduce every number here from the downloaded corpora.</p>`;
-  return page({ title: "How Daylight Commons is measured", description: "Every Daylight Commons sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.", updated: D.generated, body, css: FIGURE_CSS });
+  const description = "Every Daylight Commons sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.";
+  if (target === "site") return sitePage({ file: "transparency.html", title: "How Daylight Commons is measured", role: "Each sign's measured precision and recall with its interval, the data behind it, the side-balance check and the known limits.", description, updated: D.generated, body, css: FIGURE_CSS });
+  return page({ title: "How Daylight Commons is measured", description, updated: D.generated, body, css: FIGURE_CSS });
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  writePage("transparency.html", render());
+  writePage("transparency.html", (t) => render(t));
   console.log("wrote src/ext/transparency.html and docs/transparency.html");
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // radar: Daylight Commons' evidence from the command line, reading local files only. Nothing is fetched.
 //   radar analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
-//   radar verify <bundle.json> [--key-id id] [--json]
+//   radar verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
 //   radar site <domain> [--json]
 //   radar media <file> [--json]
 // <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
@@ -12,18 +12,21 @@ import { pathToFileURL } from "node:url";
 import { analyzeThread, analyzeText, checkMedia, siteInfo } from "../src/core/api.js";
 import { importFile } from "../src/core/imports.js";
 import { makeBundle, signBundle, verifyBundle } from "../src/core/evidence-bundle.js";
+import { chainChecks, EXPORT_FORMAT } from "../src/core/evidence-seal.js";
 import { loadTables, dataLock, radarVersion, ROOT } from "./lib/data.mjs";
 import { loadOrMakeKey, DEFAULT_KEY } from "./lib/keys.mjs";
-import { readable, verdictLines } from "./lib/report.mjs";
+import { readable, verdictLines, chainLines } from "./lib/report.mjs";
 import { validate } from "./lib/jsonschema.mjs";
 
 const USAGE = `Usage:
   radar analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
-  radar verify <bundle.json> [--key-id id] [--json]
+  radar verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
   radar site <domain> [--json]
   radar media <file> [--json]
 <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
-CSV, a Mastodon outbox.json or a Bluesky repository .car. Daylight Commons reads local files only.
+CSV, a Mastodon outbox.json or a Bluesky repository .car. verify checks a signed evidence bundle
+or an evidence chain saved from the extension ("Save evidence chain"). Daylight Commons reads local
+files only.
 `;
 const SCHEMA = JSON.parse(readFileSync(`${ROOT}/schema/evidence.v1.json`, "utf8"));
 
@@ -62,6 +65,11 @@ async function writeBundle(result, imp, f) {
 
 async function verify(file, f) {
   const bundle = JSON.parse(readFileSync(file, "utf8"));
+  if (bundle && bundle.format === EXPORT_FORMAT) {
+    const c = await chainChecks(bundle);
+    print(f.json ? asJson(c) : chainLines(file, c));
+    return c.ok ? 0 : 1;
+  }
   const v = await verifyBundle(bundle, { keyId: typeof f["key-id"] === "string" ? f["key-id"] : null });
   const errs = validate(SCHEMA, bundle);
   v.checks.push({ name: "schema", ok: !errs.length, text: errs.length ? errs.slice(0, 3).join("; ") : "fits schema/evidence.v1.json" });

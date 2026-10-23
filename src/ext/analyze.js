@@ -52,7 +52,8 @@
   async function check(file) {
     let bundle;
     try { bundle = JSON.parse(await file.text()); } catch { $("checks").replaceChildren(Object.assign(document.createElement("li"), { textContent: `${file.name} is not valid JSON.` })); return; }
-    PBAnalyzeView.checks($("checks"), await PB.verifyBundle(bundle));
+    if (bundle && bundle.format === "radar-evidence-chain/1") PBAnalyzeView.chain($("checks"), await PB.chainChecks(bundle));
+    else PBAnalyzeView.checks($("checks"), await PB.verifyBundle(bundle));
   }
 
   const fail = (where) => (e) => { console.error(`[daylight-commons] ${where} failed`, e); say(`Could not ${where}: ${e.message}`); };

@@ -96,7 +96,9 @@ Quote posts of the launch on the page, split into those X labels "Paid partnersh
 without the label.
 
 - **Bunching:** the narrowest window that holds 5 quotes, and how many quotes fall in the densest
-  hour.
+  hour. It counts as coordination context only when the 5 quotes fall inside one hour; a wider
+  window is shown as timing and counts for nothing. Before 3.0.0 any launch with 5 quotes read as
+  "looks coordinated", which a run on a synthetic, evenly spread launch found.
 - **Shared template:** groups of quotes whose own words share a skeleton, plus promo-template cues.
   Cues come from a provider interface (below); without one, a local list runs ("they just dropped",
   "sir...", "this changes everything", "game changer", "is insane", "you need to try").
@@ -166,6 +168,12 @@ identity. Tests check that the output contains no handle of a sampled account an
 **Legal review before public release.** A media lawyer should review the ladder's wording before
 this lens ships in a public release. UK and EU defamation law is stricter than US law, and "consistent
 with purchased amplification" about a named company is a statement a court could read as fact.
+
+**Held in 3.0.0.** The first public release ships before that review, so naming is held:
+`NAMING_HELD` in `src/core/campaign.js` keeps every claim at "this launch", whatever the launch
+account discloses, and leaves out the blunt "paid buzz dressed as organic" line. The lead, the
+evidence rows and the unnamed step-2 inference are unchanged, and a test checks that holding the
+name changes no evidence. Turn naming on only after the review, in the same commit as its record.
 
 ## Definition matching (data and library built, not in the window yet)
 

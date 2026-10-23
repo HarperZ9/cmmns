@@ -1,5 +1,5 @@
 /* Daylight Commons' own pages (first run, options, lessons, feed): the layout on top of canon.css. Ink on a
-   bone or void ground, Hanken Grotesk for words and Conso for figures, square controls, sections
+   bone or void ground, Hanken Grotesk for words and JetBrains Mono for figures, square controls, sections
    that open on a hairline and a registration cross. */
 :root { --size: var(--t-body); }
 .pb-large { --size: 1.25rem; }
@@ -36,7 +36,7 @@ table { font-size: .95em; }
 td.mono { white-space: normal; }
 .status { min-height: 1.5em; margin-top: var(--s-3); }
 .done { padding: var(--s-4) var(--s-5); border: 1px solid var(--ink); background: var(--panel); }
-/* Keyboard hints set in Conso, the canon's face for code, named here so no browser default
+/* Keyboard hints set in JetBrains Mono, the canon's face for code, named here so no browser default
    (a serif in some engines' kbd fallback) can reach them; never below the 14px label floor. */
 kbd { font-family: var(--font-mono); font-weight: 400; font-size: max(.9em, 14px); padding: 1px 6px; border: 1px solid var(--line-strong); border-radius: var(--radius-control); background: var(--inset); }
 code.hash { overflow-wrap: anywhere; }

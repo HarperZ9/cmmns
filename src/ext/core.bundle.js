@@ -5722,7 +5722,8 @@ const M_campaign_quotes = (() => {
 const { templateGroups, promoCues } = M_campaign_text;
 const { ownWords } = M_similarity;
 
-const BUNCH_K = 5, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
+// BUNCH_TIGHT_MS: 5 quotes inside an hour count as coordination; a wider bunch is shown, not counted.
+const BUNCH_K = 5, BUNCH_TIGHT_MS = 3600000, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
 const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour because it is news, and common phrases spread by imitation. A shared opener does not show payment, and a missing label does not show that anyone hid one.";
 
 const at = (q) => Date.parse(q.posted);
@@ -5882,7 +5883,7 @@ const M_campaign = (() => {
 
 const { engagementShape, SHAPE_DOES_NOT_PROVE } = M_campaign_shape;
 const { sampleSigns, SAMPLE_DOES_NOT_PROVE, SAMPLE_MIN } = M_campaign_sample;
-const { quoteCluster, QUOTES_DOES_NOT_PROVE } = M_campaign_quotes;
+const { quoteCluster, QUOTES_DOES_NOT_PROVE, BUNCH_TIGHT_MS } = M_campaign_quotes;
 const { OVERLAP_DOES_NOT_PROVE } = M_campaign_overlap;
 const { campaignPlatform, CAMPAIGN_PLATFORMS } = M_campaign_platforms;
 
@@ -5907,14 +5908,21 @@ function actorOf(reading) {
   return org && R.handle ? { handle: R.handle, kind: R.verifiedType === "Government" ? "official account" : "organisation" } : null;
 }
 
+// Held until a media lawyer reviews the ladder's wording (project-docs/CAMPAIGN-LENS.md, "Legal
+// review before public release"): while true, no organisation is named and the blunt step-2 line
+// ("paid buzz dressed as organic") is left out, so every claim reads "this launch". The evidence,
+// the lead and the unnamed inference are unchanged. Set to false only after the review, in the
+// same commit as its record.
+const NAMING_HELD = true;
+
 // Ladder step 1 (documented fact) and step 2 (named inference), as lines above the evidence.
-function ladder(status, families, qc, actor) {
-  const who = actor ? `@${actor.handle}'s launch` : "this launch";
+function ladder(status, families, qc, actor, held) {
+  const who = actor && !held ? `@${actor.handle}'s launch` : "this launch";
   const out = [];
   if (qc.disclosed) out.push({ step: 1, text: `Documented: ${qc.disclosed} quote post${qc.disclosed === 1 ? "" : "s"} promoting ${who} carry X's Paid partnership label, the posters' own disclosure.` });
   if (status === "strong") {
     out.push({ step: 2, text: `Inference: the engagement on ${who} is consistent with purchased amplification (${families.length} independent signs below).` });
-    if (families.includes("quotes")) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Quotes without the label share the paid quotes' template and timing.` });
+    if (families.includes("quotes") && !held) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Quotes without the label share the paid quotes' template and timing.` });
   }
   return out;
 }
@@ -5956,7 +5964,8 @@ function quoteRows(q) {
   const ind = [], ctx = [];
   if (q.lookalikes) ind.push({ id: "undisclosed-lookalike", text: `${q.lookalikes} quote${q.lookalikes === 1 ? "" : "s"} without a Paid partnership label share a template with labelled quotes or with each other inside two hours.`, dnp: QUOTES_DOES_NOT_PROVE });
   if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Daylight Commons cannot see who paid or how much." });
-  if (q.bunch.kWindowMs != null) ctx.push({ id: "quote-bunching", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
+  // Any launch with five quotes has a narrowest window; only a tight one is coordination context.
+  if (q.bunch.kWindowMs != null) ctx.push({ id: q.bunch.kWindowMs <= BUNCH_TIGHT_MS ? "quote-bunching" : "quote-timing", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
   for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Daylight Commons' local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
   return { ind, ctx };
 }
@@ -5981,11 +5990,13 @@ function campaignLens(input) {
   const coordinated = context.some((c) => ["quote-bunching", "overlap", "promo-cue", "disclosed-paid"].includes(c.id));
   const thin = sm.n < SAMPLE_MIN && !qc.n;
   const status = families.length >= 2 ? "strong" : families.length === 1 ? "one" : thin ? "thin" : coordinated ? "coordinated" : "none";
-  const claims = ladder(status, families, qc, input.actor || null);
-  return { status, lead: CAMPAIGN_LEADS[status], claims, families, indicators, context, sample: sm.n, quotes: qc.n, dnp: CAMPAIGN_DOES_NOT_PROVE, dispute: CAMPAIGN_DISPUTE };
+  // input.reviewed lets a test exercise the reviewed wording; the extension never passes it.
+  const held = input.reviewed === true ? false : NAMING_HELD;
+  const claims = ladder(status, families, qc, input.actor || null, held);
+  return { status, lead: CAMPAIGN_LEADS[status], claims, naming: held ? "held" : "on", families, indicators, context, sample: sm.n, quotes: qc.n, dnp: CAMPAIGN_DOES_NOT_PROVE, dispute: CAMPAIGN_DISPUTE };
 }
 
-return { CAMPAIGN_DOES_NOT_PROVE, CAMPAIGN_LEADS, CAMPAIGN_DISPUTE, actorOf, campaignLens };
+return { CAMPAIGN_DOES_NOT_PROVE, CAMPAIGN_LEADS, CAMPAIGN_DISPUTE, actorOf, NAMING_HELD, campaignLens };
 })();
 
 // ---- receipt.js
@@ -6116,18 +6127,30 @@ const M_evidence_domain = (() => {
 // Domain facts for the evidence layer (project-docs/EVIDENCE-LAYER.md): registration date from RDAP
 // (rdap.org forwards to the registry's own RDAP server) and the first Internet Archive capture
 // (Wayback CDX). Checked 2026-10-22: both answer without a login and send
-// Access-Control-Allow-Origin: *.
+// Access-Control-Allow-Origin: *. Rechecked 2026-10-23: rdap.org still does; the Wayback CDX no
+// longer sends it, so the extension asks for access to web.archive.org when the user turns
+// evidence lookups on (src/ext/options.js), and without it reports the archive as not asked.
 
 const RDAP_BASE = "https://rdap.org/domain/";
 const CDX_BASE = "https://web.archive.org/cdx/search/cdx";
 const DOMAIN_DOES_NOT_PROVE = "A registration date is when the current registration began. Domains are bought, sold and re-registered, and a young domain can front an old company.";
 const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly. A late first capture means the archive found the site late, not that it did not exist.";
 
+// Hosting services that give each customer a subdomain. The service's own registration says nothing
+// about a customer's site, so such a host is kept whole and RDAP is not asked about it.
+const HOSTING_SUFFIXES = ["github.io", "gitlab.io", "netlify.app", "vercel.app", "pages.dev", "web.app", "firebaseapp.com", "herokuapp.com", "blogspot.com", "wordpress.com", "substack.com", "medium.com", "notion.site", "carrd.co", "framer.website", "webflow.io", "glitch.me", "replit.app", "onrender.com", "fly.dev", "azurewebsites.net", "cloudfront.net", "s3.amazonaws.com"];
+function hostedOn(host) {
+  const h = String(host || "").toLowerCase().replace(/^www\./, "");
+  return HOSTING_SUFFIXES.find((s) => h.endsWith("." + s) && h.length > s.length + 1) || null;
+}
+
 // The registrable part of a host, roughly: the last two labels, or three under a two-letter
-// second-level such as co.uk. Good enough to pick what to ask RDAP about; RDAP itself says no if wrong.
+// second-level such as co.uk; a site on a hosting service stays whole. Good enough to pick what to
+// ask RDAP about; RDAP itself says no if wrong.
 function registrable(host) {
   const parts = String(host || "").toLowerCase().replace(/^www\./, "").split(".").filter(Boolean);
   if (parts.length < 2) return null;
+  if (hostedOn(parts.join("."))) return parts.join(".");
   const sld = parts[parts.length - 2];
   return (parts.length >= 3 && /^(?:co|com|org|net|ac|gov|edu)$/.test(sld) && parts[parts.length - 1].length === 2 ? parts.slice(-3) : parts.slice(-2)).join(".");
 }
@@ -6159,7 +6182,7 @@ function daysBefore(iso, atIso) {
   return Number.isFinite(a) && Number.isFinite(b) ? Math.floor((b - a) / 86400000) : null;
 }
 
-return { RDAP_BASE, CDX_BASE, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE, registrable, rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore };
+return { RDAP_BASE, CDX_BASE, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE, HOSTING_SUFFIXES, hostedOn, registrable, rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore };
 })();
 
 // ---- evidence-ads.js
@@ -6259,7 +6282,7 @@ const M_evidence_fetch = (() => {
 
 const { makeReceipt } = M_receipt;
 const { GITHUB_API, repoFacts, starTimes, starPages, starBursts, REPO_DOES_NOT_PROVE, STARS_DOES_NOT_PROVE } = M_evidence_github;
-const { rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE } = M_evidence_domain;
+const { rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore, hostedOn, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE } = M_evidence_domain;
 
 const MAX_REPOS = 2, MAX_DOMAINS = 3, LOOKUP_TIMEOUT_MS = 15000;
 
@@ -6296,12 +6319,17 @@ async function github(fetchFn, { owner, repo }, token, postedAt) {
   return { receipts: out, notes };
 }
 
-async function domain(fetchFn, d, postedAt) {
+async function domain(fetchFn, d, postedAt, wayback) {
   const out = [], notes = [];
-  const r = await getJson(fetchFn, rdapUrl(d), { Accept: "application/rdap+json" });
-  const f = r.json ? rdapFacts(r.json) : null;
-  if (f && f.registered) out.push(await makeReceipt({ kind: "domain-registration", subject: f.domain, observed: { ...f, daysBeforePost: daysBefore(f.registered, postedAt) }, raw: r.json, source: "RDAP via rdap.org", url: rdapUrl(d), dnp: DOMAIN_DOES_NOT_PROVE }));
-  else notes.push(`RDAP answered ${r.status} for ${d}.`);
+  const host = hostedOn(d);
+  if (host) notes.push(`${d} is a site on ${host}, a hosting service. When ${host} was registered says nothing about this site, so RDAP was not asked.`);
+  else {
+    const r = await getJson(fetchFn, rdapUrl(d), { Accept: "application/rdap+json" });
+    const f = r.json ? rdapFacts(r.json) : null;
+    if (f && f.registered) out.push(await makeReceipt({ kind: "domain-registration", subject: f.domain, observed: { ...f, daysBeforePost: daysBefore(f.registered, postedAt) }, raw: r.json, source: "RDAP via rdap.org", url: rdapUrl(d), dnp: DOMAIN_DOES_NOT_PROVE }));
+    else notes.push(`RDAP answered ${r.status} for ${d}.`);
+  }
+  if (!wayback) { notes.push(`The Internet Archive was not asked about ${d}: allow access to web.archive.org by turning Evidence lookups off and on again in Options.`); return { receipts: out, notes }; }
   const w = await getJson(fetchFn, cdxUrl(d));
   const first = w.json ? waybackFirst(w.json) : null;
   if (first) out.push(await makeReceipt({ kind: "wayback-first", subject: d, observed: { ...first, daysBeforePost: daysBefore(first.first, postedAt) }, raw: w.json, source: "Internet Archive Wayback CDX", url: cdxUrl(d), dnp: WAYBACK_DOES_NOT_PROVE }));
@@ -6309,11 +6337,13 @@ async function domain(fetchFn, d, postedAt) {
   return { receipts: out, notes };
 }
 
-// { repos: [{ owner, repo }], domains: [string], postedAt, token? } -> { receipts, notes }.
-async function lookupEvidence(fetchFn, { repos = [], domains = [], postedAt = null, token = null } = {}) {
+// { repos: [{ owner, repo }], domains: [string], postedAt, token?, wayback? } -> { receipts, notes }.
+// wayback: false when the browser has not granted access to web.archive.org (its CDX sends no CORS
+// header), so the archive is reported as not asked rather than as an error.
+async function lookupEvidence(fetchFn, { repos = [], domains = [], postedAt = null, token = null, wayback = true } = {}) {
   const receipts = [], notes = [];
   for (const x of repos.slice(0, MAX_REPOS)) { const g = await github(fetchFn, x, token, postedAt); receipts.push(...g.receipts); notes.push(...g.notes); }
-  for (const d of domains.slice(0, MAX_DOMAINS)) { const g = await domain(fetchFn, d, postedAt); receipts.push(...g.receipts); notes.push(...g.notes); }
+  for (const d of domains.slice(0, MAX_DOMAINS)) { const g = await domain(fetchFn, d, postedAt, wayback); receipts.push(...g.receipts); notes.push(...g.notes); }
   if (repos.length > MAX_REPOS || domains.length > MAX_DOMAINS) notes.push(`Looked up the first ${MAX_REPOS} repositories and ${MAX_DOMAINS} domains only.`);
   return { receipts, notes };
 }
@@ -6420,6 +6450,7 @@ async function exportSeal(seal, { title = null, at = new Date().toISOString() } 
 // Offline check of an export: the seal, the head, the root and every proof.
 async function verifyExport(x) {
   if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Daylight Commons evidence chain"] };
+  if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file has no seal or no proofs"] };
   const s = await verifySeal(x.seal), problems = [...s.problems];
   const hashes = x.seal.entries.map((e) => e.receipt.hash);
   if ((await merkleRoot(hashes)) !== x.root) problems.push("root does not match the receipts");
@@ -6429,7 +6460,37 @@ async function verifyExport(x) {
   return { ok: !problems.length, problems };
 }
 
-return { SEAL_FORMAT, SEAL_DOES_NOT_PROVE, merkleRoot, inclusionProof, verifyInclusion, emptySeal, appendSeal, verifySeal, exportSeal, verifyExport };
+// The same check as named lines, for the command line and the Analyse a file page: { ok, size,
+// root, checks: [{ name, ok, text }], receipts: [{ kind, subject, source, at }], dnp }. Each line is
+// one property a reader can recheck by hand; the receipts list says what the chain holds.
+async function chainChecks(x) {
+  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, size: 0, root: null, checks: [{ name: "format", ok: false, text: "not a Daylight Commons evidence chain" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
+  const entries = (x.seal && Array.isArray(x.seal.entries)) ? x.seal.entries : null;
+  if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file has no seal or no proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
+  const n = entries.length, hashes = entries.map((e) => (e && e.receipt && e.receipt.hash) || "");
+  let edited = 0, broken = 0, prev = GENESIS, proofsBad = 0;
+  for (let i = 0; i < n; i++) {
+    const e = entries[i] || {};
+    if (!(await verifyReceipt(e.receipt))) edited++;
+    const link = await sha256Hex(canonical({ seq: e.seq, prev: e.prev, hash: e.receipt && e.receipt.hash }));
+    if (e.seq !== i || e.prev !== prev || link !== e.link) broken++;
+    prev = e.link;
+  }
+  const root = await merkleRoot(hashes);
+  for (let i = 0; i < n; i++) if (!(await verifyInclusion(hashes[i], x.proofs[i] || {}, x.root))) proofsBad++;
+  const head = n ? entries[n - 1].link : GENESIS;
+  const checks = [
+    { name: "receipts", ok: !edited, text: edited ? `${edited} of ${n} receipts changed after they were made` : `all ${n} receipts match their own hash` },
+    { name: "chain", ok: !broken, text: broken ? `${broken} of ${n} entries do not follow the one before (edited, removed or reordered)` : `all ${n} entries follow the one before, in order` },
+    { name: "head", ok: head === x.head, text: head === x.head ? "the head matches the last entry" : "the head does not match the last entry" },
+    { name: "Merkle root", ok: root === x.root, text: root === x.root ? `the root ${String(x.root).slice(0, 16)}... is the root of these receipts` : "the root is not the root of these receipts" },
+    { name: "inclusion proofs", ok: !proofsBad && x.proofs.length === n, text: proofsBad ? `${proofsBad} of ${n} proofs fail against the root` : `all ${n} proofs place their receipt under the root` },
+  ];
+  const receipts = entries.map((e) => { const r = (e && e.receipt) || {}; return { kind: r.kind || null, subject: r.subject || null, source: r.source || null, at: r.at || null }; });
+  return { ok: checks.every((c) => c.ok), size: n, root: x.root || null, checks, receipts, dnp: SEAL_DOES_NOT_PROVE };
+}
+
+return { SEAL_FORMAT, SEAL_DOES_NOT_PROVE, merkleRoot, inclusionProof, verifyInclusion, emptySeal, appendSeal, verifySeal, exportSeal, verifyExport, chainChecks };
 })();
 
 // ---- chain.js

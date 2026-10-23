@@ -1,0 +1,87 @@
+{
+  "format": "radar-evidence-chain/1",
+  "title": "Daylight Commons evidence chain",
+  "at": "2026-10-23T02:15:11.285Z",
+  "head": "29a29ebdde826ffbe69aba269efe8105a05f8331fb4d5884642947121a324664",
+  "root": "a405f3421ce219b324fb9339aeb0d69dfca4cc63630d0025d244a333f50257f9",
+  "size": 2,
+  "seal": {
+    "entries": [
+      {
+        "link": "3ea5679f3327941cfa5fe2e4e7218b9b0ed324fd857186ef35ac6b0ccc463615",
+        "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+        "receipt": {
+          "at": "2026-10-23T02:14:58.449Z",
+          "capture": {
+            "adapter": "radar-evidence/1",
+            "method": "fetch",
+            "rawHash": "3cf76377d4babf90263d3f153ae0db2b4ee060119af1c2c697cc84c01ed04d13"
+          },
+          "content": "features",
+          "dnp": "A creation date is when this repository was made on GitHub. Work often starts elsewhere or in another repository, so it says nothing about how long a team has been building.",
+          "format": "radar-receipt/1",
+          "hash": "986f3beb3f03815675662f489502ee7fc60b3557c8ac28f77a0aee9904b18461",
+          "kind": "github-repo",
+          "observed": {
+            "created": "2026-10-18T05:37:08Z",
+            "daysBeforePost": 4,
+            "forks": 0,
+            "pushed": "2026-10-23T02:08:28Z",
+            "repo": "HarperZ9/daylight-commons",
+            "stars": 0
+          },
+          "source": "GitHub REST API, repository endpoint",
+          "subject": "HarperZ9/daylight-commons",
+          "subjectKind": "artefact",
+          "url": "https://api.github.com/repos/HarperZ9/daylight-commons"
+        },
+        "seq": 0
+      },
+      {
+        "link": "29a29ebdde826ffbe69aba269efe8105a05f8331fb4d5884642947121a324664",
+        "prev": "3ea5679f3327941cfa5fe2e4e7218b9b0ed324fd857186ef35ac6b0ccc463615",
+        "receipt": {
+          "at": "2026-10-23T02:14:59.165Z",
+          "capture": {
+            "adapter": "radar-evidence/1",
+            "method": "fetch",
+            "rawHash": "4b55789caad760c8e06183e6c2315a44bc40a28219479a4078cfecb6b5853633"
+          },
+          "content": "features",
+          "dnp": "The Internet Archive captures sites unevenly. A late first capture means the archive found the site late, not that it did not exist.",
+          "format": "radar-receipt/1",
+          "hash": "a8b32468bae9c9135203b037f3c0894296a286234d9f2bccabbf2cbde1884aa6",
+          "kind": "wayback-first",
+          "observed": {
+            "daysBeforePost": 19,
+            "first": "2026-10-02T19:30:46Z",
+            "url": "https://web.archive.org/web/20261002193046/https://harperz9.github.io/"
+          },
+          "source": "Internet Archive Wayback CDX",
+          "subject": "harperz9.github.io",
+          "subjectKind": "artefact",
+          "url": "https://web.archive.org/cdx/search/cdx?url=harperz9.github.io&limit=1&output=json&fl=timestamp,original,statuscode"
+        },
+        "seq": 1
+      }
+    ],
+    "format": "radar-seal/1"
+  },
+  "proofs": [
+    {
+      "index": 0,
+      "size": 2,
+      "path": [
+        "b06887914e0a75ab713309b4d7030be776572df23562b051259d5beef4d0d97b"
+      ]
+    },
+    {
+      "index": 1,
+      "size": 2,
+      "path": [
+        "cab975d894b1c1acf48e3bdd4d3e7a7fe33ba290774ab8f353ae6e1509c0d81d"
+      ]
+    }
+  ],
+  "dnp": "The seal shows that these receipts are the ones this browser recorded, in this order, and that none was changed or removed after the fact. It does not show that a source told the truth, and whoever holds the device could start a new log."
+}

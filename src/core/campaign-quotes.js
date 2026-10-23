@@ -7,7 +7,8 @@
 import { templateGroups, promoCues } from "./campaign-text.js";
 import { ownWords } from "./similarity.js";
 
-export const BUNCH_K = 5, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
+// BUNCH_TIGHT_MS: 5 quotes inside an hour count as coordination; a wider bunch is shown, not counted.
+export const BUNCH_K = 5, BUNCH_TIGHT_MS = 3600000, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
 export const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour because it is news, and common phrases spread by imitation. A shared opener does not show payment, and a missing label does not show that anyone hid one.";
 
 const at = (q) => Date.parse(q.posted);

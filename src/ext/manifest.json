@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Daylight Commons",
-  "version": "2.1.0",
-  "description": "Free, no account, nothing leaves your browser unless you opt in. Sourced evidence on posts and links, each sign with its error rate.",
+  "version": "3.0.0",
+  "description": "Evidence beside social media replies, each sign with its source and what it does not prove. No server, no account, no analytics.",
   "homepage_url": "https://github.com/HarperZ9/daylight-commons",
   "icons": {
     "16": "icons/radar-16.png",
@@ -135,6 +135,9 @@
       "data_collection_permissions": {
         "required": [
           "none"
+        ],
+        "optional": [
+          "websiteContent"
         ]
       },
       "strict_min_version": "121.0"

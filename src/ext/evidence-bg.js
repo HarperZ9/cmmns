@@ -6,6 +6,8 @@
 (() => {
   "use strict";
   const SEAL_KEY = "pb.seal.v1", TOKEN_KEY = "pb.evidence.github", MAX_SEAL = 2000;
+  // The Wayback CDX sends no CORS header, so its answer needs host access, asked for in Options.
+  const ARCHIVE = "https://web.archive.org/*";
   let queue = Promise.resolve();   // one lookup at a time, so the seal is appended in order
   const settings = async () => PB.normalizeSettings((await chrome.storage.local.get(PB.SETTINGS_KEY))[PB.SETTINGS_KEY]);
 
@@ -19,13 +21,23 @@
     return { size: next.entries.length };
   }
 
+  // Firefox 140 and later keep their own consent for data an add-on sends: evidence lookups send
+  // link domains and repository names, declared as optional "websiteContent" in the manifest and
+  // asked for by the Evidence lookups switch in Options (a content script cannot ask). Chrome and
+  // older Firefox have no such consent, so the check passes there.
+  async function firefoxConsent() {
+    try { return await chrome.permissions.contains({ data_collection: ["websiteContent"] }); } catch { return true; }
+  }
+
   async function lookup(msg) {
     const s = await settings();
     if (!s.evidence) return { error: "off" };
+    if (!(await firefoxConsent())) return { error: "browser-consent" };
     const token = ((await chrome.storage.local.get(TOKEN_KEY))[TOKEN_KEY] || "").trim() || null;
     const repos = PB.reposIn(msg.links || []).concat(PB.reposIn(msg.text || ""));
     const domains = [...new Set((msg.domains || []).map(PB.registrable).filter(Boolean))].filter((d) => d !== "github.com");
-    const out = await PB.lookupEvidence((u, o) => fetch(u, o), { repos, domains, postedAt: msg.postedAt || null, token });
+    const wayback = await chrome.permissions.contains({ origins: [ARCHIVE] }).catch(() => false);
+    const out = await PB.lookupEvidence((u, o) => fetch(u, o), { repos, domains, postedAt: msg.postedAt || null, token, wayback });
     const sealed = out.receipts.length ? await seal(out.receipts) : { size: null };
     if (sealed.full) out.notes.push("The evidence log is full. Save the evidence chain and clear Daylight Commons data to start a new one.");
     return { ...out, sealed: sealed.size, ads: PB.adLibraryLinks({ name: msg.name, domain: domains[0] }) };

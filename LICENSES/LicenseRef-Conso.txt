@@ -1,9 +1,0 @@
-Conso (conso-regular.woff2), by Pavel Larin.
-
-This font is used in Daylight Commons under the designer's licence, which the author of
-Daylight Commons holds. It is not covered by Daylight Commons' licences (AGPL-3.0-only for code,
-CC BY 4.0 for data and documentation), and it is not offered for reuse outside
-Daylight Commons. A fork or redistribution of Daylight Commons must remove both copies of the file
-(src/ext/fonts/conso-regular.woff2 and docs/fonts/conso-regular.woff2) or hold
-its own licence for the font. Daylight Commons' style sheets list system monospace fonts
-as the fallback; a fork that removes the file should check the pages it uses.

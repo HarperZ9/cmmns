@@ -17,7 +17,7 @@ const read = (p) => readFileSync(join(ROOT, p), "utf8");
 const SKIP = /^(claims(-\d+)?\.json|owners\.json|sites\.json|core\.bundle\.js|(rhetoric|lexicon)(-[a-z]+)?\.js)$/;
 const USER_FACING = [
   ...list("src/ext", /\.(html|js|css|json)$/), ...list("src/ext/learn", /\.js$/), ...list("src/core", /\.js$/),
-  ...list("docs", /\.html$/), "README.md", "PRIVACY.md", "project-docs/STORE-LISTING.md",
+  ...list("docs", /\.html$/), "README.md", "PRIVACY.md", "docs/store/LISTING.md",
 ].filter((p) => !SKIP.test(basename(p)));
 
 // A regular expression that looks for an em dash (the machine-writing sign, the About-page reader)
@@ -43,7 +43,8 @@ test("every Daylight Commons page loads the shared tokens before its own styles"
     assert.ok(canon > 0, `${p} links canon.css`);
     for (const m of html.matchAll(/href="([\w-]+\.css)"/g)) assert.ok(m.index >= canon, `${p}: canon.css comes before ${m[1]}`);
   }
-  for (const p of ["src/ext/transparency.html", "src/ext/privacy.html", "docs/transparency.html", "docs/privacy.html"]) {
+  // docs/ copies use the author's site cascade instead (tests/pages.test.js).
+  for (const p of ["src/ext/transparency.html", "src/ext/privacy.html"]) {
     assert.match(read(p), /--paper: #ebe5d8;/, `${p} carries the canon tokens`);
   }
 });
@@ -70,12 +71,12 @@ test("no pill or rounded-card shapes and no tracked uppercase labels", () => {
   }
 });
 
-test("keyboard hints are set in Conso, never in a browser's default face, and at 14px or more", () => {
+test("keyboard hints are set in JetBrains Mono, never in a browser's default face, and at 14px or more", () => {
   const css = read("src/ext/pages.css");
   const rule = (css.match(/(?:^|\n)kbd\s*\{[^}]*\}/) || [""])[0];
   assert.match(rule, /font-family:\s*var\(--font-mono\)/);
   assert.match(rule, /font-size:\s*max\([^)]*14px\)/);
-  assert.match(read("src/ext/canon.css"), /--font-mono:\s*"Conso",[^;]*monospace;/, "the mono stack ends in monospace, never serif");
+  assert.match(read("src/ext/canon.css"), /--font-mono:\s*"JetBrains Mono",[^;]*monospace;/, "the mono stack ends in monospace, never serif");
   for (const p of list("src/ext", /\.html$/).filter((f) => read(f).includes("<kbd>"))) assert.match(read(p), /href="pages\.css"/, p);
 });
 
@@ -96,5 +97,5 @@ test("the transparency page leads with one figure per sign and keeps counts coll
     const lead = s.replace(/<details[^]*<\/details>/, "");
     assert.doesNotMatch(lead, /\d of \d/, "counts sit in the disclosure, not the lead");
   }
-  assert.ok(html.indexOf('<section class="sign">') < html.indexOf("<h2>Language signs</h2>"), "figures come first");
+  assert.ok(html.indexOf('<section class="sign">') < html.search(/<h2[^>]*>Language signs<\/h2>/), "figures come first");
 });

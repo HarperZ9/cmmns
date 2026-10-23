@@ -39,6 +39,22 @@
     sources: "Outlet owners, state links from cited reports, ads and Community Notes.",
     media: "Media uploaded long before the post that shows it.",
   };
+  // Evidence lookups send link domains and repository names. Firefox 140 and later ask the user for
+  // that themselves ("websiteContent", optional in the manifest), from this click; elsewhere that
+  // key throws and only the host is asked for. The host is web.archive.org, whose CDX answers
+  // without a CORS header. Turning the switch off gives both back.
+  function evidenceSwitch(on, input) {
+    const origins = ["https://web.archive.org/*"], both = { origins, data_collection: ["websiteContent"] };
+    const ask = (verb) => { try { return chrome.permissions[verb](both); } catch { return chrome.permissions[verb]({ origins }); } };
+    if (!on) { Promise.resolve(ask("remove")).catch(() => {}); save({ evidence: false }); return; }
+    let asked;
+    try { asked = ask("request"); } catch { asked = Promise.resolve(false); }
+    Promise.resolve(asked).catch(() => true).then((ok) => {
+      if (ok === false) { input.checked = false; return; }
+      save({ evidence: true });
+    });
+  }
+
   function windowSwitches() {
     for (const id of PB.AREA_IDS) {
       const name = id[0].toUpperCase() + id.slice(1);
@@ -47,7 +63,7 @@
     $("reading").append(
       switchRow("Daylight Commons on feeds and profiles", "Off: Daylight Commons reads only the replies under a post you open.", s().feeds, (on) => save({ feeds: on })),
       switchRow("Read account details automatically", "Off: account details are read only when you ask in the window.", s().auto, (on) => save({ auto: on })),
-      switchRow("Evidence lookups", "Adds \"Look up evidence\" to the launch campaign section. On your click, the repository names and domains a post links to go to GitHub, rdap.org and the Internet Archive; nothing else, and never an account. Each result is sealed in this browser.", s().evidence, (on) => save({ evidence: on })),
+      switchRow("Evidence lookups", "Adds \"Look up evidence\" to the launch campaign section. On your click, the repository names and domains a post links to go to GitHub, rdap.org and the Internet Archive; nothing else, and never an account. Each result is sealed in this browser. Turning this on asks your browser for access to web.archive.org, whose answers need it.", s().evidence, (on, input) => evidenceSwitch(on, input)),
       switchRow("Read text in images", "Adds \"Read text in this image\" to the window's Media area. Daylight Commons reads the words on this device, only when you click, in Latin-script languages; the image and its text never leave your browser.", s().imageText, (on) => save({ imageText: on })),
     );
   }
@@ -120,5 +136,5 @@
 
   siteSwitches(); servers(); windowSwitches();
   tokenField().catch((e) => console.error("[daylight-commons] token field failed", e)); retention(); clearAll(); access(); families(); usage();
-  $("foot").textContent = `Daylight Commons ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Daylight Commons requests nothing off this browser unless you turn on Other coverage.`;
+  $("foot").textContent = `Daylight Commons ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Daylight Commons asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups.`;
 })().catch((e) => console.error("[daylight-commons] options page failed", e));

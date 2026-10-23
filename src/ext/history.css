@@ -1,5 +1,5 @@
 /* The history page, on top of canon.css: one column of sections that open on a hairline and a
-   registration cross, totals as large Conso figures, tables with a strong head rule, the graph and
+   registration cross, totals as large JetBrains Mono figures, tables with a strong head rule, the graph and
    the bars in ink. No card grid and no accent colour; the flagged total carries the hot mark. */
 header, main { max-width: 64rem; margin: 0 auto; padding: 0 var(--gutter); }
 header { padding-top: var(--s-7); background: var(--paper); }

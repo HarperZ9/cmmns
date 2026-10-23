@@ -5,7 +5,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { ROOT, markdown, page } from "./site/page.mjs";
+import { ROOT, markdown, sitePage } from "./site/page.mjs";
 
 const CHECKER = `<h2>Check a release here</h2>
 <p>Pick <code>SHA256SUMS</code>, <code>SHA256SUMS.sig</code> and the files you downloaded. They are read on this device and sent nowhere.</p>
@@ -30,7 +30,7 @@ export function render(md = readFileSync(join(ROOT, "INSTALL.md"), "utf8"), key 
   if (!updated) throw new Error('INSTALL.md needs a "Last updated: YYYY-MM-DD." line');
   if (!key.keyId) throw new Error("docs/release-key.json has no keyId");
   const text = md.replace(/^Last updated: .*\n\n?/m, "").replace("{{KEY_ID}}", key.keyId);
-  return page({ title: "Install Daylight Commons without a store", description: "Download, check and install Daylight Commons without a browser store, and rebuild it from source without a code host.", updated, body: markdown(text) + "\n" + CHECKER, css: CSS });
+  return sitePage({ file: "install.html", title: "Install Daylight Commons", role: "Download a release, check it, install it in Chrome, Edge, Brave or Firefox, and rebuild it from source.", description: "Download, check and install Daylight Commons without a browser store, and rebuild it from source without a code host.", updated, body: markdown(text) + CHECKER, css: CSS });
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -19,14 +19,14 @@ into values a reviewer can check, records the audit of 2026-10-21, and says what
 
 | Check | Value |
 |---|---|
-| Two faces, distinct roles | Hanken Grotesk for words. Conso for figures standing alone and for code. No third family. |
+| Two faces, distinct roles | Hanken Grotesk for words. JetBrains Mono for figures standing alone and for code (Conso until 3.0.0; see `src/ext/fonts/FONTS.md`). No third family. |
 | Display heading | Hanken Grotesk 780, tracking -0.035em, line height 0.98, size `clamp(2.4rem, 1.3rem + 4vw, 4.75rem)` |
 | Section heading | Hanken Grotesk 720, tracking -0.022em, line height about 1.1 |
 | Sub heading | Hanken Grotesk 680, tracking -0.012em |
 | Body | 17px (1.0625rem), line height 1.6, measure 38rem |
 | Labels and meta | 14px and 15px, never smaller than 14px for secondary text |
 | Case | Mixed case. No tracked uppercase labels or eyebrows. |
-| Sentences with figures | Stay in Hanken Grotesk with tabular figures. Conso does not set whole sentences. |
+| Sentences with figures | Stay in Hanken Grotesk with tabular figures. The mono face does not set whole sentences. |
 
 ### Colour
 
@@ -87,7 +87,7 @@ public page has a route back to the author's site.
   and X's own blue-grey (#1e2732) on dim. Type, rules, square shapes and colour logic stay the
   canon's. `--pb-hot` is the canon's drift colour and marks only signs worth a look.
 - The window's two faces reach the page as bytes from the worker (`fonts.js`, `background.js`)
-  under the names "Daylight Commons Hanken" and "Daylight Commons Conso". The page never loads an extension URL, so no
+  under the names "Daylight Commons Hanken" and "Daylight Commons Mono". The page never loads an extension URL, so no
   resource is web-accessible and the site's own fonts never change. If the fonts fail, the window
   uses the system sans and monospace.
 - `tests/canon.test.js` fails on an em dash in anything a user reads, on a page that skips the

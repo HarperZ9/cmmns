@@ -76,3 +76,36 @@ test("the extension's core bundle carries radar-core for its pages", async () =>
   const r = globalThis.PB.analyzeText("As an AI language model I cannot help.");
   assert.equal(r.evidence[0].kind, "leaked-ai");
 });
+
+// "Save evidence chain" in the extension writes radar-evidence-chain/1; verify must check it
+// offline and reject every tamper the seal tests reject, with a line per property.
+test("verify checks a saved evidence chain and fails an edited, reordered or truncated one", async () => {
+  const { makeReceipt } = await import("../src/core/receipt.js");
+  const { emptySeal, appendSeal, exportSeal } = await import("../src/core/evidence-seal.js");
+  let seal = emptySeal();
+  for (const [kind, subject] of [["repo-created", "example/demo"], ["domain-registered", "demo.example"], ["wayback-first", "demo.example"]]) {
+    seal = await appendSeal(seal, await makeReceipt({ kind, subject, observed: { n: subject.length }, source: "fixture", dnp: "a fixture fact proves nothing" }));
+  }
+  const x = await exportSeal(seal, { title: "fixture", at: "2026-10-22T00:00:00.000Z" });
+  const file = (name, v) => { const p = join(dir, name); writeFileSync(p, JSON.stringify(v, null, 2)); return p; };
+  const ok = run("verify", file("chain.json", x));
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+  assert.match(ok.stdout, /^Checks pass/);
+  assert.match(ok.stdout, /Evidence chain: 3 receipts/);
+  for (const name of ["receipts", "chain", "head", "Merkle root", "inclusion proofs"]) assert.match(ok.stdout, new RegExp(`pass  ${name}:`));
+  assert.match(ok.stdout, /domain-registered {2}demo\.example/);
+  assert.match(ok.stdout, /Does not prove:/);
+  const json = JSON.parse(run("verify", join(dir, "chain.json"), "--json").stdout);
+  assert.equal(json.ok, true); assert.equal(json.size, 3);
+  const clone = () => JSON.parse(JSON.stringify(x));
+  const edited = clone(); edited.seal.entries[1].receipt.subject = "other.example";
+  const reordered = clone(); [reordered.seal.entries[0], reordered.seal.entries[2]] = [reordered.seal.entries[2], reordered.seal.entries[0]];
+  const cut = clone(); cut.seal.entries.pop();
+  const noSeal = clone(); delete noSeal.seal;
+  for (const [name, v, failing] of [["edited", edited, "receipts"], ["reordered", reordered, "chain"], ["cut", cut, "head"], ["noseal", noSeal, "format"]]) {
+    const r = run("verify", file(`chain-${name}.json`, v));
+    assert.equal(r.status, 1, `${name}: ${r.stdout}`);
+    assert.match(r.stdout, /^Checks fail/, name);
+    assert.match(r.stdout, new RegExp(`FAIL  ${failing}:`), name);
+  }
+});

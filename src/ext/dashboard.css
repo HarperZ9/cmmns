@@ -1,5 +1,5 @@
 /* "Your feed" and the thread card page, on top of canon.css and pages.css: ink on a calm ground,
-   figures in Conso, bars in ink, square ends. No colour carries meaning here except text. */
+   figures in JetBrains Mono, bars in ink, square ends. No colour carries meaning here except text. */
 main.wide { max-width: 54rem; }
 .window { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: var(--s-5) 0 var(--s-2); }
 .window button { padding: .45rem 1rem; min-height: 40px; color: var(--ink); background: transparent; border-color: var(--line-strong); }

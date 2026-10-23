@@ -30,3 +30,22 @@ test("every licence REUSE.toml names has its text in LICENSES/", () => {
   assert.ok(ids.has("AGPL-3.0-only") && ids.has("CC-BY-4.0"));
   for (const id of ids) assert.ok(read(`LICENSES/${id}.txt`).length > 100, `LICENSES/${id}.txt`);
 });
+
+// An AGPL release must be free in every file it ships. Conso, under its designer's licence, was
+// removed in 3.0.0 (src/ext/fonts/FONTS.md); this keeps it, and any other non-free licence, out.
+const FREE = new Set(["AGPL-3.0-only", "CC-BY-4.0", "OFL-1.1", "Unicode-3.0", "CC0-1.0", "MIT", "Apache-2.0"]);
+test("every licence REUSE.toml names is a free licence, so no package holds a non-free file", () => {
+  for (const [, id] of read("REUSE.toml").matchAll(/SPDX-License-Identifier = "([^"]+)"/g)) assert.ok(FREE.has(id), `non-free licence in REUSE.toml: ${id}`);
+});
+
+test("every font a package ships is under the OFL with its licence text beside it, and Conso is gone", () => {
+  const names = listFiles().map(([n]) => n);
+  assert.ok(!names.some((n) => /conso/i.test(n)), "a Conso file is in the package");
+  const fonts = names.filter((n) => /\.(woff2?|ttf|otf)$/i.test(n));
+  assert.deepEqual(fonts, ["fonts/hanken-grotesk.woff2", "fonts/jetbrains-mono-regular.woff2"]);
+  for (const txt of ["fonts/OFL-hanken-grotesk.txt", "fonts/OFL-jetbrains-mono.txt"]) {
+    const body = listFiles().find(([n]) => n === txt);
+    assert.ok(body && /SIL OPEN FONT LICENSE Version 1\.1/i.test(body[1].toString("utf8")), txt);
+  }
+  for (const css of ["src/ext/canon.css", "src/ext/badges.css", "src/ext/background.js", "docs/install.html", "docs/privacy.html"]) assert.doesNotMatch(read(css), /conso-regular|"Conso"/, css);
+});

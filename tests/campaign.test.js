@@ -153,19 +153,19 @@ test("sample signs need a minimum sample", () => {
   assert.equal(sampleSigns(farmAccounts(5), LAUNCH_TEXT).enough, false);
 });
 
-test("accusation ladder: an organisation is named at steps 1 and 2; a private account never is", async () => {
+test("accusation ladder, reviewed wording: an organisation is named at steps 1 and 2; a private account never is", async () => {
   const { actorOf, CAMPAIGN_DISPUTE } = await import("../src/core/campaign.js");
   let S = emptyStore("s");
   const accounts = farmAccounts(30);
   for (const id of ["A", "B"]) S = recordLaunch(S, id, accounts.map((a) => a.handle));
   const input = { platform: "x", post: LAUNCH_COUNTS, ownPosts: OWN_POSTS, accounts, quotes: campaignQuotes(8), overlap: overlapOf(S, "C", accounts.map((a) => a.handle)) };
-  const org = campaignLens({ ...input, actor: actorOf({ handle: "examplecorp", verifiedType: "Business" }) });
+  const org = campaignLens({ ...input, reviewed: true, actor: actorOf({ handle: "examplecorp", verifiedType: "Business" }) });
   assert.ok(org.claims.some((c) => c.step === 1 && c.text.includes("@examplecorp")));
   assert.ok(org.claims.some((c) => c.step === 2 && /consistent with purchased amplification/.test(c.text)));
   assert.ok(org.claims.some((c) => /paid buzz dressed as organic/i.test(c.text)));
   assert.equal(org.dispute, CAMPAIGN_DISPUTE);
   assert.equal(actorOf({ handle: "someperson", verifiedType: "Blue" }), null);
-  const priv = campaignLens({ ...input, actor: actorOf({ handle: "someperson", verifiedType: "Blue" }) });
+  const priv = campaignLens({ ...input, reviewed: true, actor: actorOf({ handle: "someperson", verifiedType: "Blue" }) });
   assert.ok(!JSON.stringify(priv).includes("someperson"));
   for (const lens of [org, priv]) assert.doesNotMatch(JSON.stringify(lens), /\b(?:bots?|fraud\w*|crim\w*|illegal|scam\w*)\b/i);
 });
@@ -208,4 +208,33 @@ test("symmetry: the same campaign structure gives the same finding whatever the 
   });
   assert.deepEqual(out[1], out[0]);
   assert.deepEqual(out[2], out[0]);
+});
+
+// Until the media-lawyer review (project-docs/CAMPAIGN-LENS.md), the shipped lens names no one and
+// leaves out the blunt line, whatever the launch account discloses; the evidence stays the same.
+test("accusation ladder, as shipped: naming is held, so no handle and no blunt line reach the window", async () => {
+  const { actorOf, NAMING_HELD } = await import("../src/core/campaign.js");
+  assert.equal(NAMING_HELD, true, "flip only with the review's record");
+  let S = emptyStore("s");
+  const accounts = farmAccounts(30);
+  for (const id of ["A", "B"]) S = recordLaunch(S, id, accounts.map((a) => a.handle));
+  const input = { platform: "x", post: LAUNCH_COUNTS, ownPosts: OWN_POSTS, accounts, quotes: campaignQuotes(8), overlap: overlapOf(S, "C", accounts.map((a) => a.handle)), actor: actorOf({ handle: "examplecorp", verifiedType: "Business" }) };
+  const shipped = campaignLens(input), reviewed = campaignLens({ ...input, reviewed: true });
+  assert.equal(shipped.naming, "held");
+  assert.ok(!JSON.stringify(shipped).includes("examplecorp"));
+  assert.ok(shipped.claims.some((c) => c.step === 1 && c.text.includes("this launch")));
+  assert.ok(shipped.claims.some((c) => c.step === 2 && /this launch is consistent with purchased amplification/.test(c.text)));
+  assert.ok(!shipped.claims.some((c) => /paid buzz/i.test(c.text)));
+  assert.deepEqual(shipped.indicators, reviewed.indicators, "holding the name changes no evidence");
+  assert.equal(shipped.status, reviewed.status);
+});
+
+// Found on the demo stage, 2026-10-23: 8 quotes spread nine hours apart read as "looks coordinated",
+// because any five quotes have a narrowest window. Only five inside an hour count now.
+test("control 3: quotes spread over days are timing, not coordination", () => {
+  const quotes = organicQuotes(8).map((q, i) => ({ ...q, posted: new Date(Date.parse("2026-06-01T15:00:00Z") + i * 9 * 3600000).toISOString() }));
+  const lens = campaignLens({ platform: "x", post: ORDINARY_COUNTS, ownPosts: OWN_POSTS, accounts: organicAccounts(40), quotes });
+  assert.equal(lens.status, "none", lens.lead);
+  assert.ok(lens.context.some((c) => c.id === "quote-timing"), "the timing is still shown");
+  assert.ok(!lens.context.some((c) => c.id === "quote-bunching"));
 });

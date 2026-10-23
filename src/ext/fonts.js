@@ -1,4 +1,4 @@
-// The window's two faces on social sites: Hanken Grotesk for words and Conso for figures, as on
+// The window's two faces on social sites: Hanken Grotesk for words and JetBrains Mono for figures, as on
 // Daylight Commons' own pages. The worker sends the bytes (background.js), and they are added under names of
 // Daylight Commons' own, so the site's fonts never change. If they cannot load, the window falls back to the
 // system sans and monospace (badges.css).

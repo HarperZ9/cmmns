@@ -1,11 +1,11 @@
 /* Daylight Commons' window, panel and lesson links on social sites. They carry the canon of the author's site
-   (canon.css): Hanken Grotesk for words and Conso for figures (loaded by fonts.js under Daylight Commons' own
+   (canon.css): Hanken Grotesk for words and JetBrains Mono for figures (loaded by fonts.js under Daylight Commons' own
    names), ink text, hairline rules, square controls, and colour only for a verdict. The ground
    adapts to X's light, dim and dark themes (.pb-dark and .pb-dim on the root): a bone sheet on
    light, the void on dark, and X's own blue-grey on dim. --pb-hot is the canon's drift colour and
    marks only signs worth a look, always beside their words. */
 :root { --pb-ink: #16130f; --pb-muted: #4a443b; --pb-line: #c9bfab; --pb-rule: #7b7262; --pb-ground: #f1ece1; --pb-hot: #8f3a19; --pb-hot-bg: rgba(143, 58, 25, 0.08); --pb-focus: #16130f; --pb-shadow: 0 10px 30px rgba(22, 19, 15, 0.16), 0 0 0 1px rgba(123, 114, 98, 0.55); --pb-size: 13px; --pb-lh: 19px;
-  --pb-sans: "Daylight Commons Hanken", "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --pb-mono: "Daylight Commons Conso", "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  --pb-sans: "Daylight Commons Hanken", "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --pb-mono: "Daylight Commons Mono", "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace; }
 .pb-dark { --pb-ink: #ece5d6; --pb-muted: #b8b0a0; --pb-line: #38363b; --pb-rule: #6f6a61; --pb-ground: #0a0a0d; --pb-hot: #e29472; --pb-hot-bg: rgba(226, 148, 114, 0.1); --pb-focus: #ece5d6; --pb-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(111, 106, 97, 0.9); }
 /* X's dim theme: a blue-grey ground, so the window sits on the same calm ground as the page. */
 .pb-dark.pb-dim { --pb-muted: #b8b0a0; --pb-ground: #1e2732; --pb-line: #3a4550; }
@@ -70,6 +70,10 @@
 .pb-foot { margin: 0; font-size: 0.92em; color: var(--pb-muted); }
 .pb-link { color: var(--pb-ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--pb-rule); text-underline-offset: 2px; margin-right: 10px; }
 .pb-link:hover { text-decoration-color: var(--pb-ink); }
+/* Links inside the evidence block (ad libraries, the archive's save page) read as the window's own links. */
+.pb-evidence a { color: var(--pb-ink); text-decoration: underline; text-decoration-color: var(--pb-rule); text-underline-offset: 2px; }
+.pb-evidence a:hover { text-decoration-color: var(--pb-ink); }
+.pb-evidence a:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; }
 .pb-link:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; border-radius: 2px; }
 .pb-btn { font: inherit; font-weight: 600; padding: 4px 12px; border-radius: 2px; border: 1px solid var(--pb-rule); background: transparent; color: var(--pb-ink); cursor: pointer; }
 .pb-btn:hover:not(:disabled) { border-color: var(--pb-ink); }

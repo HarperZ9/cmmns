@@ -91,7 +91,74 @@ ${CSS}${css ? "\n" + css : ""}
 <h1>${esc(title)}</h1>
 <p class="muted">Updated ${esc(updated)}.</p>
 ${body}
-<footer>Daylight Commons. Evidence, not verdicts. Nothing leaves your browser unless you turn on Other coverage, which asks the outlets you choose for their feeds. <a href="${REPO}">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+<footer>Daylight Commons. Evidence, not verdicts. It asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups. <a href="${REPO}">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+</main>
+</body>
+</html>
+`;
+}
+
+// The public site's copy of a page (docs/, served under harperz9.github.io/daylight-commons/). It is
+// set in the author's site canon: the site's own document cascade (/system/doc.css, with its
+// Hanken Grotesk and Conso), its navigation (/system/nav.js), its light and dark grounds, the mast
+// and the heading rail. The extension cannot load those, so its copy keeps page() above.
+const SITE_CSS = `.sheet{--soft:var(--ink-muted);--line:var(--rule);--line-strong:var(--rule-strong);--raised:var(--page-sunk);--s-1:.25rem;--s-2:.5rem;--s-4:1rem;--s-6:2rem;--t-dek:1.12rem;--t-meta:.875rem}
+.dc-updated{color:var(--ink-muted);font-size:.9rem}
+.dc-local{display:flex;flex-wrap:wrap;gap:.35rem 1.15rem;margin:0 0 1.6rem;font-size:.9rem}
+.dc-local a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
+.scroll{overflow-x:auto;margin:.4rem 0 .9rem}
+.sheet p,.sheet li{max-width:var(--measure)}
+.dc-foot{margin-top:2.4rem;padding-top:1rem;border-top:1px solid var(--rule);color:var(--ink-muted);font-size:.9rem}`;
+export const SITE_PAGES = [["how-it-works.html", "How it works"], ["install.html", "Install"], ["privacy.html", "Privacy"], ["transparency.html", "How it is measured"]];
+
+// Wraps each h2 and what follows it in a section, so the site's heading rail can place it.
+export function sections(html) {
+  const parts = html.split(/(?=<h2>)/);
+  return parts.map((p) => {
+    const m = p.match(/^<h2>(.*?)<\/h2>/);
+    if (!m) return p;
+    const id = m[1].replace(/<[^>]+>/g, "").toLowerCase().replace(/&[a-z]+;/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    return `<section aria-labelledby="${id}">
+${p.replace(/^<h2>/, `<h2 id="${id}">`).trim()}
+</section>
+`;
+  }).join("");
+}
+
+export function sitePage({ file, title, role, description, updated, body, css = "" }) {
+  const local = SITE_PAGES.map(([f, label]) => `<a href="${f}"${f === file ? ' aria-current="page"' : ""}>${esc(label)}</a>`).join(" ");
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>${esc(title)} | Daylight Commons</title>
+<meta name="description" content="${esc(description)}">
+<link rel="canonical" href="${SITE}/${file}">
+<link rel="preload" href="/system/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/system/doc.css">
+<link rel="stylesheet" href="/system/art.css">
+<style>
+${SITE_CSS}${css ? "\n" + css : ""}
+</style>
+</head>
+<body class="doc">
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="site-nav" class="site-nav"></div>
+<noscript><nav class="site-nav" aria-label="Primary"><a href="/index.html">Home</a> <a href="/research.html">Research</a> <a href="/hire.html">Work</a></nav></noscript>
+<script type="module" src="/system/nav.js"></script>
+<main id="main">
+<article class="sheet doc-rail">
+<header class="mast">
+<h1>${esc(title)}</h1>
+<p class="role">${esc(role || description)}</p>
+</header>
+<nav class="dc-local" aria-label="Daylight Commons">${local} <a href="${REPO}">Source</a></nav>
+<p class="dc-updated">Updated ${esc(updated)}.</p>
+${sections(body.replace(/<table>/g, '<table class="data data--wide">'))}
+<p class="dc-foot">Daylight Commons gives evidence, not verdicts. It asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups. Free and open source under the AGPL-3.0.</p>
+</article>
 </main>
 </body>
 </html>
@@ -99,12 +166,13 @@ ${body}
 }
 
 // The same page goes inside the extension and in docs/ for the public site, with its fonts.
-export const FONT_FILES = ["hanken-grotesk.woff2", "conso-regular.woff2", "OFL-hanken-grotesk.txt", "FONTS.md"];
+export const FONT_FILES = ["hanken-grotesk.woff2", "jetbrains-mono-regular.woff2", "OFL-jetbrains-mono.txt", "OFL-hanken-grotesk.txt", "FONTS.md"];
 export const TARGETS = [join(ROOT, "src", "ext"), join(ROOT, "docs")];
-export function writePage(name, html) {
+// render(target): "ext" for the extension's copy, "site" for the public site's.
+export function writePage(name, render) {
   for (const dir of TARGETS) {
     mkdirSync(join(dir, "fonts"), { recursive: true });
-    writeFileSync(join(dir, name), html);
+    writeFileSync(join(dir, name), render(dir.endsWith("docs") ? "site" : "ext"));
   }
   for (const f of FONT_FILES) copyFileSync(join(ROOT, "src", "ext", "fonts", f), join(ROOT, "docs", "fonts", f));
 }

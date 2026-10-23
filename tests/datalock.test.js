@@ -3,7 +3,7 @@
 // entry being refreshed fails here, so no data update can ship unreviewed.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync, writeFileSync, mkdtempSync, mkdirSync, copyFileSync, rmSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync, mkdtempSync, mkdirSync, copyFileSync, cpSync, rmSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
@@ -11,6 +11,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadLock, checkSnapshots, checkOutputs, stepReady, sha256File } from "../scripts/data-lock.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const lf = (s) => s.split("\r\n").join("\n");
 const lock = loadLock();
 const HEX = /^[0-9a-f]{64}$/;
 
@@ -78,19 +79,23 @@ test("the offline guard blocks fetch, http, https and dns", () => {
 });
 
 test("the offline build runs with the network blocked and reproduces every table it can rebuild", () => {
-  const touched = ["src/core/confusables-data.js", "data/ops.json", "src/ext/ops.json", "src/ext/core.bundle.js", "src/ext/ocr.bundle.js"].map((p) => join(root, p));
+  // In a copy of the tree: the build rewrites tables and bundles, and other test files import them
+  // in parallel, so rebuilding them in place could hand another test a half-written file.
+  const copy = mkdtempSync(join(tmpdir(), "radar-offline-"));
   const data = mkdtempSync(join(tmpdir(), "radar-nodata-"));
-  for (const f of touched) copyFileSync(f, f + ".bak");
   try {
-    const r = spawnSync(process.execPath, [join(root, "scripts/build-offline.mjs")], { cwd: root, encoding: "utf8", env: { ...process.env, RADAR_DATA: data } });
+    for (const d of ["data", "scripts", "src", "schema", "catalogue", "project-docs/evidence", "tests/fixtures", "package.json"]) cpSync(join(root, d), join(copy, d), { recursive: true });
+    const script = join(copy, "scripts/build-offline.mjs");
+    const r = spawnSync(process.execPath, [script], { cwd: copy, encoding: "utf8", env: { ...process.env, RADAR_DATA: data } });
     assert.equal(r.status, 0, r.stderr + r.stdout);
     assert.match(r.stdout, /rebuilt {2}confusables/);
     assert.match(r.stdout, /rebuilt {2}ops/);
     assert.match(r.stdout, /skipped {2}claims/);
-    const strict = spawnSync(process.execPath, [join(root, "scripts/build-offline.mjs"), "--strict"], { cwd: root, encoding: "utf8", env: { ...process.env, RADAR_DATA: data } });
+    for (const f of ["src/core/confusables-data.js", "data/ops.json", "src/ext/ops.json"]) assert.equal(lf(readFileSync(join(copy, f), "utf8")), lf(readFileSync(join(root, f), "utf8")), `${f} rebuilt differently`);
+    const strict = spawnSync(process.execPath, [script, "--strict"], { cwd: copy, encoding: "utf8", env: { ...process.env, RADAR_DATA: data } });
     assert.equal(strict.status, 1, "--strict fails when a snapshot is missing");
   } finally {
-    for (const f of touched) { copyFileSync(f + ".bak", f); rmSync(f + ".bak"); }
+    rmSync(copy, { recursive: true, force: true });
     rmSync(data, { recursive: true, force: true });
   }
 });

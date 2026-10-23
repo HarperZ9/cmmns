@@ -43,7 +43,8 @@ whether the most extreme replies come mostly from flagged accounts. X first.
   clause that lets one party relicense contributions.
 - Third-party data or code keeps its licence: record it in `THIRD-PARTY.md` and `REUSE.toml`
   before committing it. Nothing under a non-commercial or no-derivatives licence ships.
-- The Conso font is not under Daylight Commons' licences; never present it as reusable.
+- Every shipped file must be under a free licence. The Conso font was removed in 3.0.0 for that reason
+  (`src/ext/fonts/FONTS.md`); do not add it or any other non-free font back.
 
 ## Quality gates
 No file over 300 lines, no function over 50. Commit on a branch, never on main. Push nothing
