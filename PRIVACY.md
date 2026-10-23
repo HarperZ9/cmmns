@@ -1,11 +1,13 @@
 # Daylight Commons privacy policy
 
-Last updated: 2026-10-21.
+Last updated: 2026-10-22.
 
 Daylight Commons runs entirely in your browser. It has no server, no account, no analytics and no telemetry.
-Nothing Daylight Commons reads or works out is sent to the author or to anyone else. One feature, Other
-coverage, requests the public news feeds of outlets you choose, and only when you turn it on and
-click; it sends nothing from the page, is off by default and is described below.
+Nothing Daylight Commons reads or works out is sent to the author. Apart from the site you are on,
+two features make requests, each off by default and only after you turn it on and click: Other
+coverage requests the public news feeds of outlets you choose and sends nothing from the page;
+evidence lookups send the repository names and web domains a post links to GitHub, rdap.org and
+the Internet Archive. Both are described below.
 
 ## What Daylight Commons reads
 
@@ -128,7 +130,10 @@ is gone when you close it.
 ## Your controls
 
 - **Options page:** switch Daylight Commons off per site or pause it everywhere, change how long it keeps
-  data, and press "Clear all Daylight Commons data" to delete everything above except your settings.
+  data, and press "Clear all Daylight Commons data", then confirm, to delete everything above
+  except your choices: your settings, the Mastodon servers you turned on, your data packs and the
+  keys you trust, and the tour's "No more tips". The bundle signing key stays too, so bundles you
+  already shared still check as yours.
 - **History page:** clear the history, connections and trails on their own.
 - **Save report:** writes a JSON file to your computer only when you click it. It holds the thread
   report, account labels and flags, and leaves reply text out.
@@ -145,8 +150,8 @@ is gone when you close it.
 
 ## What Daylight Commons never does
 
-- Sends anything to the author, or to a third party except the title words you send through Other
-  coverage.
+- Sends anything to the author, or to a third party except what evidence lookups send when you
+  turn them on and click: the repository names and web domains a post links to.
 - Sells, shares or uses data for advertising.
 - Guesses who runs an account, or anyone's age, gender, ethnicity, religion or politics.
 - Links accounts across sites.

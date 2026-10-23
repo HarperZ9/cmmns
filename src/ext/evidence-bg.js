@@ -19,9 +19,18 @@
     return { size: next.entries.length };
   }
 
+  // Firefox 140 and later keep their own consent for data an add-on sends: evidence lookups send
+  // link domains and repository names, declared as optional "websiteContent" in the manifest and
+  // asked for by the Evidence lookups switch in Options (a content script cannot ask). Chrome and
+  // older Firefox have no such consent, so the check passes there.
+  async function firefoxConsent() {
+    try { return await chrome.permissions.contains({ data_collection: ["websiteContent"] }); } catch { return true; }
+  }
+
   async function lookup(msg) {
     const s = await settings();
     if (!s.evidence) return { error: "off" };
+    if (!(await firefoxConsent())) return { error: "browser-consent" };
     const token = ((await chrome.storage.local.get(TOKEN_KEY))[TOKEN_KEY] || "").trim() || null;
     const repos = PB.reposIn(msg.links || []).concat(PB.reposIn(msg.text || ""));
     const domains = [...new Set((msg.domains || []).map(PB.registrable).filter(Boolean))].filter((d) => d !== "github.com");

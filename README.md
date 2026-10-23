@@ -62,15 +62,17 @@ source, so it can be rebuilt without any code host.
   never by a left or right score.
 - **Fact-checked claims:** when a post's wording closely matches a claim a fact-checker has
   already reviewed, the fact-checker's name, their rating in their own words and a link. About
-  20,000 reviews from 328 fact-checkers ship inside Daylight Commons, so no post text is sent anywhere.
+  19,000 reviews from 319 fact-checkers ship inside Daylight Commons, so no post text is sent anywhere.
   Similar wording is not the same claim, and Daylight Commons never rates a post itself. A Community Note on
   a post is shown first.
 - **Media:** media first uploaded long before the post that shows it, with reverse image search.
 - **Launch campaigns (X, not measured yet):** on a launch post and its repost and quote lists, how
   the engagement is shaped against the account's own posts, shared bio templates and join-date
   waves among the accounts the page loaded, Paid partnership labels and unlabelled look-alike
-  quotes, and accounts seen on other launches you opened. It names a company only when several
-  independent signs agree, and never names an ordinary account.
+  quotes, and accounts seen on other launches you opened. It states an inference only when two or
+  more independent signs agree, and never names an ordinary account. Naming the company behind a
+  launch is held until a media lawyer has reviewed the wording, so for now every claim reads "this
+  launch".
 - **Thread report:** whether the most extreme replies come mostly from flagged accounts, with 95%
   intervals. It says "skewed" only when the intervals do not overlap.
 - **History page:** across threads you opened, the accounts and sites your threads keep leading
@@ -91,7 +93,7 @@ No server, no account, no analytics. Daylight Commons reads only what the site s
 requests go to the site you are on, for account details that site discloses, plus the feeds of the
 outlets you chose if you turn on Other coverage and click, and, for evidence lookups you allow and click, the repository names and domains a post links to, sent to GitHub, RDAP and the Internet Archive. What it keeps stays in
 your browser: account details for 14 days and thread history for 60 by default, both adjustable,
-with a one-click "Clear all Daylight Commons data". Full details in [PRIVACY.md](PRIVACY.md).
+with a two-step "Clear all Daylight Commons data" (press, then confirm). Full details in [PRIVACY.md](PRIVACY.md).
 
 ## Options
 

@@ -34,14 +34,21 @@ export function actorOf(reading) {
   return org && R.handle ? { handle: R.handle, kind: R.verifiedType === "Government" ? "official account" : "organisation" } : null;
 }
 
+// Held until a media lawyer reviews the ladder's wording (project-docs/CAMPAIGN-LENS.md, "Legal
+// review before public release"): while true, no organisation is named and the blunt step-2 line
+// ("paid buzz dressed as organic") is left out, so every claim reads "this launch". The evidence,
+// the lead and the unnamed inference are unchanged. Set to false only after the review, in the
+// same commit as its record.
+export const NAMING_HELD = true;
+
 // Ladder step 1 (documented fact) and step 2 (named inference), as lines above the evidence.
-function ladder(status, families, qc, actor) {
-  const who = actor ? `@${actor.handle}'s launch` : "this launch";
+function ladder(status, families, qc, actor, held) {
+  const who = actor && !held ? `@${actor.handle}'s launch` : "this launch";
   const out = [];
   if (qc.disclosed) out.push({ step: 1, text: `Documented: ${qc.disclosed} quote post${qc.disclosed === 1 ? "" : "s"} promoting ${who} carry X's Paid partnership label, the posters' own disclosure.` });
   if (status === "strong") {
     out.push({ step: 2, text: `Inference: the engagement on ${who} is consistent with purchased amplification (${families.length} independent signs below).` });
-    if (families.includes("quotes")) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Quotes without the label share the paid quotes' template and timing.` });
+    if (families.includes("quotes") && !held) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Quotes without the label share the paid quotes' template and timing.` });
   }
   return out;
 }
@@ -108,6 +115,8 @@ export function campaignLens(input) {
   const coordinated = context.some((c) => ["quote-bunching", "overlap", "promo-cue", "disclosed-paid"].includes(c.id));
   const thin = sm.n < SAMPLE_MIN && !qc.n;
   const status = families.length >= 2 ? "strong" : families.length === 1 ? "one" : thin ? "thin" : coordinated ? "coordinated" : "none";
-  const claims = ladder(status, families, qc, input.actor || null);
-  return { status, lead: CAMPAIGN_LEADS[status], claims, families, indicators, context, sample: sm.n, quotes: qc.n, dnp: CAMPAIGN_DOES_NOT_PROVE, dispute: CAMPAIGN_DISPUTE };
+  // input.reviewed lets a test exercise the reviewed wording; the extension never passes it.
+  const held = input.reviewed === true ? false : NAMING_HELD;
+  const claims = ladder(status, families, qc, input.actor || null, held);
+  return { status, lead: CAMPAIGN_LEADS[status], claims, naming: held ? "held" : "on", families, indicators, context, sample: sm.n, quotes: qc.n, dnp: CAMPAIGN_DOES_NOT_PROVE, dispute: CAMPAIGN_DISPUTE };
 }

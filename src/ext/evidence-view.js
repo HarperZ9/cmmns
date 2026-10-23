@@ -61,6 +61,7 @@
     if (g) box.append(el("p", "pb-foot", PB.LEDGER_DOES_NOT_PROVE));
     const res = results.get(ev.launchId);
     if (res && res.error === "off") consent(box, ev, rerender);
+    else if (res && res.error === "browser-consent") box.append(el("p", "pb-foot", "Firefox asks you to allow this itself. Turn on Evidence lookups in Options, allow it when Firefox asks, then look up again."), btn("Open Options", "Opens Daylight Commons' options.", () => chrome.runtime.sendMessage({ type: "pb-open-options" }).catch((e) => console.error("[daylight-commons] could not open options", e))));
     else if (res && res.error) box.append(el("p", "pb-foot", "The lookup did not finish. Try again later."));
     else if (res) receipts(box, res);
     else if (globalThis.PBSettings && PBSettings.get().evidence) box.append(btn("Look up evidence", "Asks GitHub, RDAP and the Internet Archive about what this post links to.", () => run(box, ev, rerender)));

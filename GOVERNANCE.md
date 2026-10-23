@@ -13,7 +13,7 @@ Daylight Commons' commitments to its users:
 
 - **Users are never the product.** No data sales, no ad targeting, no behavioural profiles. Data
   stays on the user's device unless they choose to share it, and they can export or delete
-  everything in one step. Feedback is asked for, not harvested: the user sees what they send.
+  everything in one place. Feedback is asked for, not harvested: the user sees what they send.
 - **No models of the crowd for steering it.** Daylight Commons shows people the machinery acting on them and
   never becomes that machinery: no engagement optimisation and no nudging for the project's benefit.
 - **Transparency.** Method, catalogue, budget, funders, mistakes and corrections are public. What
@@ -28,9 +28,10 @@ Daylight Commons' commitments to its users:
 Nobody has the right to take this tool away from the public commons. These commitments make that
 structural:
 
-1. **The grants are irrevocable.** Every released version of Daylight Commons is licensed under the GNU Affero
-   General Public License v3.0 (code) and Creative Commons Attribution 4.0 (data, catalogue,
-   schemas and documentation). Both licences are irrevocable for as long as their terms are met.
+1. **The grants are irrevocable.** Every released version of Daylight Commons from 3.0.0 on is licensed
+   under the GNU Affero General Public License v3.0 (code) and Creative Commons Attribution 4.0
+   (data, catalogue, schemas and documentation). Versions 1.0.0 to 2.1.0, released as Radar, were
+   under FSL-1.1-MIT, which turns into MIT two years after each release. Both licences are irrevocable for as long as their terms are met.
    No one, the author included, can withdraw them from a version already released.
 2. **No CLA, only the DCO.** Contributors keep their copyright and license their work under the
    same terms everyone receives. There is no contributor licence agreement, so no single party, the
@@ -42,7 +43,8 @@ structural:
    project or is endorsed by it. A fork should say plainly that it is a fork and of what. This
    protects users from confusion only; forking, renaming and redistributing are never restricted.
 5. **Copies outside any one host.** Every release carries a git bundle of the whole source, and
-   the public repository is archived by Software Heritage, so Daylight Commons can be rebuilt without any
+   the public repository is archived by Software Heritage (under its earlier address,
+   github.com/HarperZ9/radar, until the archive visits the new one), so Daylight Commons can be rebuilt without any
    single code host.
 
 ## Funding

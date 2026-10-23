@@ -154,7 +154,7 @@ Daylight Commons describes how an account operates. It does not try to work out 
 ### Fact-checked claims (2026-10-21)
 
 `src/core/claims.js` matches each post against claims fact-checkers have already reviewed, from a
-table bundled with Daylight Commons (`src/ext/claims.json`, 19,728 reviews from 328 fact-checkers, 6 MB,
+table bundled with Daylight Commons (`src/ext/claims.json`, 19,728 reviews from 328 fact-checkers at the time; 19,387 from 319 since the 2026-10-22 rebuild, 6 MB,
 built from the Data Commons ClaimReview feed under CC BY 4.0 by `scripts/claims-build.mjs`). The
 background worker indexes the table once; pages send the text of the posts they show and get back
 only the matches. A match reads "A fact-checker reviewed a similar claim", with the fact-checker's

@@ -95,6 +95,7 @@ export async function exportSeal(seal, { title = null, at = new Date().toISOStri
 // Offline check of an export: the seal, the head, the root and every proof.
 export async function verifyExport(x) {
   if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Daylight Commons evidence chain"] };
+  if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file has no seal or no proofs"] };
   const s = await verifySeal(x.seal), problems = [...s.problems];
   const hashes = x.seal.entries.map((e) => e.receipt.hash);
   if ((await merkleRoot(hashes)) !== x.root) problems.push("root does not match the receipts");
@@ -102,4 +103,34 @@ export async function verifyExport(x) {
   if (head !== x.head) problems.push("head does not match the last entry");
   for (let i = 0; i < hashes.length; i++) if (!(await verifyInclusion(hashes[i], x.proofs[i] || {}, x.root))) problems.push(`proof ${i} fails`);
   return { ok: !problems.length, problems };
+}
+
+// The same check as named lines, for the command line and the Analyse a file page: { ok, size,
+// root, checks: [{ name, ok, text }], receipts: [{ kind, subject, source, at }], dnp }. Each line is
+// one property a reader can recheck by hand; the receipts list says what the chain holds.
+export async function chainChecks(x) {
+  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, size: 0, root: null, checks: [{ name: "format", ok: false, text: "not a Daylight Commons evidence chain" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
+  const entries = (x.seal && Array.isArray(x.seal.entries)) ? x.seal.entries : null;
+  if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file has no seal or no proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
+  const n = entries.length, hashes = entries.map((e) => (e && e.receipt && e.receipt.hash) || "");
+  let edited = 0, broken = 0, prev = GENESIS, proofsBad = 0;
+  for (let i = 0; i < n; i++) {
+    const e = entries[i] || {};
+    if (!(await verifyReceipt(e.receipt))) edited++;
+    const link = await sha256Hex(canonical({ seq: e.seq, prev: e.prev, hash: e.receipt && e.receipt.hash }));
+    if (e.seq !== i || e.prev !== prev || link !== e.link) broken++;
+    prev = e.link;
+  }
+  const root = await merkleRoot(hashes);
+  for (let i = 0; i < n; i++) if (!(await verifyInclusion(hashes[i], x.proofs[i] || {}, x.root))) proofsBad++;
+  const head = n ? entries[n - 1].link : GENESIS;
+  const checks = [
+    { name: "receipts", ok: !edited, text: edited ? `${edited} of ${n} receipts changed after they were made` : `all ${n} receipts match their own hash` },
+    { name: "chain", ok: !broken, text: broken ? `${broken} of ${n} entries do not follow the one before (edited, removed or reordered)` : `all ${n} entries follow the one before, in order` },
+    { name: "head", ok: head === x.head, text: head === x.head ? "the head matches the last entry" : "the head does not match the last entry" },
+    { name: "Merkle root", ok: root === x.root, text: root === x.root ? `the root ${String(x.root).slice(0, 16)}... is the root of these receipts` : "the root is not the root of these receipts" },
+    { name: "inclusion proofs", ok: !proofsBad && x.proofs.length === n, text: proofsBad ? `${proofsBad} of ${n} proofs fail against the root` : `all ${n} proofs place their receipt under the root` },
+  ];
+  const receipts = entries.map((e) => { const r = (e && e.receipt) || {}; return { kind: r.kind || null, subject: r.subject || null, source: r.source || null, at: r.at || null }; });
+  return { ok: checks.every((c) => c.ok), size: n, root: x.root || null, checks, receipts, dnp: SEAL_DOES_NOT_PROVE };
 }

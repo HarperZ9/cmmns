@@ -167,6 +167,12 @@ identity. Tests check that the output contains no handle of a sampled account an
 this lens ships in a public release. UK and EU defamation law is stricter than US law, and "consistent
 with purchased amplification" about a named company is a statement a court could read as fact.
 
+**Held in 3.0.0.** The first public release ships before that review, so naming is held:
+`NAMING_HELD` in `src/core/campaign.js` keeps every claim at "this launch", whatever the launch
+account discloses, and leaves out the blunt "paid buzz dressed as organic" line. The lead, the
+evidence rows and the unnamed step-2 inference are unchanged, and a test checks that holding the
+name changes no evidence. Turn naming on only after the review, in the same commit as its record.
+
 ## Definition matching (data and library built, not in the window yet)
 
 Built on 2026-10-22 as the definition catalogue: `catalogue/`, `src/core/definitions.js` and

@@ -3,7 +3,8 @@
 // checkout can hold CRLF while the build writes LF, and that is not staleness.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, copyFileSync, rmSync } from "node:fs";
+import { readFileSync, cpSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,17 +14,13 @@ const bundle = join(root, "src/ext/core.bundle.js");
 
 test("core.bundle.js and ocr.bundle.js match a fresh build of src/core and src/ocr", () => {
   const lf = (s) => s.split("\r\n").join("\n");
-  const files = [bundle, join(root, "src/ext/ocr.bundle.js")];
-  const before = files.map((f) => readFileSync(f, "utf8"));
-  // A backup name of its own: tests/datalock.test.js backs up the same bundles in parallel.
-  const bak = (f) => `${f}.${process.pid}.bundle-test.bak`;
-  for (const f of files) copyFileSync(f, bak(f));
+  // Built in a copy: other test files import the bundles in parallel, so the tree is never rewritten.
+  const copy = mkdtempSync(join(tmpdir(), "radar-build-"));
   try {
-    execFileSync(process.execPath, [join(root, "scripts/build.mjs")], { stdio: "ignore" });
-    files.forEach((f, i) => assert.equal(lf(readFileSync(f, "utf8")), lf(before[i]), `run \`npm run build\` and commit ${f}`));
-  } finally {
-    for (const f of files) { copyFileSync(bak(f), f); rmSync(bak(f)); }
-  }
+    for (const d of ["scripts", "src"]) cpSync(join(root, d), join(copy, d), { recursive: true });
+    execFileSync(process.execPath, [join(copy, "scripts/build.mjs")], { stdio: "ignore" });
+    for (const f of ["src/ext/core.bundle.js", "src/ext/ocr.bundle.js"]) assert.equal(lf(readFileSync(join(copy, f), "utf8")), lf(readFileSync(join(root, f), "utf8")), `run \`npm run build\` and commit ${f}`);
+  } finally { rmSync(copy, { recursive: true, force: true }); }
 });
 
 test("the bundle exposes the functions the content scripts call", async () => {

@@ -34,23 +34,23 @@ Daylight Commons
 **Summary** (CWS takes it from the manifest `description`; the test keeps the two identical)
 
 <!-- field:summary -->
-Free, no account, nothing leaves your browser unless you opt in. Sourced evidence on posts and links, each sign with its error rate.
+Evidence beside social media replies, each sign with its source and what it does not prove. No server, no account, no analytics.
 <!-- /field -->
 
 **AMO summary**
 
 <!-- field:amo-summary -->
-Free, no account, nothing leaves your browser unless you opt in. Sourced evidence behind the posts and links you read on X, YouTube, Reddit, Facebook, Instagram and Bluesky, each sign with its measured error rate. Never a score.
+Evidence beside the replies you read on X, YouTube, Reddit, Facebook, Instagram, Bluesky and more: where the site places an account, coordination, fact-checks. Each sign names its source and what it does not prove. Never a score.
 <!-- /field -->
 
 **Description**
 
 <!-- field:description -->
-Free. No account. Nothing leaves your browser unless you turn on Other coverage.
-Daylight Commons has no server, no sign-in and no analytics. What it reads stays in your browser, and one click deletes it.
+Free and open source (AGPL-3.0). No account, no server, no analytics.
+Daylight Commons asks only the site you are on. Two features, both off by default, reach further on your click: Other coverage reads the news feeds of outlets you choose, and evidence lookups send the repository names and web domains a post links to GitHub, rdap.org and the Internet Archive. What Daylight Commons keeps stays in your browser, and "Clear all Daylight Commons data" deletes it.
 
-Evidence, with its error rate. Never a score.
-Every sign says where its data came from and what it does not prove. Every sign Daylight Commons works out itself shows how often it was right when people checked by hand, with a 95% interval, or says "not measured yet". The full results, the data behind them and their licences are on the transparency page.
+Evidence with its source. Never a score.
+Every sign says where its data came from and what it does not prove. Where Daylight Commons has measured a sign against examples people checked by hand, the sign shows how often it was right, with a 95% interval; every other sign says "not measured yet". The full results, the data behind them and their licences are on the transparency page.
 
 Rest the pointer on a reply on X, YouTube, Reddit, Facebook, Instagram or Bluesky, and a window opens beside it with:
 - Place: where the site labels the account as based, and replies that speak as a local of somewhere else.
@@ -61,6 +61,8 @@ Rest the pointer on a reply on X, YouTube, Reddit, Facebook, Instagram or Bluesk
 - Site cards: rest the pointer on a link to see who owns the site, its owner type, founding date and country from Wikidata, any cited state link, and its fact-check record ("N reviews by M fact-checkers since a date"), with every rating in the fact-checker's own words. Press "Site card for this page" for the news site you are reading, and turn on labels under Google, Bing or DuckDuckGo results if you want them.
 - Other coverage, off by default: on a click, Daylight Commons reads the news feeds of outlets you choose, finds the ones covering the same story and labels each by owner and owner type (state media, public broadcaster, nonprofit, commercial), never by a left or right score. Nothing from the page is sent; the options page names every outlet it would ask.
 - A thread report: whether the most extreme replies come mostly from flagged accounts, with intervals, and "skewed" only when the intervals do not overlap.
+- Launch campaigns on X, not measured yet: how a launch post's engagement compares with the account's own posts, shared bio templates and join-date waves among the accounts the page loaded, and Paid partnership labels. It states an inference only when two or more independent signs agree, and never names an ordinary account.
+- Evidence receipts, off by default: on your click, a linked repository's creation date, a domain's registration date and its first Internet Archive capture. Each answer is kept as a receipt in a hash chain that you can save and check offline with the free command line tool.
 
 Tell Daylight Commons when it is wrong. Each sign has "This was right" and "This was wrong". Your marks stay in your browser, and after ten on one kind of sign the window shows your own count beside the measured figure. You can save them to a file and choose whether to share it.
 
@@ -68,7 +70,7 @@ What Daylight Commons never does:
 - Call anyone a bot, propagandist or extremist.
 - Use political side as an input. The same words count the same whoever they target, and the transparency page shows how evenly each side is covered.
 - Guess who runs an account, or anyone's age, gender, ethnicity, religion or politics.
-- Send your data anywhere. Other coverage, which you turn on yourself, requests the public feeds of outlets you chose on your click and sends nothing from the page.
+- Send your data anywhere it has not told you about. Other coverage requests the public feeds of outlets you chose and sends nothing from the page. Evidence lookups send only the repository names and domains a post links to.
 
 Keyboard: focus a post to open its window, Alt+R to move into it, Esc to close it.
 
@@ -96,7 +98,7 @@ The privacy and transparency URLs go live when GitHub Pages serves `/docs` from 
 **Single purpose**
 
 <!-- field:single-purpose -->
-Shows the evidence behind the posts and accounts in the social media threads the user is reading: where it comes from, signs of coordination and how it argues, each with its source and measured error rate.
+Shows the evidence behind the posts and accounts in the social media threads the user is reading: where it comes from, signs of coordination and how it argues, each with its source and what it does not prove.
 <!-- /field -->
 
 **Permission justifications**
@@ -128,7 +130,7 @@ locally". Tick these, because Daylight Commons reads and keeps them in the brows
 |---|---|---|
 | Website content | Yes | Reads the replies and account details on the page; keeps summaries and, only when the user ticks it, a post's text with a feedback mark |
 | Web browsing activity | Yes | Keeps a summary of each thread the user opened, for the history page |
-| Website content, sent | No | Other coverage downloads the feeds of outlets the user chose and sends nothing from the page; each outlet sees an ordinary request from the user's IP address. Off by default |
+| Website content, sent | Yes | Only with evidence lookups, off by default: on the user's click, the repository names and web domains the post links to go to api.github.com, rdap.org and web.archive.org. Other coverage downloads the feeds of outlets the user chose and sends nothing from the page |
 | Personally identifiable information, Health, Financial and payment, Authentication, Personal communications, Location, User activity | No | Daylight Commons reads none of these. The location labels are the sites' public labels about other accounts, not the user's location |
 
 Certifications (tick all three): not sold or transferred to third parties outside the approved use
@@ -139,17 +141,17 @@ transferred to determine creditworthiness or for lending.
 
 | Field | Value |
 |---|---|
-| Package | `dist/radar-firefox-<version>.xpi` from `npm run package`; AMO signs it |
+| Package | `radar-firefox-<version>.xpi` from the GitHub release, or `npm run package`; AMO signs it |
 | Add-on ID | `radar@harperz9.github.io`. Permanent: see DESIGN.md, "Add-on identity" |
 | Minimum version | Firefox 128 (main-world content scripts) |
-| Data collection | `"required": ["none"]`: Daylight Commons sends no user data. Other coverage, when the user turns it on, downloads public news feeds from hosts the user approved one by one and sends nothing from the page |
+| Data collection | `"required": ["none"], "optional": ["websiteContent"]`. Nothing is sent by default. Evidence lookups, when the user turns them on in Options (Firefox then asks for website content), send the repository names and web domains a post links to GitHub, rdap.org and the Internet Archive. Other coverage downloads public news feeds from hosts the user approved one by one and sends nothing from the page |
 | Lint | `web-ext lint` 8.10.0 on the 2026-10-21 build: 0 errors, 0 warnings, 0 notices |
 | Source code | Upload a source archive (`git archive`) and note: `core.bundle.js` is generated by `npm run build` from `src/core`; nothing is minified |
 | Notes to reviewer | Run `node scripts/serve.mjs` and open `http://127.0.0.1:8742/tests/fixtures/thread.html` to see the window without any account. On a real site, Firefox asks for site access on the first-run page |
 
-Daylight Commons 2.x declared `websiteContent` under `optional` for the GDELT lookup, which sent title words.
-3.0 removed that lookup and the declaration. Any future feature that sends user data must add
-its data type here first.
+Daylight Commons 2.x declared `websiteContent` under `optional` for the GDELT lookup, which sent title
+words. 3.0.0 removed that lookup, and declares `websiteContent` under `optional` again for evidence
+lookups. Any future feature that sends user data must add its data type here first.
 
 ## Screenshots and images
 

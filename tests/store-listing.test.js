@@ -1,10 +1,10 @@
-// The store listing (project-docs/STORE-LISTING.md) against each store's published limits, the
+// The store listing (docs/store/LISTING.md) against each store's published limits, the
 // manifest it describes, and the permanent Firefox add-on id.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const md = readFileSync(new URL("../project-docs/STORE-LISTING.md", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+const md = readFileSync(new URL("../docs/store/LISTING.md", import.meta.url), "utf8").replace(/\r\n/g, "\n");
 const manifest = JSON.parse(readFileSync(new URL("../src/ext/manifest.json", import.meta.url), "utf8"));
 const field = (name) => {
   const m = md.match(new RegExp(`<!-- field:${name} -->\\n([\\s\\S]*?)\\n<!-- /field -->`));
@@ -37,11 +37,22 @@ test("every requested host and permission has a justification", () => {
   for (const h of manifest.optional_host_permissions || []) assert.ok(md.includes("Optional host `" + h + "`"), h);
 });
 
-test("the Firefox id is the permanent one and declares no data collection", () => {
+test("the Firefox id is the permanent one; nothing is collected by default, and evidence lookups are declared", () => {
   const g = manifest.browser_specific_settings.gecko;
   assert.equal(g.id, "radar@harperz9.github.io", "never change the add-on id: see DESIGN.md");
   assert.deepEqual(g.data_collection_permissions.required, ["none"]);
+  // Evidence lookups send link domains and repository names (src/ext/evidence-bg.js), so Firefox
+  // must be told, and the listing and the store forms must say the same.
+  assert.deepEqual(g.data_collection_permissions.optional, ["websiteContent"]);
+  assert.ok(md.includes('"optional": ["websiteContent"]'));
+  assert.match(md, /\| Website content, sent \| Yes \|/);
   assert.ok(md.includes(g.id));
+});
+
+test("no store text claims an error rate for every sign or that nothing ever leaves the browser", () => {
+  for (const t of [manifest.description, field("summary"), field("amo-summary"), field("description"), field("single-purpose")]) {
+    assert.doesNotMatch(t, /each sign with its (measured )?error rate|nothing leaves your browser|one click deletes/i, t.slice(0, 60));
+  }
 });
 
 test("the listing points at the public privacy and transparency pages", () => {

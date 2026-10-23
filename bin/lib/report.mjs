@@ -46,3 +46,14 @@ export function verdictLines(file, v) {
   for (const c of v.checks) L.push(`  ${c.ok ? "pass" : "FAIL"}  ${c.name}: ${c.text}`);
   return L.join("\n") + "\n";
 }
+
+// An evidence chain's check (src/core/evidence-seal.js chainChecks) as text: the verdict, one line
+// per property checked, what the chain holds, and what the seal does not prove.
+export function chainLines(file, c) {
+  const L = [`${c.ok ? "Checks pass" : "Checks fail"}: ${file}`, `Evidence chain: ${c.size} receipt${c.size === 1 ? "" : "s"}${c.root ? `, root ${c.root}` : ""}`];
+  for (const k of c.checks) L.push(`  ${k.ok ? "pass" : "FAIL"}  ${k.name}: ${k.text}`);
+  if (c.receipts.length) L.push("Receipts:");
+  for (const r of c.receipts) L.push(`  ${r.at || "no time"}  ${r.kind || "?"}  ${r.subject || ""}  from ${r.source || "?"}`);
+  L.push(`Does not prove: ${c.dnp}`);
+  return L.join("\n") + "\n";
+}

@@ -93,7 +93,7 @@ were not published to a store.
 
 ### Fixed (outlet owners)
 - Six outlet owner rows that were wrong in the Wikidata-built table now show a sourced correction,
-  marked "Radar correction" with its date and source, instead of Wikidata's row:
+  marked "Daylight Commons correction" with its date and source, instead of Wikidata's row:
   - bloomberg.com no longer lists Bank of America, whose Merrill Lynch stake was sold in 2008.
   - dw.com is no longer "owned by ARD": DW is its own public-law broadcaster under federal law.
   - france24.com shows France Médias Monde.
