@@ -45,6 +45,7 @@ How it was run:
 | 23 | Accessibility | Keyboard path | focus a reply, Alt+R into the window, Tab stays inside, focus visible, Esc closes | pass | pass |
 | 24 | Accessibility | Contrast in light and dark | axe colour-contrast rule on every page above | pass | pass |
 | 25 | Workbench | `daylight case` end to end on Windows, Linux and macOS | `tests/investigate.*.test.js` in CI on all three | Windows and Linux only | all three |
+| 25b | Workbench | The command line runs when its path goes through a link | macOS CI: macOS temporary folders sit behind `/var` -> `/private/var` | **fail**: `bin/radar.mjs` exited 0 without running, so `verify` on an edited chain looked like a pass | fixed: the entry check compares real paths; found by the new macOS job |
 | 26 | Workbench | Errors tell the user what to do | missing file, not a case folder, unknown command | **fail**: raw `ENOENT`, "Run case init" without the program name | fixed: "No such file or folder ... Check the path", the help command to run next; tests |
 | 27 | Workbench | `--help` for every command | every case command and every top-level command | **fail**: one usage list only | fixed: what it does, usage and an example for each; `tests/cli.help.test.js` |
 | 28 | Updates | Head-state rollback | `tests/head.test.js` | pass | pass |
