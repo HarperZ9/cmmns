@@ -1138,6 +1138,37 @@ const STEREOTYPE_TRAITS = ["lazy", "criminals", "criminal", "thieves", "violent"
   "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil",
   "disgusting", "worthless", "useless", "ugly", "garbage"];
 
+// Groups named by faith, race or ethnicity, for the stereotype grammar added from the 2026-10-23 feed
+// test. Political and class groups are left out on purpose: "billionaires control the media" is an
+// argument about power, while "Jews control the media" names a people by an invented trait. Every
+// faith and every race in GROUPS is here, whichever side usually targets it.
+const IDENTITY_GROUPS = ["muslims", "moslems", "jews", "christians", "hindus", "sikhs", "atheists", "catholics",
+  "evangelicals", "mormons", "arabs", "africans", "blacks", "black people", "whites", "white people", "asians", "latinos",
+  "hispanics", "roma", "caucasians", "jewish people", "muslim people", "christian people", "arab people", "asian people"];
+// Peoples named by origin ("chinese" and "irish" are left out: they are also adjectives, as in
+// "dirty chinese restaurant"). They join IDENTITY_GROUPS where a nationality cannot mean an army or a
+// state ("illiterate X", "X will be our downfall"), and stay out where it can ("X will attack").
+const ORIGIN_GROUPS = ["immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "mexicans",
+  "indians", "pakistanis", "somalis", "haitians", "russians", "ukrainians", "americans", "europeans", "natives", "africans",
+  "koreans", "nigerians", "afghans", "syrians", "turks", "poles", "romanians", "albanians", "italians", "germans"];
+// "Jewish money controls ...", "Christian cabal", "white elites run ...": control put on a people.
+const CONTROL_NOUNS = ["cabal", "cabals", "money", "lobby", "bankers", "elite", "elites", "interests", "power brokers",
+  "globalists", "puppet masters"];
+const CONTROL_VERBS = ["control", "controls", "controlled", "run", "runs", "own", "owns", "dictate", "dictates",
+  "call the shots", "calls the shots", "calling the shots", "pull the strings", "pulls the strings", "pulling the strings"];
+const CONTROL_OBJECTS = ["the media", "media", "the news", "the government", "government", "the banks", "banks",
+  "hollywood", "congress", "washington", "the world", "the economy", "policy", "foreign policy", "the law", "law", "laws",
+  "politics", "everything", "the country", "this country", "our country", "america", "europe", "the west", "wall street",
+  "finance", "the money", "the courts", "the un"];
+// A whole people predicted to attack: "the Muslims will probably attack them".
+const ATTACK_VERBS = ["attack", "rape", "kill", "bomb", "behead", "stab", "rob", "murder", "terrorise", "terrorize",
+  "massacre", "invade"];
+// A people as a country's ruin: "X immigrants will cause your downfall".
+const RUIN_NOUNS = ["downfall", "destruction", "ruin", "end", "death", "collapse"];
+// A trait word put before a people: "illiterate X", "inbred X".
+const ATTRIBUTIVE_TRAITS = ["illiterate", "lazy", "filthy", "dirty", "inbred", "savage", "subhuman", "backward",
+  "uncivilised", "uncivilized", "primitive", "smelly", "stinking", "parasitic"];
+
 // Intensifiers allowed between "are" and the trait: "X are fucking stupid", "X are inherently violent".
 const INTENSIFIERS = ["fucking", "so", "too", "really", "damn", "inherently", "naturally", "genetically", "always",
   "basically", "literally", "very"];
@@ -1220,7 +1251,7 @@ const HATRED_OBJECTS = ["beauty", "us", "the west", "western civilization", "our
 // little on its own, and it never labels the post.
 const CONTEMPT_VERBS = ["hate", "despise", "loathe", "can't stand", "cant stand"];
 
-return { GROUPS, DEHUMANISE_ADJACENT, SIMILE_VERBS, SIMILE_NOUNS, SIMILE_SUBJECTS, SIMILE_THEY_VERBS, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, NOTICING_CUES, SLURS_DEMOTED, SLURS_SOFT, IDENTITY_ADJ, GENDERED_SLURS, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
+return { GROUPS, DEHUMANISE_ADJACENT, SIMILE_VERBS, SIMILE_NOUNS, SIMILE_SUBJECTS, SIMILE_THEY_VERBS, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, IDENTITY_GROUPS, ORIGIN_GROUPS, CONTROL_NOUNS, CONTROL_VERBS, CONTROL_OBJECTS, ATTACK_VERBS, RUIN_NOUNS, ATTRIBUTIVE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, NOTICING_CUES, SLURS_DEMOTED, SLURS_SOFT, IDENTITY_ADJ, GENDERED_SLURS, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
 })();
 
 // ---- rhetoric-util.js
@@ -2715,6 +2746,47 @@ function theoryMatches(text) {
 return { THEORY_DOES_NOT_PROVE, THEORIES, theoryById, theoryMatches };
 })();
 
+// ---- rhetoric-groups.js
+const M_rhetoric_groups = (() => {
+// Group stereotype grammar added from the 2026-10-23 feed test (82 X posts, a development set; the
+// rules were tuned there and on the dev split of the labelled corpora, then read once on test).
+// Each rule names a whole people by faith, race, ethnicity or origin; the lists are in lexicon.js and
+// every faith and race is in them, whichever side usually targets it (tests/feed.stereotype.test.js
+// runs each rule over every group). rhetoric.js scores these with its stricter guard, so someone
+// else's words ("posts saying ...") and counter-speech ("... is racist") are skipped.
+
+const L = M_lexicon;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const alt = (list) => [...new Set(list)].map(esc).sort((a, b) => b.length - a.length).join("|");
+const DET = "(?:the\\s+|these\\s+|those\\s+|all\\s+(?:the\\s+)?|most\\s+)?";
+const IDA = alt(L.IDENTITY_ADJ), IDG = alt(L.IDENTITY_GROUPS), PEOPLE = alt([...L.IDENTITY_GROUPS, ...L.ORIGIN_GROUPS]);
+const MIGRANT = "(?:immigrants|migrants|refugees|asylum seekers)";
+// "the media", "US policy", "our government", "American foreign policy"
+const OBJECT = `(?:(?:the|our|us|u\\.s\\.|american|western|british|european)\\s+){0,2}(?:${alt(L.CONTROL_OBJECTS)})\\b`;
+const HEDGE = "(?:secretly\\s+|really\\s+|basically\\s+|still\\s+|literally\\s+|completely\\s+|totally\\s+)?";
+
+const RULES = [
+  // "an uber wealthy Jewish cabal": a secret ruling group named by a people
+  `\\b(?:${IDA})\\s+(?:cabal|cabals|puppet masters)\\b`,
+  // "Jewish money and priorities control US policy"
+  `\\b(?:${IDA})\\s+(?:${alt(L.CONTROL_NOUNS)})(?:\\s+(?:and|&)\\s+[\\w-]+)?\\s+${HEDGE}(?:${alt(L.CONTROL_VERBS)})\\s+${OBJECT}`,
+  // "Jews control the media", "white people run everything"
+  `\\b${DET}(?:${IDG})\\s+${HEDGE}(?:${alt(L.CONTROL_VERBS)})\\s+${OBJECT}`,
+  // "the Muslims will probably attack them": a people predicted to commit violence
+  `\\b${DET}(?:${IDG}|${MIGRANT}|(?:${IDA})\\s+(?:men|people|${MIGRANT}))\\s+will\\s+(?:probably\\s+|surely\\s+|definitely\\s+|eventually\\s+|soon\\s+|just\\s+)?(?:${alt(L.ATTACK_VERBS)})\\b`,
+  // "tolerating Muslim immigrants will cause your downfall": a people as a country's ruin
+  `\\b(?:(?:${IDA})\\s+(?:immigrants|immigration|migrants|refugees|people)|${DET}(?:${PEOPLE}))\\s+(?:will|would|is going to|are going to|are gonna)` +
+    `\\s+(?:cause|be|bring(?:\\s+about)?)\\s+(?:the\\s+|your\\s+|our\\s+|their\\s+|its\\s+|this\\s+country's\\s+)?(?:${alt(L.RUIN_NOUNS)})\\b`,
+  // "illiterate X", "inbred X": a trait word put before a people
+  `\\b(?:${alt(L.ATTRIBUTIVE_TRAITS)})\\s+(?:${PEOPLE})\\b`,
+];
+
+const GROUP_STEREOTYPE = new RegExp(RULES.join("|"), "i");
+
+return { GROUP_STEREOTYPE };
+})();
+
 // ---- rhetoric.js
 const M_rhetoric = (() => {
 // Stance-neutral rhetoric markers. The word lists live in lexicon.js; this file holds the grammar.
@@ -2745,6 +2817,7 @@ const { derivedLanguages } = M_rhetoric_derived;
 const { mentionedIntl } = M_rhetoric_mention;
 const { foldConfusables } = M_confusables;
 const { theoryMatches } = M_theories;
+const { GROUP_STEREOTYPE } = M_rhetoric_groups;
 
 const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -2830,7 +2903,7 @@ const VIOLENT_STEM = /\b(?:extermin|kill|massacr|slaughter|genocid|gass(?:ed|ing
 const REPORTED = /\b(?:call(?:s|ed|ing)?|compar(?:e|es|ed|ing)|describ(?:e|es|ed|ing)|label(?:s|ed|led|ing)?|brand(?:s|ed|ing)?|dubb?(?:s|ed|ing)?|refer(?:s|red|ring)? to)\b[^.!?"]{0,40}$/i;
 // Someone else's words: "posts saying X are a plague", "nobody should say that X ...", "saying X
 // spread like a disease is wrong". The speaker's own "I say" or "we said" is still a use.
-const SAID = /\b(?:(?<!\b(?:i|we|i've|we've|i'd|we'd|i'll|we'll|i'm|we're)\s+(?:\w+\s+)?)(?:say|says|said|saying)|wrote|writes|tweeted|posts? saying|claim(?:s|ed|ing)? that|(?:phrases?|repl(?:y|ies)|posts?|memes?|slogans?|terms?|words?)\s+(?:such as|like))\b[^.!?"]{0,40}$/i;
+const SAID = /\b(?:(?<!\b(?:i|we|i've|we've|i'd|we'd|i'll|we'll|i'm|we're)\s+(?:\w+\s+)?)(?:say|says|said|saying)|wrote|writes|tweeted|posts? saying|claim(?:s|ed|ing)? that|(?:phrases?|repl(?:y|ies)|posts?|memes?|slogans?|terms?|words?)\s+(?:such as|like)|(?:myth|trope|lie|claim|idea|canard|theory|stereotype|notion)s?\s+that|asked\s+(?:whether|if))\b[^.!?"]{0,40}$/i;
 const QUOTES = /["“”«»]/;
 function mention(s, m) {
   const at = m.index ?? s.indexOf(m[0]);
@@ -2903,7 +2976,7 @@ function scoreEnglish(s, hit) {
   hit("vigilante", RE.vigilante);
   if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)
     && !hit("slur", RE.slurCompound) && !strict(s, hit, "slur", RE.noticing)) hit("slurSoft", RE.slurSoft);
-  hit("stereotype", RE.stereotype, true);
+  if (!hit("stereotype", RE.stereotype, true)) strict(s, hit, "stereotype", GROUP_STEREOTYPE);
   hit("motive", RE.motive, true);
   hit("essentialise", RE.essentialise, true);
   hit("conspiracy", RE.conspiracy);
@@ -11367,5 +11440,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

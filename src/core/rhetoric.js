@@ -26,6 +26,7 @@ import { derivedLanguages } from "./rhetoric-derived.js";
 import { mentionedIntl } from "./rhetoric-mention.js";
 import { foldConfusables } from "./confusables.js";
 import { theoryMatches } from "./theories.js";
+import { GROUP_STEREOTYPE } from "./rhetoric-groups.js";
 
 export const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -111,7 +112,7 @@ const VIOLENT_STEM = /\b(?:extermin|kill|massacr|slaughter|genocid|gass(?:ed|ing
 const REPORTED = /\b(?:call(?:s|ed|ing)?|compar(?:e|es|ed|ing)|describ(?:e|es|ed|ing)|label(?:s|ed|led|ing)?|brand(?:s|ed|ing)?|dubb?(?:s|ed|ing)?|refer(?:s|red|ring)? to)\b[^.!?"]{0,40}$/i;
 // Someone else's words: "posts saying X are a plague", "nobody should say that X ...", "saying X
 // spread like a disease is wrong". The speaker's own "I say" or "we said" is still a use.
-const SAID = /\b(?:(?<!\b(?:i|we|i've|we've|i'd|we'd|i'll|we'll|i'm|we're)\s+(?:\w+\s+)?)(?:say|says|said|saying)|wrote|writes|tweeted|posts? saying|claim(?:s|ed|ing)? that|(?:phrases?|repl(?:y|ies)|posts?|memes?|slogans?|terms?|words?)\s+(?:such as|like))\b[^.!?"]{0,40}$/i;
+const SAID = /\b(?:(?<!\b(?:i|we|i've|we've|i'd|we'd|i'll|we'll|i'm|we're)\s+(?:\w+\s+)?)(?:say|says|said|saying)|wrote|writes|tweeted|posts? saying|claim(?:s|ed|ing)? that|(?:phrases?|repl(?:y|ies)|posts?|memes?|slogans?|terms?|words?)\s+(?:such as|like)|(?:myth|trope|lie|claim|idea|canard|theory|stereotype|notion)s?\s+that|asked\s+(?:whether|if))\b[^.!?"]{0,40}$/i;
 const QUOTES = /["“”«»]/;
 function mention(s, m) {
   const at = m.index ?? s.indexOf(m[0]);
@@ -184,7 +185,7 @@ function scoreEnglish(s, hit) {
   hit("vigilante", RE.vigilante);
   if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)
     && !hit("slur", RE.slurCompound) && !strict(s, hit, "slur", RE.noticing)) hit("slurSoft", RE.slurSoft);
-  hit("stereotype", RE.stereotype, true);
+  if (!hit("stereotype", RE.stereotype, true)) strict(s, hit, "stereotype", GROUP_STEREOTYPE);
   hit("motive", RE.motive, true);
   hit("essentialise", RE.essentialise, true);
   hit("conspiracy", RE.conspiracy);
