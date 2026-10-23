@@ -48,8 +48,8 @@ These do not move for any feature below. A row that would cross one is out of sc
 | ID | Criterion | Check | Status | Evidence | Competitive bar |
 |---|---|---|---|---|---|
 | M1 | Every detector that shows a sign has a labelled evaluation that passed its bar | `measured.js` row per detector family; precision lower bound at least 0.7 | **FAIL** | 4 of 35 detectors measured (release audit row 20); the rest show "not measured yet" | Bot Sentinel claims "99% accuracy" with no method; we beat it by publishing interval and method for every sign |
-| M2 | X campaign lens measured: 30 organic and 30 paid cases, two labellers | `EVALUATION.md` protocol; Wilson intervals | **FAIL** | 0 graded cases; 2 development cases, both `unsure` | Botometer X (archival, no accounts after 2023-05-31): beat it on recency and on per-stratum error rates it does not publish |
-| M3 | Campaign lens fairness: organic false-positive gap at most 5 points between strata with 30+ cases | per-stratum table | **NOT BUILT** | no labelled cases to stratify | none of the field publishes per-stratum false-positive rates |
+| M2 | X campaign lens measured: 30 organic and 30 paid cases, two labellers | `EVALUATION.md` protocol; Wilson intervals | **FAIL** | 0 graded cases; 2 development cases, both `unsure`. Labelling kit built (wave 2): `scripts/label/` page, `dc-label/1` format, kappa and Wilson results, `docs/LABELLING-RUN.md`; the run needs labellers | Botometer X (archival, no accounts after 2023-05-31): beat it on recency and on per-stratum error rates it does not publish |
+| M3 | Campaign lens fairness: organic false-positive gap at most 5 points between strata with 30+ cases | per-stratum table; `tests/label.stats.test.js` synthetic controls | **PARTIAL** | per-stratum rates, the 30-case floor and the 5-point bound are computed by `scripts/label/stats.mjs` and pass synthetic controls; no labelled cases yet | none of the field publishes per-stratum false-positive rates |
 | M4 | Modern X engagement baseline: 200 ordinary posts per follower stratum | `campaign-baselines.json` | **FAIL** | 0 posts per stratum; PHEME 2014-15 kept as a labelled historical reference only | none |
 | M5 | Rhetoric families measured on held-out human labels | `scripts/eval.mjs`, test split read once | **PASS** | strong signs 90.7% (Wilson 89.8 to 91.5), n 4,578 | Perspective API publishes model cards, not per-family precision on held-out public corpora |
 | M6 | Side balance on rhetoric | side-recall table | **PARTIAL** | closed on HateXplain; open on MHS (10.1% against 7.9%) | none |
@@ -86,7 +86,7 @@ These do not move for any feature below. A row that would cross one is out of sc
 | W6 | Nothing leaves without a named, opt-in feature | `tests/network.test.js`; privacy text | **PASS** | release audit rows 19, 21 | Ground News reviewers report every URL sent; NewsGuard needs an account |
 | W7 | No engagement mechanics | a test that bans notification permission, badge counts and streak state | **PARTIAL** | manifest asks only `storage`, `scripting`, `activeTab`; no test guards it | none |
 | W8 | Every badge has a source and a does-not-prove line | tests; stills | **PASS** | release audit row 8 | Community Notes link sources; few others do |
-| W9 | Wrong badge reportable, corrected in the open | local feedback test; public corrections log | **PARTIAL** | `feedback.js` local; challenge template; no public log | Community Notes |
+| W9 | Wrong badge reportable, corrected in the open | local feedback test; public corrections log | **PASS** | `feedback.js` local; every badge links to the finding dispute template; `catalogue/DECISIONS.md` is the public log, checked in CI (wave 2) | Community Notes |
 | W10 | "Insufficient baseline" where the baseline is thin | test on each baseline-backed sign | **PARTIAL** | campaign shape says so; not checked for every sign | none |
 
 ## 4. Jurisdiction and the open catalogue
@@ -97,8 +97,8 @@ These do not move for any feature below. A row that would cross one is out of sc
 | J2 | Catalogue covers the US, EU, UK and each supported platform's own policy | coverage table test | **PARTIAL** | 15 entries; no common-law fraud, no UCPD transpositions, X only among platform policies | none |
 | J3 | Element tables shown in the window | fixture test; capture | **NOT BUILT** | release audit, known limits | none |
 | J4 | Every applicable jurisdiction shown, never the most damning alone | test over a multi-jurisdiction case | **PARTIAL** | library only | none |
-| J5 | Every badge links to its catalogue entry and version | test over `catalogue/signals.json` | **PARTIAL** | 23-line signal map; badges do not link | none |
-| J6 | Challenge route with a public decision for each challenge | issue template; decisions log; test that the log parses | **PARTIAL** | `.github/ISSUE_TEMPLATE/challenge.yml`; no decisions log | Community Notes rating; Wikipedia talk pages |
+| J5 | Every badge links to its catalogue entry and version | test over `catalogue/signals.json` | **PASS** | `tests/catalogue.links.test.js`: every non-context signal links to each active entry citing it at the current version; campaign window and card render the links (wave 2) | none |
+| J6 | Challenge route with a public decision for each challenge | issue template; decisions log; test that the log parses | **PASS** | `catalogue/DECISIONS.md`, `scripts/decisions-check.mjs` in CI (closed issue needs a final decision, open issue a line within 14 days); `tests/decisions.test.js` (wave 2) | Community Notes rates notes; we publish each decision with its reasons |
 | J7 | Symmetry results published with each catalogue release | release asset or page | **PARTIAL** | tests run; nothing published per release | none |
 
 ## 5. Provenance and the evidence chain
@@ -128,7 +128,7 @@ These do not move for any feature below. A row that would cross one is out of sc
 | ID | Criterion | Check | Status | Evidence | Competitive bar |
 |---|---|---|---|---|---|
 | C1 | Contributions by pull request under the DCO | DCO check on pull requests | **PASS** | `.github/workflows/dco.yml` runs `scripts/dco-check.mjs` on every pull request; `tests/dco.test.js` (wave 2) | Wikipedia edits; Community Notes |
-| C2 | Dispute template for entries, badges and findings | template test | **PARTIAL** | entries and badges covered; findings not | Wikipedia talk pages |
+| C2 | Dispute template for entries, badges and findings | template test | **PASS** | `challenge.yml` and `dispute-finding.yml`, both labelled `challenge`; `tests/decisions.test.js` (wave 2) | Wikipedia talk pages |
 | C3 | Public catalogue page generated from `catalogue/` | page regenerates in CI; no entry missing | **PASS** | `docs/catalogue.html` from `scripts/catalogue-page.mjs`; `tests/catalogue-page.test.js` and the CI freshness step (wave 2) | none |
 | C4 | Codeberg mirror | live mirror | **NOT BUILT** | steps written in `project-docs/MIRROR.md` (wave 2); needs the author's Codeberg account | |
 | C5 | Fixed, hashed evaluation splits for shared data | split hash test | **PARTIAL** | rhetoric eval seed fixed and inputs hashed | |

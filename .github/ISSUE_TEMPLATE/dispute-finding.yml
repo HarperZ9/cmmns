@@ -1,0 +1,61 @@
+name: Dispute a badge or a finding
+description: Dispute a sign, a campaign reading or an element table Daylight Commons showed on a page. Every dispute gets a public decision with its reasons.
+title: "Dispute: "
+labels: ["challenge", "finding"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Daylight Commons shows signs from what a page loaded, each with what it does not prove. If a sign
+        or a reading is wrong for this page, tell us here. The decision and its reasoning go into
+        `catalogue/DECISIONS.md`, in public.
+
+        Please do not post private information about any person. A link to the public post is enough.
+        Do not paste other people's posts; describe what the page showed.
+  - type: input
+    id: signal
+    attributes:
+      label: Badge or sign
+      description: The sign's id as its catalogue line shows it, for example undisclosed-lookalike.
+      placeholder: signal id
+    validations:
+      required: true
+  - type: input
+    id: entry
+    attributes:
+      label: Catalogue entry and version, if the badge named one
+      placeholder: id@version
+  - type: input
+    id: version
+    attributes:
+      label: Daylight Commons version
+      description: From the extension's options page or `radar --version`.
+      placeholder: 3.0.0
+  - type: input
+    id: page
+    attributes:
+      label: Public link to the post or page
+      placeholder: https://
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong
+      description: What the badge said, and what it should have said.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Your evidence
+      description: A disclosure the page carries, a source, or anything else that shows the sign is wrong here.
+    validations:
+      required: true
+  - type: checkboxes
+    id: role
+    attributes:
+      label: Who you are (optional)
+      options:
+        - label: I represent an organisation named by this badge.
+        - label: I am the author of the post.
