@@ -17,6 +17,11 @@ were not published to a store.
   followed by a verb of spreading and "like" a vermin or disease noun. It skips a match after a cue
   that someone else said it ("posts saying ...", "nobody should say that ..."). Tests in
   `tests/feed.dehumanise.test.js`, with near misses that must not fire.
+- The antisemitic "noticing" code: "oy vey, stop noticing" was missed because only "the noticing"
+  was listed. Added "noticing will continue" and "#thenoticing", and a rule for "notice" as a habit
+  or an order ("stop noticing", "keep noticing") within a few words of "oy vey", "goy" or "goyim".
+  "Oy vey" and "goy" alone stay unmarked. Source: Blue Square Alliance Against Hate, 2025-08-22,
+  recorded in `project-docs/evidence/LEXICON-SOURCES.md`. Tests in `tests/feed.coded.test.js`.
 
 ### Added
 - Carrier-safe evidence bundles. Tick Carrier-safe on the card page, or pass `--carrier-safe` to
