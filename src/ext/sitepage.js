@@ -30,20 +30,20 @@
   // The Other coverage section, in the state the user's settings put it in.
   const hostsLine = (hosts) => (hosts.length ? hosts.join(", ") : "none");
   function results(state, rows) {
-    if (!state.list.length) rows.push([null, { note: `None of the ${state.status.length} feeds asked has a headline sharing enough words with this one.` }]);
+    if (!state.list.length) rows.push([null, { note: `The ${state.status.length} feeds asked share too few headline words with this one.` }]);
     for (const g of state.groups) rows.push([g.type, state.list.filter((x) => x.type === g.type).map((x) => `${x.outlet}${x.owner ? `, owned by ${x.owner}` : ""}${x.country ? ` (${x.country})` : ""}`).join("; ")]);
     for (const x of state.list.slice(0, 12)) rows.push([x.type, { links: [[`${x.outlet}: ${x.title}`.slice(0, 90), x.url]] }], ["Shared words", x.shared.join(", ")]);
     for (const f of state.status.filter((f) => f.state !== "ok")) rows.push([f.name, f.state === "empty" ? "The feed had no entries." : PB.FEED_ERRORS[f.state] || f.state]);
-    rows.push(["Asked", `${state.hosts.length} feed host${state.hosts.length === 1 ? "" : "s"}, nothing from this page sent, ${state.ms} ms`], ["Read it as", PB.COVERAGE_DOES_NOT_PROVE]);
+    rows.push(["Asked", `${state.hosts.length} feed host${state.hosts.length === 1 ? "" : "s"}, with this page kept on your device, ${state.ms} ms`], ["Read it as", PB.COVERAGE_DOES_NOT_PROVE]);
   }
-  const ERR = { "short-title": "The title has too few words to match.", "no-outlets": "No outlets are chosen. Choose them in Daylight Commons' options.", off: "Other coverage is off." };
+  const ERR = { "short-title": "The title has too few words to match.", "no-outlets": "Choose outlets in Daylight Commons' options.", off: "Other coverage is off." };
   function coverageSection(info, state) {
     const s = PBSettings.get(), rows = [], hosts = PB.coveragePlan(PB.chosenFeeds(s));
     const options = [null, { action: ["Open Daylight Commons' options", () => send({ type: "pb-open-options" }), "Opened"] }];
     if (state && state.list) results(state, rows);
     else if (state && state.error) rows.push([null, { note: ERR[state.error] || "The lookup failed. Try again later." }]);
     else if (!s.coverage) rows.push([null, { note: "Other coverage is off. Daylight Commons' options explain what it requests and from whom before you turn it on." }], options);
-    else if (!hosts.length) rows.push([null, { note: "Other coverage is on, but no outlets are chosen yet." }], options);
+    else if (!hosts.length) rows.push([null, { note: "Other coverage is on. Choose its outlets next." }], options);
     else if (!s.feedConsent) {
       rows.push([null, { note: PB.COVERAGE_PRIVACY }], ["Would ask", hostsLine(hosts)]);
       rows.push([null, { action: ["Ask these outlets", () => save({ feedConsent: true }).then(() => run(info)), "Asking the feeds…"] }]);
@@ -51,7 +51,7 @@
       rows.push(["Will ask", hostsLine(hosts)]);
       rows.push([null, { action: ["Find other coverage", () => run(info), "Asking the feeds…"] }]);
     }
-    return { tab: "overview", title: "Other coverage", rows, foot: "Outlets are labelled by owner and owner type as Wikidata and Daylight Commons' cited state tables state them. Daylight Commons gives no left or right score." };
+    return { tab: "overview", title: "Other coverage", rows, foot: "Outlets are labelled by owner and owner type as Wikidata and Daylight Commons' cited state tables state them." };
   }
 
   // On a site Daylight Commons has no reader for, the generic reader's text checks (src/ext/generic-page.js).

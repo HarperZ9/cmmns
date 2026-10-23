@@ -25,18 +25,18 @@
       <button id="share" type="button" class="quiet" hidden>Share…</button>
       <span id="status" role="status" aria-live="polite" class="muted"></span>
     </div>
-    <details id="check"><summary>Check a copy</summary><p>The JSON file carries a SHA-256 hash of the card's content (sorted keys, no spaces, without the hash field). Hash that content to check a copy: <code id="hash" class="hash"></code></p></details>
+    <details id="check"><summary>Check a copy</summary><p>The JSON file carries a SHA-256 hash of the card's content (sorted keys, compact, minus the hash field). Hash that content to check a copy: <code id="hash" class="hash"></code></p></details>
     <p class="muted">Saving writes two files to this computer. Share hands the same two files to the app you pick. Daylight Commons uploads nothing itself.</p>
   </section>
   <section id="bundle" aria-labelledby="h-bundle" hidden>
     <h2 id="h-bundle">Signed evidence</h2>
     <p>A bundle holds this thread's post ids and every evidence item with the matched words, Daylight Commons' version, a hash of its data tables and the time, signed with this browser's own Daylight Commons key. Anyone can check it offline with Daylight Commons' command line tool or its Analyse a file page.</p>
     <label class="switch">
-      <span>Include the posts' full text<span class="hint">Off by default: the replies are other people's words. Without it, the bundle keeps only the matched words.</span></span>
+      <span>Include the posts' full text<span class="hint">Off by default: the replies are other people's words. Left off, the bundle keeps the matched words.</span></span>
       <input type="checkbox" id="bundle-text">
     </label>
     <label class="switch">
-      <span>Carrier-safe<span class="hint">For a bundle you will hand to someone else. It is signed with a one-time key that is not kept, keeps only the day, and leaves out the page address. Its signature then proves the bundle is unchanged and says nothing about who made it.</span></span>
+      <span>Carrier-safe<span class="hint">For a bundle you will hand to someone else. It is signed with a one-time key that is then discarded, keeps the day alone, and leaves out the page address. Its signature then proves the bundle is unchanged and says nothing about who made it.</span></span>
       <input type="checkbox" id="bundle-carrier">
     </label>
     <div class="field" id="bundle-page-row" hidden><label for="bundle-page">Page address to include (optional)</label><input id="bundle-page" type="text" inputmode="url" autocomplete="off"></div>

@@ -72,7 +72,7 @@
       remember(url, result);
     } catch (e) {
       console.warn("[daylight-commons] media check failed", url, e);
-      const msg = e instanceof TypeError ? "the media host did not let Daylight Commons read the file from this page" : String(e.message || e);
+      const msg = e instanceof TypeError ? "the media host blocked Daylight Commons from reading the file on this page" : String(e.message || e);
       checks.set(url, { state: "done", result: { error: `could not read the file: ${msg}` } });
     }
     PBPop.refresh();
@@ -99,10 +99,10 @@
         const blob = await new Promise((ok) => c.toBlob(ok, "image/png"));
         if (blob) list.push({ t, url: URL.createObjectURL(blob), blob });
       }
-      frames.set(key, { state: "done", list, error: list.length ? null : "no frames could be taken from this video" });
+      frames.set(key, { state: "done", list, error: list.length ? null : "this video gave up zero frames" });
     } catch (e) {
       console.warn("[daylight-commons] frames failed", e);
-      frames.set(key, { state: "done", list, error: e && e.name === "SecurityError" ? "the site's player does not let the page read its frames" : "no frames could be taken from this video" });
+      frames.set(key, { state: "done", list, error: e && e.name === "SecurityError" ? "the site's player blocks the page from reading its frames" : "this video gave up zero frames" });
     }
     try { await seek(v, t0); if (!wasPaused) await v.play(); } catch (e) { console.warn("[daylight-commons] could not restore playback", e); }
     PBPop.refresh();
@@ -137,7 +137,7 @@
       }
     } catch (e) {
       console.warn("[daylight-commons] reading text in the image failed", url, e);
-      result = { error: e instanceof TypeError ? "the media host did not let Daylight Commons read the file from this page" : String(e.message || e) };
+      result = { error: e instanceof TypeError ? "the media host blocked Daylight Commons from reading the file on this page" : String(e.message || e) };
     }
     texts.set(url, { state: "done", result: result || { error: "no answer from Daylight Commons' background worker" } });
     PBPop.refresh();

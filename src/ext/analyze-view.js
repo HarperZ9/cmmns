@@ -49,7 +49,7 @@
 
   // An evidence chain saved from "Save evidence chain" (src/core/evidence-seal.js chainChecks).
   function chain(list, c) {
-    const head = el("li", c.ok ? "checks-pass" : "checks-fail", c.ok ? `Every check passes. An evidence chain of ${plural(c.size, "receipt")}.` : "A check fails. This evidence chain was changed after it was saved, or is not whole.");
+    const head = el("li", c.ok ? "checks-pass" : "checks-fail", c.ok ? `Every check passes. An evidence chain of ${plural(c.size, "receipt")}.` : "A check fails. This evidence chain was changed after it was saved, or has parts missing.");
     const rows = c.checks.map((k) => el("li", null, `${k.ok ? "Pass" : "Fail"}, ${k.name}: ${k.text}.`));
     const held = c.receipts.slice(0, 20).map((r) => el("li", "muted", `${r.at || "no time"}: ${r.kind || "receipt"}${r.subject ? ` about ${r.subject}` : ""}, from ${r.source || "an unnamed source"}.`));
     list.replaceChildren(head, ...rows, ...held, el("li", "muted", c.dnp));

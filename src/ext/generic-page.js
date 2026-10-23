@@ -56,7 +56,7 @@
         ["With persuasion techniques", String(c.persuasive)], ["Machine-like", String(c.machine)],
         ["Repeated texts", c.repeatedTexts ? `${c.repeatedTexts} texts appear more than once (largest ${c.largestRepeat} times)` : "none"]);
     }
-    if (!out.length) out.push([null, { note: "Daylight Commons found no article body or comment list on this page." }]);
+    if (!out.length) out.push([null, { note: "Daylight Commons found zero article bodies or comment lists on this page." }]);
     out.push(["Read it as", PB.GENERIC_DOES_NOT_PROVE]);
     return out;
   }

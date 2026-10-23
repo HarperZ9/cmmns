@@ -14,7 +14,7 @@
       ["Managed from (Facebook)", R.managedFrom ? R.managedFrom.map((x) => `${x.country} (${x.people})`).join(", ") : null],
       ["Connected via", R.connectedVia || null],
       ["Profile says", R.profileLocation || null],
-      ["VPN or proxy", R.proxyNote ? "X notes the location may not be accurate" : null],
+      ["VPN or proxy", R.proxyNote ? "X notes the location may be inaccurate" : null],
       ["Active hours (inferred)", A && A.activeHours ? `fit a UTC${A.activeHours.utcOffset >= 0 ? "+" : ""}${A.activeHours.utcOffset} waking day (${Math.round(A.activeHours.fit * 100)}% of ${A.activeHours.posts} posts seen)` : null],
     ];
   }
@@ -155,18 +155,18 @@
     const groups = PBSignals.AREAS.map(([id, name]) => ({ tab: "overview", area: id, title: name, signals: signals.filter((x) => x.cat === id) })).filter((g) => g.signals.length);
     return [
       { tab: "overview", rows: head },
-      ...(groups.length ? groups : [{ tab: "overview", rows: [[null, { note: "Nothing stands out in what the site shows. The other tabs have the details." }]] }]),
+      ...(groups.length ? groups : [{ tab: "overview", rows: [[null, { note: "The overview is quiet for what the site shows. The other tabs have the details." }]] }]),
       { tab: "overview", title: compareTitle(m), rows: compare(m) },
       ...catalogue(),
       { tab: "account", title: "Where", rows: where(m) },
       { tab: "account", title: "Account", rows: account(m) },
-      { tab: "account", title: "How it posts", rows: posting(m), foot: (m.reading || {}).pattern ? "From the posts X loaded for this account in your browser, not its whole history." : null },
+      { tab: "account", title: "How it posts", rows: posting(m), foot: (m.reading || {}).pattern ? "From the posts X loaded for this account in your browser: a slice of its history." : null },
       { tab: "post", title: "This post", rows: post(m) },
-      { tab: "post", title: "Media", rows: media, foot: media.length ? "Most platforms strip Content Credentials and other metadata on upload, so a missing credential is the usual case and says nothing either way." : null },
+      { tab: "post", title: "Media", rows: media, foot: media.length ? "Most platforms strip Content Credentials and other metadata on upload, so a missing credential is the usual case." : null },
       { tab: "post", title: "Published definitions", rows: definitions(m), foot: m.campaign && globalThis.PBDefinitionsView ? PB.DEFINITION_FRAME : null },
       { tab: "post", title: "Source trail", rows: trail(m), foot: m.trail && (m.trail.steps.length || m.trail.media.length) ? "Followed through pointers X records: quotes, reposts, lifted media and upload ids. It stops at the first upload." : null },
       { tab: "history", title: "In your history", rows: history(m) },
-      { tab: "history", foot: "Daylight Commons does not show or guess demographics. Data stays in this browser." },
+      { tab: "history", foot: "Counts of threads, sites and sources, kept in this browser. Demographics stay out of it." },
     ];
   }
 

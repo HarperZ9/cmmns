@@ -7,7 +7,7 @@
 (() => {
   "use strict";
   const STATUS_WORD = { "matched": "matched", "not-matched": "not matched", "not-observable": "not observable" };
-  const ALL_NOTE = "Your own jurisdiction is not known here, so every jurisdiction the catalogue covers is shown, in a fixed order.";
+  const ALL_NOTE = "Every jurisdiction the catalogue covers is shown, in a fixed order, since your own is unknown here.";
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const link = (label, href) => { const a = el("a", "pb-link", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; return a; };
 

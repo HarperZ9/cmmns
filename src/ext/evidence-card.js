@@ -7,7 +7,7 @@
   const $ = (id) => document.getElementById(id);
   const id = location.hash.slice(1);
   const built = id ? await chrome.runtime.sendMessage({ type: "pb-card-get", id }) : null;
-  if (!built) { $("say").textContent = "This card is no longer here. Open the thread again and choose Save card in Daylight Commons' panel."; return; }
+  if (!built) { $("say").textContent = "This card has expired. Open the thread again and choose Save card in Daylight Commons' panel."; return; }
   if (!built.ok) { $("say").textContent = built.reason; $("png").hidden = true; return; }
   const card = await PB.sealCard(built.card);
   const lines = PB.cardLines(card);

@@ -25,7 +25,7 @@
       const signed = carrier ? await PBSign.signCarrierSafe(made.bundle) : await PBSign.sign(made.bundle);
       const name = `radar-bundle-${String(built.card.thread.site).toLowerCase()}-${signed.signature.value.slice(0, 10)}.json`;
       PBSign.download(name, JSON.stringify(signed, null, 2) + "\n");
-      say(carrier ? `Saved ${name}: ${signed.evidence.length} evidence items, carrier-safe, signed with a one-time key that was not kept.` : `Saved ${name}: ${signed.evidence.length} evidence items, signed with key ${signed.signer.keyId}.`);
+      say(carrier ? `Saved ${name}: ${signed.evidence.length} evidence items, carrier-safe, signed with a one-time key that was then discarded.` : `Saved ${name}: ${signed.evidence.length} evidence items, signed with key ${signed.signer.keyId}.`);
     } catch (e) {
       console.error("[daylight-commons] bundle failed", e);
       say("Could not make the bundle: " + e.message);

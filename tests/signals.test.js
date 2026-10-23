@@ -46,7 +46,7 @@ test("the card offers a lookup only while X has not given account data", () => {
   assert.ok(!rows(PBCard.sections({ ...m, reading: { aboutRead: true } }, [], () => {})).some(([h]) => h === "About this account"));
   // and never shows demographics
   const foot = PBCard.sections(m, [], null).find((s) => s.foot);
-  assert.match(foot.foot, /does not show or guess demographics/);
+  assert.match(foot.foot, /Demographics stay out of it/);
 });
 
 test("the source trail section reads the upstream steps and the spread", () => {

@@ -9,7 +9,7 @@
   const rec = info && info.record, f = (info && info.facts) || {};
   $("title").textContent = `${f.name || (info && info.owner && info.owner.name) || domain} (${domain})`;
   document.title = `Daylight Commons: ${domain}`;
-  $("line").textContent = PB.recordLine(rec) || "No review in Daylight Commons' table lists this site as where a claim appeared.";
+  $("line").textContent = PB.recordLine(rec) || "Zero reviews in Daylight Commons' table list this site as where a claim appeared.";
   for (const [h, v] of PB.siteInfoRows(info || { domain, state: [] }).filter(([h, v]) => h && typeof v === "string" && !["Fact-check record", "Review", "Read it as", "Source"].includes(h))) $("facts").append(el("dt", h), el("dd", v));
   $("dnp").textContent = PB.SITE_RECORD_DOES_NOT_PROVE;
   for (const r of (rec && rec.reviews) || []) {
