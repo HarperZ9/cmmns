@@ -34,43 +34,44 @@ Daylight Commons
 **Summary** (CWS takes it from the manifest `description`; the test keeps the two identical)
 
 <!-- field:summary -->
-Evidence beside social media replies, each sign with its source and what it does not prove. No server, no account, no analytics.
+See the evidence behind social media replies: where accounts are based, coordination and fact-checks, each with its source.
 <!-- /field -->
 
 **AMO summary**
 
 <!-- field:amo-summary -->
-Evidence beside the replies you read on X, YouTube, Reddit, Facebook, Instagram, Bluesky and more: where the site places an account, coordination, fact-checks. Each sign names its source and what it does not prove. Never a score.
+See the evidence behind the replies you read on X, YouTube, Reddit, Facebook, Instagram, Bluesky and more: where the site places an account, signs of coordination and fact-checks. Each sign names its source and what it shows.
 <!-- /field -->
 
 **Description**
 
 <!-- field:description -->
-Free and open source (AGPL-3.0). No account, no server, no analytics.
-Daylight Commons asks only the site you are on. Two features, both off by default, reach further on your click: Other coverage reads the news feeds of outlets you choose, and evidence lookups send the repository names and web domains a post links to GitHub, rdap.org and the Internet Archive. What Daylight Commons keeps stays in your browser, and "Clear all Daylight Commons data" deletes it.
+Daylight Commons shows you the evidence behind the replies you read, right beside them. Rest the pointer on a reply and see where the site places the account, whether other accounts post the same words, and what fact-checkers said about a similar claim. Each sign names its source, so you can check it and decide for yourself.
+
+Free and open source (AGPL-3.0). It runs in your browser, with no account and no analytics. It asks only the site you are on. What it keeps stays in your browser, and "Clear all Daylight Commons data" deletes it.
 
 Evidence with its source. Never a score.
-Every sign says where its data came from and what it does not prove. Where Daylight Commons has measured a sign against examples people checked by hand, the sign shows how often it was right, with a 95% interval; every other sign says "not measured yet". The full results, the data behind them and their licences are on the transparency page.
+Every sign says where its data came from and what it shows. Where Daylight Commons has measured a sign against examples people checked by hand, the sign shows how often it was right, with a 95% interval. Other signs say "not measured yet". The transparency page has the full results, the data behind them and their licences.
 
-Rest the pointer on a reply on X, YouTube, Reddit, Facebook, Instagram or Bluesky, and a window opens beside it with:
-- Place: where the site labels the account as based, and replies that speak as a local of somewhere else.
-- Coordination: the same text from several accounts, the same upload pushed by many, replies that arrive in bursts, wording that turns up in other threads you opened.
-- Account and posting: its age, renames, posting hours and the apps it posts from.
-- Sources: outlet owners, state links only where a cited report or official document names them, Community Notes, and fact-checks of similar claims with the fact-checker's own rating.
+Rest the pointer on a reply on X, YouTube, Reddit, Facebook, Instagram or Bluesky. A window opens beside it with:
+- Place: where the site labels the account as based, and replies that speak as a local of another place.
+- Coordination: the same text from several accounts, one upload pushed by many, replies that arrive in bursts, and wording that turns up in other threads you opened.
+- Account and posting: the account's age, renames, posting hours and the apps it posts from.
+- Sources: outlet owners, state links where a cited report or official document names them, Community Notes, and fact-checks of similar claims with the fact-checker's own rating.
 - Language: slurs, calls for violence and dehumanising language, measured on public research data.
-- Site cards: rest the pointer on a link to see who owns the site, its owner type, founding date and country from Wikidata, any cited state link, and its fact-check record ("N reviews by M fact-checkers since a date"), with every rating in the fact-checker's own words. Press "Site card for this page" for the news site you are reading, and turn on labels under Google, Bing or DuckDuckGo results if you want them.
-- Other coverage, off by default: on a click, Daylight Commons reads the news feeds of outlets you choose, finds the ones covering the same story and labels each by owner and owner type (state media, public broadcaster, nonprofit, commercial), never by a left or right score. Nothing from the page is sent; the options page names every outlet it would ask.
-- A thread report: whether the most extreme replies come mostly from flagged accounts, with intervals, and "skewed" only when the intervals do not overlap.
-- Launch campaigns on X, not measured yet: how a launch post's engagement compares with the account's own posts, shared bio templates and join-date waves among the accounts the page loaded, and Paid partnership labels. It states an inference only when two or more independent signs agree, and never names an ordinary account.
-- Evidence receipts, off by default: on your click, a linked repository's creation date, a domain's registration date and its first Internet Archive capture. Each answer is kept as a receipt in a hash chain that you can save and check offline with the free command line tool.
+- Site cards: rest the pointer on a link to see who owns the site, its owner type, founding date and country from Wikidata, any cited state link, and its fact-check record ("N reviews by M fact-checkers since a date"), with every rating in the fact-checker's own words. Press "Site card for this page" for the news site you are reading. You can also turn on labels under Google, Bing or DuckDuckGo results.
+- Other coverage, when you turn it on: on your click, Daylight Commons reads the news feeds of outlets you choose. It finds the ones that cover the same story and labels each by owner and owner type (state media, public broadcaster, nonprofit, commercial). The page itself stays on your device, and the options page names every outlet it asks.
+- A thread report: whether the most extreme replies come mostly from flagged accounts, with intervals. It says "skewed" when the intervals stand apart.
+- Launch campaigns on X, not measured yet: how a launch post's engagement compares with the account's own posts, shared bio templates and join-date waves among the accounts the page loaded, and Paid partnership labels. It states an inference when two or more independent signs agree, and it names accounts the platform discloses as organisations.
+- Evidence receipts, when you turn them on: on your click, a linked repository's creation date, a domain's registration date and its first Internet Archive capture. Each answer is kept as a receipt in a hash chain. You can save the chain and check it offline with the free command line tool.
 
-Tell Daylight Commons when it is wrong. Each sign has "This was right" and "This was wrong". Your marks stay in your browser, and after ten on one kind of sign the window shows your own count beside the measured figure. You can save them to a file and choose whether to share it.
+Tell Daylight Commons when it is wrong. Each sign has "This was right" and "This was wrong". Your marks stay in your browser. After ten marks on one kind of sign, the window shows your own count beside the measured figure. You can save your marks to a file and choose whether to share them.
 
-What Daylight Commons never does:
-- Call anyone a bot, propagandist or extremist.
-- Use political side as an input. The same words count the same whoever they target, and the transparency page shows how evenly each side is covered.
-- Guess who runs an account, or anyone's age, gender, ethnicity, religion or politics.
-- Send your data anywhere it has not told you about. Other coverage requests the public feeds of outlets you chose and sends nothing from the page. Evidence lookups send only the repository names and domains a post links to.
+How Daylight Commons treats people:
+- It describes posts and accounts. It leaves labels such as bot, propagandist or extremist to you.
+- The same words count the same whoever they target. Political side is never an input, and the transparency page shows how evenly each side is covered.
+- It reads what the site shows. Age, gender, ethnicity, religion and politics stay out of it.
+- It sends data only where it tells you first. Other coverage asks for the public feeds of outlets you chose. Evidence lookups send the repository names and domains a post links to.
 
 Keyboard: focus a post to open its window, Alt+R to move into it, Esc to close it.
 
@@ -98,7 +99,7 @@ The privacy and transparency URLs go live when GitHub Pages serves `/docs` from 
 **Single purpose**
 
 <!-- field:single-purpose -->
-Shows the evidence behind the posts and accounts in the social media threads the user is reading: where it comes from, signs of coordination and how it argues, each with its source and what it does not prove.
+Shows the evidence behind the posts and accounts in the social media threads the user is reading: where it comes from, signs of coordination and how it argues, each with its source and what it shows.
 <!-- /field -->
 
 **Permission justifications**
@@ -161,12 +162,12 @@ requires and AMO recommends; use the same files for both stores, in this order.
 
 | File | Caption to paste |
 |---|---|
-| `screenshots/01-finding-place.png` | A reply's window: where the platform places the account, with the evidence and what it does not prove. |
+| `screenshots/01-finding-place.png` | A reply's window: where the platform places the account, with the evidence and its source. |
 | `screenshots/02-finding-language.png` | A language sign with its measured precision and 95% interval. |
 | `screenshots/03-finding-thread-report.png` | The thread panel: where the accounts are based and coordination across the thread. |
-| `screenshots/04-finding-launch-campaign.png` | The launch campaign lens: documented fact first, then the inference, each sign with what it does not prove. |
+| `screenshots/04-finding-launch-campaign.png` | The launch campaign lens: documented fact first, then the inference, each sign with what it shows. |
 | `screenshots/05-finding-evidence.png` | Evidence lookups, on your click: each answer kept as a receipt you can check offline. |
-| `screenshots/06-page-welcome-light.png` | First run: what Daylight Commons shows, what it never does, and where it runs. |
+| `screenshots/06-page-welcome-light.png` | First run: what Daylight Commons shows, how it treats people, and where it runs. |
 
 Small promo tile (CWS, 440x280, required): `promo-tile.png` (source `promo-tile.svg`). Marquee
 (1400x560): optional, skip. Icon: `src/ext/icons/radar-128.png` inside the package. Video: the CWS

@@ -21,7 +21,7 @@ import { validate } from "../bin/lib/jsonschema.mjs";
 
 const ROOT = join(import.meta.dirname, "..");
 const DIR = join(ROOT, "tests", "fixtures", "coarse-times");
-const SCHEMA = JSON.parse(readFileSync(join(ROOT, "schema", "evidence.v1.json"), "utf8"));
+const SCHEMA = JSON.parse(readFileSync(join(ROOT, "schema", "evidence.v2.json"), "utf8"));
 const NOW = Date.parse("2026-10-23T18:00:00Z");
 const CASES = readdirSync(DIR).filter((f) => f.endsWith(".json")).sort();
 const kinds = (r) => r.evidence.map((e) => e.kind);

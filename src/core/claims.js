@@ -200,7 +200,7 @@ export function claimCard(m) {
     m.negationDiffers ? ["Note", "One of the two contains \"not\" and the other lacks it. Read both."] : null,
     ["Read it", { links: [[host, m.url]] }],
     ["Source", CLAIM_ATTRIBUTION],
-    ["Read it as", CLAIM_DOES_NOT_PROVE],
+    ["What it shows", CLAIM_DOES_NOT_PROVE],
   ].filter(Boolean);
   return { label: CLAIM_LABEL, rows };
 }

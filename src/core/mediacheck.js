@@ -47,7 +47,7 @@ export function credentialRows(r) {
   return rows;
 }
 
-const dnp = (t) => ["Read it as", t];
+const dnp = (t) => ["What it shows", t];
 
 // Signals for the window: [{ label, fam, level, cat, rows }].
 export function credentialSignals(r) {

@@ -36,4 +36,4 @@ export function clonedCitations(text, domains) {
   return out;
 }
 
-export const CLONED_DOES_NOT_PROVE = "People quote an outlet by name and paste whatever link they were sent, and some share a copy to warn others. This shows the words and the address disagree.";
+export const CLONED_DOES_NOT_PROVE = "The post names an outlet and links a copy on another address. People also share copies by mistake or to warn others.";

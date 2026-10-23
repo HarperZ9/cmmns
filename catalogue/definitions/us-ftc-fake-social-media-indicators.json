@@ -1,6 +1,6 @@
 {
   "id": "us-ftc-fake-social-media-indicators",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -16,7 +16,7 @@
   "in_force": {
     "status": "in force",
     "since": null,
-    "note": "Source: 89 FR 68077, Aug. 22, 2024, per the eCFR source note. The effective date is not stated in the retrieved text and is left unverified here."
+    "note": "Source: 89 FR 68077, Aug. 22, 2024, per the eCFR source note. The retrieved text leaves the effective date out, so it is still to be checked."
   },
   "sources": [
     {
@@ -79,7 +79,7 @@
         "cross-launch"
       ],
       "min_families": 2,
-      "note": "Page signals are consistent with fake indicators. They cannot show that a given account is not a real person. Two independent signal families are needed before this element is shown as matched."
+      "note": "Page signals are consistent with fake indicators. They describe the sample as a whole. Two independent signal families are needed before this element is shown as matched."
     },
     {
       "id": "C",
@@ -88,7 +88,7 @@
       "required": true,
       "strength": "direct",
       "signals": [],
-      "note": "A purchase shows in records such as vendor invoices or enforcement filings. Nothing on the page shows who paid."
+      "note": "A purchase shows in records such as vendor invoices or enforcement filings."
     },
     {
       "id": "D",
@@ -119,7 +119,7 @@
       ]
     }
   ],
-  "does_not_prove": "Engagement that looks bought is not proof that anyone bought it, or that the account owner knew. Rivals, fans and vendors acting on their own also produce these patterns. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "Engagement that looks bought can come from the account owner, rivals, fans or vendors acting on their own. A match compares visible elements with the published text. Courts and the Commission decide whether the rule was broken.",
   "related": [
     "eu-ucpd-annex1-23c-false-reviews-endorsements",
     "uk-dmcc-sch20-13-fake-reviews",

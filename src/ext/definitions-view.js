@@ -40,7 +40,7 @@
       for (const t of g.tables) {
         out.push([t.role === "match" ? "Definition" : t.role === "comparison" ? "For comparison" : "Context", t.title], ["", { links: [[t.catalogue, t.url], ["Challenge", t.challengeUrl]] }]);
         for (const r of t.rows) out.push([`Element ${r.id}`, `${STATUS_WORD[r.status]}: ${r.label}`]);
-        out.push(["Reading", t.summary], ["Read it as", t.dnp]);
+        out.push(["Reading", t.summary], ["What it shows", t.dnp]);
       }
     }
     out.push(["", m.legal]);
@@ -63,7 +63,7 @@
     }
     const refs = el("p", "pb-foot");
     refs.append(link(t.catalogue, t.url), link("Challenge this entry", t.challengeUrl), link("Source", t.source.url));
-    box.append(head, tb, el("p", "pb-foot", t.summary), el("p", "pb-foot", `Read it as: ${t.dnp}`), refs);
+    box.append(head, tb, el("p", "pb-foot", t.summary), el("p", "pb-foot", `What it shows: ${t.dnp}`), refs);
     return box;
   }
 

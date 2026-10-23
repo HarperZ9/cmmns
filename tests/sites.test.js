@@ -78,7 +78,7 @@ test("the site rows show owner, type, founding, country, state links and the rec
   assert.equal(get("Country"), "Exampleland (Wikidata)");
   assert.match(get("Fact-check record"), /^3 reviews by 2 fact-checkers since 2024-05-01/);
   assert.ok(get("Reviews").action, "a button opens the list");
-  assert.equal(get("Read it as"), SITE_RECORD_DOES_NOT_PROVE);
+  assert.equal(get("What it shows"), SITE_RECORD_DOES_NOT_PROVE);
 });
 
 test("a site with nothing on file says so instead of a blank card", () => {

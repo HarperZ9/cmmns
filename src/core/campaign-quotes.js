@@ -10,7 +10,7 @@ import { timePrecision, observable } from "./precision.js";
 
 // BUNCH_TIGHT_MS: 5 quotes inside an hour count as coordination; a wider bunch is shown, not counted.
 export const BUNCH_K = 5, BUNCH_TIGHT_MS = 3600000, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
-export const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour because it is news, and common phrases spread by imitation. Payment and hidden labels show in contracts and records, off the page.";
+export const QUOTES_DOES_NOT_PROVE = "The quotes share timing and phrasing. People quote news in the same hour, and common phrases spread by imitation.";
 
 const at = (q) => Date.parse(q.posted);
 

@@ -8,7 +8,7 @@ account, a network connection or a third-party package.
 There are four parts:
 
 - **radar-core**, one ES module (`src/core/api.js`) with five functions.
-- **A JSON Schema** for everything radar-core returns (`schema/evidence.v1.json`).
+- **A JSON Schema** for everything radar-core returns (`schema/evidence.v2.json`; version 1 documents check against `schema/evidence.v1.json`).
 - **A command line tool**, `bin/radar.mjs`, that reads local files only.
 - **Signed evidence bundles**, files anyone can verify offline.
 
@@ -36,7 +36,7 @@ const result = analyzeThread({
   root: { id: "1", text: "The post replied to" },
   replies: [{ id: "2", author: "a", text: "A reply", posted: "2026-10-01T12:00:00Z" }],
 });
-for (const e of result.evidence) console.log(e.label, e.shows, e.doesNotProve);
+for (const e of result.evidence) console.log(e.label, e.shows, e.context);
 ```
 
 The package exports the same entry as `radar/core` (`package.json` `exports`). Daylight Commons is not
@@ -105,8 +105,8 @@ from disk; the extension from its own package.
 
 ```json
 {
-  "schema": "urn:radar:evidence:v1",
-  "api": "1.1.0",
+  "schema": "urn:radar:evidence:v2",
+  "api": "2.0.0",
   "kind": "thread",
   "site": "X",
   "posts": { "n": 15, "accounts": 14, "ids": ["1", "100", "..."], "timePrecision": { "value": "second", "basis": "declared" } },
@@ -115,7 +115,7 @@ from disk; the extension from its own package.
 }
 ```
 
-`limits` says what the whole result does not prove. A `media` envelope adds
+`limits` gives the context for the whole result. A `media` envelope adds
 `media: { state, ai, format }`; a `site` envelope carries `site`, the rows Daylight Commons' tables hold.
 
 ### An evidence item
@@ -128,8 +128,8 @@ from disk; the extension from its own package.
   "level": "flag",
   "label": "timing burst, 5 accounts",
   "shows": "5 accounts replied within 8 s at 12:10 UTC. Chance at this thread's pace: p < 0.000001. In ordinary threads with 5 to 19 replies, ...",
-  "source": "The posts in the input, as given. Daylight Commons read them on this device and sent nothing anywhere.",
-  "doesNotProve": "A post going viral at one moment, or a notification many people get at once, brings replies together too. ...",
+  "source": "The posts in the input, as given, read by Daylight Commons on this device.",
+  "context": "Replies that arrived within the same seconds, as they also do after a viral post or a mass notification. ...",
   "posts": ["100", "101", "102", "103", "104"],
   "spans": [],
   "data": { "from": "2026-10-01T12:10:00.000Z", "to": "2026-10-01T12:10:08.000Z", "accounts": 5, "p": 1.2e-9, "timePrecision": "second" }
@@ -143,7 +143,7 @@ from disk; the extension from its own package.
 | `level` | `warn` is worth a look on its own; `flag` means more alongside others; `info` is context |
 | `label`, `shows` | The words the extension's window uses |
 | `source` | Where the data came from: the input, a named table with its licence, a cited report |
-| `doesNotProve` | The limit, in the same words the window shows |
+| `context` | How far the sign reaches, in the same words as the window's "What it shows" row. Version 1 called this field `doesNotProve` |
 | `posts` | The post ids the item concerns. No item names an account |
 | `spans` | `{ post, start, end, text }` for the words that matched; `start` and `end` are `null` when the match was found after folding look-alike letters |
 | `data` | Figures particular to the kind |
@@ -169,8 +169,9 @@ from disk; the extension from its own package.
 
 ## The schema
 
-`schema/evidence.v1.json` (JSON Schema 2020-12, `$id` `urn:radar:evidence:v1`) covers the envelope,
-the item and the bundle. Any validator works. The CLI and the tests use a short checker
+`schema/evidence.v2.json` (JSON Schema 2020-12, `$id` `urn:radar:evidence:v2`) covers the envelope,
+the item and the bundle. `schema/evidence.v1.json` (`urn:radar:evidence:v1`) stays in the repository
+for version 1 documents. Any validator works. The CLI and the tests use a short checker
 (`bin/lib/jsonschema.mjs`) so Daylight Commons needs no package; it reads `type`, `const`, `enum`,
 `pattern`, `minLength`, `minimum`, `required`, `properties`, `additionalProperties`, `items`,
 `minItems`, `anyOf`, `oneOf` and local `$ref`. The tests check real outputs against the schema
@@ -181,17 +182,28 @@ and check that the checker rejects missing limits, unknown kinds, an account fie
 The API follows semantic versioning through `API_VERSION`, separately from the extension's
 version.
 
-- **Patch** (1.0.x): wording fixes in `label`, `shows`, `source` or `doesNotProve`; bug fixes in
+- **Patch** (2.0.x): wording fixes in `label`, `shows`, `source` or `context`; bug fixes in
   what is found. Do not match on the wording.
-- **Minor** (1.x.0): new evidence kinds, new keys inside `data`, new optional envelope fields, new
+- **Minor** (2.x.0): new evidence kinds, new keys inside `data`, new optional envelope fields, new
   import formats. The schema's `kind` list grows in the same release. Treat a kind you do not know
   as context.
-- **Major** (2.0.0): removing or renaming a field or kind, changing a field's type or meaning, or
-  changing how a bundle is signed. The schema id changes to `urn:radar:evidence:v2`, and Daylight Commons
-  keeps verifying version 1 bundles.
+- **Major** (3.0.0): removing or renaming a field or kind, changing a field's type or meaning, or
+  changing how a bundle is signed. The schema id changes to `urn:radar:evidence:v3`, and Daylight Commons
+  keeps verifying earlier bundles.
 
-Fields that will not change in version 1: every item has `kind`, `scope`, `level`, `label`,
-`shows`, `source`, `doesNotProve`, `posts`, `spans` and `data`, and no item names an account.
+API 2.0.0 (2026-10-23) is the first major release. It renames the item field `doesNotProve` to
+`context`, moves the schema id to `urn:radar:evidence:v2` and writes bundles as version 2. The old
+field stays readable:
+
+- `verifyBundle` and `radar verify` accept bundle versions 1 and 2. The CLI checks each bundle
+  against the schema its `schema` field names.
+- `readEvidence(doc)` (exported from `src/core/evidence-bundle.js` and `src/core/bundle-verify.js`)
+  returns a copy of an envelope or bundle with each version 1 `doesNotProve` as `context`. The
+  signed original stays as it was, so its signature still checks.
+- `tests/evidence-v1.test.js` keeps a signed version 1 bundle verifying.
+
+Fields that will not change in version 2: every item has `kind`, `scope`, `level`, `label`,
+`shows`, `source`, `context`, `posts`, `spans` and `data`, and no item names an account.
 
 ## The command line tool
 

@@ -17,7 +17,7 @@ import { catalogueEntries } from "../bin/lib/export.mjs";
 const ROOT = join(import.meta.dirname, "..");
 const CLI = join(ROOT, "bin", "radar.mjs");
 const DEMO = join(ROOT, "docs", "demo");
-const DEF = "us-ftc-fake-social-media-indicators@1.0.0";
+const DEF = "us-ftc-fake-social-media-indicators@1.0.1";
 const dir = mkdtempSync(join(tmpdir(), "dc-export-"));
 test.after(() => rmSync(dir, { recursive: true, force: true }));
 const run = (...args) => spawnSync(process.execPath, [CLI, ...args], { encoding: "utf8" });

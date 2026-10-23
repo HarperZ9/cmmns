@@ -42,7 +42,7 @@ test("the rows quote every source's attribution and end with what the match does
   const rows = Object.fromEntries(PB.opRows(h));
   assert.match(rows["Attributed to"], /Russia/);
   assert.match(rows["Sources say"], /"/);
-  assert.equal(rows["Read it as"], PB.OPS_DOES_NOT_PROVE);
+  assert.equal(rows["What it shows"], PB.OPS_DOES_NOT_PROVE);
   assert.match(PB.OPS_DOES_NOT_PROVE, /share these links unknowingly/);
 });
 
@@ -78,6 +78,6 @@ test("a profile that names an operation's site gets the sign; the person is neve
 test("a look-alike address is its own weaker sign; the real outlet gets none", () => {
   const fake = PBSignals.all({ ...base, domains: ["washingtonpost.pm"] }).find((s) => s.fam === "lookalike-domain");
   assert.equal(fake.level, "flag");
-  assert.ok(fake.rows.some(([k]) => k === "Read it as"));
+  assert.ok(fake.rows.some(([k]) => k === "What it shows"));
   assert.ok(!PBSignals.all({ ...base, domains: ["washingtonpost.com"] }).some((s) => s.fam === "lookalike-domain" || s.fam === "named-in-report"));
 });

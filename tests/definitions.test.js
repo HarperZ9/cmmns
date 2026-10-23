@@ -62,7 +62,7 @@ test("the positive campaign fixture matches the visible elements of 16 CFR 465.8
   assert.match(t.summary, /Element B is matched on indicative evidence: signals consistent with it\./);
   assert.match(t.summary, /Elements D and E are outside what this page can show\./);
   assert.match(t.summary, /Findings belong to courts, regulators and the platform\./);
-  assert.equal(t.catalogue, "us-ftc-fake-social-media-indicators@1.0.0");
+  assert.equal(t.catalogue, "us-ftc-fake-social-media-indicators@1.0.1");
   assert.equal(t.legal_note, LEGAL_NOTE);
   const b = t.rows.find((r) => r.id === "B");
   assert.ok(b.evidence.length >= 4 && b.evidence.every((e) => e.refs[0].startsWith("campaign:")), "each match carries its evidence reference");

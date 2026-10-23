@@ -1,6 +1,6 @@
 {
   "id": "eu-ucpd-annex1-22-posing-as-consumer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -12,7 +12,7 @@
   "instrument": "Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026",
   "section": "Annex I, point 22",
   "kind": "directive",
-  "binding_note": "A directive, applied through each Member State's national law. Annex I lists practices that are unfair in all circumstances, and the text says the same single list applies in all Member States. It covers business-to-consumer practices: the party must be a trader.",
+  "binding_note": "A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader.",
   "in_force": {
     "status": "in force",
     "since": null,
@@ -57,7 +57,7 @@
       "required": true,
       "strength": "direct",
       "signals": [],
-      "note": "For unlabelled posts this would be shown by contracts or agency records, not by the page."
+      "note": "For unlabelled posts, contracts or agency records show this element."
     },
     {
       "id": "C",
@@ -69,7 +69,7 @@
       "note": "Falsity depends on element B and on how the impression was created."
     }
   ],
-  "does_not_prove": "A post that reads like a fan and shares a template with paid posts is not proof that its author was paid. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "A fan-style post that shares a template with paid posts is look-alike evidence of payment. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.",
   "related": [
     "uk-dmcc-sch20-25-posing-as-consumer",
     "eu-ucpd-annex1-11-advertorial"

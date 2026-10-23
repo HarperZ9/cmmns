@@ -96,7 +96,7 @@ export function siteInfoRows(info, opts = {}) {
   rows.push(["Fact-check record", recordLine(record) || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."]);
   for (const r of (record && (record.latest || record.reviews.slice(0, 3))) || []) rows.push(["Review", `"${r.rating}": ${r.checker}, ${r.date || "date not given"}`]);
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
-  rows.push(["Source", SITE_SOURCES], ["Read it as", SITE_RECORD_DOES_NOT_PROVE]);
+  rows.push(["Source", SITE_SOURCES], ["What it shows", SITE_RECORD_DOES_NOT_PROVE]);
   return rows.filter(([, v]) => v != null);
 }
 

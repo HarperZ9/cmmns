@@ -30,7 +30,7 @@ export const SRC_FILE = "The file's bytes, read on this device: Content Credenti
 
 export const STRONG_DOES_NOT_PROVE = "A match on the post's wording, which also turns up in quotes, irony and reported speech.";
 export const LEAK_DOES_NOT_PROVE = "Chatbot boilerplate in the post, which people also paste as a quote or a joke.";
-export const MACHINE_DOES_NOT_PROVE = "Machine-writing signs are weak evidence in a few sentences, and detectors flag non-native English writers more often.";
+export const MACHINE_DOES_NOT_PROVE = "The post has three or more machine-writing signs. Detectors flag non-native English writers more often.";
 export const SPAM_DOES_NOT_PROVE = "A giveaway or contact-detail pattern in the post, which real people post too.";
 export const BURST_DOES_NOT_PROVE = "Replies that arrived within the same seconds, as they also do after a viral post or a mass notification. The test runs on times given to the second.";
 export const COARSE_DOES_NOT_PROVE = "These times are rounded, so they can hide a burst or make one look like it.";

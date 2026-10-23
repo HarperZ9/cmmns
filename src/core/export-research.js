@@ -42,7 +42,7 @@ const CROISSANT_CONTEXT = {
 const FIELDS = [["id", "sc:Text", "SHA-256 of the receipt"], ["split", "sc:Text", "train, dev or test, fixed by hash"], ["kind", "sc:Text", "what kind of fact"],
   ["subject", "sc:Text", "what the fact is about; private accounts only as salted pseudonyms"], ["subjectKind", "sc:Text", "artefact, organisation or private-pseudonym"],
   ["source", "sc:Text", "where the fact was read"], ["at", "sc:Date", "when it was read"], ["labeller", "sc:Text", "who labelled it, when hand-labelled"],
-  ["stratum", "sc:Text", "fairness stratum, when hand-labelled"], ["doesNotProve", "sc:Text", "what the fact does not show"]];
+  ["stratum", "sc:Text", "fairness stratum, when hand-labelled"], ["doesNotProve", "sc:Text", "how far the fact reaches"]];
 
 export function croissant(ctx, dataHash, counts) {
   return {
@@ -73,7 +73,7 @@ function datasheet(ctx, rows, counts) {
     "Rows come from what one user chose to open and look up, so they describe that user's browsing, not any platform as a whole. Platforms round, delay and recount what they show.", "",
     "## Privacy and licence",
     "Private accounts appear only as pseudonyms salted per export, so two exports cannot be joined. The compilation is CC BY 4.0; facts read from third parties keep their sources' terms.", "",
-    `## Read it as`, ctx.dnp, "",
+    `## What it shows`, ctx.dnp, "",
   ].join("\n");
 }
 

@@ -20,7 +20,7 @@ test("analyze prints a readable report and JSON that fits the schema", () => {
   const text = run("analyze", join(FX, "thread.json"), "--no-claims");
   assert.equal(text.status, 0, text.stderr);
   assert.match(text.stdout, /^Thread on X: 15 posts from 14 accounts\./);
-  assert.match(text.stdout, /Read it as:/);
+  assert.match(text.stdout, /What it shows:/);
   const json = JSON.parse(run("analyze", join(FX, "x-saved.html"), "--json", "--no-claims").stdout);
   assert.equal(json.kind, "thread");
   assert.ok(json.evidence.some((e) => e.kind === "strong-language"));
@@ -94,7 +94,7 @@ test("verify checks a saved evidence chain and fails an edited, reordered or tru
   assert.match(ok.stdout, /Evidence chain: 3 receipts/);
   for (const name of ["receipts", "chain", "head", "Merkle root", "inclusion proofs"]) assert.match(ok.stdout, new RegExp(`pass  ${name}:`));
   assert.match(ok.stdout, /domain-registered {2}demo\.example/);
-  assert.match(ok.stdout, /Read it as:/);
+  assert.match(ok.stdout, /What it shows:/);
   const json = JSON.parse(run("verify", join(dir, "chain.json"), "--json").stdout);
   assert.equal(json.ok, true); assert.equal(json.size, 3);
   const clone = () => JSON.parse(JSON.stringify(x));

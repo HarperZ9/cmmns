@@ -58,7 +58,7 @@ function reproduce(ctx) {
     "",
     "The second command rebuilds `observations.jsonl` and `provenance.json` from the chain alone; they match these files except for the export time.",
     "",
-    `Read it as: ${ctx.dnp}`,
+    `What it shows: ${ctx.dnp}`,
     "",
   ].join("\n");
 }

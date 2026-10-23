@@ -5,7 +5,17 @@ were not published to a store.
 
 ## Unreleased
 
-Nothing yet.
+Every sign now says what it shows, in plain words.
+- The window, panel, exports and command line show a "What it shows" row for each sign. It describes
+  what the sign found and keeps a limit only where a reader would misread the sign without it.
+- Technique definitions and lessons are rewritten in short, plain sentences: what the technique is
+  and how to spot it.
+- The definition catalogue's own notes are rewritten the same way. Every entry moves to 1.0.1; the
+  quotes, elements and signals are unchanged (catalogue/CHANGELOG.md).
+- radar-core API 2.0.0: the evidence item field `doesNotProve` is now `context`, the schema is
+  `schema/evidence.v2.json` (`urn:radar:evidence:v2`) and new bundles are version 2. Version 1
+  bundles still verify, and `readEvidence` reads their `doesNotProve` as `context`
+  (project-docs/INTEGRATION.md).
 
 ## 3.2.2 (2026-10-23)
 

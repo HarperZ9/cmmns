@@ -20,7 +20,7 @@ export function itemLines(e) {
     wrap(e.shows, "      "),
     spans ? wrap(`Matched: ${spans}`, "      ") : null,
     wrap(`Source: ${e.source}`, "      "),
-    wrap(`Read it as: ${e.doesNotProve}`, "      "),
+    wrap(`What it shows: ${e.context}`, "      "),
   ].filter(Boolean);
 }
 
@@ -54,6 +54,6 @@ export function chainLines(file, c) {
   for (const k of c.checks) L.push(`  ${k.ok ? "pass" : "FAIL"}  ${k.name}: ${k.text}`);
   if (c.receipts.length) L.push("Receipts:");
   for (const r of c.receipts) L.push(`  ${r.at || "no time"}  ${r.kind || "?"}  ${r.subject || ""}  from ${r.source || "?"}`);
-  L.push(`Read it as: ${c.dnp}`);
+  L.push(`What it shows: ${c.dnp}`);
   return L.join("\n") + "\n";
 }

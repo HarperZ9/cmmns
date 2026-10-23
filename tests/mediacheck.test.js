@@ -45,7 +45,7 @@ test("an AI credential: a warn signal with signer and does-not-prove line", asyn
   assert.equal(s.fam, "c2pa");
   assert.equal(s.level, "warn");
   assert.match(JSON.stringify(s.rows), /made with generative AI/);
-  assert.ok(s.rows.some((x) => x[0] === "Read it as"));
+  assert.ok(s.rows.some((x) => x[0] === "What it shows"));
   const rows = text(credentialRows(r));
   assert.match(rows, /is unchanged since it was signed/);
   assert.match(rows, /the certificate's own claim/);

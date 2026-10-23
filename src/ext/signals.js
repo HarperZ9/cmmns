@@ -30,7 +30,7 @@
     "same-text": "coordination", "copied-elsewhere": "coordination", "hate-symbol-name": "language",
   };
   const day = (iso) => (iso ? iso.slice(0, 10) : "unknown");
-  const dnp = (t) => ["Read it as", t];
+  const dnp = (t) => ["What it shows", t];
 
   function language(m) {
     const out = [];
@@ -52,7 +52,7 @@
     }
     const M = m.machine;
     if (M && M.leak) out.push({ label: "leaked AI text", fam: "leaked-ai", level: "warn", cat: "language", rows: [["In this post", `"${M.leak}"`], ["What it is", "Text a chatbot writes, posted as it came out."], dnp("Chatbot boilerplate in the post, which people also paste as a quote or a joke.")] });
-    else if (M && M.machineLike) out.push({ label: "machine-writing signs", fam: "machine-writing", level: "flag", cat: "language", rows: [["Signs", M.signs.join("; ")], ["How Daylight Commons decides", "Three or more independent signs in a post of at least 25 words, using Articulate's word lists."], dnp("Machine-writing signs are weak evidence in a few sentences, and detectors flag non-native English writers more often.")] });
+    else if (M && M.machineLike) out.push({ label: "machine-writing signs", fam: "machine-writing", level: "flag", cat: "language", rows: [["Signs", M.signs.join("; ")], ["How Daylight Commons decides", "Three or more independent signs in a post of at least 25 words, using Articulate's word lists."], dnp("The post has three or more machine-writing signs. Detectors flag non-native English writers more often.")] });
     if (M && M.spam) out.push({ label: "spam pattern", fam: "spam-pattern", level: "warn", cat: "language", rows: [["In this post", `"${M.spam}"`], ["What it is", "A pattern common in scam and spam posts: giveaways, crypto, contact bait."]] });
     if (m.xSpam) out.push({ label: "X: probable spam", fam: "x-spam", level: "warn", cat: "language", rows: [["Source", "X itself filed this reply under \"Probable spam\"."], dnp("X's spam filter makes mistakes in both directions.")] });
     return out;

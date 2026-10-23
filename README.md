@@ -125,7 +125,7 @@ refused.
 
 In the extension, the toolbar popup's **Analyse a file** does the same. Code can import
 `src/core/api.js`: `analyzeThread`, `analyzeText`, `checkMedia` and `siteInfo` return evidence that
-fits `schema/evidence.v1.json`. The API, schema and bundle format are in
+fits `schema/evidence.v2.json`. The API, schema and bundle format are in
 [project-docs/INTEGRATION.md](project-docs/INTEGRATION.md).
 
 ## Develop

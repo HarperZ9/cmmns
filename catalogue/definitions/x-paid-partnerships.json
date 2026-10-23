@@ -1,6 +1,6 @@
 {
   "id": "x-paid-partnerships",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -16,7 +16,7 @@
   "in_force": {
     "status": "published",
     "since": null,
-    "note": "The page carries no date. Recorded as read on 2026-10-22."
+    "note": "The page is undated. Recorded as read on 2026-10-22."
   },
   "sources": [
     {
@@ -52,7 +52,7 @@
       "signals": [
         "disclosed-paid"
       ],
-      "note": "Shown for labelled posts, by the poster's own disclosure. For unlabelled posts a partnership is not visible."
+      "note": "Shown for labelled posts, by the poster's own disclosure. A partnership behind an unlabelled post sits off the page."
     },
     {
       "id": "B",
@@ -73,10 +73,10 @@
       "signals": [
         "undisclosed-lookalike"
       ],
-      "note": "Daylight Commons sees unlabelled posts that share a template with labelled ones. That is consistent with a missing disclosure, and it is also what fans copying a paid post look like."
+      "note": "Daylight Commons sees unlabelled posts that share a template with labelled ones. That fits a missing disclosure, and it also fits fans copying a paid post."
     }
   ],
-  "does_not_prove": "A platform policy is the platform's own rule, not law. A match on visible elements is a comparison with the published policy text; only X decides whether its policy was broken, and the policy can change after the retrieval date.",
+  "does_not_prove": "A platform policy is the platform's own rule. A match compares visible elements with the published policy text, and X decides whether its policy was broken.",
   "related": [
     "us-ftc-endorsement-material-connection",
     "eu-dsa-art26-advertising"

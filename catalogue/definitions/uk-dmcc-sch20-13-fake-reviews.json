@@ -1,6 +1,6 @@
 {
   "id": "uk-dmcc-sch20-13-fake-reviews",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -70,7 +70,7 @@
         "undisclosed-lookalike",
         "disclosed-paid"
       ],
-      "note": "Treating a quote post as a consumer review is this entry's reading, not a settled one."
+      "note": "Treating a quote post as a consumer review is this entry's reading of paragraph 13."
     },
     {
       "id": "B",
@@ -81,7 +81,7 @@
       "signals": [
         "undisclosed-lookalike"
       ],
-      "note": "A missing label next to labelled look-alikes is consistent with a concealed incentive. It does not show that the author was commissioned."
+      "note": "A missing label next to labelled look-alikes is consistent with a concealed incentive. Contracts and payments show who was commissioned."
     },
     {
       "id": "C",
@@ -90,10 +90,10 @@
       "required": true,
       "strength": "direct",
       "signals": [],
-      "note": "Commissioning is shown by contracts, briefs or payments, not by the page."
+      "note": "Contracts, briefs or payments show commissioning."
     }
   ],
-  "does_not_prove": "Look-alike posts can be fans copying a paid post. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "Look-alike posts can also be fans copying a paid post. A match compares visible elements with the published text. Courts, the CMA and trading standards services decide whether the rule was broken.",
   "related": [
     "eu-ucpd-annex1-23c-false-reviews-endorsements",
     "us-ftc-fake-social-media-indicators",

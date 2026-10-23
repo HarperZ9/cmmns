@@ -1,4 +1,4 @@
-// radar-core (src/core/api.js): every output fits schema/evidence.v1.json, every item says what it
+// radar-core (src/core/api.js): every output fits schema/evidence.v2.json, every item says what it
 // shows, its source and what it does not prove, and no output names an account.
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { analyzeThread, analyzeText, checkMedia, siteInfo, useData, API_VERSION, EVIDENCE_SCHEMA } from "../src/core/api.js";
 import { validate } from "../bin/lib/jsonschema.mjs";
 
-const SCHEMA = JSON.parse(readFileSync(new URL("../schema/evidence.v1.json", import.meta.url), "utf8"));
+const SCHEMA = JSON.parse(readFileSync(new URL("../schema/evidence.v2.json", import.meta.url), "utf8"));
 const THREAD = JSON.parse(readFileSync(new URL("./fixtures/integration/thread.json", import.meta.url), "utf8"));
 const NOW = Date.parse("2026-10-02T00:00:00Z");
 const kinds = (r) => r.evidence.map((e) => e.kind);
@@ -30,8 +30,8 @@ test("a thread gives the coordination, language, link and account evidence it ho
 test("every item states what it shows, where it came from and what it does not prove", () => {
   const r = analyzeThread(THREAD, { now: NOW });
   for (const e of r.evidence) {
-    for (const k of ["label", "shows", "source", "doesNotProve"]) assert.ok(e[k] && e[k].length > 8, `${e.kind} ${k}`);
-    assert.doesNotMatch(e.shows + e.doesNotProve + e.label, /\bbot\b|propagandist|extremist|undefined|NaN/i, e.kind);
+    for (const k of ["label", "shows", "source", "context"]) assert.ok(e[k] && e[k].length > 8, `${e.kind} ${k}`);
+    assert.doesNotMatch(e.shows + e.context + e.label, /\bbot\b|propagandist|extremist|undefined|NaN/i, e.kind);
   }
   assert.deepEqual(r.evidence.map((e) => e.id), r.evidence.map((_, i) => "e" + (i + 1)));
 });

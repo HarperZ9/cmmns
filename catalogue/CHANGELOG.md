@@ -6,6 +6,29 @@ here, with the date and the reason. A badge names the entry and version it used
 (`<id>@<version>`), so an old badge can always be read against the text it was built from.
 Challenges and their decisions are linked from the line they changed.
 
+## 1.0.1 entries (2026-10-23)
+
+Plain-language rewrite of Daylight Commons' own notes, on the author's direction of 2026-10-23. Each entry's
+`binding_note`, `in_force` note, element notes and `does_not_prove` text now say what the entry compares
+and what a match shows, in short active sentences. Quotes, titles, element labels, signals, sources and
+hashes are unchanged.
+
+- `eu-dsa-art26-advertising@1.0.1`: wording of the notes.
+- `eu-dsa-art39-ad-repository@1.0.1`: wording of the notes.
+- `eu-ucpd-annex1-11-advertorial@1.0.1`: wording of the notes.
+- `eu-ucpd-annex1-22-posing-as-consumer@1.0.1`: wording of the notes.
+- `eu-ucpd-annex1-23c-false-reviews-endorsements@1.0.1`: wording of the notes.
+- `uk-dmcc-sch20-12-advertorial@1.0.1`: wording of the notes.
+- `uk-dmcc-sch20-13-fake-reviews@1.0.1`: wording of the notes.
+- `uk-dmcc-sch20-25-posing-as-consumer@1.0.1`: wording of the notes.
+- `uk-fraud-act-2006-s2@1.0.1`: wording of the notes.
+- `us-ftc-act-s5-deception@1.0.1`: wording of the notes.
+- `us-ftc-endorsement-material-connection@1.0.1`: wording of the notes.
+- `us-ftc-fake-social-media-indicators@1.0.1`: wording of the notes.
+- `us-wire-fraud-18usc1343@1.0.1`: wording of the notes.
+- `x-authenticity-engagement-spam@1.0.1`: wording of the notes.
+- `x-paid-partnerships@1.0.1`: wording of the notes.
+
 ## Signal registry 1.1.0 (2026-10-23)
 
 - `timing-burst` added as a context-only signal: it never evidences an element. It needs times to the

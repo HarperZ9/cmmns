@@ -12,10 +12,10 @@
 
 import { MIN_CARD_ACCOUNTS } from "./evidence.js";
 import { canonicalJSON, sha256Hex, lfBytes, jwkId, signText, P256 } from "./sig.js";
-import { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle } from "./bundle-verify.js";
+import { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_VERSIONS, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, EVIDENCE_V1, EVIDENCE_V2, bundleConsistency, readEvidence, verifyBundle } from "./bundle-verify.js";
 
 // Checking a bundle lives in bundle-verify.js, which the offline kit page carries on its own.
-export { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle };
+export { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_VERSIONS, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, EVIDENCE_V1, EVIDENCE_V2, bundleConsistency, readEvidence, verifyBundle };
 // Canonical JSON, hashing, base64url and ECDSA P-256 live in sig.js, shared with data packs.
 const subtle = () => globalThis.crypto.subtle;
 

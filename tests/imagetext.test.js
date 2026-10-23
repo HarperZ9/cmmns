@@ -16,7 +16,7 @@ test("image text goes through the same matchers as a post", () => {
 });
 
 test("a sign from an image is labelled, keeps its rows, adds confidence and the image's limits", () => {
-  const sig = { label: "names a theory: Chemtrails", fam: "conspiracy-theory", level: "warn", cat: "language", rows: [["In this post", "\"chemtrails\""], ["The theory", "t"], ["Read it as", "own line"]] };
+  const sig = { label: "names a theory: Chemtrails", fam: "conspiracy-theory", level: "warn", cat: "language", rows: [["In this post", "\"chemtrails\""], ["The theory", "t"], ["What it shows", "own line"]] };
   const s = fromImage(sig, result);
   assert.equal(s.label, "in image: names a theory: Chemtrails");
   assert.equal(s.fam, "image-text");
@@ -25,10 +25,10 @@ test("a sign from an image is labelled, keeps its rows, adds confidence and the 
   assert.equal(s.cat, "language");
   assert.deepEqual(s.rows[0], ["Read from the image", "\"chemtrails\""]);
   assert.deepEqual(s.rows.find(([h]) => h === "Confidence"), ["Confidence", "91% for the image's text as a whole"]);
-  const dnp = s.rows.filter(([h]) => h === "Read it as");
+  const dnp = s.rows.filter(([h]) => h === "What it shows");
   assert.equal(dnp.length, 1);
   assert.ok(dnp[0][1].startsWith(IMAGE_TEXT_DOES_NOT_PROVE) && dnp[0][1].endsWith("own line"));
-  assert.equal(s.rows.at(-1)[0], "Read it as");
+  assert.equal(s.rows.at(-1)[0], "What it shows");
 });
 
 test("signs read from an image are not measured yet", () => {

@@ -38,7 +38,9 @@ signature then proves the bundle is unchanged and says nothing about who made it
 journalistic write-up or a research dataset, into a new folder; it refuses a chain that fails its
 check.
 `;
-const SCHEMA = JSON.parse(readFileSync(`${ROOT}/schema/evidence.v1.json`, "utf8"));
+// Version 2 is current; version 1 bundles (items with doesNotProve) still verify against their own schema.
+const SCHEMAS = { "urn:radar:evidence:v1": "evidence.v1.json", "urn:radar:evidence:v2": "evidence.v2.json" };
+const schemaFor = (doc) => { const f = SCHEMAS[doc && doc.schema] || SCHEMAS["urn:radar:evidence:v2"]; return { file: f, schema: JSON.parse(readFileSync(`${ROOT}/schema/${f}`, "utf8")) }; };
 
 export function parseArgs(argv) {
   const out = { _: [], flags: {} };
@@ -89,8 +91,8 @@ async function verify(file, f) {
     return c.ok ? 0 : 1;
   }
   const v = await verifyBundle(bundle, { keyId: typeof f["key-id"] === "string" ? f["key-id"] : null });
-  const errs = validate(SCHEMA, bundle);
-  v.checks.push({ name: "schema", ok: !errs.length, text: errs.length ? errs.slice(0, 3).join("; ") : "fits schema/evidence.v1.json" });
+  const S = schemaFor(bundle), errs = validate(S.schema, bundle);
+  v.checks.push({ name: "schema", ok: !errs.length, text: errs.length ? errs.slice(0, 3).join("; ") : `fits schema/${S.file}` });
   v.ok = v.ok && !errs.length;
   print(f.json ? asJson(v) : verdictLines(file, v));
   return v.ok ? 0 : 1;

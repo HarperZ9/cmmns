@@ -131,7 +131,7 @@ export function cardLines(card) {
   push("body", C ? `Content Credentials, ${C.checked} file${C.checked === 1 ? "" : "s"} checked: ${C.unchanged} signed and unchanged, ${C.changed} changed since signing, ${C.unchecked} not fully checked, ${C.none} with none found; ${C.ai} marked as made with generative AI (by credentials or IPTC metadata).` : "Zero files in this thread were checked for Content Credentials.");
   push("head", "Sources");
   for (const s of card.sources) push("small", s);
-  push("head", "How to read it");
+  push("head", "What it covers");
   for (const s of card.doesNotProve) push("limit", s);
   if (card.hash) push("small", "The JSON file saved with this image holds the same content and a hash of it, so anyone can check a copy.");
   return L;

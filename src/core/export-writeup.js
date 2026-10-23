@@ -18,7 +18,7 @@ function exhibit(row, n) {
   return [`### Exhibit ${n}: ${r.kind} about ${r.subject || "no subject"}`, "",
     `- Observed: ${observedLine(r.observed)}`, `- Source: ${r.source}${r.url ? ` (${r.url})` : ""}`, `- Read at: ${r.at}`,
     `- Receipt hash: \`${r.hash}\``, archive(r) ? `- Archive copy: ${archive(r)}` : "- Archive copy: none requested",
-    `- Read it as: ${r.dnp}`, ""];
+    `- What it shows: ${r.dnp}`, ""];
 }
 
 function custody(rows) {
@@ -33,7 +33,7 @@ function definitionBlock({ key, entry }) {
     `- Source: ${src.url || "none"}, retrieved ${src.retrieved_at || "unknown"}, SHA-256 \`${short(src.sha256)}\``, "",
     "| Element | What it requires | Observable from |", "|---|---|---|",
     ...(entry.elements || []).map((e) => `| ${cell(e.id)} | ${cell(e.label)} | ${cell(e.observable_from)} |`), "",
-    `Read it as: ${entry.does_not_prove || DEFINITION_FRAME}`, ""];
+    `What it shows: ${entry.does_not_prove || DEFINITION_FRAME}`, ""];
 }
 
 export async function legalFiles(ctx) {
@@ -60,12 +60,12 @@ export async function journalisticFiles(ctx) {
     const r = row.receipt;
     return [`${i + 1}. **${r.kind}**, ${r.subject || "no subject"}: ${observedLine(r.observed)}.`,
       `   Sourcing: ${r.source}${r.url ? `, ${r.url}` : ""}, read ${r.at}; receipt \`${short(r.hash)}\`${archive(r) ? `; archive copy ${archive(r)}` : ""}.`,
-      `   Read it as: ${r.dnp}`];
+      `   What it shows: ${r.dnp}`];
   });
   const corr = ctx.corrections.length ? ctx.corrections.map((c) => `- ${cell(c.date)}: ${cell(c.text)}`) : ["- None."];
   const L = ["# Write-up", "", `Draft from an evidence chain of ${rows.length} receipts, prepared ${ctx.at} by ${ctx.tool}. Every line below carries its source; add the story around them in your own words.`, "",
     "## What the record shows", "", ...claims, "", "## Right of reply", "", ...replyLog(ctx.replies),
     "## Corrections", "", ...corr, "", "## How a reader can check this", "", ...verifySteps().map((s, i) => `${i + 1}. ${s}`), "",
-    "## Read it as", "", ctx.dnp, "", CHALLENGE, ""];
+    "## What it shows", "", ctx.dnp, "", CHALLENGE, ""];
   return { "WRITE-UP.md": L.join("\n") };
 }

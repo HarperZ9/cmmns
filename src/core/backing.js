@@ -51,6 +51,6 @@ export function backingRows(p) {
   }
   if (p.wikidata && p.wikidata.employers && p.wikidata.employers.length) rows.push(["Wikidata lists", `Employer (P108): ${p.wikidata.employers.map((e) => e.label + (e.end ? ` (to ${e.end.slice(0, 4)})` : "")).join("; ")}. Fetched ${p.wikidata.fetched}; Wikidata can lag a move.`]);
   rows.push(["Wrong or out of date?", { links: [["Send a sourced correction", CORRECTIONS_PATH]] }]);
-  rows.push(["Read it as", BACKING_DOES_NOT_PROVE]);
+  rows.push(["What it shows", BACKING_DOES_NOT_PROVE]);
   return rows;
 }

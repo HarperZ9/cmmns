@@ -6,7 +6,7 @@
 import { CAMPAIGN_BASELINES } from "./campaign-baselines-data.js";
 
 export const SHAPE_MIN_INTERACTIONS = 20, OWN_MIN_POSTS = 5, OWN_OUTLIER_FACTOR = 5, STRATUM_MIN = 200;
-export const SHAPE_DOES_NOT_PROVE = "A post can travel through repost-heavy communities (news, giveaways, art shares), and a launch is unusual for an account by nature. A ratio describes how the engagement is shaped.";
+export const SHAPE_DOES_NOT_PROVE = "The ratio shows how this post's engagement is shaped. Posts travel through repost-heavy communities such as news, giveaways and art shares.";
 
 const num = (v) => (Number.isFinite(v) && v >= 0 ? v : null);
 const ratio = (a, b) => (a != null && b != null && b > 0 ? a / b : null);

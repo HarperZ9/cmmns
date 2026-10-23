@@ -286,11 +286,23 @@ const M_bundle_verify = (() => {
 const { canonicalJSON, jwkId, verifyText } = M_sig;
 
 const BUNDLE_KIND = "radar-evidence-bundle";
-const BUNDLE_VERSION = 1;
+const BUNDLE_VERSION = 2;
+const BUNDLE_VERSIONS = [1, 2];
+const EVIDENCE_V1 = "urn:radar:evidence:v1", EVIDENCE_V2 = "urn:radar:evidence:v2";
 const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
 const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the holder of this key signed the bundle and that it is unchanged since. Check the key id with the signer by another route, and read each span against its post.";
 const CARRIER_SAFE = "carrier-safe";
 const CARRIER_SAFE_NOTE = "carrier-safe: the signature proves the bundle is unchanged; it says nothing about who made it";
+
+function readEvidence(doc) {
+  if (!doc || !Array.isArray(doc.evidence)) return doc;
+  const evidence = doc.evidence.map((e) => {
+    if (!e || typeof e !== "object" || !("doesNotProve" in e)) return e;
+    const { doesNotProve, ...rest } = e;
+    return { ...rest, context: rest.context != null ? rest.context : doesNotProve };
+  });
+  return { ...doc, evidence };
+}
 
 function bundleConsistency(bundle) {
   const ids = new Set((bundle.posts || []).map((p) => p.id)), text = new Map((bundle.posts || []).filter((p) => p.text != null).map((p) => [p.id, p.text]));
@@ -319,7 +331,8 @@ async function signatureOk(bundle) {
 async function verifyBundle(bundle, opts = {}) {
   const checks = [];
   if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this file lacks the Daylight Commons evidence bundle kind" }] };
-  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version}; this Daylight Commons reads version ${BUNDLE_VERSION}` });
+  const known = BUNDLE_VERSIONS.includes(bundle.version);
+  checks.push({ name: "version", ok: known, text: known ? `bundle version ${bundle.version}` : `bundle version ${bundle.version}; this Daylight Commons reads versions ${BUNDLE_VERSIONS.join(" and ")}` });
   checks.push({ name: "signature", ...(await signatureOk(bundle)) });
   if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is unknown to this Daylight Commons` });
   const keyId = bundle.signer ? bundle.signer.keyId : null;
@@ -329,7 +342,7 @@ async function verifyBundle(bundle, opts = {}) {
   return { ok: checks.every((c) => c.ok), keyId, checks };
 }
 
-return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle };
+return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_VERSIONS, EVIDENCE_V1, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, readEvidence, bundleConsistency, verifyBundle };
 })();
 const M_kit_verify = (() => {
 

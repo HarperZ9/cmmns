@@ -1,7 +1,7 @@
 // radar-core: the public API. One zero-dependency ES module over Daylight Commons' pure core, for anyone
 // who wants Daylight Commons' evidence without the browser extension. No DOM, no network, no storage: the
 // caller hands in the posts, the file bytes and (optionally) the data tables, and gets back
-// evidence objects that match schema/evidence.v1.json. project-docs/INTEGRATION.md documents it.
+// evidence objects that match schema/evidence.v2.json. project-docs/INTEGRATION.md documents it.
 //
 //   analyzeThread({ site, root, replies })   evidence about a thread
 //   analyzeText(text)                        evidence about one piece of text
@@ -20,8 +20,8 @@ import { useData, claimIndex, dataLoaded } from "./api-data.js";
 import { REPORT_DOES_NOT_PROVE } from "./report.js";
 import { THREAD_LIMIT, TEXT_LIMIT } from "./api-words.js";
 
-export const API_VERSION = "1.1.0";
-export const EVIDENCE_SCHEMA = "urn:radar:evidence:v1";
+export const API_VERSION = "2.0.0";
+export const EVIDENCE_SCHEMA = "urn:radar:evidence:v2";
 export { useData, dataLoaded };
 
 const envelope = (kind, extra) => ({ schema: EVIDENCE_SCHEMA, api: API_VERSION, kind, ...extra });

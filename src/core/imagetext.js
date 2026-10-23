@@ -39,9 +39,9 @@ export function imageTextRows(result) {
 // becomes "image-text", so its measured line reads "not measured yet".
 export function fromImage(signal, result) {
   const rows = signal.rows.map(([h, v]) => [h === "In this post" ? "Read from the image" : h, v]);
-  const at = rows.findIndex(([h]) => h === "Read it as");
+  const at = rows.findIndex(([h]) => h === "What it shows");
   const extra = [["Confidence", `${percent(result && result.confidence)} for the image's text as a whole`]];
-  const dnp = ["Read it as", IMAGE_TEXT_DOES_NOT_PROVE + (at >= 0 ? " " + rows[at][1] : "")];
+  const dnp = ["What it shows", IMAGE_TEXT_DOES_NOT_PROVE + (at >= 0 ? " " + rows[at][1] : "")];
   const body = at >= 0 ? rows.filter((_, i) => i !== at) : rows;
   return { ...signal, label: `in image: ${signal.label}`, fam: "image-text", of: signal.fam, level: "info", fromImage: true, rows: [...body, ...extra, dnp] };
 }

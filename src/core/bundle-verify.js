@@ -8,11 +8,27 @@
 import { canonicalJSON, jwkId, verifyText } from "./sig.js";
 
 export const BUNDLE_KIND = "radar-evidence-bundle";
-export const BUNDLE_VERSION = 1;
+export const BUNDLE_VERSION = 2;
+// Bundle versions this checker reads: version 1 items carry doesNotProve, version 2 items carry context.
+export const BUNDLE_VERSIONS = [1, 2];
+export const EVIDENCE_V1 = "urn:radar:evidence:v1", EVIDENCE_V2 = "urn:radar:evidence:v2";
 export const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
 export const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the holder of this key signed the bundle and that it is unchanged since. Check the key id with the signer by another route, and read each span against its post.";
 export const CARRIER_SAFE = "carrier-safe";
 export const CARRIER_SAFE_NOTE = "carrier-safe: the signature proves the bundle is unchanged; it says nothing about who made it";
+
+// Reads an envelope or a bundle of either schema version in version 2 field names: a version 1
+// item's doesNotProve becomes context. It returns a copy and leaves the document as signed, so the
+// signature still checks against the original.
+export function readEvidence(doc) {
+  if (!doc || !Array.isArray(doc.evidence)) return doc;
+  const evidence = doc.evidence.map((e) => {
+    if (!e || typeof e !== "object" || !("doesNotProve" in e)) return e;
+    const { doesNotProve, ...rest } = e;
+    return { ...rest, context: rest.context != null ? rest.context : doesNotProve };
+  });
+  return { ...doc, evidence };
+}
 
 // Spans and post references inside the bundle agree with themselves: every post an item names is
 // listed, and when text is included every located span is the text at that place.
@@ -45,7 +61,8 @@ async function signatureOk(bundle) {
 export async function verifyBundle(bundle, opts = {}) {
   const checks = [];
   if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this file lacks the Daylight Commons evidence bundle kind" }] };
-  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version}; this Daylight Commons reads version ${BUNDLE_VERSION}` });
+  const known = BUNDLE_VERSIONS.includes(bundle.version);
+  checks.push({ name: "version", ok: known, text: known ? `bundle version ${bundle.version}` : `bundle version ${bundle.version}; this Daylight Commons reads versions ${BUNDLE_VERSIONS.join(" and ")}` });
   checks.push({ name: "signature", ...(await signatureOk(bundle)) });
   if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is unknown to this Daylight Commons` });
   const keyId = bundle.signer ? bundle.signer.keyId : null;
