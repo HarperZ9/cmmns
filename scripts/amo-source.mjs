@@ -5,7 +5,7 @@
 //   node scripts/amo-source.mjs            writes docs/store/amo-source-<version>.zip
 import { readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { zip } from "./zip.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -49,7 +49,7 @@ export function amoSource(v = version) {
   return zip(files.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   mkdirSync(join(ROOT, "docs/store"), { recursive: true });
   const out = join(ROOT, "docs/store", `amo-source-${version}.zip`), bytes = amoSource();
   writeFileSync(out, bytes);

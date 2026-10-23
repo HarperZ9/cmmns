@@ -8,9 +8,9 @@
 //   radar export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
 // <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 // CSV, a Mastodon outbox.json or a Bluesky repository .car. project-docs/INTEGRATION.md has more.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { basename } from "node:path";
-import { pathToFileURL } from "node:url";
+import { pathToFileURL, fileURLToPath } from "node:url";
 import { analyzeThread, analyzeText, checkMedia, siteInfo } from "../src/core/api.js";
 import { importFile } from "../src/core/imports.js";
 import { makeBundle, signBundle, signCarrierSafe, verifyBundle, CARRIER_SAFE } from "../src/core/evidence-bundle.js";
@@ -116,6 +116,9 @@ export async function main(argv) {
   return 2;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Run as a program, whatever path led here: macOS's temporary folders sit behind a link
+// (/var is /private/var), so the path in argv and this module's own path can differ in spelling only.
+const real = (p) => { try { return realpathSync(p); } catch { return p; } };
+if (process.argv[1] && real(process.argv[1]) === real(fileURLToPath(import.meta.url))) {
   main(process.argv.slice(2)).then((code) => { process.exitCode = code; }, (e) => { const a = process.argv.slice(2); process.stderr.write(`daylight: ${friendly(e, a[0] === "case" ? (a[1] ? `case ${a[1]}` : "case") : a[0])}\n`); process.exitCode = 1; });
 }
