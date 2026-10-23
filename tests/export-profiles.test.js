@@ -64,6 +64,9 @@ test("technical: every receipt is a PROV entity with its activity, agent, deriva
   for (const h of hashes) assert.ok(prov.entity[`dc:receipt-${h}`]["prov:generatedAtTime"]);
   assert.equal(Object.keys(prov.wasGeneratedBy).length, hashes.length);
   assert.equal(Object.keys(prov.hadMember).length, chain.size);
+  // PROV-JSON has no null; the W3C schema and prov 3.3 reject one.
+  const nulls = Object.values(prov).filter((s) => s && typeof s === "object").flatMap((s) => Object.values(s)).flatMap((n) => Object.entries(n || {})).filter(([, v]) => v === null);
+  assert.deepEqual(nulls, []);
   assert.deepEqual(Object.values(prov.wasDerivedFrom).map((d) => d["prov:usedEntity"]).sort(), [hashes[0], hashes[1]].map((h) => `dc:receipt-${h}`).sort());
 });
 
@@ -77,6 +80,10 @@ test("research: splits are fixed by hash, recorded with hashes, and Croissant po
   assert.equal(Object.values(splits).reduce((a, s) => a + s.rows, 0), rows.length);
   const cr = JSON.parse(files["croissant.json"]);
   assert.equal(cr.conformsTo, "http://mlcommons.org/croissant/1.0");
+  // mlcroissant reads @language and the cr: terms from the standard context.
+  assert.equal(cr["@context"]["@language"], "en");
+  for (const k of ["recordSet", "field", "source", "extract", "fileObject", "column", "dataType", "citeAs"]) assert.ok(cr["@context"][k], k);
+  assert.ok(cr.citeAs && cr.version);
   assert.equal(cr.distribution[0].sha256, await sha256Hex(files["rows.jsonl"]));
   assert.match(files["DATASHEET.md"], /1 rows carry a labeller; strata present: en\/tech/);
   const again = (await exportProfile(chain, "research", { ...opts, at: "2027-01-01T00:00:00Z" })).files["splits.json"];

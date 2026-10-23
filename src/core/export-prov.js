@@ -9,14 +9,17 @@ const ent = (hash) => `${NS}:receipt-${hash}`;
 const act = (hash) => `${NS}:capture-${hash}`;
 const agentId = (adapter) => `${NS}:adapter-${String(adapter || "unknown").replace(/[^A-Za-z0-9.-]/g, "-")}`;
 
+// PROV-JSON has no null: an absent attribute is left out (W3C PROV-JSON schema; prov 3.3 rejects null).
+const compact = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null && v !== undefined));
+
 function receiptNodes(row, doc) {
   const r = row.receipt, cap = r.capture || {};
-  doc.entity[ent(r.hash)] = { "prov:type": "dc:Receipt", "dc:kind": r.kind, "dc:subject": r.subject, "dc:subjectKind": r.subjectKind,
+  doc.entity[ent(r.hash)] = compact({ "prov:type": "dc:Receipt", "dc:kind": r.kind, "dc:subject": r.subject, "dc:subjectKind": r.subjectKind,
     "dc:source": r.source, "dc:url": r.url, "dc:rawHash": cap.rawHash, "dc:seq": row.seq, "dc:link": row.link,
-    "dc:catalogue": r.catalogue || null, "dc:doesNotProve": r.dnp, "prov:generatedAtTime": r.at };
-  doc.activity[act(r.hash)] = { "prov:startTime": r.at, "prov:endTime": r.at, "dc:method": cap.method || null };
+    "dc:catalogue": r.catalogue || null, "dc:doesNotProve": r.dnp, "prov:generatedAtTime": r.at });
+  doc.activity[act(r.hash)] = compact({ "prov:startTime": r.at, "prov:endTime": r.at, "dc:method": cap.method || null });
   const ag = agentId(cap.adapter);
-  doc.agent[ag] = { "prov:type": "prov:SoftwareAgent", "dc:adapter": cap.adapter || null };
+  doc.agent[ag] = compact({ "prov:type": "prov:SoftwareAgent", "dc:adapter": cap.adapter || null });
   doc.wasGeneratedBy[`${NS}:gen-${r.hash}`] = { "prov:entity": ent(r.hash), "prov:activity": act(r.hash), "prov:time": r.at };
   doc.wasAssociatedWith[`${NS}:assoc-${r.hash}`] = { "prov:activity": act(r.hash), "prov:agent": ag };
   for (const c of [].concat(r.cites || [])) doc.wasDerivedFrom[`${NS}:der-${r.hash}-${c}`] = { "prov:generatedEntity": ent(r.hash), "prov:usedEntity": ent(c) };
