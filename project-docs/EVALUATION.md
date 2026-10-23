@@ -780,3 +780,7 @@ the post's topic. In the second, the launch post's own shape is ordinary (repost
 and its two visible quotes carry X's Paid partnership label, three hours old at capture. The paid
 quotes are like-heavy (reposts per like 0.01 and 0.08), so paid quotes and repost inversion are
 separate families. Join dates and cross-launch overlap cannot be read from screenshots.
+
+## Reading lens (3.3.0)
+
+The reading lens has its own method and held-out tables: `project-docs/READING-LENS.md` (`node scripts/eval-reading.mjs`).

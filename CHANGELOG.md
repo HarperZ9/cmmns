@@ -5,7 +5,33 @@ were not published to a store.
 
 ## Unreleased
 
+Nothing yet.
+
+## 3.3.0 (2026-10-23)
+
+The reading lens. Daylight Commons now reads how a post argues, at the span: it names the technique,
+marks the words in the post, and shows the two factors that moved its weight. The thread panel counts
+how many posts and authors use the same frame, and the feed dashboard counts frames across your feed.
 Every sign now says what it shows, in plain words.
+
+### Added
+- Reading lens (`src/core/reading.js`, `reading-cues.js`, `reading-inflection.js`, `reading-lists.js`).
+  Seventeen techniques: nation denial, dehumanising metaphor, punitive annexation or elimination,
+  strongman appeal, question insinuation, true item carries a leap, case to group, essentialism, coded
+  term, replacement or blood libel, secret coercion, election theft, metaphor, hyperbole, irony,
+  allusion and dog-whistle. Each has a plain one-line definition.
+- Inflection layer: stance (quotes, mocks, rebuts, names a coded term to criticise it), irony, question,
+  target class, intensity, thread echo, the opening post, genre, the author's own usage and post length.
+  One deterministic weight vector, fitted on the dev feed tests only. Target enters as one class, and
+  `tests/reading.symmetry.test.js` checks every nation, people, party, actor and leader in the lists.
+- Spans marked in the post with the CSS Custom Highlight API (`src/ext/lens-inline.js`); the window shows
+  the span, its name and its factors; the thread panel shows "Frames in this thread"; the dashboard shows
+  "Frames across your feed".
+- Options: "Every reading technique" shows all seventeen.
+- `scripts/eval-reading.mjs`: precision and recall per technique with Wilson intervals, with and without
+  inflection, against two blind labellers. Method and tables: `project-docs/READING-LENS.md`.
+
+### Changed
 - The window, panel, exports and command line show a "What it shows" row for each sign. It describes
   what the sign found and keeps a limit only where a reader would misread the sign without it.
 - Technique definitions and lessons are rewritten in short, plain sentences: what the technique is
@@ -16,6 +42,12 @@ Every sign now says what it shows, in plain words.
   `schema/evidence.v2.json` (`urn:radar:evidence:v2`) and new bundles are version 2. Version 1
   bundles still verify, and `readEvidence` reads their `doesNotProve` as `context`
   (project-docs/INTEGRATION.md).
+
+### Measured
+- Held-out feed tests 10 and 11 (98 posts, labelled blind for this release): no technique reaches 80%
+  precision from 3 hits, so every technique is off by default. Question insinuation is closest at 3 of 4.
+  Round 1 on feed tests 6 to 11 is kept in `project-docs/evidence/reading-results-round1.json`.
+- The strong-family precision on `scripts/eval.mjs --split test` is unchanged: 4,167 of 4,597 (90.6%).
 
 ## 3.2.2 (2026-10-23)
 

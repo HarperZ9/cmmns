@@ -3715,6 +3715,27 @@ const SLOTS = {
 };
 const BE = "(?:is|are|was|were|'s|'re|isn't|aren't|is not|are not|wasn't)";
 
+// What each technique is and how to spot it, in plain English: one idea per sentence.
+const DEFINITIONS = {
+  "nation-denial": "The post says a nation or a people does not exist. Look for \"is not a real country\" or \"no man's land\".",
+  "dehumanising": "The post calls people animals, pests or a disease. Look for words like \"vermin\", \"parasites\" or \"spreading like a plague\".",
+  "punitive-annexation": "The post asks to take over a place or remove a group as a punishment. Look for \"turn it into a penal colony\", \"wipe them off the map\" or \"deport them all\".",
+  "strongman": "The post asks for one hard ruler to fix things. Look for \"we need our own\" followed by a named ruler, or \"iron fist\".",
+  "question-insinuation": "The post puts an accusation in a question. The reader supplies the answer. Look for a run of questions or \"who benefits?\".",
+  "true-leap": "The post starts from a true or documented item. Then it jumps to a larger claim. Look for \"this proves\", \"that is why\" or \"not a coincidence\".",
+  "case-to-group": "The post takes one case and applies it to a whole group. Look for \"typical\", \"they always\" or \"all of them\".",
+  "essentialism": "The post says a group has a fixed nature. Look for \"in their blood\", \"inherently\" or \"genetically\".",
+  "coded-term": "The post uses a word that stands in for a slur or a group name. The window shows the word.",
+  "replacement": "The post says a group plans to replace a people, or accuses a group of ritual crimes. Look for \"replacement\", \"flood the country with\" or \"ritual abuse\".",
+  "secret-coercion": "The post says a leader is secretly controlled. Look for \"blackmailed\", \"compromised\", \"owned by\" or \"puppet of\".",
+  "election-theft": "The post says an election was stolen or rigged. Look for \"rigged election\", \"fake president\" or \"machines flipped votes\".",
+  "metaphor": "The post describes people or events as something else. Look for \"invasion\", \"flood\" or \"cancer\".",
+  "hyperbole": "The post makes something much bigger than the facts. Look for \"in history\", \"of all time\" or \"every single one\".",
+  "irony": "The post says the opposite of what it means. Look for \"funny how\", \"what a coincidence\" or \"/s\".",
+  "allusion": "The post borrows force from a known story, book or event. Look for names like \"Orwellian\", \"Weimar\" or \"Judas\".",
+  "dog-whistle": "The post uses a phrase that one audience reads as a coded message. Look for \"certain people\" or \"we are not supposed to notice\".",
+};
+
 // [id, name, family, cues]. Family names follow the brief; literary devices are one family.
 const READING_TECHNIQUES = [
   ["nation-denial", "Nation denial", "dehumanising", [
@@ -3790,7 +3811,7 @@ const READING_TECHNIQUES = [
   ["allusion", "Allusion", "literary", [`\\b(?:${alt(ALLUSIONS)})\\b`]],
   ["dog-whistle", "Dog-whistle", "literary", ["\\b(?:certain people|you know who|those people|these people|their kind|globalists?|international bankers|rootless|the usual suspects|\\(\\(\\()\\b",
     "\\b(?:we aren'?t supposed to|you'?re not supposed to) (?:notice|talk about|say)\\b", "\\boften it'?s in the (?:last )?name\\b", "\\b(?:jewish|zionist|muslim|catholic|white|black) (?:money|cabal|lobby|power brokers)\\b"]],
-].map(([id, name, family, cues]) => ({ id, name, family, cues }));
+].map(([id, name, family, cues]) => ({ id, name, family, cues, definition: DEFINITIONS[id] }));
 
 const fill = (cue) => cue.replace(/\{(NATION|GROUP|ACTOR|STRONGMAN)\}/g, (_, k) => SLOTS[k]);
 const READING_RULES = READING_TECHNIQUES.flatMap((t) => t.cues.map((cue, i) => ({ technique: t.id, cue: `${t.id}#${i}`, re: new RegExp(fill(cue), "giu") })));
