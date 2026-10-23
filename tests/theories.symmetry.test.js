@@ -37,3 +37,28 @@ test("both sides' debunking is skipped the same way", () => {
   for (const t of ["There is no evidence Dominion flipped the votes", "There is no evidence Starlink flipped the votes",
     "The 2020 election was not stolen", "The 2016 election was not stolen"]) assert.equal(theories(t), "", t);
 });
+
+// Added 2026-10-23 from the feed test: secret control by a people or a foreign power. Each pair swaps
+// the people or the power and keeps the shape.
+const CONTROL_PAIRS = [
+  ["South Korea is now 99% under the control of the CCP", "Ukraine is now 90% under the control of the CIA"],
+  ["Our parliament is fully controlled by Mossad", "Our parliament is fully controlled by the Kremlin"],
+  ["The ministries have been infiltrated and controlled by Beijing", "The ministries have been infiltrated and controlled by Washington"],
+  ["a jewish cabal is calling the shots", "a christian cabal is calling the shots"],
+  ["muslim money controls the courts", "white money controls the courts"],
+  ["so many deep state controlled countries now", "so many deep state controlled countries now"],
+  ["she won through a rigged election", "he came to power through a stolen election"],
+];
+for (const [a, b] of CONTROL_PAIRS) {
+  test(`secret control and rigged-election pair matches both: "${a}" / "${b}"`, () => {
+    assert.notEqual(theories(a), "", a);
+    assert.equal(theories(a), theories(b), b);
+  });
+}
+
+test("secret control near misses: ownership, measurement, debunking", () => {
+  for (const t of ["The firm is 100% owned by one family", "you are only 5% controlled by your DNA",
+    "Crimea is now run by Moscow appointees", "the board is now controlled by the founders",
+    "the idea that Korea is 99% under the control of the CCP is a baseless conspiracy theory",
+    "fact check: no, the election was not won through a rigged election"]) assert.equal(theories(t), "", t);
+});
