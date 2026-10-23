@@ -26,7 +26,7 @@ export function itemLines(e) {
 
 export function readable(result, notes = []) {
   const L = [];
-  const head = result.kind === "thread" ? `Thread${result.site ? ` on ${result.site}` : ""}: ${result.posts.n} posts from ${result.posts.accounts} accounts.`
+  const head = result.kind === "thread" ? `Thread${result.site ? ` on ${result.site}` : ""}: ${result.posts.n} posts from ${result.posts.accounts} accounts.${(result.posts.quoted || []).length ? ` ${result.posts.quoted.length} quoted post${result.posts.quoted.length === 1 ? "" : "s"} read too.` : ""}`
     : result.kind === "media" ? `File: Content Credentials ${result.media.state}${result.media.ai ? ", marked as made with AI" : ""}.`
     : result.kind === "site" ? `Site: ${result.site.domain}.` : "Text: one post.";
   L.push(head, ...notes.map((n) => "Note: " + n), "");

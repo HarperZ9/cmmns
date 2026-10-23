@@ -64,7 +64,7 @@ export function makeBundle(result, opts = {}) {
   if (result.kind === "thread" && !archive && (result.posts.accounts || 0) < MIN_CARD_ACCOUNTS) {
     return { ok: false, reason: `This thread has ${result.posts.accounts || 0} accounts. A bundle needs at least ${MIN_CARD_ACCOUNTS}, so it cannot be about one person.` };
   }
-  const ids = (result.posts && result.posts.ids) || [...new Set(result.evidence.flatMap((e) => e.posts))];
+  const ids = (result.posts && result.posts.ids) ? [...result.posts.ids, ...(result.posts.quoted || [])] : [...new Set(result.evidence.flatMap((e) => e.posts))];
   const texts = opts.includeText ? opts.texts || {} : {};
   const bundle = {
     kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "Daylight Commons",

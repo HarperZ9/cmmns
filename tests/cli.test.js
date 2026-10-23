@@ -109,3 +109,21 @@ test("verify checks a saved evidence chain and fails an edited, reordered or tru
     assert.match(r.stdout, new RegExp(`FAIL  ${failing}:`), name);
   }
 });
+
+test("analyze reads quoted posts, keeps them out of the reply count, and bundles them", () => {
+  const file = join(FX, "thread-quoted.json");
+  const json = JSON.parse(run("analyze", file, "--json", "--no-claims").stdout);
+  assert.equal(json.posts.n, 6, "a quoted post is not a reply");
+  assert.deepEqual(json.posts.quoted, ["q1", "q2"]);
+  const strong = json.evidence.filter((e) => e.kind === "strong-language");
+  assert.ok(strong.some((e) => e.posts[0] === "q1" && e.data.family === "dehumanise"), "the top-level quoted list is read");
+  assert.ok(strong.some((e) => e.posts[0] === "q2" && e.data.family === "slur"), "a reply's own quoted post is read");
+  const plain = JSON.parse(run("analyze", join(FX, "thread.json"), "--json", "--no-claims").stdout);
+  assert.equal("quoted" in plain.posts, false, "a thread with no quoted posts is reported as before");
+  const text = run("analyze", file, "--no-claims");
+  assert.match(text.stdout, /2 quoted posts read too\./);
+  const out = join(dir, "quoted-bundle.json");
+  assert.equal(run("analyze", file, "--no-claims", "--include-text", "--bundle", out, "--key", join(dir, "kq.jwk")).status, 0);
+  const ok = run("verify", out);
+  assert.equal(ok.status, 0, ok.stdout);
+});

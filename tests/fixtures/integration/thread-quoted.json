@@ -1,0 +1,56 @@
+{
+ "site": "X",
+ "root": {
+  "id": "r1",
+  "author": "a",
+  "text": "Look at what this account posted today.",
+  "posted": "2026-10-01T12:00:00Z"
+ },
+ "replies": [
+  {
+   "id": "r2",
+   "author": "b",
+   "text": "Unbelievable.",
+   "posted": "2026-10-01T12:05:00Z"
+  },
+  {
+   "id": "r3",
+   "author": "c",
+   "text": "Report it.",
+   "posted": "2026-10-01T12:09:00Z",
+   "quoted": {
+    "id": "q2",
+    "author": "e",
+    "text": "the noticing will continue, friends",
+    "posted": "2026-10-01T09:00:00Z"
+   }
+  },
+  {
+   "id": "r4",
+   "author": "f",
+   "text": "Saw it.",
+   "posted": "2026-10-01T12:20:00Z"
+  },
+  {
+   "id": "r5",
+   "author": "g",
+   "text": "Not great.",
+   "posted": "2026-10-01T12:27:00Z"
+  },
+  {
+   "id": "r6",
+   "author": "h",
+   "text": "Blocking them.",
+   "posted": "2026-10-01T12:34:00Z"
+  }
+ ],
+ "quoted": [
+  {
+   "id": "q1",
+   "author": "d",
+   "text": "Those fascists are vermin and everyone knows it",
+   "posted": "2026-10-01T11:00:00Z",
+   "quoted_by": "r1"
+  }
+ ]
+}
