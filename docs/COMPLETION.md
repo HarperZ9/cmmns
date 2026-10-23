@@ -6,7 +6,7 @@ commons plan and the explainer plan) as a criterion with a check that can fail, 
 and the evidence, and the tool a user would compare it with. The wave plan that works through it is
 `docs/WAVES.md`.
 
-First written 2026-10-23 against `main` at `aaa65a1` (release 3.0.0); export rows updated by wave 1. Update the row in the same
+First written 2026-10-23 against `main` at `aaa65a1` (release 3.0.0); export rows updated by wave 1; counts updated at release 3.1.0 after wave 2. Update the row in the same
 commit as the change that moves it.
 
 ## Status words
@@ -37,10 +37,10 @@ These do not move for any feature below. A row that would cross one is out of sc
 
 | Status | Rows |
 |---|---|
-| PASS | 28 |
-| PARTIAL | 36 |
+| PASS | 38 |
+| PARTIAL | 29 |
 | FAIL | 4 |
-| NOT BUILT | 33 |
+| NOT BUILT | 30 |
 | **All** | **101** |
 
 ## 1. Measurement

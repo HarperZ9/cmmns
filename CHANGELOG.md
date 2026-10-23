@@ -5,6 +5,13 @@ were not published to a store.
 
 ## Unreleased
 
+Nothing yet.
+
+## 3.1.0 (2026-10-23)
+
+Wave 2 of `docs/WAVES.md`: the labelling kit, the challenge route, commons phase 1 and the element
+tables in the window. The integration API stays at 1.0.0.
+
 ### Fixed
 - Exports checked with outside validators: the technical profile wrote `null` for absent PROV
   attributes, which the W3C PROV-JSON schema rejects, and the research profile's Croissant context
