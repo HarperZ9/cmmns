@@ -130,7 +130,24 @@ node bin/radar.mjs analyze tweets.js --json         # or your X, Reddit, Mastodo
 node bin/radar.mjs analyze thread.json --bundle out.json
 node bin/radar.mjs verify out.json                  # anyone can check a signed bundle offline
 node bin/radar.mjs verify evidence-chain.json       # or an evidence chain saved in the extension
+node bin/radar.mjs export evidence-chain.json --profile legal --out dossier
 ```
+
+`export` writes a saved evidence chain for the reader who needs it, into a new folder, with the
+chain itself beside it so anyone can run `verify`:
+
+- `legal`: a dossier with numbered exhibits, a chain-of-custody log, each cited definition with its
+  elements, the method, the limits and the verifier steps.
+- `technical`: every receipt as W3C PROV (`provenance.json`), the raw observations and the steps to
+  reproduce.
+- `journalistic`: a write-up with a sourcing note on every line, a right-of-reply log
+  (`--reply replies.json`) and corrections (`--corrections corrections.json`).
+- `research`: one JSON line per receipt with its lineage, train, dev and test splits fixed by hash,
+  Croissant metadata and a datasheet.
+
+Exports hold identifiers, hashes and extracted features, never post text, and a private account
+only as a pseudonym. A chain that fails its check is refused. The legal dossier is Markdown; a
+PDF/A version is not built yet.
 
 In the extension, the toolbar popup's **Analyse a file** does the same on a file you choose. Code
 can import `src/core/api.js` (radar-core): `analyzeThread`, `analyzeText`, `checkMedia` and

@@ -87,10 +87,28 @@ counts are written down with the time. A point within 10 minutes of the last one
 Retention is 48 points per post, 30 days and 500 posts. No account and no text is kept. The
 evidence block shows each count's first and last value and its largest step between two visits.
 
-## Data model for exports (designed now, no export UI yet)
+## Export profiles (built in the command line tool; not in the extension yet)
 
 `VISION.md` plans four export profiles from one store: legal, technical, journalistic, and research
-and ML. The receipt already carries what they need:
+and ML. `radar export <chain> --profile <name>` builds each one from a saved evidence chain
+(`src/core/export-profiles.js`, with `export-writeup.js`, `export-prov.js` and
+`export-research.js`; tests in `tests/export-profiles.test.js`):
+- **legal:** `DOSSIER.md`, numbered exhibits, a chain-of-custody table, each cited catalogue entry
+  with its elements, the method, the limits and the verifier steps. PDF/A is not built.
+- **technical:** `provenance.json` in W3C PROV-JSON (an entity, a capture activity and an adapter
+  agent per receipt; `cites` as `wasDerivedFrom`; the chain as a collection), `observations.jsonl`
+  and `REPRODUCE.md`.
+- **journalistic:** `WRITE-UP.md`, a sourcing note on every line, the right-of-reply log and the
+  corrections the user supplies.
+- **research:** `rows.jsonl` with lineage per row (chain position, link, root, inclusion proof),
+  train, dev and test splits fixed by SHA-256 of seed and receipt hash, `splits.json` with a hash
+  per split, Croissant 1.0 metadata pointing at the rows by SHA-256, and `DATASHEET.md`.
+
+Every profile refuses a chain that fails `chainChecks`, a receipt whose content is not
+`features`, a receipt that observed post text or a handle, and a private account without its
+pseudonym; each ships the chain unchanged. The extension has no export button yet.
+
+The receipt carries what the profiles need:
 - **Provenance per row:** the capture block, the source, the URL, the time and the chain position.
 - **Labeller and stratum:** set on hand-labelled observations, using the strata in `EVALUATION.md`.
 - **Catalogue version:** on any finding that applies a definition.

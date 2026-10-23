@@ -4,6 +4,7 @@
 //   radar verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
 //   radar site <domain> [--json]
 //   radar media <file> [--json]
+//   radar export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
 // <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 // CSV, a Mastodon outbox.json or a Bluesky repository .car. project-docs/INTEGRATION.md has more.
 import { readFileSync, writeFileSync } from "node:fs";
@@ -17,16 +18,21 @@ import { loadTables, dataLock, radarVersion, ROOT } from "./lib/data.mjs";
 import { loadOrMakeKey, DEFAULT_KEY } from "./lib/keys.mjs";
 import { readable, verdictLines, chainLines } from "./lib/report.mjs";
 import { validate } from "./lib/jsonschema.mjs";
+import { runExport } from "./lib/export.mjs";
 
 const USAGE = `Usage:
   radar analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
   radar verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
   radar site <domain> [--json]
   radar media <file> [--json]
+  radar export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
+               [--reply replies.json] [--corrections corrections.json] [--seed text]
 <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 CSV, a Mastodon outbox.json or a Bluesky repository .car. verify checks a signed evidence bundle
 or an evidence chain saved from the extension ("Save evidence chain"). Daylight Commons reads local
-files only.
+files only. export writes a saved evidence chain as a legal dossier, a technical PROV record, a
+journalistic write-up or a research dataset, into a new folder; it refuses a chain that fails its
+check.
 `;
 const SCHEMA = JSON.parse(readFileSync(`${ROOT}/schema/evidence.v1.json`, "utf8"));
 
@@ -36,7 +42,7 @@ export function parseArgs(argv) {
     const a = argv[i];
     if (!a.startsWith("--")) { out._.push(a); continue; }
     const [k, v] = a.slice(2).split("=");
-    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id"].includes(k) ? argv[++i] : true;
+    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed"].includes(k) ? argv[++i] : true;
   }
   return out;
 }
@@ -84,6 +90,8 @@ export async function main(argv) {
   if (cmd === "analyze") { await analyze(arg, flags); return 0; }
   if (cmd === "verify") return verify(arg, flags);
   if (cmd === "site") { loadTables({ claims: false }); const r = siteInfo(arg); if (!r) throw new Error("No domain given."); print(flags.json ? asJson(r) : readable(r)); return 0; }
+  if (cmd === "export") { const r = await runExport(arg, flags); print(`Wrote ${r.files.length} files to ${r.out}: ${r.files.join(", ")}.
+`); return 0; }
   if (cmd === "media") { const r = await checkMedia(readFileSync(arg)); print(flags.json ? asJson(r) : readable(r)); return 0; }
   print(USAGE);
   return 2;
