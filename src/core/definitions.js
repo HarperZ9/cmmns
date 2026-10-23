@@ -56,7 +56,7 @@ function citeOf(entry) {
 
 // The one-paragraph summary. It names matched, indicative, unobservable and unevidenced elements,
 // and it never says a definition is met: the frame line always follows.
-export function summarize(entry, rows) {
+export function summarizeTable(entry, rows) {
   const ids = (st) => rows.filter((r) => r.status === st).map((r) => r.id);
   const matched = ids("matched"), unseen = ids("not-observable");
   const partial = rows.filter((r) => r.status === "not-matched" && r.families > 0);
@@ -91,7 +91,7 @@ export function elementTable(entry, finding, registry) {
     matched: rows.filter((r) => r.status === "matched").map((r) => r.id),
     notObservable: rows.filter((r) => r.status === "not-observable").map((r) => r.id),
     notMatched: rows.filter((r) => r.status === "not-matched").map((r) => r.id),
-    summary: summarize(entry, rows),
+    summary: summarizeTable(entry, rows),
     dnp: entry.does_not_prove, legal_note: LEGAL_NOTE, challenge: CHALLENGE,
   };
 }

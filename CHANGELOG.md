@@ -6,6 +6,12 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- Element tables in the launch campaign window and card. For each applicable jurisdiction, every
+  published definition is shown element by element as matched, not matched or not observable, with
+  the signs behind each match, in a fixed order that never depends on how damning a table looks.
+  When neither the actor's nor your own jurisdiction is known, every jurisdiction the catalogue
+  covers is shown. Each table links to its catalogue entry at the version used, its source and the
+  challenge template.
 - The challenge route as a product. Every badge in the launch campaign window and card names the
   catalogue entries that cite its sign, at their versions, and links to them and to a new dispute
   template for badges and findings with the sign filled in. `catalogue/DECISIONS.md` is the public

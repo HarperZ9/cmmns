@@ -70,7 +70,7 @@
       if (handles.length >= PB.SAMPLE_MIN && saved.get(id) !== handles.length) { store = PB.recordLaunch(store, id, handles); saved.set(id, handles.length); saveStore(); }
     }
     const post = T ? { ...counts(T), followers: reading && reading.followersCount, text: (items.find((r) => r.id === id) || {}).text || "" } : null;
-    return { ...PB.campaignLens({ platform: "x", post, ownPosts, accounts: [...accounts.values()], quotes, overlap, actor: PB.actorOf(reading) }), launchId: id, onForget: forget, evidence: evidenceOf(id, T, post, items, reading) };
+    return { ...PB.campaignLens({ platform: "x", post, ownPosts, accounts: [...accounts.values()], quotes, overlap, actor: PB.actorOf(reading) }), platform: "x", actor: PB.actorOf(reading), launchId: id, onForget: forget, evidence: evidenceOf(id, T, post, items, reading) };
   }
 
   // The evidence block's inputs (src/ext/evidence-view.js): the local count ledger for this post, and

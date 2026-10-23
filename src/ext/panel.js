@@ -109,6 +109,7 @@
     for (const x of c.context) { s.append(el("p", "pb-num", x.text)); catalogue(s, x.id); }
     s.append(el("p", "pb-foot", c.dnp), el("p", "pb-foot", c.dispute));
     if (PB.DECISIONS_URL) s.append(links(el("p", "pb-foot", `${PB.DECISIONS_NOTE} `), [["Decisions log", PB.DECISIONS_URL]]));
+    if (globalThis.PBDefinitionsView) PBDefinitionsView.section(s, PBDefinitionsView.model(c));
     if (c.onForget) s.append(button("Forget launches I viewed", "Deletes the launch overlap Daylight Commons keeps in this browser (hashed accounts only).", () => c.onForget()));
     if (globalThis.PBEvidenceView) PBEvidenceView.section(s, c.evidence, rerender);
     p.append(s);

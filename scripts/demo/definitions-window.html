@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- The campaign window's element tables on a synthetic launch, for the light and dark captures
+     (docs/demo/definitions-window-*.png). Add ?dark for the dark theme. No network. -->
+<html lang="en"><head><meta charset="utf-8"><title>Element tables capture</title>
+<link rel="stylesheet" href="../../src/ext/badges.css">
+<style>body { margin: 0; background: var(--pb-ground); font: 13px/19px system-ui, sans-serif; } .pb-panel { position: static; width: 460px; max-height: none; margin: 16px; }</style>
+</head><body>
+<script src="../../src/ext/core.bundle.js"></script>
+<script src="../../src/ext/definitions-view.js"></script>
+<script>
+  if (location.search.includes("dark")) document.documentElement.classList.add("pb-dark");
+  const lens = { status: "strong", platform: "x", actor: null, launch: true,
+    indicators: [{ id: "undisclosed-lookalike" }, { id: "bio-template" }, { id: "join-cluster" }], context: [{ id: "disclosed-paid" }] };
+  const p = document.createElement("aside"); p.className = "pb-panel"; p.dataset.open = "1";
+  const s = document.createElement("section"); s.className = "pb-psec"; p.append(s); document.body.append(p);
+  PBDefinitionsView.section(s, PBDefinitionsView.model(lens, { actor: "US", audience: "UK" }));
+  for (const d of document.querySelectorAll("details")) d.open = true;
+</script>
+</body></html>

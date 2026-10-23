@@ -9370,6 +9370,155 @@ function badgeLine(b) {
 return { REPO_URL, DECISIONS_URL, SIGNALS_URL, TEMPLATES, DECISIONS_NOTE, entryUrl, entryRef, challengeUrl, findingUrl, entriesCiting, badgeLinks, badgeLine };
 })();
 
+// ---- definitions.js
+const M_definitions = (() => {
+// The definition catalogue (catalogue/, project-docs/DEFINITION-CATALOGUE.md): given a finding's
+// signals, build an element table for each published definition. Each element is matched, not
+// matched or not observable, with the evidence behind it.
+//
+// The phrasing is "matches elements A and B of [definition]". Daylight Commons compares visible conduct with a
+// published definition; a court, a regulator or the platform decides whether a rule was broken.
+// No text built here ever says the conduct was committed, or that anyone is guilty or liable:
+// VERDICT_WORDS is checked by tests/definitions.test.js on every table the catalogue can produce.
+// Pure: no DOM, no network. The caller passes the catalogue entries and the signal registry.
+
+const VERDICT_WORDS = /\b(?:committed|commits?|guilty|is (?:a )?fraud|fraudulent|violat\w*|illegal|unlawful|liable|liability|crimes?|criminal|convict\w*|breach\w*|offen[cs]es?)\b/i;
+const DEFINITION_FRAME = "This compares visible conduct with a published definition, element by element. It is not a finding by a court, a regulator or the platform.";
+const LEGAL_NOTE = "Not legal advice. A media lawyer should review this wording before any public release.";
+const CHALLENGE = "Challenge this entry or this badge at https://github.com/HarperZ9/daylight-commons/issues/new?template=challenge.yml. Every decision is published with its reasons, and corrections are dated.";
+const STATUSES = ["matched", "not-matched", "not-observable"];
+
+// The words Daylight Commons must never produce about conduct, found in a piece of generated text.
+function verdictHits(text) {
+  const out = [], re = new RegExp(VERDICT_WORDS.source, "gi");
+  for (const m of String(text || "").matchAll(re)) out.push(m[0]);
+  return out;
+}
+
+const list = (xs) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+const plural = (xs, one, many) => (xs.length === 1 ? one : many);
+
+// signal id -> family, from the registry (catalogue/signals.json).
+function familyOf(registry) {
+  return new Map(((registry && registry.signals) || []).map((s) => [s.id, s.family]));
+}
+
+// finding: { signals: [{ id, ref, text? }] }. Returns signal id -> list of evidence references.
+function presentSignals(finding) {
+  const m = new Map();
+  for (const s of (finding && finding.signals) || []) {
+    if (!s || !s.id) continue;
+    if (!m.has(s.id)) m.set(s.id, []);
+    m.get(s.id).push(s.ref || s.id);
+  }
+  return m;
+}
+
+// One element's row. A not-observable element is never matched, whatever signals are present.
+function elementRow(el, present, families) {
+  const base = { id: el.id, label: el.label, observable_from: el.observable_from, strength: el.strength, required: el.required !== false, note: el.note || null };
+  if (el.observable_from === "not-observable") return { ...base, status: "not-observable", evidence: [], families: 0, needed: 0 };
+  const evidence = el.signals.filter((id) => present.has(id)).map((id) => ({ signal: id, refs: present.get(id) }));
+  const fams = new Set(evidence.map((e) => families.get(e.signal) || e.signal)).size;
+  const needed = el.min_families || 1;
+  return { ...base, status: fams >= needed ? "matched" : "not-matched", evidence, families: fams, needed };
+}
+
+function citeOf(entry) {
+  return `${entry.section} (${entry.title}, ${entry.jurisdiction.name})`;
+}
+
+// The one-paragraph summary. It names matched, indicative, unobservable and unevidenced elements,
+// and it never says a definition is met: the frame line always follows.
+function summarizeTable(entry, rows) {
+  const ids = (st) => rows.filter((r) => r.status === st).map((r) => r.id);
+  const matched = ids("matched"), unseen = ids("not-observable");
+  const partial = rows.filter((r) => r.status === "not-matched" && r.families > 0);
+  const missing = rows.filter((r) => r.status === "not-matched" && !r.families).map((r) => r.id);
+  const indicative = rows.filter((r) => r.status === "matched" && r.strength === "indicative").map((r) => r.id);
+  const lead = entry.role === "comparison" ? "For comparison: " : entry.role === "context" ? "Context: " : "";
+  const parts = [matched.length
+    ? `${lead}this conduct matches ${plural(matched, "element", "elements")} ${list(matched)} of ${citeOf(entry)}.`
+    : `${lead}no element of ${citeOf(entry)} matches what this page loaded.`];
+  if (indicative.length) parts.push(`${plural(indicative, "Element", "Elements")} ${list(indicative)} ${plural(indicative, "is", "are")} matched on indicative evidence only: the signals are consistent with ${plural(indicative, "it", "them")} and do not show ${plural(indicative, "it", "them")}.`);
+  if (unseen.length) parts.push(`${plural(unseen, "Element", "Elements")} ${list(unseen)} ${plural(unseen, "is", "are")} not observable from here.`);
+  for (const r of partial) parts.push(`Element ${r.id} has ${r.families} of the ${r.needed} independent signal families it needs, so it is not shown as matched.`);
+  if (missing.length) parts.push(`${plural(missing, "Element", "Elements")} ${list(missing)} ${plural(missing, "has", "have")} no evidence in what this page loaded.`);
+  parts.push(DEFINITION_FRAME);
+  const s = parts.join(" ");
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// The element table for one entry. An unverified entry is never matched: it returns null.
+function elementTable(entry, finding, registry) {
+  if (!entry || entry.verification !== "verified" || entry.status !== "active") return null;
+  const present = presentSignals(finding), families = familyOf(registry);
+  const rows = entry.elements.map((el) => elementRow(el, present, families));
+  const src = entry.sources[0];
+  return {
+    entry: entry.id, version: entry.version, catalogue: `${entry.id}@${entry.version}`,
+    title: entry.title, jurisdiction: entry.jurisdiction, role: entry.role,
+    citation: `${entry.instrument}, ${entry.section}`,
+    source: { url: src.url, retrieved_at: src.retrieved_at, sha256: src.sha256 },
+    quotes: entry.quotes.map((q) => ({ locator: q.locator, text: q.text, url: entry.sources[q.source].url })),
+    rows,
+    matched: rows.filter((r) => r.status === "matched").map((r) => r.id),
+    notObservable: rows.filter((r) => r.status === "not-observable").map((r) => r.id),
+    notMatched: rows.filter((r) => r.status === "not-matched").map((r) => r.id),
+    summary: summarizeTable(entry, rows),
+    dnp: entry.does_not_prove, legal_note: LEGAL_NOTE, challenge: CHALLENGE,
+  };
+}
+
+// Every jurisdiction that applies, with why. Daylight Commons shows all of them and never picks the harshest.
+// actor and audience are jurisdiction codes ("US", "EU", "UK") or null when not public.
+function applicableJurisdictions({ platform = null, actor = null, audience = null } = {}) {
+  const out = [], notes = [];
+  const add = (code, why) => { if (code && !out.some((j) => j.code === code)) out.push({ code, why }); else if (code) out.find((j) => j.code === code).why += ` ${why}`; };
+  if (platform) add(`platform:${platform}`, "The conduct is on this platform, under its own published rules.");
+  if (actor) add(actor, "Where the actor is disclosed to be based.");
+  else notes.push("The actor's location is not public, so its jurisdiction is not shown.");
+  if (audience) add(audience, "Where the audience is reached, shown as your own.");
+  return { jurisdictions: out, notes };
+}
+
+// A code covers itself and its parts: "UK" covers "UK-EW-NI" (England and Wales, and Northern Ireland).
+const covers = (code, entryCode) => entryCode === code || entryCode.startsWith(`${code}-`);
+
+// Tables for every active, verified entry in the given jurisdictions, in a fixed order (jurisdiction,
+// then role, then id). The order never depends on how damning a table looks.
+function elementTables(entries, finding, registry, { jurisdictions = null } = {}) {
+  const codes = jurisdictions && jurisdictions.map((j) => (typeof j === "string" ? j : j.code));
+  const roleOrder = { match: 0, comparison: 1, context: 2 };
+  return (entries || [])
+    .filter((e) => !codes || codes.some((c) => covers(c, e.jurisdiction.code)))
+    .map((e) => elementTable(e, finding, registry))
+    .filter(Boolean)
+    .sort((a, b) => a.jurisdiction.code.localeCompare(b.jurisdiction.code) || roleOrder[a.role] - roleOrder[b.role] || a.entry.localeCompare(b.entry));
+}
+
+// The campaign lens's output as a finding. Every indicator and context row becomes a signal with a
+// reference back to its lens row. online-post is always present; product-promotion when the lens
+// was opened on a launch or quotes carry promotion; actor-organisation when the platform discloses
+// the launch account as an organisation (actorOf in src/core/campaign.js).
+function signalsFromCampaign(lens, { launch = true, actor = null } = {}) {
+  const rows = [...((lens && lens.indicators) || []), ...((lens && lens.context) || [])];
+  const signals = rows.map((r) => ({ id: r.id, ref: `campaign:${r.id}`, text: r.text }));
+  signals.push({ id: "online-post", ref: "campaign:post" });
+  if (launch || rows.some((r) => r.id === "promo-cue" || r.id === "disclosed-paid")) signals.push({ id: "product-promotion", ref: launch ? "campaign:launch" : "campaign:promotion" });
+  if (actor) signals.push({ id: "actor-organisation", ref: "campaign:actor" });
+  return { signals };
+}
+
+// Every piece of text Daylight Commons itself wrote into a table (quotes from the source are left out: they are
+// the law's words, not Daylight Commons').
+function generatedText(table) {
+  return [table.summary, table.dnp, table.legal_note, table.challenge, ...table.rows.flatMap((r) => [r.label, r.note || ""])].join("\n");
+}
+
+return { VERDICT_WORDS, DEFINITION_FRAME, LEGAL_NOTE, CHALLENGE, STATUSES, verdictHits, presentSignals, elementRow, summarizeTable, elementTable, applicableJurisdictions, elementTables, signalsFromCampaign, generatedText };
+})();
+
 // ---- settings.js
 const M_settings = (() => {
 // Daylight Commons' settings, in one normalised shape for the toolbar popup, the first-run and options pages
@@ -10947,5 +11096,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_signing, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_evidence_bundle, ...M_signing, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();
