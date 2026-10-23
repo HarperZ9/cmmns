@@ -172,7 +172,7 @@ export async function runCaseCommand(argv, base = {}) {
   env.dir = resolve(typeof args.f.case === "string" ? args.f.case : base.cwd || process.cwd());
   if (cmd === "run" && !isCase(env.dir)) { initCase(env.dir, typeof args.f.name === "string" ? args.f.name : "Case from seeds", env.now()); if (!args.f["no-git"]) gitInit(env.dir); }
   env.data = () => loadCase(env.dir);
-  env.data();
+  if (cmd !== "verify-export") env.data();   // an export checks on its own, outside any case
   env.commit = args.f["no-commit"] || READ_ONLY.has(cmd) ? () => false : (msg) => gitCommit(env.dir, msg);
   return { code: 0, out: await fn(env, args) };
 }
