@@ -25,14 +25,14 @@ export function adapterHealth(site, found) {
   // stamp or article box at all is more likely a sign-in wall or a removed post than a redesign.
   const expectsRoot = f.page === "thread" && !!(site.hasLocation || site.rootFirst) && ((s.times | 0) >= 1 || (s.articles | 0) >= 1);
   if (expectsRoot || (s.times | 0) >= 3 || (s.articles | 0) >= 3) {
-    return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was not found" : "the page shows post-like boxes Daylight Commons cannot find" };
+    return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was missing" : "the page shows post-like boxes outside Daylight Commons' reader" };
   }
   return { state: "empty", say: null };
 }
 
 // The self-test's report as [label, value] rows, for the toolbar popup.
 export function selfTestLines(r) {
-  if (!r) return [["Result", "Daylight Commons has no reader for this site. The site card gives site context and text checks here."]];
+  if (!r) return [["Result", "This site gets the site card, with site context and text checks, in place of a reader."]];
   const v = r.verdict || {};
   const pct = (a, b) => (b ? `${a} of ${b}` : "none");
   return [
@@ -48,4 +48,4 @@ export function selfTestLines(r) {
   ];
 }
 
-export const HEALTH_DOES_NOT_PROVE = "The self-test counts what Daylight Commons' reader finds on this page now. A pass does not show every field is right, and a page that loads posts later can fail and then pass. It reads no text and sends nothing.";
+export const HEALTH_DOES_NOT_PROVE = "The self-test counts what Daylight Commons' reader finds on this page now. A page that loads posts later can fail and then pass. The test reads layout on this device and sends nothing.";

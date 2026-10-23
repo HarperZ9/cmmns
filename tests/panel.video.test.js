@@ -36,7 +36,7 @@ test("open with no comments, the panel says why there is no report and still sho
   PBPanel.setOpen(true);
   PBPanel.render(PB.threadReport([]), [], { site: YT, video, pushed: [] }, () => {});
   const text = body.children.find((c) => c.id === "pb-panel").text;
-  assert.match(text, /No comments loaded on this page/);
+  assert.match(text, /Zero comments loaded on this page/);
   assert.match(text, /Funding: Some Broadcaster is funded/);
   assert.doesNotMatch(text, /Too few extreme replies/);
 });

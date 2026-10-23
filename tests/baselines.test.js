@@ -34,7 +34,7 @@ test("the window's line names the bin, the rate, its interval and the count", ()
   assert.equal(baselineLine("burst", { replies: 3 }), null, "threads under 5 replies have no baseline");
   assert.equal(baselineFor("hate-symbol-name", { replies: 30 }), null, "only coordination signs carry one");
   assert.match(BASELINE_SOURCE, /PHEME/);
-  assert.match(BASELINE_SOURCE, /not a sample of today's X/);
+  assert.match(BASELINE_SOURCE, /from an earlier X/);
   assert.match(pairsLine(40), /median of \d+ such pair/);
 });
 

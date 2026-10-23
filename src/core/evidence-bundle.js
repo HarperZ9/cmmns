@@ -12,10 +12,10 @@
 
 import { MIN_CARD_ACCOUNTS } from "./evidence.js";
 import { canonicalJSON, sha256Hex, lfBytes, jwkId, signText, P256 } from "./sig.js";
-import { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle } from "./bundle-verify.js";
+import { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_VERSIONS, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, EVIDENCE_V1, EVIDENCE_V2, bundleConsistency, readEvidence, verifyBundle } from "./bundle-verify.js";
 
 // Checking a bundle lives in bundle-verify.js, which the offline kit page carries on its own.
-export { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle };
+export { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_VERSIONS, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, EVIDENCE_V1, EVIDENCE_V2, bundleConsistency, readEvidence, verifyBundle };
 // Canonical JSON, hashing, base64url and ECDSA P-256 live in sig.js, shared with data packs.
 const subtle = () => globalThis.crypto.subtle;
 
@@ -59,7 +59,7 @@ export const carrierTool = (tool) => { const m = String(tool || "").match(/^(.*?
 // is true. profile "carrier-safe" uses typedPage (what the user typed) and never page.
 // Returns { ok: true, bundle } or { ok: false, reason }.
 export function makeBundle(result, opts = {}) {
-  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "There is no analysis to put in a bundle." };
+  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "Run an analysis first, then put it in a bundle." };
   const archive = opts.source === "export";
   if (result.kind === "thread" && !archive && (result.posts.accounts || 0) < MIN_CARD_ACCOUNTS) {
     return { ok: false, reason: `This thread has ${result.posts.accounts || 0} accounts. A bundle needs at least ${MIN_CARD_ACCOUNTS}, so it cannot be about one person.` };

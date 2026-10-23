@@ -115,4 +115,4 @@ export function threadUrl(key) {
   return ({ x: `https://x.com/i/status/${id}`, reddit: `https://www.reddit.com/comments/${id}`, youtube: `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`, instagram: `https://www.instagram.com/p/${id}/` })[m[1]] || null;
 }
 
-export const GRAPH_DOES_NOT_PROVE = "Two accounts replying in the same threads is what friends, fans of one creator and people following the same news do, as well as coordinated accounts. The graph covers only threads you opened, and it says nothing about who runs any account.";
+export const GRAPH_DOES_NOT_PROVE = "The graph links accounts that replied in the same threads you opened. Friends, fans and people following the same news link up too.";

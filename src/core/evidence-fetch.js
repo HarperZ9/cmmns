@@ -49,18 +49,18 @@ async function github(fetchFn, { owner, repo }, token, postedAt) {
 async function domain(fetchFn, d, postedAt, wayback) {
   const out = [], notes = [];
   const host = hostedOn(d);
-  if (host) notes.push(`${d} is a site on ${host}, a hosting service. When ${host} was registered says nothing about this site, so RDAP was not asked.`);
+  if (host) notes.push(`${d} is a site on ${host}, a hosting service. RDAP dates ${host}, so it was skipped for this site.`);
   else {
     const r = await getJson(fetchFn, rdapUrl(d), { Accept: "application/rdap+json" });
     const f = r.json ? rdapFacts(r.json) : null;
     if (f && f.registered) out.push(await makeReceipt({ kind: "domain-registration", subject: f.domain, observed: { ...f, daysBeforePost: daysBefore(f.registered, postedAt) }, raw: r.json, source: "RDAP via rdap.org", url: rdapUrl(d), dnp: DOMAIN_DOES_NOT_PROVE }));
     else notes.push(`RDAP answered ${r.status} for ${d}.`);
   }
-  if (!wayback) { notes.push(`The Internet Archive was not asked about ${d}: allow access to web.archive.org by turning Evidence lookups off and on again in Options.`); return { receipts: out, notes }; }
+  if (!wayback) { notes.push(`The Internet Archive was skipped for ${d}: allow access to web.archive.org by turning Evidence lookups off and on again in Options.`); return { receipts: out, notes }; }
   const w = await getJson(fetchFn, cdxUrl(d));
   const first = w.json ? waybackFirst(w.json) : null;
   if (first) out.push(await makeReceipt({ kind: "wayback-first", subject: d, observed: { ...first, daysBeforePost: daysBefore(first.first, postedAt) }, raw: w.json, source: "Internet Archive Wayback CDX", url: cdxUrl(d), dnp: WAYBACK_DOES_NOT_PROVE }));
-  else notes.push(w.json ? `The Internet Archive has no capture of ${d}.` : `The Internet Archive answered ${w.status} for ${d}.`);
+  else notes.push(w.json ? `The Internet Archive holds zero captures of ${d}.` : `The Internet Archive answered ${w.status} for ${d}.`);
   return { receipts: out, notes };
 }
 
@@ -71,6 +71,6 @@ export async function lookupEvidence(fetchFn, { repos = [], domains = [], posted
   const receipts = [], notes = [];
   for (const x of repos.slice(0, MAX_REPOS)) { const g = await github(fetchFn, x, token, postedAt); receipts.push(...g.receipts); notes.push(...g.notes); }
   for (const d of domains.slice(0, MAX_DOMAINS)) { const g = await domain(fetchFn, d, postedAt, wayback); receipts.push(...g.receipts); notes.push(...g.notes); }
-  if (repos.length > MAX_REPOS || domains.length > MAX_DOMAINS) notes.push(`Looked up the first ${MAX_REPOS} repositories and ${MAX_DOMAINS} domains only.`);
+  if (repos.length > MAX_REPOS || domains.length > MAX_DOMAINS) notes.push(`Looked up the first ${MAX_REPOS} repositories and ${MAX_DOMAINS} domains.`);
   return { receipts, notes };
 }

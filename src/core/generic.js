@@ -70,4 +70,4 @@ export function genericChecks({ article, comments }) {
   return out;
 }
 
-export const GENERIC_DOES_NOT_PROVE = "Daylight Commons has no reader for this site, so it guessed where the article and the comments are from the page's layout. It can miss comments or count a list of links as comments. A marker is a pattern in wording, not a judgment of the writer.";
+export const GENERIC_DOES_NOT_PROVE = "The generic reader guessed where the article and the comments are from the page's layout, so it can miss comments or count a list of links as comments. A marker is a pattern in wording.";

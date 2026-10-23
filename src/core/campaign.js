@@ -13,14 +13,14 @@ import { quoteCluster, QUOTES_DOES_NOT_PROVE, BUNCH_TIGHT_MS } from "./campaign-
 import { OVERLAP_DOES_NOT_PROVE } from "./campaign-overlap.js";
 import { campaignPlatform, CAMPAIGN_PLATFORMS } from "./campaign-platforms.js";
 
-export const CAMPAIGN_DOES_NOT_PROVE = "These signs describe how this post's engagement looks in what your page loaded. They do not say who paid, whether the product is good, or that any one account is fake. Real people also write stock bios, join in waves and reshare launches.";
+export const CAMPAIGN_DOES_NOT_PROVE = "These signs describe how this post's engagement looks in what your page loaded. Real people also write stock bios, join in waves and reshare launches.";
 export const CAMPAIGN_LEADS = {
   strong: "This engagement is consistent with purchased amplification, and here is why.",
-  one: "One sign of paid or fake-account amplification. One sign is weak evidence, so this is context, not an accusation.",
+  one: "One sign of paid or fake-account amplification. One sign is weak evidence: read it as context.",
   coordinated: "The engagement looks coordinated. Coordination alone is common and often organic.",
-  none: "No campaign signs in what this page loaded.",
+  none: "Zero campaign signs in what this page loaded.",
   thin: "Too few accounts loaded to read. Open the post's reposts or quotes to load more.",
-  undefined: "The campaign lens is not defined for this site yet.",
+  undefined: "The campaign lens for this site is still to come.",
 };
 export const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/daylight-commons/issues. Corrections are made in the open.";
 
@@ -48,7 +48,7 @@ function ladder(status, families, qc, actor, held) {
   if (qc.disclosed) out.push({ step: 1, text: `Documented: ${qc.disclosed} quote post${qc.disclosed === 1 ? "" : "s"} promoting ${who} carry X's Paid partnership label, the posters' own disclosure.` });
   if (status === "strong") {
     out.push({ step: 2, text: `Inference: the engagement on ${who} is consistent with purchased amplification (${families.length} independent signs below).` });
-    if (families.includes("quotes") && !held) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Quotes without the label share the paid quotes' template and timing.` });
+    if (families.includes("quotes") && !held) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Unlabelled quotes share the paid quotes' template and timing.` });
   }
   return out;
 }
@@ -62,12 +62,12 @@ const mins = (ms) => (ms < 3600000 ? `${Math.max(1, Math.round(ms / 60000))} min
 function shapeRows(sh) {
   if (!sh || sh.tooFew) return { ind: [], ctx: [] };
   const v = sh.shape.repostsPerLike, ind = [], ctx = [];
-  const own = sh.own.insufficient ? `Not enough of this account's own posts seen on this device to compare (${sh.own.n} of 5).` : `This account's other posts: median ${r2(sh.own.median)} reposts per like, highest ${r2(sh.own.max)} (${sh.own.n} posts).`;
+  const own = sh.own.insufficient ? `Too few of this account's own posts seen on this device to compare (${sh.own.n} of 5).` : `This account's other posts: median ${r2(sh.own.median)} reposts per like, highest ${r2(sh.own.max)} (${sh.own.n} posts).`;
   const line = `Reposts per like: ${r2(v)} (${sh.shape.counts.reposts} reposts, ${sh.shape.counts.likes} likes). ${own}`;
   (sh.outlier ? ind : ctx).push({ id: sh.outlier ? "shape-outlier-own" : "shape", text: line, dnp: SHAPE_DOES_NOT_PROVE });
-  ctx.push({ id: "shape-baseline", text: sh.current ? `Against ${sh.current.n} ordinary posts in the ${sh.stratum} stratum: ${sh.current.position}.` : `Insufficient baseline for this platform today${sh.stratum ? ` (${sh.stratum})` : ""}: no labelled modern sample yet.`, dnp: "A baseline describes posts that were collected as ordinary; it is not a test." });
+  ctx.push({ id: "shape-baseline", text: sh.current ? `Against ${sh.current.n} ordinary posts in the ${sh.stratum} stratum: ${sh.current.position}.` : `Insufficient baseline for this platform today${sh.stratum ? ` (${sh.stratum})` : ""}: no labelled modern sample yet.`, dnp: "A baseline describes posts that were collected as ordinary." });
   const h = sh.historical;
-  if (h && !h.noStratum) ctx.push({ id: "shape-historical", text: `Historical reference only: ${h.source}, ${h.label}: ${h.position} (median ${h.q.q50}, 95th percentile ${h.q.q95}).`, dnp: "Breaking news in 2014 and 2015 was reposted more than liked; today's platform and topics differ, so this line never counts as a sign." });
+  if (h && !h.noStratum) ctx.push({ id: "shape-historical", text: `Historical reference: ${h.source}, ${h.label}: ${h.position} (median ${h.q.q50}, 95th percentile ${h.q.q95}).`, dnp: "Breaking news in 2014 and 2015 was reposted more than liked. Today's platform and topics differ, so this line stays context." });
   return { ind, ctx };
 }
 
@@ -77,19 +77,19 @@ function sampleRows(s) {
     "bio-template": (x) => `${x.accounts} of ${x.of} bios fall into ${x.groups} shared template${x.groups === 1 ? "" : "s"} (largest ${x.largest}).`,
     "stock-persona": (x) => `${x.n} of ${x.of} accounts (${pct(x.share)}) have stock-persona bios: age, passion, crypto slogan, pet or filler phrases together.`,
     "join-cluster": (x) => `${x.n} of ${x.of} accounts with a join date joined within 14 days (${x.from} to ${x.to}).`,
-    "topic-mismatch": (x) => `${x.n} of ${x.of} bios with a clear topic are about ${x.families.slice(0, 2).join(" and ")}, which this post is not.`,
-    "random-suffix": (x) => `Context: ${x.n} of ${x.of} handles end in a number-and-letter tail. People choose these for privacy too; this never counts as a sign.`,
+    "topic-mismatch": (x) => `${x.n} of ${x.of} bios with a clear topic are about ${x.families.slice(0, 2).join(" and ")}, a different topic from this post.`,
+    "random-suffix": (x) => `Context: ${x.n} of ${x.of} handles end in a number-and-letter tail. People choose these for privacy too; this stays context.`,
     "default-avatar": (x) => `Context: ${x.n} of ${x.of} accounts use the default picture.`,
   };
   const row = (x) => ({ id: x.id, text: text[x.id](x), dnp: SAMPLE_DOES_NOT_PROVE[x.id] });
-  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Daylight Commons reads only what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
+  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Daylight Commons reads what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
 }
 
 function quoteRows(q) {
   if (!q || !q.n) return { ind: [], ctx: [] };
   const ind = [], ctx = [];
   if (q.lookalikes) ind.push({ id: "undisclosed-lookalike", text: `${q.lookalikes} quote${q.lookalikes === 1 ? "" : "s"} without a Paid partnership label share a template with labelled quotes or with each other inside two hours.`, dnp: QUOTES_DOES_NOT_PROVE });
-  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Daylight Commons cannot see who paid or how much." });
+  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; who paid and how much stay off the page." });
   // Any launch with five quotes has a narrowest window; only a tight one is coordination context.
   if (q.bunch.kWindowMs != null) ctx.push({ id: q.bunch.kWindowMs <= BUNCH_TIGHT_MS ? "quote-bunching" : "quote-timing", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
   for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Daylight Commons' local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });

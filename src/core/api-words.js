@@ -1,5 +1,5 @@
 // The words the radar-core API puts on evidence items: labels, what a sign shows, where it came
-// from and what it does not prove. They are the same words the extension's window uses
+// from and how to read it. They are the same words the extension's window uses
 // (src/ext/signals.js and src/ext/panel.js), kept here so the API needs no DOM and no extension
 // code. Every string is stance-neutral and names no account.
 
@@ -24,16 +24,16 @@ export const FLAG_LABEL = {
 };
 
 export const SRC_RULES = "Daylight Commons' own rules, run on this device. Rules and measured error rates: Daylight Commons' EVALUATION.md.";
-export const SRC_POSTS = "The posts in the input, as given. Daylight Commons read them on this device and sent nothing anywhere.";
+export const SRC_POSTS = "The posts in the input, as given, read by Daylight Commons on this device.";
 export const SRC_ACCOUNTS = "Account details given in the input: what each platform discloses on profiles and About pages.";
 export const SRC_FILE = "The file's bytes, read on this device: Content Credentials (C2PA) and IPTC or XMP metadata.";
 
-export const STRONG_DOES_NOT_PROVE = "Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.";
-export const LEAK_DOES_NOT_PROVE = "People quote chatbots, joke, or paste a reply on purpose.";
-export const MACHINE_DOES_NOT_PROVE = "No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.";
-export const SPAM_DOES_NOT_PROVE = "Real people post giveaways and contact details too. The pattern describes the post, not who sent it.";
-export const BURST_DOES_NOT_PROVE = "A post going viral at one moment, or a notification many people get at once, brings replies together too. This describes when the replies arrived, not who sent them or why. It holds only for times given to the second: times rounded to the minute, hour or day put replies on one second by construction, and Daylight Commons does not run this test on them.";
-export const COARSE_DOES_NOT_PROVE = "Coarse times hide bursts as well as fake them. This says nothing about whether the replies arrived together or apart, only that these times cannot tell.";
-export const SITE_OWNER_DOES_NOT_PROVE = "Ownership is not editorial control, and Wikidata can lag a sale.";
-export const THREAD_LIMIT = "This covers the posts in the input as given, ranked and filtered by the platform before anyone saw them. It names no account and judges no person.";
-export const TEXT_LIMIT = "This describes one piece of text. It says nothing about who wrote it, why, or whether it is true.";
+export const STRONG_DOES_NOT_PROVE = "A match on the post's wording, which also turns up in quotes, irony and reported speech.";
+export const LEAK_DOES_NOT_PROVE = "Chatbot boilerplate in the post, which people also paste as a quote or a joke.";
+export const MACHINE_DOES_NOT_PROVE = "The post has three or more machine-writing signs. Detectors flag non-native English writers more often.";
+export const SPAM_DOES_NOT_PROVE = "A giveaway or contact-detail pattern in the post, which real people post too.";
+export const BURST_DOES_NOT_PROVE = "Replies that arrived within the same seconds, as they also do after a viral post or a mass notification. The test runs on times given to the second.";
+export const COARSE_DOES_NOT_PROVE = "These times are rounded, so they can hide a burst or make one look like it.";
+export const SITE_OWNER_DOES_NOT_PROVE = "The owner Wikidata lists, which can lag a sale and can differ from who runs the newsroom.";
+export const THREAD_LIMIT = "This covers the posts in the input as given, in the order and selection the platform showed.";
+export const TEXT_LIMIT = "This describes the wording of one piece of text.";

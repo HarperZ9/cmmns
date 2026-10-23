@@ -9,7 +9,7 @@
 import { timePrecision, observable } from "./precision.js";
 
 export const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN_KNOWN = 8;
-export const SWARM_DOES_NOT_PROVE = "A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once, and nobody has to organise it. This describes how the replies arrived, not who sent them or why.";
+export const SWARM_DOES_NOT_PROVE = "This describes how the replies arrived. A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once on its own.";
 
 // rows: [{ author, posted, timePrecision? }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
 // null when Daylight Commons has not read the account. precision: the thread's timePrecision. Returns null or

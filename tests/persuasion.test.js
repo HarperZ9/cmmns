@@ -45,7 +45,7 @@ test("the ship gate needs held-out precision of 80% with an interval from 0.7, f
   assert.deepEqual(shownTechniques(table), ["loaded-language"]);
   assert.equal(techniqueStatus("loaded-language", table).shown, true);
   assert.match(techniqueStatus("flag-waving", table).text, /^held back \(precision under 80%\)/);
-  assert.match(techniqueStatus("whataboutism", table).text, /never shown on one reply/);
+  assert.match(techniqueStatus("whataboutism", table).text, /waits for a full thread/);
   assert.ok(CONTEXT_ONLY.has("whataboutism"));
   assert.match(techniqueStatus("name-calling", table).text, /^held back \(interval starts below 70%\)/);
   assert.match(techniqueStatus("bandwagon", table).text, /^held back \(fewer than 20 hits\)/);

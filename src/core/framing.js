@@ -59,13 +59,13 @@ export function framingShown(row = MEASURED_FRAMING) {
   return !!(row && row.split === "test" && Number.isInteger(row.n) && row.n >= FRAMING_MIN_N && Number.isFinite(row.low) && row.low >= FRAMING_SHIP_LOW);
 }
 export function framingStatus(row = MEASURED_FRAMING) {
-  if (!row) return { shown: false, text: "held back: not measured. No labelled corpus of episodic and thematic posts with a usable licence was found (checked 2026-10-21)" };
+  if (!row) return { shown: false, text: "held back: not measured. A search for a labelled corpus of episodic and thematic posts with a usable licence came up empty (checked 2026-10-21)" };
   const pc = (x) => Math.round(x * 100);
   const m = `precision ${pc(row.precision)}% (95% interval ${pc(row.low)} to ${pc(row.high)}%), ${row.n} posts checked`;
   return framingShown(row) ? { shown: true, text: m } : { shown: false, text: `held back (interval starts below ${pc(FRAMING_SHIP_LOW)}% or fewer than ${FRAMING_MIN_N} hits): ${m}` };
 }
 
-export const FRAMING_DOES_NOT_PROVE = "A person's story can be true, typical and the best way to explain an issue. This describes how the post explains the issue, not whether it is right or who wrote it.";
+export const FRAMING_DOES_NOT_PROVE = "This describes how the post explains the issue. A person's story can be true, typical and the best way to explain it.";
 
 // The frame the feed log keeps for one post: framingOf's frame, "none" for a post long enough to
 // read with neither kind of cue, or null for a post too short to read.

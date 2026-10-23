@@ -105,12 +105,12 @@
     const s = el("section", "pb-psec");
     s.append(el("h3", "pb-sec-h", "Launch campaign"), el("p", "pb-num", c.lead));
     for (const x of c.claims || []) s.append(el("p", "pb-num", x.text));
-    for (const x of c.indicators) { s.append(el("p", "pb-num", x.text), el("p", "pb-foot", `Does not prove: ${x.dnp}`)); catalogue(s, x.id); }
+    for (const x of c.indicators) { s.append(el("p", "pb-num", x.text), el("p", "pb-foot", `What it shows: ${x.dnp}`)); catalogue(s, x.id); }
     for (const x of c.context) { s.append(el("p", "pb-num", x.text)); catalogue(s, x.id); }
     s.append(el("p", "pb-foot", c.dnp), el("p", "pb-foot", c.dispute));
     if (PB.DECISIONS_URL) s.append(links(el("p", "pb-foot", `${PB.DECISIONS_NOTE} `), [["Decisions log", PB.DECISIONS_URL]]));
     if (globalThis.PBDefinitionsView) PBDefinitionsView.section(s, PBDefinitionsView.model(c));
-    if (c.onForget) s.append(button("Forget launches I viewed", "Deletes the launch overlap Daylight Commons keeps in this browser (hashed accounts only).", () => c.onForget()));
+    if (c.onForget) s.append(button("Forget launches I viewed", "Deletes the launch overlap Daylight Commons keeps in this browser, stored as hashed accounts.", () => c.onForget()));
     if (globalThis.PBEvidenceView) PBEvidenceView.section(s, c.evidence, rerender);
     p.append(s);
   }
@@ -136,14 +136,14 @@
       p.append(box);
     }
     if (!open) return;
-    p.append(el("p", "pb-sentence", report.replies ? report.sentence : "No comments loaded on this page, so there is no reply report. The source details below still apply."));
+    p.append(el("p", "pb-sentence", report.replies ? report.sentence : "Zero comments loaded on this page, so the reply report waits for them. The source details below still apply."));
     section(p, "Flagged accounts", report.verdict === "too-few" ? [] : [`Among the most extreme replies: ${pct(report.extreme.share)} (95% interval ${ci(report.extreme.ci)}).`, `Among the rest: ${pct(report.others.share)} (${ci(report.others.ci)}).`]);
     section(p, "Where accounts are based", [
       report.origins && report.origins.length ? report.origins.slice(0, 6).map((o) => `${o.place} ${o.n}`).join(" · ") : null,
       stats.site && !stats.site.hasLocation ? ({
-        instagram: `${report.lookedUp} of ${report.replies} accounts have an "About this account" you opened. Instagram shows where an account is based only there.`,
-        facebook: `${report.lookedUp} of ${report.replies} accounts have Page transparency you opened. Facebook shows it for Pages, not people.`,
-        bluesky: `${report.lookedUp} of ${report.replies} accounts have Bluesky data (join date, moderation labels). Bluesky shows no account location.`,
+        instagram: `${report.lookedUp} of ${report.replies} accounts have an "About this account" you opened. Instagram shows where an account is based on that page.`,
+        facebook: `${report.lookedUp} of ${report.replies} accounts have Page transparency you opened. Facebook shows it for Pages.`,
+        bluesky: `${report.lookedUp} of ${report.replies} accounts have Bluesky data (join date, moderation labels). Bluesky keeps account location off its profiles.`,
       }[stats.site.id] || `${stats.site.name} shows no account location; this view uses coordination signs only.`) : `${report.lookedUp} of ${report.replies} accounts read so far.`,
       stats.paused ? "X is limiting requests; Daylight Commons paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
     ]);
@@ -153,6 +153,8 @@
     if (coord.some((t) => t && t.includes(" showed up in "))) p.lastChild.append(el("p", "pb-foot", PB.BASELINE_SOURCE));
     // Persuasion techniques get their own line; they never count toward "flagged".
     section(p, "Persuasion", report.persuasion ? [report.persuasion.sentence] : []);
+    // Reading-lens frames (src/core/reading.js): how many posts and authors here use each one.
+    section(p, "Frames in this thread", (report.lens || []).map((x) => `${x.name}: ${x.posts} of ${x.of} posts, ${x.authors} author${x.authors === 1 ? "" : "s"}${x.pattern ? ", a pattern" : ""}`));
     const U = report.upstream;
     section(p, "Upstream", U ? [
       U.accounts.length ? "Replies quote or lift media from: " + U.accounts.map((a) => `@${a.handle} (${a.n})`).join(", ") + "." : null,
@@ -162,9 +164,9 @@
     section(p, "Sources and media", sources(report, stats.video, stats.pushed));
     const acts = el("div", "pb-actions");
     if (!stats.scanning && !stats.paused && stats.pending) acts.append(button(`Read ${Math.min(stats.pending, 200)} accounts`, "Reads each account's profile and About page in one minimised window.", onLookupAll));
-    if (stats.onExport) acts.append(button("Save report", "Saves the report and each account's flags to a JSON file on this computer. Nothing is uploaded.", stats.onExport));
-    if (stats.onCard) acts.append(button("Save card", "Makes a card about this thread (never about one account) to read, then save or share as an image and a JSON file.", stats.onCard));
-    if (stats.onClearHistory) acts.append(button("Clear history", "Forgets which accounts Daylight Commons has seen in which threads (this browser only).", stats.onClearHistory));
+    if (stats.onExport) acts.append(button("Save report", "Saves the report and each account's flags to a JSON file on this computer.", stats.onExport));
+    if (stats.onCard) acts.append(button("Save card", "Makes a card about this thread as a whole to read, then save or share as an image and a JSON file.", stats.onCard));
+    if (stats.onClearHistory) acts.append(button("Clear history", "Forgets which accounts Daylight Commons has seen in which threads, in this browser.", stats.onClearHistory));
     p.append(acts);
     p.append(el("p", "pb-foot", PB.REPORT_DOES_NOT_PROVE));
   }

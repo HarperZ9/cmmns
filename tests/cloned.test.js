@@ -35,5 +35,5 @@ test("the topic around the outlet's name never changes the result", () => {
   const topics = ["immigration", "Ukraine", "Israel", "Gaza", "vaccines", "the election", "climate", "taxes", "the president", "the opposition"];
   const got = new Set(topics.map((t) => JSON.stringify(clonedCitations(`The Washington Post on ${t}: read it here`, ["washingtonpost.pm"]))));
   assert.equal(got.size, 1);
-  assert.match(CLONED_DOES_NOT_PROVE, /not who made the copy/);
+  assert.match(CLONED_DOES_NOT_PROVE, /links a copy on another address/);
 });

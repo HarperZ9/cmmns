@@ -1,6 +1,6 @@
 {
   "id": "us-wire-fraud-18usc1343",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "comparison",
@@ -12,7 +12,7 @@
   "instrument": "18 U.S.C. 1343, with the elements as summarised in the DOJ Criminal Resource Manual 941 (archived)",
   "section": "18 U.S.C. 1343",
   "kind": "statute",
-  "binding_note": "A criminal statute. Only a court decides whether it applies. The circuits state the elements in different words; the DOJ page lists several formulations.",
+  "binding_note": "A criminal statute, and courts decide whether it applies. The circuits state the elements in different words; the DOJ page lists several formulations.",
   "in_force": {
     "status": "in force",
     "since": null,
@@ -60,7 +60,7 @@
       "required": true,
       "strength": "direct",
       "signals": [],
-      "note": "A scheme is a plan. Visible posts can be part of one, but the plan itself is not on the page."
+      "note": "A scheme is a plan. Visible posts can be part of one, and the plan itself sits behind the page."
     },
     {
       "id": "B",
@@ -79,7 +79,7 @@
       "signals": [
         "online-post"
       ],
-      "note": "Almost any online conduct shows this element, which is why it says little on its own."
+      "note": "Almost any online conduct shows this element, so it carries little weight alone."
     },
     {
       "id": "D",
@@ -90,7 +90,7 @@
       "signals": []
     }
   ],
-  "does_not_prove": "Shown for comparison only. The elements that give this definition its meaning (the scheme and the intent) are not observable from any page, so Daylight Commons never presents it as met. Reliance and harm elements belong to other fraud definitions, such as common-law fraud, which this catalogue does not hold yet. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "Shown for comparison. The elements that give this definition its meaning, the scheme and the intent, sit behind the page, so the table keeps it as a comparison. Courts decide whether it applies.",
   "related": [
     "uk-fraud-act-2006-s2",
     "us-ftc-act-s5-deception"

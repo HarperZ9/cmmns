@@ -32,7 +32,7 @@ test("on: nothing is read until the click, then the reading and the result show"
   settings.imageText = true;
   let rows = rowsOf();
   assert.equal(rows[0][1].action[0], "Read text in this image");
-  assert.match(rows[1][1].note, /never leave your browser/);
+  assert.match(rows[1][1].note, /stay in your browser/);
   assert.deepEqual(clicked, []);
   rows[0][1].action[1]();
   assert.deepEqual(clicked, [SRC]);

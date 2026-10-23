@@ -7,8 +7,8 @@
 export const GITHUB_API = "https://api.github.com";
 export const STAR_MAX_PAGES = 10, STAR_PER_PAGE = 100;
 export const STAR_BURST_FACTOR = 10, STAR_BURST_MIN = 50;
-export const REPO_DOES_NOT_PROVE = "A creation date is when this repository was made on GitHub. Work often starts elsewhere or in another repository, so it says nothing about how long a team has been building.";
-export const STARS_DOES_NOT_PROVE = "Stars arrive in bursts after a launch, a newsletter or a front-page link. A burst shows when stars came, not who gave them or why.";
+export const REPO_DOES_NOT_PROVE = "A creation date is when this repository was made on GitHub. Work often starts elsewhere or in another repository first.";
+export const STARS_DOES_NOT_PROVE = "A burst shows when stars came. Stars also arrive in bursts after a launch, a newsletter or a front-page link.";
 
 // github.com/<owner>/<repo> links in a text or a list of links -> unique [{ owner, repo }].
 export function reposIn(textOrLinks) {

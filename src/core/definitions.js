@@ -9,7 +9,7 @@
 // Pure: no DOM, no network. The caller passes the catalogue entries and the signal registry.
 
 export const VERDICT_WORDS = /\b(?:committed|commits?|guilty|is (?:a )?fraud|fraudulent|violat\w*|illegal|unlawful|liable|liability|crimes?|criminal|convict\w*|breach\w*|offen[cs]es?)\b/i;
-export const DEFINITION_FRAME = "This compares visible conduct with a published definition, element by element. It is not a finding by a court, a regulator or the platform.";
+export const DEFINITION_FRAME = "This compares visible conduct with a published definition, element by element. Findings belong to courts, regulators and the platform.";
 export const LEGAL_NOTE = "Not legal advice. A media lawyer should review this wording before any public release.";
 export const CHALLENGE = "Challenge this entry or this badge at https://github.com/HarperZ9/daylight-commons/issues/new?template=challenge.yml. Every decision is published with its reasons, and corrections are dated.";
 export const STATUSES = ["matched", "not-matched", "not-observable"];
@@ -65,11 +65,11 @@ export function summarizeTable(entry, rows) {
   const lead = entry.role === "comparison" ? "For comparison: " : entry.role === "context" ? "Context: " : "";
   const parts = [matched.length
     ? `${lead}this conduct matches ${plural(matched, "element", "elements")} ${list(matched)} of ${citeOf(entry)}.`
-    : `${lead}no element of ${citeOf(entry)} matches what this page loaded.`];
-  if (indicative.length) parts.push(`${plural(indicative, "Element", "Elements")} ${list(indicative)} ${plural(indicative, "is", "are")} matched on indicative evidence only: the signals are consistent with ${plural(indicative, "it", "them")} and do not show ${plural(indicative, "it", "them")}.`);
-  if (unseen.length) parts.push(`${plural(unseen, "Element", "Elements")} ${list(unseen)} ${plural(unseen, "is", "are")} not observable from here.`);
-  for (const r of partial) parts.push(`Element ${r.id} has ${r.families} of the ${r.needed} independent signal families it needs, so it is not shown as matched.`);
-  if (missing.length) parts.push(`${plural(missing, "Element", "Elements")} ${list(missing)} ${plural(missing, "has", "have")} no evidence in what this page loaded.`);
+    : `${lead}zero elements of ${citeOf(entry)} match what this page loaded.`];
+  if (indicative.length) parts.push(`${plural(indicative, "Element", "Elements")} ${list(indicative)} ${plural(indicative, "is", "are")} matched on indicative evidence: signals consistent with ${plural(indicative, "it", "them")}.`);
+  if (unseen.length) parts.push(`${plural(unseen, "Element", "Elements")} ${list(unseen)} ${plural(unseen, "is", "are")} outside what this page can show.`);
+  for (const r of partial) parts.push(`Element ${r.id} has ${r.families} of the ${r.needed} independent signal families it needs, so it stays unmatched.`);
+  if (missing.length) parts.push(`${plural(missing, "Element", "Elements")} ${list(missing)} ${plural(missing, "lacks", "lack")} evidence in what this page loaded.`);
   parts.push(DEFINITION_FRAME);
   const s = parts.join(" ");
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -103,7 +103,7 @@ export function applicableJurisdictions({ platform = null, actor = null, audienc
   const add = (code, why) => { if (code && !out.some((j) => j.code === code)) out.push({ code, why }); else if (code) out.find((j) => j.code === code).why += ` ${why}`; };
   if (platform) add(`platform:${platform}`, "The conduct is on this platform, under its own published rules.");
   if (actor) add(actor, "Where the actor is disclosed to be based.");
-  else notes.push("The actor's location is not public, so its jurisdiction is not shown.");
+  else notes.push("The actor's location is private, so its jurisdiction stays off this table.");
   if (audience) add(audience, "Where the audience is reached, shown as your own.");
   return { jurisdictions: out, notes };
 }

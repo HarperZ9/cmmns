@@ -20,7 +20,7 @@
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     svg.replaceChildren();
     fillTable(parts.table, g.edges);
-    if (!g.edges.length) { svg.setAttribute("hidden", ""); note.textContent = "No two accounts have replied in two or more of the same threads you opened yet."; return; }
+    if (!g.edges.length) { svg.setAttribute("hidden", ""); note.textContent = "Links appear once two accounts have replied in two or more of the same threads you opened."; return; }
     svg.removeAttribute("hidden");
     note.textContent = `${g.nodes.length} accounts and ${g.edges.length} links${g.truncated ? ", the most connected shown" : ""}. A link's number is how many threads both accounts replied in. Tab moves between accounts; Enter lists an account's threads. ${PB.GRAPH_DOES_NOT_PROVE}`;
     const at = new Map(L.nodes.map((n) => [n.id, n]));

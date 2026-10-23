@@ -1,6 +1,6 @@
 {
   "id": "x-authenticity-engagement-spam",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -75,7 +75,7 @@
         "bio-template",
         "stock-persona"
       ],
-      "note": "The policy names copied bios as one possible sign of a fake persona, for the purpose of deceiving others. Daylight Commons never uses avatars, names, languages or places."
+      "note": "The policy names copied bios as one possible sign of a fake persona, for the purpose of deceiving others. Daylight Commons reads bio templates, and avatars, names, languages and places stay out of it."
     },
     {
       "id": "C",
@@ -84,10 +84,10 @@
       "required": true,
       "strength": "direct",
       "signals": [],
-      "note": "Who arranged the engagement, and whether anyone was paid, is not on the page."
+      "note": "Records off the page show who arranged the engagement and whether anyone was paid."
     }
   ],
-  "does_not_prove": "Templated bios and bursts of reposts also come from real communities and from vendors acting without the poster's knowledge. A platform policy is the platform's own rule, not law. A match on visible elements is a comparison with the published policy text; only X decides whether its policy was broken, and the policy can change after the retrieval date.",
+  "does_not_prove": "Templated bios and bursts of reposts also come from real communities and from vendors acting on their own. A platform policy is the platform's own rule. A match compares visible elements with the published policy text, and X decides whether its policy was broken.",
   "related": [
     "us-ftc-fake-social-media-indicators",
     "eu-ucpd-annex1-23c-false-reviews-endorsements"

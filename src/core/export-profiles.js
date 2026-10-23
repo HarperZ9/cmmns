@@ -13,7 +13,7 @@ import { technicalFiles } from "./export-prov.js";
 import { researchFiles } from "./export-research.js";
 
 export const PROFILES = ["legal", "technical", "journalistic", "research"];
-export const EXPORT_DOES_NOT_PROVE = "An export shows what this browser recorded and that the record was not changed. It does not show that a source told the truth, who wrote a post, or why. Matching a definition's elements is not a finding by a court, a regulator or the platform.";
+export const EXPORT_DOES_NOT_PROVE = "An export shows what this browser recorded, unchanged since. Each fact is as reliable as its source. A definition match compares conduct with published elements; findings belong to courts, regulators and the platform.";
 const PSEUDONYM = /^acct-[0-9a-f]{16}$/;
 const BUILDERS = { legal: legalFiles, technical: technicalFiles, journalistic: journalisticFiles, research: researchFiles };
 
@@ -58,7 +58,7 @@ export async function exportProfile(chain, profile, opts = {}) {
 // The steps any reader can run to check the export, shared by every profile.
 export function verifySteps() {
   return [
-    "Install Node.js 22 or later. Nothing else is needed: the tool has no dependencies.",
+    "Install Node.js 22 or later. The tool runs on Node alone.",
     "Download the Daylight Commons command line tool (radar-cli-<version>.zip) from the project's releases and unpack it.",
     "Run: node bin/radar.mjs verify evidence-chain.json",
     "Every line must read ok: each receipt matches its own hash, each entry follows the one before, the head and the Merkle root match, and each inclusion proof places its receipt under the root.",

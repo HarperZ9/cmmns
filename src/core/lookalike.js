@@ -121,4 +121,4 @@ export function lookalikeOf(domain) {
   return null;
 }
 
-export const LOOKALIKE_DOES_NOT_PROVE = "A similar address is not proof of a fake: outlets use other addresses, and unrelated sites share common words. Open the outlet's own site and compare.";
+export const LOOKALIKE_DOES_NOT_PROVE = "An address similar to a known outlet's. Outlets use other addresses too, and unrelated sites share common words, so open the outlet's own site and compare.";

@@ -1,7 +1,7 @@
 // radar-core: the public API. One zero-dependency ES module over Daylight Commons' pure core, for anyone
 // who wants Daylight Commons' evidence without the browser extension. No DOM, no network, no storage: the
 // caller hands in the posts, the file bytes and (optionally) the data tables, and gets back
-// evidence objects that match schema/evidence.v1.json. project-docs/INTEGRATION.md documents it.
+// evidence objects that match schema/evidence.v2.json. project-docs/INTEGRATION.md documents it.
 //
 //   analyzeThread({ site, root, replies })   evidence about a thread
 //   analyzeText(text)                        evidence about one piece of text
@@ -20,8 +20,8 @@ import { useData, claimIndex, dataLoaded } from "./api-data.js";
 import { REPORT_DOES_NOT_PROVE } from "./report.js";
 import { THREAD_LIMIT, TEXT_LIMIT } from "./api-words.js";
 
-export const API_VERSION = "1.1.0";
-export const EVIDENCE_SCHEMA = "urn:radar:evidence:v1";
+export const API_VERSION = "2.0.0";
+export const EVIDENCE_SCHEMA = "urn:radar:evidence:v2";
 export { useData, dataLoaded };
 
 const envelope = (kind, extra) => ({ schema: EVIDENCE_SCHEMA, api: API_VERSION, kind, ...extra });
@@ -88,7 +88,7 @@ export function analyzeThread(input, opts = {}) {
 // bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
 export async function checkMedia(bytes) {
   const M = await mediaReading(bytes);
-  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made."] });
 }
 
 // domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
@@ -96,7 +96,7 @@ export function siteInfo(domain) {
   const d = cleanDomain(domain);
   if (!d) return null;
   const loaded = dataLoaded();
-  const limits = ["Every row names its source. Daylight Commons adds no score or rating of its own."];
-  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("No site tables were loaded, so only the look-alike check ran.");
+  const limits = ["Every row names its source."];
+  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("The site tables were absent, so the look-alike check ran alone.");
   return envelope("site", { site: siteSummary(d), evidence: number(siteEvidence(d, [])), limits });
 }

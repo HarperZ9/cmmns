@@ -42,7 +42,7 @@ const CROISSANT_CONTEXT = {
 const FIELDS = [["id", "sc:Text", "SHA-256 of the receipt"], ["split", "sc:Text", "train, dev or test, fixed by hash"], ["kind", "sc:Text", "what kind of fact"],
   ["subject", "sc:Text", "what the fact is about; private accounts only as salted pseudonyms"], ["subjectKind", "sc:Text", "artefact, organisation or private-pseudonym"],
   ["source", "sc:Text", "where the fact was read"], ["at", "sc:Date", "when it was read"], ["labeller", "sc:Text", "who labelled it, when hand-labelled"],
-  ["stratum", "sc:Text", "fairness stratum, when hand-labelled"], ["doesNotProve", "sc:Text", "what the fact does not show"]];
+  ["stratum", "sc:Text", "fairness stratum, when hand-labelled"], ["doesNotProve", "sc:Text", "how far the fact reaches"]];
 
 export function croissant(ctx, dataHash, counts) {
   return {
@@ -65,15 +65,15 @@ function datasheet(ctx, rows, counts) {
     "# Datasheet", "",
     `Made ${ctx.at} by ${ctx.tool} from an evidence chain of ${rows.length} receipts (root \`${ctx.chain.root}\`).`, "",
     "## How it was made",
-    "Each row is one receipt this browser recorded: a fact read from a public source or the page the user loaded, with the hash of the fragment it was read from. Rows hold identifiers, hashes and extracted features, never post text.", "",
+    "Each row is one receipt this browser recorded: a fact read from a public source or the page the user loaded, with the hash of the fragment it was read from. Rows hold identifiers, hashes and extracted features.", "",
     "## Splits", `Fixed by hash under seed \`${ctx.seed}\`: ${counts}. The same receipt lands in the same split in every export with this seed.`, "",
     "## Labels and fairness",
-    labelled ? `${labelled} rows carry a labeller; strata present: ${strata.join(", ") || "none"}.` : "No row is hand-labelled. No fairness audit applies to these rows, and none is claimed.", "",
+    labelled ? `${labelled} rows carry a labeller; strata present: ${strata.join(", ") || "none"}.` : "Zero rows are hand-labelled. A fairness audit would need labelled rows first.", "",
     "## Known biases",
     "Rows come from what one user chose to open and look up, so they describe that user's browsing, not any platform as a whole. Platforms round, delay and recount what they show.", "",
     "## Privacy and licence",
     "Private accounts appear only as pseudonyms salted per export, so two exports cannot be joined. The compilation is CC BY 4.0; facts read from third parties keep their sources' terms.", "",
-    `## Does not prove`, ctx.dnp, "",
+    `## What it shows`, ctx.dnp, "",
   ].join("\n");
 }
 

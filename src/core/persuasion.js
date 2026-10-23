@@ -12,19 +12,19 @@ import { MEASURED_PERSUASION } from "./measured.js";
 
 // Definitions follow the SemEval task guidelines, shortened to one line each.
 export const TECHNIQUES = {
-  "loaded-language": { name: "Loaded language", definition: "Words with a strong emotional charge, used to sway the reader rather than to describe." },
-  "name-calling": { name: "Name calling", definition: "A label or insult attached to a person or group in place of an argument." },
-  "bandwagon": { name: "Bandwagon", definition: "Asks the reader to agree because everyone else supposedly does." },
-  "appeal-to-fear": { name: "Appeal to fear", definition: "Builds support for an idea by stirring fear of what happens otherwise." },
-  "flag-waving": { name: "Flag-waving", definition: "Appeals to patriotism or group identity to justify a position." },
-  "thought-terminating": { name: "Thought-terminating cliche", definition: "A stock phrase that closes the discussion instead of answering it." },
-  "whataboutism": { name: "Whataboutism", definition: "Answers a criticism by pointing at the other side's conduct instead." },
-  "black-and-white": { name: "Black-and-white fallacy", definition: "Presents two options as the only ones when more exist." },
-  "doubt": { name: "Doubt", definition: "Questions the credibility of someone or something without giving evidence." },
-  "appeal-to-authority": { name: "Appeal to authority", definition: "Says a claim is true because an unnamed or generic authority backs it." },
-  "exaggeration": { name: "Exaggeration", definition: "Makes something seem far larger, worse or more extreme than it is." },
-  "motive-attribution": { name: "Hidden motive", definition: "Says someone's real aim is hidden behind what they say, without showing evidence of the aim." },
-  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question, so it is suggested without being claimed." },
+  "loaded-language": { name: "Loaded language", definition: "Strong emotional words that push the reader to feel a certain way. Look for words that judge instead of describe." },
+  "name-calling": { name: "Name calling", definition: "A label or insult for a person or group. The label takes the place of a reason." },
+  "bandwagon": { name: "Bandwagon", definition: "Tells the reader to agree because many people agree. Look for \"everyone knows\" or \"millions agree\"." },
+  "appeal-to-fear": { name: "Appeal to fear", definition: "Makes the reader afraid of a result, to win support for an idea. Look for a threat that follows a choice." },
+  "flag-waving": { name: "Flag-waving", definition: "Uses love of country or group to support a position. Look for the nation or the group as the reason." },
+  "thought-terminating": { name: "Thought-terminating cliche", definition: "A stock phrase that ends the talk. It replaces an answer with a slogan." },
+  "whataboutism": { name: "Whataboutism", definition: "Answers a criticism with the other side's conduct. Look for \"what about\" after a charge." },
+  "black-and-white": { name: "Black-and-white fallacy", definition: "Gives two options as the full set. Other options exist." },
+  "doubt": { name: "Doubt", definition: "Casts doubt on a person or a source by hint. Look for a question about trust, with the facts left out." },
+  "appeal-to-authority": { name: "Appeal to authority", definition: "Says a claim is true because an expert backs it. The expert has no name or is a general group." },
+  "exaggeration": { name: "Exaggeration", definition: "Makes something seem much larger, worse or more extreme than it is. Look for words like \"total\" and \"every\"." },
+  "motive-attribution": { name: "Hidden motive", definition: "Says a person hides a secret aim behind their words. The post gives the aim and skips the evidence." },
+  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question. The post suggests the charge and leaves it unclaimed." },
 };
 
 export const PERSUASION_DOES_NOT_PROVE = "A technique can carry a true claim; it describes how the post argues.";
@@ -81,7 +81,7 @@ export function shownTechniques(table = MEASURED_PERSUASION) {
 // { shown, text } for one technique: its measured line, or why it is held back.
 export function techniqueStatus(id, table = MEASURED_PERSUASION) {
   const r = (table || {})[id];
-  if (CONTEXT_ONLY.has(id)) return { shown: false, text: "held back: needs the whole exchange, so never shown on one reply" };
+  if (CONTEXT_ONLY.has(id)) return { shown: false, text: "held back: needs the whole exchange, so it waits for a full thread" };
   if (!r || !Number.isInteger(r.n) || !r.n) return { shown: false, text: "held back: not measured" };
   const m = `precision ${pc(r.precision)}% (95% interval ${pc(r.low)} to ${pc(r.high)}%), ${r.n} spans checked, held-out news articles`;
   if (ships(r)) return { shown: true, text: m };

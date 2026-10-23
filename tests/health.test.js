@@ -47,6 +47,6 @@ test("the self-test lines name the counts and the result, and a site without a r
   const lines = Object.fromEntries(selfTestLines(r));
   assert.equal(lines["Boxes found"], "4");
   assert.match(lines.Result, /X changed its page/);
-  assert.match(selfTestLines(null)[0][1], /no reader for this site/);
+  assert.match(selfTestLines(null)[0][1], /gets the site card/);
   assert.match(HEALTH_DOES_NOT_PROVE, /sends nothing/);
 });

@@ -42,8 +42,8 @@ test("the rows quote every source's attribution and end with what the match does
   const rows = Object.fromEntries(PB.opRows(h));
   assert.match(rows["Attributed to"], /Russia/);
   assert.match(rows["Sources say"], /"/);
-  assert.equal(rows["Does not prove"], PB.OPS_DOES_NOT_PROVE);
-  assert.match(PB.OPS_DOES_NOT_PROVE, /says nothing about the person/);
+  assert.equal(rows["What it shows"], PB.OPS_DOES_NOT_PROVE);
+  assert.match(PB.OPS_DOES_NOT_PROVE, /share these links unknowingly/);
 });
 
 test("trend counts add up to the table and carry the caveat", () => {
@@ -51,7 +51,7 @@ test("trend counts add up to the table and carry the caveat", () => {
   assert.equal(T.total, table.ops.length);
   assert.equal(T.byYear.reduce((a, y) => a + y.n, 0), table.ops.length);
   assert.equal(T.byState.reduce((a, s) => a + s.n, 0), table.ops.length);
-  assert.match(PB.OPS_TREND_CAVEAT, /not a measure of how much activity/);
+  assert.match(PB.OPS_TREND_CAVEAT, /counts follow where people looked/);
 });
 
 const X = { id: "x", name: "X", hasLocation: true };
@@ -78,6 +78,6 @@ test("a profile that names an operation's site gets the sign; the person is neve
 test("a look-alike address is its own weaker sign; the real outlet gets none", () => {
   const fake = PBSignals.all({ ...base, domains: ["washingtonpost.pm"] }).find((s) => s.fam === "lookalike-domain");
   assert.equal(fake.level, "flag");
-  assert.ok(fake.rows.some(([k]) => k === "Does not prove"));
+  assert.ok(fake.rows.some(([k]) => k === "What it shows"));
   assert.ok(!PBSignals.all({ ...base, domains: ["washingtonpost.com"] }).some((s) => s.fam === "lookalike-domain" || s.fam === "named-in-report"));
 });

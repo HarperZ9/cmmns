@@ -1,6 +1,6 @@
 {
   "id": "eu-dsa-art26-advertising",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "context",
@@ -12,11 +12,11 @@
   "instrument": "Digital Services Act, Regulation (EU) 2022/2065",
   "section": "Article 26(1) and 26(2)",
   "kind": "regulation",
-  "binding_note": "A regulation, directly applicable in every Member State. Articles 26 and 39 set duties for platform providers, not for the people who post. Daylight Commons uses them as context: they say what the platform must show, which tells the reader where to look for a disclosure or an ad record.",
+  "binding_note": "A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. Daylight Commons shows them as context. They tell the reader where the platform must show a disclosure or an ad record.",
   "in_force": {
     "status": "in force",
     "since": "2024-02-17",
-    "note": "Article 93(2): the Regulation applies from 17 February 2024, apart from listed provisions that applied from 16 November 2022. Article 26 is not among them."
+    "note": "Article 93(2): the Regulation applies from 17 February 2024. A listed set of provisions applied from 16 November 2022. Article 26 applies from 17 February 2024."
   },
   "sources": [
     {
@@ -65,7 +65,7 @@
       ]
     }
   ],
-  "does_not_prove": "Context only: Article 26 sets duties for the platform. A missing declaration on a post says nothing on its own about the platform meeting or missing its duty. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "Context: Article 26 sets duties for the platform, and the post shows where to look for its ad declaration. A match compares visible elements with the published text. Courts and consumer authorities decide whether the duty was met.",
   "related": [
     "eu-dsa-art39-ad-repository",
     "x-paid-partnerships"

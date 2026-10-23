@@ -44,23 +44,23 @@ export function siteEvidence(domain, posts = [], { quiet = false } = {}) {
     const L = S.lookalike;
     out.push({ ...base, kind: "lookalike-domain", level: "flag", label: `look-alike of ${L.official}`,
       shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "Daylight Commons' list of outlet addresses, matched on this device.",
-      doesNotProve: LOOKALIKE_DOES_NOT_PROVE, data: { domain: S.domain, outlet: L.outlet, official: L.official, how: L.how } });
+      context: LOOKALIKE_DOES_NOT_PROVE, data: { domain: S.domain, outlet: L.outlet, official: L.official, how: L.how } });
   }
   for (const h of S.state) {
     const L = stateLabel(h);
     out.push({ ...base, kind: "state-link", level: stateLevel(h), label: L.chip, shows: L.says, source: sourceLine(h.source),
-      doesNotProve: STATE_DOES_NOT_PROVE[h.basis] || STATE_DOES_NOT_PROVE["named-in-report"], data: { domain: S.domain, state: h.state, basis: h.basis, actor: h.actor } });
+      context: STATE_DOES_NOT_PROVE[h.basis] || STATE_DOES_NOT_PROVE["named-in-report"], data: { domain: S.domain, state: h.state, basis: h.basis, actor: h.actor } });
   }
   if (S.owner && S.owner.owner) {
     out.push({ ...base, kind: "site-owner", level: "info", label: `link: ${S.owner.name || S.domain}`,
       shows: `${S.owner.name || S.domain} (${S.domain}). ${ownerHeading(S.owner)} ${S.owner.owner}.`, source: ownerSource(S.owner),
-      doesNotProve: SITE_OWNER_DOES_NOT_PROVE, data: { domain: S.domain, owner: S.owner.owner, ownerType: ownerType({ facts: S.facts, state: S.state }) } });
+      context: SITE_OWNER_DOES_NOT_PROVE, data: { domain: S.domain, owner: S.owner.owner, ownerType: ownerType({ facts: S.facts, state: S.state }) } });
   }
   const line = recordLine(S.record);
   if (line || (!quiet && S.facts)) {
     out.push({ ...base, kind: "site-record", level: "info", label: `site record: ${S.domain}`,
-      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "No review in Daylight Commons' table lists this site as where a claim appeared."].join(": ") + ".",
-      source: SITE_SOURCES, doesNotProve: SITE_RECORD_DOES_NOT_PROVE,
+      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."].join(": ") + ".",
+      source: SITE_SOURCES, context: SITE_RECORD_DOES_NOT_PROVE,
       data: { domain: S.domain, reviews: S.record ? S.record.n : 0, checkers: S.record ? S.record.m : 0, since: S.record ? S.record.since : null, founded: S.facts ? S.facts.founded : null, country: S.facts ? S.facts.country : null } });
   }
   return out;

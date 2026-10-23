@@ -64,6 +64,7 @@
       switchRow("Daylight Commons on feeds and profiles", "Adds Daylight Commons to feeds and profile pages, beside the replies under a post you open.", s().feeds, (on) => save({ feeds: on })),
       switchRow("Read account details automatically", "Reads account details as replies load. With this off, ask for them in the window.", s().auto, (on) => save({ auto: on })),
       switchRow("Evidence lookups", "Adds \"Look up evidence\" to the launch campaign section. On your click, the repository names and domains a post links to go to GitHub, rdap.org and the Internet Archive; nothing else, and never an account. Each result is sealed in this browser. Turning this on asks your browser for access to web.archive.org, whose answers need it.", s().evidence, (on, input) => evidenceSwitch(on, input)),
+      switchRow("Every reading technique", `Marks each reading-lens technique on posts. Off, only techniques with held-out precision of 80% or more show: ${[...PB.readingOn()].map((id) => PB.TECHNIQUE_BY_ID.get(id).name.toLowerCase()).join(", ") || "none yet"}.`, s().lensAll, (on) => save({ lensAll: on })),
       switchRow("Read text in images", "Adds \"Read text in this image\" to the window's Media area. Daylight Commons reads the words on this device, only when you click, in Latin-script languages; the image and its text never leave your browser.", s().imageText, (on) => save({ imageText: on })),
     );
   }

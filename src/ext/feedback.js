@@ -70,7 +70,7 @@
     if (!sign || !sign.fam) return [];
     const c = PB.calibration(mirror, sign.fam);
     const out = [];
-    if (c) out.push(["Your feedback", `${c.right} of ${c.total} right (your marks in this browser, not a measurement)`]);
+    if (c) out.push(["Your feedback", `${c.right} of ${c.total} right (your own marks in this browser)`]);
     out.push(["Was this right?", { feedback: { sign: { fam: sign.fam, label: sign.label }, postId: m.postId || null, threadKey: m.threadKey || null, text: m.text || null } }]);
     return out;
   }

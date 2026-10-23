@@ -10,7 +10,7 @@
 import { normLink } from "./trail.js";
 
 export const MIN_ACCOUNTS = 2;
-export const CROSS_DOES_NOT_PROVE = "Multilingual people, translators, news agencies and diaspora communities share the same link or video in several languages. This shows the material crossing languages, not who sent it or whether anyone coordinated.";
+export const CROSS_DOES_NOT_PROVE = "This shows the same material crossing languages. Multilingual people, translators, news agencies and diaspora communities share links and videos this way too.";
 
 const SCRIPTS = [["Kore", /\p{Script=Hangul}/u], ["Jpan", /[\p{Script=Hiragana}\p{Script=Katakana}]/u], ["Hani", /\p{Script=Han}/u],
   ["Hebr", /\p{Script=Hebrew}/u], ["Arab", /\p{Script=Arabic}/u], ["Cyrl", /\p{Script=Cyrillic}/u], ["Deva", /\p{Script=Devanagari}/u],

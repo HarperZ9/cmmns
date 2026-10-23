@@ -136,11 +136,11 @@ test("Community Note timing: when the note was written, against the post and now
   const now = Date.parse("2026-10-21T08:00:00Z");
   const ta = noteTiming(a, now), tb = noteTiming(b, now);
   assert.equal(ta.afterPost, 3 * 3600);
-  assert.equal(ta.text, "Note written 3 h after the post, 3 days ago. The page does not say when X began to show it.");
+  assert.equal(ta.text, "Note written 3 h after the post, 3 days ago. X keeps the time it began to show the note off the page.");
   assert.equal(tb.afterPost, 48 * 3600);
   assert.match(tb.text, /^Note written 2 days after the post, 24 h ago\./);
   assert.equal(noteTiming({ note: "x" }, now), null, "no note id, no timing");
-  assert.equal(noteTiming({ noteId: id("2026-10-21T07:30:00Z") }, now).text, "Note written 30 min ago. The page does not say when X began to show it.");
+  assert.equal(noteTiming({ noteId: id("2026-10-21T07:30:00Z") }, now).text, "Note written 30 min ago. X keeps the time it began to show the note off the page.");
   const junk = tweetsIn({ __typename: "Tweet", rest_id: "9", legacy: {}, birdwatch_pivot: { destinationUrl: "https://x.com/i/birdwatch/n/abc" } })[0];
   assert.equal(junk.noteId, undefined);
 });

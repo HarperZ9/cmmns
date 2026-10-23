@@ -1,6 +1,6 @@
 {
   "id": "eu-dsa-art39-ad-repository",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "context",
@@ -12,11 +12,11 @@
   "instrument": "Digital Services Act, Regulation (EU) 2022/2065",
   "section": "Article 39(1) and 39(2)",
   "kind": "regulation",
-  "binding_note": "A regulation, directly applicable in every Member State. Articles 26 and 39 set duties for platform providers, not for the people who post. Daylight Commons uses them as context: they say what the platform must show, which tells the reader where to look for a disclosure or an ad record.",
+  "binding_note": "A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. Daylight Commons shows them as context. They tell the reader where the platform must show a disclosure or an ad record.",
   "in_force": {
     "status": "in force",
     "since": null,
-    "note": "Article 93(2) sets general application from 17 February 2024. Article 33(6): obligations in the very-large-platform section apply from four months after the designation is notified to the provider, so the date depends on the designation of each platform, which this entry did not check."
+    "note": "Article 93(2) sets general application from 17 February 2024. Article 33(6): obligations in the very-large-platform section apply four months after the provider is notified of its designation. Each platform's date follows its own designation, which sits outside this entry."
   },
   "sources": [
     {
@@ -53,10 +53,10 @@
       "signals": [
         "ad-library-link"
       ],
-      "note": "Daylight Commons builds a search link to the repository; the user opens it. Daylight Commons does not read the repository itself."
+      "note": "Daylight Commons builds a search link to the repository. The user opens it and reads the results."
     }
   ],
-  "does_not_prove": "Context only. An empty repository search does not show that no ads ran, and an entry does not show anything about organic posts. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "Context: the repository lists the ads a very large platform recorded. A search shows those records, and organic posts sit outside them. A match compares visible elements with the published text. Courts and consumer authorities decide whether the duty was met.",
   "related": [
     "eu-dsa-art26-advertising"
   ]

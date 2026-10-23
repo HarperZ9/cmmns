@@ -87,7 +87,7 @@ test("the card never gives Daylight Commons' own verdict and always carries the 
   const text = JSON.stringify(card);
   assert.ok(text.includes("Pants on Fire") && text.includes("Checker A") && text.includes("https://a.example/1"));
   assert.ok(text.includes(CLAIM_DOES_NOT_PROVE));
-  assert.match(CLAIM_DOES_NOT_PROVE, /similar wording is not the same claim/i);
+  assert.match(CLAIM_DOES_NOT_PROVE, /similar wording to a reviewed claim/i);
   // Daylight Commons' own words never rate the post: strip the checker's rating and look for verdict words.
   const own = text.replaceAll(m.rating, "").replaceAll(m.claim, "");
   assert.doesNotMatch(own, /\b(false|fake|untrue|lie|misinformation|disinformation|debunked)\b/i);

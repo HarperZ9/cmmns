@@ -476,7 +476,7 @@ function lookalikeOf(domain) {
   return null;
 }
 
-const LOOKALIKE_DOES_NOT_PROVE = "A similar address is not proof of a fake: outlets use other addresses, and unrelated sites share common words. Open the outlet's own site and compare.";
+const LOOKALIKE_DOES_NOT_PROVE = "An address similar to a known outlet's. Outlets use other addresses too, and unrelated sites share common words, so open the outlet's own site and compare.";
 
 return { punyDecode, oneEdit, splitHost, lookalikeOf, LOOKALIKE_DOES_NOT_PROVE };
 })();
@@ -576,7 +576,7 @@ const LONG_CUES = { outlet: CUES.outlet.filter((c) => c.length >= 5), platform: 
 const SAYS_UNOFFICIAL = /\b(?:fan|fans|parody|satire|unofficial|critic|critics|commentary)\b|not\s*affiliated/i;
 const ORG_CHECK = new Set(["Business", "Government"]);
 
-const BRAND_DOES_NOT_PROVE = "Fans, critics, reporters and local partners put outlet and platform names in their profiles, and the list of official accounts Daylight Commons checks against is incomplete. A brand in a name does not show who runs the account or that anyone meant to deceive.";
+const BRAND_DOES_NOT_PROVE = "A brand in the name, outside the official account list. Fans, critics, reporters and local partners put outlet and platform names in their profiles too, and the official list is partial.";
 
 const at = (hay, needle) => { for (let i = 0; i + needle.length <= hay.length; i++) if (needle.every((t, j) => hay[i + j] === t)) return i; return -1; };
 
@@ -625,8 +625,8 @@ function brandLookalike(account) {
     if (own.has(affKey) || same.some((b) => b.nameTokens.some((nt) => at(aff, nt) >= 0))) return null;
   }
   const where = d ? `display name "${display.slice(0, 50)}"` : `handle @${handle}`;
-  const who = d ? `; @${handle} is not` : " and is not";
-  const evidence = `${where} uses the ${m.brand.name} brand${who} among the ${m.brand.name} accounts Wikidata lists, and the page shows no ${m.brand.name} affiliation badge or organisation check`;
+  const who = d ? `; @${handle} is outside` : " and is outside";
+  const evidence = `${where} uses the ${m.brand.name} brand${who} the ${m.brand.name} accounts Wikidata lists, and the page lacks a ${m.brand.name} affiliation badge or organisation check`;
   return { brand: m.brand.name, kind: m.brand.kind, where: d ? "display" : "handle", evidence, source: m.brand.source };
 }
 
@@ -968,25 +968,25 @@ const HATE_NAME = /(?:^|[^\d])(?:1488|14\/88)(?:$|[^\d])|\b(?:aryan|foid|foids|s
 const REGION_OFFSETS = { europe: [0, 3], "west asia": [2, 4], africa: [-1, 3], "south asia": [5, 6], "east asia": [7, 9], oceania: [8, 13], "north america": [-8, -4], "south america": [-5, -3] };
 
 const DOES_NOT_PROVE = {
-  "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them. Only times given to the hour or finer are counted.",
-  "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy. Only threads timed to the second are counted; rounded times cannot show a reply within a minute.",
-  "copied-elsewhere": "People repost text they agree with, and memes and quotes repeat. Repeated wording shows copying or coordination, not who is behind it.",
-  "automation-app": "Scheduling tools are common among news desks, brands and busy people.",
-  "no-sleep-gap": "Teams in several time zones, shared accounts and scheduling tools post around the clock too. Only times given to the hour or finer are counted.",
-  "repost-only": "Some people use an account only to share others' posts.",
-  "low-karma": "Many people read more than they post, and karma depends on which communities they use.",
-  "new-account": "New accounts include real people who just joined, often during a news event.",
-  "name-changes": "People rename accounts for many reasons; repeated renames are only common among resold or repurposed accounts.",
-  "default-handle": "Many real people never change the handle X suggested.",
-  "based-elsewhere": "The label can be wrong (VPNs, travel, X's own errors), and people abroad still speak as locals of where they come from.",
-  "hate-symbol-name": "The account chose this name; it can be ironic or quoted, and it says nothing about who runs the account.",
-  "high-volume": "Some people post all day, and news and alert accounts post automatically by design.",
-  "follow-pattern": "New and small accounts often follow many before anyone follows back.",
-  "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
-  "profile-location-elsewhere": "Profile locations are typed by the user, can be out of date or a joke, and people live abroad.",
-  "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
-  "platform-label": "A moderation label is the service's own judgement; labels can be wrong, disputed or applied in bulk.",
-  "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
+  "hours-elsewhere": "The hours this account posts fit a day in another region. Night owls, shift workers, scheduling tools and travel shift these hours too.",
+  "fast-replier": "This account often replies within a minute of the post, in threads timed to the second. Notifications make fast replies easy for close followers too.",
+  "copied-elsewhere": "This account posts the same words in other threads. People also repeat text they agree with, and memes and quotes repeat.",
+  "automation-app": "This account posts through an automation or scheduling app. News desks, brands and busy people use these apps too.",
+  "no-sleep-gap": "This account posts in nearly every hour of the day, by times given to the hour or finer. Teams, shared accounts and scheduling tools post around the clock too.",
+  "repost-only": "This account almost always reposts others. Some people keep an account for sharing.",
+  "low-karma": "This account has low karma for its age. Many people read more than they post, and karma depends on the communities they use.",
+  "new-account": "This account is new. Many real people join during a news event.",
+  "name-changes": "This account changed its name, and repeated renames are most common among resold or repurposed accounts. People rename for many ordinary reasons too.",
+  "default-handle": "This account uses the handle X suggested at sign-up. Many real people keep it.",
+  "based-elsewhere": "The account speaks as a local, and X labels it as based elsewhere. VPNs, travel and X's own errors move the label, and people abroad speak for home.",
+  "hate-symbol-name": "The account name carries a documented hate symbol. A name can be ironic or quoted.",
+  "high-volume": "This account posts at a very high rate. Some people post all day, and news and alert accounts post automatically.",
+  "follow-pattern": "This account follows many and few follow it back. New and small accounts often start this way.",
+  "store-elsewhere": "The account's app store country differs from where it says it is. People move, travel and buy phones abroad.",
+  "profile-location-elsewhere": "The profile location differs from the platform's label. People type their own profile location, and it can be old or a joke.",
+  "flag-elsewhere": "The profile shows another country's flag. Expats, diaspora and supporters show flags of other countries too.",
+  "platform-label": "The service put a moderation label on this account. The label is the service's own judgement.",
+  "same-text": "Other accounts posted identical replies. That shows copying or coordination, and people also share text they agree with.",
   "brand-lookalike": BRAND_DOES_NOT_PROVE,
 };
 
@@ -2800,9 +2800,9 @@ const { COERCION_PATTERNS, coercionSkipped } = M_theories_coercion;
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
 const AP_QANON = S("AP, QAnon's 'Save the Children' morphs into popular slogan", "https://www.wsls.com/news/politics/2020/10/28/qanons-save-the-children-morphs-into-popular-slogan/", "2020-10-28");
-const NAMING = "People quote, mock and argue against these claims, and Daylight Commons skips only obvious debunking.";
+const NAMING = "People also name these theories to quote, mock or argue against them, and Daylight Commons skips obvious debunking.";
 
-const THEORY_DOES_NOT_PROVE = `Naming a theory is not believing it. ${NAMING} This describes the post, not who wrote it or why, and a post that names a theory can still contain true statements.`;
+const THEORY_DOES_NOT_PROVE = `The post names this theory. ${NAMING} The rest of the post can still be true.`;
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const G = GROUPS.map(esc).sort((a, b) => b.length - a.length).join("|");
@@ -2825,12 +2825,12 @@ const CONTROL_PATTERNS = [
 const THEORIES = [
   { id: "qanon", name: "QAnon", terms: ["wwg1wga", "where we go one we go all", "q sent me", "q drops", "qanon was right", "qanon is right"],
     claim: "A secret cabal of elites runs the world and an insider called Q leaks its coming downfall.",
-    record: "None of Q's dated predictions came true. ADL and ISD document the movement and its slogans.",
+    record: "Every dated Q prediction failed. ADL and ISD document the movement and its slogans.",
     sources: [S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022"), S("ISD, QAnon explainer", "https://www.isdglobal.org/explainers/qanon/", "2023"), AP_QANON],
     dnp: "QAnon slogans are also quoted by reporters, researchers and former followers." },
   { id: "adrenochrome", name: "Adrenochrome harvesting", terms: ["adrenochrome", "adrenochrome harvesting", "harvesting adrenochrome"],
     claim: "Celebrities and elites traffic children to harvest a drug from their blood.",
-    record: "Adrenochrome is an ordinary oxidation product of adrenaline with no such use. AP reported the claim as baseless.",
+    record: "Adrenochrome is an ordinary oxidation product of adrenaline. AP reported the harvesting claim as baseless.",
     sources: [AP_QANON, S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022")],
     dnp: "The word also appears in chemistry, in fiction and in posts mocking the claim." },
   { id: "satanic-abuse", name: "Satanic ritual abuse network", terms: ["satanic ritual abuse", "satanic pedophile", "satanic pedophiles", "satanic paedophiles", "satanic cabal", "satanic elites", "pizzagate", "frazzledrip"],
@@ -2847,7 +2847,7 @@ const THEORIES = [
     claim: "The World Economic Forum's Great Reset is a hidden plan by elites to take property and freedoms.",
     record: "The Great Reset is a public WEF initiative from June 2020. ADL and ISD document how the plot framing grew from it.",
     sources: [S("ISD, The Great Reset explainer", "https://www.isdglobal.org/explainers/the-great-reset/", "2021"), S("ADL, Great Reset conspiracy flourishes amid continued pandemic", "https://www.adl.org/resources/blog/great-reset-conspiracy-flourishes-amid-continued-pandemic", "2021")],
-    dnp: "People criticise the WEF and its policies openly. The \"own nothing\" line is also used as a joke about rents and subscriptions." },
+    dnp: "People criticise the WEF and its policies openly. The slogan is also a joke about rents and subscriptions." },
   { id: "stolen-election", name: "Stolen or rigged election", terms: ["stop the steal", "stolen election"],
     patterns: [`\\b(?:the\\s+)?${YEAR}election\\s+(?:was|got|is being|has been)\\s+(?:stolen|rigged)\\b`, `\\b(?:${G}|they)\\s+(?:rigged|stole)\\s+the\\s+${YEAR}election\\b`,
       // "a fake president who won through a rigged election" (added 2026-10-23 from the feed test)
@@ -2860,7 +2860,7 @@ const THEORIES = [
     patterns: ["\\b(?:dominion|smartmatic|starlink|the machines|voting machines|the satellites)\\s+(?:flipped|switched|changed|rigged|altered)\\s+(?:the\\s+)?(?:votes?|election|results?|tallies|totals)\\b",
       "\\b(?:russia|china|iran|they)\\s+(?:hacked|changed|altered|flipped)\\s+(?:the\\s+)?(?:vote\\s+(?:totals|tallies|counts)|voting machines|votes)\\b"],
     claim: "Voting machines, satellites or a foreign government changed vote counts.",
-    record: "The Senate Intelligence Committee found no evidence that 2016 tallies were altered. PolitiFact rated the 2024 Starlink claim Pants on Fire: tabulators are not online during counting.",
+    record: "The Senate Intelligence Committee found no evidence that 2016 tallies were altered. PolitiFact rated the 2024 Starlink claim Pants on Fire: tabulators are offline during counting.",
     sources: [S("US Senate Select Committee on Intelligence, Report Volume 1", "https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume1.pdf", "2019-07-25"), S("PolitiFact, No, Elon Musk's Starlink wasn't used to rig the 2024 election", "https://www.politifact.com/factchecks/2024/nov/12/threads-posts/no-elon-musks-starlink-wasnt-used-to-rig-the-2024/", "2024-11-12"), ENDERS],
     dnp: "Foreign influence campaigns and machine faults are real and documented. They are different from changed counts." },
   { id: "staged-shooting", name: "Staged shooting", terms: [],
@@ -2869,7 +2869,7 @@ const THEORIES = [
     claim: "A shooting was staged with actors or faked to win sympathy or a policy.",
     record: "Researchers tracked staging claims about the 2024 Butler attempt from both sides (QUT, 2024). Courts found the Sandy Hook hoax claims defamatory.",
     sources: [S("QUT Digital Media Research Centre, Conspiracy theories on the Trump assassination attempt are spreading like wildfire", "https://www.qut.edu.au/news/realfocus/conspiracy-theories-on-the-trump-assassination-attempt-are-spreading-like-wildfire", "2024-07"), ENDERS],
-    dnp: "Asking how security failed is not a staging claim, and official accounts are sometimes corrected." },
+    dnp: "Questions about how security failed are a separate matter from a staging claim, and official accounts are sometimes corrected." },
   { id: "inside-job", name: "9/11 inside job", terms: ["9/11 was an inside job", "911 was an inside job", "bush did 9/11", "bush did 911", "jet fuel can't melt steel beams", "jet fuel cant melt steel beams"],
     claim: "The US government planned or carried out the 11 September 2001 attacks.",
     record: "NIST's investigation explained the collapses of the towers and of WTC 7 by impact damage and fire.",
@@ -2899,7 +2899,7 @@ const THEORIES = [
     record: "Such claims are made about leaders of every party. In July 2025 the Justice Department and the FBI said their review found no credible evidence that Jeffrey Epstein blackmailed prominent people. The Justice Department's Inspector General found that the FBI had corroborated only limited parts of the Steele reporting, the source of the claim that Russia held kompromat on Donald Trump.",
     sources: [S("NPR, DOJ memo says no evidence of Jeffrey Epstein 'client list' or blackmail", "https://www.npr.org/2025/07/08/nx-s1-5460954/doj-memo-says-no-evidence-of-jeffrey-epstein-client-list-or-blackmail", "2025-07-08"),
       S("US Department of Justice Office of the Inspector General, Review of Four FISA Applications and Other Aspects of the FBI's Crossfire Hurricane Investigation", "https://oig.justice.gov/reports/review-four-fisa-applications-and-other-aspects-fbis-crossfire-hurricane-investigation", "2019-12-09"), ENDERS],
-    dnp: "Blackmail, bribery and foreign influence happen and are sometimes proven in court. A claim about one person can be true, and this says only that the post makes the claim, not whether it is true." },
+    dnp: "Blackmail, bribery and foreign influence happen and are sometimes proven in court. A claim about one person can be true, and this marks that the post makes the claim." },
   { id: "hidden-cure", name: "Hidden cure", terms: ["hiding the cure for cancer", "hiding the cure", "suppressing the cure", "they have the cure for cancer", "sitting on the cure"],
     claim: "Drug companies or regulators hide a cure to protect profits.",
     record: "In a 2013 US survey, 37% agreed the FDA suppresses natural cures for cancer (Oliver and Wood, 2014); no such hidden cure has been shown.",
@@ -3276,7 +3276,7 @@ const MEASURED_DETAIL = {
  },
 };
 
-const MEASURED_DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), not on this site's replies. Precision says how often a marker sat on text the annotators judged hostile to a group; it does not say why anyone wrote it, and it can differ on other sites and topics.";
+const MEASURED_DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), and it can differ on this site and other topics. Precision says how often a marker sat on text the annotators judged hostile to a group.";
 
 return { MEASURED_AT, MEASURED_PERSUASION, MEASURED, MEASURED_DETAIL, MEASURED_DOES_NOT_PROVE };
 })();
@@ -3334,7 +3334,7 @@ function langLine(code) {
   const name = LANG_NAMES[code] || code;
   const r = MEASURED_LANGS[code];
   if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;
-  if (r.n < MIN_N) return `Found by the ${name} word list. Not measured in ${name}: only ${r.n} of these signs in labelled text.`;
+  if (r.n < MIN_N) return `Found by the ${name} word list. Not measured in ${name}: ${r.n} of these signs in labelled text.`;
   return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of the strong signs Daylight Commons found were on text people labelled ` +
     `hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
 }
@@ -3519,19 +3519,19 @@ const { MEASURED_PERSUASION } = M_measured;
 
 // Definitions follow the SemEval task guidelines, shortened to one line each.
 const TECHNIQUES = {
-  "loaded-language": { name: "Loaded language", definition: "Words with a strong emotional charge, used to sway the reader rather than to describe." },
-  "name-calling": { name: "Name calling", definition: "A label or insult attached to a person or group in place of an argument." },
-  "bandwagon": { name: "Bandwagon", definition: "Asks the reader to agree because everyone else supposedly does." },
-  "appeal-to-fear": { name: "Appeal to fear", definition: "Builds support for an idea by stirring fear of what happens otherwise." },
-  "flag-waving": { name: "Flag-waving", definition: "Appeals to patriotism or group identity to justify a position." },
-  "thought-terminating": { name: "Thought-terminating cliche", definition: "A stock phrase that closes the discussion instead of answering it." },
-  "whataboutism": { name: "Whataboutism", definition: "Answers a criticism by pointing at the other side's conduct instead." },
-  "black-and-white": { name: "Black-and-white fallacy", definition: "Presents two options as the only ones when more exist." },
-  "doubt": { name: "Doubt", definition: "Questions the credibility of someone or something without giving evidence." },
-  "appeal-to-authority": { name: "Appeal to authority", definition: "Says a claim is true because an unnamed or generic authority backs it." },
-  "exaggeration": { name: "Exaggeration", definition: "Makes something seem far larger, worse or more extreme than it is." },
-  "motive-attribution": { name: "Hidden motive", definition: "Says someone's real aim is hidden behind what they say, without showing evidence of the aim." },
-  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question, so it is suggested without being claimed." },
+  "loaded-language": { name: "Loaded language", definition: "Strong emotional words that push the reader to feel a certain way. Look for words that judge instead of describe." },
+  "name-calling": { name: "Name calling", definition: "A label or insult for a person or group. The label takes the place of a reason." },
+  "bandwagon": { name: "Bandwagon", definition: "Tells the reader to agree because many people agree. Look for \"everyone knows\" or \"millions agree\"." },
+  "appeal-to-fear": { name: "Appeal to fear", definition: "Makes the reader afraid of a result, to win support for an idea. Look for a threat that follows a choice." },
+  "flag-waving": { name: "Flag-waving", definition: "Uses love of country or group to support a position. Look for the nation or the group as the reason." },
+  "thought-terminating": { name: "Thought-terminating cliche", definition: "A stock phrase that ends the talk. It replaces an answer with a slogan." },
+  "whataboutism": { name: "Whataboutism", definition: "Answers a criticism with the other side's conduct. Look for \"what about\" after a charge." },
+  "black-and-white": { name: "Black-and-white fallacy", definition: "Gives two options as the full set. Other options exist." },
+  "doubt": { name: "Doubt", definition: "Casts doubt on a person or a source by hint. Look for a question about trust, with the facts left out." },
+  "appeal-to-authority": { name: "Appeal to authority", definition: "Says a claim is true because an expert backs it. The expert has no name or is a general group." },
+  "exaggeration": { name: "Exaggeration", definition: "Makes something seem much larger, worse or more extreme than it is. Look for words like \"total\" and \"every\"." },
+  "motive-attribution": { name: "Hidden motive", definition: "Says a person hides a secret aim behind their words. The post gives the aim and skips the evidence." },
+  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question. The post suggests the charge and leaves it unclaimed." },
 };
 
 const PERSUASION_DOES_NOT_PROVE = "A technique can carry a true claim; it describes how the post argues.";
@@ -3588,7 +3588,7 @@ function shownTechniques(table = MEASURED_PERSUASION) {
 // { shown, text } for one technique: its measured line, or why it is held back.
 function techniqueStatus(id, table = MEASURED_PERSUASION) {
   const r = (table || {})[id];
-  if (CONTEXT_ONLY.has(id)) return { shown: false, text: "held back: needs the whole exchange, so never shown on one reply" };
+  if (CONTEXT_ONLY.has(id)) return { shown: false, text: "held back: needs the whole exchange, so it waits for a full thread" };
   if (!r || !Number.isInteger(r.n) || !r.n) return { shown: false, text: "held back: not measured" };
   const m = `precision ${pc(r.precision)}% (95% interval ${pc(r.low)} to ${pc(r.high)}%), ${r.n} spans checked, held-out news articles`;
   if (ships(r)) return { shown: true, text: m };
@@ -3608,6 +3608,596 @@ function persuasion(text, shown = shownTechniques()) {
 }
 
 return { TECHNIQUES, PERSUASION_DOES_NOT_PROVE, SHIP_PRECISION, SHIP_LOW, SHIP_MIN_N, CONTEXT_ONLY, techniqueSpans, shownTechniques, techniqueStatus, persuasion };
+})();
+
+// ---- reading-lists.js
+const M_reading_lists = (() => {
+// Word lists for the reading lens (reading.js). Every list that names a target runs in every
+// direction: nations from every region, peoples of every faith and origin, parties and movements
+// from left and right, leaders from every bloc. tests/reading.symmetry.test.js runs each targeted
+// cue over each entry and expects the same answer, so no list entry can carry a side.
+
+const { IDENTITY_GROUPS, ORIGIN_GROUPS } = M_lexicon;
+
+// UN member and observer states plus a few widely used short names.
+const NATIONS = [
+  "afghanistan", "albania", "algeria", "andorra", "angola", "argentina", "armenia", "australia", "austria", "azerbaijan",
+  "bahrain", "bangladesh", "barbados", "belarus", "belgium", "belize", "benin", "bhutan", "bolivia", "bosnia", "botswana",
+  "brazil", "brunei", "bulgaria", "burkina faso", "burundi", "cambodia", "cameroon", "canada", "chad", "chile", "china",
+  "colombia", "comoros", "congo", "costa rica", "croatia", "cuba", "cyprus", "czechia", "denmark", "djibouti", "dominica",
+  "ecuador", "egypt", "el salvador", "eritrea", "estonia", "eswatini", "ethiopia", "fiji", "finland", "france", "gabon",
+  "gambia", "georgia", "germany", "ghana", "greece", "grenada", "guatemala", "guinea", "guyana", "haiti", "honduras",
+  "hungary", "iceland", "india", "indonesia", "iran", "iraq", "ireland", "israel", "italy", "jamaica", "japan", "jordan",
+  "kazakhstan", "kenya", "kosovo", "kuwait", "kyrgyzstan", "laos", "latvia", "lebanon", "lesotho", "liberia", "libya",
+  "lithuania", "luxembourg", "madagascar", "malawi", "malaysia", "maldives", "mali", "malta", "mauritania", "mexico",
+  "moldova", "monaco", "mongolia", "montenegro", "morocco", "mozambique", "myanmar", "namibia", "nepal", "the netherlands",
+  "new zealand", "nicaragua", "niger", "nigeria", "north korea", "north macedonia", "norway", "oman", "pakistan", "palestine",
+  "panama", "paraguay", "peru", "the philippines", "poland", "portugal", "qatar", "romania", "russia", "rwanda", "samoa",
+  "saudi arabia", "senegal", "serbia", "sierra leone", "singapore", "slovakia", "slovenia", "somalia", "south africa",
+  "south korea", "south sudan", "spain", "sri lanka", "sudan", "suriname", "sweden", "switzerland", "syria", "taiwan",
+  "tajikistan", "tanzania", "thailand", "togo", "tunisia", "turkey", "turkmenistan", "uganda", "ukraine",
+  "the united kingdom", "the uk", "britain", "england", "scotland", "wales", "the united states", "the us", "america",
+  "uruguay", "uzbekistan", "venezuela", "vietnam", "yemen", "zambia", "zimbabwe", "greenland", "puerto rico", "gaza",
+];
+
+// Political groups, both directions, named as wholes.
+const POLITICAL_GROUPS = [
+  "leftists", "liberals", "libs", "progressives", "socialists", "communists", "marxists", "democrats", "dems",
+  "conservatives", "right-wingers", "rightists", "republicans", "maga", "trumpists", "nationalists", "fascists", "libertarians",
+  "zionists", "anti-zionists", "feminists", "the woke", "globalists", "tories", "labour voters", "boomers", "gen z",
+];
+
+// Peoples named as wholes: faith, origin, nationality and politics, from lexicon.js plus a few more.
+const MORE_PEOPLES = ["haitians", "israelis", "palestinians", "iranians", "chinese people", "jamaicans", "irish people",
+  "venezuelans", "salvadorans", "ecuadorians", "indigenous people", "settlers", "christians", "hindus", "buddhists"];
+const PEOPLES = [...new Set([...IDENTITY_GROUPS, ...ORIGIN_GROUPS, ...MORE_PEOPLES])];
+const TARGET_GROUPS = [...new Set([...PEOPLES, ...POLITICAL_GROUPS])];
+
+// Strongman figures from every bloc and era, for "we need our own X" and "do an X".
+const STRONGMEN = ["bukele", "putin", "xi", "pinochet", "franco", "mussolini", "stalin", "mao", "castro", "chavez",
+  "maduro", "duterte", "orban", "erdogan", "kim jong un", "lee kuan yew", "napoleon", "caesar", "cromwell", "lenin",
+  "trump", "modi", "netanyahu", "sisi", "kagame", "lukashenko", "ortega", "museveni", "ataturk", "peron"];
+
+// Allusions: named historical episodes, works and scriptures a post borrows force from.
+const ALLUSIONS = ["another hitler", "hitler", "nazi germany", "1930s germany", "the third reich", "weimar", "kristallnacht",
+  "reichstag fire", "kapo", "kapos", "nuremberg", "goebbels", "riefenstahl", "stalin's", "the gulag", "gulags", "the holocaust",
+  "orwellian", "1984", "big brother", "ministry of truth", "brave new world", "handmaid's tale", "animal farm", "ender's game",
+  "fahrenheit 451", "the matrix", "red pill", "blue pill", "hunger games", "fall of rome", "rome fell", "neville chamberlain",
+  "appeasement", "munich agreement", "trojan horse", "judas", "thirty pieces of silver", "pharisees", "the antichrist",
+  "mark of the beast", "babylon", "pontius pilate", "salem", "witch hunt", "mccarthyism", "jim crow", "apartheid", "the inquisition",
+  "the crusades", "a crusade", "jihad", "intifada", "the trail of tears", "slow horses", "house of cards", "the godfather",
+  "the sopranos", "squid game", "idiocracy"];
+
+// Coded terms: words used in place of a slur or a group name, from every direction. Each one is
+// documented by ADL, ISD or the Southern Poverty Law Center glossaries.
+const CODED_TERMS = ["jq", "the jq", "(((", ")))", "goyim", "goy", "oy vey", "shabbos goy", "zog", "khazar", "khazarian", "khazarians",
+  "kalergi", "rootless cosmopolitan", "rootless cosmopolitans", "happy merchant", "globohomo", "1488", "14 words", "14/88", "13/50",
+  "dindu", "dindu nuffin", "groomers", "cuckservative", "cuckservatives", "libtard", "libtards", "magat", "magats", "trumptard",
+  "feminazi", "feminazis", "zionazi", "zionazis", "zio", "zios", "shitlib", "shitlibs", "fashy", "kulak", "kulaks", "wetback",
+  "anchor babies", "third worlders", "sandn", "jogger", "joggers", "noticer", "noticers"];
+
+// Words that place a post as reporting, mocking or rebutting what it names (the stance factor).
+const REPORT_VERBS = ["said", "says", "say", "writes", "wrote", "claims", "claimed", "claiming", "according to", "per", "reports",
+  "reported", "alleges", "alleged", "allegedly", "told", "tweeted", "posted", "calls", "called", "argues", "argued"];
+const REBUT_WORDS = ["not true", "untrue", "false", "debunked", "nonsense", "myth", "a lie", "lies", "no evidence", "baseless",
+  "conspiracy theory", "conspiracy theories", "obsess", "obsessed", "obsession", "obsessives", "obsessive", "fixated", "fixation",
+  "so-called", "racist", "racism", "bigot", "bigotry", "antisemitic", "antisemitism", "islamophobic", "islamophobia", "xenophobic",
+  "propaganda", "unable to see", "stop spreading", "grifter", "grifters", "brainrot", "brain rot", "bent into a pretzel", "unhinged",
+  "deranged", "disgusting that", "shame on", "condemn", "condemns", "denounce", "denounces", "smear", "slander", "dog whistle"];
+const MOCK_WORDS = ["lol", "lmao", "lmfao", "rofl", "/s", "imagine thinking", "imagine believing", "sure, jan", "yeah right",
+  "clown", "clowns", "🤡", "😂", "🤣", "😆", "🙄"];
+const IRONY_WORDS = ["funny that", "funny how", "what a coincidence", "how convenient", "totally normal", "nothing to see here",
+  "of course", "shocking", "who could have guessed", "who could have known", "color me surprised", "colour me surprised"];
+const NEWS_WORDS = ["breaking", "report:", "reports", "according to", "per ", "writes", "excerpt", "via", "source:", "sources say",
+  "officials said", "statement", "announced", "announces", "press release", "update:"];
+const PROFANITY = ["fuck", "fucking", "fucked", "shit", "damn", "hell", "bullshit", "crap", "bastards", "pissed"];
+
+return { NATIONS, POLITICAL_GROUPS, PEOPLES, TARGET_GROUPS, STRONGMEN, ALLUSIONS, CODED_TERMS, REPORT_VERBS, REBUT_WORDS, MOCK_WORDS, IRONY_WORDS, NEWS_WORDS, PROFANITY };
+})();
+
+// ---- reading-cues.js
+const M_reading_cues = (() => {
+// The techniques the reading lens names, each with its cues. A cue is a regular expression over the
+// post; {NATION}, {GROUP}, {ACTOR} and {STRONGMAN} expand to the lists in reading-lists.js, which run
+// in every direction, so a cue describes how a post argues and never whom it is about.
+// Cues were written from feed tests 1 to 5 (the dev sets) and the families in the 2026-10-23 brief.
+
+const { NATIONS, TARGET_GROUPS, STRONGMEN, ALLUSIONS, CODED_TERMS } = M_reading_lists;
+const { COERCION_ACTORS } = M_theories_coercion;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const alt = (list) => [...new Set(list)].map(esc).sort((a, b) => b.length - a.length).join("|");
+const SLOTS = {
+  NATION: `(?:${alt(NATIONS)})`,
+  GROUP: `(?:the\\s+)?(?:${alt(TARGET_GROUPS)})`,
+  ACTOR: `(?:the\\s+)?(?:${alt(COERCION_ACTORS)})`,
+  STRONGMAN: `(?:${alt(STRONGMEN)})`,
+};
+const BE = "(?:is|are|was|were|'s|'re|isn't|aren't|is not|are not|wasn't)";
+
+// What each technique is and how to spot it, in plain English: one idea per sentence.
+const DEFINITIONS = {
+  "nation-denial": "The post says a nation or a people does not exist. Look for \"is not a real country\" or \"no man's land\".",
+  "dehumanising": "The post calls people animals, pests or a disease. Look for words like \"vermin\", \"parasites\" or \"spreading like a plague\".",
+  "punitive-annexation": "The post asks to take over a place or remove a group as a punishment. Look for \"turn it into a penal colony\", \"wipe them off the map\" or \"deport them all\".",
+  "strongman": "The post asks for one hard ruler to fix things. Look for \"we need our own\" followed by a named ruler, or \"iron fist\".",
+  "question-insinuation": "The post puts an accusation in a question. The reader supplies the answer. Look for a run of questions or \"who benefits?\".",
+  "true-leap": "The post starts from a true or documented item. Then it jumps to a larger claim. Look for \"this proves\", \"that is why\" or \"not a coincidence\".",
+  "case-to-group": "The post takes one case and applies it to a whole group. Look for \"typical\", \"they always\" or \"all of them\".",
+  "essentialism": "The post says a group has a fixed nature. Look for \"in their blood\", \"inherently\" or \"genetically\".",
+  "coded-term": "The post uses a word that stands in for a slur or a group name. The window shows the word.",
+  "replacement": "The post says a group plans to replace a people, or accuses a group of ritual crimes. Look for \"replacement\", \"flood the country with\" or \"ritual abuse\".",
+  "secret-coercion": "The post says a leader is secretly controlled. Look for \"blackmailed\", \"compromised\", \"owned by\" or \"puppet of\".",
+  "election-theft": "The post says an election was stolen or rigged. Look for \"rigged election\", \"fake president\" or \"machines flipped votes\".",
+  "metaphor": "The post describes people or events as something else. Look for \"invasion\", \"flood\" or \"cancer\".",
+  "hyperbole": "The post makes something much bigger than the facts. Look for \"in history\", \"of all time\" or \"every single one\".",
+  "irony": "The post says the opposite of what it means. Look for \"funny how\", \"what a coincidence\" or \"/s\".",
+  "allusion": "The post borrows force from a known story, book or event. Look for names like \"Orwellian\", \"Weimar\" or \"Judas\".",
+  "dog-whistle": "The post uses a phrase that one audience reads as a coded message. Look for \"certain people\" or \"we are not supposed to notice\".",
+};
+
+// [id, name, family, cues]. Family names follow the brief; literary devices are one family.
+const READING_TECHNIQUES = [
+  ["nation-denial", "Nation denial", "dehumanising", [
+    `\\b{NATION}\\s+(?:isn't|is not|ain't|was never|has never been)\\s+(?:even\\s+)?(?:a\\s+)?(?:real\\s+)?(?:country|nation|state|people)\\b`,
+    "\\bno man'?s land\\b", "\\b(?:not|never) (?:a|even a) real (?:country|nation|people)\\b", "\\bso-called (?:country|nation|state|people)\\b",
+    "\\b(?:fake|invented|made-up) (?:country|nation|people)\\b", "\\bthere (?:is|was) no such (?:thing as a |)(?:country|nation|people)\\b"]],
+  ["dehumanising", "Dehumanising metaphor", "dehumanising", [
+    "\\b(?:are|like|as)\\s+(?:a\\s+)?(?:cockroaches|roaches|rats|vermin|parasites|leeches|locusts|lice|termites|maggots|insects|animals|savages|subhumans?|a plague|a cancer|a disease|a virus|an infestation)\\b",
+    "\\b(?:infest(?:ing|ed|s)?|infect(?:ing|ed|s)?|spreading like a (?:plague|virus|disease|cancer))\\b",
+    "\\b(?:subhuman|untermensch|human garbage|human trash|not even human|not human)\\b"]],
+  ["punitive-annexation", "Punitive annexation or elimination", "punitive", [
+    `\\b(?:take|seize|annex|conquer|occupy|invade|buy|colonise|colonize)\\s+{NATION}\\s+and\\s+(?:turn|convert|make)\\s+it\\s+into\\b`,
+    "\\b(?:convert|turn|make)\\s+(?:it|them|the (?:country|island|place))\\s+into\\s+(?:a\\s+)?(?:penal colony|prison colony|prison|colony|parking lot|wasteland|glass|reservation)\\b",
+    `\\b(?:nuke|glass|flatten|level|carpet[- ]bomb|wipe out|erase)\\s+{NATION}\\b`, "\\bwipe(?:d)? (?:them|it) off the (?:map|face of the earth)\\b",
+    "\\bpenal colony\\b", "\\b(?:remigrat(?:e|ion|ing)|mass deportations? now|deport them all|send them all back|round them (?:all )?up)\\b",
+    "\\b(?:put down|crush|exterminate|eradicate)\\s+(?:the\\s+)?(?:insurgency|uprising|rioters|vermin|them all)\\b",
+    "\\b(?:criminali[sz]e|abolish|outlaw|ban)\\s+(?:and\\s+(?:abolish|ban|outlaw)\\s+)?{GROUP}\\b", "\\bat maximum intensity\\b", "\\blet (?:the|them|it)\\b[^.\\n]{0,24}\\bimplode\\b"]],
+  ["strongman", "Strongman appeal", "strongman", [
+    "\\bwe need (?:a|our own|an?)\\s+(?:strong\\s?man|iron fist|dictator|{STRONGMAN})\\b", "\\b(?:do|pull) (?:a|an)\\s+{STRONGMAN}\\b",
+    "\\b{STRONGMAN}[- ]style\\b", "\\b{STRONGMAN} (?:did it right|had it right|knows how|is the model|is what we need)\\b",
+    "\\b(?:only|just) (?:a|one) (?:strong\\s?man|strong leader|man) can (?:fix|save)\\b", "\\b(?:iron fist|strong hand|martial law now|suspend the constitution|dictator for a day)\\b",
+    "\\bbenevolent dictator(?:ship)?\\b"]],
+  ["question-insinuation", "Question insinuation", "insinuation", [
+    "\\b(?:why|how|who|what|when)\\b[^?.!\\n]{0,120}\\b(?:blackmail\\w*|compromised|paid off|bought|owned|hiding|hide|cover(?:ing)? up|covered up|rigged|hacked|funded|controls?|really)\\b[^?.!\\n]{0,80}\\?",
+    "\\b(?:anyone|coincidence|ask yourself|makes you wonder|just asking|i wonder if|i'm just saying|just saying|connect the dots|think about it)\\b[^\\n]{0,4}[?!.]",
+    "\\b(?:what are they hiding|who benefits|cui bono|follow the money|why is no one talking about)\\b",
+    "\\b(?:and )?what happened\\?", "\\bwho (?:hired|paid|sent|knew|ordered|benefits|gave)\\b[^?\\n]{0,80}\\?",
+    "(?:[^?.!\\n]{6,160}\\?\\s*){2,}", "\\b(?:conveniently|coincidentally|seemingly|suspiciously)\\b"]],
+  ["true-leap", "True item carries a leap", "leap", [
+    "\\b(?:it'?s|that'?s|this is)\\s+(?:true|a fact|documented|on record|real)\\b[^.\\n]{0,80}\\b(?:so|which means|therefore|proves|that'?s why)\\b",
+    "\\b(?:this|it|which)\\s+(?:proves|confirms|shows)\\s+(?:just how|that|exactly)\\b", "\\b(?:not|no) (?:a )?coincidence\\b",
+    "\\bcan be (?:hacked|rigged|faked|manipulated)\\b", "\\bnot hard at all if\\b", "\\bthe only explanation\\b",
+    "\\bthere is an explanation\\b", "\\b(?:it all|everything) (?:makes sense|adds up) now\\b",
+    "\\b(?:obviously|clearly|undeniably) (?:ended up|means|shows|proves|is why|say)\\b", "\\b(?:and )?(?:that|this) is why\\b", "\\bwhich is why\\b", "\\btheir plan to\\b"]],
+  ["case-to-group", "Case to group", "generalisation", [
+    "\\b(?:all|every(?: single)?|most|typical)\\s+{GROUP}\\b", "\\b{GROUP}\\s+(?:always|never|all|are all|will always|will never)\\b",
+    "\\b(?:that'?s|this is) (?:what|how) {GROUP}\\s+(?:do|are|act|behave)\\b", "\\b{GROUP}\\s+(?:will probably|will|are going to)\\s+(?:attack|rape|kill|destroy|take over|ruin|replace)\\b",
+    "\\b(?:the|these|those)\\s+(?:people|kind|types?)\\s+(?:always|never|all)\\b", "\\bthe whole (?:bunch|lot) of them\\b",
+    "\\brampant (?:throughout|in|among)\\b", "\\b(?:their|these people's) (?:depravity|nature|evil|savagery|degeneracy)\\b", "\\bif they do this to their own\\b",
+    "\\bimagine what they do to\\b", "\\ball the other\\b[^.?\\n]{0,40}\\b(?:members|people|ones) who\\b", "\\b\\w+ (?:rape|crime|terror|hate) culture\\b"]],
+  ["essentialism", "Essentialism", "essentialism", [
+    "\\b(?:in their|it'?s in their)\\s+(?:blood|dna|nature|genes|culture)\\b", "\\b{GROUP}\\s+(?:are|is)\\s+(?:naturally|inherently|genetically|by nature)\\b",
+    "\\b(?:incompatible|not compatible)\\s+with\\s+(?:western|our|european|american|civili[sz]ed)\\b", "\\b(?:can'?t|cannot|won'?t) (?:be )?(?:integrate|assimilate)d?\\b",
+    "\\bcompletely different cultures?\\b", "\\b(?:third[- ]world|backward) (?:culture|people|mentality)\\b",
+    "\\b(?:genetically|biologically|innately|racially) (?:inhibited|predisposed|incapable|inferior|superior|prone|wired)\\b"]],
+  ["coded-term", "Coded term", "coded", [`(?<![\\w])(?:${alt(CODED_TERMS)})(?![\\w])`, "\\b(?:stop noticing|starting to notice|aren'?t supposed to notice|you'?re not allowed to notice)\\b"]],
+  ["replacement", "Replacement or blood libel", "replacement", [
+    "\\bgreat replacement\\b", "\\b(?:replac(?:e|ing|ement of)) (?:us|white|native|christian|european|american|the native)\\w*\\b", "\\bdemographic (?:replacement|war|takeover)\\b",
+    "\\bimport(?:ing|ed)? (?:voters|a new electorate|the third world|people from completely different)\\b", "\\bcommit(?:ting)? (?:cultural |national )?suicide by importing\\b",
+    "\\b(?:white|christian|european) genocide\\b", "\\bblood libel\\b", "\\bdrink(?:ing|s)? (?:the )?blood of\\b", "\\britual(?:istic)?,? (?:\\w+ )?(?:murder|sacrifice|abuse)\\b",
+    "\\b(?:harvest(?:ing)?|adrenochrome)\\b[^.\\n]{0,40}\\b(?:children|kids|babies|organs)\\b", "\\bpoison(?:ing|ed)? the wells\\b", "\\bcultural suicide\\b",
+    "\\bflood(?:s|ed|ing)? (?:the|our|this) (?:country|nation|cities|towns|continent) with\\b", "\\bswamp(?:s|ed|ing)? the (?:natives|locals|voters|country)\\b",
+    "\\btraffick(?:ing|s|ed)? (?:kids|children|babies)\\b", "\\b(?:rape|abuse) (?:ceremonies|assembly line|rings?)\\b", "\\bdivine permission to\\b"]],
+  ["secret-coercion", "Secret coercion", "coercion", [
+    "\\bblackmail(?:ed|ing|s)?\\b", "\\bkompromat\\b", "\\b(?:has|have|holds?|got)\\s+(?:the\\s+)?dirt on\\b",
+    "\\bcompromised\\s+(?:by|to|into)\\b", "\\b(?:is|was|were|are|being)\\s+compromised\\b(?![^.\\n]{0,30}\\b(?:account|system|server|network|password|data|phone|device)s?\\b)",
+    "\\b(?:owned|controlled|bought(?: and paid for)?|handled|infiltrated)\\s+by\\s+{ACTOR}\\b", "\\bin the pocket of\\b", "\\b{ACTOR}\\s+(?:owns|controls|runs)\\s+(?:him|her|them|congress|the president|our government)\\b",
+    "\\b(?:asset|puppet|stooge|plant) (?:of|for) {ACTOR}\\b", "\\b(?:deep state|cia|mossad|kremlin|ccp)[- ]controlled\\b", "\\bcontrolled (?:nations?|governments?|media)\\b",
+    "\\b(?:fully |completely |totally )?taken over by\\b", "\\b(?:cement|entrench|hold)(?:ing)? (?:control|power)(?: indefinitely| forever)?\\b", "\\bthe playbook\\b"]],
+  ["election-theft", "Election theft", "election", [
+    "\\b(?:rigged|stolen|fraudulent|fake)\\s+(?:the\\s+)?(?:election|vote|ballots?)\\b", "\\b(?:rig|rigged|steal|stole|stealing)\\s+(?:the\\s+)?(?:election|vote|votes|machines|ballots)\\b",
+    "\\b(?:fake|illegitimate|selected,? not elected)\\s+president\\b", "\\belection fraud\\b", "\\bmachines?\\b[^.\\n]{0,60}\\b(?:hacked|flipp(?:ed|ing)|switch(?:ed|ing)|sabotage)\\b",
+    "\\b(?:hacked|flipped)\\b[^.\\n]{0,40}\\b(?:votes?|machines?|ballots?|election)\\b", "\\bannul(?:ment of)?\\b[^.\\n]{0,30}\\belection\\b"]],
+  ["metaphor", "Metaphor", "literary", [
+    "\\b(?:invasion|invaders|flood(?:ed|ing)? of|tidal wave|swarms?|hordes?)\\b", "\\b(?:is|are) (?:a )?(?:cancer|poison|tumou?r|disease|virus|plague)\\b",
+    "\\bburn(?:ed|t)? (?:it )?out of\\b", "\\bbled (?:dry|white)\\b", "\\b(?:robbing|pillaging|raping) (?:and \\w+ )?(?:this|the|our) country\\b", "\\bone body\\b"]],
+  ["hyperbole", "Hyperbole", "literary", [
+    "\\bin (?:american|world|human|modern|recorded|our|the) history\\b", "\\bof all time\\b", "\\bmore \\w+ than (?:basically )?every\\b",
+    "\\bcombined[!.]*$", "\\b(?:nothing is being done|completely mad|every single one)\\b", "\\bthe (?:worst|biggest|most \\w+) (?:\\w+ )?(?:ever|in the world|on earth)\\b",
+    "\\bliterally (?:destroying|killing|everyone|everything)\\b", "\\b(?:absolutely|completely|totally) (?:insane|toxic|destroyed|corrupt)\\b"]],
+  ["irony", "Irony", "literary", ["\\bfunny (?:that|how)\\b", "\\bwhat a coincidence\\b", "\\bhow convenient\\b", "\\byeah,? right\\b",
+    "\\b(?:sure|totally),? (?:jan|buddy|pal)\\b", "(?:^|\\s)/s\\b", "\\bwalk into a bank\\b", "\\bwalk into a bar\\b", "\\bcolou?r me surprised\\b"]],
+  ["allusion", "Allusion", "literary", [`\\b(?:${alt(ALLUSIONS)})\\b`]],
+  ["dog-whistle", "Dog-whistle", "literary", ["\\b(?:certain people|you know who|those people|these people|their kind|globalists?|international bankers|rootless|the usual suspects|\\(\\(\\()\\b",
+    "\\b(?:we aren'?t supposed to|you'?re not supposed to) (?:notice|talk about|say)\\b", "\\boften it'?s in the (?:last )?name\\b", "\\b(?:jewish|zionist|muslim|catholic|white|black) (?:money|cabal|lobby|power brokers)\\b"]],
+].map(([id, name, family, cues]) => ({ id, name, family, cues, definition: DEFINITIONS[id] }));
+
+const fill = (cue) => cue.replace(/\{(NATION|GROUP|ACTOR|STRONGMAN)\}/g, (_, k) => SLOTS[k]);
+const READING_RULES = READING_TECHNIQUES.flatMap((t) => t.cues.map((cue, i) => ({ technique: t.id, cue: `${t.id}#${i}`, re: new RegExp(fill(cue), "giu") })));
+const TECHNIQUE_BY_ID = new Map(READING_TECHNIQUES.map((t) => [t.id, t]));
+
+return { SLOTS, READING_TECHNIQUES, READING_RULES, TECHNIQUE_BY_ID };
+})();
+
+// ---- reading-weights.js
+const M_reading_weights = (() => {
+// Generated by scripts/eval-reading.mjs --fit from feed tests 1 to 9 (112 cue hits, 75 consensus positive). Do not edit.
+const READING_WEIGHTS = {"bias":0.559,"w":{"quotes":-0.225,"mocks":0,"rebuts":-0.346,"irony":-0.351,"question":0.036,"target-group":0.392,"target-person":0.185,"intensity":-0.011,"echo":-0.279,"root":-0.276,"news":-0.008,"joke":0.07,"repeat":0.494,"author-rebuts":-0.037,"short":0.149},"threshold":0.5};
+
+return { READING_WEIGHTS };
+})();
+
+// ---- reading-inflection.js
+const M_reading_inflection = (() => {
+// The inflection layer: each cue match is weighted by what surrounds it. Stance (asserts, quotes,
+// mocks, rebuts), target class, intensity, irony, thread context, genre and the author's own usage
+// in the thread each become a number, and one logistic weight vector (reading-weights.js, fitted
+// on feed tests 1 to 5 only by scripts/eval-reading.mjs) turns them into a weight between 0 and 1.
+// The same vector applies to every technique and every target: target enters only as a class
+// (a people or nation, a person), never as which one. Deterministic: same input, same weight.
+
+const { NATIONS, TARGET_GROUPS, STRONGMEN, REPORT_VERBS, REBUT_WORDS, MOCK_WORDS, IRONY_WORDS, NEWS_WORDS, PROFANITY } = M_reading_lists;
+const { COERCION_ACTORS } = M_theories_coercion;
+const { READING_WEIGHTS } = M_reading_weights;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const words = (list, flags = "iu") => new RegExp(`(?<![\\p{L}\\p{N}])(?:${[...list].map(esc).sort((a, b) => b.length - a.length).join("|")})(?![\\p{L}\\p{N}])`, flags);
+// Every name a targeted cue can carry: peoples, nations, parties, states, agencies, firms and leaders.
+// Target enters the weight only as this one class, so every name in it weighs the same.
+const NAMED = [...new Set([...TARGET_GROUPS, ...NATIONS, ...COERCION_ACTORS, ...STRONGMEN])];
+const RE = {
+  report: words(REPORT_VERBS), rebut: words(REBUT_WORDS), mock: words(MOCK_WORDS), irony: words(IRONY_WORDS),
+  news: words(NEWS_WORDS), profane: words(PROFANITY), named: words(NAMED), namedAll: words(NAMED, "giu"),
+  pronoun: /\b(?:he|she|him|her|his)\b/iu, capitalised: /\b[A-Z][a-z]+ [A-Z][a-z]+\b/u, joke: /walk into a|knock knock|😂|🤣|\blol\b|\blmao\b/iu,
+};
+// The text with every listed name replaced by one neutral word, so a name's length or capitals
+// never change a factor.
+const neutral = (s) => s.replace(RE.namedAll, "x");
+// A person: a pronoun, or a capitalised two-word name outside the lists.
+const person = (s) => RE.pronoun.test(s) || RE.capitalised.test(neutral(s));
+
+// Factor ids, in a fixed order, with the words the window shows for each.
+const FACTORS = [
+  ["quotes", "stance: quotes or reports"], ["mocks", "stance: mocks"], ["rebuts", "stance: rebuts"], ["irony", "irony cue"],
+  ["question", "asked as a question"], ["target-group", "target: a named people, nation or power"], ["target-person", "target: a person"],
+  ["intensity", "intensity"], ["echo", "thread: other authors use it"], ["root", "thread: the opening post uses it"],
+  ["news", "genre: news or excerpt"], ["joke", "genre: joke"], ["repeat", "author: uses it again in the thread"],
+  ["author-rebuts", "author: rebuts elsewhere in the thread"], ["short", "very short post"],
+  ["mention", "stance: names the term to criticise it"],
+];
+const FACTOR_IDS = FACTORS.map(([id]) => id);
+// Use and mention: a coded term or dog-whistle named inside a sentence that criticises it is a
+// mention. This weight is fixed from that distinction, not fitted (the dev sets hold one example).
+const MENTION_WEIGHT = -3;
+const LEXICAL = new Set(["coded-term", "dog-whistle"]);
+const LABEL = new Map(FACTORS);
+
+// The sentence around [start, end) in s.
+function sentence(s, start, end) {
+  const head = s.slice(0, start), tail = s.slice(end);
+  const a = Math.max(head.lastIndexOf("."), head.lastIndexOf("!"), head.lastIndexOf("?"), head.lastIndexOf("\n")) + 1;
+  const m = tail.match(/[.!?\n]/);
+  return { before: head.slice(a), after: m ? tail.slice(0, m.index + 1) : tail };
+}
+
+// True when the span sits inside quotation marks.
+function quoted(s, start) {
+  const head = s.slice(0, start);
+  const open = (head.match(/[“"]/g) || []).length - (head.match(/”/g) || []).length;
+  return /“[^”]*$/.test(head) || open % 2 === 1;
+}
+
+function intensity(s) {
+  const letters = s.replace(/[^A-Za-z]/g, ""), caps = s.replace(/[^A-Z]/g, "").length;
+  let x = 0;
+  if (letters.length >= 12 && caps / letters.length > 0.3) x += 0.4;
+  if (/!!|!\?|\?!/.test(s)) x += 0.3;
+  if (RE.profane.test(s)) x += 0.3;
+  return Math.min(1, x);
+}
+
+// Context-free factors of one post, shared by every match in it.
+function postFactors(text) {
+  const s = String(text || "");
+  return { mocks: RE.mock.test(s) ? 1 : 0, rebuts: RE.rebut.test(s) ? 1 : 0, irony: RE.irony.test(s) ? 1 : 0,
+    "target-group": RE.named.test(s) ? 1 : 0, "target-person": person(s) ? 1 : 0, intensity: intensity(s),
+    news: RE.news.test(s) || /^\s*[“"]/.test(s) ? 1 : 0, joke: RE.joke.test(s) ? 1 : 0,
+    short: (neutral(s).match(/[\p{L}\p{N}]+/gu) || []).length < 6 ? 1 : 0 };
+}
+
+// Factors of one match: the post's own, the span's sentence, and the thread context.
+// ctx: { echo: other authors in the thread with this technique, root: 0|1, repeat: 0|1, authorRebuts: 0|1 }
+function matchFactors(text, hit, base = postFactors(text), ctx = {}) {
+  const s = String(text || ""), { before, after } = sentence(s, hit.start, hit.end);
+  // A question is the technique itself for question insinuation, so it is context only elsewhere.
+  const question = hit.technique !== "question-insinuation" && /\?/.test(after) ? 1 : 0;
+  const mention = LEXICAL.has(hit.technique) && RE.rebut.test(before + after) ? 1 : 0;
+  return { ...base, quotes: quoted(s, hit.start) || RE.report.test(before) ? 1 : 0, question, mention,
+    echo: Math.min(3, ctx.echo || 0) / 3, root: ctx.root ? 1 : 0, repeat: ctx.repeat ? 1 : 0, "author-rebuts": ctx.authorRebuts ? 1 : 0 };
+}
+
+const sigmoid = (z) => 1 / (1 + Math.exp(-z));
+
+// { weight, shown, top } for one match. top: the two factors that moved the weight most, each
+// { id, label, effect } with effect "raises" or "lowers".
+function inflect(factors, W = READING_WEIGHTS) {
+  let z = W.bias;
+  const parts = [];
+  for (const id of FACTOR_IDS) {
+    const c = (id === "mention" ? MENTION_WEIGHT : W.w[id] || 0) * (factors[id] || 0);
+    z += c;
+    if (c) parts.push({ id, label: LABEL.get(id), c });
+  }
+  parts.sort((a, b) => Math.abs(b.c) - Math.abs(a.c) || a.id.localeCompare(b.id));
+  const weight = sigmoid(z);
+  return { weight: Math.round(weight * 1000) / 1000, shown: weight >= W.threshold,
+    top: parts.slice(0, 2).map((p) => ({ id: p.id, label: p.label, effect: p.c > 0 ? "raises" : "lowers" })) };
+}
+
+return { FACTORS, FACTOR_IDS, MENTION_WEIGHT, postFactors, matchFactors, inflect };
+})();
+
+// ---- reading-measured.js
+const M_reading_measured = (() => {
+// Generated by scripts/eval-reading.mjs from held-out feed tests 10 and 11. Do not edit.
+// on: held-out precision at least 80% from at least 3 hits, with inflection.
+const READING_MEASURED = {
+ "nation-denial": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "dehumanising": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "punitive-annexation": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "strongman": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "question-insinuation": {
+  "on": false,
+  "precision": 0.75,
+  "k": 3,
+  "n": 4,
+  "low": 0.30063605244263664,
+  "high": 0.9544139373553638
+ },
+ "true-leap": {
+  "on": false,
+  "precision": 0,
+  "k": 0,
+  "n": 1,
+  "low": 0,
+  "high": 0.7934567085261071
+ },
+ "case-to-group": {
+  "on": false,
+  "precision": 1,
+  "k": 1,
+  "n": 1,
+  "low": 0.20654329147389294,
+  "high": 1
+ },
+ "essentialism": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "coded-term": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "replacement": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "secret-coercion": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "election-theft": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "metaphor": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "hyperbole": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "irony": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "allusion": {
+  "on": false,
+  "precision": 0,
+  "k": 0,
+  "n": 1,
+  "low": 0,
+  "high": 0.7934567085261071
+ },
+ "dog-whistle": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ }
+};
+
+return { READING_MEASURED };
+})();
+
+// ---- reading.js
+const M_reading = (() => {
+// The reading lens: names the techniques a post uses, at the span, and weighs each one by its
+// context (reading-inflection.js). A finding is { technique, name, family, start, end, match,
+// weight, shown, top }: the span, its name, and the two factors that moved its weight.
+// Thread and feed patterns count how many posts and authors use the same technique, so a frame
+// repeated across a thread shows as a pattern. Pure: no DOM, no network.
+// Which techniques the window shows comes from held-out measurement (reading-measured.js): a
+// technique under READING_SHIP_PRECISION held-out precision stays off.
+
+const { READING_RULES, TECHNIQUE_BY_ID, READING_TECHNIQUES } = M_reading_cues;
+const { postFactors, matchFactors, inflect } = M_reading_inflection;
+const { READING_MEASURED } = M_reading_measured;
+
+const READING_SHIP_PRECISION = 0.8;
+const READING_SHIP_MIN_N = 3;
+
+// Techniques the window shows: held-out precision at or above the bar from enough hits.
+function readingOn(table = READING_MEASURED) {
+  return new Set(READING_TECHNIQUES.map((t) => t.id).filter((id) => { const r = (table || {})[id]; return !!(r && r.on); }));
+}
+
+// The shown set for a user's settings: every technique when they turned the lens fully on.
+const lensOn = (settings) => (settings && settings.lensAll ? new Set(READING_TECHNIQUES.map((t) => t.id)) : readingOn());
+
+// Every cue match in the text, overlapping matches of one technique merged into the first.
+function cueHits(text) {
+  const s = String(text || "").replace(/[’]/g, "'");
+  const hits = [];
+  for (const r of READING_RULES) {
+    r.re.lastIndex = 0;
+    for (const m of s.matchAll(r.re)) if (m[0].trim()) hits.push({ technique: r.technique, cue: r.cue, start: m.index, end: m.index + m[0].length });
+  }
+  hits.sort((a, b) => a.start - b.start || b.end - a.end);
+  const out = [];
+  for (const h of hits) if (!out.some((o) => o.technique === h.technique && h.start < o.end && o.start < h.end)) out.push(h);
+  return out.map((h) => ({ ...h, match: String(text || "").slice(h.start, h.end) }));
+}
+
+// Who uses which technique in a thread, from the raw cue hits.
+function usage(posts, hits) {
+  const authorsOf = new Map(), rebutters = new Set();
+  posts.forEach((p, i) => {
+    if (postFactors(p.text).rebuts) rebutters.add(`${p.author}#${i}`);
+    for (const t of new Set(hits[i].map((h) => h.technique))) {
+      if (!authorsOf.has(t)) authorsOf.set(t, []);
+      authorsOf.get(t).push({ author: p.author, i });
+    }
+  });
+  return { authorsOf, rebutters };
+}
+
+function context(posts, i, technique, U) {
+  const users = U.authorsOf.get(technique) || [], me = posts[i].author, rootAt = posts.findIndex((p) => p.role === "root");
+  return {
+    echo: new Set(users.filter((u) => u.author !== me).map((u) => u.author)).size,
+    root: rootAt >= 0 && rootAt !== i && users.some((u) => u.i === rootAt) ? 1 : 0,
+    repeat: users.some((u) => u.author === me && u.i !== i) ? 1 : 0,
+    authorRebuts: [...U.rebutters].some((k) => k.startsWith(`${me}#`) && k !== `${me}#${i}`) ? 1 : 0,
+  };
+}
+
+// posts: [{ id, author, text, role? }] in thread order. Returns one entry per post:
+// { id, findings }. Options: inflection (default true), on (the shown set; default readingOn()).
+function readThread(posts, { inflection = true, on = readingOn(), withFactors = false } = {}) {
+  const P = posts.map((p) => ({ id: String(p.id), author: String(p.author || ""), text: String(p.text || ""), role: p.role || "reply" }));
+  const hits = P.map((p) => cueHits(p.text));
+  const U = usage(P, hits);
+  return P.map((p, i) => {
+    const base = postFactors(p.text);
+    const findings = hits[i].map((h) => {
+      const t = TECHNIQUE_BY_ID.get(h.technique);
+      const factors = matchFactors(p.text, h, base, context(P, i, h.technique, U)), inf = inflect(factors);
+      const kept = inflection ? inf.shown : true;
+      const f = { technique: t.id, name: t.name, family: t.family, start: h.start, end: h.end, match: h.match.trim().slice(0, 120),
+        weight: inf.weight, top: inf.top, shown: kept && on.has(t.id) };
+      return withFactors ? { ...f, factors } : f;
+    });
+    return { id: p.id, findings };
+  });
+}
+
+// One post read on its own.
+const readPost = (text, opts) => readThread([{ id: "post", author: "", text, role: "root" }], opts)[0].findings;
+
+// How many posts and authors use each shown technique: [{ technique, name, posts, authors, of }],
+// most used first. A technique in two or more posts by two or more authors is a pattern.
+function patternCounts(read, posts) {
+  const by = new Map();
+  read.forEach((r, i) => {
+    for (const t of new Set(r.findings.filter((f) => f.shown).map((f) => f.technique))) {
+      if (!by.has(t)) by.set(t, { posts: 0, authors: new Set() });
+      const x = by.get(t);
+      x.posts++;
+      x.authors.add(String((posts[i] || {}).author || i));
+    }
+  });
+  return [...by.entries()].map(([t, x]) => ({ technique: t, name: TECHNIQUE_BY_ID.get(t).name, posts: x.posts, authors: x.authors.size, of: read.length,
+    pattern: x.posts >= 2 && x.authors.size >= 2 })).sort((a, b) => b.posts - a.posts || a.technique.localeCompare(b.technique));
+}
+
+// A whole thread: per-post findings plus the thread's pattern counts.
+function readingReport(posts, opts) {
+  const read = readThread(posts, opts);
+  return { posts: read, patterns: patternCounts(read, posts) };
+}
+
+// A feed is not a conversation: each post is read on its own, then the frames are counted.
+function feedPatterns(posts, opts) {
+  const read = posts.map((p) => ({ id: String(p.id), findings: readThread([{ ...p, role: "root" }], opts)[0].findings }));
+  return patternCounts(read, posts);
+}
+
+return { READING_SHIP_PRECISION, READING_SHIP_MIN_N, readingOn, lensOn, cueHits, readThread, readPost, patternCounts, readingReport, feedPatterns };
 })();
 
 // ---- framing.js
@@ -3673,13 +4263,13 @@ function framingShown(row = MEASURED_FRAMING) {
   return !!(row && row.split === "test" && Number.isInteger(row.n) && row.n >= FRAMING_MIN_N && Number.isFinite(row.low) && row.low >= FRAMING_SHIP_LOW);
 }
 function framingStatus(row = MEASURED_FRAMING) {
-  if (!row) return { shown: false, text: "held back: not measured. No labelled corpus of episodic and thematic posts with a usable licence was found (checked 2026-10-21)" };
+  if (!row) return { shown: false, text: "held back: not measured. A search for a labelled corpus of episodic and thematic posts with a usable licence came up empty (checked 2026-10-21)" };
   const pc = (x) => Math.round(x * 100);
   const m = `precision ${pc(row.precision)}% (95% interval ${pc(row.low)} to ${pc(row.high)}%), ${row.n} posts checked`;
   return framingShown(row) ? { shown: true, text: m } : { shown: false, text: `held back (interval starts below ${pc(FRAMING_SHIP_LOW)}% or fewer than ${FRAMING_MIN_N} hits): ${m}` };
 }
 
-const FRAMING_DOES_NOT_PROVE = "A person's story can be true, typical and the best way to explain an issue. This describes how the post explains the issue, not whether it is right or who wrote it.";
+const FRAMING_DOES_NOT_PROVE = "This describes how the post explains the issue. A person's story can be true, typical and the best way to explain it.";
 
 // The frame the feed log keeps for one post: framingOf's frame, "none" for a post long enough to
 // read with neither kind of cue, or null for a post too short to read.
@@ -3776,7 +4366,7 @@ function verdict(r) {
 function sentence(r) {
   const e = r.extreme, o = r.others;
   const base = `${e.flagged} of ${e.n} extreme replies (${pct(e.share)}%) come from flagged accounts, against ${o.flagged} of ${o.n} other replies (${pct(o.share)}%).`;
-  const cover = r.notLookedUp ? ` ${r.notLookedUp} repl${r.notLookedUp === 1 ? "y is" : "ies are"} left out because the account${r.notLookedUp === 1 ? " was" : "s were"} not looked up.` : "";
+  const cover = r.notLookedUp ? ` ${r.notLookedUp} repl${r.notLookedUp === 1 ? "y is" : "ies are"} left out until the account${r.notLookedUp === 1 ? " is" : "s are"} looked up.` : "";
   switch (r.verdict) {
     case "too-few": return `Too few extreme replies to compare (${e.n}; the report needs ${MIN_EXTREME}).${cover}`;
     case "skewed-to-flagged": return `${base} The difference is larger than the uncertainty.${cover}`;
@@ -3812,7 +4402,7 @@ function techniqueCounts(replies, shown) {
   return out;
 }
 
-const REPORT_DOES_NOT_PROVE = "A skew can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event. It says nothing about any one reply or account.";
+const REPORT_DOES_NOT_PROVE = "A skew compares the thread as a whole, separate from any one reply or account. It can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event.";
 
 return { MIN_EXTREME, wilson, threadReport, origins, joinBurst, persuasionShare, REPORT_DOES_NOT_PROVE };
 })();
@@ -4377,7 +4967,7 @@ function noteTiming(tweet, now = Date.now()) {
   if (!Number.isFinite(w)) return null;
   const afterPost = Number.isFinite(p) ? Math.max(0, Math.round((w - p) / 1000)) : null, age = Math.max(0, Math.round((now - w) / 1000));
   const text = (afterPost != null ? `Note written ${span(afterPost)} after the post, ${span(age)} ago.` : `Note written ${span(age)} ago.`)
-    + " The page does not say when X began to show it.";
+    + " X keeps the time it began to show the note off the page.";
   return { written, afterPost, age, text };
 }
 
@@ -4883,7 +5473,7 @@ const { BASELINES } = M_baselines_data;
 const { TECHNIQUE_BASELINES } = M_techniques_data;
 const { sizeBin, viewBin } = M_baselines_bins;
 
-const BASELINE_SOURCE = "Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus, not a sample of today's X.";
+const BASELINE_SOURCE = "Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus from an earlier X.";
 
 const share = (x) => (x > 0 && x < 0.001 ? `${(x * 100).toFixed(2)}%` : x < 0.1 ? `${(x * 100).toFixed(1)}%` : `${Math.round(x * 100)}%`);
 const range = (ci) => `${share(ci[0])} to ${share(ci[1])}`.replace(/% to/, " to");
@@ -5056,9 +5646,9 @@ function stateSummary(items) {
 }
 
 const STATE_DOES_NOT_PROVE = {
-  "state-owned": "State ownership is not proof of disinformation. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
-  "designated": "A designation records one government's assessment and policy, not an independent finding. The domain is matched to the named outlet through Wikidata unless the document gives it.",
-  "public-broadcaster": "Public broadcasters range from editorially independent to government-directed. Check the outlet's charter and record, not the label.",
+  "state-owned": "State ownership ties the outlet to a government. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
+  "designated": "A designation records one government's assessment and policy. Wikidata matches the domain to the named outlet when the document leaves it out.",
+  "public-broadcaster": "Public broadcasters range from editorially independent to government-directed. The outlet's charter and record show which.",
   "named-in-report": "The report named this domain or account in an operation at the time it was published. Domains change hands, and accounts can be reused or impersonated.",
 };
 
@@ -5134,7 +5724,7 @@ const TYPE_WORDS = {
   "government": "a government body", "state media": "state media", "contractor": "a firm or group working for a government",
   "linked to a state": "people or a group the source links to a government", "commercial firm": "a firm, no government named", "origin only": "no operator named",
 };
-const OPS_DOES_NOT_PROVE = "The report named this domain or account as part of an operation when it was published. It says nothing about the person who posted or shared it: people share these links without knowing, or to warn others. Domains expire and are bought again, and accounts are reused.";
+const OPS_DOES_NOT_PROVE = "A published report named this domain or account in an operation. People share these links unknowingly or to warn others, and domains and accounts change hands.";
 
 // The window's rows for one hit, in the sources' own words. Every attribution is listed with its
 // document, so disagreements between sources stay visible.
@@ -5147,13 +5737,13 @@ function opRows(h) {
     ["Sources say", said.slice(0, 4).join(" ")],
     ["Named as", `${h.indicator.kind} in ${doc.title || "the report"}${doc.date ? `, ${doc.date}` : ""}`],
     ["Read it", { links: [[String(doc.url || "").replace(/^https?:\/\//, "").slice(0, 48), doc.url]] }],
-    ["Does not prove", OPS_DOES_NOT_PROVE],
+    ["What it shows", OPS_DOES_NOT_PROVE],
   ];
 }
 
 // Counts for the trend view. Year is the year an operation was first published by any cited source.
 // It counts what investigators found and published, not how much activity there was.
-const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.";
+const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. The counts follow where people looked: platforms look harder in some places and languages than others, and some governments publish takedowns while others keep them quiet.";
 function opsTrend(table = TABLE) {
   const years = new Map(), states = new Map();
   // Operations from data packs (src/core/packs-content.js) are shown on matches but never counted here.
@@ -5213,7 +5803,7 @@ function backingLookup(table, { accounts = [], channels = [] } = {}) {
 const sourceCount = (p) => new Set((p.rows || []).flatMap((r) => r.sources.map((s) => s.url))).size;
 const backingLabel = (p) => { const n = sourceCount(p); return `Backing on record: ${n} source${n === 1 ? "" : "s"}`; };
 
-const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person says nothing on its own about whether a given post is true, or that the backer chose its words. Allegations in court records are unproven. Records go out of date; each row gives the date it was read.";
+const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person, each row dated when it was read. Allegations in court records are claims, and records go out of date.";
 const CORRECTIONS_PATH = "https://github.com/HarperZ9/daylight-commons/blob/dev/data/owner-corrections.json";
 
 const STATUS_WORDS = { documented: "documented in a primary record", reported: "reported by the press", alleged: "alleged, not proven" };
@@ -5231,7 +5821,7 @@ function backingRows(p) {
   }
   if (p.wikidata && p.wikidata.employers && p.wikidata.employers.length) rows.push(["Wikidata lists", `Employer (P108): ${p.wikidata.employers.map((e) => e.label + (e.end ? ` (to ${e.end.slice(0, 4)})` : "")).join("; ")}. Fetched ${p.wikidata.fetched}; Wikidata can lag a move.`]);
   rows.push(["Wrong or out of date?", { links: [["Send a sourced correction", CORRECTIONS_PATH]] }]);
-  rows.push(["Does not prove", BACKING_DOES_NOT_PROVE]);
+  rows.push(["What it shows", BACKING_DOES_NOT_PROVE]);
   return rows;
 }
 
@@ -5278,7 +5868,7 @@ function clonedCitations(text, domains) {
   return out;
 }
 
-const CLONED_DOES_NOT_PROVE = "People quote an outlet by name and paste whatever link they were sent, and some share a copy to warn others. This shows the words and the address disagree, not who made the copy or why the post links it.";
+const CLONED_DOES_NOT_PROVE = "The post names an outlet and links a copy on another address. People also share copies by mistake or to warn others.";
 
 return { namesOutlet, clonedCitations, CLONED_DOES_NOT_PROVE };
 })();
@@ -5410,7 +6000,7 @@ const M_crosslang = (() => {
 const { normLink } = M_trail;
 
 const MIN_ACCOUNTS = 2;
-const CROSS_DOES_NOT_PROVE = "Multilingual people, translators, news agencies and diaspora communities share the same link or video in several languages. This shows the material crossing languages, not who sent it or whether anyone coordinated.";
+const CROSS_DOES_NOT_PROVE = "This shows the same material crossing languages. Multilingual people, translators, news agencies and diaspora communities share links and videos this way too.";
 
 const SCRIPTS = [["Kore", /\p{Script=Hangul}/u], ["Jpan", /[\p{Script=Hiragana}\p{Script=Katakana}]/u], ["Hani", /\p{Script=Han}/u],
   ["Hebr", /\p{Script=Hebrew}/u], ["Arab", /\p{Script=Arabic}/u], ["Cyrl", /\p{Script=Cyrillic}/u], ["Deva", /\p{Script=Devanagari}/u],
@@ -5522,7 +6112,7 @@ const M_flooding = (() => {
 const { HIGH_VOLUME_PER_DAY, ageDays } = M_flags;
 
 const FLOOD_MIN_ACCOUNTS = 3, FLOOD_SHARE = 0.25, MIN_KNOWN = 10, BURST_HIGH = 2, REPEAT_MIN = 5;
-const FLOOD_DOES_NOT_PROVE = "News, alert and fan accounts post all day by design, and a busy thread draws the most active accounts on the site. This describes how the replies were posted, not who runs any account or why.";
+const FLOOD_DOES_NOT_PROVE = "Very high-rate accounts posted many of the replies. News, alert and fan accounts post all day, and busy threads draw them.";
 
 // Posts per day since joining, or null when either number is missing.
 function ratePerDay(account, now = Date.now()) {
@@ -5580,7 +6170,7 @@ const M_swarming = (() => {
 const { timePrecision, observable } = M_precision;
 
 const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN_KNOWN = 8;
-const SWARM_DOES_NOT_PROVE = "A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once, and nobody has to organise it. This describes how the replies arrived, not who sent them or why.";
+const SWARM_DOES_NOT_PROVE = "This describes how the replies arrived. A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once on its own.";
 
 // rows: [{ author, posted, timePrecision? }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
 // null when Daylight Commons has not read the account. precision: the thread's timePrecision. Returns null or
@@ -5908,7 +6498,7 @@ const M_campaign_shape = (() => {
 const { CAMPAIGN_BASELINES } = M_campaign_baselines_data;
 
 const SHAPE_MIN_INTERACTIONS = 20, OWN_MIN_POSTS = 5, OWN_OUTLIER_FACTOR = 5, STRATUM_MIN = 200;
-const SHAPE_DOES_NOT_PROVE = "A post can travel through repost-heavy communities (news, giveaways, art shares), and a launch is unusual for an account by nature. A ratio describes how the engagement is shaped, not who made it.";
+const SHAPE_DOES_NOT_PROVE = "The ratio shows how this post's engagement is shaped. Posts travel through repost-heavy communities such as news, giveaways and art shares.";
 
 const num = (v) => (Number.isFinite(v) && v >= 0 ? v : null);
 const ratio = (a, b) => (a != null && b != null && b > 0 ? a / b : null);
@@ -5992,12 +6582,12 @@ const { templateGroups, personaCues, PERSONA_MIN_FAMILIES, topicsOf } = M_campai
 const SAMPLE_MIN = 12;
 const PERSONA_SHARE = 0.25, JOIN_WINDOW_DAYS = 14, JOIN_MIN = 5, JOIN_SHARE = 0.3, MISMATCH_SHARE = 0.4, MISMATCH_MIN = 4;
 const SAMPLE_DOES_NOT_PROVE = {
-  "bio-template": "Friends, colleagues and fan accounts copy each other's bios, and some sites suggest bio wording.",
-  "stock-persona": "Real people write short, list-like bios, and these phrases are common.",
-  "join-cluster": "Accounts join in waves after news, an event or a platform change.",
-  "topic-mismatch": "People follow and reshare outside their own interests, and a bio says little about what someone reads.",
-  "random-suffix": "Many people choose a handle with numbers and letters for privacy or safety. This is context only.",
-  "default-avatar": "Many real people never upload a picture. This is context only.",
+  "bio-template": "Many sampled bios share a template. Friends, colleagues and fan accounts copy bios too.",
+  "stock-persona": "Many sampled bios use stock-persona phrases. Real people write short, list-like bios too.",
+  "join-cluster": "Many sampled accounts joined in the same two weeks. Accounts join in waves after news or an event.",
+  "topic-mismatch": "Most sampled bios are about another topic. People reshare outside their own interests.",
+  "random-suffix": "Many handles end in numbers and letters. People choose these for privacy, so this stays context.",
+  "default-avatar": "Many accounts use the default picture. Many real people keep it, so this stays context.",
 };
 
 // A handle ending in a digit-and-letter tail ("_x5", "8t9", "c8s", "38"). Context only.
@@ -6075,7 +6665,7 @@ const { timePrecision, observable } = M_precision;
 
 // BUNCH_TIGHT_MS: 5 quotes inside an hour count as coordination; a wider bunch is shown, not counted.
 const BUNCH_K = 5, BUNCH_TIGHT_MS = 3600000, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
-const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour because it is news, and common phrases spread by imitation. A shared opener does not show payment, and a missing label does not show that anyone hid one.";
+const QUOTES_DOES_NOT_PROVE = "The quotes share timing and phrasing. People quote news in the same hour, and common phrases spread by imitation.";
 
 const at = (q) => Date.parse(q.posted);
 
@@ -6145,7 +6735,7 @@ const M_campaign_overlap = (() => {
 
 const OVERLAP_KEY = "pb.campaign.v1", OVERLAP_RETAIN_DAYS = 30, OVERLAP_MAX_LAUNCHES = 200, OVERLAP_MAX_ACCOUNTS = 500;
 const OVERLAP_OTHER_MIN = 2, OVERLAP_MIN = 5, OVERLAP_SHARE = 0.2;
-const OVERLAP_DOES_NOT_PROVE = "Fans of a field, employees and investors reshare each other's launches. Overlap says these launches drew some of the same accounts, not why.";
+const OVERLAP_DOES_NOT_PROVE = "Overlap says these launches drew some of the same accounts. Fans of a field, employees and investors reshare each other's launches too.";
 const DAY = 86400000;
 
 // FNV-1a over salt + handle, as a short hex string. Not cryptographic; its job is to keep handles
@@ -6208,11 +6798,11 @@ const CAMPAIGN_PLATFORMS = {
     shapeCounts: ["score", "comments", "upvoteRatio"],
     sampleFrom: ["commenters"],
     signs: ["join-cluster", "karma-for-age", "arrival-burst"],
-    notes: "Vote rings, karma farming, aged accounts bought for posting, and brigading from another community. Reddit fuzzes vote counts and shows no repost list. Thresholds are not set until labelled Reddit cases exist.",
+    notes: "Vote rings, karma farming, aged accounts bought for posting, and brigading from another community. Reddit fuzzes vote counts and hides repost lists. Thresholds wait for labelled Reddit cases.",
   },
-  instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, so no shape." },
+  instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, which leaves the shape unread." },
   tiktok: { status: "not defined", notes: "Not defined yet." },
-  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons does not run on LinkedIn." },
+  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons runs on other sites for now." },
 };
 
 function campaignPlatform(id) {
@@ -6240,14 +6830,14 @@ const { quoteCluster, QUOTES_DOES_NOT_PROVE, BUNCH_TIGHT_MS } = M_campaign_quote
 const { OVERLAP_DOES_NOT_PROVE } = M_campaign_overlap;
 const { campaignPlatform, CAMPAIGN_PLATFORMS } = M_campaign_platforms;
 
-const CAMPAIGN_DOES_NOT_PROVE = "These signs describe how this post's engagement looks in what your page loaded. They do not say who paid, whether the product is good, or that any one account is fake. Real people also write stock bios, join in waves and reshare launches.";
+const CAMPAIGN_DOES_NOT_PROVE = "These signs describe how this post's engagement looks in what your page loaded. Real people also write stock bios, join in waves and reshare launches.";
 const CAMPAIGN_LEADS = {
   strong: "This engagement is consistent with purchased amplification, and here is why.",
-  one: "One sign of paid or fake-account amplification. One sign is weak evidence, so this is context, not an accusation.",
+  one: "One sign of paid or fake-account amplification. One sign is weak evidence: read it as context.",
   coordinated: "The engagement looks coordinated. Coordination alone is common and often organic.",
-  none: "No campaign signs in what this page loaded.",
+  none: "Zero campaign signs in what this page loaded.",
   thin: "Too few accounts loaded to read. Open the post's reposts or quotes to load more.",
-  undefined: "The campaign lens is not defined for this site yet.",
+  undefined: "The campaign lens for this site is still to come.",
 };
 const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/daylight-commons/issues. Corrections are made in the open.";
 
@@ -6275,7 +6865,7 @@ function ladder(status, families, qc, actor, held) {
   if (qc.disclosed) out.push({ step: 1, text: `Documented: ${qc.disclosed} quote post${qc.disclosed === 1 ? "" : "s"} promoting ${who} carry X's Paid partnership label, the posters' own disclosure.` });
   if (status === "strong") {
     out.push({ step: 2, text: `Inference: the engagement on ${who} is consistent with purchased amplification (${families.length} independent signs below).` });
-    if (families.includes("quotes") && !held) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Quotes without the label share the paid quotes' template and timing.` });
+    if (families.includes("quotes") && !held) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Unlabelled quotes share the paid quotes' template and timing.` });
   }
   return out;
 }
@@ -6289,12 +6879,12 @@ const mins = (ms) => (ms < 3600000 ? `${Math.max(1, Math.round(ms / 60000))} min
 function shapeRows(sh) {
   if (!sh || sh.tooFew) return { ind: [], ctx: [] };
   const v = sh.shape.repostsPerLike, ind = [], ctx = [];
-  const own = sh.own.insufficient ? `Not enough of this account's own posts seen on this device to compare (${sh.own.n} of 5).` : `This account's other posts: median ${r2(sh.own.median)} reposts per like, highest ${r2(sh.own.max)} (${sh.own.n} posts).`;
+  const own = sh.own.insufficient ? `Too few of this account's own posts seen on this device to compare (${sh.own.n} of 5).` : `This account's other posts: median ${r2(sh.own.median)} reposts per like, highest ${r2(sh.own.max)} (${sh.own.n} posts).`;
   const line = `Reposts per like: ${r2(v)} (${sh.shape.counts.reposts} reposts, ${sh.shape.counts.likes} likes). ${own}`;
   (sh.outlier ? ind : ctx).push({ id: sh.outlier ? "shape-outlier-own" : "shape", text: line, dnp: SHAPE_DOES_NOT_PROVE });
-  ctx.push({ id: "shape-baseline", text: sh.current ? `Against ${sh.current.n} ordinary posts in the ${sh.stratum} stratum: ${sh.current.position}.` : `Insufficient baseline for this platform today${sh.stratum ? ` (${sh.stratum})` : ""}: no labelled modern sample yet.`, dnp: "A baseline describes posts that were collected as ordinary; it is not a test." });
+  ctx.push({ id: "shape-baseline", text: sh.current ? `Against ${sh.current.n} ordinary posts in the ${sh.stratum} stratum: ${sh.current.position}.` : `Insufficient baseline for this platform today${sh.stratum ? ` (${sh.stratum})` : ""}: no labelled modern sample yet.`, dnp: "A baseline describes posts that were collected as ordinary." });
   const h = sh.historical;
-  if (h && !h.noStratum) ctx.push({ id: "shape-historical", text: `Historical reference only: ${h.source}, ${h.label}: ${h.position} (median ${h.q.q50}, 95th percentile ${h.q.q95}).`, dnp: "Breaking news in 2014 and 2015 was reposted more than liked; today's platform and topics differ, so this line never counts as a sign." });
+  if (h && !h.noStratum) ctx.push({ id: "shape-historical", text: `Historical reference: ${h.source}, ${h.label}: ${h.position} (median ${h.q.q50}, 95th percentile ${h.q.q95}).`, dnp: "Breaking news in 2014 and 2015 was reposted more than liked. Today's platform and topics differ, so this line stays context." });
   return { ind, ctx };
 }
 
@@ -6304,19 +6894,19 @@ function sampleRows(s) {
     "bio-template": (x) => `${x.accounts} of ${x.of} bios fall into ${x.groups} shared template${x.groups === 1 ? "" : "s"} (largest ${x.largest}).`,
     "stock-persona": (x) => `${x.n} of ${x.of} accounts (${pct(x.share)}) have stock-persona bios: age, passion, crypto slogan, pet or filler phrases together.`,
     "join-cluster": (x) => `${x.n} of ${x.of} accounts with a join date joined within 14 days (${x.from} to ${x.to}).`,
-    "topic-mismatch": (x) => `${x.n} of ${x.of} bios with a clear topic are about ${x.families.slice(0, 2).join(" and ")}, which this post is not.`,
-    "random-suffix": (x) => `Context: ${x.n} of ${x.of} handles end in a number-and-letter tail. People choose these for privacy too; this never counts as a sign.`,
+    "topic-mismatch": (x) => `${x.n} of ${x.of} bios with a clear topic are about ${x.families.slice(0, 2).join(" and ")}, a different topic from this post.`,
+    "random-suffix": (x) => `Context: ${x.n} of ${x.of} handles end in a number-and-letter tail. People choose these for privacy too; this stays context.`,
     "default-avatar": (x) => `Context: ${x.n} of ${x.of} accounts use the default picture.`,
   };
   const row = (x) => ({ id: x.id, text: text[x.id](x), dnp: SAMPLE_DOES_NOT_PROVE[x.id] });
-  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Daylight Commons reads only what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
+  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Daylight Commons reads what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
 }
 
 function quoteRows(q) {
   if (!q || !q.n) return { ind: [], ctx: [] };
   const ind = [], ctx = [];
   if (q.lookalikes) ind.push({ id: "undisclosed-lookalike", text: `${q.lookalikes} quote${q.lookalikes === 1 ? "" : "s"} without a Paid partnership label share a template with labelled quotes or with each other inside two hours.`, dnp: QUOTES_DOES_NOT_PROVE });
-  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Daylight Commons cannot see who paid or how much." });
+  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; who paid and how much stay off the page." });
   // Any launch with five quotes has a narrowest window; only a tight one is coordination context.
   if (q.bunch.kWindowMs != null) ctx.push({ id: q.bunch.kWindowMs <= BUNCH_TIGHT_MS ? "quote-bunching" : "quote-timing", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
   for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Daylight Commons' local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
@@ -6421,8 +7011,8 @@ const M_evidence_github = (() => {
 const GITHUB_API = "https://api.github.com";
 const STAR_MAX_PAGES = 10, STAR_PER_PAGE = 100;
 const STAR_BURST_FACTOR = 10, STAR_BURST_MIN = 50;
-const REPO_DOES_NOT_PROVE = "A creation date is when this repository was made on GitHub. Work often starts elsewhere or in another repository, so it says nothing about how long a team has been building.";
-const STARS_DOES_NOT_PROVE = "Stars arrive in bursts after a launch, a newsletter or a front-page link. A burst shows when stars came, not who gave them or why.";
+const REPO_DOES_NOT_PROVE = "A creation date is when this repository was made on GitHub. Work often starts elsewhere or in another repository first.";
+const STARS_DOES_NOT_PROVE = "A burst shows when stars came. Stars also arrive in bursts after a launch, a newsletter or a front-page link.";
 
 // github.com/<owner>/<repo> links in a text or a list of links -> unique [{ owner, repo }].
 function reposIn(textOrLinks) {
@@ -6488,7 +7078,7 @@ const M_evidence_domain = (() => {
 const RDAP_BASE = "https://rdap.org/domain/";
 const CDX_BASE = "https://web.archive.org/cdx/search/cdx";
 const DOMAIN_DOES_NOT_PROVE = "A registration date is when the current registration began. Domains are bought, sold and re-registered, and a young domain can front an old company.";
-const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly. A late first capture means the archive found the site late, not that it did not exist.";
+const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly, so a late first capture means the archive found the site late.";
 
 // Hosting services that give each customer a subdomain. The service's own registration says nothing
 // about a customer's site, so such a host is kept whole and RDAP is not asked about it.
@@ -6564,7 +7154,7 @@ const AD_LIBRARIES = [
     search: () => "https://ads.x.com/ads-repository",
     api: "No public API; the repository page takes an advertiser and a date range.", by: "none", checked: "page answered 200" },
 ];
-const ADS_DOES_NOT_PROVE = "An ad library lists ads a platform chose to record for its own rules. No entry does not mean no paid promotion: influencer payments, agency-run accounts and engagement bought off-platform never appear there.";
+const ADS_DOES_NOT_PROVE = "An ad library lists ads a platform chose to record for its own rules. Influencer payments, agency-run accounts and engagement bought off-platform stay outside it.";
 
 // { name, domain } -> [{ id, name, url, covers, api, checked }] for the user to open.
 function adLibraryLinks({ name, domain } = {}) {
@@ -6676,18 +7266,18 @@ async function github(fetchFn, { owner, repo }, token, postedAt) {
 async function domain(fetchFn, d, postedAt, wayback) {
   const out = [], notes = [];
   const host = hostedOn(d);
-  if (host) notes.push(`${d} is a site on ${host}, a hosting service. When ${host} was registered says nothing about this site, so RDAP was not asked.`);
+  if (host) notes.push(`${d} is a site on ${host}, a hosting service. RDAP dates ${host}, so it was skipped for this site.`);
   else {
     const r = await getJson(fetchFn, rdapUrl(d), { Accept: "application/rdap+json" });
     const f = r.json ? rdapFacts(r.json) : null;
     if (f && f.registered) out.push(await makeReceipt({ kind: "domain-registration", subject: f.domain, observed: { ...f, daysBeforePost: daysBefore(f.registered, postedAt) }, raw: r.json, source: "RDAP via rdap.org", url: rdapUrl(d), dnp: DOMAIN_DOES_NOT_PROVE }));
     else notes.push(`RDAP answered ${r.status} for ${d}.`);
   }
-  if (!wayback) { notes.push(`The Internet Archive was not asked about ${d}: allow access to web.archive.org by turning Evidence lookups off and on again in Options.`); return { receipts: out, notes }; }
+  if (!wayback) { notes.push(`The Internet Archive was skipped for ${d}: allow access to web.archive.org by turning Evidence lookups off and on again in Options.`); return { receipts: out, notes }; }
   const w = await getJson(fetchFn, cdxUrl(d));
   const first = w.json ? waybackFirst(w.json) : null;
   if (first) out.push(await makeReceipt({ kind: "wayback-first", subject: d, observed: { ...first, daysBeforePost: daysBefore(first.first, postedAt) }, raw: w.json, source: "Internet Archive Wayback CDX", url: cdxUrl(d), dnp: WAYBACK_DOES_NOT_PROVE }));
-  else notes.push(w.json ? `The Internet Archive has no capture of ${d}.` : `The Internet Archive answered ${w.status} for ${d}.`);
+  else notes.push(w.json ? `The Internet Archive holds zero captures of ${d}.` : `The Internet Archive answered ${w.status} for ${d}.`);
   return { receipts: out, notes };
 }
 
@@ -6698,7 +7288,7 @@ async function lookupEvidence(fetchFn, { repos = [], domains = [], postedAt = nu
   const receipts = [], notes = [];
   for (const x of repos.slice(0, MAX_REPOS)) { const g = await github(fetchFn, x, token, postedAt); receipts.push(...g.receipts); notes.push(...g.notes); }
   for (const d of domains.slice(0, MAX_DOMAINS)) { const g = await domain(fetchFn, d, postedAt, wayback); receipts.push(...g.receipts); notes.push(...g.notes); }
-  if (repos.length > MAX_REPOS || domains.length > MAX_DOMAINS) notes.push(`Looked up the first ${MAX_REPOS} repositories and ${MAX_DOMAINS} domains only.`);
+  if (repos.length > MAX_REPOS || domains.length > MAX_DOMAINS) notes.push(`Looked up the first ${MAX_REPOS} repositories and ${MAX_DOMAINS} domains.`);
   return { receipts, notes };
 }
 
@@ -6718,7 +7308,7 @@ const M_evidence_seal = (() => {
 const { canonical, sha256Hex, verifyReceipt } = M_receipt;
 
 const SEAL_FORMAT = "radar-seal/1", EXPORT_FORMAT = "radar-evidence-chain/1";
-const SEAL_DOES_NOT_PROVE = "The seal shows that these receipts are the ones this browser recorded, in this order, and that none was changed or removed after the fact. It does not show that a source told the truth, and whoever holds the device could start a new log.";
+const SEAL_DOES_NOT_PROVE = "The seal shows these are the receipts this browser recorded, in this order, each unchanged since. Each receipt is as true as its source, and whoever holds the device can start a fresh log.";
 const GENESIS = "0".repeat(64);
 
 const hexToBytes = (h) => Uint8Array.from(h.match(/../g).map((x) => parseInt(x, 16)));
@@ -6804,7 +7394,7 @@ async function exportSeal(seal, { title = null, at = new Date().toISOString() } 
 // Offline check of an export: the seal, the head, the root and every proof.
 async function verifyExport(x) {
   if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Daylight Commons evidence chain"] };
-  if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file has no seal or no proofs"] };
+  if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file lacks a seal or its proofs"] };
   const s = await verifySeal(x.seal), problems = [...s.problems];
   const hashes = x.seal.entries.map((e) => e.receipt.hash);
   if ((await merkleRoot(hashes)) !== x.root) problems.push("root does not match the receipts");
@@ -6820,7 +7410,7 @@ async function verifyExport(x) {
 async function chainChecks(x) {
   if (!x || x.format !== EXPORT_FORMAT) return { ok: false, size: 0, root: null, checks: [{ name: "format", ok: false, text: "not a Daylight Commons evidence chain" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const entries = (x.seal && Array.isArray(x.seal.entries)) ? x.seal.entries : null;
-  if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file has no seal or no proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
+  if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file lacks a seal or its proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const n = entries.length, hashes = entries.map((e) => (e && e.receipt && e.receipt.hash) || "");
   let edited = 0, broken = 0, prev = GENESIS, proofsBad = 0;
   for (let i = 0; i < n; i++) {
@@ -6835,9 +7425,9 @@ async function chainChecks(x) {
   const head = n ? entries[n - 1].link : GENESIS;
   const checks = [
     { name: "receipts", ok: !edited, text: edited ? `${edited} of ${n} receipts changed after they were made` : `all ${n} receipts match their own hash` },
-    { name: "chain", ok: !broken, text: broken ? `${broken} of ${n} entries do not follow the one before (edited, removed or reordered)` : `all ${n} entries follow the one before, in order` },
-    { name: "head", ok: head === x.head, text: head === x.head ? "the head matches the last entry" : "the head does not match the last entry" },
-    { name: "Merkle root", ok: root === x.root, text: root === x.root ? `the root ${String(x.root).slice(0, 16)}... is the root of these receipts` : "the root is not the root of these receipts" },
+    { name: "chain", ok: !broken, text: broken ? `${broken} of ${n} entries break from the one before (edited, removed or reordered)` : `all ${n} entries follow the one before, in order` },
+    { name: "head", ok: head === x.head, text: head === x.head ? "the head matches the last entry" : "the head differs from the last entry" },
+    { name: "Merkle root", ok: root === x.root, text: root === x.root ? `the root ${String(x.root).slice(0, 16)}... is the root of these receipts` : "the root differs from the root of these receipts" },
     { name: "inclusion proofs", ok: !proofsBad && x.proofs.length === n, text: proofsBad ? `${proofsBad} of ${n} proofs fail against the root` : `all ${n} proofs place their receipt under the root` },
   ];
   const receipts = entries.map((e) => { const r = (e && e.receipt) || {}; return { kind: r.kind || null, subject: r.subject || null, source: r.source || null, at: r.at || null }; });
@@ -6859,7 +7449,7 @@ const M_chain = (() => {
 
 const { trailFor, firstSeen, normLink } = M_trail;
 
-const CHAIN_DOES_NOT_PROVE = "Daylight Commons cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.";
+const CHAIN_DOES_NOT_PROVE = "The chain starts at the first upload or link Daylight Commons has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.";
 
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return null; } };
 const hours = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 360000) / 10;
@@ -7001,7 +7591,7 @@ function summarize(reports, net, trail) {
   };
 }
 
-const HISTORY_DOES_NOT_PROVE = "These totals cover only the threads you opened, in the order each platform chose to show them. A recurring source shows where your feed's material comes from, not who organised it, and the shares are not a sample of any platform.";
+const HISTORY_DOES_NOT_PROVE = "These totals cover the threads you opened, in the order each platform chose to show them. A recurring source shows where your feed's material comes from.";
 
 return { HISTORY_RETAIN_DAYS, snapshot, addSnapshot, summarize, HISTORY_DOES_NOT_PROVE };
 })();
@@ -7031,7 +7621,7 @@ const { foldConfusables } = M_confusables;
 
 const MIN_CLAIM_TOKENS = 4, MIN_SHARED = 4, COVER_MIN = 0.85, BIGRAM_MIN = 0.3, MAX_CANDIDATES = 200;
 const CLAIM_LABEL = "A fact-checker reviewed a similar claim";
-const CLAIM_DOES_NOT_PROVE = "Similar wording is not the same claim; check the source. The rating is the fact-checker's, about the claim they reviewed, not about this post or the person who wrote it.";
+const CLAIM_DOES_NOT_PROVE = "Similar wording to a reviewed claim; check the source. The rating is the fact-checker's, about the claim they reviewed.";
 const CLAIM_ATTRIBUTION = "ClaimReview markup published by the fact-checker, from the Data Commons fact-check feed (CC BY 4.0).";
 
 const LANG_STOPS = {
@@ -7207,10 +7797,10 @@ function claimCard(m) {
     ["Claim they reviewed", m.claim],
     ["Reviewed on", m.date || "date not given"],
     ["Wording overlap", `${Math.round(m.coverage * 100)}% of the claim's words`],
-    m.negationDiffers ? ["Note", "One of the two says \"not\" and the other does not. Read both."] : null,
+    m.negationDiffers ? ["Note", "One of the two contains \"not\" and the other lacks it. Read both."] : null,
     ["Read it", { links: [[host, m.url]] }],
     ["Source", CLAIM_ATTRIBUTION],
-    ["Does not prove", CLAIM_DOES_NOT_PROVE],
+    ["What it shows", CLAIM_DOES_NOT_PROVE],
   ].filter(Boolean);
   return { label: CLAIM_LABEL, rows };
 }
@@ -7749,7 +8339,7 @@ async function checkSignature(sigBytes, claimBytes, claimVersion = 2) {
   let s;
   try { s = cborDecode(sigBytes); } catch { return { sign: { ok: false, text: "the signature cannot be read" } }; }
   const arr = s && s.tag === 18 ? s.value : s;
-  if (!Array.isArray(arr) || arr.length !== 4) return { sign: { ok: false, text: "the signature is not a COSE_Sign1 structure" } };
+  if (!Array.isArray(arr) || arr.length !== 4) return { sign: { ok: false, text: "the signature has some other structure than COSE_Sign1" } };
   const [protBytes, unprot, , sig] = arr;
   const prot = protBytes && protBytes.length ? cborDecode(protBytes) : {};
   const chain = prot["33"] || (unprot || {})["33"] || (unprot || {}).x5chain;
@@ -7773,7 +8363,7 @@ async function verifyWith([name, hash, salt], cert, sig, tbs) {
     const params = name === "ECDSA" ? { name, namedCurve: cert.curve } : name === "RSA-PSS" ? { name, hash } : { name };
     const key = await subtle().importKey("spki", cert.spki, params, false, ["verify"]);
     const ok = await subtle().verify(name === "ECDSA" ? { name, hash } : name === "RSA-PSS" ? { name, saltLength: salt } : { name }, key, sig, tbs);
-    return ok ? { ok: true, text: "the signature matches the claim and the signer's certificate" } : { ok: false, text: "the signature does not match the claim: the claim was changed or signed by another key" };
+    return ok ? { ok: true, text: "the signature matches the claim and the signer's certificate" } : { ok: false, text: "the signature fails against the claim: the claim changed, or another key signed it" };
   } catch (e) {
     return { ok: null, text: `this browser cannot check ${name} signatures (${String(e && e.message || e).slice(0, 60)})` };
   }
@@ -7781,11 +8371,11 @@ async function verifyWith([name, hash, salt], cert, sig, tbs) {
 
 // c2pa.hash.data: the file's bytes outside the exclusion ranges.
 async function checkDataHash(file, a, complete) {
-  if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
+  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
   const parts = [];
   let p = 0;
   for (const e of [...(a.exclusions || [])].sort((x, y) => x.start - y.start)) {
-    if (e.start < p || e.start + e.length > file.length) return { ok: false, text: "the exclusion ranges do not fit this file" };
+    if (e.start < p || e.start + e.length > file.length) return { ok: false, text: "the exclusion ranges run outside this file" };
     parts.push(file.subarray(p, e.start)); p = e.start + e.length;
   }
   parts.push(file.subarray(p));
@@ -7840,10 +8430,10 @@ function exclusionRanges(file, rules) {
 // c2pa.hash.bmff: the file without its excluded boxes; v2 and later put the 8-byte offset of each
 // top-level box that is hashed before it.
 async function checkBmffHash(file, a, label, complete) {
-  if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
+  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
   const rules = a.exclusions || [];
   if (!a.hash || a.merkle || rules.some((r) => !/^(\/[\w ]{4})+$/.test(r.xpath || ""))) {
-    return { ok: null, text: "this video uses a hash layout Daylight Commons does not check yet (fragments or partial exclusions)" };
+    return { ok: null, text: "this video uses a hash layout Daylight Commons skips for now (fragments or partial exclusions)" };
   }
   const withOffsets = /\.v[2-9]$/.test(label), ex = exclusionRanges(file, rules);
   const top = new Set(ex.filter((e) => e[2] === 0 && e[3]).map((e) => e[0]));
@@ -7875,7 +8465,7 @@ const { findManifestStore, parseStore, childByLabel } = M_jumbf;
 const { checkAssertions, checkSignature, checkDataHash, checkBmffHash } = M_c2pa_verify;
 const { sourceType, aiMetadata } = M_aimeta;
 
-const OLDER_FORMAT = "could not fully verify (older manifest format): Daylight Commons has not yet been shown to agree with the reference checker on version 1 manifests in video";
+const OLDER_FORMAT = "could not fully verify (older manifest format): Daylight Commons still needs a test against the reference checker on version 1 manifests in video";
 const content = (box) => (box && box.content && box.content[0]) || null;
 function decodeBox(box) { const c = content(box); if (!c) return null; try { return c.type === "json" ? JSON.parse(new TextDecoder().decode(c.data)) : cborDecode(c.data); } catch { return null; } }
 const assertionsOf = (m) => (childByLabel(m, "c2pa.assertions") || {}).content || [];
@@ -7923,9 +8513,9 @@ async function binding(file, m, complete, store, ranges, depth = 0) {
     const label = base(a.label), v = decodeBox(a);
     if (label === "c2pa.hash.data" && v) return checkDataHash(file, v, complete);
     if (/^c2pa\.hash\.bmff/.test(label) && v) return checkBmffHash(file, v, label, complete);
-    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is not checked by Daylight Commons yet` };
+    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is on Daylight Commons' list to check later` };
   }
-  return { ok: false, text: "the manifest has no hard binding to the file's bytes" };
+  return { ok: false, text: "the manifest lacks a hard binding to the file's bytes" };
 }
 
 async function signatureOf(store, m, s) {
@@ -7945,7 +8535,7 @@ async function readCredentials(bytes, { complete = true } = {}) {
   const out = { format: found.format, found: !!found.store, meta };
   if (!found.store) return meta.remote ? { ...out, remote: meta.remote } : out;
   let store;
-  try { store = parseStore(found.store); } catch { return { ...out, broken: "the Content Credentials in this file cannot be read" }; }
+  try { store = parseStore(found.store); } catch { return { ...out, broken: "the Content Credentials in this file are damaged or in an unreadable form" }; }
   if (!store.manifests.length) return { ...out, broken: "the credential store holds no manifest" };
   const active = store.manifests[store.manifests.length - 1], s = summarise(active);
   const sig = await signatureOf(store, active, s);
@@ -7985,14 +8575,14 @@ return { OLDER_FORMAT, readCredentials, credentialState };
 // ---- mediacheck.js
 const M_mediacheck = (() => {
 // Words for a media check: the rows the window shows for one file, and the signals it raises.
-// The wording never calls a file authentic or fake. Credentials record what the signing tool
-// declared; a valid signature shows who signed and that the file has not changed since.
+// The wording calls a file neither authentic nor fake. Credentials record what the signing tool
+// declared; a valid signature shows who signed and that the file is unchanged since.
 
 const { credentialState } = M_c2pa;
 
-const CREDENTIALS_DO_NOT_PROVE = "Credentials record what the signing tool declared. A valid signature shows who signed and that the file has not changed since, not that what it shows is true.";
-const NO_CREDENTIALS = "No Content Credentials found (platforms often strip them on upload). This says nothing about the file either way.";
-const TRUST = "Not checked against a trust list: anyone can make a certificate with any name on it.";
+const CREDENTIALS_DO_NOT_PROVE = "Credentials record what the signing tool declared, and a valid signature shows who signed and that the file is unchanged since.";
+const NO_CREDENTIALS = "Absent, the usual case: platforms often strip them on upload.";
+const TRUST = "The name is the certificate's own claim: anyone can make a certificate with any name on it.";
 
 const host = (u) => { try { return new URL(u).hostname; } catch { return "an address it names"; } };
 const who = (c) => (c ? [c.CN, c.O].filter(Boolean).filter((x, i, a) => a.indexOf(x) === i).join(", ") || "an unnamed signer" : "unknown");
@@ -8012,11 +8602,11 @@ function credentialRows(r) {
   if (r.error) return [["Content Credentials", r.error]];
   const rows = [], state = credentialState(r);
   if (state === "none") rows.push(["Content Credentials", NO_CREDENTIALS]);
-  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}. Daylight Commons does not fetch them, so nothing was checked.`]);
+  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}, which Daylight Commons leaves unfetched.`]);
   else if (r.broken) rows.push(["Content Credentials", `found, but ${r.broken}`]);
   else {
-    rows.push(["Content Credentials", state === "unchanged" ? "found and checked: the file has not changed since it was signed"
-      : state === "changed" ? `found, but they no longer match: ${failed(r).join("; ")}` : `found; not every part could be checked here: ${open(r).join("; ")}`]);
+    rows.push(["Content Credentials", state === "unchanged" ? "found and checked: the file is unchanged since it was signed"
+      : state === "changed" ? `found, but they no longer match: ${failed(r).join("; ")}` : `found; open checks: ${open(r).join("; ")}`]);
     rows.push(["Signed by", `${who(r.active.cert && r.active.cert.subject)} (${r.active.alg || "unknown algorithm"}). ${TRUST}`]);
     if (r.active.cert && r.active.cert.issuer && !r.active.cert.selfIssued) rows.push(["Certificate from", who(r.active.cert.issuer)]);
     if (r.active.cert && r.active.cert.notAfter) rows.push(["Certificate dates", `${r.active.cert.notBefore.slice(0, 10)} to ${r.active.cert.notAfter.slice(0, 10)}`]);
@@ -8024,16 +8614,16 @@ function credentialRows(r) {
     if (m) rows.push(["Says it was", m]);
     if (r.active.generator) rows.push(["Signing tool", r.active.generator]);
     for (const e of r.earlier || []) if (e.ai) rows.push(["Earlier version", `the credentials say an earlier version${e.title ? ` (${e.title})` : ""} was made with generative AI`]);
-    if (r.active.timestamp) rows.push(["Time-stamp", "attached; Daylight Commons does not check the time-stamp authority's signature"]);
+    if (r.active.timestamp) rows.push(["Time-stamp", "attached; the time-stamp authority's signature is left unchecked"]);
   }
   for (const t of (r.meta && r.meta.sourceTypes) || []) rows.push(["Metadata says", `${t.says} (IPTC ${t.code})`]);
   for (const g of (r.meta && r.meta.generators) || []) rows.push(["Generator metadata", g]);
   for (const f of (r.meta && r.meta.fields) || []) rows.push([f.key, f.text]);
-  if (state === "none" && r.meta && !r.meta.any) rows.push(["Other metadata", "none in the file; the platform probably removed it"]);
+  if (state === "none" && r.meta && !r.meta.any) rows.push(["Other metadata", "absent; the platform probably removed it"]);
   return rows;
 }
 
-const dnp = (t) => ["Does not prove", t];
+const dnp = (t) => ["What it shows", t];
 
 // Signals for the window: [{ label, fam, level, cat, rows }].
 function credentialSignals(r) {
@@ -8045,7 +8635,7 @@ function credentialSignals(r) {
     const m = made(r);
     out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What Daylight Commons read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   }
-  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Daylight Commons found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms can break credentials without any intent to mislead.")] });
+  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Daylight Commons found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms also break credentials in ordinary use.")] });
   const ai = ((r.meta && r.meta.sourceTypes) || []).find((t) => t.kind === "ai");
   if (ai || ((r.meta && r.meta.generators) || []).length) {
     out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What Daylight Commons read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
@@ -8258,7 +8848,7 @@ function threadUrl(key) {
   return ({ x: `https://x.com/i/status/${id}`, reddit: `https://www.reddit.com/comments/${id}`, youtube: `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`, instagram: `https://www.instagram.com/p/${id}/` })[m[1]] || null;
 }
 
-const GRAPH_DOES_NOT_PROVE = "Two accounts replying in the same threads is what friends, fans of one creator and people following the same news do, as well as coordinated accounts. The graph covers only threads you opened, and it says nothing about who runs any account.";
+const GRAPH_DOES_NOT_PROVE = "The graph links accounts that replied in the same threads you opened. Friends, fans and people following the same news link up too.";
 
 return { GRAPH_MIN, coGraph, forceLayout, threadUrl, GRAPH_DOES_NOT_PROVE };
 })();
@@ -8279,12 +8869,12 @@ const FEED_RETAIN_DAYS = 60, FEED_MAX_IDS = 3000;
 const DAY = 86400000;
 const dayOf = (t) => new Date(t).toISOString().slice(0, 10);
 
-// posts: [{ id, domains, strong, note, claims, techniques, frame }]. frame: "person-story",
+// posts: [{ id, domains, strong, note, claims, techniques, frame, lens }]. lens: reading-lens technique ids shown on the post. frame: "person-story",
 // "structural", "mixed", "none" (long enough, neither) or absent (too short). Log: { "site|day": entry }.
 function addFeedPosts(log, site, posts, now = Date.now()) {
   const L = { ...(log || {}) };
   const key = `${site}|${dayOf(now)}`;
-  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques }, frames: { ...(L[key].frames || {}) } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {}, frames: {} };
+  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques }, frames: { ...(L[key].frames || {}) }, lens: { ...(L[key].lens || {}) } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {}, frames: {}, lens: {} };
   const have = new Set(e.ids);
   for (const p of posts) {
     if (!p || !p.id || have.has(p.id) || e.ids.length >= FEED_MAX_IDS) continue;
@@ -8296,6 +8886,7 @@ function addFeedPosts(log, site, posts, now = Date.now()) {
     for (const d of new Set(p.domains || [])) e.links[d] = (e.links[d] || 0) + 1;
     for (const t of new Set(p.techniques || [])) e.techniques[t] = (e.techniques[t] || 0) + 1;
     if (p.frame) e.frames[p.frame] = (e.frames[p.frame] || 0) + 1;
+    for (const t of new Set(p.lens || [])) e.lens[t] = (e.lens[t] || 0) + 1;
   }
   e.at = now;
   L[key] = e;
@@ -8327,7 +8918,7 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
   const snaps = Object.values(reports || {}).filter((s) => s && s.at >= since);
   const feeds = Object.values(feedLog || {}).filter((f) => f && f.at >= since);
   const T = { strongK: 0, strongN: 0, ctxK: { notes: 0, claims: 0 }, ctxN: 0, looked: 0, flagged: 0 };
-  const sites = new Map(), tech = new Map(), frames = new Map(), daily = dailyFrame(days, now);
+  const sites = new Map(), tech = new Map(), frames = new Map(), lens = new Map(), daily = dailyFrame(days, now);
   for (const s of snaps) {
     T.looked += s.lookedUp || 0; T.flagged += s.flaggedK || 0;
     if (s.strong != null) { T.strongK += s.strong; T.strongN += s.replies || 0; }
@@ -8343,6 +8934,7 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
     for (const [d, n] of Object.entries(f.links || {})) add(sites, d, n);
     for (const [t, n] of Object.entries(f.techniques || {})) add(tech, t, n);
     for (const [t, n] of Object.entries(f.frames || {})) add(frames, t, n);
+    for (const [t, n] of Object.entries(f.lens || {})) add(lens, t, n);
     dayAdd(daily, f.at, { posts: f.posts, strong: f.strong, strongN: f.posts, feedPosts: f.posts });
   }
   const mentions = [...sites.values()].reduce((a, b) => a + b, 0);
@@ -8358,6 +8950,8 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
     notes: count(T.ctxK.notes, T.ctxN), claims: count(T.ctxK.claims, T.ctxN),
     techniques: { shown: [...shown], counts: [...tech].filter(([t]) => shown.includes(t)).map(([id, n]) => ({ id, n })).sort((a, b) => b.n - a.n) },
     framing: framingBalance(frames, framingRow),
+    // Reading-lens frames across feed posts: how many posts used each technique the window shows.
+    lens: [...lens].map(([id, n]) => ({ id, n })).sort((a, b) => b.n - a.n || (a.id < b.id ? -1 : 1)),
     together: coGraph(net, { min: 3, since, maxNodes: 40 }).edges.slice(0, 10),
     daily: [...daily.values()],
   };
@@ -8385,7 +8979,7 @@ function dayAdd(m, at, v) {
   e.posts += v.posts; e.strong += v.strong || 0; e.strongN += v.strongN; e.threads += v.threads || 0; e.feedPosts += v.feedPosts || 0;
 }
 
-const FEED_DOES_NOT_SHOW = "What this does not show: what your feed would carry for anyone else, or what a platform carries overall. These counts cover only posts and threads you opened with Daylight Commons on, in the order each platform chose to show them. A site's share says how often it was linked, not whether it is accurate, and a strong-rhetoric sign is about wording, not about the person who wrote it.";
+const FEED_DOES_NOT_SHOW = "These counts cover the posts and threads you opened with Daylight Commons on, in the order each platform chose to show them: your own feed, one view of each platform. A site's share says how often it was linked. A strong-rhetoric sign is about wording.";
 
 return { FEED_RETAIN_DAYS, addFeedPosts, threadContext, feedDashboard, FEED_DOES_NOT_SHOW };
 })();
@@ -8497,7 +9091,7 @@ function cardPage(url) {
 // thread, or null. Only their states and AI-generation marks go on the card, never a signer's name.
 // Returns { ok: true, card } or { ok: false, reason }.
 function evidenceCard(input) {
-  if (!input || !input.thread) return { ok: false, reason: "Cards are made for threads only, not for profiles or feeds." };
+  if (!input || !input.thread) return { ok: false, reason: "Cards are made for threads. Open a thread to make one." };
   const accounts = new Set((input.authors || []).map((h) => String(h).toLowerCase())).size;
   if (accounts < MIN_CARD_ACCOUNTS) return { ok: false, reason: `This thread has ${accounts} reply account${accounts === 1 ? "" : "s"}. A card needs at least ${MIN_CARD_ACCOUNTS} accounts, so it cannot be about one person.` };
   const R = input.report || {}, U = R.upstream || {};
@@ -8550,10 +9144,10 @@ function sourcesOf(card, input) {
 
 function limitsOf(card) {
   return [
-    "This card covers one thread as one viewer saw it, ranked by the platform. It names no account and judges no person.",
+    "This card covers one thread as one viewer saw it, ranked by the platform.",
     REPORT_DOES_NOT_PROVE,
     card.claims.length ? CLAIM_DOES_NOT_PROVE : null,
-    card.sites.some((s) => s.state.length) ? "A state link says a cited source ties the site to a state. It is not proof that a post is false." : null,
+    card.sites.some((s) => s.state.length) ? "A state link says a cited source ties the site to a state; each post's claims stand or fall on their own." : null,
     card.media.credentials ? CREDENTIALS_DO_NOT_PROVE : null,
     card.media.recycledUploads ? "A recycled upload can be a fair repost or a correction; it shows where the file was first seen, not who made it." : null,
   ].filter(Boolean);
@@ -8591,12 +9185,12 @@ function cardLines(card) {
   if (card.claims.length) { push("head", "Fact-checked claims"); for (const c of card.claims) push("body", `${c.checker} rated a similar claim "${c.rating}": ${c.claim} (${c.url})`); }
   if (card.sites.length) { push("head", "Sites linked"); push("body", card.sites.map((s) => [`${s.domain} (${s.posts})`, s.owner ? `owned by ${s.owner}` : null, ...s.state].filter(Boolean).join(", ")).join("; ")); }
   push("head", "Media");
-  push("body", card.media.uploads ? `${card.media.recycledUploads} of ${card.media.uploads} uploads were first posted by another account.` : "No uploads were read in this thread.");
+  push("body", card.media.uploads ? `${card.media.recycledUploads} of ${card.media.uploads} uploads were first posted by another account.` : "Zero uploads were read in this thread.");
   const C = card.media.credentials;
-  push("body", C ? `Content Credentials, ${C.checked} file${C.checked === 1 ? "" : "s"} checked: ${C.unchanged} signed and unchanged, ${C.changed} changed since signing, ${C.unchecked} not fully checked, ${C.none} with none found; ${C.ai} marked as made with generative AI (by credentials or IPTC metadata).` : "No file in this thread was checked for Content Credentials.");
+  push("body", C ? `Content Credentials, ${C.checked} file${C.checked === 1 ? "" : "s"} checked: ${C.unchanged} signed and unchanged, ${C.changed} changed since signing, ${C.unchecked} not fully checked, ${C.none} with none found; ${C.ai} marked as made with generative AI (by credentials or IPTC metadata).` : "Zero files in this thread were checked for Content Credentials.");
   push("head", "Sources");
   for (const s of card.sources) push("small", s);
-  push("head", "What this does not prove");
+  push("head", "What it covers");
   for (const s of card.doesNotProve) push("limit", s);
   if (card.hash) push("small", "The JSON file saved with this image holds the same content and a hash of it, so anyone can check a copy.");
   return L;
@@ -8769,7 +9363,7 @@ const M_packs = (() => {
 const { canonicalJSON, sha256Hex, lfBytes, publicJwk, jwkId, signText, verifyText, P256 } = M_sig;
 
 const PACK_FORMAT = "radar-pack/1";
-const PACK_DOES_NOT_PROVE = "A valid signature shows which key signed this pack and that its content has not changed since. It does not show that the content is right, or who holds the key: trust a key only when you know where it came from.";
+const PACK_DOES_NOT_PROVE = "A valid signature shows which key signed this pack and that its content is unchanged since. Trust a key when you know where it came from.";
 const subtle = () => globalThis.crypto.subtle;
 
 // The key id: the first 32 hex characters of the SHA-256 of the public key's canonical JWK.
@@ -8824,8 +9418,8 @@ async function verifyPack(pack, trusted = []) {
 
 async function hashProblems(pack) {
   const m = pack.manifest || {}, listed = m.hashes || {}, content = pack.content || {}, out = [];
-  if (!pack.content && !m.files) return ["the pack has neither content nor a file list"];
-  for (const k of Object.keys(content)) if (!(k in listed)) out.push(`content part "${k}" is not listed in the signed manifest`);
+  if (!pack.content && !m.files) return ["the pack lacks both content and a file list"];
+  for (const k of Object.keys(content)) if (!(k in listed)) out.push(`content part "${k}" is missing from the signed manifest`);
   for (const [k, h] of Object.entries(listed)) {
     if (!(k in content)) out.push(`signed content part "${k}" is missing`);
     else if ((await sha256Hex(canonicalJSON(content[k]))) !== h) out.push(`content part "${k}" changed after signing`);
@@ -9054,7 +9648,7 @@ function recordLine(rec) {
   return `${plural(rec.n, "review")} by ${plural(rec.m, "fact-checker")} since ${rec.since}, ratings as the checkers wrote them`;
 }
 
-const SITE_RECORD_DOES_NOT_PROVE = "A review lists this site as a place where a claim appeared. The site may have been reporting someone else's words, and each rating is about that claim, not about the site. Fact-checkers choose what to check, so a count says little about how often a site is right.";
+const SITE_RECORD_DOES_NOT_PROVE = "A review lists this site as a place where a claim appeared, perhaps reporting someone else's words. Each rating is about that claim. Fact-checkers choose what to check, so a count says little about how often a site is right.";
 const SITE_SOURCES = "Owner, owner type, founding date and country: Wikidata (CC0). Reviews: ClaimReview markup published by each fact-checker, from the Data Commons fact-check feed (CC BY 4.0).";
 
 // Owner types, in a fixed order. State links come first because they cite a source; then what
@@ -9088,17 +9682,17 @@ function siteInfoRows(info, opts = {}) {
     ...stateRows(info.state),
     ...packNoteRows(info.notes),
   ];
-  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Daylight Commons has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
-  rows.push(["Fact-check record", recordLine(record) || "No review in Daylight Commons' table lists this site as where a claim appeared."]);
+  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Daylight Commons lacks a Wikidata entry for this site, so its owner, founding date and country stay blank." }]);
+  rows.push(["Fact-check record", recordLine(record) || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."]);
   for (const r of (record && (record.latest || record.reviews.slice(0, 3))) || []) rows.push(["Review", `"${r.rating}": ${r.checker}, ${r.date || "date not given"}`]);
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
-  rows.push(["Source", SITE_SOURCES], ["Does not prove", SITE_RECORD_DOES_NOT_PROVE]);
+  rows.push(["Source", SITE_SOURCES], ["What it shows", SITE_RECORD_DOES_NOT_PROVE]);
   return rows.filter(([, v]) => v != null);
 }
 
 // Notes from data packs the user imported and trusts (src/core/packs-content.js), each with its
 // pack's name and source, kept apart from Daylight Commons' own rows.
-const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Daylight Commons did not write or check it.";
+const PACK_NOTE_CAVEAT = "From a data pack you imported and trust, written and checked by its publisher.";
 function packNoteRows(notes) {
   if (!notes || !notes.length) return [];
   const rows = notes.slice(0, 5).flatMap((n) => [["Pack note", `${n.note} (pack: ${n.pack})`], ["Read it", { links: [[String(n.url).replace(/^https?:\/\//, "").slice(0, 48), n.url]] }]]);
@@ -9422,7 +10016,7 @@ const { feedOrigin } = M_outlets;
 
 const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Daylight Commons asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. Daylight Commons sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or Daylight Commons server is involved. Nothing is requested until you click.";
 
-const COVERAGE_DOES_NOT_PROVE = "Matching is by shared words in headlines, so a match can be a different event with similar words, and a story told in other words is missed. A feed holds only an outlet's latest entries, and only the outlets you chose are asked. Owner and owner type are what the site tables state, not a judgment of the reporting.";
+const COVERAGE_DOES_NOT_PROVE = "A match shares words with the headline, so it can be a different event with similar words, and a story told in other words is missed. Each feed holds an outlet's latest entries, from the outlets you chose. Owner and owner type are what the site tables state.";
 
 const STOP = new Set(("the a an and or but of to in on at by for with from as is are was were be been it its this that these those their they he she his her we our you your " +
   "not no do does did has have had will would can could should may might than then so if into about over under after before what which who when where why how " +
@@ -9500,12 +10094,12 @@ function coverageGroups(list) {
 }
 
 const FEED_ERRORS = Object.freeze({
-  "no-permission": "The browser has not allowed Daylight Commons to reach this feed's host.",
-  redirect: "The feed answered with a redirect to another address, which Daylight Commons does not follow. Check the outlet's site for its current feed.",
+  "no-permission": "The browser blocked Daylight Commons from this feed's host.",
+  redirect: "The feed answered with a redirect to another address, which Daylight Commons leaves alone. Check the outlet's site for its current feed.",
   http: "The feed answered with an error.",
-  "not-a-feed": "The answer was not an RSS or Atom feed.",
+  "not-a-feed": "The answer was some other format than RSS or Atom.",
   "too-large": "The feed was larger than Daylight Commons reads.",
-  timeout: "The feed did not answer within 10 seconds.",
+  timeout: "The feed took longer than 10 seconds to answer.",
   network: "The feed could not be reached.",
 });
 
@@ -9541,14 +10135,14 @@ function adapterHealth(site, found) {
   // stamp or article box at all is more likely a sign-in wall or a removed post than a redesign.
   const expectsRoot = f.page === "thread" && !!(site.hasLocation || site.rootFirst) && ((s.times | 0) >= 1 || (s.articles | 0) >= 1);
   if (expectsRoot || (s.times | 0) >= 3 || (s.articles | 0) >= 3) {
-    return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was not found" : "the page shows post-like boxes Daylight Commons cannot find" };
+    return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was missing" : "the page shows post-like boxes outside Daylight Commons' reader" };
   }
   return { state: "empty", say: null };
 }
 
 // The self-test's report as [label, value] rows, for the toolbar popup.
 function selfTestLines(r) {
-  if (!r) return [["Result", "Daylight Commons has no reader for this site. The site card gives site context and text checks here."]];
+  if (!r) return [["Result", "This site gets the site card, with site context and text checks, in place of a reader."]];
   const v = r.verdict || {};
   const pct = (a, b) => (b ? `${a} of ${b}` : "none");
   return [
@@ -9564,7 +10158,7 @@ function selfTestLines(r) {
   ];
 }
 
-const HEALTH_DOES_NOT_PROVE = "The self-test counts what Daylight Commons' reader finds on this page now. A pass does not show every field is right, and a page that loads posts later can fail and then pass. It reads no text and sends nothing.";
+const HEALTH_DOES_NOT_PROVE = "The self-test counts what Daylight Commons' reader finds on this page now. A page that loads posts later can fail and then pass. The test reads layout on this device and sends nothing.";
 
 return { HEALTH_SETTLE_MS, HEALTH_STATES, adapterHealth, selfTestLines, HEALTH_DOES_NOT_PROVE };
 })();
@@ -9643,7 +10237,7 @@ function genericChecks({ article, comments }) {
   return out;
 }
 
-const GENERIC_DOES_NOT_PROVE = "Daylight Commons has no reader for this site, so it guessed where the article and the comments are from the page's layout. It can miss comments or count a list of links as comments. A marker is a pattern in wording, not a judgment of the writer.";
+const GENERIC_DOES_NOT_PROVE = "The generic reader guessed where the article and the comments are from the page's layout, so it can miss comments or count a list of links as comments. A marker is a pattern in wording.";
 
 return { GENERIC_MAX_COMMENTS, pickArticle, pickComments, genericChecks, GENERIC_DOES_NOT_PROVE };
 })();
@@ -9654,21 +10248,21 @@ const M_catalogue_data = (() => {
 // changing an entry. Licence: CC-BY-4.0, as the catalogue (REUSE.toml).
 const SIGNAL_REGISTRY = {"version":"1.1.0","note":"Every signal a catalogue element may cite. A signal is something Daylight Commons can show from the page or from a receipt. Signals in the same family read the same evidence and count once. Context-only signals never evidence any element.","signals":[{"id":"shape-outlier-own","family":"shape","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Reposts per like far above the author's own posts seen on this device."},{"id":"bio-template","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Groups of sampled bios cut from one template."},{"id":"stock-persona","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"A large share of sampled bios combine stock persona cues."},{"id":"join-cluster","family":"joins","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Many sampled accounts joined within the same 14 days."},{"id":"topic-mismatch","family":"topic","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled bios are dominated by a topic the post does not share."},{"id":"undisclosed-lookalike","family":"quotes","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts without a Paid partnership label share a template with labelled ones, or with each other inside two hours."},{"id":"cross-launch","family":"overlap","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled accounts were seen amplifying two or more other launches the viewer opened."},{"id":"disclosed-paid","family":"disclosure","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts carry X's Paid partnership label, the posters' own disclosure."},{"id":"promo-cue","family":"promotion","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts use promotional template phrasing."},{"id":"product-promotion","family":"promotion","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The viewer opened the launch lens on this post, or quotes carry promotional phrasing or a Paid partnership label."},{"id":"actor-organisation","family":"actor","kind":"context","source":"src/core/campaign.js (actorOf)","observes":"The platform discloses the launch account as an organisation or official account."},{"id":"online-post","family":"medium","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The conduct is a post published on an online platform."},{"id":"quote-bunching","family":"timing","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts arrived close together in time. Needs times to the minute; with coarser times it is not observable at this time precision and never shows.","needs_precision":"minute","context_only":true},{"id":"timing-burst","family":"timing","kind":"context","source":"src/core/timing.js (thread evidence)","observes":"Several accounts replied within seconds, tighter than the thread's pace explains. Needs times to the second; times worked out from rounded ages such as 14h or 1d share one second by construction, so with coarser times it is not observable at this time precision and never fires.","needs_precision":"second","context_only":true},{"id":"overlap","family":"overlap","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Some sampled accounts were seen on other launches, below the indicator threshold.","context_only":true},{"id":"random-suffix","family":"handles","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Handles ending in a number-and-letter tail. People choose these for privacy too.","context_only":true},{"id":"default-avatar","family":"avatar","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"X's own default-image disclosure.","context_only":true},{"id":"ad-library-link","family":"ad-library","kind":"context","source":"src/core/evidence-ads.js (evidence layer, PR #47)","observes":"A search link to an advertiser's entries in a public ad repository, opened by the user.","pending":"Lands with the evidence layer (PR #47), which is not merged into main yet."}]};
 const CATALOGUE_ENTRIES = [
-  {"id":"eu-dsa-art26-advertising","version":"1.0.0","status":"active","verification":"verified","role":"context","title":"Advertising transparency on online platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 26(1) and 26(2)","kind":"regulation","binding_note":"A regulation, directly applicable in every Member State. Articles 26 and 39 set duties for platform providers, not for the people who post. Daylight Commons uses them as context: they say what the platform must show, which tells the reader where to look for a disclosure or an ad record.","in_force":{"status":"in force","since":"2024-02-17","note":"Article 93(2): the Regulation applies from 17 February 2024, apart from listed provisions that applied from 16 November 2022. Article 26 is not among them."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 26(1)(a) to (c)","text":"Providers of online platforms that present advertisements on their online interfaces shall ensure that, for each specific advertisement presented to each individual recipient, the recipients of the service are able to identify, in a clear, concise and unambiguous manner and in real time, the following: (a) that the information is an advertisement, including through prominent markings, which might follow standards pursuant to Article 44; (b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement if that person is different from the natural or legal person referred to in point (b);"},{"source":0,"locator":"Article 26(2), first subparagraph","text":"Providers of online platforms shall provide recipients of the service with a functionality to declare whether the content they provide is or contains commercial communications."}],"elements":[{"id":"A","label":"The platform offers a way to declare commercial content, and some posts carry that declaration","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"]},{"id":"B","label":"Posts that look commercial carry no such declaration","observable_from":"page","required":false,"strength":"indicative","signals":["undisclosed-lookalike"]}],"does_not_prove":"Context only: Article 26 sets duties for the platform. A missing declaration on a post says nothing on its own about the platform meeting or missing its duty. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.","related":["eu-dsa-art39-ad-repository","x-paid-partnerships"]},
-  {"id":"eu-dsa-art39-ad-repository","version":"1.0.0","status":"active","verification":"verified","role":"context","title":"Advertisement repositories of very large platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 39(1) and 39(2)","kind":"regulation","binding_note":"A regulation, directly applicable in every Member State. Articles 26 and 39 set duties for platform providers, not for the people who post. Daylight Commons uses them as context: they say what the platform must show, which tells the reader where to look for a disclosure or an ad record.","in_force":{"status":"in force","since":null,"note":"Article 93(2) sets general application from 17 February 2024. Article 33(6): obligations in the very-large-platform section apply from four months after the designation is notified to the provider, so the date depends on the designation of each platform, which this entry did not check."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 39(1), first sentence","text":"Providers of very large online platforms or of very large online search engines that present advertisements on their online interfaces shall compile and make publicly available in a specific section of their online interface, through a searchable and reliable tool that allows multicriteria queries and through application programming interfaces, a repository containing the information referred to in paragraph 2, for the entire period during which they present an advertisement and until one year after the advertisement was presented for the last time on their online interfaces."},{"source":0,"locator":"Article 39(2)(b), (c) and (f)","text":"(b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement, if that person is different from the person referred to in point (b); (f) the commercial communications published on the very large online platforms and identified pursuant to Article 26(2);"}],"elements":[{"id":"A","label":"An ad repository exists where the advertiser and payer of an ad can be looked up","observable_from":"public-record","required":true,"strength":"direct","signals":["ad-library-link"],"note":"Daylight Commons builds a search link to the repository; the user opens it. Daylight Commons does not read the repository itself."}],"does_not_prove":"Context only. An empty repository search does not show that no ads ran, and an entry does not show anything about organic posts. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.","related":["eu-dsa-art26-advertising"]},
-  {"id":"eu-ucpd-annex1-11-advertorial","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"Paid editorial content not made clear (advertorial)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026","section":"Annex I, point 11","kind":"directive","binding_note":"A directive, applied through each Member State's national law. Annex I lists practices that are unfair in all circumstances, and the text says the same single list applies in all Member States. It covers business-to-consumer practices: the party must be a trader.","in_force":{"status":"in force","since":null,"note":"Original Annex I point, in the 2005 text and unchanged in the consolidated version of 27.09.2026."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"}],"quotes":[{"source":0,"locator":"Annex I, point 11 (footnote reference omitted)","text":"Using editorial content in the media to promote a product where a trader has paid for the promotion without making that clear in the content or by images or sounds clearly identifiable by the consumer (advertorial)."}],"elements":[{"id":"A","label":"Content presented as editorial or ordinary content is used to promote a product","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","promo-cue","undisclosed-lookalike"],"note":"Whether a social media post counts as \"editorial content in the media\" is a legal question this entry does not settle."},{"id":"B","label":"A trader paid for the promotion","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts, where the poster disclosed it. For unlabelled posts payment is not visible."},{"id":"C","label":"The payment is not made clear in the content or by images or sounds the consumer can clearly identify","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"Daylight Commons sees a missing platform label, not every way a disclosure could be made."}],"does_not_prove":"Daylight Commons cannot see payment for unlabelled posts, so element B and C together rest on look-alike evidence. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.","related":["uk-dmcc-sch20-12-advertorial","us-ftc-endorsement-material-connection","eu-dsa-art26-advertising"]},
-  {"id":"eu-ucpd-annex1-22-posing-as-consumer","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"Falsely representing oneself as a consumer","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026","section":"Annex I, point 22","kind":"directive","binding_note":"A directive, applied through each Member State's national law. Annex I lists practices that are unfair in all circumstances, and the text says the same single list applies in all Member States. It covers business-to-consumer practices: the party must be a trader.","in_force":{"status":"in force","since":null,"note":"Original Annex I point, in the 2005 text and unchanged in the consolidated version of 27.09.2026."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"}],"quotes":[{"source":0,"locator":"Annex I, point 22","text":"Falsely claiming or creating the impression that the trader is not acting for purposes relating to his trade, business, craft or profession, or falsely representing oneself as a consumer."}],"elements":[{"id":"A","label":"Posts present the speaker as an ordinary consumer giving their own view","observable_from":"page","required":true,"strength":"direct","signals":["undisclosed-lookalike","promo-cue"]},{"id":"B","label":"The speaker is in fact a trader, or acts in the name of or on behalf of one","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"For unlabelled posts this would be shown by contracts or agency records, not by the page."},{"id":"C","label":"The impression is false","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Falsity depends on element B and on how the impression was created."}],"does_not_prove":"A post that reads like a fan and shares a template with paid posts is not proof that its author was paid. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.","related":["uk-dmcc-sch20-25-posing-as-consumer","eu-ucpd-annex1-11-advertorial"]},
-  {"id":"eu-ucpd-annex1-23c-false-reviews-endorsements","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"False consumer reviews or endorsements, or misrepresented social endorsements","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC as amended by Directive (EU) 2019/2161 (the Omnibus Directive), consolidated text of 27.09.2026","section":"Annex I, point 23c","kind":"directive","binding_note":"A directive, applied through each Member State's national law. Annex I lists practices that are unfair in all circumstances, and the text says the same single list applies in all Member States. It covers business-to-consumer practices: the party must be a trader. Recital 49 of Directive 2019/2161 gives 'likes' on social media as an example of an endorsement.","in_force":{"status":"in force","since":"2022-05-28","note":"Inserted by Article 3 of Directive (EU) 2019/2161. Article 7 of that Directive: Member States \"shall apply those measures from 28 May 2022\"."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"},{"url":"https://eur-lex.europa.eu/eli/dir/2019/2161/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32019L2161","retrieved_at":"2026-10-22","sha256":"4f2987a941a32c9fae499098554b206e93b26365fea60353e2f886084174b1ac","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","text_sha256":"90f61e53584b248a1e560458561a916da4aa68be17c69a25de69313df2b64570"}],"quotes":[{"source":0,"locator":"Annex I, point 23c","text":"Submitting or commissioning another legal or natural person to submit false consumer reviews or endorsements, or misrepresenting consumer reviews or social endorsements, in order to promote products."},{"source":1,"locator":"Directive (EU) 2019/2161, recital 49, first sentence","text":"Traders should also be prohibited from submitting fake consumer reviews and endorsements, such as ‘likes’ on social media, or commissioning others to do so in order to promote their products, as well as from manipulating consumer reviews and endorsements, such as publishing only positive reviews and deleting the negative ones."}],"elements":[{"id":"A","label":"Consumer reviews or social endorsements are involved (likes, reposts, quote posts)","observable_from":"page","required":true,"strength":"direct","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch","undisclosed-lookalike"]},{"id":"B","label":"They are false, or are misrepresented","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch","undisclosed-lookalike"],"min_families":2,"note":"Page signals are consistent with false endorsements; they do not show that any single account is not a real consumer."},{"id":"C","label":"A trader submitted them or commissioned another person to submit them","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"Who commissioned the engagement is not visible on the page."},{"id":"D","label":"In order to promote products","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion"]}],"does_not_prove":"Bought-looking engagement can come from parties other than the trader, including rivals and vendors acting on their own. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.","related":["us-ftc-fake-social-media-indicators","uk-dmcc-sch20-13-fake-reviews","x-authenticity-engagement-spam"]},
-  {"id":"uk-dmcc-sch20-12-advertorial","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"Paid editorial content not made clear (advertorial)","jurisdiction":{"code":"UK","name":"United Kingdom"},"instrument":"Digital Markets, Competition and Consumers Act 2024","section":"Schedule 20, paragraph 12","kind":"statute","binding_note":"Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders.","in_force":{"status":"in force","since":"2025-04-06","note":"The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20","retrieved_url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml","retrieved_at":"2026-10-22","sha256":"5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.","text_sha256":"c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"},{"url":"https://www.legislation.gov.uk/uksi/2025/272/made","retrieved_url":"https://www.legislation.gov.uk/uksi/2025/272/made/data.xml","retrieved_at":"2026-10-22","sha256":"8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk","text_sha256":"e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"}],"quotes":[{"source":0,"locator":"Schedule 20, paragraph 12","text":"Using editorial content in the media to promote a product where a trader has paid for the promotion without making that clear in the content or by images or sounds clearly identifiable by the consumer."},{"source":1,"locator":"SI 2025/272, regulation 2(3)","text":"Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."}],"elements":[{"id":"A","label":"Content presented as editorial or ordinary content is used to promote a product","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","promo-cue","undisclosed-lookalike"],"note":"Whether a social media post counts as \"editorial content in the media\" is a legal question this entry does not settle."},{"id":"B","label":"A trader paid for the promotion","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts only."},{"id":"C","label":"The payment is not made clear in the content or by images or sounds the consumer can clearly identify","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"]}],"does_not_prove":"Daylight Commons cannot see payment for unlabelled posts. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.","related":["eu-ucpd-annex1-11-advertorial","us-ftc-endorsement-material-connection"]},
-  {"id":"uk-dmcc-sch20-13-fake-reviews","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"Fake or concealed-incentive consumer reviews","jurisdiction":{"code":"UK","name":"United Kingdom"},"instrument":"Digital Markets, Competition and Consumers Act 2024","section":"Schedule 20, paragraph 13 (banned practice), with the definitions in paragraph 13(5)","kind":"statute","binding_note":"Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders. Whether a repost, like or quote post is a \"consumer review\" under paragraph 13(5)(a) is a legal question; the definition covers \"a review of a product, a trader or any other matter relevant to a transactional decision\".","in_force":{"status":"in force","since":"2025-04-06","note":"The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20","retrieved_url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml","retrieved_at":"2026-10-22","sha256":"5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.","text_sha256":"c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"},{"url":"https://www.legislation.gov.uk/uksi/2025/272/made","retrieved_url":"https://www.legislation.gov.uk/uksi/2025/272/made/data.xml","retrieved_at":"2026-10-22","sha256":"8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk","text_sha256":"e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"}],"quotes":[{"source":0,"locator":"Schedule 20, paragraph 13(1)","text":"(1) Submitting, or commissioning another person to submit or write— (a) a fake consumer review, or (b) a consumer review that conceals the fact it has been incentivised."},{"source":0,"locator":"Schedule 20, paragraph 13(5)(a) to (c)","text":"(a) “consumer review” means a review of a product, a trader or any other matter relevant to a transactional decision; (b) “fake consumer review” means a consumer review that purports to be, but is not, based on a person’s genuine experience; (c) a consumer review conceals the fact it has been incentivised if— (i) a person has been commissioned to submit or write the review, and (ii) that fact is not made apparent (whether through the contents of the review or otherwise);"},{"source":1,"locator":"SI 2025/272, regulation 2(3)","text":"Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."}],"elements":[{"id":"A","label":"A consumer review: a review of a product or trader relevant to a buying decision (here, quote posts praising a launch)","observable_from":"page","required":true,"strength":"direct","signals":["promo-cue","undisclosed-lookalike","disclosed-paid"],"note":"Treating a quote post as a consumer review is this entry's reading, not a settled one."},{"id":"B","label":"The review purports to be, but is not, based on genuine experience; or it was commissioned and that fact is not made apparent","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"A missing label next to labelled look-alikes is consistent with a concealed incentive. It does not show that the author was commissioned."},{"id":"C","label":"The trader submitted it or commissioned another person to submit or write it","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"Commissioning is shown by contracts, briefs or payments, not by the page."}],"does_not_prove":"Look-alike posts can be fans copying a paid post. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.","related":["eu-ucpd-annex1-23c-false-reviews-endorsements","us-ftc-fake-social-media-indicators","us-ftc-endorsement-material-connection"]},
-  {"id":"uk-dmcc-sch20-25-posing-as-consumer","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"Falsely representing oneself as a consumer","jurisdiction":{"code":"UK","name":"United Kingdom"},"instrument":"Digital Markets, Competition and Consumers Act 2024","section":"Schedule 20, paragraph 25","kind":"statute","binding_note":"Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders.","in_force":{"status":"in force","since":"2025-04-06","note":"The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20","retrieved_url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml","retrieved_at":"2026-10-22","sha256":"5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.","text_sha256":"c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"},{"url":"https://www.legislation.gov.uk/uksi/2025/272/made","retrieved_url":"https://www.legislation.gov.uk/uksi/2025/272/made/data.xml","retrieved_at":"2026-10-22","sha256":"8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk","text_sha256":"e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"}],"quotes":[{"source":0,"locator":"Schedule 20, paragraph 25","text":"Falsely claiming or creating the false impression that the trader is not acting for purposes relating to the trader’s business or falsely representing oneself as a consumer."},{"source":1,"locator":"SI 2025/272, regulation 2(3)","text":"Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."}],"elements":[{"id":"A","label":"Posts present the speaker as an ordinary consumer giving their own view","observable_from":"page","required":true,"strength":"direct","signals":["undisclosed-lookalike","promo-cue"]},{"id":"B","label":"The speaker is in fact a trader, or acts for one","observable_from":"public-record","required":true,"strength":"direct","signals":[]},{"id":"C","label":"The impression is false","observable_from":"not-observable","required":true,"strength":"direct","signals":[]}],"does_not_prove":"A post that reads like a fan and shares a template with paid posts is not proof that its author was paid. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.","related":["eu-ucpd-annex1-22-posing-as-consumer"]},
-  {"id":"uk-fraud-act-2006-s2","version":"1.0.0","status":"active","verification":"verified","role":"comparison","title":"Fraud by false representation (for comparison)","jurisdiction":{"code":"UK-EW-NI","name":"England and Wales, and Northern Ireland"},"instrument":"Fraud Act 2006","section":"Section 2(1) and 2(2)","kind":"statute","binding_note":"A criminal provision. Only a court decides whether it applies. The extent recorded on legislation.gov.uk is England and Wales and Northern Ireland; Scotland is not covered by this section.","in_force":{"status":"in force","since":"2007-01-15","note":"Start date as recorded in the legislation.gov.uk XML for section 2."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2006/35/section/2","retrieved_url":"https://www.legislation.gov.uk/ukpga/2006/35/section/2/data.xml","retrieved_at":"2026-10-22","sha256":"8158f865b2b975a0a84a907b74abb3686d57145d1b9f19c4186ad6853c0c7aaf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"The XML gives section 2 an extent of England and Wales and Northern Ireland, from 2007-01-15.","text_sha256":"60421b98c1cbe52a652ce2db9f744fb758ef4e035aaa7accd77e8a1a41d2c158"}],"quotes":[{"source":0,"locator":"Section 2(1)","text":"(1) A person is in breach of this section if he— (a) dishonestly makes a false representation, and (b) intends, by making the representation— (i) to make a gain for himself or another, or (ii) to cause loss to another or to expose another to a risk of loss."},{"source":0,"locator":"Section 2(2)","text":"(2) A representation is false if— (a) it is untrue or misleading, and (b) the person making it knows that it is, or might be, untrue or misleading."}],"elements":[{"id":"A","label":"A representation is made (express or implied)","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","undisclosed-lookalike","disclosed-paid"]},{"id":"B","label":"The representation is untrue or misleading","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Whether the engagement or the posts misled anyone is a finding about facts behind the page."},{"id":"C","label":"The person making it knows it is, or might be, untrue or misleading","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"D","label":"Made dishonestly","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"E","label":"With intent to make a gain, or to cause loss or risk of loss","observable_from":"not-observable","required":true,"strength":"direct","signals":[]}],"does_not_prove":"Shown for comparison only. Four of the five elements are about falsity, knowledge, dishonesty and intent, and none of them is visible on a page, so Daylight Commons never presents this definition as met. The section does not require that anyone relied on the representation or lost anything; it turns on intent. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.","related":["us-wire-fraud-18usc1343","uk-dmcc-sch20-13-fake-reviews"]},
-  {"id":"us-ftc-act-s5-deception","version":"1.0.0","status":"active","verification":"verified","role":"comparison","title":"Deceptive acts or practices (general standard)","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"Federal Trade Commission Act section 5, 15 U.S.C. 45, read with the FTC Policy Statement on Deception (October 14, 1983)","section":"15 U.S.C. 45(a)(1); Policy Statement on Deception, part I (Summary)","kind":"statute","binding_note":"The statute sets the standard. The Policy Statement is the Commission's own account of the elements it applies; courts have their own formulations.","in_force":{"status":"in force","since":null,"note":"United States Code, 2024 edition, as published on govinfo."},"sources":[{"url":"https://www.govinfo.gov/link/uscode/15/45","retrieved_url":"https://www.govinfo.gov/content/pkg/USCODE-2024-title15/html/USCODE-2024-title15-chap2-subchapI-sec45.htm","retrieved_at":"2026-10-22","sha256":"28de76e074dde70c74930d24738fda83a837c04bba6304c148051d1600679546","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"US Government Publishing Office, govinfo (United States Code, 2024 edition)","text_sha256":"6d18041cecfb47e3f97602089881ca7729f09bf9486f205a52875c4466b8df25"},{"url":"https://www.ftc.gov/legal-library/browse/ftc-policy-statement-deception","retrieved_url":"https://www.ftc.gov/system/files/documents/public_statements/410531/831014deceptionstmt.pdf","retrieved_at":"2026-10-22","sha256":"b39a62b96f46f66681f5081242215fe741b2dcb72f26b4b1fbc159a899a5d26f","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"Federal Trade Commission","note":"ftc.gov answered scripted requests with a 404 page, so the PDF was read in a browser and hashed there (79,535 bytes). Text extracted with pdf.js; line breaks normalised."}],"quotes":[{"source":0,"locator":"15 U.S.C. 45(a)(1)","text":"Unfair methods of competition in or affecting commerce, and unfair or deceptive acts or practices in or affecting commerce, are hereby declared unlawful."},{"source":1,"locator":"Policy Statement on Deception, I. Summary, closing sentence","text":"Thus, the Commission will find deception if there is a representation, omission or practice that is likely to mislead the consumer acting reasonably in the circumstances, to the consumer's detriment."},{"source":1,"locator":"Policy Statement on Deception, I. Summary, third element","text":"Third, the representation, omission, or practice must be a \"material\" one. The basic question is whether the act or practice is likely to affect the consumer's conduct or decision with regard to a product or service."}],"elements":[{"id":"A","label":"A representation, omission or practice","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","undisclosed-lookalike","disclosed-paid"]},{"id":"B","label":"Likely to mislead a consumer acting reasonably in the circumstances","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"This is judged from the reasonable consumer's point of view, which a page reading cannot settle."},{"id":"C","label":"Material: likely to affect the consumer's conduct or decision about a product or service","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"D","label":"In or affecting commerce","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","actor-organisation"]}],"does_not_prove":"Section 5 is the general standard behind the more specific entries. Its two central elements, likely to mislead and material, are judgements Daylight Commons does not make. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.","related":["us-ftc-endorsement-material-connection","us-ftc-fake-social-media-indicators"]},
-  {"id":"us-ftc-endorsement-material-connection","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"Undisclosed material connection in an endorsement","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"FTC Guides Concerning Use of Endorsements and Testimonials in Advertising, 16 CFR Part 255","section":"16 CFR 255.5(a), with the definition in 255.0(b)","kind":"agency-guides","binding_note":"The Guides are the FTC's administrative interpretation of section 5 of the FTC Act (16 CFR 255.0(a)). They guide how the Commission applies section 5; they are not a separate rule.","in_force":{"status":"in force","since":"2023-07-26","note":"Current text from 88 FR 48102, July 26, 2023, per the eCFR source note. The date is the Federal Register publication date, not a verified effective date."},"sources":[{"url":"https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255","retrieved_url":"https://www.ecfr.gov/api/versioner/v1/full/2026-10-19/title-16.xml?part=255","retrieved_at":"2026-10-22","sha256":"feb1c8cfee82158c16c4210ef320bc93ffb2f414aa2bdce6e6772a77064180ea","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Office of the Federal Register and GPO, eCFR","note":"eCFR point-in-time XML for 2026-10-19, the latest issue date eCFR listed for Title 16 on the retrieval date. eCFR is an editorial compilation; the official annual edition is on govinfo.","text_sha256":"bf8ee515e45bdc40dd4269b73ec61e3790c762688a197eb9537d891225663b07"}],"quotes":[{"source":0,"locator":"16 CFR 255.5(a), first two sentences and the significant-minority sentence","text":"When there exists a connection between the endorser and the seller of the advertised product that might materially affect the weight or credibility of the endorsement, and that connection is not reasonably expected by the audience, such connection must be disclosed clearly and conspicuously. Material connections can include a business, family, or personal relationship. … A material connection needs to be disclosed when a significant minority of the audience for an endorsement does not understand or expect the connection."},{"source":0,"locator":"16 CFR 255.0(b), first sentence","text":"For purposes of this part, an “endorsement” means any advertising, marketing, or promotional message for a product that consumers are likely to believe reflects the opinions, beliefs, findings, or experiences of a party other than the sponsoring advertiser, even if the views expressed by that party are identical to those of the sponsoring advertiser."}],"elements":[{"id":"A","label":"An endorsement: a promotional message for a product that readers are likely to take as a third party's own view","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid","undisclosed-lookalike","promo-cue"]},{"id":"B","label":"A connection between the endorser and the seller","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"The Paid partnership label shows a connection for the labelled posts only. For unlabelled look-alikes the connection is an inference from shared template and timing, and the public record (contracts, agency rosters) is where it would be shown."},{"id":"C","label":"The connection might materially affect the weight or credibility of the endorsement","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Materiality turns on how the audience weighs the message. Daylight Commons cannot see that."},{"id":"D","label":"The connection is not reasonably expected by the audience","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Audience expectation is a question about readers, usually answered with evidence Daylight Commons does not have."},{"id":"E","label":"The connection is not disclosed clearly and conspicuously","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"Daylight Commons sees that a quote carries no Paid partnership label. It cannot see a disclosure made elsewhere, such as in an image or a linked page."}],"does_not_prove":"Daylight Commons sees labels and look-alike posts. It does not see contracts, payments or what the audience expected. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.","related":["us-ftc-act-s5-deception","x-paid-partnerships","eu-ucpd-annex1-11-advertorial","uk-dmcc-sch20-12-advertorial"]},
-  {"id":"us-ftc-fake-social-media-indicators","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"Misuse of fake indicators of social media influence","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"FTC Trade Regulation Rule on the Use of Consumer Reviews and Testimonials, 16 CFR Part 465","section":"16 CFR 465.8(b), with definitions in 465.1(h) and 465.1(j)","kind":"regulation","binding_note":"A trade regulation rule issued under 15 U.S.C. 57a. In the eCFR text retrieved, section 465.8 is headed \"Misuse of fake indicators of social media influence\".","in_force":{"status":"in force","since":null,"note":"Source: 89 FR 68077, Aug. 22, 2024, per the eCFR source note. The effective date is not stated in the retrieved text and is left unverified here."},"sources":[{"url":"https://www.ecfr.gov/current/title-16/chapter-I/subchapter-D/part-465","retrieved_url":"https://www.ecfr.gov/api/versioner/v1/full/2026-10-19/title-16.xml?part=465","retrieved_at":"2026-10-22","sha256":"0ed274f696f88713e0a1560408acb9b9c611b90959fb686b2afe547df568d6c4","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Office of the Federal Register and GPO, eCFR","note":"eCFR point-in-time XML for 2026-10-19.","text_sha256":"8a17e77e242835bf309049b0286f8d76d01dc38747b0b8aca39d3f994b247e30"}],"quotes":[{"source":0,"locator":"16 CFR 465.8","text":"It is an unfair or deceptive act or practice and a violation of this part for anyone to: (a) Sell or distribute fake indicators of social media influence that they knew or should have known to be fake and that can be used by individuals or businesses to materially misrepresent their influence or importance for a commercial purpose; or (b) Purchase or procure fake indicators of social media influence that they knew or should have known to be fake and that materially misrepresent their influence or importance for a commercial purpose."},{"source":0,"locator":"16 CFR 465.1(h)","text":"Fake indicators of social media influence means indicators of social media influence generated by bots, purported individual accounts not associated with a real individual, accounts created with a real individual's personal information without their consent, or hijacked accounts, or that otherwise do not reflect a real individual's or entity's activities, opinions, findings, or experiences."},{"source":0,"locator":"16 CFR 465.1(j)","text":"Indicators of social media influence means any metrics used by the public to make assessments of an individual's or entity's social media influence, such as followers, friends, connections, subscribers, views, plays, likes, saves, shares, reposts, and comments."}],"elements":[{"id":"A","label":"The conduct concerns indicators of social media influence (reposts, likes, followers, comments)","observable_from":"page","required":true,"strength":"direct","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"]},{"id":"B","label":"Those indicators are fake: they do not reflect real people's or entities' activities or opinions","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"],"min_families":2,"note":"Page signals are consistent with fake indicators. They cannot show that a given account is not a real person. Two independent signal families are needed before this element is shown as matched."},{"id":"C","label":"The party purchased or procured them","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"A purchase shows in records such as vendor invoices or enforcement filings. Nothing on the page shows who paid."},{"id":"D","label":"The party knew or should have known they were fake","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"E","label":"They materially misrepresent the party's influence or importance","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Materiality is a judgement about how the public reads the numbers."},{"id":"F","label":"For a commercial purpose","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","actor-organisation"]}],"does_not_prove":"Engagement that looks bought is not proof that anyone bought it, or that the account owner knew. Rivals, fans and vendors acting on their own also produce these patterns. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.","related":["eu-ucpd-annex1-23c-false-reviews-endorsements","uk-dmcc-sch20-13-fake-reviews","x-authenticity-engagement-spam"]},
-  {"id":"us-wire-fraud-18usc1343","version":"1.0.0","status":"active","verification":"verified","role":"comparison","title":"Fraud by wire, radio, or television (for comparison)","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"18 U.S.C. 1343, with the elements as summarised in the DOJ Criminal Resource Manual 941 (archived)","section":"18 U.S.C. 1343","kind":"statute","binding_note":"A criminal statute. Only a court decides whether it applies. The circuits state the elements in different words; the DOJ page lists several formulations.","in_force":{"status":"in force","since":null,"note":"United States Code, 2024 edition, as published on govinfo."},"sources":[{"url":"https://www.govinfo.gov/link/uscode/18/1343","retrieved_url":"https://www.govinfo.gov/content/pkg/USCODE-2024-title18/html/USCODE-2024-title18-partI-chap63-sec1343.htm","retrieved_at":"2026-10-22","sha256":"1a43985c3f9ca2e28680336d3889d8801a87db2afa7bf16231fde4c0fdfb1594","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"US Government Publishing Office, govinfo (United States Code, 2024 edition)","text_sha256":"d9243b2adbea08b7838d4ad1d13b99f523741cf930ae8539a98a729ad45d6785"},{"url":"https://www.justice.gov/archives/jm/criminal-resource-manual-941-18-usc-1343-elements-wire-fraud","retrieved_url":"https://www.justice.gov/archives/jm/criminal-resource-manual-941-18-usc-1343-elements-wire-fraud","retrieved_at":"2026-10-22","sha256":"08b307acc432d022471e05252e68bd66ccc2b464364a8920b898bf09fc9cd769","hash_method":"rendered-text","retrieved_with":"browser","publisher":"US Department of Justice (archived Criminal Resource Manual)","note":"Scripted fetches got a changing 2.7 KB challenge page, so the hash is SHA-256 over the UTF-8 text of the rendered <main> element (2,585 bytes). The page is marked archived and may be outdated."}],"quotes":[{"source":0,"locator":"18 U.S.C. 1343, first sentence (penalty clause omitted)","text":"Whoever, having devised or intending to devise any scheme or artifice to defraud, or for obtaining money or property by means of false or fraudulent pretenses, representations, or promises, transmits or causes to be transmitted by means of wire, radio, or television communication in interstate or foreign commerce, any writings, signs, signals, pictures, or sounds for the purpose of executing such scheme or artifice,"},{"source":1,"locator":"CRM 941, quoting United States v. Maxwell, 920 F.2d 1028, 1035 (D.C. Cir. 1990)","text":"Wire fraud requires proof of (1) a scheme to defraud; and (2) the use of an interstate wire communication to further the scheme."}],"elements":[{"id":"A","label":"A scheme or artifice to defraud, or to obtain money or property by false pretenses","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"A scheme is a plan. Visible posts can be part of one, but the plan itself is not on the page."},{"id":"B","label":"Intent to defraud","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"C","label":"Use of an interstate wire communication (an online post is a communication sent by wire)","observable_from":"page","required":true,"strength":"direct","signals":["online-post"],"note":"Almost any online conduct shows this element, which is why it says little on its own."},{"id":"D","label":"The communication was made to further the scheme","observable_from":"not-observable","required":true,"strength":"direct","signals":[]}],"does_not_prove":"Shown for comparison only. The elements that give this definition its meaning (the scheme and the intent) are not observable from any page, so Daylight Commons never presents it as met. Reliance and harm elements belong to other fraud definitions, such as common-law fraud, which this catalogue does not hold yet. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.","related":["uk-fraud-act-2006-s2","us-ftc-act-s5-deception"]},
-  {"id":"x-authenticity-engagement-spam","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"X's Authenticity policy: engagement spam and account metric inflation","jurisdiction":{"code":"platform:x","name":"X's own rules (applies on X wherever the user is)"},"instrument":"X Help Center, Authenticity (formerly the platform manipulation and spam policy)","section":"Inauthentic Behaviors: Engagement Spam; Inauthentic Accounts: Fake personas","kind":"platform-policy","binding_note":"X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.","in_force":{"status":"published","since":null,"note":"The page is headed \"April 2025\". Recorded as read on 2026-10-22."},"sources":[{"url":"https://help.x.com/en/rules-and-policies/authenticity","retrieved_url":"https://help.x.com/en/rules-and-policies/authenticity","retrieved_at":"2026-10-22","sha256":"075e496e31a9ff197727f23d0d9efe007edaab31695a4482190734cf58a90f22","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"X Corp., X Help Center","note":"help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 260,886 bytes. The older address help.x.com/en/rules-and-policies/platform-manipulation redirects here."}],"quotes":[{"source":0,"locator":"Inauthentic Behaviors, Engagement Spam","text":"Engagement Spam: We prohibit inauthentic use of [X] engagement features to artificially impact traffic or disrupt people’s experience."},{"source":0,"locator":"Engagement Spam, Not Allowed, third item","text":"coordinating with and/or compensating others to conduct account metric inflation in any [X] features, including Likes, Polls, Replies, Reposts, Lists, Views, or Follows;"},{"source":0,"locator":"Inauthentic Accounts, Fake personas","text":"Fake personas: You may not use manufactured identities to engage in disruptive or deceptive behavior. This may include using stock, stolen or AI-generated profile photos, copied or stolen profile bios, and/or misleading profile information for the purpose of deceiving others."}],"elements":[{"id":"A","label":"Account metrics (likes, replies, reposts, views, follows) on the post are inflated","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"],"min_families":2,"note":"Page signals are consistent with inflation. Two independent signal families are needed before this element is shown as matched."},{"id":"B","label":"Accounts with copied or templated profile bios take part","observable_from":"page","required":false,"strength":"indicative","signals":["bio-template","stock-persona"],"note":"The policy names copied bios as one possible sign of a fake persona, for the purpose of deceiving others. Daylight Commons never uses avatars, names, languages or places."},{"id":"C","label":"Someone coordinated with or compensated others to conduct the inflation","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Who arranged the engagement, and whether anyone was paid, is not on the page."}],"does_not_prove":"Templated bios and bursts of reposts also come from real communities and from vendors acting without the poster's knowledge. A platform policy is the platform's own rule, not law. A match on visible elements is a comparison with the published policy text; only X decides whether its policy was broken, and the policy can change after the retrieval date.","related":["us-ftc-fake-social-media-indicators","eu-ucpd-annex1-23c-false-reviews-endorsements"]},
-  {"id":"x-paid-partnerships","version":"1.0.0","status":"active","verification":"verified","role":"match","title":"X's Paid Partnerships policy: undisclosed paid partnership","jurisdiction":{"code":"platform:x","name":"X's own rules (applies on X wherever the user is)"},"instrument":"X Help Center, Paid Partnerships Policy","section":"What are Paid Partnerships?; Rules for Paid Partnerships","kind":"platform-policy","binding_note":"X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.","in_force":{"status":"published","since":null,"note":"The page carries no date. Recorded as read on 2026-10-22."},"sources":[{"url":"https://help.x.com/en/rules-and-policies/paid-partnerships-policy","retrieved_url":"https://help.x.com/en/rules-and-policies/paid-partnerships-policy","retrieved_at":"2026-10-22","sha256":"06403ae56a3966a359c4c494aba9b4125958a65dcb873b34995809f636cf92ac","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"X Corp., X Help Center","note":"help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 233,829 bytes. The page shows no revision date."}],"quotes":[{"source":0,"locator":"What are Paid Partnerships?","text":"[X] defines paid partnerships as the involvement of a third-party brand providing compensation or incentives to a user, such as an influencer or content creator, to promote their product or service."},{"source":0,"locator":"Rules for Paid Partnerships, second rule","text":"Posts that are part of a Paid Partnership published as an organic Post must have the “Paid Partnership” disclosure on."}],"elements":[{"id":"A","label":"The post is part of a paid partnership: a brand gave the poster compensation or incentives to promote its product","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts, by the poster's own disclosure. For unlabelled posts a partnership is not visible."},{"id":"B","label":"It was published as an organic post","observable_from":"page","required":true,"strength":"direct","signals":["online-post"]},{"id":"C","label":"The \"Paid Partnership\" disclosure is not on","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"Daylight Commons sees unlabelled posts that share a template with labelled ones. That is consistent with a missing disclosure, and it is also what fans copying a paid post look like."}],"does_not_prove":"A platform policy is the platform's own rule, not law. A match on visible elements is a comparison with the published policy text; only X decides whether its policy was broken, and the policy can change after the retrieval date.","related":["us-ftc-endorsement-material-connection","eu-dsa-art26-advertising"]},
+  {"id":"eu-dsa-art26-advertising","version":"1.0.1","status":"active","verification":"verified","role":"context","title":"Advertising transparency on online platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 26(1) and 26(2)","kind":"regulation","binding_note":"A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. Daylight Commons shows them as context. They tell the reader where the platform must show a disclosure or an ad record.","in_force":{"status":"in force","since":"2024-02-17","note":"Article 93(2): the Regulation applies from 17 February 2024. A listed set of provisions applied from 16 November 2022. Article 26 applies from 17 February 2024."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 26(1)(a) to (c)","text":"Providers of online platforms that present advertisements on their online interfaces shall ensure that, for each specific advertisement presented to each individual recipient, the recipients of the service are able to identify, in a clear, concise and unambiguous manner and in real time, the following: (a) that the information is an advertisement, including through prominent markings, which might follow standards pursuant to Article 44; (b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement if that person is different from the natural or legal person referred to in point (b);"},{"source":0,"locator":"Article 26(2), first subparagraph","text":"Providers of online platforms shall provide recipients of the service with a functionality to declare whether the content they provide is or contains commercial communications."}],"elements":[{"id":"A","label":"The platform offers a way to declare commercial content, and some posts carry that declaration","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"]},{"id":"B","label":"Posts that look commercial carry no such declaration","observable_from":"page","required":false,"strength":"indicative","signals":["undisclosed-lookalike"]}],"does_not_prove":"Context: Article 26 sets duties for the platform, and the post shows where to look for its ad declaration. A match compares visible elements with the published text. Courts and consumer authorities decide whether the duty was met.","related":["eu-dsa-art39-ad-repository","x-paid-partnerships"]},
+  {"id":"eu-dsa-art39-ad-repository","version":"1.0.1","status":"active","verification":"verified","role":"context","title":"Advertisement repositories of very large platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 39(1) and 39(2)","kind":"regulation","binding_note":"A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. Daylight Commons shows them as context. They tell the reader where the platform must show a disclosure or an ad record.","in_force":{"status":"in force","since":null,"note":"Article 93(2) sets general application from 17 February 2024. Article 33(6): obligations in the very-large-platform section apply four months after the provider is notified of its designation. Each platform's date follows its own designation, which sits outside this entry."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 39(1), first sentence","text":"Providers of very large online platforms or of very large online search engines that present advertisements on their online interfaces shall compile and make publicly available in a specific section of their online interface, through a searchable and reliable tool that allows multicriteria queries and through application programming interfaces, a repository containing the information referred to in paragraph 2, for the entire period during which they present an advertisement and until one year after the advertisement was presented for the last time on their online interfaces."},{"source":0,"locator":"Article 39(2)(b), (c) and (f)","text":"(b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement, if that person is different from the person referred to in point (b); (f) the commercial communications published on the very large online platforms and identified pursuant to Article 26(2);"}],"elements":[{"id":"A","label":"An ad repository exists where the advertiser and payer of an ad can be looked up","observable_from":"public-record","required":true,"strength":"direct","signals":["ad-library-link"],"note":"Daylight Commons builds a search link to the repository. The user opens it and reads the results."}],"does_not_prove":"Context: the repository lists the ads a very large platform recorded. A search shows those records, and organic posts sit outside them. A match compares visible elements with the published text. Courts and consumer authorities decide whether the duty was met.","related":["eu-dsa-art26-advertising"]},
+  {"id":"eu-ucpd-annex1-11-advertorial","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Paid editorial content not made clear (advertorial)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026","section":"Annex I, point 11","kind":"directive","binding_note":"A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader.","in_force":{"status":"in force","since":null,"note":"Original Annex I point, in the 2005 text and unchanged in the consolidated version of 27.09.2026."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"}],"quotes":[{"source":0,"locator":"Annex I, point 11 (footnote reference omitted)","text":"Using editorial content in the media to promote a product where a trader has paid for the promotion without making that clear in the content or by images or sounds clearly identifiable by the consumer (advertorial)."}],"elements":[{"id":"A","label":"Content presented as editorial or ordinary content is used to promote a product","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","promo-cue","undisclosed-lookalike"],"note":"Whether a social media post counts as \"editorial content in the media\" is a legal question for courts."},{"id":"B","label":"A trader paid for the promotion","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts, where the poster disclosed the payment. Payment for unlabelled posts sits in records off the page."},{"id":"C","label":"The payment is not made clear in the content or by images or sounds the consumer can clearly identify","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"Daylight Commons checks for the platform's own paid label. A disclosure can also take other forms."}],"does_not_prove":"For unlabelled posts, elements B and C rest on look-alike evidence. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.","related":["uk-dmcc-sch20-12-advertorial","us-ftc-endorsement-material-connection","eu-dsa-art26-advertising"]},
+  {"id":"eu-ucpd-annex1-22-posing-as-consumer","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Falsely representing oneself as a consumer","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026","section":"Annex I, point 22","kind":"directive","binding_note":"A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader.","in_force":{"status":"in force","since":null,"note":"Original Annex I point, in the 2005 text and unchanged in the consolidated version of 27.09.2026."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"}],"quotes":[{"source":0,"locator":"Annex I, point 22","text":"Falsely claiming or creating the impression that the trader is not acting for purposes relating to his trade, business, craft or profession, or falsely representing oneself as a consumer."}],"elements":[{"id":"A","label":"Posts present the speaker as an ordinary consumer giving their own view","observable_from":"page","required":true,"strength":"direct","signals":["undisclosed-lookalike","promo-cue"]},{"id":"B","label":"The speaker is in fact a trader, or acts in the name of or on behalf of one","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"For unlabelled posts, contracts or agency records show this element."},{"id":"C","label":"The impression is false","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Falsity depends on element B and on how the impression was created."}],"does_not_prove":"A fan-style post that shares a template with paid posts is look-alike evidence of payment. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.","related":["uk-dmcc-sch20-25-posing-as-consumer","eu-ucpd-annex1-11-advertorial"]},
+  {"id":"eu-ucpd-annex1-23c-false-reviews-endorsements","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"False consumer reviews or endorsements, or misrepresented social endorsements","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC as amended by Directive (EU) 2019/2161 (the Omnibus Directive), consolidated text of 27.09.2026","section":"Annex I, point 23c","kind":"directive","binding_note":"A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader. Recital 49 of Directive 2019/2161 gives 'likes' on social media as an example of an endorsement.","in_force":{"status":"in force","since":"2022-05-28","note":"Inserted by Article 3 of Directive (EU) 2019/2161. Article 7 of that Directive: Member States \"shall apply those measures from 28 May 2022\"."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"},{"url":"https://eur-lex.europa.eu/eli/dir/2019/2161/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32019L2161","retrieved_at":"2026-10-22","sha256":"4f2987a941a32c9fae499098554b206e93b26365fea60353e2f886084174b1ac","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","text_sha256":"90f61e53584b248a1e560458561a916da4aa68be17c69a25de69313df2b64570"}],"quotes":[{"source":0,"locator":"Annex I, point 23c","text":"Submitting or commissioning another legal or natural person to submit false consumer reviews or endorsements, or misrepresenting consumer reviews or social endorsements, in order to promote products."},{"source":1,"locator":"Directive (EU) 2019/2161, recital 49, first sentence","text":"Traders should also be prohibited from submitting fake consumer reviews and endorsements, such as ‘likes’ on social media, or commissioning others to do so in order to promote their products, as well as from manipulating consumer reviews and endorsements, such as publishing only positive reviews and deleting the negative ones."}],"elements":[{"id":"A","label":"Consumer reviews or social endorsements are involved (likes, reposts, quote posts)","observable_from":"page","required":true,"strength":"direct","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch","undisclosed-lookalike"]},{"id":"B","label":"They are false, or are misrepresented","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch","undisclosed-lookalike"],"min_families":2,"note":"Page signals are consistent with false endorsements. They describe the sample as a whole."},{"id":"C","label":"A trader submitted them or commissioned another person to submit them","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"Records off the page show who commissioned the engagement."},{"id":"D","label":"In order to promote products","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion"]}],"does_not_prove":"Bought-looking engagement can come from the trader, from rivals or from vendors acting on their own. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.","related":["us-ftc-fake-social-media-indicators","uk-dmcc-sch20-13-fake-reviews","x-authenticity-engagement-spam"]},
+  {"id":"uk-dmcc-sch20-12-advertorial","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Paid editorial content not made clear (advertorial)","jurisdiction":{"code":"UK","name":"United Kingdom"},"instrument":"Digital Markets, Competition and Consumers Act 2024","section":"Schedule 20, paragraph 12","kind":"statute","binding_note":"Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders.","in_force":{"status":"in force","since":"2025-04-06","note":"The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20","retrieved_url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml","retrieved_at":"2026-10-22","sha256":"5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.","text_sha256":"c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"},{"url":"https://www.legislation.gov.uk/uksi/2025/272/made","retrieved_url":"https://www.legislation.gov.uk/uksi/2025/272/made/data.xml","retrieved_at":"2026-10-22","sha256":"8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk","text_sha256":"e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"}],"quotes":[{"source":0,"locator":"Schedule 20, paragraph 12","text":"Using editorial content in the media to promote a product where a trader has paid for the promotion without making that clear in the content or by images or sounds clearly identifiable by the consumer."},{"source":1,"locator":"SI 2025/272, regulation 2(3)","text":"Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."}],"elements":[{"id":"A","label":"Content presented as editorial or ordinary content is used to promote a product","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","promo-cue","undisclosed-lookalike"],"note":"Whether a social media post counts as \"editorial content in the media\" is a legal question for courts."},{"id":"B","label":"A trader paid for the promotion","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts."},{"id":"C","label":"The payment is not made clear in the content or by images or sounds the consumer can clearly identify","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"]}],"does_not_prove":"For unlabelled posts, payment rests on look-alike evidence. A match compares visible elements with the published text. Courts, the CMA and trading standards services decide whether the rule was broken.","related":["eu-ucpd-annex1-11-advertorial","us-ftc-endorsement-material-connection"]},
+  {"id":"uk-dmcc-sch20-13-fake-reviews","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Fake or concealed-incentive consumer reviews","jurisdiction":{"code":"UK","name":"United Kingdom"},"instrument":"Digital Markets, Competition and Consumers Act 2024","section":"Schedule 20, paragraph 13 (banned practice), with the definitions in paragraph 13(5)","kind":"statute","binding_note":"Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders. Whether a repost, like or quote post is a \"consumer review\" under paragraph 13(5)(a) is a legal question; the definition covers \"a review of a product, a trader or any other matter relevant to a transactional decision\".","in_force":{"status":"in force","since":"2025-04-06","note":"The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20","retrieved_url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml","retrieved_at":"2026-10-22","sha256":"5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.","text_sha256":"c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"},{"url":"https://www.legislation.gov.uk/uksi/2025/272/made","retrieved_url":"https://www.legislation.gov.uk/uksi/2025/272/made/data.xml","retrieved_at":"2026-10-22","sha256":"8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk","text_sha256":"e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"}],"quotes":[{"source":0,"locator":"Schedule 20, paragraph 13(1)","text":"(1) Submitting, or commissioning another person to submit or write— (a) a fake consumer review, or (b) a consumer review that conceals the fact it has been incentivised."},{"source":0,"locator":"Schedule 20, paragraph 13(5)(a) to (c)","text":"(a) “consumer review” means a review of a product, a trader or any other matter relevant to a transactional decision; (b) “fake consumer review” means a consumer review that purports to be, but is not, based on a person’s genuine experience; (c) a consumer review conceals the fact it has been incentivised if— (i) a person has been commissioned to submit or write the review, and (ii) that fact is not made apparent (whether through the contents of the review or otherwise);"},{"source":1,"locator":"SI 2025/272, regulation 2(3)","text":"Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."}],"elements":[{"id":"A","label":"A consumer review: a review of a product or trader relevant to a buying decision (here, quote posts praising a launch)","observable_from":"page","required":true,"strength":"direct","signals":["promo-cue","undisclosed-lookalike","disclosed-paid"],"note":"Treating a quote post as a consumer review is this entry's reading of paragraph 13."},{"id":"B","label":"The review purports to be, but is not, based on genuine experience; or it was commissioned and that fact is not made apparent","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"A missing label next to labelled look-alikes is consistent with a concealed incentive. Contracts and payments show who was commissioned."},{"id":"C","label":"The trader submitted it or commissioned another person to submit or write it","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"Contracts, briefs or payments show commissioning."}],"does_not_prove":"Look-alike posts can also be fans copying a paid post. A match compares visible elements with the published text. Courts, the CMA and trading standards services decide whether the rule was broken.","related":["eu-ucpd-annex1-23c-false-reviews-endorsements","us-ftc-fake-social-media-indicators","us-ftc-endorsement-material-connection"]},
+  {"id":"uk-dmcc-sch20-25-posing-as-consumer","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Falsely representing oneself as a consumer","jurisdiction":{"code":"UK","name":"United Kingdom"},"instrument":"Digital Markets, Competition and Consumers Act 2024","section":"Schedule 20, paragraph 25","kind":"statute","binding_note":"Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders.","in_force":{"status":"in force","since":"2025-04-06","note":"The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20","retrieved_url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml","retrieved_at":"2026-10-22","sha256":"5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.","text_sha256":"c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"},{"url":"https://www.legislation.gov.uk/uksi/2025/272/made","retrieved_url":"https://www.legislation.gov.uk/uksi/2025/272/made/data.xml","retrieved_at":"2026-10-22","sha256":"8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk","text_sha256":"e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"}],"quotes":[{"source":0,"locator":"Schedule 20, paragraph 25","text":"Falsely claiming or creating the false impression that the trader is not acting for purposes relating to the trader’s business or falsely representing oneself as a consumer."},{"source":1,"locator":"SI 2025/272, regulation 2(3)","text":"Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."}],"elements":[{"id":"A","label":"Posts present the speaker as an ordinary consumer giving their own view","observable_from":"page","required":true,"strength":"direct","signals":["undisclosed-lookalike","promo-cue"]},{"id":"B","label":"The speaker is in fact a trader, or acts for one","observable_from":"public-record","required":true,"strength":"direct","signals":[]},{"id":"C","label":"The impression is false","observable_from":"not-observable","required":true,"strength":"direct","signals":[]}],"does_not_prove":"A fan-style post that shares a template with paid posts is look-alike evidence of payment. A match compares visible elements with the published text. Courts, the CMA and trading standards services decide whether the rule was broken.","related":["eu-ucpd-annex1-22-posing-as-consumer"]},
+  {"id":"uk-fraud-act-2006-s2","version":"1.0.1","status":"active","verification":"verified","role":"comparison","title":"Fraud by false representation (for comparison)","jurisdiction":{"code":"UK-EW-NI","name":"England and Wales, and Northern Ireland"},"instrument":"Fraud Act 2006","section":"Section 2(1) and 2(2)","kind":"statute","binding_note":"A criminal provision, and courts decide whether it applies. The extent recorded on legislation.gov.uk is England and Wales, and Northern Ireland.","in_force":{"status":"in force","since":"2007-01-15","note":"Start date as recorded in the legislation.gov.uk XML for section 2."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2006/35/section/2","retrieved_url":"https://www.legislation.gov.uk/ukpga/2006/35/section/2/data.xml","retrieved_at":"2026-10-22","sha256":"8158f865b2b975a0a84a907b74abb3686d57145d1b9f19c4186ad6853c0c7aaf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"The XML gives section 2 an extent of England and Wales and Northern Ireland, from 2007-01-15.","text_sha256":"60421b98c1cbe52a652ce2db9f744fb758ef4e035aaa7accd77e8a1a41d2c158"}],"quotes":[{"source":0,"locator":"Section 2(1)","text":"(1) A person is in breach of this section if he— (a) dishonestly makes a false representation, and (b) intends, by making the representation— (i) to make a gain for himself or another, or (ii) to cause loss to another or to expose another to a risk of loss."},{"source":0,"locator":"Section 2(2)","text":"(2) A representation is false if— (a) it is untrue or misleading, and (b) the person making it knows that it is, or might be, untrue or misleading."}],"elements":[{"id":"A","label":"A representation is made (express or implied)","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","undisclosed-lookalike","disclosed-paid"]},{"id":"B","label":"The representation is untrue or misleading","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Whether the engagement or the posts misled anyone is a finding about facts behind the page."},{"id":"C","label":"The person making it knows it is, or might be, untrue or misleading","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"D","label":"Made dishonestly","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"E","label":"With intent to make a gain, or to cause loss or risk of loss","observable_from":"not-observable","required":true,"strength":"direct","signals":[]}],"does_not_prove":"Shown for comparison. Four of the five elements concern falsity, knowledge, dishonesty and intent. Those sit behind the page, so the table keeps this definition as a comparison. The section turns on intent, and reliance and loss sit outside its elements. Courts decide whether it applies.","related":["us-wire-fraud-18usc1343","uk-dmcc-sch20-13-fake-reviews"]},
+  {"id":"us-ftc-act-s5-deception","version":"1.0.1","status":"active","verification":"verified","role":"comparison","title":"Deceptive acts or practices (general standard)","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"Federal Trade Commission Act section 5, 15 U.S.C. 45, read with the FTC Policy Statement on Deception (October 14, 1983)","section":"15 U.S.C. 45(a)(1); Policy Statement on Deception, part I (Summary)","kind":"statute","binding_note":"The statute sets the standard. The Policy Statement is the Commission's own account of the elements it applies; courts have their own formulations.","in_force":{"status":"in force","since":null,"note":"United States Code, 2024 edition, as published on govinfo."},"sources":[{"url":"https://www.govinfo.gov/link/uscode/15/45","retrieved_url":"https://www.govinfo.gov/content/pkg/USCODE-2024-title15/html/USCODE-2024-title15-chap2-subchapI-sec45.htm","retrieved_at":"2026-10-22","sha256":"28de76e074dde70c74930d24738fda83a837c04bba6304c148051d1600679546","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"US Government Publishing Office, govinfo (United States Code, 2024 edition)","text_sha256":"6d18041cecfb47e3f97602089881ca7729f09bf9486f205a52875c4466b8df25"},{"url":"https://www.ftc.gov/legal-library/browse/ftc-policy-statement-deception","retrieved_url":"https://www.ftc.gov/system/files/documents/public_statements/410531/831014deceptionstmt.pdf","retrieved_at":"2026-10-22","sha256":"b39a62b96f46f66681f5081242215fe741b2dcb72f26b4b1fbc159a899a5d26f","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"Federal Trade Commission","note":"ftc.gov answered scripted requests with a 404 page, so the PDF was read in a browser and hashed there (79,535 bytes). Text extracted with pdf.js; line breaks normalised."}],"quotes":[{"source":0,"locator":"15 U.S.C. 45(a)(1)","text":"Unfair methods of competition in or affecting commerce, and unfair or deceptive acts or practices in or affecting commerce, are hereby declared unlawful."},{"source":1,"locator":"Policy Statement on Deception, I. Summary, closing sentence","text":"Thus, the Commission will find deception if there is a representation, omission or practice that is likely to mislead the consumer acting reasonably in the circumstances, to the consumer's detriment."},{"source":1,"locator":"Policy Statement on Deception, I. Summary, third element","text":"Third, the representation, omission, or practice must be a \"material\" one. The basic question is whether the act or practice is likely to affect the consumer's conduct or decision with regard to a product or service."}],"elements":[{"id":"A","label":"A representation, omission or practice","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","undisclosed-lookalike","disclosed-paid"]},{"id":"B","label":"Likely to mislead a consumer acting reasonably in the circumstances","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"This is judged from the reasonable consumer's point of view, a question for the Commission and courts."},{"id":"C","label":"Material: likely to affect the consumer's conduct or decision about a product or service","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"D","label":"In or affecting commerce","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","actor-organisation"]}],"does_not_prove":"Section 5 is the general standard behind the more specific entries. Its two central elements, likely to mislead and material, are judgements for the Commission and courts. A match compares visible elements with the published text.","related":["us-ftc-endorsement-material-connection","us-ftc-fake-social-media-indicators"]},
+  {"id":"us-ftc-endorsement-material-connection","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Undisclosed material connection in an endorsement","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"FTC Guides Concerning Use of Endorsements and Testimonials in Advertising, 16 CFR Part 255","section":"16 CFR 255.5(a), with the definition in 255.0(b)","kind":"agency-guides","binding_note":"The Guides are the FTC's administrative interpretation of section 5 of the FTC Act (16 CFR 255.0(a)). They guide how the Commission applies section 5 and sit under it.","in_force":{"status":"in force","since":"2023-07-26","note":"Current text from 88 FR 48102, July 26, 2023, per the eCFR source note. The date is the Federal Register publication date, and the effective date is still to be checked."},"sources":[{"url":"https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255","retrieved_url":"https://www.ecfr.gov/api/versioner/v1/full/2026-10-19/title-16.xml?part=255","retrieved_at":"2026-10-22","sha256":"feb1c8cfee82158c16c4210ef320bc93ffb2f414aa2bdce6e6772a77064180ea","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Office of the Federal Register and GPO, eCFR","note":"eCFR point-in-time XML for 2026-10-19, the latest issue date eCFR listed for Title 16 on the retrieval date. eCFR is an editorial compilation; the official annual edition is on govinfo.","text_sha256":"bf8ee515e45bdc40dd4269b73ec61e3790c762688a197eb9537d891225663b07"}],"quotes":[{"source":0,"locator":"16 CFR 255.5(a), first two sentences and the significant-minority sentence","text":"When there exists a connection between the endorser and the seller of the advertised product that might materially affect the weight or credibility of the endorsement, and that connection is not reasonably expected by the audience, such connection must be disclosed clearly and conspicuously. Material connections can include a business, family, or personal relationship. … A material connection needs to be disclosed when a significant minority of the audience for an endorsement does not understand or expect the connection."},{"source":0,"locator":"16 CFR 255.0(b), first sentence","text":"For purposes of this part, an “endorsement” means any advertising, marketing, or promotional message for a product that consumers are likely to believe reflects the opinions, beliefs, findings, or experiences of a party other than the sponsoring advertiser, even if the views expressed by that party are identical to those of the sponsoring advertiser."}],"elements":[{"id":"A","label":"An endorsement: a promotional message for a product that readers are likely to take as a third party's own view","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid","undisclosed-lookalike","promo-cue"]},{"id":"B","label":"A connection between the endorser and the seller","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"The Paid partnership label shows a connection for the labelled posts. For unlabelled look-alikes the connection is an inference from shared template and timing. Contracts and agency rosters in the public record would show it."},{"id":"C","label":"The connection might materially affect the weight or credibility of the endorsement","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Materiality turns on how the audience weighs the message, a question about readers."},{"id":"D","label":"The connection is not reasonably expected by the audience","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Audience expectation is a question about readers, answered with evidence from outside the page."},{"id":"E","label":"The connection is not disclosed clearly and conspicuously","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"Daylight Commons sees whether a quote carries the Paid partnership label. A disclosure can also sit in an image or a linked page."}],"does_not_prove":"Daylight Commons sees labels and look-alike posts. Contracts, payments and audience expectation sit off the page. A match compares visible elements with the published text. Courts and the Commission decide whether the rule was broken.","related":["us-ftc-act-s5-deception","x-paid-partnerships","eu-ucpd-annex1-11-advertorial","uk-dmcc-sch20-12-advertorial"]},
+  {"id":"us-ftc-fake-social-media-indicators","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Misuse of fake indicators of social media influence","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"FTC Trade Regulation Rule on the Use of Consumer Reviews and Testimonials, 16 CFR Part 465","section":"16 CFR 465.8(b), with definitions in 465.1(h) and 465.1(j)","kind":"regulation","binding_note":"A trade regulation rule issued under 15 U.S.C. 57a. In the eCFR text retrieved, section 465.8 is headed \"Misuse of fake indicators of social media influence\".","in_force":{"status":"in force","since":null,"note":"Source: 89 FR 68077, Aug. 22, 2024, per the eCFR source note. The retrieved text leaves the effective date out, so it is still to be checked."},"sources":[{"url":"https://www.ecfr.gov/current/title-16/chapter-I/subchapter-D/part-465","retrieved_url":"https://www.ecfr.gov/api/versioner/v1/full/2026-10-19/title-16.xml?part=465","retrieved_at":"2026-10-22","sha256":"0ed274f696f88713e0a1560408acb9b9c611b90959fb686b2afe547df568d6c4","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Office of the Federal Register and GPO, eCFR","note":"eCFR point-in-time XML for 2026-10-19.","text_sha256":"8a17e77e242835bf309049b0286f8d76d01dc38747b0b8aca39d3f994b247e30"}],"quotes":[{"source":0,"locator":"16 CFR 465.8","text":"It is an unfair or deceptive act or practice and a violation of this part for anyone to: (a) Sell or distribute fake indicators of social media influence that they knew or should have known to be fake and that can be used by individuals or businesses to materially misrepresent their influence or importance for a commercial purpose; or (b) Purchase or procure fake indicators of social media influence that they knew or should have known to be fake and that materially misrepresent their influence or importance for a commercial purpose."},{"source":0,"locator":"16 CFR 465.1(h)","text":"Fake indicators of social media influence means indicators of social media influence generated by bots, purported individual accounts not associated with a real individual, accounts created with a real individual's personal information without their consent, or hijacked accounts, or that otherwise do not reflect a real individual's or entity's activities, opinions, findings, or experiences."},{"source":0,"locator":"16 CFR 465.1(j)","text":"Indicators of social media influence means any metrics used by the public to make assessments of an individual's or entity's social media influence, such as followers, friends, connections, subscribers, views, plays, likes, saves, shares, reposts, and comments."}],"elements":[{"id":"A","label":"The conduct concerns indicators of social media influence (reposts, likes, followers, comments)","observable_from":"page","required":true,"strength":"direct","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"]},{"id":"B","label":"Those indicators are fake: they do not reflect real people's or entities' activities or opinions","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"],"min_families":2,"note":"Page signals are consistent with fake indicators. They describe the sample as a whole. Two independent signal families are needed before this element is shown as matched."},{"id":"C","label":"The party purchased or procured them","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"A purchase shows in records such as vendor invoices or enforcement filings."},{"id":"D","label":"The party knew or should have known they were fake","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"E","label":"They materially misrepresent the party's influence or importance","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Materiality is a judgement about how the public reads the numbers."},{"id":"F","label":"For a commercial purpose","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","actor-organisation"]}],"does_not_prove":"Engagement that looks bought can come from the account owner, rivals, fans or vendors acting on their own. A match compares visible elements with the published text. Courts and the Commission decide whether the rule was broken.","related":["eu-ucpd-annex1-23c-false-reviews-endorsements","uk-dmcc-sch20-13-fake-reviews","x-authenticity-engagement-spam"]},
+  {"id":"us-wire-fraud-18usc1343","version":"1.0.1","status":"active","verification":"verified","role":"comparison","title":"Fraud by wire, radio, or television (for comparison)","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"18 U.S.C. 1343, with the elements as summarised in the DOJ Criminal Resource Manual 941 (archived)","section":"18 U.S.C. 1343","kind":"statute","binding_note":"A criminal statute, and courts decide whether it applies. The circuits state the elements in different words; the DOJ page lists several formulations.","in_force":{"status":"in force","since":null,"note":"United States Code, 2024 edition, as published on govinfo."},"sources":[{"url":"https://www.govinfo.gov/link/uscode/18/1343","retrieved_url":"https://www.govinfo.gov/content/pkg/USCODE-2024-title18/html/USCODE-2024-title18-partI-chap63-sec1343.htm","retrieved_at":"2026-10-22","sha256":"1a43985c3f9ca2e28680336d3889d8801a87db2afa7bf16231fde4c0fdfb1594","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"US Government Publishing Office, govinfo (United States Code, 2024 edition)","text_sha256":"d9243b2adbea08b7838d4ad1d13b99f523741cf930ae8539a98a729ad45d6785"},{"url":"https://www.justice.gov/archives/jm/criminal-resource-manual-941-18-usc-1343-elements-wire-fraud","retrieved_url":"https://www.justice.gov/archives/jm/criminal-resource-manual-941-18-usc-1343-elements-wire-fraud","retrieved_at":"2026-10-22","sha256":"08b307acc432d022471e05252e68bd66ccc2b464364a8920b898bf09fc9cd769","hash_method":"rendered-text","retrieved_with":"browser","publisher":"US Department of Justice (archived Criminal Resource Manual)","note":"Scripted fetches got a changing 2.7 KB challenge page, so the hash is SHA-256 over the UTF-8 text of the rendered <main> element (2,585 bytes). The page is marked archived and may be outdated."}],"quotes":[{"source":0,"locator":"18 U.S.C. 1343, first sentence (penalty clause omitted)","text":"Whoever, having devised or intending to devise any scheme or artifice to defraud, or for obtaining money or property by means of false or fraudulent pretenses, representations, or promises, transmits or causes to be transmitted by means of wire, radio, or television communication in interstate or foreign commerce, any writings, signs, signals, pictures, or sounds for the purpose of executing such scheme or artifice,"},{"source":1,"locator":"CRM 941, quoting United States v. Maxwell, 920 F.2d 1028, 1035 (D.C. Cir. 1990)","text":"Wire fraud requires proof of (1) a scheme to defraud; and (2) the use of an interstate wire communication to further the scheme."}],"elements":[{"id":"A","label":"A scheme or artifice to defraud, or to obtain money or property by false pretenses","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"A scheme is a plan. Visible posts can be part of one, and the plan itself sits behind the page."},{"id":"B","label":"Intent to defraud","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"C","label":"Use of an interstate wire communication (an online post is a communication sent by wire)","observable_from":"page","required":true,"strength":"direct","signals":["online-post"],"note":"Almost any online conduct shows this element, so it carries little weight alone."},{"id":"D","label":"The communication was made to further the scheme","observable_from":"not-observable","required":true,"strength":"direct","signals":[]}],"does_not_prove":"Shown for comparison. The elements that give this definition its meaning, the scheme and the intent, sit behind the page, so the table keeps it as a comparison. Courts decide whether it applies.","related":["uk-fraud-act-2006-s2","us-ftc-act-s5-deception"]},
+  {"id":"x-authenticity-engagement-spam","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"X's Authenticity policy: engagement spam and account metric inflation","jurisdiction":{"code":"platform:x","name":"X's own rules (applies on X wherever the user is)"},"instrument":"X Help Center, Authenticity (formerly the platform manipulation and spam policy)","section":"Inauthentic Behaviors: Engagement Spam; Inauthentic Accounts: Fake personas","kind":"platform-policy","binding_note":"X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.","in_force":{"status":"published","since":null,"note":"The page is headed \"April 2025\". Recorded as read on 2026-10-22."},"sources":[{"url":"https://help.x.com/en/rules-and-policies/authenticity","retrieved_url":"https://help.x.com/en/rules-and-policies/authenticity","retrieved_at":"2026-10-22","sha256":"075e496e31a9ff197727f23d0d9efe007edaab31695a4482190734cf58a90f22","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"X Corp., X Help Center","note":"help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 260,886 bytes. The older address help.x.com/en/rules-and-policies/platform-manipulation redirects here."}],"quotes":[{"source":0,"locator":"Inauthentic Behaviors, Engagement Spam","text":"Engagement Spam: We prohibit inauthentic use of [X] engagement features to artificially impact traffic or disrupt people’s experience."},{"source":0,"locator":"Engagement Spam, Not Allowed, third item","text":"coordinating with and/or compensating others to conduct account metric inflation in any [X] features, including Likes, Polls, Replies, Reposts, Lists, Views, or Follows;"},{"source":0,"locator":"Inauthentic Accounts, Fake personas","text":"Fake personas: You may not use manufactured identities to engage in disruptive or deceptive behavior. This may include using stock, stolen or AI-generated profile photos, copied or stolen profile bios, and/or misleading profile information for the purpose of deceiving others."}],"elements":[{"id":"A","label":"Account metrics (likes, replies, reposts, views, follows) on the post are inflated","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"],"min_families":2,"note":"Page signals are consistent with inflation. Two independent signal families are needed before this element is shown as matched."},{"id":"B","label":"Accounts with copied or templated profile bios take part","observable_from":"page","required":false,"strength":"indicative","signals":["bio-template","stock-persona"],"note":"The policy names copied bios as one possible sign of a fake persona, for the purpose of deceiving others. Daylight Commons reads bio templates, and avatars, names, languages and places stay out of it."},{"id":"C","label":"Someone coordinated with or compensated others to conduct the inflation","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Records off the page show who arranged the engagement and whether anyone was paid."}],"does_not_prove":"Templated bios and bursts of reposts also come from real communities and from vendors acting on their own. A platform policy is the platform's own rule. A match compares visible elements with the published policy text, and X decides whether its policy was broken.","related":["us-ftc-fake-social-media-indicators","eu-ucpd-annex1-23c-false-reviews-endorsements"]},
+  {"id":"x-paid-partnerships","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"X's Paid Partnerships policy: undisclosed paid partnership","jurisdiction":{"code":"platform:x","name":"X's own rules (applies on X wherever the user is)"},"instrument":"X Help Center, Paid Partnerships Policy","section":"What are Paid Partnerships?; Rules for Paid Partnerships","kind":"platform-policy","binding_note":"X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.","in_force":{"status":"published","since":null,"note":"The page is undated. Recorded as read on 2026-10-22."},"sources":[{"url":"https://help.x.com/en/rules-and-policies/paid-partnerships-policy","retrieved_url":"https://help.x.com/en/rules-and-policies/paid-partnerships-policy","retrieved_at":"2026-10-22","sha256":"06403ae56a3966a359c4c494aba9b4125958a65dcb873b34995809f636cf92ac","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"X Corp., X Help Center","note":"help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 233,829 bytes. The page shows no revision date."}],"quotes":[{"source":0,"locator":"What are Paid Partnerships?","text":"[X] defines paid partnerships as the involvement of a third-party brand providing compensation or incentives to a user, such as an influencer or content creator, to promote their product or service."},{"source":0,"locator":"Rules for Paid Partnerships, second rule","text":"Posts that are part of a Paid Partnership published as an organic Post must have the “Paid Partnership” disclosure on."}],"elements":[{"id":"A","label":"The post is part of a paid partnership: a brand gave the poster compensation or incentives to promote its product","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts, by the poster's own disclosure. A partnership behind an unlabelled post sits off the page."},{"id":"B","label":"It was published as an organic post","observable_from":"page","required":true,"strength":"direct","signals":["online-post"]},{"id":"C","label":"The \"Paid Partnership\" disclosure is not on","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"Daylight Commons sees unlabelled posts that share a template with labelled ones. That fits a missing disclosure, and it also fits fans copying a paid post."}],"does_not_prove":"A platform policy is the platform's own rule. A match compares visible elements with the published policy text, and X decides whether its policy was broken.","related":["us-ftc-endorsement-material-connection","eu-dsa-art26-advertising"]},
 ];
 
 return { SIGNAL_REGISTRY, CATALOGUE_ENTRIES };
@@ -9718,7 +10312,7 @@ function badgeLinks(signalId, entries, registry) {
 // One line for a badge's catalogue row, naming the entries and versions it cites.
 function badgeLine(b) {
   if (b.entries.length) return `Cited by ${b.entries.length} catalogue ${b.entries.length === 1 ? "entry" : "entries"}: ${b.entries.map((e) => e.ref).join(", ")}.`;
-  return b.registered ? `No catalogue entry cites this sign; it is listed in ${b.registry}.` : "This line is context and cites no catalogue entry.";
+  return b.registered ? `No catalogue entry cites this sign; it is listed in ${b.registry}.` : "This line is context, outside the catalogue.";
 }
 
 return { REPO_URL, DECISIONS_URL, SIGNALS_URL, TEMPLATES, DECISIONS_NOTE, entryUrl, entryRef, challengeUrl, findingUrl, entriesCiting, badgeLinks, badgeLine };
@@ -9737,7 +10331,7 @@ const M_definitions = (() => {
 // Pure: no DOM, no network. The caller passes the catalogue entries and the signal registry.
 
 const VERDICT_WORDS = /\b(?:committed|commits?|guilty|is (?:a )?fraud|fraudulent|violat\w*|illegal|unlawful|liable|liability|crimes?|criminal|convict\w*|breach\w*|offen[cs]es?)\b/i;
-const DEFINITION_FRAME = "This compares visible conduct with a published definition, element by element. It is not a finding by a court, a regulator or the platform.";
+const DEFINITION_FRAME = "This compares visible conduct with a published definition, element by element. Findings belong to courts, regulators and the platform.";
 const LEGAL_NOTE = "Not legal advice. A media lawyer should review this wording before any public release.";
 const CHALLENGE = "Challenge this entry or this badge at https://github.com/HarperZ9/daylight-commons/issues/new?template=challenge.yml. Every decision is published with its reasons, and corrections are dated.";
 const STATUSES = ["matched", "not-matched", "not-observable"];
@@ -9793,11 +10387,11 @@ function summarizeTable(entry, rows) {
   const lead = entry.role === "comparison" ? "For comparison: " : entry.role === "context" ? "Context: " : "";
   const parts = [matched.length
     ? `${lead}this conduct matches ${plural(matched, "element", "elements")} ${list(matched)} of ${citeOf(entry)}.`
-    : `${lead}no element of ${citeOf(entry)} matches what this page loaded.`];
-  if (indicative.length) parts.push(`${plural(indicative, "Element", "Elements")} ${list(indicative)} ${plural(indicative, "is", "are")} matched on indicative evidence only: the signals are consistent with ${plural(indicative, "it", "them")} and do not show ${plural(indicative, "it", "them")}.`);
-  if (unseen.length) parts.push(`${plural(unseen, "Element", "Elements")} ${list(unseen)} ${plural(unseen, "is", "are")} not observable from here.`);
-  for (const r of partial) parts.push(`Element ${r.id} has ${r.families} of the ${r.needed} independent signal families it needs, so it is not shown as matched.`);
-  if (missing.length) parts.push(`${plural(missing, "Element", "Elements")} ${list(missing)} ${plural(missing, "has", "have")} no evidence in what this page loaded.`);
+    : `${lead}zero elements of ${citeOf(entry)} match what this page loaded.`];
+  if (indicative.length) parts.push(`${plural(indicative, "Element", "Elements")} ${list(indicative)} ${plural(indicative, "is", "are")} matched on indicative evidence: signals consistent with ${plural(indicative, "it", "them")}.`);
+  if (unseen.length) parts.push(`${plural(unseen, "Element", "Elements")} ${list(unseen)} ${plural(unseen, "is", "are")} outside what this page can show.`);
+  for (const r of partial) parts.push(`Element ${r.id} has ${r.families} of the ${r.needed} independent signal families it needs, so it stays unmatched.`);
+  if (missing.length) parts.push(`${plural(missing, "Element", "Elements")} ${list(missing)} ${plural(missing, "lacks", "lack")} evidence in what this page loaded.`);
   parts.push(DEFINITION_FRAME);
   const s = parts.join(" ");
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -9831,7 +10425,7 @@ function applicableJurisdictions({ platform = null, actor = null, audience = nul
   const add = (code, why) => { if (code && !out.some((j) => j.code === code)) out.push({ code, why }); else if (code) out.find((j) => j.code === code).why += ` ${why}`; };
   if (platform) add(`platform:${platform}`, "The conduct is on this platform, under its own published rules.");
   if (actor) add(actor, "Where the actor is disclosed to be based.");
-  else notes.push("The actor's location is not public, so its jurisdiction is not shown.");
+  else notes.push("The actor's location is private, so its jurisdiction stays off this table.");
   if (audience) add(audience, "Where the audience is reached, shown as your own.");
   return { jurisdictions: out, notes };
 }
@@ -9912,6 +10506,9 @@ const DEFAULTS = Object.freeze({
   // Evidence lookups (src/core/evidence-fetch.js): off until the user reads what is sent to GitHub,
   // RDAP and the Internet Archive and clicks to allow it; even then each lookup is one click.
   evidence: false,
+  // The reading lens (src/core/reading.js): techniques under the held-out bar stay off unless the
+  // user turns them all on here.
+  lensAll: false,
 });
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
@@ -9935,6 +10532,7 @@ function normalizeSettings(raw) {
     outlets: switches(s.outlets, FEED_OUTLETS.map(([id]) => id)), customFeeds: feedList(s.customFeeds),
     imageText: bool(s.imageText, DEFAULTS.imageText),
     evidence: bool(s.evidence, DEFAULTS.evidence),
+    lensAll: bool(s.lensAll, DEFAULTS.lensAll),
   };
 }
 
@@ -10057,8 +10655,8 @@ const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.
 // { measured, text } for one family. A row without a sample size is not shown as a measurement.
 function measuredLine(id, table = MEASURED) {
   const f = BY_ID.get(id);
-  if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Daylight Commons detector" };
-  if (f && f.kind === F) return { measured: false, text: "what the file itself declares; Daylight Commons checks the signature, not the claim" };
+  if (f && f.kind === P) return { measured: false, text: "the site's own label, shown as the site gives it" };
+  if (f && f.kind === F) return { measured: false, text: "what the file itself declares, with its signature checked by Daylight Commons" };
   if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
   if (f && f.kind === TECH) { const st = techniqueStatus(id); return { measured: st.shown, text: st.text }; }
   const r = (table || {})[id];
@@ -10152,7 +10750,7 @@ function calibrationLine(store, family, min = CALIBRATION_MIN) {
   return c ? `Your feedback: ${c.right} of ${c.total} right` : null;
 }
 
-const FEEDBACK_ABOUT = "Your marks on Daylight Commons' signs, saved from this browser. This file is not sent anywhere by Daylight Commons. You choose whether to send it, for example as an attachment to an issue on Daylight Commons' repository. Post text appears only for marks where you ticked \"include the text\".";
+const FEEDBACK_ABOUT = "Your marks on Daylight Commons' signs, saved from this browser. It stays on your device until you send it, for example as an attachment to an issue on Daylight Commons' repository. Post text appears for marks where you ticked \"include the text\".";
 
 // The opt-in export: a JSON object the options page saves as a file when the user clicks.
 function buildExport(store, { version = null, now = Date.now() } = {}) {
@@ -10337,9 +10935,9 @@ const M_imagetext = (() => {
 const { score } = M_rhetoric;
 const { persuasion } = M_persuasion;
 
-const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Daylight Commons' own text recogniser. The image and its text never leave your browser.";
+const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Daylight Commons' own text recogniser. The image and its text stay in your browser.";
 const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in Daylight Commons' options to read the words inside an image on this device.";
-const IMAGE_TEXT_DOES_NOT_PROVE = "The words were read by software and can be misread: a letter can change a word, or a word can be missed. The image can be edited, and reading its text says nothing about whether a post shown in it was real.";
+const IMAGE_TEXT_DOES_NOT_PROVE = "Software read these words, so a letter can change a word or a word can drop out. The image itself can be edited, screenshots of posts included.";
 const MAX_SHOWN = 280;
 
 // The language model of the image's text, in the shape signals.js reads from a post.
@@ -10371,9 +10969,9 @@ function imageTextRows(result) {
 // becomes "image-text", so its measured line reads "not measured yet".
 function fromImage(signal, result) {
   const rows = signal.rows.map(([h, v]) => [h === "In this post" ? "Read from the image" : h, v]);
-  const at = rows.findIndex(([h]) => h === "Does not prove");
+  const at = rows.findIndex(([h]) => h === "What it shows");
   const extra = [["Confidence", `${percent(result && result.confidence)} for the image's text as a whole`]];
-  const dnp = ["Does not prove", IMAGE_TEXT_DOES_NOT_PROVE + (at >= 0 ? " " + rows[at][1] : "")];
+  const dnp = ["What it shows", IMAGE_TEXT_DOES_NOT_PROVE + (at >= 0 ? " " + rows[at][1] : "")];
   const body = at >= 0 ? rows.filter((_, i) => i !== at) : rows;
   return { ...signal, label: `in image: ${signal.label}`, fam: "image-text", of: signal.fam, level: "info", fromImage: true, rows: [...body, ...extra, dnp] };
 }
@@ -10384,7 +10982,7 @@ return { IMAGE_TEXT_NOTE, IMAGE_TEXT_OFF, IMAGE_TEXT_DOES_NOT_PROVE, imageTextMo
 // ---- api-words.js
 const M_api_words = (() => {
 // The words the radar-core API puts on evidence items: labels, what a sign shows, where it came
-// from and what it does not prove. They are the same words the extension's window uses
+// from and how to read it. They are the same words the extension's window uses
 // (src/ext/signals.js and src/ext/panel.js), kept here so the API needs no DOM and no extension
 // code. Every string is stance-neutral and names no account.
 
@@ -10409,19 +11007,19 @@ const FLAG_LABEL = {
 };
 
 const SRC_RULES = "Daylight Commons' own rules, run on this device. Rules and measured error rates: Daylight Commons' EVALUATION.md.";
-const SRC_POSTS = "The posts in the input, as given. Daylight Commons read them on this device and sent nothing anywhere.";
+const SRC_POSTS = "The posts in the input, as given, read by Daylight Commons on this device.";
 const SRC_ACCOUNTS = "Account details given in the input: what each platform discloses on profiles and About pages.";
 const SRC_FILE = "The file's bytes, read on this device: Content Credentials (C2PA) and IPTC or XMP metadata.";
 
-const STRONG_DOES_NOT_PROVE = "Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.";
-const LEAK_DOES_NOT_PROVE = "People quote chatbots, joke, or paste a reply on purpose.";
-const MACHINE_DOES_NOT_PROVE = "No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.";
-const SPAM_DOES_NOT_PROVE = "Real people post giveaways and contact details too. The pattern describes the post, not who sent it.";
-const BURST_DOES_NOT_PROVE = "A post going viral at one moment, or a notification many people get at once, brings replies together too. This describes when the replies arrived, not who sent them or why. It holds only for times given to the second: times rounded to the minute, hour or day put replies on one second by construction, and Daylight Commons does not run this test on them.";
-const COARSE_DOES_NOT_PROVE = "Coarse times hide bursts as well as fake them. This says nothing about whether the replies arrived together or apart, only that these times cannot tell.";
-const SITE_OWNER_DOES_NOT_PROVE = "Ownership is not editorial control, and Wikidata can lag a sale.";
-const THREAD_LIMIT = "This covers the posts in the input as given, ranked and filtered by the platform before anyone saw them. It names no account and judges no person.";
-const TEXT_LIMIT = "This describes one piece of text. It says nothing about who wrote it, why, or whether it is true.";
+const STRONG_DOES_NOT_PROVE = "A match on the post's wording, which also turns up in quotes, irony and reported speech.";
+const LEAK_DOES_NOT_PROVE = "Chatbot boilerplate in the post, which people also paste as a quote or a joke.";
+const MACHINE_DOES_NOT_PROVE = "The post has three or more machine-writing signs. Detectors flag non-native English writers more often.";
+const SPAM_DOES_NOT_PROVE = "A giveaway or contact-detail pattern in the post, which real people post too.";
+const BURST_DOES_NOT_PROVE = "Replies that arrived within the same seconds, as they also do after a viral post or a mass notification. The test runs on times given to the second.";
+const COARSE_DOES_NOT_PROVE = "These times are rounded, so they can hide a burst or make one look like it.";
+const SITE_OWNER_DOES_NOT_PROVE = "The owner Wikidata lists, which can lag a sale and can differ from who runs the newsroom.";
+const THREAD_LIMIT = "This covers the posts in the input as given, in the order and selection the platform showed.";
+const TEXT_LIMIT = "This describes the wording of one piece of text.";
 
 return { STRONG_LABEL, STRONG_MEANING, FLAG_LABEL, SRC_RULES, SRC_POSTS, SRC_ACCOUNTS, SRC_FILE, STRONG_DOES_NOT_PROVE, LEAK_DOES_NOT_PROVE, MACHINE_DOES_NOT_PROVE, SPAM_DOES_NOT_PROVE, BURST_DOES_NOT_PROVE, COARSE_DOES_NOT_PROVE, SITE_OWNER_DOES_NOT_PROVE, THREAD_LIMIT, TEXT_LIMIT };
 })();
@@ -10513,23 +11111,23 @@ function siteEvidence(domain, posts = [], { quiet = false } = {}) {
     const L = S.lookalike;
     out.push({ ...base, kind: "lookalike-domain", level: "flag", label: `look-alike of ${L.official}`,
       shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "Daylight Commons' list of outlet addresses, matched on this device.",
-      doesNotProve: LOOKALIKE_DOES_NOT_PROVE, data: { domain: S.domain, outlet: L.outlet, official: L.official, how: L.how } });
+      context: LOOKALIKE_DOES_NOT_PROVE, data: { domain: S.domain, outlet: L.outlet, official: L.official, how: L.how } });
   }
   for (const h of S.state) {
     const L = stateLabel(h);
     out.push({ ...base, kind: "state-link", level: stateLevel(h), label: L.chip, shows: L.says, source: sourceLine(h.source),
-      doesNotProve: STATE_DOES_NOT_PROVE[h.basis] || STATE_DOES_NOT_PROVE["named-in-report"], data: { domain: S.domain, state: h.state, basis: h.basis, actor: h.actor } });
+      context: STATE_DOES_NOT_PROVE[h.basis] || STATE_DOES_NOT_PROVE["named-in-report"], data: { domain: S.domain, state: h.state, basis: h.basis, actor: h.actor } });
   }
   if (S.owner && S.owner.owner) {
     out.push({ ...base, kind: "site-owner", level: "info", label: `link: ${S.owner.name || S.domain}`,
       shows: `${S.owner.name || S.domain} (${S.domain}). ${ownerHeading(S.owner)} ${S.owner.owner}.`, source: ownerSource(S.owner),
-      doesNotProve: SITE_OWNER_DOES_NOT_PROVE, data: { domain: S.domain, owner: S.owner.owner, ownerType: ownerType({ facts: S.facts, state: S.state }) } });
+      context: SITE_OWNER_DOES_NOT_PROVE, data: { domain: S.domain, owner: S.owner.owner, ownerType: ownerType({ facts: S.facts, state: S.state }) } });
   }
   const line = recordLine(S.record);
   if (line || (!quiet && S.facts)) {
     out.push({ ...base, kind: "site-record", level: "info", label: `site record: ${S.domain}`,
-      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "No review in Daylight Commons' table lists this site as where a claim appeared."].join(": ") + ".",
-      source: SITE_SOURCES, doesNotProve: SITE_RECORD_DOES_NOT_PROVE,
+      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."].join(": ") + ".",
+      source: SITE_SOURCES, context: SITE_RECORD_DOES_NOT_PROVE,
       data: { domain: S.domain, reviews: S.record ? S.record.n : 0, checkers: S.record ? S.record.m : 0, since: S.record ? S.record.since : null, founded: S.facts ? S.facts.founded : null, country: S.facts ? S.facts.country : null } });
   }
   return out;
@@ -10562,8 +11160,8 @@ function spanOf(post, text, match) {
   return at < 0 ? { post, start: null, end: null, text: m } : { post, start: at, end: at + m.length, text: String(text).slice(at, at + m.length) };
 }
 
-const item = (post, kind, level, label, shows, source, doesNotProve, spans = [], data = {}) =>
-  ({ kind, scope: "post", level, label, shows, source, doesNotProve, posts: [post], spans, data });
+const item = (post, kind, level, label, shows, source, context, spans = [], data = {}) =>
+  ({ kind, scope: "post", level, label, shows, source, context, posts: [post], spans, data });
 
 function language(id, text) {
   const out = [], s = score(text);
@@ -10626,8 +11224,8 @@ const { flagsFor, isFlagged, ageDays, DOES_NOT_PROVE, NEW_ACCOUNT_DAYS } = M_fla
 const { baselineLine } = M_baselines;
 const { FLAG_LABEL, SRC_POSTS, SRC_ACCOUNTS, BURST_DOES_NOT_PROVE, COARSE_DOES_NOT_PROVE } = M_api_words;
 
-const thread = (kind, level, label, shows, source, doesNotProve, posts, data = {}) =>
-  ({ kind, scope: "thread", level, label, shows, source, doesNotProve, posts, spans: [], data });
+const thread = (kind, level, label, shows, source, context, posts, data = {}) =>
+  ({ kind, scope: "thread", level, label, shows, source, context, posts, spans: [], data });
 const withBase = (text, sign, replies) => { const b = baselineLine(sign, { replies }); return b ? `${text} ${b}` : text; };
 
 // Flags for one reply: the input's own list (ids or { id, evidence }), or Daylight Commons' rules over the
@@ -10651,7 +11249,7 @@ function flagItems(replies, now) {
   return [...byKey.values()].map(({ f, posts }) => ({
     kind: "account-flag", scope: "post", level: f.id === "based-elsewhere" ? "warn" : "flag", label: FLAG_LABEL[f.id] || f.id,
     shows: f.evidence ? `The account behind ${posts.length === 1 ? "this post" : "these posts"}: ${f.evidence}.` : `The input marks the account behind ${posts.length === 1 ? "this post" : "these posts"} with this flag.`,
-    source: SRC_ACCOUNTS, doesNotProve: DOES_NOT_PROVE[f.id] || f.doesNotProve || "A flag is a sign to look at, not a finding about the person.",
+    source: SRC_ACCOUNTS, context: DOES_NOT_PROVE[f.id] || f.doesNotProve || "A flag is a sign to look at.",
     posts, spans: [], data: { flag: f.id, asOf: new Date(now).toISOString().slice(0, 10) },
   }));
 }
@@ -10760,10 +11358,10 @@ function mediaItems(r) {
     kind: s.fam === "c2pa" && /AI/.test(s.label) ? "credentials-ai" : KIND[s.fam] || s.fam,
     scope: "file", level: s.level, label: s.label,
     shows: [row(s.rows, "What Daylight Commons read") || row(s.rows, "What Daylight Commons found"), row(s.rows, "Signed by") ? `Signed by ${row(s.rows, "Signed by")}.` : null].filter(Boolean).join(" "),
-    source: SRC_FILE, doesNotProve: row(s.rows, "Does not prove") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
+    source: SRC_FILE, context: row(s.rows, "What it shows") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
   }));
-  if (state === "none") out.push({ kind: "no-credentials", scope: "file", level: "info", label: "no content credentials", shows: NO_CREDENTIALS, source: SRC_FILE, doesNotProve: "A file without credentials can be real or made up; most platforms remove them.", posts: [], spans: [], data: { state } });
-  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online. Daylight Commons does not fetch them, so nothing was checked.", source: SRC_FILE, doesNotProve: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
+  if (state === "none") out.push({ kind: "no-credentials", scope: "file", level: "info", label: "no content credentials", shows: NO_CREDENTIALS, source: SRC_FILE, context: "Most platforms remove credentials on upload, so this is the usual case.", posts: [], spans: [], data: { state } });
+  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online, which Daylight Commons leaves unfetched.", source: SRC_FILE, context: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
   return out;
 }
 
@@ -10782,7 +11380,7 @@ const M_api = (() => {
 // radar-core: the public API. One zero-dependency ES module over Daylight Commons' pure core, for anyone
 // who wants Daylight Commons' evidence without the browser extension. No DOM, no network, no storage: the
 // caller hands in the posts, the file bytes and (optionally) the data tables, and gets back
-// evidence objects that match schema/evidence.v1.json. project-docs/INTEGRATION.md documents it.
+// evidence objects that match schema/evidence.v2.json. project-docs/INTEGRATION.md documents it.
 //
 //   analyzeThread({ site, root, replies })   evidence about a thread
 //   analyzeText(text)                        evidence about one piece of text
@@ -10801,8 +11399,8 @@ const { useData, claimIndex, dataLoaded } = M_api_data;
 const { REPORT_DOES_NOT_PROVE } = M_report;
 const { THREAD_LIMIT, TEXT_LIMIT } = M_api_words;
 
-const API_VERSION = "1.1.0";
-const EVIDENCE_SCHEMA = "urn:radar:evidence:v1";
+const API_VERSION = "2.0.0";
+const EVIDENCE_SCHEMA = "urn:radar:evidence:v2";
 
 
 const envelope = (kind, extra) => ({ schema: EVIDENCE_SCHEMA, api: API_VERSION, kind, ...extra });
@@ -10869,7 +11467,7 @@ function analyzeThread(input, opts = {}) {
 // bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
 async function checkMedia(bytes) {
   const M = await mediaReading(bytes);
-  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made."] });
 }
 
 // domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
@@ -10877,8 +11475,8 @@ function siteInfo(domain) {
   const d = cleanDomain(domain);
   if (!d) return null;
   const loaded = dataLoaded();
-  const limits = ["Every row names its source. Daylight Commons adds no score or rating of its own."];
-  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("No site tables were loaded, so only the look-alike check ran.");
+  const limits = ["Every row names its source."];
+  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("The site tables were absent, so the look-alike check ran alone.");
   return envelope("site", { site: siteSummary(d), evidence: number(siteEvidence(d, [])), limits });
 }
 
@@ -10897,11 +11495,27 @@ const M_bundle_verify = (() => {
 const { canonicalJSON, jwkId, verifyText } = M_sig;
 
 const BUNDLE_KIND = "radar-evidence-bundle";
-const BUNDLE_VERSION = 1;
+const BUNDLE_VERSION = 2;
+// Bundle versions this checker reads: version 1 items carry doesNotProve, version 2 items carry context.
+const BUNDLE_VERSIONS = [1, 2];
+const EVIDENCE_V1 = "urn:radar:evidence:v1", EVIDENCE_V2 = "urn:radar:evidence:v2";
 const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
-const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right.";
+const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the holder of this key signed the bundle and that it is unchanged since. Check the key id with the signer by another route, and read each span against its post.";
 const CARRIER_SAFE = "carrier-safe";
 const CARRIER_SAFE_NOTE = "carrier-safe: the signature proves the bundle is unchanged; it says nothing about who made it";
+
+// Reads an envelope or a bundle of either schema version in version 2 field names: a version 1
+// item's doesNotProve becomes context. It returns a copy and leaves the document as signed, so the
+// signature still checks against the original.
+function readEvidence(doc) {
+  if (!doc || !Array.isArray(doc.evidence)) return doc;
+  const evidence = doc.evidence.map((e) => {
+    if (!e || typeof e !== "object" || !("doesNotProve" in e)) return e;
+    const { doesNotProve, ...rest } = e;
+    return { ...rest, context: rest.context != null ? rest.context : doesNotProve };
+  });
+  return { ...doc, evidence };
+}
 
 // Spans and post references inside the bundle agree with themselves: every post an item names is
 // listed, and when text is included every located span is the text at that place.
@@ -10920,31 +11534,32 @@ function bundleConsistency(bundle) {
 
 async function signatureOk(bundle) {
   const { signature, ...body } = bundle, S = body.signer;
-  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Daylight Commons can check" };
+  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle lacks an ECDSA P-256 signature with its public key" };
   const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
   let id = null;
   try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
-  if (id !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
+  if (id !== S.keyId) return { ok: false, text: "the key id belongs to a different public key" };
   const good = await verifyText(jwk, signature.value, canonicalJSON(body));
-  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature does not match: the bundle changed after signing, or was signed with another key" };
+  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature fails: the bundle changed after signing, or another key signed it" };
 }
 
 // opts.keyId: the key id you expect, from the signer by another route. Resolves to
 // { ok, keyId, checks: [{ name, ok, text }] }; ok is true only when every check passes.
 async function verifyBundle(bundle, opts = {}) {
   const checks = [];
-  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Daylight Commons evidence bundle" }] };
-  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Daylight Commons reads` });
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this file lacks the Daylight Commons evidence bundle kind" }] };
+  const known = BUNDLE_VERSIONS.includes(bundle.version);
+  checks.push({ name: "version", ok: known, text: known ? `bundle version ${bundle.version}` : `bundle version ${bundle.version}; this Daylight Commons reads versions ${BUNDLE_VERSIONS.join(" and ")}` });
   checks.push({ name: "signature", ...(await signatureOk(bundle)) });
-  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is not one this Daylight Commons reads` });
+  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is unknown to this Daylight Commons` });
   const keyId = bundle.signer ? bundle.signer.keyId : null;
   if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
   const C = bundleConsistency(bundle);
-  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts not listed (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
+  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts missing from the list (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
   return { ok: checks.every((c) => c.ok), keyId, checks };
 }
 
-return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle };
+return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_VERSIONS, EVIDENCE_V1, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, readEvidence, bundleConsistency, verifyBundle };
 })();
 
 // ---- evidence-bundle.js
@@ -10963,7 +11578,7 @@ const M_evidence_bundle = (() => {
 
 const { MIN_CARD_ACCOUNTS } = M_evidence;
 const { canonicalJSON, sha256Hex, lfBytes, jwkId, signText, P256 } = M_sig;
-const { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle } = M_bundle_verify;
+const { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_VERSIONS, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, EVIDENCE_V1, EVIDENCE_V2, bundleConsistency, readEvidence, verifyBundle } = M_bundle_verify;
 
 // Checking a bundle lives in bundle-verify.js, which the offline kit page carries on its own.
 
@@ -11010,7 +11625,7 @@ const carrierTool = (tool) => { const m = String(tool || "").match(/^(.*?)(\d+)\
 // is true. profile "carrier-safe" uses typedPage (what the user typed) and never page.
 // Returns { ok: true, bundle } or { ok: false, reason }.
 function makeBundle(result, opts = {}) {
-  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "There is no analysis to put in a bundle." };
+  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "Run an analysis first, then put it in a bundle." };
   const archive = opts.source === "export";
   if (result.kind === "thread" && !archive && (result.posts.accounts || 0) < MIN_CARD_ACCOUNTS) {
     return { ok: false, reason: `This thread has ${result.posts.accounts || 0} accounts. A bundle needs at least ${MIN_CARD_ACCOUNTS}, so it cannot be about one person.` };
@@ -11114,7 +11729,7 @@ function parseSums(text) {
   return out;
 }
 
-const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the files were signed by the holder of this key and not changed since. It does not show who holds the key, that the key was never stolen, or that the code is safe. Compare the key id with one you got another way.";
+const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the holder of this key signed the files and that they are unchanged since. Compare the key id with one you got another way.";
 
 return { signingKeyId, jwkThumbprint, generateSigningKey, signSums, verifySums, parseSums, SIGNATURE_DOES_NOT_PROVE };
 })();
@@ -11149,7 +11764,7 @@ const HEAD_KIND = "daylight-head/1";
 const HEAD_MAX_BYTES = 4096;
 const HEAD_SIG_MAX_BYTES = 4096;
 const AGING_DAYS = 30;
-const HEAD_DOES_NOT_PROVE = "A valid head shows the signer chose these files at that time. It does not show the files are safe.";
+const HEAD_DOES_NOT_PROVE = "A valid head shows the signer chose these files at that time. How safe they are rests on the signer.";
 
 const DAY = 86400000;
 const HEX64 = /^[0-9a-f]{64}$/, KEY_ID = /^[0-9a-f]{32}$/, TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/, B64URL = /^[A-Za-z0-9_-]{80,100}$/;
@@ -11281,7 +11896,7 @@ async function checkHead(opts) {
 // Statuses: current, aging (head last seen over AGING_DAYS ago), expired, none. Never an alarm.
 function freshness(state, { now = Date.now(), catalogue = null } = {}) {
   const dated = catalogue && catalogue.date ? `Catalogue dated ${day(catalogue.date)}.` : "Catalogue date unknown.";
-  if (!state) return { status: "none", label: "Not checked", line: `${dated} No signed head checked on this device yet.` };
+  if (!state) return { status: "none", label: "Not checked", line: `${dated} Signed head: unchecked on this device so far.` };
   const t = effectiveNow(state, now), sigs = `${state.valid} of ${state.needed} signature${state.needed === 1 ? "" : "s"}${state.needed === 1 ? " (single-signer release)" : ""}`;
   const seen = `Signed head version ${state.version} last seen ${day(state.seenAt)}, valid until ${day(state.expires)}, ${sigs}.`;
   if (t >= Date.parse(state.expires)) return { status: "expired", label: "Expired", line: `${dated} Newer campaigns may be missing. ${seen}` };
@@ -11692,19 +12307,19 @@ function fromJson(name, text) {
   let json;
   try { json = JSON.parse(text); } catch { return fail(`${name} is not valid JSON.`); }
   if (json && json.kind === "radar-evidence-bundle") return fail("This is a Daylight Commons evidence bundle. Use Check a bundle to verify it.");
-  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Daylight Commons found no posts it can read in ${name}.`);
+  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Daylight Commons found zero readable posts in ${name}.`);
 }
 
 function fromBytes(name, bytes) {
   const lower = String(name || "").toLowerCase();
-  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is not a Bluesky repository export Daylight Commons can read.`);
+  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is unreadable as a Bluesky repository export.`);
   const text = asText(bytes).replace(/^﻿/, ""), head = text.slice(0, 400).trimStart();
-  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Daylight Commons can read.`);
-  if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} is not a Reddit export with id, permalink and body columns.`);
+  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds zero posts Daylight Commons can read.`);
+  if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} lacks the id, permalink and body columns of a Reddit export.`);
   if (/^[[{]/.test(head)) return fromJson(name, text);
   // A saved X or Reddit page carries machine-readable times (datetime and created attributes) to the second.
-  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); if (p.kind === "thread") p.timePrecision = "second"; return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons did not recognise a thread on this page, so it read the page as one text."] : [] }; }
-  return fail(`Daylight Commons does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); if (p.kind === "thread") p.timePrecision = "second"; return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons read this page as one text, its fallback for pages outside the thread readers."] : [] }; }
+  return fail(`Daylight Commons reads these kinds of file: ${IMPORT_FORMATS.join(", ")}.`);
 }
 
 // name: the file name; bytes: Uint8Array, ArrayBuffer or string. Returns { ok: true, format,
@@ -11717,5 +12332,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

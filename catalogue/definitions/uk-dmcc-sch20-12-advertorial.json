@@ -1,6 +1,6 @@
 {
   "id": "uk-dmcc-sch20-12-advertorial",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -65,7 +65,7 @@
         "promo-cue",
         "undisclosed-lookalike"
       ],
-      "note": "Whether a social media post counts as \"editorial content in the media\" is a legal question this entry does not settle."
+      "note": "Whether a social media post counts as \"editorial content in the media\" is a legal question for courts."
     },
     {
       "id": "B",
@@ -76,7 +76,7 @@
       "signals": [
         "disclosed-paid"
       ],
-      "note": "Shown for labelled posts only."
+      "note": "Shown for labelled posts."
     },
     {
       "id": "C",
@@ -89,7 +89,7 @@
       ]
     }
   ],
-  "does_not_prove": "Daylight Commons cannot see payment for unlabelled posts. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "For unlabelled posts, payment rests on look-alike evidence. A match compares visible elements with the published text. Courts, the CMA and trading standards services decide whether the rule was broken.",
   "related": [
     "eu-ucpd-annex1-11-advertorial",
     "us-ftc-endorsement-material-connection"

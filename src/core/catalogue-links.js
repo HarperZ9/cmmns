@@ -40,5 +40,5 @@ export function badgeLinks(signalId, entries, registry) {
 // One line for a badge's catalogue row, naming the entries and versions it cites.
 export function badgeLine(b) {
   if (b.entries.length) return `Cited by ${b.entries.length} catalogue ${b.entries.length === 1 ? "entry" : "entries"}: ${b.entries.map((e) => e.ref).join(", ")}.`;
-  return b.registered ? `No catalogue entry cites this sign; it is listed in ${b.registry}.` : "This line is context and cites no catalogue entry.";
+  return b.registered ? `No catalogue entry cites this sign; it is listed in ${b.registry}.` : "This line is context, outside the catalogue.";
 }

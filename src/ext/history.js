@@ -11,7 +11,7 @@
   const s = PB.summarize(store[KEYS.reports], store[KEYS.net], store[KEYS.trail]);
 
   const sites = Object.entries(s.sites).map(([k, n]) => `${n} on ${k}`).join(", ");
-  $("scope").textContent = s.threads ? `${s.threads} thread${s.threads === 1 ? "" : "s"} since ${s.since} (${sites}). Kept 60 days in this browser only.` : "No threads yet. Open posts on X, YouTube, Reddit, Facebook, Instagram or Bluesky with Daylight Commons on, and they will show up here.";
+  $("scope").textContent = s.threads ? `${s.threads} thread${s.threads === 1 ? "" : "s"} since ${s.since} (${sites}). Kept 60 days in this browser.` : "Open posts on X, YouTube, Reddit, Facebook, Instagram or Bluesky with Daylight Commons on, and they will show up here.";
   $("caveat").textContent = PB.HISTORY_DOES_NOT_PROVE;
 
   const tile = (value, label, hot) => { const t = el("div", "tile" + (hot ? " hot" : "")); t.append(el("b", null, value), el("span", null, label)); return t; };
@@ -30,7 +30,7 @@
     ? F.concentration.sources <= 5
       ? `Across your threads, replies quoted or lifted media from ${F.concentration.sources} upstream account${F.concentration.sources === 1 ? "" : "s"} (${F.concentration.mentions} links). Concentration needs more sources to mean anything.`
       : `Across your threads, replies quoted or lifted media from ${F.concentration.sources} upstream accounts. The top five account for ${pct(F.concentration.top5)} of ${F.concentration.mentions} upstream links.`
-    : "No upstream links recorded yet. They appear once Daylight Commons has seen quotes, reposts or lifted media in the threads you open.";
+    : "Upstream links appear once Daylight Commons has seen quotes, reposts or lifted media in the threads you open.";
   const fill = (tableId, rows, cells) => {
     const tb = $(tableId).querySelector("tbody");
     tb.replaceChildren();

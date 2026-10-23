@@ -32,7 +32,7 @@ export function cardPage(url) {
 // thread, or null. Only their states and AI-generation marks go on the card, never a signer's name.
 // Returns { ok: true, card } or { ok: false, reason }.
 export function evidenceCard(input) {
-  if (!input || !input.thread) return { ok: false, reason: "Cards are made for threads only, not for profiles or feeds." };
+  if (!input || !input.thread) return { ok: false, reason: "Cards are made for threads. Open a thread to make one." };
   const accounts = new Set((input.authors || []).map((h) => String(h).toLowerCase())).size;
   if (accounts < MIN_CARD_ACCOUNTS) return { ok: false, reason: `This thread has ${accounts} reply account${accounts === 1 ? "" : "s"}. A card needs at least ${MIN_CARD_ACCOUNTS} accounts, so it cannot be about one person.` };
   const R = input.report || {}, U = R.upstream || {};
@@ -85,10 +85,10 @@ function sourcesOf(card, input) {
 
 function limitsOf(card) {
   return [
-    "This card covers one thread as one viewer saw it, ranked by the platform. It names no account and judges no person.",
+    "This card covers one thread as one viewer saw it, ranked by the platform.",
     REPORT_DOES_NOT_PROVE,
     card.claims.length ? CLAIM_DOES_NOT_PROVE : null,
-    card.sites.some((s) => s.state.length) ? "A state link says a cited source ties the site to a state. It is not proof that a post is false." : null,
+    card.sites.some((s) => s.state.length) ? "A state link says a cited source ties the site to a state; each post's claims stand or fall on their own." : null,
     card.media.credentials ? CREDENTIALS_DO_NOT_PROVE : null,
     card.media.recycledUploads ? "A recycled upload can be a fair repost or a correction; it shows where the file was first seen, not who made it." : null,
   ].filter(Boolean);
@@ -126,12 +126,12 @@ export function cardLines(card) {
   if (card.claims.length) { push("head", "Fact-checked claims"); for (const c of card.claims) push("body", `${c.checker} rated a similar claim "${c.rating}": ${c.claim} (${c.url})`); }
   if (card.sites.length) { push("head", "Sites linked"); push("body", card.sites.map((s) => [`${s.domain} (${s.posts})`, s.owner ? `owned by ${s.owner}` : null, ...s.state].filter(Boolean).join(", ")).join("; ")); }
   push("head", "Media");
-  push("body", card.media.uploads ? `${card.media.recycledUploads} of ${card.media.uploads} uploads were first posted by another account.` : "No uploads were read in this thread.");
+  push("body", card.media.uploads ? `${card.media.recycledUploads} of ${card.media.uploads} uploads were first posted by another account.` : "Zero uploads were read in this thread.");
   const C = card.media.credentials;
-  push("body", C ? `Content Credentials, ${C.checked} file${C.checked === 1 ? "" : "s"} checked: ${C.unchanged} signed and unchanged, ${C.changed} changed since signing, ${C.unchecked} not fully checked, ${C.none} with none found; ${C.ai} marked as made with generative AI (by credentials or IPTC metadata).` : "No file in this thread was checked for Content Credentials.");
+  push("body", C ? `Content Credentials, ${C.checked} file${C.checked === 1 ? "" : "s"} checked: ${C.unchanged} signed and unchanged, ${C.changed} changed since signing, ${C.unchecked} not fully checked, ${C.none} with none found; ${C.ai} marked as made with generative AI (by credentials or IPTC metadata).` : "Zero files in this thread were checked for Content Credentials.");
   push("head", "Sources");
   for (const s of card.sources) push("small", s);
-  push("head", "What this does not prove");
+  push("head", "What it covers");
   for (const s of card.doesNotProve) push("limit", s);
   if (card.hash) push("small", "The JSON file saved with this image holds the same content and a hash of it, so anyone can check a copy.");
   return L;

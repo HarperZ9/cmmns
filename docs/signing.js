@@ -125,4 +125,4 @@ export function parseSums(text) {
   return out;
 }
 
-export const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the files were signed by the holder of this key and not changed since. It does not show who holds the key, that the key was never stolen, or that the code is safe. Compare the key id with one you got another way.";
+export const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the holder of this key signed the files and that they are unchanged since. Compare the key id with one you got another way.";

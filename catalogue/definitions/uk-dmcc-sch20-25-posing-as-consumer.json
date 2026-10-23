@@ -1,6 +1,6 @@
 {
   "id": "uk-dmcc-sch20-25-posing-as-consumer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -82,7 +82,7 @@
       "signals": []
     }
   ],
-  "does_not_prove": "A post that reads like a fan and shares a template with paid posts is not proof that its author was paid. A match on visible elements is a comparison with a published definition. It is not a finding by a court, the CMA or a trading standards service, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "A fan-style post that shares a template with paid posts is look-alike evidence of payment. A match compares visible elements with the published text. Courts, the CMA and trading standards services decide whether the rule was broken.",
   "related": [
     "eu-ucpd-annex1-22-posing-as-consumer"
   ]

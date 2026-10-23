@@ -58,7 +58,7 @@ export function recordLine(rec) {
   return `${plural(rec.n, "review")} by ${plural(rec.m, "fact-checker")} since ${rec.since}, ratings as the checkers wrote them`;
 }
 
-export const SITE_RECORD_DOES_NOT_PROVE = "A review lists this site as a place where a claim appeared. The site may have been reporting someone else's words, and each rating is about that claim, not about the site. Fact-checkers choose what to check, so a count says little about how often a site is right.";
+export const SITE_RECORD_DOES_NOT_PROVE = "A review lists this site as a place where a claim appeared, perhaps reporting someone else's words. Each rating is about that claim. Fact-checkers choose what to check, so a count says little about how often a site is right.";
 export const SITE_SOURCES = "Owner, owner type, founding date and country: Wikidata (CC0). Reviews: ClaimReview markup published by each fact-checker, from the Data Commons fact-check feed (CC BY 4.0).";
 
 // Owner types, in a fixed order. State links come first because they cite a source; then what
@@ -92,17 +92,17 @@ export function siteInfoRows(info, opts = {}) {
     ...stateRows(info.state),
     ...packNoteRows(info.notes),
   ];
-  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Daylight Commons has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
-  rows.push(["Fact-check record", recordLine(record) || "No review in Daylight Commons' table lists this site as where a claim appeared."]);
+  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Daylight Commons lacks a Wikidata entry for this site, so its owner, founding date and country stay blank." }]);
+  rows.push(["Fact-check record", recordLine(record) || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."]);
   for (const r of (record && (record.latest || record.reviews.slice(0, 3))) || []) rows.push(["Review", `"${r.rating}": ${r.checker}, ${r.date || "date not given"}`]);
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
-  rows.push(["Source", SITE_SOURCES], ["Does not prove", SITE_RECORD_DOES_NOT_PROVE]);
+  rows.push(["Source", SITE_SOURCES], ["What it shows", SITE_RECORD_DOES_NOT_PROVE]);
   return rows.filter(([, v]) => v != null);
 }
 
 // Notes from data packs the user imported and trusts (src/core/packs-content.js), each with its
 // pack's name and source, kept apart from Daylight Commons' own rows.
-export const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Daylight Commons did not write or check it.";
+export const PACK_NOTE_CAVEAT = "From a data pack you imported and trust, written and checked by its publisher.";
 function packNoteRows(notes) {
   if (!notes || !notes.length) return [];
   const rows = notes.slice(0, 5).flatMap((n) => [["Pack note", `${n.note} (pack: ${n.pack})`], ["Read it", { links: [[String(n.url).replace(/^https?:\/\//, "").slice(0, 48), n.url]] }]]);

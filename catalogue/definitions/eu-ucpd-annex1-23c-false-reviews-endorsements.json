@@ -1,6 +1,6 @@
 {
   "id": "eu-ucpd-annex1-23c-false-reviews-endorsements",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -12,7 +12,7 @@
   "instrument": "Unfair Commercial Practices Directive 2005/29/EC as amended by Directive (EU) 2019/2161 (the Omnibus Directive), consolidated text of 27.09.2026",
   "section": "Annex I, point 23c",
   "kind": "directive",
-  "binding_note": "A directive, applied through each Member State's national law. Annex I lists practices that are unfair in all circumstances, and the text says the same single list applies in all Member States. It covers business-to-consumer practices: the party must be a trader. Recital 49 of Directive 2019/2161 gives 'likes' on social media as an example of an endorsement.",
+  "binding_note": "A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader. Recital 49 of Directive 2019/2161 gives 'likes' on social media as an example of an endorsement.",
   "in_force": {
     "status": "in force",
     "since": "2022-05-28",
@@ -86,7 +86,7 @@
         "undisclosed-lookalike"
       ],
       "min_families": 2,
-      "note": "Page signals are consistent with false endorsements; they do not show that any single account is not a real consumer."
+      "note": "Page signals are consistent with false endorsements. They describe the sample as a whole."
     },
     {
       "id": "C",
@@ -95,7 +95,7 @@
       "required": true,
       "strength": "direct",
       "signals": [],
-      "note": "Who commissioned the engagement is not visible on the page."
+      "note": "Records off the page show who commissioned the engagement."
     },
     {
       "id": "D",
@@ -108,7 +108,7 @@
       ]
     }
   ],
-  "does_not_prove": "Bought-looking engagement can come from parties other than the trader, including rivals and vendors acting on their own. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "Bought-looking engagement can come from the trader, from rivals or from vendors acting on their own. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.",
   "related": [
     "us-ftc-fake-social-media-indicators",
     "uk-dmcc-sch20-13-fake-reviews",

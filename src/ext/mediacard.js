@@ -12,7 +12,7 @@
     ["Yandex", (u) => "https://yandex.com/images/search?rpt=imageview&url=" + encodeURIComponent(u), "https://yandex.com/images/"],
   ];
   const SEARCH_NOTE = "Each link opens in a new tab. Clicking one sends this image's address to that service; nothing is sent before you click.";
-  const CHECK_NOTE = "Reads the file this page already loaded, from the same address, without cookies. Nothing goes anywhere else.";
+  const CHECK_NOTE = "Reads the file this page already loaded, from the same address, without cookies, and keeps it on this device.";
   const FRAME_NOTE = "Daylight Commons copies the frame to your clipboard and opens the service in a new tab. Paste it there (Ctrl+V); nothing is sent until you do.";
   const open = (id) => ({ links: [["open post", `https://x.com/i/status/${id}`]] });
 
@@ -26,7 +26,7 @@
   }
 
   function credentialRows(x) {
-    if (!x.src) return [["Content Credentials", { note: x.type === "image" ? "this image is not on screen, so Daylight Commons has no loaded file to read" : "this video is streamed in pieces, so there is no single file to read" }]];
+    if (!x.src) return [["Content Credentials", { note: x.type === "image" ? "scroll this image onto the screen so it loads, then check it" : "this video is streamed in pieces, with each piece a fragment of the file" }]];
     const c = PBMedia.checkOf(x.src);
     if (!c) return [["Content Credentials", { action: ["Check this file", () => PBMedia.check(x.src), "Reading the file…"] }], ["", { note: CHECK_NOTE }]];
     if (c.state === "reading") return [["Content Credentials", { note: "Reading the file…" }]];

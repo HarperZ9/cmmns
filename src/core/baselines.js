@@ -9,7 +9,7 @@ import { BASELINES } from "./baselines-data.js";
 import { TECHNIQUE_BASELINES } from "./techniques-data.js";
 import { sizeBin, viewBin } from "./baselines-bins.js";
 
-export const BASELINE_SOURCE = "Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus, not a sample of today's X.";
+export const BASELINE_SOURCE = "Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus from an earlier X.";
 
 const share = (x) => (x > 0 && x < 0.001 ? `${(x * 100).toFixed(2)}%` : x < 0.1 ? `${(x * 100).toFixed(1)}%` : `${Math.round(x * 100)}%`);
 const range = (ci) => `${share(ci[0])} to ${share(ci[1])}`.replace(/% to/, " to");

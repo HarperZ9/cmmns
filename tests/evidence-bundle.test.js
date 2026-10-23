@@ -9,7 +9,7 @@ import { makeBundle, signBundle, verifyBundle, newBundleKey, publicKeyOf, dataLo
 import { b64url, fromB64url } from "../src/core/sig.js";
 import { validate } from "../bin/lib/jsonschema.mjs";
 
-const SCHEMA = JSON.parse(readFileSync(new URL("../schema/evidence.v1.json", import.meta.url), "utf8"));
+const SCHEMA = JSON.parse(readFileSync(new URL("../schema/evidence.v2.json", import.meta.url), "utf8"));
 const THREAD = JSON.parse(readFileSync(new URL("./fixtures/integration/thread.json", import.meta.url), "utf8"));
 const result = analyzeThread(THREAD, { now: Date.parse("2026-10-02T00:00:00Z") });
 const texts = Object.fromEntries([THREAD.root, ...THREAD.replies].map((p) => [p.id, p.text]));
@@ -93,12 +93,12 @@ test("the schema checker rejects what the schema forbids", () => {
   const good = analyzeText("As an AI language model I cannot help.");
   assert.deepEqual(validate(SCHEMA, good), []);
   const bad = [
-    (x) => { delete x.evidence[0].doesNotProve; },
+    (x) => { delete x.evidence[0].context; },
     (x) => { x.evidence[0].kind = "bot-account"; },
     (x) => { x.evidence[0].level = "red"; },
     (x) => { x.evidence[0].handle = "someone"; },
     (x) => { x.evidence[0].spans[0].start = -1; },
-    (x) => { x.schema = "urn:radar:evidence:v2"; },
+    (x) => { x.schema = "urn:radar:evidence:v3"; },
     (x) => { x.limits = []; },
     (x) => { x.evidence[0].shows = ""; },
   ];

@@ -1,6 +1,6 @@
 {
   "id": "eu-ucpd-annex1-11-advertorial",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -12,7 +12,7 @@
   "instrument": "Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026",
   "section": "Annex I, point 11",
   "kind": "directive",
-  "binding_note": "A directive, applied through each Member State's national law. Annex I lists practices that are unfair in all circumstances, and the text says the same single list applies in all Member States. It covers business-to-consumer practices: the party must be a trader.",
+  "binding_note": "A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader.",
   "in_force": {
     "status": "in force",
     "since": null,
@@ -50,7 +50,7 @@
         "promo-cue",
         "undisclosed-lookalike"
       ],
-      "note": "Whether a social media post counts as \"editorial content in the media\" is a legal question this entry does not settle."
+      "note": "Whether a social media post counts as \"editorial content in the media\" is a legal question for courts."
     },
     {
       "id": "B",
@@ -61,7 +61,7 @@
       "signals": [
         "disclosed-paid"
       ],
-      "note": "Shown for labelled posts, where the poster disclosed it. For unlabelled posts payment is not visible."
+      "note": "Shown for labelled posts, where the poster disclosed the payment. Payment for unlabelled posts sits in records off the page."
     },
     {
       "id": "C",
@@ -72,10 +72,10 @@
       "signals": [
         "undisclosed-lookalike"
       ],
-      "note": "Daylight Commons sees a missing platform label, not every way a disclosure could be made."
+      "note": "Daylight Commons checks for the platform's own paid label. A disclosure can also take other forms."
     }
   ],
-  "does_not_prove": "Daylight Commons cannot see payment for unlabelled posts, so element B and C together rest on look-alike evidence. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "For unlabelled posts, elements B and C rest on look-alike evidence. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.",
   "related": [
     "uk-dmcc-sch20-12-advertorial",
     "us-ftc-endorsement-material-connection",

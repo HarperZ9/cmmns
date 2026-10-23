@@ -133,7 +133,7 @@
       for (const a of g.areas) {
         const b = el("button", `pb-area pb-a-${a.level}`); b.type = "button";
         b.append(el("i"), el("span", null, a.name));
-        b.title = b.ariaLabel = a.level === "none" ? `${a.name}: nothing found in what the site shows` : `${a.name}: ${a.n} sign${a.n === 1 ? "" : "s"}${a.level === "warn" ? ", worth a look" : ""}`;
+        b.title = b.ariaLabel = a.level === "none" ? `${a.name}: quiet in what the site shows` : `${a.name}: ${a.n} sign${a.n === 1 ? "" : "s"}${a.level === "warn" ? ", worth a look" : ""}`;
         if (a.n) b.addEventListener("click", (e) => { e.stopPropagation(); select("overview", a.id); });
         else b.disabled = true;
         strip.append(b);

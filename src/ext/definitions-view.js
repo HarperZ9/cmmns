@@ -7,7 +7,7 @@
 (() => {
   "use strict";
   const STATUS_WORD = { "matched": "matched", "not-matched": "not matched", "not-observable": "not observable" };
-  const ALL_NOTE = "Your own jurisdiction is not known here, so every jurisdiction the catalogue covers is shown, in a fixed order.";
+  const ALL_NOTE = "Every jurisdiction the catalogue covers is shown, in a fixed order, since your own is unknown here.";
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const link = (label, href) => { const a = el("a", "pb-link", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; return a; };
 
@@ -40,7 +40,7 @@
       for (const t of g.tables) {
         out.push([t.role === "match" ? "Definition" : t.role === "comparison" ? "For comparison" : "Context", t.title], ["", { links: [[t.catalogue, t.url], ["Challenge", t.challengeUrl]] }]);
         for (const r of t.rows) out.push([`Element ${r.id}`, `${STATUS_WORD[r.status]}: ${r.label}`]);
-        out.push(["Reading", t.summary], ["Does not prove", t.dnp]);
+        out.push(["Reading", t.summary], ["What it shows", t.dnp]);
       }
     }
     out.push(["", m.legal]);
@@ -63,7 +63,7 @@
     }
     const refs = el("p", "pb-foot");
     refs.append(link(t.catalogue, t.url), link("Challenge this entry", t.challengeUrl), link("Source", t.source.url));
-    box.append(head, tb, el("p", "pb-foot", t.summary), el("p", "pb-foot", `Does not prove: ${t.dnp}`), refs);
+    box.append(head, tb, el("p", "pb-foot", t.summary), el("p", "pb-foot", `What it shows: ${t.dnp}`), refs);
     return box;
   }
 

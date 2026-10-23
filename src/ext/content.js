@@ -129,6 +129,9 @@
     for (const [, model] of models) model.thread = thread;
     const tech = techniques(site, replies, root, cache);
     for (const [, model] of models) Object.assign(model, tech.perPost(model));
+    const lens = PBLens.read([root && { ...root, root: true }, ...replies].filter(Boolean), { feed: !!feed, settings });
+    for (const [, model] of models) model.lens = lens.by.get(model.postId) || [];
+    PBLens.paint(items, lens.by);
     drawn = models;
     drawVisible();
     const pending = site.hasLocation ? [...new Set(rows.filter((r) => !r.about).map((r) => r.author))].filter((h) => !lookingUp.has(h) && !failed.has(h)) : [];
@@ -144,6 +147,7 @@
     report.bursts = PB.timingBursts(replies, { precision: "second" });
     report.flood = PB.floodSign(replies, tech.rateOf, { bursts: report.bursts });
     report.crossLang = tech.groups;
+    report.lens = lens.patterns;
     report.swarm = root ? PB.swarmSign(replies, swarmMarks(rows), { precision: "second" }) : null;
     report.state = PB.stateSummary(replies);
     report.upstream = PB.upstream(items, tweets, PBLogs.trail());
@@ -177,7 +181,7 @@
   function recordFeed(site, items) {
     PBLogs.recordFeed(site.name, items.map((r) => {
       const an = analyse(r), c = PBLogs.claimsOf(r.id);
-      return { id: r.id, domains: r.domains || [], strong: an.extreme, note: !!noteOf(r.id), claims: c ? c.length : 0, techniques: an.persuasion.map((h) => h.technique), frame: PB.feedFrame(r.text) };
+      return { id: r.id, domains: r.domains || [], strong: an.extreme, note: !!noteOf(r.id), claims: c ? c.length : 0, techniques: an.persuasion.map((h) => h.technique), frame: PB.feedFrame(r.text), lens: PB.readPost(r.text, { on: PB.lensOn(settings) }).filter((f) => f.shown).map((f) => f.technique) };
     }));
   }
 

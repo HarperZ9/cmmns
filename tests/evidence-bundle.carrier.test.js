@@ -17,7 +17,7 @@ import { validate } from "../bin/lib/jsonschema.mjs";
 import { browserSkip, openChrome, goto, evaluate } from "./browser.js";
 
 const ROOT = join(import.meta.dirname, "..");
-const SCHEMA = JSON.parse(readFileSync(join(ROOT, "schema", "evidence.v1.json"), "utf8"));
+const SCHEMA = JSON.parse(readFileSync(join(ROOT, "schema", "evidence.v2.json"), "utf8"));
 const THREAD = JSON.parse(readFileSync(join(ROOT, "tests", "fixtures", "integration", "thread.json"), "utf8"));
 const result = analyzeThread(THREAD, { now: Date.parse("2026-10-02T00:00:00Z") });
 const LOCK = { alg: "SHA-256", of: "test", value: "0".repeat(64) };

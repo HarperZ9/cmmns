@@ -11,12 +11,12 @@ import { templateGroups, personaCues, PERSONA_MIN_FAMILIES, topicsOf } from "./c
 export const SAMPLE_MIN = 12;
 export const PERSONA_SHARE = 0.25, JOIN_WINDOW_DAYS = 14, JOIN_MIN = 5, JOIN_SHARE = 0.3, MISMATCH_SHARE = 0.4, MISMATCH_MIN = 4;
 export const SAMPLE_DOES_NOT_PROVE = {
-  "bio-template": "Friends, colleagues and fan accounts copy each other's bios, and some sites suggest bio wording.",
-  "stock-persona": "Real people write short, list-like bios, and these phrases are common.",
-  "join-cluster": "Accounts join in waves after news, an event or a platform change.",
-  "topic-mismatch": "People follow and reshare outside their own interests, and a bio says little about what someone reads.",
-  "random-suffix": "Many people choose a handle with numbers and letters for privacy or safety. This is context only.",
-  "default-avatar": "Many real people never upload a picture. This is context only.",
+  "bio-template": "Many sampled bios share a template. Friends, colleagues and fan accounts copy bios too.",
+  "stock-persona": "Many sampled bios use stock-persona phrases. Real people write short, list-like bios too.",
+  "join-cluster": "Many sampled accounts joined in the same two weeks. Accounts join in waves after news or an event.",
+  "topic-mismatch": "Most sampled bios are about another topic. People reshare outside their own interests.",
+  "random-suffix": "Many handles end in numbers and letters. People choose these for privacy, so this stays context.",
+  "default-avatar": "Many accounts use the default picture. Many real people keep it, so this stays context.",
 };
 
 // A handle ending in a digit-and-letter tail ("_x5", "8t9", "c8s", "38"). Context only.

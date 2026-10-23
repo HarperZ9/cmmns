@@ -66,7 +66,7 @@ test("the card rows name every element's status and carry no verdict words", () 
   for (const [, v] of rows.filter(([label]) => /^Element /.test(label))) assert.match(v, /^(matched|not matched|not observable): /);
   const text = rows.map(([a, b]) => `${a} ${typeof b === "string" ? b : ""}`).join("\n");
   assert.deepEqual(PB.verdictHits(text), []);
-  assert.ok(rows.some(([, v]) => v && v.links && v.links[0][0] === "x-paid-partnerships@1.0.0"));
+  assert.ok(rows.some(([, v]) => v && v.links && v.links[0][0] === "x-paid-partnerships@1.0.1"));
 });
 
 test("the window section draws one block per jurisdiction and one table per definition", () => {

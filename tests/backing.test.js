@@ -44,7 +44,7 @@ test("the badge counts distinct documents, and the window shows quotes, dates, s
   assert.match(flat, /alleged, not proven/);
   assert.match(flat, /as owner or backer of Outlet O/);
   assert.equal(rows.filter(([k]) => k === "This does not prove").length, 2);
-  assert.deepEqual(rows[rows.length - 1], ["Does not prove", BACKING_DOES_NOT_PROVE]);
+  assert.deepEqual(rows[rows.length - 1], ["What it shows", BACKING_DOES_NOT_PROVE]);
   assert.ok(rows.some(([k, v]) => k === "Wrong or out of date?" && v.links[0][1] === CORRECTIONS_PATH));
 });
 

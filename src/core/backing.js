@@ -33,7 +33,7 @@ export function backingLookup(table, { accounts = [], channels = [] } = {}) {
 export const sourceCount = (p) => new Set((p.rows || []).flatMap((r) => r.sources.map((s) => s.url))).size;
 export const backingLabel = (p) => { const n = sourceCount(p); return `Backing on record: ${n} source${n === 1 ? "" : "s"}`; };
 
-export const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person says nothing on its own about whether a given post is true, or that the backer chose its words. Allegations in court records are unproven. Records go out of date; each row gives the date it was read.";
+export const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person, each row dated when it was read. Allegations in court records are claims, and records go out of date.";
 export const CORRECTIONS_PATH = "https://github.com/HarperZ9/daylight-commons/blob/dev/data/owner-corrections.json";
 
 const STATUS_WORDS = { documented: "documented in a primary record", reported: "reported by the press", alleged: "alleged, not proven" };
@@ -51,6 +51,6 @@ export function backingRows(p) {
   }
   if (p.wikidata && p.wikidata.employers && p.wikidata.employers.length) rows.push(["Wikidata lists", `Employer (P108): ${p.wikidata.employers.map((e) => e.label + (e.end ? ` (to ${e.end.slice(0, 4)})` : "")).join("; ")}. Fetched ${p.wikidata.fetched}; Wikidata can lag a move.`]);
   rows.push(["Wrong or out of date?", { links: [["Send a sourced correction", CORRECTIONS_PATH]] }]);
-  rows.push(["Does not prove", BACKING_DOES_NOT_PROVE]);
+  rows.push(["What it shows", BACKING_DOES_NOT_PROVE]);
   return rows;
 }

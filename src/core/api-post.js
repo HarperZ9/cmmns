@@ -20,8 +20,8 @@ export function spanOf(post, text, match) {
   return at < 0 ? { post, start: null, end: null, text: m } : { post, start: at, end: at + m.length, text: String(text).slice(at, at + m.length) };
 }
 
-const item = (post, kind, level, label, shows, source, doesNotProve, spans = [], data = {}) =>
-  ({ kind, scope: "post", level, label, shows, source, doesNotProve, posts: [post], spans, data });
+const item = (post, kind, level, label, shows, source, context, spans = [], data = {}) =>
+  ({ kind, scope: "post", level, label, shows, source, context, posts: [post], spans, data });
 
 function language(id, text) {
   const out = [], s = score(text);

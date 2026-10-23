@@ -1,6 +1,6 @@
 {
   "id": "us-ftc-endorsement-material-connection",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "active",
   "verification": "verified",
   "role": "match",
@@ -12,11 +12,11 @@
   "instrument": "FTC Guides Concerning Use of Endorsements and Testimonials in Advertising, 16 CFR Part 255",
   "section": "16 CFR 255.5(a), with the definition in 255.0(b)",
   "kind": "agency-guides",
-  "binding_note": "The Guides are the FTC's administrative interpretation of section 5 of the FTC Act (16 CFR 255.0(a)). They guide how the Commission applies section 5; they are not a separate rule.",
+  "binding_note": "The Guides are the FTC's administrative interpretation of section 5 of the FTC Act (16 CFR 255.0(a)). They guide how the Commission applies section 5 and sit under it.",
   "in_force": {
     "status": "in force",
     "since": "2023-07-26",
-    "note": "Current text from 88 FR 48102, July 26, 2023, per the eCFR source note. The date is the Federal Register publication date, not a verified effective date."
+    "note": "Current text from 88 FR 48102, July 26, 2023, per the eCFR source note. The date is the Federal Register publication date, and the effective date is still to be checked."
   },
   "sources": [
     {
@@ -65,7 +65,7 @@
       "signals": [
         "disclosed-paid"
       ],
-      "note": "The Paid partnership label shows a connection for the labelled posts only. For unlabelled look-alikes the connection is an inference from shared template and timing, and the public record (contracts, agency rosters) is where it would be shown."
+      "note": "The Paid partnership label shows a connection for the labelled posts. For unlabelled look-alikes the connection is an inference from shared template and timing. Contracts and agency rosters in the public record would show it."
     },
     {
       "id": "C",
@@ -74,7 +74,7 @@
       "required": true,
       "strength": "direct",
       "signals": [],
-      "note": "Materiality turns on how the audience weighs the message. Daylight Commons cannot see that."
+      "note": "Materiality turns on how the audience weighs the message, a question about readers."
     },
     {
       "id": "D",
@@ -83,7 +83,7 @@
       "required": true,
       "strength": "direct",
       "signals": [],
-      "note": "Audience expectation is a question about readers, usually answered with evidence Daylight Commons does not have."
+      "note": "Audience expectation is a question about readers, answered with evidence from outside the page."
     },
     {
       "id": "E",
@@ -94,10 +94,10 @@
       "signals": [
         "undisclosed-lookalike"
       ],
-      "note": "Daylight Commons sees that a quote carries no Paid partnership label. It cannot see a disclosure made elsewhere, such as in an image or a linked page."
+      "note": "Daylight Commons sees whether a quote carries the Paid partnership label. A disclosure can also sit in an image or a linked page."
     }
   ],
-  "does_not_prove": "Daylight Commons sees labels and look-alike posts. It does not see contracts, payments or what the audience expected. A match on visible elements is a comparison with a published definition. It is not a finding by a court or regulator, and it says nothing about elements Daylight Commons cannot see.",
+  "does_not_prove": "Daylight Commons sees labels and look-alike posts. Contracts, payments and audience expectation sit off the page. A match compares visible elements with the published text. Courts and the Commission decide whether the rule was broken.",
   "related": [
     "us-ftc-act-s5-deception",
     "x-paid-partnerships",
