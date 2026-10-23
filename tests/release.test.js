@@ -68,3 +68,26 @@ test("the Firefox update manifest keeps one entry per version, newest last, with
   assert.equal(entry.updates[1].update_hash, "sha256:" + "c".repeat(64));
   assert.equal(Object.keys(doc.addons)[0], manifest.browser_specific_settings.gecko.id);
 });
+
+// The release carries the command line tool so a receipt can be checked without the repository:
+// unzipped into an empty folder, `radar verify` checks a saved evidence chain and fails an edited one.
+test("the command line zip runs verify from an empty folder", async () => {
+  const { cliZip, cliFiles } = await import("../scripts/cli-zip.mjs");
+  const names = cliFiles().map(([n]) => n);
+  for (const n of ["bin/radar.mjs", "src/core/evidence-seal.js", "schema/evidence.v1.json", "package.json", "LICENSE", "src/ext/claims.json"]) assert.ok(names.includes(n), n);
+  assert.ok(!names.some((n) => /\.(html|css|woff2)$/.test(n) || n.startsWith("src/ext/fonts")), "only what the command line needs");
+  assert.ok(cliZip().equals(cliZip()), "the same tree gives the same bytes");
+  const { mkdtempSync, writeFileSync: wf, mkdirSync: md, rmSync: rm } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join: j, dirname: dn } = await import("node:path");
+  const { spawnSync } = await import("node:child_process");
+  const dir = mkdtempSync(j(tmpdir(), "radar-cli-"));
+  try {
+    for (const [n, d] of cliFiles()) { md(dn(j(dir, n)), { recursive: true }); wf(j(dir, n), d); }
+    const chain = new URL("../docs/demo/demo-evidence-chain.json", import.meta.url), edited = new URL("../docs/demo/demo-evidence-chain-edited.json", import.meta.url);
+    const ok = spawnSync(process.execPath, [j(dir, "bin/radar.mjs"), "verify", chain.pathname.replace(/^\/([A-Za-z]:)/, "$1")], { encoding: "utf8", cwd: dir });
+    assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+    const bad = spawnSync(process.execPath, [j(dir, "bin/radar.mjs"), "verify", edited.pathname.replace(/^\/([A-Za-z]:)/, "$1")], { encoding: "utf8", cwd: dir });
+    assert.equal(bad.status, 1, bad.stdout);
+  } finally { rm(dir, { recursive: true, force: true }); }
+});

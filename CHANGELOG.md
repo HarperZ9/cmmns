@@ -55,6 +55,8 @@ claim, is `docs/RELEASE-AUDIT.md`.
   of under two minutes showing install, a reply's window, a lookup and the offline check, and a diagram. All made from the release package on
   synthetic pages (`scripts/demo/`).
 - `docs/store/`: the listing text, six screenshots, the promo tile and the submission steps.
+- Each release carries the command line tool as `radar-cli-<version>.zip`, signed with the rest, so
+  a receipt can be checked without the repository.
 
 
 ### Changed (name)

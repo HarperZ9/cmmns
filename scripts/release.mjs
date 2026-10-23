@@ -1,5 +1,6 @@
 // Build a signed, self-hostable release in dist/release-<version>/: the store packages and the
-// self-distribution xpi (scripts/package.mjs), the per-file hash list, a git bundle of the
+// self-distribution xpi (scripts/package.mjs), the per-file hash list, the command line tool
+// (scripts/cli-zip.mjs), a git bundle of the
 // repository at HEAD, SHA256SUMS over all of them, its detached ECDSA P-256 signature, and the
 // public key. The private key is read from outside the repository and never copied.
 //   RADAR_SIGNING_KEY=<path> node scripts/release.mjs      (or --key <path>)
@@ -11,6 +12,7 @@ import { writePackages, DIST } from "./package.mjs";
 import { readPrivateKey, signDir, writeSums, verifyDir, ROOT, PUBLIC_KEY, SUMS } from "./release-lib.mjs";
 import { signingKeyId } from "../src/core/signing.js";
 import { createHash } from "node:crypto";
+import { cliZip } from "./cli-zip.mjs";
 
 const args = process.argv.slice(2);
 const unsigned = args.includes("--unsigned");
@@ -29,6 +31,9 @@ rmSync(dir, { recursive: true, force: true });
 mkdirSync(dir, { recursive: true });
 writePackages(dir);
 rmSync(join(dir, SUMS));   // remade over every file below
+
+// The command line tool, so anyone can check a bundle or an evidence chain without the repository.
+writeFileSync(join(dir, `radar-cli-${version}.zip`), cliZip());
 
 // The whole history at HEAD, so the source survives without any code host.
 const commit = git("rev-parse", "HEAD");
