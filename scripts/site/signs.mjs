@@ -10,7 +10,7 @@ const pct = (x) => `${(x * 100).toFixed(1)}%`;
 const per100 = (x) => Math.round(x * 100);
 const counts = (r) => `${r.k.toLocaleString("en")} of ${r.n.toLocaleString("en")}; 95% interval ${pct(r.ci[0])} to ${pct(r.ci[1])}`;
 const LANG = { slur: "Slur or coded hate term", violence: "Call for violence", dehumanise: "Dehumanising language", stereotype: "Group stereotype" };
-const DNP_LANG = "Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.";
+const DNP_LANG = "A sign describes the words in the post, which can be quoted, ironic or reported speech.";
 
 function languageSigns(fams) {
   return Object.entries(LANG).filter(([id]) => fams[id] && fams[id].measured).map(([id, name]) => {
@@ -19,7 +19,7 @@ function languageSigns(fams) {
       figure: ciFigure({ value: r.value, ci: r.ci, what: `${name}, precision` }),
       details: [["Precision", esc(counts(r))], d.precisionRange ? ["Range across corpora", esc(d.precisionRange.map(pct).join(" to "))] : null,
         d.recall ? ["Recall", esc(`${pct(d.recall.value)} (${counts(d.recall)}). Daylight Commons is built for precision, so it misses most cases.`)] : null,
-        ["Data", "Measuring Hate Speech, HateXplain and Civil Comments, held-out test split"], ["Does not prove", esc(DNP_LANG)]] });
+        ["Data", "Measuring Hate Speech, HateXplain and Civil Comments, held-out test split"], ["Read it as", esc(DNP_LANG)]] });
   });
 }
 
@@ -29,7 +29,7 @@ function persuasionSigns(ptc) {
     return signBlock({ title: `Persuasion: ${name.toLowerCase()}`, takeaway: `Held back: right ${per100(r.value)} times in 100 on news articles, under the bar of ${per100(SHIP_PRECISION)}.`,
       figure: ciFigure({ value: r.value, ci: r.ci, bar: SHIP_PRECISION, what: `${name}, precision` }),
       details: [["Precision", esc(counts(r))], ["Recall", esc(pct(x.recall.value))], ["Chance", esc(`${pct(x.chance.value)} of words sit inside a span of this technique`)],
-        ["Data", "Propaganda Techniques Corpus v2, held-out articles"], ["Does not prove", "A technique can carry a true claim; it describes how a post argues."]] });
+        ["Data", "Propaganda Techniques Corpus v2, held-out articles"], ["Read it as", "A technique describes how a post argues. True claims use techniques too."]] });
   });
 }
 

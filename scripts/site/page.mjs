@@ -91,7 +91,7 @@ ${CSS}${css ? "\n" + css : ""}
 <h1>${esc(title)}</h1>
 <p class="muted">Updated ${esc(updated)}.</p>
 ${body}
-<footer>Daylight Commons. Evidence, not verdicts. It asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups. <a href="${REPO}">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+<footer>Daylight Commons reads the site you are on. Other coverage and evidence lookups reach further once you turn them on. <a href="${REPO}">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
 </main>
 </body>
 </html>

@@ -13,7 +13,7 @@
 <main class="wide">
   <header>
     <h1>Analyse a file</h1>
-    <p class="lead">Choose a saved page, a thread's JSON or a data export from your own account. Daylight Commons reads it on this device. Nothing is sent anywhere, and no platform needs to be open.</p>
+    <p class="lead">Choose a saved page, a thread's JSON or a data export from your own account. Daylight Commons reads it on this device, and the file stays here. It works with every platform closed.</p>
   </header>
   <section aria-labelledby="h-file">
     <h2 id="h-file">Choose a file</h2>
@@ -41,7 +41,7 @@
     <h2 id="h-bundle">Save signed evidence</h2>
     <p>A bundle holds the post ids, the evidence above with the matched words, Daylight Commons' version, a hash of its data tables and the time, signed with this browser's own Daylight Commons key. Anyone can check it offline with Daylight Commons' command line tool or on this page.</p>
     <label class="switch">
-      <span>Include the posts' full text<span class="hint">Off by default: the posts are other people's words. Without it, the bundle keeps only the matched words.</span></span>
+      <span>Include the posts' full text<span class="hint">The posts are other people's words, so this starts off and the bundle keeps just the matched words.</span></span>
       <input type="checkbox" id="text">
     </label>
     <div class="row">
@@ -52,11 +52,11 @@
   </section>
   <section aria-labelledby="h-check">
     <h2 id="h-check">Check a bundle or an evidence chain</h2>
-    <p>Choose a Daylight Commons evidence bundle to check its signature and that its evidence matches its own posts. Choose an evidence chain, saved with "Save evidence chain", to check that no receipt in it was changed, removed or reordered.</p>
+    <p>Choose a Daylight Commons evidence bundle to check its signature and that its evidence matches its own posts. Choose an evidence chain, saved with "Save evidence chain", to check that every receipt in it is intact and in its original order.</p>
     <label class="drop small-drop"><input type="file" id="check" accept=".json"><span>Choose a bundle or an evidence chain.</span></label>
     <ul id="checks" class="plain"></ul>
   </section>
-  <footer>Evidence, not verdicts. Each item says where it came from and what it does not prove. The file you choose stays on this device.</footer>
+  <footer>Each item says where it came from and how to read it. The file you choose stays on this device.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="settings.js"></script>

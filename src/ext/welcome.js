@@ -15,7 +15,7 @@
   const measured = detectors.filter((f) => PB.measuredLine(f.id).measured).length;
   $("measured").textContent = measured
     ? `Each sign shows its measured precision. Today ${measured} of ${detectors.length} detectors have one; the rest say "not measured yet".`
-    : `Each sign shows its measured precision. No detector has one yet, so every sign says "not measured yet".`;
+    : `Each sign shows its measured precision once it has one. Today every detector is still waiting for its first measurement.`;
 
   $("start").addEventListener("click", async () => {
     const on = sites().filter(([id]) => chosen[id] !== false);

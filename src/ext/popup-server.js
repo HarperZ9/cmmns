@@ -33,7 +33,7 @@
     const host = new URL(tab.url).hostname.toLowerCase();
     $("server").hidden = false;
     $("server-text").textContent = `This looks like a Mastodon server (${host}, Mastodon ${found.version.split("+")[0]}). ` +
-      "Daylight Commons can read the posts this server shows you here. Your browser will ask you to allow it for this server only.";
+      "Daylight Commons can read the posts this server shows you here. Your browser asks you to allow it for this one server.";
     const already = await chrome.permissions.contains({ origins: [origin] });
     $("server-on").addEventListener("click", async () => {
       if (already) {

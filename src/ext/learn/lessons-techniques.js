@@ -7,7 +7,7 @@ export const TECHNIQUE_LESSONS = [
     id: "cross-language", title: "Same link or upload in several languages", research: [],
     what: "Replies in different languages, from different accounts, carry the same link, the same uploaded file or a claim the same fact-checker reviewed. Daylight Commons reads the language the site itself assigns, and it leaves out the material of the post being answered.",
     examples: [
-      { side: "none", topic: "health", kind: "sign", text: "Within an hour, one video about a clinic appears under a news story in Turkish, Indonesian and Korean replies, each from an account with no other posts in that language." },
+      { side: "none", topic: "health", kind: "sign", text: "Within an hour, one video about a clinic appears under a news story in Turkish, Indonesian and Korean replies, each from an account whose other posts are in another language." },
       { side: "none", topic: "climate", kind: "ordinary", text: "A weather agency's storm map is shared by people in English, Spanish and French along a coast that speaks all three." },
     ],
     why: "A claim that seems to come up everywhere at once feels confirmed. Pushing one item into several language communities at the same time makes each audience think it found the story on its own.",
@@ -17,19 +17,19 @@ export const TECHNIQUE_LESSONS = [
   },
   {
     id: "laundered", title: "Material passed through other accounts", research: [],
-    what: "The post's material reached it through other accounts or a linked site, and the post does not point at the earliest source Daylight Commons has seen. Daylight Commons follows only what the site records: quotes, reposts, \"media from\", and the same upload or link seen earlier.",
+    what: "The post's material reached it through other accounts or a linked site, and the post leaves out the earliest source Daylight Commons has seen. Daylight Commons follows what the site records: quotes, reposts, \"media from\", and the same upload or link seen earlier.",
     examples: [
-      { side: "none", topic: "economy", kind: "sign", text: "A chart first posted by an anonymous account is quoted by a mid-sized account, then shared by a large one as \"reports say\", with no trace of the first post." },
+      { side: "none", topic: "economy", kind: "sign", text: "A chart first posted by an anonymous account is quoted by a mid-sized account, then shared by a large one as \"reports say\", with the first post dropped from view." },
       { side: "none", topic: "science", kind: "ordinary", text: "A teacher shares a science magazine's post, which quotes the university that ran the study." },
     ],
     why: "A claim gains weight each time it passes through a voice people trust. After two or three steps the original source drops out of sight, and one source looks like several independent ones.",
-    spot: "Open the origin in the chain. Ask who said it first, what they based it on, and whether each step added evidence or only reach.",
+    spot: "Open the origin in the chain. Ask who said it first, what they based it on, and whether each step added evidence or just reach.",
     counter: "If every step adds a source or a check, the chain is reporting. If each step only repeats the one before, you are looking at a single claim with many voices.",
     dnp: "Daylight Commons cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.",
   },
   {
     id: "person-story", title: "One person's story, no wider picture", research: [],
-    what: "The post explains an issue only through one person's case: a name, an age, what happened to them. It gives no numbers, trends, causes or policies. Iyengar called this episodic framing, and its opposite, which places the issue in context, thematic framing. Daylight Commons does not show this sign yet: it has no labelled check.",
+    what: "The post explains an issue through one person's case alone: a name, an age, what happened to them. Numbers, trends, causes and policies are left out. Iyengar called this episodic framing, and its opposite, which places the issue in context, thematic framing. Daylight Commons will show this sign once it has a labelled check.",
     examples: [
       { side: "left", topic: "housing", kind: "sign", text: "A 71-year-old widow was evicted on Tuesday after 30 years in her flat. This is what the new rules do." },
       { side: "right", topic: "immigration", kind: "sign", text: "This father lost his son to a driver who had been told to leave. Meet the family the system forgot." },
@@ -39,6 +39,6 @@ export const TECHNIQUE_LESSONS = [
     why: "A single story is vivid and easy to remember. Iyengar found that viewers shown episodic coverage tended to blame the person in it, and viewers shown thematic coverage tended to hold government or society responsible. The choice of frame moves the blame before any argument is made.",
     spot: "Ask how common the case is, and what causes it. Look for one number or one cause beyond the person.",
     counter: "A story beside the figures, like the fair example, shows both the person and the pattern. A story alone tells you about one life.",
-    dnp: "A person's story can be true, typical and the best way to explain an issue. This describes how the post explains the issue, not whether it is right or who wrote it.",
+    dnp: "A person's story can be true, typical and the best way to explain an issue. This sign describes how the post explains the issue; whether it is right, and who wrote it, are separate questions.",
   },
 ];

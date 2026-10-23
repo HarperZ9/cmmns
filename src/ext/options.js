@@ -61,8 +61,8 @@
       $("areas").append(switchRow(name, AREA_HINTS[id], PB.areaOn(s(), id), (on) => save({ areas: { ...s().areas, [id]: on } })));
     }
     $("reading").append(
-      switchRow("Daylight Commons on feeds and profiles", "Off: Daylight Commons reads only the replies under a post you open.", s().feeds, (on) => save({ feeds: on })),
-      switchRow("Read account details automatically", "Off: account details are read only when you ask in the window.", s().auto, (on) => save({ auto: on })),
+      switchRow("Daylight Commons on feeds and profiles", "Adds Daylight Commons to feeds and profile pages, beside the replies under a post you open.", s().feeds, (on) => save({ feeds: on })),
+      switchRow("Read account details automatically", "Reads account details as replies load. With this off, ask for them in the window.", s().auto, (on) => save({ auto: on })),
       switchRow("Evidence lookups", "Adds \"Look up evidence\" to the launch campaign section. On your click, the repository names and domains a post links to go to GitHub, rdap.org and the Internet Archive; nothing else, and never an account. Each result is sealed in this browser. Turning this on asks your browser for access to web.archive.org, whose answers need it.", s().evidence, (on, input) => evidenceSwitch(on, input)),
       switchRow("Read text in images", "Adds \"Read text in this image\" to the window's Media area. Daylight Commons reads the words on this device, only when you click, in Latin-script languages; the image and its text never leave your browser.", s().imageText, (on) => save({ imageText: on })),
     );
@@ -116,7 +116,7 @@
 
   function access() {
     $("access").append(
-      switchRow("Reduce motion", "The window appears and disappears without fading or sliding.", s().calm, (on) => save({ calm: on })),
+      switchRow("Reduce motion", "The window appears and disappears instantly.", s().calm, (on) => save({ calm: on })),
       switchRow("Larger text", "Larger text in Daylight Commons' window and pages.", s().large, (on) => save({ large: on })),
     );
   }
@@ -136,5 +136,5 @@
 
   siteSwitches(); servers(); windowSwitches();
   tokenField().catch((e) => console.error("[daylight-commons] token field failed", e)); retention(); clearAll(); access(); families(); usage();
-  $("foot").textContent = `Daylight Commons ${chrome.runtime.getManifest().version}. Evidence, not verdicts. Daylight Commons asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups.`;
+  $("foot").textContent = `Daylight Commons ${chrome.runtime.getManifest().version}. Daylight Commons reads the site you are on. Other coverage and evidence lookups reach further once you turn them on.`;
 })().catch((e) => console.error("[daylight-commons] options page failed", e));
