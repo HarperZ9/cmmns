@@ -149,3 +149,17 @@
 .pb-site-line { margin: 2px 0 6px; font-size: 12px; line-height: 16px; color: var(--pb-muted); cursor: default; }
 .pb-site-line:hover, .pb-site-line:focus-visible { color: var(--pb-ink); }
 .pb-site-line:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; border-radius: 2px; }
+/* Element tables in the campaign window (src/ext/definitions-view.js): ink only, weight for status. */
+.pb-defs { margin-top: 8px; }
+.pb-def-j { margin: 6px 0; border-top: 1px solid var(--pb-line); padding-top: 4px; }
+.pb-def-j > summary { cursor: pointer; color: var(--pb-ink); font-weight: 600; }
+.pb-def-j > summary:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; }
+.pb-def { margin: 6px 0 10px; }
+.pb-def-h { margin: 4px 0; color: var(--pb-ink); }
+.pb-def-role { color: var(--pb-muted); font-size: 0.92em; }
+.pb-def-t { width: 100%; border-collapse: collapse; font-size: 0.92em; }
+.pb-def-t th { text-align: left; color: var(--pb-muted); font-weight: 600; border-bottom: 1px solid var(--pb-rule); padding: 2px 4px; }
+.pb-def-t td { vertical-align: top; padding: 3px 4px; border-bottom: 1px solid var(--pb-line); color: var(--pb-muted); }
+.pb-def-t .pb-def-s { white-space: nowrap; }
+.pb-def-matched td { color: var(--pb-ink); }
+.pb-def-matched .pb-def-s { font-weight: 700; }

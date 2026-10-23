@@ -112,6 +112,7 @@
         "mediacard.js",
         "linkcard.js",
         "signals.js",
+        "definitions-view.js",
         "card.js",
         "panel.js",
         "ui.js",

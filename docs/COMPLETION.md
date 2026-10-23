@@ -95,8 +95,8 @@ These do not move for any feature below. A row that would cross one is out of sc
 |---|---|---|---|---|---|
 | J1 | Each entry carries jurisdiction, source, version, retrieval date and source hash | `tests/definitions.test.js` against the schema | **PASS** | 15 entries | none |
 | J2 | Catalogue covers the US, EU, UK and each supported platform's own policy | coverage table test | **PARTIAL** | 15 entries; no common-law fraud, no UCPD transpositions, X only among platform policies | none |
-| J3 | Element tables shown in the window | fixture test; capture | **NOT BUILT** | release audit, known limits | none |
-| J4 | Every applicable jurisdiction shown, never the most damning alone | test over a multi-jurisdiction case | **PARTIAL** | library only | none |
+| J3 | Element tables shown in the window | fixture test; capture | **PASS** | `src/ext/definitions-view.js` in the campaign window and card; `tests/definitions.window.test.js`; captures `docs/demo/definitions-window-light.png` and `-dark.png` (wave 2) | none |
+| J4 | Every applicable jurisdiction shown, never the most damning alone | test over a multi-jurisdiction case | **PASS** | `tests/definitions.window.test.js`: US actor and UK audience show X, US and UK, not EU; with neither known every jurisdiction shows; order does not change with the matches (wave 2) | none |
 | J5 | Every badge links to its catalogue entry and version | test over `catalogue/signals.json` | **PASS** | `tests/catalogue.links.test.js`: every non-context signal links to each active entry citing it at the current version; campaign window and card render the links (wave 2) | none |
 | J6 | Challenge route with a public decision for each challenge | issue template; decisions log; test that the log parses | **PASS** | `catalogue/DECISIONS.md`, `scripts/decisions-check.mjs` in CI (closed issue needs a final decision, open issue a line within 14 days); `tests/decisions.test.js` (wave 2) | Community Notes rates notes; we publish each decision with its reasons |
 | J7 | Symmetry results published with each catalogue release | release asset or page | **PARTIAL** | tests run; nothing published per release | none |
