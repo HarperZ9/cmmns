@@ -1,6 +1,6 @@
 // The "How Daylight Commons works" page (scripts/how-it-works.mjs): built fresh, every still it
-// shows is in docs/demo, every finding's does-not-prove line is the one the window shows, and the
-// page follows the author's site canon like the other public pages.
+// shows is in docs/demo, each finding has a caption and at most one plain line on how to read it, and
+// the page follows the author's site canon like the other public pages.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
@@ -20,12 +20,17 @@ test("every still, the diagram and the recording it shows are in docs/demo", () 
   for (const f of ["how-it-works-light.svg", "how-it-works-dark.svg", "demo-install-to-verify.webm"]) assert.ok(existsSync(join(ROOT, "docs/demo", f)), f);
 });
 
-test("each finding carries its own does-not-prove line, word for word", () => {
+test("each finding shows its still and caption, and at most one short line on how to read it", () => {
   assert.ok(FINDINGS.length >= 10);
-  for (const [, title, , dnp] of FINDINGS) {
-    assert.ok(dnp && dnp.length > 20, title);
-    assert.ok(html.includes(`<strong>Does not prove:</strong> ${esc(dnp)}`), title);
+  for (const [src, title, what, read] of FINDINGS) {
+    assert.ok(what && what.length > 20, title);
+    assert.ok(html.includes(`<h3>${esc(title)}</h3>`) && html.includes(`src="demo/${src}"`), title);
+    if (read) {
+      assert.ok(html.includes(`<p class="dc-read">${esc(read)}</p>`), title);
+      assert.ok(read.split(/[.!?](\s|$)/).filter((x) => x && x.trim()).length <= 3 && read.length < 160, `${title}: keep it short`);
+    }
   }
+  assert.doesNotMatch(html, /Does not prove/);
 });
 
 test("the page uses the site canon and carries no local path, placeholder or em dash", () => {

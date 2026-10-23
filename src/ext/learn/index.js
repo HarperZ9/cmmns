@@ -19,7 +19,7 @@ export const SIDES = ["left", "right", "centre", "none"];
 // so a lesson builds discernment instead of suspicion of everything (Modirrousta-Galian and Higham 2023).
 export const KINDS = ["sign", "fair", "ordinary"];
 // Every lesson says this, in these words, after its own does-not-prove line.
-export const TRUE_TOO = "A post that shows this sign can still be true. Judge the claim by its evidence, and the sign by what it is: a reason to look closer.";
+export const TRUE_TOO = "A post with this sign can still be true. The sign tells you where to look; the evidence settles the claim.";
 export const MAX_SECONDS = 120;
 
 // Groups for the lesson index, in the window's area order, with the thread report last.

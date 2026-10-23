@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <title>How Daylight Commons works | Daylight Commons</title>
-<meta name="description" content="How Daylight Commons works: each finding type with what it shows and what it does not prove, the path a reply takes, and receipts anyone can check offline.">
+<meta name="description" content="How Daylight Commons works: each finding type on a real window, the path a reply takes, and receipts anyone can check offline.">
 <link rel="canonical" href="https://harperz9.github.io/daylight-commons/how-it-works.html">
 <link rel="preload" href="/system/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/system/doc.css">
@@ -21,7 +21,7 @@
 .sheet video{display:block;width:100%;max-width:100%;height:auto;border:1px solid var(--rule)}
 .dc-fig{margin:.6rem 0 1.2rem}.dc-fig img{display:block;width:100%;height:auto;border:1px solid var(--rule)}
 .dc-fig figcaption{margin-top:.5rem;color:var(--ink-muted);font-size:.9rem;max-width:var(--measure)}
-.dc-dnp{color:var(--ink-soft)}.dc-dnp strong{color:var(--ink)}
+.dc-read{color:var(--ink-soft)}
 </style>
 </head>
 <body class="doc">
@@ -47,8 +47,8 @@
 </section>
 <section aria-labelledby="receipts-you-can-check-without-us">
 <h2 id="receipts-you-can-check-without-us">Receipts you can check without us</h2>
-<p>When an evidence lookup answers, Daylight Commons keeps the answer as a receipt: what the source said, its address, the time, a hash of the answer and what the fact does not prove. Each receipt is appended to a hash chain in your browser, with a Merkle root over the chain and a proof for each receipt. &quot;Save evidence chain&quot; downloads the whole chain as one file.</p>
-<p>Anyone holding that file can check it offline, with the command line tool or the Analyse a file page inside the extension. The check fails when a receipt was changed, removed or reordered. A passing check shows the chain is the one this browser recorded. It does not show that a source told the truth, and whoever holds the device could start a new chain.</p>
+<p>Click an evidence lookup and the answer comes back as a receipt: what the source said, its address, the time, and a hash of the answer. Each receipt joins a hash chain in your browser, with a Merkle root over the chain and a proof for each receipt. &quot;Save evidence chain&quot; downloads the whole chain as one file.</p>
+<p>Hand that file to anyone. They can check it offline, with the command line tool or the Analyse a file page inside the extension. Change one receipt, drop one or swap two, and the check fails. A pass tells you the chain is the one this browser recorded. To know whether a source was right, open the source the receipt names.</p>
 </section>
 <section aria-labelledby="watch-it">
 <h2 id="watch-it">Watch it</h2>
@@ -57,55 +57,54 @@
 </section>
 <section aria-labelledby="what-each-finding-shows">
 <h2 id="what-each-finding-shows">What each finding shows</h2>
-<p>Every still below is the installed extension on a synthetic page. Every account in them is invented.</p>
+<p>Each still is the installed extension on a made-up page. Every account in them is invented.</p>
 <h3>Place</h3>
 <figure class="dc-fig"><img src="demo/finding-place.png" alt="Place: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>Where the platform places the account, and a sign when a reply speaks as a local of somewhere else (here, &quot;Here in France&quot; from an account X labels Nigeria).</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> The label can be wrong (VPNs, travel, X's own errors), and people abroad still speak as locals of where they come from.</p>
+<p class="dc-read">Treat it as a lead. The label follows the connection, so a VPN or a trip moves it, and people abroad still talk about home.</p>
 <h3>Account</h3>
 <figure class="dc-fig"><img src="demo/finding-account.png" alt="Account: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>The account's age and renames, as the platform discloses them.</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> New accounts include real people who just joined, often during a news event.</p>
+<p class="dc-read">Plenty of real people sign up during a news event, so age is one sign among several.</p>
 <h3>Posting</h3>
 <figure class="dc-fig"><img src="demo/finding-posting.png" alt="Posting: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>How the account posts: the app it posts from, its hours, its rate.</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> Scheduling tools are common among news desks, brands and busy people.</p>
+<p class="dc-read">News desks, brands and busy people schedule posts too.</p>
 <h3>Coordination</h3>
 <figure class="dc-fig"><img src="demo/finding-coordination.png" alt="Coordination: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>The same text from several accounts in one thread, with the accounts it matched.</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.</p>
+<p class="dc-read">Matching text shows the words were copied. Open the matched accounts to see who sent them.</p>
 <h3>Language</h3>
 <figure class="dc-fig"><img src="demo/finding-language.png" alt="Language: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>Dehumanising language and calls for violence, with the words that matched and the sign's measured precision.</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.</p>
+<p class="dc-read">The sign describes the words in this post. A quote, a joke or a news report can match too.</p>
 <h3>Fact-checked claims</h3>
 <figure class="dc-fig"><img src="demo/finding-fact-check.png" alt="Fact-checked claims: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>A claim a fact-checker already reviewed, with their rating in their own words and a link.</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> Similar wording is not the same claim; check the source. The rating is the fact-checker's, about the claim they reviewed, not about this post or the person who wrote it.</p>
+<p class="dc-read">The rating belongs to the claim the fact-checker reviewed. Open their link and compare the wording with this post.</p>
 <h3>Sources</h3>
 <figure class="dc-fig"><img src="demo/finding-sources.png" alt="Sources: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>Who owns a linked outlet, and a state link only where a cited source names it (here, an outlet Wikidata records as controlled by a government).</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> State ownership is not proof of disinformation. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.</p>
+<p class="dc-read">Public broadcasters with their own newsrooms count as state-owned too, and Wikidata can lag a sale.</p>
 <h3>Thread report</h3>
 <figure class="dc-fig"><img src="demo/finding-thread-report.png" alt="Thread report: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>Where the thread's accounts are based, coordination across the thread, and whether the harshest replies come mostly from flagged accounts.</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> A skew can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event. It says nothing about any one reply or account.</p>
+<p class="dc-read">The report describes the thread as the platform ranked it. It never scores a single reply or account.</p>
 <h3>Launch campaign</h3>
 <figure class="dc-fig"><img src="demo/finding-launch-campaign.png" alt="Launch campaign: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>On a launch post: how its engagement compares with the account's own posts, shared bio templates, join-date waves and Paid partnership labels.</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> These signs describe how this post's engagement looks in what your page loaded. They do not say who paid, whether the product is good, or that any one account is fake. Real people also write stock bios, join in waves and reshare launches.</p>
+<p class="dc-read">The signs describe the engagement your page loaded. Real people also write stock bios, join in waves and reshare launches.</p>
 <h3>Evidence receipts</h3>
 <figure class="dc-fig"><img src="demo/finding-evidence.png" alt="Evidence receipts: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>On your click: a linked repository's creation date and a site's first Internet Archive capture, each kept as a receipt.</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> A creation date is when this repository was made on GitHub. Work often starts elsewhere or in another repository, so it says nothing about how long a team has been building.</p>
+<p class="dc-read">The date is when this repository appeared on GitHub. A team may have built for years before that.</p>
 <h3>Offline check</h3>
 <figure class="dc-fig"><img src="demo/finding-verify.png" alt="Offline check: Daylight Commons' window on a synthetic page" width="1280" height="800" loading="lazy" decoding="async"><figcaption>The saved evidence chain, checked on the Analyse a file page: every receipt, link, the root and each proof.</figcaption></figure>
-<p class="dc-dnp"><strong>Does not prove:</strong> The seal shows that these receipts are the ones this browser recorded, in this order, and that none was changed or removed after the fact. It does not show that a source told the truth, and whoever holds the device could start a new log.</p>
 </section>
 <section aria-labelledby="run-it-on-us">
 <h2 id="run-it-on-us">Run it on us</h2>
-<p>The screen recording on this page runs the evidence lookup on a synthetic post that links Daylight Commons' own repository and site. The answers are real: GitHub's creation date for the repository, and the Internet Archive's first capture of the site. The site is a page on github.io, a hosting service, so Daylight Commons does not ask RDAP when github.io was registered. That date would say nothing about this site.</p>
+<p>The recording on this page points the evidence lookup at a made-up post that links Daylight Commons' own repository and site. The answers are live: GitHub's creation date for the repository, and the Internet Archive's first capture of the site. The site sits on github.io, a shared host, so the lookup skips RDAP there. Its registration date would belong to GitHub.</p>
 </section>
-<section aria-labelledby="limits">
-<h2 id="limits">Limits</h2>
-<ul><li>Platform labels can be wrong. VPNs and travel move them, and users can broaden them to a region.</li>
-<li>Daylight Commons sees only the replies the site chose to show, in the site's order.</li>
-<li>Most signs are not measured yet and say so. The measured ones show their precision with a 95% interval on the measurement page.</li>
-<li>The launch campaign lens has no measured precision. Until a media lawyer has reviewed its wording, it names no company: every claim reads &quot;this launch&quot;.</li>
-<li>A site redesign can break a reader until Daylight Commons is updated. The extension says so when it reads nothing where it should.</li></ul>
+<section aria-labelledby="before-you-rely-on-it">
+<h2 id="before-you-rely-on-it">Before you rely on it</h2>
+<ul><li>The window sees the replies the site chose to show, in the site's order.</li>
+<li>Platform labels follow the connection. A VPN or a trip moves them, and users can widen them to a region.</li>
+<li>The measurement page lists which signs have a measured precision, each with a 95% interval. The window marks every other sign &quot;not measured yet&quot;.</li>
+<li>The launch campaign lens has no measured precision yet. Until a media lawyer has reviewed its wording, every claim reads &quot;this launch&quot; and names no company.</li>
+<li>A site redesign can break a reader until the next update. The extension says so when it reads nothing where replies should be.</li></ul>
 </section>
 
-<p class="dc-foot">Daylight Commons gives evidence, not verdicts. It asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups. Free and open source under the AGPL-3.0.</p>
+<p class="dc-foot">Daylight Commons reads the site you are on. It contacts anything else only when you turn on Other coverage or evidence lookups and click. Free and open source under the AGPL-3.0.</p>
 </article>
 </main>
 </body>

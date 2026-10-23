@@ -50,7 +50,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <nav class="dc-local" aria-label="Daylight Commons"><a href="how-it-works.html">How it works</a> <a href="install.html">Install</a> <a href="privacy.html">Privacy</a> <a href="transparency.html" aria-current="page">How it is measured</a> <a href="catalogue.html">Catalogue</a> <a href="https://github.com/HarperZ9/daylight-commons">Source</a></nav>
 <p class="dc-updated">Updated 2026-10-23.</p>
 
-<p class="lead">Every sign in Daylight Commons' window either shows how often it was right when people checked by hand, or says "not measured yet". This page lists every sign, the data each was checked on and its licence, how evenly the signs work whichever side a post targets, and what the numbers do not prove.</p>
+<p class="lead">Every sign in Daylight Commons' window carries one of two labels: how often it was right when people checked by hand, or "not measured yet". Below is every sign, the data it was checked on and that data's licence, and how evenly the signs fire whichever side a post targets.</p>
 <section aria-labelledby="how-to-read-the-numbers">
 <h2 id="how-to-read-the-numbers">How to read the numbers</h2>
 <ul>
@@ -202,11 +202,11 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </section>
 <section aria-labelledby="cases-written-for-the-test">
 <h2 id="cases-written-for-the-test">Cases written for the test</h2>
-<p>Same text as other replies: pair precision <span class="mono">97.7% (85 of 87; 92.0% to 99.4%)</span>, recall <span class="mono">100.0% (85 of 85; 95.7% to 100.0%)</span>. Speaks as local, labelled elsewhere: precision <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>, recall <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>. The same author wrote these cases and the rules, so they show the rules do what they say. They are not error rates on real replies.</p>
+<p>Same text as other replies: pair precision <span class="mono">97.7% (85 of 87; 92.0% to 99.4%)</span>, recall <span class="mono">100.0% (85 of 85; 95.7% to 100.0%)</span>. Speaks as local, labelled elsewhere: precision <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>, recall <span class="mono">100.0% (14 of 14; 78.5% to 100.0%)</span>. One author wrote both these cases and the rules. Read the figures as a check that the rules fire where they should; real replies have no error rate yet.</p>
 </section>
 <section aria-labelledby="side-balance">
 <h2 id="side-balance">Side balance</h2>
-<p>Political side is never an input to Daylight Commons. To check that the signs work alike whichever side a post targets, the strong language signs were measured on hostile text aimed at groups each side is often hostile to. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
+<p>The strong language signs were run on hostile text aimed at groups each side is often hostile to, and recall was compared. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
 <div class="scroll"><table class="data data--wide"><thead><tr><th scope="col">Corpus</th><th scope="col">Recall, right's usual targets</th><th scope="col">Recall, left's usual targets</th><th scope="col">Precision, right's usual targets</th><th scope="col">Precision, left's usual targets</th><th scope="col">Result</th></tr></thead><tbody>
 <tr><td>Measuring Hate Speech</td><td class="num">10.2% (771 of 7,584; 9.5% to 10.9%)</td><td class="num">8.0% (201 of 2,499; 7.0% to 9.2%)</td><td class="num">95.7% (771 of 806; 94.0% to 96.9%)</td><td class="num">93.9% (201 of 214; 89.9% to 96.4%)</td><td><span class="hot">Gap remains</span></td></tr>
 <tr><td>HateXplain</td><td class="num">45.2% (1,897 of 4,197; 43.7% to 46.7%)</td><td class="num">43.4% (109 of 251; 37.4% to 49.6%)</td><td class="num">98.0% (1,897 of 1,935; 97.3% to 98.6%)</td><td class="num">97.3% (109 of 112; 92.4% to 99.1%)</td><td>Balanced</td></tr>
@@ -381,10 +381,10 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td><a href="https://huggingface.co/datasets/Exqrch/IndoDiscourse">IndoDiscourse, formerly IndoToxic2024 (Susanto et al. 2025), Indonesian</a></td><td>Apache-2.0; the card adds &quot;for research purposes only&quot;</td></tr>
 <tr><td><a href="https://github.com/ialfina/id-hatespeech-detection">IDHSD (Alfina et al., ICACSIS 2017), Indonesian</a></td><td>Free use without permission; no public copies (README)</td></tr>
 </tbody></table></div>
-<p>No corpus text is in Daylight Commons or its repository; only counts, rates and file hashes are. The evaluation scripts in <a href="https://github.com/HarperZ9/daylight-commons">Daylight Commons' repository</a> reproduce every number here from the downloaded corpora.</p>
+<p>The repository holds counts, rates and file hashes, and none of the corpus text. Download the corpora, run the evaluation scripts in <a href="https://github.com/HarperZ9/daylight-commons">Daylight Commons' repository</a>, and every number on this page comes back.</p>
 </section>
 
-<p class="dc-foot">Daylight Commons gives evidence, not verdicts. It asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups. Free and open source under the AGPL-3.0.</p>
+<p class="dc-foot">Daylight Commons reads the site you are on. It contacts anything else only when you turn on Other coverage or evidence lookups and click. Free and open source under the AGPL-3.0.</p>
 </article>
 </main>
 </body>

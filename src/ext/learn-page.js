@@ -60,7 +60,7 @@ function showLesson(l) {
     section("Why it works on people", el("p", {}, l.why)),
     section("See it without Daylight Commons", el("p", {}, l.spot)),
     section("The counter-move", el("p", {}, l.counter)),
-    section("What the sign does not prove", dnp),
+    section("How far the sign goes", dnp),
   ];
   const m = measured(l.id);
   if (m) parts.push(m);
@@ -76,7 +76,7 @@ function showIndex() {
   document.title = "Daylight Commons lessons";
   const head = el("header");
   head.append(el("h1", {}, "Learn to see it yourself"), el("p", { class: "lead" },
-    "Every sign Daylight Commons shows has a lesson of a minute or two: what the move is, a made-up example, why it works on people, how to spot it without Daylight Commons, and what it does not prove."));
+    "Every sign Daylight Commons shows has a lesson of a minute or two: what the move is, a made-up example, why it works on people, how to spot it yourself, and how far the sign goes."));
   const parts = [head];
   for (const [name, ids] of GROUPS) {
     const ul = el("ul", { class: "index" });

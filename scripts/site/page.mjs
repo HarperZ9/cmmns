@@ -157,7 +157,7 @@ ${SITE_CSS}${css ? "\n" + css : ""}
 <nav class="dc-local" aria-label="Daylight Commons">${local} <a href="${REPO}">Source</a></nav>
 <p class="dc-updated">Updated ${esc(updated)}.</p>
 ${sections(body.replace(/<table>/g, '<table class="data data--wide">'))}
-<p class="dc-foot">Daylight Commons gives evidence, not verdicts. It asks only the site you are on, and anything else only when you turn on Other coverage or evidence lookups. Free and open source under the AGPL-3.0.</p>
+<p class="dc-foot">Daylight Commons reads the site you are on. It contacts anything else only when you turn on Other coverage or evidence lookups and click. Free and open source under the AGPL-3.0.</p>
 </article>
 </main>
 </body>

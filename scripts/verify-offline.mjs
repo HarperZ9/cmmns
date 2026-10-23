@@ -86,7 +86,7 @@ ${CSS}
 <h1>Check a Daylight Commons kit</h1>
 <p>This page checks the files in a Daylight Commons kit on this device. It needs no network and sends nothing. The key below is built into this file.</p>
 ${ids}
-<p>Compare that key with the printed card or a second source: a person you trust, a different website. A key that arrives in the same download as the files proves nothing on its own. If they differ, stop.</p>
+<p>Compare that key with the printed card or a second source, such as a person you trust or a different website. A key that came in the same download as the files can be swapped along with them. If the two differ, stop.</p>
 <h2>Pick the kit</h2>
 <label for="kit-folder">The whole kit folder</label>
 <input type="file" id="kit-folder" webkitdirectory multiple>
@@ -97,7 +97,7 @@ ${ids}
 <input type="file" id="bundle-file" accept=".json,application/json">
 <ul id="kit-out" aria-live="polite"></ul>
 <h2>What a pass shows</h2>
-<p class="muted">The files match what the holder of the built-in key signed, and the signed head gives their release, version and expiry. It does not show the files are safe, and it does not show the built-in key is right if this page came from someone you do not trust. This page has had no independent security audit.</p>
+<p class="muted">A pass means these are the files the holder of the built-in key signed. The signed head gives their release, version and expiry. The signature tells you who signed them, so give the files the same care as any download before you run them. The key is only as good as the place this page came from. No independent security audit has reviewed this page yet.</p>
 </main>
 <script>
 "use strict";
