@@ -32,5 +32,25 @@
     "verify-release": "node scripts/verify-release.mjs",
     "catalogue:refetch": "node scripts/catalogue-refetch.mjs --quotes"
   },
-  "license": "AGPL-3.0-only"
+  "license": "AGPL-3.0-only",
+  "keywords": [
+    "browser-extension",
+    "fact-checking",
+    "misinformation",
+    "disinformation",
+    "media-literacy",
+    "social-media",
+    "coordinated-inauthentic-behavior",
+    "provenance",
+    "firefox-extension",
+    "chrome-extension"
+  ],
+  "homepage": "https://harperz9.github.io/daylight-commons/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HarperZ9/daylight-commons.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HarperZ9/daylight-commons/issues"
+  }
 }
