@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Daylight Commons",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Evidence beside social media replies, each sign with its source and what it does not prove. No server, no account, no analytics.",
   "homepage_url": "https://github.com/HarperZ9/daylight-commons",
   "icons": {
