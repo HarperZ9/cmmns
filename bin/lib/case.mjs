@@ -14,6 +14,7 @@ import { rankLeads, leadLines, checkLead, checkAbsence, absentLines } from "../.
 import { clock, network, gitInit, gitCommit } from "./case-env.mjs";
 import { RUN_COMMANDS } from "./case-run.mjs";
 import { SCHEDULE_HELP } from "../../src/investigate/watch.js";
+import { CASE_HELP, helpText } from "./help.mjs";
 
 export const CASE_USAGE = `Usage: daylight case <command> [--case <folder>] [--json]
   init <name> [--dir <folder>]                 a new case folder with its own git repository
@@ -162,13 +163,16 @@ const READ_ONLY = new Set(["claims", "labels", "trace", "timeline", "network", "
 
 export async function runCaseCommand(argv, base = {}) {
   const args = parseCaseArgs(argv), cmd = args._.shift();
+  if (cmd === "help" && CASE_HELP[args._[0]]) return { code: 0, out: helpText(CASE_HELP[args._[0]], `daylight case ${args._[0]}`) };
+  if (cmd && args.f.help && CASE_HELP[cmd]) return { code: 0, out: helpText(CASE_HELP[cmd], `daylight case ${cmd}`) };
   if (!cmd || cmd === "help" || args.f.help) return { code: cmd ? 0 : 2, out: CASE_USAGE };
   const net = network(base.env || process.env);
   const env = { now: clock(base.env || process.env), ...net, ...base };
   if (cmd === "init") return { code: 0, out: init(env, args) };
   if (cmd === "watch" && args.f.schedule) return { code: 0, out: SCHEDULE_HELP };
   const fn = COMMANDS[cmd];
-  if (!fn) return { code: 2, out: CASE_USAGE };
+  if (!fn) return { code: 2, out: `Unknown case command "${cmd}". The commands are:
+${CASE_USAGE}` };
   env.dir = resolve(typeof args.f.case === "string" ? args.f.case : base.cwd || process.cwd());
   if (cmd === "run" && !isCase(env.dir)) { initCase(env.dir, typeof args.f.name === "string" ? args.f.name : "Case from seeds", env.now()); if (!args.f["no-git"]) gitInit(env.dir); }
   env.data = () => loadCase(env.dir);

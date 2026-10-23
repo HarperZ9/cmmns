@@ -5,12 +5,13 @@
 // is passed in, so this module loads no data tables itself.
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { within } from "./paths.js";
 import { readThread, patternCounts, readingOn, lensOn } from "../core/reading.js";
 
 const MAX_CHARS = 20000;
 
 function textOf(data, s) {
-  const f = s.capture && s.capture.text_file ? join(data.dir, s.capture.text_file) : null;
+  const f = s.capture && s.capture.text_file ? within(data.dir, s.capture.text_file) : null;
   return f && existsSync(f) ? readFileSync(f, "utf8").slice(0, MAX_CHARS) : null;
 }
 

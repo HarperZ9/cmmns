@@ -49,7 +49,7 @@ export function isCase(dir) { return existsSync(join(dir, "case.json")); }
 
 // Every table of a case, plus its metadata.
 export function loadCase(dir) {
-  if (!isCase(dir)) throw new Error(`${dir} is not a case folder (no case.json). Run "case init <name>" first.`);
+  if (!isCase(dir)) throw new Error(`${dir} is not a case folder (no case.json). Open one with "daylight case init <name>", or point at one with --case <folder>.`);
   const out = { dir, meta: JSON.parse(readFileSync(join(dir, "case.json"), "utf8")) };
   for (const [name, [file]] of Object.entries(TABLES)) out[name] = readJsonl(join(dir, file));
   return out;
