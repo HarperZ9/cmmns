@@ -110,5 +110,5 @@ test("the export lists every mark, a per-family count and what it leaves out, wi
   const json = JSON.stringify(x);
   assert.ok(json.includes("kept text"));
   assert.ok(!json.includes("dropped text"));
-  assert.match(x.about, /not sent/);
+  assert.match(x.about, /stays on your device until you send it/);
 });

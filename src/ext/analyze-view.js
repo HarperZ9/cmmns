@@ -15,7 +15,7 @@
     if (spans.length) li.append(el("p", "match", spans.map((s) => `"${s.text}"`).join("  ")));
     li.append(el("p", "src", "Source: " + e.source));
     const dnp = el("p", "dnp");
-    dnp.append(el("strong", null, "Does not prove: "), document.createTextNode(e.doesNotProve));
+    dnp.append(el("strong", null, "Read it as: "), document.createTextNode(e.doesNotProve));
     li.append(dnp);
     return li;
   }

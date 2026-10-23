@@ -45,10 +45,10 @@ test("an AI credential: a warn signal with signer and does-not-prove line", asyn
   assert.equal(s.fam, "c2pa");
   assert.equal(s.level, "warn");
   assert.match(JSON.stringify(s.rows), /made with generative AI/);
-  assert.ok(s.rows.some((x) => x[0] === "Does not prove"));
+  assert.ok(s.rows.some((x) => x[0] === "Read it as"));
   const rows = text(credentialRows(r));
-  assert.match(rows, /has not changed since it was signed/);
-  assert.match(rows, /Not checked against a trust list/);
+  assert.match(rows, /is unchanged since it was signed/);
+  assert.match(rows, /the certificate's own claim/);
 });
 
 test("tampered: a flag naming the failed check, no pass wording", async () => {

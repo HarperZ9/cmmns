@@ -8,7 +8,7 @@
 
 export const OVERLAP_KEY = "pb.campaign.v1", OVERLAP_RETAIN_DAYS = 30, OVERLAP_MAX_LAUNCHES = 200, OVERLAP_MAX_ACCOUNTS = 500;
 export const OVERLAP_OTHER_MIN = 2, OVERLAP_MIN = 5, OVERLAP_SHARE = 0.2;
-export const OVERLAP_DOES_NOT_PROVE = "Fans of a field, employees and investors reshare each other's launches. Overlap says these launches drew some of the same accounts, not why.";
+export const OVERLAP_DOES_NOT_PROVE = "Overlap says these launches drew some of the same accounts. Fans of a field, employees and investors reshare each other's launches too.";
 const DAY = 86400000;
 
 // FNV-1a over salt + handle, as a short hex string. Not cryptographic; its job is to keep handles

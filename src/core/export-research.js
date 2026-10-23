@@ -65,15 +65,15 @@ function datasheet(ctx, rows, counts) {
     "# Datasheet", "",
     `Made ${ctx.at} by ${ctx.tool} from an evidence chain of ${rows.length} receipts (root \`${ctx.chain.root}\`).`, "",
     "## How it was made",
-    "Each row is one receipt this browser recorded: a fact read from a public source or the page the user loaded, with the hash of the fragment it was read from. Rows hold identifiers, hashes and extracted features, never post text.", "",
+    "Each row is one receipt this browser recorded: a fact read from a public source or the page the user loaded, with the hash of the fragment it was read from. Rows hold identifiers, hashes and extracted features.", "",
     "## Splits", `Fixed by hash under seed \`${ctx.seed}\`: ${counts}. The same receipt lands in the same split in every export with this seed.`, "",
     "## Labels and fairness",
-    labelled ? `${labelled} rows carry a labeller; strata present: ${strata.join(", ") || "none"}.` : "No row is hand-labelled. No fairness audit applies to these rows, and none is claimed.", "",
+    labelled ? `${labelled} rows carry a labeller; strata present: ${strata.join(", ") || "none"}.` : "Zero rows are hand-labelled. A fairness audit would need labelled rows first.", "",
     "## Known biases",
     "Rows come from what one user chose to open and look up, so they describe that user's browsing, not any platform as a whole. Platforms round, delay and recount what they show.", "",
     "## Privacy and licence",
     "Private accounts appear only as pseudonyms salted per export, so two exports cannot be joined. The compilation is CC BY 4.0; facts read from third parties keep their sources' terms.", "",
-    `## Does not prove`, ctx.dnp, "",
+    `## Read it as`, ctx.dnp, "",
   ].join("\n");
 }
 

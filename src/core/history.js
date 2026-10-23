@@ -92,4 +92,4 @@ export function summarize(reports, net, trail) {
   };
 }
 
-export const HISTORY_DOES_NOT_PROVE = "These totals cover only the threads you opened, in the order each platform chose to show them. A recurring source shows where your feed's material comes from, not who organised it, and the shares are not a sample of any platform.";
+export const HISTORY_DOES_NOT_PROVE = "These totals cover the threads you opened, in the order each platform chose to show them. A recurring source shows where your feed's material comes from.";

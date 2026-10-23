@@ -59,9 +59,9 @@ test("the positive campaign fixture matches the visible elements of 16 CFR 465.8
   assert.deepEqual(t.notObservable, ["D", "E"]);
   assert.deepEqual(t.notMatched, ["C"]);
   assert.match(t.summary, /^This conduct matches elements A, B and F of 16 CFR 465\.8\(b\)/);
-  assert.match(t.summary, /Element B is matched on indicative evidence only/);
-  assert.match(t.summary, /Elements D and E are not observable from here\./);
-  assert.match(t.summary, /It is not a finding by a court, a regulator or the platform\./);
+  assert.match(t.summary, /Element B is matched on indicative evidence: signals consistent with it\./);
+  assert.match(t.summary, /Elements D and E are outside what this page can show\./);
+  assert.match(t.summary, /Findings belong to courts, regulators and the platform\./);
   assert.equal(t.catalogue, "us-ftc-fake-social-media-indicators@1.0.0");
   assert.equal(t.legal_note, LEGAL_NOTE);
   const b = t.rows.find((r) => r.id === "B");
@@ -118,7 +118,7 @@ test("an unverified or withdrawn entry is never matched", () => {
 test("jurisdictions: every one that applies is shown, the actor's absence is said, order is fixed", () => {
   const j = applicableJurisdictions({ platform: "x", actor: null, audience: "EU" });
   assert.deepEqual(j.jurisdictions.map((x) => x.code), ["platform:x", "EU"]);
-  assert.match(j.notes[0], /actor's location is not public/);
+  assert.match(j.notes[0], /actor's location is private/);
   const finding = signalsFromCampaign(strongLens());
   const t1 = elementTables(list, finding, registry, { jurisdictions: j.jurisdictions });
   assert.ok(t1.every((t) => ["EU", "platform:x"].includes(t.jurisdiction.code)));

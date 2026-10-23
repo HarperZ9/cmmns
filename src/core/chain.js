@@ -8,7 +8,7 @@
 
 import { trailFor, firstSeen, normLink } from "./trail.js";
 
-export const CHAIN_DOES_NOT_PROVE = "Daylight Commons cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.";
+export const CHAIN_DOES_NOT_PROVE = "The chain starts at the first upload or link Daylight Commons has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.";
 
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return null; } };
 const hours = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 360000) / 10;

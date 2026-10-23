@@ -26,7 +26,7 @@ export const HEAD_KIND = "daylight-head/1";
 export const HEAD_MAX_BYTES = 4096;
 export const HEAD_SIG_MAX_BYTES = 4096;
 export const AGING_DAYS = 30;
-export const HEAD_DOES_NOT_PROVE = "A valid head shows the signer chose these files at that time. It does not show the files are safe.";
+export const HEAD_DOES_NOT_PROVE = "A valid head shows the signer chose these files at that time. How safe they are rests on the signer.";
 
 const DAY = 86400000;
 const HEX64 = /^[0-9a-f]{64}$/, KEY_ID = /^[0-9a-f]{32}$/, TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/, B64URL = /^[A-Za-z0-9_-]{80,100}$/;
@@ -158,7 +158,7 @@ export async function checkHead(opts) {
 // Statuses: current, aging (head last seen over AGING_DAYS ago), expired, none. Never an alarm.
 export function freshness(state, { now = Date.now(), catalogue = null } = {}) {
   const dated = catalogue && catalogue.date ? `Catalogue dated ${day(catalogue.date)}.` : "Catalogue date unknown.";
-  if (!state) return { status: "none", label: "Not checked", line: `${dated} No signed head checked on this device yet.` };
+  if (!state) return { status: "none", label: "Not checked", line: `${dated} Signed head: unchecked on this device so far.` };
   const t = effectiveNow(state, now), sigs = `${state.valid} of ${state.needed} signature${state.needed === 1 ? "" : "s"}${state.needed === 1 ? " (single-signer release)" : ""}`;
   const seen = `Signed head version ${state.version} last seen ${day(state.seenAt)}, valid until ${day(state.expires)}, ${sigs}.`;
   if (t >= Date.parse(state.expires)) return { status: "expired", label: "Expired", line: `${dated} Newer campaigns may be missing. ${seen}` };

@@ -56,7 +56,7 @@ export async function checkSignature(sigBytes, claimBytes, claimVersion = 2) {
   let s;
   try { s = cborDecode(sigBytes); } catch { return { sign: { ok: false, text: "the signature cannot be read" } }; }
   const arr = s && s.tag === 18 ? s.value : s;
-  if (!Array.isArray(arr) || arr.length !== 4) return { sign: { ok: false, text: "the signature is not a COSE_Sign1 structure" } };
+  if (!Array.isArray(arr) || arr.length !== 4) return { sign: { ok: false, text: "the signature has some other structure than COSE_Sign1" } };
   const [protBytes, unprot, , sig] = arr;
   const prot = protBytes && protBytes.length ? cborDecode(protBytes) : {};
   const chain = prot["33"] || (unprot || {})["33"] || (unprot || {}).x5chain;
@@ -80,7 +80,7 @@ async function verifyWith([name, hash, salt], cert, sig, tbs) {
     const params = name === "ECDSA" ? { name, namedCurve: cert.curve } : name === "RSA-PSS" ? { name, hash } : { name };
     const key = await subtle().importKey("spki", cert.spki, params, false, ["verify"]);
     const ok = await subtle().verify(name === "ECDSA" ? { name, hash } : name === "RSA-PSS" ? { name, saltLength: salt } : { name }, key, sig, tbs);
-    return ok ? { ok: true, text: "the signature matches the claim and the signer's certificate" } : { ok: false, text: "the signature does not match the claim: the claim was changed or signed by another key" };
+    return ok ? { ok: true, text: "the signature matches the claim and the signer's certificate" } : { ok: false, text: "the signature fails against the claim: the claim changed, or another key signed it" };
   } catch (e) {
     return { ok: null, text: `this browser cannot check ${name} signatures (${String(e && e.message || e).slice(0, 60)})` };
   }
@@ -88,11 +88,11 @@ async function verifyWith([name, hash, salt], cert, sig, tbs) {
 
 // c2pa.hash.data: the file's bytes outside the exclusion ranges.
 export async function checkDataHash(file, a, complete) {
-  if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
+  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
   const parts = [];
   let p = 0;
   for (const e of [...(a.exclusions || [])].sort((x, y) => x.start - y.start)) {
-    if (e.start < p || e.start + e.length > file.length) return { ok: false, text: "the exclusion ranges do not fit this file" };
+    if (e.start < p || e.start + e.length > file.length) return { ok: false, text: "the exclusion ranges run outside this file" };
     parts.push(file.subarray(p, e.start)); p = e.start + e.length;
   }
   parts.push(file.subarray(p));
@@ -147,10 +147,10 @@ function exclusionRanges(file, rules) {
 // c2pa.hash.bmff: the file without its excluded boxes; v2 and later put the 8-byte offset of each
 // top-level box that is hashed before it.
 export async function checkBmffHash(file, a, label, complete) {
-  if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
+  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
   const rules = a.exclusions || [];
   if (!a.hash || a.merkle || rules.some((r) => !/^(\/[\w ]{4})+$/.test(r.xpath || ""))) {
-    return { ok: null, text: "this video uses a hash layout Daylight Commons does not check yet (fragments or partial exclusions)" };
+    return { ok: null, text: "this video uses a hash layout Daylight Commons skips for now (fragments or partial exclusions)" };
   }
   const withOffsets = /\.v[2-9]$/.test(label), ex = exclusionRanges(file, rules);
   const top = new Set(ex.filter((e) => e[2] === 0 && e[3]).map((e) => e[0]));

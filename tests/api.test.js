@@ -76,7 +76,7 @@ test("siteInfo reads only the tables it was given, and says so when it has none"
   fits(bare);
   assert.equal(bare.site.domain, "washingtonpost.pm");
   assert.deepEqual(kinds(bare), ["lookalike-domain"]);
-  assert.match(bare.limits.join(" "), /No site tables were loaded/);
+  assert.match(bare.limits.join(" "), /site tables were absent/);
   assert.equal(siteInfo(""), null);
   const ext = (f) => JSON.parse(readFileSync(new URL(`../src/ext/${f}`, import.meta.url), "utf8"));
   useData({ sites: ext("sites.json"), owners: ext("owners.json"), state: ext("state.json") });

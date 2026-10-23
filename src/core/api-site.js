@@ -59,7 +59,7 @@ export function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   const line = recordLine(S.record);
   if (line || (!quiet && S.facts)) {
     out.push({ ...base, kind: "site-record", level: "info", label: `site record: ${S.domain}`,
-      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "No review in Daylight Commons' table lists this site as where a claim appeared."].join(": ") + ".",
+      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."].join(": ") + ".",
       source: SITE_SOURCES, doesNotProve: SITE_RECORD_DOES_NOT_PROVE,
       data: { domain: S.domain, reviews: S.record ? S.record.n : 0, checkers: S.record ? S.record.m : 0, since: S.record ? S.record.since : null, founded: S.facts ? S.facts.founded : null, country: S.facts ? S.facts.country : null } });
   }

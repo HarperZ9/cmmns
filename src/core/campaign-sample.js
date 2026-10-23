@@ -15,8 +15,8 @@ export const SAMPLE_DOES_NOT_PROVE = {
   "stock-persona": "Real people write short, list-like bios, and these phrases are common.",
   "join-cluster": "Accounts join in waves after news, an event or a platform change.",
   "topic-mismatch": "People follow and reshare outside their own interests, and a bio says little about what someone reads.",
-  "random-suffix": "Many people choose a handle with numbers and letters for privacy or safety. This is context only.",
-  "default-avatar": "Many real people never upload a picture. This is context only.",
+  "random-suffix": "Many people choose a handle with numbers and letters for privacy or safety, so this stays context.",
+  "default-avatar": "Many real people keep the default picture, so this stays context.",
 };
 
 // A handle ending in a digit-and-letter tail ("_x5", "8t9", "c8s", "38"). Context only.

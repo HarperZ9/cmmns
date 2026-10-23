@@ -55,8 +55,8 @@ const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.
 // { measured, text } for one family. A row without a sample size is not shown as a measurement.
 export function measuredLine(id, table = MEASURED) {
   const f = BY_ID.get(id);
-  if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Daylight Commons detector" };
-  if (f && f.kind === F) return { measured: false, text: "what the file itself declares; Daylight Commons checks the signature, not the claim" };
+  if (f && f.kind === P) return { measured: false, text: "the site's own label, shown as the site gives it" };
+  if (f && f.kind === F) return { measured: false, text: "what the file itself declares, with its signature checked by Daylight Commons" };
   if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
   if (f && f.kind === TECH) { const st = techniqueStatus(id); return { measured: st.shown, text: st.text }; }
   const r = (table || {})[id];

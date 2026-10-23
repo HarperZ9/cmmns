@@ -59,7 +59,7 @@ export const carrierTool = (tool) => { const m = String(tool || "").match(/^(.*?
 // is true. profile "carrier-safe" uses typedPage (what the user typed) and never page.
 // Returns { ok: true, bundle } or { ok: false, reason }.
 export function makeBundle(result, opts = {}) {
-  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "There is no analysis to put in a bundle." };
+  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "Run an analysis first, then put it in a bundle." };
   const archive = opts.source === "export";
   if (result.kind === "thread" && !archive && (result.posts.accounts || 0) < MIN_CARD_ACCOUNTS) {
     return { ok: false, reason: `This thread has ${result.posts.accounts || 0} accounts. A bundle needs at least ${MIN_CARD_ACCOUNTS}, so it cannot be about one person.` };

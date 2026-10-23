@@ -81,7 +81,7 @@ function verdict(r) {
 function sentence(r) {
   const e = r.extreme, o = r.others;
   const base = `${e.flagged} of ${e.n} extreme replies (${pct(e.share)}%) come from flagged accounts, against ${o.flagged} of ${o.n} other replies (${pct(o.share)}%).`;
-  const cover = r.notLookedUp ? ` ${r.notLookedUp} repl${r.notLookedUp === 1 ? "y is" : "ies are"} left out because the account${r.notLookedUp === 1 ? " was" : "s were"} not looked up.` : "";
+  const cover = r.notLookedUp ? ` ${r.notLookedUp} repl${r.notLookedUp === 1 ? "y is" : "ies are"} left out until the account${r.notLookedUp === 1 ? " is" : "s are"} looked up.` : "";
   switch (r.verdict) {
     case "too-few": return `Too few extreme replies to compare (${e.n}; the report needs ${MIN_EXTREME}).${cover}`;
     case "skewed-to-flagged": return `${base} The difference is larger than the uncertainty.${cover}`;
@@ -117,4 +117,4 @@ function techniqueCounts(replies, shown) {
   return out;
 }
 
-export const REPORT_DOES_NOT_PROVE = "A skew can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event. It says nothing about any one reply or account.";
+export const REPORT_DOES_NOT_PROVE = "A skew compares the thread as a whole, separate from any one reply or account. It can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event.";

@@ -20,11 +20,11 @@ export const TECHNIQUES = {
   "thought-terminating": { name: "Thought-terminating cliche", definition: "A stock phrase that closes the discussion instead of answering it." },
   "whataboutism": { name: "Whataboutism", definition: "Answers a criticism by pointing at the other side's conduct instead." },
   "black-and-white": { name: "Black-and-white fallacy", definition: "Presents two options as the only ones when more exist." },
-  "doubt": { name: "Doubt", definition: "Questions the credibility of someone or something without giving evidence." },
+  "doubt": { name: "Doubt", definition: "Questions the credibility of someone or something by insinuation." },
   "appeal-to-authority": { name: "Appeal to authority", definition: "Says a claim is true because an unnamed or generic authority backs it." },
   "exaggeration": { name: "Exaggeration", definition: "Makes something seem far larger, worse or more extreme than it is." },
   "motive-attribution": { name: "Hidden motive", definition: "Says someone's real aim is hidden behind what they say, without showing evidence of the aim." },
-  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question, so it is suggested without being claimed." },
+  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question, so the post suggests it and leaves it unclaimed." },
 };
 
 export const PERSUASION_DOES_NOT_PROVE = "A technique can carry a true claim; it describes how the post argues.";
@@ -81,7 +81,7 @@ export function shownTechniques(table = MEASURED_PERSUASION) {
 // { shown, text } for one technique: its measured line, or why it is held back.
 export function techniqueStatus(id, table = MEASURED_PERSUASION) {
   const r = (table || {})[id];
-  if (CONTEXT_ONLY.has(id)) return { shown: false, text: "held back: needs the whole exchange, so never shown on one reply" };
+  if (CONTEXT_ONLY.has(id)) return { shown: false, text: "held back: needs the whole exchange, so it waits for a full thread" };
   if (!r || !Number.isInteger(r.n) || !r.n) return { shown: false, text: "held back: not measured" };
   const m = `precision ${pc(r.precision)}% (95% interval ${pc(r.low)} to ${pc(r.high)}%), ${r.n} spans checked, held-out news articles`;
   if (ships(r)) return { shown: true, text: m };

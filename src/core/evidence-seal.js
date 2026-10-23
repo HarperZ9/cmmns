@@ -9,7 +9,7 @@
 import { canonical, sha256Hex, verifyReceipt } from "./receipt.js";
 
 export const SEAL_FORMAT = "radar-seal/1", EXPORT_FORMAT = "radar-evidence-chain/1";
-export const SEAL_DOES_NOT_PROVE = "The seal shows that these receipts are the ones this browser recorded, in this order, and that none was changed or removed after the fact. It does not show that a source told the truth, and whoever holds the device could start a new log.";
+export const SEAL_DOES_NOT_PROVE = "The seal shows these are the receipts this browser recorded, in this order, each unchanged since. Each receipt is as true as its source, and whoever holds the device can start a fresh log.";
 const GENESIS = "0".repeat(64);
 
 const hexToBytes = (h) => Uint8Array.from(h.match(/../g).map((x) => parseInt(x, 16)));
@@ -95,7 +95,7 @@ export async function exportSeal(seal, { title = null, at = new Date().toISOStri
 // Offline check of an export: the seal, the head, the root and every proof.
 export async function verifyExport(x) {
   if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Daylight Commons evidence chain"] };
-  if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file has no seal or no proofs"] };
+  if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file lacks a seal or its proofs"] };
   const s = await verifySeal(x.seal), problems = [...s.problems];
   const hashes = x.seal.entries.map((e) => e.receipt.hash);
   if ((await merkleRoot(hashes)) !== x.root) problems.push("root does not match the receipts");
@@ -111,7 +111,7 @@ export async function verifyExport(x) {
 export async function chainChecks(x) {
   if (!x || x.format !== EXPORT_FORMAT) return { ok: false, size: 0, root: null, checks: [{ name: "format", ok: false, text: "not a Daylight Commons evidence chain" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const entries = (x.seal && Array.isArray(x.seal.entries)) ? x.seal.entries : null;
-  if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file has no seal or no proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
+  if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file lacks a seal or its proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const n = entries.length, hashes = entries.map((e) => (e && e.receipt && e.receipt.hash) || "");
   let edited = 0, broken = 0, prev = GENESIS, proofsBad = 0;
   for (let i = 0; i < n; i++) {
@@ -126,9 +126,9 @@ export async function chainChecks(x) {
   const head = n ? entries[n - 1].link : GENESIS;
   const checks = [
     { name: "receipts", ok: !edited, text: edited ? `${edited} of ${n} receipts changed after they were made` : `all ${n} receipts match their own hash` },
-    { name: "chain", ok: !broken, text: broken ? `${broken} of ${n} entries do not follow the one before (edited, removed or reordered)` : `all ${n} entries follow the one before, in order` },
-    { name: "head", ok: head === x.head, text: head === x.head ? "the head matches the last entry" : "the head does not match the last entry" },
-    { name: "Merkle root", ok: root === x.root, text: root === x.root ? `the root ${String(x.root).slice(0, 16)}... is the root of these receipts` : "the root is not the root of these receipts" },
+    { name: "chain", ok: !broken, text: broken ? `${broken} of ${n} entries break from the one before (edited, removed or reordered)` : `all ${n} entries follow the one before, in order` },
+    { name: "head", ok: head === x.head, text: head === x.head ? "the head matches the last entry" : "the head differs from the last entry" },
+    { name: "Merkle root", ok: root === x.root, text: root === x.root ? `the root ${String(x.root).slice(0, 16)}... is the root of these receipts` : "the root differs from the root of these receipts" },
     { name: "inclusion proofs", ok: !proofsBad && x.proofs.length === n, text: proofsBad ? `${proofsBad} of ${n} proofs fail against the root` : `all ${n} proofs place their receipt under the root` },
   ];
   const receipts = entries.map((e) => { const r = (e && e.receipt) || {}; return { kind: r.kind || null, subject: r.subject || null, source: r.source || null, at: r.at || null }; });

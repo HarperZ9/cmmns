@@ -122,4 +122,4 @@ function dayAdd(m, at, v) {
   e.posts += v.posts; e.strong += v.strong || 0; e.strongN += v.strongN; e.threads += v.threads || 0; e.feedPosts += v.feedPosts || 0;
 }
 
-export const FEED_DOES_NOT_SHOW = "What this does not show: what your feed would carry for anyone else, or what a platform carries overall. These counts cover only posts and threads you opened with Daylight Commons on, in the order each platform chose to show them. A site's share says how often it was linked, not whether it is accurate, and a strong-rhetoric sign is about wording, not about the person who wrote it.";
+export const FEED_DOES_NOT_SHOW = "These counts cover the posts and threads you opened with Daylight Commons on, in the order each platform chose to show them: your own feed, one view of each platform. A site's share says how often it was linked. A strong-rhetoric sign is about wording.";

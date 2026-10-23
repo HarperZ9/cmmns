@@ -10,7 +10,7 @@
 import { HIGH_VOLUME_PER_DAY, ageDays } from "./flags.js";
 
 export const FLOOD_MIN_ACCOUNTS = 3, FLOOD_SHARE = 0.25, MIN_KNOWN = 10, BURST_HIGH = 2, REPEAT_MIN = 5;
-export const FLOOD_DOES_NOT_PROVE = "News, alert and fan accounts post all day by design, and a busy thread draws the most active accounts on the site. This describes how the replies were posted, not who runs any account or why.";
+export const FLOOD_DOES_NOT_PROVE = "News, alert and fan accounts post all day by design, and a busy thread draws the most active accounts on the site. This describes how the replies were posted.";
 
 // Posts per day since joining, or null when either number is missing.
 export function ratePerDay(account, now = Date.now()) {

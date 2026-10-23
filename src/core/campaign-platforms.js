@@ -17,11 +17,11 @@ export const CAMPAIGN_PLATFORMS = {
     shapeCounts: ["score", "comments", "upvoteRatio"],
     sampleFrom: ["commenters"],
     signs: ["join-cluster", "karma-for-age", "arrival-burst"],
-    notes: "Vote rings, karma farming, aged accounts bought for posting, and brigading from another community. Reddit fuzzes vote counts and shows no repost list. Thresholds are not set until labelled Reddit cases exist.",
+    notes: "Vote rings, karma farming, aged accounts bought for posting, and brigading from another community. Reddit fuzzes vote counts and hides repost lists. Thresholds wait for labelled Reddit cases.",
   },
-  instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, so no shape." },
+  instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, which leaves the shape unread." },
   tiktok: { status: "not defined", notes: "Not defined yet." },
-  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons does not run on LinkedIn." },
+  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons runs on other sites for now." },
 };
 
 export function campaignPlatform(id) {

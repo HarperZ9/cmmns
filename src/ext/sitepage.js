@@ -34,7 +34,7 @@
     for (const g of state.groups) rows.push([g.type, state.list.filter((x) => x.type === g.type).map((x) => `${x.outlet}${x.owner ? `, owned by ${x.owner}` : ""}${x.country ? ` (${x.country})` : ""}`).join("; ")]);
     for (const x of state.list.slice(0, 12)) rows.push([x.type, { links: [[`${x.outlet}: ${x.title}`.slice(0, 90), x.url]] }], ["Shared words", x.shared.join(", ")]);
     for (const f of state.status.filter((f) => f.state !== "ok")) rows.push([f.name, f.state === "empty" ? "The feed had no entries." : PB.FEED_ERRORS[f.state] || f.state]);
-    rows.push(["Asked", `${state.hosts.length} feed host${state.hosts.length === 1 ? "" : "s"}, nothing from this page sent, ${state.ms} ms`], ["Does not prove", PB.COVERAGE_DOES_NOT_PROVE]);
+    rows.push(["Asked", `${state.hosts.length} feed host${state.hosts.length === 1 ? "" : "s"}, nothing from this page sent, ${state.ms} ms`], ["Read it as", PB.COVERAGE_DOES_NOT_PROVE]);
   }
   const ERR = { "short-title": "The title has too few words to match.", "no-outlets": "No outlets are chosen. Choose them in Daylight Commons' options.", off: "Other coverage is off." };
   function coverageSection(info, state) {

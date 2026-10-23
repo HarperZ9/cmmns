@@ -88,7 +88,7 @@ export function analyzeThread(input, opts = {}) {
 // bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
 export async function checkMedia(bytes) {
   const M = await mediaReading(bytes);
-  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made."] });
 }
 
 // domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
@@ -96,7 +96,7 @@ export function siteInfo(domain) {
   const d = cleanDomain(domain);
   if (!d) return null;
   const loaded = dataLoaded();
-  const limits = ["Every row names its source. Daylight Commons adds no score or rating of its own."];
-  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("No site tables were loaded, so only the look-alike check ran.");
+  const limits = ["Every row names its source."];
+  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("The site tables were absent, so the look-alike check ran alone.");
   return envelope("site", { site: siteSummary(d), evidence: number(siteEvidence(d, [])), limits });
 }

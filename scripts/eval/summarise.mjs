@@ -16,8 +16,8 @@ const pool = (results, f) => {
 };
 
 export const DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), " +
-  "not on this site's replies. Precision says how often a marker sat on text the annotators judged hostile to a group; " +
-  "it does not say why anyone wrote it, and it can differ on other sites and topics.";
+  "and it can differ on this site and other topics. " +
+  "Precision says how often a marker sat on text the annotators judged hostile to a group.";
 
 export function familySummary(results) {
   const out = {};

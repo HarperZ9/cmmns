@@ -30,7 +30,7 @@ test("strong language, leaked AI text and old media are warn-level; weak flags a
 test("every signal carries rows, and evidence signals say what they do not prove", () => {
   const sig = PBSignals.all({ site: X, handle: "a", flags: [{ id: "new-account", evidence: "account is 3 days old", doesNotProve: "New accounts include real people." }], markers: [], machine: {} });
   for (const s of sig) assert.ok(s.rows.length && s.rows.every(([h]) => h !== undefined));
-  assert.ok(sig[0].rows.some(([h]) => h === "Does not prove"));
+  assert.ok(sig[0].rows.some(([h]) => h === "Read it as"));
 });
 
 test("the language chip is dropped when it fits where the account is based", () => {
@@ -108,7 +108,7 @@ test("a persuasion technique is an info-level language entry with its words, def
   const rows = Object.fromEntries(s.rows);
   assert.equal(rows["In this post"], "\"disgusting\"");
   assert.match(rows["What it is"], /emotional charge/);
-  assert.equal(rows["Does not prove"], "A technique can carry a true claim; it describes how the post argues.");
+  assert.equal(rows["Read it as"], "A technique can carry a true claim; it describes how the post argues.");
   assert.match(rows.Measured, /precision \d+% \(95% interval \d+ to \d+%\)/);
 });
 
@@ -127,7 +127,7 @@ test("cross-language and laundering signs carry their baseline or 'not measured'
   const cross = sig.find((s) => s.fam === "cross-language"), laund = sig.find((s) => s.fam === "laundered");
   assert.equal(cross.label, "same link in 2 languages");
   assert.ok(cross.rows.some(([h, v]) => h === "In ordinary threads" && /95% interval/.test(v)));
-  assert.ok(cross.rows.some(([h, v]) => h === "Does not prove" && v === PB.CROSS_DOES_NOT_PROVE));
+  assert.ok(cross.rows.some(([h, v]) => h === "Read it as" && v === PB.CROSS_DOES_NOT_PROVE));
   assert.ok(laund.rows.some(([h, v]) => h === "Chain" && v.includes("@relay") && v.includes("earliest Daylight Commons saw")));
   assert.equal(laund.level, "info");
   const across = PBSignals.all({ site: X, handle: "a", markers: [], machine: {}, flags: [], tweet: {}, crossLang: [{ ...g, across: true }] }).find((s) => s.fam === "cross-language");

@@ -38,7 +38,7 @@ test("any change to the content or the manifest after signing fails", async () =
   const edited = clone(pack); edited.content.claims[0].rating = "True";
   assert.match((await verifyPack(edited)).problems.join(), /content part "claims" changed after signing/);
   const added = clone(pack); added.content.ops = [];
-  assert.match((await verifyPack(added)).problems.join(), /"ops" is not listed/);
+  assert.match((await verifyPack(added)).problems.join(), /"ops" is missing from the signed manifest/);
   const dropped = clone(pack); delete dropped.content.siteNotes;
   assert.match((await verifyPack(dropped)).problems.join(), /"siteNotes" is missing/);
   const renamed = clone(pack); renamed.manifest.name = "Another pack";

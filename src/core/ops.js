@@ -55,7 +55,7 @@ const TYPE_WORDS = {
   "government": "a government body", "state media": "state media", "contractor": "a firm or group working for a government",
   "linked to a state": "people or a group the source links to a government", "commercial firm": "a firm, no government named", "origin only": "no operator named",
 };
-export const OPS_DOES_NOT_PROVE = "The report named this domain or account as part of an operation when it was published. It says nothing about the person who posted or shared it: people share these links without knowing, or to warn others. Domains expire and are bought again, and accounts are reused.";
+export const OPS_DOES_NOT_PROVE = "The report named this domain or account as part of an operation when it was published. People share these links unknowingly or to warn others. Domains expire and are bought again, and accounts are reused.";
 
 // The window's rows for one hit, in the sources' own words. Every attribution is listed with its
 // document, so disagreements between sources stay visible.
@@ -68,13 +68,13 @@ export function opRows(h) {
     ["Sources say", said.slice(0, 4).join(" ")],
     ["Named as", `${h.indicator.kind} in ${doc.title || "the report"}${doc.date ? `, ${doc.date}` : ""}`],
     ["Read it", { links: [[String(doc.url || "").replace(/^https?:\/\//, "").slice(0, 48), doc.url]] }],
-    ["Does not prove", OPS_DOES_NOT_PROVE],
+    ["Read it as", OPS_DOES_NOT_PROVE],
   ];
 }
 
 // Counts for the trend view. Year is the year an operation was first published by any cited source.
 // It counts what investigators found and published, not how much activity there was.
-export const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.";
+export const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. The counts follow where people looked: platforms look harder in some places and languages than others, and some governments publish takedowns while others keep them quiet.";
 export function opsTrend(table = TABLE) {
   const years = new Map(), states = new Map();
   // Operations from data packs (src/core/packs-content.js) are shown on matches but never counted here.

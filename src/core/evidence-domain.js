@@ -8,7 +8,7 @@
 export const RDAP_BASE = "https://rdap.org/domain/";
 export const CDX_BASE = "https://web.archive.org/cdx/search/cdx";
 export const DOMAIN_DOES_NOT_PROVE = "A registration date is when the current registration began. Domains are bought, sold and re-registered, and a young domain can front an old company.";
-export const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly. A late first capture means the archive found the site late, not that it did not exist.";
+export const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly, so a late first capture means the archive found the site late.";
 
 // Hosting services that give each customer a subdomain. The service's own registration says nothing
 // about a customer's site, so such a host is kept whole and RDAP is not asked about it.

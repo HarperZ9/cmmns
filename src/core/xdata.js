@@ -177,7 +177,7 @@ export function noteTiming(tweet, now = Date.now()) {
   if (!Number.isFinite(w)) return null;
   const afterPost = Number.isFinite(p) ? Math.max(0, Math.round((w - p) / 1000)) : null, age = Math.max(0, Math.round((now - w) / 1000));
   const text = (afterPost != null ? `Note written ${span(afterPost)} after the post, ${span(age)} ago.` : `Note written ${span(age)} ago.`)
-    + " The page does not say when X began to show it.";
+    + " X keeps the time it began to show the note off the page.";
   return { written, afterPost, age, text };
 }
 

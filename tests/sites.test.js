@@ -78,13 +78,13 @@ test("the site rows show owner, type, founding, country, state links and the rec
   assert.equal(get("Country"), "Exampleland (Wikidata)");
   assert.match(get("Fact-check record"), /^3 reviews by 2 fact-checkers since 2024-05-01/);
   assert.ok(get("Reviews").action, "a button opens the list");
-  assert.equal(get("Does not prove"), SITE_RECORD_DOES_NOT_PROVE);
+  assert.equal(get("Read it as"), SITE_RECORD_DOES_NOT_PROVE);
 });
 
 test("a site with nothing on file says so instead of a blank card", () => {
   const rows = siteInfoRows({ domain: "nothing.example", owner: null, state: [], facts: null, record: null });
-  assert.ok(rows.some(([, v]) => typeof v === "object" && v.note && /no Wikidata entry/.test(v.note)));
-  assert.ok(rows.some(([h, v]) => h === "Fact-check record" && /No review in Daylight Commons' table/.test(v)));
+  assert.ok(rows.some(([, v]) => typeof v === "object" && v.note && /lacks a Wikidata entry/.test(v.note)));
+  assert.ok(rows.some(([h, v]) => h === "Fact-check record" && /Zero reviews in Daylight Commons' table/.test(v)));
 });
 
 test("owner type comes from state links first, then what Wikidata states", () => {

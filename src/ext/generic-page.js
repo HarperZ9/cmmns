@@ -57,7 +57,7 @@
         ["Repeated texts", c.repeatedTexts ? `${c.repeatedTexts} texts appear more than once (largest ${c.largestRepeat} times)` : "none"]);
     }
     if (!out.length) out.push([null, { note: "Daylight Commons found no article body or comment list on this page." }]);
-    out.push(["Does not prove", PB.GENERIC_DOES_NOT_PROVE]);
+    out.push(["Read it as", PB.GENERIC_DOES_NOT_PROVE]);
     return out;
   }
 
@@ -65,7 +65,7 @@
   function section() {
     const root = document;
     const found = { article: PB.pickArticle(blocks(root)), comments: PB.pickComments(groups(root)) };
-    return { tab: "overview", title: "Text on this page", rows: rows(PB.genericChecks(found)), foot: "Daylight Commons has no reader for this site; this is its generic reader, from the page's layout." };
+    return { tab: "overview", title: "Text on this page", rows: rows(PB.genericChecks(found)), foot: "Daylight Commons' generic reader, working from the page's layout." };
   }
 
   globalThis.PBGenericPage = Object.freeze({ section, blocks, groups });

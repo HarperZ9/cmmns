@@ -476,7 +476,7 @@ function lookalikeOf(domain) {
   return null;
 }
 
-const LOOKALIKE_DOES_NOT_PROVE = "A similar address is not proof of a fake: outlets use other addresses, and unrelated sites share common words. Open the outlet's own site and compare.";
+const LOOKALIKE_DOES_NOT_PROVE = "An address similar to a known outlet's. Outlets use other addresses too, and unrelated sites share common words, so open the outlet's own site and compare.";
 
 return { punyDecode, oneEdit, splitHost, lookalikeOf, LOOKALIKE_DOES_NOT_PROVE };
 })();
@@ -576,7 +576,7 @@ const LONG_CUES = { outlet: CUES.outlet.filter((c) => c.length >= 5), platform: 
 const SAYS_UNOFFICIAL = /\b(?:fan|fans|parody|satire|unofficial|critic|critics|commentary)\b|not\s*affiliated/i;
 const ORG_CHECK = new Set(["Business", "Government"]);
 
-const BRAND_DOES_NOT_PROVE = "Fans, critics, reporters and local partners put outlet and platform names in their profiles, and the list of official accounts Daylight Commons checks against is incomplete. A brand in a name does not show who runs the account or that anyone meant to deceive.";
+const BRAND_DOES_NOT_PROVE = "A brand in the name, outside the official account list. Fans, critics, reporters and local partners put outlet and platform names in their profiles too, and the official list is partial.";
 
 const at = (hay, needle) => { for (let i = 0; i + needle.length <= hay.length; i++) if (needle.every((t, j) => hay[i + j] === t)) return i; return -1; };
 
@@ -625,8 +625,8 @@ function brandLookalike(account) {
     if (own.has(affKey) || same.some((b) => b.nameTokens.some((nt) => at(aff, nt) >= 0))) return null;
   }
   const where = d ? `display name "${display.slice(0, 50)}"` : `handle @${handle}`;
-  const who = d ? `; @${handle} is not` : " and is not";
-  const evidence = `${where} uses the ${m.brand.name} brand${who} among the ${m.brand.name} accounts Wikidata lists, and the page shows no ${m.brand.name} affiliation badge or organisation check`;
+  const who = d ? `; @${handle} is outside` : " and is outside";
+  const evidence = `${where} uses the ${m.brand.name} brand${who} the ${m.brand.name} accounts Wikidata lists, and the page lacks a ${m.brand.name} affiliation badge or organisation check`;
   return { brand: m.brand.name, kind: m.brand.kind, where: d ? "display" : "handle", evidence, source: m.brand.source };
 }
 
@@ -968,25 +968,25 @@ const HATE_NAME = /(?:^|[^\d])(?:1488|14\/88)(?:$|[^\d])|\b(?:aryan|foid|foids|s
 const REGION_OFFSETS = { europe: [0, 3], "west asia": [2, 4], africa: [-1, 3], "south asia": [5, 6], "east asia": [7, 9], oceania: [8, 13], "north america": [-8, -4], "south america": [-5, -3] };
 
 const DOES_NOT_PROVE = {
-  "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them. Only times given to the hour or finer are counted.",
-  "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy. Only threads timed to the second are counted; rounded times cannot show a reply within a minute.",
-  "copied-elsewhere": "People repost text they agree with, and memes and quotes repeat. Repeated wording shows copying or coordination, not who is behind it.",
+  "hours-elsewhere": "Inferred from posting times given to the hour or finer. Night owls, shift workers, scheduling tools and travel all shift them.",
+  "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy. The count uses threads timed to the second.",
+  "copied-elsewhere": "Repeated wording shows copying or coordination. People also repost text they agree with, and memes and quotes repeat.",
   "automation-app": "Scheduling tools are common among news desks, brands and busy people.",
-  "no-sleep-gap": "Teams in several time zones, shared accounts and scheduling tools post around the clock too. Only times given to the hour or finer are counted.",
-  "repost-only": "Some people use an account only to share others' posts.",
+  "no-sleep-gap": "Teams in several time zones, shared accounts and scheduling tools post around the clock too. The count uses times given to the hour or finer.",
+  "repost-only": "Some people keep an account for sharing others' posts.",
   "low-karma": "Many people read more than they post, and karma depends on which communities they use.",
   "new-account": "New accounts include real people who just joined, often during a news event.",
-  "name-changes": "People rename accounts for many reasons; repeated renames are only common among resold or repurposed accounts.",
-  "default-handle": "Many real people never change the handle X suggested.",
+  "name-changes": "People rename accounts for many reasons; repeated renames are most common among resold or repurposed accounts.",
+  "default-handle": "Many real people keep the handle X suggested.",
   "based-elsewhere": "The label can be wrong (VPNs, travel, X's own errors), and people abroad still speak as locals of where they come from.",
-  "hate-symbol-name": "The account chose this name; it can be ironic or quoted, and it says nothing about who runs the account.",
+  "hate-symbol-name": "The account chose this name, which can be ironic or quoted.",
   "high-volume": "Some people post all day, and news and alert accounts post automatically by design.",
   "follow-pattern": "New and small accounts often follow many before anyone follows back.",
   "store-elsewhere": "People move, travel and buy phones abroad, so the two signals can disagree for ordinary reasons.",
   "profile-location-elsewhere": "Profile locations are typed by the user, can be out of date or a joke, and people live abroad.",
-  "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they do not live in.",
+  "flag-elsewhere": "Expats, diaspora and supporters show flags of countries they live outside.",
   "platform-label": "A moderation label is the service's own judgement; labels can be wrong, disputed or applied in bulk.",
-  "same-text": "People copy and share text they agree with; identical replies show coordination or copying, not who wrote them.",
+  "same-text": "Identical replies show coordination or copying, and people also copy and share text they agree with.",
   "brand-lookalike": BRAND_DOES_NOT_PROVE,
 };
 
@@ -2800,9 +2800,9 @@ const { COERCION_PATTERNS, coercionSkipped } = M_theories_coercion;
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
 const AP_QANON = S("AP, QAnon's 'Save the Children' morphs into popular slogan", "https://www.wsls.com/news/politics/2020/10/28/qanons-save-the-children-morphs-into-popular-slogan/", "2020-10-28");
-const NAMING = "People quote, mock and argue against these claims, and Daylight Commons skips only obvious debunking.";
+const NAMING = "People also name these theories to quote, mock or argue against them, and Daylight Commons skips obvious debunking.";
 
-const THEORY_DOES_NOT_PROVE = `Naming a theory is not believing it. ${NAMING} This describes the post, not who wrote it or why, and a post that names a theory can still contain true statements.`;
+const THEORY_DOES_NOT_PROVE = `The post names this theory. ${NAMING} The rest of the post can still be true.`;
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const G = GROUPS.map(esc).sort((a, b) => b.length - a.length).join("|");
@@ -2825,12 +2825,12 @@ const CONTROL_PATTERNS = [
 const THEORIES = [
   { id: "qanon", name: "QAnon", terms: ["wwg1wga", "where we go one we go all", "q sent me", "q drops", "qanon was right", "qanon is right"],
     claim: "A secret cabal of elites runs the world and an insider called Q leaks its coming downfall.",
-    record: "None of Q's dated predictions came true. ADL and ISD document the movement and its slogans.",
+    record: "Every dated Q prediction failed. ADL and ISD document the movement and its slogans.",
     sources: [S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022"), S("ISD, QAnon explainer", "https://www.isdglobal.org/explainers/qanon/", "2023"), AP_QANON],
     dnp: "QAnon slogans are also quoted by reporters, researchers and former followers." },
   { id: "adrenochrome", name: "Adrenochrome harvesting", terms: ["adrenochrome", "adrenochrome harvesting", "harvesting adrenochrome"],
     claim: "Celebrities and elites traffic children to harvest a drug from their blood.",
-    record: "Adrenochrome is an ordinary oxidation product of adrenaline with no such use. AP reported the claim as baseless.",
+    record: "Adrenochrome is an ordinary oxidation product of adrenaline. AP reported the harvesting claim as baseless.",
     sources: [AP_QANON, S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022")],
     dnp: "The word also appears in chemistry, in fiction and in posts mocking the claim." },
   { id: "satanic-abuse", name: "Satanic ritual abuse network", terms: ["satanic ritual abuse", "satanic pedophile", "satanic pedophiles", "satanic paedophiles", "satanic cabal", "satanic elites", "pizzagate", "frazzledrip"],
@@ -2847,7 +2847,7 @@ const THEORIES = [
     claim: "The World Economic Forum's Great Reset is a hidden plan by elites to take property and freedoms.",
     record: "The Great Reset is a public WEF initiative from June 2020. ADL and ISD document how the plot framing grew from it.",
     sources: [S("ISD, The Great Reset explainer", "https://www.isdglobal.org/explainers/the-great-reset/", "2021"), S("ADL, Great Reset conspiracy flourishes amid continued pandemic", "https://www.adl.org/resources/blog/great-reset-conspiracy-flourishes-amid-continued-pandemic", "2021")],
-    dnp: "People criticise the WEF and its policies openly. The \"own nothing\" line is also used as a joke about rents and subscriptions." },
+    dnp: "People criticise the WEF and its policies openly. The slogan is also a joke about rents and subscriptions." },
   { id: "stolen-election", name: "Stolen or rigged election", terms: ["stop the steal", "stolen election"],
     patterns: [`\\b(?:the\\s+)?${YEAR}election\\s+(?:was|got|is being|has been)\\s+(?:stolen|rigged)\\b`, `\\b(?:${G}|they)\\s+(?:rigged|stole)\\s+the\\s+${YEAR}election\\b`,
       // "a fake president who won through a rigged election" (added 2026-10-23 from the feed test)
@@ -2860,7 +2860,7 @@ const THEORIES = [
     patterns: ["\\b(?:dominion|smartmatic|starlink|the machines|voting machines|the satellites)\\s+(?:flipped|switched|changed|rigged|altered)\\s+(?:the\\s+)?(?:votes?|election|results?|tallies|totals)\\b",
       "\\b(?:russia|china|iran|they)\\s+(?:hacked|changed|altered|flipped)\\s+(?:the\\s+)?(?:vote\\s+(?:totals|tallies|counts)|voting machines|votes)\\b"],
     claim: "Voting machines, satellites or a foreign government changed vote counts.",
-    record: "The Senate Intelligence Committee found no evidence that 2016 tallies were altered. PolitiFact rated the 2024 Starlink claim Pants on Fire: tabulators are not online during counting.",
+    record: "The Senate Intelligence Committee found no evidence that 2016 tallies were altered. PolitiFact rated the 2024 Starlink claim Pants on Fire: tabulators are offline during counting.",
     sources: [S("US Senate Select Committee on Intelligence, Report Volume 1", "https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume1.pdf", "2019-07-25"), S("PolitiFact, No, Elon Musk's Starlink wasn't used to rig the 2024 election", "https://www.politifact.com/factchecks/2024/nov/12/threads-posts/no-elon-musks-starlink-wasnt-used-to-rig-the-2024/", "2024-11-12"), ENDERS],
     dnp: "Foreign influence campaigns and machine faults are real and documented. They are different from changed counts." },
   { id: "staged-shooting", name: "Staged shooting", terms: [],
@@ -2869,7 +2869,7 @@ const THEORIES = [
     claim: "A shooting was staged with actors or faked to win sympathy or a policy.",
     record: "Researchers tracked staging claims about the 2024 Butler attempt from both sides (QUT, 2024). Courts found the Sandy Hook hoax claims defamatory.",
     sources: [S("QUT Digital Media Research Centre, Conspiracy theories on the Trump assassination attempt are spreading like wildfire", "https://www.qut.edu.au/news/realfocus/conspiracy-theories-on-the-trump-assassination-attempt-are-spreading-like-wildfire", "2024-07"), ENDERS],
-    dnp: "Asking how security failed is not a staging claim, and official accounts are sometimes corrected." },
+    dnp: "Questions about how security failed are a separate matter from a staging claim, and official accounts are sometimes corrected." },
   { id: "inside-job", name: "9/11 inside job", terms: ["9/11 was an inside job", "911 was an inside job", "bush did 9/11", "bush did 911", "jet fuel can't melt steel beams", "jet fuel cant melt steel beams"],
     claim: "The US government planned or carried out the 11 September 2001 attacks.",
     record: "NIST's investigation explained the collapses of the towers and of WTC 7 by impact damage and fire.",
@@ -2899,7 +2899,7 @@ const THEORIES = [
     record: "Such claims are made about leaders of every party. In July 2025 the Justice Department and the FBI said their review found no credible evidence that Jeffrey Epstein blackmailed prominent people. The Justice Department's Inspector General found that the FBI had corroborated only limited parts of the Steele reporting, the source of the claim that Russia held kompromat on Donald Trump.",
     sources: [S("NPR, DOJ memo says no evidence of Jeffrey Epstein 'client list' or blackmail", "https://www.npr.org/2025/07/08/nx-s1-5460954/doj-memo-says-no-evidence-of-jeffrey-epstein-client-list-or-blackmail", "2025-07-08"),
       S("US Department of Justice Office of the Inspector General, Review of Four FISA Applications and Other Aspects of the FBI's Crossfire Hurricane Investigation", "https://oig.justice.gov/reports/review-four-fisa-applications-and-other-aspects-fbis-crossfire-hurricane-investigation", "2019-12-09"), ENDERS],
-    dnp: "Blackmail, bribery and foreign influence happen and are sometimes proven in court. A claim about one person can be true, and this says only that the post makes the claim, not whether it is true." },
+    dnp: "Blackmail, bribery and foreign influence happen and are sometimes proven in court. A claim about one person can be true, and this marks that the post makes the claim." },
   { id: "hidden-cure", name: "Hidden cure", terms: ["hiding the cure for cancer", "hiding the cure", "suppressing the cure", "they have the cure for cancer", "sitting on the cure"],
     claim: "Drug companies or regulators hide a cure to protect profits.",
     record: "In a 2013 US survey, 37% agreed the FDA suppresses natural cures for cancer (Oliver and Wood, 2014); no such hidden cure has been shown.",
@@ -3276,7 +3276,7 @@ const MEASURED_DETAIL = {
  },
 };
 
-const MEASURED_DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), not on this site's replies. Precision says how often a marker sat on text the annotators judged hostile to a group; it does not say why anyone wrote it, and it can differ on other sites and topics.";
+const MEASURED_DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), and it can differ on this site and other topics. Precision says how often a marker sat on text the annotators judged hostile to a group.";
 
 return { MEASURED_AT, MEASURED_PERSUASION, MEASURED, MEASURED_DETAIL, MEASURED_DOES_NOT_PROVE };
 })();
@@ -3334,7 +3334,7 @@ function langLine(code) {
   const name = LANG_NAMES[code] || code;
   const r = MEASURED_LANGS[code];
   if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;
-  if (r.n < MIN_N) return `Found by the ${name} word list. Not measured in ${name}: only ${r.n} of these signs in labelled text.`;
+  if (r.n < MIN_N) return `Found by the ${name} word list. Not measured in ${name}: ${r.n} of these signs in labelled text.`;
   return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of the strong signs Daylight Commons found were on text people labelled ` +
     `hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
 }
@@ -3527,11 +3527,11 @@ const TECHNIQUES = {
   "thought-terminating": { name: "Thought-terminating cliche", definition: "A stock phrase that closes the discussion instead of answering it." },
   "whataboutism": { name: "Whataboutism", definition: "Answers a criticism by pointing at the other side's conduct instead." },
   "black-and-white": { name: "Black-and-white fallacy", definition: "Presents two options as the only ones when more exist." },
-  "doubt": { name: "Doubt", definition: "Questions the credibility of someone or something without giving evidence." },
+  "doubt": { name: "Doubt", definition: "Questions the credibility of someone or something by insinuation." },
   "appeal-to-authority": { name: "Appeal to authority", definition: "Says a claim is true because an unnamed or generic authority backs it." },
   "exaggeration": { name: "Exaggeration", definition: "Makes something seem far larger, worse or more extreme than it is." },
   "motive-attribution": { name: "Hidden motive", definition: "Says someone's real aim is hidden behind what they say, without showing evidence of the aim." },
-  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question, so it is suggested without being claimed." },
+  "just-asking": { name: "Just asking questions", definition: "Puts an accusation in the form of a question, so the post suggests it and leaves it unclaimed." },
 };
 
 const PERSUASION_DOES_NOT_PROVE = "A technique can carry a true claim; it describes how the post argues.";
@@ -3588,7 +3588,7 @@ function shownTechniques(table = MEASURED_PERSUASION) {
 // { shown, text } for one technique: its measured line, or why it is held back.
 function techniqueStatus(id, table = MEASURED_PERSUASION) {
   const r = (table || {})[id];
-  if (CONTEXT_ONLY.has(id)) return { shown: false, text: "held back: needs the whole exchange, so never shown on one reply" };
+  if (CONTEXT_ONLY.has(id)) return { shown: false, text: "held back: needs the whole exchange, so it waits for a full thread" };
   if (!r || !Number.isInteger(r.n) || !r.n) return { shown: false, text: "held back: not measured" };
   const m = `precision ${pc(r.precision)}% (95% interval ${pc(r.low)} to ${pc(r.high)}%), ${r.n} spans checked, held-out news articles`;
   if (ships(r)) return { shown: true, text: m };
@@ -4242,13 +4242,13 @@ function framingShown(row = MEASURED_FRAMING) {
   return !!(row && row.split === "test" && Number.isInteger(row.n) && row.n >= FRAMING_MIN_N && Number.isFinite(row.low) && row.low >= FRAMING_SHIP_LOW);
 }
 function framingStatus(row = MEASURED_FRAMING) {
-  if (!row) return { shown: false, text: "held back: not measured. No labelled corpus of episodic and thematic posts with a usable licence was found (checked 2026-10-21)" };
+  if (!row) return { shown: false, text: "held back: not measured. A search for a labelled corpus of episodic and thematic posts with a usable licence came up empty (checked 2026-10-21)" };
   const pc = (x) => Math.round(x * 100);
   const m = `precision ${pc(row.precision)}% (95% interval ${pc(row.low)} to ${pc(row.high)}%), ${row.n} posts checked`;
   return framingShown(row) ? { shown: true, text: m } : { shown: false, text: `held back (interval starts below ${pc(FRAMING_SHIP_LOW)}% or fewer than ${FRAMING_MIN_N} hits): ${m}` };
 }
 
-const FRAMING_DOES_NOT_PROVE = "A person's story can be true, typical and the best way to explain an issue. This describes how the post explains the issue, not whether it is right or who wrote it.";
+const FRAMING_DOES_NOT_PROVE = "This describes how the post explains the issue. A person's story can be true, typical and the best way to explain it.";
 
 // The frame the feed log keeps for one post: framingOf's frame, "none" for a post long enough to
 // read with neither kind of cue, or null for a post too short to read.
@@ -4345,7 +4345,7 @@ function verdict(r) {
 function sentence(r) {
   const e = r.extreme, o = r.others;
   const base = `${e.flagged} of ${e.n} extreme replies (${pct(e.share)}%) come from flagged accounts, against ${o.flagged} of ${o.n} other replies (${pct(o.share)}%).`;
-  const cover = r.notLookedUp ? ` ${r.notLookedUp} repl${r.notLookedUp === 1 ? "y is" : "ies are"} left out because the account${r.notLookedUp === 1 ? " was" : "s were"} not looked up.` : "";
+  const cover = r.notLookedUp ? ` ${r.notLookedUp} repl${r.notLookedUp === 1 ? "y is" : "ies are"} left out until the account${r.notLookedUp === 1 ? " is" : "s are"} looked up.` : "";
   switch (r.verdict) {
     case "too-few": return `Too few extreme replies to compare (${e.n}; the report needs ${MIN_EXTREME}).${cover}`;
     case "skewed-to-flagged": return `${base} The difference is larger than the uncertainty.${cover}`;
@@ -4381,7 +4381,7 @@ function techniqueCounts(replies, shown) {
   return out;
 }
 
-const REPORT_DOES_NOT_PROVE = "A skew can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event. It says nothing about any one reply or account.";
+const REPORT_DOES_NOT_PROVE = "A skew compares the thread as a whole, separate from any one reply or account. It can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event.";
 
 return { MIN_EXTREME, wilson, threadReport, origins, joinBurst, persuasionShare, REPORT_DOES_NOT_PROVE };
 })();
@@ -4946,7 +4946,7 @@ function noteTiming(tweet, now = Date.now()) {
   if (!Number.isFinite(w)) return null;
   const afterPost = Number.isFinite(p) ? Math.max(0, Math.round((w - p) / 1000)) : null, age = Math.max(0, Math.round((now - w) / 1000));
   const text = (afterPost != null ? `Note written ${span(afterPost)} after the post, ${span(age)} ago.` : `Note written ${span(age)} ago.`)
-    + " The page does not say when X began to show it.";
+    + " X keeps the time it began to show the note off the page.";
   return { written, afterPost, age, text };
 }
 
@@ -5452,7 +5452,7 @@ const { BASELINES } = M_baselines_data;
 const { TECHNIQUE_BASELINES } = M_techniques_data;
 const { sizeBin, viewBin } = M_baselines_bins;
 
-const BASELINE_SOURCE = "Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus, not a sample of today's X.";
+const BASELINE_SOURCE = "Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus from an earlier X.";
 
 const share = (x) => (x > 0 && x < 0.001 ? `${(x * 100).toFixed(2)}%` : x < 0.1 ? `${(x * 100).toFixed(1)}%` : `${Math.round(x * 100)}%`);
 const range = (ci) => `${share(ci[0])} to ${share(ci[1])}`.replace(/% to/, " to");
@@ -5625,9 +5625,9 @@ function stateSummary(items) {
 }
 
 const STATE_DOES_NOT_PROVE = {
-  "state-owned": "State ownership is not proof of disinformation. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
-  "designated": "A designation records one government's assessment and policy, not an independent finding. The domain is matched to the named outlet through Wikidata unless the document gives it.",
-  "public-broadcaster": "Public broadcasters range from editorially independent to government-directed. Check the outlet's charter and record, not the label.",
+  "state-owned": "State ownership ties the outlet to a government. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
+  "designated": "A designation records one government's assessment and policy. Wikidata matches the domain to the named outlet when the document leaves it out.",
+  "public-broadcaster": "Public broadcasters range from editorially independent to government-directed. The outlet's charter and record show which.",
   "named-in-report": "The report named this domain or account in an operation at the time it was published. Domains change hands, and accounts can be reused or impersonated.",
 };
 
@@ -5703,7 +5703,7 @@ const TYPE_WORDS = {
   "government": "a government body", "state media": "state media", "contractor": "a firm or group working for a government",
   "linked to a state": "people or a group the source links to a government", "commercial firm": "a firm, no government named", "origin only": "no operator named",
 };
-const OPS_DOES_NOT_PROVE = "The report named this domain or account as part of an operation when it was published. It says nothing about the person who posted or shared it: people share these links without knowing, or to warn others. Domains expire and are bought again, and accounts are reused.";
+const OPS_DOES_NOT_PROVE = "The report named this domain or account as part of an operation when it was published. People share these links unknowingly or to warn others. Domains expire and are bought again, and accounts are reused.";
 
 // The window's rows for one hit, in the sources' own words. Every attribution is listed with its
 // document, so disagreements between sources stay visible.
@@ -5716,13 +5716,13 @@ function opRows(h) {
     ["Sources say", said.slice(0, 4).join(" ")],
     ["Named as", `${h.indicator.kind} in ${doc.title || "the report"}${doc.date ? `, ${doc.date}` : ""}`],
     ["Read it", { links: [[String(doc.url || "").replace(/^https?:\/\//, "").slice(0, 48), doc.url]] }],
-    ["Does not prove", OPS_DOES_NOT_PROVE],
+    ["Read it as", OPS_DOES_NOT_PROVE],
   ];
 }
 
 // Counts for the trend view. Year is the year an operation was first published by any cited source.
 // It counts what investigators found and published, not how much activity there was.
-const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. They are not a measure of how much activity each country runs: platforms look harder in some places and languages than others, and some governments publish takedowns while others never do.";
+const OPS_TREND_CAVEAT = "These are operations that investigators found and published, counted by the year of the first report. The counts follow where people looked: platforms look harder in some places and languages than others, and some governments publish takedowns while others keep them quiet.";
 function opsTrend(table = TABLE) {
   const years = new Map(), states = new Map();
   // Operations from data packs (src/core/packs-content.js) are shown on matches but never counted here.
@@ -5782,7 +5782,7 @@ function backingLookup(table, { accounts = [], channels = [] } = {}) {
 const sourceCount = (p) => new Set((p.rows || []).flatMap((r) => r.sources.map((s) => s.url))).size;
 const backingLabel = (p) => { const n = sourceCount(p); return `Backing on record: ${n} source${n === 1 ? "" : "s"}`; };
 
-const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person says nothing on its own about whether a given post is true, or that the backer chose its words. Allegations in court records are unproven. Records go out of date; each row gives the date it was read.";
+const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person, each row dated when it was read. Allegations in court records are claims, and records go out of date.";
 const CORRECTIONS_PATH = "https://github.com/HarperZ9/daylight-commons/blob/dev/data/owner-corrections.json";
 
 const STATUS_WORDS = { documented: "documented in a primary record", reported: "reported by the press", alleged: "alleged, not proven" };
@@ -5800,7 +5800,7 @@ function backingRows(p) {
   }
   if (p.wikidata && p.wikidata.employers && p.wikidata.employers.length) rows.push(["Wikidata lists", `Employer (P108): ${p.wikidata.employers.map((e) => e.label + (e.end ? ` (to ${e.end.slice(0, 4)})` : "")).join("; ")}. Fetched ${p.wikidata.fetched}; Wikidata can lag a move.`]);
   rows.push(["Wrong or out of date?", { links: [["Send a sourced correction", CORRECTIONS_PATH]] }]);
-  rows.push(["Does not prove", BACKING_DOES_NOT_PROVE]);
+  rows.push(["Read it as", BACKING_DOES_NOT_PROVE]);
   return rows;
 }
 
@@ -5847,7 +5847,7 @@ function clonedCitations(text, domains) {
   return out;
 }
 
-const CLONED_DOES_NOT_PROVE = "People quote an outlet by name and paste whatever link they were sent, and some share a copy to warn others. This shows the words and the address disagree, not who made the copy or why the post links it.";
+const CLONED_DOES_NOT_PROVE = "People quote an outlet by name and paste whatever link they were sent, and some share a copy to warn others. This shows the words and the address disagree.";
 
 return { namesOutlet, clonedCitations, CLONED_DOES_NOT_PROVE };
 })();
@@ -5979,7 +5979,7 @@ const M_crosslang = (() => {
 const { normLink } = M_trail;
 
 const MIN_ACCOUNTS = 2;
-const CROSS_DOES_NOT_PROVE = "Multilingual people, translators, news agencies and diaspora communities share the same link or video in several languages. This shows the material crossing languages, not who sent it or whether anyone coordinated.";
+const CROSS_DOES_NOT_PROVE = "This shows the same material crossing languages. Multilingual people, translators, news agencies and diaspora communities share links and videos this way too.";
 
 const SCRIPTS = [["Kore", /\p{Script=Hangul}/u], ["Jpan", /[\p{Script=Hiragana}\p{Script=Katakana}]/u], ["Hani", /\p{Script=Han}/u],
   ["Hebr", /\p{Script=Hebrew}/u], ["Arab", /\p{Script=Arabic}/u], ["Cyrl", /\p{Script=Cyrillic}/u], ["Deva", /\p{Script=Devanagari}/u],
@@ -6091,7 +6091,7 @@ const M_flooding = (() => {
 const { HIGH_VOLUME_PER_DAY, ageDays } = M_flags;
 
 const FLOOD_MIN_ACCOUNTS = 3, FLOOD_SHARE = 0.25, MIN_KNOWN = 10, BURST_HIGH = 2, REPEAT_MIN = 5;
-const FLOOD_DOES_NOT_PROVE = "News, alert and fan accounts post all day by design, and a busy thread draws the most active accounts on the site. This describes how the replies were posted, not who runs any account or why.";
+const FLOOD_DOES_NOT_PROVE = "News, alert and fan accounts post all day by design, and a busy thread draws the most active accounts on the site. This describes how the replies were posted.";
 
 // Posts per day since joining, or null when either number is missing.
 function ratePerDay(account, now = Date.now()) {
@@ -6149,7 +6149,7 @@ const M_swarming = (() => {
 const { timePrecision, observable } = M_precision;
 
 const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN_KNOWN = 8;
-const SWARM_DOES_NOT_PROVE = "A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once, and nobody has to organise it. This describes how the replies arrived, not who sent them or why.";
+const SWARM_DOES_NOT_PROVE = "This describes how the replies arrived. A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once on its own.";
 
 // rows: [{ author, posted, timePrecision? }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
 // null when Daylight Commons has not read the account. precision: the thread's timePrecision. Returns null or
@@ -6477,7 +6477,7 @@ const M_campaign_shape = (() => {
 const { CAMPAIGN_BASELINES } = M_campaign_baselines_data;
 
 const SHAPE_MIN_INTERACTIONS = 20, OWN_MIN_POSTS = 5, OWN_OUTLIER_FACTOR = 5, STRATUM_MIN = 200;
-const SHAPE_DOES_NOT_PROVE = "A post can travel through repost-heavy communities (news, giveaways, art shares), and a launch is unusual for an account by nature. A ratio describes how the engagement is shaped, not who made it.";
+const SHAPE_DOES_NOT_PROVE = "A post can travel through repost-heavy communities (news, giveaways, art shares), and a launch is unusual for an account by nature. A ratio describes how the engagement is shaped.";
 
 const num = (v) => (Number.isFinite(v) && v >= 0 ? v : null);
 const ratio = (a, b) => (a != null && b != null && b > 0 ? a / b : null);
@@ -6565,8 +6565,8 @@ const SAMPLE_DOES_NOT_PROVE = {
   "stock-persona": "Real people write short, list-like bios, and these phrases are common.",
   "join-cluster": "Accounts join in waves after news, an event or a platform change.",
   "topic-mismatch": "People follow and reshare outside their own interests, and a bio says little about what someone reads.",
-  "random-suffix": "Many people choose a handle with numbers and letters for privacy or safety. This is context only.",
-  "default-avatar": "Many real people never upload a picture. This is context only.",
+  "random-suffix": "Many people choose a handle with numbers and letters for privacy or safety, so this stays context.",
+  "default-avatar": "Many real people keep the default picture, so this stays context.",
 };
 
 // A handle ending in a digit-and-letter tail ("_x5", "8t9", "c8s", "38"). Context only.
@@ -6644,7 +6644,7 @@ const { timePrecision, observable } = M_precision;
 
 // BUNCH_TIGHT_MS: 5 quotes inside an hour count as coordination; a wider bunch is shown, not counted.
 const BUNCH_K = 5, BUNCH_TIGHT_MS = 3600000, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
-const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour because it is news, and common phrases spread by imitation. A shared opener does not show payment, and a missing label does not show that anyone hid one.";
+const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour because it is news, and common phrases spread by imitation. Payment and hidden labels show in contracts and records, off the page.";
 
 const at = (q) => Date.parse(q.posted);
 
@@ -6714,7 +6714,7 @@ const M_campaign_overlap = (() => {
 
 const OVERLAP_KEY = "pb.campaign.v1", OVERLAP_RETAIN_DAYS = 30, OVERLAP_MAX_LAUNCHES = 200, OVERLAP_MAX_ACCOUNTS = 500;
 const OVERLAP_OTHER_MIN = 2, OVERLAP_MIN = 5, OVERLAP_SHARE = 0.2;
-const OVERLAP_DOES_NOT_PROVE = "Fans of a field, employees and investors reshare each other's launches. Overlap says these launches drew some of the same accounts, not why.";
+const OVERLAP_DOES_NOT_PROVE = "Overlap says these launches drew some of the same accounts. Fans of a field, employees and investors reshare each other's launches too.";
 const DAY = 86400000;
 
 // FNV-1a over salt + handle, as a short hex string. Not cryptographic; its job is to keep handles
@@ -6777,11 +6777,11 @@ const CAMPAIGN_PLATFORMS = {
     shapeCounts: ["score", "comments", "upvoteRatio"],
     sampleFrom: ["commenters"],
     signs: ["join-cluster", "karma-for-age", "arrival-burst"],
-    notes: "Vote rings, karma farming, aged accounts bought for posting, and brigading from another community. Reddit fuzzes vote counts and shows no repost list. Thresholds are not set until labelled Reddit cases exist.",
+    notes: "Vote rings, karma farming, aged accounts bought for posting, and brigading from another community. Reddit fuzzes vote counts and hides repost lists. Thresholds wait for labelled Reddit cases.",
   },
-  instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, so no shape." },
+  instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, which leaves the shape unread." },
   tiktok: { status: "not defined", notes: "Not defined yet." },
-  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons does not run on LinkedIn." },
+  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons runs on other sites for now." },
 };
 
 function campaignPlatform(id) {
@@ -6809,14 +6809,14 @@ const { quoteCluster, QUOTES_DOES_NOT_PROVE, BUNCH_TIGHT_MS } = M_campaign_quote
 const { OVERLAP_DOES_NOT_PROVE } = M_campaign_overlap;
 const { campaignPlatform, CAMPAIGN_PLATFORMS } = M_campaign_platforms;
 
-const CAMPAIGN_DOES_NOT_PROVE = "These signs describe how this post's engagement looks in what your page loaded. They do not say who paid, whether the product is good, or that any one account is fake. Real people also write stock bios, join in waves and reshare launches.";
+const CAMPAIGN_DOES_NOT_PROVE = "These signs describe how this post's engagement looks in what your page loaded. Real people also write stock bios, join in waves and reshare launches.";
 const CAMPAIGN_LEADS = {
   strong: "This engagement is consistent with purchased amplification, and here is why.",
-  one: "One sign of paid or fake-account amplification. One sign is weak evidence, so this is context, not an accusation.",
+  one: "One sign of paid or fake-account amplification. One sign is weak evidence: read it as context.",
   coordinated: "The engagement looks coordinated. Coordination alone is common and often organic.",
-  none: "No campaign signs in what this page loaded.",
+  none: "Zero campaign signs in what this page loaded.",
   thin: "Too few accounts loaded to read. Open the post's reposts or quotes to load more.",
-  undefined: "The campaign lens is not defined for this site yet.",
+  undefined: "The campaign lens for this site is still to come.",
 };
 const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/daylight-commons/issues. Corrections are made in the open.";
 
@@ -6844,7 +6844,7 @@ function ladder(status, families, qc, actor, held) {
   if (qc.disclosed) out.push({ step: 1, text: `Documented: ${qc.disclosed} quote post${qc.disclosed === 1 ? "" : "s"} promoting ${who} carry X's Paid partnership label, the posters' own disclosure.` });
   if (status === "strong") {
     out.push({ step: 2, text: `Inference: the engagement on ${who} is consistent with purchased amplification (${families.length} independent signs below).` });
-    if (families.includes("quotes") && !held) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Quotes without the label share the paid quotes' template and timing.` });
+    if (families.includes("quotes") && !held) out.push({ step: 2, text: `Inference: paid buzz dressed as organic. Unlabelled quotes share the paid quotes' template and timing.` });
   }
   return out;
 }
@@ -6858,12 +6858,12 @@ const mins = (ms) => (ms < 3600000 ? `${Math.max(1, Math.round(ms / 60000))} min
 function shapeRows(sh) {
   if (!sh || sh.tooFew) return { ind: [], ctx: [] };
   const v = sh.shape.repostsPerLike, ind = [], ctx = [];
-  const own = sh.own.insufficient ? `Not enough of this account's own posts seen on this device to compare (${sh.own.n} of 5).` : `This account's other posts: median ${r2(sh.own.median)} reposts per like, highest ${r2(sh.own.max)} (${sh.own.n} posts).`;
+  const own = sh.own.insufficient ? `Too few of this account's own posts seen on this device to compare (${sh.own.n} of 5).` : `This account's other posts: median ${r2(sh.own.median)} reposts per like, highest ${r2(sh.own.max)} (${sh.own.n} posts).`;
   const line = `Reposts per like: ${r2(v)} (${sh.shape.counts.reposts} reposts, ${sh.shape.counts.likes} likes). ${own}`;
   (sh.outlier ? ind : ctx).push({ id: sh.outlier ? "shape-outlier-own" : "shape", text: line, dnp: SHAPE_DOES_NOT_PROVE });
-  ctx.push({ id: "shape-baseline", text: sh.current ? `Against ${sh.current.n} ordinary posts in the ${sh.stratum} stratum: ${sh.current.position}.` : `Insufficient baseline for this platform today${sh.stratum ? ` (${sh.stratum})` : ""}: no labelled modern sample yet.`, dnp: "A baseline describes posts that were collected as ordinary; it is not a test." });
+  ctx.push({ id: "shape-baseline", text: sh.current ? `Against ${sh.current.n} ordinary posts in the ${sh.stratum} stratum: ${sh.current.position}.` : `Insufficient baseline for this platform today${sh.stratum ? ` (${sh.stratum})` : ""}: no labelled modern sample yet.`, dnp: "A baseline describes posts that were collected as ordinary." });
   const h = sh.historical;
-  if (h && !h.noStratum) ctx.push({ id: "shape-historical", text: `Historical reference only: ${h.source}, ${h.label}: ${h.position} (median ${h.q.q50}, 95th percentile ${h.q.q95}).`, dnp: "Breaking news in 2014 and 2015 was reposted more than liked; today's platform and topics differ, so this line never counts as a sign." });
+  if (h && !h.noStratum) ctx.push({ id: "shape-historical", text: `Historical reference: ${h.source}, ${h.label}: ${h.position} (median ${h.q.q50}, 95th percentile ${h.q.q95}).`, dnp: "Breaking news in 2014 and 2015 was reposted more than liked. Today's platform and topics differ, so this line stays context." });
   return { ind, ctx };
 }
 
@@ -6873,19 +6873,19 @@ function sampleRows(s) {
     "bio-template": (x) => `${x.accounts} of ${x.of} bios fall into ${x.groups} shared template${x.groups === 1 ? "" : "s"} (largest ${x.largest}).`,
     "stock-persona": (x) => `${x.n} of ${x.of} accounts (${pct(x.share)}) have stock-persona bios: age, passion, crypto slogan, pet or filler phrases together.`,
     "join-cluster": (x) => `${x.n} of ${x.of} accounts with a join date joined within 14 days (${x.from} to ${x.to}).`,
-    "topic-mismatch": (x) => `${x.n} of ${x.of} bios with a clear topic are about ${x.families.slice(0, 2).join(" and ")}, which this post is not.`,
-    "random-suffix": (x) => `Context: ${x.n} of ${x.of} handles end in a number-and-letter tail. People choose these for privacy too; this never counts as a sign.`,
+    "topic-mismatch": (x) => `${x.n} of ${x.of} bios with a clear topic are about ${x.families.slice(0, 2).join(" and ")}, a different topic from this post.`,
+    "random-suffix": (x) => `Context: ${x.n} of ${x.of} handles end in a number-and-letter tail. People choose these for privacy too; this stays context.`,
     "default-avatar": (x) => `Context: ${x.n} of ${x.of} accounts use the default picture.`,
   };
   const row = (x) => ({ id: x.id, text: text[x.id](x), dnp: SAMPLE_DOES_NOT_PROVE[x.id] });
-  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Daylight Commons reads only what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
+  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Daylight Commons reads what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
 }
 
 function quoteRows(q) {
   if (!q || !q.n) return { ind: [], ctx: [] };
   const ind = [], ctx = [];
   if (q.lookalikes) ind.push({ id: "undisclosed-lookalike", text: `${q.lookalikes} quote${q.lookalikes === 1 ? "" : "s"} without a Paid partnership label share a template with labelled quotes or with each other inside two hours.`, dnp: QUOTES_DOES_NOT_PROVE });
-  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Daylight Commons cannot see who paid or how much." });
+  if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; who paid and how much stay off the page." });
   // Any launch with five quotes has a narrowest window; only a tight one is coordination context.
   if (q.bunch.kWindowMs != null) ctx.push({ id: q.bunch.kWindowMs <= BUNCH_TIGHT_MS ? "quote-bunching" : "quote-timing", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
   for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Daylight Commons' local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
@@ -6990,8 +6990,8 @@ const M_evidence_github = (() => {
 const GITHUB_API = "https://api.github.com";
 const STAR_MAX_PAGES = 10, STAR_PER_PAGE = 100;
 const STAR_BURST_FACTOR = 10, STAR_BURST_MIN = 50;
-const REPO_DOES_NOT_PROVE = "A creation date is when this repository was made on GitHub. Work often starts elsewhere or in another repository, so it says nothing about how long a team has been building.";
-const STARS_DOES_NOT_PROVE = "Stars arrive in bursts after a launch, a newsletter or a front-page link. A burst shows when stars came, not who gave them or why.";
+const REPO_DOES_NOT_PROVE = "A creation date is when this repository was made on GitHub. Work often starts elsewhere or in another repository first.";
+const STARS_DOES_NOT_PROVE = "A burst shows when stars came. Stars also arrive in bursts after a launch, a newsletter or a front-page link.";
 
 // github.com/<owner>/<repo> links in a text or a list of links -> unique [{ owner, repo }].
 function reposIn(textOrLinks) {
@@ -7057,7 +7057,7 @@ const M_evidence_domain = (() => {
 const RDAP_BASE = "https://rdap.org/domain/";
 const CDX_BASE = "https://web.archive.org/cdx/search/cdx";
 const DOMAIN_DOES_NOT_PROVE = "A registration date is when the current registration began. Domains are bought, sold and re-registered, and a young domain can front an old company.";
-const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly. A late first capture means the archive found the site late, not that it did not exist.";
+const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly, so a late first capture means the archive found the site late.";
 
 // Hosting services that give each customer a subdomain. The service's own registration says nothing
 // about a customer's site, so such a host is kept whole and RDAP is not asked about it.
@@ -7133,7 +7133,7 @@ const AD_LIBRARIES = [
     search: () => "https://ads.x.com/ads-repository",
     api: "No public API; the repository page takes an advertiser and a date range.", by: "none", checked: "page answered 200" },
 ];
-const ADS_DOES_NOT_PROVE = "An ad library lists ads a platform chose to record for its own rules. No entry does not mean no paid promotion: influencer payments, agency-run accounts and engagement bought off-platform never appear there.";
+const ADS_DOES_NOT_PROVE = "An ad library lists ads a platform chose to record for its own rules. Influencer payments, agency-run accounts and engagement bought off-platform stay outside it.";
 
 // { name, domain } -> [{ id, name, url, covers, api, checked }] for the user to open.
 function adLibraryLinks({ name, domain } = {}) {
@@ -7245,18 +7245,18 @@ async function github(fetchFn, { owner, repo }, token, postedAt) {
 async function domain(fetchFn, d, postedAt, wayback) {
   const out = [], notes = [];
   const host = hostedOn(d);
-  if (host) notes.push(`${d} is a site on ${host}, a hosting service. When ${host} was registered says nothing about this site, so RDAP was not asked.`);
+  if (host) notes.push(`${d} is a site on ${host}, a hosting service. RDAP dates ${host}, so it was skipped for this site.`);
   else {
     const r = await getJson(fetchFn, rdapUrl(d), { Accept: "application/rdap+json" });
     const f = r.json ? rdapFacts(r.json) : null;
     if (f && f.registered) out.push(await makeReceipt({ kind: "domain-registration", subject: f.domain, observed: { ...f, daysBeforePost: daysBefore(f.registered, postedAt) }, raw: r.json, source: "RDAP via rdap.org", url: rdapUrl(d), dnp: DOMAIN_DOES_NOT_PROVE }));
     else notes.push(`RDAP answered ${r.status} for ${d}.`);
   }
-  if (!wayback) { notes.push(`The Internet Archive was not asked about ${d}: allow access to web.archive.org by turning Evidence lookups off and on again in Options.`); return { receipts: out, notes }; }
+  if (!wayback) { notes.push(`The Internet Archive was skipped for ${d}: allow access to web.archive.org by turning Evidence lookups off and on again in Options.`); return { receipts: out, notes }; }
   const w = await getJson(fetchFn, cdxUrl(d));
   const first = w.json ? waybackFirst(w.json) : null;
   if (first) out.push(await makeReceipt({ kind: "wayback-first", subject: d, observed: { ...first, daysBeforePost: daysBefore(first.first, postedAt) }, raw: w.json, source: "Internet Archive Wayback CDX", url: cdxUrl(d), dnp: WAYBACK_DOES_NOT_PROVE }));
-  else notes.push(w.json ? `The Internet Archive has no capture of ${d}.` : `The Internet Archive answered ${w.status} for ${d}.`);
+  else notes.push(w.json ? `The Internet Archive holds zero captures of ${d}.` : `The Internet Archive answered ${w.status} for ${d}.`);
   return { receipts: out, notes };
 }
 
@@ -7267,7 +7267,7 @@ async function lookupEvidence(fetchFn, { repos = [], domains = [], postedAt = nu
   const receipts = [], notes = [];
   for (const x of repos.slice(0, MAX_REPOS)) { const g = await github(fetchFn, x, token, postedAt); receipts.push(...g.receipts); notes.push(...g.notes); }
   for (const d of domains.slice(0, MAX_DOMAINS)) { const g = await domain(fetchFn, d, postedAt, wayback); receipts.push(...g.receipts); notes.push(...g.notes); }
-  if (repos.length > MAX_REPOS || domains.length > MAX_DOMAINS) notes.push(`Looked up the first ${MAX_REPOS} repositories and ${MAX_DOMAINS} domains only.`);
+  if (repos.length > MAX_REPOS || domains.length > MAX_DOMAINS) notes.push(`Looked up the first ${MAX_REPOS} repositories and ${MAX_DOMAINS} domains.`);
   return { receipts, notes };
 }
 
@@ -7287,7 +7287,7 @@ const M_evidence_seal = (() => {
 const { canonical, sha256Hex, verifyReceipt } = M_receipt;
 
 const SEAL_FORMAT = "radar-seal/1", EXPORT_FORMAT = "radar-evidence-chain/1";
-const SEAL_DOES_NOT_PROVE = "The seal shows that these receipts are the ones this browser recorded, in this order, and that none was changed or removed after the fact. It does not show that a source told the truth, and whoever holds the device could start a new log.";
+const SEAL_DOES_NOT_PROVE = "The seal shows these are the receipts this browser recorded, in this order, each unchanged since. Each receipt is as true as its source, and whoever holds the device can start a fresh log.";
 const GENESIS = "0".repeat(64);
 
 const hexToBytes = (h) => Uint8Array.from(h.match(/../g).map((x) => parseInt(x, 16)));
@@ -7373,7 +7373,7 @@ async function exportSeal(seal, { title = null, at = new Date().toISOString() } 
 // Offline check of an export: the seal, the head, the root and every proof.
 async function verifyExport(x) {
   if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Daylight Commons evidence chain"] };
-  if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file has no seal or no proofs"] };
+  if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file lacks a seal or its proofs"] };
   const s = await verifySeal(x.seal), problems = [...s.problems];
   const hashes = x.seal.entries.map((e) => e.receipt.hash);
   if ((await merkleRoot(hashes)) !== x.root) problems.push("root does not match the receipts");
@@ -7389,7 +7389,7 @@ async function verifyExport(x) {
 async function chainChecks(x) {
   if (!x || x.format !== EXPORT_FORMAT) return { ok: false, size: 0, root: null, checks: [{ name: "format", ok: false, text: "not a Daylight Commons evidence chain" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const entries = (x.seal && Array.isArray(x.seal.entries)) ? x.seal.entries : null;
-  if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file has no seal or no proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
+  if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file lacks a seal or its proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const n = entries.length, hashes = entries.map((e) => (e && e.receipt && e.receipt.hash) || "");
   let edited = 0, broken = 0, prev = GENESIS, proofsBad = 0;
   for (let i = 0; i < n; i++) {
@@ -7404,9 +7404,9 @@ async function chainChecks(x) {
   const head = n ? entries[n - 1].link : GENESIS;
   const checks = [
     { name: "receipts", ok: !edited, text: edited ? `${edited} of ${n} receipts changed after they were made` : `all ${n} receipts match their own hash` },
-    { name: "chain", ok: !broken, text: broken ? `${broken} of ${n} entries do not follow the one before (edited, removed or reordered)` : `all ${n} entries follow the one before, in order` },
-    { name: "head", ok: head === x.head, text: head === x.head ? "the head matches the last entry" : "the head does not match the last entry" },
-    { name: "Merkle root", ok: root === x.root, text: root === x.root ? `the root ${String(x.root).slice(0, 16)}... is the root of these receipts` : "the root is not the root of these receipts" },
+    { name: "chain", ok: !broken, text: broken ? `${broken} of ${n} entries break from the one before (edited, removed or reordered)` : `all ${n} entries follow the one before, in order` },
+    { name: "head", ok: head === x.head, text: head === x.head ? "the head matches the last entry" : "the head differs from the last entry" },
+    { name: "Merkle root", ok: root === x.root, text: root === x.root ? `the root ${String(x.root).slice(0, 16)}... is the root of these receipts` : "the root differs from the root of these receipts" },
     { name: "inclusion proofs", ok: !proofsBad && x.proofs.length === n, text: proofsBad ? `${proofsBad} of ${n} proofs fail against the root` : `all ${n} proofs place their receipt under the root` },
   ];
   const receipts = entries.map((e) => { const r = (e && e.receipt) || {}; return { kind: r.kind || null, subject: r.subject || null, source: r.source || null, at: r.at || null }; });
@@ -7428,7 +7428,7 @@ const M_chain = (() => {
 
 const { trailFor, firstSeen, normLink } = M_trail;
 
-const CHAIN_DOES_NOT_PROVE = "Daylight Commons cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.";
+const CHAIN_DOES_NOT_PROVE = "The chain starts at the first upload or link Daylight Commons has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.";
 
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return null; } };
 const hours = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 360000) / 10;
@@ -7570,7 +7570,7 @@ function summarize(reports, net, trail) {
   };
 }
 
-const HISTORY_DOES_NOT_PROVE = "These totals cover only the threads you opened, in the order each platform chose to show them. A recurring source shows where your feed's material comes from, not who organised it, and the shares are not a sample of any platform.";
+const HISTORY_DOES_NOT_PROVE = "These totals cover the threads you opened, in the order each platform chose to show them. A recurring source shows where your feed's material comes from.";
 
 return { HISTORY_RETAIN_DAYS, snapshot, addSnapshot, summarize, HISTORY_DOES_NOT_PROVE };
 })();
@@ -7600,7 +7600,7 @@ const { foldConfusables } = M_confusables;
 
 const MIN_CLAIM_TOKENS = 4, MIN_SHARED = 4, COVER_MIN = 0.85, BIGRAM_MIN = 0.3, MAX_CANDIDATES = 200;
 const CLAIM_LABEL = "A fact-checker reviewed a similar claim";
-const CLAIM_DOES_NOT_PROVE = "Similar wording is not the same claim; check the source. The rating is the fact-checker's, about the claim they reviewed, not about this post or the person who wrote it.";
+const CLAIM_DOES_NOT_PROVE = "Similar wording to a reviewed claim; check the source. The rating is the fact-checker's, about the claim they reviewed.";
 const CLAIM_ATTRIBUTION = "ClaimReview markup published by the fact-checker, from the Data Commons fact-check feed (CC BY 4.0).";
 
 const LANG_STOPS = {
@@ -7776,10 +7776,10 @@ function claimCard(m) {
     ["Claim they reviewed", m.claim],
     ["Reviewed on", m.date || "date not given"],
     ["Wording overlap", `${Math.round(m.coverage * 100)}% of the claim's words`],
-    m.negationDiffers ? ["Note", "One of the two says \"not\" and the other does not. Read both."] : null,
+    m.negationDiffers ? ["Note", "One of the two contains \"not\" and the other lacks it. Read both."] : null,
     ["Read it", { links: [[host, m.url]] }],
     ["Source", CLAIM_ATTRIBUTION],
-    ["Does not prove", CLAIM_DOES_NOT_PROVE],
+    ["Read it as", CLAIM_DOES_NOT_PROVE],
   ].filter(Boolean);
   return { label: CLAIM_LABEL, rows };
 }
@@ -8318,7 +8318,7 @@ async function checkSignature(sigBytes, claimBytes, claimVersion = 2) {
   let s;
   try { s = cborDecode(sigBytes); } catch { return { sign: { ok: false, text: "the signature cannot be read" } }; }
   const arr = s && s.tag === 18 ? s.value : s;
-  if (!Array.isArray(arr) || arr.length !== 4) return { sign: { ok: false, text: "the signature is not a COSE_Sign1 structure" } };
+  if (!Array.isArray(arr) || arr.length !== 4) return { sign: { ok: false, text: "the signature has some other structure than COSE_Sign1" } };
   const [protBytes, unprot, , sig] = arr;
   const prot = protBytes && protBytes.length ? cborDecode(protBytes) : {};
   const chain = prot["33"] || (unprot || {})["33"] || (unprot || {}).x5chain;
@@ -8342,7 +8342,7 @@ async function verifyWith([name, hash, salt], cert, sig, tbs) {
     const params = name === "ECDSA" ? { name, namedCurve: cert.curve } : name === "RSA-PSS" ? { name, hash } : { name };
     const key = await subtle().importKey("spki", cert.spki, params, false, ["verify"]);
     const ok = await subtle().verify(name === "ECDSA" ? { name, hash } : name === "RSA-PSS" ? { name, saltLength: salt } : { name }, key, sig, tbs);
-    return ok ? { ok: true, text: "the signature matches the claim and the signer's certificate" } : { ok: false, text: "the signature does not match the claim: the claim was changed or signed by another key" };
+    return ok ? { ok: true, text: "the signature matches the claim and the signer's certificate" } : { ok: false, text: "the signature fails against the claim: the claim changed, or another key signed it" };
   } catch (e) {
     return { ok: null, text: `this browser cannot check ${name} signatures (${String(e && e.message || e).slice(0, 60)})` };
   }
@@ -8350,11 +8350,11 @@ async function verifyWith([name, hash, salt], cert, sig, tbs) {
 
 // c2pa.hash.data: the file's bytes outside the exclusion ranges.
 async function checkDataHash(file, a, complete) {
-  if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
+  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
   const parts = [];
   let p = 0;
   for (const e of [...(a.exclusions || [])].sort((x, y) => x.start - y.start)) {
-    if (e.start < p || e.start + e.length > file.length) return { ok: false, text: "the exclusion ranges do not fit this file" };
+    if (e.start < p || e.start + e.length > file.length) return { ok: false, text: "the exclusion ranges run outside this file" };
     parts.push(file.subarray(p, e.start)); p = e.start + e.length;
   }
   parts.push(file.subarray(p));
@@ -8409,10 +8409,10 @@ function exclusionRanges(file, rules) {
 // c2pa.hash.bmff: the file without its excluded boxes; v2 and later put the 8-byte offset of each
 // top-level box that is hashed before it.
 async function checkBmffHash(file, a, label, complete) {
-  if (!complete) return { ok: null, text: "only part of the file was read, so its bytes were not compared" };
+  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
   const rules = a.exclusions || [];
   if (!a.hash || a.merkle || rules.some((r) => !/^(\/[\w ]{4})+$/.test(r.xpath || ""))) {
-    return { ok: null, text: "this video uses a hash layout Daylight Commons does not check yet (fragments or partial exclusions)" };
+    return { ok: null, text: "this video uses a hash layout Daylight Commons skips for now (fragments or partial exclusions)" };
   }
   const withOffsets = /\.v[2-9]$/.test(label), ex = exclusionRanges(file, rules);
   const top = new Set(ex.filter((e) => e[2] === 0 && e[3]).map((e) => e[0]));
@@ -8444,7 +8444,7 @@ const { findManifestStore, parseStore, childByLabel } = M_jumbf;
 const { checkAssertions, checkSignature, checkDataHash, checkBmffHash } = M_c2pa_verify;
 const { sourceType, aiMetadata } = M_aimeta;
 
-const OLDER_FORMAT = "could not fully verify (older manifest format): Daylight Commons has not yet been shown to agree with the reference checker on version 1 manifests in video";
+const OLDER_FORMAT = "could not fully verify (older manifest format): Daylight Commons still needs a test against the reference checker on version 1 manifests in video";
 const content = (box) => (box && box.content && box.content[0]) || null;
 function decodeBox(box) { const c = content(box); if (!c) return null; try { return c.type === "json" ? JSON.parse(new TextDecoder().decode(c.data)) : cborDecode(c.data); } catch { return null; } }
 const assertionsOf = (m) => (childByLabel(m, "c2pa.assertions") || {}).content || [];
@@ -8492,9 +8492,9 @@ async function binding(file, m, complete, store, ranges, depth = 0) {
     const label = base(a.label), v = decodeBox(a);
     if (label === "c2pa.hash.data" && v) return checkDataHash(file, v, complete);
     if (/^c2pa\.hash\.bmff/.test(label) && v) return checkBmffHash(file, v, label, complete);
-    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is not checked by Daylight Commons yet` };
+    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is on Daylight Commons' list to check later` };
   }
-  return { ok: false, text: "the manifest has no hard binding to the file's bytes" };
+  return { ok: false, text: "the manifest lacks a hard binding to the file's bytes" };
 }
 
 async function signatureOf(store, m, s) {
@@ -8514,7 +8514,7 @@ async function readCredentials(bytes, { complete = true } = {}) {
   const out = { format: found.format, found: !!found.store, meta };
   if (!found.store) return meta.remote ? { ...out, remote: meta.remote } : out;
   let store;
-  try { store = parseStore(found.store); } catch { return { ...out, broken: "the Content Credentials in this file cannot be read" }; }
+  try { store = parseStore(found.store); } catch { return { ...out, broken: "the Content Credentials in this file are damaged or in an unreadable form" }; }
   if (!store.manifests.length) return { ...out, broken: "the credential store holds no manifest" };
   const active = store.manifests[store.manifests.length - 1], s = summarise(active);
   const sig = await signatureOf(store, active, s);
@@ -8554,14 +8554,14 @@ return { OLDER_FORMAT, readCredentials, credentialState };
 // ---- mediacheck.js
 const M_mediacheck = (() => {
 // Words for a media check: the rows the window shows for one file, and the signals it raises.
-// The wording never calls a file authentic or fake. Credentials record what the signing tool
-// declared; a valid signature shows who signed and that the file has not changed since.
+// The wording calls a file neither authentic nor fake. Credentials record what the signing tool
+// declared; a valid signature shows who signed and that the file is unchanged since.
 
 const { credentialState } = M_c2pa;
 
-const CREDENTIALS_DO_NOT_PROVE = "Credentials record what the signing tool declared. A valid signature shows who signed and that the file has not changed since, not that what it shows is true.";
-const NO_CREDENTIALS = "No Content Credentials found (platforms often strip them on upload). This says nothing about the file either way.";
-const TRUST = "Not checked against a trust list: anyone can make a certificate with any name on it.";
+const CREDENTIALS_DO_NOT_PROVE = "Credentials record what the signing tool declared, and a valid signature shows who signed and that the file is unchanged since.";
+const NO_CREDENTIALS = "Absent, the usual case: platforms often strip them on upload.";
+const TRUST = "The name is the certificate's own claim: anyone can make a certificate with any name on it.";
 
 const host = (u) => { try { return new URL(u).hostname; } catch { return "an address it names"; } };
 const who = (c) => (c ? [c.CN, c.O].filter(Boolean).filter((x, i, a) => a.indexOf(x) === i).join(", ") || "an unnamed signer" : "unknown");
@@ -8581,11 +8581,11 @@ function credentialRows(r) {
   if (r.error) return [["Content Credentials", r.error]];
   const rows = [], state = credentialState(r);
   if (state === "none") rows.push(["Content Credentials", NO_CREDENTIALS]);
-  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}. Daylight Commons does not fetch them, so nothing was checked.`]);
+  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}, which Daylight Commons leaves unfetched.`]);
   else if (r.broken) rows.push(["Content Credentials", `found, but ${r.broken}`]);
   else {
-    rows.push(["Content Credentials", state === "unchanged" ? "found and checked: the file has not changed since it was signed"
-      : state === "changed" ? `found, but they no longer match: ${failed(r).join("; ")}` : `found; not every part could be checked here: ${open(r).join("; ")}`]);
+    rows.push(["Content Credentials", state === "unchanged" ? "found and checked: the file is unchanged since it was signed"
+      : state === "changed" ? `found, but they no longer match: ${failed(r).join("; ")}` : `found; open checks: ${open(r).join("; ")}`]);
     rows.push(["Signed by", `${who(r.active.cert && r.active.cert.subject)} (${r.active.alg || "unknown algorithm"}). ${TRUST}`]);
     if (r.active.cert && r.active.cert.issuer && !r.active.cert.selfIssued) rows.push(["Certificate from", who(r.active.cert.issuer)]);
     if (r.active.cert && r.active.cert.notAfter) rows.push(["Certificate dates", `${r.active.cert.notBefore.slice(0, 10)} to ${r.active.cert.notAfter.slice(0, 10)}`]);
@@ -8593,16 +8593,16 @@ function credentialRows(r) {
     if (m) rows.push(["Says it was", m]);
     if (r.active.generator) rows.push(["Signing tool", r.active.generator]);
     for (const e of r.earlier || []) if (e.ai) rows.push(["Earlier version", `the credentials say an earlier version${e.title ? ` (${e.title})` : ""} was made with generative AI`]);
-    if (r.active.timestamp) rows.push(["Time-stamp", "attached; Daylight Commons does not check the time-stamp authority's signature"]);
+    if (r.active.timestamp) rows.push(["Time-stamp", "attached; the time-stamp authority's signature is left unchecked"]);
   }
   for (const t of (r.meta && r.meta.sourceTypes) || []) rows.push(["Metadata says", `${t.says} (IPTC ${t.code})`]);
   for (const g of (r.meta && r.meta.generators) || []) rows.push(["Generator metadata", g]);
   for (const f of (r.meta && r.meta.fields) || []) rows.push([f.key, f.text]);
-  if (state === "none" && r.meta && !r.meta.any) rows.push(["Other metadata", "none in the file; the platform probably removed it"]);
+  if (state === "none" && r.meta && !r.meta.any) rows.push(["Other metadata", "absent; the platform probably removed it"]);
   return rows;
 }
 
-const dnp = (t) => ["Does not prove", t];
+const dnp = (t) => ["Read it as", t];
 
 // Signals for the window: [{ label, fam, level, cat, rows }].
 function credentialSignals(r) {
@@ -8614,7 +8614,7 @@ function credentialSignals(r) {
     const m = made(r);
     out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What Daylight Commons read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   }
-  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Daylight Commons found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms can break credentials without any intent to mislead.")] });
+  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Daylight Commons found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms also break credentials in ordinary use.")] });
   const ai = ((r.meta && r.meta.sourceTypes) || []).find((t) => t.kind === "ai");
   if (ai || ((r.meta && r.meta.generators) || []).length) {
     out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What Daylight Commons read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
@@ -8827,7 +8827,7 @@ function threadUrl(key) {
   return ({ x: `https://x.com/i/status/${id}`, reddit: `https://www.reddit.com/comments/${id}`, youtube: `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`, instagram: `https://www.instagram.com/p/${id}/` })[m[1]] || null;
 }
 
-const GRAPH_DOES_NOT_PROVE = "Two accounts replying in the same threads is what friends, fans of one creator and people following the same news do, as well as coordinated accounts. The graph covers only threads you opened, and it says nothing about who runs any account.";
+const GRAPH_DOES_NOT_PROVE = "Two accounts replying in the same threads is what friends, fans of one creator and people following the same news do, as well as coordinated accounts. The graph covers the threads you opened.";
 
 return { GRAPH_MIN, coGraph, forceLayout, threadUrl, GRAPH_DOES_NOT_PROVE };
 })();
@@ -8958,7 +8958,7 @@ function dayAdd(m, at, v) {
   e.posts += v.posts; e.strong += v.strong || 0; e.strongN += v.strongN; e.threads += v.threads || 0; e.feedPosts += v.feedPosts || 0;
 }
 
-const FEED_DOES_NOT_SHOW = "What this does not show: what your feed would carry for anyone else, or what a platform carries overall. These counts cover only posts and threads you opened with Daylight Commons on, in the order each platform chose to show them. A site's share says how often it was linked, not whether it is accurate, and a strong-rhetoric sign is about wording, not about the person who wrote it.";
+const FEED_DOES_NOT_SHOW = "These counts cover the posts and threads you opened with Daylight Commons on, in the order each platform chose to show them: your own feed, one view of each platform. A site's share says how often it was linked. A strong-rhetoric sign is about wording.";
 
 return { FEED_RETAIN_DAYS, addFeedPosts, threadContext, feedDashboard, FEED_DOES_NOT_SHOW };
 })();
@@ -9070,7 +9070,7 @@ function cardPage(url) {
 // thread, or null. Only their states and AI-generation marks go on the card, never a signer's name.
 // Returns { ok: true, card } or { ok: false, reason }.
 function evidenceCard(input) {
-  if (!input || !input.thread) return { ok: false, reason: "Cards are made for threads only, not for profiles or feeds." };
+  if (!input || !input.thread) return { ok: false, reason: "Cards are made for threads. Open a thread to make one." };
   const accounts = new Set((input.authors || []).map((h) => String(h).toLowerCase())).size;
   if (accounts < MIN_CARD_ACCOUNTS) return { ok: false, reason: `This thread has ${accounts} reply account${accounts === 1 ? "" : "s"}. A card needs at least ${MIN_CARD_ACCOUNTS} accounts, so it cannot be about one person.` };
   const R = input.report || {}, U = R.upstream || {};
@@ -9123,10 +9123,10 @@ function sourcesOf(card, input) {
 
 function limitsOf(card) {
   return [
-    "This card covers one thread as one viewer saw it, ranked by the platform. It names no account and judges no person.",
+    "This card covers one thread as one viewer saw it, ranked by the platform.",
     REPORT_DOES_NOT_PROVE,
     card.claims.length ? CLAIM_DOES_NOT_PROVE : null,
-    card.sites.some((s) => s.state.length) ? "A state link says a cited source ties the site to a state. It is not proof that a post is false." : null,
+    card.sites.some((s) => s.state.length) ? "A state link says a cited source ties the site to a state; each post's claims stand or fall on their own." : null,
     card.media.credentials ? CREDENTIALS_DO_NOT_PROVE : null,
     card.media.recycledUploads ? "A recycled upload can be a fair repost or a correction; it shows where the file was first seen, not who made it." : null,
   ].filter(Boolean);
@@ -9164,12 +9164,12 @@ function cardLines(card) {
   if (card.claims.length) { push("head", "Fact-checked claims"); for (const c of card.claims) push("body", `${c.checker} rated a similar claim "${c.rating}": ${c.claim} (${c.url})`); }
   if (card.sites.length) { push("head", "Sites linked"); push("body", card.sites.map((s) => [`${s.domain} (${s.posts})`, s.owner ? `owned by ${s.owner}` : null, ...s.state].filter(Boolean).join(", ")).join("; ")); }
   push("head", "Media");
-  push("body", card.media.uploads ? `${card.media.recycledUploads} of ${card.media.uploads} uploads were first posted by another account.` : "No uploads were read in this thread.");
+  push("body", card.media.uploads ? `${card.media.recycledUploads} of ${card.media.uploads} uploads were first posted by another account.` : "Zero uploads were read in this thread.");
   const C = card.media.credentials;
-  push("body", C ? `Content Credentials, ${C.checked} file${C.checked === 1 ? "" : "s"} checked: ${C.unchanged} signed and unchanged, ${C.changed} changed since signing, ${C.unchecked} not fully checked, ${C.none} with none found; ${C.ai} marked as made with generative AI (by credentials or IPTC metadata).` : "No file in this thread was checked for Content Credentials.");
+  push("body", C ? `Content Credentials, ${C.checked} file${C.checked === 1 ? "" : "s"} checked: ${C.unchanged} signed and unchanged, ${C.changed} changed since signing, ${C.unchecked} not fully checked, ${C.none} with none found; ${C.ai} marked as made with generative AI (by credentials or IPTC metadata).` : "Zero files in this thread were checked for Content Credentials.");
   push("head", "Sources");
   for (const s of card.sources) push("small", s);
-  push("head", "What this does not prove");
+  push("head", "How to read it");
   for (const s of card.doesNotProve) push("limit", s);
   if (card.hash) push("small", "The JSON file saved with this image holds the same content and a hash of it, so anyone can check a copy.");
   return L;
@@ -9342,7 +9342,7 @@ const M_packs = (() => {
 const { canonicalJSON, sha256Hex, lfBytes, publicJwk, jwkId, signText, verifyText, P256 } = M_sig;
 
 const PACK_FORMAT = "radar-pack/1";
-const PACK_DOES_NOT_PROVE = "A valid signature shows which key signed this pack and that its content has not changed since. It does not show that the content is right, or who holds the key: trust a key only when you know where it came from.";
+const PACK_DOES_NOT_PROVE = "A valid signature shows which key signed this pack and that its content is unchanged since. Trust a key when you know where it came from.";
 const subtle = () => globalThis.crypto.subtle;
 
 // The key id: the first 32 hex characters of the SHA-256 of the public key's canonical JWK.
@@ -9397,8 +9397,8 @@ async function verifyPack(pack, trusted = []) {
 
 async function hashProblems(pack) {
   const m = pack.manifest || {}, listed = m.hashes || {}, content = pack.content || {}, out = [];
-  if (!pack.content && !m.files) return ["the pack has neither content nor a file list"];
-  for (const k of Object.keys(content)) if (!(k in listed)) out.push(`content part "${k}" is not listed in the signed manifest`);
+  if (!pack.content && !m.files) return ["the pack lacks both content and a file list"];
+  for (const k of Object.keys(content)) if (!(k in listed)) out.push(`content part "${k}" is missing from the signed manifest`);
   for (const [k, h] of Object.entries(listed)) {
     if (!(k in content)) out.push(`signed content part "${k}" is missing`);
     else if ((await sha256Hex(canonicalJSON(content[k]))) !== h) out.push(`content part "${k}" changed after signing`);
@@ -9627,7 +9627,7 @@ function recordLine(rec) {
   return `${plural(rec.n, "review")} by ${plural(rec.m, "fact-checker")} since ${rec.since}, ratings as the checkers wrote them`;
 }
 
-const SITE_RECORD_DOES_NOT_PROVE = "A review lists this site as a place where a claim appeared. The site may have been reporting someone else's words, and each rating is about that claim, not about the site. Fact-checkers choose what to check, so a count says little about how often a site is right.";
+const SITE_RECORD_DOES_NOT_PROVE = "A review lists this site as a place where a claim appeared, perhaps reporting someone else's words. Each rating is about that claim. Fact-checkers choose what to check, so a count says little about how often a site is right.";
 const SITE_SOURCES = "Owner, owner type, founding date and country: Wikidata (CC0). Reviews: ClaimReview markup published by each fact-checker, from the Data Commons fact-check feed (CC BY 4.0).";
 
 // Owner types, in a fixed order. State links come first because they cite a source; then what
@@ -9661,17 +9661,17 @@ function siteInfoRows(info, opts = {}) {
     ...stateRows(info.state),
     ...packNoteRows(info.notes),
   ];
-  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Daylight Commons has no Wikidata entry for this site, so its owner, founding date and country are not shown." }]);
-  rows.push(["Fact-check record", recordLine(record) || "No review in Daylight Commons' table lists this site as where a claim appeared."]);
+  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Daylight Commons lacks a Wikidata entry for this site, so its owner, founding date and country stay blank." }]);
+  rows.push(["Fact-check record", recordLine(record) || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."]);
   for (const r of (record && (record.latest || record.reviews.slice(0, 3))) || []) rows.push(["Review", `"${r.rating}": ${r.checker}, ${r.date || "date not given"}`]);
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
-  rows.push(["Source", SITE_SOURCES], ["Does not prove", SITE_RECORD_DOES_NOT_PROVE]);
+  rows.push(["Source", SITE_SOURCES], ["Read it as", SITE_RECORD_DOES_NOT_PROVE]);
   return rows.filter(([, v]) => v != null);
 }
 
 // Notes from data packs the user imported and trusts (src/core/packs-content.js), each with its
 // pack's name and source, kept apart from Daylight Commons' own rows.
-const PACK_NOTE_CAVEAT = "From a data pack you imported and trust. Daylight Commons did not write or check it.";
+const PACK_NOTE_CAVEAT = "From a data pack you imported and trust, written and checked by its publisher.";
 function packNoteRows(notes) {
   if (!notes || !notes.length) return [];
   const rows = notes.slice(0, 5).flatMap((n) => [["Pack note", `${n.note} (pack: ${n.pack})`], ["Read it", { links: [[String(n.url).replace(/^https?:\/\//, "").slice(0, 48), n.url]] }]]);
@@ -9995,7 +9995,7 @@ const { feedOrigin } = M_outlets;
 
 const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Daylight Commons asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. Daylight Commons sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or Daylight Commons server is involved. Nothing is requested until you click.";
 
-const COVERAGE_DOES_NOT_PROVE = "Matching is by shared words in headlines, so a match can be a different event with similar words, and a story told in other words is missed. A feed holds only an outlet's latest entries, and only the outlets you chose are asked. Owner and owner type are what the site tables state, not a judgment of the reporting.";
+const COVERAGE_DOES_NOT_PROVE = "A match shares words with the headline, so it can be a different event with similar words, and a story told in other words is missed. Each feed holds an outlet's latest entries, from the outlets you chose. Owner and owner type are what the site tables state.";
 
 const STOP = new Set(("the a an and or but of to in on at by for with from as is are was were be been it its this that these those their they he she his her we our you your " +
   "not no do does did has have had will would can could should may might than then so if into about over under after before what which who when where why how " +
@@ -10073,12 +10073,12 @@ function coverageGroups(list) {
 }
 
 const FEED_ERRORS = Object.freeze({
-  "no-permission": "The browser has not allowed Daylight Commons to reach this feed's host.",
-  redirect: "The feed answered with a redirect to another address, which Daylight Commons does not follow. Check the outlet's site for its current feed.",
+  "no-permission": "The browser blocked Daylight Commons from this feed's host.",
+  redirect: "The feed answered with a redirect to another address, which Daylight Commons leaves alone. Check the outlet's site for its current feed.",
   http: "The feed answered with an error.",
-  "not-a-feed": "The answer was not an RSS or Atom feed.",
+  "not-a-feed": "The answer was some other format than RSS or Atom.",
   "too-large": "The feed was larger than Daylight Commons reads.",
-  timeout: "The feed did not answer within 10 seconds.",
+  timeout: "The feed took longer than 10 seconds to answer.",
   network: "The feed could not be reached.",
 });
 
@@ -10114,14 +10114,14 @@ function adapterHealth(site, found) {
   // stamp or article box at all is more likely a sign-in wall or a removed post than a redesign.
   const expectsRoot = f.page === "thread" && !!(site.hasLocation || site.rootFirst) && ((s.times | 0) >= 1 || (s.articles | 0) >= 1);
   if (expectsRoot || (s.times | 0) >= 3 || (s.articles | 0) >= 3) {
-    return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was not found" : "the page shows post-like boxes Daylight Commons cannot find" };
+    return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was missing" : "the page shows post-like boxes outside Daylight Commons' reader" };
   }
   return { state: "empty", say: null };
 }
 
 // The self-test's report as [label, value] rows, for the toolbar popup.
 function selfTestLines(r) {
-  if (!r) return [["Result", "Daylight Commons has no reader for this site. The site card gives site context and text checks here."]];
+  if (!r) return [["Result", "This site gets the site card, with site context and text checks, in place of a reader."]];
   const v = r.verdict || {};
   const pct = (a, b) => (b ? `${a} of ${b}` : "none");
   return [
@@ -10137,7 +10137,7 @@ function selfTestLines(r) {
   ];
 }
 
-const HEALTH_DOES_NOT_PROVE = "The self-test counts what Daylight Commons' reader finds on this page now. A pass does not show every field is right, and a page that loads posts later can fail and then pass. It reads no text and sends nothing.";
+const HEALTH_DOES_NOT_PROVE = "The self-test counts what Daylight Commons' reader finds on this page now. A page that loads posts later can fail and then pass. The test reads layout on this device and sends nothing.";
 
 return { HEALTH_SETTLE_MS, HEALTH_STATES, adapterHealth, selfTestLines, HEALTH_DOES_NOT_PROVE };
 })();
@@ -10216,7 +10216,7 @@ function genericChecks({ article, comments }) {
   return out;
 }
 
-const GENERIC_DOES_NOT_PROVE = "Daylight Commons has no reader for this site, so it guessed where the article and the comments are from the page's layout. It can miss comments or count a list of links as comments. A marker is a pattern in wording, not a judgment of the writer.";
+const GENERIC_DOES_NOT_PROVE = "The generic reader guessed where the article and the comments are from the page's layout, so it can miss comments or count a list of links as comments. A marker is a pattern in wording.";
 
 return { GENERIC_MAX_COMMENTS, pickArticle, pickComments, genericChecks, GENERIC_DOES_NOT_PROVE };
 })();
@@ -10291,7 +10291,7 @@ function badgeLinks(signalId, entries, registry) {
 // One line for a badge's catalogue row, naming the entries and versions it cites.
 function badgeLine(b) {
   if (b.entries.length) return `Cited by ${b.entries.length} catalogue ${b.entries.length === 1 ? "entry" : "entries"}: ${b.entries.map((e) => e.ref).join(", ")}.`;
-  return b.registered ? `No catalogue entry cites this sign; it is listed in ${b.registry}.` : "This line is context and cites no catalogue entry.";
+  return b.registered ? `No catalogue entry cites this sign; it is listed in ${b.registry}.` : "This line is context, outside the catalogue.";
 }
 
 return { REPO_URL, DECISIONS_URL, SIGNALS_URL, TEMPLATES, DECISIONS_NOTE, entryUrl, entryRef, challengeUrl, findingUrl, entriesCiting, badgeLinks, badgeLine };
@@ -10310,7 +10310,7 @@ const M_definitions = (() => {
 // Pure: no DOM, no network. The caller passes the catalogue entries and the signal registry.
 
 const VERDICT_WORDS = /\b(?:committed|commits?|guilty|is (?:a )?fraud|fraudulent|violat\w*|illegal|unlawful|liable|liability|crimes?|criminal|convict\w*|breach\w*|offen[cs]es?)\b/i;
-const DEFINITION_FRAME = "This compares visible conduct with a published definition, element by element. It is not a finding by a court, a regulator or the platform.";
+const DEFINITION_FRAME = "This compares visible conduct with a published definition, element by element. Findings belong to courts, regulators and the platform.";
 const LEGAL_NOTE = "Not legal advice. A media lawyer should review this wording before any public release.";
 const CHALLENGE = "Challenge this entry or this badge at https://github.com/HarperZ9/daylight-commons/issues/new?template=challenge.yml. Every decision is published with its reasons, and corrections are dated.";
 const STATUSES = ["matched", "not-matched", "not-observable"];
@@ -10366,11 +10366,11 @@ function summarizeTable(entry, rows) {
   const lead = entry.role === "comparison" ? "For comparison: " : entry.role === "context" ? "Context: " : "";
   const parts = [matched.length
     ? `${lead}this conduct matches ${plural(matched, "element", "elements")} ${list(matched)} of ${citeOf(entry)}.`
-    : `${lead}no element of ${citeOf(entry)} matches what this page loaded.`];
-  if (indicative.length) parts.push(`${plural(indicative, "Element", "Elements")} ${list(indicative)} ${plural(indicative, "is", "are")} matched on indicative evidence only: the signals are consistent with ${plural(indicative, "it", "them")} and do not show ${plural(indicative, "it", "them")}.`);
-  if (unseen.length) parts.push(`${plural(unseen, "Element", "Elements")} ${list(unseen)} ${plural(unseen, "is", "are")} not observable from here.`);
-  for (const r of partial) parts.push(`Element ${r.id} has ${r.families} of the ${r.needed} independent signal families it needs, so it is not shown as matched.`);
-  if (missing.length) parts.push(`${plural(missing, "Element", "Elements")} ${list(missing)} ${plural(missing, "has", "have")} no evidence in what this page loaded.`);
+    : `${lead}zero elements of ${citeOf(entry)} match what this page loaded.`];
+  if (indicative.length) parts.push(`${plural(indicative, "Element", "Elements")} ${list(indicative)} ${plural(indicative, "is", "are")} matched on indicative evidence: signals consistent with ${plural(indicative, "it", "them")}.`);
+  if (unseen.length) parts.push(`${plural(unseen, "Element", "Elements")} ${list(unseen)} ${plural(unseen, "is", "are")} outside what this page can show.`);
+  for (const r of partial) parts.push(`Element ${r.id} has ${r.families} of the ${r.needed} independent signal families it needs, so it stays unmatched.`);
+  if (missing.length) parts.push(`${plural(missing, "Element", "Elements")} ${list(missing)} ${plural(missing, "lacks", "lack")} evidence in what this page loaded.`);
   parts.push(DEFINITION_FRAME);
   const s = parts.join(" ");
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -10404,7 +10404,7 @@ function applicableJurisdictions({ platform = null, actor = null, audience = nul
   const add = (code, why) => { if (code && !out.some((j) => j.code === code)) out.push({ code, why }); else if (code) out.find((j) => j.code === code).why += ` ${why}`; };
   if (platform) add(`platform:${platform}`, "The conduct is on this platform, under its own published rules.");
   if (actor) add(actor, "Where the actor is disclosed to be based.");
-  else notes.push("The actor's location is not public, so its jurisdiction is not shown.");
+  else notes.push("The actor's location is private, so its jurisdiction stays off this table.");
   if (audience) add(audience, "Where the audience is reached, shown as your own.");
   return { jurisdictions: out, notes };
 }
@@ -10634,8 +10634,8 @@ const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.
 // { measured, text } for one family. A row without a sample size is not shown as a measurement.
 function measuredLine(id, table = MEASURED) {
   const f = BY_ID.get(id);
-  if (f && f.kind === P) return { measured: false, text: "the site's own label, not a Daylight Commons detector" };
-  if (f && f.kind === F) return { measured: false, text: "what the file itself declares; Daylight Commons checks the signature, not the claim" };
+  if (f && f.kind === P) return { measured: false, text: "the site's own label, shown as the site gives it" };
+  if (f && f.kind === F) return { measured: false, text: "what the file itself declares, with its signature checked by Daylight Commons" };
   if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
   if (f && f.kind === TECH) { const st = techniqueStatus(id); return { measured: st.shown, text: st.text }; }
   const r = (table || {})[id];
@@ -10729,7 +10729,7 @@ function calibrationLine(store, family, min = CALIBRATION_MIN) {
   return c ? `Your feedback: ${c.right} of ${c.total} right` : null;
 }
 
-const FEEDBACK_ABOUT = "Your marks on Daylight Commons' signs, saved from this browser. This file is not sent anywhere by Daylight Commons. You choose whether to send it, for example as an attachment to an issue on Daylight Commons' repository. Post text appears only for marks where you ticked \"include the text\".";
+const FEEDBACK_ABOUT = "Your marks on Daylight Commons' signs, saved from this browser. It stays on your device until you send it, for example as an attachment to an issue on Daylight Commons' repository. Post text appears for marks where you ticked \"include the text\".";
 
 // The opt-in export: a JSON object the options page saves as a file when the user clicks.
 function buildExport(store, { version = null, now = Date.now() } = {}) {
@@ -10914,9 +10914,9 @@ const M_imagetext = (() => {
 const { score } = M_rhetoric;
 const { persuasion } = M_persuasion;
 
-const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Daylight Commons' own text recogniser. The image and its text never leave your browser.";
+const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Daylight Commons' own text recogniser. The image and its text stay in your browser.";
 const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in Daylight Commons' options to read the words inside an image on this device.";
-const IMAGE_TEXT_DOES_NOT_PROVE = "The words were read by software and can be misread: a letter can change a word, or a word can be missed. The image can be edited, and reading its text says nothing about whether a post shown in it was real.";
+const IMAGE_TEXT_DOES_NOT_PROVE = "Software read these words, so a letter can change a word or a word can drop out. The image itself can be edited, screenshots of posts included.";
 const MAX_SHOWN = 280;
 
 // The language model of the image's text, in the shape signals.js reads from a post.
@@ -10948,9 +10948,9 @@ function imageTextRows(result) {
 // becomes "image-text", so its measured line reads "not measured yet".
 function fromImage(signal, result) {
   const rows = signal.rows.map(([h, v]) => [h === "In this post" ? "Read from the image" : h, v]);
-  const at = rows.findIndex(([h]) => h === "Does not prove");
+  const at = rows.findIndex(([h]) => h === "Read it as");
   const extra = [["Confidence", `${percent(result && result.confidence)} for the image's text as a whole`]];
-  const dnp = ["Does not prove", IMAGE_TEXT_DOES_NOT_PROVE + (at >= 0 ? " " + rows[at][1] : "")];
+  const dnp = ["Read it as", IMAGE_TEXT_DOES_NOT_PROVE + (at >= 0 ? " " + rows[at][1] : "")];
   const body = at >= 0 ? rows.filter((_, i) => i !== at) : rows;
   return { ...signal, label: `in image: ${signal.label}`, fam: "image-text", of: signal.fam, level: "info", fromImage: true, rows: [...body, ...extra, dnp] };
 }
@@ -10961,7 +10961,7 @@ return { IMAGE_TEXT_NOTE, IMAGE_TEXT_OFF, IMAGE_TEXT_DOES_NOT_PROVE, imageTextMo
 // ---- api-words.js
 const M_api_words = (() => {
 // The words the radar-core API puts on evidence items: labels, what a sign shows, where it came
-// from and what it does not prove. They are the same words the extension's window uses
+// from and how to read it. They are the same words the extension's window uses
 // (src/ext/signals.js and src/ext/panel.js), kept here so the API needs no DOM and no extension
 // code. Every string is stance-neutral and names no account.
 
@@ -10986,19 +10986,19 @@ const FLAG_LABEL = {
 };
 
 const SRC_RULES = "Daylight Commons' own rules, run on this device. Rules and measured error rates: Daylight Commons' EVALUATION.md.";
-const SRC_POSTS = "The posts in the input, as given. Daylight Commons read them on this device and sent nothing anywhere.";
+const SRC_POSTS = "The posts in the input, as given, read by Daylight Commons on this device.";
 const SRC_ACCOUNTS = "Account details given in the input: what each platform discloses on profiles and About pages.";
 const SRC_FILE = "The file's bytes, read on this device: Content Credentials (C2PA) and IPTC or XMP metadata.";
 
-const STRONG_DOES_NOT_PROVE = "Words can be quoted, ironic or reported speech. This describes the post, not who wrote it or why.";
-const LEAK_DOES_NOT_PROVE = "People quote chatbots, joke, or paste a reply on purpose.";
-const MACHINE_DOES_NOT_PROVE = "No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.";
-const SPAM_DOES_NOT_PROVE = "Real people post giveaways and contact details too. The pattern describes the post, not who sent it.";
-const BURST_DOES_NOT_PROVE = "A post going viral at one moment, or a notification many people get at once, brings replies together too. This describes when the replies arrived, not who sent them or why. It holds only for times given to the second: times rounded to the minute, hour or day put replies on one second by construction, and Daylight Commons does not run this test on them.";
-const COARSE_DOES_NOT_PROVE = "Coarse times hide bursts as well as fake them. This says nothing about whether the replies arrived together or apart, only that these times cannot tell.";
-const SITE_OWNER_DOES_NOT_PROVE = "Ownership is not editorial control, and Wikidata can lag a sale.";
-const THREAD_LIMIT = "This covers the posts in the input as given, ranked and filtered by the platform before anyone saw them. It names no account and judges no person.";
-const TEXT_LIMIT = "This describes one piece of text. It says nothing about who wrote it, why, or whether it is true.";
+const STRONG_DOES_NOT_PROVE = "A match on the post's wording, which also turns up in quotes, irony and reported speech.";
+const LEAK_DOES_NOT_PROVE = "Chatbot boilerplate in the post, which people also paste as a quote or a joke.";
+const MACHINE_DOES_NOT_PROVE = "Machine-writing signs are weak evidence in a few sentences, and detectors flag non-native English writers more often.";
+const SPAM_DOES_NOT_PROVE = "A giveaway or contact-detail pattern in the post, which real people post too.";
+const BURST_DOES_NOT_PROVE = "Replies that arrived within the same seconds, as they also do after a viral post or a mass notification. The test runs on times given to the second.";
+const COARSE_DOES_NOT_PROVE = "These times are rounded, so they can hide a burst or make one look like it.";
+const SITE_OWNER_DOES_NOT_PROVE = "The owner Wikidata lists, which can lag a sale and can differ from who runs the newsroom.";
+const THREAD_LIMIT = "This covers the posts in the input as given, in the order and selection the platform showed.";
+const TEXT_LIMIT = "This describes the wording of one piece of text.";
 
 return { STRONG_LABEL, STRONG_MEANING, FLAG_LABEL, SRC_RULES, SRC_POSTS, SRC_ACCOUNTS, SRC_FILE, STRONG_DOES_NOT_PROVE, LEAK_DOES_NOT_PROVE, MACHINE_DOES_NOT_PROVE, SPAM_DOES_NOT_PROVE, BURST_DOES_NOT_PROVE, COARSE_DOES_NOT_PROVE, SITE_OWNER_DOES_NOT_PROVE, THREAD_LIMIT, TEXT_LIMIT };
 })();
@@ -11105,7 +11105,7 @@ function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   const line = recordLine(S.record);
   if (line || (!quiet && S.facts)) {
     out.push({ ...base, kind: "site-record", level: "info", label: `site record: ${S.domain}`,
-      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "No review in Daylight Commons' table lists this site as where a claim appeared."].join(": ") + ".",
+      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."].join(": ") + ".",
       source: SITE_SOURCES, doesNotProve: SITE_RECORD_DOES_NOT_PROVE,
       data: { domain: S.domain, reviews: S.record ? S.record.n : 0, checkers: S.record ? S.record.m : 0, since: S.record ? S.record.since : null, founded: S.facts ? S.facts.founded : null, country: S.facts ? S.facts.country : null } });
   }
@@ -11228,7 +11228,7 @@ function flagItems(replies, now) {
   return [...byKey.values()].map(({ f, posts }) => ({
     kind: "account-flag", scope: "post", level: f.id === "based-elsewhere" ? "warn" : "flag", label: FLAG_LABEL[f.id] || f.id,
     shows: f.evidence ? `The account behind ${posts.length === 1 ? "this post" : "these posts"}: ${f.evidence}.` : `The input marks the account behind ${posts.length === 1 ? "this post" : "these posts"} with this flag.`,
-    source: SRC_ACCOUNTS, doesNotProve: DOES_NOT_PROVE[f.id] || f.doesNotProve || "A flag is a sign to look at, not a finding about the person.",
+    source: SRC_ACCOUNTS, doesNotProve: DOES_NOT_PROVE[f.id] || f.doesNotProve || "A flag is a sign to look at.",
     posts, spans: [], data: { flag: f.id, asOf: new Date(now).toISOString().slice(0, 10) },
   }));
 }
@@ -11337,10 +11337,10 @@ function mediaItems(r) {
     kind: s.fam === "c2pa" && /AI/.test(s.label) ? "credentials-ai" : KIND[s.fam] || s.fam,
     scope: "file", level: s.level, label: s.label,
     shows: [row(s.rows, "What Daylight Commons read") || row(s.rows, "What Daylight Commons found"), row(s.rows, "Signed by") ? `Signed by ${row(s.rows, "Signed by")}.` : null].filter(Boolean).join(" "),
-    source: SRC_FILE, doesNotProve: row(s.rows, "Does not prove") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
+    source: SRC_FILE, doesNotProve: row(s.rows, "Read it as") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
   }));
   if (state === "none") out.push({ kind: "no-credentials", scope: "file", level: "info", label: "no content credentials", shows: NO_CREDENTIALS, source: SRC_FILE, doesNotProve: "A file without credentials can be real or made up; most platforms remove them.", posts: [], spans: [], data: { state } });
-  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online. Daylight Commons does not fetch them, so nothing was checked.", source: SRC_FILE, doesNotProve: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
+  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online, which Daylight Commons leaves unfetched.", source: SRC_FILE, doesNotProve: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
   return out;
 }
 
@@ -11446,7 +11446,7 @@ function analyzeThread(input, opts = {}) {
 // bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
 async function checkMedia(bytes) {
   const M = await mediaReading(bytes);
-  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made, not whether what it shows is true."] });
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made."] });
 }
 
 // domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
@@ -11454,8 +11454,8 @@ function siteInfo(domain) {
   const d = cleanDomain(domain);
   if (!d) return null;
   const loaded = dataLoaded();
-  const limits = ["Every row names its source. Daylight Commons adds no score or rating of its own."];
-  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("No site tables were loaded, so only the look-alike check ran.");
+  const limits = ["Every row names its source."];
+  if (!loaded.sites && !loaded.owners && !loaded.state) limits.push("The site tables were absent, so the look-alike check ran alone.");
   return envelope("site", { site: siteSummary(d), evidence: number(siteEvidence(d, [])), limits });
 }
 
@@ -11476,7 +11476,7 @@ const { canonicalJSON, jwkId, verifyText } = M_sig;
 const BUNDLE_KIND = "radar-evidence-bundle";
 const BUNDLE_VERSION = 1;
 const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
-const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right.";
+const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the holder of this key signed the bundle and that it is unchanged since. Check the key id with the signer by another route, and read each span against its post.";
 const CARRIER_SAFE = "carrier-safe";
 const CARRIER_SAFE_NOTE = "carrier-safe: the signature proves the bundle is unchanged; it says nothing about who made it";
 
@@ -11497,27 +11497,27 @@ function bundleConsistency(bundle) {
 
 async function signatureOk(bundle) {
   const { signature, ...body } = bundle, S = body.signer;
-  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Daylight Commons can check" };
+  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle lacks an ECDSA P-256 signature with its public key" };
   const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
   let id = null;
   try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
-  if (id !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
+  if (id !== S.keyId) return { ok: false, text: "the key id belongs to a different public key" };
   const good = await verifyText(jwk, signature.value, canonicalJSON(body));
-  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature does not match: the bundle changed after signing, or was signed with another key" };
+  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature fails: the bundle changed after signing, or another key signed it" };
 }
 
 // opts.keyId: the key id you expect, from the signer by another route. Resolves to
 // { ok, keyId, checks: [{ name, ok, text }] }; ok is true only when every check passes.
 async function verifyBundle(bundle, opts = {}) {
   const checks = [];
-  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Daylight Commons evidence bundle" }] };
-  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Daylight Commons reads` });
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this file lacks the Daylight Commons evidence bundle kind" }] };
+  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version}; this Daylight Commons reads version ${BUNDLE_VERSION}` });
   checks.push({ name: "signature", ...(await signatureOk(bundle)) });
-  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is not one this Daylight Commons reads` });
+  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is unknown to this Daylight Commons` });
   const keyId = bundle.signer ? bundle.signer.keyId : null;
   if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
   const C = bundleConsistency(bundle);
-  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts not listed (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
+  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts missing from the list (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
   return { ok: checks.every((c) => c.ok), keyId, checks };
 }
 
@@ -11587,7 +11587,7 @@ const carrierTool = (tool) => { const m = String(tool || "").match(/^(.*?)(\d+)\
 // is true. profile "carrier-safe" uses typedPage (what the user typed) and never page.
 // Returns { ok: true, bundle } or { ok: false, reason }.
 function makeBundle(result, opts = {}) {
-  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "There is no analysis to put in a bundle." };
+  if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "Run an analysis first, then put it in a bundle." };
   const archive = opts.source === "export";
   if (result.kind === "thread" && !archive && (result.posts.accounts || 0) < MIN_CARD_ACCOUNTS) {
     return { ok: false, reason: `This thread has ${result.posts.accounts || 0} accounts. A bundle needs at least ${MIN_CARD_ACCOUNTS}, so it cannot be about one person.` };
@@ -11691,7 +11691,7 @@ function parseSums(text) {
   return out;
 }
 
-const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the files were signed by the holder of this key and not changed since. It does not show who holds the key, that the key was never stolen, or that the code is safe. Compare the key id with one you got another way.";
+const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the holder of this key signed the files and that they are unchanged since. Compare the key id with one you got another way.";
 
 return { signingKeyId, jwkThumbprint, generateSigningKey, signSums, verifySums, parseSums, SIGNATURE_DOES_NOT_PROVE };
 })();
@@ -11726,7 +11726,7 @@ const HEAD_KIND = "daylight-head/1";
 const HEAD_MAX_BYTES = 4096;
 const HEAD_SIG_MAX_BYTES = 4096;
 const AGING_DAYS = 30;
-const HEAD_DOES_NOT_PROVE = "A valid head shows the signer chose these files at that time. It does not show the files are safe.";
+const HEAD_DOES_NOT_PROVE = "A valid head shows the signer chose these files at that time. How safe they are rests on the signer.";
 
 const DAY = 86400000;
 const HEX64 = /^[0-9a-f]{64}$/, KEY_ID = /^[0-9a-f]{32}$/, TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/, B64URL = /^[A-Za-z0-9_-]{80,100}$/;
@@ -11858,7 +11858,7 @@ async function checkHead(opts) {
 // Statuses: current, aging (head last seen over AGING_DAYS ago), expired, none. Never an alarm.
 function freshness(state, { now = Date.now(), catalogue = null } = {}) {
   const dated = catalogue && catalogue.date ? `Catalogue dated ${day(catalogue.date)}.` : "Catalogue date unknown.";
-  if (!state) return { status: "none", label: "Not checked", line: `${dated} No signed head checked on this device yet.` };
+  if (!state) return { status: "none", label: "Not checked", line: `${dated} Signed head: unchecked on this device so far.` };
   const t = effectiveNow(state, now), sigs = `${state.valid} of ${state.needed} signature${state.needed === 1 ? "" : "s"}${state.needed === 1 ? " (single-signer release)" : ""}`;
   const seen = `Signed head version ${state.version} last seen ${day(state.seenAt)}, valid until ${day(state.expires)}, ${sigs}.`;
   if (t >= Date.parse(state.expires)) return { status: "expired", label: "Expired", line: `${dated} Newer campaigns may be missing. ${seen}` };
@@ -12269,19 +12269,19 @@ function fromJson(name, text) {
   let json;
   try { json = JSON.parse(text); } catch { return fail(`${name} is not valid JSON.`); }
   if (json && json.kind === "radar-evidence-bundle") return fail("This is a Daylight Commons evidence bundle. Use Check a bundle to verify it.");
-  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Daylight Commons found no posts it can read in ${name}.`);
+  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Daylight Commons found zero readable posts in ${name}.`);
 }
 
 function fromBytes(name, bytes) {
   const lower = String(name || "").toLowerCase();
-  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is not a Bluesky repository export Daylight Commons can read.`);
+  if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is unreadable as a Bluesky repository export.`);
   const text = asText(bytes).replace(/^﻿/, ""), head = text.slice(0, 400).trimStart();
-  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Daylight Commons can read.`);
-  if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} is not a Reddit export with id, permalink and body columns.`);
+  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds zero posts Daylight Commons can read.`);
+  if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} lacks the id, permalink and body columns of a Reddit export.`);
   if (/^[[{]/.test(head)) return fromJson(name, text);
   // A saved X or Reddit page carries machine-readable times (datetime and created attributes) to the second.
-  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); if (p.kind === "thread") p.timePrecision = "second"; return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons did not recognise a thread on this page, so it read the page as one text."] : [] }; }
-  return fail(`Daylight Commons does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); if (p.kind === "thread") p.timePrecision = "second"; return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons read this page as one text, its fallback for pages outside the thread readers."] : [] }; }
+  return fail(`Daylight Commons reads these kinds of file: ${IMPORT_FORMATS.join(", ")}.`);
 }
 
 // name: the file name; bytes: Uint8Array, ArrayBuffer or string. Returns { ok: true, format,

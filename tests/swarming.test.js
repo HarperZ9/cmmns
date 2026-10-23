@@ -46,5 +46,5 @@ test("the organic rate on PHEME is committed and under 1% for threads under 100 
   assert.deepEqual(TECHNIQUE_BASELINES.swarm, r.swarm);
   for (const b of SIZE_BINS.filter((x) => x.max < 100)) assert.ok(r.swarm[b.id].share < 0.01, b.id);
   assert.match(baselineLine("swarm", { replies: 30 }), /^In ordinary threads with 20 to 49 replies, many new or flagged accounts replying within ten minutes showed up in/);
-  assert.match(SWARM_DOES_NOT_PROVE, /not who sent them/);
+  assert.match(SWARM_DOES_NOT_PROVE, /how the replies arrived/);
 });

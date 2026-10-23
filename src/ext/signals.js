@@ -30,7 +30,7 @@
     "same-text": "coordination", "copied-elsewhere": "coordination", "hate-symbol-name": "language",
   };
   const day = (iso) => (iso ? iso.slice(0, 10) : "unknown");
-  const dnp = (t) => ["Does not prove", t];
+  const dnp = (t) => ["Read it as", t];
 
   function language(m) {
     const out = [];

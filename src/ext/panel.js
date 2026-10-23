@@ -105,7 +105,7 @@
     const s = el("section", "pb-psec");
     s.append(el("h3", "pb-sec-h", "Launch campaign"), el("p", "pb-num", c.lead));
     for (const x of c.claims || []) s.append(el("p", "pb-num", x.text));
-    for (const x of c.indicators) { s.append(el("p", "pb-num", x.text), el("p", "pb-foot", `Does not prove: ${x.dnp}`)); catalogue(s, x.id); }
+    for (const x of c.indicators) { s.append(el("p", "pb-num", x.text), el("p", "pb-foot", `Read it as: ${x.dnp}`)); catalogue(s, x.id); }
     for (const x of c.context) { s.append(el("p", "pb-num", x.text)); catalogue(s, x.id); }
     s.append(el("p", "pb-foot", c.dnp), el("p", "pb-foot", c.dispute));
     if (PB.DECISIONS_URL) s.append(links(el("p", "pb-foot", `${PB.DECISIONS_NOTE} `), [["Decisions log", PB.DECISIONS_URL]]));

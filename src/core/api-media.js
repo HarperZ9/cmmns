@@ -15,10 +15,10 @@ export function mediaItems(r) {
     kind: s.fam === "c2pa" && /AI/.test(s.label) ? "credentials-ai" : KIND[s.fam] || s.fam,
     scope: "file", level: s.level, label: s.label,
     shows: [row(s.rows, "What Daylight Commons read") || row(s.rows, "What Daylight Commons found"), row(s.rows, "Signed by") ? `Signed by ${row(s.rows, "Signed by")}.` : null].filter(Boolean).join(" "),
-    source: SRC_FILE, doesNotProve: row(s.rows, "Does not prove") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
+    source: SRC_FILE, doesNotProve: row(s.rows, "Read it as") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
   }));
   if (state === "none") out.push({ kind: "no-credentials", scope: "file", level: "info", label: "no content credentials", shows: NO_CREDENTIALS, source: SRC_FILE, doesNotProve: "A file without credentials can be real or made up; most platforms remove them.", posts: [], spans: [], data: { state } });
-  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online. Daylight Commons does not fetch them, so nothing was checked.", source: SRC_FILE, doesNotProve: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
+  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online, which Daylight Commons leaves unfetched.", source: SRC_FILE, doesNotProve: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
   return out;
 }
 

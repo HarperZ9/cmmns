@@ -8,7 +8,7 @@
 import { canonicalJSON, sha256Hex, lfBytes, publicJwk, jwkId, signText, verifyText, P256 } from "./sig.js";
 
 export const PACK_FORMAT = "radar-pack/1";
-export const PACK_DOES_NOT_PROVE = "A valid signature shows which key signed this pack and that its content has not changed since. It does not show that the content is right, or who holds the key: trust a key only when you know where it came from.";
+export const PACK_DOES_NOT_PROVE = "A valid signature shows which key signed this pack and that its content is unchanged since. Trust a key when you know where it came from.";
 const subtle = () => globalThis.crypto.subtle;
 
 // The key id: the first 32 hex characters of the SHA-256 of the public key's canonical JWK.
@@ -63,8 +63,8 @@ export async function verifyPack(pack, trusted = []) {
 
 async function hashProblems(pack) {
   const m = pack.manifest || {}, listed = m.hashes || {}, content = pack.content || {}, out = [];
-  if (!pack.content && !m.files) return ["the pack has neither content nor a file list"];
-  for (const k of Object.keys(content)) if (!(k in listed)) out.push(`content part "${k}" is not listed in the signed manifest`);
+  if (!pack.content && !m.files) return ["the pack lacks both content and a file list"];
+  for (const k of Object.keys(content)) if (!(k in listed)) out.push(`content part "${k}" is missing from the signed manifest`);
   for (const [k, h] of Object.entries(listed)) {
     if (!(k in content)) out.push(`signed content part "${k}" is missing`);
     else if ((await sha256Hex(canonicalJSON(content[k]))) !== h) out.push(`content part "${k}" changed after signing`);

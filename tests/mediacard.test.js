@@ -44,5 +44,5 @@ test("image: nothing is read until the click; then the reading shows, never a pa
   const plain = new Uint8Array(readFileSync(new URL("./fixtures/c2pa/plain.jpg", import.meta.url)));
   state.checks.set(photo.url + "?name=small", { state: "done", result: await globalThis.PB.readCredentials(plain) });
   rows = globalThis.PBMediaCard.rows({ tweet, tweets: new Map() });
-  assert.match(flat(rows), /no Content Credentials found \(platforms often strip them/i);
+  assert.match(flat(rows), /Absent, the usual case: platforms often strip them/i);
 });

@@ -92,7 +92,7 @@ test("5. a head past its expiry is accepted as Expired, and the line keeps the c
   assert.equal(aging.label, "Aging");
   const none = freshness(null, { now: T0, catalogue: { version: "2026.10.22", date: "2026-10-22" } });
   assert.equal(none.status, "none");
-  assert.match(none.line, /Catalogue dated 2026-10-22\. No signed head checked on this device yet\./);
+  assert.match(none.line, /Catalogue dated 2026-10-22\. Signed head: unchecked on this device so far./);
 });
 
 test("6. with the clock 10 years ahead or behind, the highest seen time rules and a lower version is never accepted", async () => {

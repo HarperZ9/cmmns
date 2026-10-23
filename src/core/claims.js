@@ -21,7 +21,7 @@ import { foldConfusables } from "./confusables.js";
 
 export const MIN_CLAIM_TOKENS = 4, MIN_SHARED = 4, COVER_MIN = 0.85, BIGRAM_MIN = 0.3, MAX_CANDIDATES = 200;
 export const CLAIM_LABEL = "A fact-checker reviewed a similar claim";
-export const CLAIM_DOES_NOT_PROVE = "Similar wording is not the same claim; check the source. The rating is the fact-checker's, about the claim they reviewed, not about this post or the person who wrote it.";
+export const CLAIM_DOES_NOT_PROVE = "Similar wording to a reviewed claim; check the source. The rating is the fact-checker's, about the claim they reviewed.";
 export const CLAIM_ATTRIBUTION = "ClaimReview markup published by the fact-checker, from the Data Commons fact-check feed (CC BY 4.0).";
 
 const LANG_STOPS = {
@@ -197,10 +197,10 @@ export function claimCard(m) {
     ["Claim they reviewed", m.claim],
     ["Reviewed on", m.date || "date not given"],
     ["Wording overlap", `${Math.round(m.coverage * 100)}% of the claim's words`],
-    m.negationDiffers ? ["Note", "One of the two says \"not\" and the other does not. Read both."] : null,
+    m.negationDiffers ? ["Note", "One of the two contains \"not\" and the other lacks it. Read both."] : null,
     ["Read it", { links: [[host, m.url]] }],
     ["Source", CLAIM_ATTRIBUTION],
-    ["Does not prove", CLAIM_DOES_NOT_PROVE],
+    ["Read it as", CLAIM_DOES_NOT_PROVE],
   ].filter(Boolean);
   return { label: CLAIM_LABEL, rows };
 }

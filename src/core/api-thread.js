@@ -36,7 +36,7 @@ function flagItems(replies, now) {
   return [...byKey.values()].map(({ f, posts }) => ({
     kind: "account-flag", scope: "post", level: f.id === "based-elsewhere" ? "warn" : "flag", label: FLAG_LABEL[f.id] || f.id,
     shows: f.evidence ? `The account behind ${posts.length === 1 ? "this post" : "these posts"}: ${f.evidence}.` : `The input marks the account behind ${posts.length === 1 ? "this post" : "these posts"} with this flag.`,
-    source: SRC_ACCOUNTS, doesNotProve: DOES_NOT_PROVE[f.id] || f.doesNotProve || "A flag is a sign to look at, not a finding about the person.",
+    source: SRC_ACCOUNTS, doesNotProve: DOES_NOT_PROVE[f.id] || f.doesNotProve || "A flag is a sign to look at.",
     posts, spans: [], data: { flag: f.id, asOf: new Date(now).toISOString().slice(0, 10) },
   }));
 }

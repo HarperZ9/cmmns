@@ -51,9 +51,9 @@ export function stateSummary(items) {
 }
 
 export const STATE_DOES_NOT_PROVE = {
-  "state-owned": "State ownership is not proof of disinformation. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
-  "designated": "A designation records one government's assessment and policy, not an independent finding. The domain is matched to the named outlet through Wikidata unless the document gives it.",
-  "public-broadcaster": "Public broadcasters range from editorially independent to government-directed. Check the outlet's charter and record, not the label.",
+  "state-owned": "State ownership ties the outlet to a government. Public broadcasters with editorial independence are state-owned too, and Wikidata can lag a sale.",
+  "designated": "A designation records one government's assessment and policy. Wikidata matches the domain to the named outlet when the document leaves it out.",
+  "public-broadcaster": "Public broadcasters range from editorially independent to government-directed. The outlet's charter and record show which.",
   "named-in-report": "The report named this domain or account in an operation at the time it was published. Domains change hands, and accounts can be reused or impersonated.",
 };
 

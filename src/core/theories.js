@@ -18,9 +18,9 @@ import { COERCION_PATTERNS, coercionSkipped } from "./theories-coercion.js";
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
 const AP_QANON = S("AP, QAnon's 'Save the Children' morphs into popular slogan", "https://www.wsls.com/news/politics/2020/10/28/qanons-save-the-children-morphs-into-popular-slogan/", "2020-10-28");
-const NAMING = "People quote, mock and argue against these claims, and Daylight Commons skips only obvious debunking.";
+const NAMING = "People also name these theories to quote, mock or argue against them, and Daylight Commons skips obvious debunking.";
 
-export const THEORY_DOES_NOT_PROVE = `Naming a theory is not believing it. ${NAMING} This describes the post, not who wrote it or why, and a post that names a theory can still contain true statements.`;
+export const THEORY_DOES_NOT_PROVE = `The post names this theory. ${NAMING} The rest of the post can still be true.`;
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const G = GROUPS.map(esc).sort((a, b) => b.length - a.length).join("|");
@@ -43,12 +43,12 @@ const CONTROL_PATTERNS = [
 export const THEORIES = [
   { id: "qanon", name: "QAnon", terms: ["wwg1wga", "where we go one we go all", "q sent me", "q drops", "qanon was right", "qanon is right"],
     claim: "A secret cabal of elites runs the world and an insider called Q leaks its coming downfall.",
-    record: "None of Q's dated predictions came true. ADL and ISD document the movement and its slogans.",
+    record: "Every dated Q prediction failed. ADL and ISD document the movement and its slogans.",
     sources: [S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022"), S("ISD, QAnon explainer", "https://www.isdglobal.org/explainers/qanon/", "2023"), AP_QANON],
     dnp: "QAnon slogans are also quoted by reporters, researchers and former followers." },
   { id: "adrenochrome", name: "Adrenochrome harvesting", terms: ["adrenochrome", "adrenochrome harvesting", "harvesting adrenochrome"],
     claim: "Celebrities and elites traffic children to harvest a drug from their blood.",
-    record: "Adrenochrome is an ordinary oxidation product of adrenaline with no such use. AP reported the claim as baseless.",
+    record: "Adrenochrome is an ordinary oxidation product of adrenaline. AP reported the harvesting claim as baseless.",
     sources: [AP_QANON, S("ADL, QAnon backgrounder", "https://www.adl.org/resources/backgrounder/qanon", "2022")],
     dnp: "The word also appears in chemistry, in fiction and in posts mocking the claim." },
   { id: "satanic-abuse", name: "Satanic ritual abuse network", terms: ["satanic ritual abuse", "satanic pedophile", "satanic pedophiles", "satanic paedophiles", "satanic cabal", "satanic elites", "pizzagate", "frazzledrip"],
@@ -65,7 +65,7 @@ export const THEORIES = [
     claim: "The World Economic Forum's Great Reset is a hidden plan by elites to take property and freedoms.",
     record: "The Great Reset is a public WEF initiative from June 2020. ADL and ISD document how the plot framing grew from it.",
     sources: [S("ISD, The Great Reset explainer", "https://www.isdglobal.org/explainers/the-great-reset/", "2021"), S("ADL, Great Reset conspiracy flourishes amid continued pandemic", "https://www.adl.org/resources/blog/great-reset-conspiracy-flourishes-amid-continued-pandemic", "2021")],
-    dnp: "People criticise the WEF and its policies openly. The \"own nothing\" line is also used as a joke about rents and subscriptions." },
+    dnp: "People criticise the WEF and its policies openly. The slogan is also a joke about rents and subscriptions." },
   { id: "stolen-election", name: "Stolen or rigged election", terms: ["stop the steal", "stolen election"],
     patterns: [`\\b(?:the\\s+)?${YEAR}election\\s+(?:was|got|is being|has been)\\s+(?:stolen|rigged)\\b`, `\\b(?:${G}|they)\\s+(?:rigged|stole)\\s+the\\s+${YEAR}election\\b`,
       // "a fake president who won through a rigged election" (added 2026-10-23 from the feed test)
@@ -78,7 +78,7 @@ export const THEORIES = [
     patterns: ["\\b(?:dominion|smartmatic|starlink|the machines|voting machines|the satellites)\\s+(?:flipped|switched|changed|rigged|altered)\\s+(?:the\\s+)?(?:votes?|election|results?|tallies|totals)\\b",
       "\\b(?:russia|china|iran|they)\\s+(?:hacked|changed|altered|flipped)\\s+(?:the\\s+)?(?:vote\\s+(?:totals|tallies|counts)|voting machines|votes)\\b"],
     claim: "Voting machines, satellites or a foreign government changed vote counts.",
-    record: "The Senate Intelligence Committee found no evidence that 2016 tallies were altered. PolitiFact rated the 2024 Starlink claim Pants on Fire: tabulators are not online during counting.",
+    record: "The Senate Intelligence Committee found no evidence that 2016 tallies were altered. PolitiFact rated the 2024 Starlink claim Pants on Fire: tabulators are offline during counting.",
     sources: [S("US Senate Select Committee on Intelligence, Report Volume 1", "https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume1.pdf", "2019-07-25"), S("PolitiFact, No, Elon Musk's Starlink wasn't used to rig the 2024 election", "https://www.politifact.com/factchecks/2024/nov/12/threads-posts/no-elon-musks-starlink-wasnt-used-to-rig-the-2024/", "2024-11-12"), ENDERS],
     dnp: "Foreign influence campaigns and machine faults are real and documented. They are different from changed counts." },
   { id: "staged-shooting", name: "Staged shooting", terms: [],
@@ -87,7 +87,7 @@ export const THEORIES = [
     claim: "A shooting was staged with actors or faked to win sympathy or a policy.",
     record: "Researchers tracked staging claims about the 2024 Butler attempt from both sides (QUT, 2024). Courts found the Sandy Hook hoax claims defamatory.",
     sources: [S("QUT Digital Media Research Centre, Conspiracy theories on the Trump assassination attempt are spreading like wildfire", "https://www.qut.edu.au/news/realfocus/conspiracy-theories-on-the-trump-assassination-attempt-are-spreading-like-wildfire", "2024-07"), ENDERS],
-    dnp: "Asking how security failed is not a staging claim, and official accounts are sometimes corrected." },
+    dnp: "Questions about how security failed are a separate matter from a staging claim, and official accounts are sometimes corrected." },
   { id: "inside-job", name: "9/11 inside job", terms: ["9/11 was an inside job", "911 was an inside job", "bush did 9/11", "bush did 911", "jet fuel can't melt steel beams", "jet fuel cant melt steel beams"],
     claim: "The US government planned or carried out the 11 September 2001 attacks.",
     record: "NIST's investigation explained the collapses of the towers and of WTC 7 by impact damage and fire.",
@@ -117,7 +117,7 @@ export const THEORIES = [
     record: "Such claims are made about leaders of every party. In July 2025 the Justice Department and the FBI said their review found no credible evidence that Jeffrey Epstein blackmailed prominent people. The Justice Department's Inspector General found that the FBI had corroborated only limited parts of the Steele reporting, the source of the claim that Russia held kompromat on Donald Trump.",
     sources: [S("NPR, DOJ memo says no evidence of Jeffrey Epstein 'client list' or blackmail", "https://www.npr.org/2025/07/08/nx-s1-5460954/doj-memo-says-no-evidence-of-jeffrey-epstein-client-list-or-blackmail", "2025-07-08"),
       S("US Department of Justice Office of the Inspector General, Review of Four FISA Applications and Other Aspects of the FBI's Crossfire Hurricane Investigation", "https://oig.justice.gov/reports/review-four-fisa-applications-and-other-aspects-fbis-crossfire-hurricane-investigation", "2019-12-09"), ENDERS],
-    dnp: "Blackmail, bribery and foreign influence happen and are sometimes proven in court. A claim about one person can be true, and this says only that the post makes the claim, not whether it is true." },
+    dnp: "Blackmail, bribery and foreign influence happen and are sometimes proven in court. A claim about one person can be true, and this marks that the post makes the claim." },
   { id: "hidden-cure", name: "Hidden cure", terms: ["hiding the cure for cancer", "hiding the cure", "suppressing the cure", "they have the cure for cancer", "sitting on the cure"],
     claim: "Drug companies or regulators hide a cure to protect profits.",
     record: "In a 2013 US survey, 37% agreed the FDA suppresses natural cures for cancer (Oliver and Wood, 2014); no such hidden cure has been shown.",

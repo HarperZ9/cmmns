@@ -91,7 +91,7 @@ const LONG_CUES = { outlet: CUES.outlet.filter((c) => c.length >= 5), platform: 
 const SAYS_UNOFFICIAL = /\b(?:fan|fans|parody|satire|unofficial|critic|critics|commentary)\b|not\s*affiliated/i;
 const ORG_CHECK = new Set(["Business", "Government"]);
 
-export const BRAND_DOES_NOT_PROVE = "Fans, critics, reporters and local partners put outlet and platform names in their profiles, and the list of official accounts Daylight Commons checks against is incomplete. A brand in a name does not show who runs the account or that anyone meant to deceive.";
+export const BRAND_DOES_NOT_PROVE = "A brand in the name, outside the official account list. Fans, critics, reporters and local partners put outlet and platform names in their profiles too, and the official list is partial.";
 
 const at = (hay, needle) => { for (let i = 0; i + needle.length <= hay.length; i++) if (needle.every((t, j) => hay[i + j] === t)) return i; return -1; };
 
@@ -140,7 +140,7 @@ export function brandLookalike(account) {
     if (own.has(affKey) || same.some((b) => b.nameTokens.some((nt) => at(aff, nt) >= 0))) return null;
   }
   const where = d ? `display name "${display.slice(0, 50)}"` : `handle @${handle}`;
-  const who = d ? `; @${handle} is not` : " and is not";
-  const evidence = `${where} uses the ${m.brand.name} brand${who} among the ${m.brand.name} accounts Wikidata lists, and the page shows no ${m.brand.name} affiliation badge or organisation check`;
+  const who = d ? `; @${handle} is outside` : " and is outside";
+  const evidence = `${where} uses the ${m.brand.name} brand${who} the ${m.brand.name} accounts Wikidata lists, and the page lacks a ${m.brand.name} affiliation badge or organisation check`;
   return { brand: m.brand.name, kind: m.brand.kind, where: d ? "display" : "handle", evidence, source: m.brand.source };
 }

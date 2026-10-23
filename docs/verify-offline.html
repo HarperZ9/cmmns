@@ -140,7 +140,7 @@ function parseSums(text) {
   return out;
 }
 
-const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the files were signed by the holder of this key and not changed since. It does not show who holds the key, that the key was never stolen, or that the code is safe. Compare the key id with one you got another way.";
+const SIGNATURE_DOES_NOT_PROVE = "A valid signature shows the holder of this key signed the files and that they are unchanged since. Compare the key id with one you got another way.";
 
 return { signingKeyId, jwkThumbprint, generateSigningKey, signSums, verifySums, parseSums, SIGNATURE_DOES_NOT_PROVE };
 })();
@@ -152,7 +152,7 @@ const HEAD_KIND = "daylight-head/1";
 const HEAD_MAX_BYTES = 4096;
 const HEAD_SIG_MAX_BYTES = 4096;
 const AGING_DAYS = 30;
-const HEAD_DOES_NOT_PROVE = "A valid head shows the signer chose these files at that time. It does not show the files are safe.";
+const HEAD_DOES_NOT_PROVE = "A valid head shows the signer chose these files at that time. How safe they are rests on the signer.";
 
 const DAY = 86400000;
 const HEX64 = /^[0-9a-f]{64}$/, KEY_ID = /^[0-9a-f]{32}$/, TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/, B64URL = /^[A-Za-z0-9_-]{80,100}$/;
@@ -271,7 +271,7 @@ async function checkHead(opts) {
 
 function freshness(state, { now = Date.now(), catalogue = null } = {}) {
   const dated = catalogue && catalogue.date ? `Catalogue dated ${day(catalogue.date)}.` : "Catalogue date unknown.";
-  if (!state) return { status: "none", label: "Not checked", line: `${dated} No signed head checked on this device yet.` };
+  if (!state) return { status: "none", label: "Not checked", line: `${dated} Signed head: unchecked on this device so far.` };
   const t = effectiveNow(state, now), sigs = `${state.valid} of ${state.needed} signature${state.needed === 1 ? "" : "s"}${state.needed === 1 ? " (single-signer release)" : ""}`;
   const seen = `Signed head version ${state.version} last seen ${day(state.seenAt)}, valid until ${day(state.expires)}, ${sigs}.`;
   if (t >= Date.parse(state.expires)) return { status: "expired", label: "Expired", line: `${dated} Newer campaigns may be missing. ${seen}` };
@@ -288,7 +288,7 @@ const { canonicalJSON, jwkId, verifyText } = M_sig;
 const BUNDLE_KIND = "radar-evidence-bundle";
 const BUNDLE_VERSION = 1;
 const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
-const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right.";
+const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the holder of this key signed the bundle and that it is unchanged since. Check the key id with the signer by another route, and read each span against its post.";
 const CARRIER_SAFE = "carrier-safe";
 const CARRIER_SAFE_NOTE = "carrier-safe: the signature proves the bundle is unchanged; it says nothing about who made it";
 
@@ -307,25 +307,25 @@ function bundleConsistency(bundle) {
 
 async function signatureOk(bundle) {
   const { signature, ...body } = bundle, S = body.signer;
-  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Daylight Commons can check" };
+  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle lacks an ECDSA P-256 signature with its public key" };
   const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
   let id = null;
   try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
-  if (id !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
+  if (id !== S.keyId) return { ok: false, text: "the key id belongs to a different public key" };
   const good = await verifyText(jwk, signature.value, canonicalJSON(body));
-  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature does not match: the bundle changed after signing, or was signed with another key" };
+  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature fails: the bundle changed after signing, or another key signed it" };
 }
 
 async function verifyBundle(bundle, opts = {}) {
   const checks = [];
-  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Daylight Commons evidence bundle" }] };
-  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Daylight Commons reads` });
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this file lacks the Daylight Commons evidence bundle kind" }] };
+  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version}; this Daylight Commons reads version ${BUNDLE_VERSION}` });
   checks.push({ name: "signature", ...(await signatureOk(bundle)) });
-  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is not one this Daylight Commons reads` });
+  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is unknown to this Daylight Commons` });
   const keyId = bundle.signer ? bundle.signer.keyId : null;
   if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
   const C = bundleConsistency(bundle);
-  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts not listed (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
+  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts missing from the list (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
   return { ok: checks.every((c) => c.ok), keyId, checks };
 }
 

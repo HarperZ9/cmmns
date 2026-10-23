@@ -21,7 +21,7 @@ export const AD_LIBRARIES = [
     search: () => "https://ads.x.com/ads-repository",
     api: "No public API; the repository page takes an advertiser and a date range.", by: "none", checked: "page answered 200" },
 ];
-export const ADS_DOES_NOT_PROVE = "An ad library lists ads a platform chose to record for its own rules. No entry does not mean no paid promotion: influencer payments, agency-run accounts and engagement bought off-platform never appear there.";
+export const ADS_DOES_NOT_PROVE = "An ad library lists ads a platform chose to record for its own rules. Influencer payments, agency-run accounts and engagement bought off-platform stay outside it.";
 
 // { name, domain } -> [{ id, name, url, covers, api, checked }] for the user to open.
 export function adLibraryLinks({ name, domain } = {}) {

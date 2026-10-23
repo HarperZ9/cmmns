@@ -172,6 +172,6 @@ test("a site on a hosting service is looked up whole, and the archive needs its 
   const noArchive = [];
   const without = await lookupEvidence(stubFetch([[/rdap\.org/, 200, { objectClassName: "domain", ldhName: "example.com", events: [{ eventAction: "registration", eventDate: "1995-08-14T04:00:00Z" }] }]], noArchive), { domains: ["example.com"], wayback: false });
   assert.ok(!noArchive.some((x) => /archive\.org/.test(x.url)), "no archive request without its access");
-  assert.ok(without.notes.some((n) => /Internet Archive was not asked about example\.com/.test(n)));
+  assert.ok(without.notes.some((n) => /Internet Archive was skipped for example\.com/.test(n)));
   assert.equal(without.receipts[0].kind, "domain-registration");
 });

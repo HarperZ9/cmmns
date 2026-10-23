@@ -13,7 +13,7 @@ export const TECHNIQUE_LESSONS = [
     why: "A claim that seems to come up everywhere at once feels confirmed. Pushing one item into several language communities at the same time makes each audience think it found the story on its own.",
     spot: "Open two of the replies. Compare their wording, their timing and what else each account posts in that language.",
     counter: "If the accounts post in that language every day, it is ordinary sharing. If they appeared for this item only, look for the first copy and who posted it.",
-    dnp: "Multilingual people, translators, news agencies and diaspora communities share the same link or video in several languages. This shows the material crossing languages, not who sent it or whether anyone coordinated.",
+    dnp: "This shows the same material crossing languages. Multilingual people, translators, news agencies and diaspora communities share links and videos this way too.",
   },
   {
     id: "laundered", title: "Material passed through other accounts", research: [],
@@ -25,7 +25,7 @@ export const TECHNIQUE_LESSONS = [
     why: "A claim gains weight each time it passes through a voice people trust. After two or three steps the original source drops out of sight, and one source looks like several independent ones.",
     spot: "Open the origin in the chain. Ask who said it first, what they based it on, and whether each step added evidence or just reach.",
     counter: "If every step adds a source or a check, the chain is reporting. If each step only repeats the one before, you are looking at a single claim with many voices.",
-    dnp: "Daylight Commons cannot see past the first upload or link it has seen: who filmed, wrote or paid for the material. Passing material along through other accounts is also how ordinary sharing works.",
+    dnp: "The chain starts at the first upload or link Daylight Commons has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.",
   },
   {
     id: "person-story", title: "One person's story, no wider picture", research: [],

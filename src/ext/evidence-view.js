@@ -20,10 +20,10 @@
   }
 
   function receipts(box, res) {
-    for (const r of res.receipts || []) box.append(el("p", "pb-num", summary(r)), el("p", "pb-foot", `Source: ${r.source}. Receipt ${r.hash.slice(0, 12)}, ${r.at.slice(0, 16)} UTC. Does not prove: ${r.dnp}`));
+    for (const r of res.receipts || []) box.append(el("p", "pb-num", summary(r)), el("p", "pb-foot", `Source: ${r.source}. Receipt ${r.hash.slice(0, 12)}, ${r.at.slice(0, 16)} UTC. Read it as: ${r.dnp}`));
     for (const n of res.notes || []) box.append(el("p", "pb-foot", n));
     if ((res.ads || []).length) {
-      const p = el("p", "pb-num", "Ad libraries (open in a tab; Daylight Commons does not query them): ");
+      const p = el("p", "pb-num", "Ad libraries (each opens in a tab for you to search): ");
       res.ads.forEach((a, i) => { if (i) p.append(" · "); p.append(link(a.name, a.url)); });
       box.append(p, el("p", "pb-foot", PB.ADS_DOES_NOT_PROVE));
     }
