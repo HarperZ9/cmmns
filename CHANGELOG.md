@@ -5,7 +5,9 @@ were not published to a store.
 
 ## Unreleased
 
-Planned for 3.4.0, after the Reading lens release (3.3.0).
+Nothing yet.
+
+## 3.4.0 (2026-10-23)
 
 Case folders for investigation: `daylight case` (also `radar case`). A case is a folder with its own
 git history. Each source is captured with its sha256, access time, read mode and Wayback request;
@@ -20,6 +22,10 @@ Read these limits before relying on it:
   not linked, and two claims that disagree on a number or date in different wording are not flagged.
 - Capture reads web pages and X posts. Video, Telegram, TikTok and Truth Social posts are not
   captured yet.
+- `case read` runs the 3.3.0 Reading lens with every technique on, so it names techniques that are
+  below their precision bar and off in the extension. On the Musk and Ukraine sources it read "owned
+  and controlled by the US government" as secret coercion. Each finding is marked as below or above
+  the bar.
 
 ### Added
 - `case init`, `add`, `claim`, `claims --blind`, `label`, `labels`, `trace`, `event`, `timeline`,
@@ -31,10 +37,13 @@ Read these limits before relying on it:
   re-checks of captures and leads.
 - Exports: newsroom dossier, legal chain-of-custody bundle, research dataset with PROV-O and
   Croissant metadata. Each carries SHA256SUMS and a signed evidence bundle of `case-file` items (a new
-  evidence kind in `schema/evidence.v1.json`). Private accounts are pseudonyms unless marked public
+  evidence kind in `schema/evidence.v1.json` and `evidence.v2.json`; new exports are version 2
+  bundles). Private accounts are pseudonyms unless marked public
   figures.
 - Extension popup: **Add to case** and **Save case list** (`src/ext/case-inbox.js`). Addresses stay in
   the browser; nothing is sent.
+- `case read`: the Reading lens and the detector over every capture, with frames shared across
+  sources.
 - `examples/musk-ukraine-case`, the hand-built case of 2026-10-23 moved into the format.
 
 ## 3.3.0 (2026-10-23)

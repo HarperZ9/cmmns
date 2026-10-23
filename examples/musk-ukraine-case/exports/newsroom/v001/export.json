@@ -2,7 +2,7 @@
   "format": "daylight-case-export/1",
   "profile": "newsroom",
   "at": "2026-10-23T18:00:00.000Z",
-  "tool": "Daylight Commons 3.2.2 (daylight case)",
+  "tool": "Daylight Commons 3.4.0 (daylight case)",
   "state": "0041ecf429023a05ab5d4a495a5952472e3c289fda30ed23ff2aeeda48c2139a",
   "previous": null,
   "redacted_accounts": 2,

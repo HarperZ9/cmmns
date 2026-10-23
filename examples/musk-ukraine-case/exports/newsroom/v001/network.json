@@ -12,7 +12,7 @@
       "out": 0
     },
     {
-      "id": "[acct-39db78e08e]",
+      "id": "[acct-1f8bcb936b]",
       "in": 0,
       "out": 1
     },
@@ -63,7 +63,7 @@
       ]
     },
     {
-      "from": "[acct-39db78e08e]",
+      "from": "[acct-1f8bcb936b]",
       "to": "@realDonaldTrump",
       "type": "repost",
       "n": 1,

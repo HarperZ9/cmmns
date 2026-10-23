@@ -12,7 +12,7 @@ import { validate } from "../bin/lib/jsonschema.mjs";
 
 const ROOT = join(import.meta.dirname, "..");
 const CLI = join(ROOT, "bin", "radar.mjs");
-const SCHEMA = JSON.parse(readFileSync(join(ROOT, "schema", "evidence.v1.json"), "utf8"));
+const SCHEMA = JSON.parse(readFileSync(join(ROOT, "schema", "evidence.v2.json"), "utf8"));
 const dir = mkdtempSync(join(tmpdir(), "case-cli-"));
 const KEY = join(dir, "key.jwk"), CASE = join(dir, "harbour");
 const env = { ...process.env, DAYLIGHT_CASE_NOW: "2026-10-23T12:00:00Z", DAYLIGHT_CASE_REPLAY: join(dir, "no-network.json") };

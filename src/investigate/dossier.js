@@ -57,9 +57,11 @@ function restSections(data, extra) {
   if (!data.absent.length) L.push("None recorded.");
   if (extra.reading) {
     L.push("", "## Reading lens", "");
-    const named = extra.reading.rows.filter((x) => x.read && x.items.length);
-    for (const r of named) L.push(`- ${r.source}: ${r.items.map((i) => `${i.label}${i.spans.length ? ` ("${i.spans[0]}")` : ""}`).join("; ")}`);
+    const parts = (r) => [...(r.lens || []).map((f) => `${f.name} ("${f.match}")${f.shownByDefault ? "" : ", below its precision bar"}`), ...r.items.map((i) => `${i.label}${i.spans.length ? ` ("${i.spans[0]}")` : ""}`)];
+    const named = extra.reading.rows.filter((x) => x.read && parts(x).length);
+    for (const r of named) L.push(`- ${r.source}: ${parts(r).join("; ")}`);
     if (!named.length) L.push("The lens named no technique and no known fact-checked claim in the captured text.");
+    else L.push("", "A named technique describes how a text argues. It is a reason to read the span, not a finding about the source.");
   }
   if (extra.summary) L.push("", "## Summary", "", `${extra.summary.text}`, "", `(${reviewState(extra.summary)}.)`);
   return L.join("\n");
