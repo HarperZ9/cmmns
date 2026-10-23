@@ -115,3 +115,4 @@ bunching), no sign fired, ladder step 1 only (10 of 20 and 6 of 21 quotes carry 
 partnership mark). Does not prove: two threads at one moment each; a lens with no sign is not a
 finding that a launch is organic.
 
+| 25 | Offline kit trial: a person who has not seen the project follows the key card on a laptop with Wi-Fi off and verifies a kit from a USB stick | Record the time taken and any step that blocked them, whatever the result | open: skipped when the kit was built (2026-10-23) by the author's direction; the kit is not done until one trial is written here |

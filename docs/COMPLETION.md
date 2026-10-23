@@ -6,7 +6,7 @@ commons plan and the explainer plan) as a criterion with a check that can fail, 
 and the evidence, and the tool a user would compare it with. The wave plan that works through it is
 `docs/WAVES.md`.
 
-First written 2026-10-23 against `main` at `aaa65a1` (release 3.0.0); export rows updated by wave 1; counts updated at release 3.1.0 after wave 2; section 13 added with the signed head. Update the row in the same
+First written 2026-10-23 against `main` at `aaa65a1` (release 3.0.0); export rows updated by wave 1; counts updated at release 3.1.0 after wave 2; section 13 added with the signed head and updated with the offline kit. Update the row in the same
 commit as the change that moves it.
 
 ## Status words
@@ -37,10 +37,10 @@ These do not move for any feature below. A row that would cross one is out of sc
 
 | Status | Rows |
 |---|---|
-| PASS | 39 |
+| PASS | 41 |
 | PARTIAL | 30 |
 | FAIL | 4 |
-| NOT BUILT | 36 |
+| NOT BUILT | 34 |
 | **All** | **109** |
 
 ## 1. Measurement
@@ -216,12 +216,12 @@ broken variant. Nothing in this section has had an independent security audit.
 |---|---|---|---|---|---|
 | R1 | Signed head with version, signed time and expiry; an older head, a forked head, an oversize head, an untrusted signer and a wrong catalogue or `SHA256SUMS` hash are refused | `tests/head.test.js`, 9 tests | **PASS** | `src/core/head.js`, `scripts/head-lib.mjs`; `verify-release` checks the head first and keeps the highest version | TUF and F-Droid sign version numbers and expiry dates; we match that with one file under 1 KB |
 | R2 | Catalogue age on the card and in the popup: Current, Aging, Expired; an expired catalogue keeps every finding | `tests/head.card.test.js` | **PARTIAL** | card rows tested in node; the popup line and the options page check are not yet captured in a browser | none consumer-facing shows its own data age |
-| R3 | Offline kit and a single-file verifier with the trusted key inside it | `tests/kit.test.js` | **NOT BUILT** | increment 2 | Briar shares its app offline; Kiwix ships content packs |
-| R4 | Mirror check names a lagging, altered or unreachable mirror | `tests/mirror-check.test.js` | **NOT BUILT** | increment 2 | |
+| R3 | Offline kit and a single-file verifier with the trusted key inside it | `tests/kit.test.js`, 8 tests, one in headless Chrome with the network off | **PASS** | `docs/verify-offline.html` from `scripts/verify-offline.mjs`; `scripts/kit.mjs`; key card QR matches the Python qrcode library bit for bit | Briar shares its app offline; Kiwix ships content packs |
+| R4 | Mirror check names a lagging, altered, forked or unreachable mirror | `tests/mirror-check.test.js`, 2 tests against local mirrors | **PASS** | `scripts/mirror-check.mjs`; no live mirror besides GitHub exists yet (C4) | |
 | R5 | Carrier-safe evidence bundles: a fresh key per bundle, the day only, no page address | `tests/evidence-bundle.carrier.test.js` | **NOT BUILT** | increment 3 | |
 | R6 | Several independent signers (k of n) | `tests/threshold.test.js` | **NOT BUILT** | design on paper in `project-docs/K-OF-N-SIGNING.md`; the head already counts k | F-Droid reproducible-build verification |
 | R7 | Independent security audit of the head, the kit verifier and the carrier-safe profile | audit report | **NOT BUILT** | none requested | |
-| R8 | A person new to the project verifies a kit from a stick with the network off | entry in `LIVE-CHECKS.md` | **NOT BUILT** | | |
+| R8 | A person new to the project verifies a kit from a stick with the network off | entry in `LIVE-CHECKS.md` | **NOT BUILT** | skipped in increment 2 by the author's direction; row 25 in `project-docs/LIVE-CHECKS.md` stays open | |
 
 ## Top ten gaps, by what they unlock
 

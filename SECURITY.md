@@ -37,6 +37,10 @@ Daylight Commons is maintained by one person, so no response time is promised.
   the clock rule (`src/core/head.js`, `scripts/head-lib.mjs`, `src/ext/options-head.js`). A way to
   make a device accept an older head, or a head no trusted key signed, is a vulnerability. The head
   format has had no independent audit.
+- The offline kit checker and the mirror check (`docs/verify-offline.html`, built by
+  `scripts/verify-offline.mjs` from `src/core/kit-verify.js`; `scripts/kit.mjs`;
+  `scripts/mirror-check.mjs`). A kit that the page reports as verified although a signed file
+  changed, or a page that makes any network request, is a vulnerability. Not audited.
 - The command line tool in `bin/`.
 
 Out of scope: problems in the browsers or the social platforms themselves, and wrong evidence that

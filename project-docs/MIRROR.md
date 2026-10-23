@@ -60,6 +60,19 @@ git ls-remote --heads --tags https://codeberg.org/<account>/daylight-commons.git
 Then download one release zip from each host and compare its SHA-256 with `SHA256SUMS` from the
 release. The signature check in `INSTALL.md` works the same on either copy.
 
+Once releases carry a signed head (3.2.0 and later), compare whole mirrors in one step. Each base
+address is the folder that holds `HEAD.json`, `SHA256SUMS` and the release files:
+
+```
+node scripts/mirror-check.mjs <mirror 1> <mirror 2> <mirror 3>
+```
+
+It checks each mirror's head and `SHA256SUMS` against the project key, then every listed file's
+hash, and exits non-zero when any mirror is unreachable, serves an older head than the newest seen,
+serves a different head under the same version, or serves a changed file. `--heads-only` skips the
+file downloads. It cannot see a file a mirror adds without listing it, because plain HTTP gives no
+folder listing.
+
 ## 4. Record it
 
 1. Add the Codeberg address to `README.md` under the source link and to `INSTALL.md`.
