@@ -1,7 +1,7 @@
 // Performance budgets (project-docs/PRODUCTION-READINESS.md, "Performance"). The numbers on the
-// author's machine (2026-10-23, Node 25, Windows): 0.33 to 0.36 ms of text work per post, 71 to 80 ms
-// for the first thread pass over 500 replies and 60 to 64 ms for each later refresh of it. The
-// budgets sit about five times above that, for slower CI machines; a breach means a change made the
+// author's machine (2026-10-23, Node 25, Windows): 0.26 ms of text work per post, 59 ms
+// for the first thread pass over 500 replies and 48 to 49 ms for each later refresh of it (3.4.0: 60 ms). The
+// budgets sit six to eight times above that, for slower CI machines; a breach means a change made the
 // work grow faster than the thread, not that a machine was busy.
 import test from "node:test";
 import assert from "node:assert/strict";

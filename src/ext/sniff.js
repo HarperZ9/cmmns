@@ -66,7 +66,7 @@
       if (!Object.keys(vars).some((k) => /screen_?name|username/i.test(k))) vars.screenName = handle;
       u.searchParams.set("variables", JSON.stringify(vars));
       const csrf = (document.cookie.match(/(?:^|;\s*)ct0=([^;]+)/) || [])[1];
-      const res = await origFetch.call(window, u.toString(), { credentials: "include", headers: { ...template.headers, ...(csrf ? { "x-csrf-token": csrf } : {}) } });
+      const res = await origFetch.call(window, u.toString(), { credentials: "include", headers: { ...template.headers, ...(csrf ? { "x-csrf-token": csrf } : {}) }, signal: AbortSignal.timeout(15000) });
       if (res.ok) post({ source: "radar-sniff", json: await res.json(), about: handle });
       const num = (h) => { const v = res.headers.get(h); return v == null ? undefined : Number(v); };
       post({ source: "radar-about-done", handle, status: res.status,

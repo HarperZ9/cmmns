@@ -8,9 +8,10 @@
 // - run() and wrap(): try/catch around a callback, with report() on failure.
 // - capMap(), capSet(): keep the newest entries of a cache within a fixed count, so a long session
 //   (hours of scrolling) holds a bounded amount of memory.
-// - withTimeout(): a promise that gives up after a fixed time, so a stalled request cannot hold a
-//   reading open.
-// - Budget: refresh() measures itself; a slow pass doubles the next wait (up to 4 s) and a run of
+// - Timeouts: every request the content scripts make carries AbortSignal.timeout (reddit.js 10 s,
+//   sniff.js 15 s); the background's lookups and feeds have their own (auto.js, feedfetch.js).
+// - Budget: refresh() measures itself; two slow passes in a row stretch the next wait by half (up
+//   to 2 s; the first pass on a page is slow while the browser compiles the rules) and a run of
 //   five failed passes pauses automatic refresh on this page until the next navigation.
 (() => {
   "use strict";
@@ -47,15 +48,10 @@
   }
   const capSet = capMap;
 
-  function withTimeout(promise, ms, what = "a request") {
-    let t = 0;
-    const timeout = new Promise((_, reject) => { t = setTimeout(() => reject(new Error(`${what} took longer than ${ms} ms`)), ms); });
-    return Promise.race([promise, timeout]).finally(() => clearTimeout(t));
-  }
 
-  // The refresh budget: wait = 250 ms normally, doubled after each pass slower than 200 ms.
-  const BUDGET_MS = 200, MAX_WAIT = 4000;
-  let wait = 250;
+  // The refresh budget: wait = 250 ms normally, stretched after two passes in a row over 200 ms.
+  const BUDGET_MS = 200, MAX_WAIT = 2000;
+  let wait = 250, slow = 0;
   function measured(fn) {
     return async (...args) => {
       if (pausedAt && pausedAt === location.pathname) return undefined;
@@ -65,7 +61,8 @@
         const r = await fn(...args);
         failedRuns = 0;
         const ms = performance.now() - t0;
-        wait = ms > BUDGET_MS ? Math.min(MAX_WAIT, wait * 2) : 250;
+        slow = ms > BUDGET_MS ? slow + 1 : 0;
+        wait = slow >= 2 ? Math.min(MAX_WAIT, Math.round(wait * 1.5)) : 250;
         return r;
       } catch (e) {
         report("refresh failed", e);
@@ -76,6 +73,6 @@
   }
   const nextWait = (ms) => Math.max(ms, wait);
 
-  globalThis.PBGuard = { report, run, wrap, capMap, capSet, withTimeout, measured, nextWait,
+  globalThis.PBGuard = { report, run, wrap, capMap, capSet, measured, nextWait,
     recent: () => ring.slice(), paused: () => !!pausedAt, BUDGET_MS };
 })();

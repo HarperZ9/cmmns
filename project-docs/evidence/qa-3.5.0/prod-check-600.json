@@ -1,0 +1,158 @@
+{
+ "version": "3.5.0",
+ "package": "D:\\radar-wt\\rel-341\\dist\\radar-chrome-3.5.0.zip",
+ "install_opened": [],
+ "first_run": {
+  "seconds_to_started": 0.23,
+  "seconds_to_first_sign": 4.24,
+  "clicks": 1
+ },
+ "window_open": {
+  "samples_ms": [
+   470.6,
+   469.6,
+   468.9,
+   475.2,
+   474.2,
+   472.6
+  ],
+  "median_ms": 471.6,
+  "max_ms": 475.2
+ },
+ "keyboard": {
+  "focus_opens_window": true,
+  "alt_r_moves_into_window": true,
+  "tab_stays_in_window": true,
+  "focus_visible": true,
+  "esc_closes_window": true
+ },
+ "axe_window": [],
+ "axe_panel": [],
+ "axe_pages": {
+  "welcome.html light": [],
+  "welcome.html dark": [],
+  "options.html light": [],
+  "options.html dark": [],
+  "dashboard.html light": [],
+  "dashboard.html dark": [],
+  "popup.html light": [],
+  "popup.html dark": [],
+  "analyze.html light": [],
+  "analyze.html dark": [],
+  "history.html light": [],
+  "history.html dark": [],
+  "sites.html light": [],
+  "sites.html dark": [],
+  "learn.html light": [],
+  "learn.html dark": []
+ },
+ "soak_on": {
+  "marks": [
+   {
+    "posts": 40,
+    "heap_mb": 12.73,
+    "nodes": 544,
+    "script_s": 0.039
+   },
+   {
+    "posts": 100,
+    "heap_mb": 13.04,
+    "nodes": 804,
+    "script_s": 0.056
+   },
+   {
+    "posts": 200,
+    "heap_mb": 13.51,
+    "nodes": 804,
+    "script_s": 0.086
+   },
+   {
+    "posts": 300,
+    "heap_mb": 13.78,
+    "nodes": 804,
+    "script_s": 0.114
+   },
+   {
+    "posts": 400,
+    "heap_mb": 14.05,
+    "nodes": 804,
+    "script_s": 0.14
+   },
+   {
+    "posts": 500,
+    "heap_mb": 14.31,
+    "nodes": 804,
+    "script_s": 0.167
+   },
+   {
+    "posts": 600,
+    "heap_mb": 14.57,
+    "nodes": 804,
+    "script_s": 0.193
+   },
+   {
+    "posts": 601,
+    "heap_mb": 14.63,
+    "nodes": 804,
+    "script_s": 0.198
+   }
+  ],
+  "badges_in_page_at_end": 0
+ },
+ "soak_off": {
+  "marks": [
+   {
+    "posts": 40,
+    "heap_mb": 2.36,
+    "nodes": 541,
+    "script_s": 0.055
+   },
+   {
+    "posts": 100,
+    "heap_mb": 2.44,
+    "nodes": 801,
+    "script_s": 0.058
+   },
+   {
+    "posts": 200,
+    "heap_mb": 2.52,
+    "nodes": 801,
+    "script_s": 0.063
+   },
+   {
+    "posts": 300,
+    "heap_mb": 2.52,
+    "nodes": 801,
+    "script_s": 0.069
+   },
+   {
+    "posts": 400,
+    "heap_mb": 2.51,
+    "nodes": 801,
+    "script_s": 0.074
+   },
+   {
+    "posts": 500,
+    "heap_mb": 2.5,
+    "nodes": 801,
+    "script_s": 0.079
+   },
+   {
+    "posts": 600,
+    "heap_mb": 2.51,
+    "nodes": 801,
+    "script_s": 0.083
+   },
+   {
+    "posts": 601,
+    "heap_mb": 2.51,
+    "nodes": 801,
+    "script_s": 0.084
+   }
+  ],
+  "badges_in_page_at_end": 0
+ },
+ "service_worker_errors": [],
+ "console_errors": [],
+ "blocked_requests": []
+}

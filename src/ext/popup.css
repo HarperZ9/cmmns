@@ -2,7 +2,7 @@
    in JetBrains Mono. Narrow, so the type steps down from the pages. */
 body { width: 320px; font-size: 14px; line-height: 1.45; background-image: none; }
 header { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 16px 6px; }
-header strong { font-size: 20px; font-weight: 780; letter-spacing: -.03em; }
+header h1 { margin: 0; font-size: 20px; font-weight: 780; letter-spacing: -.03em; line-height: inherit; }
 header span { color: var(--soft); font-size: 12px; }
 main { padding: 0 16px 12px; }
 .lead { margin: 4px 0 12px; }

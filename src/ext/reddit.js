@@ -16,7 +16,7 @@
   function save() { clearTimeout(saveTimer); saveTimer = setTimeout(() => chrome.storage.local.set({ [KEY]: cache }).catch((e) => PBGuard.report("could not save reddit readings", e)), 1500); }
 
   async function readOne(name) {
-    const res = await fetch(`/user/${encodeURIComponent(name)}/about.json`, { credentials: "include", headers: { Accept: "application/json" } });
+    const res = await fetch(`/user/${encodeURIComponent(name)}/about.json`, { credentials: "include", headers: { Accept: "application/json" }, signal: AbortSignal.timeout(10000) });
     if (res.status === 429) { pausedUntil = Date.now() + PAUSE_MS; queue.unshift(name); return; }
     // A deleted or suspended account answers 404 or a stub; record it so it is not asked again.
     const reading = res.ok ? PB.redditAbout(await res.json()) : null;

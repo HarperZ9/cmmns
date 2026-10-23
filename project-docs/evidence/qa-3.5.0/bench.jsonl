@@ -1,0 +1,6 @@
+{"bundle":"3.4.0","r":{"n":500,"runs":7,"perPostMs":0.255,"threadMs":60.2,"refreshMs":60}}
+{"bundle":"3.5.0","r":{"n":500,"runs":7,"perPostMs":0.262,"threadMs":58.6,"refreshMs":48.9}}
+{"bundle":"3.4.0","r":{"n":500,"runs":7,"perPostMs":0.259,"threadMs":60.8,"refreshMs":60.8}}
+{"bundle":"3.5.0","r":{"n":500,"runs":7,"perPostMs":0.262,"threadMs":59.7,"refreshMs":49.5}}
+{"bundle":"3.4.0","r":{"n":500,"runs":7,"perPostMs":0.257,"threadMs":61.2,"refreshMs":62}}
+{"bundle":"3.5.0","r":{"n":500,"runs":7,"perPostMs":0.271,"threadMs":60.5,"refreshMs":49.4}}

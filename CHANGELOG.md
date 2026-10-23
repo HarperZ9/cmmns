@@ -7,6 +7,52 @@ were not published to a store.
 
 Nothing yet.
 
+## 3.5.0 (2026-10-23)
+
+Production hardening, plain help for every command, and the store kit. The audit behind it, with a
+pass or fail for each check, is in project-docs/PRODUCTION-READINESS.md.
+
+### Added
+- Every command has its own help with an example: `daylight analyze --help`,
+  `daylight case add --help`, `daylight case help trace`. Errors say what happened and what to do
+  next ("No such file or folder ... Check the path").
+- Quick start for each feature, a troubleshooting page and questions and answers in `docs/guide/`.
+- Store kit in `docs/store/`: five 1280x800 screenshots of the extension on real public posts with
+  every private person blurred, captions, the Firefox reviewer source package
+  (`amo-source-3.5.0.zip`, which remakes both generated files byte for byte) and an index.
+- Performance budgets in CI (`tests/budget.test.js`): text work per post, the first pass over a
+  500-reply thread and each later refresh, plus a check that the thread pass grows about linearly.
+- CI runs on macOS as well as Ubuntu and Windows.
+- `scripts/qa/`: the production checks (first run, window open time, keyboard path, axe in light and
+  dark, a 3,000-post scroll soak with the heap after garbage collection), a signed-out smoke check on
+  nine sites, and the store screenshots.
+
+### Changed
+- Content scripts fail quietly: each page reader and message listener is guarded, a failure is logged
+  once a minute as a `[daylight-commons]` warning instead of an error, and five failed passes in a row
+  stop Daylight Commons on that page until you leave it. The site keeps working.
+- Memory is bounded on long sessions: the in-page caches keep at most 5,000 posts, 5,000 YouTube
+  authors and 2,000 posting patterns. On a 3,000-post soak the heap levels off at about 16 MB.
+- Requests from content scripts give up after 10 s (Reddit) or 15 s (X About pages).
+- Coordination clusters reuse each reply's signature between refreshes: a later refresh of a
+  500-reply thread takes about a fifth less script time (60 to 49 ms).
+- Reading lens: set 12 joined the dev sets, cues were added from the misses in sets 1 to 12, and the
+  weights were refit. Sets 13 and 14, labelled blind by two labellers, were the held-out round. No
+  technique reached the ship rule (80% precision from at least 3 hits): question insinuation was right
+  on both of its 2 held-out hits. Every technique stays off by default.
+- `verify-release` explains a same-version, different-head refusal in plain words: what it means,
+  both hashes, and the steps to fix it. It never changes the state file itself.
+- The popup has a page heading and keeps all its content in its main region (axe clean in light and
+  dark). Case dossiers and network pages have a main landmark.
+
+### Fixed
+- "Starshield systems are owned and controlled by the US government" no longer reads as secret
+  coercion. Who owns a system, firm or place is a fact; the cue now skips "owned and controlled",
+  "wholly owned" and a thing as the subject.
+- A case's tables can no longer name a file outside the case folder, and `verify-export` never reads
+  outside the export folder. `case import` skips a capture that points outside the old folder.
+- Dossier and network pages carry a policy that lets no script run in them.
+
 ## 3.4.0 (2026-10-23)
 
 Case folders for investigation: `daylight case` (also `radar case`). A case is a folder with its own

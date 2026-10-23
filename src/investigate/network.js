@@ -54,13 +54,13 @@ export function networkHtml(n, title = "Case network") {
 <style>:root{--ink:#1b1b1b;--soft:#5d5d5d;--ground:#fbfaf7;--line:#d9d6cf}@media (prefers-color-scheme:dark){:root{--ink:#ecebe7;--soft:#a5a39d;--ground:#151514;--line:#3a3936}}
 body{margin:0;padding:16px;background:var(--ground);color:var(--ink);font:15px/1.5 system-ui,sans-serif}svg{max-width:100%;height:auto}line{stroke:var(--soft)}circle{fill:var(--ink)}text{fill:var(--ink);font-size:11px}
 #arrow path{fill:var(--soft)}table{border-collapse:collapse;width:100%;font-size:13px}td,th{border-top:1px solid var(--line);padding:4px 6px;text-align:left}.muted{color:var(--soft)}</style></head>
-<body><h1>${esc(title)}</h1><p class="muted">Each line is one recorded public act. Solid: quote. Dashed: reply. Dotted: repost. Hover a line for its sources. This file works offline.</p>
+<body><main><h1>${esc(title)}</h1><p class="muted">Each line is one recorded public act. Solid: quote. Dashed: reply. Dotted: repost. Hover a line for its sources. This file works offline.</p>
 <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}"><defs><marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z"/></marker></defs>
 ${lines}
 ${dots}
 </svg>
 <table><thead><tr><th>From</th><th>To</th><th>Act</th><th>Count</th><th>Sources</th></tr></thead><tbody>
 ${rows}
-</tbody></table><p class="muted">Does not prove: ${esc(n.doesNotProve)}</p></body></html>
+</tbody></table><p class="muted">Does not prove: ${esc(n.doesNotProve)}</p></main></body></html>
 `;
 }

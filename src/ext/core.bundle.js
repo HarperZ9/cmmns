@@ -712,8 +712,8 @@ function ownShingles(text, rootSh) {
 // MIN_WORDS - 2 shingles after the root post's wording is set aside.
 // Shingles and signatures per text, kept between calls: the content script reruns the clusters on
 // every refresh of a thread, and a long thread would otherwise hash every reply again each time.
-// At most 4,000 texts; the oldest go first. Pure: the same text and root give the same result.
-const PREPARED = new Map(), PREPARED_MAX = 4000;
+// At most 1,500 texts (about 3 KB each); the oldest go first. Pure: the same text and root give the same result.
+const PREPARED = new Map(), PREPARED_MAX = 1500;
 function prepared(text, rootKey, rootSh) {
   const key = rootKey + "" + text;
   if (PREPARED.has(key)) return PREPARED.get(key);

@@ -149,7 +149,7 @@ for(const op of ["TweetDetail","Retweeters"]) fetch("/i/api/graphql/demo/"+op+"?
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const out = process.argv[2];
   if (!out) { console.error("usage: node scripts/demo/stage.mjs <out dir>"); process.exit(2); }
-  const stages = { thread: threadStage(), campaign: launchStage("campaign"), ours: launchStage("organic"), long: longStage(600) };
+  const stages = { thread: threadStage(), campaign: launchStage("campaign"), ours: launchStage("organic"), long: longStage(Number(process.env.STAGE_LONG_N) || 600) };
   mkdirSync(out, { recursive: true });
   const index = {};
   for (const [name, s] of Object.entries(stages)) {
