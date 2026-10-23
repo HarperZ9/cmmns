@@ -22,7 +22,7 @@
     "data:check": "node scripts/data-lock.mjs check",
     "data:guard": "node scripts/upstream-guard.mjs",
     "pack": "node scripts/pack.mjs",
-    "pages": "node scripts/transparency.mjs && node scripts/privacy.mjs && node scripts/install-page.mjs && node scripts/how-it-works.mjs",
+    "pages": "node scripts/transparency.mjs && node scripts/privacy.mjs && node scripts/install-page.mjs && node scripts/how-it-works.mjs && node scripts/catalogue-page.mjs",
     "package": "node scripts/package.mjs",
     "eval": "node scripts/eval.mjs",
     "eval:persuasion": "node scripts/eval-persuasion.mjs",

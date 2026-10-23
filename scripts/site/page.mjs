@@ -109,7 +109,7 @@ const SITE_CSS = `.sheet{--soft:var(--ink-muted);--line:var(--rule);--line-stron
 .scroll{overflow-x:auto;margin:.4rem 0 .9rem}
 .sheet p,.sheet li{max-width:var(--measure)}
 .dc-foot{margin-top:2.4rem;padding-top:1rem;border-top:1px solid var(--rule);color:var(--ink-muted);font-size:.9rem}`;
-export const SITE_PAGES = [["how-it-works.html", "How it works"], ["install.html", "Install"], ["privacy.html", "Privacy"], ["transparency.html", "How it is measured"]];
+export const SITE_PAGES = [["how-it-works.html", "How it works"], ["install.html", "Install"], ["privacy.html", "Privacy"], ["transparency.html", "How it is measured"], ["catalogue.html", "Catalogue"]];
 
 // Wraps each h2 and what follows it in a section, so the site's heading rail can place it.
 export function sections(html) {

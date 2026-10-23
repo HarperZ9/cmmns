@@ -2,6 +2,7 @@
 // (.github/workflows/test.yml calls this file), so the project can verify itself without GitHub.
 //   npm run ci                 the "test" stage: every test, then the bundle freshness check
 //   node scripts/ci.mjs c2pa   the Content Credentials reference stage (fetches pinned fixtures)
+//   node scripts/ci.mjs dco    every commit in a range is signed off (DCO_BASE..DCO_HEAD, default origin/main..HEAD)
 //   node scripts/ci.mjs decisions  each challenge issue against catalogue/DECISIONS.md (needs gh)
 //   node scripts/ci.mjs all    the test and c2pa stages
 import { execFileSync } from "node:child_process";
@@ -21,6 +22,11 @@ export const STAGES = {
     ["catalogue data matches catalogue/", process.execPath, ["scripts/catalogue-data.mjs", "--check"]],
     ["fresh build", process.execPath, ["scripts/build.mjs"]],
     ["bundle matches a fresh build", "git", ["diff", "--exit-code", "--ignore-cr-at-eol", "--", "src/ext/core.bundle.js", "src/ext/ocr.bundle.js"]],
+    ["fresh catalogue page", process.execPath, ["scripts/catalogue-page.mjs"]],
+    ["catalogue page matches a fresh build", "git", ["diff", "--exit-code", "--ignore-cr-at-eol", "--", "docs/catalogue.html"]],
+  ],
+  dco: [
+    ["every commit in the pull request is signed off by its author", process.execPath, ["scripts/dco-check.mjs"]],
   ],
   // Every challenge issue has a public decision in catalogue/DECISIONS.md. Reads the repository's
   // issues with gh (GH_TOKEN from the workflow, read-only); the offline log check is in tests/.
@@ -58,6 +64,6 @@ export function run(names) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const want = process.argv[2] || "test";
   const names = want === "all" ? ["test", "c2pa"] : [want];
-  if (!names.every((n) => STAGES[n])) { console.error(`unknown stage ${want}; use test, c2pa or all`); process.exit(2); }
+  if (!names.every((n) => STAGES[n])) { console.error(`unknown stage ${want}; use test, c2pa, dco, decisions or all`); process.exit(2); }
   try { run(names); } catch (e) { console.error(`\nfailed: ${e.message.split("\n")[0]}`); process.exit(1); }
 }

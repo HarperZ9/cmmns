@@ -19,8 +19,19 @@ git commit -s -m "fix(reddit): read the new comment shape"
 ```
 
 This adds `Signed-off-by: Your Name <you@example.org>` to the message. A pseudonym you use
-consistently is fine. A pull request with an unsigned commit cannot be merged until it is signed
-off (`git rebase --signoff main` fixes a whole branch).
+consistently is fine. The name and email in the sign-off must match the commit's author.
+
+Every pull request runs the sign-off check (`.github/workflows/dco.yml`). It fails on any commit
+without a matching sign-off and names the commit. Merge commits are skipped. Run the same check
+before you push:
+
+```
+node scripts/ci.mjs dco
+```
+
+It checks `origin/main..HEAD`; set `DCO_BASE` and `DCO_HEAD` to check another range. A pull
+request with an unsigned commit cannot be merged until it is signed off
+(`git rebase --signoff main` fixes a whole branch).
 
 ### Why a DCO and no CLA
 
@@ -47,7 +58,14 @@ as your own; the sign-off is still yours.
 6. Never commit other people's posts. Raw captures stay in `project-docs/evidence/raw/`, which git
    ignores.
 
-To challenge a catalogue entry or a badge rather than change code, follow the challenge process in
+The definition catalogue is published as a page, `docs/catalogue.html`, built from `catalogue/` by
+`node scripts/catalogue-page.mjs`. After changing an entry, rebuild the page and commit it with the
+entry; CI fails when the page and the catalogue differ.
+
+The repository is planned to have a read-only mirror on Codeberg, so the project does not depend on
+one code host. `project-docs/MIRROR.md` has the steps.
+
+To challenge a catalogue entry or a badge, follow the challenge process in
 `GOVERNANCE.md`. Security problems go through `SECURITY.md`, never a public issue. Everyone
 taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 

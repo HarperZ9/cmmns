@@ -25,7 +25,11 @@ const USER_FACING = [
 // is a detector, not text, so regex literals are removed before the check.
 const DASH = "—";
 const REGEX = /\/(?:[^/\n\\]|\\.)+\/[gimsuy]*/g;
-const text = (p) => (p.endsWith(".js") ? read(p).replace(REGEX, "") : read(p));
+// The public catalogue page quotes legislation word for word inside <blockquote> (the Fraud Act 2006
+// uses em dashes), so those quotes are left out, as the claims and owners tables are; its own text
+// is still checked.
+const QUOTES = /<blockquote>[\s\S]*?<\/blockquote>/g;
+const text = (p) => (p.endsWith(".js") ? read(p).replace(REGEX, "") : p.endsWith("catalogue.html") ? read(p).replace(QUOTES, "") : read(p));
 
 test("no em dash in anything a user reads", () => {
   const hits = USER_FACING.filter((p) => text(p).includes(DASH));
