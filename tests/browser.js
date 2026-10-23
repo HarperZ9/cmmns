@@ -12,6 +12,7 @@ export const browserSkip = CHROME ? false : process.env.CI ? false : "no Chrome 
 export async function openChrome() {
   if (!CHROME) throw new Error("no Chrome found; set CHROME to its path");
   const port = 9400 + (process.pid % 500);
-  return launch(port, { chrome: CHROME, args: process.platform === "linux" ? ["--no-sandbox"] : [] });
+  // A cold Chrome on a Windows CI runner took over 10 s to open its port (PR #63, first run).
+  return launch(port, { chrome: CHROME, args: process.platform === "linux" ? ["--no-sandbox"] : [], waitMs: 45000 });
 }
 export { goto, evaluate };
