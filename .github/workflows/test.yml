@@ -3,6 +3,8 @@ on:
   push:
     branches: [dev, main]
   pull_request:
+  schedule:
+    - cron: "17 6 * * 1"
 permissions:
   contents: read
 # Every step here is scripts/ci.mjs, so `npm run ci` on any machine runs exactly what this runs and
@@ -30,3 +32,18 @@ jobs:
         with:
           node-version: 22
       - run: node scripts/ci.mjs c2pa
+  decisions:
+    # Every challenge issue (label "challenge") has a public decision in catalogue/DECISIONS.md.
+    # The token reads issues only.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/ci.mjs decisions
+        env:
+          GH_TOKEN: ${{ github.token }}
