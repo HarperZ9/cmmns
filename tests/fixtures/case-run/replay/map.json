@@ -1,0 +1,7 @@
+{
+  "x:1900000000000000001": { "file": "post.json", "type": "application/json" },
+  "x:1900000000000000000": { "file": "quoted.json", "type": "application/json" },
+  "https://www.example-news.test/harbour-sale": { "file": "news.html" },
+  "https://council.example.gov/minutes/2026-10-19": { "file": "minutes.html" },
+  "wayback:*": { "body": "", "status": 200, "headers": { "content-location": "/web/20261023120000/{url}" } }
+}

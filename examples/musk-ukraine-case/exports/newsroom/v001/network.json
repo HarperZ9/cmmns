@@ -1,0 +1,92 @@
+{
+  "format": "daylight-case-network/1",
+  "nodes": [
+    {
+      "id": "@elonmusk",
+      "in": 0,
+      "out": 2
+    },
+    {
+      "id": "@FedorovMykhailo",
+      "in": 1,
+      "out": 0
+    },
+    {
+      "id": "[acct-39db78e08e]",
+      "in": 0,
+      "out": 1
+    },
+    {
+      "id": "@VanityFair",
+      "in": 1,
+      "out": 0
+    },
+    {
+      "id": "@michaeldweiss",
+      "in": 0,
+      "out": 1
+    },
+    {
+      "id": "@politico",
+      "in": 1,
+      "out": 0
+    },
+    {
+      "id": "@realDonaldTrump",
+      "in": 1,
+      "out": 0
+    }
+  ],
+  "edges": [
+    {
+      "from": "@elonmusk",
+      "to": "@FedorovMykhailo",
+      "type": "reply",
+      "n": 1,
+      "edges": [
+        "N01"
+      ],
+      "sources": [
+        "S01"
+      ]
+    },
+    {
+      "from": "@elonmusk",
+      "to": "@politico",
+      "type": "quote",
+      "n": 1,
+      "edges": [
+        "N02"
+      ],
+      "sources": [
+        "S15"
+      ]
+    },
+    {
+      "from": "[acct-39db78e08e]",
+      "to": "@realDonaldTrump",
+      "type": "repost",
+      "n": 1,
+      "edges": [
+        "N03"
+      ],
+      "sources": [
+        "S33"
+      ]
+    },
+    {
+      "from": "@michaeldweiss",
+      "to": "@VanityFair",
+      "type": "link",
+      "n": 1,
+      "edges": [
+        "N04"
+      ],
+      "sources": [
+        "S36"
+      ]
+    }
+  ],
+  "mutual": [],
+  "doesNotProve": "An edge shows one public act recorded in a source. It does not show agreement, private contact or coordination."
+}

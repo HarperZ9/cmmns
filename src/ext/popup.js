@@ -17,6 +17,13 @@
   document.getElementById("transparency").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("transparency.html") }); window.close(); });
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  // Add to case (src/ext/case-inbox.js): this tab's address and title, kept in this browser only.
+  const caseCount = (n) => { $("case-save").textContent = n ? `Save case list (${n})` : "Save case list"; $("case-save").disabled = !n; };
+  $("case-add").disabled = !PBCaseInbox.row(tab);
+  PBCaseInbox.load().then((l) => caseCount(l.length)).catch((e) => console.error("[daylight-commons] could not read the case list", e));
+  $("case-add").addEventListener("click", () => PBCaseInbox.add(tab).then((l) => { caseCount(l.length); $("case-add").textContent = "Added to case"; $("case-add").disabled = true; })
+    .catch((e) => console.error("[daylight-commons] could not add to the case list", e)));
+  $("case-save").addEventListener("click", () => PBCaseInbox.load().then((l) => PBCaseInbox.save(l)).catch((e) => console.error("[daylight-commons] could not save the case list", e)));
   const send = (msg) => (tab && tab.id != null ? chrome.tabs.sendMessage(tab.id, msg).catch(() => null) : Promise.resolve(null));
   // The site card for the page being read: injected into this tab only, only on this click.
   const web = tab && /^https?:\/\//.test(tab.url || "") || (tab && !tab.url);

@@ -1,0 +1,12 @@
+{"id":"B01","claim":"C01","labeller":"labeller-a","rung":"documented","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B02","claim":"C01","labeller":"labeller-b","rung":"documented","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B03","claim":"C02","labeller":"labeller-a","rung":"inference","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B04","claim":"C02","labeller":"labeller-b","rung":"inference","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B05","claim":"C10","labeller":"labeller-a","rung":"unproven","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B06","claim":"C10","labeller":"labeller-b","rung":"unproven","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B07","claim":"C11","labeller":"labeller-a","rung":"contradicted","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B08","claim":"C11","labeller":"labeller-b","rung":"contradicted","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B09","claim":"C13","labeller":"labeller-a","rung":"unproven","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B10","claim":"C13","labeller":"labeller-b","rung":"inference","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B11","claim":"C15","labeller":"labeller-a","rung":"unproven","at":"2026-10-23T18:00:00.000Z"}
+{"id":"B12","claim":"C15","labeller":"labeller-b","rung":"unproven","at":"2026-10-23T18:00:00.000Z"}

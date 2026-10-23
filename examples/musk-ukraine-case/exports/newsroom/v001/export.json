@@ -1,0 +1,786 @@
+{
+  "format": "daylight-case-export/1",
+  "profile": "newsroom",
+  "at": "2026-10-23T18:00:00.000Z",
+  "tool": "Daylight Commons 3.2.2 (daylight case)",
+  "state": "0041ecf429023a05ab5d4a495a5952472e3c289fda30ed23ff2aeeda48c2139a",
+  "previous": null,
+  "redacted_accounts": 2,
+  "snapshot": {
+    "claims": [
+      {
+        "id": "C01",
+        "text": "A speed cap hit Ukraine's Starlink and Starshield terminals on 13 to 14 October",
+        "rung": "documented",
+        "status": null,
+        "source": "S02,S05,S21"
+      },
+      {
+        "id": "C02",
+        "text": "Musk proposed the cap to Trump, and Trump agreed",
+        "rung": "inference",
+        "status": null,
+        "source": "S06"
+      },
+      {
+        "id": "C03",
+        "text": "Musk ordered the slowdown and discussed it with Trump",
+        "rung": "inference",
+        "status": null,
+        "source": "S11"
+      },
+      {
+        "id": "C04",
+        "text": "The White House instructed the Pentagon to slow Starshield",
+        "rung": "inference",
+        "status": null,
+        "source": "S05"
+      },
+      {
+        "id": "C05",
+        "text": "Any limits on speed or usage are decided by the US military and ultimately POTUS",
+        "rung": "documented",
+        "status": null,
+        "source": "S01"
+      },
+      {
+        "id": "C06",
+        "text": "Rubio called reports of White House involvement categorically false and said it wasn't deliberate",
+        "rung": "documented",
+        "status": null,
+        "source": "S07"
+      },
+      {
+        "id": "C07",
+        "text": "Rubio said Starshield is governed by a private commercial contract that sets what speeds are allowed",
+        "rung": "documented",
+        "status": null,
+        "source": "S19"
+      },
+      {
+        "id": "C08",
+        "text": "Trump said of the restore: The bottom line, he put it back",
+        "rung": "documented",
+        "status": null,
+        "source": "S17"
+      },
+      {
+        "id": "C09",
+        "text": "The cap cut Ukraine's ability to intercept Russian jet-powered Shaheds",
+        "rung": "inference",
+        "status": null,
+        "source": "S06,S04"
+      },
+      {
+        "id": "C10",
+        "text": "Musk is actively aiding Russia, meaning he acted with intent to help Russia",
+        "rung": "unproven",
+        "status": null,
+        "source": "S47"
+      },
+      {
+        "id": "C11",
+        "text": "Musk denied aid to Ukraine this week",
+        "rung": "contradicted",
+        "status": null,
+        "source": "S47"
+      },
+      {
+        "id": "C12",
+        "text": "Musk wrote that he will find out who is really pulling the strings and come for them, quoting POLITICO on Democratic probes",
+        "rung": "documented",
+        "status": null,
+        "source": "S15"
+      },
+      {
+        "id": "C13",
+        "text": "Musk threatened Democrats with violence",
+        "rung": "unproven",
+        "status": null,
+        "source": "S15"
+      },
+      {
+        "id": "C14",
+        "text": "Trump posted a letter To the Great People of Israel endorsing Netanyahu on Truth Social",
+        "rung": "documented",
+        "status": null,
+        "source": "S29"
+      },
+      {
+        "id": "C15",
+        "text": "A source watched Kushner access a Dubai-based bank account whose money, hundreds of millions of dollars, had come from a bank in Azerbaijan",
+        "rung": "unproven",
+        "status": null,
+        "source": "S34"
+      },
+      {
+        "id": "C16",
+        "text": "Kushner had access to two bank accounts, one Azerbaijani, the other Israeli, and it's real",
+        "rung": "unproven",
+        "status": null,
+        "source": "S36"
+      },
+      {
+        "id": "C17",
+        "text": "Bank account Alpha at First Abu Dhabi Bank received roughly $750 million from the Saudis and Emiratis, beginning in 2017",
+        "rung": "unproven",
+        "status": null,
+        "source": "S34"
+      },
+      {
+        "id": "C18",
+        "text": "Kushner denies the account and says the author supplied no statements, account numbers or dates",
+        "rung": "documented",
+        "status": null,
+        "source": "S35"
+      },
+      {
+        "id": "C19",
+        "text": "Nieuwsuur and de Volkskrant spoke with people directly involved and found no confirmation",
+        "rung": "documented",
+        "status": null,
+        "source": "S37"
+      }
+    ],
+    "sources": [
+      {
+        "id": "S01",
+        "text": "Reply to Fedorov: Starshield limits 'decided by the US military and ultimately POTUS'; not edited (one id in edit history)",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S02",
+        "text": "Starlink up to 160 km/h being restored; asks Musk to remove the Starshield speed limit; parent record inside the S01 capture",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S03",
+        "text": "'True' quoting @marsrepublica: 'Starshield is under U.S. government control. That is who made last...'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S04",
+        "text": "Musk says Trump responsible; Beskrestnov Telegram; Fedorov thanks; energy ceasefire context",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S05",
+        "text": "Reuters: White House instructed Pentagon to slow Starshield; two US officials and one Western official; senior US official denial for Trump; restriction 13 to 14 Oct",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S06",
+        "text": "Telegraph: Musk proposed the cap to Trump and Trump agreed; four sources; 'they were both in it'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S07",
+        "text": "Rubio, 2026-10-17: no Starshield access 'at this moment'; 'it wasn't deliberate'; 'categorically false'; sanctions waiver",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S08",
+        "text": "Zelensky: EU road test shows the limit applies only in Ukraine; 'planned operation'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S09",
+        "text": "Zelensky: 'a message from the American government to limit this speed, and technically SpaceX did it'; maximum 161 km/h",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S10",
+        "text": "Hegseth: 'We haven't pulled anything back ... Starlink has the option to make those decisions'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S11",
+        "text": "WSJ: Musk ordered the slowdown; Musk and Trump discussed it; one source says before the cap; story ran minutes after SpaceX earnings",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S12",
+        "text": "'Capitol agenda: Dem gavels are coming for Elon Musk'; Jayapal, Lofgren, Meeks, Dexter quotes",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S13",
+        "text": "'Some fools still think the legacy news is real. Amazing.' Ward reply at 15:43:44Z links the WSJ story",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S14",
+        "text": "'Live by the sword, die by the sword. Sounds like Swisher really wants to go to prison.' replying to @WesternLensman on Kara Swisher",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S15",
+        "text": "Quoting POLITICO: 'I will find out who is really pulling the strings and come for them, not just their puppets'; not edited",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S16",
+        "text": "'Talarico, the creep, in his OWN words' quoting @KanekoaTheGreat",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S17",
+        "text": "WSJ: Trump asked Musk to lift restrictions; Trump: 'The bottom line, he put it back'; Blumenthal inquiry; Cornyn",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S18",
+        "text": "Official: 161 km/h cap still in place; Rubio 2026-10-18 quote; Zelensky awaiting Rubio",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S19",
+        "text": "Rubio 2026-10-22: 'governed by a private commercial contract' covering 'what speeds they'll allow'; Trump 'I was not involved'; Beskrestnov 'no prior warning'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S20",
+        "text": "Tillis DoD IG request; Bacon; Blumenthal 'Trump and Musk must be held accountable'; Jayapal",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S21",
+        "text": "Beskrestnov quote; Ukraine MoD statement; cutoffs between 72 and 161 km/h; Pentagon declined to elaborate",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S22",
+        "text": "Space Systems Command: 3,000 Ukraine terminals on Starshield via two contracts, 'into 2025'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S23",
+        "text": "Award HC101324F0143, DISA to SpaceX, 'BEST EFFORT SUBSCRIPTION & TERMINALS - UKRAINE', 2024-08-08 to 2025-11-30, $138,058,450; no later SpaceX award with 'Ukraine' found",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S24",
+        "text": "Starshield keyword search 2025-06 to 2026-10; e.g. SPE8EL25FW31C 'USG STARSHIELD GROUND 5TB MAX 250 KTS'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S25",
+        "text": "Quarter ended 2026-09-30; zero mentions of Ukraine or Russia",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S26",
+        "text": "Musk about 82.4% of voting power after the IPO; 'controlled company'; Starshield 'designed specifically for United States Government customers'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S27",
+        "text": "Putin call; Russian diesel supply deal",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S28",
+        "text": "'ENERGY CEASEFIRE ... Both parties have agreed'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S29",
+        "text": "'To the Great People of Israel' letter endorsing Netanyahu; edited_at null; re-posted by the same account at 15:02:37Z",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S30",
+        "text": "'My decision on Russia'; Zelensky targeting refineries; sanctions document unsigned",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S31",
+        "text": "Thanks 'our legendary friend, Elon Musk' for giving SpaceX stock through TRUMP ACCOUNTS",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S32",
+        "text": "Hubbard release after a Trump request to Putin 'in a telephone conversation last week'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S33",
+        "text": "Mirror of S29, two minutes later",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S34",
+        "text": "MIVD access to Kushner's iPhone via a turned GRU operative; 'Alpha' account at a UAE bank, about $750M via Azerbaijan; lawyer denial",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S35",
+        "text": "Denial: 'completely insane and never happened'; says the author supplied no records",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S36",
+        "text": "'one Azerbaijani, the other Israeli'; 'it's real'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S37",
+        "text": "MIVD will not comment on methods, knowledge or sources; Nieuwsuur with de Volkskrant spoke to several people directly involved and found no confirmation",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S38",
+        "text": "Summary; 'The MIVD has not yet commented publicly'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S39",
+        "text": "Account details (Watani Al Emarat Foundation, Tahnoon bin Zayed); Kushner denial; release date 2026-10-27",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S40",
+        "text": "True threats: 'serious expression' of intent to commit unlawful violence; recklessness standard",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S41",
+        "text": "Threats to assault, kidnap or murder a US official, to impede or to retaliate",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S42",
+        "text": "Interstate threats",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S43",
+        "text": "Treason: 'adheres to their enemies, giving them aid and comfort'",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S44",
+        "text": "Violent threats defined as threats of physical harm; figures of speech allowed; an unclear target can mean restricted reach",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S45",
+        "text": "AFP framing of the sword post; Lofgren quote",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S46",
+        "text": "Embedded post ids used to find S13 to S16",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "S47",
+        "text": "The author's words that opened the case",
+        "rung": null,
+        "status": null,
+        "source": null
+      }
+    ],
+    "leads": [
+      {
+        "id": "L01",
+        "text": "Who ordered the cap, and when?",
+        "rung": null,
+        "status": "open",
+        "source": null
+      },
+      {
+        "id": "L02",
+        "text": "Is the speed limit a contract term, and who may change it?",
+        "rung": null,
+        "status": "open",
+        "source": null
+      },
+      {
+        "id": "L03",
+        "text": "Did Trump and Musk, or Trump and Putin, speak between 8 and 21 October?",
+        "rung": null,
+        "status": "open",
+        "source": null
+      },
+      {
+        "id": "L04",
+        "text": "What exactly did the WSJ, Reuters and Telegraph report, and from whom?",
+        "rung": null,
+        "status": "open",
+        "source": null
+      },
+      {
+        "id": "L05",
+        "text": "Does Musk deny the WSJ report?",
+        "rung": null,
+        "status": "open",
+        "source": null
+      },
+      {
+        "id": "L06",
+        "text": "Does SpaceX treat the cap as material?",
+        "rung": null,
+        "status": "open",
+        "source": null
+      },
+      {
+        "id": "L07",
+        "text": "Is the Kushner account real?",
+        "rung": null,
+        "status": "open",
+        "source": null
+      },
+      {
+        "id": "L08",
+        "text": "What capacity stands behind 'come for them'?",
+        "rung": null,
+        "status": "open",
+        "source": null
+      }
+    ],
+    "absent": [
+      {
+        "id": "A01",
+        "text": "The WSJ, Reuters and Telegraph originals",
+        "rung": null,
+        "status": "withheld",
+        "source": "S11"
+      },
+      {
+        "id": "A02",
+        "text": "A Ukraine Starshield task order after 2025-11-30",
+        "rung": null,
+        "status": "missing",
+        "source": "S23"
+      },
+      {
+        "id": "A03",
+        "text": "A Musk statement on the WSJ report",
+        "rung": null,
+        "status": "missing",
+        "source": "S13"
+      },
+      {
+        "id": "A04",
+        "text": "Musk's 10-10 reply saying Zelensky has gone too far",
+        "rung": null,
+        "status": "missing",
+        "source": null
+      },
+      {
+        "id": "A05",
+        "text": "SpaceX 10-Q mention of Ukraine or Russia",
+        "rung": null,
+        "status": "missing",
+        "source": "S25"
+      }
+    ],
+    "edges": [
+      {
+        "id": "N01",
+        "text": null,
+        "rung": null,
+        "status": null,
+        "source": "S01"
+      },
+      {
+        "id": "N02",
+        "text": null,
+        "rung": null,
+        "status": null,
+        "source": "S15"
+      },
+      {
+        "id": "N03",
+        "text": null,
+        "rung": null,
+        "status": null,
+        "source": "S33"
+      },
+      {
+        "id": "N04",
+        "text": null,
+        "rung": null,
+        "status": null,
+        "source": "S36"
+      }
+    ],
+    "events": [
+      {
+        "id": "T01",
+        "text": "Trump posts that a call with Putin produced a Russian diesel supply deal",
+        "rung": null,
+        "status": null,
+        "source": "S27"
+      },
+      {
+        "id": "T02",
+        "text": "Musk reportedly says Zelensky \"has gone too far\", replying to a Trump video. Not captured here; reported only",
+        "rung": null,
+        "status": null,
+        "source": null
+      },
+      {
+        "id": "T03",
+        "text": "Trump announces an \"ENERGY CEASEFIRE\", saying \"Both parties have agreed\"",
+        "rung": null,
+        "status": null,
+        "source": "S28"
+      },
+      {
+        "id": "T04",
+        "text": "Ukrainian terminals start dropping above about 160 km/h, some lower. Reuters puts the restriction on 13 and 14 October",
+        "rung": null,
+        "status": null,
+        "source": "S05"
+      },
+      {
+        "id": "T05",
+        "text": "Beskrestnov, Zelensky's technology adviser: \"Our defense forces were not notified in advance ... this cannot be a coincidence\"",
+        "rung": null,
+        "status": null,
+        "source": "S21"
+      },
+      {
+        "id": "T06",
+        "text": "Fedorov: Starlink up to 160 km/h \"is being restored\"; \"Removing Starshield's speed limit entirely is now critical\"; thanks Musk",
+        "rung": null,
+        "status": null,
+        "source": "S02"
+      },
+      {
+        "id": "T07",
+        "text": "Musk: \"Starshield systems are owned and controlled by the US government. Any limits on speed or usage are decided by the US military and ultimately POTUS.\"",
+        "rung": null,
+        "status": null,
+        "source": "S01"
+      },
+      {
+        "id": "T08",
+        "text": "Musk: \"True\", quoting a post that says Starshield is under US government control",
+        "rung": null,
+        "status": null,
+        "source": "S03"
+      },
+      {
+        "id": "T09",
+        "text": "Reuters: Pentagon officials were told by the White House to slow Starshield. A senior US official: \"No such request was ever made by the president\"",
+        "rung": null,
+        "status": null,
+        "source": "S05"
+      },
+      {
+        "id": "T10",
+        "text": "Tillis asks the DoD Inspector General to investigate. Bacon and Blumenthal criticise",
+        "rung": null,
+        "status": null,
+        "source": "S20"
+      },
+      {
+        "id": "T11",
+        "text": "Telegraph: Musk proposed the cap to Trump, and Trump agreed",
+        "rung": null,
+        "status": null,
+        "source": "S06"
+      },
+      {
+        "id": "T12",
+        "text": "Zelensky: a road test in EU countries held the link above 180 km/h, so the limit applies only in Ukraine. He calls it \"a planned operation\"",
+        "rung": null,
+        "status": null,
+        "source": "S08"
+      },
+      {
+        "id": "T13",
+        "text": "Rubio: \"it wasn't deliberate. We have nothing to do with that\"; Ukraine has no Starshield access \"at this moment\"; reports of White House involvement \"categorically false\"",
+        "rung": null,
+        "status": null,
+        "source": "S07"
+      },
+      {
+        "id": "T14",
+        "text": "Zelensky on NBC: \"a message from the American government to limit this speed, and technically SpaceX did it\"",
+        "rung": null,
+        "status": null,
+        "source": "S09"
+      },
+      {
+        "id": "T15",
+        "text": "Trump on Russia sanctions: \"Zelenskyy is using Diesel Refineries in Russia as a target\"",
+        "rung": null,
+        "status": null,
+        "source": "S30"
+      },
+      {
+        "id": "T16",
+        "text": "Trump thanks \"our legendary friend, Elon Musk\" for giving SpaceX stock through Trump Accounts",
+        "rung": null,
+        "status": null,
+        "source": "S31"
+      },
+      {
+        "id": "T17",
+        "text": "Hegseth: \"We haven't pulled anything back ... that's where Starlink has the option to make those decisions\"",
+        "rung": null,
+        "status": null,
+        "source": "S10"
+      },
+      {
+        "id": "T18",
+        "text": "POLITICO: Democrats plan probes of Musk, including \"his possible role last week in throttling\" Ukraine's access",
+        "rung": null,
+        "status": null,
+        "source": "S12"
+      },
+      {
+        "id": "T19",
+        "text": "WSJ: Musk ordered the slowdown. Published minutes after SpaceX's quarterly earnings, and not raised on the earnings call",
+        "rung": null,
+        "status": null,
+        "source": "S11"
+      },
+      {
+        "id": "T20",
+        "text": "Musk: \"Some fools still think the legacy news is real. Amazing.\" A WSJ reporter asks if that is his comment on the story. No answer was found",
+        "rung": null,
+        "status": null,
+        "source": "S13"
+      },
+      {
+        "id": "T21",
+        "text": "Trump calls Musk and asks him to lift the restriction (WSJ, per S17 and S18)",
+        "rung": null,
+        "status": null,
+        "source": "S17"
+      },
+      {
+        "id": "T22",
+        "text": "Trump: \"Whether I called or whether somebody else called, doesn't make any difference ... The bottom line, he put it back.\"",
+        "rung": null,
+        "status": null,
+        "source": "S17"
+      },
+      {
+        "id": "T23",
+        "text": "A Ukrainian official: \"Overall, nothing has changed anywhere\"; the 161 km/h cap remains",
+        "rung": null,
+        "status": null,
+        "source": "S18"
+      },
+      {
+        "id": "T24",
+        "text": "Rubio: \"that is governed by a private commercial contract\", including \"what speeds they'll allow it to be used at\"",
+        "rung": null,
+        "status": null,
+        "source": "S19"
+      },
+      {
+        "id": "T25",
+        "text": "SpaceX files its 10-Q. It says nothing about Ukraine or Russia",
+        "rung": null,
+        "status": null,
+        "source": "S25"
+      },
+      {
+        "id": "T26",
+        "text": "Blumenthal opens an inquiry, with letters to Musk and Hegseth",
+        "rung": null,
+        "status": null,
+        "source": "S17"
+      }
+    ]
+  }
+}

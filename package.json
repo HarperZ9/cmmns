@@ -11,6 +11,7 @@
     "./schema/evidence.v1.json": "./schema/evidence.v1.json"
   },
   "bin": {
+    "daylight": "bin/radar.mjs",
     "daylight-commons": "bin/radar.mjs",
     "radar": "bin/radar.mjs"
   },

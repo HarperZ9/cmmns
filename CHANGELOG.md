@@ -5,7 +5,37 @@ were not published to a store.
 
 ## Unreleased
 
-Nothing yet.
+Planned for 3.4.0, after the Reading lens release (3.3.0).
+
+Case folders for investigation: `daylight case` (also `radar case`). A case is a folder with its own
+git history. Each source is captured with its sha256, access time, read mode and Wayback request;
+each claim sits on a rung (documented, inference, unproven, contradicted) with its source; and each
+export verifies offline (project-docs/INVESTIGATE.md).
+
+Read these limits before relying on it:
+- Claims from `case run` without a model come from sentence rules. On the Musk and Ukraine case they
+  found the documented facts the hand-built case found and missed every finding that needed reasoning
+  across sources; most of the 245 proposals would be rejected in review.
+- Retellings are linked by shared content words. Paraphrase in other words or another language is
+  not linked, and two claims that disagree on a number or date in different wording are not flagged.
+- Capture reads web pages and X posts. Video, Telegram, TikTok and Truth Social posts are not
+  captured yet.
+
+### Added
+- `case init`, `add`, `claim`, `claims --blind`, `label`, `labels`, `trace`, `event`, `timeline`,
+  `edge`, `network`, `lead`, `leads`, `absent`, `actor`, `read`, `import`, `export`, `verify-export`
+  (`src/investigate/`, `bin/lib/case*.mjs`).
+- `case run <seed>`: twelve resumable stages from screenshots, URLs or a claim to a dossier, with
+  checkpoints, a watchdog and a run lock; optional model steps through a local command or a
+  configured endpoint; `case review` to accept or reject each proposal; `case watch` for scheduled
+  re-checks of captures and leads.
+- Exports: newsroom dossier, legal chain-of-custody bundle, research dataset with PROV-O and
+  Croissant metadata. Each carries SHA256SUMS and a signed evidence bundle of `case-file` items (a new
+  evidence kind in `schema/evidence.v1.json`). Private accounts are pseudonyms unless marked public
+  figures.
+- Extension popup: **Add to case** and **Save case list** (`src/ext/case-inbox.js`). Addresses stay in
+  the browser; nothing is sent.
+- `examples/musk-ukraine-case`, the hand-built case of 2026-10-23 moved into the format.
 
 ## 3.3.0 (2026-10-23)
 

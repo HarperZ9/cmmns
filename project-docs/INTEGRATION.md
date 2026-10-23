@@ -166,6 +166,7 @@ from disk; the extension from its own package.
 | `state-link` | post or site | A cited source ties the site to a state |
 | `site-owner`, `site-record` | post or site | The owner on Wikidata; the site's fact-check record |
 | `content-credentials`, `credentials-ai`, `credentials-changed`, `ai-metadata`, `no-credentials`, `remote-credentials` | file | What the file's Content Credentials and metadata say |
+| `case-file` | file | One file of a `daylight case` export: its path, sha256 and size (project-docs/INVESTIGATE.md) |
 
 ## The schema
 

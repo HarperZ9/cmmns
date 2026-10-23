@@ -20,6 +20,7 @@ import { loadOrMakeKey, DEFAULT_KEY } from "./lib/keys.mjs";
 import { readable, verdictLines, chainLines } from "./lib/report.mjs";
 import { validate } from "./lib/jsonschema.mjs";
 import { runExport } from "./lib/export.mjs";
+import { runCaseCommand } from "./lib/case.mjs";
 
 const USAGE = `Usage:
   radar analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
@@ -29,6 +30,7 @@ const USAGE = `Usage:
   radar media <file> [--json]
   radar export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
+  radar case <command>   an investigation case folder; "radar case help" lists the commands
 <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 CSV, a Mastodon outbox.json or a Bluesky repository .car. verify checks a signed evidence bundle
 or an evidence chain saved from the extension ("Save evidence chain"). Daylight Commons reads local
@@ -99,6 +101,7 @@ async function verify(file, f) {
 }
 
 export async function main(argv) {
+  if (argv[0] === "case") { const r = await runCaseCommand(argv.slice(1)); print(r.out); return process.exitCode || r.code; }
   const { _: [cmd, arg], flags } = parseArgs(argv);
   if (!cmd || flags.help || !arg) { print(USAGE); return cmd ? 2 : 0; }
   if (cmd === "analyze") { await analyze(arg, flags); return 0; }
