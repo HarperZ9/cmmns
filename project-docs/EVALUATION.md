@@ -479,10 +479,10 @@ script when every letter can be read in it, else toward the word's own majority;
   ("сор"), folds to Latin. Folding applies only to the copy Daylight Commons matches, never to what it shows.
 
 ## Named conspiracy theories (2026-10-21): not measured
-`src/core/theories.js` extends the conspiracy family with twelve documented theories (QAnon slogans,
+`src/core/theories.js` extends the conspiracy family with thirteen documented theories (QAnon slogans,
 adrenochrome, satanic ritual abuse, chemtrails, "Great Reset" plot framing, stolen and rigged
 elections, machine and satellite vote-flipping, staged shootings, 9/11 inside job, 5G and COVID-19,
-vaccine harm, hidden cures), each with dated sources and its own does-not-prove line. Election and
+vaccine harm, hidden cures, and secret control of a country, added 2026-10-23 from the feed test), each with dated sources and its own does-not-prove line. Election and
 staged-event claims match both directions; `tests/theories.symmetry.test.js` pairs each right-coded
 claim with its left-coded twin (Dominion and Starlink, 2020 and 2016, Sandy Hook and Butler).
 

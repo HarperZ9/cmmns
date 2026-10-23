@@ -16,8 +16,9 @@ const every = (groups, tpl, expected = "stereotype") => {
 test("control put on a people, for every faith and race", () => {
   every(IDENTITY_GROUPS, "honestly {G} control the media and the banks");
   every(IDENTITY_GROUPS, "it is obvious that {G} secretly run this country");
-  every(IDENTITY_ADJ, "a rich {G} cabal is calling the shots");
-  every(IDENTITY_ADJ, "{G} money and influence control American foreign policy");
+  // these two also name the secret-control theory (src/core/theories.js), for every group alike
+  every(IDENTITY_ADJ, "a rich {G} cabal is calling the shots", "conspiracy-theory,stereotype");
+  every(IDENTITY_ADJ, "{G} money and influence control American foreign policy", "conspiracy-theory,stereotype");
 });
 
 test("a people predicted to attack, or named as a country's ruin, or by a trait word", () => {

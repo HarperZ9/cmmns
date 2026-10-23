@@ -2624,7 +2624,7 @@ const M_theories = (() => {
 // project-docs/EVALUATION.md). Until one is, these markers carry weight 0 and never count toward
 // the thread report's "extreme".
 
-const { GROUPS } = M_lexicon;
+const { GROUPS, IDENTITY_ADJ } = M_lexicon;
 
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
@@ -2636,6 +2636,20 @@ const THEORY_DOES_NOT_PROVE = `Naming a theory is not believing it. ${NAMING} Th
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const G = GROUPS.map(esc).sort((a, b) => b.length - a.length).join("|");
 const YEAR = "(?:(?:19|20)\\d\\d\\s+)?";
+// Secret control (added 2026-10-23 from the feed test). Every people in IDENTITY_ADJ, and foreign
+// powers from every direction, so "controlled by the CCP" reads like "controlled by Mossad" or "by the CIA".
+const IDA = IDENTITY_ADJ.map(esc).join("|");
+const POWERS = ["ccp", "chinese communist party", "communist party of china", "beijing", "china", "the kremlin", "kremlin",
+  "moscow", "putin", "russia", "mossad", "israel", "the cia", "cia", "washington", "the us", "america", "tehran", "iran",
+  "qatar", "the saudis", "saudi arabia", "soros", "the wef", "brussels", "the eu", "nato", "the deep state", "deep state"].map(esc).join("|");
+const CONTROL_PATTERNS = [
+  `\\b(?:${IDA})\\s+(?:cabal|cabals|puppet masters)\\b`,
+  `\\b(?:${IDA})\\s+(?:money|lobby|bankers|elites?|power brokers)(?:\\s+(?:and|&)\\s+[\\w-]+)?\\s+(?:secretly\\s+)?(?:controls?|runs?|owns?|dictates?|calls? the shots|pulls? the strings)\\b`,
+  `\\b\\d{1,3}(?:\\.\\d+)?\\s?%\\s+(?:under the control of|controlled by|run by)\\s+(?:the\\s+)?(?:${POWERS})\\b`,
+  "\\binfiltrated and (?:controlled|run|owned) by\\b",
+  "\\bdeep[- ]state[- ]controlled\\b|\\b(?:controlled|run|owned) by the deep state\\b|\\bthe deep state (?:controls|runs|owns)\\b",
+  `\\b(?:fully|completely|totally|secretly|entirely)\\s+(?:controlled|run|owned)\\s+by\\s+(?:the\\s+)?(?:${POWERS})\\b`,
+];
 
 const THEORIES = [
   { id: "qanon", name: "QAnon", terms: ["wwg1wga", "where we go one we go all", "q sent me", "q drops", "qanon was right", "qanon is right"],
@@ -2664,7 +2678,9 @@ const THEORIES = [
     sources: [S("ISD, The Great Reset explainer", "https://www.isdglobal.org/explainers/the-great-reset/", "2021"), S("ADL, Great Reset conspiracy flourishes amid continued pandemic", "https://www.adl.org/resources/blog/great-reset-conspiracy-flourishes-amid-continued-pandemic", "2021")],
     dnp: "People criticise the WEF and its policies openly. The \"own nothing\" line is also used as a joke about rents and subscriptions." },
   { id: "stolen-election", name: "Stolen or rigged election", terms: ["stop the steal", "stolen election"],
-    patterns: [`\\b(?:the\\s+)?${YEAR}election\\s+(?:was|got|is being|has been)\\s+(?:stolen|rigged)\\b`, `\\b(?:${G}|they)\\s+(?:rigged|stole)\\s+the\\s+${YEAR}election\\b`],
+    patterns: [`\\b(?:the\\s+)?${YEAR}election\\s+(?:was|got|is being|has been)\\s+(?:stolen|rigged)\\b`, `\\b(?:${G}|they)\\s+(?:rigged|stole)\\s+the\\s+${YEAR}election\\b`,
+      // "a fake president who won through a rigged election" (added 2026-10-23 from the feed test)
+      "\\b(?:won|wins|winning|took power|came to power)\\s+(?:through|via|by|in|with|thanks to)\\s+(?:a\\s+)?(?:rigged|stolen|fraudulent)\\s+election\\b"],
     claim: "An election result was reversed by fraud on a scale that changed who won.",
     record: "Courts, audits and election officials found no fraud that changed the 2020 result (CISA joint statement), and the Senate Intelligence Committee found no evidence that votes were changed in 2016.",
     sources: [S("CISA, Joint statement from the Elections Infrastructure Government Coordinating Council", "https://www.cisa.gov/news-events/news/joint-statement-elections-infrastructure-government-coordinating-council-election", "2020-11-12"), S("US Senate Select Committee on Intelligence, Report Volume 1, Russian Efforts Against Election Infrastructure", "https://www.intelligence.senate.gov/sites/default/files/documents/Report_Volume1.pdf", "2019-07-25"), ENDERS],
@@ -2700,6 +2716,13 @@ const THEORIES = [
     record: "A meta-analysis of studies covering over 1.2 million children found no link between vaccines and autism (Taylor et al., 2014).",
     sources: [S("Taylor, Swerdfeger and Eslick, Vaccines are not associated with autism: an evidence-based meta-analysis, Vaccine 32(29)", "https://doi.org/10.1016/j.vaccine.2014.04.085", "2014-06-17")],
     dnp: "Vaccines have real, documented side effects, and parents ask honest questions about them." },
+  { id: "secret-control", name: "Secret control of a country", terms: [], patterns: CONTROL_PATTERNS,
+    claim: "A people, a hidden group or a foreign power secretly controls a country, its government or its institutions.",
+    record: "ADL documents the claim that Jews secretly run banks, media and governments as a myth rooted in forgeries such as the Protocols. The Korea Times called the claim that China rigged Korea's elections a baseless conspiracy theory. 39% of Americans agreed a \"deep state\" was working against the president in an NPR/Ipsos poll the pollster tied to QAnon.",
+    sources: [S("ADL, Antisemitism Uncovered: Myth: Jews Have Too Much Power (undated page; the date is when it was read)", "https://antisemitism.adl.org/power/", "2026-10-23"),
+      S("The Korea Times, Why people believe fake news on China's election interference", "https://www.koreatimes.co.kr/www/nation/2025/01/113_390697.html", "2025-01-20"),
+      S("Ipsos, More than 1 in 3 Americans believe a 'deep state' is working to undermine Trump (NPR/Ipsos poll)", "https://www.ipsos.com/en-us/news-polls/npr-misinformation-123020", "2020-12-30"), ENDERS],
+    dnp: "Lobbying, foreign influence operations and spies are real and documented. A claim about one official, one law or one donor can be true." },
   { id: "hidden-cure", name: "Hidden cure", terms: ["hiding the cure for cancer", "hiding the cure", "suppressing the cure", "they have the cure for cancer", "sitting on the cure"],
     claim: "Drug companies or regulators hide a cure to protect profits.",
     record: "In a 2013 US survey, 37% agreed the FDA suppresses natural cures for cancer (Oliver and Wood, 2014); no such hidden cure has been shown.",

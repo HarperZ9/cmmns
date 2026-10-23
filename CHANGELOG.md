@@ -29,6 +29,12 @@ were not published to a store.
   race, and origin where a nationality cannot mean an army or a state; political and class groups
   stay out ("billionaires control the media" is an argument about power). Tests in
   `tests/feed.stereotype.test.js` run every rule over every group and add near misses.
+- Named theories: a new "secret control" theory (a people, a hidden group or a foreign power secretly
+  controls a country: "a Jewish cabal", "99% under the control of the CCP", "infiltrated and
+  controlled by", "Deep State controlled nations"), with dated sources (ADL, The Korea Times
+  2025-01-20, NPR/Ipsos 2020-12-30). Foreign powers from every direction are listed alike. The
+  stolen-election theory also reads "won through a rigged election". Theories stay unmeasured at
+  weight 0. Pairs in `tests/theories.symmetry.test.js`.
 
 ### Added
 - Carrier-safe evidence bundles. Tick Carrier-safe on the card page, or pass `--carrier-safe` to
