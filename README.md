@@ -128,6 +128,37 @@ In the extension, the toolbar popup's **Analyse a file** does the same. Code can
 fits `schema/evidence.v1.json`. The API, schema and bundle format are in
 [project-docs/INTEGRATION.md](project-docs/INTEGRATION.md).
 
+## Investigate: case folders
+
+`daylight case` keeps an investigation in one folder with its own git history: each source captured
+with its hash, access time and Wayback copy; each claim on a rung (documented, inference, unproven,
+contradicted) with its source; the chain from a retelling back to its origin with a word diff per
+hop; a timeline with gaps and contradictions flagged; who quoted or replied to whom; ranked leads;
+and deleted, edited, sealed and missing records. Exports verify offline.
+
+```
+node bin/radar.mjs case init "Harbour sale"     # a new folder, harbour-sale/, with its own git repo
+node bin/radar.mjs case add https://example.org/council-minutes --case harbour-sale   # capture, hash, archive
+node bin/radar.mjs case claim "The council voted 7-2 to sell" --source S01 --rung documented --case harbour-sale
+node bin/radar.mjs case trace C01 --case harbour-sale            # origin, retellings, independent origins
+node bin/radar.mjs case export --profile newsroom --case harbour-sale   # signed dossier in exports/
+```
+
+`case run <screenshots/ | urls.txt | URL | "a claim">` does all of it with nobody at the keyboard:
+it transcribes screenshots, captures and archives every source, proposes claims with their spans,
+looks for the primary record behind each one, traces drift, builds the timeline and network, ranks
+leads, logs absences, runs the reading and writes the dossier in all three profiles. It resumes
+after a crash. A model is optional; without one, rules propose and a person accepts or rejects each
+item with `case review`. `case watch` re-checks captures and leads on a schedule you set. The
+extension's popup has **Add to case**, which keeps the page's address in your browser for
+`case add case-inbox.jsonl`.
+
+Private accounts appear as pseudonyms in every export unless marked public figures, pages behind a
+login are never captured, and only the fetches and archive requests you start leave your machine.
+The format, pipeline and a test against a hand-built case are in
+[project-docs/INVESTIGATE.md](project-docs/INVESTIGATE.md); a worked example is in
+[examples/musk-ukraine-case](examples/musk-ukraine-case).
+
 ## Develop
 
 ```

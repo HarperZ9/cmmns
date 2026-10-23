@@ -1,0 +1,193 @@
+{
+  "kind": "radar-evidence-bundle",
+  "version": 1,
+  "schema": "urn:radar:evidence:v1",
+  "api": "1.1.0",
+  "tool": "Daylight Commons 3.2.2 (daylight case)",
+  "savedAt": "2026-10-23T18:00:00.000Z",
+  "dataLock": null,
+  "input": {
+    "kind": "text",
+    "site": null,
+    "page": null,
+    "source": "export",
+    "accounts": null
+  },
+  "posts": [
+    {
+      "id": "CHANGES.md"
+    },
+    {
+      "id": "DOSSIER.html"
+    },
+    {
+      "id": "DOSSIER.md"
+    },
+    {
+      "id": "SHA256SUMS"
+    },
+    {
+      "id": "export.json"
+    },
+    {
+      "id": "network.html"
+    },
+    {
+      "id": "network.json"
+    }
+  ],
+  "textIncluded": false,
+  "evidence": [
+    {
+      "id": "e1",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "CHANGES.md",
+      "shows": "sha256 91c711aa9808441ebbe5a81d5128f78fc234a7b2117c273dce241286e529d52f, 64 bytes",
+      "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
+      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "CHANGES.md"
+      ],
+      "spans": [],
+      "data": {
+        "path": "CHANGES.md",
+        "sha256": "91c711aa9808441ebbe5a81d5128f78fc234a7b2117c273dce241286e529d52f",
+        "bytes": 64
+      }
+    },
+    {
+      "id": "e2",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "DOSSIER.html",
+      "shows": "sha256 8de07cec870cbc258b48252e9d7ca727f7201581b5978b9dab1e18cfba0e2a4c, 43920 bytes",
+      "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
+      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "DOSSIER.html"
+      ],
+      "spans": [],
+      "data": {
+        "path": "DOSSIER.html",
+        "sha256": "8de07cec870cbc258b48252e9d7ca727f7201581b5978b9dab1e18cfba0e2a4c",
+        "bytes": 43920
+      }
+    },
+    {
+      "id": "e3",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "DOSSIER.md",
+      "shows": "sha256 b0b9e6f0a7b38afde79ec45de33d2697576728d843543f287337692c5486c2b8, 39321 bytes",
+      "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
+      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "DOSSIER.md"
+      ],
+      "spans": [],
+      "data": {
+        "path": "DOSSIER.md",
+        "sha256": "b0b9e6f0a7b38afde79ec45de33d2697576728d843543f287337692c5486c2b8",
+        "bytes": 39321
+      }
+    },
+    {
+      "id": "e4",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "SHA256SUMS",
+      "shows": "sha256 c84c7c7dfe46cc9e36689e734665ca88cde9a74368eaa1b49aafebca2d2c24a5, 469 bytes",
+      "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
+      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "SHA256SUMS"
+      ],
+      "spans": [],
+      "data": {
+        "path": "SHA256SUMS",
+        "sha256": "c84c7c7dfe46cc9e36689e734665ca88cde9a74368eaa1b49aafebca2d2c24a5",
+        "bytes": 469
+      }
+    },
+    {
+      "id": "e5",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "export.json",
+      "shows": "sha256 ca1b8273344a1d187cffbe48ba37441c8bdcf9f25ebd9d58aab7f7c2e075f0ef, 23885 bytes",
+      "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
+      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "export.json"
+      ],
+      "spans": [],
+      "data": {
+        "path": "export.json",
+        "sha256": "ca1b8273344a1d187cffbe48ba37441c8bdcf9f25ebd9d58aab7f7c2e075f0ef",
+        "bytes": 23885
+      }
+    },
+    {
+      "id": "e6",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "network.html",
+      "shows": "sha256 badcc56c90859b1eb9a95612d85f40c81ecc064f862b4d6a3462abe7ef761bc4, 3779 bytes",
+      "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
+      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "network.html"
+      ],
+      "spans": [],
+      "data": {
+        "path": "network.html",
+        "sha256": "badcc56c90859b1eb9a95612d85f40c81ecc064f862b4d6a3462abe7ef761bc4",
+        "bytes": 3779
+      }
+    },
+    {
+      "id": "e7",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "network.json",
+      "shows": "sha256 1e9f2ef3e82e743191866af2f004f57c248841c7fef204aa8ed780442b66adfb, 1491 bytes",
+      "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
+      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "network.json"
+      ],
+      "spans": [],
+      "data": {
+        "path": "network.json",
+        "sha256": "1e9f2ef3e82e743191866af2f004f57c248841c7fef204aa8ed780442b66adfb",
+        "bytes": 1491
+      }
+    }
+  ],
+  "limits": [
+    "Case export, profile newsroom. Rehash each file and compare with its item to check it.",
+    "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right."
+  ],
+  "signer": {
+    "alg": "ECDSA P-256 SHA-256",
+    "keyId": "0da168af82e407eb",
+    "publicKey": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "jFOxONhIdw5nNk0pr_6VFw3xYOWl5aEiaYeS_UFJ8BY",
+      "y": "Z2HMrVh_zrL-eOWNDFNSCkAHJKiwS-PxqyfSxhmC5yc"
+    }
+  },
+  "signature": {
+    "of": "canonical JSON of this bundle without the signature field (sorted keys, no spaces)",
+    "value": "K9LWYQgmwuGQWjWcgl9v6rDk2UrkbItb9rSuoLCSnPRunxvflfstSrQigPSQgZkwpUtzO-dzkGgF-cogJ-vU2Q"
+  }
+}
