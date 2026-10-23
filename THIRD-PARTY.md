@@ -10,7 +10,7 @@ code.
 | Item | Files | Licence | Notes |
 |---|---|---|---|
 | Hanken Grotesk font | `src/ext/fonts/hanken-grotesk.woff2`, `docs/fonts/hanken-grotesk.woff2` | SIL Open Font License 1.1 (`LICENSES/OFL-1.1.txt`, and `OFL-hanken-grotesk.txt` beside each copy) | Copyright 2021 The Hanken Grotesk Project Authors. |
-| Conso font | `src/ext/fonts/conso-regular.woff2`, `docs/fonts/conso-regular.woff2` | The designer's licence, held by Daylight Commons' author (`LICENSES/LicenseRef-Conso.txt`) | By Pavel Larin. Not covered by Daylight Commons' licences and not offered for reuse. A fork must remove it or license it itself. |
+| JetBrains Mono font (Regular, 2.304) | `src/ext/fonts/jetbrains-mono-regular.woff2`, `docs/fonts/jetbrains-mono-regular.woff2` | SIL Open Font License 1.1 (`LICENSES/OFL-1.1.txt`, and `OFL-jetbrains-mono.txt` beside each copy) | Copyright 2020 The JetBrains Mono Project Authors. Replaced the Conso font in 3.0.0; see `src/ext/fonts/FONTS.md`. |
 | Unicode confusables table (UTS #39) | `data/snapshots/unicode-confusables.txt`, and the table built from it in `src/core/confusables-data.js` | Unicode License v3 (`LICENSES/Unicode-3.0.txt`; notice also in `data/confusables.README.md`) | Copyright 1991-2026 Unicode, Inc. |
 | Wikidata statements | `src/ext/sites.json` (facts), `src/ext/owners.json`, parts of `src/ext/personalities.json` | CC0 1.0 | Source and retrieval date in `data/LOCK.json`. |
 | Fact-check reviews (ClaimReview) | `src/ext/claims.json`, `src/ext/claims-2.json`, `src/ext/sites.json` (records) | CC BY 4.0, via the Data Commons fact-check feed | Each match Daylight Commons shows names the fact-checker and links the review. See `data/claims.README.md`. |

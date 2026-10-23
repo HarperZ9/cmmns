@@ -176,8 +176,8 @@ offer the source to users, so the listing links here.
 Quoted laws, regulations and official guidance in the catalogue keep their own status: many are
 government works, and the rest are quoted for commentary with their source. Daylight Commons never
 redistributes platform content; captures of other people's posts stay on the user's device. Hanken
-Grotesk is under the SIL Open Font License 1.1. The Conso font is used under the designer's licence
-and is not covered by Daylight Commons' licences; a fork must drop it or license it itself. The outlet and
+Grotesk and JetBrains Mono are under the SIL Open Font License 1.1, so every file in a package is
+free to reuse. The outlet and
 state tables come from Wikidata (CC0) and the cited public documents listed in
 `data/state-reports.README.md`. The fact-check table comes from the Data Commons ClaimReview feed
 (CC BY 4.0), credited to each fact-checker in the window.

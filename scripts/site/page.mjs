@@ -99,7 +99,7 @@ ${body}
 }
 
 // The same page goes inside the extension and in docs/ for the public site, with its fonts.
-export const FONT_FILES = ["hanken-grotesk.woff2", "conso-regular.woff2", "OFL-hanken-grotesk.txt", "FONTS.md"];
+export const FONT_FILES = ["hanken-grotesk.woff2", "jetbrains-mono-regular.woff2", "OFL-jetbrains-mono.txt", "OFL-hanken-grotesk.txt", "FONTS.md"];
 export const TARGETS = [join(ROOT, "src", "ext"), join(ROOT, "docs")];
 export function writePage(name, html) {
   for (const dir of TARGETS) {

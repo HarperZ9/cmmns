@@ -70,12 +70,12 @@ test("no pill or rounded-card shapes and no tracked uppercase labels", () => {
   }
 });
 
-test("keyboard hints are set in Conso, never in a browser's default face, and at 14px or more", () => {
+test("keyboard hints are set in JetBrains Mono, never in a browser's default face, and at 14px or more", () => {
   const css = read("src/ext/pages.css");
   const rule = (css.match(/(?:^|\n)kbd\s*\{[^}]*\}/) || [""])[0];
   assert.match(rule, /font-family:\s*var\(--font-mono\)/);
   assert.match(rule, /font-size:\s*max\([^)]*14px\)/);
-  assert.match(read("src/ext/canon.css"), /--font-mono:\s*"Conso",[^;]*monospace;/, "the mono stack ends in monospace, never serif");
+  assert.match(read("src/ext/canon.css"), /--font-mono:\s*"JetBrains Mono",[^;]*monospace;/, "the mono stack ends in monospace, never serif");
   for (const p of list("src/ext", /\.html$/).filter((f) => read(f).includes("<kbd>"))) assert.match(read(p), /href="pages\.css"/, p);
 });
 

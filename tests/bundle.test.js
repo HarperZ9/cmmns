@@ -15,12 +15,14 @@ test("core.bundle.js and ocr.bundle.js match a fresh build of src/core and src/o
   const lf = (s) => s.split("\r\n").join("\n");
   const files = [bundle, join(root, "src/ext/ocr.bundle.js")];
   const before = files.map((f) => readFileSync(f, "utf8"));
-  for (const f of files) copyFileSync(f, f + ".bak");
+  // A backup name of its own: tests/datalock.test.js backs up the same bundles in parallel.
+  const bak = (f) => `${f}.${process.pid}.bundle-test.bak`;
+  for (const f of files) copyFileSync(f, bak(f));
   try {
     execFileSync(process.execPath, [join(root, "scripts/build.mjs")], { stdio: "ignore" });
     files.forEach((f, i) => assert.equal(lf(readFileSync(f, "utf8")), lf(before[i]), `run \`npm run build\` and commit ${f}`));
   } finally {
-    for (const f of files) { copyFileSync(f + ".bak", f); rmSync(f + ".bak"); }
+    for (const f of files) { copyFileSync(bak(f), f); rmSync(bak(f)); }
   }
 });
 

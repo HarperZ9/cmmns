@@ -1,17 +1,17 @@
 /* canon.css: the author's site tokens and base rules, for every Daylight Commons page.
    Values mirror system/tokens.css and system/plate.css on harperz9.github.io (read 2026-10-21):
-   bone and void grounds, ink text, two faces (Hanken Grotesk for words, Conso for figures and
+   bone and void grounds, ink text, two faces (Hanken Grotesk for words, JetBrains Mono for figures and
    code), colour only for a verdict, square controls, hairline rules that open on a registration
    cross. project-docs/DESIGN-CANON-CHECK.md lists each value and where it comes from.
    The in-page window (badges.css) uses the same values under --pb-* names. */
 @font-face { font-family: "Hanken Grotesk"; src: url("fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
-@font-face { font-family: "Conso"; src: url("fonts/conso-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("fonts/jetbrains-mono-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 
 /* 1. Light, the bone pole. Contrast is WCAG 2 against --paper. */
 :root {
   color-scheme: light;
   --font-sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "Conso", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
   --paper: #ebe5d8; --inset: #e4ddcd; --panel: #e2dac9; --raised: #d8cfbc;
   --ink: #16130f; --soft: #4a443b; --muted: #5f584d; --line: #c9bfab; --line-strong: #7b7262; --on-ink: #ebe5d8;
   --verified: #0a6b61; --drift: #8f3a19; --unverifiable: #4e4d85;
@@ -58,7 +58,7 @@ h3 { font-weight: 680; letter-spacing: -.012em; }
 a { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; }
 a:hover { text-decoration-thickness: 2px; }
 code, kbd, samp, pre, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-/* A sentence that carries figures stays in the reading face; Conso is for figures standing alone. */
+/* A sentence that carries figures stays in the reading face; JetBrains Mono is for figures standing alone. */
 .figure { font-variant-numeric: tabular-nums; }
 :is(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 

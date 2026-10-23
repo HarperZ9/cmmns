@@ -80,7 +80,9 @@ test("the offline guard blocks fetch, http, https and dns", () => {
 test("the offline build runs with the network blocked and reproduces every table it can rebuild", () => {
   const touched = ["src/core/confusables-data.js", "data/ops.json", "src/ext/ops.json", "src/ext/core.bundle.js", "src/ext/ocr.bundle.js"].map((p) => join(root, p));
   const data = mkdtempSync(join(tmpdir(), "radar-nodata-"));
-  for (const f of touched) copyFileSync(f, f + ".bak");
+  // A backup name of its own: tests/bundle.test.js backs up the same bundles in parallel.
+  const bak = (f) => `${f}.${process.pid}.datalock-test.bak`;
+  for (const f of touched) copyFileSync(f, bak(f));
   try {
     const r = spawnSync(process.execPath, [join(root, "scripts/build-offline.mjs")], { cwd: root, encoding: "utf8", env: { ...process.env, RADAR_DATA: data } });
     assert.equal(r.status, 0, r.stderr + r.stdout);
@@ -90,7 +92,7 @@ test("the offline build runs with the network blocked and reproduces every table
     const strict = spawnSync(process.execPath, [join(root, "scripts/build-offline.mjs"), "--strict"], { cwd: root, encoding: "utf8", env: { ...process.env, RADAR_DATA: data } });
     assert.equal(strict.status, 1, "--strict fails when a snapshot is missing");
   } finally {
-    for (const f of touched) { copyFileSync(f + ".bak", f); rmSync(f + ".bak"); }
+    for (const f of touched) { copyFileSync(bak(f), f); rmSync(bak(f)); }
     rmSync(data, { recursive: true, force: true });
   }
 });

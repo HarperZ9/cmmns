@@ -65,7 +65,7 @@ let fontsReady = null;
 function fontBytes() {
   const b64 = (buf) => { const u = new Uint8Array(buf); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
   const get = ([family, file, weight]) => fetch(chrome.runtime.getURL("fonts/" + file)).then((r) => r.arrayBuffer()).then((b) => ({ family, weight, data: b64(b) }));
-  if (!fontsReady) fontsReady = Promise.all([["Daylight Commons Hanken", "hanken-grotesk.woff2", "100 900"], ["Daylight Commons Conso", "conso-regular.woff2", "400"]].map(get))
+  if (!fontsReady) fontsReady = Promise.all([["Daylight Commons Hanken", "hanken-grotesk.woff2", "100 900"], ["Daylight Commons Mono", "jetbrains-mono-regular.woff2", "400"]].map(get))
     .catch((e) => { console.error("[daylight-commons] the window's fonts failed to load", e); fontsReady = null; return []; });
   return fontsReady;
 }

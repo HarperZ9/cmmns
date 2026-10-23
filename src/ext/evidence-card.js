@@ -38,7 +38,7 @@
 // Paints the lines onto the canvas and resolves to a PNG blob.
 function draw(canvas, lines) {
   const W = 1200, PAD = 64, inner = W - 2 * PAD;
-  const SANS = '"Hanken Grotesk", system-ui, sans-serif', MONO = '"Conso", ui-monospace, Consolas, monospace';
+  const SANS = '"Hanken Grotesk", system-ui, sans-serif', MONO = '"JetBrains Mono", ui-monospace, Consolas, monospace';
   const STYLE = {
     title: { font: `780 44px ${SANS}`, color: "#16130f", lh: 54, before: 0 },
     meta: { font: `400 19px ${MONO}`, color: "#4a443b", lh: 28, before: 8 },

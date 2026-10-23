@@ -194,7 +194,7 @@ The head shows the account, the key facts, warnings by name, and a strip of seve
 
 **Packaging** (`scripts/package.mjs`, `scripts/zip.mjs`). A dependency-free zip writer with sorted entries, a fixed 1980-01-01 timestamp and deflate level 9; Chrome gets a service worker manifest, Firefox background scripts and a minimum version of 128. The same tree gives the same bytes on the same Node zlib; a different zlib build can change the compressed bytes.
 
-**Type.** Extension pages bundle Hanken Grotesk (SIL OFL 1.1). Conso is named first in the figure stack but not bundled, because its licence permits the author's site and has not been checked for redistribution inside an extension; the system monospace stands in.
+**Type.** Extension pages bundle Hanken Grotesk and JetBrains Mono, both under the SIL OFL 1.1. JetBrains Mono replaced Conso in 3.0.0: Conso's licence is not open source, and JetBrains Mono is the next face in the author's site's own mono stack (`src/ext/fonts/FONTS.md`).
 
 ### Add-on identity (2026-10-21)
 The Firefox add-on id is `radar@harperz9.github.io` (`browser_specific_settings.gecko.id`). It must

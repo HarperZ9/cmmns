@@ -1,5 +1,5 @@
 /* The toolbar popup, on top of canon.css: the same bone or void ground, square controls, figures
-   in Conso. Narrow, so the type steps down from the pages. */
+   in JetBrains Mono. Narrow, so the type steps down from the pages. */
 body { width: 320px; font-size: 14px; line-height: 1.45; background-image: none; }
 header { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 16px 6px; }
 header strong { font-size: 20px; font-weight: 780; letter-spacing: -.03em; }
