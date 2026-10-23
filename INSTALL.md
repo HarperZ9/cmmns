@@ -17,6 +17,7 @@ maker still stands in the way.
 - `SOURCE`: the commit and the Node version the release was built with.
 - `release-key.json`: Daylight Commons' public signing key.
 - `SHA256SUMS` and `SHA256SUMS.sig`: the hash of every file above, and Daylight Commons' signature over that list.
+- `HEAD.json` and `HEAD.sig`, from 3.2.0: the signed head. It names `SHA256SUMS` and the catalogue by hash, with a version number that only goes up, the time it was signed and a date it expires, 90 days after the release commit.
 
 ## Check a download
 
@@ -29,9 +30,23 @@ Compare that id with one you got another way: this site, the repository's `docs/
 a mirror, or a person you trust. A key that arrives in the same download as the files proves
 nothing on its own.
 
+The signed head stops an old release from passing as the current one. Each device keeps the
+highest head version it has accepted. A lower version, a different head under the same version, or
+a release with no head after one with a head, is refused, and the refusal names the rule in one
+sentence. A head past its expiry still verifies and is marked Expired: Daylight Commons keeps
+working and says "Catalogue dated 2026-10-22. Newer campaigns may be missing." The expiry is the
+signer's claim. A device with a wrong clock uses the latest signed time it has seen.
+
+In the extension, the options page has **Check a signed head**: pick `HEAD.json` and `HEAD.sig`.
+The account card and the toolbar popup then show the catalogue date, when the head was last seen,
+its expiry and how many signatures it carried, as Current, Aging (head older than 30 days) or
+Expired. Releases today carry one signature, and the line says "single-signer release".
+
 To check in this browser, use the checker at the end of this page. It runs on your device and sends
 nothing. To check with Node 22 from a copy of the source, run `node scripts/verify-release.mjs
-<folder>`; it prints the key id, checks the signature, then every file's hash, then the bundle.
+<folder>`; it checks the head first, then prints the key id, checks the signature, then every
+file's hash, then the bundle. It keeps the highest head version in `~/.radar/head-state.json`; add
+`--no-state` to look at an old release on purpose.
 
 ## Rebuild it yourself
 
@@ -79,11 +94,11 @@ only that Mozilla's automated review passed.
 Daylight Commons' source is hosted on GitHub today. Each release's bundle holds the whole history, so the
 project survives without it: clone the bundle, then push it to any git host. Any mirror that
 serves the same bundle and the same signed `SHA256SUMS` is as good as the original, because the
-signature, not the host, is what you check.
+signature is what you check, wherever the files came from.
 
 ## What this does not prove
 
 A valid signature shows the files were signed by the holder of Daylight Commons' key and have not changed
-since. It does not show who holds the key, that the key was never stolen, or that the code is
+since. A valid head shows the signer chose these files at that time. It does not show the files are safe. It does not show who holds the key, that the key was never stolen, or that the code is
 safe. A reproducible build shows the package came from the published source; it does not show the
 source is free of mistakes. Read the source, or ask someone you trust who has.

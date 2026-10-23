@@ -10,6 +10,8 @@ import { signSums, verifySums, signingKeyId, parseSums } from "../src/core/signi
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const PUBLIC_KEY = join(ROOT, "docs", "release-key.json");
 export const SUMS = "SHA256SUMS", SIG = "SHA256SUMS.sig";
+// The signed head (scripts/head-lib.mjs) names SHA256SUMS by hash, so the sums cannot list it.
+const OUTSIDE_SUMS = new Set([SUMS, SIG, "HEAD.json", "HEAD.sig"]);
 const sha = (b) => createHash("sha256").update(b).digest("hex");
 
 // True when p is this repository or inside it. A private key must never be.
@@ -29,9 +31,9 @@ export function readPrivateKey(path) {
   return jwk;
 }
 
-// SHA256SUMS for every file in dir except the sums and the signature.
+// SHA256SUMS for every file in dir except the sums, its signature and the head.
 export function writeSums(dir) {
-  const names = readdirSync(dir).filter((n) => n !== SUMS && n !== SIG).sort();
+  const names = readdirSync(dir).filter((n) => !OUTSIDE_SUMS.has(n)).sort();
   const sums = names.map((n) => `${sha(readFileSync(join(dir, n)))}  ${n}`).join("\n") + "\n";
   writeFileSync(join(dir, SUMS), sums);
   return { names, sums };
@@ -53,6 +55,6 @@ export async function verifyDir(dir, jwk) {
   const signature = await verifySums(key, sums, readFileSync(sigPath, "utf8"));
   const listed = parseSums(sums) || {};
   const files = Object.entries(listed).map(([name, want]) => ({ name, ok: existsSync(join(dir, name)) && sha(readFileSync(join(dir, name))) === want }));
-  const unlisted = readdirSync(dir).filter((n) => n !== SUMS && n !== SIG && !(n in listed));
+  const unlisted = readdirSync(dir).filter((n) => !OUTSIDE_SUMS.has(n) && !(n in listed));
   return { ok: signature && files.length > 0 && files.every((f) => f.ok), signature, keyId: await signingKeyId(key), files, unlisted };
 }

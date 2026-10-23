@@ -33,6 +33,10 @@ Daylight Commons is maintained by one person, so no response time is promised.
   send.
 - The signing and verification of releases, data packs and evidence bundles
   (`scripts/release.mjs`, `scripts/verify-release.mjs`, `src/core/evidence-bundle.js`).
+- The signed head and its rules: the size limit, the signature count, rollback refusal, expiry and
+  the clock rule (`src/core/head.js`, `scripts/head-lib.mjs`, `src/ext/options-head.js`). A way to
+  make a device accept an older head, or a head no trusted key signed, is a vulnerability. The head
+  format has had no independent audit.
 - The command line tool in `bin/`.
 
 Out of scope: problems in the browsers or the social platforms themselves, and wrong evidence that

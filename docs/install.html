@@ -45,14 +45,17 @@
 <li><code>radar-&lt;version&gt;.bundle</code>: the whole source history at the release commit, as one git file. Commits before 3.0.0 also hold the Conso font, under its designer's licence; 3.0.0 and later ship only fonts under the SIL Open Font License.</li>
 <li><code>SOURCE</code>: the commit and the Node version the release was built with.</li>
 <li><code>release-key.json</code>: Daylight Commons' public signing key.</li>
-<li><code>SHA256SUMS</code> and <code>SHA256SUMS.sig</code>: the hash of every file above, and Daylight Commons' signature over that list.</li></ul>
+<li><code>SHA256SUMS</code> and <code>SHA256SUMS.sig</code>: the hash of every file above, and Daylight Commons' signature over that list.</li>
+<li><code>HEAD.json</code> and <code>HEAD.sig</code>, from 3.2.0: the signed head. It names <code>SHA256SUMS</code> and the catalogue by hash, with a version number that only goes up, the time it was signed and a date it expires, 90 days after the release commit.</li></ul>
 </section>
 <section aria-labelledby="check-a-download">
 <h2 id="check-a-download">Check a download</h2>
 <p>Daylight Commons signs <code>SHA256SUMS</code> with its project key, an ECDSA P-256 key whose private half never enters the repository or any server. The key id is:</p>
 <p><strong>0e5e 1984 0565 840c 977e 0f03 6c9a c021</strong></p>
 <p>Compare that id with one you got another way: this site, the repository's <code>docs/release-key.json</code>, a mirror, or a person you trust. A key that arrives in the same download as the files proves nothing on its own.</p>
-<p>To check in this browser, use the checker at the end of this page. It runs on your device and sends nothing. To check with Node 22 from a copy of the source, run <code>node scripts/verify-release.mjs &lt;folder&gt;</code>; it prints the key id, checks the signature, then every file's hash, then the bundle.</p>
+<p>The signed head stops an old release from passing as the current one. Each device keeps the highest head version it has accepted. A lower version, a different head under the same version, or a release with no head after one with a head, is refused, and the refusal names the rule in one sentence. A head past its expiry still verifies and is marked Expired: Daylight Commons keeps working and says &quot;Catalogue dated 2026-10-22. Newer campaigns may be missing.&quot; The expiry is the signer's claim. A device with a wrong clock uses the latest signed time it has seen.</p>
+<p>In the extension, the options page has <strong>Check a signed head</strong>: pick <code>HEAD.json</code> and <code>HEAD.sig</code>. The account card and the toolbar popup then show the catalogue date, when the head was last seen, its expiry and how many signatures it carried, as Current, Aging (head older than 30 days) or Expired. Releases today carry one signature, and the line says &quot;single-signer release&quot;.</p>
+<p>To check in this browser, use the checker at the end of this page. It runs on your device and sends nothing. To check with Node 22 from a copy of the source, run <code>node scripts/verify-release.mjs &lt;folder&gt;</code>; it checks the head first, then prints the key id, checks the signature, then every file's hash, then the bundle. It keeps the highest head version in <code>~/.radar/head-state.json</code>; add <code>--no-state</code> to look at an old release on purpose.</p>
 </section>
 <section aria-labelledby="rebuild-it-yourself">
 <h2 id="rebuild-it-yourself">Rebuild it yourself</h2>
@@ -77,11 +80,11 @@
 </section>
 <section aria-labelledby="if-the-code-host-goes-away">
 <h2 id="if-the-code-host-goes-away">If the code host goes away</h2>
-<p>Daylight Commons' source is hosted on GitHub today. Each release's bundle holds the whole history, so the project survives without it: clone the bundle, then push it to any git host. Any mirror that serves the same bundle and the same signed <code>SHA256SUMS</code> is as good as the original, because the signature, not the host, is what you check.</p>
+<p>Daylight Commons' source is hosted on GitHub today. Each release's bundle holds the whole history, so the project survives without it: clone the bundle, then push it to any git host. Any mirror that serves the same bundle and the same signed <code>SHA256SUMS</code> is as good as the original, because the signature is what you check, wherever the files came from.</p>
 </section>
 <section aria-labelledby="what-this-does-not-prove">
 <h2 id="what-this-does-not-prove">What this does not prove</h2>
-<p>A valid signature shows the files were signed by the holder of Daylight Commons' key and have not changed since. It does not show who holds the key, that the key was never stolen, or that the code is safe. A reproducible build shows the package came from the published source; it does not show the source is free of mistakes. Read the source, or ask someone you trust who has.</p>
+<p>A valid signature shows the files were signed by the holder of Daylight Commons' key and have not changed since. A valid head shows the signer chose these files at that time. It does not show the files are safe. It does not show who holds the key, that the key was never stolen, or that the code is safe. A reproducible build shows the package came from the published source; it does not show the source is free of mistakes. Read the source, or ask someone you trust who has.</p>
 </section>
 <section aria-labelledby="check-a-release-here">
 <h2 id="check-a-release-here">Check a release here</h2>

@@ -36,6 +36,7 @@
       "packs-bg.js",
       "sources-bg.js",
       "evidence-bg.js",
+      "head-bg.js",
       "ocr.bundle.js",
       "ocr-bg.js",
       "background.js"
@@ -113,6 +114,7 @@
         "linkcard.js",
         "signals.js",
         "definitions-view.js",
+        "freshness.js",
         "card.js",
         "panel.js",
         "ui.js",

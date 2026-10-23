@@ -72,6 +72,14 @@
     <h3 class="sub" id="h-keylist">Keys you trust</h3>
     <ul id="keyList" class="plain" aria-labelledby="h-keylist"></ul>
     <p class="muted" id="packCaveat"></p>
+    <h3 class="sub" id="h-head">How old the catalogue is</h3>
+    <p class="muted">A signed head names a release and its catalogue, with a version that only goes up and a date it expires. Pick <code>HEAD.json</code> and <code>HEAD.sig</code> from a release or an offline kit. An older head than one checked here is refused. An expired head is kept and marked Expired; every finding still shows.</p>
+    <div class="row">
+      <button id="headPick" type="button" class="quiet">Check a signed head</button>
+      <input id="headFile" type="file" multiple hidden>
+    </div>
+    <p class="status muted" id="headStatus" role="status" aria-live="polite"></p>
+    <p class="muted" id="headCaveat"></p>
   </section>
 
   <section aria-labelledby="h-keep">
@@ -128,5 +136,7 @@
 <script src="options-feedback.js"></script>
 <script src="options-sources.js"></script>
 <script src="options-packs.js"></script>
+<script src="signing.js"></script>
+<script src="options-head.js"></script>
 </body>
 </html>

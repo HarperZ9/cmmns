@@ -13,7 +13,7 @@ const ORDER = ["places.js", "confusables-data.js", "confusables.js", "lookalike-
 const PRODUCT = ["catalogue-data.js", "catalogue-links.js", "definitions.js", "settings.js", "families.js", "feedback.js", "claims-parts.js", "learn.js", "imagetext.js"];
 // The integration surface (radar-core, src/core/api.js) and its importers and bundles: they read the
 // modules above and nothing reads them, so they come after everything else.
-const INTEGRATION = ["api-words.js", "api-data.js", "api-site.js", "api-post.js", "api-thread.js", "api-media.js", "api.js", "evidence-bundle.js", "signing.js", "import-html.js", "import-exports.js", "import-json.js", "import-car.js", "imports.js"];
+const INTEGRATION = ["api-words.js", "api-data.js", "api-site.js", "api-post.js", "api-thread.js", "api-media.js", "api.js", "evidence-bundle.js", "signing.js", "head.js", "import-html.js", "import-exports.js", "import-json.js", "import-car.js", "imports.js"];
 const OCR = ["charset.js", "image.js", "binarize.js", "components.js", "segment.js", "gemm-wasm.js", "gemm.js", "model.js", "weights.js", "read.js"];
 const ident = (f) => "M_" + f.replace(/\.js$/, "").replace(/-/g, "_");
 
