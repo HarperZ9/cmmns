@@ -20,31 +20,31 @@ sends and to whom before the first use.
 
 ## Receipts you can check without us
 
-When an evidence lookup answers, Daylight Commons keeps the answer as a receipt: what the source said,
-its address, the time, a hash of the answer and what the fact does not prove. Each receipt is
-appended to a hash chain in your browser, with a Merkle root over the chain and a proof for each
-receipt. "Save evidence chain" downloads the whole chain as one file.
+Click an evidence lookup and the answer comes back as a receipt: what the source said, its
+address, the time, and a hash of the answer. Each receipt joins a hash chain in your browser, with a
+Merkle root over the chain and a proof for each receipt. "Save evidence chain" downloads the whole
+chain as one file.
 
-Anyone holding that file can check it offline, with the command line tool or the Analyse a file page
-inside the extension. The check fails when a receipt was changed, removed or reordered. A passing
-check shows the chain is the one this browser recorded. It does not show that a source told the
-truth, and whoever holds the device could start a new chain.
+Hand that file to anyone. They can check it offline, with the command line tool or the Analyse a
+file page inside the extension. Change one receipt, drop one or swap two, and the check fails. A
+pass tells you the chain is the one this browser recorded. To know whether a source was right, open
+the source the receipt names.
 
 ## Run it on us
 
-The screen recording on this page runs the evidence lookup on a synthetic post that links Daylight
-Commons' own repository and site. The answers are real: GitHub's creation date for the repository,
-and the Internet Archive's first capture of the site. The site is a page on github.io, a hosting
-service, so Daylight Commons does not ask RDAP when github.io was registered. That date would say
-nothing about this site.
+The recording on this page points the evidence lookup at a made-up post that links Daylight
+Commons' own repository and site. The answers are live: GitHub's creation date for the repository,
+and the Internet Archive's first capture of the site. The site sits on github.io, a shared host, so
+the lookup skips RDAP there. Its registration date would belong to GitHub.
 
-## Limits
+## Before you rely on it
 
-- Platform labels can be wrong. VPNs and travel move them, and users can broaden them to a region.
-- Daylight Commons sees only the replies the site chose to show, in the site's order.
-- Most signs are not measured yet and say so. The measured ones show their precision with a 95%
-  interval on the measurement page.
-- The launch campaign lens has no measured precision. Until a media lawyer has reviewed its wording,
-  it names no company: every claim reads "this launch".
-- A site redesign can break a reader until Daylight Commons is updated. The extension says so when
-  it reads nothing where it should.
+- The window sees the replies the site chose to show, in the site's order.
+- Platform labels follow the connection. A VPN or a trip moves them, and users can widen them to a
+  region.
+- The measurement page lists which signs have a measured precision, each with a 95% interval. The
+  window marks every other sign "not measured yet".
+- The launch campaign lens has no measured precision yet. Until a media lawyer has reviewed its
+  wording, every claim reads "this launch" and names no company.
+- A site redesign can break a reader until the next update. The extension says so when it reads
+  nothing where replies should be.

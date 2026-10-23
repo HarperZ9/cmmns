@@ -128,7 +128,7 @@ export function render(target = "ext") {
   const lead = leadSigns({ D, ptc, B, fold: { ...FOLD_SEEDED, ...B.fold } });
   const limits = [...bullets(evalMd, "### What the numbers do not prove"), ...bullets(evalMd, "### What the persuasion numbers do not prove")];
   const body = `
-<p class="lead">Every sign in Daylight Commons' window either shows how often it was right when people checked by hand, or says "not measured yet". This page lists every sign, the data each was checked on and its licence, how evenly the signs work whichever side a post targets, and what the numbers do not prove.</p>
+<p class="lead">Every sign in Daylight Commons' window carries one of two labels: how often it was right when people checked by hand, or "not measured yet". Below is every sign, the data it was checked on and that data's licence, and how evenly the signs fire whichever side a post targets.</p>
 <h2>How to read the numbers</h2>
 <ul>
 <li><strong>Precision</strong> is the share of signs Daylight Commons showed that the human annotators of a public research corpus agreed with. It answers "when Daylight Commons shows this, how often is it right?"</li>
@@ -156,9 +156,9 @@ ${more("Every derived list, with counts", tbl(["Language", "Terms", "Precision o
 ${more("Every technique, with counts", tbl(["Technique", "Precision (95% interval)", "Recall", "Chance", "Status"], persuasionRows(ptc)))}
 <p class="muted">${esc(PERSUASION_DOES_NOT_PROVE)} "Chance" is the share of words inside a labelled span of that technique.</p>
 <h2>Cases written for the test</h2>
-<p>Same text as other replies: pair precision <span class="mono">${rate(D.duplicates.precision)}</span>, recall <span class="mono">${rate(D.duplicates.recall)}</span>. Speaks as local, labelled elsewhere: precision <span class="mono">${rate(D.mismatch.precision)}</span>, recall <span class="mono">${rate(D.mismatch.recall)}</span>. The same author wrote these cases and the rules, so they show the rules do what they say. They are not error rates on real replies.</p>
+<p>Same text as other replies: pair precision <span class="mono">${rate(D.duplicates.precision)}</span>, recall <span class="mono">${rate(D.duplicates.recall)}</span>. Speaks as local, labelled elsewhere: precision <span class="mono">${rate(D.mismatch.precision)}</span>, recall <span class="mono">${rate(D.mismatch.recall)}</span>. One author wrote both these cases and the rules. Read the figures as a check that the rules fire where they should; real replies have no error rate yet.</p>
 <h2>Side balance</h2>
-<p>Political side is never an input to Daylight Commons. To check that the signs work alike whichever side a post targets, the strong language signs were measured on hostile text aimed at groups each side is often hostile to. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
+<p>The strong language signs were run on hostile text aimed at groups each side is often hostile to, and recall was compared. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
 ${tbl(["Corpus", "Recall, right's usual targets", "Recall, left's usual targets", "Precision, right's usual targets", "Precision, left's usual targets", "Result"], sideRows(D.sides))}
 <p class="muted">Precision agrees across sides within the intervals. Where a gap remains, the thread report undercounts extreme replies aimed at the side with lower recall.</p>
 <h2>Every sign</h2>
@@ -173,7 +173,7 @@ ${ul(limits, inline)}
 <p>Each sign in the window has "This was right" and "This was wrong". Your marks stay in your browser. After 10 marks on one kind of sign, the window shows your own count under the measured figure. It never changes the figures on this page. You can save your marks to a file from the options page and choose whether to share it.</p>
 <h2>Data used</h2>
 ${tbl(["Corpus", "Licence"], sources.map((s) => row([`<a href="${esc(s.url)}">${esc(s.name)}</a>`, esc(s.licence)])))}
-<p>No corpus text is in Daylight Commons or its repository; only counts, rates and file hashes are. The evaluation scripts in <a href="${REPO}">Daylight Commons' repository</a> reproduce every number here from the downloaded corpora.</p>`;
+<p>The repository holds counts, rates and file hashes, and none of the corpus text. Download the corpora, run the evaluation scripts in <a href="${REPO}">Daylight Commons' repository</a>, and every number on this page comes back.</p>`;
   const description = "Every Daylight Commons sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.";
   if (target === "site") return sitePage({ file: "transparency.html", title: "How Daylight Commons is measured", role: "Each sign's measured precision and recall with its interval, the data behind it, the side-balance check and the known limits.", description, updated: D.generated, body, css: FIGURE_CSS });
   return page({ title: "How Daylight Commons is measured", description, updated: D.generated, body, css: FIGURE_CSS });
