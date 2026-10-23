@@ -1138,6 +1138,37 @@ const STEREOTYPE_TRAITS = ["lazy", "criminals", "criminal", "thieves", "violent"
   "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil",
   "disgusting", "worthless", "useless", "ugly", "garbage"];
 
+// Groups named by faith, race or ethnicity, for the stereotype grammar added from the 2026-10-23 feed
+// test. Political and class groups are left out on purpose: "billionaires control the media" is an
+// argument about power, while "Jews control the media" names a people by an invented trait. Every
+// faith and every race in GROUPS is here, whichever side usually targets it.
+const IDENTITY_GROUPS = ["muslims", "moslems", "jews", "christians", "hindus", "sikhs", "atheists", "catholics",
+  "evangelicals", "mormons", "arabs", "africans", "blacks", "black people", "whites", "white people", "asians", "latinos",
+  "hispanics", "roma", "caucasians", "jewish people", "muslim people", "christian people", "arab people", "asian people"];
+// Peoples named by origin ("chinese" and "irish" are left out: they are also adjectives, as in
+// "dirty chinese restaurant"). They join IDENTITY_GROUPS where a nationality cannot mean an army or a
+// state ("illiterate X", "X will be our downfall"), and stay out where it can ("X will attack").
+const ORIGIN_GROUPS = ["immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "mexicans",
+  "indians", "pakistanis", "somalis", "haitians", "russians", "ukrainians", "americans", "europeans", "natives", "africans",
+  "koreans", "nigerians", "afghans", "syrians", "turks", "poles", "romanians", "albanians", "italians", "germans"];
+// "Jewish money controls ...", "Christian cabal", "white elites run ...": control put on a people.
+const CONTROL_NOUNS = ["cabal", "cabals", "money", "lobby", "bankers", "elite", "elites", "interests", "power brokers",
+  "globalists", "puppet masters"];
+const CONTROL_VERBS = ["control", "controls", "controlled", "run", "runs", "own", "owns", "dictate", "dictates",
+  "call the shots", "calls the shots", "calling the shots", "pull the strings", "pulls the strings", "pulling the strings"];
+const CONTROL_OBJECTS = ["the media", "media", "the news", "the government", "government", "the banks", "banks",
+  "hollywood", "congress", "washington", "the world", "the economy", "policy", "foreign policy", "the law", "law", "laws",
+  "politics", "everything", "the country", "this country", "our country", "america", "europe", "the west", "wall street",
+  "finance", "the money", "the courts", "the un"];
+// A whole people predicted to attack: "the Muslims will probably attack them".
+const ATTACK_VERBS = ["attack", "rape", "kill", "bomb", "behead", "stab", "rob", "murder", "terrorise", "terrorize",
+  "massacre", "invade"];
+// A people as a country's ruin: "X immigrants will cause your downfall".
+const RUIN_NOUNS = ["downfall", "destruction", "ruin", "end", "death", "collapse"];
+// A trait word put before a people: "illiterate X", "inbred X".
+const ATTRIBUTIVE_TRAITS = ["illiterate", "lazy", "filthy", "dirty", "inbred", "savage", "subhuman", "backward",
+  "uncivilised", "uncivilized", "primitive", "smelly", "stinking", "parasitic"];
+
 // Intensifiers allowed between "are" and the trait: "X are fucking stupid", "X are inherently violent".
 const INTENSIFIERS = ["fucking", "so", "too", "really", "damn", "inherently", "naturally", "genetically", "always",
   "basically", "literally", "very"];
@@ -1220,7 +1251,7 @@ const HATRED_OBJECTS = ["beauty", "us", "the west", "western civilization", "our
 // little on its own, and it never labels the post.
 const CONTEMPT_VERBS = ["hate", "despise", "loathe", "can't stand", "cant stand"];
 
-return { GROUPS, DEHUMANISE_ADJACENT, SIMILE_VERBS, SIMILE_NOUNS, SIMILE_SUBJECTS, SIMILE_THEY_VERBS, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, NOTICING_CUES, SLURS_DEMOTED, SLURS_SOFT, IDENTITY_ADJ, GENDERED_SLURS, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
+return { GROUPS, DEHUMANISE_ADJACENT, SIMILE_VERBS, SIMILE_NOUNS, SIMILE_SUBJECTS, SIMILE_THEY_VERBS, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, IDENTITY_GROUPS, ORIGIN_GROUPS, CONTROL_NOUNS, CONTROL_VERBS, CONTROL_OBJECTS, ATTACK_VERBS, RUIN_NOUNS, ATTRIBUTIVE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, NOTICING_CUES, SLURS_DEMOTED, SLURS_SOFT, IDENTITY_ADJ, GENDERED_SLURS, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
 })();
 
 // ---- rhetoric-util.js
@@ -2745,6 +2776,7 @@ const { derivedLanguages } = M_rhetoric_derived;
 const { mentionedIntl } = M_rhetoric_mention;
 const { foldConfusables } = M_confusables;
 const { theoryMatches } = M_theories;
+const { GROUP_STEREOTYPE } = M_rhetoric_groups;
 
 const GROUPS = L.GROUPS;
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -2830,7 +2862,7 @@ const VIOLENT_STEM = /\b(?:extermin|kill|massacr|slaughter|genocid|gass(?:ed|ing
 const REPORTED = /\b(?:call(?:s|ed|ing)?|compar(?:e|es|ed|ing)|describ(?:e|es|ed|ing)|label(?:s|ed|led|ing)?|brand(?:s|ed|ing)?|dubb?(?:s|ed|ing)?|refer(?:s|red|ring)? to)\b[^.!?"]{0,40}$/i;
 // Someone else's words: "posts saying X are a plague", "nobody should say that X ...", "saying X
 // spread like a disease is wrong". The speaker's own "I say" or "we said" is still a use.
-const SAID = /\b(?:(?<!\b(?:i|we|i've|we've|i'd|we'd|i'll|we'll|i'm|we're)\s+(?:\w+\s+)?)(?:say|says|said|saying)|wrote|writes|tweeted|posts? saying|claim(?:s|ed|ing)? that|(?:phrases?|repl(?:y|ies)|posts?|memes?|slogans?|terms?|words?)\s+(?:such as|like))\b[^.!?"]{0,40}$/i;
+const SAID = /\b(?:(?<!\b(?:i|we|i've|we've|i'd|we'd|i'll|we'll|i'm|we're)\s+(?:\w+\s+)?)(?:say|says|said|saying)|wrote|writes|tweeted|posts? saying|claim(?:s|ed|ing)? that|(?:phrases?|repl(?:y|ies)|posts?|memes?|slogans?|terms?|words?)\s+(?:such as|like)|(?:myth|trope|lie|claim|idea|canard|theory|stereotype|notion)s?\s+that|asked\s+(?:whether|if))\b[^.!?"]{0,40}$/i;
 const QUOTES = /["“”«»]/;
 function mention(s, m) {
   const at = m.index ?? s.indexOf(m[0]);
@@ -2903,7 +2935,7 @@ function scoreEnglish(s, hit) {
   hit("vigilante", RE.vigilante);
   if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)
     && !hit("slur", RE.slurCompound) && !strict(s, hit, "slur", RE.noticing)) hit("slurSoft", RE.slurSoft);
-  hit("stereotype", RE.stereotype, true);
+  if (!hit("stereotype", RE.stereotype, true)) strict(s, hit, "stereotype", GROUP_STEREOTYPE);
   hit("motive", RE.motive, true);
   hit("essentialise", RE.essentialise, true);
   hit("conspiracy", RE.conspiracy);

@@ -103,6 +103,37 @@ export const STEREOTYPE_TRAITS = ["lazy", "criminals", "criminal", "thieves", "v
   "welfare queens", "freeloaders", "invaders", "breeders", "subhuman", "trash", "liars", "cheats", "brainwashed", "sheep", "evil",
   "disgusting", "worthless", "useless", "ugly", "garbage"];
 
+// Groups named by faith, race or ethnicity, for the stereotype grammar added from the 2026-10-23 feed
+// test. Political and class groups are left out on purpose: "billionaires control the media" is an
+// argument about power, while "Jews control the media" names a people by an invented trait. Every
+// faith and every race in GROUPS is here, whichever side usually targets it.
+export const IDENTITY_GROUPS = ["muslims", "moslems", "jews", "christians", "hindus", "sikhs", "atheists", "catholics",
+  "evangelicals", "mormons", "arabs", "africans", "blacks", "black people", "whites", "white people", "asians", "latinos",
+  "hispanics", "roma", "caucasians", "jewish people", "muslim people", "christian people", "arab people", "asian people"];
+// Peoples named by origin ("chinese" and "irish" are left out: they are also adjectives, as in
+// "dirty chinese restaurant"). They join IDENTITY_GROUPS where a nationality cannot mean an army or a
+// state ("illiterate X", "X will be our downfall"), and stay out where it can ("X will attack").
+export const ORIGIN_GROUPS = ["immigrants", "migrants", "refugees", "foreigners", "asylum seekers", "mexicans",
+  "indians", "pakistanis", "somalis", "haitians", "russians", "ukrainians", "americans", "europeans", "natives", "africans",
+  "koreans", "nigerians", "afghans", "syrians", "turks", "poles", "romanians", "albanians", "italians", "germans"];
+// "Jewish money controls ...", "Christian cabal", "white elites run ...": control put on a people.
+export const CONTROL_NOUNS = ["cabal", "cabals", "money", "lobby", "bankers", "elite", "elites", "interests", "power brokers",
+  "globalists", "puppet masters"];
+export const CONTROL_VERBS = ["control", "controls", "controlled", "run", "runs", "own", "owns", "dictate", "dictates",
+  "call the shots", "calls the shots", "calling the shots", "pull the strings", "pulls the strings", "pulling the strings"];
+export const CONTROL_OBJECTS = ["the media", "media", "the news", "the government", "government", "the banks", "banks",
+  "hollywood", "congress", "washington", "the world", "the economy", "policy", "foreign policy", "the law", "law", "laws",
+  "politics", "everything", "the country", "this country", "our country", "america", "europe", "the west", "wall street",
+  "finance", "the money", "the courts", "the un"];
+// A whole people predicted to attack: "the Muslims will probably attack them".
+export const ATTACK_VERBS = ["attack", "rape", "kill", "bomb", "behead", "stab", "rob", "murder", "terrorise", "terrorize",
+  "massacre", "invade"];
+// A people as a country's ruin: "X immigrants will cause your downfall".
+export const RUIN_NOUNS = ["downfall", "destruction", "ruin", "end", "death", "collapse"];
+// A trait word put before a people: "illiterate X", "inbred X".
+export const ATTRIBUTIVE_TRAITS = ["illiterate", "lazy", "filthy", "dirty", "inbred", "savage", "subhuman", "backward",
+  "uncivilised", "uncivilized", "primitive", "smelly", "stinking", "parasitic"];
+
 // Intensifiers allowed between "are" and the trait: "X are fucking stupid", "X are inherently violent".
 export const INTENSIFIERS = ["fucking", "so", "too", "really", "damn", "inherently", "naturally", "genetically", "always",
   "basically", "literally", "very"];

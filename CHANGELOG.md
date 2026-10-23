@@ -22,6 +22,13 @@ were not published to a store.
   or an order ("stop noticing", "keep noticing") within a few words of "oy vey", "goy" or "goyim".
   "Oy vey" and "goy" alone stay unmarked. Source: Blue Square Alliance Against Hate, 2025-08-22,
   recorded in `project-docs/evidence/LEXICON-SOURCES.md`. Tests in `tests/feed.coded.test.js`.
+- Group stereotypes beyond "X are <trait>" (`src/core/rhetoric-groups.js`): control put on a people
+  ("a Jewish cabal", "Jewish money controls US policy", "X control the media"), a people predicted to
+  attack ("the X will probably attack them"), a people as a country's ruin ("X immigrants will cause
+  your downfall"), and a trait word before a people ("illiterate X"). Each rule reads every faith and
+  race, and origin where a nationality cannot mean an army or a state; political and class groups
+  stay out ("billionaires control the media" is an argument about power). Tests in
+  `tests/feed.stereotype.test.js` run every rule over every group and add near misses.
 
 ### Added
 - Carrier-safe evidence bundles. Tick Carrier-safe on the card page, or pass `--carrier-safe` to
