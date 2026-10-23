@@ -35,6 +35,12 @@ were not published to a store.
   2025-01-20, NPR/Ipsos 2020-12-30). Foreign powers from every direction are listed alike. The
   stolen-election theory also reads "won through a rigged election". Theories stay unmeasured at
   weight 0. Pairs in `tests/theories.symmetry.test.js`.
+- Measured figures re-read once on the held-out test split after these fixes (`src/core/measured.js`,
+  `project-docs/EVALUATION.md`, "Feed-test fixes"). Dehumanise 92.5% (37/40; 80.1 to 97.4),
+  stereotype 84.2% (96/114; 76.4 to 89.8), any strong family 90.6% (4,167/4,597; 89.8 to 91.5): each
+  inside its earlier interval, so every new rule ships. On the 82 feed-test posts the detector now
+  finds 14 of 21 consensus findings with no flag outside them. Those posts are the development set the
+  rules were written for, so that is not a held-out recall figure.
 
 ### Added
 - Carrier-safe evidence bundles. Tick Carrier-safe on the card page, or pass `--carrier-safe` to
