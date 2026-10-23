@@ -5,21 +5,30 @@
 // The same vector applies to every technique and every target: target enters only as a class
 // (a people or nation, a person), never as which one. Deterministic: same input, same weight.
 
-import { NATIONS, TARGET_GROUPS, REPORT_VERBS, REBUT_WORDS, MOCK_WORDS, IRONY_WORDS, NEWS_WORDS, PROFANITY } from "./reading-lists.js";
+import { NATIONS, TARGET_GROUPS, STRONGMEN, REPORT_VERBS, REBUT_WORDS, MOCK_WORDS, IRONY_WORDS, NEWS_WORDS, PROFANITY } from "./reading-lists.js";
+import { COERCION_ACTORS } from "./theories-coercion.js";
 import { READING_WEIGHTS } from "./reading-weights.js";
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const words = (list) => new RegExp(`(?<![\\p{L}\\p{N}])(?:${[...list].map(esc).sort((a, b) => b.length - a.length).join("|")})(?![\\p{L}\\p{N}])`, "iu");
+const words = (list, flags = "iu") => new RegExp(`(?<![\\p{L}\\p{N}])(?:${[...list].map(esc).sort((a, b) => b.length - a.length).join("|")})(?![\\p{L}\\p{N}])`, flags);
+// Every name a targeted cue can carry: peoples, nations, parties, states, agencies, firms and leaders.
+// Target enters the weight only as this one class, so every name in it weighs the same.
+const NAMED = [...new Set([...TARGET_GROUPS, ...NATIONS, ...COERCION_ACTORS, ...STRONGMEN])];
 const RE = {
   report: words(REPORT_VERBS), rebut: words(REBUT_WORDS), mock: words(MOCK_WORDS), irony: words(IRONY_WORDS),
-  news: words(NEWS_WORDS), profane: words(PROFANITY), group: words([...TARGET_GROUPS, ...NATIONS]),
-  person: /\b(?:he|she|him|her|his)\b|\b[A-Z][a-z]+ [A-Z][a-z]+\b/u, joke: /walk into a|knock knock|😂|🤣|\blol\b|\blmao\b/iu,
+  news: words(NEWS_WORDS), profane: words(PROFANITY), named: words(NAMED), namedAll: words(NAMED, "giu"),
+  pronoun: /\b(?:he|she|him|her|his)\b/iu, capitalised: /\b[A-Z][a-z]+ [A-Z][a-z]+\b/u, joke: /walk into a|knock knock|😂|🤣|\blol\b|\blmao\b/iu,
 };
+// The text with every listed name replaced by one neutral word, so a name's length or capitals
+// never change a factor.
+const neutral = (s) => s.replace(RE.namedAll, "x");
+// A person: a pronoun, or a capitalised two-word name outside the lists.
+const person = (s) => RE.pronoun.test(s) || RE.capitalised.test(neutral(s));
 
 // Factor ids, in a fixed order, with the words the window shows for each.
 export const FACTORS = [
   ["quotes", "stance: quotes or reports"], ["mocks", "stance: mocks"], ["rebuts", "stance: rebuts"], ["irony", "irony cue"],
-  ["question", "asked as a question"], ["target-group", "target: a people or nation"], ["target-person", "target: a person"],
+  ["question", "asked as a question"], ["target-group", "target: a named people, nation or power"], ["target-person", "target: a person"],
   ["intensity", "intensity"], ["echo", "thread: other authors use it"], ["root", "thread: the opening post uses it"],
   ["news", "genre: news or excerpt"], ["joke", "genre: joke"], ["repeat", "author: uses it again in the thread"],
   ["author-rebuts", "author: rebuts elsewhere in the thread"], ["short", "very short post"],
@@ -60,9 +69,9 @@ function intensity(s) {
 export function postFactors(text) {
   const s = String(text || "");
   return { mocks: RE.mock.test(s) ? 1 : 0, rebuts: RE.rebut.test(s) ? 1 : 0, irony: RE.irony.test(s) ? 1 : 0,
-    "target-group": RE.group.test(s) ? 1 : 0, "target-person": RE.person.test(s) ? 1 : 0, intensity: intensity(s),
+    "target-group": RE.named.test(s) ? 1 : 0, "target-person": person(s) ? 1 : 0, intensity: intensity(s),
     news: RE.news.test(s) || /^\s*[“"]/.test(s) ? 1 : 0, joke: RE.joke.test(s) ? 1 : 0,
-    short: (s.match(/[\p{L}\p{N}]+/gu) || []).length < 6 ? 1 : 0 };
+    short: (neutral(s).match(/[\p{L}\p{N}]+/gu) || []).length < 6 ? 1 : 0 };
 }
 
 // Factors of one match: the post's own, the span's sentence, and the thread context.

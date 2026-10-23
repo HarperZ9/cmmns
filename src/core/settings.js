@@ -35,6 +35,9 @@ export const DEFAULTS = Object.freeze({
   // Evidence lookups (src/core/evidence-fetch.js): off until the user reads what is sent to GitHub,
   // RDAP and the Internet Archive and clicks to allow it; even then each lookup is one click.
   evidence: false,
+  // The reading lens (src/core/reading.js): techniques under the held-out bar stay off unless the
+  // user turns them all on here.
+  lensAll: false,
 });
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
@@ -58,6 +61,7 @@ export function normalizeSettings(raw) {
     outlets: switches(s.outlets, FEED_OUTLETS.map(([id]) => id)), customFeeds: feedList(s.customFeeds),
     imageText: bool(s.imageText, DEFAULTS.imageText),
     evidence: bool(s.evidence, DEFAULTS.evidence),
+    lensAll: bool(s.lensAll, DEFAULTS.lensAll),
   };
 }
 

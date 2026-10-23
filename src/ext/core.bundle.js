@@ -3610,6 +3610,575 @@ function persuasion(text, shown = shownTechniques()) {
 return { TECHNIQUES, PERSUASION_DOES_NOT_PROVE, SHIP_PRECISION, SHIP_LOW, SHIP_MIN_N, CONTEXT_ONLY, techniqueSpans, shownTechniques, techniqueStatus, persuasion };
 })();
 
+// ---- reading-lists.js
+const M_reading_lists = (() => {
+// Word lists for the reading lens (reading.js). Every list that names a target runs in every
+// direction: nations from every region, peoples of every faith and origin, parties and movements
+// from left and right, leaders from every bloc. tests/reading.symmetry.test.js runs each targeted
+// cue over each entry and expects the same answer, so no list entry can carry a side.
+
+const { IDENTITY_GROUPS, ORIGIN_GROUPS } = M_lexicon;
+
+// UN member and observer states plus a few widely used short names.
+const NATIONS = [
+  "afghanistan", "albania", "algeria", "andorra", "angola", "argentina", "armenia", "australia", "austria", "azerbaijan",
+  "bahrain", "bangladesh", "barbados", "belarus", "belgium", "belize", "benin", "bhutan", "bolivia", "bosnia", "botswana",
+  "brazil", "brunei", "bulgaria", "burkina faso", "burundi", "cambodia", "cameroon", "canada", "chad", "chile", "china",
+  "colombia", "comoros", "congo", "costa rica", "croatia", "cuba", "cyprus", "czechia", "denmark", "djibouti", "dominica",
+  "ecuador", "egypt", "el salvador", "eritrea", "estonia", "eswatini", "ethiopia", "fiji", "finland", "france", "gabon",
+  "gambia", "georgia", "germany", "ghana", "greece", "grenada", "guatemala", "guinea", "guyana", "haiti", "honduras",
+  "hungary", "iceland", "india", "indonesia", "iran", "iraq", "ireland", "israel", "italy", "jamaica", "japan", "jordan",
+  "kazakhstan", "kenya", "kosovo", "kuwait", "kyrgyzstan", "laos", "latvia", "lebanon", "lesotho", "liberia", "libya",
+  "lithuania", "luxembourg", "madagascar", "malawi", "malaysia", "maldives", "mali", "malta", "mauritania", "mexico",
+  "moldova", "monaco", "mongolia", "montenegro", "morocco", "mozambique", "myanmar", "namibia", "nepal", "the netherlands",
+  "new zealand", "nicaragua", "niger", "nigeria", "north korea", "north macedonia", "norway", "oman", "pakistan", "palestine",
+  "panama", "paraguay", "peru", "the philippines", "poland", "portugal", "qatar", "romania", "russia", "rwanda", "samoa",
+  "saudi arabia", "senegal", "serbia", "sierra leone", "singapore", "slovakia", "slovenia", "somalia", "south africa",
+  "south korea", "south sudan", "spain", "sri lanka", "sudan", "suriname", "sweden", "switzerland", "syria", "taiwan",
+  "tajikistan", "tanzania", "thailand", "togo", "tunisia", "turkey", "turkmenistan", "uganda", "ukraine",
+  "the united kingdom", "the uk", "britain", "england", "scotland", "wales", "the united states", "the us", "america",
+  "uruguay", "uzbekistan", "venezuela", "vietnam", "yemen", "zambia", "zimbabwe", "greenland", "puerto rico", "gaza",
+];
+
+// Political groups, both directions, named as wholes.
+const POLITICAL_GROUPS = [
+  "leftists", "liberals", "libs", "progressives", "socialists", "communists", "marxists", "democrats", "dems",
+  "conservatives", "right-wingers", "rightists", "republicans", "maga", "trumpists", "nationalists", "fascists", "libertarians",
+  "zionists", "anti-zionists", "feminists", "the woke", "globalists", "tories", "labour voters", "boomers", "gen z",
+];
+
+// Peoples named as wholes: faith, origin, nationality and politics, from lexicon.js plus a few more.
+const MORE_PEOPLES = ["haitians", "israelis", "palestinians", "iranians", "chinese people", "jamaicans", "irish people",
+  "venezuelans", "salvadorans", "ecuadorians", "indigenous people", "settlers", "christians", "hindus", "buddhists"];
+const PEOPLES = [...new Set([...IDENTITY_GROUPS, ...ORIGIN_GROUPS, ...MORE_PEOPLES])];
+const TARGET_GROUPS = [...new Set([...PEOPLES, ...POLITICAL_GROUPS])];
+
+// Strongman figures from every bloc and era, for "we need our own X" and "do an X".
+const STRONGMEN = ["bukele", "putin", "xi", "pinochet", "franco", "mussolini", "stalin", "mao", "castro", "chavez",
+  "maduro", "duterte", "orban", "erdogan", "kim jong un", "lee kuan yew", "napoleon", "caesar", "cromwell", "lenin",
+  "trump", "modi", "netanyahu", "sisi", "kagame", "lukashenko", "ortega", "museveni", "ataturk", "peron"];
+
+// Allusions: named historical episodes, works and scriptures a post borrows force from.
+const ALLUSIONS = ["another hitler", "hitler", "nazi germany", "1930s germany", "the third reich", "weimar", "kristallnacht",
+  "reichstag fire", "kapo", "kapos", "nuremberg", "goebbels", "riefenstahl", "stalin's", "the gulag", "gulags", "the holocaust",
+  "orwellian", "1984", "big brother", "ministry of truth", "brave new world", "handmaid's tale", "animal farm", "ender's game",
+  "fahrenheit 451", "the matrix", "red pill", "blue pill", "hunger games", "fall of rome", "rome fell", "neville chamberlain",
+  "appeasement", "munich agreement", "trojan horse", "judas", "thirty pieces of silver", "pharisees", "the antichrist",
+  "mark of the beast", "babylon", "pontius pilate", "salem", "witch hunt", "mccarthyism", "jim crow", "apartheid", "the inquisition",
+  "the crusades", "a crusade", "jihad", "intifada", "the trail of tears", "slow horses", "house of cards", "the godfather",
+  "the sopranos", "squid game", "idiocracy"];
+
+// Coded terms: words used in place of a slur or a group name, from every direction. Each one is
+// documented by ADL, ISD or the Southern Poverty Law Center glossaries.
+const CODED_TERMS = ["jq", "the jq", "(((", ")))", "goyim", "goy", "oy vey", "shabbos goy", "zog", "khazar", "khazarian", "khazarians",
+  "kalergi", "rootless cosmopolitan", "rootless cosmopolitans", "happy merchant", "globohomo", "1488", "14 words", "14/88", "13/50",
+  "dindu", "dindu nuffin", "groomers", "cuckservative", "cuckservatives", "libtard", "libtards", "magat", "magats", "trumptard",
+  "feminazi", "feminazis", "zionazi", "zionazis", "zio", "zios", "shitlib", "shitlibs", "fashy", "kulak", "kulaks", "wetback",
+  "anchor babies", "third worlders", "sandn", "jogger", "joggers", "noticer", "noticers"];
+
+// Words that place a post as reporting, mocking or rebutting what it names (the stance factor).
+const REPORT_VERBS = ["said", "says", "say", "writes", "wrote", "claims", "claimed", "claiming", "according to", "per", "reports",
+  "reported", "alleges", "alleged", "allegedly", "told", "tweeted", "posted", "calls", "called", "argues", "argued"];
+const REBUT_WORDS = ["not true", "untrue", "false", "debunked", "nonsense", "myth", "a lie", "lies", "no evidence", "baseless",
+  "conspiracy theory", "conspiracy theories", "obsess", "obsessed", "obsession", "obsessives", "obsessive", "fixated", "fixation",
+  "so-called", "racist", "racism", "bigot", "bigotry", "antisemitic", "antisemitism", "islamophobic", "islamophobia", "xenophobic",
+  "propaganda", "unable to see", "stop spreading", "grifter", "grifters", "brainrot", "brain rot", "bent into a pretzel", "unhinged",
+  "deranged", "disgusting that", "shame on", "condemn", "condemns", "denounce", "denounces", "smear", "slander", "dog whistle"];
+const MOCK_WORDS = ["lol", "lmao", "lmfao", "rofl", "/s", "imagine thinking", "imagine believing", "sure, jan", "yeah right",
+  "clown", "clowns", "🤡", "😂", "🤣", "😆", "🙄"];
+const IRONY_WORDS = ["funny that", "funny how", "what a coincidence", "how convenient", "totally normal", "nothing to see here",
+  "of course", "shocking", "who could have guessed", "who could have known", "color me surprised", "colour me surprised"];
+const NEWS_WORDS = ["breaking", "report:", "reports", "according to", "per ", "writes", "excerpt", "via", "source:", "sources say",
+  "officials said", "statement", "announced", "announces", "press release", "update:"];
+const PROFANITY = ["fuck", "fucking", "fucked", "shit", "damn", "hell", "bullshit", "crap", "bastards", "pissed"];
+
+return { NATIONS, POLITICAL_GROUPS, PEOPLES, TARGET_GROUPS, STRONGMEN, ALLUSIONS, CODED_TERMS, REPORT_VERBS, REBUT_WORDS, MOCK_WORDS, IRONY_WORDS, NEWS_WORDS, PROFANITY };
+})();
+
+// ---- reading-cues.js
+const M_reading_cues = (() => {
+// The techniques the reading lens names, each with its cues. A cue is a regular expression over the
+// post; {NATION}, {GROUP}, {ACTOR} and {STRONGMAN} expand to the lists in reading-lists.js, which run
+// in every direction, so a cue describes how a post argues and never whom it is about.
+// Cues were written from feed tests 1 to 5 (the dev sets) and the families in the 2026-10-23 brief.
+
+const { NATIONS, TARGET_GROUPS, STRONGMEN, ALLUSIONS, CODED_TERMS } = M_reading_lists;
+const { COERCION_ACTORS } = M_theories_coercion;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const alt = (list) => [...new Set(list)].map(esc).sort((a, b) => b.length - a.length).join("|");
+const SLOTS = {
+  NATION: `(?:${alt(NATIONS)})`,
+  GROUP: `(?:the\\s+)?(?:${alt(TARGET_GROUPS)})`,
+  ACTOR: `(?:the\\s+)?(?:${alt(COERCION_ACTORS)})`,
+  STRONGMAN: `(?:${alt(STRONGMEN)})`,
+};
+const BE = "(?:is|are|was|were|'s|'re|isn't|aren't|is not|are not|wasn't)";
+
+// [id, name, family, cues]. Family names follow the brief; literary devices are one family.
+const READING_TECHNIQUES = [
+  ["nation-denial", "Nation denial", "dehumanising", [
+    `\\b{NATION}\\s+(?:isn't|is not|ain't|was never|has never been)\\s+(?:even\\s+)?(?:a\\s+)?(?:real\\s+)?(?:country|nation|state|people)\\b`,
+    "\\bno man'?s land\\b", "\\b(?:not|never) (?:a|even a) real (?:country|nation|people)\\b", "\\bso-called (?:country|nation|state|people)\\b",
+    "\\b(?:fake|invented|made-up) (?:country|nation|people)\\b", "\\bthere (?:is|was) no such (?:thing as a |)(?:country|nation|people)\\b"]],
+  ["dehumanising", "Dehumanising metaphor", "dehumanising", [
+    "\\b(?:are|like|as)\\s+(?:a\\s+)?(?:cockroaches|roaches|rats|vermin|parasites|leeches|locusts|lice|termites|maggots|insects|animals|savages|subhumans?|a plague|a cancer|a disease|a virus|an infestation)\\b",
+    "\\b(?:infest(?:ing|ed|s)?|infect(?:ing|ed|s)?|spreading like a (?:plague|virus|disease|cancer))\\b",
+    "\\b(?:subhuman|untermensch|human garbage|human trash|not even human|not human)\\b"]],
+  ["punitive-annexation", "Punitive annexation or elimination", "punitive", [
+    `\\b(?:take|seize|annex|conquer|occupy|invade|buy|colonise|colonize)\\s+{NATION}\\s+and\\s+(?:turn|convert|make)\\s+it\\s+into\\b`,
+    "\\b(?:convert|turn|make)\\s+(?:it|them|the (?:country|island|place))\\s+into\\s+(?:a\\s+)?(?:penal colony|prison colony|prison|colony|parking lot|wasteland|glass|reservation)\\b",
+    `\\b(?:nuke|glass|flatten|level|carpet[- ]bomb|wipe out|erase)\\s+{NATION}\\b`, "\\bwipe(?:d)? (?:them|it) off the (?:map|face of the earth)\\b",
+    "\\bpenal colony\\b", "\\b(?:remigrat(?:e|ion|ing)|mass deportations? now|deport them all|send them all back|round them (?:all )?up)\\b",
+    "\\b(?:put down|crush|exterminate|eradicate)\\s+(?:the\\s+)?(?:insurgency|uprising|rioters|vermin|them all)\\b",
+    "\\b(?:criminali[sz]e|abolish|outlaw|ban)\\s+(?:and\\s+(?:abolish|ban|outlaw)\\s+)?{GROUP}\\b", "\\bat maximum intensity\\b", "\\blet (?:the|them|it)\\b[^.\\n]{0,24}\\bimplode\\b"]],
+  ["strongman", "Strongman appeal", "strongman", [
+    "\\bwe need (?:a|our own|an?)\\s+(?:strong\\s?man|iron fist|dictator|{STRONGMAN})\\b", "\\b(?:do|pull) (?:a|an)\\s+{STRONGMAN}\\b",
+    "\\b{STRONGMAN}[- ]style\\b", "\\b{STRONGMAN} (?:did it right|had it right|knows how|is the model|is what we need)\\b",
+    "\\b(?:only|just) (?:a|one) (?:strong\\s?man|strong leader|man) can (?:fix|save)\\b", "\\b(?:iron fist|strong hand|martial law now|suspend the constitution|dictator for a day)\\b",
+    "\\bbenevolent dictator(?:ship)?\\b"]],
+  ["question-insinuation", "Question insinuation", "insinuation", [
+    "\\b(?:why|how|who|what|when)\\b[^?.!\\n]{0,120}\\b(?:blackmail\\w*|compromised|paid off|bought|owned|hiding|hide|cover(?:ing)? up|covered up|rigged|hacked|funded|controls?|really)\\b[^?.!\\n]{0,80}\\?",
+    "\\b(?:anyone|coincidence|ask yourself|makes you wonder|just asking|i wonder if|i'm just saying|just saying|connect the dots|think about it)\\b[^\\n]{0,4}[?!.]",
+    "\\b(?:what are they hiding|who benefits|cui bono|follow the money|why is no one talking about)\\b",
+    "\\b(?:and )?what happened\\?", "\\bwho (?:hired|paid|sent|knew|ordered|benefits|gave)\\b[^?\\n]{0,80}\\?",
+    "(?:[^?.!\\n]{6,160}\\?\\s*){2,}", "\\b(?:conveniently|coincidentally|seemingly|suspiciously)\\b"]],
+  ["true-leap", "True item carries a leap", "leap", [
+    "\\b(?:it'?s|that'?s|this is)\\s+(?:true|a fact|documented|on record|real)\\b[^.\\n]{0,80}\\b(?:so|which means|therefore|proves|that'?s why)\\b",
+    "\\b(?:this|it|which)\\s+(?:proves|confirms|shows)\\s+(?:just how|that|exactly)\\b", "\\b(?:not|no) (?:a )?coincidence\\b",
+    "\\bcan be (?:hacked|rigged|faked|manipulated)\\b", "\\bnot hard at all if\\b", "\\bthe only explanation\\b",
+    "\\bthere is an explanation\\b", "\\b(?:it all|everything) (?:makes sense|adds up) now\\b",
+    "\\b(?:obviously|clearly|undeniably) (?:ended up|means|shows|proves|is why|say)\\b", "\\b(?:and )?(?:that|this) is why\\b", "\\bwhich is why\\b", "\\btheir plan to\\b"]],
+  ["case-to-group", "Case to group", "generalisation", [
+    "\\b(?:all|every(?: single)?|most|typical)\\s+{GROUP}\\b", "\\b{GROUP}\\s+(?:always|never|all|are all|will always|will never)\\b",
+    "\\b(?:that'?s|this is) (?:what|how) {GROUP}\\s+(?:do|are|act|behave)\\b", "\\b{GROUP}\\s+(?:will probably|will|are going to)\\s+(?:attack|rape|kill|destroy|take over|ruin|replace)\\b",
+    "\\b(?:the|these|those)\\s+(?:people|kind|types?)\\s+(?:always|never|all)\\b", "\\bthe whole (?:bunch|lot) of them\\b",
+    "\\brampant (?:throughout|in|among)\\b", "\\b(?:their|these people's) (?:depravity|nature|evil|savagery|degeneracy)\\b", "\\bif they do this to their own\\b",
+    "\\bimagine what they do to\\b", "\\ball the other\\b[^.?\\n]{0,40}\\b(?:members|people|ones) who\\b", "\\b\\w+ (?:rape|crime|terror|hate) culture\\b"]],
+  ["essentialism", "Essentialism", "essentialism", [
+    "\\b(?:in their|it'?s in their)\\s+(?:blood|dna|nature|genes|culture)\\b", "\\b{GROUP}\\s+(?:are|is)\\s+(?:naturally|inherently|genetically|by nature)\\b",
+    "\\b(?:incompatible|not compatible)\\s+with\\s+(?:western|our|european|american|civili[sz]ed)\\b", "\\b(?:can'?t|cannot|won'?t) (?:be )?(?:integrate|assimilate)d?\\b",
+    "\\bcompletely different cultures?\\b", "\\b(?:third[- ]world|backward) (?:culture|people|mentality)\\b",
+    "\\b(?:genetically|biologically|innately|racially) (?:inhibited|predisposed|incapable|inferior|superior|prone|wired)\\b"]],
+  ["coded-term", "Coded term", "coded", [`(?<![\\w])(?:${alt(CODED_TERMS)})(?![\\w])`, "\\b(?:stop noticing|starting to notice|aren'?t supposed to notice|you'?re not allowed to notice)\\b"]],
+  ["replacement", "Replacement or blood libel", "replacement", [
+    "\\bgreat replacement\\b", "\\b(?:replac(?:e|ing|ement of)) (?:us|white|native|christian|european|american|the native)\\w*\\b", "\\bdemographic (?:replacement|war|takeover)\\b",
+    "\\bimport(?:ing|ed)? (?:voters|a new electorate|the third world|people from completely different)\\b", "\\bcommit(?:ting)? (?:cultural |national )?suicide by importing\\b",
+    "\\b(?:white|christian|european) genocide\\b", "\\bblood libel\\b", "\\bdrink(?:ing|s)? (?:the )?blood of\\b", "\\britual(?:istic)?,? (?:\\w+ )?(?:murder|sacrifice|abuse)\\b",
+    "\\b(?:harvest(?:ing)?|adrenochrome)\\b[^.\\n]{0,40}\\b(?:children|kids|babies|organs)\\b", "\\bpoison(?:ing|ed)? the wells\\b", "\\bcultural suicide\\b",
+    "\\bflood(?:s|ed|ing)? (?:the|our|this) (?:country|nation|cities|towns|continent) with\\b", "\\bswamp(?:s|ed|ing)? the (?:natives|locals|voters|country)\\b",
+    "\\btraffick(?:ing|s|ed)? (?:kids|children|babies)\\b", "\\b(?:rape|abuse) (?:ceremonies|assembly line|rings?)\\b", "\\bdivine permission to\\b"]],
+  ["secret-coercion", "Secret coercion", "coercion", [
+    "\\bblackmail(?:ed|ing|s)?\\b", "\\bkompromat\\b", "\\b(?:has|have|holds?|got)\\s+(?:the\\s+)?dirt on\\b",
+    "\\bcompromised\\s+(?:by|to|into)\\b", "\\b(?:is|was|were|are|being)\\s+compromised\\b(?![^.\\n]{0,30}\\b(?:account|system|server|network|password|data|phone|device)s?\\b)",
+    "\\b(?:owned|controlled|bought(?: and paid for)?|handled|infiltrated)\\s+by\\s+{ACTOR}\\b", "\\bin the pocket of\\b", "\\b{ACTOR}\\s+(?:owns|controls|runs)\\s+(?:him|her|them|congress|the president|our government)\\b",
+    "\\b(?:asset|puppet|stooge|plant) (?:of|for) {ACTOR}\\b", "\\b(?:deep state|cia|mossad|kremlin|ccp)[- ]controlled\\b", "\\bcontrolled (?:nations?|governments?|media)\\b",
+    "\\b(?:fully |completely |totally )?taken over by\\b", "\\b(?:cement|entrench|hold)(?:ing)? (?:control|power)(?: indefinitely| forever)?\\b", "\\bthe playbook\\b"]],
+  ["election-theft", "Election theft", "election", [
+    "\\b(?:rigged|stolen|fraudulent|fake)\\s+(?:the\\s+)?(?:election|vote|ballots?)\\b", "\\b(?:rig|rigged|steal|stole|stealing)\\s+(?:the\\s+)?(?:election|vote|votes|machines|ballots)\\b",
+    "\\b(?:fake|illegitimate|selected,? not elected)\\s+president\\b", "\\belection fraud\\b", "\\bmachines?\\b[^.\\n]{0,60}\\b(?:hacked|flipp(?:ed|ing)|switch(?:ed|ing)|sabotage)\\b",
+    "\\b(?:hacked|flipped)\\b[^.\\n]{0,40}\\b(?:votes?|machines?|ballots?|election)\\b", "\\bannul(?:ment of)?\\b[^.\\n]{0,30}\\belection\\b"]],
+  ["metaphor", "Metaphor", "literary", [
+    "\\b(?:invasion|invaders|flood(?:ed|ing)? of|tidal wave|swarms?|hordes?)\\b", "\\b(?:is|are) (?:a )?(?:cancer|poison|tumou?r|disease|virus|plague)\\b",
+    "\\bburn(?:ed|t)? (?:it )?out of\\b", "\\bbled (?:dry|white)\\b", "\\b(?:robbing|pillaging|raping) (?:and \\w+ )?(?:this|the|our) country\\b", "\\bone body\\b"]],
+  ["hyperbole", "Hyperbole", "literary", [
+    "\\bin (?:american|world|human|modern|recorded|our|the) history\\b", "\\bof all time\\b", "\\bmore \\w+ than (?:basically )?every\\b",
+    "\\bcombined[!.]*$", "\\b(?:nothing is being done|completely mad|every single one)\\b", "\\bthe (?:worst|biggest|most \\w+) (?:\\w+ )?(?:ever|in the world|on earth)\\b",
+    "\\bliterally (?:destroying|killing|everyone|everything)\\b", "\\b(?:absolutely|completely|totally) (?:insane|toxic|destroyed|corrupt)\\b"]],
+  ["irony", "Irony", "literary", ["\\bfunny (?:that|how)\\b", "\\bwhat a coincidence\\b", "\\bhow convenient\\b", "\\byeah,? right\\b",
+    "\\b(?:sure|totally),? (?:jan|buddy|pal)\\b", "(?:^|\\s)/s\\b", "\\bwalk into a bank\\b", "\\bwalk into a bar\\b", "\\bcolou?r me surprised\\b"]],
+  ["allusion", "Allusion", "literary", [`\\b(?:${alt(ALLUSIONS)})\\b`]],
+  ["dog-whistle", "Dog-whistle", "literary", ["\\b(?:certain people|you know who|those people|these people|their kind|globalists?|international bankers|rootless|the usual suspects|\\(\\(\\()\\b",
+    "\\b(?:we aren'?t supposed to|you'?re not supposed to) (?:notice|talk about|say)\\b", "\\boften it'?s in the (?:last )?name\\b", "\\b(?:jewish|zionist|muslim|catholic|white|black) (?:money|cabal|lobby|power brokers)\\b"]],
+].map(([id, name, family, cues]) => ({ id, name, family, cues }));
+
+const fill = (cue) => cue.replace(/\{(NATION|GROUP|ACTOR|STRONGMAN)\}/g, (_, k) => SLOTS[k]);
+const READING_RULES = READING_TECHNIQUES.flatMap((t) => t.cues.map((cue, i) => ({ technique: t.id, cue: `${t.id}#${i}`, re: new RegExp(fill(cue), "giu") })));
+const TECHNIQUE_BY_ID = new Map(READING_TECHNIQUES.map((t) => [t.id, t]));
+
+return { SLOTS, READING_TECHNIQUES, READING_RULES, TECHNIQUE_BY_ID };
+})();
+
+// ---- reading-weights.js
+const M_reading_weights = (() => {
+// Generated by scripts/eval-reading.mjs --fit from feed tests 1 to 9 (112 cue hits, 75 consensus positive). Do not edit.
+const READING_WEIGHTS = {"bias":0.559,"w":{"quotes":-0.225,"mocks":0,"rebuts":-0.346,"irony":-0.351,"question":0.036,"target-group":0.392,"target-person":0.185,"intensity":-0.011,"echo":-0.279,"root":-0.276,"news":-0.008,"joke":0.07,"repeat":0.494,"author-rebuts":-0.037,"short":0.149},"threshold":0.5};
+
+return { READING_WEIGHTS };
+})();
+
+// ---- reading-inflection.js
+const M_reading_inflection = (() => {
+// The inflection layer: each cue match is weighted by what surrounds it. Stance (asserts, quotes,
+// mocks, rebuts), target class, intensity, irony, thread context, genre and the author's own usage
+// in the thread each become a number, and one logistic weight vector (reading-weights.js, fitted
+// on feed tests 1 to 5 only by scripts/eval-reading.mjs) turns them into a weight between 0 and 1.
+// The same vector applies to every technique and every target: target enters only as a class
+// (a people or nation, a person), never as which one. Deterministic: same input, same weight.
+
+const { NATIONS, TARGET_GROUPS, STRONGMEN, REPORT_VERBS, REBUT_WORDS, MOCK_WORDS, IRONY_WORDS, NEWS_WORDS, PROFANITY } = M_reading_lists;
+const { COERCION_ACTORS } = M_theories_coercion;
+const { READING_WEIGHTS } = M_reading_weights;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const words = (list, flags = "iu") => new RegExp(`(?<![\\p{L}\\p{N}])(?:${[...list].map(esc).sort((a, b) => b.length - a.length).join("|")})(?![\\p{L}\\p{N}])`, flags);
+// Every name a targeted cue can carry: peoples, nations, parties, states, agencies, firms and leaders.
+// Target enters the weight only as this one class, so every name in it weighs the same.
+const NAMED = [...new Set([...TARGET_GROUPS, ...NATIONS, ...COERCION_ACTORS, ...STRONGMEN])];
+const RE = {
+  report: words(REPORT_VERBS), rebut: words(REBUT_WORDS), mock: words(MOCK_WORDS), irony: words(IRONY_WORDS),
+  news: words(NEWS_WORDS), profane: words(PROFANITY), named: words(NAMED), namedAll: words(NAMED, "giu"),
+  pronoun: /\b(?:he|she|him|her|his)\b/iu, capitalised: /\b[A-Z][a-z]+ [A-Z][a-z]+\b/u, joke: /walk into a|knock knock|😂|🤣|\blol\b|\blmao\b/iu,
+};
+// The text with every listed name replaced by one neutral word, so a name's length or capitals
+// never change a factor.
+const neutral = (s) => s.replace(RE.namedAll, "x");
+// A person: a pronoun, or a capitalised two-word name outside the lists.
+const person = (s) => RE.pronoun.test(s) || RE.capitalised.test(neutral(s));
+
+// Factor ids, in a fixed order, with the words the window shows for each.
+const FACTORS = [
+  ["quotes", "stance: quotes or reports"], ["mocks", "stance: mocks"], ["rebuts", "stance: rebuts"], ["irony", "irony cue"],
+  ["question", "asked as a question"], ["target-group", "target: a named people, nation or power"], ["target-person", "target: a person"],
+  ["intensity", "intensity"], ["echo", "thread: other authors use it"], ["root", "thread: the opening post uses it"],
+  ["news", "genre: news or excerpt"], ["joke", "genre: joke"], ["repeat", "author: uses it again in the thread"],
+  ["author-rebuts", "author: rebuts elsewhere in the thread"], ["short", "very short post"],
+  ["mention", "stance: names the term to criticise it"],
+];
+const FACTOR_IDS = FACTORS.map(([id]) => id);
+// Use and mention: a coded term or dog-whistle named inside a sentence that criticises it is a
+// mention. This weight is fixed from that distinction, not fitted (the dev sets hold one example).
+const MENTION_WEIGHT = -3;
+const LEXICAL = new Set(["coded-term", "dog-whistle"]);
+const LABEL = new Map(FACTORS);
+
+// The sentence around [start, end) in s.
+function sentence(s, start, end) {
+  const head = s.slice(0, start), tail = s.slice(end);
+  const a = Math.max(head.lastIndexOf("."), head.lastIndexOf("!"), head.lastIndexOf("?"), head.lastIndexOf("\n")) + 1;
+  const m = tail.match(/[.!?\n]/);
+  return { before: head.slice(a), after: m ? tail.slice(0, m.index + 1) : tail };
+}
+
+// True when the span sits inside quotation marks.
+function quoted(s, start) {
+  const head = s.slice(0, start);
+  const open = (head.match(/[“"]/g) || []).length - (head.match(/”/g) || []).length;
+  return /“[^”]*$/.test(head) || open % 2 === 1;
+}
+
+function intensity(s) {
+  const letters = s.replace(/[^A-Za-z]/g, ""), caps = s.replace(/[^A-Z]/g, "").length;
+  let x = 0;
+  if (letters.length >= 12 && caps / letters.length > 0.3) x += 0.4;
+  if (/!!|!\?|\?!/.test(s)) x += 0.3;
+  if (RE.profane.test(s)) x += 0.3;
+  return Math.min(1, x);
+}
+
+// Context-free factors of one post, shared by every match in it.
+function postFactors(text) {
+  const s = String(text || "");
+  return { mocks: RE.mock.test(s) ? 1 : 0, rebuts: RE.rebut.test(s) ? 1 : 0, irony: RE.irony.test(s) ? 1 : 0,
+    "target-group": RE.named.test(s) ? 1 : 0, "target-person": person(s) ? 1 : 0, intensity: intensity(s),
+    news: RE.news.test(s) || /^\s*[“"]/.test(s) ? 1 : 0, joke: RE.joke.test(s) ? 1 : 0,
+    short: (neutral(s).match(/[\p{L}\p{N}]+/gu) || []).length < 6 ? 1 : 0 };
+}
+
+// Factors of one match: the post's own, the span's sentence, and the thread context.
+// ctx: { echo: other authors in the thread with this technique, root: 0|1, repeat: 0|1, authorRebuts: 0|1 }
+function matchFactors(text, hit, base = postFactors(text), ctx = {}) {
+  const s = String(text || ""), { before, after } = sentence(s, hit.start, hit.end);
+  // A question is the technique itself for question insinuation, so it is context only elsewhere.
+  const question = hit.technique !== "question-insinuation" && /\?/.test(after) ? 1 : 0;
+  const mention = LEXICAL.has(hit.technique) && RE.rebut.test(before + after) ? 1 : 0;
+  return { ...base, quotes: quoted(s, hit.start) || RE.report.test(before) ? 1 : 0, question, mention,
+    echo: Math.min(3, ctx.echo || 0) / 3, root: ctx.root ? 1 : 0, repeat: ctx.repeat ? 1 : 0, "author-rebuts": ctx.authorRebuts ? 1 : 0 };
+}
+
+const sigmoid = (z) => 1 / (1 + Math.exp(-z));
+
+// { weight, shown, top } for one match. top: the two factors that moved the weight most, each
+// { id, label, effect } with effect "raises" or "lowers".
+function inflect(factors, W = READING_WEIGHTS) {
+  let z = W.bias;
+  const parts = [];
+  for (const id of FACTOR_IDS) {
+    const c = (id === "mention" ? MENTION_WEIGHT : W.w[id] || 0) * (factors[id] || 0);
+    z += c;
+    if (c) parts.push({ id, label: LABEL.get(id), c });
+  }
+  parts.sort((a, b) => Math.abs(b.c) - Math.abs(a.c) || a.id.localeCompare(b.id));
+  const weight = sigmoid(z);
+  return { weight: Math.round(weight * 1000) / 1000, shown: weight >= W.threshold,
+    top: parts.slice(0, 2).map((p) => ({ id: p.id, label: p.label, effect: p.c > 0 ? "raises" : "lowers" })) };
+}
+
+return { FACTORS, FACTOR_IDS, MENTION_WEIGHT, postFactors, matchFactors, inflect };
+})();
+
+// ---- reading-measured.js
+const M_reading_measured = (() => {
+// Generated by scripts/eval-reading.mjs from held-out feed tests 10 and 11. Do not edit.
+// on: held-out precision at least 80% from at least 3 hits, with inflection.
+const READING_MEASURED = {
+ "nation-denial": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "dehumanising": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "punitive-annexation": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "strongman": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "question-insinuation": {
+  "on": false,
+  "precision": 0.75,
+  "k": 3,
+  "n": 4,
+  "low": 0.30063605244263664,
+  "high": 0.9544139373553638
+ },
+ "true-leap": {
+  "on": false,
+  "precision": 0,
+  "k": 0,
+  "n": 1,
+  "low": 0,
+  "high": 0.7934567085261071
+ },
+ "case-to-group": {
+  "on": false,
+  "precision": 1,
+  "k": 1,
+  "n": 1,
+  "low": 0.20654329147389294,
+  "high": 1
+ },
+ "essentialism": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "coded-term": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "replacement": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "secret-coercion": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "election-theft": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "metaphor": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "hyperbole": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "irony": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ },
+ "allusion": {
+  "on": false,
+  "precision": 0,
+  "k": 0,
+  "n": 1,
+  "low": 0,
+  "high": 0.7934567085261071
+ },
+ "dog-whistle": {
+  "on": false,
+  "precision": null,
+  "k": 0,
+  "n": 0,
+  "low": 0,
+  "high": 0
+ }
+};
+
+return { READING_MEASURED };
+})();
+
+// ---- reading.js
+const M_reading = (() => {
+// The reading lens: names the techniques a post uses, at the span, and weighs each one by its
+// context (reading-inflection.js). A finding is { technique, name, family, start, end, match,
+// weight, shown, top }: the span, its name, and the two factors that moved its weight.
+// Thread and feed patterns count how many posts and authors use the same technique, so a frame
+// repeated across a thread shows as a pattern. Pure: no DOM, no network.
+// Which techniques the window shows comes from held-out measurement (reading-measured.js): a
+// technique under READING_SHIP_PRECISION held-out precision stays off.
+
+const { READING_RULES, TECHNIQUE_BY_ID, READING_TECHNIQUES } = M_reading_cues;
+const { postFactors, matchFactors, inflect } = M_reading_inflection;
+const { READING_MEASURED } = M_reading_measured;
+
+const READING_SHIP_PRECISION = 0.8;
+const READING_SHIP_MIN_N = 3;
+
+// Techniques the window shows: held-out precision at or above the bar from enough hits.
+function readingOn(table = READING_MEASURED) {
+  return new Set(READING_TECHNIQUES.map((t) => t.id).filter((id) => { const r = (table || {})[id]; return !!(r && r.on); }));
+}
+
+// The shown set for a user's settings: every technique when they turned the lens fully on.
+const lensOn = (settings) => (settings && settings.lensAll ? new Set(READING_TECHNIQUES.map((t) => t.id)) : readingOn());
+
+// Every cue match in the text, overlapping matches of one technique merged into the first.
+function cueHits(text) {
+  const s = String(text || "").replace(/[’]/g, "'");
+  const hits = [];
+  for (const r of READING_RULES) {
+    r.re.lastIndex = 0;
+    for (const m of s.matchAll(r.re)) if (m[0].trim()) hits.push({ technique: r.technique, cue: r.cue, start: m.index, end: m.index + m[0].length });
+  }
+  hits.sort((a, b) => a.start - b.start || b.end - a.end);
+  const out = [];
+  for (const h of hits) if (!out.some((o) => o.technique === h.technique && h.start < o.end && o.start < h.end)) out.push(h);
+  return out.map((h) => ({ ...h, match: String(text || "").slice(h.start, h.end) }));
+}
+
+// Who uses which technique in a thread, from the raw cue hits.
+function usage(posts, hits) {
+  const authorsOf = new Map(), rebutters = new Set();
+  posts.forEach((p, i) => {
+    if (postFactors(p.text).rebuts) rebutters.add(`${p.author}#${i}`);
+    for (const t of new Set(hits[i].map((h) => h.technique))) {
+      if (!authorsOf.has(t)) authorsOf.set(t, []);
+      authorsOf.get(t).push({ author: p.author, i });
+    }
+  });
+  return { authorsOf, rebutters };
+}
+
+function context(posts, i, technique, U) {
+  const users = U.authorsOf.get(technique) || [], me = posts[i].author, rootAt = posts.findIndex((p) => p.role === "root");
+  return {
+    echo: new Set(users.filter((u) => u.author !== me).map((u) => u.author)).size,
+    root: rootAt >= 0 && rootAt !== i && users.some((u) => u.i === rootAt) ? 1 : 0,
+    repeat: users.some((u) => u.author === me && u.i !== i) ? 1 : 0,
+    authorRebuts: [...U.rebutters].some((k) => k.startsWith(`${me}#`) && k !== `${me}#${i}`) ? 1 : 0,
+  };
+}
+
+// posts: [{ id, author, text, role? }] in thread order. Returns one entry per post:
+// { id, findings }. Options: inflection (default true), on (the shown set; default readingOn()).
+function readThread(posts, { inflection = true, on = readingOn(), withFactors = false } = {}) {
+  const P = posts.map((p) => ({ id: String(p.id), author: String(p.author || ""), text: String(p.text || ""), role: p.role || "reply" }));
+  const hits = P.map((p) => cueHits(p.text));
+  const U = usage(P, hits);
+  return P.map((p, i) => {
+    const base = postFactors(p.text);
+    const findings = hits[i].map((h) => {
+      const t = TECHNIQUE_BY_ID.get(h.technique);
+      const factors = matchFactors(p.text, h, base, context(P, i, h.technique, U)), inf = inflect(factors);
+      const kept = inflection ? inf.shown : true;
+      const f = { technique: t.id, name: t.name, family: t.family, start: h.start, end: h.end, match: h.match.trim().slice(0, 120),
+        weight: inf.weight, top: inf.top, shown: kept && on.has(t.id) };
+      return withFactors ? { ...f, factors } : f;
+    });
+    return { id: p.id, findings };
+  });
+}
+
+// One post read on its own.
+const readPost = (text, opts) => readThread([{ id: "post", author: "", text, role: "root" }], opts)[0].findings;
+
+// How many posts and authors use each shown technique: [{ technique, name, posts, authors, of }],
+// most used first. A technique in two or more posts by two or more authors is a pattern.
+function patternCounts(read, posts) {
+  const by = new Map();
+  read.forEach((r, i) => {
+    for (const t of new Set(r.findings.filter((f) => f.shown).map((f) => f.technique))) {
+      if (!by.has(t)) by.set(t, { posts: 0, authors: new Set() });
+      const x = by.get(t);
+      x.posts++;
+      x.authors.add(String((posts[i] || {}).author || i));
+    }
+  });
+  return [...by.entries()].map(([t, x]) => ({ technique: t, name: TECHNIQUE_BY_ID.get(t).name, posts: x.posts, authors: x.authors.size, of: read.length,
+    pattern: x.posts >= 2 && x.authors.size >= 2 })).sort((a, b) => b.posts - a.posts || a.technique.localeCompare(b.technique));
+}
+
+// A whole thread: per-post findings plus the thread's pattern counts.
+function readingReport(posts, opts) {
+  const read = readThread(posts, opts);
+  return { posts: read, patterns: patternCounts(read, posts) };
+}
+
+// A feed is not a conversation: each post is read on its own, then the frames are counted.
+function feedPatterns(posts, opts) {
+  const read = posts.map((p) => ({ id: String(p.id), findings: readThread([{ ...p, role: "root" }], opts)[0].findings }));
+  return patternCounts(read, posts);
+}
+
+return { READING_SHIP_PRECISION, READING_SHIP_MIN_N, readingOn, lensOn, cueHits, readThread, readPost, patternCounts, readingReport, feedPatterns };
+})();
+
 // ---- framing.js
 const M_framing = (() => {
 // Episodic and thematic framing (Iyengar, "Is Anyone Responsible? How Television Frames Political
@@ -8279,12 +8848,12 @@ const FEED_RETAIN_DAYS = 60, FEED_MAX_IDS = 3000;
 const DAY = 86400000;
 const dayOf = (t) => new Date(t).toISOString().slice(0, 10);
 
-// posts: [{ id, domains, strong, note, claims, techniques, frame }]. frame: "person-story",
+// posts: [{ id, domains, strong, note, claims, techniques, frame, lens }]. lens: reading-lens technique ids shown on the post. frame: "person-story",
 // "structural", "mixed", "none" (long enough, neither) or absent (too short). Log: { "site|day": entry }.
 function addFeedPosts(log, site, posts, now = Date.now()) {
   const L = { ...(log || {}) };
   const key = `${site}|${dayOf(now)}`;
-  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques }, frames: { ...(L[key].frames || {}) } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {}, frames: {} };
+  const e = L[key] ? { ...L[key], ids: [...L[key].ids], links: { ...L[key].links }, techniques: { ...L[key].techniques }, frames: { ...(L[key].frames || {}) }, lens: { ...(L[key].lens || {}) } } : { site, day: dayOf(now), at: now, ids: [], posts: 0, strong: 0, notes: 0, claims: 0, links: {}, techniques: {}, frames: {}, lens: {} };
   const have = new Set(e.ids);
   for (const p of posts) {
     if (!p || !p.id || have.has(p.id) || e.ids.length >= FEED_MAX_IDS) continue;
@@ -8296,6 +8865,7 @@ function addFeedPosts(log, site, posts, now = Date.now()) {
     for (const d of new Set(p.domains || [])) e.links[d] = (e.links[d] || 0) + 1;
     for (const t of new Set(p.techniques || [])) e.techniques[t] = (e.techniques[t] || 0) + 1;
     if (p.frame) e.frames[p.frame] = (e.frames[p.frame] || 0) + 1;
+    for (const t of new Set(p.lens || [])) e.lens[t] = (e.lens[t] || 0) + 1;
   }
   e.at = now;
   L[key] = e;
@@ -8327,7 +8897,7 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
   const snaps = Object.values(reports || {}).filter((s) => s && s.at >= since);
   const feeds = Object.values(feedLog || {}).filter((f) => f && f.at >= since);
   const T = { strongK: 0, strongN: 0, ctxK: { notes: 0, claims: 0 }, ctxN: 0, looked: 0, flagged: 0 };
-  const sites = new Map(), tech = new Map(), frames = new Map(), daily = dailyFrame(days, now);
+  const sites = new Map(), tech = new Map(), frames = new Map(), lens = new Map(), daily = dailyFrame(days, now);
   for (const s of snaps) {
     T.looked += s.lookedUp || 0; T.flagged += s.flaggedK || 0;
     if (s.strong != null) { T.strongK += s.strong; T.strongN += s.replies || 0; }
@@ -8343,6 +8913,7 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
     for (const [d, n] of Object.entries(f.links || {})) add(sites, d, n);
     for (const [t, n] of Object.entries(f.techniques || {})) add(tech, t, n);
     for (const [t, n] of Object.entries(f.frames || {})) add(frames, t, n);
+    for (const [t, n] of Object.entries(f.lens || {})) add(lens, t, n);
     dayAdd(daily, f.at, { posts: f.posts, strong: f.strong, strongN: f.posts, feedPosts: f.posts });
   }
   const mentions = [...sites.values()].reduce((a, b) => a + b, 0);
@@ -8358,6 +8929,8 @@ function feedDashboard(reports, feedLog, net, { days = 7, now = Date.now(), isSt
     notes: count(T.ctxK.notes, T.ctxN), claims: count(T.ctxK.claims, T.ctxN),
     techniques: { shown: [...shown], counts: [...tech].filter(([t]) => shown.includes(t)).map(([id, n]) => ({ id, n })).sort((a, b) => b.n - a.n) },
     framing: framingBalance(frames, framingRow),
+    // Reading-lens frames across feed posts: how many posts used each technique the window shows.
+    lens: [...lens].map(([id, n]) => ({ id, n })).sort((a, b) => b.n - a.n || (a.id < b.id ? -1 : 1)),
     together: coGraph(net, { min: 3, since, maxNodes: 40 }).edges.slice(0, 10),
     daily: [...daily.values()],
   };
@@ -9912,6 +10485,9 @@ const DEFAULTS = Object.freeze({
   // Evidence lookups (src/core/evidence-fetch.js): off until the user reads what is sent to GitHub,
   // RDAP and the Internet Archive and clicks to allow it; even then each lookup is one click.
   evidence: false,
+  // The reading lens (src/core/reading.js): techniques under the held-out bar stay off unless the
+  // user turns them all on here.
+  lensAll: false,
 });
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
@@ -9935,6 +10511,7 @@ function normalizeSettings(raw) {
     outlets: switches(s.outlets, FEED_OUTLETS.map(([id]) => id)), customFeeds: feedList(s.customFeeds),
     imageText: bool(s.imageText, DEFAULTS.imageText),
     evidence: bool(s.evidence, DEFAULTS.evidence),
+    lensAll: bool(s.lensAll, DEFAULTS.lensAll),
   };
 }
 
@@ -11717,5 +12294,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

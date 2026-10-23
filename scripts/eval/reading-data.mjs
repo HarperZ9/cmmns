@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-// Round 1 (commit 0a80e52) fitted on 1 to 5 and was scored once on 6 to 11
+// Round 1 (commit dac81a7, 0a80e52 before the rebase) fitted on 1 to 5 and was scored once on 6 to 11
 // (project-docs/evidence/reading-results-round1.json). Round 2 read the misses in 6 to 9, so 6 to 9
 // joined the dev sets; 10 and 11, labelled blind after round 1 was frozen, are the held-out sets.
 export const DEV_SETS = [1, 2, 3, 4, 5, 6, 7, 8, 9];

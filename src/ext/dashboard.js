@@ -105,6 +105,13 @@
       : T.counts.length ? `Counted for the techniques that passed their measurement: ${T.shown.map((t) => PB.TECHNIQUES[t].name.toLowerCase()).join(", ")}.` : "Measured techniques are counted here when a post you open uses one.";
   }
 
+  // Reading-lens frames (src/core/reading.js): feed posts that used each technique the window shows.
+  function lens(d) {
+    const rows = d.lens || [];
+    bars($("lens"), rows, (r) => PB.TECHNIQUE_BY_ID.get(r.id).name, (r) => `${r.n} of ${d.feedPosts.toLocaleString()} feed posts`);
+    $("lens-say").textContent = rows.length ? "Feed posts you scrolled past, counted once per technique." : "Frames show here when a feed post uses a technique the window shows.";
+  }
+
   // The episodic and thematic balance (src/core/feed.js framingBalance): held with its reason and no
   // counts until the person-story reading clears its measurement.
   function framing(d) {
@@ -163,7 +170,7 @@
     const d = PB.feedDashboard(store[KEYS.reports], store[KEYS.feed], store[KEYS.net], { days, isState });
     const held = Math.min(days, keep);
     $("scope").textContent = `${plural(d.threads, "thread", "threads")} and ${plural(d.feedPosts, "feed post", "feed posts")}, ${d.from} to ${d.to}.` + (held < days ? ` Daylight Commons keeps ${keep} days (Options), so this covers ${keep}.` : "");
-    sites(d); operations(); rhetoric(d); techniques(d); framing(d); checks(d); media(days);
+    sites(d); operations(); rhetoric(d); techniques(d); lens(d); framing(d); checks(d); media(days);
     for (const b of document.querySelectorAll(".window button")) b.setAttribute("aria-pressed", String(+b.dataset.days === days));
   }
 

@@ -46,6 +46,10 @@
     for (const t of m.persuasion || []) {
       out.push({ label: `persuasion: ${t.name.toLowerCase()}`, fam: t.technique, level: "info", cat: "language", rows: [["In this post", `"${t.match}"`], ["What it is", t.definition], t.lang === "fr" ? ["French cue", "Not measured in French. The figure below is for English news articles."] : null, dnp(PB.PERSUASION_DOES_NOT_PROVE)].filter(Boolean) });
     }
+    // The reading lens (src/core/reading.js): the span, its name, and the two factors that moved it.
+    for (const f of m.lens || []) {
+      out.push({ label: f.name.toLowerCase(), fam: "reading", level: "info", cat: "language", rows: [["In this post", `"${f.match}"`], ...(f.top.length ? [["Weighed by", f.top.map((x) => `${x.label} (${x.effect})`).join("; ")]] : [])] });
+    }
     const M = m.machine;
     if (M && M.leak) out.push({ label: "leaked AI text", fam: "leaked-ai", level: "warn", cat: "language", rows: [["In this post", `"${M.leak}"`], ["What it is", "Text a chatbot writes, posted without editing."], dnp("People quote chatbots, joke, or paste a reply on purpose.")] });
     else if (M && M.machineLike) out.push({ label: "machine-writing signs", fam: "machine-writing", level: "flag", cat: "language", rows: [["Signs", M.signs.join("; ")], ["How Daylight Commons decides", "Three or more independent signs in a post of at least 25 words, using Articulate's word lists."], dnp("No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.")] });

@@ -100,6 +100,7 @@
       "js": [
         "core.bundle.js",
         "settings.js",
+        "lens-inline.js",
         "fonts.js",
         "store.js",
         "feedback.js",

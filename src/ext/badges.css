@@ -163,3 +163,6 @@
 .pb-def-t .pb-def-s { white-space: nowrap; }
 .pb-def-matched td { color: var(--pb-ink); }
 .pb-def-matched .pb-def-s { font-weight: 700; }
+
+/* Reading-lens spans (src/ext/lens-inline.js), painted with the CSS Custom Highlight API. */
+::highlight(pb-lens) { background-color: var(--pb-hot-bg); text-decoration: underline 1px var(--pb-hot); text-underline-offset: 3px; }

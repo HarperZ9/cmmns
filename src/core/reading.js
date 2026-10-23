@@ -18,6 +18,9 @@ export function readingOn(table = READING_MEASURED) {
   return new Set(READING_TECHNIQUES.map((t) => t.id).filter((id) => { const r = (table || {})[id]; return !!(r && r.on); }));
 }
 
+// The shown set for a user's settings: every technique when they turned the lens fully on.
+export const lensOn = (settings) => (settings && settings.lensAll ? new Set(READING_TECHNIQUES.map((t) => t.id)) : readingOn());
+
 // Every cue match in the text, overlapping matches of one technique merged into the first.
 export function cueHits(text) {
   const s = String(text || "").replace(/[’]/g, "'");

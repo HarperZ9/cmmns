@@ -153,6 +153,8 @@
     if (coord.some((t) => t && t.includes(" showed up in "))) p.lastChild.append(el("p", "pb-foot", PB.BASELINE_SOURCE));
     // Persuasion techniques get their own line; they never count toward "flagged".
     section(p, "Persuasion", report.persuasion ? [report.persuasion.sentence] : []);
+    // Reading-lens frames (src/core/reading.js): how many posts and authors here use each one.
+    section(p, "Frames in this thread", (report.lens || []).map((x) => `${x.name}: ${x.posts} of ${x.of} posts, ${x.authors} author${x.authors === 1 ? "" : "s"}${x.pattern ? ", a pattern" : ""}`));
     const U = report.upstream;
     section(p, "Upstream", U ? [
       U.accounts.length ? "Replies quote or lift media from: " + U.accounts.map((a) => `@${a.handle} (${a.n})`).join(", ") + "." : null,
