@@ -1,7 +1,7 @@
 // Scoring and fitting for the reading lens (scripts/eval-reading.mjs).
 
 import { readThread } from "../../src/core/reading.js";
-import { FACTOR_IDS } from "../../src/core/reading-inflection.js";
+import { FACTOR_IDS, MENTION_WEIGHT } from "../../src/core/reading-inflection.js";
 import { READING_TECHNIQUES } from "../../src/core/reading-cues.js";
 import { wilson } from "../../src/core/report.js";
 import { consensus, either, harmPositive } from "./reading-data.mjs";
@@ -61,14 +61,14 @@ export function fitLogistic({ X, y }, { lambda = 5, rate: lr = 0.1, steps = 4000
     const gw = new Array(d).fill(0);
     let gb = 0;
     for (let i = 0; i < X.length; i++) {
-      const z = b + X[i].reduce((a, x, j) => a + x * w[j], 0), e = 1 / (1 + Math.exp(-z)) - y[i];
+      const z = b + X[i].reduce((a, x, j) => a + x * (FACTOR_IDS[j] === "mention" ? MENTION_WEIGHT : w[j]), 0), e = 1 / (1 + Math.exp(-z)) - y[i];
       gb += e;
       for (let j = 0; j < d; j++) gw[j] += e * X[i][j];
     }
     b -= (lr * gb) / X.length;
-    for (let j = 0; j < d; j++) w[j] -= lr * (gw[j] / X.length + (lambda * w[j]) / X.length);
+    for (let j = 0; j < d; j++) if (FACTOR_IDS[j] !== "mention") w[j] -= lr * (gw[j] / X.length + (lambda * w[j]) / X.length);
   }
   const round = (x) => Math.round(x * 1000) / 1000;
-  return { bias: round(b), w: Object.fromEntries(FACTOR_IDS.map((id, j) => [id, round(w[j])])) };
+  return { bias: round(b), w: Object.fromEntries(FACTOR_IDS.filter((id) => id !== "mention").map((id) => [id, round(w[FACTOR_IDS.indexOf(id)])])) };
 }
 

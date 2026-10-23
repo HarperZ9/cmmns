@@ -23,8 +23,13 @@ export const FACTORS = [
   ["intensity", "intensity"], ["echo", "thread: other authors use it"], ["root", "thread: the opening post uses it"],
   ["news", "genre: news or excerpt"], ["joke", "genre: joke"], ["repeat", "author: uses it again in the thread"],
   ["author-rebuts", "author: rebuts elsewhere in the thread"], ["short", "very short post"],
+  ["mention", "stance: names the term to criticise it"],
 ];
 export const FACTOR_IDS = FACTORS.map(([id]) => id);
+// Use and mention: a coded term or dog-whistle named inside a sentence that criticises it is a
+// mention. This weight is fixed from that distinction, not fitted (the dev sets hold one example).
+export const MENTION_WEIGHT = -3;
+const LEXICAL = new Set(["coded-term", "dog-whistle"]);
 const LABEL = new Map(FACTORS);
 
 // The sentence around [start, end) in s.
@@ -66,7 +71,8 @@ export function matchFactors(text, hit, base = postFactors(text), ctx = {}) {
   const s = String(text || ""), { before, after } = sentence(s, hit.start, hit.end);
   // A question is the technique itself for question insinuation, so it is context only elsewhere.
   const question = hit.technique !== "question-insinuation" && /\?/.test(after) ? 1 : 0;
-  return { ...base, quotes: quoted(s, hit.start) || RE.report.test(before) ? 1 : 0, question,
+  const mention = LEXICAL.has(hit.technique) && RE.rebut.test(before + after) ? 1 : 0;
+  return { ...base, quotes: quoted(s, hit.start) || RE.report.test(before) ? 1 : 0, question, mention,
     echo: Math.min(3, ctx.echo || 0) / 3, root: ctx.root ? 1 : 0, repeat: ctx.repeat ? 1 : 0, "author-rebuts": ctx.authorRebuts ? 1 : 0 };
 }
 
@@ -78,7 +84,7 @@ export function inflect(factors, W = READING_WEIGHTS) {
   let z = W.bias;
   const parts = [];
   for (const id of FACTOR_IDS) {
-    const c = (W.w[id] || 0) * (factors[id] || 0);
+    const c = (id === "mention" ? MENTION_WEIGHT : W.w[id] || 0) * (factors[id] || 0);
     z += c;
     if (c) parts.push({ id, label: LABEL.get(id), c });
   }

@@ -7,9 +7,11 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-export const DEV_SETS = [1, 2, 3, 4, 5];
-export const HELDOUT_SETS = [6, 7, 8, 9];
-export const FRESH_SETS = [10, 11];
+// Round 1 (commit 0a80e52) fitted on 1 to 5 and was scored once on 6 to 11
+// (project-docs/evidence/reading-results-round1.json). Round 2 read the misses in 6 to 9, so 6 to 9
+// joined the dev sets; 10 and 11, labelled blind after round 1 was frozen, are the held-out sets.
+export const DEV_SETS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+export const HELDOUT_SETS = [10, 11];
 export const setDir = (data, n) => join(data, n === 1 ? "2026-10-23-feed-test" : `2026-10-23-feed-test-${n}`);
 const rows = (p) => (existsSync(p) ? readFileSync(p, "utf8").split(/\r?\n/).filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const sha = (p) => (existsSync(p) ? createHash("sha256").update(readFileSync(p)).digest("hex") : null);
