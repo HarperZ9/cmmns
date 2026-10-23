@@ -3,6 +3,19 @@
 All notable changes to Daylight Commons, named Radar before 2026-10-22. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
+## Unreleased
+
+### Added
+- `radar export <evidence-chain.json> --profile legal|technical|journalistic|research`: the four
+  export profiles from one saved evidence chain. A legal dossier with exhibits, a custody log and
+  the cited definitions' elements; W3C PROV-JSON with the raw observations; a journalistic
+  write-up with a right-of-reply log; and a research set with lineage per row, hash-fixed splits,
+  Croissant metadata and a datasheet. Each refuses a chain that fails its check, post text and a
+  private account without a pseudonym, and ships the chain so a reader can run `radar verify`.
+  The command line release file now carries the definition catalogue.
+- `docs/COMPLETION.md`, the completion ledger: every feature in the project's direction with a
+  check that can fail, its status and the tool it competes with; `docs/WAVES.md`, the work plan.
+
 ## 3.0.0 (2026-10-23)
 
 Major version: the name, the licence and the first public package of the campaign lens change
