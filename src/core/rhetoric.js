@@ -48,6 +48,7 @@ const LINK = "(?:(?:and|or|&)\\s+[\\w-]+\\s+|(?:fucking|filthy|dirty|disgusting|
   "economic|socioeconomic)\\s+)?";
 // Up to two helper words before a simile verb: "are just breeding", "keep spreading".
 const AUX = "(?:(?:are|is|were|keep|just|all)\\s+){0,2}";
+const NOTICE = "(?:stop|quit|keep|kept|start|started|starting|are|were|is|been|caught|always)\\s+notic(?:e|es|ed|ing)\\b";
 const INTENSE =`(?:(?:${alt(L.INTENSIFIERS)})\\s+)?`;
 
 const RE = {
@@ -91,6 +92,10 @@ const RE = {
   // "<identity> bitch", "<identity> whores": a gendered slur fused with an identity word
   slurCompound: new RegExp(`\\b(?:${alt(L.IDENTITY_ADJ)})\\s+(?:ass\\s+)?(?:${alt(L.GENDERED_SLURS)})\\b`, "i"),
   slurSoft: word(L.SLURS_SOFT),
+  // The "noticing" code beside a mocking cue: "oy vey, stop noticing", "the goyim keep noticing". The
+  // verb must be a habit or an order ("stop noticing", "are noticing"), so "oy vey, did you notice" stays clear.
+  noticing: new RegExp(`\\b(?:${alt(L.NOTICING_CUES)})\\b[^.!?\\n]{0,30}?\\b${NOTICE}` +
+    `|\\b${NOTICE}[^.!?\\n]{0,30}?\\b(?:${alt(L.NOTICING_CUES)})\\b`, "i"),
   stereotype: new RegExp(`\\b(?:${G})\\s+(?:are|is)\\s+(?:all\\s+|just\\s+|nothing but\\s+|such\\s+)?${INTENSE}(?:${alt(L.STEREOTYPE_TRAITS)})\\b|\\btypical\\s+(?:${G})\\b`, "i"),
   motive: new RegExp(`\\b(?:${G})\\s+(?:want|wants|are trying|plan|are planning|intend)\\s+to\\s+(?:${alt(L.MOTIVE_VERBS)})\\b|\\b(?:they|${G})\\s+(?:all\\s+)?hate\\s+(?:${alt(L.HATRED_OBJECTS)})\\b`, "i"),
   essentialise: new RegExp(`\\b(?:${alt(L.ESSENTIALISE)})\\b|\\ball (?:the )?(?:${G}) are\\b|\\b(?:${G}) are all\\b`, "i"),
@@ -106,7 +111,7 @@ const VIOLENT_STEM = /\b(?:extermin|kill|massacr|slaughter|genocid|gass(?:ed|ing
 const REPORTED = /\b(?:call(?:s|ed|ing)?|compar(?:e|es|ed|ing)|describ(?:e|es|ed|ing)|label(?:s|ed|led|ing)?|brand(?:s|ed|ing)?|dubb?(?:s|ed|ing)?|refer(?:s|red|ring)? to)\b[^.!?"]{0,40}$/i;
 // Someone else's words: "posts saying X are a plague", "nobody should say that X ...", "saying X
 // spread like a disease is wrong". The speaker's own "I say" or "we said" is still a use.
-const SAID = /\b(?:(?<!\b(?:i|we|i've|we've|i'd|we'd|i'll|we'll|i'm|we're)\s+(?:\w+\s+)?)(?:say|says|said|saying)|wrote|writes|tweeted|posts? saying|claim(?:s|ed|ing)? that)\b[^.!?"]{0,40}$/i;
+const SAID = /\b(?:(?<!\b(?:i|we|i've|we've|i'd|we'd|i'll|we'll|i'm|we're)\s+(?:\w+\s+)?)(?:say|says|said|saying)|wrote|writes|tweeted|posts? saying|claim(?:s|ed|ing)? that|(?:phrases?|repl(?:y|ies)|posts?|memes?|slogans?|terms?|words?)\s+(?:such as|like))\b[^.!?"]{0,40}$/i;
 const QUOTES = /["“”«»]/;
 function mention(s, m) {
   const at = m.index ?? s.indexOf(m[0]);
@@ -160,9 +165,13 @@ function recorder(s, markers) {
 
 // For the rules added from the 2026-10-23 feed test: a match after a cue that someone else said it
 // is skipped. The older rules keep the narrower REPORTED guard, which their measured figures rest on.
+// Counter-speech names the words as hate right after them: "... is just antisemitism".
+const COUNTERED = /^[^.!?\n]{0,40}?\b(?:is|are|was|were)\s+(?:just\s+|pure\s+|plain\s+|textbook\s+)?(?:antisemitic|antisemitism|racist|racism|bigoted|bigotry|hateful|hate speech|dehumanising|dehumanizing|vile|disgusting|wrong)\b/i;
 function strict(s, hit, family, re) {
   const m = s.match(re);
-  return !!m && !SAID.test(s.slice(Math.max(0, m.index - 60), m.index)) && hit(family, re, true);
+  if (!m) return false;
+  const before = s.slice(Math.max(0, m.index - 60), m.index), after = s.slice(m.index + m[0].length);
+  return !SAID.test(before) && !COUNTERED.test(after) && hit(family, re, true);
 }
 
 function scoreEnglish(s, hit) {
@@ -174,7 +183,7 @@ function scoreEnglish(s, hit) {
   }
   hit("vigilante", RE.vigilante);
   if (!hit("slur", RE.slur) && !hit("slur", RE.slur, false, unleet(s)) && !hit("slur", RE.echo)
-    && !hit("slur", RE.slurCompound)) hit("slurSoft", RE.slurSoft);
+    && !hit("slur", RE.slurCompound) && !strict(s, hit, "slur", RE.noticing)) hit("slurSoft", RE.slurSoft);
   hit("stereotype", RE.stereotype, true);
   hit("motive", RE.motive, true);
   hit("essentialise", RE.essentialise, true);

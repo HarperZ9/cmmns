@@ -168,3 +168,17 @@ Known gaps in these five: Hindi has no motive, contempt or conspiracy grammar be
 phrases, and its Latin spelling varies far more than the list does; Chinese pinyin and homophone
 spellings are not read; Arabic dialect spellings beyond Egyptian and Gulf fillers are partly covered;
 Russian and Ukrainian have no essentialise grammar.
+
+## English coded terms added from the 2026-10-23 feed test
+
+Checked 2026-10-23. Each term is a usage fact typed in by hand; nothing is copied from a list.
+
+| Term or rule | Source | Date of source | Used for |
+|---|---|---|---|
+| "noticing will continue", "#thenoticing" (slurs) | Blue Square Alliance Against Hate, "Antisemitic Dog Whistles: How Hate Spreads Through Coded Language", bluesquarealliance.org/?p=3186 | 2025-08-22 | The page names "the noticing" as a phrase for "noticing Jewish influence" without saying it, with the variants "noticing will continue" and the hashtag #TheNoticing. "The noticing" was already a slur here. |
+| "notice" as a habit or an order ("stop noticing", "keep noticing", "are noticing") within 30 characters of "oy vey", "goy" or "goyim" (slur grammar) | The same page for "noticing"; "oy vey shut it down" and "the goyim know" were already slurs here (ADL Hate Symbols database, Hatebase, GNET and ISD glossaries, as cited in `lexicon.js`) | 2025-08-22 | The pairing of the code with a mocking Yiddish cue. "Oy vey" and "goy" alone stay unmarked: both are ordinary Yiddish. |
+
+Considered and left out:
+- "impossible not to notice", also a variant on the Blue Square page: it is an ordinary English phrase ("impossible not to notice the traffic"), so as a fixed term it would mark innocent text.
+- "starting to notice" and "we aren't supposed to notice", from the feed test: the two labellers disagreed on both (cases c033 and c036), and no source lists them.
+- No ADL Hate Symbols entry for "noticing" was found on 2026-10-23, and no entry was found in the Mendelsohn et al. (ACL 2023) dog-whistle glossary search either. The Blue Square page is the only dated source used. Asking a second source to confirm it would strengthen the entry.

@@ -128,6 +128,9 @@ export const SLURS = [
   // antisemitic
   "kike", "kikes", "hymie", "heeb", "heebs", "goyim know", "the goyim", "zog", "the jq", "6 million wasn't enough",
   "oy vey shut it down", "early life section", "the noticing",
+  // added 2026-10-23 from the feed test; Blue Square Alliance, "Antisemitic Dog Whistles", 2025-08-22
+  // (project-docs/evidence/LEXICON-SOURCES.md)
+  "noticing will continue", "#thenoticing",
   // anti-Arab and anti-Muslim
   "towelhead", "towelheads", "raghead", "ragheads", "sand nigger", "sand niggers", "camel jockey", "mudslime", "mudslimes",
   "muzrat", "muzrats", "sand people", "goat lovers",
@@ -151,6 +154,10 @@ export const SLURS = [
   // neo-Nazi
   "1488", "14/88", "14 words", "sieg heil", "hitler was right", "hitler where are you", "hitler... where are you",
 ];
+
+// Cues that turn "notice" into the antisemitic "noticing" code when they sit within a few words of it
+// ("oy vey, stop noticing"). "Oy vey" and "goy" alone stay unmarked: both are ordinary Yiddish.
+export const NOTICING_CUES = ["oy vey", "oy vei", "goy", "goys", "goyim", "goyum"];
 
 // Context-dependent: innocent in many uses (weight 1, counted only beside another marker).
 // Moved from SLURS on 2026-10-21: the upper 95% bound of their dev-split precision was under 0.75
