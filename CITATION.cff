@@ -10,7 +10,7 @@ authors:
     given-names: "Zain Dana"
     orcid: "https://orcid.org/0009-0001-7175-5393"
 repository-code: "https://github.com/HarperZ9/daylight-commons"
-url: "https://harperz9.github.io/daylight-commons/"
+url: "https://harperz9.github.io/daylight-commons/install.html"
 license: AGPL-3.0-only
 keywords:
   - browser-extension
