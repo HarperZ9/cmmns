@@ -15,6 +15,12 @@ export const SLOTS = {
   STRONGMAN: `(?:${alt(STRONGMEN)})`,
 };
 const BE = "(?:is|are|was|were|'s|'re|isn't|aren't|is not|are not|wasn't)";
+// Who owns a system, firm or place is a fact, not secret coercion ("Starshield systems are owned and
+// controlled by the US government", found by the 3.4.0 case run). These lookbehinds skip the legal
+// "owned and controlled", "wholly owned" and a thing as the subject.
+const THINGS = "systems?|satellites?|compan(?:y|ies)|firms?|platforms?|networks?|stations?|outlets?|subsidiar(?:y|ies)|assets?|infrastructure|facilit(?:y|ies)|terminals?|services?|contracts?|programm?e?s?|shares?|stakes?|lands?|propert(?:y|ies)|territor(?:y|ies)|airspace|ports?|bases?";
+const NOT_OWNERSHIP = "\\b(?<!\\b(?:owned|operated|run|managed|built) and )(?<!\\b(?:wholly|majority|jointly|publicly|privately|partly|fully|state|government)[- ])"
+  + `(?<!\\b(?:${THINGS})\\s+(?:are|is|was|were|remain|remains)\\s+(?:\\w+\\s+)?)`;
 
 // What each technique is and how to spot it, in plain English: one idea per sentence.
 const DEFINITIONS = {
@@ -64,7 +70,10 @@ export const READING_TECHNIQUES = [
     "\\b(?:anyone|coincidence|ask yourself|makes you wonder|just asking|i wonder if|i'm just saying|just saying|connect the dots|think about it)\\b[^\\n]{0,4}[?!.]",
     "\\b(?:what are they hiding|who benefits|cui bono|follow the money|why is no one talking about)\\b",
     "\\b(?:and )?what happened\\?", "\\bwho (?:hired|paid|sent|knew|ordered|benefits|gave)\\b[^?\\n]{0,80}\\?",
-    "(?:[^?.!\\n]{6,160}\\?\\s*){2,}", "\\b(?:conveniently|coincidentally|seemingly|suspiciously)\\b"]],
+    "(?:[^?.!\\n]{6,160}\\?\\s*){2,}", "\\b(?:conveniently|coincidentally|seemingly|suspiciously)\\b",
+    // Added for 3.4.1 from dev-set misses (feed tests 1 to 12).
+    "\\bwonder (?:what|who|which)\\b[^?.!\\n]{0,80}\\b(?:benefits?|profits?|gains?)\\b", "\\bwhy do you think (?:that|this) is\\b",
+    "\\bwhat does (?:that|this) (?:\\w+ )?say about\\b", "\\bimagine what (?:they|he|she) (?:do|did|would do|will do)\\b"]],
   ["true-leap", "True item carries a leap", "leap", [
     "\\b(?:it'?s|that'?s|this is)\\s+(?:true|a fact|documented|on record|real)\\b[^.\\n]{0,80}\\b(?:so|which means|therefore|proves|that'?s why)\\b",
     "\\b(?:this|it|which)\\s+(?:proves|confirms|shows)\\s+(?:just how|that|exactly)\\b", "\\b(?:not|no) (?:a )?coincidence\\b",
@@ -89,13 +98,16 @@ export const READING_TECHNIQUES = [
     "\\b(?:white|christian|european) genocide\\b", "\\bblood libel\\b", "\\bdrink(?:ing|s)? (?:the )?blood of\\b", "\\britual(?:istic)?,? (?:\\w+ )?(?:murder|sacrifice|abuse)\\b",
     "\\b(?:harvest(?:ing)?|adrenochrome)\\b[^.\\n]{0,40}\\b(?:children|kids|babies|organs)\\b", "\\bpoison(?:ing|ed)? the wells\\b", "\\bcultural suicide\\b",
     "\\bflood(?:s|ed|ing)? (?:the|our|this) (?:country|nation|cities|towns|continent) with\\b", "\\bswamp(?:s|ed|ing)? the (?:natives|locals|voters|country)\\b",
-    "\\btraffick(?:ing|s|ed)? (?:kids|children|babies)\\b", "\\b(?:rape|abuse) (?:ceremonies|assembly line|rings?)\\b", "\\bdivine permission to\\b"]],
+    "\\btraffick(?:ing|s|ed)? (?:kids|children|babies)\\b", "\\b(?:rape|abuse) (?:ceremonies|assembly line|rings?)\\b", "\\bdivine permission to\\b",
+    "\\bdemographic engineering\\b", "\\bit(?:'s| is) (?:replacement|conquest)\\b", "\\bship(?:ping)? millions of foreign\\b"]],
   ["secret-coercion", "Secret coercion", "coercion", [
     "\\bblackmail(?:ed|ing|s)?\\b", "\\bkompromat\\b", "\\b(?:has|have|holds?|got)\\s+(?:the\\s+)?dirt on\\b",
     "\\bcompromised\\s+(?:by|to|into)\\b", "\\b(?:is|was|were|are|being)\\s+compromised\\b(?![^.\\n]{0,30}\\b(?:account|system|server|network|password|data|phone|device)s?\\b)",
-    "\\b(?:owned|controlled|bought(?: and paid for)?|handled|infiltrated)\\s+by\\s+{ACTOR}\\b", "\\bin the pocket of\\b", "\\b{ACTOR}\\s+(?:owns|controls|runs)\\s+(?:him|her|them|congress|the president|our government)\\b",
+    `${NOT_OWNERSHIP}(?:owned(?! and)|controlled|bought(?: and paid for)?|handled|infiltrated)\\s+by\\s+{ACTOR}\\b`, "\\bin the pocket of\\b", "\\b{ACTOR}\\s+(?:owns|controls|runs)\\s+(?:him|her|them|congress|the president|our government)\\b",
     "\\b(?:asset|puppet|stooge|plant) (?:of|for) {ACTOR}\\b", "\\b(?:deep state|cia|mossad|kremlin|ccp)[- ]controlled\\b", "\\bcontrolled (?:nations?|governments?|media)\\b",
-    "\\b(?:fully |completely |totally )?taken over by\\b", "\\b(?:cement|entrench|hold)(?:ing)? (?:control|power)(?: indefinitely| forever)?\\b", "\\bthe playbook\\b"]],
+    "\\b(?:fully |completely |totally )?taken over by\\b", "\\b(?:cement|entrench|hold)(?:ing)? (?:control|power)(?: indefinitely| forever)?\\b", "\\bthe playbook\\b",
+    "\\bcalling the shots\\b", "\\b{GROUP}\\s+money\\b[^.\\n]{0,40}\\b(?:controls?|runs?|owns?|buys?)\\b",
+    "\\bworks? for (?:the )?(?:cia|mossad|kremlin|fsb|kgb|ccp|mss)\\b", "\\b(?:cia|mossad|kremlin|fsb|ccp|mss) runs (?:the|our|global)\\b"]],
   ["election-theft", "Election theft", "election", [
     "\\b(?:rigged|stolen|fraudulent|fake)\\s+(?:the\\s+)?(?:election|vote|ballots?)\\b", "\\b(?:rig|rigged|steal|stole|stealing)\\s+(?:the\\s+)?(?:election|vote|votes|machines|ballots)\\b",
     "\\b(?:fake|illegitimate|selected,? not elected)\\s+president\\b", "\\belection fraud\\b", "\\bmachines?\\b[^.\\n]{0,60}\\b(?:hacked|flipp(?:ed|ing)|switch(?:ed|ing)|sabotage)\\b",
