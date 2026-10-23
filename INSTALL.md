@@ -11,6 +11,7 @@ maker still stands in the way.
 - `radar-chrome-<version>.zip`: the Chrome, Edge and Brave build.
 - `radar-firefox-<version>.xpi`: the Firefox build sent to Mozilla's add-on store.
 - `radar-firefox-self-<version>.xpi`: the Firefox build for installing from this site once Mozilla has signed it. It checks this site for updates.
+- `radar-cli-<version>.zip`: the command line tool. Unzip it anywhere and run `node bin/radar.mjs verify <file>` with Node 22 or later to check a signed evidence bundle or a saved evidence chain offline. No install step.
 - `FILES-<version>.sha256`: the hash of every file inside each package.
 - `radar-<version>.bundle`: the whole source history at the release commit, as one git file. Commits before 3.0.0 also hold the Conso font, under its designer's licence; 3.0.0 and later ship only fonts under the SIL Open Font License.
 - `SOURCE`: the commit and the Node version the release was built with.

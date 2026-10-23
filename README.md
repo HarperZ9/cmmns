@@ -120,13 +120,16 @@ everything, reduce motion and enlarge text.
 
 ## Use Daylight Commons outside the browser
 
-Daylight Commons' rules also run without the extension, on your own files, with nothing sent anywhere:
+Daylight Commons' rules also run without the extension, on your own files, with nothing sent anywhere.
+Each release carries the tool as `radar-cli-<version>.zip`; unzip it and run it with Node 22 or
+later, with no install step:
 
 ```
 node bin/radar.mjs analyze saved-thread.html        # a saved X or Reddit thread, thread JSON,
 node bin/radar.mjs analyze tweets.js --json         # or your X, Reddit, Mastodon or Bluesky export
 node bin/radar.mjs analyze thread.json --bundle out.json
 node bin/radar.mjs verify out.json                  # anyone can check a signed bundle offline
+node bin/radar.mjs verify evidence-chain.json       # or an evidence chain saved in the extension
 ```
 
 In the extension, the toolbar popup's **Analyse a file** does the same on a file you choose. Code
