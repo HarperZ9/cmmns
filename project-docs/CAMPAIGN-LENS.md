@@ -96,7 +96,9 @@ Quote posts of the launch on the page, split into those X labels "Paid partnersh
 without the label.
 
 - **Bunching:** the narrowest window that holds 5 quotes, and how many quotes fall in the densest
-  hour.
+  hour. It counts as coordination context only when the 5 quotes fall inside one hour; a wider
+  window is shown as timing and counts for nothing. Before 3.0.0 any launch with 5 quotes read as
+  "looks coordinated", which a run on a synthetic, evenly spread launch found.
 - **Shared template:** groups of quotes whose own words share a skeleton, plus promo-template cues.
   Cues come from a provider interface (below); without one, a local list runs ("they just dropped",
   "sir...", "this changes everything", "game changer", "is insane", "you need to try").

@@ -5722,7 +5722,8 @@ const M_campaign_quotes = (() => {
 const { templateGroups, promoCues } = M_campaign_text;
 const { ownWords } = M_similarity;
 
-const BUNCH_K = 5, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
+// BUNCH_TIGHT_MS: 5 quotes inside an hour count as coordination; a wider bunch is shown, not counted.
+const BUNCH_K = 5, BUNCH_TIGHT_MS = 3600000, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
 const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour because it is news, and common phrases spread by imitation. A shared opener does not show payment, and a missing label does not show that anyone hid one.";
 
 const at = (q) => Date.parse(q.posted);
@@ -5882,7 +5883,7 @@ const M_campaign = (() => {
 
 const { engagementShape, SHAPE_DOES_NOT_PROVE } = M_campaign_shape;
 const { sampleSigns, SAMPLE_DOES_NOT_PROVE, SAMPLE_MIN } = M_campaign_sample;
-const { quoteCluster, QUOTES_DOES_NOT_PROVE } = M_campaign_quotes;
+const { quoteCluster, QUOTES_DOES_NOT_PROVE, BUNCH_TIGHT_MS } = M_campaign_quotes;
 const { OVERLAP_DOES_NOT_PROVE } = M_campaign_overlap;
 const { campaignPlatform, CAMPAIGN_PLATFORMS } = M_campaign_platforms;
 
@@ -5963,7 +5964,8 @@ function quoteRows(q) {
   const ind = [], ctx = [];
   if (q.lookalikes) ind.push({ id: "undisclosed-lookalike", text: `${q.lookalikes} quote${q.lookalikes === 1 ? "" : "s"} without a Paid partnership label share a template with labelled quotes or with each other inside two hours.`, dnp: QUOTES_DOES_NOT_PROVE });
   if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; Daylight Commons cannot see who paid or how much." });
-  if (q.bunch.kWindowMs != null) ctx.push({ id: "quote-bunching", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
+  // Any launch with five quotes has a narrowest window; only a tight one is coordination context.
+  if (q.bunch.kWindowMs != null) ctx.push({ id: q.bunch.kWindowMs <= BUNCH_TIGHT_MS ? "quote-bunching" : "quote-timing", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
   for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Daylight Commons' local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
   return { ind, ctx };
 }
