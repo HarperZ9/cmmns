@@ -128,6 +128,7 @@ later, with no install step:
 node bin/radar.mjs analyze saved-thread.html        # a saved X or Reddit thread, thread JSON,
 node bin/radar.mjs analyze tweets.js --json         # or your X, Reddit, Mastodon or Bluesky export
 node bin/radar.mjs analyze thread.json --bundle out.json
+node bin/radar.mjs analyze thread.json --bundle out.json --carrier-safe   # one-time key, day only
 node bin/radar.mjs verify out.json                  # anyone can check a signed bundle offline
 node bin/radar.mjs verify evidence-chain.json       # or an evidence chain saved in the extension
 node bin/radar.mjs export evidence-chain.json --profile legal --out dossier

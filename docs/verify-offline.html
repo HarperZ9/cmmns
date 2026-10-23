@@ -28,6 +28,9 @@ label{display:block;margin:.75rem 0 .25rem;font-weight:600}input[type=file]{font
 <input type="file" id="kit-folder" webkitdirectory multiple>
 <label for="kit-files">Or every file in it</label>
 <input type="file" id="kit-files" multiple>
+<h2>Or check one evidence bundle</h2>
+<label for="bundle-file">A signed bundle saved by Daylight Commons</label>
+<input type="file" id="bundle-file" accept=".json,application/json">
 <ul id="kit-out" aria-live="polite"></ul>
 <h2>What a pass shows</h2>
 <p class="muted">The files match what the holder of the built-in key signed, and the signed head gives their release, version and expiry. It does not show the files are safe, and it does not show the built-in key is right if this page came from someone you do not trust. This page has had no independent security audit.</p>
@@ -278,11 +281,62 @@ function freshness(state, { now = Date.now(), catalogue = null } = {}) {
 
 return { HEAD_KIND, HEAD_MAX_BYTES, HEAD_SIG_MAX_BYTES, AGING_DAYS, HEAD_DOES_NOT_PROVE, headKeyId, makeHead, headText, signHead, sigFileText, parseHead, refusalSentence, effectiveNow, checkHead, freshness };
 })();
+const M_bundle_verify = (() => {
+
+const { canonicalJSON, jwkId, verifyText } = M_sig;
+
+const BUNDLE_KIND = "radar-evidence-bundle";
+const BUNDLE_VERSION = 1;
+const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
+const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right.";
+const CARRIER_SAFE = "carrier-safe";
+const CARRIER_SAFE_NOTE = "carrier-safe: the signature proves the bundle is unchanged; it says nothing about who made it";
+
+function bundleConsistency(bundle) {
+  const ids = new Set((bundle.posts || []).map((p) => p.id)), text = new Map((bundle.posts || []).filter((p) => p.text != null).map((p) => [p.id, p.text]));
+  const missing = [], wrong = [];
+  for (const e of bundle.evidence || []) {
+    for (const p of e.posts || []) if (!ids.has(p)) missing.push(`${e.id}: ${p}`);
+    for (const s of e.spans || []) {
+      const t = text.get(s.post);
+      if (t != null && s.start != null && t.slice(s.start, s.end) !== s.text) wrong.push(`${e.id}: ${s.post}`);
+    }
+  }
+  return { ok: !missing.length && !wrong.length, missing, wrong };
+}
+
+async function signatureOk(bundle) {
+  const { signature, ...body } = bundle, S = body.signer;
+  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Daylight Commons can check" };
+  const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
+  let id = null;
+  try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
+  if (id !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
+  const good = await verifyText(jwk, signature.value, canonicalJSON(body));
+  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature does not match: the bundle changed after signing, or was signed with another key" };
+}
+
+async function verifyBundle(bundle, opts = {}) {
+  const checks = [];
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Daylight Commons evidence bundle" }] };
+  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Daylight Commons reads` });
+  checks.push({ name: "signature", ...(await signatureOk(bundle)) });
+  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is not one this Daylight Commons reads` });
+  const keyId = bundle.signer ? bundle.signer.keyId : null;
+  if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
+  const C = bundleConsistency(bundle);
+  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts not listed (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
+  return { ok: checks.every((c) => c.ok), keyId, checks };
+}
+
+return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle };
+})();
 const M_kit_verify = (() => {
 
 const { sha256Hex } = M_sig;
 const { verifySums, parseSums, signingKeyId, SIGNATURE_DOES_NOT_PROVE } = M_signing;
 const { checkHead, HEAD_DOES_NOT_PROVE } = M_head;
+const { verifyBundle, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE } = M_bundle_verify;
 
 const KIT_SIGNED_FILES = ["SHA256SUMS", "SHA256SUMS.sig", "HEAD.json", "HEAD.sig"];
 const text = (b) => new TextDecoder().decode(b);
@@ -340,10 +394,24 @@ async function checkKit(files, { trusted }) {
   return result(ok, { failed, uncovered, keyIdFound: builtIn });
 }
 
-return { KIT_SIGNED_FILES, checkKit };
+const BUNDLE_MAX_BYTES = 50 * 1024 * 1024;
+async function checkBundleFile(bytes) {
+  const lines = [], add = (kind, t) => lines.push({ kind, text: t });
+  let bundle = null;
+  try { bundle = bytes.length > BUNDLE_MAX_BYTES ? null : JSON.parse(text(bytes)); } catch { bundle = null; }
+  if (!bundle) { add("bad", "This file is not a readable evidence bundle."); return { ok: false, lines }; }
+  const v = await verifyBundle(bundle);
+  add("note", `Signed by key ${v.keyId || "none"}${bundle.profile === CARRIER_SAFE ? ", made for this bundle alone" : ""}.`);
+  for (const c of v.checks) add(c.ok ? "good" : "bad", `${c.name}: ${c.text}.`);
+  add(v.ok ? "good" : "bad", v.ok ? "Bundle verified: unchanged since it was signed." : "Bundle not verified.");
+  add("note", BUNDLE_DOES_NOT_PROVE);
+  return { ok: v.ok, lines };
+}
+
+return { KIT_SIGNED_FILES, checkKit, BUNDLE_MAX_BYTES, checkBundleFile };
 })();
 
-const { checkKit } = M_kit_verify;
+const { checkKit, checkBundleFile } = M_kit_verify;
 const $ = (id) => document.getElementById(id);
 function show(r) {
   const out = $("kit-out");
@@ -361,6 +429,10 @@ async function run(list) {
 }
 const fail = (e) => { console.error("[daylight-commons] kit check failed", e); show({ ok: false, lines: [{ kind: "bad", text: "The check could not run: " + e.message }] }); };
 for (const id of ["kit-files", "kit-folder"]) $(id).addEventListener("change", (e) => run(e.target.files).catch(fail));
+$("bundle-file").addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  if (f) f.arrayBuffer().then((b) => checkBundleFile(new Uint8Array(b))).then(show).catch(fail);
+});
 })();
 </script>
 </body>

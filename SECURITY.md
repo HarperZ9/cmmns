@@ -41,6 +41,9 @@ Daylight Commons is maintained by one person, so no response time is promised.
   `scripts/verify-offline.mjs` from `src/core/kit-verify.js`; `scripts/kit.mjs`;
   `scripts/mirror-check.mjs`). A kit that the page reports as verified although a signed file
   changed, or a page that makes any network request, is a vulnerability. Not audited.
+- The carrier-safe bundle profile (`src/core/evidence-bundle.js`, `src/core/bundle-verify.js`,
+  `src/ext/signing.js`): any field, timing or stored key that links two carrier-safe bundles from
+  one install is a vulnerability. Not audited.
 - The command line tool in `bin/`.
 
 Out of scope: problems in the browsers or the social platforms themselves, and wrong evidence that

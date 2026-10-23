@@ -1,4 +1,5 @@
-// The offline kit check (docs/verify-offline.html, scripts/kit.mjs): given the files a person picked
+// The offline kit check (docs/verify-offline.html, scripts/kit.mjs), and the same page's check of one
+// signed evidence bundle (checkBundleFile). given the files a person picked
 // from a kit and the keys built into the page, check the signed head, the signature over
 // SHA256SUMS, every listed file's hash, and name any file the signature does not cover. Pure: no
 // network, no storage, no DOM. The page prints `lines` as they come.
@@ -10,6 +11,7 @@
 import { sha256Hex } from "./sig.js";
 import { verifySums, parseSums, signingKeyId, SIGNATURE_DOES_NOT_PROVE } from "./signing.js";
 import { checkHead, HEAD_DOES_NOT_PROVE } from "./head.js";
+import { verifyBundle, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE } from "./bundle-verify.js";
 
 export const KIT_SIGNED_FILES = ["SHA256SUMS", "SHA256SUMS.sig", "HEAD.json", "HEAD.sig"];
 const text = (b) => new TextDecoder().decode(b);
@@ -68,4 +70,20 @@ export async function checkKit(files, { trusted }) {
   out.note(SIGNATURE_DOES_NOT_PROVE);
   out.note(HEAD_DOES_NOT_PROVE);
   return result(ok, { failed, uncovered, keyIdFound: builtIn });
+}
+
+export const BUNDLE_MAX_BYTES = 50 * 1024 * 1024;
+// One evidence bundle file, as the CLI's `radar verify` checks it: { ok, lines }. The signer's key
+// travels inside the bundle, so a pass says the bundle is unchanged, not who made it.
+export async function checkBundleFile(bytes) {
+  const lines = [], add = (kind, t) => lines.push({ kind, text: t });
+  let bundle = null;
+  try { bundle = bytes.length > BUNDLE_MAX_BYTES ? null : JSON.parse(text(bytes)); } catch { bundle = null; }
+  if (!bundle) { add("bad", "This file is not a readable evidence bundle."); return { ok: false, lines }; }
+  const v = await verifyBundle(bundle);
+  add("note", `Signed by key ${v.keyId || "none"}${bundle.profile === CARRIER_SAFE ? ", made for this bundle alone" : ""}.`);
+  for (const c of v.checks) add(c.ok ? "good" : "bad", `${c.name}: ${c.text}.`);
+  add(v.ok ? "good" : "bad", v.ok ? "Bundle verified: unchanged since it was signed." : "Bundle not verified.");
+  add("note", BUNDLE_DOES_NOT_PROVE);
+  return { ok: v.ok, lines };
 }
