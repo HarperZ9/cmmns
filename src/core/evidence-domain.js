@@ -1,18 +1,30 @@
 // Domain facts for the evidence layer (project-docs/EVIDENCE-LAYER.md): registration date from RDAP
 // (rdap.org forwards to the registry's own RDAP server) and the first Internet Archive capture
 // (Wayback CDX). Checked 2026-10-22: both answer without a login and send
-// Access-Control-Allow-Origin: *.
+// Access-Control-Allow-Origin: *. Rechecked 2026-10-23: rdap.org still does; the Wayback CDX no
+// longer sends it, so the extension asks for access to web.archive.org when the user turns
+// evidence lookups on (src/ext/options.js), and without it reports the archive as not asked.
 
 export const RDAP_BASE = "https://rdap.org/domain/";
 export const CDX_BASE = "https://web.archive.org/cdx/search/cdx";
 export const DOMAIN_DOES_NOT_PROVE = "A registration date is when the current registration began. Domains are bought, sold and re-registered, and a young domain can front an old company.";
 export const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly. A late first capture means the archive found the site late, not that it did not exist.";
 
+// Hosting services that give each customer a subdomain. The service's own registration says nothing
+// about a customer's site, so such a host is kept whole and RDAP is not asked about it.
+export const HOSTING_SUFFIXES = ["github.io", "gitlab.io", "netlify.app", "vercel.app", "pages.dev", "web.app", "firebaseapp.com", "herokuapp.com", "blogspot.com", "wordpress.com", "substack.com", "medium.com", "notion.site", "carrd.co", "framer.website", "webflow.io", "glitch.me", "replit.app", "onrender.com", "fly.dev", "azurewebsites.net", "cloudfront.net", "s3.amazonaws.com"];
+export function hostedOn(host) {
+  const h = String(host || "").toLowerCase().replace(/^www\./, "");
+  return HOSTING_SUFFIXES.find((s) => h.endsWith("." + s) && h.length > s.length + 1) || null;
+}
+
 // The registrable part of a host, roughly: the last two labels, or three under a two-letter
-// second-level such as co.uk. Good enough to pick what to ask RDAP about; RDAP itself says no if wrong.
+// second-level such as co.uk; a site on a hosting service stays whole. Good enough to pick what to
+// ask RDAP about; RDAP itself says no if wrong.
 export function registrable(host) {
   const parts = String(host || "").toLowerCase().replace(/^www\./, "").split(".").filter(Boolean);
   if (parts.length < 2) return null;
+  if (hostedOn(parts.join("."))) return parts.join(".");
   const sld = parts[parts.length - 2];
   return (parts.length >= 3 && /^(?:co|com|org|net|ac|gov|edu)$/.test(sld) && parts[parts.length - 1].length === 2 ? parts.slice(-3) : parts.slice(-2)).join(".");
 }

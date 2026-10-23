@@ -153,3 +153,25 @@ test("data model: private subjects are pseudonyms, content mode is features, lab
   assert.ok(await verifyReceipt(r));
   await assert.rejects(makeReceipt({ kind: "k", source: "s", dnp: "d", subjectKind: "person" }), /unknown subject kind/);
 });
+
+// Live check 2026-10-23: a launch linking harperz9.github.io got RDAP's 404 for github.io and a
+// Wayback "error" (the CDX stopped sending a CORS header). A hosted site is now kept whole and RDAP is
+// not asked; without archive access the archive is reported as not asked, not as an error.
+test("a site on a hosting service is looked up whole, and the archive needs its access", async () => {
+  assert.equal(registrable("harperz9.github.io"), "harperz9.github.io");
+  assert.equal(registrable("www.example.co.uk"), "example.co.uk");
+  assert.equal(registrable("blog.example.com"), "example.com");
+  const CDX = [["timestamp", "original", "statuscode"], ["20261019000000", "https://harperz9.github.io/", "200"]];
+  const log = [];
+  const got = await lookupEvidence(stubFetch([[/web\.archive\.org\/cdx/, 200, CDX]], log), { domains: ["harperz9.github.io"], postedAt: "2026-10-22T00:00:00Z" });
+  assert.ok(!log.some((x) => /rdap/.test(x.url)), "RDAP is not asked about a hosting service's subdomain");
+  assert.ok(got.notes.some((n) => /a site on github\.io, a hosting service/.test(n)));
+  assert.equal(got.receipts.length, 1);
+  assert.equal(got.receipts[0].kind, "wayback-first");
+  assert.equal(got.receipts[0].subject, "harperz9.github.io");
+  const noArchive = [];
+  const without = await lookupEvidence(stubFetch([[/rdap\.org/, 200, { objectClassName: "domain", ldhName: "example.com", events: [{ eventAction: "registration", eventDate: "1995-08-14T04:00:00Z" }] }]], noArchive), { domains: ["example.com"], wayback: false });
+  assert.ok(!noArchive.some((x) => /archive\.org/.test(x.url)), "no archive request without its access");
+  assert.ok(without.notes.some((n) => /Internet Archive was not asked about example\.com/.test(n)));
+  assert.equal(without.receipts[0].kind, "domain-registration");
+});

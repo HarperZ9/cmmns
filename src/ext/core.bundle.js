@@ -6125,18 +6125,30 @@ const M_evidence_domain = (() => {
 // Domain facts for the evidence layer (project-docs/EVIDENCE-LAYER.md): registration date from RDAP
 // (rdap.org forwards to the registry's own RDAP server) and the first Internet Archive capture
 // (Wayback CDX). Checked 2026-10-22: both answer without a login and send
-// Access-Control-Allow-Origin: *.
+// Access-Control-Allow-Origin: *. Rechecked 2026-10-23: rdap.org still does; the Wayback CDX no
+// longer sends it, so the extension asks for access to web.archive.org when the user turns
+// evidence lookups on (src/ext/options.js), and without it reports the archive as not asked.
 
 const RDAP_BASE = "https://rdap.org/domain/";
 const CDX_BASE = "https://web.archive.org/cdx/search/cdx";
 const DOMAIN_DOES_NOT_PROVE = "A registration date is when the current registration began. Domains are bought, sold and re-registered, and a young domain can front an old company.";
 const WAYBACK_DOES_NOT_PROVE = "The Internet Archive captures sites unevenly. A late first capture means the archive found the site late, not that it did not exist.";
 
+// Hosting services that give each customer a subdomain. The service's own registration says nothing
+// about a customer's site, so such a host is kept whole and RDAP is not asked about it.
+const HOSTING_SUFFIXES = ["github.io", "gitlab.io", "netlify.app", "vercel.app", "pages.dev", "web.app", "firebaseapp.com", "herokuapp.com", "blogspot.com", "wordpress.com", "substack.com", "medium.com", "notion.site", "carrd.co", "framer.website", "webflow.io", "glitch.me", "replit.app", "onrender.com", "fly.dev", "azurewebsites.net", "cloudfront.net", "s3.amazonaws.com"];
+function hostedOn(host) {
+  const h = String(host || "").toLowerCase().replace(/^www\./, "");
+  return HOSTING_SUFFIXES.find((s) => h.endsWith("." + s) && h.length > s.length + 1) || null;
+}
+
 // The registrable part of a host, roughly: the last two labels, or three under a two-letter
-// second-level such as co.uk. Good enough to pick what to ask RDAP about; RDAP itself says no if wrong.
+// second-level such as co.uk; a site on a hosting service stays whole. Good enough to pick what to
+// ask RDAP about; RDAP itself says no if wrong.
 function registrable(host) {
   const parts = String(host || "").toLowerCase().replace(/^www\./, "").split(".").filter(Boolean);
   if (parts.length < 2) return null;
+  if (hostedOn(parts.join("."))) return parts.join(".");
   const sld = parts[parts.length - 2];
   return (parts.length >= 3 && /^(?:co|com|org|net|ac|gov|edu)$/.test(sld) && parts[parts.length - 1].length === 2 ? parts.slice(-3) : parts.slice(-2)).join(".");
 }
@@ -6168,7 +6180,7 @@ function daysBefore(iso, atIso) {
   return Number.isFinite(a) && Number.isFinite(b) ? Math.floor((b - a) / 86400000) : null;
 }
 
-return { RDAP_BASE, CDX_BASE, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE, registrable, rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore };
+return { RDAP_BASE, CDX_BASE, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE, HOSTING_SUFFIXES, hostedOn, registrable, rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore };
 })();
 
 // ---- evidence-ads.js
@@ -6268,7 +6280,7 @@ const M_evidence_fetch = (() => {
 
 const { makeReceipt } = M_receipt;
 const { GITHUB_API, repoFacts, starTimes, starPages, starBursts, REPO_DOES_NOT_PROVE, STARS_DOES_NOT_PROVE } = M_evidence_github;
-const { rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE } = M_evidence_domain;
+const { rdapUrl, cdxUrl, rdapFacts, waybackFirst, daysBefore, hostedOn, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE } = M_evidence_domain;
 
 const MAX_REPOS = 2, MAX_DOMAINS = 3, LOOKUP_TIMEOUT_MS = 15000;
 
@@ -6305,12 +6317,17 @@ async function github(fetchFn, { owner, repo }, token, postedAt) {
   return { receipts: out, notes };
 }
 
-async function domain(fetchFn, d, postedAt) {
+async function domain(fetchFn, d, postedAt, wayback) {
   const out = [], notes = [];
-  const r = await getJson(fetchFn, rdapUrl(d), { Accept: "application/rdap+json" });
-  const f = r.json ? rdapFacts(r.json) : null;
-  if (f && f.registered) out.push(await makeReceipt({ kind: "domain-registration", subject: f.domain, observed: { ...f, daysBeforePost: daysBefore(f.registered, postedAt) }, raw: r.json, source: "RDAP via rdap.org", url: rdapUrl(d), dnp: DOMAIN_DOES_NOT_PROVE }));
-  else notes.push(`RDAP answered ${r.status} for ${d}.`);
+  const host = hostedOn(d);
+  if (host) notes.push(`${d} is a site on ${host}, a hosting service. When ${host} was registered says nothing about this site, so RDAP was not asked.`);
+  else {
+    const r = await getJson(fetchFn, rdapUrl(d), { Accept: "application/rdap+json" });
+    const f = r.json ? rdapFacts(r.json) : null;
+    if (f && f.registered) out.push(await makeReceipt({ kind: "domain-registration", subject: f.domain, observed: { ...f, daysBeforePost: daysBefore(f.registered, postedAt) }, raw: r.json, source: "RDAP via rdap.org", url: rdapUrl(d), dnp: DOMAIN_DOES_NOT_PROVE }));
+    else notes.push(`RDAP answered ${r.status} for ${d}.`);
+  }
+  if (!wayback) { notes.push(`The Internet Archive was not asked about ${d}: allow access to web.archive.org by turning Evidence lookups off and on again in Options.`); return { receipts: out, notes }; }
   const w = await getJson(fetchFn, cdxUrl(d));
   const first = w.json ? waybackFirst(w.json) : null;
   if (first) out.push(await makeReceipt({ kind: "wayback-first", subject: d, observed: { ...first, daysBeforePost: daysBefore(first.first, postedAt) }, raw: w.json, source: "Internet Archive Wayback CDX", url: cdxUrl(d), dnp: WAYBACK_DOES_NOT_PROVE }));
@@ -6318,11 +6335,13 @@ async function domain(fetchFn, d, postedAt) {
   return { receipts: out, notes };
 }
 
-// { repos: [{ owner, repo }], domains: [string], postedAt, token? } -> { receipts, notes }.
-async function lookupEvidence(fetchFn, { repos = [], domains = [], postedAt = null, token = null } = {}) {
+// { repos: [{ owner, repo }], domains: [string], postedAt, token?, wayback? } -> { receipts, notes }.
+// wayback: false when the browser has not granted access to web.archive.org (its CDX sends no CORS
+// header), so the archive is reported as not asked rather than as an error.
+async function lookupEvidence(fetchFn, { repos = [], domains = [], postedAt = null, token = null, wayback = true } = {}) {
   const receipts = [], notes = [];
   for (const x of repos.slice(0, MAX_REPOS)) { const g = await github(fetchFn, x, token, postedAt); receipts.push(...g.receipts); notes.push(...g.notes); }
-  for (const d of domains.slice(0, MAX_DOMAINS)) { const g = await domain(fetchFn, d, postedAt); receipts.push(...g.receipts); notes.push(...g.notes); }
+  for (const d of domains.slice(0, MAX_DOMAINS)) { const g = await domain(fetchFn, d, postedAt, wayback); receipts.push(...g.receipts); notes.push(...g.notes); }
   if (repos.length > MAX_REPOS || domains.length > MAX_DOMAINS) notes.push(`Looked up the first ${MAX_REPOS} repositories and ${MAX_DOMAINS} domains only.`);
   return { receipts, notes };
 }
