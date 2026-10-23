@@ -27,7 +27,7 @@ Precision comes first: a badge on a real person's honest reply is the main harm.
 The split is fixed (seed `radar-eval-2026-10-21`, about 50/50 per corpus). Every lexicon and
 grammar change was tuned on dev. Test was read once, after tuning.
 
-## Results (test split, 2026-10-21, with the Spanish, German, Portuguese and Italian grammars and the side-recall terms merged)
+## Results (test split, 2026-10-23, with the language grammars, the side-recall terms and the feed-test fixes merged)
 "P(hostile)" is the share of marker hits on text the annotators judged hostile to a group. The
 pooled figure combines Measuring Hate Speech (MHS), HateXplain and Civil Comments. The range runs
 from the lowest to the highest corpus with at least 20 hits. "P(item)" and "R(item)" use MHS's own
@@ -35,25 +35,25 @@ survey item for that family. Intervals are Wilson 95%.
 
 | Family | P(hostile), pooled | Range across corpora | P(item), MHS | R(item), MHS |
 |---|---|---|---|---|
-| dehumanise | 92.3% (36/39; 79.7 to 97.3) | under 20 hits in each corpus | 57.9% (11/19; 36.3 to 76.9) | 0.2% (11/5,046; 0.1 to 0.4) |
+| dehumanise | 92.5% (37/40; 80.1 to 97.4) | MHS 90.0% (18/20); others under 20 hits | 60.0% (12/20; 38.7 to 78.1) | 0.2% (12/5,046; 0.1 to 0.4) |
 | violence | 87.5% (77/88; 79.0 to 92.9) | MHS 96.7% (59/61); Civil 3/9 | 63.9% (39/61; 51.4 to 74.8) | 2.1% (39/1,819; 1.6 to 2.9) |
 | vigilante | 2 of 3 hits | not measured (3 hits) | no item | no item |
-| slur | 91.0% (3,995/4,392; 90.1 to 91.8) | Civil 34.0% (16/47) to MHS 95.3% | no item | not measured |
-| stereotype | 83.3% (80/96; 74.6 to 89.5) | MHS 91.7% (66/72); Civil 3/9 | 70.8% (51/72; 59.5 to 80.1) | 0.6% (51/8,368; 0.5 to 0.8) |
-| any strong family | 90.7% (4,150/4,578; 89.8 to 91.5) | Civil 33.8% (23/68) to MHS 95.0% | | |
+| slur | 91.0% (3,996/4,393; 90.1 to 91.8) | Civil 34.0% (16/47) to MHS 95.3% | no item | not measured |
+| stereotype | 84.2% (96/114; 76.4 to 89.8) | HateXplain 77.3% (17/22) to MHS 92.5% (74/80); Civil 5/12 | 72.5% (58/80; 61.9 to 81.1) | 0.7% (58/8,368; 0.5 to 0.9) |
+| any strong family | 90.6% (4,167/4,597; 89.8 to 91.5) | Civil 35.2% (25/71) to MHS 95.1% | | |
 | slurSoft (weak) | 65.5% (837/1,278; 62.8 to 68.0) | Civil 20.3% to MHS 91.7% | | |
 | contempt (weak, new) | 92.0% (92/100; 85.0 to 95.9) | HateXplain 93.1%, MHS 91.4% | | |
 | motive (weak) | 72.5% (29/40; 57.2 to 83.9) | MHS 81.8% (18/22) | | |
 | essentialise (weak) | 57.8% (59/102; 48.1 to 67.0) | Civil 25.8% to HateXplain 75.0% | | |
 | absolutist (weak) | 50.7% (137/270; 44.8 to 56.7) | Civil 32.9% to HateXplain 84.2% | | |
-| conspiracy (weak) | 28.8% (34/118; 21.4 to 37.6) | Civil 3.6% (3/84) | | |
+| conspiracy (weak) | 29.5% (36/122; 22.1 to 38.1) | Civil 3.6% (3/84) to MHS 81.0% (17/21) | | |
 
 Strong families (dehumanise, violence, vigilante, slur, stereotype) label the post. Weak ones only
 count toward "extreme".
 
 **Report "extreme"** (`EXTREME_AT` = 2). Against MHS `hate_speech_score > 0.5`: precision 70.3%
-(896/1,275; 67.7 to 72.7), recall 17.2% (896/5,224; 16.2 to 18.2). Against HateXplain's majority
-"hatespeech": precision 60.1% (1,950/3,246; 58.4 to 61.7), recall 64.7% (1,950/3,016; 62.9 to 66.3).
+(903/1,285; 67.7 to 72.7), recall 17.3% (903/5,224; 16.3 to 18.3). Against HateXplain's majority
+"hatespeech": precision 60.0% (1,951/3,252; 58.3 to 61.7), recall 64.7% (1,951/3,016; 63.0 to 66.4).
 Civil Comments has no usable severity label.
 
 **French (MLMA).** 9 strong hits in the test split, 8 of them hostile. The French grammar is not
@@ -225,8 +225,10 @@ group lists in `evidence/CORPORA.md`). "Before" is the release with the four lan
 |---|---|---|---|---|---|
 | MHS | before | 9.3% (702/7,584; 8.6 to 9.9) | 4.3% (107/2,499; 3.6 to 5.1) | 96.2% (702/730; 94.5 to 97.3) | 93.9% (107/114; 87.9 to 97.0) |
 | MHS | after | 10.1% (765/7,584; 9.4 to 10.8) | 7.9% (198/2,499; 6.9 to 9.0) | 95.6% (765/800; 94.0 to 96.8) | 93.8% (198/211; 89.7 to 96.4) |
+| MHS | feed-test fixes, 2026-10-23 | 10.2% (771/7,584; 9.5 to 10.9) | 8.0% (201/2,499; 7.0 to 9.2) | 95.7% (771/806; 94.0 to 96.9) | 93.9% (201/214; 89.9 to 96.4) |
 | HateXplain | before | 43.2% (1,814/4,197; 41.7 to 44.7) | 18.3% (46/251; 14.0 to 23.6) | 98.1% (1,814/1,849; 97.4 to 98.6) | 100% (46/46; 92.3 to 100) |
 | HateXplain | after | 45.2% (1,895/4,197; 43.7 to 46.7) | 43.4% (109/251; 37.4 to 49.6) | 98.0% (1,895/1,933; 97.3 to 98.6) | 97.3% (109/112; 92.4 to 99.1) |
+| HateXplain | feed-test fixes, 2026-10-23 | 45.2% (1,897/4,197; 43.7 to 46.7) | 43.4% (109/251; 37.4 to 49.6) | 98.0% (1,897/1,935; 97.3 to 98.6) | 97.3% (109/112; 92.4 to 99.1) |
 
 The rule for "closed": the side intervals overlap and the point estimates sit within a factor of
 1.25. **HateXplain: closed.** Recall is 45.2% against 43.4% (ratio 1.04), and the intervals overlap.
@@ -286,6 +288,60 @@ not in the extension. Status: not measured.
   "honky" (4/10) and "dindu nuffin" (2/10), one aimed at each side.
 - Effect on test, before and after: strong precision MHS 94.0% to 95.6%, HateXplain 90.0% to 91.0%,
   Civil 34.4% to 34.6%. Strong recall MHS 8.8% to 8.4%, HateXplain 46.5% to 45.0%.
+
+## Feed-test fixes (2026-10-23)
+A feed test on 2026-10-23 ran 82 public X posts past two blind labellers (Claude Opus and Sonnet,
+kappa 0.65 to 1.0) and the 3.1.0 detector. The detector found 1 of 21 consensus findings and flagged
+nothing wrongly. Those 82 posts are a development set now: each miss was traced in the code, rules
+were written for the misses, tests paraphrase the misses (no post is copied) and add near misses that
+must not fire. The rules were tuned on those posts and on the dev split here, then test was read once.
+
+Why each miss was missed, and what changed:
+
+| Miss | Cause in the code | Change |
+|---|---|---|
+| "infecting all countries like parasites" | Every dehumanise rule needs a group noun from `GROUPS` before or after the marker. The post names its target as "they" ("these people"). With a group noun the WINDOW rule would have fired. | Simile rule: a group, "these people" or "they", a verb of spreading, "like" a vermin or disease noun. "They" takes only verbs said of people or vermin. |
+| a political group "spreading like a plague" | "plague" counts only straight after "are" (FILLERS allow "like a", not a verb), and it is not in the list allowed after a word window. | The same simile rule. |
+| "oy vey, stop noticing" | Only "the noticing" was listed; "oy vey" alone is ordinary Yiddish and stays unmarked. | "noticing will continue", "#thenoticing", and "notice" as a habit or an order near "oy vey", "goy" or "goyim". Source: Blue Square Alliance Against Hate, 2025-08-22 (`evidence/LEXICON-SOURCES.md`). |
+| the "noticing" image | The post has no text; the slogan is in an image the CLI does not read. With its text the existing "the noticing" term matches. | None. Image text needs the OCR path, which the CLI does not run. |
+| "Jewish cabal", "Jewish money ... control US policy" | Stereotype read only "X are/is <trait>" and "typical X". Conspiracy had framing words and twelve theories, none about control by a people. | Stereotype grammar for control put on a people (`src/core/rhetoric-groups.js`), and a named "secret control" theory. |
+| "99% under the control of" a foreign party, "infiltrated and controlled by", "Deep State controlled nations" | No theory covered capture of a country. "Deep State" matched the weak framing family, which never shows on its own. | The "secret control" theory, with foreign powers from every direction listed alike. "won through a rigged election" joins the stolen-election theory. |
+| "the X will probably attack", "X immigrants will cause your downfall", "illiterate X" | No grammar for a people predicted to attack, a people as a country's ruin, or a trait word before a people. | Three stereotype rules, over every faith and race, and origin where a nationality cannot mean an army or a state. |
+| a stereotype also labelled dehumanising (2 posts) | The detector reports one strong family per marker; both posts get "dehumanising". | None. Counted as missed under stereotype in the recall below. |
+| crime blamed on a people across two sentences; immigration as national "suicide" with no people named; "the Irish of the Orient" | The cause sits in a later sentence, no people is named, or the stereotype is a comparison. | None. These stay missed. |
+| quoted posts | `analyzeThread` ignored the `quoted` list. No consensus finding sat in a quoted post. | Quoted posts are read and listed in `posts.quoted`; they stay out of the reply comparisons. |
+
+The new rules use a stricter guard than the older ones: a match after a cue that someone else said it
+("posts saying", "the myth that", "asked whether") or followed by counter-speech ("... is racist")
+is skipped. Applied to every family on dev, the same guard dropped 101 slur hits, 79 of them on
+hostile text, so the older rules keep their narrower guard.
+
+**Held-out precision, read once.** Before is the 3.1.0 code on the same test split; the figures in
+the results table above are after.
+
+| Family | Before | After | New hits | New hits on hostile text |
+|---|---|---|---|---|
+| dehumanise | 92.3% (36/39; 79.7 to 97.3) | 92.5% (37/40; 80.1 to 97.4) | 1 | 1 |
+| stereotype | 83.3% (80/96; 74.6 to 89.5) | 84.2% (96/114; 76.4 to 89.8) | 18 | 16 |
+| slur | 91.0% (3,996/4,393) | 91.0% (3,996/4,393) | 0 | 0 |
+| any strong family | 90.7% (4,151/4,579; 89.8 to 91.5) | 90.6% (4,167/4,597; 89.8 to 91.5) | 18 | 16 |
+
+Every family stays inside its earlier interval, so every rule ships. On Civil Comments, where 8% of
+comments are hostile, stereotype went from 3/9 to 5/12 and strong from 23/68 to 25/71. MHS item
+precision for stereotype went from 70.8% (51/72) to 72.5% (58/80). The MHS side gap stays open:
+right-target recall 10.2% against left 8.0% (ratio 1.28). Three committed figures were a little stale
+before this read (slur 3,995/4,392, strong 4,150/4,578, weak conspiracy 34/118 and the side rows); the 3.1.0 code gives the
+"before" column above, and only the rows in the "new hits" column changed.
+
+The "secret control" theory carries weight 0 and is not measured, like every named theory. As context,
+not a measurement: across all of MHS, HateXplain and Civil Comments (both splits) it fired twice, both on
+MHS dev, and both were read during tuning.
+
+**Development recall on the 82 posts, after the fixes: 14 of 21 consensus findings (Wilson 95% 0.45 to
+0.83), with no flag on any post outside the consensus.** By family: dehumanise 3/3, slur 1/2, conspiracy
+(named theories) 5/5, stereotype 5/11. This is not a held-out measure. The rules were written for these
+posts, so this number shows the misses are fixed, not how often the detector finds such content.
+A held-out live-feed set, labelled the same way, is needed before any recall claim.
 
 ## Persuasion techniques (PTC test split, 2026-10-21): none ship
 Daylight Commons looks for eleven techniques from the SemEval-2020 Task 11 and SemEval-2023 Task 3 taxonomy.

@@ -121,7 +121,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <body>
 <main>
 <h1>How Daylight Commons is measured</h1>
-<p class="muted">Updated 2026-10-21.</p>
+<p class="muted">Updated 2026-10-23.</p>
 
 <p class="lead">Every sign in Daylight Commons' window either shows how often it was right when people checked by hand, or says "not measured yet". This page lists every sign, the data each was checked on and its licence, how evenly the signs work whichever side a post targets, and what the numbers do not prove.</p>
 <h2>How to read the numbers</h2>
@@ -129,7 +129,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <li><strong>Precision</strong> is the share of signs Daylight Commons showed that the human annotators of a public research corpus agreed with. It answers "when Daylight Commons shows this, how often is it right?"</li>
 <li><strong>Recall</strong> is the share of the annotated cases that Daylight Commons found. Daylight Commons is built for precision: a wrong sign on an honest reply is the harm it avoids most, so recall is low.</li>
 <li>Each figure gives the count and a 95% interval (Wilson). A wide interval means few cases were checked.</li>
-<li>All figures come from a held-out test split (seed <code>radar-eval-2026-10-21</code>). Rules were tuned on a separate split, and the test split was read once, after tuning. Measured 2026-10-21.</li>
+<li>All figures come from a held-out test split (seed <code>radar-eval-2026-10-21</code>). Rules were tuned on a separate split, and the test split was read once, after tuning. Measured 2026-10-23.</li>
 </ul>
 <h2>One figure per sign</h2>
 <p>Each sign leads with what its measurement means when you see it. The figure draws the 95% interval as a band and the measured value as a mark; a dashed line is the bar a sign must clear to show. Counts, data and limits sit under "How we know".</p>
@@ -137,7 +137,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <h3>Slur or coded hate term</h3>
 <p class="takeaway">When Daylight Commons shows this sign, the people who labelled the test comments agreed 91 times in 100.</p>
 <svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Slur or coded hate term, precision: 91%, 95% interval 90.1% to 91.8%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="354.0" y="10" width="6.5" height="12"/><line class="point" x1="357.4" y1="6" x2="357.4" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
-<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>3,995 of 4,392; 95% interval 90.1% to 91.8%</dd><dt>Range across corpora</dt><dd>34.0% to 95.3%</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>3,996 of 4,393; 95% interval 90.1% to 91.8%</dd><dt>Range across corpora</dt><dd>34.0% to 95.3%</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
 </section>
 <section class="sign">
 <h3>Call for violence</h3>
@@ -147,21 +147,21 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </section>
 <section class="sign">
 <h3>Dehumanising language</h3>
-<p class="takeaway">When Daylight Commons shows this sign, the people who labelled the test comments agreed 92 times in 100.</p>
-<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Dehumanising language, precision: 92.3%, 95% interval 79.7% to 97.3%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="314.0" y="10" width="67.6" height="12"/><line class="point" x1="362.4" y1="6" x2="362.4" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
-<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>36 of 39; 95% interval 79.7% to 97.3%</dd><dt>Recall</dt><dd>0.2% (11 of 5,046; 95% interval 0.1% to 0.4%). Daylight Commons is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
+<p class="takeaway">When Daylight Commons shows this sign, the people who labelled the test comments agreed 93 times in 100.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Dehumanising language, precision: 92.5%, 95% interval 80.1% to 97.4%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="315.6" y="10" width="66.4" height="12"/><line class="point" x1="363.2" y1="6" x2="363.2" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>37 of 40; 95% interval 80.1% to 97.4%</dd><dt>Range across corpora</dt><dd>90.0% to 90.0%</dd><dt>Recall</dt><dd>0.2% (12 of 5,046; 95% interval 0.1% to 0.4%). Daylight Commons is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
 </section>
 <section class="sign">
 <h3>Group stereotype</h3>
-<p class="takeaway">When Daylight Commons shows this sign, the people who labelled the test comments agreed 83 times in 100.</p>
-<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Group stereotype, precision: 83.3%, 95% interval 74.6% to 89.5%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="294.5" y="10" width="57.2" height="12"/><line class="point" x1="327.9" y1="6" x2="327.9" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
-<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>80 of 96; 95% interval 74.6% to 89.5%</dd><dt>Range across corpora</dt><dd>91.7% to 91.7%</dd><dt>Recall</dt><dd>0.6% (51 of 8,368; 95% interval 0.5% to 0.8%). Daylight Commons is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
+<p class="takeaway">When Daylight Commons shows this sign, the people who labelled the test comments agreed 84 times in 100.</p>
+<svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Group stereotype, precision: 84.2%, 95% interval 76.4% to 89.8%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="301.4" y="10" width="51.5" height="12"/><line class="point" x1="331.3" y1="6" x2="331.3" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>96 of 114; 95% interval 76.4% to 89.8%</dd><dt>Range across corpora</dt><dd>77.3% to 92.5%</dd><dt>Recall</dt><dd>0.7% (58 of 8,368; 95% interval 0.5% to 0.9%). Daylight Commons is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Does not prove</dt><dd>Words can be quoted, ironic or reported speech. A sign describes the post, not who wrote it or why.</dd></dl></details>
 </section>
 <section class="sign">
 <h3>The thread report's &quot;extreme&quot;</h3>
 <p class="takeaway">When the report counts a reply as extreme, the corpus labelled it severe 70 times in 100.</p>
 <svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Extreme, precision: 70.3%, 95% interval 67.7% to 72.7%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="268.0" y="10" width="19.2" height="12"/><line class="point" x1="278.0" y1="6" x2="278.0" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
-<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>896 of 1,275; 95% interval 67.7% to 72.7%</dd><dt>Recall</dt><dd>896 of 5,224; 95% interval 16.2% to 18.2%</dd><dt>Data</dt><dd>Measuring Hate Speech severity labels</dd></dl></details>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>903 of 1,285; 95% interval 67.7% to 72.7%</dd><dt>Recall</dt><dd>903 of 5,224; 95% interval 16.3% to 18.3%</dd><dt>Data</dt><dd>Measuring Hate Speech severity labels</dd></dl></details>
 </section>
 <section class="sign">
 <h3>Same text as other replies</h3>
@@ -209,9 +209,9 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <p>Checked on three public corpora of comments labelled by people, pooled: Measuring Hate Speech (CC BY 4.0), HateXplain (MIT) and Civil Comments (CC0 1.0). The range runs from the lowest to the highest corpus with at least 20 hits. Recall is against Measuring Hate Speech's own survey item for that sign, where one exists.</p>
 <details class="how-we-know"><summary>Every language sign, with counts</summary>
 <div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Precision (95% interval)</th><th scope="col">Range across corpora</th><th scope="col">Recall</th><th scope="col">Status</th></tr></thead><tbody>
-<tr><td>Slur or coded hate term</td><td class="num">91.0% (3,995 of 4,392; 90.1% to 91.8%)</td><td class="num">34.0% to 95.3%</td><td class="num">not measured</td><td>Shown with this figure</td></tr>
-<tr><td>Group stereotype</td><td class="num">83.3% (80 of 96; 74.6% to 89.5%)</td><td class="num">91.7%</td><td class="num">0.6% (51 of 8,368; 0.5% to 0.8%)</td><td>Shown with this figure</td></tr>
-<tr><td>Dehumanising language</td><td class="num">92.3% (36 of 39; 79.7% to 97.3%)</td><td class="num">under 20 hits in each corpus</td><td class="num">0.2% (11 of 5,046; 0.1% to 0.4%)</td><td>Shown with this figure</td></tr>
+<tr><td>Slur or coded hate term</td><td class="num">91.0% (3,996 of 4,393; 90.1% to 91.8%)</td><td class="num">34.0% to 95.3%</td><td class="num">not measured</td><td>Shown with this figure</td></tr>
+<tr><td>Group stereotype</td><td class="num">84.2% (96 of 114; 76.4% to 89.8%)</td><td class="num">77.3% to 92.5%</td><td class="num">0.7% (58 of 8,368; 0.5% to 0.9%)</td><td>Shown with this figure</td></tr>
+<tr><td>Dehumanising language</td><td class="num">92.5% (37 of 40; 80.1% to 97.4%)</td><td class="num">90.0%</td><td class="num">0.2% (12 of 5,046; 0.1% to 0.4%)</td><td>Shown with this figure</td></tr>
 <tr><td>Call for violence</td><td class="num">87.5% (77 of 88; 79.0% to 92.9%)</td><td class="num">96.7%</td><td class="num">2.1% (39 of 1,819; 1.6% to 2.9%)</td><td>Shown with this figure</td></tr>
 <tr><td>Call for vigilantes</td><td class="num">66.7% (2 of 3; 20.8% to 93.9%)</td><td class="num">under 20 hits in each corpus</td><td class="num">not measured</td><td>Not measured: fewer than 20 hits in the test split</td></tr>
 </tbody></table></div>
@@ -225,13 +225,13 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td>Motive attribution</td><td class="num">72.5% (29 of 40; 57.2% to 83.9%)</td><td class="num">81.8%</td></tr>
 <tr><td>Essentialising</td><td class="num">57.8% (59 of 102; 48.1% to 67.0%)</td><td class="num">25.8% to 75.0%</td></tr>
 <tr><td>Absolutist wording</td><td class="num">50.7% (137 of 270; 44.8% to 56.7%)</td><td class="num">32.9% to 84.2%</td></tr>
-<tr><td>Conspiracy framing</td><td class="num">28.8% (34 of 118; 21.4% to 37.6%)</td><td class="num">3.6%</td></tr>
-<tr><td>Any strong language sign</td><td class="num">90.7% (4,150 of 4,578; 89.8% to 91.5%)</td><td class="num">33.8% to 95.0%</td></tr>
+<tr><td>Conspiracy framing</td><td class="num">29.5% (36 of 122; 22.1% to 38.1%)</td><td class="num">3.6% to 81.0%</td></tr>
+<tr><td>Any strong language sign</td><td class="num">90.6% (4,167 of 4,597; 89.8% to 91.5%)</td><td class="num">35.2% to 95.1%</td></tr>
 </tbody></table></div>
 </details>
 <p class="muted">These describe framing, which the corpora do not label. Their figures against hostility labels are context, not error rates.</p>
 <h3>The thread report's "extreme"</h3>
-<p>Precision against Measuring Hate Speech severity labels: <span class="mono">70.3% (896 of 1,275; 67.7% to 72.7%)</span>. Recall: <span class="mono">17.2% (896 of 5,224; 16.2% to 18.2%)</span>. On HateXplain: precision <span class="mono">60.1% (1,950 of 3,246; 58.4% to 61.7%)</span>. Most severe replies do not count as extreme, so the report undercounts them.</p>
+<p>Precision against Measuring Hate Speech severity labels: <span class="mono">70.3% (903 of 1,285; 67.7% to 72.7%)</span>. Recall: <span class="mono">17.3% (903 of 5,224; 16.3% to 18.3%)</span>. On HateXplain: precision <span class="mono">60.0% (1,951 of 3,252; 58.3% to 61.7%)</span>. Most severe replies do not count as extreme, so the report undercounts them.</p>
 <h3>Word lists derived from labelled data</h3>
 <p>For Hebrew, Turkish, Korean, Japanese, Persian, Indonesian and Hindi, a script picks each slur term from the training half of public corpora labelled by people, and the other half measures it. A language shows signs only when its list was derived against labels of hate aimed at a group and the 95% interval of its precision starts at 70% or above, from at least 20 signs. Held-back lists never run.</p>
 <details class="how-we-know"><summary>Every derived list, with counts</summary>
@@ -270,17 +270,17 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <h2>Side balance</h2>
 <p>Political side is never an input to Daylight Commons. To check that the signs work alike whichever side a post targets, the strong language signs were measured on hostile text aimed at groups each side is often hostile to. "Balanced" means the two recall intervals overlap and the larger is at most 1.25 times the smaller.</p>
 <div class="scroll"><table><thead><tr><th scope="col">Corpus</th><th scope="col">Recall, right's usual targets</th><th scope="col">Recall, left's usual targets</th><th scope="col">Precision, right's usual targets</th><th scope="col">Precision, left's usual targets</th><th scope="col">Result</th></tr></thead><tbody>
-<tr><td>Measuring Hate Speech</td><td class="num">10.1% (765 of 7,584; 9.4% to 10.8%)</td><td class="num">7.9% (198 of 2,499; 6.9% to 9.0%)</td><td class="num">95.6% (765 of 800; 94.0% to 96.8%)</td><td class="num">93.8% (198 of 211; 89.7% to 96.4%)</td><td><span class="hot">Gap remains</span></td></tr>
-<tr><td>HateXplain</td><td class="num">45.2% (1,895 of 4,197; 43.7% to 46.7%)</td><td class="num">43.4% (109 of 251; 37.4% to 49.6%)</td><td class="num">98.0% (1,895 of 1,933; 97.3% to 98.6%)</td><td class="num">97.3% (109 of 112; 92.4% to 99.1%)</td><td>Balanced</td></tr>
+<tr><td>Measuring Hate Speech</td><td class="num">10.2% (771 of 7,584; 9.5% to 10.9%)</td><td class="num">8.0% (201 of 2,499; 7.0% to 9.2%)</td><td class="num">95.7% (771 of 806; 94.0% to 96.9%)</td><td class="num">93.9% (201 of 214; 89.9% to 96.4%)</td><td><span class="hot">Gap remains</span></td></tr>
+<tr><td>HateXplain</td><td class="num">45.2% (1,897 of 4,197; 43.7% to 46.7%)</td><td class="num">43.4% (109 of 251; 37.4% to 49.6%)</td><td class="num">98.0% (1,897 of 1,935; 97.3% to 98.6%)</td><td class="num">97.3% (109 of 112; 92.4% to 99.1%)</td><td>Balanced</td></tr>
 </tbody></table></div>
 <p class="muted">Precision agrees across sides within the intervals. Where a gap remains, the thread report undercounts extreme replies aimed at the side with lower recall.</p>
 <h2>Every sign</h2>
 <p>Each of Daylight Commons' 62 signs, with the line its window shows beside it.</p>
 <details class="how-we-know"><summary>Every sign and its measured line</summary>
 <div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Kind</th><th scope="col">What the window says</th></tr></thead><tbody>
-<tr><td>Slur or coded hate term</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 91% (95% interval 90 to 92%), 4392 badges checked, held-out test set</td></tr>
-<tr><td>Group stereotype</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 83% (95% interval 75 to 90%), 96 badges checked, held-out test set</td></tr>
-<tr><td>Dehumanising language</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 92% (95% interval 80 to 97%), 39 badges checked, held-out test set</td></tr>
+<tr><td>Slur or coded hate term</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 91% (95% interval 90 to 92%), 4393 badges checked, held-out test set</td></tr>
+<tr><td>Group stereotype</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 84% (95% interval 76 to 90%), 114 badges checked, held-out test set</td></tr>
+<tr><td>Dehumanising language</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 93% (95% interval 80 to 97%), 40 badges checked, held-out test set</td></tr>
 <tr><td>Call for violence</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 88% (95% interval 79 to 93%), 88 badges checked, held-out test set</td></tr>
 <tr><td>Call for vigilantes</td><td>Language</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
 <tr><td>Named conspiracy theory</td><td>Language</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>

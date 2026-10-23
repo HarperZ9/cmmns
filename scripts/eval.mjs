@@ -73,7 +73,7 @@ function main() {
   console.log(`\nduplicates (SYNTHETIC) P ${pct(duplicates.precision)} R ${pct(duplicates.recall)}`);
   console.log(`mismatch (SYNTHETIC)   P ${pct(mismatch.precision)} R ${pct(mismatch.recall)}`);
   const extreme = Object.fromEntries(Object.entries(corpora).map(([c, r]) => [c, r.extreme.againstSevere]));
-  const summary = { generated: "2026-10-21", split: SPLIT, seed: SEED, extremeAt: EXTREME_AT, families: familySummary(corpora),
+  const summary = { generated: "2026-10-23", split: SPLIT, seed: SEED, extremeAt: EXTREME_AT, families: familySummary(corpora),
     extreme: { precision: extreme.mhs.precision, recall: extreme.mhs.recall, against: "mhs: hate_speech_score > 0.5", byCorpus: Object.fromEntries(Object.entries(extreme).map(([c, x]) => [c, x.precision])) },
     sides: sidesSummary(corpora),
     duplicates: { synthetic: true, precision: duplicates.precision, recall: duplicates.recall },
