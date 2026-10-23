@@ -1,0 +1,21 @@
+name: dco
+# Every commit in a pull request must carry a Developer Certificate of Origin sign-off that matches
+# its author (CONTRIBUTING.md). The check is scripts/dco-check.mjs through scripts/ci.mjs, so
+# `node scripts/ci.mjs dco` runs the same check on any machine. No third-party action.
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  sign-off:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - run: node scripts/ci.mjs dco
+        env:
+          DCO_BASE: ${{ github.event.pull_request.base.sha }}
+          DCO_HEAD: ${{ github.event.pull_request.head.sha }}

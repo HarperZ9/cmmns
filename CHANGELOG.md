@@ -13,6 +13,15 @@ were not published to a store.
   Croissant metadata and a datasheet. Each refuses a chain that fails its check, post text and a
   private account without a pseudonym, and ships the chain so a reader can run `radar verify`.
   The command line release file now carries the definition catalogue.
+- The definition catalogue as a public page, `docs/catalogue.html`: every entry with its
+  jurisdiction, version, sources, retrieval dates and elements, and the source hashes and quoted
+  text in a details section. Each entry has an anchor a badge can link to. The page is built from
+  `catalogue/` by `scripts/catalogue-page.mjs`, CI fails when it is stale, and the other public
+  pages link to it.
+- An automatic sign-off check on every pull request (`.github/workflows/dco.yml`,
+  `scripts/dco-check.mjs`): each commit needs a `Signed-off-by` line matching its author.
+  `node scripts/ci.mjs dco` runs the same check locally.
+- `project-docs/MIRROR.md`: the steps for a read-only Codeberg mirror, for the author to carry out.
 - `docs/COMPLETION.md`, the completion ledger: every feature in the project's direction with a
   check that can fail, its status and the tool it competes with; `docs/WAVES.md`, the work plan.
 

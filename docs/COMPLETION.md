@@ -127,10 +127,10 @@ These do not move for any feature below. A row that would cross one is out of sc
 
 | ID | Criterion | Check | Status | Evidence | Competitive bar |
 |---|---|---|---|---|---|
-| C1 | Contributions by pull request under the DCO | DCO check on pull requests | **PARTIAL** | `CONTRIBUTING.md`; no automated sign-off check | Wikipedia edits; Community Notes |
+| C1 | Contributions by pull request under the DCO | DCO check on pull requests | **PASS** | `.github/workflows/dco.yml` runs `scripts/dco-check.mjs` on every pull request; `tests/dco.test.js` (wave 2) | Wikipedia edits; Community Notes |
 | C2 | Dispute template for entries, badges and findings | template test | **PARTIAL** | entries and badges covered; findings not | Wikipedia talk pages |
-| C3 | Public catalogue page generated from `catalogue/` | page regenerates in CI; no entry missing | **NOT BUILT** | | none |
-| C4 | Codeberg mirror | live mirror | **NOT BUILT** | author account | |
+| C3 | Public catalogue page generated from `catalogue/` | page regenerates in CI; no entry missing | **PASS** | `docs/catalogue.html` from `scripts/catalogue-page.mjs`; `tests/catalogue-page.test.js` and the CI freshness step (wave 2) | none |
+| C4 | Codeberg mirror | live mirror | **NOT BUILT** | steps written in `project-docs/MIRROR.md` (wave 2); needs the author's Codeberg account | |
 | C5 | Fixed, hashed evaluation splits for shared data | split hash test | **PARTIAL** | rhetoric eval seed fixed and inputs hashed | |
 | C6 | Labels need independent agreement; poisoning controls | control set with planted bad rows | **NOT BUILT** | | |
 | C7 | Scheduled full dumps | release asset | **NOT BUILT** | | Wikipedia dumps |
