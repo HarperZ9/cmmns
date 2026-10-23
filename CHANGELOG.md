@@ -13,6 +13,13 @@ were not published to a store.
   Croissant metadata and a datasheet. Each refuses a chain that fails its check, post text and a
   private account without a pseudonym, and ships the chain so a reader can run `radar verify`.
   The command line release file now carries the definition catalogue.
+- The campaign-lens labelling kit (`scripts/label/`): a blind labelling page that runs from a file,
+  stores structure only and sends nothing; the `dc-label/1` labels format, which refuses text,
+  handles and links; and `node scripts/label/results.mjs`, which reports Cohen's kappa with a 95%
+  interval, precision and recall with Wilson intervals, and the organic false-positive rate per
+  language and region stratum against the 5-point fairness bound. The guide is
+  `project-docs/LABELLING.md`; `docs/LABELLING-RUN.md` lists the labellers and time the run needs.
+  Nothing has been labelled yet.
 - `docs/COMPLETION.md`, the completion ledger: every feature in the project's direction with a
   check that can fail, its status and the tool it competes with; `docs/WAVES.md`, the work plan.
 
