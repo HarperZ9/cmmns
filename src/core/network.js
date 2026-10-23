@@ -7,13 +7,15 @@
 
 import { foldConfusables } from "./confusables.js";
 import { ownWords } from "./similarity.js";
+import { timePrecision, observable } from "./precision.js";
 
 export const RETAIN_DAYS = 30, MAX_THREADS = 2000;
 const DAY = 86400000;
 
-// log: { threads: { [threadKey]: { at, authors: { [handle]: delaySeconds|null } } } }
-// rows: [{ author, posted }], rootPosted: ISO time of the original post (or null)
-export function recordThread(log, threadKey, rows, rootPosted, now = Date.now()) {
+// log: { threads: { [threadKey]: { at, prec, authors: { [handle]: delaySeconds|null } } } }
+// rows: [{ author, posted }], rootPosted: ISO time of the original post (or null). precision: how
+// precise the times are (src/core/precision.js); when it is not given it is inferred from the times.
+export function recordThread(log, threadKey, rows, rootPosted, now = Date.now(), precision) {
   const L = { threads: { ...((log && log.threads) || {}) } };
   const t0 = Date.parse(rootPosted);
   const authors = {}, hours = {}, fps = {}, links = {};
@@ -27,7 +29,8 @@ export function recordThread(log, threadKey, rows, rootPosted, now = Date.now())
     if (fp && !(fps[fp] || []).includes(h)) (fps[fp] = fps[fp] || []).push(h);
     for (const d of r.domains || []) if (!(links[d] || []).includes(h)) (links[d] = links[d] || []).push(h);
   }
-  L.threads[threadKey] = { at: now, authors, posts: hours, fps, links };
+  const prec = timePrecision([...rows, { posted: rootPosted }], precision).precision;
+  L.threads[threadKey] = { at: now, prec, authors, posts: hours, fps, links };
   // retention and size cap, oldest first
   const keys = Object.keys(L.threads).filter((k) => now - L.threads[k].at <= RETAIN_DAYS * DAY).sort((a, b) => L.threads[b].at - L.threads[a].at);
   return { threads: Object.fromEntries(keys.slice(0, MAX_THREADS).map((k) => [k, L.threads[k]])) };
@@ -35,11 +38,17 @@ export function recordThread(log, threadKey, rows, rootPosted, now = Date.now())
 
 const median = (xs) => { if (!xs.length) return null; const s = [...xs].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
 
-// One account's activity across the log.
+// The precision a logged thread's times were recorded at. Entries from before 3.2.1 carry none; the
+// extension wrote them from the page's machine-readable datetime attributes, which give seconds.
+const precOf = (t) => ("prec" in t ? t.prec : "second");
+
+// One account's activity across the log. Reply delays count only from threads timed to the second
+// (fast replies need it) and posting hours only from threads timed to the hour; coarseThreads counts
+// the threads left out of either.
 export function activity(log, handle) {
   const h = String(handle).toLowerCase();
   const threads = Object.values((log && log.threads) || {}).filter((t) => h in t.authors);
-  const delays = threads.map((t) => t.authors[h]).filter((d) => d != null);
+  const delays = threads.filter((t) => observable(precOf(t), "fast-replier")).map((t) => t.authors[h]).filter((d) => d != null);
   const together = new Map();
   for (const t of threads) for (const other of Object.keys(t.authors)) if (other !== h) together.set(other, (together.get(other) || 0) + 1);
   return {
@@ -47,7 +56,8 @@ export function activity(log, handle) {
     firstSeen: threads.length ? new Date(Math.min(...threads.map((t) => t.at))).toISOString().slice(0, 10) : null,
     medianDelay: median(delays),
     fastReplies: delays.filter((d) => d <= 60).length,
-    activeHours: activeHours(threads.flatMap((t) => (t.posts && t.posts[h]) || [])),
+    activeHours: activeHours(threads.filter((t) => observable(precOf(t), "active-hours")).flatMap((t) => (t.posts && t.posts[h]) || [])),
+    coarseThreads: threads.filter((t) => !observable(precOf(t), "fast-replier")).length,
     alongside: [...together].filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([other, n]) => ({ handle: other, n })),
   };
 }

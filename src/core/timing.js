@@ -7,6 +7,10 @@
 // around the window. Replies rush in after a post and then thin out; tested against the average
 // alone, that rush fired the sign on 12% of ordinary Twitter threads and on 39% of threads with
 // 50 or more replies. Against the local pace it fired on 1.6% (project-docs/EVALUATION.md).
+// A burst needs times to the second (precision.js). Times rounded to the minute, hour or day put
+// many replies on one second by construction, so below that precision the test does not run.
+
+import { timePrecision, observable } from "./precision.js";
 
 export const WINDOW_SEC = 20, MIN_ACCOUNTS = 3, MAX_P = 0.001, LOCAL_SEC = 120;
 
@@ -28,8 +32,21 @@ export function poissonTail(k, lambda) {
   return Math.max(0, 1 - cdf);
 }
 
-// rows: [{ author, posted }]. Returns [{ from, to, authors, p }], tightest first, not overlapping.
-export function timingBursts(rows, windowSec = WINDOW_SEC, minAccounts = MIN_ACCOUNTS) {
+// rows: [{ author, posted, timePrecision? }]. opts: { precision, windowSec, minAccounts }, where
+// precision is the thread's timePrecision. Returns { observable, precision, basis, bursts }.
+export function burstCheck(rows, opts = {}) {
+  const P = timePrecision(rows, opts.precision);
+  const ok = observable(P.precision, "timing-burst");
+  return { observable: ok, precision: P.precision, basis: P.basis, bursts: ok ? findBursts(rows, opts.windowSec || WINDOW_SEC, opts.minAccounts || MIN_ACCOUNTS) : [] };
+}
+
+// Returns [{ from, to, authors, p }], tightest first, not overlapping; [] when the times are too
+// coarse to show a burst.
+export function timingBursts(rows, opts = {}) {
+  return burstCheck(rows, opts).bursts;
+}
+
+function findBursts(rows, windowSec, minAccounts) {
   const pts = rows.map((r) => ({ a: String(r.author).toLowerCase(), t: Date.parse(r.posted) })).filter((x) => Number.isFinite(x.t)).sort((x, y) => x.t - y.t);
   if (pts.length < minAccounts + 2) return [];
   const span = (pts[pts.length - 1].t - pts[0].t) / 1000;

@@ -140,10 +140,11 @@
     if (feed) { removePanel(); recordFeed(site, items); return; }
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
-    report.bursts = PB.timingBursts(replies);
+    // Reply times come from the page's datetime attributes, which give seconds (src/core/precision.js).
+    report.bursts = PB.timingBursts(replies, { precision: "second" });
     report.flood = PB.floodSign(replies, tech.rateOf, { bursts: report.bursts });
     report.crossLang = tech.groups;
-    report.swarm = root ? PB.swarmSign(replies, swarmMarks(rows)) : null;
+    report.swarm = root ? PB.swarmSign(replies, swarmMarks(rows), { precision: "second" }) : null;
     report.state = PB.stateSummary(replies);
     report.upstream = PB.upstream(items, tweets, PBLogs.trail());
     const pushed = PB.pushedLinks(PBLogs.net(), items.flatMap((r) => r.domains || []));
@@ -216,7 +217,8 @@
       for (const p of posts) all.set(p.id, p);
       const list = [...all.values()].slice(-200);
       authorPosts.set(k, list);
-      const pattern = PB.postingPattern(list);
+      // X's created_at gives seconds; a scheduler posting on the hour must not read as rounded times.
+      const pattern = PB.postingPattern(list, { precision: "second" });
       if (pattern) PBStore.put({ handle: posts[0].author, pattern }).catch((e) => console.error("[daylight-commons] could not save a posting pattern", e));
     }
   }

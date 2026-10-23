@@ -17,7 +17,10 @@ export const MAX_IMPORT_POSTS = 20000;
 
 const fail = (reason) => ({ ok: false, reason });
 const asText = (bytes) => (typeof bytes === "string" ? bytes : new TextDecoder("utf-8").decode(bytes));
-const fromExport = (format, r) => (r && r.posts.length ? { ok: true, format, source: "export", site: r.site, input: { site: r.site, root: null, replies: r.posts.slice(0, MAX_IMPORT_POSTS) }, notes: [...r.notes, ...(r.posts.length > MAX_IMPORT_POSTS ? [`Only the first ${MAX_IMPORT_POSTS} posts were read.`] : [])] } : null);
+// How precise each export's own timestamps are (src/core/precision.js): X, Reddit and Mastodon give
+// seconds, Bluesky records give milliseconds.
+const EXPORT_PRECISION = { "X archive tweets.js": "second", "Reddit export CSV": "second", "Mastodon outbox.json": "second", "Bluesky repository .car": "exact" };
+const fromExport = (format, r) => (r && r.posts.length ? { ok: true, format, source: "export", site: r.site, input: { site: r.site, root: null, replies: r.posts.slice(0, MAX_IMPORT_POSTS), timePrecision: EXPORT_PRECISION[format] }, notes: [...r.notes, ...(r.posts.length > MAX_IMPORT_POSTS ? [`Only the first ${MAX_IMPORT_POSTS} posts were read.`] : [])] } : null);
 const fromThread = (format, t, notes = []) => (t && (t.replies.length || t.root) ? { ok: true, format, source: "thread", site: t.site, input: t, notes } : null);
 
 function fromJson(name, text) {
@@ -34,7 +37,8 @@ function fromBytes(name, bytes) {
   if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Daylight Commons can read.`);
   if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} is not a Reddit export with id, permalink and body columns.`);
   if (/^[[{]/.test(head)) return fromJson(name, text);
-  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons did not recognise a thread on this page, so it read the page as one text."] : [] }; }
+  // A saved X or Reddit page carries machine-readable times (datetime and created attributes) to the second.
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); if (p.kind === "thread") p.timePrecision = "second"; return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons did not recognise a thread on this page, so it read the page as one text."] : [] }; }
   return fail(`Daylight Commons does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
 }
 

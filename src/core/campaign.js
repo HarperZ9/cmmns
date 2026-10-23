@@ -102,14 +102,15 @@ function overlapRows(o) {
   return o.indicator ? { ind: [row], ctx: [] } : { ind: [], ctx: o.repeat ? [row] : [] };
 }
 
-// input: { platform, post: counts + { followers, text }, ownPosts, accounts, quotes, overlap, actor }
+// input: { platform, post: counts + { followers, text }, ownPosts, accounts, quotes, overlap, actor, timePrecision }
+// timePrecision: how precise the quote times are (src/core/precision.js); inferred from them when absent.
 // actor: actorOf(the launch author's reading), or null; only a disclosed organisation is named.
 export function campaignLens(input) {
   const def = campaignPlatform(input && input.platform);
   if (!def) return { status: "undefined", lead: CAMPAIGN_LEADS.undefined, notes: (CAMPAIGN_PLATFORMS[input && input.platform] || {}).notes || null, indicators: [], context: [], dnp: CAMPAIGN_DOES_NOT_PROVE };
   const sh = input.post ? engagementShape(input.platform, input.post, input.ownPosts) : null;
   const sm = sampleSigns(input.accounts, input.post && input.post.text);
-  const qc = quoteCluster(input.quotes);
+  const qc = quoteCluster(input.quotes, { precision: input.timePrecision });
   const parts = [shapeRows(sh), sampleRows(sm), quoteRows(qc), overlapRows(input.overlap)];
   const indicators = parts.flatMap((p) => p.ind), context = parts.flatMap((p) => p.ctx);
   const families = [...new Set(indicators.map((i) => FAMILY[i.id]))];

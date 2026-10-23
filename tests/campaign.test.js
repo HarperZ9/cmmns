@@ -233,7 +233,8 @@ test("accusation ladder, as shipped: naming is held, so no handle and no blunt l
 // because any five quotes have a narrowest window. Only five inside an hour count now.
 test("control 3: quotes spread over days are timing, not coordination", () => {
   const quotes = organicQuotes(8).map((q, i) => ({ ...q, posted: new Date(Date.parse("2026-06-01T15:00:00Z") + i * 9 * 3600000).toISOString() }));
-  const lens = campaignLens({ platform: "x", post: ORDINARY_COUNTS, ownPosts: OWN_POSTS, accounts: organicAccounts(40), quotes });
+  // X's created_at gives seconds; quotes on round hours here are synthetic, not rounded.
+  const lens = campaignLens({ platform: "x", timePrecision: "second", post: ORDINARY_COUNTS, ownPosts: OWN_POSTS, accounts: organicAccounts(40), quotes });
   assert.equal(lens.status, "none", lens.lead);
   assert.ok(lens.context.some((c) => c.id === "quote-timing"), "the timing is still shown");
   assert.ok(!lens.context.some((c) => c.id === "quote-bunching"));

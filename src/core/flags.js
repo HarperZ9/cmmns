@@ -26,11 +26,11 @@ const HATE_NAME = /(?:^|[^\d])(?:1488|14\/88)(?:$|[^\d])|\b(?:aryan|foid|foids|s
 const REGION_OFFSETS = { europe: [0, 3], "west asia": [2, 4], africa: [-1, 3], "south asia": [5, 6], "east asia": [7, 9], oceania: [8, 13], "north america": [-8, -4], "south america": [-5, -3] };
 
 export const DOES_NOT_PROVE = {
-  "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them.",
-  "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy.",
+  "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them. Only times given to the hour or finer are counted.",
+  "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy. Only threads timed to the second are counted; rounded times cannot show a reply within a minute.",
   "copied-elsewhere": "People repost text they agree with, and memes and quotes repeat. Repeated wording shows copying or coordination, not who is behind it.",
   "automation-app": "Scheduling tools are common among news desks, brands and busy people.",
-  "no-sleep-gap": "Teams in several time zones, shared accounts and scheduling tools post around the clock too.",
+  "no-sleep-gap": "Teams in several time zones, shared accounts and scheduling tools post around the clock too. Only times given to the hour or finer are counted.",
   "repost-only": "Some people use an account only to share others' posts.",
   "low-karma": "Many people read more than they post, and karma depends on which communities they use.",
   "new-account": "New accounts include real people who just joined, often during a news event.",

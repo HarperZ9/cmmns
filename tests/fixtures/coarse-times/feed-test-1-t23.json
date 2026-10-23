@@ -1,0 +1,138 @@
+{
+ "note": "Timing pattern from a thread transcribed from phone screenshots on 2026-10-23 (feed test 1). Post times are placeholders worked out from ages shown on screen such as 14h and 1d. Text is replaced and accounts renamed.",
+ "site": "X",
+ "root": {
+  "id": "r1",
+  "author": "acct-01",
+  "text": "The original post, about a news story.",
+  "posted": null
+ },
+ "replies": [
+  {
+   "id": "c01",
+   "author": "acct-02",
+   "text": "A reply that agrees with the post.",
+   "posted": "2026-10-23T06:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c02",
+   "author": "acct-02",
+   "text": "A reply that disagrees and gives a reason.",
+   "posted": "2026-10-23T06:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c03",
+   "author": "acct-03",
+   "text": "A reply asking for a source.",
+   "posted": "2026-10-23T10:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c04",
+   "author": "acct-04",
+   "text": "A reply with a short joke about the topic.",
+   "posted": "2026-10-23T16:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c05",
+   "author": "acct-05",
+   "text": "A reply sharing a related personal view.",
+   "posted": "2026-10-23T08:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c06",
+   "author": "acct-06",
+   "text": "A reply that questions the numbers in the post.",
+   "posted": "2026-10-23T14:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c07",
+   "author": "acct-07",
+   "text": "A reply thanking the author.",
+   "posted": "2026-10-23T13:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c08",
+   "author": "acct-08",
+   "text": "A reply adding context from a news report.",
+   "posted": "2026-10-23T14:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c09",
+   "author": "acct-09",
+   "text": "A reply criticising a public figure named in the post.",
+   "posted": "2026-10-23T12:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c10",
+   "author": "acct-10",
+   "text": "A reply with a one-word reaction.",
+   "posted": "2026-10-23T16:58:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c11",
+   "author": "acct-11",
+   "text": "A reply restating the post in other words.",
+   "posted": "2026-10-23T14:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c12",
+   "author": "acct-12",
+   "text": "A reply pointing to an earlier event.",
+   "posted": "2026-10-23T14:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c13",
+   "author": "acct-13",
+   "text": "A reply that agrees with the post.",
+   "posted": "2026-10-23T07:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c14",
+   "author": "acct-14",
+   "text": "A reply that disagrees and gives a reason.",
+   "posted": "2026-10-23T16:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c15",
+   "author": "acct-15",
+   "text": "A reply asking for a source.",
+   "posted": "2026-10-23T16:58:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c16",
+   "author": "acct-16",
+   "text": "A reply with a short joke about the topic.",
+   "posted": "2026-10-23T15:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c17",
+   "author": "acct-17",
+   "text": "A reply sharing a related personal view.",
+   "posted": "2026-10-23T12:10:00.000Z",
+   "flags": []
+  },
+  {
+   "id": "c18",
+   "author": "acct-18",
+   "text": "A reply that questions the numbers in the post.",
+   "posted": "2026-10-23T11:10:00.000Z",
+   "flags": []
+  }
+ ]
+}

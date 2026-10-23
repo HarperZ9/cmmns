@@ -64,6 +64,38 @@ account; `account` gives the details a platform discloses (`joinDate`, `postsCou
 `followersCount`, `basedIn` and the rest of `src/core/flags.js`) and Daylight Commons works out the flags.
 With neither, the account counts as not read, as in the extension.
 
+### Time precision
+
+`timePrecision` says how precise the `posted` times are: `exact`, `second`, `minute`, `hour` or
+`day`. Give it on the thread input for every post, or on a post to override the thread. Times
+copied from a screen often come from rounded ages ("14h", "1d") and are good only to the hour or
+the day, yet they look like any other timestamp. Several replies then share one second by
+rounding, and before 3.2.1 the burst test read that as a burst (p < 0.000001).
+
+When `timePrecision` is missing, Daylight Commons infers it:
+
+- from the input format: X (GraphQL, archive, saved page), Reddit and Mastodon give seconds,
+  Bluesky gives milliseconds;
+- for a thread typed or assembled in Daylight Commons' own shape, from the times themselves. If at
+  least half the distinct times, and at least three, fall on the same point of the day, hour or
+  minute, the times are taken as rounded to that unit. Fewer than three distinct times give
+  unknown. Typed times are never taken as second-precise without that evidence.
+
+A post's own precision wins over the thread's, and the thread is as coarse as its coarsest timed
+post. Each timing signal needs a resolution:
+
+| Signal | Needs | Below that |
+|---|---|---|
+| `timing-burst` | second | not run; a `timing-not-observable` item says so |
+| `swarming` | minute | not run; a `timing-not-observable` item says so |
+| fast replier (extension) | second | the thread's reply delays are left out |
+| active hours, posts around the clock (extension) | hour | the thread's or account's hours are left out |
+| quote bunching (campaign lens) | minute | no bunching row |
+
+A thread envelope reports what was used in `posts.timePrecision`: `{ value, basis }`, where
+`value` is a precision or `null` for unknown and `basis` is `declared`, `inferred`, `declared and
+inferred` or `unknown` (API 1.1.0 on).
+
 `useData` loads Daylight Commons' tables: the site facts and records (`src/ext/sites.json`), ownership
 (`owners.json`), state links (`state.json`) and the fact-check table (`claims.json` and the parts
 it names). Without them, evidence that needs a table is left out, never guessed. The CLI loads them
@@ -74,10 +106,10 @@ from disk; the extension from its own package.
 ```json
 {
   "schema": "urn:radar:evidence:v1",
-  "api": "1.0.0",
+  "api": "1.1.0",
   "kind": "thread",
   "site": "X",
-  "posts": { "n": 15, "accounts": 14, "ids": ["1", "100", "..."] },
+  "posts": { "n": 15, "accounts": 14, "ids": ["1", "100", "..."], "timePrecision": { "value": "second", "basis": "declared" } },
   "evidence": [ ],
   "limits": ["This covers the posts in the input as given, ..."]
 }
@@ -100,7 +132,7 @@ from disk; the extension from its own package.
   "doesNotProve": "A post going viral at one moment, or a notification many people get at once, brings replies together too. ...",
   "posts": ["100", "101", "102", "103", "104"],
   "spans": [],
-  "data": { "from": "2026-10-01T12:10:00.000Z", "to": "2026-10-01T12:10:08.000Z", "accounts": 5, "p": 1.2e-9 }
+  "data": { "from": "2026-10-01T12:10:00.000Z", "to": "2026-10-01T12:10:08.000Z", "accounts": 5, "p": 1.2e-9, "timePrecision": "second" }
 }
 ```
 
@@ -121,7 +153,8 @@ from disk; the extension from its own package.
 | `thread-report` | thread | The flagged share among the most extreme replies against the rest, with 95% intervals |
 | `account-flag` | post | One flag on the account behind a post, with its evidence |
 | `same-text` | thread | Near-identical replies from different accounts, with the baseline rate in ordinary threads |
-| `timing-burst` | thread | Several accounts replying within seconds, tighter than the thread's pace explains |
+| `timing-burst` | thread | Several accounts replying within seconds, tighter than the thread's pace explains. Runs only on times given to the second |
+| `timing-not-observable` | thread | The post times are too coarse for a timing signal, which did not run. `data.signals` names them, `data.timePrecision` gives the precision and `data.needs` what each signal needs (API 1.1.0 on) |
 | `swarming` | thread | Many new or flagged accounts converging on one post within minutes; counts only |
 | `strong-language` | post | Slurs, dehumanising language, calls for violence or vigilantes, group stereotypes |
 | `names-theory` | post | A documented conspiracy theory named, with what the record shows |

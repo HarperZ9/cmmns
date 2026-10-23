@@ -4,14 +4,18 @@
 // The sign is about the thread, never about an account: it carries counts only, no handles, so it
 // cannot become a list to pile on in turn (DESIGN-MAP R12). Thresholds were set on the dev half of
 // PHEME and read once on the test half (scripts/techniques-baselines.mjs).
+// A ten-minute window needs times to the minute (precision.js); coarser times return null.
+
+import { timePrecision, observable } from "./precision.js";
 
 export const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN_KNOWN = 8;
 export const SWARM_DOES_NOT_PROVE = "A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once, and nobody has to organise it. This describes how the replies arrived, not who sent them or why.";
 
-// rows: [{ author, posted }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
-// null when Daylight Commons has not read the account. Returns null or { from, to, accounts, known, marked,
-// newAccounts, flagged, windowSec } for the densest window.
-export function swarmSign(rows, markOf, { windowSec = SWARM_WINDOW_SEC } = {}) {
+// rows: [{ author, posted, timePrecision? }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
+// null when Daylight Commons has not read the account. precision: the thread's timePrecision. Returns null or
+// { from, to, accounts, known, marked, newAccounts, flagged, windowSec } for the densest window.
+export function swarmSign(rows, markOf, { windowSec = SWARM_WINDOW_SEC, precision } = {}) {
+  if (!observable(timePrecision(rows, precision).precision, "swarming")) return null;
   const xs = (rows || []).map((r) => ({ a: String(r.author || "").toLowerCase(), t: Date.parse(r.posted) })).filter((r) => r.a && Number.isFinite(r.t)).sort((p, q) => p.t - q.t);
   let best = null;
   for (let i = 0, j = 0; i < xs.length; i++) {

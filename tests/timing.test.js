@@ -15,7 +15,8 @@ test("a tight burst in a slow thread is found", () => {
   // 20 replies spread over 10 hours, plus 5 accounts inside 10 seconds
   const rows = Array.from({ length: 20 }, (_, i) => ({ author: "u" + i, posted: at(i * 1800) }));
   for (let i = 0; i < 5; i++) rows.push({ author: "b" + i, posted: at(15000 + i * 2) });
-  const b = timingBursts(rows);
+  // Synthetic times, exact to the second; spaced on round half hours they would otherwise read as rounded.
+  const b = timingBursts(rows, { precision: "second" });
   assert.equal(b.length, 1);
   assert.deepEqual(b[0].authors.filter((a) => a.startsWith("b")).length, 5);
   assert.ok(b[0].p < 0.001);

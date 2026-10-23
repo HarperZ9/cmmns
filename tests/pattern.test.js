@@ -12,7 +12,8 @@ test("too few posts gives no pattern", () => {
 
 test("a scheduled account posting every hour, every day", () => {
   const ps = Array.from({ length: 96 }, (_, i) => post(i, i % 10 === 0 ? { repostOf: "x" } : {}));
-  const p = postingPattern(ps);
+  // X's created_at gives seconds: posts exactly on the hour are a scheduler, not rounded times.
+  const p = postingPattern(ps, { precision: "second" });
   assert.equal(p.posts, 96);
   assert.equal(p.days, 4);
   assert.equal(p.activeUtcHours, 24);

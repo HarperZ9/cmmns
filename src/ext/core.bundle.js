@@ -2,6 +2,74 @@
 (() => {
 "use strict";
 
+// ---- precision.js
+const M_precision = (() => {
+// How precise a post's time is, and which timing signals can be read at that precision. A time
+// shown on screen as "14h" or "1d" and turned into a timestamp is only good to the hour or the day,
+// yet it looks like any other timestamp. Several replies then share one second by rounding, and a
+// burst test reads that as coordination. Every timing signal checks the precision first and, below
+// the resolution it needs, reports that it could not be observed instead of firing.
+//
+// Precision comes, in order, from a post's own timePrecision, the thread's timePrecision (the
+// input, or the importer for a platform format), or the times themselves. A typed time is never
+// taken as second-precise without evidence: when most times fall on the same point of the minute,
+// hour or day, they are taken as rounded to that unit.
+
+const PRECISIONS = ["exact", "second", "minute", "hour", "day"];
+const PRECISION_MS = { exact: 1, second: 1000, minute: 60000, hour: 3600000, day: 86400000 };
+// The coarsest precision each timing signal can still be read at.
+const SIGNAL_NEEDS = { "timing-burst": "second", "fast-replier": "second", swarming: "minute", "quote-bunching": "minute", "active-hours": "hour", "no-sleep-gap": "hour" };
+const MIN_INFER = 3;
+const NOT_OBSERVABLE = "not observable at this time precision";
+const PRECISION_WORDS = { exact: "to the millisecond", second: "to the second", minute: "to the minute", hour: "to the hour", day: "to the day" };
+
+const asPrecision = (p) => (PRECISIONS.includes(p) ? p : null);
+// The coarser of two precisions; unknown (null) wins, since nothing finer can be assumed.
+const coarser = (a, b) => (a == null || b == null ? null : PRECISION_MS[a] >= PRECISION_MS[b] ? a : b);
+// True when a signal can be read at this precision. signal: a key of SIGNAL_NEEDS, or a precision.
+function observable(precision, signal) {
+  const p = asPrecision(precision), need = SIGNAL_NEEDS[signal] || asPrecision(signal);
+  return p != null && need != null && PRECISION_MS[p] <= PRECISION_MS[need];
+}
+
+// From the times alone (ms since the epoch): the coarsest unit on whose same point at least half
+// the times, and at least MIN_INFER of them, fall. Genuine second-precise times almost never share
+// a second of the minute; times worked out from rounded ages share one by construction. Fewer than
+// MIN_INFER distinct times give null: unknown.
+function inferPrecision(times) {
+  // Distinct times only: replies that share one time exactly say nothing about the unit.
+  const ts = [...new Set(times.filter(Number.isFinite))];
+  if (ts.length < MIN_INFER) return null;
+  for (const p of ["day", "hour", "minute", "second"]) {
+    const unit = PRECISION_MS[p], count = new Map();
+    for (const t of ts) { const r = ((t % unit) + unit) % unit; count.set(r, (count.get(r) || 0) + 1); }
+    const top = Math.max(...count.values());
+    if (top >= MIN_INFER && top * 2 >= ts.length) return p;
+  }
+  return "exact";
+}
+
+// posts: [{ posted, timePrecision? }]; declared: the thread's timePrecision. Returns
+// { precision, basis, timed }: the coarsest precision across the timed posts (null when unknown),
+// and whether it was "declared", "inferred", "declared and inferred" or "unknown".
+function timePrecision(posts, declared) {
+  const timed = (posts || []).filter((p) => p && Number.isFinite(Date.parse(p.posted)));
+  const thread = asPrecision(declared);
+  let precision = "exact", fromInput = false, fromTimes = false;
+  const rest = [];
+  for (const p of timed) {
+    const own = asPrecision(p.timePrecision) || thread;
+    if (own) { precision = coarser(precision, own); fromInput = true; } else rest.push(Date.parse(p.posted));
+  }
+  if (rest.length) { precision = coarser(precision, inferPrecision(rest)); fromTimes = true; }
+  if (!timed.length) precision = null;
+  const basis = precision == null ? "unknown" : fromInput && fromTimes ? "declared and inferred" : fromInput ? "declared" : "inferred";
+  return { precision, basis, timed: timed.length };
+}
+
+return { PRECISIONS, PRECISION_MS, SIGNAL_NEEDS, MIN_INFER, NOT_OBSERVABLE, PRECISION_WORDS, asPrecision, coarser, observable, inferPrecision, timePrecision };
+})();
+
 // ---- places.js
 const M_places = (() => {
 // A small gazetteer: countries, their demonyms, a few large cities, and the broad regions an
@@ -810,13 +878,18 @@ const M_pattern = (() => {
 // How an account posts, from the posts X has loaded for it (a profile timeline, a thread, a search):
 // which apps it posts from, how much is reposts and replies, how often, and whether it ever stops.
 // Everything describes the account's behaviour; none of it says who runs it.
+// Hours of the day need times to the hour and gaps between posts need seconds (precision.js); below
+// that, those fields are null and timeNotObservable names them.
+
+const { timePrecision, observable, NOT_OBSERVABLE } = M_precision;
 
 const MIN_PATTERN_POSTS = 10;
 
 const median = (xs) => { if (!xs.length) return null; const s = [...xs].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
 
 // posts: tweets by one author, as tweetsIn() returns them ({ posted, client, repostOf, replyTo, quotedId, media, lang }).
-function postingPattern(posts) {
+// opts.precision: how precise the times are, when known; otherwise it is inferred from them.
+function postingPattern(posts, opts = {}) {
   const ps = [...new Map(posts.filter((p) => p && p.posted).map((p) => [p.id, p])).values()].sort((a, b) => Date.parse(a.posted) - Date.parse(b.posted));
   if (ps.length < MIN_PATTERN_POSTS) return null;
   const n = ps.length, share = (f) => Math.round((ps.filter(f).length / n) * 100) / 100;
@@ -829,17 +902,20 @@ function postingPattern(posts) {
   const hours = new Set(times.map((t) => new Date(t).getUTCHours()));
   const days = new Set(times.map((t) => new Date(t).toISOString().slice(0, 10)));
   const spanDays = Math.max(1, (times[n - 1] - times[0]) / 86400000);
+  const prec = timePrecision(ps, opts.precision).precision, byHour = observable(prec, "active-hours"), bySecond = observable(prec, "fast-replier");
   return {
     posts: n, from: new Date(times[0]).toISOString(), to: new Date(times[n - 1]).toISOString(), days: days.size,
     perDay: Math.round((n / spanDays) * 10) / 10,
     reposts: share((p) => p.repostOf), replies: share((p) => p.replyTo && !p.repostOf), quotes: share((p) => p.quotedId), media: share((p) => (p.media || []).length),
     clients: [...clients].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([name, k]) => ({ name, share: Math.round((k / n) * 100) / 100 })),
     langs: [...langs].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([lang, k]) => ({ lang, share: Math.round((k / n) * 100) / 100 })),
-    medianGapSec: median(gaps),
+    medianGapSec: bySecond ? median(gaps) : null,
     // Hours of the UTC day with at least one post; people sleep, so 22 or more over several days is rare.
-    activeUtcHours: hours.size,
+    activeUtcHours: byHour ? hours.size : null,
     // For the window's small charts: posts per UTC hour of the day, and per day for the last 14 days.
-    hourHist: Array.from({ length: 24 }, (_, h) => times.filter((t) => new Date(t).getUTCHours() === h).length),
+    hourHist: byHour ? Array.from({ length: 24 }, (_, h) => times.filter((t) => new Date(t).getUTCHours() === h).length) : null,
+    timePrecision: prec,
+    timeNotObservable: byHour && bySecond ? null : `${[!byHour && "hours of the day", !bySecond && "gaps between posts"].filter(Boolean).join(" and ")}: ${NOT_OBSERVABLE}`,
     daily: lastDays(times, 14),
   };
 }
@@ -892,11 +968,11 @@ const HATE_NAME = /(?:^|[^\d])(?:1488|14\/88)(?:$|[^\d])|\b(?:aryan|foid|foids|s
 const REGION_OFFSETS = { europe: [0, 3], "west asia": [2, 4], africa: [-1, 3], "south asia": [5, 6], "east asia": [7, 9], oceania: [8, 13], "north america": [-8, -4], "south america": [-5, -3] };
 
 const DOES_NOT_PROVE = {
-  "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them.",
-  "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy.",
+  "hours-elsewhere": "Inferred from posting times only. Night owls, shift workers, scheduling tools and travel all shift them. Only times given to the hour or finer are counted.",
+  "fast-replier": "Some people watch accounts closely and reply at once, and notifications make that easy. Only threads timed to the second are counted; rounded times cannot show a reply within a minute.",
   "copied-elsewhere": "People repost text they agree with, and memes and quotes repeat. Repeated wording shows copying or coordination, not who is behind it.",
   "automation-app": "Scheduling tools are common among news desks, brands and busy people.",
-  "no-sleep-gap": "Teams in several time zones, shared accounts and scheduling tools post around the clock too.",
+  "no-sleep-gap": "Teams in several time zones, shared accounts and scheduling tools post around the clock too. Only times given to the hour or finer are counted.",
   "repost-only": "Some people use an account only to share others' posts.",
   "low-karma": "Many people read more than they post, and karma depends on which communities they use.",
   "new-account": "New accounts include real people who just joined, often during a news event.",
@@ -4329,13 +4405,15 @@ const M_network = (() => {
 
 const { foldConfusables } = M_confusables;
 const { ownWords } = M_similarity;
+const { timePrecision, observable } = M_precision;
 
 const RETAIN_DAYS = 30, MAX_THREADS = 2000;
 const DAY = 86400000;
 
-// log: { threads: { [threadKey]: { at, authors: { [handle]: delaySeconds|null } } } }
-// rows: [{ author, posted }], rootPosted: ISO time of the original post (or null)
-function recordThread(log, threadKey, rows, rootPosted, now = Date.now()) {
+// log: { threads: { [threadKey]: { at, prec, authors: { [handle]: delaySeconds|null } } } }
+// rows: [{ author, posted }], rootPosted: ISO time of the original post (or null). precision: how
+// precise the times are (src/core/precision.js); when it is not given it is inferred from the times.
+function recordThread(log, threadKey, rows, rootPosted, now = Date.now(), precision) {
   const L = { threads: { ...((log && log.threads) || {}) } };
   const t0 = Date.parse(rootPosted);
   const authors = {}, hours = {}, fps = {}, links = {};
@@ -4349,7 +4427,8 @@ function recordThread(log, threadKey, rows, rootPosted, now = Date.now()) {
     if (fp && !(fps[fp] || []).includes(h)) (fps[fp] = fps[fp] || []).push(h);
     for (const d of r.domains || []) if (!(links[d] || []).includes(h)) (links[d] = links[d] || []).push(h);
   }
-  L.threads[threadKey] = { at: now, authors, posts: hours, fps, links };
+  const prec = timePrecision([...rows, { posted: rootPosted }], precision).precision;
+  L.threads[threadKey] = { at: now, prec, authors, posts: hours, fps, links };
   // retention and size cap, oldest first
   const keys = Object.keys(L.threads).filter((k) => now - L.threads[k].at <= RETAIN_DAYS * DAY).sort((a, b) => L.threads[b].at - L.threads[a].at);
   return { threads: Object.fromEntries(keys.slice(0, MAX_THREADS).map((k) => [k, L.threads[k]])) };
@@ -4357,11 +4436,17 @@ function recordThread(log, threadKey, rows, rootPosted, now = Date.now()) {
 
 const median = (xs) => { if (!xs.length) return null; const s = [...xs].sort((a, b) => a - b); return s[Math.floor(s.length / 2)]; };
 
-// One account's activity across the log.
+// The precision a logged thread's times were recorded at. Entries from before 3.2.1 carry none; the
+// extension wrote them from the page's machine-readable datetime attributes, which give seconds.
+const precOf = (t) => ("prec" in t ? t.prec : "second");
+
+// One account's activity across the log. Reply delays count only from threads timed to the second
+// (fast replies need it) and posting hours only from threads timed to the hour; coarseThreads counts
+// the threads left out of either.
 function activity(log, handle) {
   const h = String(handle).toLowerCase();
   const threads = Object.values((log && log.threads) || {}).filter((t) => h in t.authors);
-  const delays = threads.map((t) => t.authors[h]).filter((d) => d != null);
+  const delays = threads.filter((t) => observable(precOf(t), "fast-replier")).map((t) => t.authors[h]).filter((d) => d != null);
   const together = new Map();
   for (const t of threads) for (const other of Object.keys(t.authors)) if (other !== h) together.set(other, (together.get(other) || 0) + 1);
   return {
@@ -4369,7 +4454,8 @@ function activity(log, handle) {
     firstSeen: threads.length ? new Date(Math.min(...threads.map((t) => t.at))).toISOString().slice(0, 10) : null,
     medianDelay: median(delays),
     fastReplies: delays.filter((d) => d <= 60).length,
-    activeHours: activeHours(threads.flatMap((t) => (t.posts && t.posts[h]) || [])),
+    activeHours: activeHours(threads.filter((t) => observable(precOf(t), "active-hours")).flatMap((t) => (t.posts && t.posts[h]) || [])),
+    coarseThreads: threads.filter((t) => !observable(precOf(t), "fast-replier")).length,
     alongside: [...together].filter(([, n]) => n >= 2).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([other, n]) => ({ handle: other, n })),
   };
 }
@@ -4570,6 +4656,10 @@ const M_timing = (() => {
 // around the window. Replies rush in after a post and then thin out; tested against the average
 // alone, that rush fired the sign on 12% of ordinary Twitter threads and on 39% of threads with
 // 50 or more replies. Against the local pace it fired on 1.6% (project-docs/EVALUATION.md).
+// A burst needs times to the second (precision.js). Times rounded to the minute, hour or day put
+// many replies on one second by construction, so below that precision the test does not run.
+
+const { timePrecision, observable } = M_precision;
 
 const WINDOW_SEC = 20, MIN_ACCOUNTS = 3, MAX_P = 0.001, LOCAL_SEC = 120;
 
@@ -4591,8 +4681,21 @@ function poissonTail(k, lambda) {
   return Math.max(0, 1 - cdf);
 }
 
-// rows: [{ author, posted }]. Returns [{ from, to, authors, p }], tightest first, not overlapping.
-function timingBursts(rows, windowSec = WINDOW_SEC, minAccounts = MIN_ACCOUNTS) {
+// rows: [{ author, posted, timePrecision? }]. opts: { precision, windowSec, minAccounts }, where
+// precision is the thread's timePrecision. Returns { observable, precision, basis, bursts }.
+function burstCheck(rows, opts = {}) {
+  const P = timePrecision(rows, opts.precision);
+  const ok = observable(P.precision, "timing-burst");
+  return { observable: ok, precision: P.precision, basis: P.basis, bursts: ok ? findBursts(rows, opts.windowSec || WINDOW_SEC, opts.minAccounts || MIN_ACCOUNTS) : [] };
+}
+
+// Returns [{ from, to, authors, p }], tightest first, not overlapping; [] when the times are too
+// coarse to show a burst.
+function timingBursts(rows, opts = {}) {
+  return burstCheck(rows, opts).bursts;
+}
+
+function findBursts(rows, windowSec, minAccounts) {
   const pts = rows.map((r) => ({ a: String(r.author).toLowerCase(), t: Date.parse(r.posted) })).filter((x) => Number.isFinite(x.t)).sort((x, y) => x.t - y.t);
   if (pts.length < minAccounts + 2) return [];
   const span = (pts[pts.length - 1].t - pts[0].t) / 1000;
@@ -4619,7 +4722,7 @@ function timingBursts(rows, windowSec = WINDOW_SEC, minAccounts = MIN_ACCOUNTS) 
   return out;
 }
 
-return { WINDOW_SEC, poissonTail, timingBursts };
+return { WINDOW_SEC, poissonTail, burstCheck, timingBursts };
 })();
 
 // ---- baselines-bins.js
@@ -5369,14 +5472,18 @@ const M_swarming = (() => {
 // The sign is about the thread, never about an account: it carries counts only, no handles, so it
 // cannot become a list to pile on in turn (DESIGN-MAP R12). Thresholds were set on the dev half of
 // PHEME and read once on the test half (scripts/techniques-baselines.mjs).
+// A ten-minute window needs times to the minute (precision.js); coarser times return null.
+
+const { timePrecision, observable } = M_precision;
 
 const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN_KNOWN = 8;
 const SWARM_DOES_NOT_PROVE = "A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once, and nobody has to organise it. This describes how the replies arrived, not who sent them or why.";
 
-// rows: [{ author, posted }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
-// null when Daylight Commons has not read the account. Returns null or { from, to, accounts, known, marked,
-// newAccounts, flagged, windowSec } for the densest window.
-function swarmSign(rows, markOf, { windowSec = SWARM_WINDOW_SEC } = {}) {
+// rows: [{ author, posted, timePrecision? }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
+// null when Daylight Commons has not read the account. precision: the thread's timePrecision. Returns null or
+// { from, to, accounts, known, marked, newAccounts, flagged, windowSec } for the densest window.
+function swarmSign(rows, markOf, { windowSec = SWARM_WINDOW_SEC, precision } = {}) {
+  if (!observable(timePrecision(rows, precision).precision, "swarming")) return null;
   const xs = (rows || []).map((r) => ({ a: String(r.author || "").toLowerCase(), t: Date.parse(r.posted) })).filter((r) => r.a && Number.isFinite(r.t)).sort((p, q) => p.t - q.t);
   let best = null;
   for (let i = 0, j = 0; i < xs.length; i++) {
@@ -5861,6 +5968,7 @@ const M_campaign_quotes = (() => {
 
 const { templateGroups, promoCues } = M_campaign_text;
 const { ownWords } = M_similarity;
+const { timePrecision, observable } = M_precision;
 
 // BUNCH_TIGHT_MS: 5 quotes inside an hour count as coordination; a wider bunch is shown, not counted.
 const BUNCH_K = 5, BUNCH_TIGHT_MS = 3600000, LOOKALIKE_WINDOW_MS = 2 * 3600000, LOOKALIKE_MIN = 3, QUOTE_TEMPLATE_JACCARD = 0.4;
@@ -5868,21 +5976,23 @@ const QUOTES_DOES_NOT_PROVE = "People quote a launch in the same hour because it
 
 const at = (q) => Date.parse(q.posted);
 
-// The narrowest window holding k quotes, and the busiest hour: { kWindowMs, k, hourMax }.
-function bunching(quotes, k = BUNCH_K) {
+// The narrowest window holding k quotes, and the busiest hour: { kWindowMs, k, hourMax }. Bunching
+// needs times to the minute (precision.js); coarser times give kWindowMs null and observable false.
+function bunching(quotes, k = BUNCH_K, precision) {
   const t = quotes.map(at).filter(Number.isFinite).sort((a, b) => a - b);
+  if (!observable(timePrecision(quotes, precision).precision, "quote-bunching")) return { k, kWindowMs: null, hourMax: null, n: t.length, observable: false };
   let kWindowMs = null, hourMax = 0;
   for (let i = 0, j = 0; i < t.length; i++) {
     if (i >= k - 1) { const w = t[i] - t[i - k + 1]; if (kWindowMs == null || w < kWindowMs) kWindowMs = w; }
     while (t[i] - t[j] > 3600000) j++;
     hourMax = Math.max(hourMax, i - j + 1);
   }
-  return { k, kWindowMs, hourMax, n: t.length };
+  return { k, kWindowMs, hourMax, n: t.length, observable: true };
 }
 
 // quotes: [{ id, author, text, posted, paidPartnership }]. Returns
 // { n, disclosed, undisclosed, bunch, groups: [{ size, disclosed, undisclosed, spanMs }], lookalikes, cues }.
-function quoteCluster(quotes) {
+function quoteCluster(quotes, { precision } = {}) {
   const qs = (quotes || []).filter((q) => q && q.id);
   const own = qs.map((q) => ({ id: q.id, text: ownWords(q.text || "") || q.text || "" }));
   const byId = new Map(qs.map((q) => [q.id, q]));
@@ -5910,7 +6020,7 @@ function quoteCluster(quotes) {
     n: qs.length,
     disclosed: qs.filter((q) => q.paidPartnership).length,
     undisclosed: qs.filter((q) => !q.paidPartnership).length,
-    bunch: bunching(qs),
+    bunch: bunching(qs, BUNCH_K, precision),
     groups: groups.map(({ ids, ...g }) => g).sort((a, b) => b.size - a.size),
     lookalikes: look.size,
     cues: Object.values(cueIds).filter((c) => c.ids.length >= 2).map((c) => ({ id: c.id, source: c.source, n: c.ids.length })),
@@ -6116,14 +6226,15 @@ function overlapRows(o) {
   return o.indicator ? { ind: [row], ctx: [] } : { ind: [], ctx: o.repeat ? [row] : [] };
 }
 
-// input: { platform, post: counts + { followers, text }, ownPosts, accounts, quotes, overlap, actor }
+// input: { platform, post: counts + { followers, text }, ownPosts, accounts, quotes, overlap, actor, timePrecision }
+// timePrecision: how precise the quote times are (src/core/precision.js); inferred from them when absent.
 // actor: actorOf(the launch author's reading), or null; only a disclosed organisation is named.
 function campaignLens(input) {
   const def = campaignPlatform(input && input.platform);
   if (!def) return { status: "undefined", lead: CAMPAIGN_LEADS.undefined, notes: (CAMPAIGN_PLATFORMS[input && input.platform] || {}).notes || null, indicators: [], context: [], dnp: CAMPAIGN_DOES_NOT_PROVE };
   const sh = input.post ? engagementShape(input.platform, input.post, input.ownPosts) : null;
   const sm = sampleSigns(input.accounts, input.post && input.post.text);
-  const qc = quoteCluster(input.quotes);
+  const qc = quoteCluster(input.quotes, { precision: input.timePrecision });
   const parts = [shapeRows(sh), sampleRows(sm), quoteRows(qc), overlapRows(input.overlap)];
   const indicators = parts.flatMap((p) => p.ind), context = parts.flatMap((p) => p.ctx);
   const families = [...new Set(indicators.map((i) => FAMILY[i.id]))];
@@ -9438,7 +9549,7 @@ return { GENERIC_MAX_COMMENTS, pickArticle, pickComments, genericChecks, GENERIC
 const M_catalogue_data = (() => {
 // Generated by scripts/catalogue-data.mjs from catalogue/. Do not edit; run the script after
 // changing an entry. Licence: CC-BY-4.0, as the catalogue (REUSE.toml).
-const SIGNAL_REGISTRY = {"version":"1.0.0","note":"Every signal a catalogue element may cite. A signal is something Daylight Commons can show from the page or from a receipt. Signals in the same family read the same evidence and count once. Context-only signals never evidence any element.","signals":[{"id":"shape-outlier-own","family":"shape","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Reposts per like far above the author's own posts seen on this device."},{"id":"bio-template","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Groups of sampled bios cut from one template."},{"id":"stock-persona","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"A large share of sampled bios combine stock persona cues."},{"id":"join-cluster","family":"joins","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Many sampled accounts joined within the same 14 days."},{"id":"topic-mismatch","family":"topic","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled bios are dominated by a topic the post does not share."},{"id":"undisclosed-lookalike","family":"quotes","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts without a Paid partnership label share a template with labelled ones, or with each other inside two hours."},{"id":"cross-launch","family":"overlap","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled accounts were seen amplifying two or more other launches the viewer opened."},{"id":"disclosed-paid","family":"disclosure","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts carry X's Paid partnership label, the posters' own disclosure."},{"id":"promo-cue","family":"promotion","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts use promotional template phrasing."},{"id":"product-promotion","family":"promotion","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The viewer opened the launch lens on this post, or quotes carry promotional phrasing or a Paid partnership label."},{"id":"actor-organisation","family":"actor","kind":"context","source":"src/core/campaign.js (actorOf)","observes":"The platform discloses the launch account as an organisation or official account."},{"id":"online-post","family":"medium","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The conduct is a post published on an online platform."},{"id":"quote-bunching","family":"timing","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts arrived close together in time.","context_only":true},{"id":"overlap","family":"overlap","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Some sampled accounts were seen on other launches, below the indicator threshold.","context_only":true},{"id":"random-suffix","family":"handles","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Handles ending in a number-and-letter tail. People choose these for privacy too.","context_only":true},{"id":"default-avatar","family":"avatar","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"X's own default-image disclosure.","context_only":true},{"id":"ad-library-link","family":"ad-library","kind":"context","source":"src/core/evidence-ads.js (evidence layer, PR #47)","observes":"A search link to an advertiser's entries in a public ad repository, opened by the user.","pending":"Lands with the evidence layer (PR #47), which is not merged into main yet."}]};
+const SIGNAL_REGISTRY = {"version":"1.1.0","note":"Every signal a catalogue element may cite. A signal is something Daylight Commons can show from the page or from a receipt. Signals in the same family read the same evidence and count once. Context-only signals never evidence any element.","signals":[{"id":"shape-outlier-own","family":"shape","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Reposts per like far above the author's own posts seen on this device."},{"id":"bio-template","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Groups of sampled bios cut from one template."},{"id":"stock-persona","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"A large share of sampled bios combine stock persona cues."},{"id":"join-cluster","family":"joins","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Many sampled accounts joined within the same 14 days."},{"id":"topic-mismatch","family":"topic","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled bios are dominated by a topic the post does not share."},{"id":"undisclosed-lookalike","family":"quotes","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts without a Paid partnership label share a template with labelled ones, or with each other inside two hours."},{"id":"cross-launch","family":"overlap","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled accounts were seen amplifying two or more other launches the viewer opened."},{"id":"disclosed-paid","family":"disclosure","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts carry X's Paid partnership label, the posters' own disclosure."},{"id":"promo-cue","family":"promotion","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts use promotional template phrasing."},{"id":"product-promotion","family":"promotion","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The viewer opened the launch lens on this post, or quotes carry promotional phrasing or a Paid partnership label."},{"id":"actor-organisation","family":"actor","kind":"context","source":"src/core/campaign.js (actorOf)","observes":"The platform discloses the launch account as an organisation or official account."},{"id":"online-post","family":"medium","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The conduct is a post published on an online platform."},{"id":"quote-bunching","family":"timing","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts arrived close together in time. Needs times to the minute; with coarser times it is not observable at this time precision and never shows.","needs_precision":"minute","context_only":true},{"id":"timing-burst","family":"timing","kind":"context","source":"src/core/timing.js (thread evidence)","observes":"Several accounts replied within seconds, tighter than the thread's pace explains. Needs times to the second; times worked out from rounded ages such as 14h or 1d share one second by construction, so with coarser times it is not observable at this time precision and never fires.","needs_precision":"second","context_only":true},{"id":"overlap","family":"overlap","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Some sampled accounts were seen on other launches, below the indicator threshold.","context_only":true},{"id":"random-suffix","family":"handles","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Handles ending in a number-and-letter tail. People choose these for privacy too.","context_only":true},{"id":"default-avatar","family":"avatar","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"X's own default-image disclosure.","context_only":true},{"id":"ad-library-link","family":"ad-library","kind":"context","source":"src/core/evidence-ads.js (evidence layer, PR #47)","observes":"A search link to an advertiser's entries in a public ad repository, opened by the user.","pending":"Lands with the evidence layer (PR #47), which is not merged into main yet."}]};
 const CATALOGUE_ENTRIES = [
   {"id":"eu-dsa-art26-advertising","version":"1.0.0","status":"active","verification":"verified","role":"context","title":"Advertising transparency on online platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 26(1) and 26(2)","kind":"regulation","binding_note":"A regulation, directly applicable in every Member State. Articles 26 and 39 set duties for platform providers, not for the people who post. Daylight Commons uses them as context: they say what the platform must show, which tells the reader where to look for a disclosure or an ad record.","in_force":{"status":"in force","since":"2024-02-17","note":"Article 93(2): the Regulation applies from 17 February 2024, apart from listed provisions that applied from 16 November 2022. Article 26 is not among them."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 26(1)(a) to (c)","text":"Providers of online platforms that present advertisements on their online interfaces shall ensure that, for each specific advertisement presented to each individual recipient, the recipients of the service are able to identify, in a clear, concise and unambiguous manner and in real time, the following: (a) that the information is an advertisement, including through prominent markings, which might follow standards pursuant to Article 44; (b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement if that person is different from the natural or legal person referred to in point (b);"},{"source":0,"locator":"Article 26(2), first subparagraph","text":"Providers of online platforms shall provide recipients of the service with a functionality to declare whether the content they provide is or contains commercial communications."}],"elements":[{"id":"A","label":"The platform offers a way to declare commercial content, and some posts carry that declaration","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"]},{"id":"B","label":"Posts that look commercial carry no such declaration","observable_from":"page","required":false,"strength":"indicative","signals":["undisclosed-lookalike"]}],"does_not_prove":"Context only: Article 26 sets duties for the platform. A missing declaration on a post says nothing on its own about the platform meeting or missing its duty. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.","related":["eu-dsa-art39-ad-repository","x-paid-partnerships"]},
   {"id":"eu-dsa-art39-ad-repository","version":"1.0.0","status":"active","verification":"verified","role":"context","title":"Advertisement repositories of very large platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 39(1) and 39(2)","kind":"regulation","binding_note":"A regulation, directly applicable in every Member State. Articles 26 and 39 set duties for platform providers, not for the people who post. Daylight Commons uses them as context: they say what the platform must show, which tells the reader where to look for a disclosure or an ad record.","in_force":{"status":"in force","since":null,"note":"Article 93(2) sets general application from 17 February 2024. Article 33(6): obligations in the very-large-platform section apply from four months after the designation is notified to the provider, so the date depends on the designation of each platform, which this entry did not check."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 39(1), first sentence","text":"Providers of very large online platforms or of very large online search engines that present advertisements on their online interfaces shall compile and make publicly available in a specific section of their online interface, through a searchable and reliable tool that allows multicriteria queries and through application programming interfaces, a repository containing the information referred to in paragraph 2, for the entire period during which they present an advertisement and until one year after the advertisement was presented for the last time on their online interfaces."},{"source":0,"locator":"Article 39(2)(b), (c) and (f)","text":"(b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement, if that person is different from the person referred to in point (b); (f) the commercial communications published on the very large online platforms and identified pursuant to Article 26(2);"}],"elements":[{"id":"A","label":"An ad repository exists where the advertiser and payer of an ad can be looked up","observable_from":"public-record","required":true,"strength":"direct","signals":["ad-library-link"],"note":"Daylight Commons builds a search link to the repository; the user opens it. Daylight Commons does not read the repository itself."}],"does_not_prove":"Context only. An empty repository search does not show that no ads ran, and an entry does not show anything about organic posts. A match on visible elements is a comparison with a published definition. It is not a finding by a court or a consumer authority, and it says nothing about elements Daylight Commons cannot see.","related":["eu-dsa-art26-advertising"]},
@@ -10203,12 +10314,13 @@ const STRONG_DOES_NOT_PROVE = "Words can be quoted, ironic or reported speech. T
 const LEAK_DOES_NOT_PROVE = "People quote chatbots, joke, or paste a reply on purpose.";
 const MACHINE_DOES_NOT_PROVE = "No detector reliably tells human from machine writing in a few sentences, and detectors flag non-native English writers more often.";
 const SPAM_DOES_NOT_PROVE = "Real people post giveaways and contact details too. The pattern describes the post, not who sent it.";
-const BURST_DOES_NOT_PROVE = "A post going viral at one moment, or a notification many people get at once, brings replies together too. This describes when the replies arrived, not who sent them or why.";
+const BURST_DOES_NOT_PROVE = "A post going viral at one moment, or a notification many people get at once, brings replies together too. This describes when the replies arrived, not who sent them or why. It holds only for times given to the second: times rounded to the minute, hour or day put replies on one second by construction, and Daylight Commons does not run this test on them.";
+const COARSE_DOES_NOT_PROVE = "Coarse times hide bursts as well as fake them. This says nothing about whether the replies arrived together or apart, only that these times cannot tell.";
 const SITE_OWNER_DOES_NOT_PROVE = "Ownership is not editorial control, and Wikidata can lag a sale.";
 const THREAD_LIMIT = "This covers the posts in the input as given, ranked and filtered by the platform before anyone saw them. It names no account and judges no person.";
 const TEXT_LIMIT = "This describes one piece of text. It says nothing about who wrote it, why, or whether it is true.";
 
-return { STRONG_LABEL, STRONG_MEANING, FLAG_LABEL, SRC_RULES, SRC_POSTS, SRC_ACCOUNTS, SRC_FILE, STRONG_DOES_NOT_PROVE, LEAK_DOES_NOT_PROVE, MACHINE_DOES_NOT_PROVE, SPAM_DOES_NOT_PROVE, BURST_DOES_NOT_PROVE, SITE_OWNER_DOES_NOT_PROVE, THREAD_LIMIT, TEXT_LIMIT };
+return { STRONG_LABEL, STRONG_MEANING, FLAG_LABEL, SRC_RULES, SRC_POSTS, SRC_ACCOUNTS, SRC_FILE, STRONG_DOES_NOT_PROVE, LEAK_DOES_NOT_PROVE, MACHINE_DOES_NOT_PROVE, SPAM_DOES_NOT_PROVE, BURST_DOES_NOT_PROVE, COARSE_DOES_NOT_PROVE, SITE_OWNER_DOES_NOT_PROVE, THREAD_LIMIT, TEXT_LIMIT };
 })();
 
 // ---- api-data.js
@@ -10404,11 +10516,12 @@ const M_api_thread = (() => {
 
 const { threadReport, REPORT_DOES_NOT_PROVE } = M_report;
 const { duplicateClusters } = M_similarity;
-const { timingBursts } = M_timing;
+const { burstCheck, MIN_ACCOUNTS } = M_timing;
 const { swarmSign, SWARM_DOES_NOT_PROVE } = M_swarming;
+const { timePrecision, observable, SIGNAL_NEEDS, PRECISION_WORDS, NOT_OBSERVABLE } = M_precision;
 const { flagsFor, isFlagged, ageDays, DOES_NOT_PROVE, NEW_ACCOUNT_DAYS } = M_flags;
 const { baselineLine } = M_baselines;
-const { FLAG_LABEL, SRC_POSTS, SRC_ACCOUNTS, BURST_DOES_NOT_PROVE } = M_api_words;
+const { FLAG_LABEL, SRC_POSTS, SRC_ACCOUNTS, BURST_DOES_NOT_PROVE, COARSE_DOES_NOT_PROVE } = M_api_words;
 
 const thread = (kind, level, label, shows, source, doesNotProve, posts, data = {}) =>
   ({ kind, scope: "thread", level, label, shows, source, doesNotProve, posts, spans: [], data });
@@ -10450,15 +10563,40 @@ function reportItem(replies, R) {
     });
 }
 
-function burstItems(replies) {
-  return timingBursts(replies).map((b) => {
+function burstItems(replies, precision) {
+  const check = burstCheck(replies, { precision });
+  return check.bursts.map((b) => {
     const who = new Set(b.authors), from = Date.parse(b.from), to = Date.parse(b.to);
     const posts = replies.filter((r) => who.has(String(r.author).toLowerCase()) && Date.parse(r.posted) >= from && Date.parse(r.posted) <= to).map((r) => r.id);
     const secs = Math.max(1, Math.round((to - from) / 1000));
     return thread("timing-burst", "flag", `timing burst, ${b.authors.length} accounts`,
       withBase(`${b.authors.length} accounts replied within ${secs} s at ${b.from.slice(11, 16)} UTC. Chance at this thread's pace: p ${b.p < 1e-6 ? "< 0.000001" : "= " + b.p.toPrecision(2)}.`, "burst", replies.length),
-      SRC_POSTS, BURST_DOES_NOT_PROVE, posts, { from: b.from, to: b.to, accounts: b.authors.length, p: b.p });
+      SRC_POSTS, BURST_DOES_NOT_PROVE, posts, { from: b.from, to: b.to, accounts: b.authors.length, p: b.p, timePrecision: check.precision });
   });
+}
+
+// One item naming the timing signals the post times are too coarse for. They report this instead of
+// firing: rounded times put replies on the same second by construction (precision.js).
+const SIGNAL_NAME = { "timing-burst": "Timing bursts", swarming: "Swarming" };
+const BASIS = {
+  declared: "The input, or the platform format it was read from, gives this precision.",
+  inferred: (p) => `Daylight Commons inferred this from the times: most of them fall on the same point of the ${p === "day" ? "day" : p === "hour" ? "hour" : "minute"}, as times worked out from rounded ages such as "14h" do.`,
+  "declared and inferred": "The input gives the precision for some posts; for the rest Daylight Commons inferred it from the times.",
+  unknown: "Too few posts carry a time to tell how precise the times are.",
+};
+function coarseItem(replies, root, P) {
+  const timed = replies.filter((r) => Number.isFinite(Date.parse(r.posted)));
+  const off = [];
+  if (timed.length >= MIN_ACCOUNTS + 2 && !observable(P.precision, "timing-burst")) off.push("timing-burst");
+  if (root && timed.length >= MIN_ACCOUNTS && !observable(P.precision, "swarming")) off.push("swarming");
+  if (!off.length) return [];
+  const needs = off.map((k) => `${SIGNAL_NAME[k].toLowerCase()} need${k === "swarming" ? "s" : ""} times ${PRECISION_WORDS[SIGNAL_NEEDS[k]]}`);
+  const given = P.precision ? `given ${PRECISION_WORDS[P.precision]}` : "of unknown precision";
+  const names = off.map((k, i) => (i ? SIGNAL_NAME[k].toLowerCase() : SIGNAL_NAME[k])).join(" and ");
+  const basis = typeof BASIS[P.basis] === "function" ? BASIS[P.basis](P.precision) : BASIS[P.basis];
+  return [thread("timing-not-observable", "info", "timing " + NOT_OBSERVABLE,
+    `${names} ${off.length > 1 || off[0] === "timing-burst" ? "are" : "is"} ${NOT_OBSERVABLE}. The post times are ${given}, and ${needs.join("; ")}. ${basis}`,
+    SRC_POSTS, COARSE_DOES_NOT_PROVE, timed.map((r) => r.id), { signals: off, timePrecision: P.precision, basis: P.basis, needs: Object.fromEntries(off.map((k) => [k, SIGNAL_NEEDS[k]])) })];
 }
 
 function sameTextItems(replies, root) {
@@ -10467,7 +10605,7 @@ function sameTextItems(replies, root) {
     SRC_POSTS, DOES_NOT_PROVE["same-text"], c.ids.map(String), { posts: c.ids.length, accounts: c.authors.length, similarity: c.similarity }));
 }
 
-function swarmItem(replies, now) {
+function swarmItem(replies, now, precision) {
   const by = new Map(replies.map((r) => [String(r.author).toLowerCase(), r]));
   const markOf = (a, t) => {
     const r = by.get(a);
@@ -10475,7 +10613,7 @@ function swarmItem(replies, now) {
     const age = r.account && r.account.joinDate ? ageDays(r.account.joinDate, t || now) : null;
     return { new: age != null && age < NEW_ACCOUNT_DAYS, flagged: isFlagged(r.flags) };
   };
-  const w = swarmSign(replies, markOf);
+  const w = swarmSign(replies, markOf, { precision });
   if (!w) return [];
   const from = Date.parse(w.from), to = Date.parse(w.to);
   const posts = replies.filter((r) => { const t = Date.parse(r.posted); return t >= from && t <= to; }).map((r) => r.id);
@@ -10483,15 +10621,18 @@ function swarmItem(replies, now) {
     `${SRC_POSTS} ${SRC_ACCOUNTS}`, SWARM_DOES_NOT_PROVE, posts, { from: w.from, to: w.to, known: w.known, marked: w.marked, newAccounts: w.newAccounts, flagged: w.flagged })];
 }
 
-// replies: normalised [{ id, author, text, posted, flags, extreme, machine }]. root: { text } or null.
-function threadItems(replies, root, { now = Date.now() } = {}) {
+// replies: normalised [{ id, author, text, posted, timePrecision, flags, extreme, machine }]. root: { text } or
+// null. timePrecision: the thread's declared precision (precision.js), or undefined to infer it.
+function threadItems(replies, root, { now = Date.now(), timePrecision: declared } = {}) {
   const accounts = new Set(replies.map((r) => String(r.author).toLowerCase())).size;
   const R = threadReport(replies);
   // One account (a data export, or a thread with one replier) has nothing to compare.
   const out = [...(accounts >= 2 ? [reportItem(replies, R)] : []), ...flagItems(replies, now)];
-  if (accounts >= 2) out.push(...sameTextItems(replies, root), ...burstItems(replies));
-  if (root && accounts >= 2) out.push(...swarmItem(replies, now));
-  return { items: out, report: R, accounts };
+  const P = timePrecision(replies, declared);
+  if (accounts >= 2) out.push(...sameTextItems(replies, root), ...burstItems(replies, declared));
+  if (root && accounts >= 2) out.push(...swarmItem(replies, now, declared));
+  if (accounts >= 2) out.push(...coarseItem(replies, root, P));
+  return { items: out, report: R, accounts, timePrecision: { value: P.precision, basis: P.basis } };
 }
 
 return { flagsOf, threadItems };
@@ -10557,7 +10698,7 @@ const { useData, claimIndex, dataLoaded } = M_api_data;
 const { REPORT_DOES_NOT_PROVE } = M_report;
 const { THREAD_LIMIT, TEXT_LIMIT } = M_api_words;
 
-const API_VERSION = "1.0.0";
+const API_VERSION = "1.1.0";
 const EVIDENCE_SCHEMA = "urn:radar:evidence:v1";
 
 
@@ -10569,11 +10710,12 @@ function linkItems(byDomain) {
   return [...byDomain].flatMap(([d, posts]) => siteEvidence(d, posts, { quiet: true }));
 }
 
-// One post in the input: { id?, author?, text, posted?, links?, flags?, account? }.
+// One post in the input: { id?, author?, text, posted?, timePrecision?, links?, flags?, account? }.
 function normalise(p, i, now) {
   const post = { id: p && p.id != null ? String(p.id) : "p" + (i + 1), author: String((p && p.author) || "unknown-" + (i + 1)), text: String((p && p.text) || ""), posted: (p && p.posted) || null, links: (p && p.links) || [] };
   post.flags = flagsOf(p || {}, now);
   if (p && p.account) post.account = p.account;
+  if (p && p.timePrecision) post.timePrecision = p.timePrecision;
   return post;
 }
 
@@ -10599,7 +10741,9 @@ function quotedPosts(input, now) {
   return out;
 }
 
-// input: { site, root?, replies: [post], quoted?: [post] }. opts: { now }: the time account ages are measured at.
+// input: { site, root?, replies: [post], quoted?: [post], timePrecision? }. opts: { now }: the time account
+// ages are measured at. timePrecision ("exact", "second", "minute", "hour" or "day") says how precise the
+// post times are, for the whole thread; a post's own timePrecision overrides it (src/core/precision.js).
 function analyzeThread(input, opts = {}) {
   const now = opts.now || Date.now();
   const replies = ((input && input.replies) || []).map((p, i) => normalise(p, i, now));
@@ -10612,9 +10756,9 @@ function analyzeThread(input, opts = {}) {
     post.extreme = P.extreme; post.machine = P.machineLike;
     for (const d of P.domains) (links.get(d) || links.set(d, []).get(d)).push(post.id);
   }
-  const T = threadItems(replies, root, { now });
+  const T = threadItems(replies, root, { now, timePrecision: input && input.timePrecision });
   const evidence = number([...T.items, ...items, ...linkItems(links)]);
-  const posts = { n: replies.length + (root ? 1 : 0), accounts: T.accounts, ids: [...(root ? [root.id] : []), ...replies.map((r) => r.id)] };
+  const posts = { n: replies.length + (root ? 1 : 0), accounts: T.accounts, ids: [...(root ? [root.id] : []), ...replies.map((r) => r.id)], timePrecision: T.timePrecision };
   if (quoted.length) posts.quoted = quoted.map((q) => q.id);
   return envelope("thread", { site: (input && input.site) || null, posts, evidence, limits: [THREAD_LIMIT, REPORT_DOES_NOT_PROVE] });
 }
@@ -11247,8 +11391,9 @@ function walk(json, visit, limit = 300000) {
   }
 }
 
-// The post most others reply to is the root; the rest are replies, oldest first.
-function asThread(site, posts) {
+// The post most others reply to is the root; the rest are replies, oldest first. timePrecision: how
+// precise the platform's own timestamps are (src/core/precision.js).
+function asThread(site, posts, timePrecision) {
   if (!posts.length) return null;
   const counts = new Map();
   for (const p of posts) if (p.replyTo) counts.set(p.replyTo, (counts.get(p.replyTo) || 0) + 1);
@@ -11256,7 +11401,7 @@ function asThread(site, posts) {
   const root = (top && posts.find((p) => p.id === top[0])) || posts.find((p) => !p.replyTo) || null;
   const replies = posts.filter((p) => p !== root).sort((a, b) => String(a.posted).localeCompare(String(b.posted)));
   const clean = ({ replyTo, ...p }) => p;
-  return { site, root: root ? clean(root) : null, replies: replies.map(clean) };
+  return { site, root: root ? clean(root) : null, replies: replies.map(clean), timePrecision };
 }
 
 function xThread(json) {
@@ -11268,7 +11413,7 @@ function xThread(json) {
     posts.set(v.rest_id, { id: v.rest_id, author: (u.core || {}).screen_name || (u.legacy || {}).screen_name || "unknown", text: note || L.full_text || "", posted: iso(L.created_at),
       links: ((L.entities || {}).urls || []).map((x) => x.expanded_url).filter((x) => x && !/^https?:\/\/(x|twitter)\.com\//.test(x)), replyTo: L.in_reply_to_status_id_str || null });
   });
-  return asThread("X", [...posts.values()]);
+  return asThread("X", [...posts.values()], "second");
 }
 
 function bskyThread(json) {
@@ -11282,7 +11427,7 @@ function bskyThread(json) {
     const parent = v.record.reply && v.record.reply.parent && v.record.reply.parent.uri;
     posts.set(v.uri, { id: v.uri.split("/").pop(), author: v.author.handle, text: v.record.text, posted: iso(v.record.createdAt), links, replyTo: parent ? parent.split("/").pop() : null });
   });
-  return asThread("Bluesky", [...posts.values()]);
+  return asThread("Bluesky", [...posts.values()], "exact");
 }
 
 function mastoThread(json) {
@@ -11292,7 +11437,7 @@ function mastoThread(json) {
     const links = [...v.content.matchAll(/<a\b[^>]*\bhref="(https?:\/\/[^"]+)"[^>]*>/gi)].filter((m) => !/\b(mention|hashtag)\b/.test(m[0])).map((m) => m[1]);
     posts.set(v.id, { id: v.id, author: v.account.acct, text: htmlText(v.content), posted: iso(v.created_at), links, replyTo: v.in_reply_to_id || null });
   });
-  return asThread("Mastodon", [...posts.values()]);
+  return asThread("Mastodon", [...posts.values()], "second");
 }
 
 const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r) => r && typeof r.text === "string");
@@ -11300,7 +11445,9 @@ const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r)
 // Returns { site, root, replies } or null when the JSON holds no thread Daylight Commons can read.
 function threadFromJson(json) {
   if (!json || typeof json !== "object") return null;
-  if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies, ...(Array.isArray(json.quoted) ? { quoted: json.quoted } : {}) };
+  // Daylight Commons' own shape is typed or assembled by hand: its timePrecision is kept as given, and
+  // when it is missing the times are not assumed to be second-precise (precision.js infers it).
+  if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies, ...(Array.isArray(json.quoted) ? { quoted: json.quoted } : {}), ...(json.timePrecision ? { timePrecision: json.timePrecision } : {}) };
   const text = JSON.stringify(json).slice(0, 2000000);
   if (text.includes("\"__typename\":\"Tweet\"")) return xThread(json);
   if (text.includes("\"at://")) return bskyThread(json);
@@ -11432,7 +11579,10 @@ const MAX_IMPORT_POSTS = 20000;
 
 const fail = (reason) => ({ ok: false, reason });
 const asText = (bytes) => (typeof bytes === "string" ? bytes : new TextDecoder("utf-8").decode(bytes));
-const fromExport = (format, r) => (r && r.posts.length ? { ok: true, format, source: "export", site: r.site, input: { site: r.site, root: null, replies: r.posts.slice(0, MAX_IMPORT_POSTS) }, notes: [...r.notes, ...(r.posts.length > MAX_IMPORT_POSTS ? [`Only the first ${MAX_IMPORT_POSTS} posts were read.`] : [])] } : null);
+// How precise each export's own timestamps are (src/core/precision.js): X, Reddit and Mastodon give
+// seconds, Bluesky records give milliseconds.
+const EXPORT_PRECISION = { "X archive tweets.js": "second", "Reddit export CSV": "second", "Mastodon outbox.json": "second", "Bluesky repository .car": "exact" };
+const fromExport = (format, r) => (r && r.posts.length ? { ok: true, format, source: "export", site: r.site, input: { site: r.site, root: null, replies: r.posts.slice(0, MAX_IMPORT_POSTS), timePrecision: EXPORT_PRECISION[format] }, notes: [...r.notes, ...(r.posts.length > MAX_IMPORT_POSTS ? [`Only the first ${MAX_IMPORT_POSTS} posts were read.`] : [])] } : null);
 const fromThread = (format, t, notes = []) => (t && (t.replies.length || t.root) ? { ok: true, format, source: "thread", site: t.site, input: t, notes } : null);
 
 function fromJson(name, text) {
@@ -11449,7 +11599,8 @@ function fromBytes(name, bytes) {
   if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds no posts Daylight Commons can read.`);
   if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} is not a Reddit export with id, permalink and body columns.`);
   if (/^[[{]/.test(head)) return fromJson(name, text);
-  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons did not recognise a thread on this page, so it read the page as one text."] : [] }; }
+  // A saved X or Reddit page carries machine-readable times (datetime and created attributes) to the second.
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); if (p.kind === "thread") p.timePrecision = "second"; return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons did not recognise a thread on this page, so it read the page as one text."] : [] }; }
   return fail(`Daylight Commons does not read this kind of file. It reads: ${IMPORT_FORMATS.join(", ")}.`);
 }
 
@@ -11463,5 +11614,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

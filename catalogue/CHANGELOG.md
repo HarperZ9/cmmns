@@ -6,6 +6,14 @@ here, with the date and the reason. A badge names the entry and version it used
 (`<id>@<version>`), so an old badge can always be read against the text it was built from.
 Challenges and their decisions are linked from the line they changed.
 
+## Signal registry 1.1.0 (2026-10-23)
+
+- `timing-burst` added as a context-only signal: it never evidences an element. It needs times to the
+  second and, with coarser times, is not observable at this time precision and never fires.
+- `quote-bunching` now states that it needs times to the minute.
+- Each timing signal carries `needs_precision`. No entry's quotes, elements or signals changed, so no
+  entry version moved.
+
 ## 1.0.0 (2026-10-22)
 
 First release of the catalogue: 15 entries, all verified against their official sources on

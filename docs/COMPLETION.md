@@ -6,7 +6,7 @@ commons plan and the explainer plan) as a criterion with a check that can fail, 
 and the evidence, and the tool a user would compare it with. The wave plan that works through it is
 `docs/WAVES.md`.
 
-First written 2026-10-23 against `main` at `aaa65a1` (release 3.0.0); export rows updated by wave 1; counts updated at release 3.1.0 after wave 2; section 13 added with the signed head and updated with the offline kit and carrier-safe bundles; M5, M6 and M9 updated after the 2026-10-23 feed-test fixes. Update the row in the same
+First written 2026-10-23 against `main` at `aaa65a1` (release 3.0.0); export rows updated by wave 1; counts updated at release 3.1.0 after wave 2; section 13 added with the signed head and updated with the offline kit and carrier-safe bundles; M5, M6 and M9 updated after the 2026-10-23 feed-test fixes; S3 updated at release 3.2.1 with the time-precision fix. Update the row in the same
 commit as the change that moves it.
 
 ## Status words
@@ -63,7 +63,7 @@ These do not move for any feature below. A row that would cross one is out of sc
 |---|---|---|---|---|---|
 | S1 | Room map: behaviour groups, burst share, paid against look-alike against ordinary, post against ordinary size | per-platform labelled set; invariance test that groups never use identity features; capture | **NOT BUILT** | thread report and coordination signs exist; no map | Hoaxy/OSoMeNet and Bot Sentinel v3 graphs; beat them with every edge linked to its receipt and 500 nodes drawn in under 1 s |
 | S2 | Thread report: extreme replies against flagged accounts, with intervals | `tests/report.test.js` | **PASS** | README, "Thread report" | no consumer tool does this |
-| S3 | Coordination signs: copies, same upload, bursts, cross-thread wording | unit tests; synthetic pilot | **PARTIAL** | duplicates 97.7% on SYNTHETIC cases only | InVID offers search, not coordination; beat on measured precision on real threads |
+| S3 | Coordination signs: copies, same upload, bursts, cross-thread wording | unit tests; synthetic pilot; coarse-time fixtures from real runs | **PARTIAL** | duplicates 97.7% on SYNTHETIC cases only. Bursts gave a false alarm on every screenshot-based run on 2026-10-23 (placeholder times from ages such as "14h" share one second; "6 accounts replied within 1 s, p < 0.000001"). Fixed in 3.2.1: every timing signal checks the time precision and reports "not observable at this time precision" below what it needs (`src/core/precision.js`, `tests/precision.test.js`, five fixtures with the real timing that no longer fire). No measured burst precision on real coordinated threads yet | InVID offers search, not coordination; beat on measured precision on real threads |
 | S4 | Technique lens, stance-neutral, with a fairness audit | per-technique precision at the bar; symmetry suite | **PARTIAL** | symmetry suites pass; no technique ships | Bad News and Go Viral teach techniques; we name them in place |
 | S5 | Mirror: sources seen, owners, promoted share, recurring framings, accounts seen most | network log empty during use (test); capture | **PARTIAL** | `src/ext/history.*`, `src/ext/dashboard.*` | Ground News "My News Bias"; beat it on owner and state-link depth and on sending nothing |
 | S6 | Mirror: "what you never saw" (the other half of a story) | fixture with a known missing side | **NOT BUILT** | none | Ground News Blindspot |

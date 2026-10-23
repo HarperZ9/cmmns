@@ -101,7 +101,8 @@
       ["Posts seen", `${P.posts} from ${P.from.slice(0, 10)} to ${P.to.slice(0, 10)} (about ${P.perDay} a day)`],
       ["Mix", `reposts ${pc(P.reposts)}, replies ${pc(P.replies)}, quotes ${pc(P.quotes)}, with media ${pc(P.media)}`],
       ["Typical gap", gap ? `${gap} between posts` : null],
-      ["Hours active", `${P.activeUtcHours} of 24 UTC hours across ${P.days} days`],
+      ["Hours active", P.activeUtcHours == null ? null : `${P.activeUtcHours} of 24 UTC hours across ${P.days} days`],
+      ["Times", P.timeNotObservable || null],
       ["Languages", P.langs.map((l) => `${l.lang} ${pc(l.share)}`).join(", ") || null],
     ];
   }
