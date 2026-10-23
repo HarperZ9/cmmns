@@ -27,6 +27,18 @@ async function rowsWithSplits(ctx) {
   return out;
 }
 
+// The Croissant 1.0 context as the specification publishes it; mlcroissant needs @language and the cr: terms.
+const CROISSANT_CONTEXT = {
+  "@language": "en", "@vocab": "https://schema.org/", sc: "https://schema.org/", cr: "http://mlcommons.org/croissant/",
+  rai: "http://mlcommons.org/croissant/RAI/", dct: "http://purl.org/dc/terms/", citeAs: "cr:citeAs", column: "cr:column",
+  conformsTo: "dct:conformsTo", equivalentProperty: "cr:equivalentProperty", samplingRate: "cr:samplingRate", data: { "@id": "cr:data", "@type": "@json" }, dataType: { "@id": "cr:dataType", "@type": "@vocab" },
+  examples: { "@id": "cr:examples", "@type": "@json" }, extract: "cr:extract", field: "cr:field", fileProperty: "cr:fileProperty",
+  fileObject: "cr:fileObject", fileSet: "cr:fileSet", format: "cr:format", includes: "cr:includes", isLiveDataset: "cr:isLiveDataset",
+  jsonPath: "cr:jsonPath", key: "cr:key", md5: "cr:md5", parentField: "cr:parentField", path: "cr:path", recordSet: "cr:recordSet",
+  references: "cr:references", regex: "cr:regex", repeated: "cr:repeated", replace: "cr:replace", separator: "cr:separator",
+  source: "cr:source", subField: "cr:subField", transform: "cr:transform",
+};
+
 const FIELDS = [["id", "sc:Text", "SHA-256 of the receipt"], ["split", "sc:Text", "train, dev or test, fixed by hash"], ["kind", "sc:Text", "what kind of fact"],
   ["subject", "sc:Text", "what the fact is about; private accounts only as salted pseudonyms"], ["subjectKind", "sc:Text", "artefact, organisation or private-pseudonym"],
   ["source", "sc:Text", "where the fact was read"], ["at", "sc:Date", "when it was read"], ["labeller", "sc:Text", "who labelled it, when hand-labelled"],
@@ -34,11 +46,12 @@ const FIELDS = [["id", "sc:Text", "SHA-256 of the receipt"], ["split", "sc:Text"
 
 export function croissant(ctx, dataHash, counts) {
   return {
-    "@context": { "@vocab": "https://schema.org/", sc: "https://schema.org/", cr: "http://mlcommons.org/croissant/", dct: "http://purl.org/dc/terms/" },
+    "@context": CROISSANT_CONTEXT,
     "@type": "sc:Dataset", conformsTo: "http://mlcommons.org/croissant/1.0",
     name: "daylight-commons-evidence", description: `Receipts from one Daylight Commons evidence chain (root ${ctx.chain.root}), as features and identifiers only. Split counts: ${counts}.`,
     license: "https://creativecommons.org/licenses/by/4.0/", creator: { "@type": "sc:Organization", name: ctx.tool }, datePublished: ctx.at,
-    url: "https://github.com/HarperZ9/daylight-commons",
+    url: "https://github.com/HarperZ9/daylight-commons", version: "1.0.0",
+    citeAs: `Daylight Commons evidence chain, root ${ctx.chain.root}, exported ${ctx.at}.`,
     distribution: [{ "@type": "cr:FileObject", "@id": "rows.jsonl", name: "rows.jsonl", contentUrl: "rows.jsonl", encodingFormat: "application/jsonlines", sha256: dataHash }],
     recordSet: [{ "@type": "cr:RecordSet", "@id": "rows", name: "rows",
       field: FIELDS.map(([name, type, description]) => ({ "@type": "cr:Field", "@id": `rows/${name}`, name, description, dataType: type,

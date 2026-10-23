@@ -5,6 +5,11 @@ were not published to a store.
 
 ## Unreleased
 
+### Fixed
+- Exports checked with outside validators: the technical profile wrote `null` for absent PROV
+  attributes, which the W3C PROV-JSON schema rejects, and the research profile's Croissant context
+  made `mlcroissant` fail. Both now pass (`project-docs/evidence/EXPORT-VALIDATION.md`).
+
 ### Added
 - Element tables in the launch campaign window and card. For each applicable jurisdiction, every
   published definition is shown element by element as matched, not matched or not observable, with
