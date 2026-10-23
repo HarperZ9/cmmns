@@ -8,6 +8,12 @@ Facebook, Instagram, Bluesky, Threads, TikTok or any Mastodon server you turn it
 opens a window beside it (on a phone, tap the post's Daylight Commons button): where the platform places the account, signs of coordination,
 how the account posts, and how the thread's harshest replies compare with the rest.
 
+![Daylight Commons installed, a synthetic thread, a reply's window and its evidence, a lookup's receipts, and the saved chain checked offline](docs/demo/demo-install-to-verify.gif)
+
+How it works, with every finding type and what each does not prove:
+[harperz9.github.io/daylight-commons/how-it-works.html](https://harperz9.github.io/daylight-commons/how-it-works.html).
+The stills, the recording and how they were made are in [docs/demo](docs/demo/README.md).
+
 Daylight Commons gives evidence, never verdicts. It never calls anyone a bot, a propagandist or an extremist,
 and every sign says where its data came from and what it does not prove. It runs in your browser
 and sends nothing anywhere unless you turn on Other coverage or evidence lookups, each of which says what it sends and to whom first.

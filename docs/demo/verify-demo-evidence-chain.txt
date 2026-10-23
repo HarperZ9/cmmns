@@ -1,0 +1,11 @@
+Checks pass: demo-evidence-chain.json
+Evidence chain: 2 receipts, root 69415080fdba25fd633e9d2fe8e3e5185417d629563ebafe096081319082c0b1
+  pass  receipts: all 2 receipts match their own hash
+  pass  chain: all 2 entries follow the one before, in order
+  pass  head: the head matches the last entry
+  pass  Merkle root: the root 69415080fdba25fd... is the root of these receipts
+  pass  inclusion proofs: all 2 proofs place their receipt under the root
+Receipts:
+  2026-10-23T01:51:15.871Z  github-repo  HarperZ9/daylight-commons  from GitHub REST API, repository endpoint
+  2026-10-23T01:51:16.327Z  wayback-first  harperz9.github.io  from Internet Archive Wayback CDX
+Does not prove: The seal shows that these receipts are the ones this browser recorded, in this order, and that none was changed or removed after the fact. It does not show that a source told the truth, and whoever holds the device could start a new log.

@@ -3,7 +3,59 @@
 All notable changes to Daylight Commons, named Radar before 2026-10-22. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
-## Unreleased
+## 3.0.0 (2026-10-23)
+
+Major version: the name, the licence and the first public package of the campaign lens change
+together, and the GDELT lookup and its permission are gone. Under semantic versioning a removed
+feature and a new licence are breaking for anyone who redistributes or builds on the extension. The
+integration API keeps its own version (1.0.0) and does not change. The full release audit, claim by
+claim, is `docs/RELEASE-AUDIT.md`.
+
+### Fixed (release audit)
+- `radar verify` and the Analyse a file page check an evidence chain saved with "Save evidence
+  chain": every receipt, every link, the head, the Merkle root and each inclusion proof, one line
+  each. Before, only a library function could, and `radar verify` refused the file.
+- Evidence lookups: the Internet Archive's capture index stopped sending a CORS header, so the
+  archive lookup failed. Turning on Evidence lookups in Options now asks for access to
+  web.archive.org; without it the archive is reported as not asked. A site on a hosting service
+  (github.io, netlify.app and others) is looked up whole, and RDAP is not asked when the service was
+  registered.
+- Campaign lens: any launch with five quotes read as "looks coordinated", because five quotes always
+  have a narrowest window. Only five inside an hour count now; a wider window is shown as timing.
+- Firefox: evidence lookups are declared as optional `websiteContent` data collection and asked for
+  from the Options switch, as Firefox 140 and later require.
+- The manifest, store listing, privacy policy, first-run page, popup and page footers no longer say
+  nothing leaves the browser, or that every sign has an error rate. "Clear all" is described as two
+  steps, and the privacy policy lists what it keeps. The README says 319 fact-checkers, not 328.
+  GOVERNANCE says the AGPL grant covers 3.0.0 and later.
+- Two tests rebuilt shared files in place while other tests read them, and could fail at random;
+  both now build in a temporary copy.
+
+### Changed (campaign lens naming held)
+- Until a media lawyer has reviewed the accusation ladder's wording, the lens names no company and
+  leaves out "paid buzz dressed as organic". Every claim reads "this launch". The evidence, the lead
+  and the unnamed inference are unchanged (`NAMING_HELD` in `src/core/campaign.js`, tested).
+
+### Changed (fonts)
+- The Conso font is removed, because its licence is not open source. JetBrains Mono 2.304 Regular
+  (SIL Open Font License 1.1), the next face in the author's site's own stack, sets figures and code
+  in the extension. A test keeps every licence in `REUSE.toml` free and every packaged font under
+  the OFL.
+
+### Changed (public pages)
+- The install, privacy and measurement pages on the project's site now use the author's site
+  design: its shared style and navigation, its light and dark grounds, the mast and the heading
+  rail. The extension's own copies keep their self-contained style.
+
+### Added (how it works and demonstration)
+- A "How Daylight Commons works" page: the path a reply takes, each finding type with a still of the
+  installed extension and its does-not-prove line read from the same constants the window shows,
+  receipts and the offline check, and the limits.
+- `docs/demo/`: stills of every finding type, the extension's pages in light and dark, a one-minute
+  recording of install, a reply's window, a lookup and the offline check, and a diagram. All made from the release package on
+  synthetic pages (`scripts/demo/`).
+- `docs/store/`: the listing text, six screenshots, the promo tile and the submission steps.
+
 
 ### Changed (name)
 - Radar is now Daylight Commons. The name follows Justice Brandeis: "Sunlight is said to be the

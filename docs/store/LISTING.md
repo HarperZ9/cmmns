@@ -115,7 +115,7 @@ Shows the evidence behind the posts and accounts in the social media threads the
 | `activeTab` | Lets the site card and that one check read the current tab when the user opens the toolbar button, and no other time. |
 | Host `https://www.threads.com/*`, `https://www.threads.net/*` | Reads the posts and replies Threads shows on the page. |
 | Host `https://www.tiktok.com/*` | Reads the comments TikTok shows and the comment list its app already loaded. |
-| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Daylight Commons here" on that server; the browser shows its own prompt. Never granted for all sites. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for one news feed's host at a time (for example `https://feeds.bbci.co.uk/*`) only when the user chooses that outlet or adds that feed for Other coverage, which on the user's click downloads the feed and sends nothing from the page. |
+| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Daylight Commons here" on that server; the browser shows its own prompt. Never granted for all sites. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for one news feed's host at a time (for example `https://feeds.bbci.co.uk/*`) only when the user chooses that outlet or adds that feed for Other coverage, which on the user's click downloads the feed and sends nothing from the page. It is asked for `https://web.archive.org/*` only when the user turns on Evidence lookups, because the Internet Archive's capture index answers a browser extension only with host access. |
 
 The APIs Daylight Commons also calls (`action`, `tabs.create`, `tabs.query`, `tabs.sendMessage`,
 `windows.create`) need no manifest permission. `tests/store-listing.test.js` fails when the
@@ -155,30 +155,69 @@ lookups. Any future feature that sends user data must add its data type here fir
 
 ## Screenshots and images
 
-Use the invented fixture thread or the author's own posts only, never another person's real
-account. Take them in a clean browser profile at 1280x800 (CWS needs that size; AMO uses the same
-files).
+All in `docs/store/`, made from the installed 3.0.0 Chrome package on synthetic pages where every
+account is invented (`docs/demo/README.md` says how). Each screenshot is 1280x800, the size CWS
+requires and AMO recommends; use the same files for both stores, in this order.
 
-1. The window beside a reply on the fixture thread, light theme: the area strip, "speaks as local,
-   labelled elsewhere" open with its evidence, "Does not prove", "Measured" and the feedback
-   buttons.
-2. The same window in a dark theme, with a measured language sign showing its precision and
-   interval.
-3. The thread report panel with the flagged shares and intervals.
-4. The transparency page at the side-balance table.
-5. The first-run page: what Daylight Commons shows, what it never does, the site switches.
+| File | Caption to paste |
+|---|---|
+| `screenshots/01-finding-place.png` | A reply's window: where the platform places the account, with the evidence and what it does not prove. |
+| `screenshots/02-finding-language.png` | A language sign with its measured precision and 95% interval. |
+| `screenshots/03-finding-thread-report.png` | The thread panel: where the accounts are based and coordination across the thread. |
+| `screenshots/04-finding-launch-campaign.png` | The launch campaign lens: documented fact first, then the inference, each sign with what it does not prove. |
+| `screenshots/05-finding-evidence.png` | Evidence lookups, on your click: each answer kept as a receipt you can check offline. |
+| `screenshots/06-page-welcome-light.png` | First run: what Daylight Commons shows, what it never does, and where it runs. |
 
-Small promo tile (CWS, 440x280, required): the aperture icon on the void ground (#060608) with the name in Hanken Grotesk 780, from
-`assets/icons/radar.svg`. Marquee (1400x560): optional, skip. Icon: `src/ext/icons/radar-128.png`.
-YouTube video: the CWS listing page lists one; if the dashboard requires it, a 30 to 60 second
-screen recording of the fixture thread, uploaded to the author's channel.
+Small promo tile (CWS, 440x280, required): `promo-tile.png` (source `promo-tile.svg`). Marquee
+(1400x560): optional, skip. Icon: `src/ext/icons/radar-128.png` inside the package. Video: the CWS
+dashboard lists a YouTube link among the listing items; `docs/demo/demo-install-to-verify.webm` is a
+one-minute recording the author can upload to their own channel if the dashboard asks for one.
 
-## Before submitting
+## Submission steps for the author
 
-- The coordinator bumps the version in `manifest.json` and `package.json`.
-- `npm test` green; `npm run build` and `npm run pages` leave no diff; `npm run package` hashes
-  recorded in the release notes.
-- GitHub Pages on, serving `docs/`; both policy URLs load.
+Nothing here has been submitted. Creating the developer accounts, paying the CWS registration fee,
+accepting each store's developer agreement and pressing submit are the author's steps.
+
+**Chrome Web Store**
+1. Sign in at chrome.google.com/webstore/devconsole with the account that will own the listing.
+   Pay the one-time registration fee and accept the developer agreement if this is the first item.
+2. New item: upload `radar-chrome-3.0.0.zip` from the GitHub release v3.0.0. Check its SHA-256
+   against the release's `SHA256SUMS` first.
+3. Store listing tab: the summary comes from the manifest; paste "Description" from above;
+   category Social & Communication; language English; upload the six screenshots in order and the
+   promo tile; homepage and support URLs from the table above.
+4. Privacy practices tab: paste "Single purpose", one justification per permission from the table,
+   "Remote code: No", tick the data usage rows as the table says (Website content sent: Yes), tick
+   the three certifications, and give the privacy policy URL.
+5. Distribution: Public, all regions. Submit for review.
+
+**Firefox Add-ons (listed)**
+1. Sign in at addons.mozilla.org/developers with the account that will own the add-on, and accept
+   the distribution agreement.
+2. Submit a new add-on, "On this site": upload `radar-firefox-3.0.0.xpi` from the release. The
+   add-on id `radar@harperz9.github.io` is set in the package; it must never change.
+3. Source code: answer yes and upload `git archive --format=zip v3.0.0` of the repository, with the
+   note from the Firefox fields table above (`npm run build` regenerates `core.bundle.js` and
+   `ocr.bundle.js`; nothing is minified).
+4. Paste the name, the AMO summary and the description; licence AGPL-3.0-only; tags from the table;
+   upload the screenshots with their captions; privacy policy URL.
+5. Submit. The data collection answer comes from the manifest: nothing required, website content
+   optional for evidence lookups.
+
+**Firefox self-distribution (optional, signed but not listed)**
+1. At addons.mozilla.org/developers/addon/api/key, create an API key and secret. Keep them out of
+   the repository, for example in environment variables `WEB_EXT_API_KEY` and
+   `WEB_EXT_API_SECRET`.
+2. `npx web-ext sign --channel unlisted --source-dir <unzipped radar-firefox-self-3.0.0.xpi>`, or
+   upload that xpi as "On your own" in the developer hub.
+3. Attach the signed file Mozilla returns to the v3.0.0 release, then run
+   `node scripts/firefox-updates.mjs <signed.xpi>` and commit `docs/firefox/updates.json`, so
+   installed copies find the next version.
+
+## Before each later submission
+
+- Bump the version in `src/ext/manifest.json` and `package.json`.
+- `npm test` green; `npm run build` and `npm run pages` leave no diff.
+- Cut the release with `npm run release`, attach every file, download them back and run
+  `node scripts/verify-release.mjs <folder>`.
 - `web-ext lint` on the Firefox package: no errors.
-- Author steps: CWS developer account, the registration fee and the developer agreement; AMO
-  account and its agreement; the YouTube video if the CWS dashboard asks for one.

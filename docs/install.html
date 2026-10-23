@@ -33,15 +33,15 @@
 <p class="role">Download a release, check it, install it in Chrome, Edge, Brave or Firefox, and rebuild it from source.</p>
 </header>
 <nav class="dc-local" aria-label="Daylight Commons"><a href="how-it-works.html">How it works</a> <a href="install.html" aria-current="page">Install</a> <a href="privacy.html">Privacy</a> <a href="transparency.html">How it is measured</a> <a href="https://github.com/HarperZ9/daylight-commons">Source</a></nav>
-<p class="dc-updated">Updated 2026-10-21.</p>
+<p class="dc-updated">Updated 2026-10-23.</p>
 <p>Every Daylight Commons release can be downloaded, checked and installed without a browser store, and its source can be rebuilt without any code host. This page says how, and says plainly where a browser maker still stands in the way.</p>
 <section aria-labelledby="what-a-release-holds">
 <h2 id="what-a-release-holds">What a release holds</h2>
 <ul><li><code>radar-chrome-&lt;version&gt;.zip</code>: the Chrome, Edge and Brave build.</li>
 <li><code>radar-firefox-&lt;version&gt;.xpi</code>: the Firefox build sent to Mozilla's add-on store.</li>
-<li><code>radar-firefox-self-&lt;version&gt;.xpi</code>: the Firefox build for installing from this site. It checks this site for updates.</li>
+<li><code>radar-firefox-self-&lt;version&gt;.xpi</code>: the Firefox build for installing from this site once Mozilla has signed it. It checks this site for updates.</li>
 <li><code>FILES-&lt;version&gt;.sha256</code>: the hash of every file inside each package.</li>
-<li><code>radar-&lt;version&gt;.bundle</code>: the whole source history at the release commit, as one git file.</li>
+<li><code>radar-&lt;version&gt;.bundle</code>: the whole source history at the release commit, as one git file. Commits before 3.0.0 also hold the Conso font, under its designer's licence; 3.0.0 and later ship only fonts under the SIL Open Font License.</li>
 <li><code>SOURCE</code>: the commit and the Node version the release was built with.</li>
 <li><code>release-key.json</code>: Daylight Commons' public signing key.</li>
 <li><code>SHA256SUMS</code> and <code>SHA256SUMS.sig</code>: the hash of every file above, and Daylight Commons' signature over that list.</li></ul>
@@ -70,7 +70,8 @@
 </section>
 <section aria-labelledby="install-in-firefox">
 <h2 id="install-in-firefox">Install in Firefox</h2>
-<p>Release versions of Firefox install only add-ons that Mozilla has signed, even when the file comes from somewhere other than Mozilla's store. Mozilla signs <code>radar-firefox-self</code> without listing it in its store; once signed, open the file in Firefox to install it, and Firefox checks <code>firefox/updates.json</code> on this site for new versions. Firefox Developer Edition, Nightly and unbranded builds can turn signing checks off; <code>about:debugging</code> can load any build until Firefox restarts.</p>
+<p>Release versions of Firefox install only add-ons that Mozilla has signed, even when the file comes from somewhere other than Mozilla's store. Mozilla signs <code>radar-firefox-self</code> without listing it in its store; once signed, open the file in Firefox to install it, and Firefox checks <code>firefox/updates.json</code> on this site for new versions.</p>
+<p>No release so far carries a Mozilla-signed file, 3.0.0 included, and <code>firefox/updates.json</code> is not published yet. Until Mozilla signs the self-distributed build or lists Daylight Commons on Firefox Add-ons, release Firefox can load it only for one session: open <code>about:debugging</code>, choose This Firefox, then Load Temporary Add-on, and pick the <code>.xpi</code>. Firefox Developer Edition, Nightly and unbranded builds can turn signing checks off.</p>
 <p>That signature is Mozilla's requirement. Daylight Commons cannot remove it, and a Mozilla signature says only that Mozilla's automated review passed.</p>
 </section>
 <section aria-labelledby="if-the-code-host-goes-away">

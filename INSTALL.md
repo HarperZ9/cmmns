@@ -1,6 +1,6 @@
 # Install Daylight Commons without a store
 
-Last updated: 2026-10-21.
+Last updated: 2026-10-23.
 
 Every Daylight Commons release can be downloaded, checked and installed without a browser store, and its
 source can be rebuilt without any code host. This page says how, and says plainly where a browser
@@ -10,9 +10,9 @@ maker still stands in the way.
 
 - `radar-chrome-<version>.zip`: the Chrome, Edge and Brave build.
 - `radar-firefox-<version>.xpi`: the Firefox build sent to Mozilla's add-on store.
-- `radar-firefox-self-<version>.xpi`: the Firefox build for installing from this site. It checks this site for updates.
+- `radar-firefox-self-<version>.xpi`: the Firefox build for installing from this site once Mozilla has signed it. It checks this site for updates.
 - `FILES-<version>.sha256`: the hash of every file inside each package.
-- `radar-<version>.bundle`: the whole source history at the release commit, as one git file.
+- `radar-<version>.bundle`: the whole source history at the release commit, as one git file. Commits before 3.0.0 also hold the Conso font, under its designer's licence; 3.0.0 and later ship only fonts under the SIL Open Font License.
 - `SOURCE`: the commit and the Node version the release was built with.
 - `release-key.json`: Daylight Commons' public signing key.
 - `SHA256SUMS` and `SHA256SUMS.sig`: the hash of every file above, and Daylight Commons' signature over that list.
@@ -62,9 +62,13 @@ Daylight Commons cannot change it.
 Release versions of Firefox install only add-ons that Mozilla has signed, even when the file comes
 from somewhere other than Mozilla's store. Mozilla signs `radar-firefox-self` without listing it in
 its store; once signed, open the file in Firefox to install it, and Firefox checks
-`firefox/updates.json` on this site for new versions. Firefox Developer Edition, Nightly and
-unbranded builds can turn signing checks off; `about:debugging` can load any build until Firefox
-restarts.
+`firefox/updates.json` on this site for new versions.
+
+No release so far carries a Mozilla-signed file, 3.0.0 included, and `firefox/updates.json` is not
+published yet. Until Mozilla signs the self-distributed build or lists Daylight Commons on Firefox
+Add-ons, release Firefox can load it only for one session: open `about:debugging`, choose This
+Firefox, then Load Temporary Add-on, and pick the `.xpi`. Firefox Developer Edition, Nightly and
+unbranded builds can turn signing checks off.
 
 That signature is Mozilla's requirement. Daylight Commons cannot remove it, and a Mozilla signature says
 only that Mozilla's automated review passed.
