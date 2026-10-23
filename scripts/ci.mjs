@@ -2,7 +2,8 @@
 // (.github/workflows/test.yml calls this file), so the project can verify itself without GitHub.
 //   npm run ci                 the "test" stage: every test, then the bundle freshness check
 //   node scripts/ci.mjs c2pa   the Content Credentials reference stage (fetches pinned fixtures)
-//   node scripts/ci.mjs all    both
+//   node scripts/ci.mjs decisions  each challenge issue against catalogue/DECISIONS.md (needs gh)
+//   node scripts/ci.mjs all    the test and c2pa stages
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -17,8 +18,14 @@ const C2PA_DIR = join(ROOT, ".cache", "c2pa-rs");
 export const STAGES = {
   test: [
     ["every test", process.execPath, ["--test", "tests/*.test.js"]],
+    ["catalogue data matches catalogue/", process.execPath, ["scripts/catalogue-data.mjs", "--check"]],
     ["fresh build", process.execPath, ["scripts/build.mjs"]],
     ["bundle matches a fresh build", "git", ["diff", "--exit-code", "--ignore-cr-at-eol", "--", "src/ext/core.bundle.js", "src/ext/ocr.bundle.js"]],
+  ],
+  // Every challenge issue has a public decision in catalogue/DECISIONS.md. Reads the repository's
+  // issues with gh (GH_TOKEN from the workflow, read-only); the offline log check is in tests/.
+  decisions: [
+    ["every challenge issue has a decision", process.execPath, ["scripts/decisions-check.mjs", "--github"]],
   ],
   c2pa: [
     ["fetch the c2pa-rs fixtures at the pinned commit", null, fetchC2pa],

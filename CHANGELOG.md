@@ -6,6 +6,13 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- The challenge route as a product. Every badge in the launch campaign window and card names the
+  catalogue entries that cite its sign, at their versions, and links to them and to a new dispute
+  template for badges and findings with the sign filled in. `catalogue/DECISIONS.md` is the public
+  log of challenge decisions, each with its reasoning; `scripts/decisions-check.mjs` checks it in CI,
+  where a closed challenge needs a final decision and an open one needs a line within 14 days. The
+  extension carries a generated copy of the catalogue (`src/core/catalogue-data.js`), checked
+  against `catalogue/` in CI.
 - `radar export <evidence-chain.json> --profile legal|technical|journalistic|research`: the four
   export profiles from one saved evidence chain. A legal dossier with exhibits, a custody log and
   the cited definitions' elements; W3C PROV-JSON with the raw observations; a journalistic

@@ -12,9 +12,10 @@ const read = (p) => readFileSync(join(ROOT, p), "utf8");
 // Everything a user can read: pages, scripts that build text, styles, Daylight Commons' own data files, the
 // store listing, the README and the privacy policy. Left out: the claims, owners and sites tables, which
 // quote fact-checkers and Wikidata word for word; the rhetoric grammars and word lists, where a
-// dash is the copula Daylight Commons matches in Russian and Ukrainian and is never shown; and the core
-// bundle, which is built from the core files checked here.
-const SKIP = /^(claims(-\d+)?\.json|owners\.json|sites\.json|core\.bundle\.js|(rhetoric|lexicon)(-[a-z]+)?\.js)$/;
+// dash is the copula Daylight Commons matches in Russian and Ukrainian and is never shown; the core
+// bundle, which is built from the core files checked here; and the catalogue copy, whose quotes are
+// the statutes' own words (UK legislation writes "if—"), generated from catalogue/.
+const SKIP = /^(claims(-\d+)?\.json|owners\.json|sites\.json|core\.bundle\.js|catalogue-data\.js|(rhetoric|lexicon)(-[a-z]+)?\.js)$/;
 const USER_FACING = [
   ...list("src/ext", /\.(html|js|css|json)$/), ...list("src/ext/learn", /\.js$/), ...list("src/core", /\.js$/),
   ...list("docs", /\.html$/), "README.md", "PRIVACY.md", "docs/store/LISTING.md",

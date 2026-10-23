@@ -164,13 +164,20 @@
     return out;
   }
 
+  // A sign's catalogue rows: the entries and versions that cite it, linked, and the dispute template.
+  const catalogue = (id) => {
+    if (!id || !PB.badgeLinks) return [];
+    const b = PB.badgeLinks(id, PB.CATALOGUE_ENTRIES, PB.SIGNAL_REGISTRY);
+    return [["Catalogue", PB.badgeLine(b)], ["", { links: b.links }]];
+  };
+
   // The launch campaign lens on the launch post itself: the lead and the ladder's claims, with each
   // sign's does-not-prove line. Shown only when at least one inauthenticity sign fired.
   function campaign(m) {
     const c = m.campaign;
     if (!c || (c.status !== "strong" && c.status !== "one")) return [];
     return [{ label: c.status === "strong" ? "consistent with purchased amplification" : "one campaign sign", fam: "campaign", level: c.status === "strong" ? "warn" : "info", cat: "coordination",
-      rows: [["Reading", c.lead], ...(c.claims || []).map((x) => [x.step === 1 ? "Documented" : "Inference", x.text]), ...c.indicators.flatMap((x) => [["Sign", x.text], dnp(x.dnp)]), dnp(c.dnp), ["Dispute", c.dispute]] }];
+      rows: [["Reading", c.lead], ...(c.claims || []).map((x) => [x.step === 1 ? "Documented" : "Inference", x.text]), ...c.indicators.flatMap((x) => [["Sign", x.text], dnp(x.dnp), ...catalogue(x.id)]), dnp(c.dnp), ["Dispute", c.dispute], ...(PB.DECISIONS_URL ? [["", { links: [["Decisions log", PB.DECISIONS_URL]] }]] : [])] }];
   }
 
   const ORDER = { warn: 0, flag: 1, info: 2 };

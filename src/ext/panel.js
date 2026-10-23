@@ -89,6 +89,15 @@
     ];
   }
 
+  const links = (p, pairs) => { for (const [label, href] of pairs) { const a = el("a", "pb-link", label); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer"; p.append(a); } return p; };
+  // Each campaign sign names the catalogue entries that cite it, at their versions, and links to them
+  // and to the dispute template (src/core/catalogue-links.js). A link opens only when clicked.
+  function catalogue(s, id) {
+    if (!id || !PB.badgeLinks) return;
+    const b = PB.badgeLinks(id, PB.CATALOGUE_ENTRIES, PB.SIGNAL_REGISTRY);
+    s.append(links(el("p", "pb-foot pb-cat", `${PB.badgeLine(b)} `), b.links));
+  }
+
   // The launch campaign lens (src/core/campaign.js, src/ext/campaign.js): the lead, the ladder's
   // claims, each sign with what it does not prove, then context, the dispute route and the wipe.
   function campaign(p, c, rerender) {
@@ -96,9 +105,10 @@
     const s = el("section", "pb-psec");
     s.append(el("h3", "pb-sec-h", "Launch campaign"), el("p", "pb-num", c.lead));
     for (const x of c.claims || []) s.append(el("p", "pb-num", x.text));
-    for (const x of c.indicators) s.append(el("p", "pb-num", x.text), el("p", "pb-foot", `Does not prove: ${x.dnp}`));
-    for (const x of c.context) s.append(el("p", "pb-num", x.text));
+    for (const x of c.indicators) { s.append(el("p", "pb-num", x.text), el("p", "pb-foot", `Does not prove: ${x.dnp}`)); catalogue(s, x.id); }
+    for (const x of c.context) { s.append(el("p", "pb-num", x.text)); catalogue(s, x.id); }
     s.append(el("p", "pb-foot", c.dnp), el("p", "pb-foot", c.dispute));
+    if (PB.DECISIONS_URL) s.append(links(el("p", "pb-foot", `${PB.DECISIONS_NOTE} `), [["Decisions log", PB.DECISIONS_URL]]));
     if (c.onForget) s.append(button("Forget launches I viewed", "Deletes the launch overlap Daylight Commons keeps in this browser (hashed accounts only).", () => c.onForget()));
     if (globalThis.PBEvidenceView) PBEvidenceView.section(s, c.evidence, rerender);
     p.append(s);

@@ -17,6 +17,7 @@ path = [
   "project-docs/**",
   "data/**",
   "catalogue/**",
+  "src/core/catalogue-data.js",
   "schema/**",
   "docs/*.html",
   "docs/release-key.json",
