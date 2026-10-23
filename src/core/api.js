@@ -48,13 +48,28 @@ export function analyzeText(text, opts = {}) {
   return envelope("text", { posts: { n: 1, accounts: null }, evidence: number([...P.items, ...linkItems(links)]), limits: [TEXT_LIMIT] });
 }
 
-// input: { site, root?, replies: [post] }. opts: { now }: the time account ages are measured at.
+// Quoted posts: a top-level `quoted` list, or a `quoted` post inside the root or a reply. Their
+// words are read like any post's, but they are not replies, so the thread comparisons skip them.
+function quotedPosts(input, now) {
+  const own = [input.root, ...(input.replies || [])].filter((p) => p && p.quoted && typeof p.quoted === "object" && !Array.isArray(p.quoted)).map((p) => p.quoted);
+  const listed = Array.isArray(input.quoted) ? input.quoted : [];
+  const seen = new Set(), out = [];
+  for (const [i, q] of [...listed, ...own].entries()) {
+    if (!q || typeof q.text !== "string" || !q.text.trim()) continue;
+    const post = normalise({ id: q.id != null ? q.id : "q" + (i + 1), ...q }, i, now);
+    if (!seen.has(post.id)) { seen.add(post.id); out.push(post); }
+  }
+  return out;
+}
+
+// input: { site, root?, replies: [post], quoted?: [post] }. opts: { now }: the time account ages are measured at.
 export function analyzeThread(input, opts = {}) {
   const now = opts.now || Date.now();
   const replies = ((input && input.replies) || []).map((p, i) => normalise(p, i, now));
   const root = input && input.root && input.root.text != null ? normalise({ id: "root", ...input.root }, -1, now) : null;
+  const quoted = input ? quotedPosts(input, now).filter((q) => q.id !== (root && root.id) && !replies.some((r) => r.id === q.id)) : [];
   const items = [], links = new Map();
-  for (const post of root ? [root, ...replies] : replies) {
+  for (const post of [...(root ? [root] : []), ...replies, ...quoted]) {
     const P = postEvidence(post, { claimIndex: claimIndex() });
     items.push(...P.items);
     post.extreme = P.extreme; post.machine = P.machineLike;
@@ -62,11 +77,9 @@ export function analyzeThread(input, opts = {}) {
   }
   const T = threadItems(replies, root, { now });
   const evidence = number([...T.items, ...items, ...linkItems(links)]);
-  return envelope("thread", {
-    site: (input && input.site) || null,
-    posts: { n: replies.length + (root ? 1 : 0), accounts: T.accounts, ids: [...(root ? [root.id] : []), ...replies.map((r) => r.id)] },
-    evidence, limits: [THREAD_LIMIT, REPORT_DOES_NOT_PROVE],
-  });
+  const posts = { n: replies.length + (root ? 1 : 0), accounts: T.accounts, ids: [...(root ? [root.id] : []), ...replies.map((r) => r.id)] };
+  if (quoted.length) posts.quoted = quoted.map((q) => q.id);
+  return envelope("thread", { site: (input && input.site) || null, posts, evidence, limits: [THREAD_LIMIT, REPORT_DOES_NOT_PROVE] });
 }
 
 // bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.

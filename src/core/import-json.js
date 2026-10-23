@@ -71,7 +71,7 @@ const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r)
 // Returns { site, root, replies } or null when the JSON holds no thread Daylight Commons can read.
 export function threadFromJson(json) {
   if (!json || typeof json !== "object") return null;
-  if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies };
+  if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies, ...(Array.isArray(json.quoted) ? { quoted: json.quoted } : {}) };
   const text = JSON.stringify(json).slice(0, 2000000);
   if (text.includes("\"__typename\":\"Tweet\"")) return xThread(json);
   if (text.includes("\"at://")) return bskyThread(json);

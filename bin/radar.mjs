@@ -64,7 +64,8 @@ async function analyze(file, f) {
 }
 
 async function writeBundle(result, imp, f) {
-  const texts = Object.fromEntries([imp.input.root, ...imp.input.replies].filter(Boolean).map((p, i) => [p.id != null ? String(p.id) : "p" + i, p.text]));
+  const quoted = [...(imp.input.quoted || []), ...[imp.input.root, ...imp.input.replies].filter((p) => p && p.quoted && typeof p.quoted === "object").map((p) => p.quoted)];
+  const texts = Object.fromEntries([imp.input.root, ...imp.input.replies, ...quoted].filter(Boolean).map((p, i) => [p.id != null ? String(p.id) : "p" + i, p.text]));
   const carrier = !!f["carrier-safe"];
   const built = makeBundle(result, { tool: `Daylight Commons ${radarVersion()} (CLI)`, dataLock: await dataLock(), source: imp.source === "export" ? "export" : "thread", includeText: !!f["include-text"], texts, ...(carrier ? { profile: CARRIER_SAFE, typedPage: typeof f.page === "string" ? f.page : null } : {}) });
   if (!built.ok) throw new Error(built.reason);

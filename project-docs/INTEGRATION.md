@@ -52,6 +52,11 @@ published to npm; use it from a clone or a release archive.
 | `siteInfo(domain)` | `"example.com"` or a URL | envelope, kind `site`, or `null` |
 | `useData(tables)` | `{ sites, owners, state, claims, claimParts }` | row counts loaded |
 
+Quoted posts are read too: a top-level `quoted` list in the thread input, or a `quoted` post
+inside the root or a reply. Their words get the same post evidence as any post, listed by id in
+`posts.quoted`. They are not replies, so the thread report, bursts and the other thread comparisons
+leave them out.
+
 A post is `{ id, author, text, posted, links, flags, account }`. Only `text` is needed. `author`
 is used to tell accounts apart for the thread comparisons and never appears in the output.
 `flags` is a list of flag ids (or `{ id, evidence }` objects) when you have already read the

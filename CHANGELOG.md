@@ -5,6 +5,12 @@ were not published to a store.
 
 ## Unreleased
 
+### Fixed
+- Quoted posts are read. `analyzeThread` and `radar analyze` skipped a thread file's `quoted` list,
+  so words in a quoted post got no evidence. They now get the same post evidence as any post and are
+  listed in `posts.quoted`; the thread report and the other reply comparisons still leave them out,
+  since a quoted post is not a reply. Found by the 2026-10-23 feed test (`tests/cli.test.js`).
+
 ### Added
 - Carrier-safe evidence bundles. Tick Carrier-safe on the card page, or pass `--carrier-safe` to
   `radar analyze`, for a bundle you will hand to someone else: it is signed with a one-time key

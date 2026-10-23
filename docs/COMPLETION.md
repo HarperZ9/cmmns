@@ -38,10 +38,10 @@ These do not move for any feature below. A row that would cross one is out of sc
 | Status | Rows |
 |---|---|
 | PASS | 42 |
-| PARTIAL | 30 |
+| PARTIAL | 31 |
 | FAIL | 4 |
 | NOT BUILT | 33 |
-| **All** | **109** |
+| **All** | **110** |
 
 ## 1. Measurement
 
@@ -55,6 +55,7 @@ These do not move for any feature below. A row that would cross one is out of sc
 | M6 | Side balance on rhetoric | side-recall table | **PARTIAL** | closed on HateXplain; open on MHS (10.1% against 7.9%) | none |
 | M7 | Persuasion techniques shown only where they pass | `MEASURED_PERSUASION` | **PASS** (gate holds; none ship) | 0 of 11 meet the bar | SemEval-2020 Task 11 systems; beat their span precision at the same recall on the PTC test split |
 | M8 | Each sign's figure reaches the user | `tests/measured.test.js`, options page | **PASS** | release audit row 20 | MBFC shows confidence labels; we show intervals |
+| M9 | Language signs find what people flag on a live feed, without losing held-out precision | a feed set labelled by two blind labellers; held-out precision per family stays inside its interval (`scripts/eval.mjs`) | **PARTIAL** | 2026-10-23 feed test (82 X posts): 1 of 21 consensus findings found, none flagged wrongly. Quoted posts are now read (`tests/cli.test.js`). The 82 posts are a development set; no held-out live-feed set exists yet | Perspective API and Detoxify report toxicity scores, not which technique fired or why |
 
 ## 2. The five senses
 
