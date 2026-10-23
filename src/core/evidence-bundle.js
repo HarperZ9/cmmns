@@ -11,12 +11,11 @@
 // evidence is right. Compare the key id with one you got from its holder some other way.
 
 import { MIN_CARD_ACCOUNTS } from "./evidence.js";
-import { canonicalJSON, sha256Hex, lfBytes, jwkId, signText, verifyText, P256 } from "./sig.js";
+import { canonicalJSON, sha256Hex, lfBytes, jwkId, signText, P256 } from "./sig.js";
+import { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle } from "./bundle-verify.js";
 
-export const BUNDLE_KIND = "radar-evidence-bundle";
-export const BUNDLE_VERSION = 1;
-export const BUNDLE_SIG_ALG = "ECDSA P-256 SHA-256";
-export const BUNDLE_DOES_NOT_PROVE = "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right.";
+// Checking a bundle lives in bundle-verify.js, which the offline kit page carries on its own.
+export { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_SIG_ALG, BUNDLE_DOES_NOT_PROVE, CARRIER_SAFE, CARRIER_SAFE_NOTE, bundleConsistency, verifyBundle };
 // Canonical JSON, hashing, base64url and ECDSA P-256 live in sig.js, shared with data packs.
 const subtle = () => globalThis.crypto.subtle;
 
@@ -47,8 +46,17 @@ export async function publicKeyOf(publicKey) {
   return { jwk, keyId: await jwkId(jwk, 16) };
 }
 
+// A time of day becomes spaces of the same length, so the date stays and every span offset into the
+// text still holds: after a date or a bare "T" ("2026-10-01T09:30:00Z", "2026-10-01 09:30 UTC"), or
+// a clock time with a zone or am/pm ("at 12:10 UTC", "9:05 pm"). A ratio or verse number is kept.
+const TIME_OF_DAY = /(?:(?<=\d{4}-\d{2}-\d{2})[T ]|T)\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:\s?(?:Z|UTC|[+-]\d{2}:?\d{2}))?|\b\d{1,2}:\d{2}(?::\d{2})?\s?(?:UTC|GMT|Z|am|pm)\b/gi;
+const blankTimes = (v) => (typeof v === "string" ? v.replace(TIME_OF_DAY, (m) => " ".repeat(m.length)) : Array.isArray(v) ? v.map(blankTimes) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, blankTimes(x)])) : v);
+// "Daylight Commons 3.1.0 (CLI)" becomes "Daylight Commons 3".
+export const carrierTool = (tool) => { const m = String(tool || "").match(/^(.*?)(\d+)\.\d+(\.\d+)?/); return m ? `${m[1]}${m[2]}`.trim() : "Daylight Commons"; };
+
 // result: an analyzeThread or analyzeText envelope. opts: { tool, dataLock, savedAt, page, texts,
-// includeText, source }. texts: { postId: text }, used only when includeText is true.
+// includeText, source, profile, typedPage }. texts: { postId: text }, used only when includeText
+// is true. profile "carrier-safe" uses typedPage (what the user typed) and never page.
 // Returns { ok: true, bundle } or { ok: false, reason }.
 export function makeBundle(result, opts = {}) {
   if (!result || !Array.isArray(result.evidence)) return { ok: false, reason: "There is no analysis to put in a bundle." };
@@ -66,7 +74,18 @@ export function makeBundle(result, opts = {}) {
     textIncluded: !!opts.includeText,
     evidence: result.evidence, limits: [...(result.limits || []), BUNDLE_DOES_NOT_PROVE],
   };
+  if (opts.profile === CARRIER_SAFE) {
+    const safe = blankTimes({ ...bundle, savedAt: undefined, tool: undefined });
+    return { ok: true, bundle: { ...safe, profile: CARRIER_SAFE, tool: carrierTool(bundle.tool), savedAt: bundle.savedAt.slice(0, 10), input: { ...safe.input, page: opts.typedPage ? String(opts.typedPage) : null }, limits: [...bundle.limits, CARRIER_SAFE_NOTE] } };
+  }
   return { ok: true, bundle };
+}
+
+// Signs a carrier-safe bundle with a key made for it alone; the key is dropped when this returns
+// and is never stored or exported.
+export async function signCarrierSafe(bundle) {
+  if (bundle.profile !== CARRIER_SAFE) throw new Error("not a carrier-safe bundle");
+  return signBundle(bundle, await newBundleKey({ extractable: false }));
 }
 
 // Signs a bundle with a key pair from newBundleKey(). Returns a new bundle with `signature`.
@@ -76,44 +95,4 @@ export async function signBundle(bundle, keyPair) {
   const signed = { ...body, signer: { alg: BUNDLE_SIG_ALG, keyId, publicKey: jwk } };
   const value = await signText(keyPair.privateKey, canonicalJSON(signed));
   return { ...signed, signature: { of: "canonical JSON of this bundle without the signature field (sorted keys, no spaces)", value } };
-}
-
-// Spans and post references inside the bundle agree with themselves: every post an item names is
-// listed, and when text is included every located span is the text at that place.
-export function bundleConsistency(bundle) {
-  const ids = new Set((bundle.posts || []).map((p) => p.id)), text = new Map((bundle.posts || []).filter((p) => p.text != null).map((p) => [p.id, p.text]));
-  const missing = [], wrong = [];
-  for (const e of bundle.evidence || []) {
-    for (const p of e.posts || []) if (!ids.has(p)) missing.push(`${e.id}: ${p}`);
-    for (const s of e.spans || []) {
-      const t = text.get(s.post);
-      if (t != null && s.start != null && t.slice(s.start, s.end) !== s.text) wrong.push(`${e.id}: ${s.post}`);
-    }
-  }
-  return { ok: !missing.length && !wrong.length, missing, wrong };
-}
-
-async function signatureOk(bundle) {
-  const { signature, ...body } = bundle, S = body.signer;
-  if (!signature || !S || S.alg !== BUNDLE_SIG_ALG || !S.publicKey) return { ok: false, text: "the bundle carries no signature Daylight Commons can check" };
-  const jwk = { kty: S.publicKey.kty, crv: S.publicKey.crv, x: S.publicKey.x, y: S.publicKey.y };
-  let id = null;
-  try { id = await jwkId(jwk, 16); } catch { return { ok: false, text: "the public key cannot be read" }; }
-  if (id !== S.keyId) return { ok: false, text: "the key id does not match the public key" };
-  const good = await verifyText(jwk, signature.value, canonicalJSON(body));
-  return good ? { ok: true, text: "the signature matches the content and the key in the bundle" } : { ok: false, text: "the signature does not match: the bundle changed after signing, or was signed with another key" };
-}
-
-// opts.keyId: the key id you expect, from the signer by another route. Resolves to
-// { ok, keyId, checks: [{ name, ok, text }] }; ok is true only when every check passes.
-export async function verifyBundle(bundle, opts = {}) {
-  const checks = [];
-  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this is not a Daylight Commons evidence bundle" }] };
-  checks.push({ name: "version", ok: bundle.version === BUNDLE_VERSION, text: bundle.version === BUNDLE_VERSION ? `bundle version ${BUNDLE_VERSION}` : `bundle version ${bundle.version} is not one this Daylight Commons reads` });
-  checks.push({ name: "signature", ...(await signatureOk(bundle)) });
-  const keyId = bundle.signer ? bundle.signer.keyId : null;
-  if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
-  const C = bundleConsistency(bundle);
-  checks.push({ name: "consistency", ok: C.ok, text: C.ok ? (bundle.textIncluded ? "every item's posts are listed and every span matches the included text" : "every item's posts are listed; post text is not included, so spans were not checked against it") : `items name posts not listed (${C.missing.length}) or spans that differ from the text (${C.wrong.length})` });
-  return { ok: checks.every((c) => c.ok), keyId, checks };
 }

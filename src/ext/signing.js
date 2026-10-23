@@ -47,6 +47,8 @@
   }
 
   async function sign(bundle) { return PB.signBundle(bundle, await keyPair()); }
+  // A carrier-safe bundle: a key made for this bundle alone, never put in IndexedDB, dropped after signing.
+  const signCarrierSafe = (bundle) => PB.signCarrierSafe(bundle);
   // This browser's key id, or null when no bundle has been signed here yet.
   async function keyId() { const p = await keyPair(false); return p ? (await PB.publicKeyOf(p.publicKey)).keyId : null; }
   const tool = () => "Daylight Commons " + chrome.runtime.getManifest().version;
@@ -59,5 +61,5 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   }
 
-  globalThis.PBSign = Object.freeze({ loadTables, dataLock, sign, keyId, tool, download });
+  globalThis.PBSign = Object.freeze({ loadTables, dataLock, sign, signCarrierSafe, keyId, tool, download });
 })();

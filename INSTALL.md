@@ -69,7 +69,8 @@ the release, the head version and the expiry; compare them with the newest you h
 `KIT-GUIDE.txt` says the same in plain language. It is a draft that a security partner has not
 reviewed yet.
 
-The page is also published beside this one as `verify-offline.html`. To make a kit folder from a
+The same page checks one signed evidence bundle with no network: pick it under "Or check one
+evidence bundle". The page is also published beside this one as `verify-offline.html`. To make a kit folder from a
 release folder with Node, run `node scripts/kit.mjs <release folder> --out <kit folder>`.
 
 ## Rebuild it yourself

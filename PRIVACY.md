@@ -1,6 +1,6 @@
 # Daylight Commons privacy policy
 
-Last updated: 2026-10-22.
+Last updated: 2026-10-23.
 
 Daylight Commons runs entirely in your browser. It has no server, no account, no analytics and no telemetry.
 Nothing Daylight Commons reads or works out is sent to the author. Apart from the site you are on,
@@ -113,7 +113,7 @@ profile you installed Daylight Commons in. It is not synced to other devices.
 | Feed tally (`pb.feed.v1`) | Per site and day: the ids of feed posts counted (so each counts once), how many linked each site, and how many showed strong rhetoric signs, a Community Note or a fact-check match. No post text | 60 days by default; follows the history setting |
 | Media checks (`pb.media.v1`) | For each file you asked Daylight Commons to check: a short hash of its address (not the address), the site, the time and the outcome (credentials intact, partly checked, changed, stored online, or none found), for the survival count on the feed page | 60 days by default; follows the history setting; at most 5,000 files |
 | Thread card (session storage) | The card you asked for from a thread panel, and the thread's posts as the page showed them, so the card page can build a signed evidence bundle if you ask for one. The card names no account | Until the browser closes |
-| Bundle key (IndexedDB `radar-keys`) | The ECDSA P-256 key pair Daylight Commons makes the first time you save a signed evidence bundle. The private half is stored so that it can sign but cannot be read, exported or sent | Until you remove Daylight Commons |
+| Bundle key (IndexedDB `radar-keys`) | The ECDSA P-256 key pair Daylight Commons makes the first time you save a signed evidence bundle. The private half is stored so that it can sign but cannot be read, exported or sent. A carrier-safe bundle does not use it | Until you remove Daylight Commons |
 | Your feedback (`pb.feedback.v1`) | Your "This was right" and "This was wrong" marks: which sign (its kind, the post id and a short hash of its label), the thread, your mark and the time. The post text only for marks where you ticked "include the text" | Until you clear it or remove Daylight Commons; at most 2,000 marks, the oldest dropped first |
 | Count ledger (`pb.ledger.v1`) | For each launch post you opened: its post id and the public counts (reposts, likes, replies, quotes, bookmarks, views) at each visit, at most one point per 10 minutes. No accounts, no text | 30 days, at most 48 visits per post and 500 posts |
 | Evidence log (`pb.seal.v1`) | The receipts of evidence lookups you ran: what GitHub, RDAP and the Internet Archive said about a repository or domain, when, a hash of each answer, and the chain that seals them. No accounts | Until you clear Daylight Commons data; at most 2,000 receipts |
@@ -127,6 +127,26 @@ profile you installed Daylight Commons in. It is not synced to other devices.
 
 Post data from the page (views, posting app, media upload times) is held in memory for the tab and
 is gone when you close it.
+
+### Carrier-safe evidence bundles
+
+An ordinary bundle is signed with this browser's own key, so every bundle you save carries the same
+key id, and it records the exact save time and the page address. Anyone who holds two of your
+bundles can tell they came from one install. For a bundle you will hand to someone else, tick
+**Carrier-safe** on the card page, or use `radar analyze --carrier-safe` on the command line:
+
+- it is signed with a one-time key made for that bundle alone, which is never stored and is gone
+  when the signing ends;
+- it keeps the day it was saved and no time of day, and blanks every time of day inside it;
+- it leaves out the page address unless you type one in;
+- it names the tool by its major version only.
+
+Its signature proves the bundle is unchanged and says nothing about who made it. The profile cannot
+hide two bundles sent from one connection: whoever sees the network can still link them. It strips
+nothing from your own files, and the post ids it carries identify the thread and, on X, when each
+post was made. If you hold information that could put you at risk, do not send it through Daylight
+Commons: use a newsroom's SecureDrop or a GlobaLeaks site through Tor Browser, and their own tools
+for removing hidden data. The profile has had no independent review.
 
 ## Your controls
 

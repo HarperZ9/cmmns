@@ -163,7 +163,7 @@ check, 2 for a usage error.
 
 | Command | What it does |
 |---|---|
-| `analyze <file>` | Reads any supported file (below) and prints the evidence. `--no-claims` skips the fact-check table (faster). `--bundle out.json` also writes a signed bundle; `--include-text` puts full post text in it; `--key path` chooses the key file |
+| `analyze <file>` | Reads any supported file (below) and prints the evidence. `--no-claims` skips the fact-check table (faster). `--bundle out.json` also writes a signed bundle; `--include-text` puts full post text in it; `--key path` chooses the key file; `--carrier-safe` signs with a one-time key that is never saved, keeps the day only and leaves the page address out unless `--page <address>` gives one |
 | `verify <bundle>` | Checks the signature, the key id (`--key-id`), the bundle's own consistency and the schema |
 | `site <domain>` | What Daylight Commons' tables hold about a site |
 | `media <file>` | Content Credentials and AI-generation metadata |
@@ -210,8 +210,21 @@ CLI keeps its key in `~/.radar/bundle-key.jwk`, readable only by you where the s
 commit a key file. Share your key id with people by another route, so they can check that a bundle
 came from you.
 
+**Carrier-safe profile.** One key per install means any two of your bundles share a key id, and an
+ordinary bundle records the exact save time and the page address. For a bundle that leaves your
+hands, tick Carrier-safe on the card page, pass `--carrier-safe` to `analyze` (with `--page
+<address>` only if you want the address in it), or call `makeBundle(result, { profile:
+"carrier-safe", typedPage })` and then `signCarrierSafe(bundle)`. The bundle then carries
+`"profile": "carrier-safe"`; a key made for it alone, never stored or written to a file;
+`savedAt` as the day only (`YYYY-MM-DD`, which `schema/evidence.v1.json` accepts from 3.2.0); every
+time of day inside it blanked to spaces of the same length, so span offsets still hold; no page
+address unless one was typed; and the tool's major version only. `verify` adds a `profile` check
+that says: carrier-safe, the signature proves the bundle is unchanged and says nothing about who
+made it. Verifiers before 3.2.0 refuse a day-only `savedAt` at the schema step. The profile cannot
+hide two bundles sent from one connection, and it strips nothing from your own files.
+
 **Verifying.** `node bin/radar.mjs verify bundle.json`, or Check a bundle on the Analyse a file
-page. Both check that the key id matches the key, that the signature matches the content, that
+page, or the offline kit's `verify-offline.html`. All check that the key id matches the key, that the signature matches the content, that
 every item's posts are listed, and, when text is included, that every span is the text at that
 place. The CLI also checks the schema.
 

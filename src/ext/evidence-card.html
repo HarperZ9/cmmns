@@ -35,6 +35,11 @@
       <span>Include the posts' full text<span class="hint">Off by default: the replies are other people's words. Without it, the bundle keeps only the matched words.</span></span>
       <input type="checkbox" id="bundle-text">
     </label>
+    <label class="switch">
+      <span>Carrier-safe<span class="hint">For a bundle you will hand to someone else. It is signed with a one-time key that is not kept, keeps only the day, and leaves out the page address. Its signature then proves the bundle is unchanged and says nothing about who made it.</span></span>
+      <input type="checkbox" id="bundle-carrier">
+    </label>
+    <div class="field" id="bundle-page-row" hidden><label for="bundle-page">Page address to include (optional)</label><input id="bundle-page" type="text" inputmode="url" autocomplete="off"></div>
     <div class="row">
       <button id="bundle-save" type="button" class="quiet">Save signed bundle</button>
       <span id="bundle-status" role="status" aria-live="polite" class="muted"></span>

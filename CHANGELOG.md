@@ -6,6 +6,14 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- Carrier-safe evidence bundles. Tick Carrier-safe on the card page, or pass `--carrier-safe` to
+  `radar analyze`, for a bundle you will hand to someone else: it is signed with a one-time key
+  that is never stored, keeps the day it was saved and no time of day, leaves out the page address
+  unless you type one, and names the tool by its major version only. Two such bundles from one
+  install share no key id, time or address. `radar verify` and the offline kit page say its
+  signature proves the bundle is unchanged and says nothing about who made it. The ordinary
+  profile stays the default and is unchanged.
+- The offline kit page also checks one signed evidence bundle.
 - The offline kit. Every release folder now carries `verify-offline.html`, one file with the
   project key, the signing code, the styles and the font inside it, so a person with a USB stick
   and a browser can check a kit with the network off. It checks the signed head, the signature over
@@ -34,6 +42,14 @@ were not published to a store.
 - The offline checker cannot show its own key is right if the kit came from an attacker; the printed
   card and a second source are the defence. It keeps no record, so it cannot refuse an older kit by
   itself. No person new to the project has yet tried the kit with the network off.
+- A carrier-safe bundle cannot hide two bundles sent from one connection, and it strips nothing
+  from the user's own files. Its post ids still identify the thread. A blind model review found no
+  field that links two carrier-safe bundles from one install; no independent person has reviewed
+  it yet.
+
+### Changed
+- `schema/evidence.v1.json` accepts a day-only `savedAt` for carrier-safe bundles. Verifiers before
+  3.2.0 refuse such a bundle at the schema step.
 
 ## 3.1.0 (2026-10-23)
 

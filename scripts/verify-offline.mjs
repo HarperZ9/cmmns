@@ -1,5 +1,6 @@
 // Builds docs/verify-offline.html: one file that checks an offline kit with no network. The trusted
-// key set, Daylight Commons' own signing code (src/core/sig.js, signing.js, head.js, kit-verify.js),
+// key set, Daylight Commons' own signing code (src/core/sig.js, signing.js, head.js, bundle-verify.js,
+// kit-verify.js),
 // the styles and the Hanken Grotesk font are all inside it. No fetch, no external script, no
 // external font, no address of any kind, so it works from a USB stick with the network off.
 // scripts/kit.mjs puts a copy in every release before SHA256SUMS is signed.
@@ -9,7 +10,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { ROOT, esc } from "./site/page.mjs";
 
-const MODULES = ["sig.js", "signing.js", "head.js", "kit-verify.js"];
+const MODULES = ["sig.js", "signing.js", "head.js", "bundle-verify.js", "kit-verify.js"];
 const ident = (f) => "M_" + f.replace(/\.js$/, "").replace(/-/g, "_");
 
 // Each module in its own scope, imports read from the modules before it, as scripts/build.mjs does.
@@ -32,7 +33,7 @@ export function trustedSet(keys) {
   return keys.map((k) => ({ keyId: String(k.keyId).replace(/\s/g, ""), label: k.label || "Daylight Commons project key", jwk: { kty: k.kty, crv: k.crv, x: k.x, y: k.y } }));
 }
 
-const UI = `const { checkKit } = M_kit_verify;
+const UI = `const { checkKit, checkBundleFile } = M_kit_verify;
 const $ = (id) => document.getElementById(id);
 function show(r) {
   const out = $("kit-out");
@@ -49,7 +50,11 @@ async function run(list) {
   show(await checkKit(files, { trusted: TRUSTED }));
 }
 const fail = (e) => { console.error("[daylight-commons] kit check failed", e); show({ ok: false, lines: [{ kind: "bad", text: "The check could not run: " + e.message }] }); };
-for (const id of ["kit-files", "kit-folder"]) $(id).addEventListener("change", (e) => run(e.target.files).catch(fail));`;
+for (const id of ["kit-files", "kit-folder"]) $(id).addEventListener("change", (e) => run(e.target.files).catch(fail));
+$("bundle-file").addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  if (f) f.arrayBuffer().then((b) => checkBundleFile(new Uint8Array(b))).then(show).catch(fail);
+});`;
 
 const CSS = `:root{color-scheme:light;--paper:#ebe5d8;--panel:#e2dac9;--ink:#16130f;--soft:#4a443b;--line:#c9bfab;--drift:#8f3a19;--verified:#0a6b61;--sans:"Hanken Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--mono:ui-monospace,"Cascadia Mono",Consolas,monospace}
 @media (prefers-color-scheme:dark){:root{color-scheme:dark;--paper:#060608;--panel:#111114;--ink:#ece5d6;--soft:#b8b0a0;--line:#29282c;--drift:#e29472;--verified:#63d4ce}}
@@ -87,6 +92,9 @@ ${ids}
 <input type="file" id="kit-folder" webkitdirectory multiple>
 <label for="kit-files">Or every file in it</label>
 <input type="file" id="kit-files" multiple>
+<h2>Or check one evidence bundle</h2>
+<label for="bundle-file">A signed bundle saved by Daylight Commons</label>
+<input type="file" id="bundle-file" accept=".json,application/json">
 <ul id="kit-out" aria-live="polite"></ul>
 <h2>What a pass shows</h2>
 <p class="muted">The files match what the holder of the built-in key signed, and the signed head gives their release, version and expiry. It does not show the files are safe, and it does not show the built-in key is right if this page came from someone you do not trust. This page has had no independent security audit.</p>
