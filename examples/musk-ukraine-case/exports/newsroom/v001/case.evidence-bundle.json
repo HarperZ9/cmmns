@@ -1,9 +1,9 @@
 {
   "kind": "radar-evidence-bundle",
-  "version": 1,
-  "schema": "urn:radar:evidence:v1",
-  "api": "1.1.0",
-  "tool": "Daylight Commons 3.2.2 (daylight case)",
+  "version": 2,
+  "schema": "urn:radar:evidence:v2",
+  "api": "2.0.0",
+  "tool": "Daylight Commons 3.4.0 (daylight case)",
   "savedAt": "2026-10-23T18:00:00.000Z",
   "dataLock": null,
   "input": {
@@ -46,7 +46,7 @@
       "label": "CHANGES.md",
       "shows": "sha256 91c711aa9808441ebbe5a81d5128f78fc234a7b2117c273dce241286e529d52f, 64 bytes",
       "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
-      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
       "posts": [
         "CHANGES.md"
       ],
@@ -63,16 +63,16 @@
       "scope": "file",
       "level": "info",
       "label": "DOSSIER.html",
-      "shows": "sha256 8de07cec870cbc258b48252e9d7ca727f7201581b5978b9dab1e18cfba0e2a4c, 43920 bytes",
+      "shows": "sha256 b8ad7d42fe2fa3c44fd828e3ad1b40fa35d5da3b4042c65fbc88e3b688c27913, 43920 bytes",
       "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
-      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
       "posts": [
         "DOSSIER.html"
       ],
       "spans": [],
       "data": {
         "path": "DOSSIER.html",
-        "sha256": "8de07cec870cbc258b48252e9d7ca727f7201581b5978b9dab1e18cfba0e2a4c",
+        "sha256": "b8ad7d42fe2fa3c44fd828e3ad1b40fa35d5da3b4042c65fbc88e3b688c27913",
         "bytes": 43920
       }
     },
@@ -82,16 +82,16 @@
       "scope": "file",
       "level": "info",
       "label": "DOSSIER.md",
-      "shows": "sha256 b0b9e6f0a7b38afde79ec45de33d2697576728d843543f287337692c5486c2b8, 39321 bytes",
+      "shows": "sha256 5f0442815b4f4d2198a58421e6395ab8b297804a3b9333cc4a89120a53987941, 39321 bytes",
       "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
-      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
       "posts": [
         "DOSSIER.md"
       ],
       "spans": [],
       "data": {
         "path": "DOSSIER.md",
-        "sha256": "b0b9e6f0a7b38afde79ec45de33d2697576728d843543f287337692c5486c2b8",
+        "sha256": "5f0442815b4f4d2198a58421e6395ab8b297804a3b9333cc4a89120a53987941",
         "bytes": 39321
       }
     },
@@ -101,16 +101,16 @@
       "scope": "file",
       "level": "info",
       "label": "SHA256SUMS",
-      "shows": "sha256 c84c7c7dfe46cc9e36689e734665ca88cde9a74368eaa1b49aafebca2d2c24a5, 469 bytes",
+      "shows": "sha256 b6dd03df8c43803d8c507939905b6e29b3d675a236fe1c2c98bfc961f7f196d9, 469 bytes",
       "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
-      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
       "posts": [
         "SHA256SUMS"
       ],
       "spans": [],
       "data": {
         "path": "SHA256SUMS",
-        "sha256": "c84c7c7dfe46cc9e36689e734665ca88cde9a74368eaa1b49aafebca2d2c24a5",
+        "sha256": "b6dd03df8c43803d8c507939905b6e29b3d675a236fe1c2c98bfc961f7f196d9",
         "bytes": 469
       }
     },
@@ -120,16 +120,16 @@
       "scope": "file",
       "level": "info",
       "label": "export.json",
-      "shows": "sha256 ca1b8273344a1d187cffbe48ba37441c8bdcf9f25ebd9d58aab7f7c2e075f0ef, 23885 bytes",
+      "shows": "sha256 3282e77cb7b1956f1946810b80e86d9415c8cd78d9ddf0ebee1a88258791f306, 23885 bytes",
       "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
-      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
       "posts": [
         "export.json"
       ],
       "spans": [],
       "data": {
         "path": "export.json",
-        "sha256": "ca1b8273344a1d187cffbe48ba37441c8bdcf9f25ebd9d58aab7f7c2e075f0ef",
+        "sha256": "3282e77cb7b1956f1946810b80e86d9415c8cd78d9ddf0ebee1a88258791f306",
         "bytes": 23885
       }
     },
@@ -139,16 +139,16 @@
       "scope": "file",
       "level": "info",
       "label": "network.html",
-      "shows": "sha256 badcc56c90859b1eb9a95612d85f40c81ecc064f862b4d6a3462abe7ef761bc4, 3779 bytes",
+      "shows": "sha256 3dff187673a06397245a0f6db7f6c2851bef0974d351bfb208eeeede58065046, 3779 bytes",
       "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
-      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
       "posts": [
         "network.html"
       ],
       "spans": [],
       "data": {
         "path": "network.html",
-        "sha256": "badcc56c90859b1eb9a95612d85f40c81ecc064f862b4d6a3462abe7ef761bc4",
+        "sha256": "3dff187673a06397245a0f6db7f6c2851bef0974d351bfb208eeeede58065046",
         "bytes": 3779
       }
     },
@@ -158,23 +158,23 @@
       "scope": "file",
       "level": "info",
       "label": "network.json",
-      "shows": "sha256 1e9f2ef3e82e743191866af2f004f57c248841c7fef204aa8ed780442b66adfb, 1491 bytes",
+      "shows": "sha256 b9d5fc0e4267e8ab91539ac2db010ba92565fd1954fd5290648fa966e4b15afe, 1491 bytes",
       "source": "daylight case export, profile newsroom, case \"Musk, Ukraine and the Democrats\"",
-      "doesNotProve": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
       "posts": [
         "network.json"
       ],
       "spans": [],
       "data": {
         "path": "network.json",
-        "sha256": "1e9f2ef3e82e743191866af2f004f57c248841c7fef204aa8ed780442b66adfb",
+        "sha256": "b9d5fc0e4267e8ab91539ac2db010ba92565fd1954fd5290648fa966e4b15afe",
         "bytes": 1491
       }
     }
   ],
   "limits": [
     "Case export, profile newsroom. Rehash each file and compare with its item to check it.",
-    "A valid signature shows the bundle has not changed since the holder of this key signed it. It does not show who holds the key, that the posts said what the spans say, or that the evidence is right."
+    "A valid signature shows the holder of this key signed the bundle and that it is unchanged since. Check the key id with the signer by another route, and read each span against its post."
   ],
   "signer": {
     "alg": "ECDSA P-256 SHA-256",
@@ -188,6 +188,6 @@
   },
   "signature": {
     "of": "canonical JSON of this bundle without the signature field (sorted keys, no spaces)",
-    "value": "K9LWYQgmwuGQWjWcgl9v6rDk2UrkbItb9rSuoLCSnPRunxvflfstSrQigPSQgZkwpUtzO-dzkGgF-cogJ-vU2Q"
+    "value": "MwhuYNAbhLcSnBg9qVgNW-rrGdOMMg3fSVzOvBkXPj8af_0MkMn3hzc5pR_NB0npABjVpAEjSX-DdKoK0i5QCA"
   }
 }
