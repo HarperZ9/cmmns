@@ -7,6 +7,35 @@ were not published to a store.
 
 Nothing yet.
 
+## 3.2.2 (2026-10-23)
+
+A recall fix for conspiracy claims. In feed test 3 both blind labellers marked a reply that explains a
+leader's conduct by saying a foreign state is blackmailing him, and 3.2.1 flagged nothing. A new named
+theory, "secret coercion of a leader", reads that claim and its family, whichever state or group is
+named. The held-out test split gives the same figures before and after.
+
+Read these limits before relying on this release:
+- The rule was written for one post, so its 1 of 1 is development recall, not a held-out figure. Like
+  every named theory it is not measured, carries weight 0 and never counts toward "extreme".
+- Conditionals, questions, allegations someone else made, documented cases and computer compromises
+  are skipped, so a real claim inside such a sentence is missed.
+- A bare name with "owned by" or "controlled by" is not read, because a name cannot be told from a
+  place; an actor missing from the list is missed.
+
+### Fixed
+- Named theories: "secret coercion of a leader" (`src/core/theories-coercion.js`). A leader or
+  congress blackmailed, compromised, owned or controlled by a state or a group, "has dirt on",
+  kompromat, and "a Russian asset" or "a Kremlin puppet". One actor list holds states, leaders,
+  agencies, parties, peoples, lobbies and companies from every direction, and
+  `tests/theories.coercion.test.js` requires the same answer for every actor, with mirrored pairs
+  (Israel and Russia, China and the US, Democrats and Republicans, Pfizer and BlackRock) and a
+  control for every guard. Sources: NPR on the DOJ and FBI memo (2025-07-08) and the DOJ Inspector
+  General's Crossfire Hurricane review (2019-12-09).
+- Held-out precision on the test split, before and after: dehumanise 92.5% (37/40; 80.1 to 97.4),
+  stereotype 84.2% (96/114; 76.4 to 89.8), any strong family 90.6% (4,167/4,597; 89.8 to 91.5),
+  unchanged (`project-docs/EVALUATION.md`, "Feed test 3 fix"). On feed tests 1 to 3 the only change is
+  the missed post, now flagged.
+
 ## 3.2.1 (2026-10-23)
 
 A fix for a false alarm. The timing-burst signal reported bursts such as "6 accounts replied within

@@ -2684,6 +2684,100 @@ const derivedLanguages = (codes = DERIVED_SHIP) => codes.map(derivedLanguage);
 return { DERIVED_CODES, prepDerived, candidates, compileTerms, markerCode, derivedLanguage, derivedLanguages };
 })();
 
+// ---- theories-coercion.js
+const M_theories_coercion = (() => {
+// Secret coercion (added 2026-10-23 from feed test 3): a leader or an institution is blackmailed,
+// compromised, owned or controlled by a state or a group, or that state or group "has dirt on" them.
+// It names the technique, never a side: every pattern takes the same list of actors, and that list
+// holds states, leaders, agencies, parties, peoples, lobbies and companies from every direction, so
+// "blackmailed by Israel" reads like "blackmailed by Russia", "by the CIA", "by the Democrats" or
+// "by Pfizer". tests/theories.coercion.test.js runs every pattern over every actor.
+//
+// Precision guards, on top of the ones every theory has (debunking, mockery, negation, reported
+// speech, quotes): a conditional or a question ("if he were being blackmailed by ..."), an allegation
+// someone else made ("allegedly", "according to", "accused ... of"), a documented case ("convicted
+// of blackmail", "the court found") and a computer compromise ("his phone was compromised by ...")
+// skip the match. Precision comes first, so a first-person claim inside such a sentence is missed.
+
+const { IDENTITY_GROUPS } = M_lexicon;
+
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const alt = (list) => [...new Set(list)].map(esc).sort((a, b) => b.length - a.length).join("|");
+
+// States, their capitals and leaders, agencies, parties and movements, lobbies, companies and donors.
+const ACTOR_LIST = [
+  "israel", "russia", "china", "iran", "ukraine", "america", "the us", "the usa", "the united states", "the uk", "britain",
+  "saudi arabia", "the saudis", "qatar", "turkey", "india", "pakistan", "north korea", "germany", "france", "the eu", "nato", "the un",
+  "the kremlin", "moscow", "beijing", "tehran", "tel aviv", "jerusalem", "kyiv", "washington", "london", "brussels", "riyadh", "doha",
+  "putin", "xi", "xi jinping", "netanyahu", "bibi", "zelensky", "zelenskyy", "erdogan", "modi", "kim jong un", "the ayatollah",
+  "mossad", "the mossad", "cia", "fbi", "nsa", "kgb", "fsb", "gru", "mi6", "mss", "the deep state", "deep state",
+  "ccp", "chinese communist party", "the communist party", "the democrats", "democrats", "the dems", "dems", "the dnc",
+  "the republicans", "republicans", "the gop", "gop", "the rnc", "the tories", "tories", "labour", "the communists",
+  "the globalists", "globalists", "the zionists", "zionists", "the elites", "the illuminati", "the freemasons", "the masons",
+  "the cartels", "the cartel", "the mafia", "the mob", "hamas", "hezbollah",
+  "aipac", "the nra", "the israel lobby", "the gun lobby", "the wef", "the banks", "the bankers", "wall street",
+  "big pharma", "pfizer", "big tech", "google", "facebook", "meta", "microsoft", "amazon", "blackrock", "vanguard",
+  "goldman sachs", "big oil", "exxon", "soros", "george soros", "gates", "bill gates", "musk", "elon musk", "the kochs", "the koch brothers",
+  ...IDENTITY_GROUPS, ...IDENTITY_GROUPS.map((g) => `the ${g}`),
+];
+const COERCION_ACTORS = [...new Set(ACTOR_LIST)];
+const A = `(?:the\\s+)?(?:${alt(COERCION_ACTORS)})`;
+// Adjectives for "a Russian asset", "a Kremlin puppet": nationalities, agencies and movements alike.
+const COERCION_ADJ = ["israeli", "russian", "chinese", "iranian", "ukrainian", "american", "british", "saudi", "qatari",
+  "turkish", "indian", "pakistani", "north korean", "german", "french", "kremlin", "mossad", "cia", "ccp", "zionist", "globalist",
+  "soros", "democrat", "republican", "gop", "pharma", "cartel"];
+const ADJ = alt(COERCION_ADJ);
+// Who can be coerced: a person or a lawmaking body, never a place or a firm ("the board is controlled by").
+const PERSON = "(?:he|she|him|her|the president|our president|the prime minister|the pm|our pm|the chancellor|the senator|the speaker|our leaders?|our politicians|politicians|our government)";
+const BODY = "(?:congress|the senate|parliament|the white house|downing street|our government|our politicians|politicians)";
+const CONTROLLED = "him|her|the president|our president|the prime minister|our pm";
+const OWNED = `${CONTROLLED}|congress|our politicians|politicians`;
+const BE ="(?:is|are|was|were|has been|have been|'s|'re|being|been|getting|gets|got)";
+
+const COERCION_PATTERNS = [
+  // "Trump is being blackmailed by Israel", "they were all blackmailed by the CIA"
+  `\\b${BE}\\s+(?:\\w+\\s+){0,2}?blackmailed\\s+(?:\\w+\\s+){0,2}?by\\s+${A}\\b`,
+  // "Russia is blackmailing him", "Mossad blackmails our politicians", "the CIA blackmailed him"
+  `\\b${A}\\s+(?:(?:is|are|has been|have been)\\s+)?(?:\\w+\\s+)?blackmail(?:s|ing|ed)\\s+[a-z]+\\b`,
+  // "China has dirt on him", "the Kremlin holds kompromat on", "the CIA has tapes on"
+  `\\b${A}\\s+(?:has|have|holds?|has got|have got|is holding|are holding|got)\\s+(?:\\w+\\s+){0,2}?(?:kompromat|dirt|compromising (?:material|tapes|videos?|photos?|files?)|tapes)\\s+on\\b`,
+  `\\b${A}(?:'s|'|s)?\\s+kompromat\\b`,
+  // "he is compromised by Beijing", "Trump is totally compromised by Russia"
+  `\\b${BE}\\s+(?:\\w+\\s+){0,2}?compromised\\s+by\\s+${A}\\b`,
+  // "he is owned by AIPAC", "the president is controlled by China", "congress is bought and paid for by"
+  `\\b${PERSON}\\s+${BE}\\s+(?:being\\s+)?(?:\\w+\\s+){0,2}?(?:controlled|owned|bought|handled)\\s+(?:and\\s+(?:paid for|controlled|owned)\\s+)?by\\s+${A}\\b`,
+  `\\b${BODY}\\s+${BE}\\s+(?:\\w+\\s+){0,2}?(?:owned|bought(?:\\s+and\\s+paid\\s+for)?)\\s+by\\s+${A}\\b`,
+  // "Israel owns congress", "China controls him". A party "controls the Senate" or "the White House"
+  // after an election, so control takes a person only, and ownership a person, congress or politicians.
+  `\\b${A}\\s+(?:(?:totally|completely|fully|secretly|basically|literally)\\s+)?(?:owns?\\s+(?:${OWNED})|controls?\\s+(?:${CONTROLLED}))\\b`,
+  // "he is a Russian asset", "she's a Kremlin puppet"
+  `\\b${BE}\\s+(?:a|an)\\s+(?:\\w+\\s+)?(?:${ADJ})\\s+(?:asset|puppet|stooge|plant)\\b`,
+];
+
+// The sentence around a match: from the last end mark before it to the next one after it.
+function sentenceAround(s, index, length) {
+  const head = s.slice(0, index), tail = s.slice(index + length);
+  const start = Math.max(head.lastIndexOf("."), head.lastIndexOf("!"), head.lastIndexOf("?"), head.lastIndexOf("\n")) + 1;
+  const m = tail.match(/[.!?\n]/);
+  return { before: head.slice(start), after: m ? tail.slice(0, m.index + 1) : tail };
+}
+
+const CONDITIONAL = /\b(?:if|whether|what if|suppose|supposing|imagine|imagining|unless|assuming|in case|could|might|may|would|wonder|wondering|hypothetically)\b/i;
+const ALLEGED = /\b(?:allegedly|reportedly|supposedly|according to|accus(?:e|es|ed|ing|ation|ations)|allegations?|rumou?rs?|report(?:s|ed)? that|wrote that|told|tweeted|posted that|theory that)\b/i;
+const DOCUMENTED = /\b(?:convicted|pleaded guilty|pled guilty|found guilty|charged|indicted|sentenced|acquitted|court|jury|prosecutors?|trial|lawsuit|sued|verdict)\b/i;
+const COMPUTER = /\b(?:hack(?:ed|ers?|ing)?|cyber\w*|systems?|networks?|servers?|accounts?|data|e-?mails?|passwords?|breach\w*|malware|software|devices?|phones?|frozen|sanctions?)\b/i;
+
+// True when the match sits in a conditional or a question, repeats an allegation, describes a
+// documented case or a computer compromise: the match is then skipped.
+function coercionSkipped(s, index, length) {
+  const { before, after } = sentenceAround(String(s || ""), index, length);
+  const lead = before + s.slice(index, index + length), sentence = lead + after;
+  return /\?/.test(after) || CONDITIONAL.test(lead) || ALLEGED.test(lead) || DOCUMENTED.test(sentence) || COMPUTER.test(sentence);
+}
+
+return { COERCION_ACTORS, COERCION_ADJ, COERCION_PATTERNS, coercionSkipped };
+})();
+
 // ---- theories.js
 const M_theories = (() => {
 // Named conspiracy theories: an extension of the conspiracy family in rhetoric.js. The conspiracy
@@ -2701,6 +2795,7 @@ const M_theories = (() => {
 // the thread report's "extreme".
 
 const { GROUPS, IDENTITY_ADJ } = M_lexicon;
+const { COERCION_PATTERNS, coercionSkipped } = M_theories_coercion;
 
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
@@ -2799,6 +2894,12 @@ const THEORIES = [
       S("The Korea Times, Why people believe fake news on China's election interference", "https://www.koreatimes.co.kr/www/nation/2025/01/113_390697.html", "2025-01-20"),
       S("Ipsos, More than 1 in 3 Americans believe a 'deep state' is working to undermine Trump (NPR/Ipsos poll)", "https://www.ipsos.com/en-us/news-polls/npr-misinformation-123020", "2020-12-30"), ENDERS],
     dnp: "Lobbying, foreign influence operations and spies are real and documented. A claim about one official, one law or one donor can be true." },
+  { id: "secret-coercion", name: "Secret coercion of a leader", terms: [], patterns: COERCION_PATTERNS, guard: coercionSkipped,
+    claim: "A leader or a lawmaking body is secretly blackmailed, compromised, owned or controlled by a state or a group that holds leverage over them.",
+    record: "Such claims are made about leaders of every party. In July 2025 the Justice Department and the FBI said their review found no credible evidence that Jeffrey Epstein blackmailed prominent people. The Justice Department's Inspector General found that the FBI had corroborated only limited parts of the Steele reporting, the source of the claim that Russia held kompromat on Donald Trump.",
+    sources: [S("NPR, DOJ memo says no evidence of Jeffrey Epstein 'client list' or blackmail", "https://www.npr.org/2025/07/08/nx-s1-5460954/doj-memo-says-no-evidence-of-jeffrey-epstein-client-list-or-blackmail", "2025-07-08"),
+      S("US Department of Justice Office of the Inspector General, Review of Four FISA Applications and Other Aspects of the FBI's Crossfire Hurricane Investigation", "https://oig.justice.gov/reports/review-four-fisa-applications-and-other-aspects-fbis-crossfire-hurricane-investigation", "2019-12-09"), ENDERS],
+    dnp: "Blackmail, bribery and foreign influence happen and are sometimes proven in court. A claim about one person can be true, and this says only that the post makes the claim, not whether it is true." },
   { id: "hidden-cure", name: "Hidden cure", terms: ["hiding the cure for cancer", "hiding the cure", "suppressing the cure", "they have the cure for cancer", "sitting on the cure"],
     claim: "Drug companies or regulators hide a cure to protect profits.",
     record: "In a 2013 US survey, 37% agreed the FDA suppresses natural cures for cancer (Oliver and Wood, 2014); no such hidden cure has been shown.",
@@ -2808,7 +2909,7 @@ const THEORIES = [
 
 const word = (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|");
 const COMPILED = THEORIES.map((t) => ({ id: t.id,
-  res: [...((t.terms || []).length ? [new RegExp(`(?:^|[^\\w])(${word(t.terms)})(?=$|[^\\w])`, "i")] : []), ...(t.patterns || []).map((p) => new RegExp(p, "i"))] }));
+  res: [...((t.terms || []).length ? [new RegExp(`(?:^|[^\\w])(${word(t.terms)})(?=$|[^\\w])`, "i")] : []), ...(t.patterns || []).map((p) => new RegExp(p, "i"))], guard: t.guard }));
 const BY_ID = new Map(THEORIES.map((t) => [t.id, t]));
 const theoryById = (id) => BY_ID.get(id) || null;
 
@@ -2835,6 +2936,8 @@ function theoryMatches(text) {
       const match = (m[1] || m[0]).trim(), index = m.index + m[0].indexOf(match);
       const before = s.slice(Math.max(0, index - 60), index);
       if (NEGATED.test(before.slice(-30)) || REPORTED_CLAIM.test(before) || /\b(?:not|never)\b/i.test(m[0])) continue;
+      // A theory's own guard (secret coercion: conditionals, allegations, documented cases).
+      if (c.guard && c.guard(s, m.index, m[0].length)) continue;
       out.push({ theory: c.id, match: match.slice(0, 80), index });
       break;
     }
@@ -11614,5 +11717,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

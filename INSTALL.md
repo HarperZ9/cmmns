@@ -105,7 +105,7 @@ from somewhere other than Mozilla's store. Mozilla signs `radar-firefox-self` wi
 its store; once signed, open the file in Firefox to install it, and Firefox checks
 `firefox/updates.json` on this site for new versions.
 
-No release so far carries a Mozilla-signed file, 3.2.1 included, and `firefox/updates.json` is not
+No release so far carries a Mozilla-signed file, 3.2.2 included, and `firefox/updates.json` is not
 published yet. Until Mozilla signs the self-distributed build or lists Daylight Commons on Firefox
 Add-ons, release Firefox can load it only for one session: open `about:debugging`, choose This
 Firefox, then Load Temporary Add-on, and pick the `.xpi`. Firefox Developer Edition, Nightly and

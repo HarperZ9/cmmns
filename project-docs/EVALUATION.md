@@ -343,6 +343,59 @@ MHS dev, and both were read during tuning.
 posts, so this number shows the misses are fixed, not how often the detector finds such content.
 A held-out live-feed set, labelled the same way, is needed before any recall claim.
 
+## Feed test 3 fix: secret coercion (2026-10-23)
+Feed test 3 ran 8 public X posts past the same two blind labellers and the 3.2.1 detector. Both marked
+one post as a conspiracy claim: a reply that explains a leader's conduct by saying a foreign state is
+blackmailing him, with no evidence offered. The detector flagged nothing. That post is a development
+case now; the rule was written for it, so its recall is not a held-out figure.
+
+| Miss | Cause in the code | Change |
+|---|---|---|
+| a leader "being blackmailed by" a foreign state | No theory covered coercion of a person. The secret-control theory reads control of a country, and its "controlled by" pattern needs "fully", "secretly" or a percentage. | A named "secret coercion" theory (`src/core/theories-coercion.js`): blackmailed by, compromised by, owned or controlled by (a person or congress only), "has dirt on", kompromat, and "a Russian asset" or "a Kremlin puppet". |
+
+The rule names the technique, never a side. Every pattern takes one list of actors: states, capitals
+and leaders, intelligence agencies, parties from several countries, peoples, lobbies, companies and
+donors. `tests/theories.coercion.test.js` runs six templates over every actor and requires the same
+answer for each, adds mirrored pairs (Israel and Russia, China and the US, Democrats and Republicans,
+Pfizer and BlackRock, Mossad and the CIA, Beijing and Washington), and checks every guard with eight
+entities from those sides.
+
+Guards, on top of those every theory has (debunking, mockery, negation, reported speech, quotes): a
+conditional or a question ("if he were being blackmailed by ...", "what if", "could"), an allegation
+someone else made ("allegedly", "according to", "accused of"), a documented case ("convicted", "the
+court found", "jury") and a computer compromise ("his phone was compromised by ...") skip the match.
+Each guard test has a control: the same sentence without the guard word fires. Control takes a person
+only, because a party "controls the White House" or "the Senate" after an election; a first version
+fired on exactly that in Civil Comments, and the test now keeps it out.
+
+Known gaps, by design: a bare name with "owned by" or "controlled by" ("X is owned by Y") is not read,
+because a name cannot be told from a place ("Crimea is controlled by Russia"), and an actor missing
+from the list is missed.
+
+**Held-out precision, read once.** The test split, before (3.2.1, `main` at 3539dfd) and after:
+
+| Family | Before | After |
+|---|---|---|
+| dehumanise | 92.5% (37/40; 80.1 to 97.4) | 92.5% (37/40; 80.1 to 97.4) |
+| stereotype | 84.2% (96/114; 76.4 to 89.8) | 84.2% (96/114; 76.4 to 89.8) |
+| slur | 91.0% (3,996/4,393) | 91.0% (3,996/4,393) |
+| any strong family | 90.6% (4,167/4,597; 89.8 to 91.5) | 90.6% (4,167/4,597; 89.8 to 91.5) |
+
+The `scripts/eval.mjs --split test` output is identical line for line before and after, weak families
+included: the new theory carries weight 0 and is not one of the measured families. The committed
+results file is unchanged for that reason.
+
+The theory itself is not measured, like every named theory. As context, not a measurement: across all
+of MHS, HateXplain, Civil Comments and MLMA-fr (257,038 items, both splits) it fires 4 times, all read:
+"you are a zionist puppet" (HateXplain), "He's a Russian plant" said in mockery of the people who say
+it, "He is owned by Wall Street and the bankers", and "a treasonous Russian puppet" (Civil Comments).
+The mocking one is a quote a guard does not catch; "owned by Wall Street" is a claim about donors that
+can be argued in good faith, which the does-not-prove line names.
+
+**Development recall:** the feed test 3 post now fires, 1 of 1 consensus conspiracy finding (Wilson 95%
+0.21 to 1.00). Rerun on feed tests 1 to 3 (109 posts, text and transcribed media), nothing else
+changed: no new flag on any other post, and no change to any other evidence item.
+
 ## Persuasion techniques (PTC test split, 2026-10-21): none ship
 Daylight Commons looks for eleven techniques from the SemEval-2020 Task 11 and SemEval-2023 Task 3 taxonomy.
 Each is a list of lexical and grammatical cues that name no group, person, party or side
@@ -535,10 +588,10 @@ script when every letter can be read in it, else toward the word's own majority;
   ("сор"), folds to Latin. Folding applies only to the copy Daylight Commons matches, never to what it shows.
 
 ## Named conspiracy theories (2026-10-21): not measured
-`src/core/theories.js` extends the conspiracy family with thirteen documented theories (QAnon slogans,
+`src/core/theories.js` extends the conspiracy family with fourteen documented theories (QAnon slogans,
 adrenochrome, satanic ritual abuse, chemtrails, "Great Reset" plot framing, stolen and rigged
 elections, machine and satellite vote-flipping, staged shootings, 9/11 inside job, 5G and COVID-19,
-vaccine harm, hidden cures, and secret control of a country, added 2026-10-23 from the feed test), each with dated sources and its own does-not-prove line. Election and
+vaccine harm, hidden cures, secret control of a country, added 2026-10-23 from the feed test, and secret coercion of a leader, added the same day from feed test 3), each with dated sources and its own does-not-prove line. Election and
 staged-event claims match both directions; `tests/theories.symmetry.test.js` pairs each right-coded
 claim with its left-coded twin (Dominion and Starlink, 2020 and 2016, Sandy Hook and Butler).
 
