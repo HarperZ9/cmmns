@@ -46,6 +46,7 @@ test("sign examples name the theory they use", () => {
     ["5G causes covid, look at the tower maps", "covid-5g"],
     ["Vaccines cause autism and they know it", "vaccine-harm"],
     ["Big pharma is hiding the cure for cancer", "hidden-cure"],
+    ["One explanation: the president is being blackmailed by Russia", "secret-coercion"],
   ];
   for (const [text, id] of cases) assert.ok(ids(text).includes(id), `${id}: "${text}"`);
 });

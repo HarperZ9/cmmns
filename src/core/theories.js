@@ -13,6 +13,7 @@
 // the thread report's "extreme".
 
 import { GROUPS, IDENTITY_ADJ } from "./lexicon.js";
+import { COERCION_PATTERNS, coercionSkipped } from "./theories-coercion.js";
 
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
@@ -111,6 +112,12 @@ export const THEORIES = [
       S("The Korea Times, Why people believe fake news on China's election interference", "https://www.koreatimes.co.kr/www/nation/2025/01/113_390697.html", "2025-01-20"),
       S("Ipsos, More than 1 in 3 Americans believe a 'deep state' is working to undermine Trump (NPR/Ipsos poll)", "https://www.ipsos.com/en-us/news-polls/npr-misinformation-123020", "2020-12-30"), ENDERS],
     dnp: "Lobbying, foreign influence operations and spies are real and documented. A claim about one official, one law or one donor can be true." },
+  { id: "secret-coercion", name: "Secret coercion of a leader", terms: [], patterns: COERCION_PATTERNS, guard: coercionSkipped,
+    claim: "A leader or a lawmaking body is secretly blackmailed, compromised, owned or controlled by a state or a group that holds leverage over them.",
+    record: "Such claims are made about leaders of every party. In July 2025 the Justice Department and the FBI said their review found no credible evidence that Jeffrey Epstein blackmailed prominent people. The Justice Department's Inspector General found that the FBI had corroborated only limited parts of the Steele reporting, the source of the claim that Russia held kompromat on Donald Trump.",
+    sources: [S("NPR, DOJ memo says no evidence of Jeffrey Epstein 'client list' or blackmail", "https://www.npr.org/2025/07/08/nx-s1-5460954/doj-memo-says-no-evidence-of-jeffrey-epstein-client-list-or-blackmail", "2025-07-08"),
+      S("US Department of Justice Office of the Inspector General, Review of Four FISA Applications and Other Aspects of the FBI's Crossfire Hurricane Investigation", "https://oig.justice.gov/reports/review-four-fisa-applications-and-other-aspects-fbis-crossfire-hurricane-investigation", "2019-12-09"), ENDERS],
+    dnp: "Blackmail, bribery and foreign influence happen and are sometimes proven in court. A claim about one person can be true, and this says only that the post makes the claim, not whether it is true." },
   { id: "hidden-cure", name: "Hidden cure", terms: ["hiding the cure for cancer", "hiding the cure", "suppressing the cure", "they have the cure for cancer", "sitting on the cure"],
     claim: "Drug companies or regulators hide a cure to protect profits.",
     record: "In a 2013 US survey, 37% agreed the FDA suppresses natural cures for cancer (Oliver and Wood, 2014); no such hidden cure has been shown.",
@@ -120,7 +127,7 @@ export const THEORIES = [
 
 const word = (list) => list.map(esc).sort((a, b) => b.length - a.length).join("|");
 const COMPILED = THEORIES.map((t) => ({ id: t.id,
-  res: [...((t.terms || []).length ? [new RegExp(`(?:^|[^\\w])(${word(t.terms)})(?=$|[^\\w])`, "i")] : []), ...(t.patterns || []).map((p) => new RegExp(p, "i"))] }));
+  res: [...((t.terms || []).length ? [new RegExp(`(?:^|[^\\w])(${word(t.terms)})(?=$|[^\\w])`, "i")] : []), ...(t.patterns || []).map((p) => new RegExp(p, "i"))], guard: t.guard }));
 const BY_ID = new Map(THEORIES.map((t) => [t.id, t]));
 export const theoryById = (id) => BY_ID.get(id) || null;
 
@@ -147,6 +154,8 @@ export function theoryMatches(text) {
       const match = (m[1] || m[0]).trim(), index = m.index + m[0].indexOf(match);
       const before = s.slice(Math.max(0, index - 60), index);
       if (NEGATED.test(before.slice(-30)) || REPORTED_CLAIM.test(before) || /\b(?:not|never)\b/i.test(m[0])) continue;
+      // A theory's own guard (secret coercion: conditionals, allegations, documented cases).
+      if (c.guard && c.guard(s, m.index, m[0].length)) continue;
       out.push({ theory: c.id, match: match.slice(0, 80), index });
       break;
     }
