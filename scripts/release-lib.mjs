@@ -50,7 +50,7 @@ export async function signDir(dir, privateJwk) {
 export async function verifyDir(dir, jwk) {
   const key = jwk;
   const sumsPath = join(dir, SUMS), sigPath = join(dir, SIG);
-  if (!existsSync(sumsPath) || !existsSync(sigPath)) return { ok: false, signature: false, files: [], error: "SHA256SUMS or SHA256SUMS.sig is missing" };
+  if (!existsSync(sumsPath) || !existsSync(sigPath)) return { ok: false, signature: false, keyId: await signingKeyId(key), files: [], error: "SHA256SUMS or SHA256SUMS.sig is missing" };
   const sums = readFileSync(sumsPath, "utf8");
   const signature = await verifySums(key, sums, readFileSync(sigPath, "utf8"));
   const listed = parseSums(sums) || {};

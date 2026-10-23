@@ -113,6 +113,7 @@ const SENTENCES = {
   sums: () => "Refused: SHA256SUMS does not match the hash the head lists.",
   catalogue: () => "Refused: the catalogue here does not match the hash the head lists.",
   missing: () => "Refused (rollback): this release has no signed head, and a signed head was already accepted here.",
+  unsigned: () => "Refused: the head carries no signature.",
 };
 // One plain sentence naming the rule a head failed.
 export const refusalSentence = (rule, ctx = {}) => (SENTENCES[rule] || SENTENCES.form)(ctx);
@@ -131,6 +132,7 @@ export async function checkHead(opts) {
   const refuse = (rule, ctx, extra = {}) => ({ ok: false, rule, sentence: refusalSentence(rule, ctx), status: null, state: old, ...extra });
   const p = parseHead(opts.head);
   if (!p.ok) return refuse(p.rule, {}, { detail: p.detail });
+  if (!String(opts.sig || "").trim()) return refuse("unsigned", {}, { head: p.head });
   const head = p.head, sigs = parseSigs(opts.sig);
   if (!sigs) return refuse("form", {}, { detail: "signature file" });
   const needed = Math.max(head.signers.k, opts.minK || 1);

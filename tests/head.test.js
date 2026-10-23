@@ -146,7 +146,7 @@ test("9. each refusal is named in one plain sentence, and the release verifier p
     size: refusalSentence("size"), form: refusalSentence("form"), signature: refusalSentence("signature"),
     untrusted: refusalSentence("untrusted"), threshold: refusalSentence("threshold", { valid: 1, needed: 2 }),
     rollback: refusalSentence("rollback", { version: 4, stored: 5 }), fork: refusalSentence("fork", { version: 5 }),
-    sums: refusalSentence("sums"), catalogue: refusalSentence("catalogue"), missing: refusalSentence("missing"),
+    sums: refusalSentence("sums"), catalogue: refusalSentence("catalogue"), missing: refusalSentence("missing"), unsigned: refusalSentence("unsigned"),
   }, {
     size: "Refused: the head is larger than 4 KB, so it was not read.",
     form: "Refused: the head is not in the expected form.",
@@ -158,7 +158,9 @@ test("9. each refusal is named in one plain sentence, and the release verifier p
     sums: "Refused: SHA256SUMS does not match the hash the head lists.",
     catalogue: "Refused: the catalogue here does not match the hash the head lists.",
     missing: "Refused (rollback): this release has no signed head, and a signed head was already accepted here.",
+    unsigned: "Refused: the head carries no signature.",
   });
+  assert.equal((await check({ head: (await signed()).head, sig: "" })).rule, "unsigned", "a head with no HEAD.sig");
   for (const s of Object.values({ a: refusalSentence("rollback", { version: 1, stored: 2 }) })) assert.equal(s.split(/\.\s/).length, 1, "one sentence");
 
   const dir = mkdtempSync(join(tmpdir(), "radar-head-")), statePath = join(dir, "..", `head-state-${process.pid}.json`);
