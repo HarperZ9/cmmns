@@ -5,14 +5,13 @@ Last updated: 2026-10-23.
 Daylight Commons is a browser extension. Rest the pointer on a reply on X, Reddit, YouTube,
 Bluesky, Mastodon and a few other sites, and a window opens beside it. The window shows where the
 platform places the account, signs of coordination, how the post argues, and who stands behind a
-linked outlet. Each sign names its source and says what it does not prove. Daylight Commons never
-calls anyone a bot, a propagandist or an extremist, and it never decides for you.
+linked outlet. Each sign names its source, so you can open it and judge for yourself.
 
 ## The path a reply takes
 
 Everything up to the window happens in your browser. The reader takes only what the site already
-shows you, and what the site discloses about accounts. The rules turn that into signs. Political side
-is never an input, and a test checks that the same words count the same whichever side they target.
+shows you, and what the site discloses about accounts. The rules turn that into signs, and the same
+words count the same whichever side they target.
 
 Two features reach further, and only after you turn them on and click. Evidence lookups send the
 repository names and web domains a post links to GitHub, rdap.org and the Internet Archive. Other
