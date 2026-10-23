@@ -6,6 +6,15 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- The offline kit. Every release folder now carries `verify-offline.html`, one file with the
+  project key, the signing code, the styles and the font inside it, so a person with a USB stick
+  and a browser can check a kit with the network off. It checks the signed head, the signature over
+  `SHA256SUMS` and every file, and names a changed file, a file the signature does not cover, and
+  the key it found when a kit was signed by another key. `KEY-CARD.html` is a printable card with
+  the key id and a QR copy of it; `KIT-GUIDE.txt` is plain guidance, still a draft awaiting a
+  security partner's review. `scripts/kit.mjs` makes a kit folder from a release folder.
+- `scripts/mirror-check.mjs` compares release mirrors and names each one that is unreachable,
+  serves an older head, serves a different head under the same version, or serves a changed file.
 - The signed head. A release now carries `HEAD.json` and `HEAD.sig`: a document of under 1 KB that
   names `SHA256SUMS` and the catalogue by hash, with a version that only goes up, the time it was
   signed and an expiry. `scripts/verify-release.mjs` and the options page check it before anything
@@ -22,6 +31,9 @@ were not published to a store.
   safe. Releases carry one signature, so a stolen project key can still sign a newer head. Several
   signers are designed on paper only (`project-docs/K-OF-N-SIGNING.md`). The head format has had no
   independent audit.
+- The offline checker cannot show its own key is right if the kit came from an attacker; the printed
+  card and a second source are the defence. It keeps no record, so it cannot refuse an older kit by
+  itself. No person new to the project has yet tried the kit with the network off.
 
 ## 3.1.0 (2026-10-23)
 

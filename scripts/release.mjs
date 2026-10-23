@@ -1,10 +1,10 @@
 // Build a signed, self-hostable release in dist/release-<version>/: the store packages and the
 // self-distribution xpi (scripts/package.mjs), the per-file hash list, the command line tool
-// (scripts/cli-zip.mjs), a git bundle of the
-// repository at HEAD, SHA256SUMS over all of them, its detached ECDSA P-256 signature, the
-// public key, and the signed head (HEAD.json, HEAD.sig: scripts/head-lib.mjs), which names
-// SHA256SUMS and the catalogue by hash with a rising version and an expiry 90 days after the
-// release commit. The private key is read from outside the repository and never copied.
+// (scripts/cli-zip.mjs), a git bundle of the repository at HEAD, the public key, the offline
+// kit's checker, key card and guide (scripts/kit.mjs), SHA256SUMS over all of them, its detached
+// ECDSA P-256 signature, and the signed head (HEAD.json, HEAD.sig: scripts/head-lib.mjs), which
+// names SHA256SUMS and the catalogue by hash with a rising version and an expiry 90 days after
+// the release commit. The private key is read from outside the repository and never copied.
 //   RADAR_SIGNING_KEY=<path> node scripts/release.mjs      (or --key <path>)
 //   node scripts/release.mjs --unsigned                    (a dry run: everything but the signature)
 import { mkdirSync, rmSync, copyFileSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
@@ -16,6 +16,7 @@ import { signingKeyId } from "../src/core/signing.js";
 import { createHash } from "node:crypto";
 import { cliZip } from "./cli-zip.mjs";
 import { writeHead, headVersionOf, headTimes, verifyRelease } from "./head-lib.mjs";
+import { writeKitExtras } from "./kit.mjs";
 import { dataLock } from "../bin/lib/data.mjs";
 
 const args = process.argv.slice(2);
@@ -45,6 +46,8 @@ git("bundle", "create", join(dir, `radar-${version}.bundle`), "HEAD");
 git("bundle", "verify", join(dir, `radar-${version}.bundle`));
 writeFileSync(join(dir, "SOURCE"), `commit ${commit}\nversion ${version}\nbuilt with node ${process.version}\n`);
 copyFileSync(PUBLIC_KEY, join(dir, "release-key.json"));
+// The offline kit's own files (scripts/kit.mjs), written before the sums so the signature covers them.
+writeKitExtras(dir, { version, keys: [publicJwk] });
 
 // The head names the catalogue this release ships: the bundled data pack's version and the tables' hash.
 const pack = JSON.parse(readFileSync(join(ROOT, "src", "ext", "radar-data.pack.json"), "utf8"));
@@ -64,4 +67,4 @@ console.log(`signed ${names.length} files in ${dir}`);
 console.log(`key id ${keyId}`);
 console.log(`head version ${head.version}, valid until ${head.expires.slice(0, 10)}`);
 console.log(`SHA256SUMS sha256 ${createHash("sha256").update(readFileSync(join(dir, SUMS))).digest("hex")}`);
-console.log("next: attach every file to the release; send radar-firefox-self to Mozilla's unlisted signing; then node scripts/firefox-updates.mjs <signed.xpi>");
+console.log(`next: node scripts/kit.mjs ${dir} --out <kit folder> for the offline kit; attach every file to the release; send radar-firefox-self to Mozilla's unlisted signing; then node scripts/firefox-updates.mjs <signed.xpi>`);

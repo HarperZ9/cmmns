@@ -8,14 +8,17 @@ import { join } from "node:path";
 
 const CHROME = process.env.CHROME || "C:/Program Files/Google/Chrome/Application/chrome.exe";
 
-export async function launch(port = 9333) {
+// opts.chrome: the browser to run; opts.args: extra command line flags (tests/browser.js passes
+// --no-sandbox on Linux CI runners, where Chrome's sandbox cannot start).
+export async function launch(port = 9333, { chrome = CHROME, args = [] } = {}) {
   const profile = mkdtempSync(join(tmpdir(), "radar-ocr-chrome-"));
-  const proc = spawn(CHROME, ["--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "--no-first-run", "--disable-extensions", "--hide-scrollbars", "--force-color-profile=srgb", "about:blank"], { stdio: "ignore" });
+  const proc = spawn(chrome, ["--headless=new", `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "--no-first-run", "--disable-extensions", "--hide-scrollbars", "--force-color-profile=srgb", ...args, "about:blank"], { stdio: "ignore" });
   let info = null;
   for (let i = 0; i < 100 && !info; i++) {
     await new Promise((ok) => setTimeout(ok, 100));
     try { info = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json(); } catch { info = null; }
   }
+  if (!info) { proc.kill(); throw new Error(`Chrome did not open its debugging port (${chrome})`); }
   const page = info.find((t) => t.type === "page");
   const ws = new WebSocket(page.webSocketDebuggerUrl);
   await new Promise((ok, no) => { ws.onopen = ok; ws.onerror = no; });
