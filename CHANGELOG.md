@@ -10,6 +10,13 @@ were not published to a store.
   so words in a quoted post got no evidence. They now get the same post evidence as any post and are
   listed in `posts.quoted`; the thread report and the other reply comparisons still leave them out,
   since a quoted post is not a reply. Found by the 2026-10-23 feed test (`tests/cli.test.js`).
+- Dehumanising similes: "they are infecting every country like parasites", "X are spreading like
+  a plague". The grammar needed a named group before the noun, and "plague" only counted straight
+  after "are", so a verb of spreading or a target named as "they" or "these people" hid the marker.
+  A new rule reads a group, "these people", or "they" (with verbs said of people or vermin only)
+  followed by a verb of spreading and "like" a vermin or disease noun. It skips a match after a cue
+  that someone else said it ("posts saying ...", "nobody should say that ..."). Tests in
+  `tests/feed.dehumanise.test.js`, with near misses that must not fire.
 
 ### Added
 - Carrier-safe evidence bundles. Tick Carrier-safe on the card page, or pass `--carrier-safe` to

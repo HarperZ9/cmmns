@@ -38,6 +38,18 @@ export const GROUPS = [
 export const DEHUMANISE_ADJACENT = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "subhuman",
   "sub-human", "savages", "filth", "scum", "insects", "apes", "monkeys", "beasts", "pigs", "invaders"];
 
+// A simile with a verb of spreading: "they are infecting every country like parasites", "X are
+// spreading like a plague". The subject may be a group or "they" / "these people", since a reply
+// often names its target only in the post it answers. Added 2026-10-23 from the feed test.
+export const SIMILE_VERBS = ["infecting", "infect", "infests", "infesting", "infest", "breeding", "breed", "multiplying", "multiply",
+  "swarming", "swarm", "spreading", "spread", "invading", "invade", "crawling"];
+export const SIMILE_NOUNS = ["parasites", "vermin", "rats", "cockroaches", "roaches", "locusts", "leeches", "lice", "termites",
+  "maggots", "a plague", "the plague", "a virus", "a cancer", "cancer", "a disease", "an infection", "a pestilence"];
+export const SIMILE_SUBJECTS = ["these people", "those people", "such people"];
+// After a bare "they", only verbs said of people or vermin: weeds and rumours also "spread".
+export const SIMILE_THEY_VERBS = ["infecting", "infect", "infesting", "infest", "breeding", "breed", "multiplying", "multiply",
+  "swarming", "swarm", "invading", "invade"];
+
 // "An infestation of X", "hordes of X".
 export const SWARM = ["infestation", "plague", "swarm", "swarms", "horde", "hordes"];
 
