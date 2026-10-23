@@ -27,15 +27,16 @@
 <body>
 <main>
   <h1>Campaign-lens labelling</h1>
-  <p class="note">Blind labelling for project-docs/LABELLING.md. This page never shows the lens's verdict or the other labeller's answers. It stores structure only, on this device, and sends nothing anywhere. The export holds case ids, labels and strata codes, never a handle, a link or post text.</p>
+  <p class="note">Blind labelling for project-docs/LABELLING.md. This page never shows the lens's verdict or the other labeller's answers. It stores structure only, on this device, and sends nothing anywhere. The export holds case ids and labels, never a handle, a link or post text.</p>
 
   <fieldset id="setup">
     <legend>Start</legend>
     <div class="row">
-      <span>Your labeller id</span><input type="text" id="labeller" placeholder="L1" size="4">
-      <span>Case list</span><input type="file" id="cases" accept=".json,application/json">
+      <span>Labeller</span><input type="text" id="labeller" placeholder="A" size="4">
+      <span>Model id</span><input type="text" id="model" placeholder="claude-opus-5-5" size="20">
+      <span>Case list</span><input type="file" id="cases" accept=".jsonl,.json">
     </div>
-    <p class="note">The coordinator gives you the case list. Your order is shuffled from your id, so the two labellers see the cases in different orders.</p>
+    <p class="note">Load the fixed case file (cases.jsonl). The order is shuffled from the labeller letter. Use a browser profile without Daylight Commons, so the detector's output is never in view.</p>
   </fieldset>
 
   <form id="form" hidden>
@@ -48,7 +49,6 @@
 
     <fieldset><legend>Signs you can see on the page</legend><div id="families" class="row"></div></fieldset>
 
-    <fieldset><legend>Strata (describe the post and its audience)</legend><div class="row" id="strata"></div></fieldset>
 
     <button type="submit">Save and next</button>
     <button type="button" class="quiet" id="back">Back</button>

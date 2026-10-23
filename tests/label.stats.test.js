@@ -1,11 +1,9 @@
 // Synthetic controls for the labelling kit's statistics (scripts/label/stats.mjs). No real labels.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { kappaOf, kappaInterval, results, strataRates, rng, MIN_STRATUM } from "../scripts/label/stats.mjs";
+import { kappaOf, kappaInterval, strataRates, rng, MIN_STRATUM } from "../scripts/label/stats.mjs";
 
 const strata = (over = {}) => ({ platform: "x", audience: "10k-100k", topic: "tech", language: "en", region: "US", ...over });
-const label = (id, who, campaign, s = strata()) => ({ format: "dc-label/1", kind: "label", case: id, labeller: who, campaign, families: {}, strata: s });
-const lensRow = (id, lens) => ({ format: "dc-label/1", kind: "lens", case: id, lens });
 
 test("perfect agreement gives kappa 1", () => {
   const pairs = [["organic", "organic"], ["paid-disclosed", "paid-disclosed"], ["unsure", "unsure"], ["organic", "organic"]];
@@ -64,26 +62,4 @@ test("a gap over 5 points between reported strata breaks the bound, in either di
 test("a gap of 5 points or less holds", () => {
   const rows = [...organicCases(40, 1, strata({ language: "en" })), ...organicCases(40, 2, strata({ language: "es" }))];
   assert.equal(strataRates(rows, "language").bound, "holds");
-});
-
-test("results: disagreements become unsure, precision and recall carry Wilson intervals", () => {
-  const labels = [], lens = [];
-  for (let i = 0; i < 6; i++) { const id = `c${i}`; labels.push(label(id, "L1", i < 3 ? "paid-disclosed" : "organic"), label(id, "L2", i < 3 ? "paid-disclosed" : "organic")); }
-  labels.push(label("c9", "L1", "organic"), label("c9", "L2", "paid-disclosed"));
-  ["strong", "strong", "none", "strong", "none", "none", "strong"].forEach((s, i) => lens.push(lensRow(i === 6 ? "c9" : `c${i}`, s)));
-  const r = results({ labels, lens }, { boot: 200 });
-  assert.equal(r.cases, 7);
-  assert.equal(r.disagreements, 1);
-  assert.equal(r.counts.unsure, 1);
-  assert.deepEqual([r.precision.k, r.precision.n], [2, 3]);
-  assert.deepEqual([r.recall.k, r.recall.n], [2, 3]);
-  assert.deepEqual([r.organicFalsePositive.k, r.organicFalsePositive.n], [1, 3]);
-  assert.equal(r.precision.interval.length, 2);
-  assert.equal(r.claimable[0].enough, false, "3 and 3 cases are under the 30 and 30 minimum");
-});
-
-test("results: a case read by one labeller is skipped, not counted", () => {
-  const r = results({ labels: [label("c1", "L1", "organic")], lens: [] }, { boot: 10 });
-  assert.equal(r.cases, 0);
-  assert.equal(r.skipped, 1);
 });
