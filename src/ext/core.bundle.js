@@ -1073,6 +1073,18 @@ const GROUPS = [
 const DEHUMANISE_ADJACENT = ["vermin", "rats", "cockroaches", "roaches", "parasites", "leeches", "subhuman",
   "sub-human", "savages", "filth", "scum", "insects", "apes", "monkeys", "beasts", "pigs", "invaders"];
 
+// A simile with a verb of spreading: "they are infecting every country like parasites", "X are
+// spreading like a plague". The subject may be a group or "they" / "these people", since a reply
+// often names its target only in the post it answers. Added 2026-10-23 from the feed test.
+const SIMILE_VERBS = ["infecting", "infect", "infests", "infesting", "infest", "breeding", "breed", "multiplying", "multiply",
+  "swarming", "swarm", "spreading", "spread", "invading", "invade", "crawling"];
+const SIMILE_NOUNS = ["parasites", "vermin", "rats", "cockroaches", "roaches", "locusts", "leeches", "lice", "termites",
+  "maggots", "a plague", "the plague", "a virus", "a cancer", "cancer", "a disease", "an infection", "a pestilence"];
+const SIMILE_SUBJECTS = ["these people", "those people", "such people"];
+// After a bare "they", only verbs said of people or vermin: weeds and rumours also "spread".
+const SIMILE_THEY_VERBS = ["infecting", "infect", "infesting", "infest", "breeding", "breed", "multiplying", "multiply",
+  "swarming", "swarm", "invading", "invade"];
+
 // "An infestation of X", "hordes of X".
 const SWARM = ["infestation", "plague", "swarm", "swarms", "horde", "hordes"];
 
@@ -1201,7 +1213,7 @@ const HATRED_OBJECTS = ["beauty", "us", "the west", "western civilization", "our
 // little on its own, and it never labels the post.
 const CONTEMPT_VERBS = ["hate", "despise", "loathe", "can't stand", "cant stand"];
 
-return { GROUPS, DEHUMANISE_ADJACENT, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, SLURS_DEMOTED, SLURS_SOFT, IDENTITY_ADJ, GENDERED_SLURS, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
+return { GROUPS, DEHUMANISE_ADJACENT, SIMILE_VERBS, SIMILE_NOUNS, SIMILE_SUBJECTS, SIMILE_THEY_VERBS, SWARM, DEHUMANISE, VIOLENCE_VERBS, KILL_VERBS, DEATH_WISH, VIOLENT_SLOGANS, VIGILANTE, CONSPIRACY, ABSOLUTIST, ESSENTIALISE, STEREOTYPE_TRAITS, INTENSIFIERS, MOTIVE_VERBS, SLURS, SLURS_DEMOTED, SLURS_SOFT, IDENTITY_ADJ, GENDERED_SLURS, LEET, HATRED_OBJECTS, CONTEMPT_VERBS };
 })();
 
 // ---- rhetoric-util.js
@@ -2746,6 +2758,8 @@ const ADJ = alt(L.DEHUMANISE_ADJACENT);
 const WINDOW = "(?:(?!(?:to|from|by|with|of|for|about|on|in|at|than|over|against|and|or|not|never)\\b)[\\w']+,?\\s+){0,4}?";
 const LINK = "(?:(?:and|or|&)\\s+[\\w-]+\\s+|(?:fucking|filthy|dirty|disgusting|vile|stinking|rabid|ghetto|lazy|worthless|useless|" +
   "economic|socioeconomic)\\s+)?";
+// Up to two helper words before a simile verb: "are just breeding", "keep spreading".
+const AUX = "(?:(?:are|is|were|keep|just|all)\\s+){0,2}";
 const INTENSE =`(?:(?:${alt(L.INTENSIFIERS)})\\s+)?`;
 
 const RE = {
@@ -2756,6 +2770,10 @@ const RE = {
     `|\\b(?:${G})\\s+${LINK}(?:${ADJ})\\b` +
     `|\\b(?:${ADJ})\\s+like\\s+(?:these\\s+|those\\s+|the\\s+|all\\s+)?(?:${G})\\b` +
     `|\\b(?:${alt(L.SWARM)})\\s+of\\s+(?:the\\s+)?(?:${G})\\b`, "i"),
+  // "they are infecting every country like parasites", "X are spreading like a plague". Scored with
+  // the stricter guard in scoreEnglish: someone else's words ("posts saying ...") are skipped.
+  simile: new RegExp(`\\b(?:(?:${G}|${alt(L.SIMILE_SUBJECTS)})(?:'re)?\\s+${AUX}(?:${alt(L.SIMILE_VERBS)})|they(?:'re)?\\s+${AUX}(?:${alt(L.SIMILE_THEY_VERBS)}))\\b` +
+    `(?:\\s+[\\w']+){0,4}?\\s+like\\s+(?:${alt(L.SIMILE_NOUNS)})\\b`, "i"),
   violenceGroup: new RegExp(`\\b(?:${G})\\b(?:\\W+\\w+){0,6}?\\W+(?:should|must|need to|needs to|deserve to|ought to|will)\\s+(?:all\\s+)?(?:be\\s+)?(?:${alt(L.VIOLENCE_VERBS)})\\b`, "i"),
   violenceSlogan: word(L.VIOLENT_SLOGANS),
   // "X deserve to die", "X should all die"
@@ -2798,6 +2816,9 @@ const VIOLENT_STEM = /\b(?:extermin|kill|massacr|slaughter|genocid|gass(?:ed|ing
 // Reported speech and quoted words are a mention, not the speaker's own use: "he called X vermin",
 // "compared X to rats", "the word "slur"". Group-blind, so it treats every target alike.
 const REPORTED = /\b(?:call(?:s|ed|ing)?|compar(?:e|es|ed|ing)|describ(?:e|es|ed|ing)|label(?:s|ed|led|ing)?|brand(?:s|ed|ing)?|dubb?(?:s|ed|ing)?|refer(?:s|red|ring)? to)\b[^.!?"]{0,40}$/i;
+// Someone else's words: "posts saying X are a plague", "nobody should say that X ...", "saying X
+// spread like a disease is wrong". The speaker's own "I say" or "we said" is still a use.
+const SAID = /\b(?:(?<!\b(?:i|we|i've|we've|i'd|we'd|i'll|we'll|i'm|we're)\s+(?:\w+\s+)?)(?:say|says|said|saying)|wrote|writes|tweeted|posts? saying|claim(?:s|ed|ing)? that)\b[^.!?"]{0,40}$/i;
 const QUOTES = /["“”«»]/;
 function mention(s, m) {
   const at = m.index ?? s.indexOf(m[0]);
@@ -2849,8 +2870,15 @@ function recorder(s, markers) {
   };
 }
 
+// For the rules added from the 2026-10-23 feed test: a match after a cue that someone else said it
+// is skipped. The older rules keep the narrower REPORTED guard, which their measured figures rest on.
+function strict(s, hit, family, re) {
+  const m = s.match(re);
+  return !!m && !SAID.test(s.slice(Math.max(0, m.index - 60), m.index)) && hit(family, re, true);
+}
+
 function scoreEnglish(s, hit) {
-  if (!hit("dehumanise", RE.notHuman)) hit("dehumanise", RE.dehumanise, true);
+  if (!hit("dehumanise", RE.notHuman) && !hit("dehumanise", RE.dehumanise, true)) strict(s, hit, "dehumanise", RE.simile);
   if (!hit("violence", RE.violenceGroup, true) && !hit("violence", RE.violenceCall, true) && !hit("violence", RE.warOn, true)
     && !hit("violence", RE.deathWish, true) && !hit("violence", RE.onlyGoodDead)
     && !(VIOLENT_STEM.test(s) && hit("violence", RE.sameFate, true))) {
