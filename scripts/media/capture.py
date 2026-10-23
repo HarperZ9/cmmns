@@ -88,11 +88,25 @@ async def verify(ctx, base, out, states, good, edited):
     await page.close()
 
 
+async def install(ctx, base, out, states):
+    """The install as a user sees it: the install page, then the extension's first-run page, run in
+    an ordinary page with tests/fixtures/chrome-stub.js (headless Chromium does not load extensions)."""
+    page = await ctx.new_page()
+    await page.goto(f"{base}/docs/install.html")
+    await page.wait_for_timeout(1200)
+    await snap(page, out, "install-0-page", states)
+    await page.add_init_script(path=str(pathlib.Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "chrome-stub.js"))
+    await page.goto(f"{base}/src/ext/welcome.html")
+    await page.wait_for_timeout(1500)
+    await snap(page, out, "install-1-welcome", states)
+    await page.close()
+
+
 async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default="http://127.0.0.1:8743")
     ap.add_argument("--out", required=True)
-    ap.add_argument("--only", default="all")
+    ap.add_argument("--only", default="all", help="all, launch, defs, verify or install")
     ap.add_argument("--bundle", help="a signed bundle for the verify states")
     ap.add_argument("--edited", help="the same bundle with one line changed")
     ap.add_argument("--scheme", default="light", choices=["light", "dark"])
@@ -110,6 +124,8 @@ async def main():
             await defs(ctx, a.base, out, states)
         if a.only in ("all", "verify") and a.bundle and a.edited:
             await verify(ctx, a.base, out, states, a.bundle, a.edited)
+        if a.only in ("all", "install"):
+            await install(ctx, a.base, out, states)
         await browser.close()
     states_path.write_text(json.dumps(states, indent=1), encoding="utf-8")
 

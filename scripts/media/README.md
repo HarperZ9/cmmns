@@ -9,7 +9,7 @@ tools only; nothing here ships in the extension.
   network plumbing in `src/ext/campaign.js` is staged. Every handle carries a `demo_` prefix.
 - `stage-definitions.html?entry=<id>`: the element table `src/core/definitions.js` builds for the
   same launch, drawn in the extension's canon. The extension does not draw these tables yet.
-- `capture.py`: Playwright stills of each state at 3840x2160 and `states.json` with the rectangles
+- `capture.py`: Playwright stills of each state at 3840x2160 (install page, first-run page, thread, reply window, panel, element tables, bundle check) and `states.json` with the rectangles
   a compositor needs.
 
 ```
