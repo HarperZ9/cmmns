@@ -26,7 +26,7 @@
   }
 
   const { ensureOwners, recordNet, recordTrail, saveSnapshot, exportReport } = PBLogs;
-  const clearNet = () => PBLogs.clearAll().then(refresh).catch((e) => console.error("[daylight-commons] could not clear history", e));
+  const clearNet = () => PBLogs.clearAll().then(refresh).catch((e) => PBGuard.report("could not clear history", e));
 
   function removePanel() { PBPanel.remove(); }
 
@@ -94,7 +94,7 @@
     if (site && !PB.siteOn(settings, site.id)) { removePanel(); PBUI.closePop(); icon("paused"); PBHealth.observe(null); return; }
     if (!site || (!site.onThread() && !feed)) { removePanel(); PBHealth.observe(null); return; }
     // Adapter health (src/ext/health.js): a reader that finds nothing where it should says so.
-    const nodes = site.items(), items = nodes.map((n) => site.read(n)).filter(Boolean);
+    const nodes = site.items(), items = nodes.map((n) => PBGuard.run("reading a post", () => site.read(n))).filter(Boolean);
     PBHealth.observe(site, feed, nodes.length, items, () => schedule(0));
     if (!items.length) { videoOnly(site, feed); return; }
     const [root, replies] = !feed && (site.hasLocation || site.rootFirst) ? [items[0], items.slice(1)] : [null, items];
@@ -117,7 +117,7 @@
       rows.push({ id: r.id, author: r.author, text: r.text, extreme: an.extreme, techniques: an.persuasion.map((h) => h.technique), machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
     if (root) models.push([root.node, { site, node: root.node, tweets, postId: root.id, threadKey, text: root.text, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, PBLogs.trail()), claims: PBLogs.claimsOf(root.id), reading: cache[root.author.toLowerCase()] || (site.reading ? site.reading(root.author) : null), flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
-    PBLogs.ensureProfiles(readings).catch((e) => console.error("[daylight-commons] profile lookup failed", e));
+    PBLogs.ensureProfiles(readings).catch((e) => PBGuard.report("profile lookup failed", e));
     // Thread context for the window's comparison: median account age, labels and flags among the
     // accounts read here.
     const read = rows.filter((r) => r.about || r.joinDate);
@@ -196,7 +196,7 @@
   function videoOnly(site, feed) {
     // A repost list shows accounts, not posts: the launch campaign lens still reads it.
     if (!feed && globalThis.PBCampaign && PBCampaign.onList()) {
-      PBStore.all().then((cache) => { const r = PB.threadReport([]); r.campaign = PBCampaign.lens(site, [], tweets, cache); PBUI.panel(r, [], { pending: 0, scanning: 0, paused: false, site, pushed: [] }, () => {}); }).catch((e) => console.error("[daylight-commons] campaign lens failed", e));
+      PBStore.all().then((cache) => { const r = PB.threadReport([]); r.campaign = PBCampaign.lens(site, [], tweets, cache); PBUI.panel(r, [], { pending: 0, scanning: 0, paused: false, site, pushed: [] }, () => {}); }).catch((e) => PBGuard.report("campaign lens failed", e));
       return;
     }
     const video = feed ? null : currentVideo(site);
@@ -207,8 +207,8 @@
   function lookup(...handles) {
     const fresh = handles.filter((h) => !lookingUp.has(h) && !failed.has(h));
     if (!fresh.length) return;
-    fresh.forEach((h) => lookingUp.add(h));
-    chrome.runtime.sendMessage({ type: "pb-lookup", handles: fresh }).catch((e) => console.error("[daylight-commons] lookup request failed", e));
+    fresh.forEach((h) => lookingUp.add(h)); PBGuard.capSet(failed, 2000);
+    chrome.runtime.sendMessage({ type: "pb-lookup", handles: fresh }).catch((e) => PBGuard.report("lookup request failed", e));
     schedule();
   }
 
@@ -220,51 +220,53 @@
       const all = new Map((authorPosts.get(k) || []).map((p) => [p.id, p]));
       for (const p of posts) all.set(p.id, p);
       const list = [...all.values()].slice(-200);
-      authorPosts.set(k, list);
+      authorPosts.set(k, list); PBGuard.capMap(authorPosts, 2000);
       // X's created_at gives seconds; a scheduler posting on the hour must not read as rounded times.
       const pattern = PB.postingPattern(list, { precision: "second" });
-      if (pattern) PBStore.put({ handle: posts[0].author, pattern }).catch((e) => console.error("[daylight-commons] could not save a posting pattern", e));
+      if (pattern) PBStore.put({ handle: posts[0].author, pattern }).catch((e) => PBGuard.report("could not save a posting pattern", e));
     }
   }
 
   // Post metadata from X's responses, and YouTube's page data (src/ext/ytsniff.js), in memory only.
   const tweets = new Map(), ytAuthors = new Map();
   const ytVideos = new Map();   // videoId -> info; the page's first data goes stale after in-page navigation
-  window.addEventListener("message", (e) => {
+  window.addEventListener("message", PBGuard.wrap("reading the site's data", (e) => {
     if (e.source !== window || !e.data) return;
     if (!enabled()) return;
     if (e.data.source === "radar-sniff") {
       const batch = PB.tweetsIn(e.data.json);
       for (const t of batch) tweets.set(t.id, { ...(tweets.get(t.id) || {}), ...t });
+      PBGuard.capMap(tweets, 5000);
       if (batch.length) { recordTrail(batch); recordPatterns(batch); }
     }
     if (e.data.source !== "radar-yt") return;
     const v = PB.ytVideoInfo(e.data.json);
     if (v && v.videoId) ytVideos.set(v.videoId, { ...(ytVideos.get(v.videoId) || {}), ...v });
     for (const [h, a] of PB.ytCommentAuthors(e.data.json)) ytAuthors.set(h, { ...(ytAuthors.get(h) || {}), ...a });
+    PBGuard.capMap(ytAuthors, 5000); PBGuard.capMap(ytVideos, 100);
     schedule();
-  });
+  }));
   if (/(^|\.)youtube\.com$/.test(location.hostname)) window.postMessage({ source: "radar-yt-ask" }, location.origin);
   if (globalThis.PBMeta) PBMeta.onChange(() => schedule());
 
   // Live data: accounts in the responses X's own app already downloaded (src/ext/sniff.js). Each
   // reading is merged into the local cache, so badges fill in as the page loads, with no request.
-  window.addEventListener("message", (e) => {
+  window.addEventListener("message", PBGuard.wrap("reading the site's data", (e) => {
     if (e.source !== window || !e.data || e.data.source !== "radar-sniff" || !enabled()) return;
     const users = PB.usersIn(e.data.json);
     // An About response for a handle we asked about: record it even if X showed no location, so
     // the account is not asked again.
     if (e.data.about) users.push({ handle: e.data.about, aboutRead: true, ...(PB.aboutIn(e.data.json) || {}) });
     if (!users.length) return;
-    Promise.all(users.map((u) => PBStore.put(u))).then(schedule).catch((err) => console.error("[daylight-commons] live data cache failed", err));
-  });
+    Promise.all(users.map((u) => PBStore.put(u))).then(schedule).catch((err) => PBGuard.report("live data cache failed", err));
+  }));
 
   chrome.runtime.onMessage.addListener((msg) => {
     // One click: the toolbar button scans every account on screen and opens the report.
     if (msg && msg.type === "pb-scan") {
       const p = document.getElementById("pb-panel");
       if (p) p.dataset.collapsed = "0";
-      refresh().then(() => lookup(...lastPending.slice(0, SCAN_MAX))).catch((e) => console.error("[daylight-commons] scan failed", e));
+      refresh().then(() => lookup(...lastPending.slice(0, SCAN_MAX))).catch((e) => PBGuard.report("scan failed", e));
     }
     if (msg && msg.type === "pb-progress") { scanLeft = msg.left; schedule(); }
     if (msg && msg.type === "pb-panel") { PBPanel.setOpen(true); schedule(0); }
@@ -283,13 +285,14 @@
     return false;
   });
 
-  function schedule(ms = 250) { clearTimeout(timer); timer = setTimeout(() => refresh().catch((e) => console.error("[daylight-commons] refresh failed", e)), ms); }
+  const guarded = PBGuard.measured(refresh);
+  function schedule(ms = 250) { clearTimeout(timer); timer = setTimeout(guarded, PBGuard.nextWait(ms)); }
   let scrollFrame = 0;
   window.addEventListener("scroll", () => { if (!scrollFrame) scrollFrame = requestAnimationFrame(() => { scrollFrame = 0; drawVisible(); }); }, { passive: true });
 
-  new MutationObserver((muts) => {
+  new MutationObserver(PBGuard.wrap("watching the page", (muts) => {
     if (location.pathname !== lastPath) { lastPath = location.pathname; PBUI.closePop(); PBAbout.check(); }
     if (muts.some((m) => [...m.addedNodes].some((n) => n.nodeType === 1 && !(n.closest && n.closest(".pb-bar, .pb-panel, .pb-pop"))))) schedule();
-  }).observe(document.body, { childList: true, subtree: true });
+  })).observe(document.body, { childList: true, subtree: true });
   schedule();
 })();

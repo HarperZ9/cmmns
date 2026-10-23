@@ -44,7 +44,7 @@
     const [probe] = await chrome.scripting.executeScript({ target: { tabId }, func: () => !!globalThis.PBSitePage });
     if (probe && probe.result) { await chrome.scripting.executeScript({ target: { tabId }, func: () => globalThis.PBSitePage.show() }); return; }
     await chrome.scripting.insertCSS({ target: { tabId }, files: ["badges.css"] });
-    await chrome.scripting.executeScript({ target: { tabId }, files: ["core.bundle.js", "settings.js", "pop.js", "linkcard.js", "generic-page.js", "sitepage.js"] });
+    await chrome.scripting.executeScript({ target: { tabId }, files: ["core.bundle.js", "guard.js", "settings.js", "pop.js", "linkcard.js", "generic-page.js", "sitepage.js"] });
   }
 
   // Search-result cards: one registered script per engine the user turned on and granted.
@@ -55,7 +55,7 @@
     for (const [id, , matches, origin] of PB.SEARCH_ENGINES) {
       const sid = "radar-search-" + id;
       const want = PB.searchOn(s, id) && (await chrome.permissions.contains({ origins: [origin] }));
-      if (want && !have.has(sid)) await chrome.scripting.registerContentScripts([{ id: sid, matches, js: ["core.bundle.js", "settings.js", "pop.js", "linkcard.js", "search.js"], css: ["badges.css"], runAt: "document_idle", persistAcrossSessions: true }]);
+      if (want && !have.has(sid)) await chrome.scripting.registerContentScripts([{ id: sid, matches, js: ["core.bundle.js", "guard.js", "settings.js", "pop.js", "linkcard.js", "search.js"], css: ["badges.css"], runAt: "document_idle", persistAcrossSessions: true }]);
       if (!want && have.has(sid)) await chrome.scripting.unregisterContentScripts({ ids: [sid] });
     }
   }

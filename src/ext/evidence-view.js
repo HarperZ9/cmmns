@@ -30,14 +30,14 @@
   }
 
   async function run(box, ev, rerender) {
-    const res = await chrome.runtime.sendMessage({ type: "pb-evidence", ...ev.request }).catch((e) => { console.error("[daylight-commons] evidence request failed", e); return { error: "failed" }; });
+    const res = await chrome.runtime.sendMessage({ type: "pb-evidence", ...ev.request }).catch((e) => { PBGuard.report("evidence request failed", e); return { error: "failed" }; });
     results.set(ev.launchId, res || { error: "failed" });
     rerender();
   }
 
   function consent(box, ev, rerender) {
     box.append(el("p", "pb-foot", CONSENT), btn("Allow and look up", "Turns on evidence lookups (you can turn them off in Options) and runs this one.", async () => {
-      await PBSettings.save({ evidence: true }).catch((e) => console.error("[daylight-commons] could not save settings", e));
+      await PBSettings.save({ evidence: true }).catch((e) => PBGuard.report("could not save settings", e));
       run(box, ev, rerender);
     }));
   }
@@ -61,7 +61,7 @@
     if (g) box.append(el("p", "pb-foot", PB.LEDGER_DOES_NOT_PROVE));
     const res = results.get(ev.launchId);
     if (res && res.error === "off") consent(box, ev, rerender);
-    else if (res && res.error === "browser-consent") box.append(el("p", "pb-foot", "Firefox asks you to allow this itself. Turn on Evidence lookups in Options, allow it when Firefox asks, then look up again."), btn("Open Options", "Opens Daylight Commons' options.", () => chrome.runtime.sendMessage({ type: "pb-open-options" }).catch((e) => console.error("[daylight-commons] could not open options", e))));
+    else if (res && res.error === "browser-consent") box.append(el("p", "pb-foot", "Firefox asks you to allow this itself. Turn on Evidence lookups in Options, allow it when Firefox asks, then look up again."), btn("Open Options", "Opens Daylight Commons' options.", () => chrome.runtime.sendMessage({ type: "pb-open-options" }).catch((e) => PBGuard.report("could not open options", e))));
     else if (res && res.error) box.append(el("p", "pb-foot", "The lookup stopped partway. Try again later."));
     else if (res) receipts(box, res);
     else if (globalThis.PBSettings && PBSettings.get().evidence) box.append(btn("Look up evidence", "Asks GitHub, RDAP and the Internet Archive about what this post links to.", () => run(box, ev, rerender)));
@@ -69,7 +69,7 @@
     const actions = el("p", "pb-num");
     if (ev.postUrl) {
       const save = link("Save this post to the Internet Archive", `https://web.archive.org/save/${ev.postUrl}`);
-      save.addEventListener("click", () => chrome.runtime.sendMessage({ type: "pb-evidence-witness", postUrl: ev.postUrl }).catch((e) => console.error("[daylight-commons] witness receipt failed", e)));
+      save.addEventListener("click", () => chrome.runtime.sendMessage({ type: "pb-evidence-witness", postUrl: ev.postUrl }).catch((e) => PBGuard.report("witness receipt failed", e)));
       actions.append(save, " · ");
     }
     actions.append(btn("Save evidence chain", "Downloads every receipt Daylight Commons sealed in this browser, with the chain and Merkle proofs, to check offline.", saveChain));

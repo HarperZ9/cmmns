@@ -8,6 +8,7 @@
 // New text is saved beside the capture as captures/<id>.<date>.txt; the original stays untouched.
 import { readFileSync, writeFileSync, existsSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
+import { within } from "./paths.js";
 import { captureUrl, sha256 } from "./capture.js";
 import { wordDiff, renderDiff, hopChanges } from "./diff.js";
 import { addRow, updateRow } from "./store.js";
@@ -21,7 +22,7 @@ async function checkSource(ctx, s) {
   try { cap = await captureUrl(s.url, { fetchFn: ctx.fetchFn }); } catch (e) { return [{ kind: "unreachable", ref: s.id, text: `${s.url}: ${e.message}` }]; }
   if (!cap.ok) return [{ kind: /HTTP 4(04|10)/.test(cap.reason) ? "deleted" : "unreachable", ref: s.id, text: `${s.url}: ${cap.reason}` }];
   if (cap.post && cap.post.deleted) return [{ kind: "deleted", ref: s.id, text: `post ${s.url} returns no record now` }];
-  const f = s.capture && s.capture.text_file ? join(ctx.dir, s.capture.text_file) : null;
+  const f = s.capture && s.capture.text_file ? within(ctx.dir, s.capture.text_file) : null;
   const before = f && existsSync(f) ? readFileSync(f, "utf8") : "";
   if (sha256(Buffer.from(cap.text, "utf8")) !== sha256(Buffer.from(before, "utf8"))) {
     const day = ctx.now().slice(0, 10), name = `captures/${s.id}.${day}.txt`;

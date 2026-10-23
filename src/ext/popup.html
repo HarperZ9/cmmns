@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-<header><strong>Daylight Commons</strong><span id="site"></span></header>
+<header><h1>Daylight Commons</h1><span id="site"></span></header>
 <main>
   <p id="sentence" class="lead">Open a post or a feed on X, YouTube, Reddit, Facebook, Instagram, Bluesky, Threads, TikTok or a Mastodon server.</p>
   <section id="server" class="server bare" hidden>
@@ -35,11 +35,12 @@
     <label><input type="checkbox" id="feeds"> Daylight Commons on feeds and profiles</label>
     <label><input type="checkbox" id="auto"> Read About pages automatically</label>
   </section>
+  <p id="freshness" class="muted"></p>
 </main>
-<p id="freshness" class="muted"></p>
 <footer>Daylight Commons reads the site you are on. Other coverage and evidence lookups reach further once you turn them on.</footer>
 <script src="core.bundle.js"></script>
-<script src="settings.js"></script>
+<script src="guard.js"></script>
+  <script src="settings.js"></script>
 <script src="popup-server.js"></script>
 <script src="case-inbox.js"></script>
 <script src="freshness.js"></script>

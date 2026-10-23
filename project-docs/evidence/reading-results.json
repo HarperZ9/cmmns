@@ -3,53 +3,53 @@
  "rule": {
   "precision": 0.8,
   "minN": 3,
-  "against": "consensus of labellers A and B, held-out feed tests 10 and 11, with inflection"
+  "against": "consensus of labellers A and B, held-out feed tests 13 and 14, with inflection"
  },
  "weights": {
-  "bias": 0.559,
+  "bias": 0.609,
   "w": {
-   "quotes": -0.225,
+   "quotes": -0.229,
    "mocks": 0,
-   "rebuts": -0.346,
-   "irony": -0.351,
-   "question": 0.036,
-   "target-group": 0.392,
-   "target-person": 0.185,
-   "intensity": -0.011,
-   "echo": -0.279,
-   "root": -0.276,
-   "news": -0.008,
-   "joke": 0.07,
-   "repeat": 0.494,
-   "author-rebuts": -0.037,
-   "short": 0.149
+   "rebuts": -0.3,
+   "irony": -0.357,
+   "question": 0.029,
+   "target-group": 0.394,
+   "target-person": 0.07,
+   "intensity": 0.017,
+   "echo": -0.211,
+   "root": -0.158,
+   "news": -0.023,
+   "joke": 0.067,
+   "repeat": 0.564,
+   "author-rebuts": -0.042,
+   "short": 0.141
   },
   "threshold": 0.5
  },
  "inputs": [
   {
-   "file": "set 10/posts.jsonl",
-   "sha256": "d0d5220a9ea52e808a93446438b91acb10977c03d1a98bfa122f386da347d411"
+   "file": "set 13/posts.jsonl",
+   "sha256": "e126ba553d6baed80fa86af1228e1828d69847f42de8be587cce9f8b46958471"
   },
   {
-   "file": "set 10/labels-A.jsonl",
-   "sha256": "b5d202c04395107f25fa533c2bf322498d70a25e74f9e0e125599fd7f51449cb"
+   "file": "set 13/labels-A.jsonl",
+   "sha256": "a3eddd76e62e54893b4eff3e1def18ef816fc068b0942c26a9793d2a8babf002"
   },
   {
-   "file": "set 10/labels-B.jsonl",
-   "sha256": "95b468e463ee5a025170f322880b3b5d59d7fd98960d9deeae7fb69ea400aecf"
+   "file": "set 13/labels-B.jsonl",
+   "sha256": "604355f9949001656ea4d9683b3472200250bcdcf7781ab7c5037ac6136ed31d"
   },
   {
-   "file": "set 11/posts.jsonl",
-   "sha256": "6bed0f27eb5d4d81f9dbfff4ed1d147515d0efa57dff3d32fded55036b7749e8"
+   "file": "set 14/posts.jsonl",
+   "sha256": "3715e2f00ce501181489f18889fcd886d7d644d965fc5c99192187af72a691a0"
   },
   {
-   "file": "set 11/labels-A.jsonl",
-   "sha256": "6a29dd0c20230c5f84d97ba3cee32368db129871d7c0dcacc451c0ef27423393"
+   "file": "set 14/labels-A.jsonl",
+   "sha256": "c6af64408522c73edcda805d10399deced0a4f96bb6b32b8072cdcf8e1245b05"
   },
   {
-   "file": "set 11/labels-B.jsonl",
-   "sha256": "3eb1d7c186860e57619db0e55a8a482e3a22a5e6a0d743ef88f263d6bead898a"
+   "file": "set 14/labels-B.jsonl",
+   "sha256": "bb26ec4e804e13f68d9bf39d1a889ed3a3413f3bacf8b664e9fdcc1a70402831"
   }
  ],
  "heldout": {
@@ -75,11 +75,11 @@
     },
     "recall": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     }
    },
@@ -104,11 +104,11 @@
     },
     "recall": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     }
    },
@@ -133,11 +133,11 @@
     },
     "recall": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     }
    },
@@ -172,266 +172,92 @@
    },
    "question-insinuation": {
     "precision": {
-     "k": 3,
-     "n": 4,
-     "value": 0.75,
+     "k": 2,
+     "n": 2,
+     "value": 1,
      "ci": [
-      0.30063605244263664,
-      0.9544139373553638
+      0.3423719528896193,
+      1
      ]
     },
     "precisionEither": {
-     "k": 3,
-     "n": 4,
-     "value": 0.75,
+     "k": 2,
+     "n": 2,
+     "value": 1,
      "ci": [
-      0.30063605244263664,
-      0.9544139373553638
+      0.3423719528896193,
+      1
      ]
     },
     "recall": {
-     "k": 3,
-     "n": 21,
-     "value": 0.14285714285714285,
+     "k": 2,
+     "n": 6,
+     "value": 0.3333333333333333,
      "ci": [
-      0.049809217982134925,
-      0.34636494149229496
+      0.09676933255921684,
+      0.7000116786584712
      ]
     }
    },
    "true-leap": {
     "precision": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     },
     "precisionEither": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     },
     "recall": {
      "k": 0,
-     "n": 12,
+     "n": 3,
      "value": 0,
      "ci": [
       0,
-      0.2425007574992425
+      0.5615060804490177
      ]
     }
    },
    "case-to-group": {
     "precision": {
-     "k": 1,
-     "n": 1,
-     "value": 1,
+     "k": 0,
+     "n": 0,
+     "value": null,
      "ci": [
-      0.20654329147389294,
-      1
+      0,
+      0
      ]
     },
     "precisionEither": {
-     "k": 1,
-     "n": 1,
-     "value": 1,
+     "k": 0,
+     "n": 0,
+     "value": null,
      "ci": [
-      0.20654329147389294,
-      1
+      0,
+      0
      ]
     },
     "recall": {
-     "k": 1,
-     "n": 12,
-     "value": 0.08333333333333333,
+     "k": 0,
+     "n": 3,
+     "value": 0,
      "ci": [
-      0.014864709450773488,
-      0.35388592179859524
+      0,
+      0.5615060804490177
      ]
     }
    },
    "essentialism": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 11,
-     "value": 0,
-     "ci": [
-      2.057132194452876e-17,
-      0.2588400172488141
-     ]
-    }
-   },
-   "coded-term": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    }
-   },
-   "replacement": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 15,
-     "value": 0,
-     "ci": [
-      0,
-      0.20388926630434784
-     ]
-    }
-   },
-   "secret-coercion": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 11,
-     "value": 0,
-     "ci": [
-      2.057132194452876e-17,
-      0.2588400172488141
-     ]
-    }
-   },
-   "election-theft": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 11,
-     "value": 0,
-     "ci": [
-      2.057132194452876e-17,
-      0.2588400172488141
-     ]
-    }
-   },
-   "metaphor": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 5,
-     "value": 0,
-     "ci": [
-      0,
-      0.43449149475208104
-     ]
-    }
-   },
-   "hyperbole": {
     "precision": {
      "k": 0,
      "n": 0,
@@ -460,6 +286,180 @@
      ]
     }
    },
+   "coded-term": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 1,
+     "value": 0,
+     "ci": [
+      0,
+      0.7934567085261071
+     ]
+    }
+   },
+   "replacement": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 5,
+     "value": 0,
+     "ci": [
+      0,
+      0.43449149475208104
+     ]
+    }
+   },
+   "secret-coercion": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 3,
+     "value": 0,
+     "ci": [
+      0,
+      0.5615060804490177
+     ]
+    }
+   },
+   "election-theft": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 3,
+     "value": 0,
+     "ci": [
+      0,
+      0.5615060804490177
+     ]
+    }
+   },
+   "metaphor": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 1,
+     "value": 0,
+     "ci": [
+      0,
+      0.7934567085261071
+     ]
+    }
+   },
+   "hyperbole": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 1,
+     "value": 0,
+     "ci": [
+      0,
+      0.7934567085261071
+     ]
+    }
+   },
    "irony": {
     "precision": {
      "k": 0,
@@ -481,40 +481,40 @@
     },
     "recall": {
      "k": 0,
-     "n": 10,
+     "n": 2,
      "value": 0,
      "ci": [
       0,
-      0.2775401687666165
+      0.6576280471103807
      ]
     }
    },
    "allusion": {
     "precision": {
-     "k": 0,
+     "k": 1,
      "n": 1,
-     "value": 0,
+     "value": 1,
      "ci": [
-      0,
-      0.7934567085261071
+      0.20654329147389294,
+      1
      ]
     },
     "precisionEither": {
-     "k": 0,
+     "k": 1,
      "n": 1,
-     "value": 0,
+     "value": 1,
      "ci": [
-      0,
-      0.7934567085261071
+      0.20654329147389294,
+      1
      ]
     },
     "recall": {
-     "k": 0,
-     "n": 4,
-     "value": 0,
+     "k": 1,
+     "n": 1,
+     "value": 1,
      "ci": [
-      0,
-      0.48990002040399916
+      0.20654329147389294,
+      1
      ]
     }
    },
@@ -570,11 +570,11 @@
     },
     "recall": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     }
    },
@@ -599,11 +599,11 @@
     },
     "recall": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     }
    },
@@ -628,11 +628,11 @@
     },
     "recall": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     }
    },
@@ -667,266 +667,92 @@
    },
    "question-insinuation": {
     "precision": {
-     "k": 3,
-     "n": 4,
-     "value": 0.75,
+     "k": 2,
+     "n": 2,
+     "value": 1,
      "ci": [
-      0.30063605244263664,
-      0.9544139373553638
+      0.3423719528896193,
+      1
      ]
     },
     "precisionEither": {
-     "k": 3,
-     "n": 4,
-     "value": 0.75,
+     "k": 2,
+     "n": 2,
+     "value": 1,
      "ci": [
-      0.30063605244263664,
-      0.9544139373553638
+      0.3423719528896193,
+      1
      ]
     },
     "recall": {
-     "k": 3,
-     "n": 21,
-     "value": 0.14285714285714285,
+     "k": 2,
+     "n": 6,
+     "value": 0.3333333333333333,
      "ci": [
-      0.049809217982134925,
-      0.34636494149229496
+      0.09676933255921684,
+      0.7000116786584712
      ]
     }
    },
    "true-leap": {
     "precision": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     },
     "precisionEither": {
      "k": 0,
-     "n": 1,
-     "value": 0,
+     "n": 0,
+     "value": null,
      "ci": [
       0,
-      0.7934567085261071
+      0
      ]
     },
     "recall": {
      "k": 0,
-     "n": 12,
+     "n": 3,
      "value": 0,
      "ci": [
       0,
-      0.2425007574992425
+      0.5615060804490177
      ]
     }
    },
    "case-to-group": {
     "precision": {
-     "k": 1,
-     "n": 1,
-     "value": 1,
+     "k": 0,
+     "n": 0,
+     "value": null,
      "ci": [
-      0.20654329147389294,
-      1
+      0,
+      0
      ]
     },
     "precisionEither": {
-     "k": 1,
-     "n": 1,
-     "value": 1,
+     "k": 0,
+     "n": 0,
+     "value": null,
      "ci": [
-      0.20654329147389294,
-      1
+      0,
+      0
      ]
     },
     "recall": {
-     "k": 1,
-     "n": 12,
-     "value": 0.08333333333333333,
+     "k": 0,
+     "n": 3,
+     "value": 0,
      "ci": [
-      0.014864709450773488,
-      0.35388592179859524
+      0,
+      0.5615060804490177
      ]
     }
    },
    "essentialism": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 11,
-     "value": 0,
-     "ci": [
-      2.057132194452876e-17,
-      0.2588400172488141
-     ]
-    }
-   },
-   "coded-term": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    }
-   },
-   "replacement": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 15,
-     "value": 0,
-     "ci": [
-      0,
-      0.20388926630434784
-     ]
-    }
-   },
-   "secret-coercion": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 11,
-     "value": 0,
-     "ci": [
-      2.057132194452876e-17,
-      0.2588400172488141
-     ]
-    }
-   },
-   "election-theft": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 11,
-     "value": 0,
-     "ci": [
-      2.057132194452876e-17,
-      0.2588400172488141
-     ]
-    }
-   },
-   "metaphor": {
-    "precision": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "precisionEither": {
-     "k": 0,
-     "n": 0,
-     "value": null,
-     "ci": [
-      0,
-      0
-     ]
-    },
-    "recall": {
-     "k": 0,
-     "n": 5,
-     "value": 0,
-     "ci": [
-      0,
-      0.43449149475208104
-     ]
-    }
-   },
-   "hyperbole": {
     "precision": {
      "k": 0,
      "n": 0,
@@ -955,6 +781,180 @@
      ]
     }
    },
+   "coded-term": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 1,
+     "value": 0,
+     "ci": [
+      0,
+      0.7934567085261071
+     ]
+    }
+   },
+   "replacement": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 5,
+     "value": 0,
+     "ci": [
+      0,
+      0.43449149475208104
+     ]
+    }
+   },
+   "secret-coercion": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 3,
+     "value": 0,
+     "ci": [
+      0,
+      0.5615060804490177
+     ]
+    }
+   },
+   "election-theft": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 3,
+     "value": 0,
+     "ci": [
+      0,
+      0.5615060804490177
+     ]
+    }
+   },
+   "metaphor": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 1,
+     "value": 0,
+     "ci": [
+      0,
+      0.7934567085261071
+     ]
+    }
+   },
+   "hyperbole": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "precisionEither": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": [
+      0,
+      0
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 1,
+     "value": 0,
+     "ci": [
+      0,
+      0.7934567085261071
+     ]
+    }
+   },
    "irony": {
     "precision": {
      "k": 0,
@@ -976,40 +976,40 @@
     },
     "recall": {
      "k": 0,
-     "n": 10,
+     "n": 2,
      "value": 0,
      "ci": [
       0,
-      0.2775401687666165
+      0.6576280471103807
      ]
     }
    },
    "allusion": {
     "precision": {
-     "k": 0,
+     "k": 1,
      "n": 1,
-     "value": 0,
+     "value": 1,
      "ci": [
-      0,
-      0.7934567085261071
+      0.20654329147389294,
+      1
      ]
     },
     "precisionEither": {
-     "k": 0,
+     "k": 1,
      "n": 1,
-     "value": 0,
+     "value": 1,
      "ci": [
-      0,
-      0.7934567085261071
+      0.20654329147389294,
+      1
      ]
     },
     "recall": {
-     "k": 0,
-     "n": 4,
-     "value": 0,
+     "k": 1,
+     "n": 1,
+     "value": 1,
      "ci": [
-      0,
-      0.48990002040399916
+      0.20654329147389294,
+      1
      ]
     }
    },
@@ -1045,21 +1045,21 @@
   },
   "harm": {
    "with": {
-    "k": 2,
-    "n": 16,
-    "value": 0.125,
+    "k": 0,
+    "n": 5,
+    "value": 0,
     "ci": [
-     0.034976749337057134,
-     0.3602333143674828
+     0,
+     0.43449149475208104
     ]
    },
    "without": {
-    "k": 2,
-    "n": 16,
-    "value": 0.125,
+    "k": 0,
+    "n": 5,
+    "value": 0,
     "ci": [
-     0.034976749337057134,
-     0.3602333143674828
+     0,
+     0.43449149475208104
     ]
    }
   }
@@ -1099,27 +1099,27 @@
   },
   "question-insinuation": {
    "on": false,
-   "precision": 0.75,
-   "k": 3,
-   "n": 4,
-   "low": 0.30063605244263664,
-   "high": 0.9544139373553638
+   "precision": 1,
+   "k": 2,
+   "n": 2,
+   "low": 0.3423719528896193,
+   "high": 1
   },
   "true-leap": {
    "on": false,
-   "precision": 0,
+   "precision": null,
    "k": 0,
-   "n": 1,
+   "n": 0,
    "low": 0,
-   "high": 0.7934567085261071
+   "high": 0
   },
   "case-to-group": {
    "on": false,
-   "precision": 1,
-   "k": 1,
-   "n": 1,
-   "low": 0.20654329147389294,
-   "high": 1
+   "precision": null,
+   "k": 0,
+   "n": 0,
+   "low": 0,
+   "high": 0
   },
   "essentialism": {
    "on": false,
@@ -1187,11 +1187,11 @@
   },
   "allusion": {
    "on": false,
-   "precision": 0,
-   "k": 0,
+   "precision": 1,
+   "k": 1,
    "n": 1,
-   "low": 0,
-   "high": 0.7934567085261071
+   "low": 0.20654329147389294,
+   "high": 1
   },
   "dog-whistle": {
    "on": false,

@@ -58,3 +58,19 @@ test("no store text claims an error rate for every sign or that nothing ever lea
 test("the listing points at the public privacy and transparency pages", () => {
   for (const u of ["https://harperz9.github.io/daylight-commons/privacy.html", "https://harperz9.github.io/daylight-commons/transparency.html"]) assert.ok(md.includes(u), u);
 });
+
+test("the committed Firefox source package matches this version's source", async () => {
+  const { amoSource } = await import("../scripts/amo-source.mjs");
+  const { readFileSync, existsSync } = await import("node:fs");
+  const version = JSON.parse(readFileSync(new URL("../src/ext/manifest.json", import.meta.url), "utf8")).version;
+  const file = new URL(`../docs/store/amo-source-${version}.zip`, import.meta.url);
+  assert.ok(existsSync(file), `docs/store/amo-source-${version}.zip is missing; run node scripts/amo-source.mjs`);
+  // Compressed bytes depend on the zlib build, so compare each entry's name and CRC-32 from the
+  // central directory, which do not.
+  const entries = (buf) => { const out = []; for (let i = buf.length - 22; i >= 0; i--) if (buf.readUInt32LE(i) === 0x06054b50) {
+    let p = buf.readUInt32LE(i + 16); for (let n = buf.readUInt16LE(i + 10); n > 0; n--) { const len = buf.readUInt16LE(p + 28);
+      out.push(`${buf.toString("utf8", p + 46, p + 46 + len)} ${buf.readUInt32LE(p + 16)} ${buf.readUInt32LE(p + 24)}`); p += 46 + len + buf.readUInt16LE(p + 30) + buf.readUInt16LE(p + 32); } break; } return out; };
+  const want = entries(amoSource(version)), have = entries(readFileSync(file));
+  assert.ok(want.length > 10, "the package lists its files");
+  assert.deepEqual(have, want, "the source package is stale; run node scripts/amo-source.mjs");
+});

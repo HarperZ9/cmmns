@@ -8,9 +8,9 @@
 //   radar export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
 // <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 // CSV, a Mastodon outbox.json or a Bluesky repository .car. project-docs/INTEGRATION.md has more.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, realpathSync } from "node:fs";
 import { basename } from "node:path";
-import { pathToFileURL } from "node:url";
+import { pathToFileURL, fileURLToPath } from "node:url";
 import { analyzeThread, analyzeText, checkMedia, siteInfo } from "../src/core/api.js";
 import { importFile } from "../src/core/imports.js";
 import { makeBundle, signBundle, signCarrierSafe, verifyBundle, CARRIER_SAFE } from "../src/core/evidence-bundle.js";
@@ -21,16 +21,17 @@ import { readable, verdictLines, chainLines } from "./lib/report.mjs";
 import { validate } from "./lib/jsonschema.mjs";
 import { runExport } from "./lib/export.mjs";
 import { runCaseCommand } from "./lib/case.mjs";
+import { TOP_HELP, helpText, friendly } from "./lib/help.mjs";
 
 const USAGE = `Usage:
-  radar analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
+  daylight analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
                [--carrier-safe [--page address]]
-  radar verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
-  radar site <domain> [--json]
-  radar media <file> [--json]
-  radar export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
+  daylight verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
+  daylight site <domain> [--json]
+  daylight media <file> [--json]
+  daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
-  radar case <command>   an investigation case folder; "radar case help" lists the commands
+  daylight case <command>   an investigation case folder; "daylight case help" lists the commands
 <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 CSV, a Mastodon outbox.json or a Bluesky repository .car. verify checks a signed evidence bundle
 or an evidence chain saved from the extension ("Save evidence chain"). Daylight Commons reads local
@@ -38,7 +39,7 @@ files only. --carrier-safe signs the bundle with a one-time key that is never sa
 the day it was made, and leaves out the page address unless you give one with --page; its
 signature then proves the bundle is unchanged and says nothing about who made it. export writes a saved evidence chain as a legal dossier, a technical PROV record, a
 journalistic write-up or a research dataset, into a new folder; it refuses a chain that fails its
-check.
+check. "daylight <command> --help" shows one command with an example.
 `;
 // Version 2 is current; version 1 bundles (items with doesNotProve) still verify against their own schema.
 const SCHEMAS = { "urn:radar:evidence:v1": "evidence.v1.json", "urn:radar:evidence:v2": "evidence.v2.json" };
@@ -103,7 +104,8 @@ async function verify(file, f) {
 export async function main(argv) {
   if (argv[0] === "case") { const r = await runCaseCommand(argv.slice(1)); print(r.out); return process.exitCode || r.code; }
   const { _: [cmd, arg], flags } = parseArgs(argv);
-  if (!cmd || flags.help || !arg) { print(USAGE); return cmd ? 2 : 0; }
+  if (cmd && flags.help && TOP_HELP[cmd]) { print(helpText(TOP_HELP[cmd], `daylight ${cmd}`)); return 0; }
+  if (!cmd || flags.help || !arg) { print(USAGE); return cmd && !flags.help ? 2 : 0; }
   if (cmd === "analyze") { await analyze(arg, flags); return 0; }
   if (cmd === "verify") return verify(arg, flags);
   if (cmd === "site") { loadTables({ claims: false }); const r = siteInfo(arg); if (!r) throw new Error("No domain given."); print(flags.json ? asJson(r) : readable(r)); return 0; }
@@ -114,6 +116,9 @@ export async function main(argv) {
   return 2;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main(process.argv.slice(2)).then((code) => { process.exitCode = code; }, (e) => { process.stderr.write(`radar: ${e.message}\n`); process.exitCode = 1; });
+// Run as a program, whatever path led here: macOS's temporary folders sit behind a link
+// (/var is /private/var), so the path in argv and this module's own path can differ in spelling only.
+const real = (p) => { try { return realpathSync(p); } catch { return p; } };
+if (process.argv[1] && real(process.argv[1]) === real(fileURLToPath(import.meta.url))) {
+  main(process.argv.slice(2)).then((code) => { process.exitCode = code; }, (e) => { const a = process.argv.slice(2); process.stderr.write(`daylight: ${friendly(e, a[0] === "case" ? (a[1] ? `case ${a[1]}` : "case") : a[0])}\n`); process.exitCode = 1; });
 }

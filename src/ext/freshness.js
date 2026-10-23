@@ -7,7 +7,7 @@
   const api = { view: null, ready: null };
   const load = () => (api.ready = chrome.runtime.sendMessage({ type: "pb-freshness" })
     .then((v) => (api.view = v || null))
-    .catch((e) => { console.error("[daylight-commons] could not read the catalogue's age", e); return null; }));
+    .catch((e) => { PBGuard.report("could not read the catalogue's age", e); return null; }));
   load();
   chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch["pb.head.v1"]) load(); });
   globalThis.PBFreshness = api;

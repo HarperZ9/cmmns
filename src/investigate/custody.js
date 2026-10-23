@@ -5,11 +5,12 @@
 // not public figures are withheld from the bundle; their hashes stay in the record.
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { within } from "./paths.js";
 import { sha256 } from "./capture.js";
 
 export function custodyRows(data, isPublic) {
   return data.sources.map((s) => {
-    const f = s.capture && s.capture.file ? join(data.dir, s.capture.file) : null;
+    const f = s.capture && s.capture.file ? within(data.dir, s.capture.file) : null;
     const present = !!(f && existsSync(f));
     const now = present ? sha256(readFileSync(f)) : null;
     const withheld = s.kind === "x-post" && s.author && !isPublic(s.author);

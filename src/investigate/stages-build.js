@@ -3,6 +3,7 @@
 // stages are deterministic; only the optional summary in the export stage uses a model.
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { within } from "./paths.js";
 import { addRow, byId, writeJsonl, TABLES } from "./store.js";
 import { sha256 } from "./capture.js";
 import { contentWords, overlapSimilarity } from "./diff.js";
@@ -61,7 +62,7 @@ export const network = {
   name: "network",
   items: (ctx) => ctx.data().sources.filter((s) => authorOf(s) && s.capture && s.capture.text_file).map((s) => ({ key: s.id, id: s.id })),
   run(ctx, { id }, tag) {
-    const data = ctx.data(), s = byId(data.sources).get(id), f = join(ctx.dir, s.capture.text_file);
+    const data = ctx.data(), s = byId(data.sources).get(id), f = within(ctx.dir, s.capture.text_file);
     const text = existsSync(f) ? readFileSync(f, "utf8") : "";
     const handles = [...new Set((text.match(/(?<![\w@])@[A-Za-z0-9_]{1,15}\b/g) || []))].filter((h) => h.toLowerCase() !== s.author.toLowerCase());
     for (const h of handles) addRow(ctx.dir, "edges", { from: s.author, to: h, type: "mention", source: id, run_item: tag });

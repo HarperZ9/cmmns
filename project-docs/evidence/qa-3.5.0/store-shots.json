@@ -1,0 +1,32 @@
+[
+ {
+  "file": "01-reply-window-bluesky.png",
+  "caption": "Rest the pointer on a reply: the words that carry a technique are marked, and the window names it. (Reading lens, with Every reading technique on.)",
+  "url": "https://bsky.app/profile/apnews.com/post/3mykdskhcba23",
+  "ok": true
+ },
+ {
+  "file": "02-thread-panel-bluesky.png",
+  "caption": "The thread panel: how many accounts it read, and the frames the thread repeats, counted across posts and authors.",
+  "url": "https://bsky.app/profile/apnews.com/post/3mykdskhcba23",
+  "ok": true
+ },
+ {
+  "file": "03-site-card-bluesky.png",
+  "caption": "Rest the pointer on a link: who owns the site, its owner type and its fact-check record, in the fact-checkers' own words.",
+  "url": "https://bsky.app/profile/theguardian.com/post/3myklzkfj2c2m",
+  "ok": true
+ },
+ {
+  "file": "04-reply-window-mastodon.png",
+  "caption": "On any Mastodon server you turn it on for: join dates, coordination and language signs beside each reply.",
+  "url": "https://mastodon.social/@Mastodon/116765910384325070",
+  "ok": true
+ },
+ {
+  "file": "05-comment-window-youtube.png",
+  "caption": "YouTube comments: when each comment was posted and how it was received, beside the comment, with coordination and language signs when they appear.",
+  "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  "ok": true
+ }
+]

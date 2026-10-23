@@ -16,3 +16,6 @@ project-docs/evidence/raw/
 *.key
 *.p12
 radar-keys/
+
+# The Firefox reviewer source package is committed for the store kit (docs/store/README.md).
+!docs/store/amo-source-*.zip

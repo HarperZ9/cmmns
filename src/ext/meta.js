@@ -18,10 +18,10 @@
     const now = Date.now();
     cache = { ...Object.fromEntries(Object.entries(g[KEY] || {}).filter(([, r]) => now - r.at < KEEP_DAYS * DAY)), ...cache };
     onChange();
-  }).catch((e) => console.error("[daylight-commons] meta cache failed", e));
+  }).catch((e) => PBGuard.report("meta cache failed", e));
 
   const k = (site, handle) => site + ":" + String(handle || "").toLowerCase();
-  function save() { clearTimeout(saveTimer); saveTimer = setTimeout(() => api && api.set({ [KEY]: cache }).catch((e) => console.error("[daylight-commons] could not save account readings", e)), 1500); }
+  function save() { clearTimeout(saveTimer); saveTimer = setTimeout(() => api && api.set({ [KEY]: cache }).catch((e) => PBGuard.report("could not save account readings", e)), 1500); }
   function put(site, reading) {
     if (!reading || !reading.handle) return;
     const key = k(site, reading.handle);

@@ -3,6 +3,7 @@
 // item's tag, so a crashed item is purged and run again cleanly.
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, basename } from "node:path";
+import { within, isWithin } from "./paths.js";
 import { addSource } from "./add.js";
 import { addRow, updateRow, byId } from "./store.js";
 import { sha256, xPostId } from "./capture.js";
@@ -32,7 +33,7 @@ async function ingestScreenshot(ctx, seed, tag) {
     addRow(ctx.dir, "proposals", { kind: "transcription", source: source.id, status: "proposed", note: `needs transcription: write ${basename(seed.path)}.txt beside the image, then run again`, run_item: tag });
     return "needs transcription";
   }
-  writeFileSync(join(ctx.dir, source.capture.text_file), tr.text);
+  writeFileSync(within(ctx.dir, source.capture.text_file), tr.text);
   const post = screenshotPost(tr.text);
   updateRow(ctx.dir, "sources", source.id, (r) => ({ ...r, kind: "screenshot", author: post.author, source_date: post.date, read_mode: `screenshot supplied by the investigator; text by ${tr.method}`, capture: { ...r.capture, text_sha256: sha256(Buffer.from(tr.text, "utf8")) }, transcription: { method: tr.method, confidence: tr.confidence } }));
   const facts = postFacts(tr.text), data = ctx.data();
@@ -92,9 +93,9 @@ const yearOf = (s, meta) => Number(String(s.source_date || meta.created || "").s
 
 export const claims = {
   name: "claims",
-  items: (ctx) => ctx.data().sources.filter((s) => s.capture && s.capture.text_file && existsSync(join(ctx.dir, s.capture.text_file))).map((s) => ({ key: s.id, id: s.id })),
+  items: (ctx) => ctx.data().sources.filter((s) => s.capture && s.capture.text_file && isWithin(ctx.dir, s.capture.text_file) && existsSync(within(ctx.dir, s.capture.text_file))).map((s) => ({ key: s.id, id: s.id })),
   async run(ctx, { id }, tag) {
-    const data = ctx.data(), s = byId(data.sources).get(id), raw = readFileSync(join(ctx.dir, s.capture.text_file), "utf8");
+    const data = ctx.data(), s = byId(data.sources).get(id), raw = readFileSync(within(ctx.dir, s.capture.text_file), "utf8");
     const text = s.kind === "screenshot" ? screenshotPost(raw).body : raw;
     const year = yearOf(s, data.meta);
     const got = ctx.model ? (await modelClaims(ctx.model, id, text, { year })).claims : ruleClaims(id, text, { year, max: s.kind === "web" ? 12 : 6 });
@@ -109,7 +110,7 @@ export const claims = {
 };
 
 async function followPrimary(ctx, src, tag) {
-  const f = src.capture && src.capture.file ? join(ctx.dir, src.capture.file) : null;
+  const f = src.capture && src.capture.file ? within(ctx.dir, src.capture.file) : null;
   if (!f || !existsSync(f)) return [];
   const links = linksIn(readFileSync(f)).filter((u) => u !== src.url && primaryKind(u)).slice(0, MAX_PRIMARY_LINKS), out = [];
   for (const u of links) {

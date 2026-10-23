@@ -50,17 +50,17 @@ export function networkHtml(n, title = "Case network") {
   const dots = n.nodes.map((x) => { const p = pos.get(x.id), r = 4 + Math.min(14, 2 * Math.sqrt(x.in + x.out)); return `<g><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r.toFixed(1)}"><title>${esc(`${x.id}: ${x.in} in, ${x.out} out`)}</title></circle><text x="${p.x.toFixed(1)}" y="${(p.y - r - 4).toFixed(1)}" text-anchor="middle">${esc(x.id)}</text></g>`; }).join("\n");
   const rows = n.edges.map((e) => `<tr><td>${esc(e.from)}</td><td>${esc(e.to)}</td><td>${esc(e.type)}</td><td>${e.n}</td><td>${esc(e.sources.join(", "))}</td></tr>`).join("\n");
   return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
+<html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
 <style>:root{--ink:#1b1b1b;--soft:#5d5d5d;--ground:#fbfaf7;--line:#d9d6cf}@media (prefers-color-scheme:dark){:root{--ink:#ecebe7;--soft:#a5a39d;--ground:#151514;--line:#3a3936}}
 body{margin:0;padding:16px;background:var(--ground);color:var(--ink);font:15px/1.5 system-ui,sans-serif}svg{max-width:100%;height:auto}line{stroke:var(--soft)}circle{fill:var(--ink)}text{fill:var(--ink);font-size:11px}
 #arrow path{fill:var(--soft)}table{border-collapse:collapse;width:100%;font-size:13px}td,th{border-top:1px solid var(--line);padding:4px 6px;text-align:left}.muted{color:var(--soft)}</style></head>
-<body><h1>${esc(title)}</h1><p class="muted">Each line is one recorded public act. Solid: quote. Dashed: reply. Dotted: repost. Hover a line for its sources. This file works offline.</p>
+<body><main><h1>${esc(title)}</h1><p class="muted">Each line is one recorded public act. Solid: quote. Dashed: reply. Dotted: repost. Hover a line for its sources. This file works offline.</p>
 <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}"><defs><marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z"/></marker></defs>
 ${lines}
 ${dots}
 </svg>
 <table><thead><tr><th>From</th><th>To</th><th>Act</th><th>Count</th><th>Sources</th></tr></thead><tbody>
 ${rows}
-</tbody></table><p class="muted">Does not prove: ${esc(n.doesNotProve)}</p></body></html>
+</tbody></table><p class="muted">Does not prove: ${esc(n.doesNotProve)}</p></main></body></html>
 `;
 }

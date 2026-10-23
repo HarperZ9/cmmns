@@ -5,6 +5,7 @@
 // the files. A new version is written only when the case changed; CHANGES.md lists what changed.
 import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { within, isWithin } from "./paths.js";
 import { sha256 } from "./capture.js";
 import { makeRedactor } from "./redact.js";
 import { newsroomMarkdown, markdownHtml } from "./dossier.js";
@@ -106,7 +107,8 @@ export async function writeExport(data, profile, ctx) {
 export function checkExportFiles(dir) {
   const bundle = JSON.parse(readFileSync(join(dir, BUNDLE_FILE), "utf8"));
   return bundle.evidence.map((e) => {
-    const f = join(dir, e.data.path);
+    if (!isWithin(dir, e.data.path)) return { file: e.data.path, ok: false, text: "points outside the export folder; not read" };
+    const f = within(dir, e.data.path, "the export folder");
     const got = existsSync(f) ? sha256(readFileSync(f)) : null;
     return { file: e.data.path, ok: got === e.data.sha256, text: got === null ? "missing" : got === e.data.sha256 ? "matches" : "DOES NOT MATCH" };
   });

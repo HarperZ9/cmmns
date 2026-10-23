@@ -53,7 +53,7 @@ test("site, media, a refused file and the usage text", () => {
   assert.match(run("media", join(ROOT, "tests", "fixtures", "c2pa", "ai.jpg")).stdout, /marked as made with AI/);
   const refused = run("analyze", join(ROOT, "package.json"));
   assert.equal(refused.status, 1);
-  assert.match(refused.stderr, /^radar: Daylight Commons found zero readable posts/);
+  assert.match(refused.stderr, /^daylight: Daylight Commons found zero readable posts/);
   assert.match(execFileSync(process.execPath, [CLI], { encoding: "utf8" }), /^Usage:/);
   assert.deepEqual(parseArgs(["analyze", "f", "--json", "--bundle", "o.json", "--key-id=abc"]), { _: ["analyze", "f"], flags: { json: true, bundle: "o.json", "key-id": "abc" } });
 });

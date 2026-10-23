@@ -14,7 +14,7 @@
     root.classList.toggle("pb-large", current.large);
   }
   function set(next) { current = PB.normalizeSettings(next); apply(); for (const f of listeners) f(current); }
-  const ready = api ? api.get(KEY).then((g) => set(g[KEY])).catch((e) => console.error("[daylight-commons] could not read settings", e)) : Promise.resolve();
+  const ready = api ? api.get(KEY).then((g) => set(g[KEY])).catch((e) => PBGuard.report("could not read settings", e)) : Promise.resolve();
   if (api && chrome.storage.onChanged) chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch[KEY]) set(ch[KEY].newValue); });
   // Merge a change into the stored settings.
   async function save(patch) {

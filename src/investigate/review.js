@@ -4,6 +4,7 @@
 // other rows keep it in "review" or "status" as they were written.
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { within } from "./paths.js";
 import { updateRow, byId } from "./store.js";
 
 const FIELD = { claims: "status", leads: "review", proposals: "status" };
@@ -23,7 +24,7 @@ export function describe(data, item) {
   const span = (r.spans || [])[0];
   let ctxLine = "";
   if (span) {
-    const s = sources.get(span.source), f = s && s.capture && s.capture.text_file ? join(data.dir, s.capture.text_file) : null;
+    const s = sources.get(span.source), f = s && s.capture && s.capture.text_file ? within(data.dir, s.capture.text_file) : null;
     const t = f && existsSync(f) ? readFileSync(f, "utf8") : "";
     const a = Math.max(0, span.start - 120), b = Math.min(t.length, span.end + 120);
     ctxLine = t ? `\n  In ${span.source}: ...${t.slice(a, span.start)}>>${t.slice(span.start, span.end)}<<${t.slice(span.end, b)}...` : `\n  Span: "${span.text}"`;

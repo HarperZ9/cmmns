@@ -11,12 +11,12 @@
     const keep = globalThis.PBSettings ? PBSettings.get().aboutDays : KEEP_DAYS;
     cache = Object.fromEntries(Object.entries(g[KEY] || {}).filter(([, r]) => now - r.at < keep * DAY));
     loaded = true; onChange(); pump();
-  }).catch((e) => console.error("[daylight-commons] reddit cache failed", e));
+  }).catch((e) => PBGuard.report("reddit cache failed", e));
 
-  function save() { clearTimeout(saveTimer); saveTimer = setTimeout(() => chrome.storage.local.set({ [KEY]: cache }).catch((e) => console.error("[daylight-commons] could not save reddit readings", e)), 1500); }
+  function save() { clearTimeout(saveTimer); saveTimer = setTimeout(() => chrome.storage.local.set({ [KEY]: cache }).catch((e) => PBGuard.report("could not save reddit readings", e)), 1500); }
 
   async function readOne(name) {
-    const res = await fetch(`/user/${encodeURIComponent(name)}/about.json`, { credentials: "include", headers: { Accept: "application/json" } });
+    const res = await fetch(`/user/${encodeURIComponent(name)}/about.json`, { credentials: "include", headers: { Accept: "application/json" }, signal: AbortSignal.timeout(10000) });
     if (res.status === 429) { pausedUntil = Date.now() + PAUSE_MS; queue.unshift(name); return; }
     // A deleted or suspended account answers 404 or a stub; record it so it is not asked again.
     const reading = res.ok ? PB.redditAbout(await res.json()) : null;
@@ -27,7 +27,7 @@
   async function pump() {
     if (busy || !loaded || !queue.length || Date.now() < pausedUntil) return;
     busy = true;
-    try { await readOne(queue.shift()); } catch (e) { console.error("[daylight-commons] reddit lookup failed", e); }
+    try { await readOne(queue.shift()); } catch (e) { PBGuard.report("reddit lookup failed", e); }
     busy = false;
     setTimeout(pump, Date.now() < pausedUntil ? pausedUntil - Date.now() : GAP_MS);
   }

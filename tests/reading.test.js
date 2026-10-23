@@ -96,3 +96,15 @@ test("the ship gate: only techniques the held-out run turned on show by default"
   const hidden = readPost(HAITI[1].text).filter((f) => f.shown && !on.has(f.technique));
   assert.deepEqual(hidden, []);
 });
+
+// The 3.4.0 case run (2026-10-23) tagged a plain ownership statement as secret coercion.
+test("a statement of who owns a system or firm is not secret coercion", () => {
+  for (const t of [
+    "Starshield systems are owned and controlled by the US government. Any limits on speed are decided by the military.",
+    "The network is wholly owned by the US government.",
+    "The satellites are controlled by the United States.",
+    "The company was owned by China until last year.",
+  ]) assert.deepEqual(cueHits(t).filter((h) => h.technique === "secret-coercion"), [], t);
+  for (const t of ["He is controlled by the Kremlin.", "Congress is owned by AIPAC.", "She was bought and paid for by Big Pharma."])
+    assert.ok(cueHits(t).some((h) => h.technique === "secret-coercion"), t);
+});

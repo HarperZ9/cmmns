@@ -1,0 +1,167 @@
+{
+ "version": "3.5.0",
+ "package": "D:\\radar-wt\\rel-341\\dist\\radar-chrome-3.5.0.zip",
+ "install_opened": [],
+ "first_run": {
+  "seconds_to_started": 0.21,
+  "seconds_to_first_sign": 4.22,
+  "clicks": 1
+ },
+ "soak_on": {
+  "marks": [
+   {
+    "posts": 40,
+    "heap_mb": 13.11,
+    "nodes": 544,
+    "script_s": 0.066
+   },
+   {
+    "posts": 100,
+    "heap_mb": 13.42,
+    "nodes": 804,
+    "script_s": 0.083
+   },
+   {
+    "posts": 400,
+    "heap_mb": 14.42,
+    "nodes": 804,
+    "script_s": 0.167
+   },
+   {
+    "posts": 700,
+    "heap_mb": 15.11,
+    "nodes": 804,
+    "script_s": 0.248
+   },
+   {
+    "posts": 1000,
+    "heap_mb": 15.2,
+    "nodes": 804,
+    "script_s": 0.331
+   },
+   {
+    "posts": 1300,
+    "heap_mb": 15.32,
+    "nodes": 804,
+    "script_s": 0.406
+   },
+   {
+    "posts": 1600,
+    "heap_mb": 15.37,
+    "nodes": 804,
+    "script_s": 0.485
+   },
+   {
+    "posts": 1900,
+    "heap_mb": 15.46,
+    "nodes": 804,
+    "script_s": 0.565
+   },
+   {
+    "posts": 2200,
+    "heap_mb": 15.59,
+    "nodes": 804,
+    "script_s": 0.644
+   },
+   {
+    "posts": 2500,
+    "heap_mb": 15.64,
+    "nodes": 804,
+    "script_s": 0.72
+   },
+   {
+    "posts": 2800,
+    "heap_mb": 15.73,
+    "nodes": 804,
+    "script_s": 0.799
+   },
+   {
+    "posts": 3001,
+    "heap_mb": 15.76,
+    "nodes": 804,
+    "script_s": 0.857
+   }
+  ],
+  "badges_in_page_at_end": 0
+ },
+ "soak_off": {
+  "marks": [
+   {
+    "posts": 40,
+    "heap_mb": 2.74,
+    "nodes": 541,
+    "script_s": 0.059
+   },
+   {
+    "posts": 100,
+    "heap_mb": 2.82,
+    "nodes": 801,
+    "script_s": 0.062
+   },
+   {
+    "posts": 400,
+    "heap_mb": 2.9,
+    "nodes": 801,
+    "script_s": 0.078
+   },
+   {
+    "posts": 700,
+    "heap_mb": 2.89,
+    "nodes": 801,
+    "script_s": 0.093
+   },
+   {
+    "posts": 1000,
+    "heap_mb": 2.87,
+    "nodes": 801,
+    "script_s": 0.107
+   },
+   {
+    "posts": 1300,
+    "heap_mb": 2.85,
+    "nodes": 801,
+    "script_s": 0.121
+   },
+   {
+    "posts": 1600,
+    "heap_mb": 2.84,
+    "nodes": 801,
+    "script_s": 0.134
+   },
+   {
+    "posts": 1900,
+    "heap_mb": 2.82,
+    "nodes": 801,
+    "script_s": 0.148
+   },
+   {
+    "posts": 2200,
+    "heap_mb": 2.8,
+    "nodes": 801,
+    "script_s": 0.161
+   },
+   {
+    "posts": 2500,
+    "heap_mb": 2.78,
+    "nodes": 801,
+    "script_s": 0.175
+   },
+   {
+    "posts": 2800,
+    "heap_mb": 2.76,
+    "nodes": 801,
+    "script_s": 0.189
+   },
+   {
+    "posts": 3001,
+    "heap_mb": 2.75,
+    "nodes": 801,
+    "script_s": 0.198
+   }
+  ],
+  "badges_in_page_at_end": 0
+ },
+ "service_worker_errors": [],
+ "console_errors": [],
+ "blocked_requests": []
+}

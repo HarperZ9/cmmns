@@ -68,6 +68,20 @@ Feed tests 1 to 11 stay on the author's machine; only counts and SHA-256 hashes 
 
 No technique clears the ship rule, so none shows by default in 3.3.0. Recall is the binding limit: the held-out posts carry their frames in wording the cue lists do not cover. Precision on the few hits is close to the bar for question insinuation (3 of 4).
 
+### Round 3, held out, sets 13 and 14 (53 posts), 3.4.1
+Sets 12 to 14 were labelled blind for 3.4.1 by the same two labellers (A Opus, B Sonnet), with the set 5 schema. The label files were hashed before any detector run. Set 12 joined the dev sets. Cues were extended from the misses in sets 1 to 12, the false positive from the 3.4.0 case run was fixed ("owned and controlled by the US government" about a satellite system is ownership, not secret coercion), and the weights were refit on 1 to 12. Cues and weights were frozen at commit e6683cd and scored once on 13 and 14. Results: `project-docs/evidence/reading-results.json`.
+
+| Technique | P with inflection | R with |
+|---|---|---|
+| question-insinuation | 100% (2/2, 34 to 100) | 33% (2/6, 10 to 70) |
+| allusion | 100% (1/1, 21 to 100) | 100% (1/1, 21 to 100) |
+| true-leap, case-to-group, essentialism, replacement, secret-coercion, election-theft | no hits | 0% on 2 to 5 positives each |
+| any finding on a harm-family post | | 0% (0/5, 0 to 43) |
+
+Dev sets 1 to 12 (440 posts) after the new cues: harm-family posts with any finding rose from 63% (36/57) to 72% (41/57); secret coercion recall from 35% to 44% at 94% precision (15/16); question insinuation from 14% to 20% at 75% precision.
+
+No technique clears the ship rule, so none shows by default in 3.4.1. Question insinuation is right on both of its held-out hits, one short of the 3 the rule needs. Sets 13 and 14 hold five harm-family posts between them, so the held-out sample is the binding limit now, beside recall. The next labelled feed sets decide question insinuation.
+
 ## Inflection effect
 On the dev sets (1 to 9, 240 posts), inflection raised precision for true item carries a leap (78% to 88%) and election theft (67% to 80%) and cost one coded-term true positive (the use/mention rule). On held-out 10 and 11 it changed nothing: the few hits all sit above the threshold.
 
@@ -82,6 +96,6 @@ With the default setting, 3.3.0 shows nothing on either post, because both techn
 - z004 ("bent into a pretzel by the JQ"): the use/mention factor takes it to weight 0.06, so it does not show. Both labellers named "coded term" on it, so the truth map counts that as a miss.
 
 ## Reproduce
-    node scripts/eval-reading.mjs --split dev            # dev table, sets 1 to 9
+    node scripts/eval-reading.mjs --split dev            # dev table, sets 1 to 12
     node scripts/eval-reading.mjs --split dev --fit      # refit the weights
-    node scripts/eval-reading.mjs                        # held-out 10 and 11; writes the results and reading-measured.js
+    node scripts/eval-reading.mjs                        # held-out 13 and 14; writes the results and reading-measured.js

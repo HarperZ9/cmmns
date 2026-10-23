@@ -1,0 +1,154 @@
+{
+ "version": "3.5.0",
+ "sites": [
+  {
+   "site": "X",
+   "url": "https://x.com/NASA",
+   "error": "Page.goto: net::ERR_HTTP_RESPONSE_CODE_FAILURE at https://x.com/NASA\nCall log:\n  - navigating to \"https://x.com/NASA\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+   "site": "YouTube",
+   "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+   "final_url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+   "reader": {
+    "site": "youtube",
+    "thread": true,
+    "items": 3,
+    "read": 3,
+    "failures": []
+   },
+   "extension_errors": [],
+   "extension_warnings": [],
+   "page_errors_not_ours": 0,
+   "content_script_ran": true
+  },
+  {
+   "site": "Reddit",
+   "url": "https://www.reddit.com/r/AskHistorians/top/?t=week",
+   "final_url": "https://www.reddit.com/r/AskHistorians/top/?solution=86178550a13598d686178550a13598d6&js_challenge=1&jsc_token=2824be10929bdc604753c70a67a1c331619fadc8c96dfecc7d9d106c63b58d95&jsc_orig_r=&t=week",
+   "probe_errors": [
+    "CDPSession.send: Protocol error (Runtime.evaluate): Cannot find context with specified id"
+   ],
+   "reader": {
+    "site": "reddit",
+    "thread": false,
+    "items": 0,
+    "read": 0,
+    "failures": []
+   },
+   "extension_errors": [],
+   "extension_warnings": [],
+   "page_errors_not_ours": 0,
+   "content_script_ran": true
+  },
+  {
+   "site": "Bluesky",
+   "url": "https://bsky.app/profile/bsky.app",
+   "opened": "/profile/bsky.app/post/3l6oveex3ii2l",
+   "final_url": "https://bsky.app/profile/bsky.app/post/3l6oveex3ii2l",
+   "probe_errors": [
+    "CDPSession.send: Protocol error (Runtime.evaluate): Cannot find context with specified id"
+   ],
+   "reader": {
+    "site": "bluesky",
+    "thread": true,
+    "items": 49,
+    "read": 49,
+    "failures": []
+   },
+   "extension_errors": [],
+   "extension_warnings": [],
+   "page_errors_not_ours": 0,
+   "content_script_ran": true
+  },
+  {
+   "site": "Mastodon",
+   "url": "https://mastodon.social/@Mastodon",
+   "opened": "/@Mastodon/116765910384325070",
+   "final_url": "https://mastodon.social/@Mastodon/116765910384325070",
+   "probe_errors": [
+    "CDPSession.send: Protocol error (Runtime.evaluate): Cannot find context with specified id"
+   ],
+   "reader": {
+    "site": "mastodon",
+    "thread": true,
+    "items": 60,
+    "read": 60,
+    "failures": []
+   },
+   "extension_errors": [],
+   "extension_warnings": [],
+   "page_errors_not_ours": 0,
+   "content_script_ran": true
+  },
+  {
+   "site": "Threads",
+   "url": "https://www.threads.com/@threads",
+   "opened": "/@threads/post/DezlErpD1zJ",
+   "final_url": "https://www.threads.com/@threads/post/DezlErpD1zJ",
+   "probe_errors": [
+    "CDPSession.send: Protocol error (Runtime.evaluate): Cannot find context with specified id"
+   ],
+   "reader": {
+    "site": "threads",
+    "thread": true,
+    "items": 15,
+    "read": 15,
+    "failures": []
+   },
+   "extension_errors": [],
+   "extension_warnings": [],
+   "page_errors_not_ours": 0,
+   "content_script_ran": true
+  },
+  {
+   "site": "Facebook",
+   "url": "https://www.facebook.com/NASA",
+   "final_url": "https://www.facebook.com/NASA",
+   "reader": {
+    "site": "facebook",
+    "thread": false,
+    "items": 2,
+    "read": 1,
+    "failures": []
+   },
+   "extension_errors": [],
+   "extension_warnings": [],
+   "page_errors_not_ours": 1,
+   "content_script_ran": true
+  },
+  {
+   "site": "Instagram",
+   "url": "https://www.instagram.com/nasa/",
+   "final_url": "https://www.instagram.com/nasa/",
+   "reader": {
+    "site": "instagram",
+    "thread": false,
+    "items": 0,
+    "read": 0,
+    "failures": []
+   },
+   "extension_errors": [],
+   "extension_warnings": [],
+   "page_errors_not_ours": 0,
+   "content_script_ran": true
+  },
+  {
+   "site": "TikTok",
+   "url": "https://www.tiktok.com/@nasa",
+   "final_url": "https://www.tiktok.com/@nasa",
+   "reader": {
+    "site": "tiktok",
+    "thread": false,
+    "items": 0,
+    "read": 0,
+    "failures": []
+   },
+   "extension_errors": [],
+   "extension_warnings": [],
+   "page_errors_not_ours": 2,
+   "content_script_ran": true
+  }
+ ],
+ "service_worker_errors": []
+}

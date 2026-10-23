@@ -7,7 +7,7 @@ import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 import { makeHead, headText, signHead, sigFileText, checkHead, headKeyId, refusalSentence, HEAD_DOES_NOT_PROVE } from "../src/core/head.js";
 import { verifyDir, SUMS } from "./release-lib.mjs";
-import { sha256Hex } from "../src/core/sig.js";
+import { sha256Hex, canonicalJSON } from "../src/core/sig.js";
 
 export const HEAD = "HEAD.json", HEAD_SIG = "HEAD.sig";
 export const DEFAULT_STATE = join(homedir(), ".radar", "head-state.json");
@@ -43,6 +43,31 @@ function saveState(p, state) {
   writeFileSync(p, JSON.stringify(state, null, 2) + "\n", { mode: 0o600 });
 }
 
+// Same version, different head: say in plain words what that means and what to do. The usual cause
+// is a local or test build of a version that was checked on this machine before the published one;
+// the other cause, the one the rule exists for, is someone serving different files under a version
+// number already seen. The state file is never changed here.
+export async function forkHelp(head, state, statePath) {
+  const mine = head ? await sha256Hex(canonicalJSON(head)) : "unknown";
+  const day = (t) => String(t || "unknown").slice(0, 10);
+  return [
+    "what this means",
+    `  This machine already accepted a signed head for release ${state.release || "?"} (version ${state.version}) on ${day(state.seenAt)}.`,
+    `  That head was signed ${day(state.maxTime)}; the one in this download was signed ${day(head && head.time)}.`,
+    `  Stored head hash   ${state.headSha256}`,
+    `  This head's hash   ${mine}`,
+    "  Two different heads under one version means one of them was not the published release:",
+    "  usually a local or test build checked here first, and rarely someone serving other files.",
+    "what to do",
+    "  1. Compare this download's SHA256SUMS with the one on the release page, from another device or person.",
+    "  2. If they match, this download is the published release and the stored entry came from an earlier build.",
+    `     Check it once with --no-state to see every other check pass, then move ${statePath || "the state file"} aside`,
+    "     (rename it, for example to head-state.json.old) and check again, so this head becomes the one remembered.",
+    "  3. If they do not match, do not install this download.",
+    "  Checking any newer release also replaces the stored entry, because a higher version is always accepted.",
+  ];
+}
+
 // The head first, then the signature over SHA256SUMS and every file. opts: { key (public JWK),
 // statePath (null for none), now }. Resolves to { ok, lines }.
 export async function verifyRelease(dir, { key, statePath = null, now = Date.now() } = {}) {
@@ -53,7 +78,7 @@ export async function verifyRelease(dir, { key, statePath = null, now = Date.now
     const sums = existsSync(join(dir, SUMS)) ? readFileSync(join(dir, SUMS), "utf8") : "";
     const r = await checkHead({ head: readFileSync(join(dir, HEAD), "utf8"), sig, trusted: [key], state, now, sums, catalogue: null });
     headOk = r.ok;
-    if (!r.ok) lines.push(r.sentence);
+    if (!r.ok) { lines.push(r.sentence); if (r.rule === "fork") lines.push(...await forkHelp(r.head, state, statePath)); }
     else {
       const sigs = `${r.valid} of ${r.needed} signature${r.needed === 1 ? "" : "s"}${r.needed === 1 ? " (single-signer release)" : ""}`;
       lines.push(`head      version ${r.head.version}, signed ${r.head.time.slice(0, 10)}, valid until ${r.head.expires.slice(0, 10)}, ${sigs}`);

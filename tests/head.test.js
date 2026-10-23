@@ -182,3 +182,15 @@ test("9. each refusal is named in one plain sentence, and the release verifier p
     assert.ok(bare.lines.includes(refusalSentence("missing")));
   } finally { rmSync(dir, { recursive: true, force: true }); rmSync(statePath, { force: true }); }
 });
+
+test("verify-release explains a same-version, different-head refusal and the fix in plain words", async () => {
+  const { forkHelp } = await import("../scripts/head-lib.mjs");
+  const lines = await forkHelp({ version: 3004000, time: "2026-10-23T21:00:00Z" }, { version: 3004000, release: "3.4.0", seenAt: "2026-10-23T20:34:51Z", maxTime: "2026-10-23T20:34:22Z", headSha256: "ab".repeat(32) }, "/home/u/.radar/head-state.json");
+  const text = lines.join("\n");
+  assert.match(text, /already accepted a signed head for release 3\.4\.0/);
+  assert.match(text, /local or test build/);
+  assert.match(text, /--no-state/);
+  assert.match(text, /move \/home\/u\/\.radar\/head-state\.json aside/);
+  assert.match(text, /do not install this download/);
+  assert.ok(!/—/.test(text));
+});

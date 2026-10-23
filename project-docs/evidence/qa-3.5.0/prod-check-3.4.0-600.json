@@ -1,0 +1,140 @@
+{
+ "version": "3.5.0",
+ "package": "D:/radar-wt/main-340/dist/radar-chrome-3.4.0.zip",
+ "install_opened": [
+  "welcome.html"
+ ],
+ "first_run": {
+  "seconds_to_started": 0.2,
+  "seconds_to_first_sign": 4.22,
+  "clicks": 1
+ },
+ "window_open": {
+  "samples_ms": [
+   473.7,
+   473.6,
+   475.6,
+   473.5,
+   468.9,
+   466.7
+  ],
+  "median_ms": 473.55,
+  "max_ms": 475.6
+ },
+ "keyboard": {
+  "focus_opens_window": true,
+  "alt_r_moves_into_window": true,
+  "tab_stays_in_window": true,
+  "focus_visible": true,
+  "esc_closes_window": true
+ },
+ "soak_on": {
+  "marks": [
+   {
+    "posts": 40,
+    "heap_mb": 12.55,
+    "nodes": 544,
+    "script_s": 0.076
+   },
+   {
+    "posts": 100,
+    "heap_mb": 12.75,
+    "nodes": 804,
+    "script_s": 0.093
+   },
+   {
+    "posts": 200,
+    "heap_mb": 13.01,
+    "nodes": 804,
+    "script_s": 0.122
+   },
+   {
+    "posts": 300,
+    "heap_mb": 13.07,
+    "nodes": 804,
+    "script_s": 0.149
+   },
+   {
+    "posts": 400,
+    "heap_mb": 13.12,
+    "nodes": 804,
+    "script_s": 0.176
+   },
+   {
+    "posts": 500,
+    "heap_mb": 13.16,
+    "nodes": 804,
+    "script_s": 0.203
+   },
+   {
+    "posts": 600,
+    "heap_mb": 13.2,
+    "nodes": 804,
+    "script_s": 0.23
+   },
+   {
+    "posts": 601,
+    "heap_mb": 13.22,
+    "nodes": 804,
+    "script_s": 0.235
+   }
+  ],
+  "badges_in_page_at_end": 0
+ },
+ "soak_off": {
+  "marks": [
+   {
+    "posts": 40,
+    "heap_mb": 2.35,
+    "nodes": 541,
+    "script_s": 0.055
+   },
+   {
+    "posts": 100,
+    "heap_mb": 2.43,
+    "nodes": 801,
+    "script_s": 0.058
+   },
+   {
+    "posts": 200,
+    "heap_mb": 2.51,
+    "nodes": 801,
+    "script_s": 0.064
+   },
+   {
+    "posts": 300,
+    "heap_mb": 2.5,
+    "nodes": 801,
+    "script_s": 0.069
+   },
+   {
+    "posts": 400,
+    "heap_mb": 2.5,
+    "nodes": 801,
+    "script_s": 0.074
+   },
+   {
+    "posts": 500,
+    "heap_mb": 2.49,
+    "nodes": 801,
+    "script_s": 0.079
+   },
+   {
+    "posts": 600,
+    "heap_mb": 2.49,
+    "nodes": 801,
+    "script_s": 0.084
+   },
+   {
+    "posts": 601,
+    "heap_mb": 2.49,
+    "nodes": 801,
+    "script_s": 0.084
+   }
+  ],
+  "badges_in_page_at_end": 0
+ },
+ "service_worker_errors": [],
+ "console_errors": [],
+ "blocked_requests": []
+}

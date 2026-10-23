@@ -94,10 +94,24 @@ export function launchStage(kind) {
   return { url: base, quotesUrl: `${base}/quotes`, retweetsUrl: `${base}/retweets`, html: page("Post", posts), json: { TweetDetail: detail([launch, ...qs, ...replies, ...own]), Retweeters: retweeters(crowd) } };
 }
 
+// A long thread for the soak test (scripts/qa/prod_check.py): n invented replies, every fifth one a
+// copy of an earlier one so the coordination signs have work to do. The page renders 20 at a time
+// as the reader scrolls and keeps at most 60 in the page, the way X's own list drops posts that
+// scrolled far out of view, so detached posts must not stay alive in memory.
+export function longStage(n = 600) {
+  const root = "1900000000000000900", words = ["the vote", "the budget", "the bridge", "the school plan", "the new rail line", "the clinic", "the park"];
+  const posts = [{ h: demo("city_desk"), text: "The council publishes its plan for the coming year today. Read it and tell us what you think.", id: root, root: true }];
+  for (let i = 1; i <= n; i++) {
+    const text = i % 5 === 0 ? posts[Math.max(1, i - 7)].text : `Reply ${i}: my view on ${words[i % words.length]} is that it needs ${i % 3 ? "more time" : "a public meeting"} before anyone signs.`;
+    posts.push({ h: demo(`reader${i}`), text, id: String(BigInt(root) + BigInt(i)) });
+  }
+  return { url: `https://x.com/${posts[0].h}/status/${root}`, html: page("Post", posts, { window: 60, step: 20 }), json: {} };
+}
+
 // An X-shaped page: articles with the test ids and status links X uses, flat-tone avatars, no faces,
 // no X name or logo. The script asks for the stage's responses the way X's app does, so the
 // extension's page-context reader sees them.
-function page(title, posts) {
+function page(title, posts, { window: win = 0, step = 20 } = {}) {
   const rows = JSON.stringify(posts);
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title} (synthetic demo)</title>
 <style>
@@ -117,14 +131,17 @@ article.root [data-testid="tweetText"]{font-size:19px}
 <script>
 const P=${rows},tones=["#cfd9de","#d8cbb8","#bfcabd","#cfc3cf","#c4ccd6","#d6d0c2"],box=document.getElementById("thread");
 const k=(n)=>n>=1000?(Math.round(n/100)/10)+"K":String(n);
-P.forEach((r,i)=>{const a=document.createElement("article");a.setAttribute("data-testid","tweet");a.tabIndex=0;if(r.root)a.className="root";a.style.setProperty("--av",r.root?"#20242b":tones[i%tones.length]);
+const draw=(r,i)=>{const a=document.createElement("article");a.setAttribute("data-testid","tweet");a.tabIndex=0;if(r.root)a.className="root";a.style.setProperty("--av",r.root?"#20242b":tones[i%tones.length]);
 a.innerHTML='<div data-testid="User-Name"><a href="/'+r.h+'"></a> <span>@'+r.h+' · <a href="/'+r.h+'/status/'+r.id+'"><time datetime="2026-10-22T15:00:00Z">'+(r.root?"2h":(i*4+1)+"m")+'</time></a></span></div><div data-testid="tweetText" lang="en" dir="auto"></div>';
 a.querySelector('[data-testid="User-Name"] a').textContent=r.h.replace(/^demo_/,"").replace(/_/g," ");a.querySelector('[data-testid="tweetText"]').textContent=r.text;
 if(r.link){const t=a.querySelector('[data-testid="tweetText"]'),l=document.createElement("a");l.href=r.link;l.textContent=" "+r.link.slice(8);t.append(l);}
 if(r.quoteOf){const q=document.createElement("div");q.className="quoted";q.textContent="Quoting @"+r.quoteOf;a.append(q);}
 if(r.paid){const s=document.createElement("span");s.className="paid";s.textContent="Paid partnership";a.append(s);}
 if(r.counts){const c=document.createElement("div");c.className="counts";c.textContent=k(r.counts.replies)+" replies  "+k(r.counts.reposts)+" reposts  "+k(r.counts.likes)+" likes  "+k(r.counts.views)+" views";a.append(c);}
-box.append(a);});
+box.append(a);};
+const W=${win},S=${step};let next=0;const more=()=>{const end=Math.min(P.length,next+S);for(;next<end;next++)draw(P[next],next);while(W&&box.children.length>W)box.firstElementChild.remove();};
+if(!W)P.forEach(draw);else{more();more();addEventListener("scroll",()=>{if(innerHeight+scrollY>document.body.scrollHeight-400&&next<P.length)more();},{passive:true});}
+window.__stage={rendered:()=>next,total:P.length};
 for(const op of ["TweetDetail","Retweeters"]) fetch("/i/api/graphql/demo/"+op+"?stage=1").then((r)=>r.ok?r.json():null).catch(()=>null);
 </script></body></html>`;
 }
@@ -132,7 +149,7 @@ for(const op of ["TweetDetail","Retweeters"]) fetch("/i/api/graphql/demo/"+op+"?
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const out = process.argv[2];
   if (!out) { console.error("usage: node scripts/demo/stage.mjs <out dir>"); process.exit(2); }
-  const stages = { thread: threadStage(), campaign: launchStage("campaign"), ours: launchStage("organic") };
+  const stages = { thread: threadStage(), campaign: launchStage("campaign"), ours: launchStage("organic"), long: longStage(Number(process.env.STAGE_LONG_N) || 600) };
   mkdirSync(out, { recursive: true });
   const index = {};
   for (const [name, s] of Object.entries(stages)) {

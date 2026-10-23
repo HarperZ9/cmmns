@@ -29,7 +29,7 @@
     for (const f of findings) {
       const at = lower.indexOf(String(f.match).toLowerCase());
       if (at < 0) continue;
-      try { const r = rangeFor(map, at, at + f.match.length); if (r) out.push(r); } catch (e) { console.error("[daylight-commons] lens range failed", e); }
+      try { const r = rangeFor(map, at, at + f.match.length); if (r) out.push(r); } catch (e) { PBGuard.report("lens range failed", e); }
     }
     return out;
   }

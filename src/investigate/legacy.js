@@ -4,6 +4,7 @@
 // The import never edits the original folder.
 import { readFileSync, existsSync, copyFileSync } from "node:fs";
 import { join, extname } from "node:path";
+import { within, isWithin } from "./paths.js";
 import { readJsonl, writeJsonl, TABLES } from "./store.js";
 import { dayOf } from "./timeline.js";
 
@@ -62,7 +63,7 @@ export function importLegacy(caseDir, folder, { withCaptures = false, year } = {
   const sources = legacySources(folder).map((s) => JSON.parse(JSON.stringify(s)));
   let copied = 0;
   for (const s of sources) {
-    const src = s.capture.legacy_file ? join(folder, s.capture.legacy_file) : null;
+    const src = s.capture.legacy_file && isWithin(folder, s.capture.legacy_file) ? within(folder, s.capture.legacy_file, "the old case folder") : null;
     if (withCaptures && src && existsSync(src)) { copyFileSync(src, join(caseDir, s.capture.file)); copied++; } else if (s.capture.file) s.capture.included = false;
   }
   writeJsonl(join(caseDir, TABLES.sources[0]), sources);

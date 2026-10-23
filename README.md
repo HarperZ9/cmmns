@@ -32,6 +32,10 @@ Node 22 or later on a saved thread or your own export:
 node bin/radar.mjs analyze saved-thread.html
 ```
 
+New here? [Quick start](docs/guide/QUICKSTART.md) has one short recipe per feature;
+[Troubleshooting](docs/guide/TROUBLESHOOTING.md) and [questions and answers](docs/guide/FAQ.md)
+cover the rest.
+
 ## What the window shows
 
 - **Place:** where X labels the account as based, and a sign when a reply speaks as a local of
