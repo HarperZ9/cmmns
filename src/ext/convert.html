@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Convert and compress · Daylight Commons</title>
+<link rel="stylesheet" href="canon.css">
+<link rel="stylesheet" href="pages.css">
+<link rel="stylesheet" href="media.css">
+</head>
+<body>
+<main class="wide">
+  <header>
+    <h1>Convert and compress</h1>
+    <p class="lead">Change a picture, GIF, video or sound file to a similar format, or make it smaller. It all runs in this browser: no server, no upload. The original keeps its hash, and the new file records its own hash and the step that made it.</p>
+  </header>
+  <section aria-labelledby="h-source">
+    <h2 id="h-source">The file</h2>
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept="image/*,video/*,audio/*,.gif">
+      <span>Drop a file here, or choose one. Or open Convert on an item in Collections.</span>
+    </label>
+    <dl id="source" class="facts"></dl>
+  </section>
+  <section aria-labelledby="h-options" id="options-box" hidden>
+    <h2 id="h-options">Into</h2>
+    <div class="field">
+      <label for="to">Format</label>
+      <select id="to"></select>
+      <label for="quality" data-for="image">Quality <output id="quality-out" for="quality">0.80</output></label>
+      <input id="quality" type="range" min="0.1" max="1" step="0.05" value="0.8" data-for="image">
+      <label for="maxSide" data-for="image">Longest side</label>
+      <select id="maxSide" data-for="image"><option value="0">Keep</option><option>4096</option><option>2048</option><option>1600</option><option>1280</option><option>1024</option><option>640</option></select>
+      <label for="maxHeight" data-for="video gif">Height at most</label>
+      <select id="maxHeight" data-for="video gif"><option value="0">Keep</option><option>1080</option><option>720</option><option>480</option><option>360</option><option>240</option></select>
+      <label for="bitrate" data-for="video gif">Video bitrate</label>
+      <select id="bitrate" data-for="video gif"><option value="4000000">4 Mbit/s</option><option value="2000000" selected>2 Mbit/s</option><option value="1000000">1 Mbit/s</option><option value="500000">500 kbit/s</option><option value="250000">250 kbit/s</option></select>
+      <label for="fps" data-for="video">Frames per second</label>
+      <select id="fps" data-for="video"><option value="0">Keep</option><option>30</option><option>24</option><option>15</option></select>
+      <label for="audioBitrate" data-for="video audio">Sound bitrate</label>
+      <select id="audioBitrate" data-for="video audio"><option value="128000">128 kbit/s</option><option value="96000" selected>96 kbit/s</option><option value="64000">64 kbit/s</option><option value="32000">32 kbit/s</option></select>
+    </div>
+    <p class="muted" id="caps"></p>
+    <div class="actions"><button id="go" type="button">Convert</button></div>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </section>
+  <section aria-labelledby="h-result" id="result-box" hidden>
+    <h2 id="h-result">Result</h2>
+    <p id="size" class="lead"></p>
+    <dl id="result" class="facts"></dl>
+    <div class="actions"><a id="download" class="btn" href="#">Download</a> <button id="lineage" type="button" class="quiet">Save the lineage (JSON)</button> <a href="collections.html">Open collections</a></div>
+    <div id="preview"></div>
+  </section>
+</main>
+<script src="core.bundle.js"></script>
+<script src="guard.js"></script>
+<script src="settings.js"></script>
+<script src="pages.js"></script>
+<script src="media-store.js"></script>
+<script src="convert-image.js"></script>
+<script src="convert-audio.js"></script>
+<script src="convert-video.js"></script>
+<script src="convert.js"></script>
+</body>
+</html>

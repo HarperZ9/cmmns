@@ -3712,6 +3712,105 @@ const PROFANITY = ["fuck", "fucking", "fucked", "shit", "damn", "hell", "bullshi
 return { NATIONS, POLITICAL_GROUPS, PEOPLES, TARGET_GROUPS, STRONGMEN, ALLUSIONS, CODED_TERMS, REPORT_VERBS, REBUT_WORDS, MOCK_WORDS, IRONY_WORDS, NEWS_WORDS, PROFANITY };
 })();
 
+// ---- reading-pressure.js
+const M_reading_pressure = (() => {
+// The pressure family of the reading lens: six moves that push a reader to act before they check,
+// whoever writes the message (a person, a scammer, a sock puppet or an AI agent). Seeded from the
+// five sock-puppet messages in Anthropic's 2026-10-23 assessment of the UK AISI incident, and
+// written against the dev set in project-docs/evidence/pressure/dev.jsonl only. The held-out set
+// (test.jsonl) was written by a separate model that never saw these cues, and is scored once by
+// scripts/eval-pressure.mjs. No cue names a group, person, party or side.
+// The family is off by default: it shows only when the user turns on the pressure lens in Options.
+
+const PRESSURE_DEFINITIONS = {
+  "urgency": "The message presses for speed: something is blocked, about to expire or available today only, or the writer apologises for pushing. Look for \"blocked on\", \"today only\" or \"sorry to push\".",
+  "shrinking-ask": "The message makes the request look small so it is easier to say yes. Look for \"three quick steps\", \"~5 minutes\" or \"just one click\".",
+  "manufactured-consensus": "A voice presents itself as an outside party and vouches for the request. Look for \"chiming in as a user\", \"no stake here\" or \"everyone on our team agrees\".",
+  "false-even-handedness": "The message credits both sides to make a dispute look settled. Look for credit to the person who raised a concern and to the person accused, or \"both sides are right\".",
+  "burden-shifting": "The message hands the work of checking to the reader instead of answering. Look for \"check it yourself\", \"prove it\" or \"if you can't show it, merge\".",
+  "deflection-by-label": "The message answers a concern with a label instead of a reason. Look for \"noise\", \"FUD\" or \"drama\" said of an objection.",
+};
+
+const PRESSURE_DOES_NOT_PROVE = "A pressure move describes how a message asks. People in a real hurry use the same words, and it says nothing about who wrote the message.";
+
+const SELF = "(?:yoursel(?:f|ves))";
+// "you can verify it yourself" is help, not a demand, so these lead-ins skip the match.
+const OFFERED = "(?<!\\b(?:you can|you may|you could|feel free to|easy to|able to|lets you|so you can|to help you) )";
+
+const PRESSURE_TECHNIQUES = [
+  ["urgency", "Urgency", "pressure", [
+    "\\bsorry to (?:push|nag|pester|chase|hassle|bug you|keep (?:asking|pushing|chasing))\\b",
+    "\\bapolog(?:ies|ise|ize) for (?:the )?(?:hassl|push|nag|pester|chas|bugg)\\w*",
+    "\\b(?:rollout|release|launch|pipeline|deploy(?:ment)?|merge|we|we're|we are|i'm|i am|team|customer|everything)\\s+(?:is |are )?(?:currently |still |completely )?blocked (?:on|by|until|waiting)\\b",
+    "\\bunblock(?:s|ing)? (?:the|our|this|us|me)\\b",
+    "\\b(?:account|access|mailbox|licen[cs]e|password|wallet|domain|subscription|page)s? (?:will be |is being |has been |gets )?(?:suspended|deleted|locked|closed|disabled|terminated|deactivated|frozen)\\b",
+    "\\b(?:password|account|licen[cs]e|subscription) (?:expires|ends|lapses) (?:today|tonight|in (?:\\d+|one|two) (?:hours?|minutes?))\\b",
+    "\\btoday only\\b", "\\b(?:last|only) (?:\\d+|few) (?:left|licen[cs]es|spots|seats|units)\\b", "\\bfirst \\d+ (?:wallets|people|users|customers|buyers)\\b",
+    "\\blimited[- ](?:time|giveaway|offer|window)\\b", "\\bact (?:now|fast|quickly)\\b", "\\bbefore (?:it'?s|it is) too late\\b",
+    "\\b(?:slips|is lost|falls through|is off|gets cancell?ed|fails) if (?:this|it|you|we)\\b",
+    "\\bif (?:this|it) (?:isn'?t|is not|doesn'?t|does not) (?:get )?(?:in|merged|done|approved|signed|paid|land)\\b[^.\\n]{0,20}\\bby\\b",
+    "\\bor (?:i|we) (?:will )?(?:disclose|publish|go public|leak|release it|report you)\\b",
+    "\\b(?:need|needs|want)s? (?:this|it|them|gift cards|you|an answer|approval|a decision)\\b[^.\\n]{0,40}\\b(?:today|right now|asap|immediately|urgently|within the hour|by noon|by tonight|before end of day|in the next hour)\\b",
+    "\\b(?:discreetly|keep (?:this|it) between us|don'?t (?:mention|tell|say anything about) (?:it|this|anyone))\\b", "\\bare you at your desk\\b",
+    "\\btime[- ]sensitive\\b", "\\b(?:final|last) (?:notice|warning|reminder|chance)\\b", "\\bimmediate action (?:is )?required\\b",
+    "\\b(?:respond|reply|act|pay|confirm|verify)\\b[^.\\n]{0,25}\\bwithin (?:\\d+|one|two|the next) (?:hours?|minutes?|hrs?)\\b",
+    "\\bor (?:your|the) (?:account|access|service|domain|licen[cs]e|funds?)s? (?:will|gets|get) (?:be )?\\w+",
+  ]],
+  ["shrinking-ask", "Shrinking the ask", "pressure", [
+    "\\b(?:three|two|four|a few|a couple of|\\d) (?:quick|simple|small|easy|tiny|short) (?:steps|clicks|questions|things|checks|changes)\\b",
+    "~\\s?\\d+\\s?(?:min(?:ute)?s?|sec(?:ond)?s?)\\b", "\\b(?:minutes?|seconds?|moments?) of your time\\b",
+    "\\btakes? (?:only )?(?:seconds|a second|a minute|no time|two minutes)\\b",
+    "\\b(?:with |in )?(?:one|a single|1) click\\b", "\\bone-click\\b",
+    "\\bjust (?:a|one) (?:one-liner|small|tiny|quick|minor|trivial|single)\\b", "\\bbarely worth a review\\b",
+    "\\b(?:it'?s|it is|this is) (?:only|just|literally) (?:a )?(?:small|tiny|minor|quick|trivial|harmless|one-line)\\b",
+    "\\b(?:it'?s|it is) a small change\\b", "\\bsmall (?:ux |ui )?add-on\\b", "\\b(?:tiny|harmless|trivial|teeny) (?:change|tweak|patch|update|add-on|favou?r)\\b",
+    "\\ball you (?:need|have) to do is\\b", "\\bsimply (?:click|reply|confirm|approve|sign|scan|enter|log in)\\b", "\\bwon'?t take (?:long|more than|a minute)\\b",
+    "\\breal quick\\b", "\\b(?:quick|small|tiny) favou?r\\b", "\\bonly takes? (?:a|one|two|\\d+)\\b",
+  ]],
+  ["manufactured-consensus", "Manufactured consensus", "pressure", [
+    "\\bchiming in as (?:a|an|just a) (?:\\w+ )?(?:user|outsider|bystander|customer|developer|observer)\\b",
+    "\\bas (?:a|an|just a) (?:casual|ordinary|neutral|independent|disinterested|uninvolved|random|outside) (?:user|observer|bystander|reader|developer|customer)\\b",
+    "\\b(?:with )?no (?:stake|skin|horse) in (?:this|the race|here)\\b", "\\bno stake here\\b",
+    "\\blurker,? first (?:post|comment)\\b", "\\bfirst (?:post|comment) here\\b",
+    "\\b(?:our|my) (?:whole|entire) (?:company|team|org|organi[sz]ation|office)\\b[^.\\n]{0,40}\\b(?:runs|uses|agrees|trusts|vouches|approves)\\b",
+    "\\b(?:everyone|everybody|all of us) (?:here |on (?:our|the|my) team |i know |on the list |in the channel )?(?:agrees|trusts|vouches|is fine with)\\b",
+    "\\bothers (?:here |on the list |in the thread |in the channel )?agree\\b", "\\b(?:all |each )?vouch(?:es|ed|ing)? for (?:this|him|her|them|the)\\b",
+    "\\+1,?\\s[^.\\n]{0,50}\\b(?:safe|harmless|fine|legit)\\b",
+    "\\bspeaking as (?:a|an|just a) (?:\\w+ )?(?:user|outsider|bystander|customer|third party)\\b", "\\b(?:i have no|not) affiliat(?:ion|ed) with\\b",
+    "\\bas someone (?:outside|not involved in|with no ties to)\\b", "\\bpasser-?by\\b",
+    "\\b(?:the (?:whole )?community|many of us|most of us) (?:already )?(?:agrees?|trusts?|supports?)\\b",
+  ]],
+  ["false-even-handedness", "False even-handedness", "pressure", [
+    "\\b(?:credit|props|kudos) to (?:both|the \\w+|the \\w+ \\w+)\\b[^.\\n]{0,90}\\band (?:to )?the \\w+ for (?:owning|answering|addressing|fixing|being)\\b",
+    "\\b(?:credit|props|kudos) to both (?:parties|sides|of you)\\b", "\\b(?:props|credit|kudos) to the (?:skeptics?|critics?|reporters?|doubters?|whistle-?blowers?) for\\b",
+    "\\bfor owning it\\b", "\\b(?:each|both) sides? (?:has|have|had) (?:merit|a point|good points)\\b", "\\bboth sides (?:are|were) right\\b",
+    "\\bright in (?:their|its) own way\\b", "\\bno one needs to retract\\b", "\\b(?:can|let'?s) call (?:this|it) settled\\b",
+    "\\b(?:fair|good|valid) points on both sides\\b", "\\bgood faith on (?:both|all) sides\\b", "\\bcredit where (?:it'?s )?due,? to both\\b",
+    "\\bboth (?:of you|parties|sides) (?:made|have|raised|did) (?:great|good|valid|fair)\\b",
+  ]],
+  ["burden-shifting", "Burden shifting", "pressure", [
+    `${OFFERED}\\b(?:check|verify|see|look at|read|test|confirm) [^.,;\\n]{0,30}\\b${SELF}\\b`, "\\bsee for yoursel(?:f|ves)\\b",
+    "\\bshow me (?:where|the line|exactly)\\b", "\\bprove (?:it|that|you|where|this|me wrong)\\b", "\\b(?:it'?s|it is) (?:your job|on you|up to you) to (?:prove|show|find)\\b",
+    "\\bif you can'?t (?:show|prove|find|point)\\b", "\\bif you can'?t\\b[^.\\n]{0,15}[,.]\\s*(?:merge|approve|accept|close|ship)\\b",
+    "\\bnot (?:going|gonna) to walk you through\\b", "\\bwill not discuss (?:it|this) until\\b", "\\bdo your own (?:review|homework|checking)\\b",
+    "\\bthe burden (?:of proof )?is on (?:you|them|the reviewers?)\\b", "\\bunless you can (?:show|prove|point)\\b",
+    "\\bif (?:it'?s|it is) (?:so|really) (?:bad|dangerous|broken|malicious)\\b",
+  ]],
+  ["deflection-by-label", "Deflection by label", "pressure", [
+    "\\bnot the noise\\b", "\\b(?:just|only|mostly|pure|all|more) (?:fud|noise|drama|trolling|hysteria|concern trolling|politics)\\b",
+    "\\bthat'?s (?:just )?(?:fud|noise|drama|trolling)\\b", "\\bignore the (?:drama|noise|haters|fud|trolls|naysayers)\\b",
+    "\\b(?:objections?|complaints?|concerns?|criticism) (?:are|is) (?:just |only |mostly )?(?:noise|fud|drama|trolling)\\b",
+    "\\bwon'?t dignify\\b", "\\bconcern[- ]trolling\\b",
+    "\\bbikeshedd?ing\\b", "\\btin ?foil\\b", "\\bparanoi(?:a|d)\\b", "\\b(?:you'?re|they'?re|people are) (?:just )?overreacting\\b",
+    "\\b(?:the usual|a few|some) (?:naysayers|haters|trolls)\\b", "\\b(?:conspiracy|scare) (?:theory|theories|mongering|tactics)\\b",
+  ]],
+];
+
+const PRESSURE_IDS = PRESSURE_TECHNIQUES.map(([id]) => id);
+
+return { PRESSURE_DEFINITIONS, PRESSURE_DOES_NOT_PROVE, PRESSURE_TECHNIQUES, PRESSURE_IDS };
+})();
+
 // ---- reading-cues.js
 const M_reading_cues = (() => {
 // The techniques the reading lens names, each with its cues. A cue is a regular expression over the
@@ -3721,6 +3820,7 @@ const M_reading_cues = (() => {
 
 const { NATIONS, TARGET_GROUPS, STRONGMEN, ALLUSIONS, CODED_TERMS } = M_reading_lists;
 const { COERCION_ACTORS } = M_theories_coercion;
+const { PRESSURE_TECHNIQUES, PRESSURE_DEFINITIONS } = M_reading_pressure;
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const alt = (list) => [...new Set(list)].map(esc).sort((a, b) => b.length - a.length).join("|");
@@ -3760,7 +3860,7 @@ const DEFINITIONS = {
 };
 
 // [id, name, family, cues]. Family names follow the brief; literary devices are one family.
-const READING_TECHNIQUES = [
+const READING_TECHNIQUES = [...[
   ["nation-denial", "Nation denial", "dehumanising", [
     `\\b{NATION}\\s+(?:isn't|is not|ain't|was never|has never been)\\s+(?:even\\s+)?(?:a\\s+)?(?:real\\s+)?(?:country|nation|state|people)\\b`,
     "\\bno man'?s land\\b", "\\b(?:not|never) (?:a|even a) real (?:country|nation|people)\\b", "\\bso-called (?:country|nation|state|people)\\b",
@@ -3840,7 +3940,7 @@ const READING_TECHNIQUES = [
   ["allusion", "Allusion", "literary", [`\\b(?:${alt(ALLUSIONS)})\\b`]],
   ["dog-whistle", "Dog-whistle", "literary", ["\\b(?:certain people|you know who|those people|these people|their kind|globalists?|international bankers|rootless|the usual suspects|\\(\\(\\()\\b",
     "\\b(?:we aren'?t supposed to|you'?re not supposed to) (?:notice|talk about|say)\\b", "\\boften it'?s in the (?:last )?name\\b", "\\b(?:jewish|zionist|muslim|catholic|white|black) (?:money|cabal|lobby|power brokers)\\b"]],
-].map(([id, name, family, cues]) => ({ id, name, family, cues, definition: DEFINITIONS[id] }));
+], ...PRESSURE_TECHNIQUES].map(([id, name, family, cues]) => ({ id, name, family, cues, definition: DEFINITIONS[id] || PRESSURE_DEFINITIONS[id] }));
 
 const fill = (cue) => cue.replace(/\{(NATION|GROUP|ACTOR|STRONGMAN)\}/g, (_, k) => SLOTS[k]);
 const READING_RULES = READING_TECHNIQUES.flatMap((t) => t.cues.map((cue, i) => ({ technique: t.id, cue: `${t.id}#${i}`, re: new RegExp(fill(cue), "giu") })));
@@ -4126,6 +4226,7 @@ const M_reading = (() => {
 const { READING_RULES, TECHNIQUE_BY_ID, READING_TECHNIQUES } = M_reading_cues;
 const { postFactors, matchFactors, inflect } = M_reading_inflection;
 const { READING_MEASURED } = M_reading_measured;
+const { PRESSURE_IDS } = M_reading_pressure;
 
 const READING_SHIP_PRECISION = 0.8;
 const READING_SHIP_MIN_N = 3;
@@ -4136,7 +4237,14 @@ function readingOn(table = READING_MEASURED) {
 }
 
 // The shown set for a user's settings: every technique when they turned the lens fully on.
-const lensOn = (settings) => (settings && settings.lensAll ? new Set(READING_TECHNIQUES.map((t) => t.id)) : readingOn());
+// The pressure family (reading-pressure.js) is its own switch, off by default, whatever its measurement.
+function lensOn(settings) {
+  if (settings && settings.lensAll) return new Set(READING_TECHNIQUES.map((t) => t.id));
+  const on = readingOn();
+  for (const id of PRESSURE_IDS) on.delete(id);
+  if (settings && settings.pressureLens) for (const id of PRESSURE_IDS) on.add(id);
+  return on;
+}
 
 // Every cue match in the text, overlapping matches of one technique merged into the first.
 function cueHits(text) {
@@ -4186,7 +4294,8 @@ function readThread(posts, { inflection = true, on = readingOn(), withFactors = 
     const findings = hits[i].map((h) => {
       const t = TECHNIQUE_BY_ID.get(h.technique);
       const factors = matchFactors(p.text, h, base, context(P, i, h.technique, U)), inf = inflect(factors);
-      const kept = inflection ? inf.shown : true;
+      // A pressure phrase in quotes or after a reporting verb is a mention ("he wrote 'sorry to push'"), not a use.
+      const kept = inflection ? inf.shown && !(t.family === "pressure" && factors.quotes) : true;
       const f = { technique: t.id, name: t.name, family: t.family, start: h.start, end: h.end, match: h.match.trim().slice(0, 120),
         weight: inf.weight, top: inf.top, shown: kept && on.has(t.id) };
       return withFactors ? { ...f, factors } : f;
@@ -10271,6 +10380,1699 @@ const GENERIC_DOES_NOT_PROVE = "The generic reader guessed where the article and
 return { GENERIC_MAX_COMMENTS, pickArticle, pickComments, genericChecks, GENERIC_DOES_NOT_PROVE };
 })();
 
+// ---- media-bytes.js
+const M_media_bytes = (() => {
+// A growable big-endian byte writer and small byte helpers shared by the media muxers
+// (WebM, MP4, Ogg). Plain Uint8Array and DataView only, so it runs in a browser page or Node.
+
+const muxTextEncoder = new TextEncoder();
+const TWO32 = 4294967296;
+
+class MuxByteWriter {
+  constructor(capacity = 256) {
+    this.buf = new Uint8Array(capacity);
+    this.pos = 0;
+  }
+  ensure(n) {
+    if (this.pos + n <= this.buf.length) return;
+    let cap = this.buf.length * 2;
+    while (cap < this.pos + n) cap *= 2;
+    const next = new Uint8Array(cap);
+    next.set(this.buf.subarray(0, this.pos));
+    this.buf = next;
+  }
+  u8(v) {
+    this.ensure(1);
+    this.buf[this.pos++] = v & 255;
+    return this;
+  }
+  u16(v) {
+    this.ensure(2);
+    this.buf[this.pos++] = (v >>> 8) & 255;
+    this.buf[this.pos++] = v & 255;
+    return this;
+  }
+  u24(v) {
+    this.ensure(3);
+    this.buf[this.pos++] = (v >>> 16) & 255;
+    this.buf[this.pos++] = (v >>> 8) & 255;
+    this.buf[this.pos++] = v & 255;
+    return this;
+  }
+  u32(v) {
+    this.ensure(4);
+    const x = v >>> 0;
+    this.buf[this.pos++] = (x >>> 24) & 255;
+    this.buf[this.pos++] = (x >>> 16) & 255;
+    this.buf[this.pos++] = (x >>> 8) & 255;
+    this.buf[this.pos++] = x & 255;
+    return this;
+  }
+  u64(v) {
+    const hi = Math.floor(v / TWO32);
+    this.u32(hi);
+    return this.u32(v - hi * TWO32);
+  }
+  i16(v) {
+    return this.u16(v < 0 ? v + 65536 : v);
+  }
+  i32(v) {
+    return this.u32(v < 0 ? v + TWO32 : v);
+  }
+  f64(v) {
+    this.ensure(8);
+    new DataView(this.buf.buffer, this.buf.byteOffset + this.pos, 8).setFloat64(0, v, false);
+    this.pos += 8;
+    return this;
+  }
+  bytes(arr) {
+    this.ensure(arr.length);
+    this.buf.set(arr, this.pos);
+    this.pos += arr.length;
+    return this;
+  }
+  zeros(n) {
+    this.ensure(n);
+    this.buf.fill(0, this.pos, this.pos + n);
+    this.pos += n;
+    return this;
+  }
+  // Four-character codes and other ASCII text, one byte per character.
+  ascii(str) {
+    this.ensure(str.length);
+    for (let i = 0; i < str.length; i++) this.buf[this.pos++] = str.charCodeAt(i) & 255;
+    return this;
+  }
+  utf8(str) {
+    return this.bytes(muxTextEncoder.encode(str));
+  }
+  finish() {
+    return this.buf.slice(0, this.pos);
+  }
+}
+
+// Joins a list of Uint8Array pieces into one new Uint8Array.
+function concatBytes(list) {
+  let total = 0;
+  for (const part of list) total += part.length;
+  const out = new Uint8Array(total);
+  let at = 0;
+  for (const part of list) {
+    out.set(part, at);
+    at += part.length;
+  }
+  return out;
+}
+
+function muxUtf8(str) {
+  return muxTextEncoder.encode(str);
+}
+
+// Reads a big-endian unsigned integer of 1 to 8 bytes as a JavaScript number.
+function muxReadUint(bytes, start, length) {
+  let v = 0;
+  for (let i = 0; i < length; i++) v = v * 256 + bytes[start + i];
+  return v;
+}
+
+return { MuxByteWriter, concatBytes, muxUtf8, muxReadUint };
+})();
+
+// ---- media-webm.js
+const M_media_webm = (() => {
+// Writes WebM files (Matroska subset) from already encoded video and audio chunks, such as the
+// output of WebCodecs VideoEncoder (VP8, VP9, AV1) and AudioEncoder (Opus). Also builds the
+// 19-byte OpusHead that WebM and Ogg carry as Opus codec setup.
+
+const { concatBytes, muxUtf8 } = M_media_bytes;
+
+const ID = {
+  EBML: 0x1a45dfa3, EBMLVersion: 0x4286, EBMLReadVersion: 0x42f7, EBMLMaxIDLength: 0x42f2,
+  EBMLMaxSizeLength: 0x42f3, DocType: 0x4282, DocTypeVersion: 0x4287, DocTypeReadVersion: 0x4285,
+  Segment: 0x18538067, SeekHead: 0x114d9b74, Seek: 0x4dbb, SeekID: 0x53ab, SeekPosition: 0x53ac,
+  Info: 0x1549a966, TimecodeScale: 0x2ad7b1, MuxingApp: 0x4d80, WritingApp: 0x5741, Duration: 0x4489,
+  Tracks: 0x1654ae6b, TrackEntry: 0xae, TrackNumber: 0xd7, TrackUID: 0x73c5, TrackType: 0x83,
+  FlagLacing: 0x9c, CodecID: 0x86, CodecPrivate: 0x63a2, CodecDelay: 0x56aa, SeekPreRoll: 0x56bb,
+  Video: 0xe0, PixelWidth: 0xb0, PixelHeight: 0xba, Audio: 0xe1, SamplingFrequency: 0xb5, Channels: 0x9f,
+  Cluster: 0x1f43b675, Timecode: 0xe7, SimpleBlock: 0xa3,
+  Cues: 0x1c53bb6b, CuePoint: 0xbb, CueTime: 0xb3, CueTrackPositions: 0xb7, CueTrack: 0xf7,
+  CueClusterPosition: 0xf1,
+};
+const VIDEO_CODECS = ["V_VP8", "V_VP9", "V_AV1"];
+const APP_NAME = "Daylight Commons";
+
+// Element ids are written as given, marker bits included.
+function idBytes(id) {
+  const out = [];
+  for (let v = id; v > 0; v = Math.floor(v / 256)) out.unshift(v % 256);
+  return Uint8Array.from(out);
+}
+
+// EBML variable-length size; the all-ones value of each length is reserved for "unknown".
+function sizeBytes(n) {
+  let len = 1;
+  while (len < 8 && n >= 2 ** (7 * len) - 1) len++;
+  const out = new Uint8Array(len);
+  let v = n;
+  for (let i = len - 1; i >= 0; i--) {
+    out[i] = v % 256;
+    v = Math.floor(v / 256);
+  }
+  out[0] |= 0x80 >> (len - 1);
+  return out;
+}
+
+function uintBytes(v, width = 0) {
+  const out = [];
+  for (let x = v; x > 0; x = Math.floor(x / 256)) out.unshift(x % 256);
+  while (out.length < Math.max(1, width)) out.unshift(0);
+  return Uint8Array.from(out);
+}
+
+function piecesLength(pieces) {
+  let n = 0;
+  for (const p of pieces) n += p.length;
+  return n;
+}
+
+// An element is a flat list of byte pieces: id, size, then the payload pieces.
+function el(id, payload) {
+  const pieces = payload instanceof Uint8Array ? [payload] : payload;
+  const out = [idBytes(id), sizeBytes(piecesLength(pieces))];
+  for (const p of pieces) out.push(p);
+  return out;
+}
+
+const elUint = (id, v) => el(id, uintBytes(v));
+const elStr = (id, s) => el(id, muxUtf8(s));
+function elFloat(id, v) {
+  const b = new Uint8Array(8);
+  new DataView(b.buffer).setFloat64(0, v, false);
+  return el(id, b);
+}
+
+function opusHead({ channels, sampleRate, preSkip = 3840 }) {
+  if (!(channels === 1 || channels === 2)) {
+    throw new Error("opusHead: only 1 or 2 channels use mapping family 0; pass the encoder's OpusHead as codecPrivate for more channels");
+  }
+  const b = new Uint8Array(19);
+  b.set(muxUtf8("OpusHead"), 0);
+  const dv = new DataView(b.buffer);
+  dv.setUint8(8, 1);
+  dv.setUint8(9, channels);
+  dv.setUint16(10, preSkip, true);
+  dv.setUint32(12, sampleRate, true);
+  dv.setInt16(16, 0, true);
+  dv.setUint8(18, 0);
+  return b;
+}
+
+function ebmlHeader() {
+  return el(ID.EBML, [
+    ...elUint(ID.EBMLVersion, 1), ...elUint(ID.EBMLReadVersion, 1),
+    ...elUint(ID.EBMLMaxIDLength, 4), ...elUint(ID.EBMLMaxSizeLength, 8),
+    ...elStr(ID.DocType, "webm"), ...elUint(ID.DocTypeVersion, 4), ...elUint(ID.DocTypeReadVersion, 2),
+  ]);
+}
+
+function videoEntry(video, number) {
+  if (!VIDEO_CODECS.includes(video.codec)) throw new Error(`muxWebM: video codec must be one of ${VIDEO_CODECS.join(", ")}`);
+  if (!(video.width > 0 && video.height > 0)) throw new Error("muxWebM: video width and height are required");
+  const body = [
+    ...elUint(ID.TrackNumber, number), ...elUint(ID.TrackUID, number), ...elUint(ID.TrackType, 1),
+    ...elUint(ID.FlagLacing, 0), ...elStr(ID.CodecID, video.codec),
+  ];
+  if (video.codecPrivate && video.codecPrivate.length) body.push(...el(ID.CodecPrivate, video.codecPrivate));
+  body.push(...el(ID.Video, [...elUint(ID.PixelWidth, video.width), ...elUint(ID.PixelHeight, video.height)]));
+  return el(ID.TrackEntry, body);
+}
+
+function audioEntry(audio, number) {
+  if (audio.codec !== "A_OPUS") throw new Error("muxWebM: audio codec must be A_OPUS");
+  const head = audio.codecPrivate && audio.codecPrivate.length ? audio.codecPrivate : opusHead(audio);
+  const preSkip = head.length >= 12 ? head[10] | (head[11] << 8) : 0;
+  return el(ID.TrackEntry, [
+    ...elUint(ID.TrackNumber, number), ...elUint(ID.TrackUID, number), ...elUint(ID.TrackType, 2),
+    ...elUint(ID.FlagLacing, 0), ...elStr(ID.CodecID, "A_OPUS"), ...el(ID.CodecPrivate, head),
+    ...elUint(ID.CodecDelay, Math.round((preSkip / 48000) * 1e9)), ...elUint(ID.SeekPreRoll, 80000000),
+    ...el(ID.Audio, [...elFloat(ID.SamplingFrequency, audio.sampleRate), ...elUint(ID.Channels, audio.channels)]),
+  ]);
+}
+
+function simpleBlock(trackNo, rel, key, data) {
+  const head = new Uint8Array(4);
+  head[0] = 0x80 | trackNo;
+  head[1] = (rel >> 8) & 255;
+  head[2] = rel & 255;
+  head[3] = key ? 0x80 : 0;
+  return el(ID.SimpleBlock, [head, data]);
+}
+
+// Groups sorted chunks into clusters. A cluster opens at each video keyframe, before the
+// int16 relative timecode would overflow, and every 5 s when there is no video track.
+function webmClusters(sorted, numbers, hasVideo) {
+  const clusters = [];
+  let cur = null;
+  for (const c of sorted) {
+    const ms = Math.round(c.timestampUs / 1000);
+    const videoKey = hasVideo && c.track === "video" && c.key;
+    const rel = cur ? ms - cur.time : 0;
+    if (!cur || videoKey || rel > 32767 || (!hasVideo && rel >= 5000)) {
+      cur = { time: ms, cue: !hasVideo || videoKey, blocks: [] };
+      clusters.push(cur);
+    }
+    cur.blocks.push(...simpleBlock(numbers[c.track], ms - cur.time, c.key, c.data));
+  }
+  if (clusters.length && !clusters.some((cl) => cl.cue)) clusters[0].cue = true;
+  return clusters.map((cl) => ({ ...cl, pieces: el(ID.Cluster, [...elUint(ID.Timecode, cl.time), ...cl.blocks]) }));
+}
+
+function seekEntry(target, pos) {
+  return el(ID.Seek, [...el(ID.SeekID, idBytes(target)), ...el(ID.SeekPosition, uintBytes(pos, 8))]);
+}
+
+function seekHead(infoPos, tracksPos, cuesPos) {
+  const body = [...seekEntry(ID.Info, infoPos), ...seekEntry(ID.Tracks, tracksPos)];
+  if (cuesPos !== null) body.push(...seekEntry(ID.Cues, cuesPos));
+  return el(ID.SeekHead, body);
+}
+
+function webmCues(clusters, firstPos, cueTrack) {
+  const points = [];
+  let pos = firstPos;
+  for (const cl of clusters) {
+    if (cl.cue) {
+      points.push(...el(ID.CuePoint, [
+        ...elUint(ID.CueTime, cl.time),
+        ...el(ID.CueTrackPositions, [...elUint(ID.CueTrack, cueTrack), ...elUint(ID.CueClusterPosition, pos)]),
+      ]));
+    }
+    pos += piecesLength(cl.pieces);
+  }
+  return el(ID.Cues, points);
+}
+
+function checkChunks(chunks, numbers) {
+  for (const c of chunks) {
+    if (!numbers[c.track]) throw new Error(`muxWebM: chunk for missing track "${c.track}"`);
+    if (!(c.data instanceof Uint8Array)) throw new Error("muxWebM: chunk data must be a Uint8Array");
+    if (!Number.isFinite(c.timestampUs)) throw new Error("muxWebM: chunk timestampUs must be a number");
+  }
+}
+
+function totalDurationUs(chunks, durationUs) {
+  if (Number.isFinite(durationUs)) return durationUs;
+  let end = 0;
+  for (const c of chunks) end = Math.max(end, c.timestampUs + (c.durationUs || 0));
+  return end;
+}
+
+// Time order; on a tie video goes first so a keyframe opens its cluster before the audio.
+function webmOrder(a, b) {
+  return a.timestampUs - b.timestampUs || (a.track === b.track ? 0 : a.track === "video" ? -1 : 1);
+}
+
+function muxWebM({ video, audio, chunks = [], durationUs } = {}) {
+  if (!video && !audio) throw new Error("muxWebM: needs a video or an audio track");
+  const numbers = {};
+  const entries = [];
+  if (video) entries.push(...videoEntry(video, (numbers.video = 1)));
+  if (audio) entries.push(...audioEntry(audio, (numbers.audio = video ? 2 : 1)));
+  checkChunks(chunks, numbers);
+  const sorted = chunks.slice().sort(webmOrder);
+  const info = el(ID.Info, [
+    ...elUint(ID.TimecodeScale, 1000000), ...elStr(ID.MuxingApp, APP_NAME), ...elStr(ID.WritingApp, APP_NAME),
+    ...elFloat(ID.Duration, totalDurationUs(chunks, durationUs) / 1000),
+  ]);
+  const tracks = el(ID.Tracks, entries);
+  const clusters = webmClusters(sorted, numbers, Boolean(video));
+  const hasCues = clusters.length > 0;
+  const seekLen = piecesLength(seekHead(0, 0, hasCues ? 0 : null));
+  const infoPos = seekLen;
+  const tracksPos = infoPos + piecesLength(info);
+  const firstCluster = tracksPos + piecesLength(tracks);
+  let cuesPos = firstCluster;
+  for (const cl of clusters) cuesPos += piecesLength(cl.pieces);
+  const cues = hasCues ? webmCues(clusters, firstCluster, video ? numbers.video : numbers.audio) : [];
+  const body = [...seekHead(infoPos, tracksPos, hasCues ? cuesPos : null), ...info, ...tracks];
+  for (const cl of clusters) for (const p of cl.pieces) body.push(p);
+  for (const p of cues) body.push(p);
+  return concatBytes([...ebmlHeader(), ...el(ID.Segment, body)]);
+}
+
+return { opusHead, muxWebM };
+})();
+
+// ---- media-ogg.js
+const M_media_ogg = (() => {
+// Writes Ogg Opus files (RFC 7845) from encoded Opus packets: an OpusHead page, an OpusTags
+// page, then audio pages with lacing, 48 kHz granule positions that count the pre-skip, and
+// the Ogg page CRC (polynomial 0x04c11db7, not reflected, initial value 0).
+
+const { concatBytes, muxUtf8 } = M_media_bytes;
+const { opusHead } = M_media_webm;
+
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let r = i << 24;
+    for (let k = 0; k < 8; k++) r = r & 0x80000000 ? (r << 1) ^ 0x04c11db7 : r << 1;
+    t[i] = r >>> 0;
+  }
+  return t;
+})();
+
+function oggCrc32(bytes) {
+  let crc = 0;
+  for (let i = 0; i < bytes.length; i++) crc = ((crc << 8) ^ CRC_TABLE[((crc >>> 24) ^ bytes[i]) & 255]) >>> 0;
+  return crc >>> 0;
+}
+
+const PAGE_TARGET = 4096;
+const FLAG_CONTINUED = 1;
+const FLAG_BOS = 2;
+const FLAG_EOS = 4;
+
+// granule is a number, or -1 for "no packet ends on this page".
+function oggPage({ flags, granule, serial, sequence, lacing, body }) {
+  const head = new Uint8Array(27 + lacing.length);
+  const dv = new DataView(head.buffer);
+  head.set(muxUtf8("OggS"), 0);
+  head[4] = 0;
+  head[5] = flags;
+  if (granule < 0) {
+    dv.setUint32(6, 0xffffffff, true);
+    dv.setUint32(10, 0xffffffff, true);
+  } else {
+    dv.setUint32(6, granule % 4294967296, true);
+    dv.setUint32(10, Math.floor(granule / 4294967296), true);
+  }
+  dv.setUint32(14, serial, true);
+  dv.setUint32(18, sequence, true);
+  head[26] = lacing.length;
+  head.set(lacing, 27);
+  const page = concatBytes([head, body]);
+  new DataView(page.buffer).setUint32(22, oggCrc32(page), true);
+  return page;
+}
+
+function opusTags(vendor) {
+  const v = muxUtf8(vendor);
+  const b = new Uint8Array(8 + 4 + v.length + 4);
+  b.set(muxUtf8("OpusTags"), 0);
+  const dv = new DataView(b.buffer);
+  dv.setUint32(8, v.length, true);
+  b.set(v, 12);
+  dv.setUint32(12 + v.length, 0, true);
+  return b;
+}
+
+// Packs packets into pages. Each packet is { data, granule }; a packet may span pages.
+function packPages(packets, serial, firstSequence) {
+  const pages = [];
+  let page = null;
+  const open = (continued) => ({ flags: continued ? FLAG_CONTINUED : 0, granule: -1, lacing: [], parts: [], size: 0 });
+  const flush = () => {
+    pages.push({ ...page, serial, sequence: firstSequence + pages.length, body: concatBytes(page.parts) });
+    page = null;
+  };
+  for (const pkt of packets) {
+    const len = pkt.data.length;
+    const segs = Math.floor(len / 255) + 1;
+    let pos = 0;
+    for (let s = 0; s < segs; s++) {
+      if (!page) page = open(s > 0);
+      const take = s < segs - 1 ? 255 : len - pos;
+      page.lacing.push(take);
+      page.parts.push(pkt.data.subarray(pos, pos + take));
+      page.size += take;
+      pos += take;
+      if (s === segs - 1) page.granule = pkt.granule;
+      if (page.lacing.length === 255 && s < segs - 1) flush();
+    }
+    if (page && (page.size >= PAGE_TARGET || page.lacing.length === 255)) flush();
+  }
+  if (page) flush();
+  return pages;
+}
+
+// Granules count decoded 48 kHz samples from 0, so they include the pre-skip samples that a
+// player drops. With totalSamples (the source PCM length) the last page trims the end to
+// preSkip + totalSamples, never past what the packets decode to.
+function muxOggOpus({ sampleRate = 48000, channels, preSkip = 3840, packets = [], totalSamples, serial = 0x44434f4d, vendor = "Daylight Commons", head } = {}) {
+  if (!(channels > 0)) throw new Error("muxOggOpus: channels is required");
+  const headBytes = head instanceof Uint8Array ? head : opusHead({ channels, sampleRate, preSkip });
+  const headPage = { flags: FLAG_BOS, granule: 0, serial, sequence: 0, lacing: laceOne(headBytes.length), body: headBytes };
+  let granule = 0;
+  const audio = packets.map((p) => {
+    if (!(p.data instanceof Uint8Array)) throw new Error("muxOggOpus: packet data must be a Uint8Array");
+    if (!(p.durationSamples >= 0)) throw new Error("muxOggOpus: packet durationSamples is required");
+    granule += p.durationSamples;
+    return { data: p.data, granule };
+  });
+  const tags = packPages([{ data: opusTags(vendor), granule: 0 }], serial, 1);
+  const pages = [headPage, ...tags, ...packPages(audio, serial, 1 + tags.length)];
+  const lastPage = pages[pages.length - 1];
+  lastPage.flags |= FLAG_EOS;
+  if (Number.isFinite(totalSamples) && audio.length && lastPage.granule >= 0) {
+    const floor = pages.slice(0, -1).reduce((g, pg) => Math.max(g, pg.granule), 0);
+    lastPage.granule = Math.max(floor, Math.min(granule, preSkip + totalSamples));
+  }
+  return concatBytes(pages.map(oggPage));
+}
+
+function laceOne(len) {
+  const out = new Array(Math.floor(len / 255)).fill(255);
+  out.push(len % 255);
+  return out;
+}
+
+return { oggCrc32, muxOggOpus };
+})();
+
+// ---- media-mp4-boxes.js
+const M_media_mp4_boxes = (() => {
+// ISO base media (MP4) box builders used by muxMp4: generic boxes, movie and track headers,
+// handler and media info boxes, and the stsd sample entries for avc1, vp09, av01, mp4a and Opus.
+
+const { MuxByteWriter, concatBytes } = M_media_bytes;
+
+const TWO32 = 4294967296;
+const MATRIX = [0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000];
+
+function mp4Box(type, parts = []) {
+  let len = 8;
+  for (const p of parts) len += p.length;
+  const w = new MuxByteWriter(len);
+  if (len >= TWO32) {
+    w.u32(1).ascii(type).u64(len + 8);
+  } else {
+    w.u32(len).ascii(type);
+  }
+  for (const p of parts) w.bytes(p);
+  return w.finish();
+}
+
+function mp4FullBox(type, version, flags, parts = []) {
+  const head = new MuxByteWriter(4).u8(version).u24(flags).finish();
+  return mp4Box(type, [head, ...parts]);
+}
+
+function writeMatrix(w) {
+  for (const v of MATRIX) w.u32(v);
+}
+
+function mp4Ftyp() {
+  const w = new MuxByteWriter(24).ascii("isom").u32(0x200).ascii("isomiso2avc1mp41");
+  return mp4Box("ftyp", [w.finish()]);
+}
+
+// Times and durations go in 32 bits (version 0) unless a duration needs 64 bits (version 1).
+function timeFields(w, wide, timescale, duration) {
+  if (wide) w.u64(0).u64(0);
+  else w.u32(0).u32(0);
+  if (timescale !== null) w.u32(timescale);
+  return w;
+}
+
+function mp4Mvhd(timescale, duration, nextTrackId) {
+  const wide = duration >= TWO32;
+  const w = timeFields(new MuxByteWriter(100), wide, timescale, duration);
+  if (wide) w.u64(duration);
+  else w.u32(duration);
+  w.u32(0x00010000).u16(0x0100).zeros(10);
+  writeMatrix(w);
+  w.zeros(24).u32(nextTrackId);
+  return mp4FullBox("mvhd", wide ? 1 : 0, 0, [w.finish()]);
+}
+
+function mp4Tkhd({ trackId, duration, width = 0, height = 0, audio = false }) {
+  const wide = duration >= TWO32;
+  const w = timeFields(new MuxByteWriter(92), wide, null, duration);
+  w.u32(trackId).u32(0);
+  if (wide) w.u64(duration);
+  else w.u32(duration);
+  w.zeros(8).u16(0).u16(0).u16(audio ? 0x0100 : 0).u16(0);
+  writeMatrix(w);
+  w.u32(width * 65536).u32(height * 65536);
+  return mp4FullBox("tkhd", wide ? 1 : 0, 3, [w.finish()]);
+}
+
+function mp4Mdhd(timescale, duration) {
+  const wide = duration >= TWO32;
+  const w = timeFields(new MuxByteWriter(32), wide, timescale, duration);
+  if (wide) w.u64(duration);
+  else w.u32(duration);
+  w.u16(0x55c4).u16(0);
+  return mp4FullBox("mdhd", wide ? 1 : 0, 0, [w.finish()]);
+}
+
+function mp4Hdlr(audio) {
+  const name = audio ? "SoundHandler" : "VideoHandler";
+  const w = new MuxByteWriter(40).u32(0).ascii(audio ? "soun" : "vide").zeros(12).utf8(name).u8(0);
+  return mp4FullBox("hdlr", 0, 0, [w.finish()]);
+}
+
+function mp4Minf(audio, stbl) {
+  const header = audio
+    ? mp4FullBox("smhd", 0, 0, [new Uint8Array(4)])
+    : mp4FullBox("vmhd", 0, 1, [new Uint8Array(8)]);
+  const url = mp4FullBox("url ", 0, 1);
+  const dref = mp4FullBox("dref", 0, 0, [new MuxByteWriter(4).u32(1).finish(), url]);
+  return mp4Box("minf", [header, mp4Box("dinf", [dref]), stbl]);
+}
+
+function visualEntry(type, width, height, configBoxes) {
+  const w = new MuxByteWriter(78).zeros(6).u16(1).u16(0).u16(0).zeros(12);
+  w.u16(width).u16(height).u32(0x00480000).u32(0x00480000).u32(0).u16(1);
+  w.zeros(32).u16(0x18).i16(-1);
+  return mp4Box(type, [w.finish(), ...configBoxes]);
+}
+
+function audioEntry(type, channels, sampleRate, configBoxes) {
+  const w = new MuxByteWriter(28).zeros(6).u16(1).zeros(8).u16(channels).u16(16).u16(0).u16(0);
+  w.u32(Math.min(sampleRate, 65535) * 65536);
+  return mp4Box(type, [w.finish(), ...configBoxes]);
+}
+
+// MPEG-4 descriptor with its length in 7-bit groups.
+function descriptor(tag, parts) {
+  const body = concatBytes(parts);
+  const len = [];
+  for (let n = body.length; ; n = Math.floor(n / 128)) {
+    len.unshift(n % 128);
+    if (n < 128) break;
+  }
+  for (let i = 0; i < len.length - 1; i++) len[i] |= 0x80;
+  return concatBytes([Uint8Array.of(tag, ...len), body]);
+}
+
+function esds(asc) {
+  const dcd = new MuxByteWriter(13).u8(0x40).u8(0x15).u24(0).u32(0).u32(0).finish();
+  const dec = descriptor(0x04, [dcd, descriptor(0x05, [asc])]);
+  const es = descriptor(0x03, [Uint8Array.of(0, 0, 0), dec, descriptor(0x06, [Uint8Array.of(2)])]);
+  return mp4FullBox("esds", 0, 0, [es]);
+}
+
+function dOps({ channels, sampleRate, preSkip = 3840 }) {
+  if (!(channels === 1 || channels === 2)) throw new Error("muxMp4: Opus in MP4 supports 1 or 2 channels (mapping family 0)");
+  const w = new MuxByteWriter(11).u8(0).u8(channels).u16(preSkip).u32(sampleRate).i16(0).u8(0);
+  return mp4Box("dOps", [w.finish()]);
+}
+
+function vpcC({ profile = 0, level = 31, bitDepth = 8 }) {
+  const w = new MuxByteWriter(8).u8(profile).u8(level).u8((bitDepth << 4) | (1 << 1));
+  w.u8(1).u8(1).u8(1).u16(0);
+  return mp4FullBox("vpcC", 1, 0, [w.finish()]);
+}
+
+function videoSampleEntry(video) {
+  const { codec, width, height, description } = video;
+  if (!(width > 0 && height > 0)) throw new Error("muxMp4: video width and height are required");
+  if (codec === "avc1") {
+    if (!(description instanceof Uint8Array) || description[0] !== 1) {
+      throw new Error("muxMp4: avc1 needs description, the avcC record from VideoEncoder decoderConfig (avc format)");
+    }
+    return visualEntry("avc1", width, height, [mp4Box("avcC", [description])]);
+  }
+  if (codec === "vp09") return visualEntry("vp09", width, height, [vpcC(video)]);
+  if (codec === "av01") {
+    if (!(description instanceof Uint8Array) || description[0] !== 0x81) {
+      throw new Error("muxMp4: av01 needs description, an AV1CodecConfigurationRecord (av1C) starting with 0x81");
+    }
+    return visualEntry("av01", width, height, [mp4Box("av1C", [description])]);
+  }
+  throw new Error(`muxMp4: unsupported video codec "${codec}" (use avc1, vp09 or av01)`);
+}
+
+function audioSampleEntry(audio) {
+  if (audio.codec === "mp4a") {
+    if (!(audio.description instanceof Uint8Array) || !audio.description.length) {
+      throw new Error("muxMp4: mp4a needs description, the AudioSpecificConfig bytes");
+    }
+    return audioEntry("mp4a", audio.channels, audio.sampleRate, [esds(audio.description)]);
+  }
+  if (audio.codec === "Opus") return audioEntry("Opus", audio.channels, 48000, [dOps(audio)]);
+  throw new Error(`muxMp4: unsupported audio codec "${audio.codec}" (use mp4a or Opus)`);
+}
+
+function mp4Stsd(track) {
+  const entry = track.audio ? audioSampleEntry(track.config) : videoSampleEntry(track.config);
+  return mp4FullBox("stsd", 0, 0, [new MuxByteWriter(4).u32(1).finish(), entry]);
+}
+
+
+return { mp4Box, mp4FullBox, mp4Ftyp, mp4Mvhd, mp4Tkhd, mp4Mdhd, mp4Hdlr, mp4Minf, mp4Stsd };
+})();
+
+// ---- media-mp4.js
+const M_media_mp4 = (() => {
+// Writes a non-fragmented MP4 with the moov box before mdat (fast start) from encoded video
+// and audio chunks, such as WebCodecs output. Builds the sample tables (stts, ctts, stss, stsc,
+// stsz, stco or co64) and lays the chunk bytes out in mdat interleaved by decode time.
+
+const { MuxByteWriter, concatBytes } = M_media_bytes;
+const { mp4Box, mp4FullBox, mp4Ftyp, mp4Mvhd, mp4Tkhd, mp4Mdhd, mp4Hdlr, mp4Minf, mp4Stsd } = M_media_mp4_boxes;
+
+const TWO32 = 4294967296;
+const MOVIE_TIMESCALE = 1000;
+const VIDEO_TIMESCALE = 90000;
+
+// Chunks come in any order. Each track is sorted by decode time: decodeTimestampUs when the
+// caller supplies it (B-frames), otherwise timestampUs. Composition offsets come from the gap.
+function trackSamples(chunks, name, timescale, defaultDurationUs) {
+  const own = chunks.filter((c) => c.track === name);
+  const useDts = own.some((c) => Number.isFinite(c.decodeTimestampUs));
+  const dts = (c) => (useDts && Number.isFinite(c.decodeTimestampUs) ? c.decodeTimestampUs : c.timestampUs);
+  const ticks = (us) => Math.round((us * timescale) / 1e6);
+  const list = own.slice().sort((a, b) => dts(a) - dts(b));
+  const samples = [];
+  for (let i = 0; i < list.length; i++) {
+    const c = list[i];
+    let duration;
+    if (Number.isFinite(c.durationUs)) duration = ticks(c.durationUs);
+    else if (i + 1 < list.length) duration = ticks(dts(list[i + 1])) - ticks(dts(c));
+    else if (samples.length) duration = samples[samples.length - 1].duration;
+    else duration = ticks(defaultDurationUs);
+    samples.push({
+      data: c.data, size: c.data.length, key: Boolean(c.key), duration: Math.max(0, duration),
+      cts: ticks(c.timestampUs) - ticks(dts(c)), dtsUs: dts(c),
+    });
+  }
+  return samples;
+}
+
+function makeTracks(video, audio, chunks) {
+  const tracks = [];
+  if (video) {
+    tracks.push({ audio: false, name: "video", config: video, timescale: VIDEO_TIMESCALE, samples: trackSamples(chunks, "video", VIDEO_TIMESCALE, 33333) });
+  }
+  if (audio) {
+    const opus = audio.codec === "Opus";
+    const timescale = opus ? 48000 : audio.sampleRate;
+    if (!(timescale > 0)) throw new Error("muxMp4: audio sampleRate is required");
+    const frameUs = opus ? 20000 : (1024 * 1e6) / timescale;
+    tracks.push({ audio: true, name: "audio", config: audio, timescale, samples: trackSamples(chunks, "audio", timescale, frameUs) });
+  }
+  tracks.forEach((t, i) => {
+    t.id = i + 1;
+    t.duration = t.samples.reduce((n, s) => n + s.duration, 0);
+    // Opus pre-skip is trimmed with an edit list that starts the presentation after it.
+    t.mediaStart = t.config.codec === "Opus" ? Math.min(t.duration, t.config.preSkip ?? 3840) : 0;
+    t.movieDuration = Math.round(((t.duration - t.mediaStart) * MOVIE_TIMESCALE) / t.timescale);
+  });
+  return tracks;
+}
+
+// Orders all samples by decode time and groups runs of one track into mdat chunks.
+function layoutMdat(tracks) {
+  const all = [];
+  for (const t of tracks) {
+    t.chunks = [];
+    for (const s of t.samples) all.push({ t, s });
+  }
+  all.sort((a, b) => a.s.dtsUs - b.s.dtsUs);
+  const parts = [];
+  let offset = 0;
+  let last = null;
+  for (const { t, s } of all) {
+    if (t !== last) t.chunks.push({ offset, count: 0 });
+    t.chunks[t.chunks.length - 1].count++;
+    last = t;
+    parts.push(s.data);
+    offset += s.size;
+  }
+  return { parts, size: offset };
+}
+
+function runs(values) {
+  const out = [];
+  for (const v of values) {
+    const top = out[out.length - 1];
+    if (top && top.value === v) top.count++;
+    else out.push({ value: v, count: 1 });
+  }
+  return out;
+}
+
+function countTable(type, version, entries, write) {
+  const w = new MuxByteWriter(8 + entries.length * 8).u32(entries.length);
+  for (const e of entries) write(w, e);
+  return mp4FullBox(type, version, 0, [w.finish()]);
+}
+
+function stts(samples) {
+  return countTable("stts", 0, runs(samples.map((s) => s.duration)), (w, r) => w.u32(r.count).u32(r.value));
+}
+
+function ctts(samples) {
+  if (!samples.some((s) => s.cts !== 0)) return null;
+  const signed = samples.some((s) => s.cts < 0);
+  return countTable("ctts", signed ? 1 : 0, runs(samples.map((s) => s.cts)), (w, r) => w.u32(r.count).i32(r.value));
+}
+
+function stss(samples) {
+  const keys = [];
+  samples.forEach((s, i) => s.key && keys.push(i + 1));
+  return countTable("stss", 0, keys, (w, k) => w.u32(k));
+}
+
+function stsc(chunks) {
+  const entries = [];
+  chunks.forEach((c, i) => {
+    const top = entries[entries.length - 1];
+    if (!top || top.count !== c.count) entries.push({ first: i + 1, count: c.count });
+  });
+  return countTable("stsc", 0, entries, (w, e) => w.u32(e.first).u32(e.count).u32(1));
+}
+
+function stsz(samples) {
+  const w = new MuxByteWriter(8 + samples.length * 4).u32(0).u32(samples.length);
+  for (const s of samples) w.u32(s.size);
+  return mp4FullBox("stsz", 0, 0, [w.finish()]);
+}
+
+function chunkOffsets(chunks, base, wide) {
+  return countTable(wide ? "co64" : "stco", 0, chunks, (w, c) => (wide ? w.u64(base + c.offset) : w.u32(base + c.offset)));
+}
+
+function trak(t, base, wide) {
+  const tables = [mp4Stsd(t), stts(t.samples)];
+  const c = ctts(t.samples);
+  if (c) tables.push(c);
+  if (!t.audio) tables.push(stss(t.samples));
+  tables.push(stsc(t.chunks), stsz(t.samples), chunkOffsets(t.chunks, base, wide));
+  const tkhd = mp4Tkhd({ trackId: t.id, duration: t.movieDuration, width: t.config.width, height: t.config.height, audio: t.audio });
+  const mdia = mp4Box("mdia", [mp4Mdhd(t.timescale, t.duration), mp4Hdlr(t.audio), mp4Minf(t.audio, mp4Box("stbl", tables))]);
+  return mp4Box("trak", t.mediaStart ? [tkhd, edts(t), mdia] : [tkhd, mdia]);
+}
+
+function edts(t) {
+  const w = new MuxByteWriter(16).u32(1).u32(t.movieDuration).u32(t.mediaStart).u16(1).u16(0);
+  return mp4Box("edts", [mp4FullBox("elst", 0, 0, [w.finish()])]);
+}
+
+function moov(tracks, base, wide) {
+  let duration = 0;
+  for (const t of tracks) duration = Math.max(duration, t.movieDuration);
+  const traks = tracks.map((t) => trak(t, base, wide));
+  return mp4Box("moov", [mp4Mvhd(MOVIE_TIMESCALE, duration, tracks.length + 1), ...traks]);
+}
+
+function mdatHeader(payloadSize) {
+  if (payloadSize + 8 < TWO32) return new MuxByteWriter(8).u32(payloadSize + 8).ascii("mdat").finish();
+  return new MuxByteWriter(16).u32(1).ascii("mdat").u64(payloadSize + 16).finish();
+}
+
+function checkChunks(chunks, tracksByName) {
+  for (const c of chunks) {
+    if (!tracksByName[c.track]) throw new Error(`muxMp4: chunk for missing track "${c.track}"`);
+    if (!(c.data instanceof Uint8Array)) throw new Error("muxMp4: chunk data must be a Uint8Array");
+    if (!Number.isFinite(c.timestampUs)) throw new Error("muxMp4: chunk timestampUs must be a number");
+  }
+}
+
+function muxMp4({ video, audio, chunks = [] } = {}) {
+  if (!video && !audio) throw new Error("muxMp4: needs a video or an audio track");
+  checkChunks(chunks, { video: Boolean(video), audio: Boolean(audio) });
+  const tracks = makeTracks(video, audio, chunks);
+  const mdat = layoutMdat(tracks);
+  const ftyp = mp4Ftyp();
+  const head = mdatHeader(mdat.size);
+  // Offsets depend on the moov size, which only changes if stco must become co64.
+  const narrowLen = moov(tracks, 0, false).length;
+  const wide = ftyp.length + narrowLen + head.length + mdat.size >= TWO32;
+  const moovLen = wide ? moov(tracks, 0, true).length : narrowLen;
+  const movie = moov(tracks, ftyp.length + moovLen + head.length, wide);
+  return concatBytes([ftyp, movie, head, ...mdat.parts]);
+}
+
+return { muxMp4 };
+})();
+
+// ---- media-gif-lzw.js
+const M_media_gif_lzw = (() => {
+// The GIF variant of LZW decompression: variable code size from minCodeSize + 1 up to 12 bits,
+// clear and end-of-information codes, and the deferred-clear case when the table is full.
+
+const MAX_CODES = 4096;
+
+// Writes the string for `code` into out, ending at index end - 1, clipped to out.length.
+function emit(out, code, start, length, prefix, suffix) {
+  let c = code;
+  for (let k = start + length - 1; k >= start; k--) {
+    if (k < out.length) out[k] = suffix[c];
+    c = prefix[c];
+  }
+}
+
+function tables(minCodeSize) {
+  const t = {
+    prefix: new Int16Array(MAX_CODES), suffix: new Uint8Array(MAX_CODES),
+    first: new Uint8Array(MAX_CODES), length: new Uint16Array(MAX_CODES),
+  };
+  for (let i = 0; i < 1 << minCodeSize; i++) {
+    t.prefix[i] = -1;
+    t.suffix[i] = i;
+    t.first[i] = i;
+    t.length[i] = 1;
+  }
+  return t;
+}
+
+// Decodes up to pixelCount colour indices. Missing data leaves the rest of the frame at 0.
+function gifLzwDecode(data, minCodeSize, pixelCount) {
+  if (!(minCodeSize >= 1 && minCodeSize <= 11)) throw new Error("decodeGif: bad LZW minimum code size");
+  const out = new Uint8Array(pixelCount);
+  const { prefix, suffix, first, length } = tables(minCodeSize);
+  const clear = 1 << minCodeSize;
+  const eoi = clear + 1;
+  let codeSize = minCodeSize + 1;
+  let next = eoi + 1;
+  let prev = -1;
+  let bits = 0, nbits = 0, pos = 0, op = 0;
+  while (op < pixelCount) {
+    while (nbits < codeSize) {
+      if (pos >= data.length) return out;
+      bits |= data[pos++] << nbits;
+      nbits += 8;
+    }
+    const code = bits & ((1 << codeSize) - 1);
+    bits >>>= codeSize;
+    nbits -= codeSize;
+    if (code === clear) {
+      codeSize = minCodeSize + 1;
+      next = eoi + 1;
+      prev = -1;
+      continue;
+    }
+    if (code === eoi) break;
+    if (prev === -1) {
+      if (code > clear) break;
+      out[op++] = code;
+      prev = code;
+      continue;
+    }
+    if (code > next) break;
+    if (next < MAX_CODES) {
+      prefix[next] = prev;
+      first[next] = first[prev];
+      suffix[next] = code < next ? first[code] : first[prev];
+      length[next] = length[prev] + 1;
+      next++;
+      if (next === 1 << codeSize && codeSize < 12) codeSize++;
+    }
+    emit(out, code, op, length[code], prefix, suffix);
+    op += length[code];
+    prev = code;
+  }
+  return out;
+}
+
+return { gifLzwDecode };
+})();
+
+// ---- media-gif.js
+const M_media_gif = (() => {
+// Decodes GIF87a and GIF89a files into fully composited RGBA frames: global and local colour
+// tables, interlacing, transparency and delays from the Graphic Control Extension, disposal
+// methods 0 to 3, and the NETSCAPE2.0 loop count. A truncated file keeps the frames before the cut.
+
+const { gifLzwDecode } = M_media_gif_lzw;
+
+const TRUNCATED = "decodeGif: truncated";
+
+function isGif(bytes) {
+  if (!bytes || bytes.length < 6) return false;
+  const sig = String.fromCharCode(...bytes.subarray(0, 6));
+  return sig === "GIF87a" || sig === "GIF89a";
+}
+
+function gifReader(bytes) {
+  let pos = 0;
+  const need = (n) => {
+    if (pos + n > bytes.length) {
+      const err = new Error(TRUNCATED);
+      err.gifTruncated = true;
+      throw err;
+    }
+  };
+  return {
+    get pos() { return pos; },
+    u8() { need(1); return bytes[pos++]; },
+    u16() { need(2); const v = bytes[pos] | (bytes[pos + 1] << 8); pos += 2; return v; },
+    take(n) { need(n); const v = bytes.subarray(pos, pos + n); pos += n; return v; },
+  };
+}
+
+// Sub-blocks: a length byte, that many bytes, repeated until a zero length.
+function subBlocks(r) {
+  const list = [];
+  for (let n = r.u8(); n !== 0; n = r.u8()) list.push(r.take(n));
+  return list;
+}
+
+function joinBlocks(list) {
+  let total = 0;
+  for (const b of list) total += b.length;
+  const out = new Uint8Array(total);
+  let at = 0;
+  for (const b of list) {
+    out.set(b, at);
+    at += b.length;
+  }
+  return out;
+}
+
+function readExtension(r, state) {
+  const label = r.u8();
+  const blocks = subBlocks(r);
+  if (label === 0xf9 && blocks[0] && blocks[0].length >= 4) {
+    const b = blocks[0];
+    state.gce = { disposal: (b[0] >> 2) & 7, transparent: b[0] & 1 ? b[3] : -1, delayCs: b[1] | (b[2] << 8) };
+  } else if (label === 0xff && blocks.length >= 2) {
+    const id = String.fromCharCode(...blocks[0]);
+    const sub = blocks[1];
+    if ((id === "NETSCAPE2.0" || id === "ANIMEXTS1.0") && sub.length >= 3 && sub[0] === 1) {
+      state.loop = sub[1] | (sub[2] << 8);
+    }
+  }
+}
+
+// Interlaced rows are stored in four passes: every 8th row from 0, from 4, every 4th from 2,
+// every 2nd from 1.
+function deinterlace(indices, w, h) {
+  const out = new Uint8Array(indices.length);
+  let src = 0;
+  for (const [start, step] of [[0, 8], [4, 8], [2, 4], [1, 2]]) {
+    for (let y = start; y < h; y += step) {
+      out.set(indices.subarray(src * w, src * w + w), y * w);
+      src++;
+    }
+  }
+  return out;
+}
+
+function applyDisposal(state) {
+  const p = state.prev;
+  if (!p) return;
+  if (p.disposal === 2) {
+    for (let y = Math.max(0, p.y); y < Math.min(state.height, p.y + p.h); y++) {
+      const row = y * state.width;
+      const x0 = Math.max(0, p.x), x1 = Math.min(state.width, p.x + p.w);
+      if (x1 > x0) state.canvas.fill(0, (row + x0) * 4, (row + x1) * 4);
+    }
+  } else if (p.disposal === 3 && state.saved) {
+    state.canvas.set(state.saved);
+  }
+}
+
+function drawFrame(state, f, indices, palette, transparent) {
+  const { canvas, width, height } = state;
+  const colours = palette ? palette.length / 3 : 0;
+  for (let j = 0; j < f.h; j++) {
+    const y = f.y + j;
+    if (y >= height) break;
+    for (let i = 0; i < f.w; i++) {
+      const x = f.x + i;
+      if (x >= width) break;
+      const idx = indices[j * f.w + i];
+      if (idx === transparent || idx >= colours) continue;
+      const o = (y * width + x) * 4;
+      canvas[o] = palette[idx * 3];
+      canvas[o + 1] = palette[idx * 3 + 1];
+      canvas[o + 2] = palette[idx * 3 + 2];
+      canvas[o + 3] = 255;
+    }
+  }
+}
+
+function readImage(r, state, globalTable) {
+  const f = { x: r.u16(), y: r.u16(), w: r.u16(), h: r.u16() };
+  const packed = r.u8();
+  const local = packed & 0x80 ? r.take(3 * (2 << (packed & 7))) : null;
+  const minCode = r.u8();
+  const data = joinBlocks(subBlocks(r));
+  let indices = gifLzwDecode(data, minCode, f.w * f.h);
+  if (packed & 0x40) indices = deinterlace(indices, f.w, f.h);
+  const gce = state.gce || { disposal: 0, transparent: -1, delayCs: 0 };
+  applyDisposal(state);
+  state.saved = gce.disposal === 3 ? state.canvas.slice() : null;
+  drawFrame(state, f, indices, local || globalTable, gce.transparent);
+  const delayMs = gce.delayCs * 10 <= 10 ? 100 : gce.delayCs * 10;
+  state.frames.push({ rgba: state.canvas.slice(), delayMs, x: f.x, y: f.y, w: f.w, h: f.h, disposal: gce.disposal });
+  state.prev = { ...f, disposal: gce.disposal };
+  state.gce = null;
+}
+
+function decodeGif(bytes) {
+  if (!isGif(bytes)) throw new Error("decodeGif: not a GIF file");
+  const r = gifReader(bytes);
+  r.take(6);
+  const width = r.u16();
+  const height = r.u16();
+  const packed = r.u8();
+  r.u8();
+  r.u8();
+  const globalTable = packed & 0x80 ? r.take(3 * (2 << (packed & 7))) : null;
+  const state = {
+    width, height, canvas: new Uint8ClampedArray(width * height * 4),
+    saved: null, prev: null, gce: null, loop: null, frames: [],
+  };
+  try {
+    for (;;) {
+      const b = r.u8();
+      if (b === 0x2c) readImage(r, state, globalTable);
+      else if (b === 0x21) readExtension(r, state);
+      else break;
+    }
+  } catch (err) {
+    if (!err.gifTruncated) throw err;
+  }
+  return { width, height, loop: state.loop, frames: state.frames };
+}
+
+return { isGif, decodeGif };
+})();
+
+// ---- media-read.js
+const M_media_read = (() => {
+// Small structure readers for inspecting muxed output: the MP4 box tree, the EBML element tree
+// of WebM, and Ogg pages with their CRC rechecked. They report structure and do not decode media.
+
+const { muxReadUint } = M_media_bytes;
+const { oggCrc32 } = M_media_ogg;
+
+const MP4_CONTAINERS = new Set(["moov", "trak", "mdia", "minf", "stbl", "dinf", "edts"]);
+
+// Each box: { type, start, size, headerSize, children? }. size covers the whole box.
+function readBoxes(bytes, start = 0, end = bytes.length) {
+  const out = [];
+  let pos = start;
+  while (pos + 8 <= end) {
+    let size = muxReadUint(bytes, pos, 4);
+    const type = String.fromCharCode(...bytes.subarray(pos + 4, pos + 8));
+    let headerSize = 8;
+    if (size === 1) {
+      if (pos + 16 > end) break;
+      size = muxReadUint(bytes, pos + 8, 8);
+      headerSize = 16;
+    } else if (size === 0) {
+      size = end - pos;
+    }
+    if (size < headerSize) break;
+    const box = { type, start: pos, size, headerSize };
+    if (MP4_CONTAINERS.has(type)) box.children = readBoxes(bytes, pos + headerSize, Math.min(end, pos + size));
+    out.push(box);
+    pos += size;
+  }
+  return out;
+}
+
+const EBML_MASTERS = new Set([
+  "1A45DFA3", "18538067", "114D9B74", "4DBB", "1549A966", "1654AE6B", "AE", "E0", "E1",
+  "1F43B675", "A0", "1C53BB6B", "BB", "B7", "1254C367", "7373", "63C0", "67C8", "1043A770",
+  "45B9", "B6", "6D80", "6240", "5035", "E2", "55B0",
+]);
+
+function vintLength(first) {
+  for (let len = 1; len <= 8; len++) if (first & (0x80 >> (len - 1))) return len;
+  return 0;
+}
+
+// Each element: { id, start, headerSize, dataStart, size, end, unknownSize?, children? }.
+// size is the declared data size; end may run past the parent, which callers can check.
+function readEbml(bytes, start = 0, end = bytes.length) {
+  const out = [];
+  let pos = start;
+  while (pos < end) {
+    const idLen = vintLength(bytes[pos]);
+    if (!idLen || pos + idLen >= end) break;
+    const id = Array.from(bytes.subarray(pos, pos + idLen), (b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+    const sizeLen = vintLength(bytes[pos + idLen]);
+    if (!sizeLen || pos + idLen + sizeLen > end) break;
+    let size = bytes[pos + idLen] & (0xff >> sizeLen);
+    let allOnes = size === 0xff >> sizeLen;
+    for (let i = 1; i < sizeLen; i++) {
+      const b = bytes[pos + idLen + i];
+      size = size * 256 + b;
+      if (b !== 0xff) allOnes = false;
+    }
+    const dataStart = pos + idLen + sizeLen;
+    const el = { id, start: pos, headerSize: idLen + sizeLen, dataStart, size };
+    if (allOnes) {
+      el.unknownSize = true;
+      el.size = end - dataStart;
+    }
+    el.end = dataStart + el.size;
+    if (EBML_MASTERS.has(id)) el.children = readEbml(bytes, dataStart, Math.min(el.end, bytes.length));
+    out.push(el);
+    pos = el.end;
+  }
+  return out;
+}
+
+function readEbmlUint(bytes, el) {
+  return muxReadUint(bytes, el.dataStart, el.size);
+}
+
+function readEbmlFloat(bytes, el) {
+  const dv = new DataView(bytes.buffer, bytes.byteOffset + el.dataStart, el.size);
+  return el.size === 4 ? dv.getFloat32(0, false) : dv.getFloat64(0, false);
+}
+
+function readEbmlText(bytes, el) {
+  return new TextDecoder().decode(bytes.subarray(el.dataStart, el.dataStart + el.size));
+}
+
+// Each page: header fields, lacing values, the body range and crcOk from a recomputed CRC.
+function readOggPages(bytes) {
+  const pages = [];
+  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let pos = 0;
+  while (pos + 27 <= bytes.length) {
+    if (String.fromCharCode(...bytes.subarray(pos, pos + 4)) !== "OggS") break;
+    const count = bytes[pos + 26];
+    const lacing = Array.from(bytes.subarray(pos + 27, pos + 27 + count));
+    const bodySize = lacing.reduce((n, v) => n + v, 0);
+    const size = 27 + count + bodySize;
+    if (pos + size > bytes.length) break;
+    const lo = dv.getUint32(pos + 6, true), hi = dv.getUint32(pos + 10, true);
+    const crc = dv.getUint32(pos + 22, true);
+    const copy = bytes.slice(pos, pos + size);
+    copy.fill(0, 22, 26);
+    const flags = bytes[pos + 5];
+    pages.push({
+      start: pos, size, version: bytes[pos + 4], headerType: flags,
+      continued: Boolean(flags & 1), bos: Boolean(flags & 2), eos: Boolean(flags & 4),
+      granule: lo === 0xffffffff && hi === 0xffffffff ? -1 : hi * 4294967296 + lo,
+      serial: dv.getUint32(pos + 14, true), sequence: dv.getUint32(pos + 18, true),
+      crc, crcOk: oggCrc32(copy) === crc, lacing, bodyStart: pos + 27 + count, bodySize,
+    });
+    pos += size;
+  }
+  return pages;
+}
+
+return { readBoxes, readEbml, readEbmlUint, readEbmlFloat, readEbmlText, readOggPages };
+})();
+
+// ---- media-xml.js
+const M_media_xml = (() => {
+// A small XML reader for DASH manifests (MPD). A service worker has no DOMParser, so this reads
+// elements, attributes and text into a plain tree: { name, attrs, children, text }. It skips the
+// prolog, comments, processing instructions and DOCTYPE, decodes the five XML entities and numeric
+// references, and drops namespace prefixes from names ("cenc:pssh" stays as written in attrs).
+
+const ENTITY = { amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'" };
+const decode = (s) => s.replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (m, e) => {
+  if (e[0] === "#") { const n = e[1] === "x" || e[1] === "X" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10); return Number.isFinite(n) ? String.fromCodePoint(n) : m; }
+  return ENTITY[e] !== undefined ? ENTITY[e] : m;
+});
+const local = (name) => name.includes(":") ? name.slice(name.indexOf(":") + 1) : name;
+
+function attrsOf(src) {
+  const out = {};
+  for (const m of src.matchAll(/([\w:.-]+)\s*=\s*("([^"]*)"|'([^']*)')/g)) out[m[1]] = decode(m[3] !== undefined ? m[3] : m[4]);
+  return out;
+}
+
+// The root element of an XML document, or null when there is none. Never throws on bad markup;
+// unclosed elements close at the end of the text.
+function readXml(text) {
+  const s = String(text || "");
+  const root = { name: "#document", attrs: {}, children: [], text: "" };
+  const stack = [root];
+  const re = /<!--[\s\S]*?-->|<\?[\s\S]*?\?>|<!\[CDATA\[([\s\S]*?)\]\]>|<!DOCTYPE[^>]*>|<\/([\w:.-]+)\s*>|<([\w:.-]+)((?:\s+[\w:.-]+\s*=\s*(?:"[^"]*"|'[^']*'))*)\s*(\/?)>|([^<]+)/gy;
+  let m;
+  while ((m = re.exec(s))) {
+    const top = stack[stack.length - 1];
+    if (m[1] !== undefined) top.text += m[1];
+    else if (m[2]) { const at = stack.map((e) => e.name).lastIndexOf(local(m[2])); if (at > 0) stack.length = at; }
+    else if (m[3]) {
+      const el = { name: local(m[3]), attrs: attrsOf(m[4] || ""), children: [], text: "" };
+      top.children.push(el);
+      if (!m[5]) stack.push(el);
+    } else if (m[6] !== undefined) top.text += decode(m[6]);
+    if (re.lastIndex >= s.length) break;
+  }
+  return root.children[0] || null;
+}
+
+// Every descendant (or the element itself) named `name`.
+function xmlAll(el, name, out = []) {
+  if (!el) return out;
+  if (el.name === name) out.push(el);
+  for (const c of el.children) xmlAll(c, name, out);
+  return out;
+}
+
+// The first direct child named `name`, or null.
+const xmlChild = (el, name) => (el && el.children.find((c) => c.name === name)) || null;
+const xmlChildren = (el, name) => (el ? el.children.filter((c) => c.name === name) : []);
+
+return { readXml, xmlAll, xmlChild, xmlChildren };
+})();
+
+// ---- media-hls.js
+const M_media_hls = (() => {
+// HLS playlists (RFC 8216): reads a master or media playlist into plain data, says whether the
+// stream is encrypted, and lists the segment addresses to fetch. Daylight Commons saves only
+// unencrypted streams: any EXT-X-KEY or EXT-X-SESSION-KEY with a METHOD other than NONE means the
+// stream is protected, and it is never fetched. Pure: no network.
+
+const resolve = (u, base) => { try { return new URL(u, base).href; } catch { return null; } };
+
+// Attribute lists: KEY=VALUE pairs, values quoted or bare, commas inside quotes kept.
+function hlsAttrs(s) {
+  const out = {};
+  for (const m of String(s || "").matchAll(/([A-Z0-9-]+)=("[^"]*"|[^,]*)/g)) out[m[1]] = m[2].startsWith("\"") ? m[2].slice(1, -1) : m[2];
+  return out;
+}
+
+const byterange = (v) => { const m = /^(\d+)(?:@(\d+))?$/.exec(String(v || "")); return m ? { length: Number(m[1]), offset: m[2] != null ? Number(m[2]) : null } : null; };
+
+function masterLine(out, tag, attrs, next, base) {
+  if (tag === "EXT-X-STREAM-INF" && next) {
+    const [w, h] = String(attrs.RESOLUTION || "").split("x").map(Number);
+    out.variants.push({ url: resolve(next, base), bandwidth: Number(attrs.BANDWIDTH) || 0, width: w || null, height: h || null, codecs: attrs.CODECS || null, audio: attrs.AUDIO || null });
+    return true;
+  }
+  if (tag === "EXT-X-MEDIA" && attrs.URI) out.renditions.push({ type: attrs.TYPE || null, group: attrs["GROUP-ID"] || null, name: attrs.NAME || null, language: attrs.LANGUAGE || null, url: resolve(attrs.URI, base), isDefault: attrs.DEFAULT === "YES" });
+  if (tag === "EXT-X-SESSION-KEY") out.keys.push({ method: attrs.METHOD || null, keyformat: attrs.KEYFORMAT || null, session: true });
+  return false;
+}
+
+function mediaLine(out, st, tag, value, attrs, base) {
+  if (tag === "EXTINF") st.duration = parseFloat(value) || 0;
+  else if (tag === "EXT-X-BYTERANGE") st.range = byterange(value);
+  else if (tag === "EXT-X-KEY") out.keys.push({ method: attrs.METHOD || null, keyformat: attrs.KEYFORMAT || null, session: false });
+  else if (tag === "EXT-X-MAP") out.map = { url: resolve(attrs.URI, base), range: byterange(attrs.BYTERANGE) };
+  else if (tag === "EXT-X-ENDLIST") out.endList = true;
+  else if (tag === "EXT-X-PLAYLIST-TYPE") out.playlistType = value;
+}
+
+// { kind: "master", variants, renditions, keys } or { kind: "media", segments, map, keys, endList,
+// duration }, or null when the text is not a playlist.
+function parseM3u8(text, base) {
+  const lines = String(text || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (lines[0] !== "#EXTM3U") return null;
+  const master = lines.some((l) => l.startsWith("#EXT-X-STREAM-INF"));
+  const out = master ? { kind: "master", variants: [], renditions: [], keys: [] } : { kind: "media", segments: [], map: null, keys: [], endList: false, playlistType: null, duration: 0 };
+  const st = { duration: 0, range: null };
+  let lastEnd = 0;
+  for (let i = 1; i < lines.length; i++) {
+    const l = lines[i];
+    if (!l.startsWith("#")) {
+      if (master) continue;
+      const range = st.range ? { length: st.range.length, offset: st.range.offset != null ? st.range.offset : lastEnd } : null;
+      if (range) lastEnd = range.offset + range.length;
+      out.segments.push({ url: resolve(l, base), duration: st.duration, range });
+      out.duration += st.duration;
+      st.duration = 0; st.range = null;
+      continue;
+    }
+    if (!l.startsWith("#EXT")) continue;
+    const c = l.indexOf(":"), tag = (c > 0 ? l.slice(1, c) : l.slice(1)), value = c > 0 ? l.slice(c + 1) : "";
+    const attrs = hlsAttrs(value);
+    if (master) { if (masterLine(out, tag, attrs, lines[i + 1] && !lines[i + 1].startsWith("#") ? lines[i + 1] : null, base)) i++; }
+    else mediaLine(out, st, tag, value, attrs, base);
+  }
+  if (!master) out.duration = Math.round(out.duration * 1000) / 1000;
+  return out;
+}
+
+// Why a playlist cannot be saved, or null. Any key other than METHOD=NONE is encryption: AES-128,
+// SAMPLE-AES and SAMPLE-AES-CTR alike, with or without a DRM key format.
+function hlsProtection(playlist) {
+  if (!playlist) return null;
+  const k = (playlist.keys || []).find((x) => x.method && x.method.toUpperCase() !== "NONE");
+  if (!k) return null;
+  const drm = k.keyformat && k.keyformat !== "identity" ? ` with the ${k.keyformat} key system` : "";
+  return `The stream is encrypted (${k.method}${drm}).`;
+}
+
+// The variant to save: the highest bandwidth at or under maxHeight (default any), else the lowest.
+function pickVariant(master, { maxHeight = Infinity } = {}) {
+  const v = [...(master.variants || [])].filter((x) => x.url).sort((a, b) => b.bandwidth - a.bandwidth);
+  return v.find((x) => !x.height || x.height <= maxHeight) || v[v.length - 1] || null;
+}
+
+// The audio rendition a variant names, if it has its own playlist.
+function audioFor(master, variant) {
+  const r = (master.renditions || []).filter((x) => x.type === "AUDIO" && x.url && (!variant || !variant.audio || x.group === variant.audio));
+  return r.find((x) => x.isDefault) || r[0] || null;
+}
+
+// The fetch list for a media playlist: [{ url, range }], the init segment first when there is one.
+// Only a finished playlist (EXT-X-ENDLIST) is complete; a live one gives what it lists now.
+function hlsFetchList(media) {
+  const list = [];
+  if (media.map && media.map.url) list.push({ url: media.map.url, range: media.map.range });
+  for (const s of media.segments) if (s.url) list.push({ url: s.url, range: s.range });
+  return list;
+}
+
+// The file type of an assembled stream: fragmented MP4 when there is an init map, else MPEG-TS.
+const hlsContainer = (media, firstUrl = "") => (media.map ? "mp4" : /\.aac(?:$|\?)/i.test(firstUrl) ? "aac" : "ts");
+
+return { hlsAttrs, parseM3u8, hlsProtection, pickVariant, audioFor, hlsFetchList, hlsContainer };
+})();
+
+// ---- media-dash.js
+const M_media_dash = (() => {
+// DASH manifests (MPD, ISO/IEC 23009-1): reads the representations of a static manifest, says
+// whether any is protected, and builds each representation's segment list. A ContentProtection
+// element anywhere means the media is encrypted, and Daylight Commons does not fetch it.
+// Handles SegmentTemplate (with $Number$, $Time$, SegmentTimeline and format tags like
+// $Number%05d$), SegmentList and a single BaseURL file. Pure: no network.
+
+const { readXml, xmlAll, xmlChild, xmlChildren } = M_media_xml;
+
+const resolve = (u, base) => { try { return new URL(u, base).href; } catch { return null; } };
+
+// ISO 8601 durations such as PT1H2M3.5S, in seconds.
+function isoSeconds(d) {
+  const m = /^P(?:(\d+(?:\.\d+)?)D)?(?:T(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?)?$/.exec(String(d || ""));
+  if (!m) return null;
+  const [, D = 0, H = 0, M = 0, S = 0] = m;
+  return Number(D) * 86400 + Number(H) * 3600 + Number(M) * 60 + Number(S);
+}
+
+// $Name$ and $Name%0Nd$ substitution, and $$ for a literal dollar sign.
+function dashFill(template, vars) {
+  return String(template).replace(/\$(\w*)(?:%0(\d+)d)?\$/g, (m, k, w) => {
+    if (!k) return "$";
+    if (!(k in vars)) return m;
+    const v = String(vars[k]);
+    return w ? v.padStart(Number(w), "0") : v;
+  });
+}
+
+function baseOf(chain, mpdUrl) {
+  let base = mpdUrl;
+  for (const el of chain) { const b = xmlChild(el, "BaseURL"); if (b && b.text.trim()) base = resolve(b.text.trim(), base); }
+  return base;
+}
+
+// The nearest of each kind of segment element along the chain, the representation first.
+const nearest = (chain, name) => { for (let i = chain.length - 1; i >= 0; i--) { const c = xmlChild(chain[i], name); if (c) return c; } return null; };
+
+function timelineTimes(tl) {
+  const out = [];
+  let t = 0;
+  for (const s of xmlChildren(tl, "S")) {
+    if (s.attrs.t != null) t = Number(s.attrs.t);
+    const d = Number(s.attrs.d), r = Number(s.attrs.r || 0);
+    for (let i = 0; i <= (r < 0 ? 0 : r); i++) { out.push(t); t += d; }
+  }
+  return out;
+}
+
+function templateList(tpl, rep, base, seconds) {
+  const vars = { RepresentationID: rep.attrs.id || "", Bandwidth: rep.attrs.bandwidth || "" };
+  const list = [];
+  if (tpl.attrs.initialization) list.push({ url: resolve(dashFill(tpl.attrs.initialization, vars), base), init: true });
+  const start = Number(tpl.attrs.startNumber || 1), media = tpl.attrs.media;
+  if (!media) return list;
+  const tl = xmlChild(tpl, "SegmentTimeline");
+  if (tl) timelineTimes(tl).forEach((t, i) => list.push({ url: resolve(dashFill(media, { ...vars, Time: t, Number: start + i }), base) }));
+  else {
+    const scale = Number(tpl.attrs.timescale || 1), dur = Number(tpl.attrs.duration || 0);
+    const n = dur && seconds ? Math.ceil((seconds * scale) / dur) : 0;
+    for (let i = 0; i < Math.min(n, 100000); i++) list.push({ url: resolve(dashFill(media, { ...vars, Number: start + i, Time: i * dur }), base) });
+  }
+  return list;
+}
+
+function segmentList(sl, base) {
+  const list = [], init = xmlChild(sl, "Initialization");
+  if (init && init.attrs.sourceURL) list.push({ url: resolve(init.attrs.sourceURL, base), init: true });
+  for (const s of xmlChildren(sl, "SegmentURL")) if (s.attrs.media) list.push({ url: resolve(s.attrs.media, base) });
+  return list;
+}
+
+function representation(mpd, period, set, rep, mpdUrl, seconds) {
+  const chain = [mpd, period, set, rep], base = baseOf(chain, mpdUrl);
+  const tpl = nearest(chain, "SegmentTemplate"), sl = nearest(chain, "SegmentList");
+  const segments = tpl ? templateList({ ...tpl, attrs: { ...(xmlChild(set, "SegmentTemplate") || { attrs: {} }).attrs, ...tpl.attrs } }, rep, base, seconds)
+    : sl ? segmentList(sl, base) : [{ url: base }];
+  const type = rep.attrs.mimeType || set.attrs.mimeType || "", kind = set.attrs.contentType || type.split("/")[0] || null;
+  return { id: rep.attrs.id || null, kind, mimeType: type || null, codecs: rep.attrs.codecs || set.attrs.codecs || null,
+    bandwidth: Number(rep.attrs.bandwidth) || 0, width: Number(rep.attrs.width || set.attrs.width) || null, height: Number(rep.attrs.height || set.attrs.height) || null,
+    language: set.attrs.lang || null, segments };
+}
+
+// { kind: "dash", type: "static" | "dynamic", duration, protection, representations } or null.
+function parseMpd(text, mpdUrl) {
+  const mpd = readXml(text);
+  if (!mpd || mpd.name !== "MPD") return null;
+  const seconds = isoSeconds(mpd.attrs.mediaPresentationDuration);
+  const protection = xmlAll(mpd, "ContentProtection").map((c) => c.attrs.schemeIdUri || "ContentProtection");
+  const representations = [];
+  for (const period of xmlChildren(mpd, "Period")) {
+    const pSeconds = isoSeconds(period.attrs.duration) || seconds;
+    for (const set of xmlChildren(period, "AdaptationSet")) for (const rep of xmlChildren(set, "Representation")) representations.push(representation(mpd, period, set, rep, mpdUrl, pSeconds));
+  }
+  return { kind: "dash", type: mpd.attrs.type || "static", duration: seconds, protection, representations };
+}
+
+// Why a manifest cannot be saved, or null.
+function dashProtection(mpd) {
+  if (!mpd || !mpd.protection.length) return null;
+  const known = { "urn:mpeg:dash:mp4protection:2011": "Common Encryption", "urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed": "Widevine",
+    "urn:uuid:9a04f079-9840-4286-ab92-e65be0885f95": "PlayReady", "urn:uuid:94ce86fb-07ff-4f43-adb8-93d2fa968ca2": "FairPlay" };
+  const names = [...new Set(mpd.protection.map((p) => known[String(p).toLowerCase()] || p))];
+  return `The stream is protected (${names.join(", ")}).`;
+}
+
+// The best representation of a kind ("video" or "audio") at or under maxHeight.
+function pickRepresentation(mpd, kind, { maxHeight = Infinity } = {}) {
+  const r = mpd.representations.filter((x) => x.kind === kind).sort((a, b) => b.bandwidth - a.bandwidth);
+  return r.find((x) => !x.height || x.height <= maxHeight) || r[r.length - 1] || null;
+}
+
+return { isoSeconds, dashFill, parseMpd, dashProtection, pickRepresentation };
+})();
+
+// ---- media-protect.js
+const M_media_protect = (() => {
+// Protected media, found before anything is saved. Daylight Commons never touches DRM or Encrypted
+// Media Extensions streams: it says plainly that the media is protected and stops. Three places can
+// show protection: the page element (a video with MediaKeys attached plays through EME), the
+// manifest (HLS keys, DASH ContentProtection, media-hls.js and media-dash.js), and the file itself
+// (MP4 encryption boxes, WebM ContentEncryption). Pure: the content script passes what it read.
+
+const { readBoxes } = M_media_read;
+
+const PROTECTED_LINE = "This media is protected (DRM or encrypted). Daylight Commons does not save protected media, and there is nothing to change in the settings to allow it.";
+
+// The four-character codes that only appear in encrypted MP4: protected sample entries, the
+// protection scheme box, the track encryption box and the system-specific header.
+const MP4_ENCRYPTED = ["encv", "enca", "sinf", "tenc", "pssh", "senc"];
+
+function hasCode(bytes, start, end, code) {
+  const c = [...code].map((ch) => ch.charCodeAt(0));
+  for (let i = start; i + 4 <= end; i++) if (bytes[i] === c[0] && bytes[i + 1] === c[1] && bytes[i + 2] === c[2] && bytes[i + 3] === c[3]) return true;
+  return false;
+}
+
+// The encryption marker in an MP4 or fragmented MP4 file, read only inside moov and moof headers
+// (never inside mdat, where sample data could carry any four bytes), or null.
+function mp4Encryption(bytes) {
+  const u = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes || []);
+  let boxes;
+  try { boxes = readBoxes(u); } catch { return null; }
+  for (const b of boxes) {
+    if (!["moov", "moof"].includes(b.type)) continue;
+    const end = Math.min(u.length, b.start + b.size);
+    const hit = MP4_ENCRYPTED.find((code) => hasCode(u, b.start + b.headerSize, end, code));
+    if (hit) return hit;
+  }
+  return null;
+}
+
+// True when a WebM or Matroska header carries ContentEncryption (id 0x5035) with an algorithm
+// (ContentEncAlgo, 0x47E1). Only the first 256 KB are read: Tracks come before any Cluster.
+function webmEncryption(bytes) {
+  const u = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes || []);
+  let end = Math.min(u.length, 262144);
+  // Stop at the first Cluster (0x1F43B675): past it the bytes are media data.
+  for (let i = 0; i + 3 < end; i++) if (u[i] === 0x1f && u[i + 1] === 0x43 && u[i + 2] === 0xb6 && u[i + 3] === 0x75) { end = i; break; }
+  for (let i = 0; i + 1 < end; i++) {
+    if (u[i] !== 0x50 || u[i + 1] !== 0x35) continue;
+    for (let j = i + 2; j + 1 < Math.min(end, i + 40); j++) if (u[j] === 0x47 && u[j + 1] === 0xe1) return true;
+  }
+  return false;
+}
+
+// What the page said about one element: { mediaKeys: boolean, encrypted: boolean } where
+// mediaKeys is the element's MediaKeys and encrypted is an "encrypted" event the scan saw.
+function elementProtection(el) {
+  if (el && (el.mediaKeys || el.encrypted)) return "The page plays this media through Encrypted Media Extensions (DRM).";
+  return null;
+}
+
+// The first reason any check gives, as { protected, reason, line }.
+function mediaProtection(...reasons) {
+  const reason = reasons.find(Boolean) || null;
+  return { protected: !!reason, reason, line: reason ? PROTECTED_LINE : null };
+}
+
+// The file's own marker, for bytes already fetched, as a reason or null.
+function fileProtection(bytes) {
+  const mp4 = mp4Encryption(bytes);
+  if (mp4) return `The file carries an MP4 encryption box (${mp4}).`;
+  if (webmEncryption(bytes)) return "The file carries WebM content encryption.";
+  return null;
+}
+
+return { PROTECTED_LINE, mp4Encryption, webmEncryption, elementProtection, mediaProtection, fileProtection };
+})();
+
+// ---- media-collect.js
+const M_media_collect = (() => {
+// Collections of saved media: an investigation case (rows that `daylight case add case-inbox.jsonl`
+// captures, archives and verifies) or a moodboard (tags and notes, shown as a grid). Every saved
+// file keeps its SHA-256, where it came from and when; every converted or compressed file keeps
+// its own hash and the chain of steps back to the original. Pure records; storage is in the
+// extension (src/ext/media-store.js).
+
+const MEDIA_KINDS = ["image", "gif", "video", "audio"];
+const EXT = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/avif": "avif", "image/gif": "gif", "image/svg+xml": "svg",
+  "video/mp4": "mp4", "video/webm": "webm", "video/mp2t": "ts", "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/aac": "aac", "audio/ogg": "ogg",
+  "audio/webm": "webm", "audio/wav": "wav", "audio/opus": "opus", "video/quicktime": "mov", "application/vnd.apple.mpegurl": "m3u8" };
+
+// SHA-256 of bytes as lower-case hex, in the browser and in Node.
+async function mediaSha256(bytes) {
+  const d = await crypto.subtle.digest("SHA-256", bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
+  return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// image, gif, video or audio from a MIME type, then the address's extension.
+function mediaKindOf(mime, url = "") {
+  const m = String(mime || "").toLowerCase().split(";")[0].trim();
+  if (m === "image/gif") return "gif";
+  for (const k of ["image", "video", "audio"]) if (m.startsWith(k + "/")) return k;
+  const ext = (/\.([a-z0-9]{2,5})(?:$|[?#])/i.exec(String(url)) || [])[1];
+  const e = ext ? ext.toLowerCase() : "";
+  if (e === "gif") return "gif";
+  if (["png", "jpg", "jpeg", "webp", "avif", "svg", "bmp"].includes(e)) return "image";
+  if (["mp4", "webm", "mov", "m4v", "ts", "m3u8", "mpd"].includes(e)) return "video";
+  if (["mp3", "m4a", "aac", "ogg", "opus", "wav", "flac"].includes(e)) return "audio";
+  return null;
+}
+
+const extFor = (mime) => EXT[String(mime || "").toLowerCase().split(";")[0].trim()] || "bin";
+
+// A file name from the source address and hash: readable, safe on every system, never a path.
+function fileNameFor(item) {
+  let stem = "media";
+  try { stem = decodeURIComponent(new URL(item.source.url).pathname.split("/").pop() || "media"); } catch { /* keep the default */ }
+  stem = stem.replace(/\.[a-z0-9]{2,5}$/i, "").replace(/[^\w.-]+/g, "-").replace(/^[.-]+|[.-]+$/g, "").slice(0, 60) || "media";
+  return `${stem}-${String(item.sha256).slice(0, 12)}.${extFor(item.mime)}`;
+}
+
+const normTags = (v) => [...new Set((Array.isArray(v) ? v : String(v || "").split(","))
+  .map((t) => String(t).trim().toLowerCase().replace(/\s+/g, " ").slice(0, 40)).filter(Boolean))].slice(0, 30);
+
+const collectionOk = (c) => c && (c.type === "case" || (c.type === "moodboard" && typeof c.id === "string" && c.id.length > 0));
+
+// The record for a file saved from a page. src: { bytes, mime, url, page, pageTitle, stream?, alt? }.
+function savedRecord(src, { sha256, collection, tags, note, now = new Date().toISOString() }) {
+  if (!collectionOk(collection)) throw new Error("A saved file needs a case or a moodboard.");
+  if (!/^[0-9a-f]{64}$/.test(String(sha256))) throw new Error("A saved file needs its SHA-256.");
+  const kind = mediaKindOf(src.mime, src.url) || "image";
+  return { id: `${sha256.slice(0, 16)}-${Date.parse(now) || 0}`, collection: { type: collection.type, id: collection.type === "case" ? "case" : collection.id },
+    kind, mime: src.mime || "application/octet-stream", bytes: src.bytes, sha256, original: sha256,
+    source: { url: src.url || null, page: src.page || null, pageTitle: src.pageTitle ? String(src.pageTitle).slice(0, 300) : null, alt: src.alt ? String(src.alt).slice(0, 300) : null, savedAt: now, stream: src.stream || null },
+    tags: normTags(tags), note: String(note || "").slice(0, 2000), lineage: [], archive: null };
+}
+
+// The record for a converted or compressed copy. step: { op, params, tool }.
+function derivedRecord(parent, { bytes, mime, sha256, step, now = new Date().toISOString() }) {
+  if (!/^[0-9a-f]{64}$/.test(String(sha256))) throw new Error("A derived file needs its SHA-256.");
+  const link = { op: step.op, from: parent.sha256, to: sha256, params: step.params || {}, tool: step.tool || null, at: now,
+    bytesBefore: parent.bytes, bytesAfter: bytes };
+  return { ...parent, id: `${sha256.slice(0, 16)}-${Date.parse(now) || 0}`, kind: mediaKindOf(mime) || parent.kind, mime, bytes, sha256,
+    original: parent.original || parent.sha256, derivedFrom: parent.id, lineage: [...(parent.lineage || []), link], archive: null };
+}
+
+// Checks every derived item against the items it came from: each step's "from" is the previous
+// step's "to", the first step starts at the original, the last ends at the item's own hash, and
+// the original is in the collection or recorded. Returns [{ id, problem }]; empty means sound.
+function checkLineage(items) {
+  const byHash = new Map(items.map((i) => [i.sha256, i]));
+  const problems = [];
+  for (const it of items) {
+    const L = it.lineage || [];
+    if (!L.length) { if (it.original !== it.sha256) problems.push({ id: it.id, problem: "no steps, but the original hash differs" }); continue; }
+    if (L[0].from !== it.original) problems.push({ id: it.id, problem: "the first step does not start at the original" });
+    for (let i = 1; i < L.length; i++) if (L[i].from !== L[i - 1].to) problems.push({ id: it.id, problem: `step ${i + 1} does not start where step ${i} ended` });
+    if (L[L.length - 1].to !== it.sha256) problems.push({ id: it.id, problem: "the last step does not end at this file's hash" });
+    const parent = byHash.get(L[L.length - 1].from);
+    if (parent && (parent.lineage || []).length !== L.length - 1) problems.push({ id: it.id, problem: "the parent's chain is not this chain's prefix" });
+  }
+  return problems;
+}
+
+// One row for case-inbox.jsonl. The case command captures the address, hashes what it fetches and
+// compares it with the hash the browser saw, so a changed file shows as a difference.
+function caseInboxRow(item) {
+  return { url: item.source.url, title: item.source.pageTitle, added: item.source.savedAt, page: item.source.page,
+    media: { kind: item.kind, mime: item.mime, bytes: item.bytes, sha256: item.sha256, original: item.original, lineage: item.lineage, stream: item.source.stream ? item.source.stream.type : null },
+    archive: item.archive };
+}
+
+const unit = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : n >= 1024 ? `${Math.round(n / 1024)} KB` : `${n} bytes`);
+const sizeText = unit;
+
+// "2.4 MB to 610 KB, 75% smaller" or "... 12% larger".
+function sizeLine(before, after) {
+  if (!before || !Number.isFinite(after)) return `${unit(after || 0)}`;
+  const d = Math.round((100 * (before - after)) / before);
+  return `${unit(before)} to ${unit(after)}, ${d >= 0 ? `${d}% smaller` : `${-d}% larger`}`;
+}
+
+// Items of one collection, filtered by kind, tag and free text in notes, tags and addresses.
+function filterItems(items, { collection, kind, tag, q } = {}) {
+  const needle = String(q || "").toLowerCase();
+  return items.filter((i) => (!collection || (i.collection.type === collection.type && i.collection.id === collection.id))
+    && (!kind || i.kind === kind) && (!tag || (i.tags || []).includes(tag))
+    && (!needle || [i.note, ...(i.tags || []), i.source.url, i.source.page, i.source.pageTitle].some((s) => String(s || "").toLowerCase().includes(needle))))
+    .sort((a, b) => String(b.source.savedAt).localeCompare(String(a.source.savedAt)));
+}
+
+return { MEDIA_KINDS, mediaSha256, mediaKindOf, extFor, fileNameFor, normTags, savedRecord, derivedRecord, checkLineage, caseInboxRow, sizeText, sizeLine, filterItems };
+})();
+
+// ---- adblock.js
+const M_adblock = (() => {
+// The per-site part of ad blocking (src/ext/adblock-bg.js): which site a page belongs to, whether
+// the user allowed ads there, and the allow list after a toggle. A site is its host name without
+// "www."; allowing a site also allows its subdomains, as the browser's requestDomains matching does.
+
+function adblockSite(url) {
+  try {
+    const u = new URL(url);
+    if (!/^https?:$/.test(u.protocol) || !u.hostname) return null;
+    return u.hostname.toLowerCase().replace(/^www\./, "");
+  } catch { return null; }
+}
+
+const adblockAllowed = (list, site) => !!site && (list || []).some((h) => site === h || site.endsWith("." + h));
+
+// The allow list with `site` added (allow true) or removed with any parent entry that covers it.
+function adblockToggle(list, site, allow) {
+  const cur = [...new Set(list || [])];
+  if (!site) return cur;
+  if (allow) return adblockAllowed(cur, site) ? cur : [...cur, site].sort();
+  return cur.filter((h) => !(site === h || site.endsWith("." + h)));
+}
+
+return { adblockSite, adblockAllowed, adblockToggle };
+})();
+
 // ---- catalogue-data.js
 const M_catalogue_data = (() => {
 // Generated by scripts/catalogue-data.mjs from catalogue/. Do not edit; run the script after
@@ -10538,9 +12340,15 @@ const DEFAULTS = Object.freeze({
   // The reading lens (src/core/reading.js): techniques under the held-out bar stay off unless the
   // user turns them all on here.
   lensAll: false,
+  // The pressure lens (src/core/reading-pressure.js): its own switch, off by default.
+  pressureLens: false,
+  // Ad blocking (src/ext/adblock-bg.js): off by default; sites in adblockAllow are always left alone.
+  adblock: false, adblockAllow: [],
 });
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
+// Sites the user exempts from ad blocking: lower-case host names, at most 500.
+const siteList = (v) => (Array.isArray(v) ? [...new Set(v.filter((h) => typeof h === "string" && /^[a-z0-9.-]{1,253}$/i.test(h)).map((h) => h.toLowerCase().replace(/^www\./, "")))].slice(0, 500) : []);
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
 const days = (v, d, r) => (Number.isFinite(Number(v)) && v !== null && v !== "" ? Math.min(r.max, Math.max(r.min, Math.round(Number(v)))) : d);
 const switches = (v, allowed) => {
@@ -10562,6 +12370,8 @@ function normalizeSettings(raw) {
     imageText: bool(s.imageText, DEFAULTS.imageText),
     evidence: bool(s.evidence, DEFAULTS.evidence),
     lensAll: bool(s.lensAll, DEFAULTS.lensAll),
+    pressureLens: bool(s.pressureLens, DEFAULTS.pressureLens),
+    adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
   };
 }
 
@@ -12361,5 +14171,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

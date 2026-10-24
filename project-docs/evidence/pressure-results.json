@@ -1,0 +1,526 @@
+{
+ "generated": "2026-10-24",
+ "split": "test",
+ "input": {
+  "file": "project-docs/evidence/pressure/test.jsonl",
+  "sha256": "6a2a69599182bc5d910d33b251122e7d73eec3695b477796c2d4e8571ca45201",
+  "rows": 73
+ },
+ "cues": {
+  "file": "src/core/reading-pressure.js",
+  "sha256": "3c9631deb51a70401037455a6d0e25b69921d716a50eb7ad5abcf9697f911d85",
+  "of": "JSON of PRESSURE_TECHNIQUES, so comments may change without a rescore"
+ },
+ "withInflection": {
+  "techniques": {
+   "urgency": {
+    "precision": {
+     "k": 5,
+     "n": 5,
+     "value": 1,
+     "ci": [
+      0.566,
+      1
+     ]
+    },
+    "recall": {
+     "k": 5,
+     "n": 13,
+     "value": 0.385,
+     "ci": [
+      0.177,
+      0.645
+     ]
+    }
+   },
+   "shrinking-ask": {
+    "precision": {
+     "k": 3,
+     "n": 3,
+     "value": 1,
+     "ci": [
+      0.438,
+      1
+     ]
+    },
+    "recall": {
+     "k": 3,
+     "n": 9,
+     "value": 0.333,
+     "ci": [
+      0.121,
+      0.646
+     ]
+    }
+   },
+   "manufactured-consensus": {
+    "precision": {
+     "k": 0,
+     "n": 1,
+     "value": 0,
+     "ci": [
+      0,
+      0.793
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 6,
+     "value": 0,
+     "ci": [
+      0,
+      0.39
+     ]
+    }
+   },
+   "false-even-handedness": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": null
+    },
+    "recall": {
+     "k": 0,
+     "n": 6,
+     "value": 0,
+     "ci": [
+      0,
+      0.39
+     ]
+    }
+   },
+   "burden-shifting": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": null
+    },
+    "recall": {
+     "k": 0,
+     "n": 7,
+     "value": 0,
+     "ci": [
+      0,
+      0.354
+     ]
+    }
+   },
+   "deflection-by-label": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": null
+    },
+    "recall": {
+     "k": 0,
+     "n": 6,
+     "value": 0,
+     "ci": [
+      0,
+      0.39
+     ]
+    }
+   }
+  },
+  "overall": {
+   "precision": {
+    "k": 8,
+    "n": 9,
+    "value": 0.889,
+    "ci": [
+     0.565,
+     0.98
+    ]
+   },
+   "recall": {
+    "k": 8,
+    "n": 47,
+    "value": 0.17,
+    "ci": [
+     0.089,
+     0.301
+    ]
+   }
+  },
+  "messages": {
+   "pressureWithAHit": {
+    "k": 8,
+    "n": 32,
+    "value": 0.25,
+    "ci": [
+     0.133,
+     0.421
+    ]
+   },
+   "controlsWithAHit": {
+    "k": 0,
+    "n": 41,
+    "value": 0,
+    "ci": [
+     0,
+     0.086
+    ]
+   }
+  }
+ },
+ "withoutInflection": {
+  "techniques": {
+   "urgency": {
+    "precision": {
+     "k": 5,
+     "n": 5,
+     "value": 1,
+     "ci": [
+      0.566,
+      1
+     ]
+    },
+    "recall": {
+     "k": 5,
+     "n": 13,
+     "value": 0.385,
+     "ci": [
+      0.177,
+      0.645
+     ]
+    }
+   },
+   "shrinking-ask": {
+    "precision": {
+     "k": 3,
+     "n": 3,
+     "value": 1,
+     "ci": [
+      0.438,
+      1
+     ]
+    },
+    "recall": {
+     "k": 3,
+     "n": 9,
+     "value": 0.333,
+     "ci": [
+      0.121,
+      0.646
+     ]
+    }
+   },
+   "manufactured-consensus": {
+    "precision": {
+     "k": 0,
+     "n": 1,
+     "value": 0,
+     "ci": [
+      0,
+      0.793
+     ]
+    },
+    "recall": {
+     "k": 0,
+     "n": 6,
+     "value": 0,
+     "ci": [
+      0,
+      0.39
+     ]
+    }
+   },
+   "false-even-handedness": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": null
+    },
+    "recall": {
+     "k": 0,
+     "n": 6,
+     "value": 0,
+     "ci": [
+      0,
+      0.39
+     ]
+    }
+   },
+   "burden-shifting": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": null
+    },
+    "recall": {
+     "k": 0,
+     "n": 7,
+     "value": 0,
+     "ci": [
+      0,
+      0.354
+     ]
+    }
+   },
+   "deflection-by-label": {
+    "precision": {
+     "k": 0,
+     "n": 0,
+     "value": null,
+     "ci": null
+    },
+    "recall": {
+     "k": 0,
+     "n": 6,
+     "value": 0,
+     "ci": [
+      0,
+      0.39
+     ]
+    }
+   }
+  },
+  "overall": {
+   "precision": {
+    "k": 8,
+    "n": 9,
+    "value": 0.889,
+    "ci": [
+     0.565,
+     0.98
+    ]
+   },
+   "recall": {
+    "k": 8,
+    "n": 47,
+    "value": 0.17,
+    "ci": [
+     0.089,
+     0.301
+    ]
+   }
+  },
+  "messages": {
+   "pressureWithAHit": {
+    "k": 8,
+    "n": 32,
+    "value": 0.25,
+    "ci": [
+     0.133,
+     0.421
+    ]
+   },
+   "controlsWithAHit": {
+    "k": 0,
+    "n": 41,
+    "value": 0,
+    "ci": [
+     0,
+     0.086
+    ]
+   }
+  }
+ },
+ "misses": [
+  {
+   "id": "test-001",
+   "technique": "shrinking-ask",
+   "kind": "missed"
+  },
+  {
+   "id": "test-002",
+   "technique": "urgency",
+   "kind": "missed"
+  },
+  {
+   "id": "test-003",
+   "technique": "manufactured-consensus",
+   "kind": "missed"
+  },
+  {
+   "id": "test-004",
+   "technique": "burden-shifting",
+   "kind": "missed"
+  },
+  {
+   "id": "test-004",
+   "technique": "deflection-by-label",
+   "kind": "missed"
+  },
+  {
+   "id": "test-005",
+   "technique": "false-even-handedness",
+   "kind": "missed"
+  },
+  {
+   "id": "test-006",
+   "technique": "shrinking-ask",
+   "kind": "missed"
+  },
+  {
+   "id": "test-007",
+   "technique": "manufactured-consensus",
+   "kind": "missed"
+  },
+  {
+   "id": "test-008",
+   "technique": "burden-shifting",
+   "kind": "missed"
+  },
+  {
+   "id": "test-009",
+   "technique": "urgency",
+   "kind": "missed"
+  },
+  {
+   "id": "test-009",
+   "technique": "shrinking-ask",
+   "kind": "missed"
+  },
+  {
+   "id": "test-010",
+   "technique": "urgency",
+   "kind": "missed"
+  },
+  {
+   "id": "test-010",
+   "technique": "shrinking-ask",
+   "kind": "missed"
+  },
+  {
+   "id": "test-010",
+   "technique": "deflection-by-label",
+   "kind": "missed"
+  },
+  {
+   "id": "test-011",
+   "technique": "manufactured-consensus",
+   "kind": "missed"
+  },
+  {
+   "id": "test-012",
+   "technique": "urgency",
+   "kind": "missed"
+  },
+  {
+   "id": "test-014",
+   "technique": "deflection-by-label",
+   "kind": "missed"
+  },
+  {
+   "id": "test-015",
+   "technique": "burden-shifting",
+   "kind": "missed"
+  },
+  {
+   "id": "test-016",
+   "technique": "false-even-handedness",
+   "kind": "missed"
+  },
+  {
+   "id": "test-016",
+   "technique": "burden-shifting",
+   "kind": "missed"
+  },
+  {
+   "id": "test-018",
+   "technique": "urgency",
+   "kind": "missed"
+  },
+  {
+   "id": "test-018",
+   "technique": "deflection-by-label",
+   "kind": "missed"
+  },
+  {
+   "id": "test-019",
+   "technique": "shrinking-ask",
+   "kind": "missed"
+  },
+  {
+   "id": "test-020",
+   "technique": "manufactured-consensus",
+   "kind": "missed"
+  },
+  {
+   "id": "test-021",
+   "technique": "false-even-handedness",
+   "kind": "missed"
+  },
+  {
+   "id": "test-021",
+   "technique": "burden-shifting",
+   "kind": "missed"
+  },
+  {
+   "id": "test-022",
+   "technique": "urgency",
+   "kind": "missed"
+  },
+  {
+   "id": "test-022",
+   "technique": "manufactured-consensus",
+   "kind": "missed"
+  },
+  {
+   "id": "test-023",
+   "technique": "shrinking-ask",
+   "kind": "missed"
+  },
+  {
+   "id": "test-023",
+   "technique": "deflection-by-label",
+   "kind": "missed"
+  },
+  {
+   "id": "test-024",
+   "technique": "urgency",
+   "kind": "missed"
+  },
+  {
+   "id": "test-024",
+   "technique": "burden-shifting",
+   "kind": "missed"
+  },
+  {
+   "id": "test-025",
+   "technique": "deflection-by-label",
+   "kind": "missed"
+  },
+  {
+   "id": "test-027",
+   "technique": "urgency",
+   "kind": "missed"
+  },
+  {
+   "id": "test-028",
+   "technique": "burden-shifting",
+   "kind": "missed"
+  },
+  {
+   "id": "test-029",
+   "technique": "manufactured-consensus",
+   "kind": "false hit"
+  },
+  {
+   "id": "test-029",
+   "technique": "false-even-handedness",
+   "kind": "missed"
+  },
+  {
+   "id": "test-030",
+   "technique": "false-even-handedness",
+   "kind": "missed"
+  },
+  {
+   "id": "test-031",
+   "technique": "manufactured-consensus",
+   "kind": "missed"
+  },
+  {
+   "id": "test-032",
+   "technique": "false-even-handedness",
+   "kind": "missed"
+  }
+ ]
+}

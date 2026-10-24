@@ -71,6 +71,9 @@ cover the rest.
 - **Thread report:** whether the most extreme replies come mostly from flagged accounts, with 95%
   intervals. It says "skewed" only when the intervals do not overlap.
 - **History page:** the accounts and sites your threads keep leading back to.
+- **Pressure lens (off by default):** urgency, shrinking the ask, a newcomer vouching, crediting both
+  sides to close a dispute, "check it yourself" and "that's just noise", in messages from anyone.
+  Held out, it was right on 8 of its 9 marks and found 8 of 47 moves, so silence is not a clean bill.
 
 Each sign shows its measured precision from the evaluation in `project-docs/EVALUATION.md`, or "not
 measured yet". The options page lists every sign with its figure. Every finding type is explained on
@@ -78,6 +81,23 @@ the [how it works page](https://harperz9.github.io/daylight-commons/how-it-works
 
 Keyboard: focus a post to open its window, <kbd>Alt</kbd>+<kbd>R</kbd> to move into it, arrow keys
 between its tabs, <kbd>Esc</kbd> to close it.
+
+## Save, convert and keep media
+
+Right-click any image, GIF, video or audio and choose **Save to Daylight**, or use **Save media from
+this page** in the toolbar menu. A video the page streams is put together from its HLS or DASH
+segments. Each file goes into an investigation case, with its SHA-256, address, page and time and an
+optional Internet Archive copy, or into a moodboard with tags and notes. **Collections** shows them as
+a grid. Protected media (DRM or encrypted streams) is never saved, and Daylight Commons says so.
+
+**Convert or compress a file** changes pictures among PNG, JPEG, WebP and AVIF, turns a GIF into MP4
+or WebM, makes video smaller as WebM or MP4, and turns sound into Opus. It runs in your browser with no
+upload, shows the size before and after, and keeps a hash chain from every copy to the original. On
+the command line, `daylight media convert clip.gif --to mp4` and `daylight media compress talk.mp4
+--max-height 720` do the same with ffmpeg. Details: [project-docs/MEDIA-TOOLKIT.md](project-docs/MEDIA-TOOLKIT.md).
+
+**Block ads and trackers**, off until you turn it on, uses EasyList and EasyPrivacy in your browser's
+own blocking engine, with **Allow ads on this site** in the toolbar menu.
 
 ## What it sends and keeps
 
@@ -117,6 +137,7 @@ node bin/radar.mjs analyze thread.json --bundle out.json --carrier-safe   # one-
 node bin/radar.mjs verify out.json                  # check a signed bundle offline
 node bin/radar.mjs verify evidence-chain.json       # or an evidence chain saved in the extension
 node bin/radar.mjs export evidence-chain.json --profile legal --out dossier
+node bin/radar.mjs media convert photo.png --to webp   # with ffmpeg; writes photo.webp.lineage.json
 ```
 
 `export` writes a saved evidence chain into a new folder in one of four layouts: `legal` (numbered

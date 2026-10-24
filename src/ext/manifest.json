@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Daylight Commons",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "See the evidence behind social media replies: where accounts are based, coordination and fact-checks, each with its source.",
   "homepage_url": "https://github.com/HarperZ9/daylight-commons",
   "icons": {
@@ -13,7 +13,9 @@
   "permissions": [
     "storage",
     "scripting",
-    "activeTab"
+    "activeTab",
+    "contextMenus",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
     "https://x.com/*",
@@ -39,6 +41,8 @@
       "head-bg.js",
       "ocr.bundle.js",
       "ocr-bg.js",
+      "media-bg.js",
+      "adblock-bg.js",
       "background.js"
     ]
   },
@@ -142,7 +146,8 @@
           "none"
         ],
         "optional": [
-          "websiteContent"
+          "websiteContent",
+          "browsingActivity"
         ]
       },
       "strict_min_version": "121.0"
@@ -168,5 +173,19 @@
   },
   "optional_host_permissions": [
     "https://*/*"
-  ]
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "easylist",
+        "enabled": false,
+        "path": "rules/easylist.json"
+      },
+      {
+        "id": "easyprivacy",
+        "enabled": false,
+        "path": "rules/easyprivacy.json"
+      }
+    ]
+  }
 }

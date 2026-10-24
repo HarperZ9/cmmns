@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collections · Daylight Commons</title>
+<link rel="stylesheet" href="canon.css">
+<link rel="stylesheet" href="pages.css">
+<link rel="stylesheet" href="media.css">
+</head>
+<body>
+<main class="wide">
+  <header>
+    <h1>Collections</h1>
+    <p class="lead">Media you saved, for a case, for reference or for a moodboard. Every file keeps its SHA-256, where it came from and when, and every converted copy keeps its chain back to the original. Everything here stays in this browser.</p>
+  </header>
+  <section aria-labelledby="h-pick" class="bare">
+    <h2 id="h-pick" class="sr-only">Which collection</h2>
+    <div class="toolbar">
+      <label for="which">Collection</label>
+      <select id="which"></select>
+      <label for="kind">Kind</label>
+      <select id="kind">
+        <option value="">All</option><option value="image">Images</option><option value="gif">GIFs</option><option value="video">Video</option><option value="audio">Audio</option>
+      </select>
+      <label for="q">Search notes, tags and addresses</label>
+      <input id="q" type="search">
+    </div>
+    <div class="toolbar">
+      <input id="new-name" type="text" maxlength="80" aria-label="New moodboard name" placeholder="New moodboard name">
+      <button id="new-board" type="button">New moodboard</button>
+      <button id="export" type="button">Save this list (JSON)</button>
+      <a href="convert.html">Convert a file from this computer</a>
+    </div>
+    <p id="tags" class="tags" aria-label="Tags in this collection"></p>
+    <p id="summary" class="muted" role="status" aria-live="polite"></p>
+  </section>
+  <section aria-labelledby="h-items">
+    <h2 id="h-items">Items</h2>
+    <ul id="grid" class="media-grid board"></ul>
+  </section>
+  <section aria-labelledby="h-detail" id="detail-box" hidden>
+    <h2 id="h-detail">Details</h2>
+    <dl id="detail" class="facts"></dl>
+  </section>
+  <section aria-labelledby="h-danger">
+    <h2 id="h-danger">Storage</h2>
+    <p id="usage" class="muted"></p>
+    <button id="clear" type="button" class="quiet">Delete all saved media</button>
+  </section>
+</main>
+<script src="core.bundle.js"></script>
+<script src="guard.js"></script>
+<script src="settings.js"></script>
+<script src="pages.js"></script>
+<script src="media-store.js"></script>
+<script src="collections-ui.js"></script>
+<script src="collections.js"></script>
+</body>
+</html>

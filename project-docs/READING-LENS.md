@@ -99,3 +99,28 @@ With the default setting, 3.3.0 shows nothing on either post, because both techn
     node scripts/eval-reading.mjs --split dev            # dev table, sets 1 to 12
     node scripts/eval-reading.mjs --split dev --fit      # refit the weights
     node scripts/eval-reading.mjs                        # held-out 13 and 14; writes the results and reading-measured.js
+
+## The pressure family (3.6.0)
+Six moves that push a reader to act before they check, whoever writes the message: urgency, shrinking the ask, manufactured consensus, false even-handedness, burden shifting and deflection by label. Code: `src/core/reading-pressure.js`. They come from the five sock-puppet messages in Anthropic's 2026-10-23 assessment of the UK AISI incident, where a style check found the template line ("Judge the code, not the noise") and missed the pressure around it (`project-docs/evidence/pressure/README.md`).
+
+The family has its own switch, **Pressure lens** in Options, off by default, and it never turns on from a measurement alone. "Every reading technique" also shows it. A pressure phrase in quotes or after a reporting verb is a mention and does not show. In the window each sign says what the move is and that it describes how a message asks, not who wrote it.
+
+Data: `dev.jsonl` (30 pressure messages including the five seeds, 20 ordinary ones) and `test.jsonl` (32 pressure messages, 41 ordinary maintainer and support messages with hard controls: real outages, an honest "about five minutes", thanks to two people). Claude Sonnet 5.5 wrote and labelled both sets without seeing the detector, wrote the test set first and recorded its SHA-256 before any cue existed. I wrote the cues against the dev set only, froze them at commit 7852482, and scored the test set once (`project-docs/evidence/pressure-results.json`, `tests/pressure.test.js` reproduces it).
+
+### Held out, 73 messages
+| Technique | Precision | Recall |
+|---|---|---|
+| urgency | 100% (5/5, 57 to 100) | 38% (5/13, 18 to 64) |
+| shrinking the ask | 100% (3/3, 44 to 100) | 33% (3/9, 12 to 65) |
+| manufactured consensus | 0% (0/1, 0 to 79) | 0% (0/6, 0 to 39) |
+| false even-handedness | no hits | 0% (0/6, 0 to 39) |
+| burden shifting | no hits | 0% (0/7, 0 to 35) |
+| deflection by label | no hits | 0% (0/6, 0 to 39) |
+| all six | 89% (8/9, 57 to 98) | 17% (8/47, 9 to 30) |
+
+Messages: 8 of 32 pressure messages got any mark (25%, 13 to 42); 0 of 41 ordinary messages did (0%, 0 to 9). Inflection changed nothing here. On the dev set every cue scores 100% because the cues were written on it, which says nothing about new messages.
+
+Reading: when it marks a message it is usually right, and it misses most pressure, because the test messages carry the same moves in words the cue lists do not hold. Four of the six techniques found nothing at all held out. A message with no mark can still carry pressure. The next round needs a fresh blind test set; the current one is spent. The sets are synthetic: no rate on real inboxes or threads is claimed.
+
+    node scripts/eval-pressure.mjs                 # dev table and every miss
+    node scripts/eval-pressure.mjs --split test    # the held-out score (already spent for these cues)

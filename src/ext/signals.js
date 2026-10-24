@@ -47,8 +47,12 @@
       out.push({ label: `persuasion: ${t.name.toLowerCase()}`, fam: t.technique, level: "info", cat: "language", rows: [["In this post", `"${t.match}"`], ["What it is", t.definition], t.lang === "fr" ? ["French cue", "The figure below is for English news articles; French is still to be measured."] : null, dnp(PB.PERSUASION_DOES_NOT_PROVE)].filter(Boolean) });
     }
     // The reading lens (src/core/reading.js): the span, its name, and the two factors that moved it.
+    const seenPressure = new Set();
     for (const f of m.lens || []) {
-      out.push({ label: f.name.toLowerCase(), fam: "reading", level: "info", cat: "language", rows: [["In this post", `"${f.match}"`], ...(f.top.length ? [["Weighed by", f.top.map((x) => `${x.label} (${x.effect})`).join("; ")]] : [])] });
+      if (f.family === "pressure") { if (seenPressure.has(f.technique)) continue; seenPressure.add(f.technique); }
+      // The pressure family says what the move is and what it does not show, since its marks read a request, not a person.
+      const pressure = f.family === "pressure" ? [["What it is", PB.TECHNIQUE_BY_ID.get(f.technique).definition], dnp(PB.PRESSURE_DOES_NOT_PROVE)] : [];
+      out.push({ label: f.family === "pressure" ? `pressure: ${f.name.toLowerCase()}` : f.name.toLowerCase(), fam: "reading", level: "info", cat: "language", rows: [["In this post", `"${f.match}"`], ...pressure, ...(f.top.length ? [["Weighed by", f.top.map((x) => `${x.label} (${x.effect})`).join("; ")]] : [])] });
     }
     const M = m.machine;
     if (M && M.leak) out.push({ label: "leaked AI text", fam: "leaked-ai", level: "warn", cat: "language", rows: [["In this post", `"${M.leak}"`], ["What it is", "Text a chatbot writes, posted as it came out."], dnp("Chatbot boilerplate in the post, which people also paste as a quote or a joke.")] });

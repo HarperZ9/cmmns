@@ -33,7 +33,7 @@ test("every licence REUSE.toml names has its text in LICENSES/", () => {
 
 // An AGPL release must be free in every file it ships. Conso, under its designer's licence, was
 // removed in 3.0.0 (src/ext/fonts/FONTS.md); this keeps it, and any other non-free licence, out.
-const FREE = new Set(["AGPL-3.0-only", "CC-BY-4.0", "OFL-1.1", "Unicode-3.0", "CC0-1.0", "MIT", "Apache-2.0"]);
+const FREE = new Set(["GPL-3.0-or-later", "AGPL-3.0-only", "CC-BY-4.0", "OFL-1.1", "Unicode-3.0", "CC0-1.0", "MIT", "Apache-2.0"]);
 test("every licence REUSE.toml names is a free licence, so no package holds a non-free file", () => {
   for (const [, id] of read("REUSE.toml").matchAll(/SPDX-License-Identifier = "([^"]+)"/g)) assert.ok(FREE.has(id), `non-free licence in REUSE.toml: ${id}`);
 });

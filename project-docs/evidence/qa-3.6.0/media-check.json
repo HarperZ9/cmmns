@@ -1,0 +1,140 @@
+{
+ "drm_fixture": "ready",
+ "case_save": {
+  "found": [
+   "VideoVideo, 1280 by 720, 8 s, HLS streamhttp://127.0.0.1:8765/stream/master.m3u8",
+   "VideoVideo, 1280 by 720, 8 s, HLS streamhttp://127.0.0.1:8765/locked/index.m3u8",
+   "Video, 1280 by 720, 8 shttp://127.0.0.1:8765/clip.mp4",
+   "AudioAudio, 10 shttp://127.0.0.1:8765/tone.wav",
+   "VideoVideoProtected: The page plays this media through Encrypted Media Extensions (DRM). This media is protected (DRM or encrypted). Daylight Commons does not save protected media, and there is nothin",
+   "Image, 1920 by 1080http://127.0.0.1:8765/photo.png",
+   "GIF, 480 by 270http://127.0.0.1:8765/anim.gif"
+  ],
+  "results": [
+   "Saved Video, 7.8 MB.9ccf321f0fc92684108c7f6ae3b09b843ceb1b2672a1ffe169af0add66620469  Convert or compress",
+   "Not saved. The stream is encrypted (AES-128). This media is protected (DRM or encrypted). Daylight Commons does not save protected media, and there is nothing to change in the settings to allow it.",
+   "Saved Video, 7.6 MB.6f45b57daa98995ce87e7d3c0925d42edb4b634622e844d35cb0b20421c3267e  Convert or compress",
+   "Saved Audio, 1.8 MB.f9c2392790f0664dcbeb864a14d5064cffee31193944e50ae47c57f473caa698  Convert or compress",
+   "Saved Image, 955 KB.a56ddf219114dfe263376cffa10e7c65a82d870304c67959bd0991f6edd6e7c0  Convert or compress",
+   "Saved GIF, 333 KB.4a9b65c7b3f52d27899e0b67875af385ae57e06b5dd9a5832158d254a55a4cd7  Convert or compress"
+  ]
+ },
+ "board_save": {
+  "found": [
+   "VideoVideo, 1280 by 720, 8 s, HLS streamhttp://127.0.0.1:8765/stream/master.m3u8",
+   "VideoVideo, 1280 by 720, 8 s, HLS streamhttp://127.0.0.1:8765/locked/index.m3u8",
+   "Video, 1280 by 720, 8 shttp://127.0.0.1:8765/clip.mp4",
+   "AudioAudio, 10 shttp://127.0.0.1:8765/tone.wav",
+   "VideoVideoProtected: The page plays this media through Encrypted Media Extensions (DRM). This media is protected (DRM or encrypted). Daylight Commons does not save protected media, and there is nothin",
+   "Image, 1920 by 1080http://127.0.0.1:8765/photo.png",
+   "GIF, 480 by 270http://127.0.0.1:8765/anim.gif"
+  ],
+  "results": [
+   "Saved Image, 955 KB.a56ddf219114dfe263376cffa10e7c65a82d870304c67959bd0991f6edd6e7c0  Convert or compress",
+   "Saved GIF, 333 KB.4a9b65c7b3f52d27899e0b67875af385ae57e06b5dd9a5832158d254a55a4cd7  Convert or compress"
+  ]
+ },
+ "stored": [
+  {
+   "kind": "gif",
+   "mime": "image/gif",
+   "bytes": 340962,
+   "sha256": "4a9b65c7b3f52d27899e0b67875af385ae57e06b5dd9a5832158d254a55a4cd7",
+   "collection": "case"
+  },
+  {
+   "kind": "gif",
+   "mime": "image/gif",
+   "bytes": 340962,
+   "sha256": "4a9b65c7b3f52d27899e0b67875af385ae57e06b5dd9a5832158d254a55a4cd7",
+   "collection": "moodboard"
+  },
+  {
+   "kind": "video",
+   "mime": "video/mp4",
+   "bytes": 7924426,
+   "sha256": "6f45b57daa98995ce87e7d3c0925d42edb4b634622e844d35cb0b20421c3267e",
+   "collection": "case"
+  },
+  {
+   "kind": "video",
+   "mime": "video/mp2t",
+   "bytes": 8127428,
+   "sha256": "9ccf321f0fc92684108c7f6ae3b09b843ceb1b2672a1ffe169af0add66620469",
+   "collection": "case"
+  },
+  {
+   "kind": "image",
+   "mime": "image/png",
+   "bytes": 977546,
+   "sha256": "a56ddf219114dfe263376cffa10e7c65a82d870304c67959bd0991f6edd6e7c0",
+   "collection": "case"
+  },
+  {
+   "kind": "image",
+   "mime": "image/png",
+   "bytes": 977546,
+   "sha256": "a56ddf219114dfe263376cffa10e7c65a82d870304c67959bd0991f6edd6e7c0",
+   "collection": "moodboard"
+  },
+  {
+   "kind": "audio",
+   "mime": "audio/wav",
+   "bytes": 1920078,
+   "sha256": "f9c2392790f0664dcbeb864a14d5064cffee31193944e50ae47c57f473caa698",
+   "collection": "case"
+  }
+ ],
+ "case_kinds": [
+  "audio",
+  "gif",
+  "image",
+  "video",
+  "video-hls"
+ ],
+ "conversions": {
+  "05-convert-image": {
+   "status": "Done in 0.1 s.",
+   "size": "Size: 955 KB to 77 KB, 92% smaller.",
+   "file": "photo-07a35a9c6eed.webp"
+  },
+  "06-convert-gif": {
+   "status": "Done in 0.2 s.",
+   "size": "Size: 333 KB to 94 KB, 72% smaller.",
+   "file": "anim-ae475b134bea.mp4"
+  },
+  "07-compress-video": {
+   "status": "Done in 8.2 s.",
+   "size": "Size: 7.6 MB to 858 KB, 89% smaller.",
+   "file": "clip-2ab067e6a3e4.webm"
+  },
+  "08-convert-audio": {
+   "status": "Done in 0.1 s.",
+   "size": "Size: 1.8 MB to 80 KB, 96% smaller.",
+   "file": "tone-733f37891353.ogg"
+  },
+  "07b-convert-video-mp4": {
+   "status": "Done in 8.3 s.",
+   "size": "Size: 7.6 MB to 2.2 MB, 71% smaller.",
+   "file": "clip-2cd7f7a27ce5.mp4"
+  }
+ },
+ "lineage_problems": [],
+ "adblock": {
+  "off": "ads: {\"doubleclick\":\"loaded\",\"analytics\":\"loaded\"}",
+  "enabled_rulesets": [
+   "easylist",
+   "easyprivacy"
+  ],
+  "on": "ads: {\"doubleclick\":\"blocked\",\"analytics\":\"blocked\"}",
+  "on_but_site_allowed": "ads: {\"doubleclick\":\"loaded\",\"analytics\":\"loaded\"}"
+ },
+ "outside_requests": [
+  "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+  "https://www.google-analytics.com/analytics.js",
+  "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+  "https://www.google-analytics.com/analytics.js",
+  "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
+  "https://www.google-analytics.com/analytics.js"
+ ]
+}

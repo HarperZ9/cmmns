@@ -43,8 +43,10 @@ test("the Firefox id is the permanent one; nothing is collected by default, and 
   assert.deepEqual(g.data_collection_permissions.required, ["none"]);
   // Evidence lookups send link domains and repository names (src/ext/evidence-bg.js), so Firefox
   // must be told, and the listing and the store forms must say the same.
-  assert.deepEqual(g.data_collection_permissions.optional, ["websiteContent"]);
-  assert.ok(md.includes('"optional": ["websiteContent"]'));
+  // A case save with "Ask the Internet Archive" ticked sends the saved file's address
+  // (src/ext/save.js), which Firefox counts as browsing activity.
+  assert.deepEqual(g.data_collection_permissions.optional, ["websiteContent", "browsingActivity"]);
+  assert.ok(md.includes('"optional": ["websiteContent", "browsingActivity"]'));
   assert.match(md, /\| Website content, sent \| Yes \|/);
   assert.ok(md.includes(g.id));
 });

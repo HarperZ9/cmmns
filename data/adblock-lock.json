@@ -1,0 +1,84 @@
+{
+  "generated_by": "scripts/adblock-build.mjs",
+  "cap": 30000,
+  "total_rules": 12900,
+  "lists": [
+    {
+      "id": "easylist",
+      "source_url": "https://easylist.to/easylist/easylist.txt",
+      "output": "src/ext/rules/easylist.json",
+      "version": "202610240032",
+      "last_modified": "24 Oct 2026 00:32 UTC",
+      "homepage": "https://easylist.to/",
+      "licence_line": "! Licence: https://easylist.to/pages/licence.html",
+      "licence": "GPL-3.0-or-later OR CC-BY-SA-3.0 (or any later version)",
+      "sha256": "6547e7972bc84698b86bc39f10682332291f92bba1e291f1dadaaffec2e986ed",
+      "filters_read": 85634,
+      "candidates": {
+        "allow": 511,
+        "host": 150,
+        "other": 3094
+      },
+      "host_filters_merged": 53337,
+      "subdomains_pruned": 8,
+      "rules_written": 3755,
+      "id_first": 1,
+      "id_last": 3755,
+      "dropped_by_cap": 0,
+      "skipped": {
+        "bad-anchor": 3,
+        "comment": 275,
+        "cosmetic": 24703,
+        "document-block": 583,
+        "document-mixed": 3,
+        "duplicate": 8,
+        "header": 1,
+        "option:csp": 3,
+        "option:generichide": 167,
+        "option:popup": 2970,
+        "option:rewrite": 7,
+        "regex": 18,
+        "too-short": 2
+      }
+    },
+    {
+      "id": "easyprivacy",
+      "source_url": "https://easylist.to/easylist/easyprivacy.txt",
+      "output": "src/ext/rules/easyprivacy.json",
+      "version": "202610240036",
+      "last_modified": "24 Oct 2026 00:36 UTC",
+      "homepage": "https://easylist.to/",
+      "licence_line": "! Licence: https://easylist.to/pages/licence.html",
+      "licence": "GPL-3.0-or-later OR CC-BY-SA-3.0 (or any later version)",
+      "sha256": "c6e0d2158533d0e3c8d3a7a0a47b0fe64e1d55ab589bed1451b22141be2ae047",
+      "filters_read": 57174,
+      "candidates": {
+        "allow": 839,
+        "host": 130,
+        "other": 8176
+      },
+      "host_filters_merged": 47403,
+      "subdomains_pruned": 1,
+      "rules_written": 9145,
+      "id_first": 3756,
+      "id_last": 12900,
+      "dropped_by_cap": 0,
+      "skipped": {
+        "bad-domain": 2,
+        "comment": 772,
+        "cosmetic": 37,
+        "domain-wildcard": 1,
+        "duplicate": 2,
+        "header": 1,
+        "option:csp": 2,
+        "option:method": 1,
+        "option:redirect": 29,
+        "option:redirect-rule": 1,
+        "option:rewrite": 1,
+        "option:unknown": 1,
+        "regex": 7,
+        "too-short": 2
+      }
+    }
+  ]
+}

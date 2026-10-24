@@ -38,9 +38,15 @@ export const DEFAULTS = Object.freeze({
   // The reading lens (src/core/reading.js): techniques under the held-out bar stay off unless the
   // user turns them all on here.
   lensAll: false,
+  // The pressure lens (src/core/reading-pressure.js): its own switch, off by default.
+  pressureLens: false,
+  // Ad blocking (src/ext/adblock-bg.js): off by default; sites in adblockAllow are always left alone.
+  adblock: false, adblockAllow: [],
 });
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
+// Sites the user exempts from ad blocking: lower-case host names, at most 500.
+const siteList = (v) => (Array.isArray(v) ? [...new Set(v.filter((h) => typeof h === "string" && /^[a-z0-9.-]{1,253}$/i.test(h)).map((h) => h.toLowerCase().replace(/^www\./, "")))].slice(0, 500) : []);
 const bool = (v, d) => (typeof v === "boolean" ? v : d);
 const days = (v, d, r) => (Number.isFinite(Number(v)) && v !== null && v !== "" ? Math.min(r.max, Math.max(r.min, Math.round(Number(v)))) : d);
 const switches = (v, allowed) => {
@@ -62,6 +68,8 @@ export function normalizeSettings(raw) {
     imageText: bool(s.imageText, DEFAULTS.imageText),
     evidence: bool(s.evidence, DEFAULTS.evidence),
     lensAll: bool(s.lensAll, DEFAULTS.lensAll),
+    pressureLens: bool(s.pressureLens, DEFAULTS.pressureLens),
+    adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
   };
 }
 

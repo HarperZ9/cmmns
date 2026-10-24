@@ -20,6 +20,7 @@ export const STAGES = {
   test: [
     ["every test", process.execPath, ["--test", "tests/*.test.js"]],
     ["catalogue data matches catalogue/", process.execPath, ["scripts/catalogue-data.mjs", "--check"]],
+    ["ad-blocking rules match their pinned lists (skipped without the cached lists)", process.execPath, ["scripts/adblock-build.mjs", "--check"]],
     ["fresh build", process.execPath, ["scripts/build.mjs"]],
     ["bundle matches a fresh build", "git", ["diff", "--exit-code", "--ignore-cr-at-eol", "--", "src/ext/core.bundle.js", "src/ext/ocr.bundle.js"]],
     ["fresh catalogue page", process.execPath, ["scripts/catalogue-page.mjs"]],

@@ -23,6 +23,11 @@
   PBCaseInbox.load().then((l) => caseCount(l.length)).catch((e) => console.error("[daylight-commons] could not read the case list", e));
   $("case-add").addEventListener("click", () => PBCaseInbox.add(tab).then((l) => { caseCount(l.length); $("case-add").textContent = "Added to case"; $("case-add").disabled = true; })
     .catch((e) => console.error("[daylight-commons] could not add to the case list", e)));
+  // Save media (src/ext/media-bg.js): this click lets Daylight Commons read this tab once.
+  $("media-save").disabled = !(tab && /^https?:/.test(tab.url || ""));
+  $("media-save").addEventListener("click", () => chrome.runtime.sendMessage({ type: "pb-media-scan", tab }).then(() => window.close()).catch((e) => console.error("[daylight-commons] could not read the page's media", e)));
+  for (const page of ["collections", "convert"]) $(page).addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL(page + ".html") }); window.close(); });
+  PBAdblockPopup.wire(tab);
   $("case-save").addEventListener("click", () => PBCaseInbox.load().then((l) => PBCaseInbox.save(l)).catch((e) => console.error("[daylight-commons] could not save the case list", e)));
   const send = (msg) => (tab && tab.id != null ? chrome.tabs.sendMessage(tab.id, msg).catch(() => null) : Promise.resolve(null));
   // The site card for the page being read: injected into this tab only, only on this click.

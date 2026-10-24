@@ -253,6 +253,34 @@
     "count": 90,
     "unit": "people researched (78 with at least one shipped record)"
    }
+  },
+  "easylist": {
+   "source": "https://easylist.to/easylist/easylist.txt",
+   "upstreamVersion": "! Version: 202610240032 (Last modified 24 Oct 2026 00:32 UTC)",
+   "retrieved": "2026-10-24",
+   "licence": "GPL-3.0-or-later OR CC BY-SA 3.0 or later (dual licence)",
+   "licenceUrl": "https://easylist.to/pages/licence.html",
+   "snapshot": null,
+   "rawRetained": false,
+   "note": "Fetched by scripts/adblock-build.mjs --download into .cache/adblock/ (never committed). The raw sha256, version, licence line and per-reason counts are pinned in data/adblock-lock.json; node scripts/adblock-build.mjs --check rebuilds from the cache.",
+   "rows": {
+    "count": 85634,
+    "unit": "filter list lines"
+   }
+  },
+  "easyprivacy": {
+   "source": "https://easylist.to/easylist/easyprivacy.txt",
+   "upstreamVersion": "! Version: 202610240036 (Last modified 24 Oct 2026 00:36 UTC)",
+   "retrieved": "2026-10-24",
+   "licence": "GPL-3.0-or-later OR CC BY-SA 3.0 or later (dual licence)",
+   "licenceUrl": "https://easylist.to/pages/licence.html",
+   "snapshot": null,
+   "rawRetained": false,
+   "note": "Fetched by scripts/adblock-build.mjs --download into .cache/adblock/ (never committed). The raw sha256, version, licence line and per-reason counts are pinned in data/adblock-lock.json; node scripts/adblock-build.mjs --check rebuilds from the cache.",
+   "rows": {
+    "count": 57174,
+    "unit": "filter list lines"
+   }
   }
  },
  "builds": [
