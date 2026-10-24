@@ -9,6 +9,7 @@
 import { READING_RULES, TECHNIQUE_BY_ID, READING_TECHNIQUES } from "./reading-cues.js";
 import { postFactors, matchFactors, inflect } from "./reading-inflection.js";
 import { READING_MEASURED } from "./reading-measured.js";
+import { PRESSURE_IDS } from "./reading-pressure.js";
 
 export const READING_SHIP_PRECISION = 0.8;
 export const READING_SHIP_MIN_N = 3;
@@ -19,7 +20,14 @@ export function readingOn(table = READING_MEASURED) {
 }
 
 // The shown set for a user's settings: every technique when they turned the lens fully on.
-export const lensOn = (settings) => (settings && settings.lensAll ? new Set(READING_TECHNIQUES.map((t) => t.id)) : readingOn());
+// The pressure family (reading-pressure.js) is its own switch, off by default, whatever its measurement.
+export function lensOn(settings) {
+  if (settings && settings.lensAll) return new Set(READING_TECHNIQUES.map((t) => t.id));
+  const on = readingOn();
+  for (const id of PRESSURE_IDS) on.delete(id);
+  if (settings && settings.pressureLens) for (const id of PRESSURE_IDS) on.add(id);
+  return on;
+}
 
 // Every cue match in the text, overlapping matches of one technique merged into the first.
 export function cueHits(text) {
@@ -69,7 +77,8 @@ export function readThread(posts, { inflection = true, on = readingOn(), withFac
     const findings = hits[i].map((h) => {
       const t = TECHNIQUE_BY_ID.get(h.technique);
       const factors = matchFactors(p.text, h, base, context(P, i, h.technique, U)), inf = inflect(factors);
-      const kept = inflection ? inf.shown : true;
+      // A pressure phrase in quotes or after a reporting verb is a mention ("he wrote 'sorry to push'"), not a use.
+      const kept = inflection ? inf.shown && !(t.family === "pressure" && factors.quotes) : true;
       const f = { technique: t.id, name: t.name, family: t.family, start: h.start, end: h.end, match: h.match.trim().slice(0, 120),
         weight: inf.weight, top: inf.top, shown: kept && on.has(t.id) };
       return withFactors ? { ...f, factors } : f;

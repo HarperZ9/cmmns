@@ -5,6 +5,7 @@
 
 import { NATIONS, TARGET_GROUPS, STRONGMEN, ALLUSIONS, CODED_TERMS } from "./reading-lists.js";
 import { COERCION_ACTORS } from "./theories-coercion.js";
+import { PRESSURE_TECHNIQUES, PRESSURE_DEFINITIONS } from "./reading-pressure.js";
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const alt = (list) => [...new Set(list)].map(esc).sort((a, b) => b.length - a.length).join("|");
@@ -44,7 +45,7 @@ const DEFINITIONS = {
 };
 
 // [id, name, family, cues]. Family names follow the brief; literary devices are one family.
-export const READING_TECHNIQUES = [
+export const READING_TECHNIQUES = [...[
   ["nation-denial", "Nation denial", "dehumanising", [
     `\\b{NATION}\\s+(?:isn't|is not|ain't|was never|has never been)\\s+(?:even\\s+)?(?:a\\s+)?(?:real\\s+)?(?:country|nation|state|people)\\b`,
     "\\bno man'?s land\\b", "\\b(?:not|never) (?:a|even a) real (?:country|nation|people)\\b", "\\bso-called (?:country|nation|state|people)\\b",
@@ -124,7 +125,7 @@ export const READING_TECHNIQUES = [
   ["allusion", "Allusion", "literary", [`\\b(?:${alt(ALLUSIONS)})\\b`]],
   ["dog-whistle", "Dog-whistle", "literary", ["\\b(?:certain people|you know who|those people|these people|their kind|globalists?|international bankers|rootless|the usual suspects|\\(\\(\\()\\b",
     "\\b(?:we aren'?t supposed to|you'?re not supposed to) (?:notice|talk about|say)\\b", "\\boften it'?s in the (?:last )?name\\b", "\\b(?:jewish|zionist|muslim|catholic|white|black) (?:money|cabal|lobby|power brokers)\\b"]],
-].map(([id, name, family, cues]) => ({ id, name, family, cues, definition: DEFINITIONS[id] }));
+], ...PRESSURE_TECHNIQUES].map(([id, name, family, cues]) => ({ id, name, family, cues, definition: DEFINITIONS[id] || PRESSURE_DEFINITIONS[id] }));
 
 const fill = (cue) => cue.replace(/\{(NATION|GROUP|ACTOR|STRONGMAN)\}/g, (_, k) => SLOTS[k]);
 export const READING_RULES = READING_TECHNIQUES.flatMap((t) => t.cues.map((cue, i) => ({ technique: t.id, cue: `${t.id}#${i}`, re: new RegExp(fill(cue), "giu") })));
