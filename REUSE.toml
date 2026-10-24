@@ -47,3 +47,10 @@ SPDX-License-Identifier = "OFL-1.1"
 path = ["src/ext/fonts/jetbrains-mono-regular.woff2", "docs/fonts/jetbrains-mono-regular.woff2", "src/ext/fonts/OFL-jetbrains-mono.txt", "docs/fonts/OFL-jetbrains-mono.txt"]
 SPDX-FileCopyrightText = "2020 The JetBrains Mono Project Authors"
 SPDX-License-Identifier = "OFL-1.1"
+
+# EasyList and EasyPrivacy, dual-licensed GPL-3.0-or-later or CC BY-SA 3.0 or later by their
+# authors; Daylight Commons ships the compiled rules under the GPL option (THIRD-PARTY.md).
+[[annotations]]
+path = ["src/ext/rules/easylist.json", "src/ext/rules/easyprivacy.json"]
+SPDX-FileCopyrightText = "The EasyList authors <https://easylist.to/>"
+SPDX-License-Identifier = "GPL-3.0-or-later"
