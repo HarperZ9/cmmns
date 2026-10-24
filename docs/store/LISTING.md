@@ -99,7 +99,7 @@ The privacy and transparency URLs go live when GitHub Pages serves `/docs` from 
 **Single purpose**
 
 <!-- field:single-purpose -->
-Shows the evidence behind the posts and accounts in the social media threads the user is reading: where it comes from, signs of coordination and how it argues, each with its source and what it shows.
+Shows the evidence behind the posts and accounts in the social media threads the user is reading: where it comes from, signs of coordination and how it argues, each with its source and what it shows. Its tools for keeping that evidence (saving media with its hash, converting it on the device) and for reading without trackers (optional ad and tracker blocking) serve the same purpose.
 <!-- /field -->
 
 **Permission justifications**
@@ -113,10 +113,12 @@ Shows the evidence behind the posts and accounts in the social media threads the
 | Host `https://www.facebook.com/*`, `https://www.instagram.com/*` | Reads comments and the account transparency details Meta shows when the user opens them. |
 | Host `https://bsky.app/*` | Reads replies, account data and moderation labels the Bluesky app loaded. |
 | `scripting` | Injects the site card into the current tab when the user presses "Site card for this page", and registers the search-result labels only for the engines the user turned on. Also runs Daylight Commons on a Mastodon server only after the user turns it on for that server, and checks, when the user opens the toolbar button on such a page, whether it is the Mastodon web app (its root element, version and domain, nothing else). |
-| `activeTab` | Lets the site card and that one check read the current tab when the user opens the toolbar button, and no other time. |
+| `activeTab` | Lets the site card and that one check read the current tab when the user opens the toolbar button, and no other time. The same grant lets "Save media from this page" and the right-click "Save to Daylight" list the images, GIFs, video and audio that tab loaded, once, on that click. |
+| `contextMenus` | Adds one item, "Save to Daylight", to the right-click menu on images, video and audio. Choosing it opens Daylight Commons' save page with that file; nothing runs until the user picks it. |
+| `declarativeNetRequest` | Ad and tracker blocking, off until the user turns it on: the EasyList and EasyPrivacy filter lists, compiled into two static rulesets the browser matches itself, and one allow rule for the sites where the user allowed ads. Daylight Commons never reads which requests were blocked and needs no host access for it. |
 | Host `https://www.threads.com/*`, `https://www.threads.net/*` | Reads the posts and replies Threads shows on the page. |
 | Host `https://www.tiktok.com/*` | Reads the comments TikTok shows and the comment list its app already loaded. |
-| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Daylight Commons here" on that server; the browser shows its own prompt. Never granted for all sites. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for one news feed's host at a time (for example `https://feeds.bbci.co.uk/*`) only when the user chooses that outlet or adds that feed for Other coverage, which on the user's click downloads the feed and sends nothing from the page. It is asked for `https://web.archive.org/*` only when the user turns on Evidence lookups, because the Internet Archive's capture index answers a browser extension only with host access. |
+| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Daylight Commons here" on that server; the browser shows its own prompt. Never granted for all sites. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for one news feed's host at a time (for example `https://feeds.bbci.co.uk/*`) only when the user chooses that outlet or adds that feed for Other coverage, which on the user's click downloads the feed and sends nothing from the page. It is asked for `https://web.archive.org/*` only when the user turns on Evidence lookups, because the Internet Archive's capture index answers a browser extension only with host access, or ticks "Ask the Internet Archive to keep a copy" on a case save. When the user saves media, it is asked for the one host the file or stream comes from (for example `https://pbs.twimg.com/*`), on the Save click, so the save page can download the file the page already loaded; a stream whose segments sit on another host asks again on a second click. |
 
 The APIs Daylight Commons also calls (`action`, `tabs.create`, `tabs.query`, `tabs.sendMessage`,
 `windows.create`) need no manifest permission. `tests/store-listing.test.js` fails when the
@@ -130,8 +132,8 @@ locally". Tick these, because Daylight Commons reads and keeps them in the brows
 | CWS category | Ticked | Why |
 |---|---|---|
 | Website content | Yes | Reads the replies and account details on the page; keeps summaries and, only when the user ticks it, a post's text with a feedback mark |
-| Web browsing activity | Yes | Keeps a summary of each thread the user opened, for the history page |
-| Website content, sent | Yes | Only with evidence lookups, off by default: on the user's click, the repository names and web domains the post links to go to api.github.com, rdap.org and web.archive.org. Other coverage downloads the feeds of outlets the user chose and sends nothing from the page |
+| Web browsing activity | Yes | Keeps a summary of each thread the user opened, for the history page, and the page address beside each media file the user saves |
+| Website content, sent | Yes | Only with evidence lookups, off by default: on the user's click, the repository names and web domains the post links to go to api.github.com, rdap.org and web.archive.org. Other coverage downloads the feeds of outlets the user chose and sends nothing from the page. A case save with "Ask the Internet Archive" ticked sends the saved file's address to web.archive.org |
 | Personally identifiable information, Health, Financial and payment, Authentication, Personal communications, Location, User activity | No | Daylight Commons reads none of these. The location labels are the sites' public labels about other accounts, not the user's location |
 
 Certifications (tick all three): not sold or transferred to third parties outside the approved use
@@ -145,7 +147,7 @@ transferred to determine creditworthiness or for lending.
 | Package | `radar-firefox-<version>.xpi` from the GitHub release, or `npm run package`; AMO signs it |
 | Add-on ID | `radar@harperz9.github.io`. Permanent: see DESIGN.md, "Add-on identity" |
 | Minimum version | Firefox 128 (main-world content scripts) |
-| Data collection | `"required": ["none"], "optional": ["websiteContent"]`. Nothing is sent by default. Evidence lookups, when the user turns them on in Options (Firefox then asks for website content), send the repository names and web domains a post links to GitHub, rdap.org and the Internet Archive. Other coverage downloads public news feeds from hosts the user approved one by one and sends nothing from the page |
+| Data collection | `"required": ["none"], "optional": ["websiteContent", "browsingActivity"]`. Nothing is sent by default. A case save with "Ask the Internet Archive to keep a copy" ticked (Firefox then asks for browsing activity) sends the saved file's address to web.archive.org. Evidence lookups, when the user turns them on in Options (Firefox then asks for website content), send the repository names and web domains a post links to GitHub, rdap.org and the Internet Archive. Other coverage downloads public news feeds from hosts the user approved one by one and sends nothing from the page |
 | Lint | `web-ext lint` 8.10.0 on the 2026-10-21 build: 0 errors, 0 warnings, 0 notices |
 | Source code | Upload `docs/store/amo-source-<version>.zip` (`node scripts/amo-source.mjs`): `src/core`, `src/ocr`, the build script and `REVIEWER.md`, whose steps remake both generated files byte for byte; nothing is minified |
 | Notes to reviewer | Run `node scripts/serve.mjs` and open `http://127.0.0.1:8742/tests/fixtures/thread.html` to see the window without any account. On a real site, Firefox asks for site access on the first-run page |
@@ -188,7 +190,7 @@ accepting each store's developer agreement and pressing submit are the author's 
 **Chrome Web Store**
 1. Sign in at chrome.google.com/webstore/devconsole with the account that will own the listing.
    Pay the one-time registration fee and accept the developer agreement if this is the first item.
-2. New item: upload `radar-chrome-3.5.0.zip` from the GitHub release v3.5.0. Check its SHA-256
+2. New item: upload `radar-chrome-3.6.0.zip` from the GitHub release v3.6.0. Check its SHA-256
    against the release's `SHA256SUMS` first.
 3. Store listing tab: the summary comes from the manifest; paste "Description" from above;
    category Social & Communication; language English; upload the five screenshots in order and the
@@ -201,9 +203,9 @@ accepting each store's developer agreement and pressing submit are the author's 
 **Firefox Add-ons (listed)**
 1. Sign in at addons.mozilla.org/developers with the account that will own the add-on, and accept
    the distribution agreement.
-2. Submit a new add-on, "On this site": upload `radar-firefox-3.5.0.xpi` from the release. The
+2. Submit a new add-on, "On this site": upload `radar-firefox-3.6.0.xpi` from the release. The
    add-on id `radar@harperz9.github.io` is set in the package; it must never change.
-3. Source code: answer yes and upload `docs/store/amo-source-3.5.0.zip` (also attached to the
+3. Source code: answer yes and upload `docs/store/amo-source-3.6.0.zip` (also attached to the
    release). Its `REVIEWER.md` gives the steps that remake `core.bundle.js` and `ocr.bundle.js` byte
    for byte from `src/core` and `src/ocr`; nothing is minified.
 4. Paste the name, the AMO summary and the description; licence AGPL-3.0-only; tags from the table;
@@ -215,9 +217,9 @@ accepting each store's developer agreement and pressing submit are the author's 
 1. At addons.mozilla.org/developers/addon/api/key, create an API key and secret. Keep them out of
    the repository, for example in environment variables `WEB_EXT_API_KEY` and
    `WEB_EXT_API_SECRET`.
-2. `npx web-ext sign --channel unlisted --source-dir <unzipped radar-firefox-self-3.5.0.xpi>`, or
+2. `npx web-ext sign --channel unlisted --source-dir <unzipped radar-firefox-self-3.6.0.xpi>`, or
    upload that xpi as "On your own" in the developer hub.
-3. Attach the signed file Mozilla returns to the v3.5.0 release, then run
+3. Attach the signed file Mozilla returns to the v3.6.0 release, then run
    `node scripts/firefox-updates.mjs <signed.xpi>` and commit `docs/firefox/updates.json`, so
    installed copies find the next version.
 

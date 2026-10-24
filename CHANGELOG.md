@@ -7,6 +7,42 @@ were not published to a store.
 
 Nothing yet.
 
+## 3.6.0 (2026-10-24)
+
+A media toolkit for keeping and checking what you read, a pressure lens, and optional ad blocking.
+Details and measurements: project-docs/MEDIA-TOOLKIT.md and the pressure section of
+project-docs/READING-LENS.md.
+
+### Added
+- **Save to Daylight.** Right-click any image, GIF, video or audio, or use "Save media from this
+  page" in the toolbar menu. Direct files are saved as they are; a video the page streams is
+  assembled from its unencrypted HLS or DASH segments. Each file keeps its SHA-256, address, page and
+  time, in an investigation case (with the case list and an optional Internet Archive request) or a
+  moodboard with tags and notes. A collections page shows each as a grid.
+- **Protected media is refused.** Encrypted Media Extensions on the element, an HLS key other than
+  NONE, a DASH ContentProtection element or MP4 and WebM encryption markers stop the save with a
+  plain sentence. Nothing in the settings changes that.
+- **Convert and compress on the device.** Images among PNG, JPEG, WebP and AVIF (where the browser
+  writes it); GIF to MP4 or WebM; video to WebM or MP4 at a lower size, bitrate or frame rate; audio
+  to Opus in WebM or Ogg. WebCodecs encodes; Daylight Commons' own GIF decoder and WebM, MP4 and Ogg
+  writers do the rest, with no new dependency. Each result shows the size before and after and keeps
+  a hash chain back to the original.
+- `daylight media convert <file> --to <format>` and `daylight media compress <file>`, through a
+  system ffmpeg, with a lineage file beside the result.
+- **Ad and tracker blocking**, off by default and separate from every reading feature: EasyList and
+  EasyPrivacy compiled into the browser's own blocking engine (12,900 rules), with "Allow ads on
+  this site" in the toolbar menu.
+- **Pressure lens**, off by default: urgency, shrinking the ask, manufactured consensus, false
+  even-handedness, burden shifting and deflection by label, in messages from anyone. Held out on 73
+  synthetic messages written blind: right on 8 of its 9 marks, found 8 of 47 moves, and marked none
+  of 41 ordinary messages.
+
+### Changed
+- New permissions: `contextMenus` (the "Save to Daylight" item) and `declarativeNetRequest` (ad
+  blocking). Firefox's data declaration adds optional "browsing activity" for the Internet Archive
+  request on a case save. The store listing justifies each one.
+- The Firefox source package for reviewers is now `docs/store/amo-source-3.6.0.zip`.
+
 ## 3.5.0 (2026-10-23)
 
 Production hardening, plain help for every command, and the store kit. The audit behind it, with a

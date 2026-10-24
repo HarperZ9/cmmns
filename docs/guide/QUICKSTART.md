@@ -59,7 +59,7 @@ What it does: marks the words in a post that carry a named technique, such as a 
 carries an accusation, and says which factors weighed it.
 
 1. Open **Options** and turn on **Every reading technique**. Techniques that passed their measured
-   bar show without this switch; in 3.5.0 none has passed yet, so the switch shows them all.
+   bar show without this switch; in 3.6.0 none has passed yet, so the switch shows them all.
 2. Open a post's window. Marked spans name their technique and the two factors that moved it most.
 
 ## Tell it when it is wrong

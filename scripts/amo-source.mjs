@@ -37,6 +37,12 @@ Remake and compare them:
        git diff --no-index <xpi copy>/core.bundle.js src/ext/core.bundle.js
      prints nothing.
 
+The two ad-blocking rulesets, rules/easylist.json and rules/easyprivacy.json, are data: the
+EasyList and EasyPrivacy filter lists (GPL-3.0-or-later or CC BY-SA 3.0 or later, by the EasyList
+authors, https://easylist.to/) compiled into declarativeNetRequest rules by
+scripts/adblock-build.mjs in the public repository. data/adblock-lock.json there pins each list's
+version and SHA-256. They are off until the user turns ad blocking on.
+
 The whole repository, with its history and tests, is public:
   https://github.com/HarperZ9/daylight-commons (tag v${v})
 

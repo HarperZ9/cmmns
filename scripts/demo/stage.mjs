@@ -65,6 +65,28 @@ export function threadStage() {
   return { url: `https://x.com/${THREAD[0][0]}/status/${root}`, html: page("Post", posts), json: { TweetDetail: detail(tweets) } };
 }
 
+// A pressure thread for the pressure lens (src/core/reading-pressure.js): a maintainer's question about
+// a pull request and replies that push for the merge, in the shape of the sock-puppet messages in the
+// 2026-10-23 UK AISI incident write-up, with every account invented, plus two ordinary replies.
+const PRESSURE = [
+  ["proj_maint", "Before I merge the preload change: a reviewer says one line downloads and runs a file. Can someone confirm?", { basedIn: "Germany", joinDate: "2013-03-01" }],
+  ["patch_author", "Hi, it's me again. Sorry to push, but our rollout is blocked on this fix. Three quick steps, ~5 minutes. Judge the code, not the noise.", { basedIn: "United States", joinDate: "2026-10-01" }],
+  ["just_a_user", "Chiming in as a user. I can't find any download logic in the diff.", { basedIn: "United States", joinDate: "2026-10-20" }],
+  ["fair_voice", "Credit to the reviewer for catching it, and to the author for owning it. Check the Files tab yourself, it's fine.", { basedIn: "Canada", joinDate: "2026-10-19" }],
+  ["rev_ana", "I ran the build in a sandbox. Line 41 fetches a script from an outside host and runs it. Please don't merge.", { basedIn: "Spain", joinDate: "2015-08-01" }],
+  ["long_user", "Thanks for checking this carefully. I will wait for the next release.", { basedIn: "Japan", joinDate: "2017-01-01" }],
+].map(([h, text, about]) => [demo(h), text, about]);
+
+export function pressureStage() {
+  const root = "1900000000000000400", tweets = [];
+  PRESSURE.forEach(([h, text, about], i) => {
+    const id = i ? String(BigInt(root) + BigInt(i)) : root;
+    tweets.push(tweet(id, user(h, { joinDate: about.joinDate, about }), text, { conv: root, replyTo: i ? root : null, replyToHandle: PRESSURE[0][0], at: new Date(BASE + i * 61000).toISOString() }));
+  });
+  const posts = PRESSURE.map(([h, text], i) => ({ h, text, id: tweets[i].rest_id, root: i === 0 }));
+  return { url: `https://x.com/${PRESSURE[0][0]}/status/${root}`, html: page("Post", posts), json: { TweetDetail: detail(tweets) } };
+}
+
 // A launch: the company's post, its quotes and its reposters. kind "campaign" uses the farm and paid
 // quotes; kind "organic" uses varied people and is the "run it on us" control.
 export function launchStage(kind) {
@@ -149,7 +171,7 @@ for(const op of ["TweetDetail","Retweeters"]) fetch("/i/api/graphql/demo/"+op+"?
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const out = process.argv[2];
   if (!out) { console.error("usage: node scripts/demo/stage.mjs <out dir>"); process.exit(2); }
-  const stages = { thread: threadStage(), campaign: launchStage("campaign"), ours: launchStage("organic"), long: longStage(Number(process.env.STAGE_LONG_N) || 600) };
+  const stages = { thread: threadStage(), pressure: pressureStage(), campaign: launchStage("campaign"), ours: launchStage("organic"), long: longStage(Number(process.env.STAGE_LONG_N) || 600) };
   mkdirSync(out, { recursive: true });
   const index = {};
   for (const [name, s] of Object.entries(stages)) {

@@ -54,6 +54,32 @@ How it was run:
 | 31 | Docs | INSTALL, a quick start per feature, troubleshooting, FAQ | `INSTALL.md`, `docs/guide/` | INSTALL only | all four; linked from the README |
 | 32 | Store | Listing copy, privacy answers, permission justifications, 5 screenshots at 1280x800, promo tile 440x280, AMO source package | `docs/store/` | copy and synthetic screenshots | all, with real-post screenshots and a source package that remakes both generated files byte for byte (checked) |
 
+## 3.6.0 additions
+
+Checked 2026-10-24 on the 3.6.0 branch. Browser rows ran in Google Chrome 155, headless, fresh profile, with
+`scripts/qa/media_check.py` on a local fixture site (synthetic image, GIF, video, sound, an HLS
+stream, an AES-128 HLS stream and a video with ClearKey MediaKeys) and `scripts/qa/pressure_shot.py`
+on the demo stage. Results and screenshots: `project-docs/evidence/qa-3.6.0/`. The budgets above are
+unchanged and still enforced by `tests/budget.test.js`.
+
+| # | Area | Check | How | 3.6.0 |
+|---|---|---|---|---|
+| 33 | Save | Save media from a page into a case and a moodboard | `media_check.py`: 7 items found; image, GIF, direct MP4, WAV and an HLS stream (4 segments joined into MPEG-TS) saved with their SHA-256 | pass |
+| 34 | Save | Protected media is refused, never fetched | element with MediaKeys: card disabled with the reason; AES-128 HLS: "Not saved", no segment kept; `tests/media-stream.test.js` for SAMPLE-AES, session keys, DASH ContentProtection, MP4 `encv` and WebM ContentEncryption | pass |
+| 35 | Convert | Local conversion, output decodes | PNG to WebP, GIF to MP4, MP4 to WebM 480p, MP4 to MP4 720p (H.264 and AAC), WAV to Ogg Opus; every output decoded by ffmpeg 7.1 with no errors | pass; sizes in `project-docs/MEDIA-TOOLKIT.md` |
+| 36 | Convert | Hash lineage | `checkLineage` over every saved item after the conversions: 0 problems; `tests/media-collect.test.js` rejects forged and broken chains | pass |
+| 37 | Convert | Command line | `daylight media convert` and `compress` on the same samples through ffmpeg; `tests/media-cli.test.js` runs a real conversion where ffmpeg is installed | pass |
+| 38 | Ad blocking | Off by default, blocks when on, per-site allow | two ad scripts on the fixture: loaded (off), blocked (on), loaded (on, site allowed); both rulesets ship disabled | pass |
+| 39 | Ad blocking | Rules match their pinned lists and stay in budget | `node scripts/adblock-build.mjs --check` (CI stage, skipped without the cached lists); 12,900 rules of a 30,000 budget; `tests/adblock.test.js` | pass |
+| 40 | Pressure lens | Off by default; held-out score reproduced | `tests/pressure.test.js`; precision 89% (8/9), recall 17% (8/47), 0 of 41 ordinary messages marked | pass for the check; recall is low, see READING-LENS.md |
+| 41 | Pressure lens | Window shows each move with its definition and limit, spans marked in the post | stage thread, screenshot `13-pressure-window.png` | pass |
+| 42 | Performance | Text work per post, first pass and refresh, 500 replies | `scripts/qa/bench.mjs` | 0.32 ms; 75 ms; 64 ms (3.5.0: 0.26; 59; 48), inside the 4 ms and 1,500 ms budgets |
+| 43 | Security | New permissions justified | `contextMenus`, `declarativeNetRequest` rows in `docs/store/LISTING.md`; `tests/store-listing.test.js` | pass |
+| 44 | Security | No new dependency, no remote code, no markup from strings | `package.json`, `tests/hardening.test.js` | pass |
+
+Not tested for 3.6.0: the media toolkit and ad blocking in Firefox, saving from a real DASH site, and
+the toolkit on the signed-in social sites. The fixture site is synthetic.
+
 ## What could not be tested here
 
 - **X, Facebook, Instagram and TikTok on real pages.** They show posts only to a signed-in viewer,

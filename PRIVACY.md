@@ -1,13 +1,14 @@
 # Daylight Commons privacy policy
 
-Last updated: 2026-10-23.
+Last updated: 2026-10-24.
 
 Daylight Commons runs in your browser, and everything it reads or works out stays there. It talks
 to the site you are on, with that site's own session. Two features reach further, and both stay off
 until you turn them on and click: Other coverage downloads the public news feeds of outlets you
 choose, and evidence lookups send the repository names and web domains a post links to GitHub,
-rdap.org and the Internet Archive. Your browser's extension details page lists every site Daylight
-Commons has access to.
+rdap.org and the Internet Archive. Saving media downloads a file from the host the page loaded it
+from, on your click. Your browser's extension details page lists every site Daylight Commons has
+access to.
 
 ## What Daylight Commons reads
 
@@ -91,6 +92,26 @@ used and without cookies, and hands its bytes to Daylight Commons' own backgroun
 browser. Code and weights shipped inside Daylight Commons read the words there. The image, the text
 and any hash of either stay in your browser, and the text lasts as long as that window.
 
+## Saved media, conversions and ad blocking
+
+- **Save to Daylight** and **Save media from this page** read the current tab once, on your click,
+  to list the media it loaded. On **Save**, your browser asks you to let Daylight Commons reach the
+  one host each file or stream comes from (for example `pbs.twimg.com`); it then downloads the file
+  from there, as the page did, with your browser's own cookies for that host. Nothing from the page
+  is sent anywhere else.
+- Saved files, their hashes, addresses, page, time, tags, notes and lineage are kept in this
+  browser's IndexedDB for the extension, until you delete them on the collections page ("Delete all
+  saved media") or remove Daylight Commons. A case save also adds the file's address, page and hash
+  to the case list in `chrome.storage.local`.
+- **Ask the Internet Archive to keep a copy**, a tick box on a case save that is off unless you tick
+  it, sends the saved file's address (or the page's, for a stream) to web.archive.org. Firefox asks
+  you to allow "browsing activity" for this the first time.
+- Protected media (DRM or encrypted streams) is never downloaded.
+- **Convert and compress** runs on this device. No file is uploaded.
+- **Ad and tracker blocking**, off until you turn it on, is done by your browser's own blocking
+  engine with the bundled EasyList and EasyPrivacy rules. Daylight Commons does not see which
+  requests were blocked. The sites where you allowed ads are kept with your settings.
+
 ## What Daylight Commons keeps, where, and for how long
 
 Everything is kept in `chrome.storage.local` (Firefox: `browser.storage.local`) in the browser
@@ -167,6 +188,9 @@ The carrier-safe profile awaits independent review.
 - To GitHub, rdap.org and the Internet Archive: the repository names and web domains a post links
   to, when evidence lookups are on and you click.
 - To the news outlets you chose: a feed download, when Other coverage is on and you click.
+- To the host a saved file came from: the download of that file, when you click Save.
+- To the Internet Archive: a saved file's address, when you tick "Ask the Internet Archive to keep a
+  copy" on a case save.
 
 That is the whole list. Your data serves the features above and stays out of advertising and
 sale. Account labels show what each site discloses about an account, kept per site; Daylight
