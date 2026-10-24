@@ -13,11 +13,21 @@ export const TOP_HELP = {
     "Exit code 0 means every check passed; 1 means at least one failed, and the output names it."],
   site: ["Show who owns a news site, its owner type and its fact-check record, from the bundled tables.",
     "daylight site <domain> [--json]", "daylight site example.org", ""],
-  media: ["Read an image or video file's Content Credentials and AI-generation labels.",
-    "daylight media <file> [--json]", "daylight media photo.jpg", ""],
+  media: ["Read an image or video file's Content Credentials and AI-generation labels. \"daylight media convert\" and \"daylight media compress\" change a file's format or size.",
+    "daylight media <file> [--json]", "daylight media photo.jpg", "See daylight media convert --help and daylight media compress --help."],
   export: ["Turn a saved evidence chain into a legal dossier, a PROV record, a write-up or a research dataset.",
     "daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir] [--reply replies.json] [--corrections corrections.json] [--seed text]",
     "daylight export chain.json --profile legal --out dossier", "It refuses a chain that fails its own check."],
+};
+
+// `daylight media convert` and `compress` (bin/lib/media.mjs), through a system ffmpeg.
+export const MEDIA_HELP = {
+  convert: ["Convert a picture, GIF, video or sound file to a similar format, with ffmpeg on this computer, and write its lineage beside it.",
+    "daylight media convert <file> --to png|jpg|webp|avif|mp4|webm|ogg|opus [--quality 0-1] [--max-side N] [--max-height N] [--bitrate 2M] [--audio-bitrate 96k] [--fps N] [--out file] [--force] [--json]",
+    "daylight media convert clip.gif --to mp4", "Needs ffmpeg on the PATH, or FFMPEG set to its path. The original is never replaced; <new file>.lineage.json records both hashes and the step."],
+  compress: ["Make a picture, GIF, video or sound file smaller in the same kind of format, with ffmpeg on this computer.",
+    "daylight media compress <file> [--to format] [--quality 0-1] [--max-side N] [--max-height N] [--bitrate 1M] [--audio-bitrate 64k] [--fps N] [--out file] [--force] [--json]",
+    "daylight media compress interview.mp4 --max-height 720", "Writes <name>.small.<ext> beside the original, with its lineage file."],
 };
 
 export const CASE_HELP = {

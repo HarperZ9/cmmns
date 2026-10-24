@@ -5,6 +5,7 @@
 //   radar verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
 //   radar site <domain> [--json]
 //   radar media <file> [--json]
+//   radar media convert|compress <file> [--to format] [options]   (needs a system ffmpeg)
 //   radar export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
 // <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 // CSV, a Mastodon outbox.json or a Bluesky repository .car. project-docs/INTEGRATION.md has more.
@@ -21,7 +22,8 @@ import { readable, verdictLines, chainLines } from "./lib/report.mjs";
 import { validate } from "./lib/jsonschema.mjs";
 import { runExport } from "./lib/export.mjs";
 import { runCaseCommand } from "./lib/case.mjs";
-import { TOP_HELP, helpText, friendly } from "./lib/help.mjs";
+import { TOP_HELP, MEDIA_HELP, helpText, friendly } from "./lib/help.mjs";
+import { runMedia } from "./lib/media.mjs";
 
 const USAGE = `Usage:
   daylight analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
@@ -29,6 +31,9 @@ const USAGE = `Usage:
   daylight verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
   daylight site <domain> [--json]
   daylight media <file> [--json]
+  daylight media convert <file> --to <format> [--quality 0-1] [--max-side N] [--max-height N]
+               [--bitrate 2M] [--audio-bitrate 96k] [--fps N] [--out file] [--json]
+  daylight media compress <file> [the same options]
   daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
   daylight case <command>   an investigation case folder; "daylight case help" lists the commands
@@ -51,7 +56,7 @@ export function parseArgs(argv) {
     const a = argv[i];
     if (!a.startsWith("--")) { out._.push(a); continue; }
     const [k, v] = a.slice(2).split("=");
-    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page"].includes(k) ? argv[++i] : true;
+    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate"].includes(k) ? argv[++i] : true;
   }
   return out;
 }
@@ -103,6 +108,13 @@ async function verify(file, f) {
 
 export async function main(argv) {
   if (argv[0] === "case") { const r = await runCaseCommand(argv.slice(1)); print(r.out); return process.exitCode || r.code; }
+  if (argv[0] === "media" && (argv[1] === "convert" || argv[1] === "compress")) {
+    const { _: [file], flags } = parseArgs(argv.slice(2));
+    if (flags.help || !file) { print(helpText(MEDIA_HELP[argv[1]], `daylight media ${argv[1]}`)); return file || flags.help ? 0 : 2; }
+    const r = runMedia(argv[1], file, flags);
+    print(flags.json ? asJson(r.lineage) : r.line);
+    return 0;
+  }
   const { _: [cmd, arg], flags } = parseArgs(argv);
   if (cmd && flags.help && TOP_HELP[cmd]) { print(helpText(TOP_HELP[cmd], `daylight ${cmd}`)); return 0; }
   if (!cmd || flags.help || !arg) { print(USAGE); return cmd && !flags.help ? 2 : 0; }
