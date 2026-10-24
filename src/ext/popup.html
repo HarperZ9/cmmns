@@ -26,6 +26,9 @@
     <button id="analyze" type="button">Analyse a file</button>
     <button id="case-add" type="button">Add to case</button>
     <button id="case-save" type="button">Save case list</button>
+    <button id="media-save" type="button">Save media from this page</button>
+    <button id="collections" type="button">Collections</button>
+    <button id="convert" type="button">Convert or compress a file</button>
     <button id="options" type="button">Options</button>
     <button id="transparency" type="button">How Daylight Commons is measured</button>
   </div>
@@ -35,6 +38,10 @@
     <label><input type="checkbox" id="feeds"> Daylight Commons on feeds and profiles</label>
     <label><input type="checkbox" id="auto"> Read About pages automatically</label>
   </section>
+  <section class="settings bare" aria-label="Ad blocking">
+    <label><input type="checkbox" id="adblock"> Block ads and trackers (EasyList, EasyPrivacy)</label>
+    <label><input type="checkbox" id="adblock-site" disabled> <span id="adblock-site-text">Allow ads on this site</span></label>
+  </section>
   <p id="freshness" class="muted"></p>
 </main>
 <footer>Daylight Commons reads the site you are on. Other coverage and evidence lookups reach further once you turn them on.</footer>
@@ -43,6 +50,7 @@
   <script src="settings.js"></script>
 <script src="popup-server.js"></script>
 <script src="case-inbox.js"></script>
+<script src="adblock-popup.js"></script>
 <script src="freshness.js"></script>
 <script src="popup.js"></script>
 </body>

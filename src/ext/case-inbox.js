@@ -23,6 +23,14 @@ globalThis.PBCaseInbox = (() => {
 
   async function load() { const got = await chrome.storage.local.get(KEY); return Array.isArray(got[KEY]) ? got[KEY] : []; }
   async function add(tab) { const list = addTo(await load(), row(tab)); await chrome.storage.local.set({ [KEY]: list }); return list; }
+  // A saved media file (src/core/media-collect.js caseInboxRow): its address with the hash, page and
+  // lineage the browser recorded. A second save of the same address replaces the first row.
+  async function addRow(r) {
+    if (!r || !/^https?:\/\//i.test(String(r.url || ""))) return load();
+    const list = [...(await load()).filter((x) => x.url !== r.url), r].slice(-MAX);
+    await chrome.storage.local.set({ [KEY]: list });
+    return list;
+  }
 
   function save(list, doc = document) {
     const a = doc.createElement("a");
@@ -32,5 +40,5 @@ globalThis.PBCaseInbox = (() => {
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
 
-  return Object.freeze({ row, addTo, toJsonl, load, add, save, KEY, MAX });
+  return Object.freeze({ row, addTo, toJsonl, load, add, addRow, save, KEY, MAX });
 })();

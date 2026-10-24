@@ -62,7 +62,7 @@ test("the reader runs in the background worker only, from files inside the exten
   assert.ok(m.background.scripts.includes("ocr.bundle.js") && m.background.scripts.includes("ocr-bg.js"));
   // The one policy change: compiling Daylight Commons' own WebAssembly kernel. No remote script source.
   assert.equal(m.content_security_policy.extension_pages, "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'");
-  assert.match(read("src/ext/background.js"), /importScripts\([^)]*"ocr\.bundle\.js", "ocr-bg\.js"\)/);
+  assert.match(read("src/ext/background.js"), /importScripts\([^)]*"ocr\.bundle\.js", "ocr-bg\.js"[,)]/);
   for (const f of readdirSync(new URL("../src/ocr/", import.meta.url))) {
     const src = read(`src/ocr/${f}`);
     assert.doesNotMatch(src, /https?:\/\/|fetch\(|XMLHttpRequest|WebSocket|importScripts|import\(/, f);

@@ -15,6 +15,8 @@ export const PRESSURE_DEFINITIONS = {
   "deflection-by-label": "The message answers a concern with a label instead of a reason. Look for \"noise\", \"FUD\" or \"drama\" said of an objection.",
 };
 
+export const PRESSURE_DOES_NOT_PROVE = "A pressure move describes how a message asks. People in a real hurry use the same words, and it says nothing about who wrote the message.";
+
 const SELF = "(?:yoursel(?:f|ves))";
 // "you can verify it yourself" is help, not a demand, so these lead-ins skip the match.
 const OFFERED = "(?<!\\b(?:you can|you may|you could|feel free to|easy to|able to|lets you|so you can|to help you) )";

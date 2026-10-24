@@ -11,7 +11,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readPost } from "../src/core/reading.js";
-import { PRESSURE_IDS } from "../src/core/reading-pressure.js";
+import { PRESSURE_IDS, PRESSURE_TECHNIQUES } from "../src/core/reading-pressure.js";
 import { wilson } from "../src/core/report.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -25,6 +25,9 @@ export function loadSet(split) {
   const rows = raw.toString("utf8").split(/\r?\n/).filter((l) => l.trim()).map((l) => JSON.parse(l));
   return { file, sha256: createHash("sha256").update(raw).digest("hex"), rows };
 }
+
+// The hash of the cue lists themselves, so a comment change does not count as new cues.
+export const cueHash = () => createHash("sha256").update(JSON.stringify(PRESSURE_TECHNIQUES)).digest("hex");
 
 // Which pressure techniques the lens shows on one message.
 export function shownPressure(text, { inflection = true } = {}) {
@@ -67,9 +70,9 @@ function main() {
   print(split, r);
   if (split === "dev") { for (const m of r.misses) console.log(`    ${m.kind.padEnd(9)} ${m.technique.padEnd(24)} ${m.id}`); return; }
   if (process.argv.includes("--no-write")) return;
-  const cues = readFileSync(join(ROOT, "src/core/reading-pressure.js"));
+  const cues = cueHash();
   const out = { generated: new Date().toISOString().slice(0, 10), split, input: { file: "project-docs/evidence/pressure/test.jsonl", sha256: set.sha256, rows: set.rows.length },
-    cues: { file: "src/core/reading-pressure.js", sha256: createHash("sha256").update(cues).digest("hex") },
+    cues: { file: "src/core/reading-pressure.js", sha256: cues, of: "JSON of PRESSURE_TECHNIQUES, so comments may change without a rescore" },
     withInflection: { techniques: r.techniques, overall: r.overall, messages: r.messages },
     withoutInflection: { techniques: raw.techniques, overall: raw.overall, messages: raw.messages },
     misses: r.misses };

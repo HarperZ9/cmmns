@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Save to Daylight · Daylight Commons</title>
+<link rel="stylesheet" href="canon.css">
+<link rel="stylesheet" href="pages.css">
+<link rel="stylesheet" href="media.css">
+</head>
+<body>
+<main class="wide">
+  <header>
+    <h1>Save to Daylight</h1>
+    <p class="lead" id="from">Reading what the page loaded.</p>
+  </header>
+  <section aria-labelledby="h-pick">
+    <h2 id="h-pick">Media on the page</h2>
+    <p class="muted" id="pick-hint">Tick what to keep. Daylight Commons downloads each file from the host the page loaded it from, on your click, and keeps it in this browser.</p>
+    <ul id="found" class="media-grid" aria-label="Media found on the page"></ul>
+  </section>
+  <section aria-labelledby="h-where">
+    <h2 id="h-where">Where it goes</h2>
+    <fieldset class="where">
+      <legend class="muted">Collection</legend>
+      <label><input type="radio" name="where" value="case" checked> Investigation case</label>
+      <label><input type="radio" name="where" value="moodboard"> Moodboard</label>
+    </fieldset>
+    <div id="case-opts" class="field">
+      <p class="muted">Each file joins the case list with its SHA-256, its address, the page and the time. "Save case list" in the toolbar menu writes case-inbox.jsonl for <code>daylight case add</code>, which captures and archives each address again.</p>
+      <label><input type="checkbox" id="archive"> Ask the Internet Archive to keep a copy of each file's address now</label>
+      <p class="muted">Sends the file's address to web.archive.org, nothing else. Your browser asks for access to web.archive.org the first time.</p>
+    </div>
+    <div id="board-opts" class="field" hidden>
+      <label for="board">Moodboard</label>
+      <select id="board"></select>
+      <label for="board-new">Or a new moodboard</label>
+      <input id="board-new" type="text" maxlength="80" placeholder="Name">
+    </div>
+    <div class="field">
+      <label for="tags">Tags, separated by commas</label>
+      <input id="tags" type="text" maxlength="400">
+      <label for="note">Note</label>
+      <textarea id="note" rows="3" maxlength="2000"></textarea>
+      <label for="quality">Stream quality</label>
+      <select id="quality">
+        <option value="Infinity">Best available</option>
+        <option value="1080">Up to 1080p</option>
+        <option value="720">Up to 720p</option>
+        <option value="480">Up to 480p</option>
+        <option value="360">Up to 360p</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button id="save" type="button">Save</button>
+      <button id="more" type="button" hidden>Allow and continue</button>
+      <a href="collections.html" id="open-collections">Open collections</a>
+    </div>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+    <ul id="results" class="plain results"></ul>
+  </section>
+</main>
+<footer>Protected media (DRM or encrypted streams) is never saved. Daylight Commons says so and stops.</footer>
+<script src="core.bundle.js"></script>
+<script src="guard.js"></script>
+<script src="settings.js"></script>
+<script src="pages.js"></script>
+<script src="case-inbox.js"></script>
+<script src="media-store.js"></script>
+<script src="media-fetch.js"></script>
+<script src="save-ui.js"></script>
+<script src="save.js"></script>
+</body>
+</html>
