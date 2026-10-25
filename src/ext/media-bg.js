@@ -10,6 +10,7 @@
   function menus() {
     if (!chrome.contextMenus) return;
     chrome.contextMenus.removeAll(() => {
+      if (globalThis.PBQuickBg) PBQuickBg.create();   // Download, Download as GIF, Copy, Copy link come first
       chrome.contextMenus.create({ id: MENU, title: "Save to Daylight", contexts: ["image", "video", "audio"] }, () => void chrome.runtime.lastError);
     });
   }

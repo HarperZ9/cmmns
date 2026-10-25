@@ -82,9 +82,16 @@ the [how it works page](https://harperz9.github.io/daylight-commons/how-it-works
 Keyboard: focus a post to open its window, <kbd>Alt</kbd>+<kbd>R</kbd> to move into it, arrow keys
 between its tabs, <kbd>Esc</kbd> to close it.
 
-## Save, convert and keep media
+## Download, save, convert and keep media
 
-Right-click any image, GIF, video or audio and choose **Save to Daylight**, or use **Save media from
+Right-click any picture, GIF or video and choose **Download**: it lands in your Downloads folder in one
+click, with its real type and a name from the page. X and Reddit posts get a quiet **Download** button
+that saves every picture and video in the post, videos with their sound. **Download as GIF** makes a
+real GIF from the MP4 that sites send in place of GIFs. **Copy** and **Copy link** sit beside it.
+Other tools can use the same code: `import { assembleStream, encodeGif } from "daylight-commons/media"`
+([project-docs/MEDIA-LIBRARY.md](project-docs/MEDIA-LIBRARY.md)).
+
+To keep a file as evidence instead, right-click any image, GIF, video or audio and choose **Save to Daylight**, or use **Save media from
 this page** in the toolbar menu. A video the page streams is put together from its HLS or DASH
 segments. Each file goes into an investigation case, with its SHA-256, address, page and time and an
 optional Internet Archive copy, or into a moodboard with tags and notes. **Collections** shows them as

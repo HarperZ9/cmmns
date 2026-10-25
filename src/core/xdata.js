@@ -200,8 +200,20 @@ function mediaOf(L) {
   const out = list.filter((m) => m && m.id_str).map((m) => ({
     type: m.type || "photo", url: m.media_url_https || null, uploaded: snowflakeTime(m.id_str),
     fromPost: m.source_status_id_str || null, fromPostTime: m.source_status_id_str ? snowflakeTime(m.source_status_id_str) : null,
+    ...videoOf(m),
   }));
   return out.length ? out : null;
+}
+
+// A video's or GIF's files as X lists them: the MP4 with the highest bitrate, the HLS playlist, and
+// the size. Added only for videos and GIFs, so a photo's entry is unchanged.
+function videoOf(m) {
+  const vars = ((m.video_info || {}).variants || []).filter((v) => v && /^https:/.test(v.url || ""));
+  if (!vars.length) return {};
+  const mp4 = vars.filter((v) => v.content_type === "video/mp4").sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+  const hls = vars.find((v) => /mpegurl/i.test(v.content_type || ""));
+  const size = (m.original_info && m.original_info.width) ? { width: m.original_info.width, height: m.original_info.height } : {};
+  return { mp4: mp4 ? mp4.url : null, hls: hls ? hls.url : null, ...size };
 }
 
 // Media uploaded well before the post that shows it: [{ type, uploaded, days, fromPost }].

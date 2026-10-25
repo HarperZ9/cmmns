@@ -11,6 +11,10 @@
   const isAbout = (url) => /\/AboutAccountQuery\b/.test(String(url || ""));
   const post = (msg) => { try { window.postMessage(msg, location.origin); } catch (_) { /* ignore */ } };
   let template = null;   // { url, headers } of X's own AboutAccountQuery, csrf removed
+  // The last few responses, kept in this tab only, for the download button (quick-sites.js), which
+  // starts after X has already loaded the post it shows. Sent again only when that script asks.
+  const recent = [];
+  const sniffed = (json) => { recent.push(json); if (recent.length > 8) recent.shift(); post({ source: "radar-sniff", json }); };
 
   function learn(url, headers) {
     if (!isAbout(url)) return;
@@ -29,7 +33,7 @@
       if (isGraph(url)) {
         const hd = init && init.headers ? (init.headers instanceof Headers ? Object.fromEntries(init.headers) : init.headers) : {};
         learn(url, hd);
-        p.then((res) => res.clone().json().then((json) => post({ source: "radar-sniff", json })).catch(() => {})).catch(() => {});
+        p.then((res) => res.clone().json().then(sniffed).catch(() => {})).catch(() => {});
       }
     } catch (_) { /* ignore */ }
     return p;
@@ -41,8 +45,7 @@
     if (this.__radar) this.addEventListener("load", () => {
       try {
         learn(this.__radar.url, this.__radar.headers);
-        const json = this.responseType === "json" ? this.response : JSON.parse(this.responseText);
-        post({ source: "radar-sniff", json });
+        sniffed(this.responseType === "json" ? this.response : JSON.parse(this.responseText));
       } catch (_) { /* ignore */ }
     });
     return origOpen.apply(this, arguments);
@@ -56,6 +59,7 @@
   window.addEventListener("message", async (e) => {
     if (e.source !== window || !e.data) return;
     if (e.data.source === "radar-template-set" && e.data.template && !template) template = e.data.template;
+    if (e.data.source === "radar-sniff-replay-ask") { for (const json of recent) post({ source: "radar-sniff-replay", json }); return; }
     if (e.data.source !== "radar-ask-about") return;
     const handle = e.data.handle;
     if (!template) { post({ source: "radar-about-done", handle, status: "no-template" }); return; }

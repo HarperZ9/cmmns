@@ -5128,8 +5128,20 @@ function mediaOf(L) {
   const out = list.filter((m) => m && m.id_str).map((m) => ({
     type: m.type || "photo", url: m.media_url_https || null, uploaded: snowflakeTime(m.id_str),
     fromPost: m.source_status_id_str || null, fromPostTime: m.source_status_id_str ? snowflakeTime(m.source_status_id_str) : null,
+    ...videoOf(m),
   }));
   return out.length ? out : null;
+}
+
+// A video's or GIF's files as X lists them: the MP4 with the highest bitrate, the HLS playlist, and
+// the size. Added only for videos and GIFs, so a photo's entry is unchanged.
+function videoOf(m) {
+  const vars = ((m.video_info || {}).variants || []).filter((v) => v && /^https:/.test(v.url || ""));
+  if (!vars.length) return {};
+  const mp4 = vars.filter((v) => v.content_type === "video/mp4").sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0];
+  const hls = vars.find((v) => /mpegurl/i.test(v.content_type || ""));
+  const size = (m.original_info && m.original_info.width) ? { width: m.original_info.width, height: m.original_info.height } : {};
+  return { mp4: mp4 ? mp4.url : null, hls: hls ? hls.url : null, ...size };
 }
 
 // Media uploaded well before the post that shows it: [{ type, uploaded, days, fromPost }].
@@ -12046,6 +12058,915 @@ function filterItems(items, { collection, kind, tag, q } = {}) {
 return { MEDIA_KINDS, mediaSha256, mediaKindOf, extFor, fileNameFor, normTags, savedRecord, derivedRecord, checkLineage, caseInboxRow, sizeText, sizeLine, filterItems };
 })();
 
+// ---- media-name.js
+const M_media_name = (() => {
+// Names and types for a downloaded file. The type comes from the file's own first bytes when they
+// are known, then the server's content type, then the address, so a WebP served from an address
+// ending in .jpg is saved as .webp. File names are made from the page or post title and the
+// media's own name, safe on Windows, macOS and Linux, and never a path.
+
+const EXT = {
+  "image/png": "png", "image/jpeg": "jpg", "image/gif": "gif", "image/webp": "webp", "image/avif": "avif", "image/heic": "heic", "image/heif": "heif",
+  "image/svg+xml": "svg", "image/bmp": "bmp", "image/x-icon": "ico", "image/vnd.microsoft.icon": "ico", "image/tiff": "tif", "image/jxl": "jxl",
+  "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov", "video/x-matroska": "mkv", "video/mp2t": "ts", "video/x-msvideo": "avi", "video/ogg": "ogv",
+  "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/aac": "aac", "audio/ogg": "ogg", "audio/webm": "weba", "audio/wav": "wav", "audio/x-wav": "wav",
+  "audio/flac": "flac", "audio/opus": "opus", "application/vnd.apple.mpegurl": "m3u8", "application/dash+xml": "mpd", "application/pdf": "pdf",
+};
+const BY_EXT = Object.fromEntries(Object.entries(EXT).map(([m, e]) => [e, m]));
+Object.assign(BY_EXT, { jpeg: "image/jpeg", jfif: "image/jpeg", m4v: "video/mp4", gifv: "video/mp4", oga: "audio/ogg", tiff: "image/tiff" });
+
+const downloadExt = (mime) => EXT[String(mime || "").toLowerCase().split(";")[0].trim()] || null;
+
+const ascii = (b, at, s) => b.length >= at + s.length && [...s].every((c, k) => b[at + k] === c.charCodeAt(0));
+const bytesAt = (b, at, xs) => b.length >= at + xs.length && xs.every((x, k) => b[at + k] === x);
+
+function isoBrand(b) {
+  const brand = String.fromCharCode(...b.subarray(8, 12));
+  if (/^avi[fs]$/.test(brand)) return "image/avif";
+  if (/^(heic|heix|heim|heis)$/.test(brand)) return "image/heic";
+  if (/^(mif1|msf1)$/.test(brand)) return "image/heif";
+  if (brand === "qt  ") return "video/quicktime";
+  if (/^M4A |^M4B /.test(brand)) return "audio/mp4";
+  return "video/mp4";
+}
+
+function textType(b) {
+  const head = String.fromCharCode(...b.subarray(0, Math.min(b.length, 512))).replace(/^﻿|^\xEF\xBB\xBF/, "").trimStart();
+  if (head.startsWith("#EXTM3U")) return "application/vnd.apple.mpegurl";
+  if (/<svg[\s>]/i.test(head)) return "image/svg+xml";
+  if (/^<MPD[\s>]/.test(head) || /<MPD[\s>]/.test(head)) return "application/dash+xml";
+  if (/^<(!doctype html|html|head|body)[\s>]/i.test(head)) return "text/html";
+  return null;
+}
+
+// The MIME type a file's first bytes show, or null. Sixteen bytes are enough for every binary
+// format here; SVG, HTML and playlists are read from the first 512.
+function sniffMime(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes || []);
+  if (b.length < 4) return null;
+  if (bytesAt(b, 0, [0x89, 0x50, 0x4e, 0x47])) return "image/png";
+  if (bytesAt(b, 0, [0xff, 0xd8, 0xff])) return "image/jpeg";
+  if (ascii(b, 0, "GIF8")) return "image/gif";
+  if (ascii(b, 0, "RIFF")) return ascii(b, 8, "WEBP") ? "image/webp" : ascii(b, 8, "WAVE") ? "audio/wav" : ascii(b, 8, "AVI ") ? "video/x-msvideo" : null;
+  if (ascii(b, 4, "ftyp")) return isoBrand(b);
+  if (ascii(b, 4, "moof") || ascii(b, 4, "styp") || ascii(b, 4, "sidx")) return "video/mp4";
+  if (bytesAt(b, 0, [0x1a, 0x45, 0xdf, 0xa3])) return String.fromCharCode(...b.subarray(0, 64)).includes("webm") ? "video/webm" : "video/x-matroska";
+  if (ascii(b, 0, "OggS")) return "audio/ogg";
+  if (ascii(b, 0, "fLaC")) return "audio/flac";
+  if (ascii(b, 0, "ID3")) return "audio/mpeg";
+  if (b[0] === 0xff && (b[1] & 0xf6) === 0xf0) return "audio/aac";
+  if (b[0] === 0xff && (b[1] & 0xe0) === 0xe0 && (b[1] & 0x06) !== 0) return "audio/mpeg";
+  if (b[0] === 0x47 && b.length > 188 && b[188] === 0x47) return "video/mp2t";
+  if (ascii(b, 0, "%PDF")) return "application/pdf";
+  if (bytesAt(b, 0, [0xff, 0x0a]) || bytesAt(b, 0, [0, 0, 0, 0x0c, 0x4a, 0x58, 0x4c, 0x20])) return "image/jxl";
+  if (bytesAt(b, 0, [0x49, 0x49, 0x2a, 0]) || bytesAt(b, 0, [0x4d, 0x4d, 0, 0x2a])) return "image/tiff";
+  if (bytesAt(b, 0, [0, 0, 1, 0])) return "image/x-icon";
+  if (ascii(b, 0, "BM") && b.length > 14) return "image/bmp";
+  return textType(b);
+}
+
+const extOfUrl = (url) => {
+  try { const m = /\.([a-z0-9]{2,5})$/i.exec(new URL(url).pathname); return m ? m[1].toLowerCase() : null; } catch { return null; }
+};
+const GENERIC = /^(application\/octet-stream|binary\/octet-stream|text\/plain|application\/x-www-form-urlencoded)?$/;
+
+// { mime, ext, from } for a download: "bytes" when the first bytes decided it, "header" for the
+// server's content type, "address" for the address's extension, or "none" with ext "bin".
+function chooseType({ bytes = null, contentType = "", url = "" } = {}) {
+  const sniffed = bytes ? sniffMime(bytes) : null;
+  if (sniffed && downloadExt(sniffed)) return { mime: sniffed, ext: downloadExt(sniffed), from: "bytes" };
+  const ct = String(contentType || "").toLowerCase().split(";")[0].trim();
+  if (!GENERIC.test(ct) && downloadExt(ct)) return { mime: ct, ext: downloadExt(ct), from: "header" };
+  const e = extOfUrl(url);
+  if (e && BY_EXT[e]) return { mime: BY_EXT[e], ext: EXT[BY_EXT[e]], from: "address" };
+  return { mime: ct || "application/octet-stream", ext: "bin", from: "none" };
+}
+
+const RESERVED = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
+
+// Letters, digits and single hyphens; any script, never a path, at most `max` characters.
+function slug(s, max = 60) {
+  const out = String(s || "").normalize("NFKC").replace(/[\u0000-\u001f\u007f<>:"/\\|?*#%&{}$!'`@=+^~[\];,]+/g, " ")
+    .replace(/[\s._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, max).replace(/-+$/, "");
+  return RESERVED.test(out) ? "_" + out : out;
+}
+
+// The media's own name from its address, without the extension, or "" when it is only a number
+// or a generic word ("media", "image", "giphy", "DASH_720").
+function mediaStem(url) {
+  let last = "";
+  try { last = decodeURIComponent(new URL(url).pathname.split("/").filter(Boolean).pop() || ""); } catch { return ""; }
+  const stem = last.replace(/\.[a-z0-9]{2,5}$/i, "");
+  return /^(media|image|img|video|file|download|giphy|tenor|original|source|default|playlist|master|index|DASH_\w+|HLS\w*|\d{1,4})$/i.test(stem) ? "" : slug(stem, 40);
+}
+
+// "<title>-<media name>[-<n>].<ext>": the title of the page or post, the file's own name when it
+// has one, its place in a gallery when there are several, and the extension the type decided.
+function downloadName({ title = "", url = "", index = 0, total = 1, ext = "bin" } = {}) {
+  const parts = [slug(title, 60), mediaStem(url)].filter(Boolean);
+  let stem = [...new Set(parts)].join("-").slice(0, 100).replace(/-+$/, "") || "media";
+  if (total > 1) stem += `-${index + 1}`;
+  return `${stem}.${String(ext || "bin").replace(/[^a-z0-9]/gi, "").toLowerCase() || "bin"}`;
+}
+
+return { downloadExt, sniffMime, chooseType, slug, downloadName };
+})();
+
+// ---- media-pick.js
+const M_media_pick = (() => {
+// Which file a download takes, and whether it may be taken at all. The largest picture a <picture>
+// or srcset offers, the full-size address on hosts that serve a reduced copy by default, and the
+// plan for one target: a plain address, bytes the page holds, a stream to assemble, a GIF to make,
+// or a refusal. Protected media is refused with the toolkit's own sentence and is never fetched.
+
+const { PROTECTED_LINE } = M_media_protect;
+
+// srcset as [{ url, w, x, h }], parsed as the HTML standard does: an address runs to the first
+// space, so commas inside it (image CDNs use "w_100,h_100") stay in the address; a trailing comma
+// ends a candidate with no descriptor.
+function parseSrcset(srcset) {
+  const s = String(srcset || ""), out = [];
+  let i = 0;
+  while (i < s.length) {
+    while (i < s.length && /[\s,]/.test(s[i])) i++;
+    if (i >= s.length) break;
+    let url = "";
+    while (i < s.length && !/\s/.test(s[i])) url += s[i++];
+    let desc = "";
+    if (/,+$/.test(url)) url = url.replace(/,+$/, "");
+    else {
+      let depth = 0;
+      while (i < s.length && (s[i] !== "," || depth)) { if (s[i] === "(") depth++; if (s[i] === ")") depth = Math.max(0, depth - 1); desc += s[i++]; }
+    }
+    const c = { url, w: null, x: null, h: null };
+    for (const d of desc.trim().split(/\s+/).filter(Boolean)) {
+      const m = /^(\d+(?:\.\d+)?)([wxh])$/i.exec(d);
+      if (m) c[m[2].toLowerCase()] = Number(m[1]);
+    }
+    if (url) out.push(c);
+  }
+  return out;
+}
+
+// The address of the largest candidate. el: { src, currentSrc, srcset, sources: [{ srcset, type }],
+// layoutWidth }. A width descriptor counts as its width; a density descriptor as density times the
+// laid-out width. Sources whose type the browser cannot show (supports(type) false) are skipped.
+function largestSource(el, { base = undefined, supports = () => true } = {}) {
+  const width = Number(el.layoutWidth) || 1;
+  const list = [];
+  for (const s of [...(el.sources || []), { srcset: el.srcset, type: null }]) {
+    if (!s || !s.srcset || (s.type && !supports(s.type))) continue;
+    for (const c of parseSrcset(s.srcset)) list.push({ url: c.url, score: c.w || (c.x || 1) * width });
+  }
+  for (const u of [el.currentSrc, el.src]) if (u) list.push({ url: u, score: Number(el.naturalWidth) || width, plain: true });
+  if (!list.length) return null;
+  list.sort((a, b) => b.score - a.score || Number(!!b.plain) - Number(!!a.plain));
+  try { return new URL(list[0].url, base).href; } catch { return list[0].url; }
+}
+
+// The full-size addresses to try, best first, on hosts that serve a smaller copy by default; the
+// address itself comes last. X: pbs.twimg.com/media/<id> keeps the original only at name=orig in
+// the original format, which the page does not say (it asks for WebP), so JPEG and PNG originals
+// are tried, then the largest WebP (name=4096x4096). Reddit: preview.redd.it/<file> (resized and
+// signed) to i.redd.it/<file>, the original upload. Imgur: <id>_lq.mp4, the low-quality preview its
+// pages play first, to <id>.mp4.
+function sizeLadder(url) {
+  let u;
+  try { u = new URL(url); } catch { return [url]; }
+  if (u.hostname === "pbs.twimg.com" && u.pathname.startsWith("/media/")) {
+    const m = /^(\/media\/[\w-]+)(?:\.(\w+))?(?::\w+)?$/.exec(u.pathname);
+    if (!m) return [url];
+    const said = (u.searchParams.get("format") || m[2] || "jpg").toLowerCase(), base = `https://pbs.twimg.com${m[1]}?format=`;
+    const formats = [...new Set([said === "webp" ? null : said, "jpg", "png"].filter(Boolean))];
+    return [...new Set([...formats.map((f) => `${base}${f}&name=orig`), `${base}${said}&name=4096x4096`, url])];
+  }
+  if (u.hostname === "i.imgur.com" && /^\/\w+_lq\.mp4$/.test(u.pathname)) return [`https://i.imgur.com${u.pathname.replace("_lq.mp4", ".mp4")}`, url];
+  if (u.hostname === "preview.redd.it" && /^\/[\w-]+\.(jpe?g|png|gif|webp)$/i.test(u.pathname)) return [`https://i.redd.it${u.pathname}`, url];
+  return [url];
+}
+const fullSizeUrl = (url) => sizeLadder(url)[0];
+
+// The plan for one target. target: { kind, url, streams, protected, canvas, gifUrl, blob }.
+// { action, ... } where action is
+//   "refuse"   protected media: { reason, line, reference: true } (a reference may be saved)
+//   "url"      a plain address the browser downloads: { url }
+//   "bytes"    data: or blob: content the page holds: { url }
+//   "canvas"   pixels drawn on a canvas, saved as PNG
+//   "stream"   an HLS or DASH stream to assemble: { stream }
+//   "gif"      a GIF to make on this device: { from: "video" | "image" | "stream", url?, stream? }
+//   "none"     nothing that can be read: { reason }
+function downloadPlan(t, { asGif = false } = {}) {
+  if (!t) return { action: "none", reason: "Nothing was found under the pointer." };
+  if (t.protected) return { action: "refuse", reason: t.protected, line: PROTECTED_LINE, reference: true };
+  const web = (u) => /^https?:/i.test(String(u || ""));
+  const stream = t.streams && t.streams.length ? t.streams[t.streams.length - 1] : null;
+  if (asGif) {
+    if (t.gifUrl) return { action: "url", url: t.gifUrl };
+    if (t.kind === "gif" && (web(t.url) || /^(data|blob):/.test(t.url || ""))) return { action: web(t.url) ? "url" : "bytes", url: t.url };
+    if (t.url && (t.kind === "video" || t.kind === "image")) return { action: "gif", from: t.kind, url: t.url };
+    if (stream) return { action: "gif", from: "stream", stream };
+    return { action: "none", reason: "This media has no file Daylight Commons can read to make a GIF." };
+  }
+  if (t.canvas) return { action: "canvas" };
+  if (web(t.url)) { const [url, ...alternatives] = sizeLadder(t.url); return { action: "url", url, alternatives }; }
+  if (t.url && /^data:/i.test(t.url)) return { action: "bytes", url: t.url };
+  if (t.url && /^blob:/i.test(t.url) && t.kind !== "video" && t.kind !== "audio") return { action: "bytes", url: t.url };
+  if (stream) return { action: "stream", stream };
+  return { action: "none", reason: "The page builds this media in memory from a stream Daylight Commons cannot find, so it cannot be saved as one file." };
+}
+
+const REFERENCE_LABEL = "Protected source. Reference only, not for redistribution.";
+
+// A reference to protected media: what the page shows in the clear about it, never the media.
+// { page, title, savedAt, label, images: [addresses], previews: [addresses], reason }.
+function referenceOf({ page, title, poster = null, images = [], previews = [], reason = null }, now = new Date().toISOString()) {
+  const clean = (list) => [...new Set(list.filter((u) => /^https?:/i.test(String(u || ""))))].slice(0, 12);
+  return { page: page || null, title: title ? String(title).slice(0, 300) : null, savedAt: now, label: REFERENCE_LABEL,
+    images: clean([poster, ...images]), previews: clean(previews), reason: reason || null };
+}
+
+return { parseSrcset, largestSource, sizeLadder, fullSizeUrl, downloadPlan, REFERENCE_LABEL, referenceOf };
+})();
+
+// ---- media-gif-encode.js
+const M_media_gif_encode = (() => {
+// A GIF writer for "Download as GIF": one palette for the whole animation by median cut over the
+// frames' colours (5 bits a channel), each pixel mapped to its nearest palette colour, and GIF's
+// own LZW. Frames are RGBA at one size; the result loops forever. No dependency.
+
+// Median cut over a 15-bit histogram: up to `max` colours as [r, g, b] triples.
+function gifPalette(frames, { max = 256, step = 3 } = {}) {
+  const hist = new Uint32Array(32768);
+  for (const f of frames) {
+    const d = f.rgba;
+    for (let i = 0; i < d.length; i += 4 * step) hist[((d[i] >> 3) << 10) | ((d[i + 1] >> 3) << 5) | (d[i + 2] >> 3)]++;
+  }
+  const keys = [];
+  for (let k = 0; k < 32768; k++) if (hist[k]) keys.push(k);
+  if (!keys.length) return [[0, 0, 0]];
+  const ch = (k, c) => (k >> (10 - 5 * c)) & 31;
+  const boxOf = (list) => {
+    const lo = [31, 31, 31], hi = [0, 0, 0];
+    let n = 0;
+    for (const k of list) { n += hist[k]; for (let c = 0; c < 3; c++) { const v = ch(k, c); if (v < lo[c]) lo[c] = v; if (v > hi[c]) hi[c] = v; } }
+    const span = [0, 1, 2].map((c) => hi[c] - lo[c]), axis = span.indexOf(Math.max(...span));
+    return { list, n, axis, span: span[axis] };
+  };
+  const boxes = [boxOf(keys)];
+  while (boxes.length < max) {
+    let pick = -1, best = 0;
+    boxes.forEach((b, i) => { const s = b.span * Math.sqrt(b.n); if (b.list.length > 1 && s > best) { best = s; pick = i; } });
+    if (pick < 0) break;
+    const b = boxes[pick], list = b.list.slice().sort((p, q) => ch(p, b.axis) - ch(q, b.axis));
+    let acc = 0, cut = 1;
+    for (let i = 0; i < list.length - 1; i++) { acc += hist[list[i]]; if (acc >= b.n / 2) { cut = i + 1; break; } cut = i + 1; }
+    boxes.splice(pick, 1, boxOf(list.slice(0, cut)), boxOf(list.slice(cut)));
+  }
+  return boxes.map((b) => {
+    const s = [0, 0, 0];
+    for (const k of b.list) for (let c = 0; c < 3; c++) s[c] += ch(k, c) * hist[k];
+    return s.map((v) => Math.min(255, Math.round(((v / b.n) * 255) / 31)));
+  });
+}
+
+// The nearest palette index for each 15-bit colour, worked out when first needed.
+function mapper(palette) {
+  const table = new Int16Array(32768).fill(-1);
+  return (r, g, b) => {
+    const k = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+    if (table[k] >= 0) return table[k];
+    let best = 0, bd = Infinity;
+    for (let i = 0; i < palette.length; i++) {
+      const p = palette[i], d = (p[0] - r) ** 2 * 3 + (p[1] - g) ** 2 * 4 + (p[2] - b) ** 2 * 2;
+      if (d < bd) { bd = d; best = i; }
+    }
+    return (table[k] = best);
+  };
+}
+
+// GIF's variant of LZW, as a list of byte chunks; the code size grows to 12 bits, then resets.
+function gifLzwEncode(indices, minCodeSize) {
+  const clear = 1 << minCodeSize, eoi = clear + 1, out = [];
+  let size = minCodeSize + 1, next = eoi + 1, cur = 0, bits = 0, buf = new Uint8Array(65536), n = 0;
+  const table = new Int32Array(4096 * 256).fill(-1);
+  const emit = (code) => {
+    cur |= code << bits; bits += size;
+    while (bits >= 8) { buf[n++] = cur & 255; cur >>>= 8; bits -= 8; if (n === buf.length) { out.push(buf); buf = new Uint8Array(65536); n = 0; } }
+  };
+  emit(clear);
+  let prefix = indices[0];
+  for (let i = 1; i < indices.length; i++) {
+    const k = indices[i], key = prefix * 256 + k, code = table[key];
+    if (code >= 0) { prefix = code; continue; }
+    emit(prefix);
+    if (next === 4096) { emit(clear); table.fill(-1); next = eoi + 1; size = minCodeSize + 1; }
+    else { if (next >= 1 << size) size++; table[key] = next++; }
+    prefix = k;
+  }
+  emit(prefix); emit(eoi);
+  if (bits > 0) buf[n++] = cur & 255;
+  out.push(buf.subarray(0, n));
+  return out;
+}
+
+function subBlocks(chunks) {
+  const total = chunks.reduce((s, c) => s + c.length, 0), data = new Uint8Array(total);
+  let o = 0;
+  for (const c of chunks) { data.set(c, o); o += c.length; }
+  const out = new Uint8Array(total + Math.ceil(total / 255) + 1);
+  let w = 0;
+  for (let i = 0; i < total; i += 255) { const len = Math.min(255, total - i); out[w++] = len; out.set(data.subarray(i, i + len), w); w += len; }
+  out[w++] = 0;
+  return out.subarray(0, w);
+}
+
+// A looping GIF from frames [{ rgba, delayMs }] all `width` by `height`.
+function encodeGif({ width, height, frames, palette = null }) {
+  if (!(width > 0 && height > 0 && width < 65536 && height < 65536)) throw new Error("encodeGif: width and height must be 1 to 65535");
+  if (!frames || !frames.length) throw new Error("encodeGif: no frames");
+  const pal = palette || gifPalette(frames);
+  const bitsFor = Math.max(1, Math.ceil(Math.log2(Math.max(2, pal.length)))), tableSize = 1 << bitsFor, min = Math.max(2, bitsFor);
+  const near = mapper(pal), parts = [];
+  const u16 = (v) => [v & 255, (v >> 8) & 255];
+  const gct = new Uint8Array(tableSize * 3);
+  pal.forEach((c, i) => gct.set(c, i * 3));
+  parts.push(new TextEncoder().encode("GIF89a"), Uint8Array.of(...u16(width), ...u16(height), 0x80 | 0x70 | (bitsFor - 1), 0, 0), gct);
+  parts.push(Uint8Array.of(0x21, 0xff, 0x0b, ...new TextEncoder().encode("NETSCAPE2.0"), 3, 1, 0, 0, 0));
+  const idx = new Uint8Array(width * height);
+  for (const f of frames) {
+    if (f.rgba.length !== width * height * 4) throw new Error("encodeGif: every frame must be width by height RGBA");
+    for (let p = 0, i = 0; p < idx.length; p++, i += 4) idx[p] = near(f.rgba[i], f.rgba[i + 1], f.rgba[i + 2]);
+    const cs = Math.max(2, Math.round((f.delayMs || 100) / 10));
+    parts.push(Uint8Array.of(0x21, 0xf9, 4, 0x04, ...u16(cs), 0, 0), Uint8Array.of(0x2c, 0, 0, 0, 0, ...u16(width), ...u16(height), 0), Uint8Array.of(min), subBlocks(gifLzwEncode(idx, min)));
+  }
+  parts.push(Uint8Array.of(0x3b));
+  const out = new Uint8Array(parts.reduce((s, p) => s + p.length, 0));
+  let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+
+return { gifPalette, gifLzwEncode, encodeGif };
+})();
+
+// ---- media-demux.js
+const M_media_demux = (() => {
+// Reads the samples out of an MP4, plain or fragmented (an init segment followed by moof and mdat
+// pairs, as HLS and DASH deliver it), so that a video track and an audio track fetched apart can
+// be written into one MP4 with the toolkit's own muxer (media-mp4.js). It copies sample bytes as
+// they are and never decodes them. Encrypted tracks are refused before this runs (media-protect.js).
+
+const { readBoxes } = M_media_read;
+const { muxMp4 } = M_media_mp4;
+
+const u8 = (b, at) => b[at];
+const u16 = (b, at) => (b[at] << 8) | b[at + 1];
+const u32 = (b, at) => ((b[at] << 24) >>> 0) + (b[at + 1] << 16) + (b[at + 2] << 8) + b[at + 3];
+const u64 = (b, at) => u32(b, at) * 4294967296 + u32(b, at + 4);
+const i32 = (b, at) => u32(b, at) | 0;
+const kids = (b, box) => readBoxes(b, box.start + box.headerSize, box.start + box.size);
+const child = (b, box, type) => box && (box.children || kids(b, box)).find((x) => x.type === type);
+const path = (b, box, ...types) => types.reduce((x, t) => x && child(b, x, t), box);
+const body = (box) => box.start + box.headerSize;
+
+// The MPEG-4 AudioSpecificConfig inside esds (descriptor tags 3, 4, 5).
+function escConfig(b, start, end) {
+  let at = start + 4;
+  const desc = () => { const tag = u8(b, at++); let len = 0, k = 0, c; do { c = u8(b, at++); len = (len << 7) | (c & 127); } while (c & 128 && ++k < 4); return { tag, len }; };
+  let d = desc();
+  if (d.tag !== 3) return null;
+  at += 2; const flags = u8(b, at++);
+  if (flags & 0x80) at += 2;
+  if (flags & 0x40) at += u8(b, at) + 1;
+  if (flags & 0x20) at += 2;
+  d = desc();
+  if (d.tag !== 4) return null;
+  at += 13;
+  d = desc();
+  return d.tag === 5 && at + d.len <= end ? b.slice(at, at + d.len) : null;
+}
+
+// { kind, codec, width, height, channels, sampleRate, description } from the first stsd entry.
+function sampleEntry(b, stsd, audio) {
+  const [entry] = readBoxes(b, body(stsd) + 8, stsd.start + stsd.size);
+  if (!entry) return null;
+  const fields = audio ? 28 : 78, inner = readBoxes(b, entry.start + 8 + fields, entry.start + entry.size);
+  const config = (t) => inner.find((x) => x.type === t);
+  const out = { codec: entry.type };
+  if (audio) {
+    Object.assign(out, { channels: u16(b, entry.start + 24), sampleRate: u32(b, entry.start + 32) >>> 16 });
+    const e = config("esds");
+    if (e) out.description = escConfig(b, body(e), e.start + e.size);
+  } else {
+    Object.assign(out, { width: u16(b, entry.start + 32), height: u16(b, entry.start + 34) });
+    const c = config("avcC") || config("hvcC") || config("av1C");
+    if (c) out.description = b.slice(body(c), c.start + c.size);
+  }
+  return out;
+}
+
+function trackInfo(b, trak) {
+  const tkhd = child(b, trak, "tkhd"), mdhd = path(b, trak, "mdia", "mdhd"), hdlr = path(b, trak, "mdia", "hdlr");
+  const v = (box) => u8(b, body(box));
+  const id = u32(b, body(tkhd) + (v(tkhd) === 1 ? 20 : 12)), timescale = u32(b, body(mdhd) + (v(mdhd) === 1 ? 20 : 12));
+  const handler = String.fromCharCode(...b.subarray(body(hdlr) + 8, body(hdlr) + 12));
+  const kind = handler === "vide" ? "video" : handler === "soun" ? "audio" : null;
+  const stbl = path(b, trak, "mdia", "minf", "stbl"), stsd = stbl && child(b, stbl, "stsd");
+  return { id, timescale, kind, entry: stsd && kind ? sampleEntry(b, stsd, kind === "audio") : null, stbl };
+}
+
+function table(b, box, width) {
+  if (!box) return [];
+  const at = body(box) + 4, n = u32(b, at), rows = [];
+  for (let i = 0; i < n; i++) rows.push(Array.from({ length: width }, (_, k) => u32(b, at + 4 + (i * width + k) * 4)));
+  return rows;
+}
+
+// Samples of a plain MP4 track from its sample tables.
+function plainSamples(b, t) {
+  const s = t.stbl, stsz = child(b, s, "stsz"), co64 = child(b, s, "co64"), stco = child(b, s, "stco");
+  if (!stsz || !(stco || co64)) return [];
+  const fixed = u32(b, body(stsz) + 4), n = u32(b, body(stsz) + 8);
+  const sizes = Array.from({ length: n }, (_, i) => (fixed || u32(b, body(stsz) + 12 + i * 4)));
+  const offsets = co64 ? Array.from({ length: u32(b, body(co64) + 4) }, (_, i) => u64(b, body(co64) + 8 + i * 8)) : table(b, stco, 1).map((r) => r[0]);
+  const stsc = table(b, child(b, s, "stsc"), 3), stts = table(b, child(b, s, "stts"), 2), ctts = table(b, child(b, s, "ctts"), 2);
+  const sync = child(b, s, "stss") ? new Set(table(b, child(b, s, "stss"), 1).map((r) => r[0] - 1)) : null;
+  const out = [];
+  let i = 0;
+  for (let c = 0; c < offsets.length && i < n; c++) {
+    const row = stsc.filter((r) => r[0] <= c + 1).pop();
+    let at = offsets[c];
+    for (let k = 0; k < (row ? row[1] : 1) && i < n; k++, i++) { out.push({ offset: at, size: sizes[i], key: !sync || sync.has(i) }); at += sizes[i]; }
+  }
+  const expand = (rows) => rows.flatMap(([count, v]) => Array(count).fill(v));
+  const durs = expand(stts), cts = expand(ctts);
+  let dts = 0;
+  out.forEach((x, k) => { x.dts = dts; x.duration = durs[k] ?? durs[durs.length - 1] ?? 0; x.cts = cts[k] ? (cts[k] | 0) : 0; dts += x.duration; });
+  return out;
+}
+
+const TFHD = { base: 0x1, desc: 0x2, dur: 0x8, size: 0x10, flags: 0x20 };
+
+// Samples of every track in the moof boxes, with defaults from trex.
+function fragmentSamples(b, top, trex) {
+  const out = new Map(), next = new Map();
+  for (const moof of top.filter((x) => x.type === "moof")) {
+    for (const traf of kids(b, moof).filter((x) => x.type === "traf")) {
+      const tfhd = child(b, traf, "tfhd"), tfdt = child(b, traf, "tfdt");
+      const f = u32(b, body(tfhd)) & 0xffffff, id = u32(b, body(tfhd) + 4), d = { ...(trex.get(id) || { dur: 0, size: 0, flags: 0 }) };
+      let at = body(tfhd) + 8, base = moof.start;
+      if (f & TFHD.base) { base = u64(b, at); at += 8; }
+      if (f & TFHD.desc) at += 4;
+      if (f & TFHD.dur) { d.dur = u32(b, at); at += 4; }
+      if (f & TFHD.size) { d.size = u32(b, at); at += 4; }
+      if (f & TFHD.flags) d.flags = u32(b, at);
+      let dts = tfdt ? (u8(b, body(tfdt)) === 1 ? u64(b, body(tfdt) + 4) : u32(b, body(tfdt) + 4)) : next.get(id) || 0;
+      const list = out.get(id) || [];
+      let cursor = null;
+      for (const trun of kids(b, traf).filter((x) => x.type === "trun")) {
+        const tf = u32(b, body(trun)) & 0xffffff, n = u32(b, body(trun) + 4);
+        let p = body(trun) + 8;
+        if (tf & 0x1) { cursor = base + i32(b, p); p += 4; } else if (cursor === null) cursor = base;
+        let first = null;
+        if (tf & 0x4) { first = u32(b, p); p += 4; }
+        for (let k = 0; k < n; k++) {
+          const dur = tf & 0x100 ? u32(b, (p += 4) - 4) : d.dur, size = tf & 0x200 ? u32(b, (p += 4) - 4) : d.size;
+          const flags = tf & 0x400 ? u32(b, (p += 4) - 4) : k === 0 && first !== null ? first : d.flags;
+          const cts = tf & 0x800 ? i32(b, (p += 4) - 4) : 0;
+          list.push({ offset: cursor, size, dts, duration: dur, cts, key: !(flags & 0x10000) });
+          cursor += size; dts += dur;
+        }
+      }
+      out.set(id, list); next.set(id, dts);
+    }
+  }
+  return out;
+}
+
+// { tracks: [{ id, kind, timescale, entry }], samples: Map(id -> [{ offset, size, dts, cts, duration, key }]) }.
+function demuxMp4(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const top = readBoxes(b), moov = top.find((x) => x.type === "moov");
+  if (!moov) throw new Error("The file has no movie header (moov), so it is not an MP4 Daylight Commons can read.");
+  const tracks = (moov.children || kids(b, moov)).filter((x) => x.type === "trak").map((t) => trackInfo(b, t)).filter((t) => t.kind && t.entry);
+  const trex = new Map();
+  const mvex = child(b, moov, "mvex");
+  for (const x of mvex ? kids(b, mvex).filter((y) => y.type === "trex") : []) trex.set(u32(b, body(x) + 4), { dur: u32(b, body(x) + 12), size: u32(b, body(x) + 16), flags: u32(b, body(x) + 20) });
+  const frag = top.some((x) => x.type === "moof") ? fragmentSamples(b, top, trex) : null;
+  const samples = new Map(tracks.map((t) => [t.id, frag ? frag.get(t.id) || [] : plainSamples(b, t)]));
+  return { tracks, samples, bytes: b };
+}
+
+const MUXABLE_VIDEO = { avc1: "avc1", avc3: "avc1", av01: "av01" }, MUXABLE_AUDIO = { mp4a: "mp4a" };
+
+// Chunks for muxMp4 from one demuxed track.
+function chunksOf(d, t, name) {
+  const us = (v) => (v * 1e6) / t.timescale;
+  return d.samples.get(t.id).filter((s) => s.offset + s.size <= d.bytes.length).map((s) => ({ track: name, data: d.bytes.subarray(s.offset, s.offset + s.size),
+    timestampUs: us(s.dts + s.cts), decodeTimestampUs: us(s.dts), durationUs: us(s.duration), key: s.key }));
+}
+
+// One MP4 with sound from MP4 files that each hold a video or an audio track (or both). Throws
+// when a codec is one the muxer cannot write; the caller then keeps the files apart.
+function remuxMp4(files) {
+  const parsed = files.map((f) => demuxMp4(f));
+  const find = (kind) => { for (const d of parsed) { const t = d.tracks.find((x) => x.kind === kind && d.samples.get(x.id).length); if (t) return { d, t }; } return null; };
+  const v = find("video"), a = find("audio");
+  if (!v && !a) throw new Error("No video or audio samples were found.");
+  if (v && !MUXABLE_VIDEO[v.t.entry.codec]) throw new Error(`The video is ${v.t.entry.codec}, which Daylight Commons cannot rewrap yet.`);
+  if (a && (!MUXABLE_AUDIO[a.t.entry.codec] || !a.t.entry.description)) throw new Error(`The sound is ${a.t.entry.codec}, which Daylight Commons cannot rewrap yet.`);
+  const video = v && { codec: MUXABLE_VIDEO[v.t.entry.codec], width: v.t.entry.width, height: v.t.entry.height, description: v.t.entry.description };
+  const audio = a && { codec: "mp4a", channels: a.t.entry.channels || 2, sampleRate: a.t.entry.sampleRate || a.t.timescale, description: a.t.entry.description };
+  const chunks = [...(v ? chunksOf(v.d, v.t, "video") : []), ...(a ? chunksOf(a.d, a.t, "audio") : [])];
+  return muxMp4({ video, audio, chunks });
+}
+
+return { demuxMp4, remuxMp4 };
+})();
+
+// ---- media-assemble.js
+const M_media_assemble = (() => {
+// Puts a streamed video together as one file: an HLS playlist or DASH manifest, its segments in
+// order, then one MP4 with sound where the parts are MP4 (media-demux.js). No network code of its
+// own: the caller passes get(url, { range, as }) that answers { bytes, type } or, with as "text",
+// the text. The extension passes the page's fetch; the command line can pass Node's. An encrypted
+// playlist, a DRM manifest or an encrypted file stops it with MediaProtected before more is read.
+
+const { parseM3u8, hlsProtection, pickVariant, audioFor, hlsFetchList, hlsContainer } = M_media_hls;
+const { parseMpd, dashProtection, pickRepresentation } = M_media_dash;
+const { fileProtection } = M_media_protect;
+const { concatBytes } = M_media_bytes;
+const { remuxMp4 } = M_media_demux;
+
+class MediaProtected extends Error { constructor(reason) { super(reason); this.reason = reason; this.name = "MediaProtected"; } }
+
+const MAX_BYTES = 1024 * 1048576, PARALLEL = 4;
+
+async function segmentsOf(get, list, onProgress) {
+  const out = new Array(list.length);
+  let next = 0, done = 0, total = 0;
+  async function worker() {
+    while (next < list.length) {
+      const i = next++;
+      out[i] = (await get(list[i].url, { range: list[i].range })).bytes;
+      if ((total += out[i].length) > MAX_BYTES) throw new Error("The stream is larger than 1 GB, more than one download holds.");
+      if (onProgress) onProgress(++done, list.length);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(PARALLEL, list.length) }, worker));
+  return concatBytes(out);
+}
+
+async function hlsMedia(get, url, role, onProgress) {
+  const pl = parseM3u8(await get(url, { as: "text" }), url);
+  if (!pl || pl.kind !== "media") throw new Error("The playlist could not be read.");
+  const why = hlsProtection(pl);
+  if (why) throw new MediaProtected(why);
+  const list = hlsFetchList(pl);
+  return { role, bytes: await segmentsOf(get, list, onProgress), container: hlsContainer(pl, list[0] && list[0].url), live: !pl.endList };
+}
+
+async function hlsParts(get, url, onProgress) {
+  const pl = parseM3u8(await get(url, { as: "text" }), url);
+  if (!pl) throw new Error("The address did not answer with an HLS playlist.");
+  const why = hlsProtection(pl);
+  if (why) throw new MediaProtected(why);
+  if (pl.kind === "media") return [await hlsMedia(get, url, "video", onProgress)];
+  const variant = pickVariant(pl), audio = audioFor(pl, variant);
+  const parts = [await hlsMedia(get, variant.url, "video", onProgress)];
+  if (audio) parts.push(await hlsMedia(get, audio.url, "audio", onProgress));
+  return parts;
+}
+
+async function dashParts(get, url, onProgress) {
+  const mpd = parseMpd(await get(url, { as: "text" }), url);
+  if (!mpd) throw new Error("The address did not answer with a DASH manifest.");
+  const why = dashProtection(mpd);
+  if (why) throw new MediaProtected(why);
+  const parts = [];
+  for (const kind of ["video", "audio"]) {
+    const rep = pickRepresentation(mpd, kind);
+    if (rep) parts.push({ role: kind, bytes: await segmentsOf(get, rep.segments, onProgress), container: /webm/.test(rep.mimeType || "") ? "webm" : "mp4", live: mpd.type === "dynamic" });
+  }
+  if (!parts.length) throw new Error("The manifest lists no video or sound.");
+  return parts;
+}
+
+const mimeOf = (p) => (p.container === "mp4" ? (p.role === "audio" ? "audio/mp4" : "video/mp4") : p.container === "webm" ? `${p.role}/webm` : p.container === "aac" ? "audio/aac" : "video/mp2t");
+
+// One file from the parts: { files: [{ bytes, mime, role }], note }. Two files come back only when
+// the codecs cannot be rewrapped or the parts are not MP4; the note says so.
+function combineParts(parts) {
+  for (const p of parts) { const why = fileProtection(p.bytes); if (why) throw new MediaProtected(why); }
+  const live = parts.some((p) => p.live) ? " This is a live stream: the file holds what it listed when saved." : "";
+  const apart = (why) => ({ files: parts.map((p) => ({ bytes: p.bytes, mime: mimeOf(p), role: p.role })), note: ` Saved as separate video and sound files${why ? ": " + why : "."}${live}` });
+  if (parts.length === 1) return { files: [{ bytes: parts[0].bytes, mime: mimeOf(parts[0]), role: parts[0].role }], note: live };
+  if (!parts.every((p) => p.container === "mp4")) return apart("");
+  try { return { files: [{ bytes: remuxMp4(parts.map((p) => p.bytes)), mime: "video/mp4", role: "video" }], note: live }; }
+  catch (e) { return apart(e.message); }
+}
+
+// Fetches and combines a stream { type: "hls" | "dash", url } with the caller's get().
+async function assembleStream(stream, { get, onProgress } = {}) {
+  if (typeof get !== "function") throw new Error("assembleStream needs a get(url, { range, as }) function");
+  const parts = await (stream.type === "hls" ? hlsParts : dashParts)(get, stream.url, onProgress);
+  return combineParts(parts);
+}
+
+return { MediaProtected, combineParts, assembleStream };
+})();
+
+// ---- media-meta.js
+const M_media_meta = (() => {
+// What a post said about the media it carried, kept beside the file: the post's text exactly as
+// written, who posted it and when, where it lives, the alt text, hashtags and links, the quoted or
+// parent post, the author's own continuation of the thread, and the item's place in a gallery.
+// Built only from what the page already shows; nothing here makes a request.
+
+// UTC ISO time from a date, a number or text such as Reddit's "2026-10-20T21:04:00.000000+0000".
+const iso = (t) => {
+  if (t == null || t === "") return null;
+  const s = typeof t === "string" ? t.replace(/(\.\d{3})\d+/, "$1").replace(/([+-]\d\d)(\d\d)$/, "$1:$2") : t;
+  const d = new Date(s);
+  return Number.isFinite(d.getTime()) ? d.toISOString() : null;
+};
+const clean = (s) => (s == null ? null : String(s).replace(/\r\n?/g, "\n"));
+
+// The sidecar format, the contract with any library that reads these files
+// (project-docs/SIDECAR-FORMAT.md). A change that removes or renames a field raises the number.
+const SIDECAR_FORMAT = "daylight.sidecar/1";
+
+// Hashtags and links in a text, each once, in order.
+function textTags(text) {
+  const t = String(text || "");
+  const hashtags = [...new Set([...t.matchAll(/(^|[^\p{L}\p{N}_&])#([\p{L}\p{N}_]{1,100})/gu)].map((m) => "#" + m[2]))];
+  const links = [...new Set([...t.matchAll(/\bhttps?:\/\/[^\s<>"')\]]+/gi)].map((m) => m[0].replace(/[.,;:!?]+$/, "")))];
+  return { hashtags, links };
+}
+
+// One record. Fields not known stay null; the text keeps its line breaks.
+function postMeta(m = {}, now = new Date().toISOString()) {
+  const text = clean(m.text);
+  const tags = textTags([text, ...(m.thread || [])].join("\n"));
+  const sub = (p) => (p && (p.text || p.url) ? { text: clean(p.text), url: p.url || null, author: p.author || null } : null);
+  return {
+    format: SIDECAR_FORMAT,
+    site: m.site || null, title: m.title ? String(m.title) : null, text,
+    author: { name: m.authorName || null, handle: m.handle ? String(m.handle).replace(/^@/, "") : null },
+    postUrl: m.postUrl || null, mediaUrl: m.mediaUrl || null, pageUrl: m.pageUrl || null,
+    postedAt: iso(m.postedAt), savedAt: iso(now) || now,
+    alt: m.alt && !/^(image|video|gif|embedded video)$/i.test(String(m.alt).trim()) ? String(m.alt) : null,
+    hashtags: [...new Set([...tags.hashtags, ...(m.hashtags || [])])], links: [...new Set([...(m.links || []), ...tags.links])],
+    quoted: sub(m.quoted), parent: sub(m.parent), thread: (m.thread || []).map(clean).filter(Boolean),
+    subreddit: m.subreddit || null, item: m.total > 1 ? { index: (m.index || 0) + 1, total: m.total } : null,
+  };
+}
+
+// Letters and digits joined by hyphens, cut at a word boundary within max characters.
+function slugText(s, max) {
+  const full = String(s || "").normalize("NFKC").replace(/https?:\/\/\S+/g, " ").replace(/[#@]/g, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").toLowerCase();
+  if (full.length <= max) return full;
+  const cut = full.slice(0, max + 1), at = cut.lastIndexOf("-");
+  return (at > max / 2 ? cut.slice(0, at) : full.slice(0, max)).replace(/-+$/, "");
+}
+
+// "<handle>_<date>_<slug-from-text>[-n].<ext>": sorts by person then day, and reads at a glance.
+function metaName(meta, ext) {
+  const handle = slugText(meta.author && meta.author.handle, 30) || slugText(meta.site, 30) || "media";
+  const date = (meta.postedAt || meta.savedAt || "").slice(0, 10) || "undated";
+  const words = slugText(meta.text || meta.title || meta.alt, 48) || "post";
+  const n = meta.item ? `-${meta.item.index}` : "";
+  return `${handle}_${date}_${words}${n}.${String(ext || "bin").replace(/[^a-z0-9]/gi, "").toLowerCase() || "bin"}`;
+}
+
+// "@name" on X, "u/name" on Reddit as Reddit writes it.
+const at = (h) => (/^u\//.test(h) ? h : "@" + h);
+const quoteBlock = (t) => String(t).split("\n").map((l) => (l ? "> " + l : ">")).join("\n");
+
+// The front matter that opens every .md sidecar: the fields a library indexes, one JSON value per
+// line (YAML reads them as they are), so a reader needs no Markdown parser.
+function frontMatter(meta, files) {
+  const rows = { format: SIDECAR_FORMAT, files, site: meta.site, handle: meta.author.handle, author: meta.author.name, posted: meta.postedAt, saved: meta.savedAt,
+    post: meta.postUrl, media: meta.mediaUrl, page: meta.postUrl ? null : meta.pageUrl, subreddit: meta.subreddit, hashtags: meta.hashtags,
+    item: meta.item ? `${meta.item.index} of ${meta.item.total}` : null };
+  return ["---", ...Object.entries(rows).filter(([, v]) => v != null && !(Array.isArray(v) && !v.length)).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
+}
+
+// The sidecar a person reads: front matter, then the post's text first. fileNames: one name, or
+// every file of a post saved together (then the item line is left out: the list says it).
+function sidecarMarkdown(meta, fileNames = null) {
+  const files = [].concat(fileNames || []).filter(Boolean);
+  const m = files.length > 1 ? { ...meta, item: null } : meta;
+  const who = [m.author.name, m.author.handle ? at(m.author.handle) : null].filter(Boolean).join(" ");
+  const out = [...frontMatter(m, files), `# ${who || m.title || "Saved media"}${m.item ? ` (item ${m.item.index} of ${m.item.total})` : ""}`, ""];
+  if (m.title && m.site === "reddit") out.push(`**${m.title}**`, "");
+  if (m.text) out.push(quoteBlock(m.text), "");
+  for (const t of m.thread) out.push("Continued by the author:", "", quoteBlock(t), "");
+  if (m.alt) out.push(`Alt text: ${m.alt}`, "");
+  for (const [label, p] of [["Quoting", m.quoted], ["Replying to", m.parent]]) {
+    if (!p) continue;
+    out.push(`${label}${p.author ? " " + at(String(p.author).replace(/^@/, "")) : ""}${p.url ? ` (${p.url})` : ""}:`, "");
+    if (p.text) out.push(quoteBlock(p.text), "");
+  }
+  const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
+    ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
+    ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
+  out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by Daylight Commons from what the page showed.", "");
+  return out.join("\n");
+}
+
+// The folder a save goes to, inside Downloads: "<folder>/<site>/", each part safe on every system.
+// An empty folder setting saves straight into Downloads.
+function saveFolder(folder, site) {
+  const part = (s) => String(s || "").normalize("NFKC").replace(/[\u0000-\u001f<>:"/\\|?*]+/g, "-").replace(/^[\s.]+|[\s.]+$/g, "").slice(0, 60);
+  const root = String(folder || "").split(/[\\/]+/).map(part).filter((x) => x && x !== "..").join("/");
+  if (!root) return "";
+  const s = part(String(site || "").replace(/^www\./, ""));
+  return s ? `${root}/${s}/` : `${root}/`;
+}
+
+const sidecarJson = (meta, fileNames = null) => JSON.stringify({ ...meta, files: [].concat(fileNames || []).filter(Boolean) }, null, 2) + "\n";
+
+// The text for "Copy with caption": the post's words, who said them, and the link.
+function captionText(meta, link = null) {
+  const who = meta.author.handle ? at(meta.author.handle) : meta.author.name || meta.site || "";
+  const body = meta.text || meta.title || meta.alt || "";
+  return [body, [who ? `${who}` : null, link || meta.postUrl || meta.mediaUrl || meta.pageUrl].filter(Boolean).join(" ")].filter(Boolean).join("\n\n");
+}
+
+// The one-paragraph description embedded in the file itself (XMP, MP4 comment, GIF comment).
+function embedText(meta) {
+  const who = meta.author.handle ? at(meta.author.handle) : meta.author.name;
+  return [meta.title && meta.site === "reddit" ? meta.title : null, meta.text, meta.alt ? `Alt text: ${meta.alt}` : null,
+    [who, meta.postedAt, meta.postUrl || meta.pageUrl].filter(Boolean).join(", ")].filter(Boolean).join("\n\n");
+}
+
+return { SIDECAR_FORMAT, textTags, postMeta, metaName, sidecarMarkdown, saveFolder, sidecarJson, captionText, embedText };
+})();
+
+// ---- media-embed.js
+const M_media_embed = (() => {
+// Writes a post's description into the file itself, losslessly, so the words stay with the picture
+// or video when the sidecar is lost: XMP (dc:description, dc:creator, dc:source) in JPEG, PNG and
+// WebP; an iTunes-style comment, description and artist in MP4 (moov/udta/meta/ilst, with every
+// chunk offset moved by the bytes added); a comment block in GIF. The pixels and samples are never
+// touched. A file that already carries its own XMP or MP4 metadata is left as it is.
+
+const { readBoxes } = M_media_read;
+
+const enc = new TextEncoder(), dec = new TextDecoder();
+const cat = (list) => { const o = new Uint8Array(list.reduce((s, x) => s + x.length, 0)); let p = 0; for (const x of list) { o.set(x, p); p += x.length; } return o; };
+const be32 = (v) => Uint8Array.of(v >>> 24, (v >> 16) & 255, (v >> 8) & 255, v & 255);
+const le32 = (v) => Uint8Array.of(v & 255, (v >> 8) & 255, (v >> 16) & 255, v >>> 24);
+const u32 = (b, at) => ((b[at] << 24) >>> 0) + (b[at + 1] << 16) + (b[at + 2] << 8) + b[at + 3];
+const ascii = (b, at, s) => [...s].every((c, k) => b[at + k] === c.charCodeAt(0));
+const xml = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const MAX = 30000;
+
+function xmpPacket({ description = "", creator = "", source = "" }) {
+  const d = String(description).slice(0, MAX);
+  return `<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">`
+    + `<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:description><rdf:Alt><rdf:li xml:lang="x-default">${xml(d)}</rdf:li></rdf:Alt></dc:description>`
+    + (creator ? `<dc:creator><rdf:Seq><rdf:li>${xml(creator)}</rdf:li></rdf:Seq></dc:creator>` : "") + (source ? `<dc:source>${xml(source)}</dc:source>` : "")
+    + `</rdf:Description></rdf:RDF></x:xmpmeta><?xpacket end="w"?>`;
+}
+
+const XMP_NS = "http://ns.adobe.com/xap/1.0/\0";
+
+function jpeg(b, xmp) {
+  let at = 2;
+  while (at + 4 <= b.length && b[at] === 0xff && b[at + 1] >= 0xe0 && b[at + 1] <= 0xef) {
+    const len = (b[at + 2] << 8) | b[at + 3];
+    if (b[at + 1] === 0xe1 && ascii(b, at + 4, "http://ns.adobe.com/xap/1.0/")) return null;
+    if (b[at + 1] !== 0xe0) break;
+    at += 2 + len;
+  }
+  const body = enc.encode(XMP_NS + xmp);
+  if (body.length + 2 > 65535) return null;
+  return cat([b.subarray(0, at), Uint8Array.of(0xff, 0xe1, (body.length + 2) >> 8, (body.length + 2) & 255), body, b.subarray(at)]);
+}
+
+let crcTable = null;
+function crc32(bytes) {
+  if (!crcTable) crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+  let c = 0xffffffff;
+  for (const x of bytes) c = crcTable[(c ^ x) & 255] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+function png(b, xmp) {
+  for (let at = 8; at + 12 <= b.length;) {
+    const len = u32(b, at);
+    if (ascii(b, at + 4, "iTXt") && ascii(b, at + 8, "XML:com.adobe.xmp")) return null;
+    if (ascii(b, at + 4, "IEND")) break;
+    at += 12 + len;
+  }
+  const ihdrEnd = 8 + 12 + u32(b, 8);
+  const data = cat([enc.encode("iTXt"), enc.encode("XML:com.adobe.xmp"), Uint8Array.of(0, 0, 0, 0, 0), enc.encode(xmp)]);
+  return cat([b.subarray(0, ihdrEnd), be32(data.length - 4), data, be32(crc32(data)), b.subarray(ihdrEnd)]);
+}
+
+function riffChunk(type, data) { return cat([enc.encode(type), le32(data.length), data, data.length % 2 ? Uint8Array.of(0) : new Uint8Array(0)]); }
+
+function webp(b, xmp) {
+  const first = String.fromCharCode(...b.subarray(12, 16)), body = b.subarray(12);
+  const le24 = (v) => Uint8Array.of(v & 255, (v >> 8) & 255, (v >> 16) & 255);
+  let head;
+  if (first === "VP8X") {
+    if (b[20] & 0x04) return null;
+    head = b.slice(12);
+    head[8] |= 0x04;
+  } else {
+    let w, h, alpha = 0;
+    const d = 20;
+    if (first === "VP8 ") { w = ((b[d + 7] << 8) | b[d + 6]) & 0x3fff; h = ((b[d + 9] << 8) | b[d + 8]) & 0x3fff; }
+    else if (first === "VP8L") { const v = b[d + 1] | (b[d + 2] << 8) | (b[d + 3] << 16) | (b[d + 4] << 24); w = (v & 0x3fff) + 1; h = ((v >>> 14) & 0x3fff) + 1; alpha = (v >>> 28) & 1 ? 0x10 : 0; }
+    else return null;
+    head = cat([riffChunk("VP8X", cat([Uint8Array.of(0x04 | alpha, 0, 0, 0), le24(w - 1), le24(h - 1)])), body]);
+  }
+  const out = cat([enc.encode("RIFF"), le32(0), enc.encode("WEBP"), head, riffChunk("XMP ", enc.encode(xmp))]);
+  out.set(le32(out.length - 8), 4);
+  return out;
+}
+
+function ilstItem(type, text) {
+  const v = enc.encode(String(text).slice(0, MAX));
+  const data = cat([be32(16 + v.length), enc.encode("data"), be32(1), be32(0), v]);
+  const name = type.length === 4 && type[0] === "©" ? Uint8Array.of(0xa9, ...enc.encode(type.slice(1))) : enc.encode(type);
+  return cat([be32(8 + data.length), name, data]);
+}
+
+function mp4(b, { description, creator }) {
+  const top = readBoxes(b), moov = top.find((x) => x.type === "moov");
+  if (!moov || moov.headerSize !== 8 || (moov.children || []).some((x) => x.type === "udta")) return null;
+  const items = [ilstItem("©cmt", description), ilstItem("desc", description), ...(creator ? [ilstItem("©ART", creator)] : [])];
+  const ilst = cat([be32(8 + items.reduce((s, x) => s + x.length, 0)), enc.encode("ilst"), ...items]);
+  const hdlr = cat([be32(33), enc.encode("hdlr"), be32(0), be32(0), enc.encode("mdirappl"), be32(0), be32(0), Uint8Array.of(0)]);
+  const meta = cat([be32(12 + hdlr.length + ilst.length), enc.encode("meta"), be32(0), hdlr, ilst]);
+  const udta = cat([be32(8 + meta.length), enc.encode("udta"), meta]);
+  const out = cat([b.subarray(0, moov.start + moov.size), udta, b.subarray(moov.start + moov.size)]);
+  out.set(be32(moov.size + udta.length), moov.start);
+  // Every chunk offset that points past the moov moves by the bytes added.
+  const walk = (list) => { for (const x of list) { if (x.children) walk(x.children); if (x.type === "stco" || x.type === "co64") offsets(out, x, moov.start, udta.length); } };
+  walk(readBoxes(out, moov.start + 8, moov.start + moov.size + udta.length));
+  return out;
+}
+
+function offsets(b, box, after, delta) {
+  const at = box.start + box.headerSize + 4, n = u32(b, at), wide = box.type === "co64";
+  for (let i = 0; i < n; i++) {
+    const p = at + 4 + i * (wide ? 8 : 4);
+    if (wide) { const v = u32(b, p) * 4294967296 + u32(b, p + 4) + (u32(b, p) * 4294967296 + u32(b, p + 4) > after ? delta : 0); b.set(be32(Math.floor(v / 4294967296)), p); b.set(be32(v >>> 0), p + 4); }
+    else { const v = u32(b, p); if (v > after) b.set(be32(v + delta), p); }
+  }
+}
+
+function gif(b, { description }) {
+  if (b[b.length - 1] !== 0x3b) return null;
+  const t = enc.encode(String(description).slice(0, MAX)), blocks = [];
+  for (let i = 0; i < t.length; i += 255) blocks.push(Uint8Array.of(Math.min(255, t.length - i)), t.subarray(i, i + 255));
+  return cat([b.subarray(0, b.length - 1), Uint8Array.of(0x21, 0xfe), ...blocks, Uint8Array.of(0, 0x3b)]);
+}
+
+// The file with the description inside, or null when the type is not one this writes or the file
+// already carries its own metadata. info: { description, creator, source }.
+function embedDescription(bytes, mime, info) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (!info || !info.description) return null;
+  try {
+    if (mime === "image/jpeg") return jpeg(b, xmpPacket(info));
+    if (mime === "image/png") return png(b, xmpPacket(info));
+    if (mime === "image/webp") return webp(b, xmpPacket(info));
+    if (mime === "video/mp4" || mime === "audio/mp4" || mime === "video/quicktime") return mp4(b, info);
+    if (mime === "image/gif") return gif(b, info);
+  } catch { return null; }
+  return null;
+}
+
+// The description a file carries, read back: XMP dc:description, the MP4 comment or the GIF comment.
+function readDescription(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const x = /<dc:description><rdf:Alt><rdf:li[^>]*>([\s\S]*?)<\/rdf:li>/.exec(dec.decode(b));
+  if (x) return x[1].replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+  for (let k = 4; k + 24 <= b.length; k++) {
+    if (b[k] === 0xa9 && b[k + 1] === 0x63 && b[k + 2] === 0x6d && b[k + 3] === 0x74 && ascii(b, k + 8, "data")) return dec.decode(b.subarray(k + 20, k - 4 + u32(b, k - 4)));
+  }
+  if (ascii(b, 0, "GIF8")) {
+    for (let k = b.length - 3; k > 0; k--) {
+      if (b[k] !== 0x21 || b[k + 1] !== 0xfe) continue;
+      const parts = [];
+      let p = k + 2;
+      while (p < b.length && b[p]) { parts.push(b.subarray(p + 1, p + 1 + b[p])); p += 1 + b[p]; }
+      if (p === b.length - 2) return dec.decode(cat(parts));
+    }
+  }
+  return null;
+}
+
+return { xmpPacket, embedDescription, readDescription };
+})();
+
 // ---- adblock.js
 const M_adblock = (() => {
 // The per-site part of ad blocking (src/ext/adblock-bg.js): which site a page belongs to, whether
@@ -12344,7 +13265,19 @@ const DEFAULTS = Object.freeze({
   pressureLens: false,
   // Ad blocking (src/ext/adblock-bg.js): off by default; sites in adblockAllow are always left alone.
   adblock: false, adblockAllow: [],
+  // One-click downloads (src/ext/quick-*.js): the Download button on X and Reddit posts, on by
+  // default; "always ask where to save" off, so files go straight to the Downloads folder.
+  mediaButtons: true, mediaAskWhere: false,
+  // The post's words with each download: a .md sidecar and the description inside the file, on by
+  // default; a .json sidecar for tools, off by default.
+  mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
+  // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
+  mediaFolder: "Daylight",
 });
+// A folder path inside Downloads: letters, digits, spaces, dots, hyphens, underscores and slashes,
+// no ".." part, at most 120 characters.
+const folder = (v, d) => (typeof v !== "string" ? d
+  : v.split(/[\\/]+/).map((p) => p.replace(/[^\p{L}\p{N} ._-]+/gu, "-").trim()).filter((p) => p && !/^\.+$/.test(p)).join("/").slice(0, 120));
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
 // Sites the user exempts from ad blocking: lower-case host names, at most 500.
@@ -12372,6 +13305,9 @@ function normalizeSettings(raw) {
     lensAll: bool(s.lensAll, DEFAULTS.lensAll),
     pressureLens: bool(s.pressureLens, DEFAULTS.pressureLens),
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
+    mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
+    mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
+    mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder),
   };
 }
 
@@ -14171,5 +15107,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

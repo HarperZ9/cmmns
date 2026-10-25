@@ -26,7 +26,7 @@
   }
 
   function credentialRows(x) {
-    if (!x.src) return [["Content Credentials", { note: x.type === "image" ? "scroll this image onto the screen so it loads, then check it" : "this video is streamed in pieces, with each piece a fragment of the file" }]];
+    if (!x.src) return [["Content Credentials", { note: x.type === "image" ? "scroll this image onto the screen so it loads, then check it" : "this video is streamed in pieces, so there is no single file to check here. Download above puts the pieces together as one MP4" }]];
     const c = PBMedia.checkOf(x.src);
     if (!c) return [["Content Credentials", { action: ["Check this file", () => PBMedia.check(x.src), "Reading the file…"] }], ["", { note: CHECK_NOTE }]];
     if (c.state === "reading") return [["Content Credentials", { note: "Reading the file…" }]];
@@ -58,6 +58,10 @@
     return rows;
   }
 
+  // One-click download (quick-save.js): the file X or Reddit actually serves, a stream put together.
+  const target = (m, x) => (globalThis.PBQuickSites && PBQuickSites.postMedia(m.node).items[x.i]) || { kind: x.type === "image" ? "image" : "video", url: x.src, el: x.video || null };
+  const download = (m, x) => { const p = globalThis.PBQuickSites ? PBQuickSites.postMedia(m.node) : { title: document.title }; return PBQuickSave.start(target(m, x), { title: p.title }); };
+
   // Rows for every piece of media in the post. node: the post element; tweet and trail as in card.js.
   function rows(m) {
     const T = m.tweet || {}, list = globalThis.PBMedia ? PBMedia.inPost(m.node, m.tweet) : [];
@@ -66,6 +70,7 @@
     for (const x of list) {
       const md = x.media || {};
       out.push([`${list.length > 1 ? `Media ${x.i + 1}` : "Media"}: ${x.type}`, md.uploaded ? `first uploaded to X ${day(md.uploaded)}` + (md.fromPost ? `, taken from a post of ${day(md.fromPostTime)}` : "") : "on this page"]);
+      if (globalThis.PBQuickSave) out.push(["Save", { actions: [["Download", () => download(m, x)], ["Copy link", () => PBQuickCopy.copy(target(m, x), { link: true })]] }]);
       out.push(...seenRows(seen[x.i]));
       if (x.searchUrl) out.push(["Find earlier copies", { links: SEARCH.map(([label, f]) => [label, f(x.searchUrl)]) }], ["", { note: SEARCH_NOTE }]);
       out.push(...credentialRows(x), ...textRows(x), ...frameRows(x, `${T.id || "post"}:${x.i}`));

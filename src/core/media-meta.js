@@ -1,0 +1,123 @@
+// What a post said about the media it carried, kept beside the file: the post's text exactly as
+// written, who posted it and when, where it lives, the alt text, hashtags and links, the quoted or
+// parent post, the author's own continuation of the thread, and the item's place in a gallery.
+// Built only from what the page already shows; nothing here makes a request.
+
+// UTC ISO time from a date, a number or text such as Reddit's "2026-10-20T21:04:00.000000+0000".
+const iso = (t) => {
+  if (t == null || t === "") return null;
+  const s = typeof t === "string" ? t.replace(/(\.\d{3})\d+/, "$1").replace(/([+-]\d\d)(\d\d)$/, "$1:$2") : t;
+  const d = new Date(s);
+  return Number.isFinite(d.getTime()) ? d.toISOString() : null;
+};
+const clean = (s) => (s == null ? null : String(s).replace(/\r\n?/g, "\n"));
+
+// The sidecar format, the contract with any library that reads these files
+// (project-docs/SIDECAR-FORMAT.md). A change that removes or renames a field raises the number.
+export const SIDECAR_FORMAT = "daylight.sidecar/1";
+
+// Hashtags and links in a text, each once, in order.
+export function textTags(text) {
+  const t = String(text || "");
+  const hashtags = [...new Set([...t.matchAll(/(^|[^\p{L}\p{N}_&])#([\p{L}\p{N}_]{1,100})/gu)].map((m) => "#" + m[2]))];
+  const links = [...new Set([...t.matchAll(/\bhttps?:\/\/[^\s<>"')\]]+/gi)].map((m) => m[0].replace(/[.,;:!?]+$/, "")))];
+  return { hashtags, links };
+}
+
+// One record. Fields not known stay null; the text keeps its line breaks.
+export function postMeta(m = {}, now = new Date().toISOString()) {
+  const text = clean(m.text);
+  const tags = textTags([text, ...(m.thread || [])].join("\n"));
+  const sub = (p) => (p && (p.text || p.url) ? { text: clean(p.text), url: p.url || null, author: p.author || null } : null);
+  return {
+    format: SIDECAR_FORMAT,
+    site: m.site || null, title: m.title ? String(m.title) : null, text,
+    author: { name: m.authorName || null, handle: m.handle ? String(m.handle).replace(/^@/, "") : null },
+    postUrl: m.postUrl || null, mediaUrl: m.mediaUrl || null, pageUrl: m.pageUrl || null,
+    postedAt: iso(m.postedAt), savedAt: iso(now) || now,
+    alt: m.alt && !/^(image|video|gif|embedded video)$/i.test(String(m.alt).trim()) ? String(m.alt) : null,
+    hashtags: [...new Set([...tags.hashtags, ...(m.hashtags || [])])], links: [...new Set([...(m.links || []), ...tags.links])],
+    quoted: sub(m.quoted), parent: sub(m.parent), thread: (m.thread || []).map(clean).filter(Boolean),
+    subreddit: m.subreddit || null, item: m.total > 1 ? { index: (m.index || 0) + 1, total: m.total } : null,
+  };
+}
+
+// Letters and digits joined by hyphens, cut at a word boundary within max characters.
+function slugText(s, max) {
+  const full = String(s || "").normalize("NFKC").replace(/https?:\/\/\S+/g, " ").replace(/[#@]/g, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").toLowerCase();
+  if (full.length <= max) return full;
+  const cut = full.slice(0, max + 1), at = cut.lastIndexOf("-");
+  return (at > max / 2 ? cut.slice(0, at) : full.slice(0, max)).replace(/-+$/, "");
+}
+
+// "<handle>_<date>_<slug-from-text>[-n].<ext>": sorts by person then day, and reads at a glance.
+export function metaName(meta, ext) {
+  const handle = slugText(meta.author && meta.author.handle, 30) || slugText(meta.site, 30) || "media";
+  const date = (meta.postedAt || meta.savedAt || "").slice(0, 10) || "undated";
+  const words = slugText(meta.text || meta.title || meta.alt, 48) || "post";
+  const n = meta.item ? `-${meta.item.index}` : "";
+  return `${handle}_${date}_${words}${n}.${String(ext || "bin").replace(/[^a-z0-9]/gi, "").toLowerCase() || "bin"}`;
+}
+
+// "@name" on X, "u/name" on Reddit as Reddit writes it.
+const at = (h) => (/^u\//.test(h) ? h : "@" + h);
+const quoteBlock = (t) => String(t).split("\n").map((l) => (l ? "> " + l : ">")).join("\n");
+
+// The front matter that opens every .md sidecar: the fields a library indexes, one JSON value per
+// line (YAML reads them as they are), so a reader needs no Markdown parser.
+function frontMatter(meta, files) {
+  const rows = { format: SIDECAR_FORMAT, files, site: meta.site, handle: meta.author.handle, author: meta.author.name, posted: meta.postedAt, saved: meta.savedAt,
+    post: meta.postUrl, media: meta.mediaUrl, page: meta.postUrl ? null : meta.pageUrl, subreddit: meta.subreddit, hashtags: meta.hashtags,
+    item: meta.item ? `${meta.item.index} of ${meta.item.total}` : null };
+  return ["---", ...Object.entries(rows).filter(([, v]) => v != null && !(Array.isArray(v) && !v.length)).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
+}
+
+// The sidecar a person reads: front matter, then the post's text first. fileNames: one name, or
+// every file of a post saved together (then the item line is left out: the list says it).
+export function sidecarMarkdown(meta, fileNames = null) {
+  const files = [].concat(fileNames || []).filter(Boolean);
+  const m = files.length > 1 ? { ...meta, item: null } : meta;
+  const who = [m.author.name, m.author.handle ? at(m.author.handle) : null].filter(Boolean).join(" ");
+  const out = [...frontMatter(m, files), `# ${who || m.title || "Saved media"}${m.item ? ` (item ${m.item.index} of ${m.item.total})` : ""}`, ""];
+  if (m.title && m.site === "reddit") out.push(`**${m.title}**`, "");
+  if (m.text) out.push(quoteBlock(m.text), "");
+  for (const t of m.thread) out.push("Continued by the author:", "", quoteBlock(t), "");
+  if (m.alt) out.push(`Alt text: ${m.alt}`, "");
+  for (const [label, p] of [["Quoting", m.quoted], ["Replying to", m.parent]]) {
+    if (!p) continue;
+    out.push(`${label}${p.author ? " " + at(String(p.author).replace(/^@/, "")) : ""}${p.url ? ` (${p.url})` : ""}:`, "");
+    if (p.text) out.push(quoteBlock(p.text), "");
+  }
+  const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
+    ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
+    ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
+  out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by Daylight Commons from what the page showed.", "");
+  return out.join("\n");
+}
+
+// The folder a save goes to, inside Downloads: "<folder>/<site>/", each part safe on every system.
+// An empty folder setting saves straight into Downloads.
+export function saveFolder(folder, site) {
+  const part = (s) => String(s || "").normalize("NFKC").replace(/[\u0000-\u001f<>:"/\\|?*]+/g, "-").replace(/^[\s.]+|[\s.]+$/g, "").slice(0, 60);
+  const root = String(folder || "").split(/[\\/]+/).map(part).filter((x) => x && x !== "..").join("/");
+  if (!root) return "";
+  const s = part(String(site || "").replace(/^www\./, ""));
+  return s ? `${root}/${s}/` : `${root}/`;
+}
+
+export const sidecarJson = (meta, fileNames = null) => JSON.stringify({ ...meta, files: [].concat(fileNames || []).filter(Boolean) }, null, 2) + "\n";
+
+// The text for "Copy with caption": the post's words, who said them, and the link.
+export function captionText(meta, link = null) {
+  const who = meta.author.handle ? at(meta.author.handle) : meta.author.name || meta.site || "";
+  const body = meta.text || meta.title || meta.alt || "";
+  return [body, [who ? `${who}` : null, link || meta.postUrl || meta.mediaUrl || meta.pageUrl].filter(Boolean).join(" ")].filter(Boolean).join("\n\n");
+}
+
+// The one-paragraph description embedded in the file itself (XMP, MP4 comment, GIF comment).
+export function embedText(meta) {
+  const who = meta.author.handle ? at(meta.author.handle) : meta.author.name;
+  return [meta.title && meta.site === "reddit" ? meta.title : null, meta.text, meta.alt ? `Alt text: ${meta.alt}` : null,
+    [who, meta.postedAt, meta.postUrl || meta.pageUrl].filter(Boolean).join(", ")].filter(Boolean).join("\n\n");
+}
