@@ -48,23 +48,27 @@ export function largestSource(el, { base = undefined, supports = () => true } = 
   try { return new URL(list[0].url, base).href; } catch { return list[0].url; }
 }
 
-// The full-size address on hosts that serve a smaller copy by default, else the address itself.
-// X: pbs.twimg.com/media/<id>?format=jpg&name=small to name=orig. Reddit: preview.redd.it/<file>
-// (resized and signed) to i.redd.it/<file>, the original upload. Imgur: <id>_lq.mp4, the low-quality
-// preview its pages play first, to <id>.mp4.
-export function fullSizeUrl(url) {
+// The full-size addresses to try, best first, on hosts that serve a smaller copy by default; the
+// address itself comes last. X: pbs.twimg.com/media/<id> keeps the original only at name=orig in
+// the original format, which the page does not say (it asks for WebP), so JPEG and PNG originals
+// are tried, then the largest WebP (name=4096x4096). Reddit: preview.redd.it/<file> (resized and
+// signed) to i.redd.it/<file>, the original upload. Imgur: <id>_lq.mp4, the low-quality preview its
+// pages play first, to <id>.mp4.
+export function sizeLadder(url) {
   let u;
-  try { u = new URL(url); } catch { return url; }
+  try { u = new URL(url); } catch { return [url]; }
   if (u.hostname === "pbs.twimg.com" && u.pathname.startsWith("/media/")) {
     const m = /^(\/media\/[\w-]+)(?:\.(\w+))?(?::\w+)?$/.exec(u.pathname);
-    if (!m) return url;
-    const format = u.searchParams.get("format") || m[2] || "jpg";
-    return `https://pbs.twimg.com${m[1]}?format=${format}&name=orig`;
+    if (!m) return [url];
+    const said = (u.searchParams.get("format") || m[2] || "jpg").toLowerCase(), base = `https://pbs.twimg.com${m[1]}?format=`;
+    const formats = [...new Set([said === "webp" ? null : said, "jpg", "png"].filter(Boolean))];
+    return [...new Set([...formats.map((f) => `${base}${f}&name=orig`), `${base}${said}&name=4096x4096`, url])];
   }
-  if (u.hostname === "i.imgur.com" && /^\/\w+_lq\.mp4$/.test(u.pathname)) return `https://i.imgur.com${u.pathname.replace("_lq.mp4", ".mp4")}`;
-  if (u.hostname === "preview.redd.it" && /^\/[\w-]+\.(jpe?g|png|gif|webp)$/i.test(u.pathname)) return `https://i.redd.it${u.pathname}`;
-  return url;
+  if (u.hostname === "i.imgur.com" && /^\/\w+_lq\.mp4$/.test(u.pathname)) return [`https://i.imgur.com${u.pathname.replace("_lq.mp4", ".mp4")}`, url];
+  if (u.hostname === "preview.redd.it" && /^\/[\w-]+\.(jpe?g|png|gif|webp)$/i.test(u.pathname)) return [`https://i.redd.it${u.pathname}`, url];
+  return [url];
 }
+export const fullSizeUrl = (url) => sizeLadder(url)[0];
 
 // The plan for one target. target: { kind, url, streams, protected, canvas, gifUrl, blob }.
 // { action, ... } where action is
@@ -88,7 +92,7 @@ export function downloadPlan(t, { asGif = false } = {}) {
     return { action: "none", reason: "This media has no file Daylight Commons can read to make a GIF." };
   }
   if (t.canvas) return { action: "canvas" };
-  if (web(t.url)) return { action: "url", url: fullSizeUrl(t.url) };
+  if (web(t.url)) { const [url, ...alternatives] = sizeLadder(t.url); return { action: "url", url, alternatives }; }
   if (t.url && /^data:/i.test(t.url)) return { action: "bytes", url: t.url };
   if (t.url && /^blob:/i.test(t.url) && t.kind !== "video" && t.kind !== "audio") return { action: "bytes", url: t.url };
   if (stream) return { action: "stream", stream };

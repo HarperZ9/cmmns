@@ -67,8 +67,22 @@ palette of up to 256 colours for the whole animation. `gifPalette(frames)` and `
 minCodeSize)` are the two steps on their own. The output reads back through `decodeGif` in
 `media-gif.js`, which the tests check frame by frame.
 
+## The post's words with the file (`media-meta.js`, `media-embed.js`)
+
+| Function | Gives |
+|---|---|
+| `postMeta({ site, text, authorName, handle, postUrl, mediaUrl, postedAt, alt, quoted, parent, thread, subreddit, title, index, total })` | one record; the text keeps its line breaks; hashtags and links are read from it; X's placeholder alt text ("Image") is dropped |
+| `sidecarMarkdown(meta, fileName)`, `sidecarJson(meta, fileName)` | the `.md` file a person reads (the post's text first, quoted or parent post, the author's own continuation, alt text, addresses, times) and the `.json` for tools |
+| `metaName(meta, ext)` | `<handle>_<date>_<words-from-the-text>[-n].<ext>`, cut at a word boundary, so a folder sorts by person and day |
+| `captionText(meta, link)` | the post's words, the handle and the link, for "Copy with caption" |
+| `embedText(meta)` | one paragraph for inside the file |
+| `embedDescription(bytes, mime, { description, creator, source })` | the file with the description inside, or `null`: XMP for JPEG (APP1), PNG (iTXt) and WebP (VP8X and an XMP chunk), a comment, description and artist in MP4 (`moov/udta/meta/ilst`, every chunk offset moved), a comment block in GIF. Pixels and samples are untouched; a file with its own XMP or MP4 metadata is left alone |
+| `readDescription(bytes)` | the description read back from any of those |
+
 ## Tests
 
-`tests/media-quicksave.test.js` (types, names, srcset, full-size addresses, plans, DRM refusal, GIF
+`tests/media-meta.test.js` (sidecars for an X post with alt text, a quote post and a Reddit gallery
+item; the description written into and read back from JPEG, PNG, WebP, GIF and MP4 with every sample
+unchanged), `tests/media-quicksave.test.js` (types, names, srcset, full-size addresses, plans, DRM refusal, GIF
 round trip) and `tests/media-demux.test.js` (plain and fragmented MP4, rewrapping, stream assembly
 with a fake `get`, protected streams stopping before segments are fetched).

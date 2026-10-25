@@ -45,7 +45,16 @@ export const DEFAULTS = Object.freeze({
   // One-click downloads (src/ext/quick-*.js): the Download button on X and Reddit posts, on by
   // default; "always ask where to save" off, so files go straight to the Downloads folder.
   mediaButtons: true, mediaAskWhere: false,
+  // The post's words with each download: a .md sidecar and the description inside the file, on by
+  // default; a .json sidecar for tools, off by default.
+  mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
+  // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
+  mediaFolder: "Daylight",
 });
+// A folder path inside Downloads: letters, digits, spaces, dots, hyphens, underscores and slashes,
+// no ".." part, at most 120 characters.
+const folder = (v, d) => (typeof v !== "string" ? d
+  : v.split(/[\\/]+/).map((p) => p.replace(/[^\p{L}\p{N} ._-]+/gu, "-").trim()).filter((p) => p && !/^\.+$/.test(p)).join("/").slice(0, 120));
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
 // Sites the user exempts from ad blocking: lower-case host names, at most 500.
@@ -74,6 +83,8 @@ export function normalizeSettings(raw) {
     pressureLens: bool(s.pressureLens, DEFAULTS.pressureLens),
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
+    mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
+    mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder),
   };
 }
 

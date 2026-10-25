@@ -1,0 +1,720 @@
+{
+ "tool": "scripts/qa/quick_save_check.py",
+ "run": "2026-10-25, Google Chrome stable on Windows 11, window off screen, fresh profile, signed out everywhere",
+ "cases": [
+  {
+   "case": "x-photo",
+   "page": "https://x.com/NASA/status/2113655288687431819",
+   "discovered": null,
+   "action": "inline Download button",
+   "note": "Saved nasa_2026-10-23_ahh-blue-lagoon-this-deep-blue-sea-of-gas-and.jpg, 112 KB.",
+   "files": [
+    {
+     "name": "Daylight/x/nasa_2026-10-23_ahh-blue-lagoon-this-deep-blue-sea-of-gas-and.md",
+     "bytes": 1138,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/x/nasa_2026-10-23_ahh-blue-lagoon-this-deep-blue-sea-of-gas-and.jpg",
+     "bytes": 114708,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       1041,
+       941
+      ],
+      "frames": 1
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "x-video-inline",
+   "page": "https://x.com/NASA/status/2113776971603689874",
+   "discovered": null,
+   "action": "inline Download button",
+   "note": "Saved nasa_2026-10-23_we-are-not-slowing-down-our-artemis-iii-mission.mp4, 20.2 MB.",
+   "files": [
+    {
+     "name": "Daylight/x/nasa_2026-10-23_we-are-not-slowing-down-our-artemis-iii-mission.md",
+     "bytes": 1101,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/x/nasa_2026-10-23_we-are-not-slowing-down-our-artemis-iii-mission.mp4",
+     "bytes": 21170561,
+     "sniffed": "mp4/isom",
+     "check": {
+      "opens": true,
+      "duration": 59.9,
+      "size": [
+       1920,
+       1080
+      ],
+      "soundBytes": 43190
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "x-video-rightclick",
+   "page": "https://x.com/NASA/status/2113776971603689874",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Already saved as nasa_2026-10-23_we-are-not-slowing-down-our-artemis-iii-mission.mp4.",
+   "files": [],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "x-gif-inline",
+   "page": "https://x.com/GIPHY/status/1957913446118285360",
+   "discovered": null,
+   "action": "inline Download button",
+   "note": "Saved giphy_2025-08-19_post.mp4, 43 KB.",
+   "files": [
+    {
+     "name": "Daylight/x/giphy_2025-08-19_post.md",
+     "bytes": 611,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/x/giphy_2025-08-19_post.mp4",
+     "bytes": 43773,
+     "sniffed": "mp4/iso5",
+     "check": {
+      "opens": true,
+      "duration": 6.3,
+      "size": [
+       400,
+       224
+      ],
+      "soundBytes": 0
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "x-gif-as-gif",
+   "page": "https://x.com/GIPHY/status/1957913446118285360",
+   "discovered": null,
+   "action": "pb-dl-gif",
+   "note": "Saved giphy_2025-08-19_post.gif, 1.5 MB.",
+   "files": [
+    {
+     "name": "Daylight/x/giphy_2025-08-19_post (1).md",
+     "bytes": 611,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/x/giphy_2025-08-19_post.gif",
+     "bytes": 1599855,
+     "sniffed": "gif",
+     "check": {
+      "opens": true,
+      "size": [
+       400,
+       224
+      ],
+      "frames": 76
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "reddit-dash-inline",
+   "page": "Reddit markup replica (www.reddit.com mapped to the fixture server)",
+   "discovered": null,
+   "action": "inline Download button",
+   "note": "Saved u-tidewatch_2026-10-20_shot-at-f-2-8-1-50-s-iso-3200-handheld-braced-on.mp4, 572 KB.",
+   "files": [
+    {
+     "name": "Daylight/reddit/u-tidewatch_2026-10-20_shot-at-f-2-8-1-50-s-iso-3200-handheld-braced-on.mp4",
+     "bytes": 586174,
+     "sniffed": "mp4/isom",
+     "check": {
+      "opens": true,
+      "duration": 10.1,
+      "size": [
+       320,
+       176
+      ],
+      "soundBytes": 55311
+     }
+    },
+    {
+     "name": "Daylight/reddit/u-tidewatch_2026-10-20_shot-at-f-2-8-1-50-s-iso-3200-handheld-braced-on.md",
+     "bytes": 909,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "reddit-packaged-inline",
+   "page": "Reddit markup replica (www.reddit.com mapped to the fixture server)",
+   "discovered": null,
+   "action": "inline Download button",
+   "note": "Saved Packaged-clip-clip-320.mp4, 770 KB.",
+   "files": [
+    {
+     "name": "Daylight/reddit/Packaged-clip-clip-320.md",
+     "bytes": 516,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/reddit/Packaged-clip-clip-320.mp4",
+     "bytes": 788493,
+     "sniffed": "mp4/mp42",
+     "check": {
+      "opens": true,
+      "duration": 10,
+      "size": [
+       320,
+       176
+      ],
+      "soundBytes": 55706
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "reddit-gallery-inline",
+   "page": "Reddit markup replica (www.reddit.com mapped to the fixture server)",
+   "discovered": null,
+   "action": "inline Download button",
+   "note": "Saved all 3 files from the gallery.",
+   "files": [
+    {
+     "name": "Daylight/reddit/u-tidewatch_2026-10-21_three-harbour-photos-1.jpg",
+     "bytes": 12135,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       800,
+       600
+      ],
+      "frames": 1
+     }
+    },
+    {
+     "name": "Daylight/reddit/u-tidewatch_2026-10-21_three-harbour-photos-3.webp",
+     "bytes": 1842,
+     "sniffed": "webp",
+     "check": {
+      "opens": true,
+      "size": [
+       800,
+       600
+      ],
+      "frames": 1
+     }
+    },
+    {
+     "name": "Daylight/reddit/u-tidewatch_2026-10-21_three-harbour-photos.md",
+     "bytes": 883,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/reddit/u-tidewatch_2026-10-21_three-harbour-photos-2.png",
+     "bytes": 3487,
+     "sniffed": "png",
+     "check": {
+      "opens": true,
+      "size": [
+       800,
+       600
+      ],
+      "frames": 1
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "reddit-video-rightclick",
+   "page": "Reddit markup replica (www.reddit.com mapped to the fixture server)",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Already saved as u-tidewatch_2026-10-20_shot-at-f-2-8-1-50-s-iso-3200-handheld-braced-on.mp4.",
+   "files": [],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "wikipedia-srcset",
+   "page": "https://en.wikipedia.org/wiki/Mount_Rainier",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Saved Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg, 94 KB.",
+   "files": [
+    {
+     "name": "Daylight/en.wikipedia.org/Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg",
+     "bytes": 95825,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       960,
+       640
+      ],
+      "frames": 1
+     }
+    },
+    {
+     "name": "Daylight/en.wikipedia.org/Mount-Rainier-Wikipedia-960px-Rainier20200906.md",
+     "bytes": 807,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "wikipedia-copy",
+   "page": "https://en.wikipedia.org/wiki/Mount_Rainier",
+   "discovered": null,
+   "action": "pb-copy",
+   "note": "Copied the picture.",
+   "files": [],
+   "clipboard": [
+    [
+     "image/png"
+    ]
+   ],
+   "error": null
+  },
+  {
+   "case": "wikipedia-copy-link",
+   "page": "https://en.wikipedia.org/wiki/Mount_Rainier",
+   "discovered": null,
+   "action": "pb-copy-link",
+   "note": "Copied the file's address.",
+   "files": [],
+   "clipboard": [
+    [
+     "text/plain"
+    ]
+   ],
+   "error": null
+  },
+  {
+   "case": "overlay-webp-as-jpg",
+   "page": "local fixture: overlay.html",
+   "discovered": null,
+   "action": "pb-dl-here",
+   "note": "Saved Overlay-test-pic.webp, 2 KB.",
+   "files": [
+    {
+     "name": "Daylight/127.0.0.1/Overlay-test-pic.webp",
+     "bytes": 1700,
+     "sniffed": "webp",
+     "check": {
+      "opens": true,
+      "size": [
+       800,
+       600
+      ],
+      "frames": 1
+     }
+    },
+    {
+     "name": "Daylight/127.0.0.1/Overlay-test-pic.md",
+     "bytes": 446,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "canvas",
+   "page": "local fixture: canvas.html",
+   "discovered": null,
+   "action": "pb-dl-here",
+   "note": "Saved Canvas-test.png, 3 KB.",
+   "files": [
+    {
+     "name": "Daylight/127.0.0.1/Canvas-test.png",
+     "bytes": 2605,
+     "sniffed": "png",
+     "check": {
+      "opens": true,
+      "size": [
+       300,
+       200
+      ],
+      "frames": 1
+     }
+    },
+    {
+     "name": "Daylight/127.0.0.1/Canvas-test.md",
+     "bytes": 334,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "iframe",
+   "page": "local fixture: iframe.html",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Saved Inner-pic.png, 3 KB.",
+   "files": [
+    {
+     "name": "Daylight/localhost/Inner-pic.md",
+     "bytes": 417,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/localhost/Inner-pic.png",
+     "bytes": 3336,
+     "sniffed": "png",
+     "check": {
+      "opens": true,
+      "size": [
+       800,
+       600
+      ],
+      "frames": 1
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "drm-refused",
+   "page": "local fixture: drm.html",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Protected, can't be saved. The page plays this media through Encrypted Media Extensions (DRM).",
+   "files": [],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "giphy",
+   "page": "https://giphy.com/explore/cat",
+   "discovered": "https://giphy.com/gifs/ai-cat-meme-774uK11mxE3W0cjE8L",
+   "action": "pb-dl-here",
+   "note": "Saved High-Five-Ai-GIF-Find-Share-on-GIPHY.gif, 3.3 MB.",
+   "files": [
+    {
+     "name": "Daylight/giphy.com/High-Five-Ai-GIF-Find-Share-on-GIPHY.md",
+     "bytes": 944,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/giphy.com/High-Five-Ai-GIF-Find-Share-on-GIPHY.gif",
+     "bytes": 3454026,
+     "sniffed": "gif",
+     "check": {
+      "opens": true,
+      "size": [
+       480,
+       480
+      ],
+      "frames": 53
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "giphy-as-gif",
+   "page": "https://giphy.com/explore/cat",
+   "discovered": "https://giphy.com/gifs/ai-cat-meme-774uK11mxE3W0cjE8L",
+   "action": "pb-dl-gif",
+   "note": "Saved High-Five-Ai-GIF-Find-Share-on-GIPHY.gif, 3.3 MB.",
+   "files": [
+    {
+     "name": "Daylight/giphy.com/High-Five-Ai-GIF-Find-Share-on-GIPHY (1).md",
+     "bytes": 944,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/giphy.com/High-Five-Ai-GIF-Find-Share-on-GIPHY (1).gif",
+     "bytes": 3454026,
+     "sniffed": "gif",
+     "check": {
+      "opens": true,
+      "size": [
+       480,
+       480
+      ],
+      "frames": 53
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "tenor",
+   "page": "https://tenor.com/search/cat-gifs",
+   "discovered": "https://tenor.com/view/cat-cat-dance-kitten-kitten-dance-vibe-gif-7523542997650649169",
+   "action": "pb-dl-here",
+   "note": "Saved Cat-Cat-Dance-GIF-Cat-Cat-dance-Kitten-Discover-Share-GIFs-cat-cat-dance.gif, 1.2 MB.",
+   "files": [
+    {
+     "name": "Daylight/tenor.com/Cat-Cat-Dance-GIF-Cat-Cat-dance-Kitten-Discover-Share-GIFs-cat-cat-dance.md",
+     "bytes": 932,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/tenor.com/Cat-Cat-Dance-GIF-Cat-Cat-dance-Kitten-Discover-Share-GIFs-cat-cat-dance.gif",
+     "bytes": 1240241,
+     "sniffed": "gif",
+     "check": {
+      "opens": true,
+      "size": [
+       498,
+       476
+      ],
+      "frames": 16
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "imgur-gifv",
+   "page": "https://imgur.com/t/gifs",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Saved Gifs-Memes-and-Images-Imgur-ttXWkKd.webp, 807 KB.",
+   "files": [
+    {
+     "name": "Daylight/imgur.com/Gifs-Memes-and-Images-Imgur-ttXWkKd.md",
+     "bytes": 610,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/imgur.com/Gifs-Memes-and-Images-Imgur-ttXWkKd.webp",
+     "bytes": 825880,
+     "sniffed": "webp",
+     "check": {
+      "opens": true,
+      "size": [
+       240,
+       254
+      ],
+      "frames": 62
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "html5-mp4",
+   "page": "https://www.w3schools.com/html/html5_video.asp",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Saved HTML-Video-mov-bbb.mp4, 770 KB.",
+   "files": [
+    {
+     "name": "Daylight/w3schools.com/HTML-Video-mov-bbb.md",
+     "bytes": 548,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/w3schools.com/HTML-Video-mov-bbb.mp4",
+     "bytes": 788493,
+     "sniffed": "mp4/mp42",
+     "check": {
+      "opens": true,
+      "duration": 10,
+      "size": [
+       320,
+       176
+      ],
+      "soundBytes": 54532
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "hls-fmp4-separate-audio",
+   "page": "local fixture: hls-player.html",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Saved Angel-One-over-HLS.mp4, 11.2 MB.",
+   "files": [
+    {
+     "name": "Daylight/127.0.0.1/Angel-One-over-HLS.mp4",
+     "bytes": 11795001,
+     "sniffed": "mp4/isom",
+     "check": {
+      "opens": true,
+      "duration": 60,
+      "size": [
+       768,
+       576
+      ],
+      "soundBytes": 31065
+     }
+    },
+    {
+     "name": "Daylight/127.0.0.1/Angel-One-over-HLS.md",
+     "bytes": 525,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "dash-separate-audio",
+   "page": "local fixture: dash-player.html",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Saved Angel-One-over-DASH.mp4, 11.7 MB.",
+   "files": [
+    {
+     "name": "Daylight/127.0.0.1/Angel-One-over-DASH.md",
+     "bytes": 522,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/127.0.0.1/Angel-One-over-DASH.mp4",
+     "bytes": 12261627,
+     "sniffed": "mp4/isom",
+     "check": {
+      "opens": true,
+      "duration": 60.1,
+      "size": [
+       720,
+       576
+      ],
+      "soundBytes": 30765
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  },
+  {
+   "case": "hls-ts-mux",
+   "page": "https://hlsjs.video-dev.org/demo/?src=https%3A%2F%2Ftest-streams.mux.dev%2Fx36xhzz%2Fx36xhzz.m3u8",
+   "discovered": null,
+   "action": "pb-dl",
+   "note": "Saved hls-js-demo.ts, 478.9 MB.",
+   "files": [
+    {
+     "name": "Daylight/hlsjs.video-dev.org/hls-js-demo.md",
+     "bytes": 588,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": {
+      "opens": null,
+      "note": "not opened here (unknown 2d2d2d0a666f726d)"
+     }
+    },
+    {
+     "name": "Daylight/hlsjs.video-dev.org/hls-js-demo.ts",
+     "bytes": 502204400,
+     "sniffed": "mpeg-ts",
+     "check": {
+      "opens": null,
+      "note": "not opened here (mpeg-ts)"
+     }
+    }
+   ],
+   "clipboard": null,
+   "error": null
+  }
+ ]
+}

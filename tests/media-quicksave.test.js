@@ -4,7 +4,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { sniffMime, chooseType, downloadName, slug } from "../src/core/media-name.js";
-import { parseSrcset, largestSource, fullSizeUrl, downloadPlan, referenceOf, REFERENCE_LABEL } from "../src/core/media-pick.js";
+import { parseSrcset, largestSource, fullSizeUrl, sizeLadder, downloadPlan, referenceOf, REFERENCE_LABEL } from "../src/core/media-pick.js";
 import { PROTECTED_LINE } from "../src/core/media-protect.js";
 import { encodeGif, gifPalette } from "../src/core/media-gif-encode.js";
 import { decodeGif } from "../src/core/media-gif.js";
@@ -53,7 +53,8 @@ test("srcset: commas inside addresses survive, and the largest candidate wins", 
 });
 
 test("full-size addresses on X and Reddit", () => {
-  assert.equal(fullSizeUrl("https://pbs.twimg.com/media/GxYz123?format=webp&name=small"), "https://pbs.twimg.com/media/GxYz123?format=webp&name=orig");
+  assert.deepEqual(sizeLadder("https://pbs.twimg.com/media/GxYz123?format=webp&name=small"), ["https://pbs.twimg.com/media/GxYz123?format=jpg&name=orig",
+    "https://pbs.twimg.com/media/GxYz123?format=png&name=orig", "https://pbs.twimg.com/media/GxYz123?format=webp&name=4096x4096", "https://pbs.twimg.com/media/GxYz123?format=webp&name=small"]);
   assert.equal(fullSizeUrl("https://pbs.twimg.com/media/GxYz123.png:large"), "https://pbs.twimg.com/media/GxYz123?format=png&name=orig");
   assert.equal(fullSizeUrl("https://preview.redd.it/abc.jpeg?width=640&s=1f"), "https://i.redd.it/abc.jpeg");
   assert.equal(fullSizeUrl("https://i.imgur.com/a6vwc0X_lq.mp4"), "https://i.imgur.com/a6vwc0X.mp4");
@@ -72,7 +73,9 @@ test("protected media is refused with the toolkit's sentence; a reference may be
 });
 
 test("plans for plain files, page bytes, streams and GIFs", () => {
-  assert.deepEqual(downloadPlan({ kind: "image", url: "https://pbs.twimg.com/media/A?format=jpg&name=small" }), { action: "url", url: "https://pbs.twimg.com/media/A?format=jpg&name=orig" });
+  const x = downloadPlan({ kind: "image", url: "https://pbs.twimg.com/media/A?format=jpg&name=small" });
+  assert.equal(x.url, "https://pbs.twimg.com/media/A?format=jpg&name=orig");
+  assert.equal(x.alternatives.at(-1), "https://pbs.twimg.com/media/A?format=jpg&name=small");
   assert.equal(downloadPlan({ kind: "image", url: "data:image/png;base64,AAAA" }).action, "bytes");
   assert.equal(downloadPlan({ kind: "image", canvas: true }).action, "canvas");
   assert.equal(downloadPlan({ kind: "video", url: "blob:https://x.com/1", streams: [{ type: "hls", url: "https://video.twimg.com/a.m3u8" }] }).action, "stream");

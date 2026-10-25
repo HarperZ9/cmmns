@@ -12224,23 +12224,27 @@ function largestSource(el, { base = undefined, supports = () => true } = {}) {
   try { return new URL(list[0].url, base).href; } catch { return list[0].url; }
 }
 
-// The full-size address on hosts that serve a smaller copy by default, else the address itself.
-// X: pbs.twimg.com/media/<id>?format=jpg&name=small to name=orig. Reddit: preview.redd.it/<file>
-// (resized and signed) to i.redd.it/<file>, the original upload. Imgur: <id>_lq.mp4, the low-quality
-// preview its pages play first, to <id>.mp4.
-function fullSizeUrl(url) {
+// The full-size addresses to try, best first, on hosts that serve a smaller copy by default; the
+// address itself comes last. X: pbs.twimg.com/media/<id> keeps the original only at name=orig in
+// the original format, which the page does not say (it asks for WebP), so JPEG and PNG originals
+// are tried, then the largest WebP (name=4096x4096). Reddit: preview.redd.it/<file> (resized and
+// signed) to i.redd.it/<file>, the original upload. Imgur: <id>_lq.mp4, the low-quality preview its
+// pages play first, to <id>.mp4.
+function sizeLadder(url) {
   let u;
-  try { u = new URL(url); } catch { return url; }
+  try { u = new URL(url); } catch { return [url]; }
   if (u.hostname === "pbs.twimg.com" && u.pathname.startsWith("/media/")) {
     const m = /^(\/media\/[\w-]+)(?:\.(\w+))?(?::\w+)?$/.exec(u.pathname);
-    if (!m) return url;
-    const format = u.searchParams.get("format") || m[2] || "jpg";
-    return `https://pbs.twimg.com${m[1]}?format=${format}&name=orig`;
+    if (!m) return [url];
+    const said = (u.searchParams.get("format") || m[2] || "jpg").toLowerCase(), base = `https://pbs.twimg.com${m[1]}?format=`;
+    const formats = [...new Set([said === "webp" ? null : said, "jpg", "png"].filter(Boolean))];
+    return [...new Set([...formats.map((f) => `${base}${f}&name=orig`), `${base}${said}&name=4096x4096`, url])];
   }
-  if (u.hostname === "i.imgur.com" && /^\/\w+_lq\.mp4$/.test(u.pathname)) return `https://i.imgur.com${u.pathname.replace("_lq.mp4", ".mp4")}`;
-  if (u.hostname === "preview.redd.it" && /^\/[\w-]+\.(jpe?g|png|gif|webp)$/i.test(u.pathname)) return `https://i.redd.it${u.pathname}`;
-  return url;
+  if (u.hostname === "i.imgur.com" && /^\/\w+_lq\.mp4$/.test(u.pathname)) return [`https://i.imgur.com${u.pathname.replace("_lq.mp4", ".mp4")}`, url];
+  if (u.hostname === "preview.redd.it" && /^\/[\w-]+\.(jpe?g|png|gif|webp)$/i.test(u.pathname)) return [`https://i.redd.it${u.pathname}`, url];
+  return [url];
 }
+const fullSizeUrl = (url) => sizeLadder(url)[0];
 
 // The plan for one target. target: { kind, url, streams, protected, canvas, gifUrl, blob }.
 // { action, ... } where action is
@@ -12264,7 +12268,7 @@ function downloadPlan(t, { asGif = false } = {}) {
     return { action: "none", reason: "This media has no file Daylight Commons can read to make a GIF." };
   }
   if (t.canvas) return { action: "canvas" };
-  if (web(t.url)) return { action: "url", url: fullSizeUrl(t.url) };
+  if (web(t.url)) { const [url, ...alternatives] = sizeLadder(t.url); return { action: "url", url, alternatives }; }
   if (t.url && /^data:/i.test(t.url)) return { action: "bytes", url: t.url };
   if (t.url && /^blob:/i.test(t.url) && t.kind !== "video" && t.kind !== "audio") return { action: "bytes", url: t.url };
   if (stream) return { action: "stream", stream };
@@ -12281,7 +12285,7 @@ function referenceOf({ page, title, poster = null, images = [], previews = [], r
     images: clean([poster, ...images]), previews: clean(previews), reason: reason || null };
 }
 
-return { parseSrcset, largestSource, fullSizeUrl, downloadPlan, REFERENCE_LABEL, referenceOf };
+return { parseSrcset, largestSource, sizeLadder, fullSizeUrl, downloadPlan, REFERENCE_LABEL, referenceOf };
 })();
 
 // ---- media-gif-encode.js
@@ -12672,6 +12676,297 @@ async function assembleStream(stream, { get, onProgress } = {}) {
 return { MediaProtected, combineParts, assembleStream };
 })();
 
+// ---- media-meta.js
+const M_media_meta = (() => {
+// What a post said about the media it carried, kept beside the file: the post's text exactly as
+// written, who posted it and when, where it lives, the alt text, hashtags and links, the quoted or
+// parent post, the author's own continuation of the thread, and the item's place in a gallery.
+// Built only from what the page already shows; nothing here makes a request.
+
+// UTC ISO time from a date, a number or text such as Reddit's "2026-10-20T21:04:00.000000+0000".
+const iso = (t) => {
+  if (t == null || t === "") return null;
+  const s = typeof t === "string" ? t.replace(/(\.\d{3})\d+/, "$1").replace(/([+-]\d\d)(\d\d)$/, "$1:$2") : t;
+  const d = new Date(s);
+  return Number.isFinite(d.getTime()) ? d.toISOString() : null;
+};
+const clean = (s) => (s == null ? null : String(s).replace(/\r\n?/g, "\n"));
+
+// The sidecar format, the contract with any library that reads these files
+// (project-docs/SIDECAR-FORMAT.md). A change that removes or renames a field raises the number.
+const SIDECAR_FORMAT = "daylight.sidecar/1";
+
+// Hashtags and links in a text, each once, in order.
+function textTags(text) {
+  const t = String(text || "");
+  const hashtags = [...new Set([...t.matchAll(/(^|[^\p{L}\p{N}_&])#([\p{L}\p{N}_]{1,100})/gu)].map((m) => "#" + m[2]))];
+  const links = [...new Set([...t.matchAll(/\bhttps?:\/\/[^\s<>"')\]]+/gi)].map((m) => m[0].replace(/[.,;:!?]+$/, "")))];
+  return { hashtags, links };
+}
+
+// One record. Fields not known stay null; the text keeps its line breaks.
+function postMeta(m = {}, now = new Date().toISOString()) {
+  const text = clean(m.text);
+  const tags = textTags([text, ...(m.thread || [])].join("\n"));
+  const sub = (p) => (p && (p.text || p.url) ? { text: clean(p.text), url: p.url || null, author: p.author || null } : null);
+  return {
+    format: SIDECAR_FORMAT,
+    site: m.site || null, title: m.title ? String(m.title) : null, text,
+    author: { name: m.authorName || null, handle: m.handle ? String(m.handle).replace(/^@/, "") : null },
+    postUrl: m.postUrl || null, mediaUrl: m.mediaUrl || null, pageUrl: m.pageUrl || null,
+    postedAt: iso(m.postedAt), savedAt: iso(now) || now,
+    alt: m.alt && !/^(image|video|gif|embedded video)$/i.test(String(m.alt).trim()) ? String(m.alt) : null,
+    hashtags: [...new Set([...tags.hashtags, ...(m.hashtags || [])])], links: [...new Set([...(m.links || []), ...tags.links])],
+    quoted: sub(m.quoted), parent: sub(m.parent), thread: (m.thread || []).map(clean).filter(Boolean),
+    subreddit: m.subreddit || null, item: m.total > 1 ? { index: (m.index || 0) + 1, total: m.total } : null,
+  };
+}
+
+// Letters and digits joined by hyphens, cut at a word boundary within max characters.
+function slugText(s, max) {
+  const full = String(s || "").normalize("NFKC").replace(/https?:\/\/\S+/g, " ").replace(/[#@]/g, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").toLowerCase();
+  if (full.length <= max) return full;
+  const cut = full.slice(0, max + 1), at = cut.lastIndexOf("-");
+  return (at > max / 2 ? cut.slice(0, at) : full.slice(0, max)).replace(/-+$/, "");
+}
+
+// "<handle>_<date>_<slug-from-text>[-n].<ext>": sorts by person then day, and reads at a glance.
+function metaName(meta, ext) {
+  const handle = slugText(meta.author && meta.author.handle, 30) || slugText(meta.site, 30) || "media";
+  const date = (meta.postedAt || meta.savedAt || "").slice(0, 10) || "undated";
+  const words = slugText(meta.text || meta.title || meta.alt, 48) || "post";
+  const n = meta.item ? `-${meta.item.index}` : "";
+  return `${handle}_${date}_${words}${n}.${String(ext || "bin").replace(/[^a-z0-9]/gi, "").toLowerCase() || "bin"}`;
+}
+
+// "@name" on X, "u/name" on Reddit as Reddit writes it.
+const at = (h) => (/^u\//.test(h) ? h : "@" + h);
+const quoteBlock = (t) => String(t).split("\n").map((l) => (l ? "> " + l : ">")).join("\n");
+
+// The front matter that opens every .md sidecar: the fields a library indexes, one JSON value per
+// line (YAML reads them as they are), so a reader needs no Markdown parser.
+function frontMatter(meta, files) {
+  const rows = { format: SIDECAR_FORMAT, files, site: meta.site, handle: meta.author.handle, author: meta.author.name, posted: meta.postedAt, saved: meta.savedAt,
+    post: meta.postUrl, media: meta.mediaUrl, page: meta.postUrl ? null : meta.pageUrl, subreddit: meta.subreddit, hashtags: meta.hashtags,
+    item: meta.item ? `${meta.item.index} of ${meta.item.total}` : null };
+  return ["---", ...Object.entries(rows).filter(([, v]) => v != null && !(Array.isArray(v) && !v.length)).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
+}
+
+// The sidecar a person reads: front matter, then the post's text first. fileNames: one name, or
+// every file of a post saved together (then the item line is left out: the list says it).
+function sidecarMarkdown(meta, fileNames = null) {
+  const files = [].concat(fileNames || []).filter(Boolean);
+  const m = files.length > 1 ? { ...meta, item: null } : meta;
+  const who = [m.author.name, m.author.handle ? at(m.author.handle) : null].filter(Boolean).join(" ");
+  const out = [...frontMatter(m, files), `# ${who || m.title || "Saved media"}${m.item ? ` (item ${m.item.index} of ${m.item.total})` : ""}`, ""];
+  if (m.title && m.site === "reddit") out.push(`**${m.title}**`, "");
+  if (m.text) out.push(quoteBlock(m.text), "");
+  for (const t of m.thread) out.push("Continued by the author:", "", quoteBlock(t), "");
+  if (m.alt) out.push(`Alt text: ${m.alt}`, "");
+  for (const [label, p] of [["Quoting", m.quoted], ["Replying to", m.parent]]) {
+    if (!p) continue;
+    out.push(`${label}${p.author ? " " + at(String(p.author).replace(/^@/, "")) : ""}${p.url ? ` (${p.url})` : ""}:`, "");
+    if (p.text) out.push(quoteBlock(p.text), "");
+  }
+  const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
+    ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
+    ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
+  out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by Daylight Commons from what the page showed.", "");
+  return out.join("\n");
+}
+
+// The folder a save goes to, inside Downloads: "<folder>/<site>/", each part safe on every system.
+// An empty folder setting saves straight into Downloads.
+function saveFolder(folder, site) {
+  const part = (s) => String(s || "").normalize("NFKC").replace(/[\u0000-\u001f<>:"/\\|?*]+/g, "-").replace(/^[\s.]+|[\s.]+$/g, "").slice(0, 60);
+  const root = String(folder || "").split(/[\\/]+/).map(part).filter((x) => x && x !== "..").join("/");
+  if (!root) return "";
+  const s = part(String(site || "").replace(/^www\./, ""));
+  return s ? `${root}/${s}/` : `${root}/`;
+}
+
+const sidecarJson = (meta, fileNames = null) => JSON.stringify({ ...meta, files: [].concat(fileNames || []).filter(Boolean) }, null, 2) + "\n";
+
+// The text for "Copy with caption": the post's words, who said them, and the link.
+function captionText(meta, link = null) {
+  const who = meta.author.handle ? at(meta.author.handle) : meta.author.name || meta.site || "";
+  const body = meta.text || meta.title || meta.alt || "";
+  return [body, [who ? `${who}` : null, link || meta.postUrl || meta.mediaUrl || meta.pageUrl].filter(Boolean).join(" ")].filter(Boolean).join("\n\n");
+}
+
+// The one-paragraph description embedded in the file itself (XMP, MP4 comment, GIF comment).
+function embedText(meta) {
+  const who = meta.author.handle ? at(meta.author.handle) : meta.author.name;
+  return [meta.title && meta.site === "reddit" ? meta.title : null, meta.text, meta.alt ? `Alt text: ${meta.alt}` : null,
+    [who, meta.postedAt, meta.postUrl || meta.pageUrl].filter(Boolean).join(", ")].filter(Boolean).join("\n\n");
+}
+
+return { SIDECAR_FORMAT, textTags, postMeta, metaName, sidecarMarkdown, saveFolder, sidecarJson, captionText, embedText };
+})();
+
+// ---- media-embed.js
+const M_media_embed = (() => {
+// Writes a post's description into the file itself, losslessly, so the words stay with the picture
+// or video when the sidecar is lost: XMP (dc:description, dc:creator, dc:source) in JPEG, PNG and
+// WebP; an iTunes-style comment, description and artist in MP4 (moov/udta/meta/ilst, with every
+// chunk offset moved by the bytes added); a comment block in GIF. The pixels and samples are never
+// touched. A file that already carries its own XMP or MP4 metadata is left as it is.
+
+const { readBoxes } = M_media_read;
+
+const enc = new TextEncoder(), dec = new TextDecoder();
+const cat = (list) => { const o = new Uint8Array(list.reduce((s, x) => s + x.length, 0)); let p = 0; for (const x of list) { o.set(x, p); p += x.length; } return o; };
+const be32 = (v) => Uint8Array.of(v >>> 24, (v >> 16) & 255, (v >> 8) & 255, v & 255);
+const le32 = (v) => Uint8Array.of(v & 255, (v >> 8) & 255, (v >> 16) & 255, v >>> 24);
+const u32 = (b, at) => ((b[at] << 24) >>> 0) + (b[at + 1] << 16) + (b[at + 2] << 8) + b[at + 3];
+const ascii = (b, at, s) => [...s].every((c, k) => b[at + k] === c.charCodeAt(0));
+const xml = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const MAX = 30000;
+
+function xmpPacket({ description = "", creator = "", source = "" }) {
+  const d = String(description).slice(0, MAX);
+  return `<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?><x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">`
+    + `<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:description><rdf:Alt><rdf:li xml:lang="x-default">${xml(d)}</rdf:li></rdf:Alt></dc:description>`
+    + (creator ? `<dc:creator><rdf:Seq><rdf:li>${xml(creator)}</rdf:li></rdf:Seq></dc:creator>` : "") + (source ? `<dc:source>${xml(source)}</dc:source>` : "")
+    + `</rdf:Description></rdf:RDF></x:xmpmeta><?xpacket end="w"?>`;
+}
+
+const XMP_NS = "http://ns.adobe.com/xap/1.0/\0";
+
+function jpeg(b, xmp) {
+  let at = 2;
+  while (at + 4 <= b.length && b[at] === 0xff && b[at + 1] >= 0xe0 && b[at + 1] <= 0xef) {
+    const len = (b[at + 2] << 8) | b[at + 3];
+    if (b[at + 1] === 0xe1 && ascii(b, at + 4, "http://ns.adobe.com/xap/1.0/")) return null;
+    if (b[at + 1] !== 0xe0) break;
+    at += 2 + len;
+  }
+  const body = enc.encode(XMP_NS + xmp);
+  if (body.length + 2 > 65535) return null;
+  return cat([b.subarray(0, at), Uint8Array.of(0xff, 0xe1, (body.length + 2) >> 8, (body.length + 2) & 255), body, b.subarray(at)]);
+}
+
+let crcTable = null;
+function crc32(bytes) {
+  if (!crcTable) crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+  let c = 0xffffffff;
+  for (const x of bytes) c = crcTable[(c ^ x) & 255] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+function png(b, xmp) {
+  for (let at = 8; at + 12 <= b.length;) {
+    const len = u32(b, at);
+    if (ascii(b, at + 4, "iTXt") && ascii(b, at + 8, "XML:com.adobe.xmp")) return null;
+    if (ascii(b, at + 4, "IEND")) break;
+    at += 12 + len;
+  }
+  const ihdrEnd = 8 + 12 + u32(b, 8);
+  const data = cat([enc.encode("iTXt"), enc.encode("XML:com.adobe.xmp"), Uint8Array.of(0, 0, 0, 0, 0), enc.encode(xmp)]);
+  return cat([b.subarray(0, ihdrEnd), be32(data.length - 4), data, be32(crc32(data)), b.subarray(ihdrEnd)]);
+}
+
+function riffChunk(type, data) { return cat([enc.encode(type), le32(data.length), data, data.length % 2 ? Uint8Array.of(0) : new Uint8Array(0)]); }
+
+function webp(b, xmp) {
+  const first = String.fromCharCode(...b.subarray(12, 16)), body = b.subarray(12);
+  const le24 = (v) => Uint8Array.of(v & 255, (v >> 8) & 255, (v >> 16) & 255);
+  let head;
+  if (first === "VP8X") {
+    if (b[20] & 0x04) return null;
+    head = b.slice(12);
+    head[8] |= 0x04;
+  } else {
+    let w, h, alpha = 0;
+    const d = 20;
+    if (first === "VP8 ") { w = ((b[d + 7] << 8) | b[d + 6]) & 0x3fff; h = ((b[d + 9] << 8) | b[d + 8]) & 0x3fff; }
+    else if (first === "VP8L") { const v = b[d + 1] | (b[d + 2] << 8) | (b[d + 3] << 16) | (b[d + 4] << 24); w = (v & 0x3fff) + 1; h = ((v >>> 14) & 0x3fff) + 1; alpha = (v >>> 28) & 1 ? 0x10 : 0; }
+    else return null;
+    head = cat([riffChunk("VP8X", cat([Uint8Array.of(0x04 | alpha, 0, 0, 0), le24(w - 1), le24(h - 1)])), body]);
+  }
+  const out = cat([enc.encode("RIFF"), le32(0), enc.encode("WEBP"), head, riffChunk("XMP ", enc.encode(xmp))]);
+  out.set(le32(out.length - 8), 4);
+  return out;
+}
+
+function ilstItem(type, text) {
+  const v = enc.encode(String(text).slice(0, MAX));
+  const data = cat([be32(16 + v.length), enc.encode("data"), be32(1), be32(0), v]);
+  const name = type.length === 4 && type[0] === "©" ? Uint8Array.of(0xa9, ...enc.encode(type.slice(1))) : enc.encode(type);
+  return cat([be32(8 + data.length), name, data]);
+}
+
+function mp4(b, { description, creator }) {
+  const top = readBoxes(b), moov = top.find((x) => x.type === "moov");
+  if (!moov || moov.headerSize !== 8 || (moov.children || []).some((x) => x.type === "udta")) return null;
+  const items = [ilstItem("©cmt", description), ilstItem("desc", description), ...(creator ? [ilstItem("©ART", creator)] : [])];
+  const ilst = cat([be32(8 + items.reduce((s, x) => s + x.length, 0)), enc.encode("ilst"), ...items]);
+  const hdlr = cat([be32(33), enc.encode("hdlr"), be32(0), be32(0), enc.encode("mdirappl"), be32(0), be32(0), Uint8Array.of(0)]);
+  const meta = cat([be32(12 + hdlr.length + ilst.length), enc.encode("meta"), be32(0), hdlr, ilst]);
+  const udta = cat([be32(8 + meta.length), enc.encode("udta"), meta]);
+  const out = cat([b.subarray(0, moov.start + moov.size), udta, b.subarray(moov.start + moov.size)]);
+  out.set(be32(moov.size + udta.length), moov.start);
+  // Every chunk offset that points past the moov moves by the bytes added.
+  const walk = (list) => { for (const x of list) { if (x.children) walk(x.children); if (x.type === "stco" || x.type === "co64") offsets(out, x, moov.start, udta.length); } };
+  walk(readBoxes(out, moov.start + 8, moov.start + moov.size + udta.length));
+  return out;
+}
+
+function offsets(b, box, after, delta) {
+  const at = box.start + box.headerSize + 4, n = u32(b, at), wide = box.type === "co64";
+  for (let i = 0; i < n; i++) {
+    const p = at + 4 + i * (wide ? 8 : 4);
+    if (wide) { const v = u32(b, p) * 4294967296 + u32(b, p + 4) + (u32(b, p) * 4294967296 + u32(b, p + 4) > after ? delta : 0); b.set(be32(Math.floor(v / 4294967296)), p); b.set(be32(v >>> 0), p + 4); }
+    else { const v = u32(b, p); if (v > after) b.set(be32(v + delta), p); }
+  }
+}
+
+function gif(b, { description }) {
+  if (b[b.length - 1] !== 0x3b) return null;
+  const t = enc.encode(String(description).slice(0, MAX)), blocks = [];
+  for (let i = 0; i < t.length; i += 255) blocks.push(Uint8Array.of(Math.min(255, t.length - i)), t.subarray(i, i + 255));
+  return cat([b.subarray(0, b.length - 1), Uint8Array.of(0x21, 0xfe), ...blocks, Uint8Array.of(0, 0x3b)]);
+}
+
+// The file with the description inside, or null when the type is not one this writes or the file
+// already carries its own metadata. info: { description, creator, source }.
+function embedDescription(bytes, mime, info) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (!info || !info.description) return null;
+  try {
+    if (mime === "image/jpeg") return jpeg(b, xmpPacket(info));
+    if (mime === "image/png") return png(b, xmpPacket(info));
+    if (mime === "image/webp") return webp(b, xmpPacket(info));
+    if (mime === "video/mp4" || mime === "audio/mp4" || mime === "video/quicktime") return mp4(b, info);
+    if (mime === "image/gif") return gif(b, info);
+  } catch { return null; }
+  return null;
+}
+
+// The description a file carries, read back: XMP dc:description, the MP4 comment or the GIF comment.
+function readDescription(bytes) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const x = /<dc:description><rdf:Alt><rdf:li[^>]*>([\s\S]*?)<\/rdf:li>/.exec(dec.decode(b));
+  if (x) return x[1].replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+  for (let k = 4; k + 24 <= b.length; k++) {
+    if (b[k] === 0xa9 && b[k + 1] === 0x63 && b[k + 2] === 0x6d && b[k + 3] === 0x74 && ascii(b, k + 8, "data")) return dec.decode(b.subarray(k + 20, k - 4 + u32(b, k - 4)));
+  }
+  if (ascii(b, 0, "GIF8")) {
+    for (let k = b.length - 3; k > 0; k--) {
+      if (b[k] !== 0x21 || b[k + 1] !== 0xfe) continue;
+      const parts = [];
+      let p = k + 2;
+      while (p < b.length && b[p]) { parts.push(b.subarray(p + 1, p + 1 + b[p])); p += 1 + b[p]; }
+      if (p === b.length - 2) return dec.decode(cat(parts));
+    }
+  }
+  return null;
+}
+
+return { xmpPacket, embedDescription, readDescription };
+})();
+
 // ---- adblock.js
 const M_adblock = (() => {
 // The per-site part of ad blocking (src/ext/adblock-bg.js): which site a page belongs to, whether
@@ -12973,7 +13268,16 @@ const DEFAULTS = Object.freeze({
   // One-click downloads (src/ext/quick-*.js): the Download button on X and Reddit posts, on by
   // default; "always ask where to save" off, so files go straight to the Downloads folder.
   mediaButtons: true, mediaAskWhere: false,
+  // The post's words with each download: a .md sidecar and the description inside the file, on by
+  // default; a .json sidecar for tools, off by default.
+  mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
+  // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
+  mediaFolder: "Daylight",
 });
+// A folder path inside Downloads: letters, digits, spaces, dots, hyphens, underscores and slashes,
+// no ".." part, at most 120 characters.
+const folder = (v, d) => (typeof v !== "string" ? d
+  : v.split(/[\\/]+/).map((p) => p.replace(/[^\p{L}\p{N} ._-]+/gu, "-").trim()).filter((p) => p && !/^\.+$/.test(p)).join("/").slice(0, 120));
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
 // Sites the user exempts from ad blocking: lower-case host names, at most 500.
@@ -13002,6 +13306,8 @@ function normalizeSettings(raw) {
     pressureLens: bool(s.pressureLens, DEFAULTS.pressureLens),
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
+    mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
+    mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder),
   };
 }
 
@@ -14801,5 +15107,5 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
 })();

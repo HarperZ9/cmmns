@@ -172,7 +172,7 @@
 .dc-dl { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 9999px; }
 .dc-dl-x { width: 34.75px; height: 34.75px; color: rgb(113, 118, 123); transition: background-color .2s; }
 .dc-dl-x:hover { background: rgba(127, 127, 127, .14); }
-.dc-dl-r { position: absolute; top: 8px; right: 8px; z-index: 3; width: 32px; height: 32px; background: rgba(0, 0, 0, .55); color: #fff; opacity: .75; }
+.dc-dl-r { position: absolute; top: 8px; right: 8px; z-index: 30; width: 32px; height: 32px; background: rgba(0, 0, 0, .55); color: #fff; opacity: .75; }
 .dc-dl-r:hover, .dc-dl-r:focus-visible { opacity: 1; background: rgba(0, 0, 0, .75); }
 .dc-dl:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .dc-dl:disabled { opacity: .4; cursor: progress; }

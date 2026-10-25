@@ -31,19 +31,26 @@ PAGES = {
 const g=document.getElementById('m').getContext('2d');g.fillStyle='#0a6b61';g.fillRect(0,0,300,200);g.fillStyle='#ebe5d8';g.fillRect(40,40,120,80);</script>""",
     "iframe.html": """<!doctype html><title>Frame test</title><iframe id="f" src="http://localhost:8765/inner.html" width="460" height="340"></iframe>""",
     "inner.html": """<!doctype html><title>Inner</title><img id="m" src="/pic.png" width="400" height="300" alt="inner">""",
+    "hls-player.html": """<!doctype html><title>Angel One over HLS</title><video id="m" width="640" height="360" muted autoplay></video>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script><script>
+const h = new Hls(); h.loadSource('https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/hls.m3u8'); h.attachMedia(document.getElementById('m'));</script>""",
+    "dash-player.html": """<!doctype html><title>Angel One over DASH</title><video id="m" width="640" height="360" muted autoplay></video>
+<script src="https://cdn.jsdelivr.net/npm/shaka-player@4.12.6/dist/shaka-player.compiled.js"></script><script>
+const pl = new shaka.Player(); pl.attach(document.getElementById('m')).then(() => pl.load('https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd'));</script>""",
     "drm.html": """<!doctype html><title>Protected test</title><video id="m" width="320" height="176" src="/bbb.mp4" muted></video><script>
 navigator.requestMediaKeySystemAccess('org.w3.clearkey',[{initDataTypes:['cenc'],videoCapabilities:[{contentType:'video/mp4; codecs="avc1.42E01E"'}]}])
 .then(a=>a.createMediaKeys()).then(k=>document.getElementById('m').setMediaKeys(k)).then(()=>document.body.dataset.drm='on',e=>document.body.dataset.drm='failed '+e);</script>""",
 }
 
 REDDIT = """<!doctype html><title>Reddit replica</title><body style="font-family:sans-serif">
-<shreddit-post id="vid" post-title="Harbour at night, with sound" permalink="/r/test/comments/v1/harbour/" post-type="video">
+<shreddit-post id="vid" post-title="Harbour at night, with sound" permalink="/r/test/comments/v1/harbour/" post-type="video" author="tidewatch" subreddit-prefixed-name="r/test" created-timestamp="2026-10-20T21:04:00.000000+0000">
+ <div slot="text-body"><p>Shot at f/2.8, 1/50 s, ISO 3200.</p><p>Handheld, braced on the rail. #nightphotography</p></div>
  <div slot="post-media-container" style="width:480px"><shreddit-player id="p1" src="https://v.redd.it/abc123/HLSPlaylist.m3u8?a=1" poster="https://preview.redd.it/poster.jpg?width=640&amp;s=1"></shreddit-player></div></shreddit-post>
 <shreddit-post id="pkg" post-title="Packaged clip" permalink="/r/test/comments/v2/clip/" post-type="video">
  <div slot="post-media-container" style="width:480px"><shreddit-player-2 id="p2" packaged-media-json='{"playbackMp4s":{"permutations":[{"source":{"url":"https://packaged-media.redd.it/clip-240.mp4?m=1","dimensions":{"width":240,"height":132}}},{"source":{"url":"https://packaged-media.redd.it/clip-320.mp4?m=1","dimensions":{"width":320,"height":176}}}]}}'></shreddit-player-2></div></shreddit-post>
-<shreddit-post id="gal" post-title="Three harbour photos" permalink="/r/test/comments/g1/photos/" post-type="gallery">
+<shreddit-post id="gal" post-title="Three harbour photos" permalink="/r/test/comments/g1/photos/" post-type="gallery" author="tidewatch" subreddit-prefixed-name="r/test" created-timestamp="2026-10-21T07:30:00.000000+0000">
  <div slot="post-media-container" style="width:480px"><gallery-carousel><ul>
- <li><img src="https://preview.redd.it/g1.jpeg?width=640&amp;s=1" width="400"></li><li><img src="https://preview.redd.it/g2.png?width=640&amp;s=2" width="400"></li><li><img src="https://preview.redd.it/g3.webp?width=640&amp;s=3" width="400"></li></ul></gallery-carousel></div></shreddit-post>
+ <li><img src="https://preview.redd.it/g1.jpeg?width=640&amp;s=1" width="400" alt="Boats at the north pier"></li><li><img src="https://preview.redd.it/g2.png?width=640&amp;s=2" width="400"></li><li><img src="https://preview.redd.it/g3.webp?width=640&amp;s=3" width="400"></li></ul></gallery-carousel></div></shreddit-post>
 <script>
 for (const p of document.querySelectorAll('shreddit-player, shreddit-player-2')) {
   const root = p.attachShadow({ mode: 'closed' }), v = document.createElement('video');

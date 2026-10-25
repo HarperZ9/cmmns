@@ -1,6 +1,6 @@
 # Daylight Commons privacy policy
 
-Last updated: 2026-10-24.
+Last updated: 2026-10-25.
 
 Daylight Commons runs in your browser, and everything it reads or works out stays there. It talks
 to the site you are on, with that site's own session. Two features reach further, and both stay off
@@ -106,6 +106,13 @@ and any hash of either stay in your browser, and the text lasts as long as that 
 - **Ask the Internet Archive to keep a copy**, a tick box on a case save that is off unless you tick
   it, sends the saved file's address (or the page's, for a stream) to web.archive.org. Firefox asks
   you to allow "browsing activity" for this the first time.
+- **Download**, **Download as GIF**, **Copy**, **Copy link** and **Copy with caption** read the current
+  tab once, on your click (the Download button on X and Reddit posts reads that post). The file comes
+  from the host the page loaded it from, with the same request the page's own player makes; cookies go
+  only to the page's own site. It goes to your Downloads folder through your browser's downloads.
+  The post's text, author, time, alt text and links that the page already shows go into a `.md` file
+  beside it and into the file's own description; nothing is fetched for them and nothing is sent
+  anywhere. Both can be turned off in the settings.
 - Protected media (DRM or encrypted streams) is never downloaded.
 - **Convert and compress** runs on this device. No file is uploaded.
 - **Ad and tracker blocking**, off until you turn it on, is done by your browser's own blocking
@@ -125,6 +132,7 @@ profile you installed Daylight Commons in, on this device.
 | Source trails (`pb.trail.v1`) | Post ids, handles and times that carried the same upload or link | 30 days, or your shorter history setting |
 | Thread history (`pb.history.v1`) | One summary per thread you opened: counts, origins, flagged shares, linked sites, Community Note and fact-check counts | 60 days by default; 1 to 60 days in options, at most 600 threads |
 | Feed tally (`pb.feed.v1`) | Per site and day: the ids of feed posts counted (so each counts once), how many linked each site, and how many showed strong rhetoric signs, a Community Note or a fact-check match | 60 days by default; follows the history setting |
+| Saved files (`pb.saved.v1`) | For each file you downloaded: its address (or, for a file made on this device, its SHA-256) and the name it was saved under, so the same file is not saved twice | Until you delete your data; at most 20,000 files, the oldest dropped first |
 | Media checks (`pb.media.v1`) | For each file you asked Daylight Commons to check: a short hash of its address, the site, the time and the outcome (credentials intact, partly checked, changed, stored online, or absent), for the survival count on the feed page | 60 days by default; follows the history setting; at most 5,000 files |
 | Thread card (session storage) | The card you asked for from a thread panel, and the thread's posts as the page showed them, so the card page can build a signed evidence bundle if you ask for one. The card names no account | Until the browser closes |
 | Bundle key (IndexedDB `radar-keys`) | The ECDSA P-256 key pair Daylight Commons makes the first time you save a signed evidence bundle. The browser stores the private half so it can sign and stays sealed against reading, export or sending. Carrier-safe bundles use their own one-time keys | Until you remove Daylight Commons |

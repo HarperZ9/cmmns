@@ -74,11 +74,25 @@ unchanged and still enforced by `tests/budget.test.js`.
 | 40 | Pressure lens | Off by default; held-out score reproduced | `tests/pressure.test.js`; precision 89% (8/9), recall 17% (8/47), 0 of 41 ordinary messages marked | pass for the check; recall is low, see READING-LENS.md |
 | 41 | Pressure lens | Window shows each move with its definition and limit, spans marked in the post | stage thread, screenshot `13-pressure-window.png` | pass |
 | 42 | Performance | Text work per post, first pass and refresh, 500 replies | `scripts/qa/bench.mjs` | 0.32 ms; 75 ms; 64 ms (3.5.0: 0.26; 59; 48), inside the 4 ms and 1,500 ms budgets |
-| 43 | Security | New permissions justified | `contextMenus`, `declarativeNetRequest` rows in `docs/store/LISTING.md`; `tests/store-listing.test.js` | pass |
+| 43 | Security | New permissions justified | `contextMenus`, `downloads`, `clipboardWrite`, `declarativeNetRequest` rows in `docs/store/LISTING.md`; `tests/store-listing.test.js` | pass |
 | 44 | Security | No new dependency, no remote code, no markup from strings | `package.json`, `tests/hardening.test.js` | pass |
+| 45 | Download | One click saves the file to Downloads with its real type and a readable name | `scripts/qa/quick_save_check.py`, 24 cases, Chrome 155 on Windows 11, signed out; each file reopened (Pillow for pictures, Chrome for video with sound decoded); `project-docs/evidence/qa-3.6.0/quick-save-check.json` | pass on 23 of 24; Imgur: see below |
+| 46 | Download | X: pictures at original size, video and GIF posts with sound, Download as GIF | real public posts: JPEG 1041 by 941 from `name=orig`; a 60 s video put together from HLS as one 1920 by 1080 MP4 with sound; a GIF post as its MP4 and as a 76-frame GIF | pass |
+| 47 | Download | Reddit: DASH video and sound rewrapped into one MP4; packaged MP4; whole gallery with one sidecar | Reddit's markup replicated on a local server mapped to Reddit's hosts (Reddit asks automated browsers to prove they are human): 10 s MP4 with sound; 3 gallery files and one `.md` | pass on the replica; not checked on reddit.com |
+| 48 | Download | Overlays, srcset, canvas, frames, real HLS and DASH | a WebP behind a clear layer and a `.jpg` address saved as `.webp`; Wikipedia's largest srcset; canvas as PNG; a cross-origin frame; Angel One over hls.js (fMP4, separate sound) and shaka (DASH) as one MP4 each, 60 s with sound; Mux's test stream as MPEG-TS (479 MB) | pass |
+| 49 | Download | Protected media refused, nothing saved | ClearKey MediaKeys on the element: "Protected, can't be saved", no download; `tests/media-quicksave.test.js`, `tests/media-demux.test.js` (encrypted HLS and Widevine DASH stop before any segment) | pass |
+| 50 | Download | The post's words travel with the file | `.md` sidecar per save, `daylight.sidecar/1` (`project-docs/SIDECAR-FORMAT.md`); description inside JPEG, PNG, WebP, GIF and MP4 read back after download; `tests/media-meta.test.js` round trips with every sample unchanged | pass |
+| 51 | Download | No duplicates; one folder tree | a second save of the same video: "Already saved as ..." with Save again; files under `Downloads/Daylight/<site>/` | pass |
+| 52 | Copy | Copy, Copy link, Copy with caption | Wikipedia picture: clipboard holds `image/png`; Copy link holds the file's address | pass for Copy and Copy link; Copy with caption by unit test only |
 
-Not tested for 3.6.0: the media toolkit and ad blocking in Firefox, saving from a real DASH site, and
-the toolkit on the signed-in social sites. The fixture site is synthetic.
+How the browser check stands in for the right-click menu: a script cannot open Chrome's own menu, so
+each case right-clicks the page for real and then runs the menu's handler with what Chrome passes on
+a click. The test copy of the extension also holds `<all_urls>`, standing in for the one-tab access a
+real menu click grants (`activeTab`). The menu items themselves, and Imgur's `.gifv` pages (the check
+reached only a tag page and saved an animated WebP thumbnail from it), were not checked by hand.
+
+Not tested for 3.6.0: the media toolkit, downloads and ad blocking in Firefox; the download path on
+reddit.com itself and on signed-in X; a real right-click menu by hand.
 
 ## What could not be tested here
 

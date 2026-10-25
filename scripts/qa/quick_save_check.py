@@ -18,6 +18,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+import time
 
 from playwright.async_api import async_playwright
 
@@ -49,7 +50,8 @@ def ext_copy(work):
     return d
 
 
-async def launch(p, work, port=9361):
+async def launch(p, work, port=None):
+    port = port or 9400 + int(time.time()) % 500
     prof = pathlib.Path(tempfile.mkdtemp(prefix="dc-qs-prof-", dir=work))
     dl = work / "downloads"
     shutil.rmtree(dl, ignore_errors=True)
@@ -75,9 +77,33 @@ async def launch(p, work, port=9361):
     for _ in range(50):
         sws = [w for w in ctx.service_workers if ext_id in w.url]
         if sws:
-            return proc, browser, ctx, sws[0], dl
+            return proc, browser, ctx, Worker(ctx, ext_id), dl
         await asyncio.sleep(0.2)
     raise RuntimeError("the service worker did not start")
+
+
+class Worker:
+    """The extension's service worker. Chrome stops an idle worker, which closes Playwright's handle,
+    so each call looks the worker up again and wakes it from an extension page when it is gone."""
+    def __init__(self, ctx, ext_id):
+        self.ctx, self.ext_id = ctx, ext_id
+
+    async def evaluate(self, js, arg=None):
+        for _ in range(3):
+            sws = [w for w in self.ctx.service_workers if self.ext_id in w.url]
+            if not sws:
+                page = await self.ctx.new_page()
+                await page.goto(f"chrome-extension://{self.ext_id}/options.html")
+                await page.evaluate("chrome.runtime.sendMessage({ type: 'pb-ping' }).catch(() => null)")
+                await asyncio.sleep(1)
+                await page.close()
+                continue
+            try:
+                return await sws[0].evaluate(js, arg)
+            except Exception as e:
+                if "closed" not in str(e):
+                    raise
+        raise RuntimeError("the service worker could not be reached")
 
 
 async def newest_ids(sw):
@@ -85,7 +111,7 @@ async def newest_ids(sw):
 
 
 async def wait_downloads(sw, before, page_frame_note, want=1, timeout=90):
-    """Waits for `want` new finished downloads, or for the page's note to report a refusal or failure."""
+    """Waits for `want` new finished downloads (each file and its .md sidecar), or for the page's note to report a refusal or failure."""
     for _ in range(timeout * 4):
         items = await sw.evaluate("chrome.downloads.search({}).then((l) => l.map((d) => ({ id: d.id, state: d.state, filename: d.filename, bytes: d.fileSize, mime: d.mime, error: d.error || null, url: d.finalUrl || d.url })))")
         new = [d for d in items if d["id"] not in before]
@@ -140,6 +166,29 @@ async def menu_click(sw, page, menu, point=None, selector=None, frame_url=None):
     return info
 
 
+async def verify(ctx, path):
+    """Opens a saved file: pictures with Pillow (frames counted), video and sound in Chrome (length,
+    size, and whether sound decodes after a second of play)."""
+    kind = sniff(path)
+    if kind in ("png", "jpeg", "gif", "webp"):
+        from PIL import Image
+        with Image.open(path) as im:
+            im.load()
+            return {"opens": True, "size": im.size, "frames": getattr(im, "n_frames", 1)}
+    if kind.startswith("mp4") or kind == "webm":
+        page = await ctx.new_page()
+        try:
+            await page.goto(pathlib.Path(path).as_uri(), wait_until="commit")
+            await asyncio.sleep(1)
+            return await page.evaluate("""async () => { const v = document.querySelector('video'); if (!v) return { opens: false };
+              await new Promise((r) => { if (v.readyState >= 1) r(); else v.onloadedmetadata = r; setTimeout(r, 8000); });
+              v.muted = true; await v.play().catch(() => {}); await new Promise((r) => setTimeout(r, 1500));
+              return { opens: v.readyState >= 1 && v.duration > 0, duration: Math.round(v.duration * 10) / 10, size: [v.videoWidth, v.videoHeight], soundBytes: v.webkitAudioDecodedByteCount || 0 }; }""")
+        finally:
+            await page.close()
+    return {"opens": None, "note": "not opened here (" + kind + ")"}
+
+
 async def run_case(ctx, sw, out, case):
     page = await ctx.new_page()
     await page.set_viewport_size({"width": 1280, "height": 900})
@@ -168,8 +217,11 @@ async def run_case(ctx, sw, out, case):
             rec["clipboard"] = await page.evaluate("navigator.clipboard.read().then(async (items) => items.map((i) => i.types)).catch((e) => String(e))")
             rec["clipboard_text"] = await page.evaluate("navigator.clipboard.readText().catch((e) => String(e))")
         else:
-            done, rec["note"] = await wait_downloads(sw, before, read, want=case.get("want", 1), timeout=case.get("timeout", 90))
+            done, rec["note"] = await wait_downloads(sw, before, read, want=case.get("want", 2), timeout=case.get("timeout", 90))
             rec["files"] = [dict(d, sniffed=sniff(d["filename"]) if d.get("filename") and pathlib.Path(d["filename"]).exists() else None) for d in done]
+            for f in rec["files"]:
+                if f["sniffed"]:
+                    f["check"] = await verify(ctx, f["filename"])
         await page.screenshot(path=str(out / f"{case['name']}.png"))
     except Exception as e:  # recorded, never hidden: the table shows the failure
         rec["error"] = f"{type(e).__name__}: {e}"
@@ -199,7 +251,8 @@ async def main(work, src):
         finally:
             (out / "quick-save-check.json").write_text(json.dumps(report, indent=1) + "\n", encoding="utf-8")
             await browser.close()
-            proc.terminate()
+            # Chrome's helper processes outlive the main one on Windows; end the whole tree.
+            subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"], capture_output=True) if sys.platform == "win32" else proc.terminate()
             for s in servers:
                 s.shutdown()
 

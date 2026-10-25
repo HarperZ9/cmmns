@@ -1,5 +1,5 @@
-// The right-click entries Download, Download as GIF, Copy and Copy link, and the browser download
-// each one asks for. A click lets Daylight Commons read the clicked tab once (activeTab): the
+// The right-click entries Download, Download as GIF, Copy, Copy link and Copy with caption, and
+// the browser download each one asks for. A click lets Daylight Commons read the clicked tab once (activeTab): the
 // in-page scripts (quick-*.js) find the media under the pointer and make the file; this worker
 // hands addresses to chrome.downloads, which saves to the Downloads folder without a dialog unless
 // "Always ask where to save" is on. Protected media references are kept in the collections store.
@@ -12,6 +12,7 @@ globalThis.PBQuickBg = (() => {
     ["pb-dl-gif", "Download as GIF", ["image", "video"]],
     ["pb-copy", "Copy", ["image", "video", "page", "link", "frame"]],
     ["pb-copy-link", "Copy link", ["image", "video", "audio", "page", "link", "frame"]],
+    ["pb-copy-caption", "Copy with caption", ["image", "video", "page", "link", "frame"]],
   ];
   const pending = new Map();   // download id or address -> { fixExt, filename }
 
@@ -33,9 +34,9 @@ globalThis.PBQuickBg = (() => {
     if (!tab || !ITEMS.some(([x]) => x === id)) return;
     try {
       const target = await inject(tab.id, info.frameId);
-      const args = { srcUrl: info.srcUrl || null, linkUrl: info.linkUrl || null, asGif: id === "pb-dl-gif", copy: id === "pb-copy", link: id === "pb-copy-link" };
+      const args = { srcUrl: info.srcUrl || null, linkUrl: info.linkUrl || null, asGif: id === "pb-dl-gif", copy: id === "pb-copy", link: id === "pb-copy-link", caption: id === "pb-copy-caption" };
       await chrome.scripting.executeScript({ target, args: [args], func: (a) => {
-        if (a.copy || a.link) return PBQuickCopy.copy(PBQuickResolve.resolve(a), { link: a.link }).then(() => true);
+        if (a.copy || a.link || a.caption) return PBQuickCopy.copy(PBQuickResolve.resolve(a), { link: a.link, caption: a.caption }).then(() => true);
         PBQuickSave.fromMenu(a);
         return true;
       } });
@@ -51,11 +52,13 @@ globalThis.PBQuickBg = (() => {
     try { return PB.normalizeSettings((await chrome.storage.local.get(k))[k]); } catch { return PB.normalizeSettings(null); }
   }
 
-  // Starts a browser download. { url, filename, fixExt } -> { id }.
-  async function download({ url, filename, fixExt }) {
+  // Starts a browser download. { url, filename, site, fixExt } -> { id }. The file goes to
+  // "<save folder>/<site>/<name>" inside Downloads, so thousands of saves stay in one tree.
+  async function download({ url, filename: name, site, fixExt }) {
     if (!chrome.downloads) throw new Error("This browser did not give Daylight Commons the downloads permission.");
     const s = await settings();
-    const opts = { url, saveAs: !!s.mediaAskWhere, conflictAction: "uniquify", ...(filename ? { filename: filename.replace(/[\\/]/g, "-") } : {}) };
+    const filename = name ? PB.saveFolder(s.mediaFolder, site) + name.replace(/[\\/]/g, "-") : null;
+    const opts = { url, saveAs: !!s.mediaAskWhere, conflictAction: "uniquify", ...(filename ? { filename } : {}) };
     pending.set(url, { fixExt: !!fixExt, filename });
     const id = await chrome.downloads.download(opts);
     if (id === undefined) throw new Error((chrome.runtime.lastError && chrome.runtime.lastError.message) || "The browser refused the download.");

@@ -3,6 +3,33 @@
 
 Daylight Commons 3.6.0 keeps the media people need to revisit: for an investigation, for reference, or for a design moodboard. It saves what a page loaded, converts and compresses it on the device, and records a hash chain from every copy back to the original. Ad and tracker blocking is a separate switch. Machine results of the browser check are in `project-docs/evidence/qa-3.6.0/`.
 
+## Download in one click
+
+The quick path, for keeping a file rather than building a case. Code: `src/ext/quick-*.js` in the
+page and `src/ext/quick-save-bg.js` in the background; the pure parts are the media library
+(`project-docs/MEDIA-LIBRARY.md`); the `.md` file beside each save follows
+`project-docs/SIDECAR-FORMAT.md`.
+
+- **Where it starts.** Right-click: **Download**, **Download media here** (for media under a clear
+  layer), **Download as GIF**, **Copy**, **Copy link**, **Copy with caption**. On X and Reddit posts, a
+  Download button saves every file of the post. The panel beside a post has Download and Copy link
+  per item. X keeps its own right-click menu on videos; the button, or Shift and right-click, reaches
+  them there.
+- **What is saved.** The largest `srcset` or `<picture>` candidate; X pictures at their original size
+  (JPEG or PNG at `name=orig`, else the largest WebP); X videos and GIFs as their best MP4, or their
+  HLS stream put together with its sound; Reddit's packaged MP4 with sound, or its DASH video and
+  sound rewrapped into one MP4 (`src/core/media-demux.js`, no re-encoding); canvas drawings as PNG.
+  The type comes from the file's first bytes.
+- **Where it goes.** `Downloads/Daylight/<site>/`, named `<handle>_<date>_<first words>`, through the
+  browser's downloads API with no dialog unless "Always ask where to save" is on. A file already saved
+  (same address, or the same SHA-256 for a file made on the device) is skipped with a note and a
+  "Save again" button.
+- **The post's words.** A `.md` sidecar with the post's text, author, times, alt text, links, quoted or
+  parent post and the author's own continuation, and the same description inside JPEG, PNG, WebP, GIF
+  and MP4 files without re-encoding (`src/core/media-meta.js`, `media-embed.js`). Only what the page
+  showed; nothing is fetched for it.
+- **Protected media** is refused exactly as in Save below.
+
 ## Save
 
 - **Where it starts.** The toolbar menu's **Save media from this page**, or **Save to Daylight** in the right-click menu on any image, GIF, video or audio. Either click lets the extension read the current tab once (`activeTab`). `src/ext/media-scan.js` lists the images, GIFs, video, audio and large CSS background images the page loaded, and the HLS and DASH addresses in the page's resource timing.

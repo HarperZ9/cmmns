@@ -52,7 +52,10 @@ globalThis.PBQuickResolve = globalThis.PBQuickResolve || (() => {
     const ids = String(hint || "").match(/\d{8,}/g) || [];
     const list = [...new Set(names)].map((url) => ({ type: /\.m3u8/i.test(url) ? "hls" : "dash", url }));
     const mine = list.filter((s) => ids.some((id) => s.url.includes(id)));
-    return mine.length ? mine : list;
+    // The last one is tried first: the whole stream's playlist (shortest address), never a
+    // sound-only or single-quality one when the whole is there (X lists /pl/mp4a/ and /pl/avc1/ too).
+    const part = (u) => /\/(mp4a|avc1|hvc1|audio|video)\/|_audio|audio_/i.test(u);
+    return (mine.length ? mine : list).sort((a, b) => Number(part(b.url)) - Number(part(a.url)) || b.url.length - a.url.length);
   }
 
   function imageTarget(img) {
@@ -66,7 +69,8 @@ globalThis.PBQuickResolve = globalThis.PBQuickResolve || (() => {
   }
 
   function mediaTarget(el) {
-    const sources = [el.currentSrc, el.src, ...[...el.querySelectorAll("source")].map((s) => s.src)].map(abs).filter(Boolean);
+    // An empty src would resolve to the page's own address; a player using srcObject has none.
+    const sources = [el.currentSrc, el.src, ...[...el.querySelectorAll("source")].map((s) => s.src)].filter(Boolean).map(abs).filter(Boolean);
     const direct = sources.find((u) => /^https?:/i.test(u) && !STREAM.test(u)) || null;
     const listed = sources.filter((u) => STREAM.test(u)).map((url) => ({ type: /\.m3u8/i.test(url) ? "hls" : "dash", url }));
     const blob = sources.some((u) => u.startsWith("blob:"));

@@ -1,5 +1,6 @@
-// "Copy" and "Copy link" beside Download. Copy puts a picture on the clipboard as PNG, which every
-// app can paste. Browsers let pages put only text and PNG pictures on the clipboard, so for a video
+// "Copy", "Copy link" and "Copy with caption" beside Download. Copy puts a picture on the
+// clipboard as PNG, which every app can paste. Copy with caption gives the post's words and the
+// link, for sharing. Browsers let pages put only text and PNG pictures on the clipboard, so for a video
 // or GIF, Copy gives its direct address instead and says so. Copy link gives the file's own address,
 // or the post's address for a stream that has no single file. Nothing is sent anywhere.
 globalThis.PBQuickCopy = globalThis.PBQuickCopy || (() => {
@@ -35,19 +36,26 @@ globalThis.PBQuickCopy = globalThis.PBQuickCopy || (() => {
 
   // The address worth sharing: the file's own, else the post's, else the page's.
   function linkOf(t, plan) {
+    // The address the page itself loads always answers; a guessed full-size one might not.
+    if (t.url && /^https?:/i.test(t.url)) return { text: t.url, what: "the file's address" };
     if (plan.url && /^https?:/i.test(plan.url)) return { text: plan.url, what: "the file's address" };
-    if (t.url && /^https?:/i.test(t.url)) return { text: PB.fullSizeUrl(t.url), what: "the file's address" };
     const post = t.el && t.el.closest && (t.el.closest("article") || t.el.closest("shreddit-post"));
     const a = post && (post.getAttribute("permalink") || ([...post.querySelectorAll('a[href*="/status/"]')].find((x) => x.querySelector("time")) || {}).href);
     if (a) return { text: new URL(a, location.href).href, what: "the post's address (this video streams in parts and has no single file)" };
     return { text: location.href, what: "the page's address (this media has no single file)" };
   }
 
-  async function copy(t, { link = false } = {}) {
+  async function copy(t, { link = false, caption = false } = {}) {
     if (!t) { toast("No picture, GIF or video was found under the pointer.", { tone: "no" }); return { ok: false }; }
     const plan = PB.downloadPlan(t);
     if (plan.action === "refuse") { toast(`Protected, can't be copied. ${plan.reason}`, { tone: "no", stay: 7000 }); return { ok: false, protected: true }; }
     try {
+      if (caption) {
+        const l = linkOf(t, plan);
+        await writeText(PB.captionText(PBQuickSave.metaOf(t, {}), l.text));
+        toast("Copied the post's words and the link.", { tone: "ok" });
+        return { ok: true, what: "caption" };
+      }
       const still = !link && t.kind === "image" && ["url", "bytes", "canvas"].includes(plan.action) && typeof ClipboardItem !== "undefined";
       if (still) {
         try {

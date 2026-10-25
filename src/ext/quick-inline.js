@@ -21,13 +21,20 @@
     const { title, items, gallery } = PBQuickSites.postMedia(node);
     if (!items.length) { PBQuickToast.show("No pictures or videos were found in this post yet. Let it load, then try again.", { tone: "no" }); return; }
     btn.disabled = true;
-    let ok = 0, last = "";
+    let ok = 0, last = "", already = 0, meta = null;
+    const names = [], many = items.length > 1;
     for (const [index, t] of items.entries()) {
-      const r = await PBQuickSave.start(t, { title, index, total: items.length, quiet: items.length > 1 });
+      const r = await PBQuickSave.start(t, { title, index, total: items.length, quiet: many, oneSidecar: many });
       if (r.ok) ok++; else last = r.line;
+      if (r.already) already++;
+      if (r.names) names.push(...r.names);
+      meta = meta || r.meta || null;
     }
+    // One sidecar for the whole post, listing every file in order.
+    if (many && meta) await PBQuickSave.postSidecar(meta, names).catch((e) => console.warn("[daylight-commons] could not write the post's sidecar", e));
     btn.disabled = false;
-    if (items.length > 1) PBQuickToast.show(ok === items.length ? `Saved all ${items.length} files${gallery ? " from the gallery" : ""}.` : `Saved ${ok} of ${items.length} files. ${last}`, { tone: ok === items.length ? "ok" : "no" });
+    const was = already ? ` ${already} ${already === 1 ? "was" : "were"} already saved.` : "";
+    if (many) PBQuickToast.show(ok === items.length ? `Saved all ${items.length} files${gallery ? " from the gallery" : ""}.${was}` : `Saved ${ok} of ${items.length} files. ${last}`, { tone: ok === items.length ? "ok" : "no" });
   }
 
   function button(node, style) {
@@ -42,15 +49,43 @@
     return b;
   }
 
-  // X: a post with media gets the button at the end of its action row.
+  // X: a post with media gets the button at the end of its action row. Signed out, X draws posts
+  // with no action row, so the button goes in the corner of the post's first picture or video.
+  const xMedia = (article) => [...article.querySelectorAll('img[src*="pbs.twimg.com/media/"], img[src*="pbs.twimg.com/tweet_video_thumb/"], video')]
+    .filter((m) => m.closest("article") === article);
   function decorateX(article) {
-    if (!article.querySelector('[data-testid="tweetPhoto"], [data-testid="videoPlayer"], [data-testid="videoComponent"], video')) return;
+    const media = xMedia(article);
+    if (!media.length || article.querySelector(".dc-dl")) return;
     const row = [...article.querySelectorAll('[role="group"]')].find((g) => g.querySelector('[data-testid="reply"], [data-testid="like"], [data-testid="unlike"]'));
-    if (!row || row.querySelector(".dc-dl")) return;
-    const cell = document.createElement("div");
-    cell.className = "dc-dl-cell";
-    cell.append(button(article, "dc-dl-x"));
-    row.append(cell);
+    if (row) {
+      const cell = document.createElement("div");
+      cell.className = "dc-dl-cell";
+      cell.append(button(article, "dc-dl-x"));
+      row.append(cell);
+      return;
+    }
+    const box = overlayOf(media[0]);
+    if (box) corner(box, article);
+  }
+
+  // Where the corner button goes: X lays a clear link over each picture, so the button goes inside
+  // that layer to stay clickable; otherwise beside the media. Decided once the media is on screen.
+  function overlayOf(m) {
+    const r = m.getBoundingClientRect();
+    if (r.width < 40 || r.height < 40 || r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) return null;
+    const x = Math.min(Math.max(r.left + r.width / 2, 0), innerWidth - 1), y = Math.min(Math.max(r.top + r.height / 2, 0), innerHeight - 1);
+    const top = document.elementFromPoint(x, y);
+    if (top && top !== m && !top.contains(m) && top.closest("article") === m.closest("article")) {
+      const t = top.getBoundingClientRect();
+      if (t.width >= r.width * 0.8 && t.height >= r.height * 0.8 && getComputedStyle(top).position !== "static") return top;
+    }
+    return m.parentElement;
+  }
+
+  function corner(box, node) {
+    if (!box || box.querySelector(":scope > .dc-dl")) return;
+    if (getComputedStyle(box).position === "static") box.style.position = "relative";
+    box.append(button(node, "dc-dl-r"));
   }
 
   // Reddit: the corner of the post's media.
@@ -58,8 +93,7 @@
     const box = post.querySelector('[slot="post-media-container"]') || post.querySelector("shreddit-player, shreddit-player-2, gallery-carousel");
     if (!box || box.querySelector(":scope > .dc-dl")) return;
     if (!PBQuickSites.postMedia(post).items.length) return;
-    if (getComputedStyle(box).position === "static") box.style.position = "relative";
-    box.append(button(post, "dc-dl-r"));
+    corner(box, post);
   }
 
   let queued = false;
@@ -67,7 +101,7 @@
     queued = false;
     if (!on()) { for (const b of document.querySelectorAll(".dc-dl")) (b.closest(".dc-dl-cell") || b).remove(); return; }
     try {
-      if (PBQuickSites.isX) for (const a of document.querySelectorAll('article[data-testid="tweet"]')) decorateX(a);
+      if (PBQuickSites.isX) for (const a of document.querySelectorAll("article")) decorateX(a);
       else for (const p of document.querySelectorAll("shreddit-post")) decorateReddit(p);
     } catch (e) { console.warn("[daylight-commons] could not place a download button", e); }
   }

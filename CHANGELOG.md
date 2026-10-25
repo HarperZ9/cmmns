@@ -7,7 +7,7 @@ were not published to a store.
 
 Nothing yet.
 
-## 3.6.0 (2026-10-24)
+## 3.6.0 (2026-10-25)
 
 A media toolkit for keeping and checking what you read, a pressure lens, and optional ad blocking.
 Details and measurements: project-docs/MEDIA-TOOLKIT.md and the pressure section of
@@ -30,9 +30,18 @@ project-docs/READING-LENS.md.
   one.
 - **Streams as one file.** A video the page plays in pieces (HLS or DASH) is put together as one MP4
   with its sound. Protected (DRM or encrypted) media is still refused, with a plain sentence.
+- **The post's words come with the file.** Each download gets a `.md` file with the same name: the
+  post's text exactly as written, the author, the post and file addresses, when it was posted and
+  saved, the alt text, hashtags and links, the quoted or parent post, the author's own follow-up
+  posts the page already loaded, and for a gallery, which item it is. On Reddit it also has the title
+  and subreddit. The same description is written into JPEG, PNG, WebP, GIF and MP4 files without
+  re-encoding them, so it survives if the `.md` file is lost. Files are named
+  `<handle>_<date>_<first words>` so a folder sorts by person and day. A `.json` copy for tools is
+  a setting, off by default. Nothing is fetched for any of this.
 - **Copy and Copy link.** Copy puts a picture on the clipboard. Browsers let pages copy pictures but
   not video or GIF files, so for those Copy gives the file's address. Copy link gives the file's own
-  address, or the post's for a video that streams in pieces.
+  address, or the post's for a video that streams in pieces. **Copy with caption** gives the post's
+  words with the link, for sharing.
 - **A short note in the corner** says what was saved and its size, or why nothing was. An optional
   setting, "Always ask where to save", brings back the save dialog.
 - **The media library** behind all of this is one import for other tools: `daylight-commons/media`

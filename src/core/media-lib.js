@@ -3,7 +3,7 @@
 // browser-extension calls; network access is passed in (assembleStream's get). Documented in
 // project-docs/MEDIA-LIBRARY.md. Not part of the extension bundle (each module is bundled itself).
 export { sniffMime, chooseType, downloadName, downloadExt, slug } from "./media-name.js";
-export { parseSrcset, largestSource, fullSizeUrl, downloadPlan, referenceOf, REFERENCE_LABEL } from "./media-pick.js";
+export { parseSrcset, largestSource, fullSizeUrl, sizeLadder, downloadPlan, referenceOf, REFERENCE_LABEL } from "./media-pick.js";
 export { demuxMp4, remuxMp4 } from "./media-demux.js";
 export { assembleStream, combineParts, MediaProtected } from "./media-assemble.js";
 export { encodeGif, gifPalette, gifLzwEncode } from "./media-gif-encode.js";
@@ -12,3 +12,6 @@ export { muxMp4 } from "./media-mp4.js";
 export { fileProtection, mediaProtection, PROTECTED_LINE } from "./media-protect.js";
 export { parseM3u8, hlsProtection, pickVariant } from "./media-hls.js";
 export { parseMpd, dashProtection, pickRepresentation } from "./media-dash.js";
+export { postMeta, sidecarMarkdown, sidecarJson, metaName, captionText, embedText, textTags } from "./media-meta.js";
+export { embedDescription, readDescription, xmpPacket } from "./media-embed.js";
+export { saveFolder, SIDECAR_FORMAT } from "./media-meta.js";
