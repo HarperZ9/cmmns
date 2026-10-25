@@ -2,12 +2,11 @@
 // pointer is on the post or the window, and fades out when it leaves. Clicking inside the window
 // keeps it open until Escape or a click elsewhere. On a touch screen, where nothing hovers, each post
 // gets one small "Daylight Commons" button that opens the window on a tap; otherwise nothing is drawn on the
-// page itself. Content is
-// built from data with textContent only, never innerHTML, so nothing a post says can inject markup.
+// page itself. The window has Pin and Close. Content is built from data with textContent only,
+// never innerHTML, so nothing a post says can inject markup.
 (() => {
   "use strict";
-  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-  const OPEN_MS = 450, CLOSE_MS = 260, FADE_MS = 160;
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }, OPEN_MS = 450, CLOSE_MS = 260, FADE_MS = 160;
   const TABS = [["overview", "Overview"], ["account", "Account"], ["post", "This post"], ["history", "History"]];
   // A device whose main pointer cannot hover (phones, Firefox for Android).
   const TOUCH = !!(globalThis.matchMedia && matchMedia("(hover: none)").matches);
@@ -17,8 +16,7 @@
     clearTimeout(openTimer); clearTimeout(closeTimer);
     const p = pop, o = owner;
     if (refocus && o && p && (p.contains(document.activeElement) || o.contains(document.activeElement))) { if (document.activeElement !== o) quiet = o; o.focus({ preventScroll: true }); }
-    pop = null; owner = null; pinned = false;
-    if (!p) return;
+    pop = null; owner = null; pinned = false; if (!p) return;
     if (now) { p.remove(); return; }
     p.classList.remove("pb-in");
     setTimeout(() => p.remove(), FADE_MS);
@@ -144,8 +142,18 @@
   }
 
   // sections: [{ glance }, { tab, title?, area?, rows?, signals?, foot? }, ...]
+  // Pin keeps the window open while you scroll or move away; Close shuts it. Both stay in the window.
+  function controls() {
+    const bar = el("div", "pb-ctl"), pin = el("button", "pb-btn", "Pin"), x = el("button", "pb-btn", "Close");
+    pin.type = x.type = "button"; pin.setAttribute("aria-pressed", "false"); pin.setAttribute("aria-label", "Pin the window open");
+    pin.addEventListener("click", (e) => { e.stopPropagation(); pinned = pin.getAttribute("aria-pressed") !== "true"; pin.setAttribute("aria-pressed", String(pinned)); pin.textContent = pinned ? "Pinned" : "Pin"; });
+    x.addEventListener("click", (e) => { e.stopPropagation(); close(false, true); });
+    bar.append(pin, x); return bar;
+  }
+
   function build(sections) {
     const p = el("div", "pb-pop");
+    p.append(controls());
     p.setAttribute("role", "dialog");
     const g = (sections.find((s) => s.glance) || {}).glance;
     p.setAttribute("aria-label", g && g.who ? `Daylight Commons: ${g.who}` : "Daylight Commons");
@@ -244,7 +252,7 @@
     // and returns focus to the post. Focus leaving both the post and the window closes it.
     target.addEventListener("focusin", (e) => { if (e.target !== target) return; if (quiet === target) { quiet = null; return; } clearTimeout(openTimer); openTimer = setTimeout(() => show(target, () => target.__pbSections()), 150); });
     target.addEventListener("focusout", (e) => {
-      if (owner !== target || !pop || pop.contains(e.relatedTarget) || target.contains(e.relatedTarget)) return;
+      if (owner !== target || !pop || !e.relatedTarget || pop.contains(e.relatedTarget) || target.contains(e.relatedTarget)) return;
       clearTimeout(openTimer); close();
     });
     target.addEventListener("keydown", (e) => { if (e.altKey && (e.key === "r" || e.key === "R")) { e.preventDefault(); enter(show(target, () => target.__pbSections())); } });
@@ -279,8 +287,12 @@
   }
 
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && pop) close(false, true); }, true);
+  // Switching tabs and back moves focus without the user leaving the window: ignored, the window stays.
+  let backAt = 0;
+  const away = () => document.hidden || !document.hasFocus() || Date.now() - backAt < 600;
+  window.addEventListener("focus", () => { backAt = Date.now(); }); document.addEventListener("visibilitychange", () => { if (!document.hidden) backAt = Date.now(); });
   // Focus leaving the window (Tab past its last control) closes it, unless it went back to the post.
-  document.addEventListener("focusin", (e) => { if (pop && !pop.contains(e.target) && !(owner && owner.contains(e.target))) close(); }, true);
+  document.addEventListener("focusin", (e) => { if (pop && !away() && !pop.contains(e.target) && !(owner && owner.contains(e.target))) close(); }, true);
   document.addEventListener("pointerdown", (e) => { if (pop && pinned && !pop.contains(e.target) && !(e.target.closest && e.target.closest(".pb-tap"))) close(); }, true);
   window.addEventListener("scroll", () => { if (pop && !pinned) close(); }, { passive: true });
 

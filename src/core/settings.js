@@ -42,6 +42,9 @@ export const DEFAULTS = Object.freeze({
   pressureLens: false,
   // Ad blocking (src/ext/adblock-bg.js): off by default; sites in adblockAllow are always left alone.
   adblock: false, adblockAllow: [],
+  // One-click downloads (src/ext/quick-*.js): the Download button on X and Reddit posts, on by
+  // default; "always ask where to save" off, so files go straight to the Downloads folder.
+  mediaButtons: true, mediaAskWhere: false,
 });
 
 const feedList = (v) => (Array.isArray(v) ? [...new Set(v.map(cleanFeedUrl).filter(Boolean))].slice(0, MAX_CUSTOM_FEEDS) : []);
@@ -70,6 +73,7 @@ export function normalizeSettings(raw) {
     lensAll: bool(s.lensAll, DEFAULTS.lensAll),
     pressureLens: bool(s.pressureLens, DEFAULTS.pressureLens),
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
+    mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
   };
 }
 

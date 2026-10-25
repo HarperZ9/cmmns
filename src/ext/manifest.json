@@ -15,7 +15,9 @@
     "scripting",
     "activeTab",
     "contextMenus",
-    "declarativeNetRequest"
+    "declarativeNetRequest",
+    "downloads",
+    "clipboardWrite"
   ],
   "host_permissions": [
     "https://x.com/*",
@@ -41,6 +43,8 @@
       "head-bg.js",
       "ocr.bundle.js",
       "ocr-bg.js",
+      "media-store.js",
+      "quick-save-bg.js",
       "media-bg.js",
       "adblock-bg.js",
       "background.js"
@@ -130,6 +134,14 @@
         "health.js",
         "campaign.js",
         "evidence-view.js",
+        "quick-toast.js",
+        "quick-resolve.js",
+        "quick-sites.js",
+        "quick-stream.js",
+        "quick-gif.js",
+        "quick-save.js",
+        "quick-copy.js",
+        "quick-inline.js",
         "content.js"
       ],
       "css": [

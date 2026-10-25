@@ -166,3 +166,17 @@
 
 /* Reading-lens spans (src/ext/lens-inline.js), painted with the CSS Custom Highlight API. */
 ::highlight(pb-lens) { background-color: var(--pb-hot-bg); text-decoration: underline 1px var(--pb-hot); text-underline-offset: 3px; }
+
+/* One-click download buttons on X and Reddit posts (quick-inline.js): quiet, in the site's own colours. */
+.dc-dl-cell { display: flex; align-items: center; }
+.dc-dl { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 9999px; }
+.dc-dl-x { width: 34.75px; height: 34.75px; color: rgb(113, 118, 123); transition: background-color .2s; }
+.dc-dl-x:hover { background: rgba(127, 127, 127, .14); }
+.dc-dl-r { position: absolute; top: 8px; right: 8px; z-index: 3; width: 32px; height: 32px; background: rgba(0, 0, 0, .55); color: #fff; opacity: .75; }
+.dc-dl-r:hover, .dc-dl-r:focus-visible { opacity: 1; background: rgba(0, 0, 0, .75); }
+.dc-dl:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.dc-dl:disabled { opacity: .4; cursor: progress; }
+
+/* The window's own Pin and Close (pop.js). */
+.pb-ctl { display: flex; justify-content: flex-end; gap: 6px; margin: 0 0 6px; }
+.pb-ctl .pb-btn { padding: 1px 8px; font-size: 12px; }

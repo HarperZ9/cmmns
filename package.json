@@ -8,6 +8,7 @@
     "./core": "./src/core/api.js",
     "./imports": "./src/core/imports.js",
     "./bundle": "./src/core/evidence-bundle.js",
+    "./media": "./src/core/media-lib.js",
     "./schema/evidence.v1.json": "./schema/evidence.v1.json"
   },
   "bin": {

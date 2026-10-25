@@ -14,6 +14,29 @@ Details and measurements: project-docs/MEDIA-TOOLKIT.md and the pressure section
 project-docs/READING-LENS.md.
 
 ### Added
+- **Download in one click.** Right-click any picture, GIF, video or audio and choose **Download**: the
+  file goes straight to your Downloads folder, with no new tab and no second click. It is named from
+  the page or post and gets its real type from its own first bytes, so a WebP is never saved as
+  `.jpg`. **Download media here** finds the picture or video under the pointer when a site covers it
+  with a clear layer, and works inside frames, on `<picture>` and `srcset` (the largest version), CSS
+  background images and canvas drawings (saved as PNG).
+- **A Download button on X and Reddit posts.** One click saves every picture and video in the post,
+  at full size: X videos and GIFs as their best MP4, Reddit videos with their sound joined into one
+  MP4, and every picture of a Reddit gallery. X keeps its own right-click menu on videos, so the
+  button (or Shift and right-click, which reaches the browser's menu) is the way there. The button can
+  be turned off in the settings.
+- **Download as GIF.** Sites send most "GIFs" as MP4 or WebM. This makes a real GIF on your device
+  (12 frames a second, up to 480 pixels wide and 20 seconds), or saves the site's own GIF when it has
+  one.
+- **Streams as one file.** A video the page plays in pieces (HLS or DASH) is put together as one MP4
+  with its sound. Protected (DRM or encrypted) media is still refused, with a plain sentence.
+- **Copy and Copy link.** Copy puts a picture on the clipboard. Browsers let pages copy pictures but
+  not video or GIF files, so for those Copy gives the file's address. Copy link gives the file's own
+  address, or the post's for a video that streams in pieces.
+- **A short note in the corner** says what was saved and its size, or why nothing was. An optional
+  setting, "Always ask where to save", brings back the save dialog.
+- **The media library** behind all of this is one import for other tools: `daylight-commons/media`
+  (project-docs/MEDIA-LIBRARY.md).
 - **Save to Daylight.** Right-click any image, GIF, video or audio, or use "Save media from this
   page" in the toolbar menu. Direct files are saved as they are; a video the page streams is
   assembled from its unencrypted HLS or DASH segments. Each file keeps its SHA-256, address, page and
@@ -38,7 +61,10 @@ project-docs/READING-LENS.md.
   of 41 ordinary messages.
 
 ### Changed
-- New permissions: `contextMenus` (the "Save to Daylight" item) and `declarativeNetRequest` (ad
+- The window beside a post has **Pin** and **Close**, and stays where it was when you switch tabs and
+  come back. Its media section has **Download** and **Copy link** for each picture or video.
+- New permissions: `contextMenus` (the right-click items), `downloads` (Download saves to your
+  Downloads folder), `clipboardWrite` (Copy and Copy link) and `declarativeNetRequest` (ad
   blocking). Firefox's data declaration adds optional "browsing activity" for the Internet Archive
   request on a case save. The store listing justifies each one.
 - The Firefox source package for reviewers is now `docs/store/amo-source-3.6.0.zip`.
