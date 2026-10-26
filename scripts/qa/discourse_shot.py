@@ -29,7 +29,7 @@ async def main(stage, package, out):
     async with async_playwright() as p:
         s = await Session(p, package, stage, port=9357).start()
         try:
-            await s.settings({"auto": False, "onboarded": True, "discourse": True})
+            await s.settings({"auto": False, "onboarded": True, "discourse": True, "argumentLens": True})
             pg = await s.page(1280, 1000)
             await pg.goto(s.stages["discourse"]["url"])
             # the first answer loads and checks the signed data in the worker, which can take seconds
@@ -48,6 +48,7 @@ async def main(stage, package, out):
             await open_window(pg, 0)
             await window_text(pg)
             sb = pg.locator(".pb-pop button", has_text="Open the post and what lies under it as sheets").first
+            print("step: sheets button on the discourse root", await sb.count(), flush=True)
             if await sb.count():
                 async with pg.context.expect_page() as info:
                     await sb.click()
@@ -70,6 +71,7 @@ async def main(stage, package, out):
             await open_window(pg, 0)
             seen["k-root"] = await window_text(pg)
             kb = pg.locator(".pb-pop button", has_text="Open the post and what lies under it as sheets").first
+            print("step: sheets button on the example", await kb.count(), flush=True)
             logs = []
             pg.on("console", lambda m: logs.append(m.text))
             if await kb.count():
@@ -112,6 +114,7 @@ async def main(stage, package, out):
         "a sheet lifts": "sheet lifted" in seen.get("sheets-lifted", ""),
         "example: correction raised over likes": "brings a source or names an error" in seen.get("k-root", ""),
         "example: correction is 0.27% of the claim": "0.27%" in seen.get("k-sheets", ""),
+        "argument lens: claim types on the example claim": "claims:" in seen.get("k-root", ""),
         "example: the report is the ground": "dni.gov" in seen.get("k-sheets", "").split("\nground\n")[-1],
     }
     for k, v in checks.items():

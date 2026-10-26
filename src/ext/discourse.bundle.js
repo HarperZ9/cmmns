@@ -460,7 +460,7 @@ function docRows(r) {
   return rows;
 }
 
-return { DOC_DOES_NOT_PROVE, keyTerms, checkDocument, docRows };
+return { DOC_DOES_NOT_PROVE, keyTerms, findIn, checkDocument, docRows };
 })();
 
 // ---- corrections.js
@@ -542,12 +542,26 @@ function correctionRows(ranked) {
 return { CORRECTIONS_DOES_NOT_PROVE, sourceKind, readReply, rankCorrections, correctionRows };
 })();
 
+// ---- argument-measured.js
+const M_argument_measured = (() => {
+// The argument lens's gate, written by scripts/eval-argument-gold.mjs --write from two people's
+// annotations of the held-out gold passages (data/argument/passages.json). A role shows by default only
+// when its precision is 0.8 or more from at least 3 hits; boundaries per language need precision 0.8
+// and recall 0.7. Until annotations exist every entry is null and nothing passes.
+const ARGUMENT_GATE = { premise: null, "minor premise": null, "supporting premise": null, assumption: null, conclusion: null, turn: null };
+const BOUNDARY_GATE = { la: null, en: null, fr: null, es: null, pt: null };
+const GATE_SOURCE = "awaiting two annotators";
+
+return { ARGUMENT_GATE, BOUNDARY_GATE, GATE_SOURCE };
+})();
+
 // ---- cards.js
 const M_cards = (() => {
 // The window's signs for the discourse checks, in the shape src/ext/signals.js draws: { label, fam,
 // level, cat, rows }. All are info level: these checks are new and not yet measured on real threads
 // (project-docs/DISCOURSE.md), so none of them raises a warning.
 const { QUOTE_DOES_NOT_PROVE } = M_quotes;
+const { ARGUMENT_GATE } = M_argument_measured;
 const { countRows, STATS_DOES_NOT_PROVE } = M_stats;
 const { docRows } = M_docclaim;
 const { correctionRows } = M_corrections;
@@ -627,7 +641,46 @@ function studyNotes(signs) {
   };
 }
 
-return { quoteSigns, personaSign, countSigns, docSign, correctionSign, studyNotes };
+// The argument lens's gate (project-docs/ARGUMENT-LENS.md): a role shows by default only when its own
+// held-out precision is 0.8 or more, from at least 3 hits, against two annotators' agreement. No role
+// has been measured yet, so every role is shown as a plain segment unless "Every argument role" is on.
+const roleShown = (role, all, gate = ARGUMENT_GATE) => all || !!(gate[role] && gate[role].precision >= 0.8 && gate[role].hits >= 3);
+
+function argumentSign(r, { all = false, gate = ARGUMENT_GATE } = {}) {
+  if (!r || r.segments.length < 2 || !r.segments.some((s) => s.opener)) return [];
+  const rows = r.segments.map((s, i) => [roleShown(s.role, all, gate) ? `${i + 1}. ${s.role}` : `${i + 1}. segment`, `${s.opener ? `[${s.opener.form}] ` : ""}${s.text.length > 140 ? s.text.slice(0, 140) + " …" : s.text}`]);
+  const moves = r.units.map((u) => u.movement);
+  return [sign(`argument: ${r.segments.length} segments, ${r.units.length} ${r.units.length === 1 ? "movement" : "movements"}`, "argument-structure", "language", [
+    ...rows,
+    ["Movements", moves.join(", ")],
+    ["Language", r.lang],
+    ["Roles", all ? "Every role is shown, measured or not; none has passed its held-out gate yet." : "Roles show once their held-out precision passes; until then each part reads as a segment."],
+    ["What it shows", "A connective is what the author says links two claims. The lens shows that the author marks a part as following; it does not show that it follows."],
+  ])];
+}
+
+function claimTypeSign(types) {
+  if (!types || !types.length) return [];
+  const kinds = [...new Set(types.map((t) => t.type))];
+  return [sign(`claims: ${kinds.join(", ")}`, "claim-type", "language", [
+    ...types.slice(0, 8).map((t) => [t.type, `"${t.text.length > 120 ? t.text.slice(0, 120) + " …" : t.text}" (${t.cue})`]),
+    ["What it shows", "A claim type is read from wording cues, so a sentence can carry two kinds, and irony or quotation can mislead the cue. It says what kind of claim the words make, not whether the claim is true."],
+  ])];
+}
+
+function gapSign(gaps) {
+  if (!gaps || !gaps.length) return [];
+  return [sign(`${gaps.length} inference ${gaps.length === 1 ? "gap" : "gaps"}`, "inference-gap", "language", [
+    ...gaps.slice(0, 5).map((g) => [g.kind === "mind" ? `about someone's mind ("${g.cue}")` : `conclusion ("${g.cue}")`, `${g.why} "${g.text.length > 120 ? g.text.slice(0, 120) + " …" : g.text}"`]),
+    ["What it shows", "An inference can be sound even when its words are new, and a claim about someone's intent can be right. The marker shows where the post goes beyond what it states; it does not say the conclusion is wrong."],
+  ])];
+}
+
+function reframingSign(r, rows) {
+  return r ? [sign(`reframes ${r.shared.length} named parts of its sources`, "reframing", "sources", rows(r))] : [];
+}
+
+return { quoteSigns, personaSign, countSigns, docSign, correctionSign, studyNotes, roleShown, argumentSign, claimTypeSign, gapSign, reframingSign };
 })();
 
 // ---- sheets.js
@@ -759,9 +812,26 @@ function personaLayer(p) {
   return p ? { name: "account", parts: [{ name: p.person.name, tags: ["persona"], properties: [prop("uses the name of", `${p.person.name} (${p.person.qid})`, "measured", "Wikidata name match with a second cue"), prop("cue", p.cue, "observed", "handle or display name")] }] } : null;
 }
 
+function argumentLayer(a) {
+  if (!a || a.segments.length < 2) return null;
+  return { name: "argument structure", parts: a.segments.map((s, i) => ({ name: `segment ${i + 1}`, tags: [s.role, ...(s.opener ? [s.opener.form] : [])], properties: [
+    prop("text", s.text, "observed", "the post"), prop("role", s.role, "inferred", "argument lens: connective and position; role precision not yet measured"),
+    ...(s.opener ? [prop("connective", s.opener.form, "measured", `lexicon match (${a.lang}); roles it can take: ${s.opener.roles.join(", ")}`)] : []),
+  ] })).concat(a.units.map((u, i) => ({ name: `movement ${i + 1}`, tags: [u.movement], properties: [prop("segments", u.segments.map((k) => k + 1), "measured", "units cut at continuation connectives and conclusions"), prop("movement", u.movement, "inferred", "opening connective and shared words with the previous conclusion")] }))) };
+}
+
+function claimLayer(types, gaps, reframe) {
+  const parts = [
+    ...(types || []).map((t) => ({ name: t.text.slice(0, 120), tags: [t.type], properties: [prop("claim type", t.type, "inferred", `wording cue: ${t.cue}`)] })),
+    ...(gaps || []).map((g) => ({ name: g.text.slice(0, 120), tags: ["inference gap", g.kind], properties: [prop("gap", g.why, "inferred", g.kind === "mind" ? `mind-reading cue "${g.cue}"` : "conclusion words absent from the premises")] })),
+    ...(reframe ? [{ name: "reframing", tags: ["isomer"], properties: [prop("shared names", reframe.shared, "measured", "names found in the sources beneath"), prop("stated only to deny", reframe.denied, "measured", "negation within 80 characters before"), prop("in no source", reframe.added, "measured", "word match over the sources beneath")] }] : []),
+  ];
+  return parts.length ? { name: "claims", parts } : null;
+}
+
 // post: { site, postUrl, handle, author }; r: the results for one post.
 function discourseParts(post, r) {
-  const layers = [quoteLayer(r.quotes), docLayer(r.doc), countLayer(r.counts), correctionLayer(r.corrections, r.independence), personaLayer(r.persona)].filter(Boolean);
+  const layers = [quoteLayer(r.quotes), docLayer(r.doc), countLayer(r.counts), correctionLayer(r.corrections, r.independence), personaLayer(r.persona), argumentLayer(r.argument), claimLayer(r.types, r.gaps, r.reframing)].filter(Boolean);
   return {
     format: "refdb.parts/1", study: null,
     source: { site: post.site || null, postUrl: post.postUrl || null, author: { name: post.author || null, handle: post.handle || null } },
@@ -772,5 +842,347 @@ function discourseParts(post, r) {
 return { discourseParts };
 })();
 
-globalThis.PBD = Object.freeze({ ...M_text, ...M_quotes, ...M_persona, ...M_stats, ...M_docclaim, ...M_corrections, ...M_cards, ...M_sheets, ...M_parts });
+// ---- argument-cues.js
+const M_argument_cues = (() => {
+// Connectives by logical role, for the argument lens (src/core/discourse/argument.js). Seeded from the
+// reference library's study of Aliocha's reading method (2026-10-25) and the grammar of each language.
+// Each form lists every role it can take; the lens picks one by position. "clauseStart" forms count only
+// at the start of a sentence or after a comma, colon or semicolon, because elsewhere they are something
+// else (Portuguese "se" is mostly a pronoun; English "as" and "for" mostly are not connectives).
+// Roles: conclusion, continuation, reversal, concession, cause, condition, minor, example.
+
+const L = (spec) => Object.entries(spec).flatMap(([roles, forms]) => forms.split("|").map((f) => ({ form: f, roles: roles.split(",") })));
+
+const CUES = {
+  en: L({
+    "conclusion": "therefore|thus|hence|consequently|it follows that|so it follows|accordingly|which means|that means|this means|would mean|proves that",
+    "continuation": "moreover|furthermore|in addition|besides|further",
+    "reversal": "however|nevertheless|nonetheless|on the contrary|on the other hand|on the other side",
+    "reversal,minor": "but|yet",
+    "minor,continuation": "now",
+    "concession": "although|though|even if|even though|granted that",
+    "cause": "because|given that|in that",
+    "cause,continuation": "since",
+    "condition": "if|unless|provided that",
+    "example": "for example|for instance",
+    "conclusion,continuation": "so",
+  }),
+  pt: L({
+    "conclusion": "portanto|logo|por conseguinte|por isso|consequentemente|dessa forma|desse modo|segue-se que",
+    "conclusion,example": "assim",
+    "conclusion,condition": "então",
+    "continuation": "além disso|ademais|outrossim|em seguida",
+    "reversal": "porém|contudo|todavia|entretanto|no entanto|ao contrário",
+    "reversal,minor": "mas",
+    "minor": "ora",
+    "concession": "embora|ainda que|mesmo que|apesar de|conquanto",
+    "cause": "porque|visto que|já que|uma vez que|dado que",
+    "cause,conclusion": "pois",
+    "condition": "se|caso|desde que",
+    "example": "por exemplo",
+  }),
+  es: L({
+    "conclusion": "por lo tanto|por tanto|así pues|por consiguiente|en consecuencia|de modo que",
+    "conclusion,continuation": "luego",
+    "continuation": "además|asimismo|por otra parte",
+    "reversal": "sin embargo|no obstante|en cambio|por el contrario",
+    "reversal,minor": "pero",
+    "minor": "ahora bien",
+    "concession": "aunque|a pesar de|si bien|aun cuando",
+    "cause": "porque|ya que|puesto que|dado que",
+    "cause,conclusion": "pues",
+    "condition": "si|siempre que|a menos que",
+    "example": "por ejemplo",
+  }),
+  fr: L({
+    "conclusion": "donc|par conséquent|en conséquence|il s'ensuit que|c'est pourquoi",
+    "conclusion,example": "ainsi",
+    "continuation": "de plus|en outre|par ailleurs",
+    "reversal": "cependant|pourtant|toutefois|néanmoins|au contraire",
+    "reversal,minor": "mais",
+    "minor,reversal": "or",
+    "concession": "bien que|quoique|même si|encore que",
+    "cause": "parce que|car|puisque|étant donné que",
+    "condition": "si|à condition que|à moins que",
+    "example": "par exemple",
+  }),
+  la: L({
+    "conclusion": "ergo|igitur|itaque|ideo|relinquitur quod|sequitur quod|videtur quod",
+    "conclusion,cause": "unde",
+    "continuation": "praeterea|item|insuper",
+    "reversal": "tamen|verum|sed contra",
+    "minor,reversal": "sed|atqui",
+    "minor,continuation,reversal": "autem",
+    "concession": "licet|quamvis|etsi|quamquam",
+    "cause": "quia|nam|enim|quoniam",
+    "cause,concession": "cum",
+    "condition": "si|nisi|dummodo",
+    "example": "sicut|ut dicit|ut patet",
+  }),
+};
+
+// Forms that count only at a clause start (see above), per language.
+const CLAUSE_START = { en: new Set(["so", "now", "yet", "since", "if"]), pt: new Set(["se", "caso", "assim", "então", "ora", "logo"]), es: new Set(["si", "luego", "pues"]), fr: new Set(["or", "si", "ainsi"]), la: new Set(["si", "cum", "item"]) };
+
+// Postpositive Latin particles sit second in their clause ("finiti autem", "Deum enim"); they open the
+// clause they sit in.
+const POSTPOSITIVE = { la: new Set(["autem", "enim", "vero", "igitur", "tamen"]) };
+
+const LANGS = Object.keys(CUES);
+
+return { CUES, CLAUSE_START, POSTPOSITIVE, LANGS };
+})();
+
+// ---- argument.js
+const M_argument = (() => {
+// The argument lens (project-docs/ARGUMENT-LENS.md), after the reading method in Aliocha's notes on the
+// Summa: split a passage into segments, mark the connective that opens each one, give each segment a
+// role by its position in the argument (premise, minor premise, supporting premise, assumption,
+// conclusion, turn), and group segments into movements (a list of arguments, a chain, a turn).
+// A connective is what the author says links two claims. The lens shows "the author marks this as
+// following", never "this follows".
+const { CUES, CLAUSE_START, POSTPOSITIVE, LANGS } = M_argument_cues;
+const { content } = M_text;
+
+const LETTER = "\\p{L}";
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const COMPILED = Object.fromEntries(LANGS.map((l) => [l, CUES[l].slice().sort((a, b) => b.form.length - a.form.length)
+  .map((c) => ({ ...c, re: new RegExp(`(?<!${LETTER})${esc(c.form).replace(/ /g, "\\s+")}(?!${LETTER})`, "giu") }))]));
+
+// Strong punctuation ends a segment; a comma does not. A full stop after these abbreviations does not.
+const ABBREV = new Set(["mr", "mrs", "ms", "dr", "st", "vs", "cf", "eg", "ie", "e.g", "i.e", "p", "pp", "ch", "art", "q", "obj", "ad", "no", "sr", "sra", "m", "mme"]);
+const STRONG = /[.;!?]/;
+// Where the clause a position sits in starts: after strong punctuation or a colon, or at the start.
+function clauseStartAt(text, i) {
+  let j = i - 1;
+  while (j >= 0 && /\s/.test(text[j])) j--;
+  return j < 0 || /[.;:!?(“"]/.test(text[j]) ? "strong" : text[j] === "," ? "comma" : null;
+}
+// The word before position i, and where it starts.
+function prevWord(text, i) {
+  const m = text.slice(0, i).match(/([\p{L}\d'-]+)\s*$/u);
+  return m ? { word: m[1], at: i - m[0].length } : null;
+}
+
+// Every connective in the text: { start, end, form, roles, clause: "strong" | "comma" | null }.
+function findConnectives(text, lang) {
+  const out = [], taken = [];
+  for (const c of COMPILED[lang] || []) {
+    for (const m of text.matchAll(c.re)) {
+      const start = m.index, end = start + m[0].length;
+      if (taken.some(([a, b]) => start < b && end > a)) continue;
+      let clause = clauseStartAt(text, start);
+      if (!clause && POSTPOSITIVE[lang] && POSTPOSITIVE[lang].has(c.form)) { const p = prevWord(text, start); if (p) clause = clauseStartAt(text, p.at); }
+      if (CLAUSE_START[lang] && CLAUSE_START[lang].has(c.form) && !clause) continue;
+      taken.push([start, end]);
+      out.push({ start, end, form: m[0].toLowerCase().replace(/\s+/g, " "), roles: c.roles, clause });
+    }
+  }
+  return out.sort((a, b) => a.start - b.start);
+}
+
+// The language whose connectives the text uses most, or the one the site gave.
+function guessLang(text, given = null) {
+  if (given && CUES[given]) return given;
+  let best = "en", n = 0;
+  for (const l of LANGS) { const k = findConnectives(text, l).length; if (k > n) { best = l; n = k; } }
+  return best;
+}
+
+// Segments: cut at strong punctuation. Each keeps the connectives in its first three words.
+function segment(text, lang) {
+  const cons = findConnectives(text, lang), segs = [];
+  let start = 0;
+  const push = (end) => {
+    const raw = text.slice(start, end), lead = raw.length - raw.trimStart().length, s = start + lead, e = start + raw.trimEnd().length;
+    if (e > s && /[\p{L}\d]/u.test(text.slice(s, e))) {
+      const words = [...text.slice(s, e).matchAll(/[\p{L}\d'-]+/gu)], third = words[2] ? s + words[2].index + words[2][0].length : e;
+      segs.push({ start: s, end: e, text: text.slice(s, e), openers: cons.filter((c) => c.start >= s && c.start < third), inner: cons.filter((c) => c.start >= third && c.start < e) });
+    }
+    start = end;
+  };
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    if (/["\u201c\u201d]/.test(text[i])) quoted = text[i] === "\u201c" ? true : text[i] === "\u201d" ? false : !quoted;
+    // a stop inside quotation marks, or not followed by a space or the end (a URL, "U.S."), does not cut
+    if (!STRONG.test(text[i]) || quoted || (i + 1 < text.length && !/[\s"\u201d)]/.test(text[i + 1]))) continue;
+    const w = prevWord(text, i);
+    if (text[i] === "." && w && (ABBREV.has(w.word.toLowerCase()) || /^\p{Lu}$/u.test(w.word))) continue;
+    push(i + 1);
+  }
+  push(text.length);
+  return segs;
+}
+
+const has = (seg, role) => seg.openers.some((c) => c.roles.includes(role));
+const opensWith = (seg, role) => seg.openers.length && seg.openers[0].roles[0] === role;
+const ASSUME = /^(?:\W*)(?:if|suppose|assuming|given that|se|si|caso|supposons|suponiendo|supondo)\b/iu;
+
+// Roles by position. A unit is one argument: it starts at the first segment or at a segment opened by a
+// continuation ("Praeterea", "Moreover"), and a conclusion closes it.
+function readArgument(text, lang = null) {
+  const L = guessLang(text, lang), segs = segment(text, L), units = [];
+  let unit = null;
+  for (const s of segs) {
+    const isC = has(s, "conclusion") && !opensWith(s, "condition");
+    if (!unit || (opensWith(s, "continuation") && !isC) || (unit.closed && !isC)) { unit = { segments: [], closed: false, opener: s.openers[0] || null }; units.push(unit); }
+    s.role = isC ? "conclusion" : null;
+    unit.segments.push(s);
+    if (isC) unit.closed = true;
+  }
+  for (const u of units) labelUnit(u);
+  return { lang: L, segments: segs.map(({ start, end, text: t, role, openers }) => ({ start, end, text: t, role, opener: openers[0] ? { form: openers[0].form, roles: openers[0].roles } : null })), units: units.map((u, i) => ({ segments: u.segments.map((s) => segs.indexOf(s)), movement: movement(u, units[i - 1]) })) };
+}
+
+function labelUnit(u) {
+  const segs = u.segments, lastC = segs.map((s) => s.role === "conclusion").lastIndexOf(true);
+  let sawMinor = false;
+  segs.forEach((s, i) => {
+    if (s.role) return;
+    const minorish = has(s, "minor"), before = segs.slice(0, i).some((x) => !x.role || x.role === "premise" || x.role === "assumption");
+    if (minorish && before && lastC > i) { s.role = sawMinor ? "supporting premise" : "minor premise"; sawMinor = true; }
+    else if (has(s, "reversal") && !(lastC > i)) s.role = "turn";
+    else if (ASSUME.test(s.text.replace(/^[\p{L}]+,\s*/u, (m) => (has(s, "continuation") ? "" : m)))) s.role = "assumption";
+    else s.role = "premise";
+  });
+}
+
+// How a unit moves against the one before: a list (opened by "Moreover", "Praeterea"), a turn (opened
+// by "But", "However", "Sed contra", or holding a turn), a chain (its first premise takes up the
+// previous conclusion's words) or a single argument.
+function movement(u, prev) {
+  const first = u.segments[0];
+  if (u.segments.some((s) => s.role === "turn") || (first.openers[0] && first.openers[0].roles[0] === "reversal")) return "turn";
+  if (first.openers[0] && first.openers[0].roles.includes("continuation") && prev) return "list";
+  const prevC = prev && prev.segments.filter((s) => s.role === "conclusion").pop();
+  if (prevC) { const a = new Set(content(prevC.text)); if (content(first.text).filter((w) => a.has(w)).length >= 2) return "chain"; }
+  return "argument";
+}
+
+// The boundaries the lens draws: where each segment after the first starts.
+const boundaries = (reading) => reading.segments.slice(1).map((s) => s.start);
+
+return { findConnectives, guessLang, segment, readArgument, boundaries };
+})();
+
+// ---- claimtype.js
+const M_claimtype = (() => {
+// The claim-type marker (F7) and the inference-gap marker (F9), project-docs/ARGUMENT-LENS.md.
+// F7 names what kind of claim each sentence makes, with the cue that decided it: a question, a
+// quotation, a definition, a sourced statement, an opinion or value, an inference, or a factual claim
+// with or without a source. F9 marks two moves: a claim about what another person knows, wants or
+// intends (not observable from a post), and a conclusion whose words its premises do not contain.
+// Every rule reads the move; none reads a side, a party or a person (tests/discourse.argument.test.js
+// runs them with the sides swapped).
+const { readArgument, segment, guessLang } = M_argument;
+const { content } = M_text;
+
+const CLAIM_DOES_NOT_PROVE = "A claim type is read from wording cues, so a sentence can carry two kinds, and irony or quotation can mislead the cue. It says what kind of claim the words make, not whether the claim is true.";
+const GAP_DOES_NOT_PROVE = "An inference can be sound even when its words are new, and a claim about someone's intent can be right. The marker shows where the post goes beyond what it states; it does not say the conclusion is wrong.";
+
+const SENT = /[^.!?\n]+[.!?]*/g;
+const RULES = [
+  ["question", /\?\s*$/u, "ends with a question mark"],
+  ["quotation", /["“«][^"”»]{12,}["”»]/u, "a passage in quotation marks"],
+  ["definition", /\b(?:by definition|is defined as|(?:the|its) (?:true |real )?meaning of|what counts as|means (?:that )?(?:a|an|the)\b|is not (?:a|an) (?:fact|concept|opinion|matter)\b|is (?:a|an) (?:philosophical|religious|political|legal) (?:concept|term)|in the (?:strict|literal) sense|o que se entende por|se define como|par définition)\b/iu, "defines or disputes what a word means"],
+  ["sourced statement", /\b(?:according to|the (?:report|study|assessment|filing|ruling|record|transcript|data|census|survey)\s+(?:says|shows|found|concluded|states)|(?:historians|scientists|researchers|economists|intelligence|investigators|the court|the (?:un|who|odni|cia|fbi))\s+(?:say|says|found|concluded|agree|place|assessed|reported)|declassified|peer[- ]reviewed|published in|https?:\/\/)/iu, "names or links its source"],
+  ["classification", /\b(?:is|was|are|were)\s+(?:not\s+)?(?:a\s+|an\s+)?(?:(?:far|hard|radical|extreme|literal|real|true)[- ]?)?(?:\w+\s+){0,3}?(?:\w+ists?|\w+isms?|extremists?|terrorists?|dictators?|tyrants?)\b/iu, "puts a person, group or idea in a category"],
+  ["inference", /(?:^|\W)(?:therefore|thus|hence|so|which means|that means|this means|would mean|it follows|proves that|must have|clearly)\b/iu, "a conclusion connective"],
+  ["opinion or value", /\b(?:i think|i believe|in my (?:view|opinion)|should|ought to|must|best|worst|greatest|terrible|disgusting|amazing|stupid|scary|evil|shameful|pathetic|beautiful|deserves?|everyone should)\b|!\s*$/iu, "evaluative or first-person wording"],
+];
+const FACT = /\b\p{Lu}\p{Ll}+\s+\w+ed\b|\b(?:\d{4}|\d+(?:[.,]\d+)?\s*(?:%|percent|million|billion|thousand)|(?:was|were|is|are|has|have|had|did)\s+\w+ed\b|(?:killed|hired|sent|signed|voted|said|wrote|published|arrested|paid|launched|invented|founded|died|won|lost|built|funded|ordered)\b)/iu;
+const LINK = /https?:\/\/|\b\w+\.(?:com|org|gov|edu|net)\/\S+/iu;
+
+// Words too general to count as fresh in a conclusion.
+const PLAIN = new Set(["claim", "mean", "would", "could", "thing", "fact", "point", "case", "make", "made"]);
+
+// One sentence's type: { type, cue }.
+function claimTypeOf(sentence) {
+  const s = sentence.trim();
+  for (const [type, re, cue] of RULES) if (re.test(s)) return { type, cue };
+  if (FACT.test(s)) return LINK.test(s) ? { type: "factual claim with a link", cue: "a statement of fact with a link" } : { type: "factual claim, no source", cue: "a statement of fact with no source given" };
+  return { type: "statement", cue: "no cue for a narrower type" };
+}
+
+// Every sentence of a post, typed.
+function claimTypes(text) {
+  const t = String(text || "");
+  return segment(t, guessLang(t)).flatMap((s) => s.text.split(/\n+/)).map((x) => x.trim()).filter((x) => x.length > 3).map((x) => ({ text: x, ...claimTypeOf(x) }));
+}
+
+// Claims about a third party's mind: knowing, wanting, intending, fearing, lying on purpose.
+const MIND = /\b(?:he|she|they|his|her|their|[A-Z][a-z]+|(?:[Tt]he|[Tt]his|[Tt]hat)(?:\s+[a-z]+){1,2})\s+(?:absolutely |clearly |obviously |secretly )?(?:knows|knew|is aware|was aware|wants|wanted|intends|intended|is afraid|was afraid|fears|plans|planned|meant to|pretends|is pretending)\b|\b(?:a |the )?(?:calculated|deliberate|intentional) (?:lie|deception|move)\b|\bon purpose\b|\bit'?s (?:all )?about the (?:[Mm]oney|[Bb]enjamins)\b|\b(?:his|her|their) (?:real|true) (?:motive|reason|goal|agenda)\b/u;
+
+// F9: { kind, text, why } for each gap in a post.
+function inferenceGaps(text, lang = null) {
+  const out = [], t = String(text || "");
+  for (const s of t.match(SENT) || []) {
+    const m = s.match(MIND);
+    if (m) out.push({ kind: "mind", text: s.trim(), cue: m[0], why: "It states what someone else knows, wants or intends, which a post cannot show." });
+  }
+  const r = readArgument(t, lang);
+  const premises = r.segments.filter((s) => s.role !== "conclusion"), have = new Set(premises.flatMap((s) => content(s.text)));
+  for (const c of r.segments.filter((s) => s.role === "conclusion")) {
+    if (!premises.length) continue;
+    const words = [...new Set(content(c.text))].filter((w) => w.length > 3 && !PLAIN.has(w)), fresh = words.filter((w) => !have.has(w));
+    if (words.length >= 4 && fresh.length / words.length >= 0.6) out.push({ kind: "leap", text: c.text, cue: c.opener ? c.opener.form : "", fresh: fresh.slice(0, 8), why: `The conclusion brings ${fresh.length} of its ${words.length} meaning words in fresh: ${fresh.slice(0, 5).join(", ")}. The premises before it do not contain them.` });
+  }
+  return out;
+}
+
+return { CLAIM_DOES_NOT_PROVE, GAP_DOES_NOT_PROVE, claimTypeOf, claimTypes, inferenceGaps };
+})();
+
+// ---- isomer.js
+const M_isomer = (() => {
+// The reframing marker (project-docs/ARGUMENT-LENS.md): an isomer is the same parts in a different
+// arrangement. A post names the same people and things as the sources beneath it (the replies that bring
+// a source, the documents they link) but puts them in an act none of those sources states, or states
+// only to deny. The worked example of 2026-10-26: a documented relationship and a documented killing,
+// rearranged as "hired a hitman". The marker compares words; it reads no side and no person.
+const { keyTerms, findIn } = M_docclaim;
+const { content, fold } = M_text;
+
+const ISOMER_DOES_NOT_PROVE = "Sources can be incomplete, and words the sources lack can still be true. This shows only that the post's arrangement goes past what the sources beneath it say.";
+const NEGATION = /\b(?:no|not|never|nor|false|untrue|without|denied|denies|deny|no credible evidence|there is no|unfounded|baseless)\b/i;
+
+// Where a term sits in a source: "stated", "denied" (a negation in the 80 characters before it), or null.
+function standing(source, term) {
+  const t = fold(source), hit = findIn(source, term);
+  if (!hit) return null;
+  const at = t.indexOf(hit);
+  return at >= 0 && NEGATION.test(t.slice(Math.max(0, at - 80), at)) ? "denied" : "stated";
+}
+
+// claim: the post's text; sources: [{ text }]. Returns null, or { shared, added, denied, sources }.
+function reframing(claim, sources) {
+  const usable = (sources || []).filter((s) => s && s.text && s.text.length > 40);
+  if (!usable.length) return null;
+  const names = keyTerms(claim).filter((t) => t.kind === "name").map((t) => t.term);
+  const nameWords = new Set(names.flatMap((n) => content(n)));
+  const shared = names.filter((n) => usable.some((s) => standing(s.text, n)));
+  const acts = [...new Set(content(claim).filter((w) => w.length >= 4 && !nameWords.has(w)))];
+  const added = [], denied = [];
+  for (const w of acts) {
+    const st = usable.map((s) => standing(s.text, w));
+    if (st.includes("stated")) continue;
+    (st.includes("denied") ? denied : added).push(w);
+  }
+  if (shared.length < 2 || added.length + denied.length < 1) return null;
+  return { shared, added, denied, sources: usable.length };
+}
+
+function reframingRows(r) {
+  return [
+    ["Same parts", `The post names what the ${r.sources} ${r.sources === 1 ? "source" : "sources"} beneath it name: ${r.shared.join(", ")}.`],
+    ...(r.denied.length ? [["Stated only to deny", `The sources contain ${r.denied.map((w) => `"${w}"`).join(", ")} only next to a denial.`]] : []),
+    ...(r.added.length ? [["In none of the sources", r.added.slice(0, 10).map((w) => `"${w}"`).join(", ")]] : []),
+    ["What it shows", ISOMER_DOES_NOT_PROVE],
+  ];
+}
+
+return { ISOMER_DOES_NOT_PROVE, reframing, reframingRows };
+})();
+
+globalThis.PBD = Object.freeze({ ...M_text, ...M_quotes, ...M_persona, ...M_stats, ...M_docclaim, ...M_corrections, ...M_argument_measured, ...M_cards, ...M_sheets, ...M_parts, ...M_argument_cues, ...M_argument, ...M_claimtype, ...M_isomer });
 })();

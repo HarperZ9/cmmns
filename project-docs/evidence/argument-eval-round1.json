@@ -1,0 +1,127 @@
+{
+ "date": "2026-10-26",
+ "dev": {
+  "set": "claims-dev.json",
+  "cases": 20,
+  "labellersAgree": null,
+  "typeAccuracy": {
+   "right": 17,
+   "of": 20,
+   "interval": [
+    0.64,
+    0.948
+   ]
+  },
+  "gapPrecision": {
+   "right": 3,
+   "of": 3,
+   "interval": [
+    0.438,
+    1
+   ]
+  },
+  "gapRecall": {
+   "right": 3,
+   "of": 5
+  },
+  "misses": [
+   {
+    "text": "It's a calculated lie designed to fool people.",
+    "type": "statement",
+    "got": "factual claim, no source",
+    "gap": "mind",
+    "gotGap": "mind"
+   },
+   {
+    "text": "For Musk, it's all about the Benjamins.",
+    "type": "statement",
+    "got": "statement",
+    "gap": "mind",
+    "gotGap": "none"
+   },
+   {
+    "text": "Marcus Aurelius wrote: \"Do not disturb yourself by imagining your whol",
+    "type": "quotation",
+    "got": "factual claim, no source",
+    "gap": "none",
+    "gotGap": "none"
+   },
+   {
+    "text": "The Principia was published in 1687, see https://en.wikipedia.org/wiki",
+    "type": "sourced statement",
+    "got": "statement",
+    "gap": "none",
+    "gotGap": "none"
+   },
+   {
+    "text": "The senator wants to destroy the economy.",
+    "type": "statement",
+    "got": "statement",
+    "gap": "mind",
+    "gotGap": "none"
+   }
+  ]
+ },
+ "heldout": {
+  "set": "claims-heldout.json",
+  "cases": 20,
+  "labellersAgree": 20,
+  "typeAccuracy": {
+   "right": 17,
+   "of": 20,
+   "interval": [
+    0.64,
+    0.948
+   ]
+  },
+  "gapPrecision": {
+   "right": 2,
+   "of": 2,
+   "interval": [
+    0.342,
+    1
+   ]
+  },
+  "gapRecall": {
+   "right": 2,
+   "of": 4
+  },
+  "misses": [
+   {
+    "text": "The minister secretly wants the war to continue.",
+    "type": "statement",
+    "got": "statement",
+    "gap": "mind",
+    "gotGap": "none"
+   },
+   {
+    "text": "The opposition leader knew the figures were false.",
+    "type": "statement",
+    "got": "statement",
+    "gap": "mind",
+    "gotGap": "none"
+   },
+   {
+    "text": "The judge wrote, \"The evidence does not support the charge as filed.\"",
+    "type": "quotation",
+    "got": "factual claim, no source",
+    "gap": "none",
+    "gotGap": "none"
+   },
+   {
+    "text": "The rally drew about 3,000 people, as reported at https://example.org/",
+    "type": "sourced statement",
+    "got": "statement",
+    "gap": "none",
+    "gotGap": "none"
+   },
+   {
+    "text": "That party is a bunch of extremists.",
+    "type": "classification",
+    "got": "statement",
+    "gap": "none",
+    "gotGap": "none"
+   }
+  ]
+ }
+}

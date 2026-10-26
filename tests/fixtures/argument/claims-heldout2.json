@@ -1,0 +1,185 @@
+{
+ "about": "Held out, round 2: written and labelled by Claude (Opus 5.5) on 2026-10-26 after the round-1 fixes were frozen, scored once. Round 1 (claims-heldout.json) was looked at before those fixes, so it now counts as development data; its first score is kept in project-docs/evidence/argument-eval-round1.json. Every political pair appears both ways. labels2: a second labelling, blind, by Claude (Sonnet 5.5) from the definitions only.",
+ "cases": [
+  {
+   "text": "Why did the ministry delete the page?",
+   "type": "question",
+   "gap": "none",
+   "labels2": {
+    "type": "question",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The candidate is a radical socialist.",
+   "type": "classification",
+   "gap": "none",
+   "labels2": {
+    "type": "classification",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The candidate is a radical nationalist.",
+   "type": "classification",
+   "gap": "none",
+   "labels2": {
+    "type": "classification",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The inspector general found that the contracts were never put out to tender.",
+   "type": "sourced statement",
+   "gap": "none",
+   "labels2": {
+    "type": "sourced statement",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The general obviously plans to seize power.",
+   "type": "statement",
+   "gap": "mind",
+   "labels2": {
+    "type": "factual claim, no source",
+    "gap": "mind"
+   }
+  },
+  {
+   "text": "Everyone in that newsroom knows the story is fake.",
+   "type": "statement",
+   "gap": "mind",
+   "labels2": {
+    "type": "factual claim, no source",
+    "gap": "mind"
+   }
+  },
+  {
+   "text": "What a disgraceful vote!",
+   "type": "opinion or value",
+   "gap": "none",
+   "labels2": {
+    "type": "opinion or value",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The dam failed in 1975 and flooded three towns.",
+   "type": "factual claim, no source",
+   "gap": "none",
+   "labels2": {
+    "type": "factual claim, no source",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "A tax is, by definition, a compulsory payment.",
+   "type": "definition",
+   "gap": "none",
+   "labels2": {
+    "type": "definition",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The witness said, \"I saw the convoy leave before dawn.\"",
+   "type": "quotation",
+   "gap": "none",
+   "labels2": {
+    "type": "quotation",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The census shows the city's population grew by 8 percent.",
+   "type": "sourced statement",
+   "gap": "none",
+   "labels2": {
+    "type": "sourced statement",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "Turnout fell in two districts. So the election was stolen by the incumbent's allies.",
+   "type": "inference",
+   "gap": "leap",
+   "labels2": {
+    "type": "inference",
+    "gap": "leap"
+   }
+  },
+  {
+   "text": "The ferry sank in 2014.",
+   "type": "factual claim, no source",
+   "gap": "none",
+   "labels2": {
+    "type": "factual claim, no source",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "In my view the ruling was correct.",
+   "type": "opinion or value",
+   "gap": "none",
+   "labels2": {
+    "type": "opinion or value",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The ban was lifted last week, per https://example.org/notice",
+   "type": "sourced statement",
+   "gap": "none",
+   "labels2": {
+    "type": "sourced statement",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "They are only doing this on purpose to divide us.",
+   "type": "statement",
+   "gap": "mind",
+   "labels2": {
+    "type": "factual claim, no source",
+    "gap": "mind"
+   }
+  },
+  {
+   "text": "The court adjourned until Monday.",
+   "type": "statement",
+   "gap": "none",
+   "labels2": {
+    "type": "factual claim, no source",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "Wages rose faster than prices this year. Therefore real wages went up.",
+   "type": "inference",
+   "gap": "none",
+   "labels2": {
+    "type": "inference",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "Those protesters are anarchists.",
+   "type": "classification",
+   "gap": "none",
+   "labels2": {
+    "type": "classification",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "Has anyone read the full judgment?",
+   "type": "question",
+   "gap": "none",
+   "labels2": {
+    "type": "question",
+    "gap": "none"
+   }
+  }
+ ]
+}

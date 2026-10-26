@@ -57,7 +57,7 @@ test("the content scripts and the worker load the discourse bundle after the cor
 });
 
 test("no discourse code fetches anything but the extension's own files", () => {
-  for (const f of ["src/ext/discourse.js", "src/ext/discourse-bg.js", "src/ext/sheets-page.js", ...["text", "quotes", "persona", "stats", "docclaim", "corrections", "cards", "sheets", "parts"].map((n) => `src/core/discourse/${n}.js`)]) {
+  for (const f of ["src/ext/discourse.js", "src/ext/discourse-bg.js", "src/ext/sheets-page.js", ...["text", "quotes", "persona", "stats", "docclaim", "corrections", "cards", "sheets", "parts", "argument-cues", "argument", "argument-measured", "claimtype", "isomer"].map((n) => `src/core/discourse/${n}.js`)]) {
     const src = read(f);
     for (const m of src.matchAll(/fetch\(([^)]*)\)/g)) assert.match(m[1], /^url\(f$/, `${f} fetches ${m[1]}`);
     assert.doesNotMatch(src, /XMLHttpRequest|WebSocket|sendBeacon/, f);

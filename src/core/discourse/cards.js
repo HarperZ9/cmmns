@@ -2,6 +2,7 @@
 // level, cat, rows }. All are info level: these checks are new and not yet measured on real threads
 // (project-docs/DISCOURSE.md), so none of them raises a warning.
 import { QUOTE_DOES_NOT_PROVE } from "./quotes.js";
+import { ARGUMENT_GATE } from "./argument-measured.js";
 import { countRows, STATS_DOES_NOT_PROVE } from "./stats.js";
 import { docRows } from "./docclaim.js";
 import { correctionRows } from "./corrections.js";
@@ -79,4 +80,43 @@ export function studyNotes(signs) {
     notes: keep.map((s) => ({ label: `Analysis: ${s.label}`, text: s.rows.map(rowText).filter(Boolean).join("\n") })),
     analysis: [...new Set(keep.map((s) => s.fam))],
   };
+}
+
+// The argument lens's gate (project-docs/ARGUMENT-LENS.md): a role shows by default only when its own
+// held-out precision is 0.8 or more, from at least 3 hits, against two annotators' agreement. No role
+// has been measured yet, so every role is shown as a plain segment unless "Every argument role" is on.
+export const roleShown = (role, all, gate = ARGUMENT_GATE) => all || !!(gate[role] && gate[role].precision >= 0.8 && gate[role].hits >= 3);
+
+export function argumentSign(r, { all = false, gate = ARGUMENT_GATE } = {}) {
+  if (!r || r.segments.length < 2 || !r.segments.some((s) => s.opener)) return [];
+  const rows = r.segments.map((s, i) => [roleShown(s.role, all, gate) ? `${i + 1}. ${s.role}` : `${i + 1}. segment`, `${s.opener ? `[${s.opener.form}] ` : ""}${s.text.length > 140 ? s.text.slice(0, 140) + " …" : s.text}`]);
+  const moves = r.units.map((u) => u.movement);
+  return [sign(`argument: ${r.segments.length} segments, ${r.units.length} ${r.units.length === 1 ? "movement" : "movements"}`, "argument-structure", "language", [
+    ...rows,
+    ["Movements", moves.join(", ")],
+    ["Language", r.lang],
+    ["Roles", all ? "Every role is shown, measured or not; none has passed its held-out gate yet." : "Roles show once their held-out precision passes; until then each part reads as a segment."],
+    ["What it shows", "A connective is what the author says links two claims. The lens shows that the author marks a part as following; it does not show that it follows."],
+  ])];
+}
+
+export function claimTypeSign(types) {
+  if (!types || !types.length) return [];
+  const kinds = [...new Set(types.map((t) => t.type))];
+  return [sign(`claims: ${kinds.join(", ")}`, "claim-type", "language", [
+    ...types.slice(0, 8).map((t) => [t.type, `"${t.text.length > 120 ? t.text.slice(0, 120) + " …" : t.text}" (${t.cue})`]),
+    ["What it shows", "A claim type is read from wording cues, so a sentence can carry two kinds, and irony or quotation can mislead the cue. It says what kind of claim the words make, not whether the claim is true."],
+  ])];
+}
+
+export function gapSign(gaps) {
+  if (!gaps || !gaps.length) return [];
+  return [sign(`${gaps.length} inference ${gaps.length === 1 ? "gap" : "gaps"}`, "inference-gap", "language", [
+    ...gaps.slice(0, 5).map((g) => [g.kind === "mind" ? `about someone's mind ("${g.cue}")` : `conclusion ("${g.cue}")`, `${g.why} "${g.text.length > 120 ? g.text.slice(0, 120) + " …" : g.text}"`]),
+    ["What it shows", "An inference can be sound even when its words are new, and a claim about someone's intent can be right. The marker shows where the post goes beyond what it states; it does not say the conclusion is wrong."],
+  ])];
+}
+
+export function reframingSign(r, rows) {
+  return r ? [sign(`reframes ${r.shared.length} named parts of its sources`, "reframing", "sources", rows(r))] : [];
 }

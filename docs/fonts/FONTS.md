@@ -2,10 +2,11 @@
 
 | File | Font | Designer | Terms |
 |---|---|---|---|
+| `AccessionStencil.woff2` | Accession Stencil, variable (weight 300 to 900), version 0.1.0 | Zain Dana Harper | SIL Open Font License 1.1, full text in `OFL-accession.txt` |
 | `hanken-grotesk.woff2` | Hanken Grotesk | The Hanken Grotesk Project Authors | SIL Open Font License 1.1, full text in `OFL-hanken-grotesk.txt` |
 | `jetbrains-mono-regular.woff2` | JetBrains Mono Regular, version 2.304 | The JetBrains Mono Project Authors | SIL Open Font License 1.1, full text in `OFL-jetbrains-mono.txt` |
 
-Hanken Grotesk sets the words and JetBrains Mono sets figures and code. Daylight Commons' pages
+Accession Stencil sets the running heads and titles of study boards, Hanken Grotesk sets the words and JetBrains Mono sets figures and code. The Accession file is the unmodified `variable/AccessionStencil[wght].woff2` from the typeface's release build, whose name table carries the OFL (nameID 13); its SHA-256 is `7e6c643fa9c4ea49a19fe3ee948288516dd83821e1dca56a5ae1253bba490963`. Daylight Commons' pages
 use them; the window on social sites takes the site's own font for the post and these two for
 itself.
 

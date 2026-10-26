@@ -43,6 +43,9 @@ export const DEFAULTS = Object.freeze({
   // The discourse checks (src/core/discourse/): quote sources, persona names, counts with their sample
   // size, document images against the post and correction replies. Off by default; all run on this device.
   discourse: false,
+  // The argument lens (src/core/discourse/argument.js), under the discourse checks: its own switch, and
+  // "every argument role" to show roles that have not passed their held-out gate. Both off by default.
+  argumentLens: false, argumentAll: false,
   // Ad blocking (src/ext/adblock-bg.js): off by default; sites in adblockAllow are always left alone.
   adblock: false, adblockAllow: [],
   // One-click downloads (src/ext/quick-*.js): the Download button on X and Reddit posts, on by
@@ -99,6 +102,7 @@ export function normalizeSettings(raw) {
     lensAll: bool(s.lensAll, DEFAULTS.lensAll),
     pressureLens: bool(s.pressureLens, DEFAULTS.pressureLens),
     discourse: bool(s.discourse, DEFAULTS.discourse),
+    argumentLens: bool(s.argumentLens, DEFAULTS.argumentLens), argumentAll: bool(s.argumentAll, DEFAULTS.argumentAll),
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),

@@ -1,0 +1,185 @@
+{
+ "about": "Held out for F7 and F9: written and labelled by Claude (Opus 5.5) on 2026-10-26 after the rules were frozen, never used to tune them, scored once (scripts/eval-argument.mjs). Invented sentences across topics and sides; every political pair appears both ways. labels2 is a second labelling, blind to the first labels and to the rules, by Claude (Sonnet 5.5) from definitions only, on 2026-10-26. Two model labellers are a pilot, not the human gold the argument lens needs.",
+ "cases": [
+  {
+   "text": "Did the governor really sign that bill?",
+   "type": "question",
+   "gap": "none",
+   "labels2": {
+    "type": "question",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The mayor was a committed communist.",
+   "type": "classification",
+   "gap": "none",
+   "labels2": {
+    "type": "classification",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The mayor was a committed fascist.",
+   "type": "classification",
+   "gap": "none",
+   "labels2": {
+    "type": "classification",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "According to the city audit, the program cost 40 million dollars.",
+   "type": "sourced statement",
+   "gap": "none",
+   "labels2": {
+    "type": "sourced statement",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The minister secretly wants the war to continue.",
+   "type": "statement",
+   "gap": "mind",
+   "labels2": {
+    "type": "statement",
+    "gap": "mind"
+   }
+  },
+  {
+   "text": "The opposition leader knew the figures were false.",
+   "type": "statement",
+   "gap": "mind",
+   "labels2": {
+    "type": "statement",
+    "gap": "mind"
+   }
+  },
+  {
+   "text": "This is the best decision the council has made in years!",
+   "type": "opinion or value",
+   "gap": "none",
+   "labels2": {
+    "type": "opinion or value",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The bridge collapsed in 2019 after years of warnings.",
+   "type": "factual claim, no source",
+   "gap": "none",
+   "labels2": {
+    "type": "factual claim, no source",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "Freedom means the absence of coercion, by definition.",
+   "type": "definition",
+   "gap": "none",
+   "labels2": {
+    "type": "definition",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The judge wrote, \"The evidence does not support the charge as filed.\"",
+   "type": "quotation",
+   "gap": "none",
+   "labels2": {
+    "type": "quotation",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "Researchers found that the drug halved hospital stays.",
+   "type": "sourced statement",
+   "gap": "none",
+   "labels2": {
+    "type": "sourced statement",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The company lost money last year. Therefore the chief executive must be stealing from the pension fund.",
+   "type": "inference",
+   "gap": "leap",
+   "labels2": {
+    "type": "inference",
+    "gap": "leap"
+   }
+  },
+  {
+   "text": "The union called a strike in March.",
+   "type": "factual claim, no source",
+   "gap": "none",
+   "labels2": {
+    "type": "factual claim, no source",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "I think the new rule is a mistake.",
+   "type": "opinion or value",
+   "gap": "none",
+   "labels2": {
+    "type": "opinion or value",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "The rally drew about 3,000 people, as reported at https://example.org/rally",
+   "type": "sourced statement",
+   "gap": "none",
+   "labels2": {
+    "type": "sourced statement",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "She is pretending to care about the flood victims.",
+   "type": "statement",
+   "gap": "mind",
+   "labels2": {
+    "type": "statement",
+    "gap": "mind"
+   }
+  },
+  {
+   "text": "The treaty was signed in 1648.",
+   "type": "factual claim, no source",
+   "gap": "none",
+   "labels2": {
+    "type": "factual claim, no source",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "Prices rose because demand outran supply. So the shortage will end when supply recovers.",
+   "type": "inference",
+   "gap": "none",
+   "labels2": {
+    "type": "inference",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "That party is a bunch of extremists.",
+   "type": "classification",
+   "gap": "none",
+   "labels2": {
+    "type": "classification",
+    "gap": "none"
+   }
+  },
+  {
+   "text": "What does the report actually say?",
+   "type": "question",
+   "gap": "none",
+   "labels2": {
+    "type": "question",
+    "gap": "none"
+   }
+  }
+ ]
+}
