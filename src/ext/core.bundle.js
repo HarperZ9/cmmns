@@ -13292,6 +13292,91 @@ async function verifyCustody(lines) {
 return { CAPTURE_FORMAT, CUSTODY_FORMAT, sha256Text, captureCanonical, transparencyRecord, captureRecord, custodyLine, verifyCustody };
 })();
 
+// ---- discourse/sheets.js
+const M_discourse_sheets = (() => {
+// Truth as sheets (project-docs/DISCOURSE.md): a claim is a sheet laid over what it rests on. The
+// post sits on top, the replies that bring a source beneath it, the primary documents at the ground.
+// Each sheet's ink coverage is its reach, so a claim seen 230,000 times covers a correction seen 627
+// times. Lifting a sheet shows what lies under it.
+//
+// The compositing engine is the workspace medium's sheet engine (lib/medium/sheets.mjs), copied here
+// unchanged so the extension ships with no dependency. It has no single law: each sheet carries its own
+// (multiply, density_add, weber, screen), and where sheets meet each applies its own on its side. Every
+// sheet here is a post seen through the ones above it, so every sheet uses the same law, weber
+// (Albers XX-1, a = 29.75). tests/discourse.sheets.test.js holds the constants and, when
+// SUPERFRAME_SHEETS points at the original module, checks the two give the same colours.
+
+const DENSITY_W = 0.243;
+const WEBER = 29.75;
+const hexLin = (h) => { const n = parseInt(h.slice(1), 16); return [16, 8, 0].map((s) => { const c = ((n >> s) & 255) / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); };
+const perceived = (D, unit) => (unit > 1e-6 ? unit * Math.log1p(WEBER * D / unit) / Math.log1p(WEBER) : D);
+
+// one pixel: paper (linear rgb) under the sheets in print order (copied from the medium's composite)
+function composite(paper, sheets) {
+  const c = paper.slice(), D = [0, 0, 0], U = [0, 0, 0];
+  let inked = 0, anyWeber = false;
+  for (const s of sheets) {
+    const law = s.law ?? "multiply", cov = s.cover ?? 1;
+    if (cov <= 0) continue;
+    for (let k = 0; k < 3; k++) {
+      const t = 1 - cov * (1 - s.ink[k]);
+      if (law === "multiply") c[k] *= t;
+      else if (law === "density_add") c[k] *= inked > 0 ? Math.pow(Math.max(1e-4, t), 1 - (1 - DENSITY_W) * inked) : t;
+      else if (law === "screen") c[k] = 1 - (1 - c[k]) * (1 - cov * s.ink[k]);
+      else { const d = -Math.log(Math.max(1e-4, t)); D[k] += d; if (d > U[k]) U[k] = d; anyWeber = true; }
+    }
+    if (law === "density_add") inked = Math.min(1, inked + cov);
+  }
+  if (anyWeber) for (let k = 0; k < 3; k++) c[k] *= Math.exp(-perceived(D[k], U[k]));
+  return c;
+}
+
+// The medium's printSheets: a paper colour and sheets, each sheet's own law or the default.
+function printSheets(paper, sheets, { law = "weber" } = {}) {
+  const P = typeof paper === "string" ? hexLin(paper) : paper;
+  return composite(P, sheets.map((s) => ({ ...s, law: s.law ?? law })));
+}
+const toHex = (lin) => "#" + lin.map((c) => Math.round(255 * (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055))).map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("");
+
+// The canon's ground and verdict inks. The verdict is about sourcing only, the same for every sheet:
+// a post that links a primary record or a reference work prints in verified, one that does not in
+// drift, whatever it says and whoever wrote it. A primary document is the ground.
+const PAPER = "#ebe5d8";
+const INKS = { sourced: "#0a6b61", unsourced: "#8f3a19", document: "#16130f" };
+
+// thread: { claim: { text, reach }, corrections: [{ text, reach, origin }], documents: [{ title, url }] }
+// reach is the views the site showed (null when it showed none). Corrections that share an origin are
+// one sheet: many replies from one source are a metamer of independence, not several witnesses.
+function buildSheets(thread) {
+  const claim = thread.claim || {}, top = Math.max(1, Number(claim.reach) || 0, ...(thread.corrections || []).map((c) => Number(c.reach) || 0));
+  const byOrigin = new Map();
+  for (const c of thread.corrections || []) {
+    const k = c.origin || `reply:${byOrigin.size}`, g = byOrigin.get(k);
+    if (g) { g.replies += 1; g.reach += Number(c.reach) || 0; } else byOrigin.set(k, { kind: "correction", text: c.text, origin: c.origin || null, sourced: !!c.origin, replies: 1, reach: Number(c.reach) || 0 });
+  }
+  const sheets = [
+    { kind: "claim", text: claim.text || "", origin: claim.origin || null, sourced: !!claim.origin, replies: 1, reach: Number(claim.reach) || 0 },
+    ...byOrigin.values(),
+    ...(thread.documents || []).map((d) => ({ kind: "document", text: d.title, origin: d.url || null, replies: 0, reach: null })),
+  ].map((s) => ({ ...s, cover: s.reach == null ? 0 : s.reach / top, ink: s.kind === "document" ? INKS.document : s.sourced ? INKS.sourced : INKS.unsourced }));
+  // A document has no reach readout, so it prints no ink: it is the ground the sheets lie on, named.
+  // What each sheet looks like with everything above it lifted: it over the sheets beneath it, printed
+  // from the ground up (documents first, the claim last).
+  return sheets.map((s, i) => {
+    const under = sheets.slice(i).reverse().map((x) => ({ ink: hexLin(x.ink), cover: x.cover }));
+    return { ...s, seen: toHex(printSheets(PAPER, under)), share: s.reach == null ? null : Math.round(s.cover * 10000) / 100 };
+  });
+}
+
+// How many independent origins the corrections rest on, against how many replies carry them.
+function independence(sheets) {
+  const c = sheets.filter((s) => s.kind === "correction");
+  return { replies: c.reduce((a, s) => a + s.replies, 0), origins: c.length };
+}
+
+return { DENSITY_W, WEBER, hexLin, composite, printSheets, PAPER, INKS, buildSheets, independence };
+})();
+
 // ---- board.js
 const M_board = (() => {
 // Study boards: saved items gathered into numbered plates that keep each item's source, author, time
@@ -13453,9 +13538,11 @@ const M_board_html = (() => {
 // board of sheets. The page stands alone, needs no script, and prints to A4 pages. House type:
 // Accession Stencil for running heads and titles, Hanken Grotesk
 // for captions and text, JetBrains Mono for numbers. Ink on paper; the one hot mark is the right-hand
-// running head. In the evidence board each claim is a sheet over its sources, opacity from reach.
+// running head. In the evidence board each claim is printed as sheets over its sources with the one
+// sheet engine Daylight has (src/core/discourse/sheets.js): ink coverage from reach.
 
 const { bookPages, timelineRows, evidencePlan, plateCaption } = M_board;
+const { buildSheets } = M_discourse_sheets;
 
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const num = (n) => `( ${n} )`;
@@ -13505,9 +13592,11 @@ a { color: inherit; text-decoration-color: var(--rule); }
 .claim { padding: 28px 0; border-top: 1px solid var(--rule); }
 .claim > p { margin: 6px 0 14px; font-size: 18px; line-height: 1.35; }
 .stack { position: relative; display: grid; gap: 0; }
-.layer { position: relative; display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 12px; background: var(--paper); border: 1px solid var(--ink); margin-top: -36px; transition: opacity .2s; }
+.layer { position: relative; display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 12px; background: var(--paper); border: 1px solid var(--ink); margin-top: -36px; }
 .layer:first-child { margin-top: 0; }
-.layer:hover, .layer:focus-within { opacity: 1 !important; z-index: 9 !important; }
+.layer:hover, .layer:focus-within { z-index: 99 !important; }
+.ink { grid-column: 1 / -1; height: 10px; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.ink span { display: block; height: 100%; }
 .prov { font: 500 12px/1.4 var(--mono); margin-top: 6px; }
 .layer img, .layer video { width: 140px; height: 140px; object-fit: contain; }
 @page { size: A4; margin: 0; }
@@ -13566,15 +13655,20 @@ function timeline(board, url) {
   return `<main class="sheet">${header(board)}${rows.join("\n")}</main>`;
 }
 
-// Each claim a sheet over its sources; the most-seen source on top, every layer as opaque as its
-// reach. Each layer's provenance line is as opaque as the source is corroborated by other origins,
-// and says so in words. Pointing at a layer lifts it to full opacity.
+// Each claim printed as sheets over its sources (the shared sheet engine): the most-seen source on
+// top, each sheet's ink band as wide as its share of the widest reach and coloured as it looks through
+// the sheets above it. Each provenance line is as opaque as the source is corroborated by other
+// origins, and says so in words. Pointing at a sheet brings it to the front.
 function evidence(board, url, caseData) {
   const plan = evidencePlan(board.plates, caseData);
-  const sheets = plan.sheets.map((s) => `<section class="claim"><div class="rung">${esc(s.claim.rung)} ${esc(s.claim.id)}</div><p>${esc(s.claim.text)}</p>
-<div class="stack">${s.layers.map((l, i) => `<div class="layer" tabindex="0" style="opacity:${l.opacity};z-index:${s.layers.length - i};margin-left:${i * 28}px">${media(l.plate, url)}<div><div class="n">${num(l.plate.n)} ${esc(l.source)}</div>${caption(l.plate)}
+  const sheets = plan.sheets.map((s) => {
+    // Every layer is its own origin here (its address), so the engine merges nothing the plan kept apart.
+    const printed = buildSheets({ claim: { text: s.claim.text, reach: null }, corrections: s.layers.map((l) => ({ text: l.source, reach: l.plate.source.reach, origin: l.plate.source.post || l.plate.source.media || `plate ${l.plate.n}` })) }).slice(1);
+    return `<section class="claim"><div class="rung">${esc(s.claim.rung)} ${esc(s.claim.id)}</div><p>${esc(s.claim.text)}</p>
+<div class="stack">${s.layers.map((l, i) => { const p = printed[i] || {}; return `<div class="layer" tabindex="0" style="z-index:${s.layers.length - i};margin-left:${i * 28}px"><div class="ink" aria-hidden="true"><span style="background:${esc(p.seen || "transparent")};width:${p.cover ? Math.round(p.cover * 1000) / 10 : 0}%"></span></div>${media(l.plate, url)}<div><div class="n">${num(l.plate.n)} ${esc(l.source)}${p.share != null && p.share > 0 ? ` · ${p.share}% of the widest reach` : ""}</div>${caption(l.plate)}
 <div class="prov" style="opacity:${l.provenance_opacity}">${l.corroborated_by ? `Corroborated by ${l.corroborated_by} other ${l.corroborated_by === 1 ? "origin" : "origins"} among this claim's sources.` : "No other origin among this claim's sources."}</div>
-<div class="hash">${l.plate.source && l.plate.source.reach != null ? esc(Number(l.plate.source.reach).toLocaleString("en-US")) + " views shown. " : ""}${l.plate.source && l.plate.source.sha256 ? "SHA-256 " + esc(l.plate.source.sha256) : ""}</div></div></div>`).join("")}</div></section>`);
+<div class="hash">${l.plate.source && l.plate.source.reach != null ? esc(Number(l.plate.source.reach).toLocaleString("en-US")) + " views shown. " : ""}${l.plate.source && l.plate.source.sha256 ? "SHA-256 " + esc(l.plate.source.sha256) : ""}</div></div></div>`; }).join("")}</div></section>`;
+  });
   const rest = board.plates.filter((p) => plan.unmatched.includes(p.n)).map((p) => `<div class="row"><div class="when">${num(p.n)}</div>${media(p, url)}${caption(p)}</div>`);
   return `<main class="sheet">${header(board)}${sheets.join("\n")}${rest.join("\n")}</main>`;
 }
@@ -16551,5 +16645,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

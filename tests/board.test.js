@@ -130,3 +130,14 @@ test("the claim sheet pairs reach (sheet opacity) with corroboration (provenance
   const html = boardHtml(b, { layout: "evidence", caseData });
   assert.match(html, /class="prov" style="opacity:0\.5">Corroborated by 1 other origin among this claim's sources\./);
 });
+
+test("the evidence board prints through the shared sheet engine: ink bands by reach, no CSS opacity on sheets", () => {
+  const b = boardFrom([entry({ post: "https://x.com/a/status/1", engagement: { views: 1000 } }, ["a.jpg"]), entry({ post: "https://www.reuters.com/world/flood", engagement: { views: 250 } }, ["b.jpg"])]);
+  const caseData = { sources: [{ id: "S1", url: "https://x.com/a/status/1" }, { id: "S2", url: "https://www.reuters.com/world/flood" }], claims: [{ id: "C1", text: "Flood", rung: "documented", source: "S1 S2" }] };
+  const html = boardHtml(b, { layout: "evidence", caseData });
+  const bands = [...html.matchAll(/<div class="ink" aria-hidden="true"><span style="background:(#[0-9a-f]{6});width:([\d.]+)%">/g)];
+  assert.equal(bands.length, 2);
+  assert.deepEqual(bands.map((m) => Number(m[2])), [100, 25]);
+  assert.doesNotMatch(html, /class="layer"[^>]*opacity/);
+  assert.match(html, /25% of the widest reach/);
+});

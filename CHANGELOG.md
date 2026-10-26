@@ -20,8 +20,10 @@ Capture a post as evidence, turn saves into study boards, and check where a quot
   the one before. `daylight capture verify <folder>` checks every file, picture, record and line, and
   says which changed. Nothing is sent anywhere. Not yet: a full-page picture, a page snapshot, a
   signed log and trusted time.
-- On an evidence board, each source's provenance line is as opaque as the source is backed by the
-  claim's other sources from other sites or accounts, and says how many.
+- An evidence board prints each claim over its sources with the same sheet engine as the discourse
+  sheets: each source's ink band is its share of the widest reach. Each source's provenance line is
+  as opaque as the source is backed by the claim's other sources from other sites or accounts, and
+  says how many.
 - **Study boards.** Saved items become numbered plates in a board you can print, save as one web
   page or keep as a folder: a book with running heads, numbered plates, captions and a keyword line;
   a grid; or a timeline in posted order with long silences drawn as breaks. Open one from the

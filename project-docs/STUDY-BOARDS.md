@@ -74,11 +74,12 @@ Moodboards keep working on the collections page as before.
   with its length, so silences and bursts show. For journalism: the order things were posted, not
   saved.
 - **Evidence.** With a case (`daylight case`): each plate matched to the case's source by address.
-  The layout uses the sheet model shared with the analysis view and the site: each claim is drawn
-  over the plates of the sources it cites, as stacked sheets, and each sheet's opacity comes from that
-  source's reach on a log scale (`0.25 + 0.75 × log(1 + reach) / log(1 + widest reach)`; unknown reach
-  is faint at 0.25). A widely seen post covers a little-seen correction the way it does in the feed;
-  hovering or focusing a sheet lifts it to full. Paired with it, each layer's provenance line is as
+  The layout prints through Daylight's one sheet engine (`src/core/discourse/sheets.js`, shared with
+  the discourse sheets page): each claim over the plates of the sources it cites, as stacked sheets,
+  the most-seen on top. Each sheet's ink band is as wide as its share of the widest reach and coloured
+  as it looks through the sheets above it; a sheet with no reach figure prints no ink. A widely seen
+  post covers a little-seen correction the way it does in the feed; pointing at a sheet or focusing
+  it brings it to the front. Each sheet also states its share in words. Paired with it, each layer's provenance line is as
   opaque as the source is corroborated by the claim's other sources from other origins (another site
   or account: 0.25 alone, full at three) and says the count in words. Every plate shows its SHA-256, and plates no claim
   cites are listed after the sheets.

@@ -31,8 +31,9 @@ format (`project-docs/SIDECAR-FORMAT.md`) and the case workbench (`daylight case
 ## The claim view: a claim over its sources
 
 The evidence board (`daylight board make --layout evidence --case ...`) draws each claim as a sheet
-over the plates of the sources it cites. Two readouts, paired: the sheet's opacity is the source's
-reach (the views the page showed, on a log scale), and the provenance line's opacity is how far the
+over the plates of the sources it cites, printed by the one sheet engine Daylight has
+(`src/core/discourse/sheets.js`). Two readouts, paired: the sheet's ink coverage is the source's
+reach (the views the page showed, as a share of the widest), and the provenance line's opacity is how far the
 source is corroborated by the claim's other sources from other origins (another site or another
 account; 0.25 alone, full at three). The line also says it in words, so neither readout depends on
 seeing opacity.
