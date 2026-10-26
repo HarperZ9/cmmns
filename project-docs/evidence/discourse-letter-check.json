@@ -1,0 +1,8 @@
+{
+  "about": "The document check on the study's real case: a post characterising a law firm's six-page letter, shown as four images (two of them two-page spreads). Run 2026-10-25 in Node with Daylight's own recogniser, each image scaled to at most 2,400 pixels a side as the extension does. Only terms and counts are kept; the letter's text and the images stay outside the repository.",
+  "images": 4,
+  "recogniserConfidence": [0.989, 0.993, 0.987, 0.994],
+  "linesRead": [43, 46, 107, 40],
+  "postTerms": { "absent": ["security clearances", "divulging classified", "classified information", "illegal access", "admitting"], "found": { "Jared Kushner": [1, 3] } },
+  "note": "The single word \"classified\" appears once, on image 3, in another sense (\"would certainly not be classified as a defender\"); the post's phrase \"classified information\" does not appear."
+}

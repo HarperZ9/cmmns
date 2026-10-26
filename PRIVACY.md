@@ -150,6 +150,14 @@ and any hash of either stay in your browser, and the text lasts as long as that 
 - On the command line, `daylight case add` no longer asks the Wayback Machine for a copy unless you
   pass `--archive` or turn the case's archive setting on.
 
+## Discourse checks
+
+Off until you turn on Discourse checks in the options. The quote index and the name list ship inside
+the extension and are read in its background worker; a post's text and an account's display name
+and handle go there, inside your browser, and nowhere else. Counts, replies and document pages are
+read on the page. Document pages are read only on your click, with Read text in images on. Nothing
+is kept beyond the page, except what you save as a study item.
+
 ## What Daylight Commons keeps, where, and for how long
 
 Everything is kept in `chrome.storage.local` (Firefox: `browser.storage.local`) in the browser

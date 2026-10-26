@@ -1,0 +1,24 @@
+{
+ "format": "radar-pack/1",
+ "manifest": {
+  "name": "Daylight Commons discourse data",
+  "version": "2026.10.25",
+  "description": "The quote finder's index of public-domain texts with its sourced lists, and the persona marker's names of people who have died, from Wikidata.",
+  "author": {
+   "keyId": "0e5e19840565840c977e0f036c9ac021",
+   "name": "Daylight Commons project key"
+  },
+  "created": "2026-10-25",
+  "files": {
+   "quotes.json": "2c6e6feb3b3206d06f76f5907d1e111c10aa91aa07d18a833a7634c25ec9db21",
+   "persons.json": "67fe681ad247f24bcd3f4a01b67924bd995c9e7a679e261bd81106835808b352"
+  }
+ },
+ "publicKey": {
+  "kty": "EC",
+  "crv": "P-256",
+  "x": "0iyHwn2zRDoP7RfuuxvKGxhRYmAXiS7NelteWFPo8CM",
+  "y": "8n431mx6HCqh1hNM1xZmJeDX2ZPckhNUlIBezeKro_k"
+ },
+ "signature": "IR14v0p3vBHYhzBXfz5lZA2Y8Fu4vnqZuTKwKm0-wqx9P62j2s0KH2aG2kUKjf2zmHZuTU43_Asb5OJeBqVuIA"
+}

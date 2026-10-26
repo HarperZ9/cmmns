@@ -17,7 +17,7 @@ const read = (p) => readFileSync(join(ROOT, p), "utf8");
 // the statutes' own words (UK legislation writes "if—"), generated from catalogue/.
 const SKIP = /^(claims(-\d+)?\.json|owners\.json|sites\.json|core\.bundle\.js|catalogue-data\.js|(rhetoric|lexicon)(-[a-z]+)?\.js)$/;
 const USER_FACING = [
-  ...list("src/ext", /\.(html|js|css|json)$/), ...list("src/ext/learn", /\.js$/), ...list("src/core", /\.js$/),
+  ...list("src/ext", /\.(html|js|css|json)$/), ...list("src/ext/learn", /\.js$/), ...list("src/core", /\.js$/), ...list("src/core/discourse", /\.js$/),
   ...list("docs", /\.html$/), "README.md", "PRIVACY.md", "docs/store/LISTING.md",
 ].filter((p) => !SKIP.test(basename(p)));
 

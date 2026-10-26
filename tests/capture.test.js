@@ -135,3 +135,16 @@ test("origin collapse: five outlets relaying one wire story count as one upstrea
   assert.deepEqual(r.collapsed, [{ upstream: "wire.example/story/1", relays: ["a", "b", "c", "d", "e"] }]);
   assert.deepEqual(originCollapse(items.slice(0, 2)).collapsed, []);
 });
+
+test("capture is wired in both browsers: worker script, page script, menu item", async () => {
+  const { readFileSync } = await import("node:fs");
+  const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
+  const m = JSON.parse(read("src/ext/manifest.json"));
+  const bg = m.background.scripts;
+  assert.ok(bg.indexOf("capture-bg.js") > bg.indexOf("quick-save-bg.js"), "Firefox loads the capture worker after the save worker");
+  assert.match(read("src/ext/background.js"), /importScripts\([^)]*"quick-save-bg\.js", "capture-bg\.js"/);
+  assert.ok(m.content_scripts.some((c) => c.js.indexOf("quick-capture.js") > c.js.indexOf("quick-save.js")));
+  const q = read("src/ext/quick-save-bg.js");
+  assert.match(q, /"quick-save\.js", "quick-capture\.js"/);
+  assert.match(q, /\["pb-capture", "Capture as evidence"/);
+});

@@ -1,0 +1,21 @@
+/* sheets.css: the post and what lies under it, as sheets (src/core/discourse/sheets.js). Each sheet's
+   ink is the engine's composite at its depth, set by the page; everything else uses the canon tokens. */
+.sheets-page { max-width: var(--wide); margin: 0 auto; padding: var(--s-6) var(--gutter); }
+.sheet-stack { list-style: none; margin: var(--s-5) 0 0; padding: 0; position: relative; }
+.sheet { position: relative; margin: 0 0 calc(-1 * var(--s-6)); padding: var(--s-4) var(--s-4) var(--s-7); border: 1px solid var(--line-strong);
+  background: var(--paper); transition: transform 0.6s ease-out, opacity 0.6s ease-out; }
+.sheet:last-child { margin-bottom: 0; padding-bottom: var(--s-4); }
+/* the sheet's ink: a band whose inked width is the sheet's reach share, in the colour seen at its depth;
+   the words sit on paper beside it, so the reading never depends on the ink */
+.sheet .ink { position: relative; height: var(--s-3); margin: 0 0 var(--s-3) 4.5rem; background: var(--inset); outline: 1px solid var(--line); }
+.sheet .ink span { display: block; height: 100%; min-width: 2px; }
+.sheet .body { position: relative; display: grid; grid-template-columns: 4.5rem 1fr; gap: var(--s-3); align-items: start; }
+.sheet .depth { font-family: var(--font-mono); font-size: var(--t-label); color: var(--soft); }
+.sheet .text { margin: 0; color: var(--ink); }
+.sheet .reach { margin: var(--s-2) 0 0; font-family: var(--font-mono); font-size: var(--t-label); color: var(--soft); }
+.sheet button { margin-top: var(--s-2); font: inherit; font-size: var(--t-label); padding: var(--s-1) var(--s-3); border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control); background: var(--paper); color: var(--ink); cursor: pointer; }
+.sheet button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.sheet.lifted { transform: translateY(-1.25rem); opacity: 0.18; }
+.sheet.ground { border-style: dashed; }
+@media (prefers-reduced-motion: reduce) { .sheet { transition: none; } }

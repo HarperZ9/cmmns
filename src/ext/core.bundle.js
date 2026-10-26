@@ -12741,6 +12741,8 @@ function postMeta(m = {}, now = new Date().toISOString()) {
     study: !!m.study, studyNote: m.studyNote ? String(m.studyNote).replace(/\s+/g, " ").trim().slice(0, 300) || null : null,
     // Further text the page showed, under its own heading (YouTube chapters and transcript).
     notes: (m.notes || []).filter((n) => n && n.label && n.text).map((n) => ({ label: String(n.label).slice(0, 80), text: clean(n.text) })),
+    // The analyses a study save carries as notes (src/core/discourse/cards.js studyNotes), by sign family.
+    analysis: (m.analysis || []).filter((a) => typeof a === "string" && /^[a-z][a-z0-9-]{1,40}$/.test(a)).slice(0, 20),
   };
 }
 
@@ -12775,7 +12777,7 @@ function frontMatter(meta, files) {
     flair: meta.flair || null, selection: meta.selection ? true : null,
     thread_complete: meta.thread && meta.thread.length && meta.threadComplete === true ? true : meta.threadComplete === "unknown" ? "unknown" : null,
     engagement: meta.engagement || null,
-    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null };
+    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
 }
 
@@ -14552,6 +14554,9 @@ const DEFAULTS = Object.freeze({
   lensAll: false,
   // The pressure lens (src/core/reading-pressure.js): its own switch, off by default.
   pressureLens: false,
+  // The discourse checks (src/core/discourse/): quote sources, persona names, counts with their sample
+  // size, document images against the post and correction replies. Off by default; all run on this device.
+  discourse: false,
   // Ad blocking (src/ext/adblock-bg.js): off by default; sites in adblockAllow are always left alone.
   adblock: false, adblockAllow: [],
   // One-click downloads (src/ext/quick-*.js): the Download button on X and Reddit posts, on by
@@ -14607,6 +14612,7 @@ function normalizeSettings(raw) {
     evidence: bool(s.evidence, DEFAULTS.evidence),
     lensAll: bool(s.lensAll, DEFAULTS.lensAll),
     pressureLens: bool(s.pressureLens, DEFAULTS.pressureLens),
+    discourse: bool(s.discourse, DEFAULTS.discourse),
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
@@ -14893,7 +14899,7 @@ const TOUR_GAP_MS = 60 * 60 * 1000;
 const DAY_MS = 86400000;
 
 const ID = /^[a-z][a-z0-9-]{1,40}$/;
-const PAGES = new Set(["learn.html", "quiz.html"]);
+const PAGES = new Set(["learn.html", "quiz.html", "sheets.html"]);
 
 // The lesson page for a sign family, or null for an id that cannot be a lesson.
 function lessonPath(fam) {

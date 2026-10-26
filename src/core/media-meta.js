@@ -57,6 +57,8 @@ export function postMeta(m = {}, now = new Date().toISOString()) {
     study: !!m.study, studyNote: m.studyNote ? String(m.studyNote).replace(/\s+/g, " ").trim().slice(0, 300) || null : null,
     // Further text the page showed, under its own heading (YouTube chapters and transcript).
     notes: (m.notes || []).filter((n) => n && n.label && n.text).map((n) => ({ label: String(n.label).slice(0, 80), text: clean(n.text) })),
+    // The analyses a study save carries as notes (src/core/discourse/cards.js studyNotes), by sign family.
+    analysis: (m.analysis || []).filter((a) => typeof a === "string" && /^[a-z][a-z0-9-]{1,40}$/.test(a)).slice(0, 20),
   };
 }
 
@@ -91,7 +93,7 @@ function frontMatter(meta, files) {
     flair: meta.flair || null, selection: meta.selection ? true : null,
     thread_complete: meta.thread && meta.thread.length && meta.threadComplete === true ? true : meta.threadComplete === "unknown" ? "unknown" : null,
     engagement: meta.engagement || null,
-    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null };
+    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
 }
 

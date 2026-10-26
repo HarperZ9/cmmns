@@ -1,0 +1,21 @@
+{
+  "about": "Held out: labelled on 2026-10-25 after the matcher's rules were frozen, from memory of the works and of common online wordings, and scored once (scripts/eval-discourse.mjs --heldout). Not used to tune anything.",
+  "cases": [
+    { "q": "Very little is needed to make a happy life.", "by": "Marcus Aurelius", "expect": "found", "work": "aurelius-long", "at": "Book VII" },
+    { "q": "Loss is nothing else but change.", "by": "Marcus Aurelius", "expect": "found", "work": "aurelius-long", "at": "Book IX", "alt": [{ "work": "aurelius-casaubon", "at": "Ninth Book" }] },
+    { "q": "The universe is change; our life is what our thoughts make it.", "by": "Marcus Aurelius", "expect": "found", "work": "aurelius-long", "at": "Book IV", "alt": [{ "work": "aurelius-casaubon", "at": "Fourth Book" }] },
+    { "q": "That which is not good for the swarm, neither is it good for the bee.", "by": "Marcus Aurelius", "expect": "found", "work": "aurelius-long", "at": "Book VI", "alt": [{ "work": "aurelius-casaubon", "at": "Sixth Book" }] },
+    { "q": "The hour of departure has arrived, and we go our ways, I to die, and you to live.", "by": "Socrates", "expect": "found", "work": "plato-apology", "at": "paragraph" },
+    { "q": "I neither know nor think that I know.", "by": "Socrates", "expect": "found", "work": "plato-apology", "at": "paragraph" },
+    { "q": "Man is the cruellest animal.", "by": "Nietzsche", "expect": "found", "work": "nietzsche-zarathustra", "at": "Convalescent" },
+    { "q": "Insanity in individuals is something rare, but in groups, parties, nations and epochs it is the rule.", "by": "Nietzsche", "expect": "found", "work": "nietzsche-bge", "at": "section 156" },
+    { "q": "Wealth is like sea-water; the more we drink, the thirstier we become.", "by": "Schopenhauer", "expect": "found", "work": "schopenhauer-wisdom", "at": "Chapter III" },
+    { "q": "Twice two makes four is not life, gentlemen, but is the beginning of death.", "by": "Dostoevsky", "expect": "found", "work": "dostoevsky-underground", "at": "Part I" },
+    { "q": "That which does not kill us makes us stronger.", "by": "Nietzsche", "expect": "absent" },
+    { "q": "Luck is what happens when preparation meets opportunity.", "by": "Seneca", "expect": "absent" },
+    { "q": "To live is the rarest thing in the world. Most people exist, that is all.", "by": "Oscar Wilde", "expect": "absent" },
+    { "q": "The mind is everything. What you think you become.", "by": "Buddha", "expect": "absent" },
+    { "q": "Pain and suffering are always inevitable for a large intelligence and a deep heart.", "by": "Dostoevsky", "expect": "absent" },
+    { "q": "Whoever fights monsters must take care that he does not become one in the process of fighting.", "by": "Nietzsche", "expect": "found", "work": "nietzsche-bge", "at": "section 146" }
+  ]
+}
