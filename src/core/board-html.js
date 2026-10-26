@@ -1,6 +1,6 @@
 // A study board (refdb.board/1) as one HTML page: book spreads, a grid, a timeline, or an evidence
 // board of sheets. The page stands alone, needs no script, and prints to A4 pages. House type:
-// Accession Stencil for running heads and titles (JetBrains Mono when it is absent), Hanken Grotesk
+// Accession Stencil for running heads and titles, Hanken Grotesk
 // for captions and text, JetBrains Mono for numbers. Ink on paper; the one hot mark is the right-hand
 // running head. In the evidence board each claim is a sheet over its sources, opacity from reach.
 
@@ -11,11 +11,12 @@ const num = (n) => `( ${n} )`;
 // Where a plate's media is, from the page: plates/<file name> unless the caller maps it (blob URLs).
 const defaultUrl = (m) => `plates/${encodeURIComponent(String(m.path || m.id).split(/[\\/]/).pop())}`;
 
-const CSS = (fonts, accession) => `${accession ? `@font-face { font-family: "Accession Stencil"; src: url("${fonts}AccessionStencil.woff2") format("woff2"); font-weight: 100 900; }
+const HEADS = { grotesk: "var(--sans)", accession: "\"Accession Stencil\", var(--mono)", mono: "var(--mono)" };
+const CSS = (fonts, head) => `${head === "accession" ? `@font-face { font-family: "Accession Stencil"; src: url("${fonts}AccessionStencil.woff2") format("woff2"); font-weight: 300 900; }
 ` : ""}@font-face { font-family: "Hanken Grotesk"; src: url("${fonts}hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; }
 @font-face { font-family: "JetBrains Mono"; src: url("${fonts}jetbrains-mono-regular.woff2") format("woff2"); }
 :root { --paper: #ebe5d8; --ink: #16130f; --soft: #4a443b; --rule: #c9bfab; --hot: #8f3a19; --ground: #d8cfbc;
-  --sans: "Hanken Grotesk", "Segoe UI", sans-serif; --mono: "JetBrains Mono", Consolas, monospace; --head: "Accession Stencil", var(--mono); }
+  --sans: "Hanken Grotesk", "Segoe UI", sans-serif; --mono: "JetBrains Mono", Consolas, monospace; --head: ${HEADS[head] || HEADS.grotesk}; }
 * { box-sizing: border-box; }
 html { background: var(--ground); color: var(--ink); font: 400 15px/1.5 var(--sans); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 body { margin: 0; padding: 32px 16px 64px; }
@@ -124,9 +125,9 @@ function evidence(board, url, caseData) {
   return `<main class="sheet">${header(board)}${sheets.join("\n")}${rest.join("\n")}</main>`;
 }
 
-// The page. opts: { fonts: "fonts/", url: (media, plate) => address, caseData, layout, accession }.
-// accession: true only where AccessionStencil.woff2 sits beside the other fonts.
-export function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData = null, layout = board.layout || "book", accession = false } = {}) {
+// The page. opts: { fonts: "fonts/", url: (media, plate) => address, caseData, layout, head }.
+// head: the face for running heads and titles (grotesk, accession or mono), else the board's own.
+export function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData = null, layout = board.layout || "book", head = board.head || "grotesk" } = {}) {
   const body = layout === "grid" ? grid(board, url) : layout === "timeline" ? timeline(board, url) : layout === "evidence" ? evidence(board, url, caseData) : book(board, url);
   return `<!doctype html>
 <html lang="en">
@@ -135,7 +136,7 @@ export function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Daylight Commons study board (${esc(board.format)})">
 <title>${esc(board.running_head.left)}</title>
-<style>${CSS(fonts, accession)}</style>
+<style>${CSS(fonts, head)}</style>
 </head>
 <body>
 ${body}

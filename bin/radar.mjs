@@ -40,7 +40,7 @@ const USAGE = `Usage:
   daylight media compress <file> [the same options]
   daylight media fetch <page address> [--dir folder]       (needs a system yt-dlp)
   daylight sidecar check <folder>                          (flags unproved thread continuations)
-  daylight board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--pdf]
+  daylight board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--head grotesk|accession|mono] [--pdf]
   daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
   daylight case <command>   an investigation case folder; "daylight case help" lists the commands
@@ -63,7 +63,7 @@ export function parseArgs(argv) {
     const a = argv[i];
     if (!a.startsWith("--")) { out._.push(a); continue; }
     const [k, v] = a.slice(2).split("=");
-    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate", "title", "lane", "keywords", "layout", "site", "since", "until", "case", "dir"].includes(k) ? argv[++i] : true;
+    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate", "title", "lane", "keywords", "layout", "head", "site", "since", "until", "case", "dir"].includes(k) ? argv[++i] : true;
   }
   return out;
 }

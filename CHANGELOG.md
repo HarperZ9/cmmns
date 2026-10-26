@@ -16,6 +16,9 @@ were not published to a store.
   layout for a case (each claim drawn over its sources, more widely seen sources drawn more opaque),
   Share clean plates, a PDF and a SHA-256 manifest. `daylight board render <board.json>` draws a
   board made by the reference library. One format, `refdb.board/1`, for both.
+- A board's running heads and titles take the face you pick: Hanken Grotesk, Accession Stencil or
+  JetBrains Mono. Accession Stencil now ships with Daylight Commons under the SIL Open Font License
+  1.1.
 
 ## 3.6.2 (2026-10-26)
 

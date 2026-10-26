@@ -14,10 +14,9 @@ import { shareClean } from "../../src/core/clean.js";
 import { loadCase } from "../../src/investigate/store.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-// Hanken Grotesk and JetBrains Mono ship with Daylight Commons. Accession Stencil, the house face for
-// running heads, is copied in only from DAYLIGHT_ACCESSION (a path to its woff2) until its licence is
-// recorded in the font itself; without it the heads fall back to JetBrains Mono.
-const FONTS = [["hanken-grotesk.woff2", "src/ext/fonts/hanken-grotesk.woff2"], ["jetbrains-mono-regular.woff2", "src/ext/fonts/jetbrains-mono-regular.woff2"]];
+// The three faces that ship with Daylight Commons, all under the SIL Open Font License 1.1: Accession
+// Stencil for running heads and titles, Hanken Grotesk for words, JetBrains Mono for figures.
+const FONTS = [["AccessionStencil.woff2", "src/ext/fonts/AccessionStencil.woff2"], ["hanken-grotesk.woff2", "src/ext/fonts/hanken-grotesk.woff2"], ["jetbrains-mono-regular.woff2", "src/ext/fonts/jetbrains-mono-regular.woff2"]];
 const sha = (b) => createHash("sha256").update(b).digest("hex");
 
 function* notes(dir, depth = 0) {
@@ -98,16 +97,14 @@ export async function makeBoard(dir, f = {}, env = process.env) {
   if (!items.length) throw new Error("No saved items with Daylight notes were found there (or none matched the filters).");
   mkdirSync(out, { recursive: true });
   const { entries, lines } = await writePlates(out, items, f);
-  const board = boardFrom(entries, { title: f.title, lane: f.lane, keywords: f.keywords, layout: f.layout });
+  const board = boardFrom(entries, { title: f.title, lane: f.lane, keywords: f.keywords, layout: f.layout, head: f.head });
   const caseData = f.case ? loadCase(f.case) : null;
   mkdirSync(join(out, "fonts"), { recursive: true });
   for (const [name, from] of FONTS) copyFileSync(join(ROOT, from), join(out, "fonts", name));
-  const accession = !!(env.DAYLIGHT_ACCESSION && existsSync(env.DAYLIGHT_ACCESSION));
-  if (accession) copyFileSync(env.DAYLIGHT_ACCESSION, join(out, "fonts", "AccessionStencil.woff2"));
   if (!f["no-sidecars"]) { mkdirSync(join(out, "sidecars"), { recursive: true }); for (const it of items) copyFileSync(it.path, join(out, "sidecars", it.sidecarName)); }
   if (caseData) { mkdirSync(join(out, "case"), { recursive: true }); for (const t of ["case.json", "sources.jsonl", "claims.jsonl", "edges.jsonl"]) if (existsSync(join(f.case, t))) copyFileSync(join(f.case, t), join(out, "case", t)); }
   writeFileSync(join(out, "board.json"), JSON.stringify(board, null, 2) + "\n");
-  writeFileSync(join(out, "index.html"), boardHtml(board, { caseData, accession }));
+  writeFileSync(join(out, "index.html"), boardHtml(board, { caseData }));
   let pdf = "";
   if (f.pdf) {
     const chrome = findChrome(env);
@@ -135,11 +132,9 @@ export async function renderSpec(specPath, f = {}, env = process.env) {
   }
   mkdirSync(join(out, "fonts"), { recursive: true });
   for (const [name, from] of FONTS) copyFileSync(join(ROOT, from), join(out, "fonts", name));
-  const accession = !!(env.DAYLIGHT_ACCESSION && existsSync(env.DAYLIGHT_ACCESSION));
-  if (accession) copyFileSync(env.DAYLIGHT_ACCESSION, join(out, "fonts", "AccessionStencil.woff2"));
   const layout = typeof f.layout === "string" ? f.layout : spec.layout || "book";
   writeFileSync(join(out, "board.json"), JSON.stringify(spec, null, 2) + "\n");
-  writeFileSync(join(out, "index.html"), boardHtml(spec, { layout, accession, caseData: f.case ? loadCase(f.case) : null }));
+  writeFileSync(join(out, "index.html"), boardHtml(spec, { layout, head: typeof f.head === "string" ? f.head : spec.head, caseData: f.case ? loadCase(f.case) : null }));
   const count = manifest(out);
   return { out, line: `Board "${spec.running_head.left}" (${layout}, ${spec.plates.length} plates) written to ${out}.\n${count} files listed in MANIFEST.sha256.${missing.length ? "\nNot found: " + missing.join("; ") : ""}\n` };
 }

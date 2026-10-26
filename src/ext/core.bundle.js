@@ -13120,6 +13120,8 @@ const M_board = (() => {
 
 const BOARD_FORMAT = "refdb.board/1";
 const LAYOUTS = ["book", "grid", "timeline", "evidence"];
+// The face for running heads and titles: one choice among the shipped faces, never a fixed house look.
+const HEAD_FACES = ["grotesk", "accession", "mono"];
 const LANES = ["design", "research", "journalism", "sound", "writing", "film", "science", "history"];
 
 // A sidecar's front matter and the parts of its body a plate needs (daylight.sidecar/1).
@@ -13170,11 +13172,11 @@ function platesOf(entry) {
 const words = (v) => [...new Set((Array.isArray(v) ? v : String(v || "").split(",")).map((w) => String(w).trim()).filter(Boolean))].slice(0, 8);
 
 // The board. opts: { title, lane, keywords, layout, kind, key, created }.
-function boardFrom(entries, { title = "Study board", lane = "research", keywords = [], layout = "book", kind = "saves", key = null, created = new Date().toISOString() } = {}) {
+function boardFrom(entries, { title = "Study board", lane = "research", keywords = [], layout = "book", head = "grotesk", kind = "saves", key = null, created = new Date().toISOString() } = {}) {
   const plates = entries.filter((e) => e && e.sidecar).flatMap(platesOf).map((p, i) => ({ n: i + 1, ...p }));
   const t = String(title).slice(0, 120), l = String(lane || "research").slice(0, 60);
   return { format: BOARD_FORMAT, kind, key: key || t, running_head: { left: t, right: l.toUpperCase() }, lane: l, keyword_line: words(keywords),
-    plates, also_in: { documents: 0, units: 0 }, sources: { daylight: { from: "saves" } }, layout: LAYOUTS.includes(layout) ? layout : "book", created };
+    plates, also_in: { documents: 0, units: 0 }, sources: { daylight: { from: "saves" } }, layout: LAYOUTS.includes(layout) ? layout : "book", head: HEAD_FACES.includes(head) ? head : "grotesk", created };
 }
 
 // A 3.6.0 moodboard (src/ext/media-store.js: the board and its records) as a board.
@@ -13254,14 +13256,14 @@ function evidencePlan(plates, caseData) {
   return { sheets, unmatched: plates.filter((p) => !used.has(p.n)).map((p) => p.n) };
 }
 
-return { BOARD_FORMAT, LAYOUTS, LANES, parseSidecar, mediaKind, boardFrom, boardFromMoodboard, plateCaption, bookPages, timelineRows, sheetOpacity, evidencePlan };
+return { BOARD_FORMAT, LAYOUTS, HEAD_FACES, LANES, parseSidecar, mediaKind, boardFrom, boardFromMoodboard, plateCaption, bookPages, timelineRows, sheetOpacity, evidencePlan };
 })();
 
 // ---- board-html.js
 const M_board_html = (() => {
 // A study board (refdb.board/1) as one HTML page: book spreads, a grid, a timeline, or an evidence
 // board of sheets. The page stands alone, needs no script, and prints to A4 pages. House type:
-// Accession Stencil for running heads and titles (JetBrains Mono when it is absent), Hanken Grotesk
+// Accession Stencil for running heads and titles, Hanken Grotesk
 // for captions and text, JetBrains Mono for numbers. Ink on paper; the one hot mark is the right-hand
 // running head. In the evidence board each claim is a sheet over its sources, opacity from reach.
 
@@ -13272,11 +13274,12 @@ const num = (n) => `( ${n} )`;
 // Where a plate's media is, from the page: plates/<file name> unless the caller maps it (blob URLs).
 const defaultUrl = (m) => `plates/${encodeURIComponent(String(m.path || m.id).split(/[\\/]/).pop())}`;
 
-const CSS = (fonts, accession) => `${accession ? `@font-face { font-family: "Accession Stencil"; src: url("${fonts}AccessionStencil.woff2") format("woff2"); font-weight: 100 900; }
+const HEADS = { grotesk: "var(--sans)", accession: "\"Accession Stencil\", var(--mono)", mono: "var(--mono)" };
+const CSS = (fonts, head) => `${head === "accession" ? `@font-face { font-family: "Accession Stencil"; src: url("${fonts}AccessionStencil.woff2") format("woff2"); font-weight: 300 900; }
 ` : ""}@font-face { font-family: "Hanken Grotesk"; src: url("${fonts}hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; }
 @font-face { font-family: "JetBrains Mono"; src: url("${fonts}jetbrains-mono-regular.woff2") format("woff2"); }
 :root { --paper: #ebe5d8; --ink: #16130f; --soft: #4a443b; --rule: #c9bfab; --hot: #8f3a19; --ground: #d8cfbc;
-  --sans: "Hanken Grotesk", "Segoe UI", sans-serif; --mono: "JetBrains Mono", Consolas, monospace; --head: "Accession Stencil", var(--mono); }
+  --sans: "Hanken Grotesk", "Segoe UI", sans-serif; --mono: "JetBrains Mono", Consolas, monospace; --head: ${HEADS[head] || HEADS.grotesk}; }
 * { box-sizing: border-box; }
 html { background: var(--ground); color: var(--ink); font: 400 15px/1.5 var(--sans); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 body { margin: 0; padding: 32px 16px 64px; }
@@ -13385,9 +13388,9 @@ function evidence(board, url, caseData) {
   return `<main class="sheet">${header(board)}${sheets.join("\n")}${rest.join("\n")}</main>`;
 }
 
-// The page. opts: { fonts: "fonts/", url: (media, plate) => address, caseData, layout, accession }.
-// accession: true only where AccessionStencil.woff2 sits beside the other fonts.
-function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData = null, layout = board.layout || "book", accession = false } = {}) {
+// The page. opts: { fonts: "fonts/", url: (media, plate) => address, caseData, layout, head }.
+// head: the face for running heads and titles (grotesk, accession or mono), else the board's own.
+function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData = null, layout = board.layout || "book", head = board.head || "grotesk" } = {}) {
   const body = layout === "grid" ? grid(board, url) : layout === "timeline" ? timeline(board, url) : layout === "evidence" ? evidence(board, url, caseData) : book(board, url);
   return `<!doctype html>
 <html lang="en">
@@ -13396,7 +13399,7 @@ function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData = null,
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Daylight Commons study board (${esc(board.format)})">
 <title>${esc(board.running_head.left)}</title>
-<style>${CSS(fonts, accession)}</style>
+<style>${CSS(fonts, head)}</style>
 </head>
 <body>
 ${body}

@@ -35,7 +35,7 @@ spec, `refdb.board/1`. Daylight writes it and draws it, and draws one made by `r
 | `keyword_line` | up to eight words, the line at the foot of every page |
 | `plates` | in order; each has `n`, `unit` (the sidecar or record it came from), `item_ids`, `media` (`[{ id, kind, path }]`, kind `still`, `motion`, `audio` or `text`), `caption`, `medium` and `concepts` |
 | `also_in`, `sources` | the reference library's cross-references and measured summary; Daylight writes its own provenance under `sources.daylight` (`{ from: "saves" }` or `{ from: "moodboard", id }`) so it never collides with the library's keys |
-| `layout`, `created` | Daylight's additions: the layout to draw and when the board was made |
+| `layout`, `head`, `created` | Daylight's additions: the layout to draw, the face for running heads and titles (`grotesk`, `accession` or `mono`), and when the board was made |
 
 Daylight's plates add `source`: the sidecar's facts (site, handle, author, posted, saved, post
 address, media address, title, quoted text, alt text, item "2 of 4", study flag, note, SHA-256, and
@@ -123,8 +123,8 @@ A board shows what was saved and what the notes say about it. It does not check 
 true, that an item is still online, or that the plates are complete for a topic. The evidence layout
 shows links the case recorded, not links the board found.
 
-Type: Accession Stencil is the house face for running heads and titles. The current build records in
-the font itself "Licence: not yet chosen ... not for distribution", so it does not ship yet: the
-command line takes it from `DAYLIGHT_ACCESSION` when set, and the heads fall back to JetBrains Mono.
-It ships once a build carries its licence (SIL OFL 1.1 is proposed). Hanken Grotesk and JetBrains Mono
-carry the text and numbers.
+Type: the running heads and titles take whichever face the person picks: Hanken Grotesk (the
+default), Accession Stencil or JetBrains Mono. Accession is one available face, never a fixed house
+look. The author licensed Accession under the SIL Open Font License 1.1 on 2026-10-26; it ships in
+the extension with its licence text, and a board's page loads it only when the board uses it. Hanken
+Grotesk and JetBrains Mono carry the text and numbers.

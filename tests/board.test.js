@@ -86,6 +86,16 @@ test("the page escapes captions, carries no script and draws every layout", () =
   assert.match(boardHtml(b, { layout: "book" }), /plates\/a\.jpg/);
 });
 
+test("the heading face is a choice, and Accession loads only when a board uses it", () => {
+  const b = boardFrom([entry({ site: "x" })], { title: "T" });
+  assert.equal(b.head, "grotesk");
+  assert.doesNotMatch(boardHtml(b), /AccessionStencil/);
+  assert.match(boardHtml(b, { head: "accession" }), /AccessionStencil\.woff2[\s\S]*--head: "Accession Stencil"/);
+  assert.match(boardHtml(b, { head: "mono" }), /--head: var\(--mono\)/);
+  assert.equal(boardFrom([], { head: "comic" }).head, "grotesk");
+  assert.match(boardHtml(b, { head: "</style><b>" }), /--head: var\(--sans\)/);
+});
+
 test("board make and board render write the page, board.json and a manifest", async () => {
   const dir = mkdtempSync(join(tmpdir(), "board-"));
   try {

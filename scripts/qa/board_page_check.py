@@ -58,6 +58,10 @@ async def main(work):
             await page.dispatch_event("#lane", "change")
             await asyncio.sleep(1)
             await page.screenshot(path=str(work / "boards-book.png"))
+            await page.select_option("#head", "accession")
+            await asyncio.sleep(1.5)
+            await page.screenshot(path=str(work / "boards-book-accession.png"))
+            out["accession_loaded"] = await frame.locator("body").evaluate("""async () => { await document.fonts.load('600 32px "Accession Stencil"'); return [...document.fonts].some((f) => f.family.includes("Accession") && f.status === "loaded"); }""")
             out["head_right"] = await frame.locator("body").inner_text()
             out["head_right"] = "DESIGN" in out["head_right"]
             await page.select_option("#layout", "timeline")
