@@ -5,6 +5,12 @@ were not published to a store.
 
 ## Unreleased
 
+Nothing yet.
+
+## 3.8.0 (2026-10-26)
+
+Read how a post argues: its premises and conclusions, the kind of claim each sentence makes, where it goes beyond what it states, and when it rearranges its sources.
+
 ### Added
 - **Argument lens** (options, under Discourse checks, off by default; project-docs/ARGUMENT-LENS.md).
   Splits a post into premises, minor premises, supporting premises, assumptions, conclusions and turns
