@@ -1,0 +1,28 @@
+{
+  "format": "daylight.calibration-cases/1",
+  "fixed": "2026-10-26",
+  "about": "Preregistered case list for the retrospective calibration of Daylight Commons' post-level readouts (project-docs/CALIBRATION-STUDY.md). Fixed before any readout was run on any case. Cases are periods, not peoples: each is a place and a time window with a documented outcome. The study calibrates readouts; it never produces a risk score for any group, country or person.",
+  "outcomeKinds": {
+    "atrocity": "mass atrocity crimes documented by an international or national inquiry",
+    "tension-no-atrocity": "a period of high tension with documented dangerous speech, followed by no mass atrocity, documented by observers"
+  },
+  "cases": [
+    { "id": "P1", "place": "Rwanda", "window": "1993-07 to 1994-07", "outcome": "atrocity",
+      "outcomeSource": { "title": "ICTR, Prosecutor v. Nahimana, Barayagwiza and Ngeze (the Media case), Trial Chamber judgement, 3 December 2003", "status": "cited; not fetched" },
+      "readoutCorpus": { "title": "RTLM broadcast transcripts with English translations, ICTR exhibits", "where": "University of Texas Libraries, UNICTR RTLM tapes (for example https://repositories.lib.utexas.edu/items/0d43607d-197b-4879-a0c9-7c03802f7fe0/full)", "status": "blocked: the repository answered scripted requests with 403 on 2026-10-26; a person can download tapes from the item pages", "kind": "full broadcasts" } },
+    { "id": "P2", "place": "Myanmar (Rakhine State)", "window": "2016-10 to 2017-12", "outcome": "atrocity",
+      "outcomeSource": { "title": "Independent International Fact-Finding Mission on Myanmar, A/HRC/39/64 (2018) and detailed findings A/HRC/39/CRP.2 (17 September 2018)", "url": "https://www.ecoi.net/en/file/local/1441760/1930_1535440161_a-hrc-39-64.pdf", "sha256": "36791aa2179b15ef05231ee2ede7aa9d8603750bb5937aa7c21453f463e9abb5", "status": "fetched 2026-10-26 (A/HRC/39/64); CRP.2 not fetched (the UN library answered 202 with no body)" },
+      "readoutCorpus": { "title": "Posts and speeches quoted in A/HRC/39/CRP.2", "status": "quotes only, selected by the mission", "kind": "curated quotes" } },
+    { "id": "P3", "place": "Kenya", "window": "2007-12 to 2008-02", "outcome": "atrocity",
+      "outcomeSource": { "title": "Commission of Inquiry into Post-Election Violence (Waki report), October 2008; KNCHR, On the Brink of the Precipice (15 August 2008)", "url": "https://libraryir.parliament.go.ke/items/6573f071-aab2-49dd-91f5-a05c1fbfad57/full", "status": "item page reached 2026-10-26; the report PDF (about 189 MB) not fetched" },
+      "readoutCorpus": { "title": "Vernacular radio and SMS messages quoted by KNCHR", "status": "quotes only, selected by the commission", "kind": "curated quotes" } },
+    { "id": "C1", "place": "Kenya", "window": "2012-09 to 2013-05", "outcome": "tension-no-atrocity",
+      "outcomeSource": { "title": "EU Election Observation Mission, Kenya 2013, Final Report (29 May 2013)", "status": "cited; not fetched (EEAS archive page)" },
+      "readoutCorpus": { "title": "Umati project reports on online dangerous speech (iHub, 2013; EISF 2014)", "url": "https://ihub.co.ke/wp-content/uploads/2024/11/07-Umati-Report.pdf", "sha256": "49f6fc4232971d4bd7bf81eb2fe2fe2dbb238fd55bb07e2687d4217737c333e6", "also": { "url": "https://gisf.ngo/wp-content/uploads/2020/02/2257-EISF-2014-Monitoring-Online-Dangerous-Speech-in-Kenya.pdf", "sha256": "9aaffa472fc3da2fead6173e0dcb84e3a2d10d734904a20d4c916664f63a2ba6" }, "status": "fetched 2026-10-26", "kind": "curated quotes and counts" } }
+  ],
+  "neededForAValidRun": [
+    "Readout corpora that are samples of what people actually received in each window (full broadcasts, full feeds), not quotes chosen because they were dangerous: curated quotes make every readout look like a hit.",
+    "At least as many no-atrocity control periods as atrocity periods, matched on tension, with full samples.",
+    "A reviewer outside this workspace to check the case list, the outcome coding and the scoring before results are read."
+  ]
+}

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Argument annotation</title>
+<link rel="stylesheet" href="/system/doc.css">
+<style>
+@font-face { font-family: "Hanken Grotesk"; src: url("../fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; }
+:root { --a-paper: var(--paper, #ebe5d8); --a-ink: var(--ink, #16130f); --a-soft: var(--ink-muted, #4a443b); --a-rule: var(--rule, #c9bfab); --a-mark: var(--verified, #0a6b61); }
+body { background: var(--a-paper); color: var(--a-ink); font-family: "Hanken Grotesk", system-ui, sans-serif; }
+main { max-width: 58rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+.passage { border-top: 1px solid var(--a-rule); padding: 1.25rem 0; }
+.meta { color: var(--a-soft); font-size: .9rem; margin: 0 0 .75rem; }
+.words { line-height: 2.1; font-size: 1.0625rem; }
+.gap { display: inline-block; width: .9rem; margin: 0 .05rem; cursor: pointer; border: 0; background: none; padding: 0; vertical-align: middle; height: 1.4rem; }
+.gap:hover, .gap:focus-visible { outline: 1px dashed var(--a-soft); }
+.gap.cut { border-left: 3px solid var(--a-mark); }
+.segs { margin: .75rem 0 0; padding: 0; list-style: none; }
+.segs li { display: grid; grid-template-columns: 11rem 1fr; gap: .75rem; align-items: start; margin: .35rem 0; font-size: .95rem; }
+select, input, button.act { font: inherit; padding: .25rem .5rem; border: 1px solid var(--a-soft); background: var(--a-paper); color: var(--a-ink); border-radius: 2px; }
+.bar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Argument annotation</h1>
+  <p>Mark where each passage breaks into parts, then name each part. Click the space before a word to put a break there; click again to take it away. Mark breaks where the argument moves to a new claim, as you would with a pen. Then choose a role for each part. Work on your own: the lens's answers are not shown here.</p>
+  <p class="meta">Roles: <b>premise</b> (a claim the argument starts from), <b>minor premise</b> (the second claim that applies the first, often after "but", "now", "sed", "ora", "or", "ahora bien"), <b>supporting premise</b> (a reason for another premise), <b>assumption</b> (a condition or presupposition taken for granted), <b>conclusion</b> (where the argument lands), <b>turn</b> (a move against what came before), <b>other</b>.</p>
+  <div class="bar">
+    <label>Your initials <input id="who" size="6" autocomplete="off"></label>
+    <label>Language <select id="lang"><option value="">all</option><option>la</option><option>en</option><option>fr</option><option>es</option><option>pt</option></select></label>
+    <button class="act" id="save" type="button">Save my annotations as a file</button>
+    <span id="state" class="meta" aria-live="polite"></span>
+  </div>
+  <div id="list"></div>
+</main>
+<script src="argument.js"></script>
+</body>
+</html>

@@ -96,6 +96,11 @@ Turn on **Discourse checks** in the options and the window adds five more, all o
   on: which of the post's terms are on which page, and which are on none.
 - **Replies that bring a source or name an error,** ranked by the source, never by likes.
 
+**Argument lens** (its own switch): the parts of an argument (premises, conclusions, turns) at the
+words that join them, in five languages; the kind of claim each sentence makes; where a post goes
+beyond what it states; and posts that rearrange their sources' facts. Details in
+[project-docs/ARGUMENT-LENS.md](project-docs/ARGUMENT-LENS.md).
+
 Each can be saved with its post as a study item. Held out, the quote finder named the right passage
 for 8 of the 8 quotes it placed and found 8 of 11; details in
 [project-docs/DISCOURSE.md](project-docs/DISCOURSE.md).

@@ -146,6 +146,7 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <li>On the command line, <code>daylight case add</code> no longer asks the Wayback Machine for a copy unless you pass <code>--archive</code> or turn the case's archive setting on.</li></ul>
 <h2>Discourse checks</h2>
 <p>Off until you turn on Discourse checks in the options. The quote index and the name list ship inside the extension and are read in its background worker; a post's text and an account's display name and handle go there, inside your browser, and nowhere else. Counts, replies and document pages are read on the page. Document pages are read only on your click, with Read text in images on. Nothing is kept beyond the page, except what you save as a study item.</p>
+<p>The <strong>argument lens</strong>, with its claim-type, inference-gap and reframing markers, is off until you turn it on under the discourse checks. It reads the post's own text on the page and sends nothing.</p>
 <h2>What Daylight Commons keeps, where, and for how long</h2>
 <p>Everything is kept in <code>chrome.storage.local</code> (Firefox: <code>browser.storage.local</code>) in the browser profile you installed Daylight Commons in, on this device.</p>
 <div class="scroll"><table><thead><tr><th scope="col">Store</th><th scope="col">What it holds</th><th scope="col">Kept for</th></tr></thead><tbody>

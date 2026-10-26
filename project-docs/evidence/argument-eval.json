@@ -1,0 +1,116 @@
+{
+ "date": "2026-10-26",
+ "dev": {
+  "set": "claims-dev.json",
+  "cases": 20,
+  "labellersAgree": null,
+  "typeAccuracy": {
+   "right": 19,
+   "of": 20,
+   "interval": [
+    0.764,
+    0.991
+   ]
+  },
+  "gapPrecision": {
+   "right": 5,
+   "of": 5,
+   "interval": [
+    0.566,
+    1
+   ]
+  },
+  "gapRecall": {
+   "right": 5,
+   "of": 5
+  },
+  "misses": [
+   {
+    "text": "It's a calculated lie designed to fool people.",
+    "type": "statement",
+    "got": "factual claim, no source",
+    "gap": "mind",
+    "gotGap": "mind",
+    "typeGold": true,
+    "gapGold": true
+   }
+  ]
+ },
+ "round1AsDev": {
+  "set": "claims-heldout.json",
+  "cases": 20,
+  "labellersAgree": {
+   "type": 20,
+   "gap": 20
+  },
+  "typeAccuracy": {
+   "right": 20,
+   "of": 20,
+   "interval": [
+    0.839,
+    1
+   ]
+  },
+  "gapPrecision": {
+   "right": 4,
+   "of": 4,
+   "interval": [
+    0.51,
+    1
+   ]
+  },
+  "gapRecall": {
+   "right": 4,
+   "of": 4
+  },
+  "misses": []
+ },
+ "heldout": {
+  "set": "claims-heldout2.json",
+  "cases": 20,
+  "labellersAgree": {
+   "type": 16,
+   "gap": 20
+  },
+  "typeAccuracy": {
+   "right": 15,
+   "of": 16,
+   "interval": [
+    0.717,
+    0.989
+   ]
+  },
+  "gapPrecision": {
+   "right": 4,
+   "of": 5,
+   "interval": [
+    0.376,
+    0.964
+   ]
+  },
+  "gapRecall": {
+   "right": 4,
+   "of": 4
+  },
+  "misses": [
+   {
+    "text": "The inspector general found that the contracts were never put out to t",
+    "type": "sourced statement",
+    "got": "statement",
+    "gap": "none",
+    "gotGap": "none",
+    "typeGold": true,
+    "gapGold": true
+   },
+   {
+    "text": "Wages rose faster than prices this year. Therefore real wages went up.",
+    "type": "inference",
+    "got": "inference",
+    "gap": "none",
+    "gotGap": "leap",
+    "typeGold": true,
+    "gapGold": true
+   }
+  ]
+ }
+}

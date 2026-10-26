@@ -29,7 +29,7 @@ export function keyTerms(text) {
 // Where one term appears in one page's text: a phrase must appear whole; a word may be off by one
 // letter when it has six or more, for the recogniser's slips; a word's stem also counts
 // ("clearances" finds "clearance").
-function findIn(page, term) {
+export function findIn(page, term) {
   const p = fold(page).replace(/\s+/g, " "), t = fold(term).replace(/\s+/g, " ");
   if (p.includes(t)) return t;
   const parts = t.split(" ");

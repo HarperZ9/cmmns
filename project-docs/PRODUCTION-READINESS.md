@@ -191,6 +191,19 @@ fresh profile, on the demo stage's discourse thread (every account invented) wit
 Not tested: the checks on real X threads signed in, Firefox, and a measured precision for the
 persona marker, counts, document check and correction ranking on real posts.
 
+## Argument lens and claim markers (unreleased)
+
+Checked 2026-10-26 on the main branch after #88.
+
+| # | Area | Check | How | Result |
+|---|---|---|---|---|
+| 85 | Argument lens | Summa I q.2 a.2 objections 1 to 3: every break Aliocha marked, no other, the 3 "sed" as minor premises | `tests/discourse.argument.test.js` | 9 of 9 breaks (7 inner, 2 starts), 3 of 3 minor premises |
+| 86 | Argument lens | Gate against two annotators | `scripts/eval-argument-gold.mjs` on `data/argument/passages.json` | not run: no annotations yet; every role shows as "segment" by default |
+| 87 | Claim types | Held out, round 2, two blind model labellers | `scripts/eval-argument.mjs` | 15 of 16 where they agree |
+| 88 | Inference gaps | Held out, round 2 | same | 4 of 5 marks right; 4 of 4 found |
+| 89 | Symmetry | Same types, gaps, roles and reframing with sides swapped | `tests/discourse.argument.test.js` | pass |
+| 90 | Calibration | Case list fixed before any readout ran | `data/calibration/cases.json`, hash pinned in a test | preregistered; not run |
+
 ## What could not be tested here
 
 - **X, Facebook, Instagram and TikTok on real pages.** They show posts only to a signed-in viewer,

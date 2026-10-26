@@ -5,7 +5,23 @@ were not published to a store.
 
 ## Unreleased
 
-Nothing yet.
+### Added
+- **Argument lens** (options, under Discourse checks, off by default; project-docs/ARGUMENT-LENS.md).
+  Splits a post into premises, minor premises, supporting premises, assumptions, conclusions and turns
+  at its connectives, in English, Portuguese, Spanish, French and Latin, and groups arguments into
+  lists, chains and turns, after Aliocha's reading method. Regression: all 7 breaks she marked in
+  Summa I q.2 a.2 and the 3 "sed" as minor premises. Roles show only once they pass a held-out gate
+  against two people's annotations; the 60 gold passages are fixed and the annotation page is
+  `docs/annotate/argument.html`. No annotations yet, so no role has passed.
+  - The claim-type marker: question, quotation, definition, sourced statement, classification,
+    inference, opinion, factual claim with or without a source. Held out (model labels): 15 of 16.
+  - The inference-gap marker: claims about someone else's mind, and conclusions whose words their
+    premises lack. Held out: 4 of 5 marks right, 4 of 4 found.
+  - The reframing marker: a post that names its sources' people and things in an act none of them
+    states, or states only to deny.
+  - All four in the study parts tree, and a side-swap symmetry test over each.
+- **Calibration study** (project-docs/CALIBRATION-STUDY.md): four cases preregistered with their
+  outcome sources and corpora; not run, and why.
 
 ## 3.7.0 (2026-10-26)
 

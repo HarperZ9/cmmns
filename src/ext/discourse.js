@@ -84,7 +84,10 @@
   // Every finished result for a post, for the parts tree and the sheets.
   function results(m) {
     const ranked = corrections.get(m.postId) || null;
+    const lang = (m.tweet && m.tweet.lang) || null;
     return { quotes: quotes.get(m.postId) || null, doc: docResult(m), counts: PBD.findCounts(m.text), corrections: ranked,
+      argument: PBD.readArgument(m.text || "", lang), types: PBD.claimTypes(m.text), gaps: PBD.inferenceGaps(m.text || "", lang),
+      reframing: ranked && ranked.length ? PBD.reframing(m.text || "", ranked.map((x) => ({ text: x.text }))) : null,
       independence: ranked ? PBD.independence(PBD.buildSheets({ claim: {}, corrections: ranked.map((x) => ({ reach: x.reach, origin: x.origin })) })) : null, persona: personas.get(keyOf(m)) || null };
   }
 
@@ -127,9 +130,21 @@
     return out.map((s) => (s.rows.some(([, v]) => v && typeof v === "object" && v.action) ? s : { ...s, rows: [...s.rows, ...(s.fam === "correction-replies" ? [sheets] : []), save] }));
   }
 
+  // The argument lens and its markers: structure, claim types, inference gaps, and on a root post the
+  // reframing of the sources beneath it.
+  function argumentSigns(m, settings) {
+    if (!settings.argumentLens || !m.text) return [];
+    const lang = (m.tweet && m.tweet.lang) || null, ranked = corrections.get(m.postId) || [];
+    const sources = ranked.map((x) => ({ text: x.text }));
+    const reframe = ranked.length ? PBD.reframing(m.text, sources) : null;
+    return [...PBD.argumentSign(PBD.readArgument(m.text, lang), { all: settings.argumentAll }), ...PBD.claimTypeSign(PBD.claimTypes(m.text)),
+      ...PBD.gapSign(PBD.inferenceGaps(m.text, lang)), ...PBD.reframingSign(reframe, PBD.reframingRows)];
+  }
+
   function collect(m, settings) {
     const q = quotes.get(m.postId);
     return [
+      ...argumentSigns(m, settings),
       ...PBD.personaSign(personas.get(keyOf(m)) || null),
       ...(q ? PBD.quoteSigns(q.results, q.list) : []),
       ...countSigns(m),

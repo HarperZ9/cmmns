@@ -74,4 +74,52 @@ export const DISCOURSE_LESSONS = [
     counter: "Read the correction's source as carefully as the post's. A correction can be wrong too.",
     dnp: "A reply that brings a source or names an error can still be wrong. Daylight Commons ranks by the kind of source, not by who is right.",
   },
+  {
+    id: "argument-structure", title: "How an argument is built", research: [],
+    what: "Daylight Commons splits a passage at the words that join its claims, such as therefore, but, now and since, and names each part by where it sits: a premise the argument starts from, a minor premise that applies it, a supporting reason, an assumption, a conclusion, or a turn against what came before. It also says whether the arguments form a list, a chain or a turn.",
+    examples: [
+      { side: "none", topic: "philosophy", kind: "sign", text: "All birds lay eggs. But a penguin is a bird. Therefore a penguin lays eggs: premise, minor premise, conclusion." },
+      { side: "none", topic: "science", kind: "ordinary", text: "A lab note says the sample was cooled, and then it was weighed. The word then marks time, not a conclusion, and the lens should read it as one part." },
+    ],
+    why: "Dense writing hides its joints. Seeing which sentence is meant to follow from which lets a reader check each step instead of the whole at once, the way a careful student marks a hard text by hand.",
+    spot: "Circle the joining words. Ask of each conclusion which earlier sentences it rests on, and whether a premise is missing.",
+    counter: "Test a conclusion by asking what else would have to be true for it to follow. If nothing in the passage says so, that is the gap to look into.",
+    dnp: "A joining word is what the author says links two claims. The lens shows that the author marks a part as following, not that it follows.",
+  },
+  {
+    id: "claim-type", title: "What kind of claim a sentence makes", research: [],
+    what: "Daylight Commons names the kind of claim each sentence makes from its wording: a question, a quotation, a definition, a statement that names its source, a category placed on someone, an inference, an opinion, or a factual claim with or without a source.",
+    examples: [
+      { side: "none", topic: "politics", kind: "sign", text: "A post says a party is a gang of extremists. That puts a group in a category; it is not a checkable fact about what anyone did." },
+      { side: "none", topic: "health", kind: "fair", text: "A post says the health ministry's report found that hospital stays fell by a fifth, and links the report: a statement with its source." },
+    ],
+    why: "Arguments go in circles when one side argues about facts and the other about the meaning of a word. Naming the kind of claim shows which kind of evidence would settle it.",
+    spot: "Ask what would settle the sentence: a record, a definition, a source, or nothing at all because it is a view.",
+    counter: "Answer a factual claim with a source, a definition with the definitions in use, and an opinion as an opinion.",
+    dnp: "A claim type is read from wording cues, so irony or quotation can mislead it. It says what kind of claim the words make, not whether it is true.",
+  },
+  {
+    id: "inference-gap", title: "Where a post goes beyond what it states", research: [],
+    what: "Daylight Commons marks two moves. One is a claim about what someone else knows, wants or intends, which no post can show. The other is a conclusion whose main words appear nowhere in the sentences it is meant to follow from.",
+    examples: [
+      { side: "none", topic: "business", kind: "sign", text: "A post says the company lost money, so the chief executive must be stealing. The theft appears nowhere in the premise." },
+      { side: "none", topic: "economy", kind: "ordinary", text: "A post says wages rose faster than prices, so real wages rose. The words differ, but the step is sound: the marker can flag sound reasoning too." },
+    ],
+    why: "A leap carries a reader from something true to something unshown, and a claim about someone's motives turns a disagreement into a judgement of character. Both are easy to miss in a confident sentence.",
+    spot: "Read the conclusion alone and ask what the earlier sentences actually established. Watch for knows, wants, secretly and on purpose.",
+    counter: "Ask for the evidence that would connect the step, and keep what someone did apart from what they are said to intend.",
+    dnp: "An inference can be sound even when its words are new, and a claim about intent can be right. The marker shows where to look, not that the conclusion is wrong.",
+  },
+  {
+    id: "reframing", title: "The same facts in a new arrangement", research: [],
+    what: "Daylight Commons compares a post with the sources beneath it, the replies that bring a source and the documents they link. When the post names the same people and things but puts them in an act that none of the sources states, or that the sources state only to deny, it says so.",
+    examples: [
+      { side: "none", topic: "politics", kind: "sign", text: "Two people with a documented relationship and a documented crime become a post saying one hired the other to commit it. Every name is real; the act joining them is not in any source." },
+      { side: "none", topic: "sport", kind: "ordinary", text: "A post says a coach and a player argued before the final, and the match report beneath it says the same." },
+    ],
+    why: "True parts make a false whole persuasive. Each name checks out, so the arrangement borrows their credibility.",
+    spot: "Check the verb, not the names: who did what to whom, and which source says so.",
+    counter: "Look for a source that states the act itself. If the sources mention it only to deny it, the post has reversed them.",
+    dnp: "Sources can be incomplete, and words they lack can still be true. The marker shows only that the post goes past what the sources beneath it say.",
+  },
 ];

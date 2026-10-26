@@ -1,0 +1,25 @@
+{
+  "about": "Development set for the claim-type marker (F7) and the inference-gap marker (F9). Sentences shaped like the X discourse study of 2026-10-25 and the worked example of 2026-10-26, with invented or paraphrased wording; labelled by Claude (Opus 5.5) on 2026-10-26. The rules were tuned on this set. type: question | quotation | definition | sourced statement | classification | inference | opinion or value | factual claim, no source | factual claim with a link | statement. gap: none | mind | leap.",
+  "cases": [
+    { "text": "Is this confirmed?", "type": "question", "gap": "none" },
+    { "text": "Khashoggi was dismembered at the Turkish embassy.", "type": "factual claim, no source", "gap": "none" },
+    { "text": "Everyone should watch this!", "type": "opinion or value", "gap": "none" },
+    { "text": "Hitler was a far left socialist.", "type": "classification", "gap": "none" },
+    { "text": "Talarico is a far left extremist.", "type": "classification", "gap": "none" },
+    { "text": "The truth is not a fact, but a philosophical concept.", "type": "definition", "gap": "none" },
+    { "text": "U.S. intelligence concluded that the prince approved an operation to capture or kill the journalist.", "type": "sourced statement", "gap": "none" },
+    { "text": "Jared Kushner hired a hitman to kill Jamal Khashoggi.", "type": "factual claim, no source", "gap": "none" },
+    { "text": "Elon Musk absolutely knows the history.", "type": "statement", "gap": "mind" },
+    { "text": "It's a calculated lie designed to fool people.", "type": "statement", "gap": "mind" },
+    { "text": "For Musk, it's all about the Benjamins.", "type": "statement", "gap": "mind" },
+    { "text": "Marcus Aurelius wrote: \"Do not disturb yourself by imagining your whole life at once.\"", "type": "quotation", "gap": "none" },
+    { "text": "Newton invented calculus in two years.", "type": "factual claim, no source", "gap": "none" },
+    { "text": "The Principia was published in 1687, see https://en.wikipedia.org/wiki/Principia", "type": "sourced statement", "gap": "none" },
+    { "text": "Your mental model is pathetically stupid.", "type": "opinion or value", "gap": "none" },
+    { "text": "He does not have any security clearances. So his claim about divulging secrets would mean he is admitting to illegal access.", "type": "inference", "gap": "leap" },
+    { "text": "The party purged its left wing in 1934.", "type": "factual claim, no source", "gap": "none" },
+    { "text": "What counts as socialism depends on who you ask.", "type": "definition", "gap": "none" },
+    { "text": "According to the annual report, revenue fell by 12 percent.", "type": "sourced statement", "gap": "none" },
+    { "text": "The senator wants to destroy the economy.", "type": "statement", "gap": "mind" }
+  ]
+}

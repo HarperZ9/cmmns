@@ -40,9 +40,26 @@ function personaLayer(p) {
   return p ? { name: "account", parts: [{ name: p.person.name, tags: ["persona"], properties: [prop("uses the name of", `${p.person.name} (${p.person.qid})`, "measured", "Wikidata name match with a second cue"), prop("cue", p.cue, "observed", "handle or display name")] }] } : null;
 }
 
+function argumentLayer(a) {
+  if (!a || a.segments.length < 2) return null;
+  return { name: "argument structure", parts: a.segments.map((s, i) => ({ name: `segment ${i + 1}`, tags: [s.role, ...(s.opener ? [s.opener.form] : [])], properties: [
+    prop("text", s.text, "observed", "the post"), prop("role", s.role, "inferred", "argument lens: connective and position; role precision not yet measured"),
+    ...(s.opener ? [prop("connective", s.opener.form, "measured", `lexicon match (${a.lang}); roles it can take: ${s.opener.roles.join(", ")}`)] : []),
+  ] })).concat(a.units.map((u, i) => ({ name: `movement ${i + 1}`, tags: [u.movement], properties: [prop("segments", u.segments.map((k) => k + 1), "measured", "units cut at continuation connectives and conclusions"), prop("movement", u.movement, "inferred", "opening connective and shared words with the previous conclusion")] }))) };
+}
+
+function claimLayer(types, gaps, reframe) {
+  const parts = [
+    ...(types || []).map((t) => ({ name: t.text.slice(0, 120), tags: [t.type], properties: [prop("claim type", t.type, "inferred", `wording cue: ${t.cue}`)] })),
+    ...(gaps || []).map((g) => ({ name: g.text.slice(0, 120), tags: ["inference gap", g.kind], properties: [prop("gap", g.why, "inferred", g.kind === "mind" ? `mind-reading cue "${g.cue}"` : "conclusion words absent from the premises")] })),
+    ...(reframe ? [{ name: "reframing", tags: ["isomer"], properties: [prop("shared names", reframe.shared, "measured", "names found in the sources beneath"), prop("stated only to deny", reframe.denied, "measured", "negation within 80 characters before"), prop("in no source", reframe.added, "measured", "word match over the sources beneath")] }] : []),
+  ];
+  return parts.length ? { name: "claims", parts } : null;
+}
+
 // post: { site, postUrl, handle, author }; r: the results for one post.
 export function discourseParts(post, r) {
-  const layers = [quoteLayer(r.quotes), docLayer(r.doc), countLayer(r.counts), correctionLayer(r.corrections, r.independence), personaLayer(r.persona)].filter(Boolean);
+  const layers = [quoteLayer(r.quotes), docLayer(r.doc), countLayer(r.counts), correctionLayer(r.corrections, r.independence), personaLayer(r.persona), argumentLayer(r.argument), claimLayer(r.types, r.gaps, r.reframing)].filter(Boolean);
   return {
     format: "refdb.parts/1", study: null,
     source: { site: post.site || null, postUrl: post.postUrl || null, author: { name: post.author || null, handle: post.handle || null } },

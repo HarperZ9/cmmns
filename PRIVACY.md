@@ -158,6 +158,9 @@ and handle go there, inside your browser, and nowhere else. Counts, replies and 
 read on the page. Document pages are read only on your click, with Read text in images on. Nothing
 is kept beyond the page, except what you save as a study item.
 
+The **argument lens**, with its claim-type, inference-gap and reframing markers, is off until you turn
+it on under the discourse checks. It reads the post's own text on the page and sends nothing.
+
 ## What Daylight Commons keeps, where, and for how long
 
 Everything is kept in `chrome.storage.local` (Firefox: `browser.storage.local`) in the browser
