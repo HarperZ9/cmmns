@@ -123,6 +123,14 @@ export function sidecarMarkdown(meta, fileNames = null) {
   return out.join("\n");
 }
 
+// The folder for one save from the settings: "<folder>/<site>/", "<folder>/study/<site>/" for
+// Study, or "" only when the user turned on saving straight into Downloads.
+export function savePath(settings, site, study = false) {
+  const s = settings || {}, base = String(s.mediaFolder || "").trim() || "Daylight";
+  if (s.mediaToRoot) return study ? saveFolder("study", site) : "";
+  return saveFolder(study ? `${base}/study` : base, site);
+}
+
 // The folder a save goes to, inside Downloads: "<folder>/<site>/", each part safe on every system.
 // An empty folder setting saves straight into Downloads.
 export function saveFolder(folder, site) {

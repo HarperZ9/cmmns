@@ -25,6 +25,10 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
 
   // The folder inside the save folder, and whether this is a study save (Daylight/study/<site>/); set per download in run().
   let site = location.hostname, study = false;
+  // After Daylight Commons is updated or reloaded, a page opened before keeps the old script, which
+  // can no longer reach the extension. It says so instead of saving somewhere unexpected.
+  const RELOAD = "Daylight Commons was updated. Reload this page, then save again.";
+  function alive() { if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) throw new Error(RELOAD); }
   async function viaBrowser(url, name, opts) {
     const r = await msg({ type: "pb-qs-download", url, filename: name, site, study, overwrite: !!opts.overwrite, fixExt: opts.fixExt || false });
     if (!r || r.error) throw new Error(r && r.error ? r.error : "The browser did not start the download.");
@@ -33,15 +37,19 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
 
   // Bytes made in the page: handed to the browser's downloads as a blob address; where the
   // browser cannot read the page's blob address, a download link in the page saves it instead.
+  // Bytes made in the page go to the browser's downloads as a blob address, so they land in
+  // <save folder>/<site>/. Where the browser cannot read the page's blob address, the bytes go to the
+  // worker, which hands over its own. Never a download link in the page: that saves into the
+  // Downloads root, which is how 3.6.1 lost the folder after an update (pages kept the old script).
   async function saveBytes(bytes, mime, name, o = {}) {
+    alive();
     const url = URL.createObjectURL(new Blob([bytes], { type: mime }));
     try { await viaBrowser(url, name, o); }
     catch (e) {
-      const a = document.createElement("a");
-      a.href = url; a.download = name; a.style.display = "none";
-      (document.body || document.documentElement).append(a); a.click(); a.remove();
-    }
-    setTimeout(() => URL.revokeObjectURL(url), 120000);
+      alive();
+      const r = await msg({ type: "pb-qs-bytes", bytes: Array.from(bytes), mime, filename: name, site, study, overwrite: !!o.overwrite });
+      if (!r || r.error) throw new Error(r && r.error ? r.error : e.message);
+    } finally { setTimeout(() => URL.revokeObjectURL(url), 120000); }
   }
 
   async function plainFile(t, plan0, c) {
@@ -207,6 +215,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
 
   // The entry point for a click: runs, then says what happened. Returns the outcome for tests.
   async function start(t, opts = {}) {
+    if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) { toast(RELOAD, { tone: "no", stay: 9000 }); return { ok: false, line: RELOAD }; }
     toast(opts.asGif ? "Making a GIF" : "Downloading", { stay: 0 });
     try {
       const r = await run(t, opts);

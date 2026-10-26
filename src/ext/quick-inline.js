@@ -8,6 +8,8 @@
   "use strict";
   if (!globalThis.PBQuickSites || !(PBQuickSites.isX || PBQuickSites.isReddit)) return;
   const MARK = "data-dc-dl";
+  // Buttons left by a script from before an update can no longer save; this script draws its own.
+  for (const old of document.querySelectorAll(".dc-dl")) (old.closest(".dc-dl-cell") || old).remove();
   const STUDY = "M7 3.5h10a1.5 1.5 0 0 1 1.5 1.5v15.2a.6.6 0 0 1-.92.5L12 17.3l-5.58 3.4a.6.6 0 0 1-.92-.5V5A1.5 1.5 0 0 1 7 3.5zm.5 2v12.9l4.5-2.74 4.5 2.74V5.5h-9z";
   const ICON = "M12 3.5a1 1 0 0 1 1 1v8.09l2.8-2.8a1 1 0 1 1 1.4 1.42l-4.5 4.5a1 1 0 0 1-1.4 0l-4.5-4.5a1 1 0 0 1 1.4-1.42l2.8 2.8V4.5a1 1 0 0 1 1-1zM5 18.5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1z";
   const on = () => !globalThis.PBSettings || PBSettings.get().mediaButtons !== false;

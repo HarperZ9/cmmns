@@ -10,8 +10,9 @@ Written by `sidecarMarkdown` and `sidecarJson` in `src/core/media-meta.js`; test
 
 ## Where files go
 
-`Downloads/<save folder>/<site>/` (the save folder is a setting, `Daylight` by default; empty saves
-straight into Downloads). `<site>` is `x`, `reddit`, or the host name of the page.
+`Downloads/<save folder>/<site>/` (the save folder is a setting, `Daylight` by default; left empty
+it goes back to `Daylight`). Study saves go to `<save folder>/study/<site>/`. The switch "Save
+straight into Downloads" puts files in Downloads itself (Study in `study/<site>/`). `<site>` is `x`, `reddit`, or the host name of the page.
 
 File names are `<handle>_<date>_<first words of the text>[-n].<ext>` for posts with an author, for
 example `nasa_2026-10-23_ahh-blue-lagoon-this-deep-blue-sea-of-gas-and.jpg`. The date is the post's

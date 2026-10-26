@@ -71,8 +71,8 @@ globalThis.PBQuickBg = (() => {
     const s = await settings();
     if (s.protection && /^https?:/i.test(url)) throw new Error(PROTECTED_SAVE);
     // Study saves go to "<save folder>/study/<site>/"; the reference library reads them first.
-    const folder = study ? `${s.mediaFolder || "Daylight"}/study` : s.mediaFolder, conflict = overwrite ? "overwrite" : "uniquify";
-    const filename = name ? PB.saveFolder(folder, site) + name.replace(/[\\/]/g, "-") : null;
+    const conflict = overwrite ? "overwrite" : "uniquify";
+    const filename = name ? PB.savePath(s, site, study) + name.replace(/[\\/]/g, "-") : null;
     const opts = { url, saveAs: !!s.mediaAskWhere && !overwrite, conflictAction: conflict, ...(filename ? { filename } : {}) };
     pending.set(url, { fixExt: !!fixExt, filename, conflict });
     const id = await chrome.downloads.download(opts);
@@ -91,6 +91,20 @@ globalThis.PBQuickBg = (() => {
     if (!p || !p.filename) return;
     const ext = p.fixExt ? PB.downloadExt(item.mime) : null;
     suggest({ filename: ext ? p.filename.replace(/\.[a-z0-9]{1,5}$/i, "") + "." + ext : p.filename, conflictAction: p.conflict || "uniquify" });
+  }
+
+  // Bytes the page made, saved through the worker's own address: a blob address where the worker has
+  // one (Firefox's background page), else a data: address (Chrome's service worker; under 2 MB).
+  async function fromBytes({ bytes, mime, filename, site, study, overwrite }) {
+    const b = Uint8Array.from(bytes || []);
+    let url;
+    if (typeof URL.createObjectURL === "function") url = URL.createObjectURL(new Blob([b], { type: mime }));
+    else {
+      if (b.length > 1900000) throw new Error("The browser could not save this file from the page, and it is too large to pass on.");
+      let s = ""; for (let i = 0; i < b.length; i += 32768) s += String.fromCharCode(...b.subarray(i, i + 32768));
+      url = `data:${mime || "application/octet-stream"};base64,${btoa(s)}`;
+    }
+    return download({ url, filename, site, study, overwrite });
   }
 
   // A protected item's reference: kept on the "Protected references" moodboard with its label.
@@ -115,10 +129,22 @@ globalThis.PBQuickBg = (() => {
 
   function onMessage(msg, sender, sendResponse) {
     if (!msg || !sender.tab) return false;
+    if (msg.type === "pb-qs-bytes") { fromBytes(msg).then(sendResponse, (e) => sendResponse({ error: e.message })); return true; }
     if (msg.type === "pb-qs-download") { download(msg).then(sendResponse, (e) => sendResponse({ error: e.message })); return true; }
     if (msg.type === "pb-qs-reference") { reference(msg.ref, msg.thumbs || []).then(sendResponse, (e) => sendResponse({ error: e.message })); return true; }
     return false;
   }
+
+  // After an install or update, pages that were already open keep the old scripts, which can no
+  // longer reach the extension. The download parts are loaded into them again, so their buttons
+  // and the hover control work at once and save into the right folder without a page reload.
+  const FRESH = ["core.bundle.js", "guard.js", "settings.js", ...PAGE, "yt-reference.js", "quick-inline.js", "quick-hover-ui.js", "quick-hover.js"];
+  async function refreshOpenTabs() {
+    const sites = (chrome.runtime.getManifest().content_scripts || []).filter((c) => c.js.includes("quick-inline.js")).flatMap((c) => c.matches);
+    const tabs = await chrome.tabs.query({ url: sites }).catch(() => []);
+    for (const t of tabs) chrome.scripting.executeScript({ target: { tabId: t.id }, files: FRESH }).catch(() => {});
+  }
+  chrome.runtime.onInstalled.addListener((d) => { if (d.reason === "update" || d.reason === "install") refreshOpenTabs(); });
 
   if (chrome.contextMenus) chrome.contextMenus.onClicked.addListener((info, tab) => { onClick(info, tab); });
   if (chrome.downloads && chrome.downloads.onDeterminingFilename) chrome.downloads.onDeterminingFilename.addListener(onFilename);

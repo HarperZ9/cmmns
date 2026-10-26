@@ -159,6 +159,7 @@ Summary: `project-docs/evidence/qa-3.6.1/hover-check.json`.
 | 70 | Side panel | Window moves to the panel and back | the panel shows the post window, its button runs in the page, no window over the page while it is open, the page's state resets when it closes | pass |
 | 71 | YouTube | Reference only in store builds | a reference saved from a real video (thumbnail and note with the whole description); `tests/store-build.test.js` fails if either store package carries the command line hand-off | pass |
 | 72 | CLI | `daylight media fetch`, `daylight sidecar check` | unit tests for the fetch plan and the sidecar built from yt-dlp's record; the check run on the author's own notes flagged the 17 saved by 3.6.0 with an unproved continuation | pass |
+| 74 | Save folder | Every save path keeps Daylight/<site>/ on a profile with 3.6.0 settings, and across an update with the page left open | `scripts/qa/folder_check.py`: right-click, hover, Study, text card, X button, text note, Reddit button, and the X button again after the extension was loaded anew with the tab open; no file in the Downloads root; `tests/save-folder.test.js`; summary in `project-docs/evidence/qa-3.6.2/folder-check.json` | pass |
 | 73 | Protection | The new paths make no request in source-protection mode | hover Download on Wikipedia with protection on: "Not saved: Source protection is on ...", no download; `daylight media fetch` refused before yt-dlp runs (`tests/media-fetch.test.js`) | pass |
 
 Not tested for 3.6.1: Firefox; signed-in sites; the shortcut pressed by hand; the control on
