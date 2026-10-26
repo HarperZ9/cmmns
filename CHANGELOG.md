@@ -5,7 +5,17 @@ were not published to a store.
 
 ## Unreleased
 
-Nothing yet.
+### Added
+- **Study boards.** Saved items become numbered plates in a board you can print, save as one web
+  page or keep as a folder: a book with running heads, numbered plates, captions and a keyword line;
+  a grid; or a timeline in posted order with long silences drawn as breaks. Open one from the
+  collections page ("Study board") for any moodboard, or pick a folder of saves. Every plate keeps
+  its source, author, time and link. Moodboards from 3.6.0 open as boards, and the lane, keywords and
+  layout you choose stay with the moodboard.
+- `daylight board make <folder>` makes the same board from the command line, with an evidence
+  layout for a case (each claim drawn over its sources, more widely seen sources drawn more opaque),
+  Share clean plates, a PDF and a SHA-256 manifest. `daylight board render <board.json>` draws a
+  board made by the reference library. One format, `refdb.board/1`, for both.
 
 ## 3.6.2 (2026-10-26)
 

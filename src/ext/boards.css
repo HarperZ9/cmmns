@@ -1,0 +1,4 @@
+/* The Boards page (boards.html): the board fills the width below its controls. */
+#view { display: block; width: 100%; height: 78vh; margin-top: var(--s-4); border: 1px solid var(--line); background: var(--paper); }
+.toolbar label input[type="checkbox"] { margin-right: var(--s-1); }
+.toolbar .pair { display: inline-flex; align-items: center; gap: var(--s-2); }

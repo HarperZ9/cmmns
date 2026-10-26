@@ -27,6 +27,12 @@ export const TOP_HELP = {
     "daylight export chain.json --profile legal --out dossier", "It refuses a chain that fails its own check."],
 };
 
+// `daylight board make` (bin/lib/board.mjs).
+export const BOARD_HELP = ["Make a study board from saved items and their Daylight notes: book spreads, a grid, a timeline, or an evidence board with a case. Every plate keeps its source, author, time and link.",
+  "daylight board make <folder> --title <name> [--lane design|research|journalism|...] [--keywords a,b,c] [--layout book|grid|timeline|evidence] [--site x] [--study] [--since date] [--until date] [--case folder] [--clean] [--no-sidecars] [--pdf] [--out folder]",
+  "daylight board make ~/Downloads/Daylight/study --title \"Observing mind\" --lane design --keywords contextual,intuitive,human --pdf",
+  "Writes index.html, board.json (refdb.board/1, the reference library's format), plates/, fonts/, sidecars/ and MANIFEST.sha256. --clean saves Share clean copies of the plates. --pdf needs Chrome or Edge on this computer. daylight board render <board.json> [--layout ...] [--out folder] draws a board the reference library made."];
+
 // `daylight sidecar check` (bin/lib/sidecar-check.mjs).
 export const SIDECAR_HELP = ["Check the notes Daylight Commons saved beside your files. Flags notes whose \"Continued by the author\" parts were not proved to be one thread (3.6.0 could join unrelated posts saved from a profile or timeline page).",
   "daylight sidecar check <folder> [--json]", "daylight sidecar check ~/Downloads/Daylight", "Reads local files only. Exits with 1 when a note needs checking."];

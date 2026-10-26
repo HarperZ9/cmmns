@@ -22,11 +22,12 @@ import { readable, verdictLines, chainLines } from "./lib/report.mjs";
 import { validate } from "./lib/jsonschema.mjs";
 import { runExport } from "./lib/export.mjs";
 import { runCaseCommand } from "./lib/case.mjs";
-import { TOP_HELP, MEDIA_HELP, SIDECAR_HELP, helpText, friendly } from "./lib/help.mjs";
+import { TOP_HELP, MEDIA_HELP, SIDECAR_HELP, BOARD_HELP, helpText, friendly } from "./lib/help.mjs";
 import { runMedia } from "./lib/media.mjs";
 import { cleanCommand, protectCommand, selfAuditCommand, PROTECT_USAGE } from "./lib/protect.mjs";
 import { runFetch } from "./lib/media-fetch.mjs";
 import { checkSidecars, checkLines } from "./lib/sidecar-check.mjs";
+import { makeBoard, renderSpec } from "./lib/board.mjs";
 
 const USAGE = `Usage:
   daylight analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
@@ -39,6 +40,7 @@ const USAGE = `Usage:
   daylight media compress <file> [the same options]
   daylight media fetch <page address> [--dir folder]       (needs a system yt-dlp)
   daylight sidecar check <folder>                          (flags unproved thread continuations)
+  daylight board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--pdf]
   daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
   daylight case <command>   an investigation case folder; "daylight case help" lists the commands
@@ -61,7 +63,7 @@ export function parseArgs(argv) {
     const a = argv[i];
     if (!a.startsWith("--")) { out._.push(a); continue; }
     const [k, v] = a.slice(2).split("=");
-    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate"].includes(k) ? argv[++i] : true;
+    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate", "title", "lane", "keywords", "layout", "site", "since", "until", "case", "dir"].includes(k) ? argv[++i] : true;
   }
   return out;
 }
@@ -115,6 +117,18 @@ export async function main(argv) {
   if (argv[0] === "case") { const r = await runCaseCommand(argv.slice(1)); print(r.out); return process.exitCode || r.code; }
   if (argv[0] === "protect" && argv[1] && !argv.includes("--help")) { print(protectCommand(argv[1])); return 0; }
   if (argv[0] === "self-audit" && !argv.includes("--help")) { const { _: files, flags } = parseArgs(argv.slice(1)); print(selfAuditCommand(files, flags)); return 0; }
+  if (argv[0] === "board" && argv[1] === "render") {
+    const { _: [spec], flags } = parseArgs(argv.slice(2));
+    if (flags.help || !spec) { print(helpText(BOARD_HELP, "daylight board")); return spec || flags.help ? 0 : 2; }
+    print((await renderSpec(spec, flags)).line);
+    return 0;
+  }
+  if (argv[0] === "board" && argv[1] === "make") {
+    const { _: [dir], flags } = parseArgs(argv.slice(2));
+    if (flags.help || !dir) { print(helpText(BOARD_HELP, "daylight board make")); return dir || flags.help ? 0 : 2; }
+    print((await makeBoard(dir, flags)).line);
+    return 0;
+  }
   if (argv[0] === "sidecar" && argv[1] === "check") {
     const { _: [dir], flags } = parseArgs(argv.slice(2));
     if (flags.help || !dir) { print(helpText(SIDECAR_HELP, "daylight sidecar check")); return dir || flags.help ? 0 : 2; }
