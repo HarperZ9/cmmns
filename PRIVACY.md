@@ -113,6 +113,16 @@ and any hash of either stay in your browser, and the text lasts as long as that 
   The post's text, author, time, alt text and links that the page already shows go into a `.md` file
   beside it and into the file's own description; nothing is fetched for them and nothing is sent
   anywhere. Both can be turned off in the settings.
+- The **Download control on pictures and videos** watches where the pointer rests, in that tab only,
+  to know when to show; it reads and sends nothing until you click it. It runs on the sites Daylight
+  Commons reads, and on every https site only after you turn on "Show it on every site", when your
+  browser asks you once. **Alt+Shift+D** reads the current tab once, on the key press. **Study**,
+  **Save as note**, **Save selection** and **Save as card** keep text the page shows (and, for a card,
+  a picture made on this device) in your Downloads folder; nothing is sent.
+- On YouTube, **Save reference** keeps the thumbnail the page shows and a note; Daylight Commons
+  never downloads YouTube video. The command line's `daylight media fetch`, which you run yourself,
+  asks yt-dlp to download from the address you give it.
+- The **side panel** shows what the window beside a post would show. It reads nothing itself.
 - Protected media (DRM or encrypted streams) is never downloaded.
 - **Convert and compress** runs on this device. No file is uploaded.
 - **Ad and tracker blocking**, off until you turn it on, is done by your browser's own blocking

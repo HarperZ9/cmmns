@@ -64,7 +64,8 @@ export function sniffMime(bytes) {
 }
 
 const extOfUrl = (url) => {
-  try { const m = /\.([a-z0-9]{2,5})$/i.exec(new URL(url).pathname); return m ? m[1].toLowerCase() : null; } catch { return null; }
+  // ".jpg", or Bluesky's "@jpeg" at the end of the path
+  try { const m = /[.@]([a-z0-9]{2,5})$/i.exec(new URL(url).pathname); return m ? m[1].toLowerCase() : null; } catch { return null; }
 };
 const GENERIC = /^(application\/octet-stream|binary\/octet-stream|text\/plain|application\/x-www-form-urlencoded)?$/;
 
@@ -84,7 +85,7 @@ const RESERVED = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
 
 // Letters, digits and single hyphens; any script, never a path, at most `max` characters.
 export function slug(s, max = 60) {
-  const out = String(s || "").normalize("NFKC").replace(/[\u0000-\u001f\u007f<>:"/\\|?*#%&{}$!'`@=+^~[\];,]+/g, " ")
+  const out = String(s || "").normalize("NFKC").replace(/[\u0000-\u001f\u007f<>:"/\\|?*#%&{}$!'`@=+^~[\];,()‐-―•]+/g, " ")
     .replace(/[\s._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, max).replace(/-+$/, "");
   return RESERVED.test(out) ? "_" + out : out;
 }

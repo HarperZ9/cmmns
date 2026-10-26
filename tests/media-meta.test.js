@@ -109,3 +109,25 @@ test("MP4: the comment goes in moov and every sample still reads back the same b
   s.forEach((x, i) => assert.deepEqual([...d.bytes.subarray(x.offset, x.offset + x.size)], [...chunks[i].data]));
   assert.equal(embedDescription(out, "video/mp4", { description: "again" }), null, "a file with its own udta is left alone");
 });
+
+test("a long post cut short by the page says so; the whole text from X's own field is kept whole", async () => {
+  const long = "Isso é valiosíssimo em especial para quem estuda. ".repeat(80);
+  const { tweetsIn } = await import("../src/core/xdata.js");
+  const [t] = tweetsIn({ data: { __typename: "Tweet", rest_id: "1", legacy: { full_text: long.slice(0, 270) }, note_tweet: { note_tweet_results: { result: { text: long } } } } });
+  assert.equal(t.text.length, 2000, "the lenses keep reading 2,000 characters");
+  assert.equal(t.fullText, long, "the whole long post is kept apart");
+  const cut = postMeta({ site: "x", handle: "a", text: long.slice(0, 300), textComplete: false }, NOW);
+  const md = sidecarMarkdown(cut);
+  assert.ok(md.includes("\ntext_complete: false\n"));
+  assert.ok(md.includes("The page showed only the start of this text"));
+  assert.ok(!sidecarMarkdown(postMeta({ site: "x", text: long }, NOW)).includes("text_complete"));
+});
+
+test("a study save says so, with its optional note, and further notes get their own heading", () => {
+  const s = postMeta({ site: "x", handle: "a", text: "Wood ash glaze test tiles.", study: true, studyNote: "  the crawl   pattern  ", notes: [{ label: "Chapters", text: "00:00 Intro" }] }, NOW);
+  const md = sidecarMarkdown(s, "a.jpg");
+  assert.ok(md.includes("\nstudy: true\n") && md.includes('\nnote: "the crawl pattern"\n'));
+  assert.ok(md.includes("What draws me to this: the crawl pattern"));
+  assert.ok(md.includes("## Chapters\n\n00:00 Intro"));
+  assert.ok(!sidecarMarkdown(postMeta({ site: "x", text: "x" }, NOW)).includes("study:"));
+});

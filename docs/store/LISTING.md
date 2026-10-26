@@ -119,16 +119,24 @@ Shows the evidence behind the posts and accounts in the social media threads the
 | Host `https://bsky.app/*` | Reads replies, account data and moderation labels the Bluesky app loaded. |
 | `scripting` | Injects the site card into the current tab when the user presses "Site card for this page", and registers the search-result labels only for the engines the user turned on. Also runs Daylight Commons on a Mastodon server only after the user turns it on for that server, and checks, when the user opens the toolbar button on such a page, whether it is the Mastodon web app (its root element, version and domain, nothing else). |
 | `activeTab` | Lets the site card and that one check read the current tab when the user opens the toolbar button, and no other time. The same grant lets "Save media from this page" and the right-click "Save to Daylight" list the images, GIFs, video and audio that tab loaded, once, on that click. |
-| `contextMenus` | Adds right-click items on pictures, video and audio, and on the page for media under a clear layer: Download, Download media here, Download as GIF, Copy, Copy link and Save to Daylight. Nothing runs until the user picks one. |
+| `contextMenus` | Adds right-click items on pictures, video and audio, and on the page for media under a clear layer: Download, Download media here, Study, Download as GIF, Copy, Copy link, Copy with caption and Save to Daylight. Nothing runs until the user picks one. |
+| `sidePanel` | Chrome only (Firefox uses `sidebar_action`, which needs no permission). Shows the window for the post under the pointer in the browser's side panel instead of over the page, when the user opens it from the toolbar menu. The panel reads nothing itself; the page sends it what the window would show. |
 | `downloads` | Saves the file the user chose with Download straight to the Downloads folder, named from the page and typed from the file's own first bytes, with no new tab and no second click. Used only on that click. |
 | `clipboardWrite` | Copy and Copy link put the chosen picture (as PNG) or the file's address on the clipboard, only on that click. |
 | `declarativeNetRequest` | Ad and tracker blocking, off until the user turns it on: the EasyList and EasyPrivacy filter lists, compiled into two static rulesets the browser matches itself, and one allow rule for the sites where the user allowed ads. Daylight Commons never reads which requests were blocked and needs no host access for it. |
 | Host `https://www.threads.com/*`, `https://www.threads.net/*` | Reads the posts and replies Threads shows on the page. |
 | Host `https://www.tiktok.com/*` | Reads the comments TikTok shows and the comment list its app already loaded. |
-| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Daylight Commons here" on that server; the browser shows its own prompt. Never granted for all sites. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for one news feed's host at a time (for example `https://feeds.bbci.co.uk/*`) only when the user chooses that outlet or adds that feed for Other coverage, which on the user's click downloads the feed and sends nothing from the page. It is asked for `https://web.archive.org/*` only when the user turns on Evidence lookups, because the Internet Archive's capture index answers a browser extension only with host access, or ticks "Ask the Internet Archive to keep a copy" on a case save. When the user saves media, it is asked for the one host the file or stream comes from (for example `https://pbs.twimg.com/*`), on the Save click, so the save page can download the file the page already loaded; a stream whose segments sit on another host asks again on a second click. |
+| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Daylight Commons here" on that server; the browser shows its own prompt. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for one news feed's host at a time (for example `https://feeds.bbci.co.uk/*`) only when the user chooses that outlet or adds that feed for Other coverage, which on the user's click downloads the feed and sends nothing from the page. It is asked for `https://web.archive.org/*` only when the user turns on Evidence lookups, because the Internet Archive's capture index answers a browser extension only with host access, or ticks "Ask the Internet Archive to keep a copy" on a case save. When the user saves media, it is asked for the one host the file or stream comes from (for example `https://pbs.twimg.com/*`), on the Save click, so the save page can download the file the page already loaded; a stream whose segments sit on another host asks again on a second click. The one request for all of `https://*/*` is "Show it on every site" for the hover Download control in the options, asked only when the user turns that on: the control then runs on every https page, reads nothing until the pointer rests on a picture or video, and reads that one file only when the user clicks it. |
 
-The APIs Daylight Commons also calls (`action`, `tabs.create`, `tabs.query`, `tabs.sendMessage`,
-`windows.create`) need no manifest permission. `tests/store-listing.test.js` fails when the
+The APIs Daylight Commons also calls (`action`, `commands` for the Alt+Shift+D shortcut, `tabs.create`,
+`tabs.query`, `tabs.sendMessage`, `windows.create`) need no manifest permission.
+
+**YouTube.** The store packages never download YouTube video. On YouTube the hover control saves a
+reference (the thumbnail and a note with the title, channel, link at the current time, description,
+chapters and any transcript the page shows) and copies links. The unpacked and self-distributed
+builds add one menu item that copies a command for Daylight Commons' command line, which uses the
+user's own yt-dlp; that file (`yt-handoff.js`) is left out of the Chrome Web Store and Firefox
+Add-ons packages, and `tests/store-build.test.js` fails if either package carries it. `tests/store-listing.test.js` fails when the
 manifest asks for a host or permission this table does not justify.
 
 **Remote code:** No, I am not using remote code. Every script ships in the package.
@@ -197,7 +205,7 @@ accepting each store's developer agreement and pressing submit are the author's 
 **Chrome Web Store**
 1. Sign in at chrome.google.com/webstore/devconsole with the account that will own the listing.
    Pay the one-time registration fee and accept the developer agreement if this is the first item.
-2. New item: upload `radar-chrome-3.6.0.zip` from the GitHub release v3.6.0. Check its SHA-256
+2. New item: upload `radar-chrome-3.6.1.zip` from the GitHub release v3.6.1. Check its SHA-256
    against the release's `SHA256SUMS` first.
 3. Store listing tab: the summary comes from the manifest; paste "Description" from above;
    category Social & Communication; language English; upload the five screenshots in order and the
@@ -210,9 +218,9 @@ accepting each store's developer agreement and pressing submit are the author's 
 **Firefox Add-ons (listed)**
 1. Sign in at addons.mozilla.org/developers with the account that will own the add-on, and accept
    the distribution agreement.
-2. Submit a new add-on, "On this site": upload `radar-firefox-3.6.0.xpi` from the release. The
+2. Submit a new add-on, "On this site": upload `radar-firefox-3.6.1.xpi` from the release. The
    add-on id `radar@harperz9.github.io` is set in the package; it must never change.
-3. Source code: answer yes and upload `docs/store/amo-source-3.6.0.zip` (also attached to the
+3. Source code: answer yes and upload `docs/store/amo-source-3.6.1.zip` (also attached to the
    release). Its `REVIEWER.md` gives the steps that remake `core.bundle.js` and `ocr.bundle.js` byte
    for byte from `src/core` and `src/ocr`; nothing is minified.
 4. Paste the name, the AMO summary and the description; licence AGPL-3.0-only; tags from the table;
@@ -224,9 +232,9 @@ accepting each store's developer agreement and pressing submit are the author's 
 1. At addons.mozilla.org/developers/addon/api/key, create an API key and secret. Keep them out of
    the repository, for example in environment variables `WEB_EXT_API_KEY` and
    `WEB_EXT_API_SECRET`.
-2. `npx web-ext sign --channel unlisted --source-dir <unzipped radar-firefox-self-3.6.0.xpi>`, or
+2. `npx web-ext sign --channel unlisted --source-dir <unzipped radar-firefox-self-3.6.1.xpi>`, or
    upload that xpi as "On your own" in the developer hub.
-3. Attach the signed file Mozilla returns to the v3.6.0 release, then run
+3. Attach the signed file Mozilla returns to the v3.6.1 release, then run
    `node scripts/firefox-updates.mjs <signed.xpi>` and commit `docs/firefox/updates.json`, so
    installed copies find the next version.
 

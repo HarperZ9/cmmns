@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Daylight Commons",
-  "version": "3.6.0",
+  "version": "3.6.1",
   "description": "See the evidence behind social media replies: where accounts are based, coordination and fact-checks, each with its source.",
   "homepage_url": "https://github.com/HarperZ9/daylight-commons",
   "icons": {
@@ -17,7 +17,8 @@
     "contextMenus",
     "declarativeNetRequest",
     "downloads",
-    "clipboardWrite"
+    "clipboardWrite",
+    "sidePanel"
   ],
   "host_permissions": [
     "https://x.com/*",
@@ -45,6 +46,9 @@
       "ocr-bg.js",
       "media-store.js",
       "quick-save-bg.js",
+      "quick-hover-bg.js",
+      "side-bg.js",
+      "card-bg.js",
       "media-bg.js",
       "adblock-bg.js",
       "background.js"
@@ -118,6 +122,7 @@
         "platforms-reach.js",
         "platforms.js",
         "tour.js",
+        "side-bridge.js",
         "pop.js",
         "media.js",
         "mediacard.js",
@@ -141,11 +146,24 @@
         "quick-gif.js",
         "quick-save.js",
         "quick-copy.js",
+        "quick-text.js",
+        "yt-reference.js",
         "quick-inline.js",
+        "quick-hover-ui.js",
+        "quick-hover.js",
         "content.js"
       ],
       "css": [
         "badges.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "yt-handoff.js"
       ],
       "run_at": "document_idle"
     }
@@ -199,5 +217,21 @@
         "path": "rules/easyprivacy.json"
       }
     ]
+  },
+  "commands": {
+    "save-media": {
+      "suggested_key": {
+        "default": "Alt+Shift+D"
+      },
+      "description": "Download the picture or video under the pointer"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "sidebar_action": {
+    "default_panel": "sidepanel.html",
+    "default_title": "Daylight Commons",
+    "open_at_install": false
   }
 }

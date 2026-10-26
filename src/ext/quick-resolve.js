@@ -30,8 +30,13 @@ globalThis.PBQuickResolve = globalThis.PBQuickResolve || (() => {
     return out;
   }
 
+  // The newest of: the last right-click, the last pointer position the hover control saw
+  // (quick-hover.js), the focused media element (the keyboard shortcut), the element under the pointer.
   function point() {
-    if (last && Date.now() - last.at < 60000) return last;
+    const seen = [last, globalThis.PBHover ? PBHover.lastPoint() : null].filter((p) => p && Date.now() - p.at < 60000).sort((a, b) => b.at - a.at)[0];
+    if (seen) return seen;
+    const f = document.activeElement, m = f && f !== document.body && (isMedia(f) ? f : f.querySelector && f.querySelector("img, video, canvas"));
+    if (m) { const r = m.getBoundingClientRect(); if (r.width && r.height) return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
     const hovered = [...document.querySelectorAll(":hover")].pop();
     if (!hovered) return null;
     const r = hovered.getBoundingClientRect();
@@ -92,13 +97,16 @@ globalThis.PBQuickResolve = globalThis.PBQuickResolve || (() => {
 
   // The site's own resolver first (quick-sites.js: X and Reddit know their files), then the stack.
   function fromElement(el) {
+    // YouTube video is never downloaded by the extension: a reference to it is saved instead.
+    if (el.tagName === "VIDEO" && globalThis.PBYouTube && PBYouTube.isYouTube) return PBYouTube.reference();
     const site = globalThis.PBQuickSites && PBQuickSites.targetFor(el);
     return site || targetOf(el);
   }
 
-  // The target for a right-click. info: { srcUrl, linkUrl, here }.
-  function resolve({ srcUrl = null, linkUrl = null } = {}) {
-    const p = point();
+  // The target for a right-click, the hover control or the keyboard. info: { srcUrl, linkUrl, at }
+  // where `at` is the point the hover control was over.
+  function resolve({ srcUrl = null, linkUrl = null, at = null } = {}) {
+    const p = at && Number.isFinite(at.x) && Number.isFinite(at.y) ? at : point();
     const stack = p ? stackAt(p.x, p.y) : [];
     if (srcUrl && !/^blob:/.test(srcUrl)) {
       const el = stack.find((e) => isMedia(e) && [e.currentSrc, e.src].includes(srcUrl)) || [...document.querySelectorAll("img, video, audio, source")].find((e) => [e.currentSrc, e.src].includes(srcUrl));

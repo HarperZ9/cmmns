@@ -27,6 +27,10 @@ export const TOP_HELP = {
     "daylight export chain.json --profile legal --out dossier", "It refuses a chain that fails its own check."],
 };
 
+// `daylight sidecar check` (bin/lib/sidecar-check.mjs).
+export const SIDECAR_HELP = ["Check the notes Daylight Commons saved beside your files. Flags notes whose \"Continued by the author\" parts were not proved to be one thread (3.6.0 could join unrelated posts saved from a profile or timeline page).",
+  "daylight sidecar check <folder> [--json]", "daylight sidecar check ~/Downloads/Daylight", "Reads local files only. Exits with 1 when a note needs checking."];
+
 // `daylight media convert` and `compress` (bin/lib/media.mjs), through a system ffmpeg.
 export const MEDIA_HELP = {
   convert: ["Convert a picture, GIF, video or sound file to a similar format, with ffmpeg on this computer, and write its lineage beside it.",
@@ -35,6 +39,9 @@ export const MEDIA_HELP = {
   compress: ["Make a picture, GIF, video or sound file smaller in the same kind of format, with ffmpeg on this computer.",
     "daylight media compress <file> [--to format] [--quality 0-1] [--max-side N] [--max-height N] [--bitrate 1M] [--audio-bitrate 64k] [--fps N] [--out file] [--force] [--json]",
     "daylight media compress interview.mp4 --max-height 720", "Writes <name>.small.<ext> beside the original, with its lineage file."],
+  fetch: ["Save a video from its page address with yt-dlp on this computer, into Downloads/Daylight/<site>/, with the same note beside it as the extension writes.",
+    "daylight media fetch <page address> [--dir folder] [--json] [--keep-info]",
+    "daylight media fetch \"https://www.youtube.com/watch?v=...\"", "Needs yt-dlp on the PATH, or YTDLP set to its path. Protected (DRM) video is refused. Only save what you have the right to keep."],
 };
 
 export const CASE_HELP = {
@@ -64,7 +71,7 @@ export const CASE_HELP = {
 };
 
 export function helpText([what, usage, example, note], name) {
-  return `${name}: ${what}\n\nUsage:\n  ${usage}\n\nExample:\n  ${example}\n${note ? `\n${note}\n` : ""}\nEvery command works on local files; only add, run and watch go online.\n`;
+  return `${name}: ${what}\n\nUsage:\n  ${usage}\n\nExample:\n  ${example}\n${note ? `\n${note}\n` : ""}\nEvery command works on local files; only add, run, watch and media fetch go online.\n`;
 }
 
 // An error, said as what happened and what to do.

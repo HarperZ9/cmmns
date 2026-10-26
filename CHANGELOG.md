@@ -5,21 +5,15 @@ were not published to a store.
 
 ## Unreleased
 
-Protection for the people who use Daylight Commons and their sources: the case workbench stops
+Nothing yet.
+
+## 3.6.1 (2026-10-25)
+
+Save from any site, save text too, and keep things for study. Protection for the people who use Daylight Commons and their sources: the case workbench stops
 telling the Internet Archive and the target's server who is investigating, a clean copy of any file
 to share, one switch for source protection, and a look at what Daylight's own signals show about
 your account. Plans for the next two: project-docs/REDACTION-PLAN.md and
 project-docs/PROVENANCE-TRACING-PLAN.md.
-
-### Changed
-- **`daylight case add` and `case run` no longer ask the Wayback Machine for a copy by default.**
-  A save request tells the page's server and the Internet Archive who is looking and when, and the
-  copy is public. Ask for one with `--archive`, or for a whole case with
-  `daylight case settings archive on`. `case watch` asks the Archive whether it holds a copy only
-  with that setting on.
-  **Migration:** scripts that relied on the old default add `--archive`. `--no-archive` still works
-  and wins over the case setting. Cases made before this release have no `archive` key in
-  `case.json` and read as off; set it to `true` to keep the old behaviour.
 
 ### Added
 - **Share clean.** A copy of a file with everything it says about itself removed: EXIF with GPS,
@@ -42,11 +36,60 @@ project-docs/PROVENANCE-TRACING-PLAN.md.
   renames, account age, posting clock, posting apps, volume, repeated wording) on your own account
   only, each with what it reveals and how to reduce it. Your own signed-in profile on X, or your own
   data export (`daylight self-audit tweets.js account.js`). There is no field to type an account.
+- **A Download control on any picture, GIF or video.** Rest the pointer on one for a moment and a
+  small Download button shows in its corner, even where the site blocks right-click or lays a clear
+  layer over its pictures. Its second button offers Study, Download as GIF, Copy, Copy link, Copy with
+  caption and Save to Daylight. It never moves the page or takes its clicks. It shows on the sites
+  Daylight Commons reads; "Show it on every site" in the settings asks your browser once to allow all
+  sites. "Never on this site" and a switch turn it off. **Alt+Shift+D** saves the picture or video
+  under the pointer, or the focused one, on any site.
+- **Study.** Beside Download everywhere: the same save, into `Daylight/study/<site>/`, marked
+  `study: true`, with an optional line on what draws you to it. A study library can pick these up
+  first.
+- **Text is saved too.** X and Reddit text posts get the button: one note with the whole text, the
+  author, address and time, the quoted or parent post, the author's thread, link cards, hashtags, a
+  poll as shown, and on Reddit the title, subreddit and flair. Select text on any page and "Save
+  selection" keeps it with the page's title, address and author. **Save as card** renders the words
+  as a picture in the house type, marked as a Daylight Commons rendering, never as a screenshot.
+- **YouTube references.** The control on a YouTube video saves a reference: the thumbnail and a note
+  with the title, channel, the link at the current time, the whole description, chapters and any
+  transcript the page shows. Copy link at this time copies the address at the current second. The
+  store versions never download YouTube video. The unpacked build adds a command to copy for the new
+  `daylight media fetch <address>`, which uses your own yt-dlp and writes the same note.
+- **The side panel.** "Show windows in the side panel" in the toolbar menu moves the window for a post
+  to the browser's side panel, where it stays while you switch tabs. Close the panel and the window
+  returns to the page.
+- **Threads.** On a post's own page, the X button saves the author's whole thread below it: every
+  picture and video, or one note with every part in order, where X's own data shows the parts belong
+  together.
+- Notes keep the engagement the page showed at save time (replies, reposts, likes, views, bookmarks;
+  score and comments on Reddit), under `engagement`, with the time it was read.
+- `daylight sidecar check <folder>` lists the notes whose thread continuation was not proved.
+
+### Changed
+- **`daylight case add` and `case run` no longer ask the Wayback Machine for a copy by default.**
+  A save request tells the page's server and the Internet Archive who is looking and when, and the
+  copy is public. Ask for one with `--archive`, or for a whole case with
+  `daylight case settings archive on`. `case watch` asks the Archive whether it holds a copy only
+  with that setting on.
+  **Migration:** scripts that relied on the old default add `--archive`. `--no-archive` still works
+  and wins over the case setting. Cases made before this release have no `archive` key in
+  `case.json` and read as off; set it to `true` to keep the old behaviour.
+- In source-protection mode the Download control, Study, the X and Reddit buttons, YouTube
+  references, picture Copy and `daylight media fetch` make no request to any host and say why. Notes
+  of text and text cards still save, since they use only what the page shows.
 
 ### Fixed
 - **Case exports named private accounts in `export.json`.** The export's snapshot (and
   `CHANGES.md` from the second version on) carried claim text with private handles unredacted.
   Both now use the same pseudonyms as the export's files.
+- **Notes saved with 3.6.0 from a profile or timeline page could list unrelated posts by the same
+  author as "Continued by the author".** A continuation is now joined only where X's own data shows each
+  part answering the one before; otherwise the note holds none and, where a thread may exist, says
+  `thread_complete: "unknown"`. Run `daylight sidecar check <your Daylight folder>` to list the 3.6.0
+  notes to check against the post.
+- Long X posts are no longer cut short in the note. When the page showed only the start of a post and
+  no fuller copy was loaded, the note says `text_complete: false` and a line under the text says so.
 
 ## 3.6.0 (2026-10-25)
 

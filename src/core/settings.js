@@ -53,6 +53,9 @@ export const DEFAULTS = Object.freeze({
   // Source-protection mode (project-docs/SECURITY-REVIEW.md): off by default. While on, every
   // switch in PROTECTION_FORCES is held off, and the save page and Share clean behave as it says.
   protection: false,
+  // The hover Download control (src/ext/quick-hover.js): on by default; on every site once the user
+  // allows that access; never on the sites listed in hoverOffSites.
+  hoverDownload: true, hoverEverywhere: true, hoverOffSites: [],
 });
 
 // What source-protection mode holds off while it is on: evidence lookups (GitHub, RDAP, the Internet
@@ -95,6 +98,7 @@ export function normalizeSettings(raw) {
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
     mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder),
     protection: bool(s.protection, DEFAULTS.protection),
+    hoverDownload: bool(s.hoverDownload, DEFAULTS.hoverDownload), hoverEverywhere: bool(s.hoverEverywhere, DEFAULTS.hoverEverywhere), hoverOffSites: siteList(s.hoverOffSites),
   };
   return out.protection ? { ...out, ...PROTECTION_FORCES } : out;
 }

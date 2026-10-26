@@ -3,8 +3,8 @@ message: "If you use this software, please cite it using these metadata."
 type: software
 title: "Daylight Commons"
 abstract: "A browser extension that shows where social media replies come from, signs of coordination, how replies argue, and whether a fact-checker has reviewed the claim. Install it in Chrome, Edge, Brave or Firefox."
-version: "3.6.0"
-date-released: "2026-10-24"
+version: "3.6.1"
+date-released: "2026-10-25"
 authors:
   - family-names: "Harper"
     given-names: "Zain Dana"

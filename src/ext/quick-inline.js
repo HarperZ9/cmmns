@@ -1,30 +1,38 @@
 // A Download button on X and Reddit posts with pictures, videos or GIFs. On X it sits in the post's
 // own row of actions (reply, repost, like) and looks like them; on Reddit it sits in the corner of
 // the post's media. One click saves every file in the post: all pictures of a gallery, each video
-// with its sound. Buttons are added once per post and again as the site redraws or scrolls; they
-// stop the click there, so the site never opens the post by accident. Turned off in the settings.
+// with its sound; on a post's own page, the author's thread below it too. Buttons are added once
+// per post and again as the site redraws or scrolls; they stop the click there, so the site never
+// opens the post by accident. Turned off in the settings.
 (() => {
   "use strict";
   if (!globalThis.PBQuickSites || !(PBQuickSites.isX || PBQuickSites.isReddit)) return;
   const MARK = "data-dc-dl";
+  const STUDY = "M7 3.5h10a1.5 1.5 0 0 1 1.5 1.5v15.2a.6.6 0 0 1-.92.5L12 17.3l-5.58 3.4a.6.6 0 0 1-.92-.5V5A1.5 1.5 0 0 1 7 3.5zm.5 2v12.9l4.5-2.74 4.5 2.74V5.5h-9z";
   const ICON = "M12 3.5a1 1 0 0 1 1 1v8.09l2.8-2.8a1 1 0 1 1 1.4 1.42l-4.5 4.5a1 1 0 0 1-1.4 0l-4.5-4.5a1 1 0 0 1 1.4-1.42l2.8 2.8V4.5a1 1 0 0 1 1-1zM5 18.5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1z";
   const on = () => !globalThis.PBSettings || PBSettings.get().mediaButtons !== false;
 
-  function svg() {
+  function svg(d = ICON) {
     const ns = "http://www.w3.org/2000/svg", s = document.createElementNS(ns, "svg"), p = document.createElementNS(ns, "path");
     s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true"); s.setAttribute("width", "18.75"); s.setAttribute("height", "18.75");
-    p.setAttribute("d", ICON); p.setAttribute("fill", "currentColor"); s.append(p);
+    p.setAttribute("d", d); p.setAttribute("fill", "currentColor"); s.append(p);
     return s;
   }
 
-  async function saveAll(node, btn) {
-    const { title, items, gallery } = PBQuickSites.postMedia(node);
-    if (!items.length) { PBQuickToast.show("No pictures or videos were found in this post yet. Let it load, then try again.", { tone: "no" }); return; }
+  async function saveAll(node, btn, study = false) {
+    const { title, items, gallery, thread } = PBQuickSites.postMedia(node);
+    // A text post (or a thread of them): one note with the whole text, every part in order.
+    if (!items.length) {
+      const raw = PBQuickSites.postMetaOf(node);
+      if (raw && (raw.text || raw.title)) { btn.disabled = true; await PBQuickText.run(study ? "study" : "note", { raw: { ...raw, kind: "text" } }); btn.disabled = false; return; }
+      PBQuickToast.show("Nothing to save in this post yet. Let it load, then try again.", { tone: "no" });
+      return;
+    }
     btn.disabled = true;
     let ok = 0, last = "", already = 0, meta = null;
     const names = [], many = items.length > 1;
     for (const [index, t] of items.entries()) {
-      const r = await PBQuickSave.start(t, { title, index, total: items.length, quiet: many, oneSidecar: many });
+      const r = await PBQuickSave.start(t, { title, index, total: items.length, quiet: many, oneSidecar: many, study });
       if (r.ok) ok++; else last = r.line;
       if (r.already) already++;
       if (r.names) names.push(...r.names);
@@ -34,18 +42,20 @@
     if (many && meta) await PBQuickSave.postSidecar(meta, names).catch((e) => console.warn("[daylight-commons] could not write the post's sidecar", e));
     btn.disabled = false;
     const was = already ? ` ${already} ${already === 1 ? "was" : "were"} already saved.` : "";
-    if (many) PBQuickToast.show(ok === items.length ? `Saved all ${items.length} files${gallery ? " from the gallery" : ""}.${was}` : `Saved ${ok} of ${items.length} files. ${last}`, { tone: ok === items.length ? "ok" : "no" });
+    if (many) PBQuickToast.show(ok === items.length ? `Saved all ${items.length} files${gallery ? " from the gallery" : thread ? " from the thread" : ""}.${was}` : `Saved ${ok} of ${items.length} files. ${last}`, { tone: ok === items.length ? "ok" : "no" });
   }
 
-  function button(node, style) {
+  // Download, or Study (the same save, kept apart for study later) when study is true.
+  function button(node, style, study = false) {
     const b = document.createElement("button");
-    b.type = "button"; b.className = "dc-dl " + style;
-    const n = PBQuickSites.isReddit && node.querySelector("gallery-carousel") ? "Download all" : "Download";
-    b.setAttribute("aria-label", n + " media"); b.title = n;
-    b.append(svg());
+    b.type = "button"; b.className = "dc-dl " + style + (study ? " dc-study" : "");
+    const text = !PBQuickSites.postMedia(node).items.length;
+    const n = study ? "Study" : text ? "Save as note" : PBQuickSites.isReddit && node.querySelector("gallery-carousel") ? "Download all" : "Download";
+    b.setAttribute("aria-label", study ? "Save this post for study" : text ? "Save this post's text as a note" : n + " media"); b.title = n;
+    b.append(svg(study ? STUDY : ICON));
     const stop = (e) => { e.stopPropagation(); };
     for (const ev of ["pointerdown", "mousedown", "pointerup", "mouseup"]) b.addEventListener(ev, stop);
-    b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); saveAll(node, b).catch((x) => PBQuickToast.show(`Not saved: ${x.message}`, { tone: "no" })); });
+    b.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); saveAll(node, b, study).catch((x) => PBQuickToast.show(`Not saved: ${x.message}`, { tone: "no" })); });
     return b;
   }
 
@@ -55,15 +65,17 @@
     .filter((m) => m.closest("article") === article);
   function decorateX(article) {
     const media = xMedia(article);
-    if (!media.length || article.querySelector(".dc-dl")) return;
+    if (article.querySelector(".dc-dl")) return;
+    if (!media.length && !article.querySelector('[data-testid="tweetText"], div[lang], div.whitespace-pre-wrap')) return;
     const row = [...article.querySelectorAll('[role="group"]')].find((g) => g.querySelector('[data-testid="reply"], [data-testid="like"], [data-testid="unlike"]'));
     if (row) {
       const cell = document.createElement("div");
       cell.className = "dc-dl-cell";
-      cell.append(button(article, "dc-dl-x"));
+      cell.append(button(article, "dc-dl-x"), button(article, "dc-dl-x", true));
       row.append(cell);
       return;
     }
+    if (!media.length) { corner(article, article, " dc-bottom"); return; }   // a text post, signed out: its lower corner
     const box = overlayOf(media[0]);
     if (box) corner(box, article);
   }
@@ -82,18 +94,18 @@
     return m.parentElement;
   }
 
-  function corner(box, node) {
+  function corner(box, node, where = "") {
     if (!box || box.querySelector(":scope > .dc-dl")) return;
     if (getComputedStyle(box).position === "static") box.style.position = "relative";
-    box.append(button(node, "dc-dl-r"));
+    box.append(button(node, "dc-dl-r" + where), button(node, "dc-dl-r" + where, true));
   }
 
   // Reddit: the corner of the post's media.
   function decorateReddit(post) {
-    const box = post.querySelector('[slot="post-media-container"]') || post.querySelector("shreddit-player, shreddit-player-2, gallery-carousel");
+    const media = post.querySelector('[slot="post-media-container"]') || post.querySelector("shreddit-player, shreddit-player-2, gallery-carousel");
+    const box = media && PBQuickSites.postMedia(post).items.length ? media : post.querySelector('[slot="text-body"]');
     if (!box || box.querySelector(":scope > .dc-dl")) return;
-    if (!PBQuickSites.postMedia(post).items.length) return;
-    corner(box, post);
+    corner(box, post, box === media ? "" : " dc-bottom");
   }
 
   let queued = false;

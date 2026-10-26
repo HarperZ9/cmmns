@@ -31,6 +31,7 @@ test("a WebP served from a .jpg address is saved as .webp; the header and addres
   assert.deepEqual(chooseType({ contentType: "image/avif; q=1", url: "https://cdn.example/a.jpg" }), { mime: "image/avif", ext: "avif", from: "header" });
   assert.deepEqual(chooseType({ contentType: "application/octet-stream", url: "https://i.imgur.com/abc.gifv" }), { mime: "video/mp4", ext: "mp4", from: "address" });
   assert.equal(chooseType({ contentType: "", url: "https://x.example/blob" }).ext, "bin");
+  assert.equal(chooseType({ url: "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:z/bafk@jpeg" }).ext, "jpg");
 });
 
 test("file names come from the title and the media's own name, safe on every system", () => {
@@ -39,6 +40,7 @@ test("file names come from the title and the media's own name, safe on every sys
   assert.equal(downloadName({ title: "", url: "https://media.giphy.com/media/abc/giphy.webp", ext: "webp" }), "media.webp");
   assert.equal(downloadName({ title: "Nachrichten über Wasser", url: "https://v.redd.it/q/DASH_720.mp4", ext: "mp4" }), "Nachrichten-über-Wasser.mp4");
   assert.equal(slug("CON"), "_CON");
+  assert.equal(slug("Bluesky (@bsky.app) — Bluesky"), "Bluesky-bsky-app-Bluesky");
   for (const n of [downloadName({ title: "../../etc/passwd", ext: "txt" }), downloadName({ title: "a\\b:c*d", ext: "png" })]) assert.doesNotMatch(n, /[\\/:*?"<>|]|\.\./);
 });
 

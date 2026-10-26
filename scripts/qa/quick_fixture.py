@@ -92,7 +92,7 @@ def build(out, src):
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
-    ROUTES = {"www.reddit.com": "reddit", "v.redd.it": "vredd", "i.redd.it": "iredd", "preview.redd.it": "iredd", "packaged-media.redd.it": "pkg"}
+    ROUTES = {"x.com": "xsite", "www.reddit.com": "reddit", "v.redd.it": "vredd", "i.redd.it": "iredd", "preview.redd.it": "iredd", "packaged-media.redd.it": "pkg"}
 
     def translate_path(self, path):
         host = (self.headers.get("Host") or "").split(":")[0]
@@ -100,6 +100,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         p = path.split("?", 1)[0]
         if host == "www.reddit.com":
             p = "/index.html"
+        if host == "x.com" and not p.startswith("/i/api/"):
+            p = "/status.html" if "/status/" in p else "/profile.html"
         return str(pathlib.Path(self.directory) / sub / p.lstrip("/"))
 
     def end_headers(self):

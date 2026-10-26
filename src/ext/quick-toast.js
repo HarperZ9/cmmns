@@ -11,6 +11,8 @@ globalThis.PBQuickToast = globalThis.PBQuickToast || (() => {
 .t button { font: inherit; font-weight: 600; margin: 6px 8px 0 0; padding: 3px 10px; border-radius: 2px; border: 1px solid #7b7262; background: transparent; color: inherit; cursor: pointer; }
 .t button:hover { border-color: #16130f; }
 .t button:focus-visible { outline: 2px solid #16130f; outline-offset: 2px; }
+.t input { font: inherit; width: 100%; box-sizing: border-box; margin-top: 6px; padding: 4px 6px; border-radius: 2px; border: 1px solid #7b7262; background: transparent; color: inherit; }
+.t input:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
 @media (prefers-color-scheme: dark) { .t { background: #111114; color: #ece5d6; box-shadow: 0 10px 30px rgba(0,0,0,.7), 0 0 0 1px rgba(111,106,97,.9); }
   .t.ok { border-left-color: #63d4ce; } .t.no { border-left-color: #e29472; } .t button:hover { border-color: #ece5d6; } }
 @media (prefers-reduced-motion: no-preference) { .t { animation: in .16s ease-out; } @keyframes in { from { opacity: 0; transform: translateY(6px); } } }`;
@@ -29,8 +31,9 @@ globalThis.PBQuickToast = globalThis.PBQuickToast || (() => {
     (document.body || document.documentElement).append(host);
   }
 
-  // show(text, { tone: "ok" | "no" | null, stay: ms, actions: [[label, fn]] })
-  function show(text, { tone = null, stay = 4000, actions = [] } = {}) {
+  // show(text, { tone: "ok" | "no" | null, stay: ms, actions: [[label, fn]], input: { label, onSubmit } })
+  // input adds one optional line; Enter submits it, and typing keeps the note open.
+  function show(text, { tone = null, stay = 4000, actions = [], input = null } = {}) {
     last = { text, tone };
     try {
       mount();
@@ -41,6 +44,13 @@ globalThis.PBQuickToast = globalThis.PBQuickToast || (() => {
         b.type = "button"; b.textContent = label;
         b.addEventListener("click", () => { hide(); fn(); });
         box.append(document.createElement("br"), b);
+      }
+      if (input) {
+        const f = document.createElement("input");
+        f.type = "text"; f.placeholder = input.label; f.setAttribute("aria-label", input.label); f.maxLength = 300;
+        f.addEventListener("input", () => clearTimeout(timer));
+        f.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Enter" && f.value.trim()) { hide(); input.onSubmit(f.value.trim()); } if (e.key === "Escape") hide(); });
+        box.append(f);
       }
       clearTimeout(timer);
       if (stay) timer = setTimeout(hide, actions.length ? Math.max(stay, 9000) : stay);
