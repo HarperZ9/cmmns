@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source protection · Daylight Commons</title>
+<link rel="stylesheet" href="canon.css">
+<link rel="stylesheet" href="pages.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Source protection</h1>
+    <p class="lead">One switch for working on something the subject must not learn about. While it is on, Daylight Commons sends nothing: every file it keeps is one this page already held, and every copy you share leaves clean.</p>
+    <p id="state" class="done" role="status" aria-live="polite">Reading the setting.</p>
+  </header>
+  <section aria-labelledby="h-switch">
+    <h2 id="h-switch">The switch</h2>
+    <div class="switches">
+      <label class="switch"><span>Source protection<span class="hint">Not yet independently reviewed. A reviewer's checklist is in the project's SECURITY-REVIEW.md.</span></span><input type="checkbox" id="protection"></label>
+    </div>
+    <p class="muted">For one investigation folder on the command line: <code>daylight case settings protection on</code>. For every case on a computer: <code>daylight protect on</code>.</p>
+  </section>
+  <section aria-labelledby="h-does">
+    <h2 id="h-does">While it is on</h2>
+    <ul class="plain">
+      <li><strong>No requests.</strong> No Internet Archive copy, no file downloaded again from its host, no evidence lookups (GitHub, RDAP, the Archive), no Other coverage feeds, no About pages read for you, no Reddit account reads. The toolbar button shows a P.</li>
+      <li><strong>Clean exports.</strong> Download in Collections gives a Share clean copy, and every evidence bundle is carrier-safe: a one-time key, the day only, no page address.</li>
+      <li><strong>No name of yours.</strong> On the command line, case notes and history record you as "investigator", with the day only, and every account in an export is a pseudonym.</li>
+      <li><strong>Your writing style can identify you.</strong> Word choice, spelling and punctuation can point to one person. Keep what you share short and plain, and have someone else reword it when it matters.</li>
+    </ul>
+  </section>
+  <section aria-labelledby="h-cannot">
+    <h2 id="h-cannot">What it cannot protect against</h2>
+    <ul class="plain">
+      <li><strong>This device.</strong> Anyone who holds or has broken into it can read what you saved and this extension. Daylight Commons cannot detect spyware.</li>
+      <li><strong>The network.</strong> No Tor is built in. Your provider sees which sites your browser visits while you read them. Open the pages in Tor Browser (torproject.org) instead, save them there, and add the saved files to your case.</li>
+      <li><strong>The platforms' own logs.</strong> Every page you open, search you run and account you look at is recorded by that platform, whatever Daylight Commons does.</li>
+      <li><strong>Screenshots and what is visible.</strong> Faces, voices, street signs, reflections, screens and a writing style survive any metadata cleaning.</li>
+      <li><strong>Being made to unlock the device, or to talk.</strong></li>
+    </ul>
+    <p>For a source who needs to reach a newsroom safely: <strong>SecureDrop</strong> (securedrop.org) lists the newsrooms that run it. For help with digital security, free for civil society: the <strong>Access Now Digital Security Helpline</strong> (accessnow.org/help).</p>
+  </section>
+</main>
+<script src="core.bundle.js"></script>
+<script src="guard.js"></script>
+<script src="settings.js"></script>
+<script src="protection.js"></script>
+</body>
+</html>

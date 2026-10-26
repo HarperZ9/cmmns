@@ -76,6 +76,12 @@ The same description, as one paragraph, is written into the file without re-enco
 `dc:description`, `dc:creator` and `dc:source` in JPEG, PNG and WebP; `©cmt`, `desc` and `©ART` in
 MP4; a comment block in GIF. A file that already carries its own XMP or MP4 metadata is left as it is.
 
+**Share clean removes it.** A copy made with Share clean (Collections, the save page, `daylight
+clean <file>`, `case export --clean`) has this description removed along with every other piece of
+file metadata. The `.md` sidecar stays on your disk unless you choose to send it, and the evidence
+copy keeps the description. `tests/clean.test.js` embeds a description in each of the five formats
+and checks that none of it survives cleaning.
+
 ## What it never holds
 
 Only what the page showed: nothing is fetched to fill a sidecar, and nothing about the person saving

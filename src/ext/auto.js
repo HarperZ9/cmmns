@@ -70,6 +70,7 @@
   // handles: accounts on screen with no About data yet. Each is asked once per page session.
   function want(handles, cb) {
     if (cb) onChange = cb;
+    if (globalThis.PBSettings && PBSettings.get().protection) return;   // source-protection mode: no lookups
     for (const h of handles) if (!asked.has(h)) { asked.add(h); queue.push(h); }
     pump();
   }

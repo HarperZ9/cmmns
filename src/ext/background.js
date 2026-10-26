@@ -120,9 +120,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
   if (msg && msg.type === "pb-lookup" && sender.tab) {
-    for (const h of msg.handles || []) if (!queue.some((q) => q.handle === h)) queue.push({ handle: h, replyTo: sender.tab.id });
-    report(sender.tab.id);
-    pump();
+    // Source-protection mode: no About page is opened, so X sees no lookup.
+    chrome.storage.local.get(PB.SETTINGS_KEY).then((g) => {
+      if (PB.normalizeSettings(g[PB.SETTINGS_KEY]).protection) { for (const h of msg.handles || []) chrome.tabs.sendMessage(sender.tab.id, { type: "pb-about-result", handle: h, reading: null, error: "source-protection mode is on" }).catch(() => {}); return; }
+      for (const h of msg.handles || []) if (!queue.some((q) => q.handle === h)) queue.push({ handle: h, replyTo: sender.tab.id });
+      report(sender.tab.id);
+      pump();
+    }).catch((e) => console.error("[daylight-commons] lookup settings failed", e));
   }
   if (msg && msg.type === "pb-page-read" && worker && sender.tab && sender.tab.id === worker.tabId && current) step(msg.kind, msg.reading);
 });

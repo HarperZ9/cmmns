@@ -10,6 +10,9 @@
   const job = id ? await chrome.runtime.sendMessage({ type: "pb-save-get", id }).catch(() => null) : null;
   const status = (t) => { $("status").textContent = t; };
   let pending = null;
+  await PBSettings.ready;
+  const protectedMode = PBSettings.get().protection;
+  if (protectedMode) { $("archive").checked = false; $("archive").disabled = true; $("protection-note").hidden = false; }
 
   if (!job) { $("from").textContent = "Nothing to save here. Use \"Save to Daylight\" on a picture or video, or \"Save media from this page\" in the toolbar menu."; $("save").disabled = true; return; }
   $("from").textContent = job.error || `From ${job.title || "this page"} (${job.page || "unknown address"}). ${job.items.length} item${job.items.length === 1 ? "" : "s"} found.`;
@@ -89,17 +92,18 @@
   $("save").addEventListener("click", () => {
     const items = chosen();
     if (!items.length) { status("Tick at least one item."); return; }
-    const origins = [...new Set(items.flatMap(PBMediaFetch.firstOrigins))];
-    if (where() === "case" && $("archive").checked) origins.push("https://web.archive.org/*");
+    // Source-protection mode asks for no host access: nothing will be fetched (media-fetch.js).
+    const origins = protectedMode ? [] : [...new Set(items.flatMap(PBMediaFetch.firstOrigins))];
+    if (where() === "case" && $("archive").checked && !protectedMode) origins.push("https://web.archive.org/*");
     // Firefox 140 and later ask for "browsing activity" themselves when an address goes to the Internet
     // Archive; other browsers throw on that key, and only the hosts are asked for.
-    const archive = where() === "case" && $("archive").checked;
+    const archive = where() === "case" && $("archive").checked && !protectedMode;
     let asked;
     if (!origins.length) asked = Promise.resolve(true);
     else { try { asked = chrome.permissions.request(archive ? { origins, data_collection: ["browsingActivity"] } : { origins }); } catch { asked = chrome.permissions.request({ origins }); } }
     asked.then(async (ok) => {
       if (!ok) { status("Access was not given, so nothing was saved."); return; }
-      const opts = { tags: $("tags").value, note: $("note").value, archive: where() === "case" && $("archive").checked };
+      const opts = { tags: $("tags").value, note: $("note").value, archive };
       run(items, await collection(), opts);
     }).catch((e) => status(e.message));
   });

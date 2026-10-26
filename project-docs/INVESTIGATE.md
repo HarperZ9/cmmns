@@ -146,9 +146,19 @@ offline from its captures. `DAYLIGHT_CASE_NOW` fixes the clock.
   sign-in address, or a page that is little more than a sign-in form is refused and logged as
   withheld. A sign-in box in a long article's header does not count.
 - **Nothing leaves the machine unless asked.** `case add <url>`, `case run` and `case watch` fetch
-  the addresses given (and, for X posts, the public post-data endpoint) and ask the Wayback Machine
-  to save each one unless `--no-archive` is passed. A configured model endpoint receives source text.
-  Every other command works offline. The extension's "Add to case" keeps addresses in the browser
+  the addresses given (and, for X posts, the public post-data endpoint). They ask the Wayback Machine
+  to save a page only with `--archive`, or when `case settings archive on` is set for the case: a
+  save request tells the page's server and the Internet Archive who is looking and when, and the
+  copy is public. `--no-archive` still works and wins over the setting. `case watch` asks the
+  Archive whether it holds a copy only when the archive setting is on. A configured model endpoint
+  receives source text. Every other command works offline.
+- **Source-protection mode** (`case settings protection on`, or `daylight protect on` for every
+  case) refuses every request: add pages you saved in your browser as files. Exports are Share clean
+  (`lineage/clean.jsonl` in the case keeps each original-to-clean hash pair, outside the export),
+  carrier-safe (a one-time key, the day only), every account is a pseudonym unless marked
+  `--keep-name`, and the case's own history names the investigator only as "investigator" with the
+  day. `daylight protect limits` lists what it cannot protect against. Not yet independently
+  reviewed: project-docs/SECURITY-REVIEW.md. The extension's "Add to case" keeps addresses in the browser
   and sends nothing.
 
 ## What journalists use now

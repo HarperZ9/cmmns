@@ -16,7 +16,8 @@ const dir = mkdtempSync(join(tmpdir(), "case-run-"));
 const KEY = join(dir, "key.jwk");
 const base = { ...process.env, DAYLIGHT_CASE_NOW: "2026-10-23T12:00:00Z", DAYLIGHT_CASE_REPLAY: join(FX, "replay", "map.json") };
 const cli = (envExtra, ...args) => spawnSync(process.execPath, [CLI, "case", ...args], { encoding: "utf8", env: { ...base, ...envExtra } });
-const runCase = (name, envExtra = {}) => cli(envExtra, "run", join(FX, "seeds"), "--case", join(dir, name), "--name", "Harbour sale", "--key-file", KEY);
+// --archive: this run checks the archive stage too, which is opt-in.
+const runCase = (name, envExtra = {}) => cli(envExtra, "run", join(FX, "seeds"), "--case", join(dir, name), "--name", "Harbour sale", "--key-file", KEY, "--archive");
 const lines = (p) => readFileSync(p, "utf8").trim().split("\n").filter(Boolean).map(JSON.parse);
 test.after(() => rmSync(dir, { recursive: true, force: true }));
 

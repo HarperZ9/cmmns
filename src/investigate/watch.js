@@ -3,7 +3,8 @@
 // writes what changed to watch.jsonl and to CHANGELOG.md under the date:
 //   edited       a page's text or a post's text differs from the capture (with a word diff)
 //   deleted      a post now returns no record, or a page answers 404 or 410
-//   archived     the Wayback Machine now holds a copy of a source that had none
+//   archived     the Wayback Machine now holds a copy of a source that had none (asked only when
+//                the case's archive setting is on: the lookup tells the Archive what you follow)
 //   lead-changed a lead's public search now returns different results: a new record may settle it
 // New text is saved beside the capture as captures/<id>.<date>.txt; the original stays untouched.
 import { readFileSync, writeFileSync, existsSync, appendFileSync } from "node:fs";
@@ -67,10 +68,10 @@ function record(ctx, changes) {
   return shown;
 }
 
-// ctx: { dir, data, fetchFn, now }. Returns the changes recorded (baselines left out).
+// ctx: { dir, data, fetchFn, now, archive }. Returns the changes recorded (baselines left out).
 export async function watchCase(ctx) {
   const data = ctx.data(), changes = [];
-  for (const s of data.sources.filter((x) => x.url)) { changes.push(...(await checkSource(ctx, s))); changes.push(...(await checkArchive(ctx, s))); }
+  for (const s of data.sources.filter((x) => x.url)) { changes.push(...(await checkSource(ctx, s))); if (ctx.archive) changes.push(...(await checkArchive(ctx, s))); }
   for (const l of data.leads.filter((x) => x.check_url && (x.status || "open") === "open" && x.review !== "rejected")) changes.push(...(await checkLead(ctx, l)));
   return record(ctx, changes);
 }

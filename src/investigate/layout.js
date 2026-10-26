@@ -15,7 +15,7 @@ Opened ${created.slice(0, 10)}. Made with \`daylight case\` (Daylight Commons).
 
 ## Files
 
-- \`sources.jsonl\`: one row per source. URL, access time, read mode, Wayback result, sha256 of the capture.
+- \`sources.jsonl\`: one row per source. URL, access time, read mode, Wayback result (when asked), sha256 of the capture.
 - \`captures/\`: the captured bytes and their extracted text. Names start with the source id.
 - \`claims.jsonl\`: the claim inventory. Each claim has a source and a rung:
   documented, inference, unproven or contradicted.
@@ -36,8 +36,10 @@ Opened ${created.slice(0, 10)}. Made with \`daylight case\` (Daylight Commons).
     daylight case timeline
     daylight case export --profile newsroom
 
-Every command except \`add <url>\` works offline. \`add <url>\` fetches that page and asks the
-Wayback Machine to save it, unless you pass --no-archive.
+Every command except \`add <url>\`, \`run\` and \`watch\` works offline. \`add <url>\` fetches that
+page from your connection. It asks the Wayback Machine to save it only with --archive, or when
+\`daylight case settings --archive on\` is set; the page's server and the Archive then see the
+request, and the copy is public. \`daylight case settings --protection on\` stops every request.
 `;
 }
 
@@ -47,7 +49,7 @@ export function initCase(dir, name, now = new Date().toISOString()) {
   if (existsSync(dir) && readdirSync(dir).length) throw new Error(`${dir} is not empty; choose a new folder`);
   mkdirSync(dir, { recursive: true });
   for (const d of DIRS) { mkdirSync(join(dir, d), { recursive: true }); writeFileSync(join(dir, d, ".keep"), ""); }
-  const meta = { format: CASE_FORMAT, name: String(name), created: now, salt: randomBytes(16).toString("hex"), models: { provider: "none" } };
+  const meta = { format: CASE_FORMAT, name: String(name), created: now, salt: randomBytes(16).toString("hex"), models: { provider: "none" }, archive: false, protection: false };
   writeFileSync(join(dir, "case.json"), JSON.stringify(meta, null, 2) + "\n");
   for (const [file] of Object.values(TABLES)) writeFileSync(join(dir, file), "");
   writeFileSync(join(dir, "README.md"), readme(meta.name, now));

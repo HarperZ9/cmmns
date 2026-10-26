@@ -119,6 +119,27 @@ and any hash of either stay in your browser, and the text lasts as long as that 
   engine with the bundled EasyList and EasyPrivacy rules. Daylight Commons does not see which
   requests were blocked. The sites where you allowed ads are kept with your settings.
 
+## Source protection, Share clean and the self-audit
+
+- **Source protection**, off until you turn it on (toolbar menu, Source protection), stops every
+  request in this policy that Daylight Commons makes on its own: no About pages or Reddit account
+  data read for you, no evidence lookups, no Other coverage, no Internet Archive copy, and no file
+  downloaded again from its host. Save to Daylight keeps only what the page already holds in
+  memory. Download gives Share clean copies, and every evidence bundle is carrier-safe. The toolbar
+  button shows a P while it is on. The sites you open still load their own pages and record what
+  you do there; the mode's own page lists what it cannot protect against. It has not yet been
+  independently reviewed.
+- **Share clean** (Collections, and the save page's result) makes a copy of a saved file with what
+  the file says about itself removed: EXIF with GPS, XMP, IPTC, colour-profile text, comments, video
+  tags and dates, PDF and office document authors, and the description Daylight Commons wrote into
+  it. It runs on this device and sends nothing. The copy gets a neutral name. The saved file keeps
+  everything, as your evidence copy, and its record gains a line tying the two hashes together.
+- **What Daylight shows about you** runs Daylight Commons' account signals on your own account:
+  your profile as X already loaded it in this browser, read only when the page shows you signed in
+  on your own profile, or the data export files you choose. It sends nothing and keeps nothing.
+- On the command line, `daylight case add` no longer asks the Wayback Machine for a copy unless you
+  pass `--archive` or turn the case's archive setting on.
+
 ## What Daylight Commons keeps, where, and for how long
 
 Everything is kept in `chrome.storage.local` (Firefox: `browser.storage.local`) in the browser
@@ -199,6 +220,8 @@ The carrier-safe profile awaits independent review.
 - To the host a saved file came from: the download of that file, when you click Save.
 - To the Internet Archive: a saved file's address, when you tick "Ask the Internet Archive to keep a
   copy" on a case save.
+
+With source protection on, the list is empty: only the sites you open load their own pages.
 
 That is the whole list. Your data serves the features above and stays out of advertising and
 sale. Account labels show what each site discloses about an account, kept per site; Daylight

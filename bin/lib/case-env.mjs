@@ -38,6 +38,7 @@ export function network(env = process.env) {
 }
 
 const git = (dir, ...args) => spawnSync("git", args, { cwd: dir, encoding: "utf8" });
+const gitAt = (dir, env, ...args) => spawnSync("git", args, { cwd: dir, encoding: "utf8", env: { ...process.env, ...env } });
 export const hasGit = (dir) => existsSync(join(dir, ".git"));
 
 // Git identity: the user's own when set; a neutral local one otherwise, so a commit never fails.
@@ -54,11 +55,15 @@ export function gitInit(dir) {
   return true;
 }
 
-export function gitCommit(dir, message) {
+// In source-protection mode (anon) a commit names no one and keeps only the day: commit times
+// would show when the investigator works, as a posting clock does.
+export function gitCommit(dir, message, { anon = false } = {}) {
   if (!hasGit(dir)) return false;
   git(dir, "add", "-A");
   if (!git(dir, "status", "--porcelain").stdout.trim()) return false;
-  const r = git(dir, ...idArgs(dir), "commit", "-q", "-m", message);
+  const day = `${new Date().toISOString().slice(0, 10)}T00:00:00Z`;
+  const r = anon ? gitAt(dir, { GIT_AUTHOR_DATE: day, GIT_COMMITTER_DATE: day }, "-c", "user.name=investigator", "-c", "user.email=case@localhost", "commit", "-q", "-m", message)
+    : git(dir, ...idArgs(dir), "commit", "-q", "-m", message);
   return r.status === 0;
 }
 

@@ -65,6 +65,11 @@ Rest the pointer on a reply on X, YouTube, Reddit, Facebook, Instagram or Bluesk
 - Launch campaigns on X, not measured yet: how a launch post's engagement compares with the account's own posts, shared bio templates and join-date waves among the accounts the page loaded, and Paid partnership labels. It states an inference when two or more independent signs agree, and it names accounts the platform discloses as organisations.
 - Evidence receipts, when you turn them on: on your click, a linked repository's creation date, a domain's registration date and its first Internet Archive capture. Each answer is kept as a receipt in a hash chain. You can save the chain and check it offline with the free command line tool.
 
+Protecting you and your sources:
+- Share clean: a copy of any saved file with what it says about itself removed (camera and GPS data, XMP, IPTC, comments, video tags and dates, PDF and office document authors), without re-encoding the picture or sound. Your saved copy keeps everything as evidence.
+- Source protection: one switch that stops every request Daylight Commons would make on its own, makes every download a clean copy and every evidence bundle carrier-safe, and says plainly what it cannot protect against. Not yet independently reviewed.
+- What Daylight shows about you: the same signals, run on your own account only (your own signed-in profile, or your own data export), with what each reveals and how to reduce it.
+
 Tell Daylight Commons when it is wrong. Each sign has "This was right" and "This was wrong". Your marks stay in your browser. After ten marks on one kind of sign, the window shows your own count beside the measured figure. You can save your marks to a file and choose whether to share them.
 
 How Daylight Commons treats people:
@@ -136,7 +141,7 @@ locally". Tick these, because Daylight Commons reads and keeps them in the brows
 | Website content | Yes | Reads the replies and account details on the page; keeps summaries and, only when the user ticks it, a post's text with a feedback mark |
 | Web browsing activity | Yes | Keeps a summary of each thread the user opened, for the history page, and the page address beside each media file the user saves |
 | Website content, sent | Yes | Only with evidence lookups, off by default: on the user's click, the repository names and web domains the post links to go to api.github.com, rdap.org and web.archive.org. Other coverage downloads the feeds of outlets the user chose and sends nothing from the page. A case save with "Ask the Internet Archive" ticked sends the saved file's address to web.archive.org |
-| Personally identifiable information, Health, Financial and payment, Authentication, Personal communications, Location, User activity | No | Daylight Commons reads none of these. The location labels are the sites' public labels about other accounts, not the user's location |
+| Personally identifiable information, Health, Financial and payment, Authentication, Personal communications, Location, User activity | No | Daylight Commons reads none of these. The location labels are the sites' public labels about accounts, not the user's location. "What Daylight shows about you" shows the user their own account's public label on their own device and keeps nothing. Share clean reads a file's GPS data only to remove it, and never shows it |
 
 Certifications (tick all three): not sold or transferred to third parties outside the approved use
 cases; not used or transferred for purposes unrelated to the single purpose; not used or

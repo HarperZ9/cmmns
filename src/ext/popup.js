@@ -17,6 +17,12 @@
   document.getElementById("transparency").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("transparency.html") }); window.close(); });
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  // Source protection (protection.html) and "What Daylight shows about you" (selfaudit.html, which
+  // reads this tab only when it is your own profile).
+  const protectedMode = PBSettings.get().protection;
+  $("protection-on").hidden = !protectedMode;
+  $("protect").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("protection.html") }); window.close(); });
+  $("selfaudit").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL(`selfaudit.html${tab && tab.id != null ? `?tab=${tab.id}` : ""}`) }); window.close(); });
   // Add to case (src/ext/case-inbox.js): this tab's address and title, kept in this browser only.
   const caseCount = (n) => { $("case-save").textContent = n ? `Save case list (${n})` : "Save case list"; $("case-save").disabled = !n; };
   $("case-add").disabled = !PBCaseInbox.row(tab);
@@ -68,7 +74,7 @@
     const dd = document.createElement("dd"); dd.textContent = String(v); if (hot) dd.className = "hot";
     $("facts").append(dt, dd);
   }
-  $("scan").disabled = !s.pending || !!s.scanning;
+  $("scan").disabled = !s.pending || !!s.scanning || protectedMode;
   $("scan").textContent = s.pending ? `Read ${Math.min(s.pending, 200)} more accounts` : "All accounts read";
   $("panel").disabled = !!s.feed;
   $("export").disabled = !!s.feed;

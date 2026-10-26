@@ -19,10 +19,18 @@
     } catch (e) { console.error("[daylight-commons] retention prune failed", e); }
   }
 
+  let protectedMode = false;
   function setIcon(state, tabId) {
     const opts = tabId != null ? { tabId } : {};
     chrome.action.setIcon({ ...opts, path: paths(state) }).catch((e) => console.error("[daylight-commons] could not set the icon", e));
-    chrome.action.setTitle({ ...opts, title: TITLES[state] || "Daylight Commons" }).catch(() => {});
+    chrome.action.setTitle({ ...opts, title: (TITLES[state] || "Daylight Commons") + (protectedMode ? " (source protection on)" : "") }).catch(() => {});
+  }
+  // Source-protection mode shows on the toolbar button on every tab: a badge reading P.
+  function setProtection(on) {
+    protectedMode = !!on;
+    chrome.action.setBadgeText({ text: on ? "P" : "" }).catch(() => {});
+    if (on && chrome.action.setBadgeBackgroundColor) chrome.action.setBadgeBackgroundColor({ color: "#16130f" }).catch(() => {});
+    chrome.action.setTitle({ title: on ? "Daylight Commons (source protection on)" : "Daylight Commons" }).catch(() => {});
   }
 
   chrome.runtime.onInstalled.addListener((d) => {
@@ -35,6 +43,7 @@
   chrome.storage.onChanged.addListener((ch, area) => {
     if (area !== "local" || !ch[KEY]) return;
     const s = PB.normalizeSettings(ch[KEY].newValue);
+    setProtection(s.protection);
     setIcon(s.paused ? "paused" : "idle");
     prune();
   });
@@ -46,6 +55,6 @@
       if (path) chrome.tabs.create({ url: chrome.runtime.getURL(path), index: sender.tab.index + 1 }).catch((e) => console.error("[daylight-commons] could not open", path, e));
     }
   });
-  settings().then((s) => { if (s.paused) setIcon("paused"); }).catch(() => {});
-  globalThis.PBLife = Object.freeze({ prune, setIcon });
+  settings().then((s) => { setProtection(s.protection); if (s.paused) setIcon("paused"); }).catch(() => {});
+  globalThis.PBLife = Object.freeze({ prune, setIcon, setProtection });
 })();

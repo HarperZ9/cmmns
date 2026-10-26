@@ -1,0 +1,69 @@
+{
+  "off_save": {
+    "result": "Saved Image, 30 KB.\n8734075e7de6f1495dfb4b4f09176e574e2f930371c3b4ce05f259795afeb440 Convert or compress Share clean",
+    "server_requests_after_click": [
+      "/photo.jpg"
+    ],
+    "browser_requests_after_click": [
+      "http://127.0.0.1:51984/photo.jpg"
+    ]
+  },
+  "share_clean_one": {
+    "summary": "Share clean copy saved as clean-537443a19e23.jpg. Removed: EXIF (camera, time, GPS, maker notes); comment. Share clean removes what the file says about itself. What the picture, sound or words show stays as it is: faces, voices, street signs, reflections, screens, a writing style, and the tracking dots some printers add to every page.",
+    "files": [
+      "clean-537443a19e23.jpg"
+    ],
+    "dlsecret_left": false,
+    "exif_left": false,
+    "bytes": 30081
+  },
+  "share_clean_all": {
+    "zip": [
+      "share-clean.zip"
+    ],
+    "entries": [
+      "clean-537443a19e23.jpg",
+      "SHARE-CLEAN.txt"
+    ],
+    "dlsecret_left": false
+  },
+  "lineage_records_on_saved_file": [
+    2
+  ],
+  "badge": "P",
+  "on_save": {
+    "result": "Not saved: Source-protection mode is on, so Daylight Commons did not download this again from 127.0.0.1:51984: that request would tell the host. Save it with your browser's own Save as, then add the file to the case.",
+    "server_requests_after_click": [],
+    "browser_requests_after_click": []
+  },
+  "on_menu_download": {
+    "server_requests": [],
+    "browser_requests": [],
+    "alert": [
+      "Source protection is on, so Daylight Commons did not download this: the request would tell the host. Use your browser's own Save as, and add the file to your case."
+    ]
+  },
+  "on_evidence_lookup": {
+    "error": "off"
+  },
+  "protection_page_state": "Source protection is on. Daylight Commons makes no request, and the toolbar button shows a P.",
+  "popup_indicator_visible": true,
+  "self_audit": {
+    "signed_out": {
+      "status": "Not your own profile, or not signed in, so nothing was read. This works only on your own account: open your own profile while signed in (the page must show the signed-in account and its Edit profile button), or load the data export the platform gave you.",
+      "signals": 0,
+      "requests_during_audit": []
+    },
+    "someone_else": {
+      "status": "Not your own profile, or not signed in, so nothing was read. This works only on your own account: open your own profile while signed in (the page must show the signed-in account and its Edit profile button), or load the data export the platform gave you.",
+      "signals": 0,
+      "requests_during_audit": []
+    },
+    "me_test": {
+      "status": "Your own profile, @me_test, from what X loaded in this browser. Nothing was sent.",
+      "signals": 8,
+      "requests_during_audit": []
+    }
+  },
+  "pass": true
+}
