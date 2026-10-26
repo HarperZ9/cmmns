@@ -72,6 +72,8 @@ globalThis.PBHover = globalThis.PBHover || (() => {
 
   function act(action) {
     if (!shown) return;
+    // A page opened before an update keeps this old script: it cannot reach the extension any more.
+    if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) { PBHoverUi.show(shown.el ? shown.el.getBoundingClientRect() : { left: shown.at.x, right: shown.at.x + 70, top: shown.at.y, bottom: shown.at.y + 40 }, "Daylight Commons was updated: reload this page", () => {}, [null]); return; }
     const s = shown, p = s.at;
     // A selection's actions carry its words: the click may have cleared it by the time they run.
     if (s.kind === "selection" && action === "download") action = "text-note";

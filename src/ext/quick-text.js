@@ -61,6 +61,7 @@ globalThis.PBQuickText = globalThis.PBQuickText || (() => {
 
   // From the right-click menu, the hover control and the post buttons. action: note | study | card | caption.
   async function run(action, info = {}) {
+    if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) { toast("Daylight Commons was updated. Reload this page, then save again.", { tone: "no", stay: 9000 }); return { ok: false }; }
     const raw = info.raw || source(info);
     if (!raw) { toast("Select some text, or point at a post, then try again.", { tone: "no" }); return { ok: false }; }
     try {

@@ -7,6 +7,21 @@ were not published to a store.
 
 Nothing yet.
 
+## 3.6.2 (2026-10-26)
+
+Saves land in their folder again after an update.
+
+### Fixed
+- **After updating to 3.6.1, saves from pages that were already open landed in the Downloads folder
+  itself instead of `Daylight/<site>/`.** Those pages kept the old script, which could no longer
+  reach the extension and fell back to a plain download link. That fallback is gone: a save goes
+  through the browser's downloads into its folder, or says it could not. After an install or update,
+  the download parts are loaded into open pages again, so their buttons work without a reload; an
+  old page that still cannot reach the extension says "Daylight Commons was updated. Reload this
+  page, then save again."
+- An empty folder name in the settings now means the default, `Daylight`. Saving straight into
+  Downloads is its own switch, "Save straight into Downloads", off by default.
+
 ## 3.6.1 (2026-10-25)
 
 Save from any site, save text too, and keep things for study. Protection for the people who use Daylight Commons and their sources: the case workbench stops

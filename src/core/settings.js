@@ -50,6 +50,8 @@ export const DEFAULTS = Object.freeze({
   mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
   // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
   mediaFolder: "Daylight",
+  // Saving straight into Downloads, with no folders, is its own switch, never an empty folder name.
+  mediaToRoot: false,
   // Source-protection mode (project-docs/SECURITY-REVIEW.md): off by default. While on, every
   // switch in PROTECTION_FORCES is held off, and the save page and Share clean behave as it says.
   protection: false,
@@ -96,7 +98,8 @@ export function normalizeSettings(raw) {
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
-    mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder),
+    mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder) || DEFAULTS.mediaFolder,
+    mediaToRoot: bool(s.mediaToRoot, DEFAULTS.mediaToRoot),
     protection: bool(s.protection, DEFAULTS.protection),
     hoverDownload: bool(s.hoverDownload, DEFAULTS.hoverDownload), hoverEverywhere: bool(s.hoverEverywhere, DEFAULTS.hoverEverywhere), hoverOffSites: siteList(s.hoverOffSites),
   };

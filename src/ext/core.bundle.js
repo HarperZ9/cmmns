@@ -12807,6 +12807,14 @@ function sidecarMarkdown(meta, fileNames = null) {
   return out.join("\n");
 }
 
+// The folder for one save from the settings: "<folder>/<site>/", "<folder>/study/<site>/" for
+// Study, or "" only when the user turned on saving straight into Downloads.
+function savePath(settings, site, study = false) {
+  const s = settings || {}, base = String(s.mediaFolder || "").trim() || "Daylight";
+  if (s.mediaToRoot) return study ? saveFolder("study", site) : "";
+  return saveFolder(study ? `${base}/study` : base, site);
+}
+
 // The folder a save goes to, inside Downloads: "<folder>/<site>/", each part safe on every system.
 // An empty folder setting saves straight into Downloads.
 function saveFolder(folder, site) {
@@ -12833,7 +12841,7 @@ function embedText(meta) {
     [who, meta.postedAt, meta.postUrl || meta.pageUrl].filter(Boolean).join(", ")].filter(Boolean).join("\n\n");
 }
 
-return { SIDECAR_FORMAT, textTags, postMeta, metaName, sidecarMarkdown, saveFolder, sidecarJson, captionText, embedText };
+return { SIDECAR_FORMAT, textTags, postMeta, metaName, sidecarMarkdown, savePath, saveFolder, sidecarJson, captionText, embedText };
 })();
 
 // ---- media-embed.js
@@ -14063,6 +14071,8 @@ const DEFAULTS = Object.freeze({
   mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
   // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
   mediaFolder: "Daylight",
+  // Saving straight into Downloads, with no folders, is its own switch, never an empty folder name.
+  mediaToRoot: false,
   // Source-protection mode (project-docs/SECURITY-REVIEW.md): off by default. While on, every
   // switch in PROTECTION_FORCES is held off, and the save page and Share clean behave as it says.
   protection: false,
@@ -14109,7 +14119,8 @@ function normalizeSettings(raw) {
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
-    mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder),
+    mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder) || DEFAULTS.mediaFolder,
+    mediaToRoot: bool(s.mediaToRoot, DEFAULTS.mediaToRoot),
     protection: bool(s.protection, DEFAULTS.protection),
     hoverDownload: bool(s.hoverDownload, DEFAULTS.hoverDownload), hoverEverywhere: bool(s.hoverEverywhere, DEFAULTS.hoverEverywhere), hoverOffSites: siteList(s.hoverOffSites),
   };

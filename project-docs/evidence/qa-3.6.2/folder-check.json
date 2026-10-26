@@ -1,0 +1,153 @@
+{
+ "tool": "scripts/qa/folder_check.py",
+ "run": "2026-10-26, Chrome 155, Windows 11, signed out, profile seeded with 3.6.0 settings",
+ "paths": [
+  {
+   "path": "right-click",
+   "note": "Saved Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg, 94 KB.",
+   "files": [
+    {
+     "name": "Mount-Rainier-Wikipedia-960px-Rainier20200906.md",
+     "folder": "Daylight/en.wikipedia.org",
+     "bytes": 821,
+     "sniffed": "unknown 2d2d2d0a666f726d"
+    },
+    {
+     "name": "Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg",
+     "folder": "Daylight/en.wikipedia.org",
+     "bytes": 95825,
+     "sniffed": "jpeg"
+    }
+   ]
+  },
+  {
+   "path": "study",
+   "note": "Saved for study: Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.jpg",
+   "files": [
+    {
+     "name": "Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.md",
+     "folder": "study/en.wikipedia.org",
+     "bytes": 960,
+     "sniffed": "unknown 2d2d2d0a666f726d"
+    },
+    {
+     "name": "Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.jpg",
+     "folder": "study/en.wikipedia.org",
+     "bytes": 171762,
+     "sniffed": "jpeg"
+    }
+   ]
+  },
+  {
+   "path": "text-card",
+   "note": "Saved the text: starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.md and starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.png",
+   "files": [
+    {
+     "name": "starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.md",
+     "folder": "Daylight/x",
+     "bytes": 992,
+     "sniffed": "unknown 2d2d2d0a666f726d"
+    },
+    {
+     "name": "starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.png",
+     "folder": "Daylight/x",
+     "bytes": 120526,
+     "sniffed": "png"
+    }
+   ]
+  },
+  {
+   "path": "hover",
+   "note": "Saved Mount-St-Helens-Wikipedia-960px-MSH82-st-helens-plume-from-harrys.jpg, 138 KB.",
+   "files": [
+    {
+     "name": "Mount-St-Helens-Wikipedia-960px-MSH82-st-helens-plume-from-harrys.md",
+     "folder": "Daylight/en.wikipedia.org",
+     "bytes": 1002,
+     "sniffed": "unknown 2d2d2d0a666f726d"
+    },
+    {
+     "name": "Mount-St-Helens-Wikipedia-960px-MSH82-st-helens-plume-from-harrys.jpg",
+     "folder": "Daylight/en.wikipedia.org",
+     "bytes": 141634,
+     "sniffed": "jpeg"
+    }
+   ]
+  },
+  {
+   "path": "x-button",
+   "note": "Saved the text: jwhap-photo_2026-10-23_no-shot-we-got-nasa-making-spongebob-references.md",
+   "files": [
+    {
+     "name": "jwhap-photo_2026-10-23_no-shot-we-got-nasa-making-spongebob-references.md",
+     "folder": "Daylight/x",
+     "bytes": 557,
+     "sniffed": "unknown 2d2d2d0a666f726d"
+    }
+   ]
+  },
+  {
+   "path": "x-button-after-update",
+   "note": "Saved jesterhildex_2026-10-23_i-photographed-this-last-night-with-my-telescope.jpg, 86 KB.",
+   "files": [
+    {
+     "name": "jesterhildex_2026-10-23_i-photographed-this-last-night-with-my-telescope.md",
+     "folder": "Daylight/x",
+     "bytes": 866,
+     "sniffed": "unknown 2d2d2d0a666f726d"
+    },
+    {
+     "name": "jesterhildex_2026-10-23_i-photographed-this-last-night-with-my-telescope.jpg",
+     "folder": "Daylight/x",
+     "bytes": 87658,
+     "sniffed": "jpeg"
+    }
+   ]
+  },
+  {
+   "path": "text-note",
+   "note": "Saved the text: starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.md",
+   "files": [
+    {
+     "name": "starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth (1).md",
+     "folder": "Daylight/x",
+     "bytes": 992,
+     "sniffed": "unknown 2d2d2d0a666f726d"
+    }
+   ]
+  },
+  {
+   "path": "reddit-button",
+   "note": "Saved all 3 files from the gallery.",
+   "files": [
+    {
+     "name": "u-tidewatch_2026-10-21_three-harbour-photos.md",
+     "folder": "Daylight/reddit",
+     "bytes": 897,
+     "sniffed": "unknown 2d2d2d0a666f726d"
+    },
+    {
+     "name": "u-tidewatch_2026-10-21_three-harbour-photos-3.webp",
+     "folder": "Daylight/reddit",
+     "bytes": 1842,
+     "sniffed": "webp"
+    },
+    {
+     "name": "u-tidewatch_2026-10-21_three-harbour-photos-2.png",
+     "folder": "Daylight/reddit",
+     "bytes": 3487,
+     "sniffed": "png"
+    },
+    {
+     "name": "u-tidewatch_2026-10-21_three-harbour-photos-1.jpg",
+     "folder": "Daylight/reddit",
+     "bytes": 12135,
+     "sniffed": "jpeg"
+    }
+   ]
+  },
+  {
+   "downloads_root_files": []
+  }
+ ]
+}
