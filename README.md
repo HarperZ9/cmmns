@@ -82,6 +82,24 @@ the [how it works page](https://harperz9.github.io/daylight-commons/how-it-works
 Keyboard: focus a post to open its window, <kbd>Alt</kbd>+<kbd>R</kbd> to move into it, arrow keys
 between its tabs, <kbd>Esc</kbd> to close it.
 
+## Quotes, counts, documents and corrections
+
+Turn on **Discourse checks** in the options and the window adds five more, all on this device:
+- **Where a quote comes from.** A quoted line is looked up in eleven public-domain works (Marcus
+  Aurelius, Schopenhauer, Nietzsche, Plato, Dostoevsky, Epictetus) and in a sourced list of famous
+  misquotes. It says found, close paraphrase, listed as misattributed, or not found, and not found
+  proves nothing. A list of one-line sayings pinned on names is counted with its sources.
+- **Accounts named after someone who died,** with the name in the handle or a word like "Quotes",
+  from Wikidata. Names a living person shares are left out.
+- **Counts with their sample size:** 45/50 gets its 95% interval, and two arms are compared.
+- **The post's words against the pages it shows,** read from the images with "Read text in images"
+  on: which of the post's terms are on which page, and which are on none.
+- **Replies that bring a source or name an error,** ranked by the source, never by likes.
+
+Each can be saved with its post as a study item. Held out, the quote finder named the right passage
+for 8 of the 8 quotes it placed and found 8 of 11; details in
+[project-docs/DISCOURSE.md](project-docs/DISCOURSE.md).
+
 ## Download, save, convert and keep media
 
 Rest the pointer on any picture, GIF or video for a moment and a small **Download** button shows in its

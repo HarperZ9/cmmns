@@ -76,9 +76,24 @@
     return out;
   }
 
-  // The signs for one post, in the shape src/ext/signals.js draws.
+  // Save the post as a study item with every finished analysis attached (daylight.sidecar/1, study:
+  // true, "## Analysis" sections), through the same study save as the Study button (src/ext/quick-text.js).
+  async function saveStudy(m, settings) {
+    const { notes, analysis } = PBD.studyNotes(collect(m, settings));
+    const raw = (globalThis.PBQuickSites && m.node && PBQuickSites.postMetaOf(m.node)) || { site: location.hostname.replace(/^www\./, ""), text: m.text, handle: m.handle, pageUrl: location.href };
+    if (!globalThis.PBQuickText) throw new Error("the study save is not loaded on this page");
+    return PBQuickText.run("study", { raw: { ...raw, kind: "text", notes, analysis } });
+  }
+
+  // The signs for one post, with a "save as study" row on each finished analysis.
   function signs(m, settings) {
     if (!settings || !settings.discourse || !globalThis.PBD) return [];
+    const out = collect(m, settings);
+    const save = ["Study", { action: ["Save the post with this analysis for study", () => saveStudy(m, settings).catch((e) => console.warn("[daylight-commons] study save failed", e)), "Saving…"] }];
+    return out.map((s) => (s.rows.some(([, v]) => v && typeof v === "object" && v.action) ? s : { ...s, rows: [...s.rows, save] }));
+  }
+
+  function collect(m, settings) {
     const q = quotes.get(m.postId);
     return [
       ...PBD.personaSign(personas.get(keyOf(m)) || null),

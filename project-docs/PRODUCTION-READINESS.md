@@ -165,6 +165,26 @@ Summary: `project-docs/evidence/qa-3.6.1/hover-check.json`.
 Not tested for 3.6.1: Firefox; signed-in sites; the shortcut pressed by hand; the control on
 Facebook past its sign-in wall.
 
+## Discourse checks (unreleased)
+
+Checked 2026-10-25 on the 3.6.1 base. Browser rows ran in Google Chrome 155 on Windows 11, headless,
+fresh profile, on the demo stage's discourse thread (every account invented) with
+`scripts/qa/discourse_shot.py`; results and screenshots in `project-docs/evidence/qa-discourse/`.
+
+| # | Area | Check | How | Result |
+|---|---|---|---|---|
+| 74 | Quotes | Right passage for every quote placed; nothing found for quotes the index lacks | `scripts/eval-discourse.mjs`, development set (36) and held-out set (16), `tests/discourse.quotes.test.js` | development 14 of 14 placed right, 14 of 15 found, 0 of 12 wrong; held out 8 of 8, 8 of 11, 0 of 5 |
+| 75 | Quotes | Every indexed text public domain; data signed | `tests/discourse.data.test.js` (translator died before 1956, published before 1931; project-key signature over both files) | pass |
+| 76 | Persona | Never a living person or a name one shares; never on a display name alone | `tests/discourse.persona.test.js`: study accounts and common names absent from the list and unmarked | pass |
+| 77 | Counts | Wilson intervals; dates and scores left alone | `tests/discourse.stats.test.js` | pass |
+| 78 | Documents | The study's letter: post terms against the four images | `project-docs/evidence/discourse-letter-check.json`; recogniser confidence 0.987 to 0.994 | 5 post terms on no page; the name on images 1 and 3 |
+| 79 | Corrections | Same ranking with the sides of each thread swapped; likes never read | `tests/discourse.symmetry.test.js`, `tests/discourse.corrections.test.js` | pass |
+| 80 | Window | All five signs, and a study save, in the packaged extension | `discourse_shot.py`, nine checks | 9 of 9 |
+| 81 | Network | No request from the discourse code but the extension's own files | `tests/discourse.data.test.js` | pass |
+
+Not tested: the checks on real X threads signed in, Firefox, and a measured precision for the
+persona marker, counts, document check and correction ranking on real posts.
+
 ## What could not be tested here
 
 - **X, Facebook, Instagram and TikTok on real pages.** They show posts only to a signed-in viewer,

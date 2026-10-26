@@ -40,6 +40,18 @@ async def main(stage, package, out):
                 await settle(pg, 2500)
                 seen[name] = await window_text(pg)
                 await pg.screenshot(path=str(out / f"discourse-{name}.png"))
+
+            # Last, since the study save opens its note prompt: save the root post with its analysis.
+            await pg.mouse.move(5, 5)
+            await settle(pg, 900)
+            await open_window(pg, 0)
+            await window_text(pg)
+            btn = pg.locator(".pb-pop button", has_text="Save the post with this analysis for study").first
+            if await btn.count():
+                await btn.click()
+                await settle(pg, 2500)
+                seen["study-toast"] = await pg.evaluate("document.body.innerText.slice(-600)")
+                await pg.screenshot(path=str(out / "discourse-study.png"))
         finally:
             await s.close()
     (out / "discourse-windows.json").write_text(json.dumps(seen, indent=1, ensure_ascii=False), encoding="utf-8")
@@ -51,6 +63,8 @@ async def main(stage, package, out):
         "counts with intervals": "95% interval" in seen.get("counts", ""),
         "list of sayings counted": "lines credited to names" in seen.get("list", ""),
         "misattribution named": "misattributed" in seen.get("misattributed", ""),
+        "study save offered": "Save the post with this analysis for study" in seen.get("root", ""),
+        "study saved": "for study" in seen.get("study-toast", ""),
     }
     for k, v in checks.items():
         print(("pass " if v else "FAIL ") + k)

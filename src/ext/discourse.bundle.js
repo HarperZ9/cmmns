@@ -608,7 +608,23 @@ function correctionSign(ranked) {
 }
 
 
-return { quoteSigns, personaSign, countSigns, docSign, correctionSign };
+// A sign's rows as plain text for a study note: "Heading: value", links as their addresses, and
+// buttons left out. The sidecar keeps these under "## Analysis: <label>" (project-docs/SIDECAR-FORMAT.md).
+function rowText([h, v]) {
+  if (v && typeof v === "object") return v.links ? `${h ? h + ": " : ""}${v.links.map(([t, u]) => `${t} (${u})`).join("; ")}` : null;
+  return h ? `${h}: ${v}` : String(v);
+}
+
+// The discourse signs of one post as study notes and the ids of the analyses they carry.
+function studyNotes(signs) {
+  const keep = (signs || []).filter((s) => s && s.fam && s.rows && !s.rows.some(([, v]) => v && typeof v === "object" && v.action));
+  return {
+    notes: keep.map((s) => ({ label: `Analysis: ${s.label}`, text: s.rows.map(rowText).filter(Boolean).join("\n") })),
+    analysis: [...new Set(keep.map((s) => s.fam))],
+  };
+}
+
+return { quoteSigns, personaSign, countSigns, docSign, correctionSign, studyNotes };
 })();
 
 globalThis.PBD = Object.freeze({ ...M_text, ...M_quotes, ...M_persona, ...M_stats, ...M_docclaim, ...M_corrections, ...M_cards });

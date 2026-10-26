@@ -69,3 +69,10 @@ test("the committed evaluation figures match a fresh run", () => {
     assert.deepEqual({ p: have.precision, r: have.recall, a: have.falseFoundOnAbsent }, { p: want.precision, r: want.recall, a: want.falseFoundOnAbsent }, `rerun node scripts/eval-discourse.mjs${set.includes("held") ? " --heldout" : ""} --write`);
   }
 });
+
+test("the study's thirteen-line list reads as 13 lines, none sourced, all too short to look up", () => {
+  const names = ["Dostoevsky", "Socrates", "Aristotle", "Nietzsche", "Freud", "Marx", "Picasso", "Gandhi", "Schopenhauer", "Steve Jobs", "Einstein", "Stephen Hawking", "Kafka"];
+  const post = "What is life?\n" + names.map((n, i) => ` - ${n}: It\u2019s ${["hell", "a test", "the mind", "power", "death", "the idea", "art", "love", "suffering", "faith", "knowledge", "hope", "just the beginning"][i]}.`).join("\n");
+  const { list } = extractQuotes(post, ["Dostoevsky", "Nietzsche", "Schopenhauer", "Aristotle"]);
+  assert.deepEqual(list, { lines: 13, named: 4, sourced: 0, short: 13 });
+});

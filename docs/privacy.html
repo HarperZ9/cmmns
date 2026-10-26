@@ -79,6 +79,10 @@
 <li><strong>What Daylight shows about you</strong> runs Daylight Commons' account signals on your own account: your profile as X already loaded it in this browser, read only when the page shows you signed in on your own profile, or the data export files you choose. It sends nothing and keeps nothing.</li>
 <li>On the command line, <code>daylight case add</code> no longer asks the Wayback Machine for a copy unless you pass <code>--archive</code> or turn the case's archive setting on.</li></ul>
 </section>
+<section aria-labelledby="discourse-checks">
+<h2 id="discourse-checks">Discourse checks</h2>
+<p>Off until you turn on Discourse checks in the options. The quote index and the name list ship inside the extension and are read in its background worker; a post's text and an account's display name and handle go there, inside your browser, and nowhere else. Counts, replies and document pages are read on the page. Document pages are read only on your click, with Read text in images on. Nothing is kept beyond the page, except what you save as a study item.</p>
+</section>
 <section aria-labelledby="what-daylight-commons-keeps-where-and-for-how-long">
 <h2 id="what-daylight-commons-keeps-where-and-for-how-long">What Daylight Commons keeps, where, and for how long</h2>
 <p>Everything is kept in <code>chrome.storage.local</code> (Firefox: <code>browser.storage.local</code>) in the browser profile you installed Daylight Commons in, on this device.</p>

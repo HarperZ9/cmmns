@@ -63,3 +63,16 @@ test("no discourse code fetches anything but the extension's own files", () => {
     assert.doesNotMatch(src, /XMLHttpRequest|WebSocket|sendBeacon/, f);
   }
 });
+
+test("a study save carries each finished analysis as its own section, and the sidecar lists them", async () => {
+  const { studyNotes, quoteSigns } = await import("../src/core/discourse/cards.js");
+  const { postMeta, sidecarMarkdown } = await import("../src/core/media-meta.js");
+  const signs = quoteSigns([{ status: "not-found", quote: "He who has a why to live", by: "Nietzsche", searched: { works: 11, byPerson: [] } }], null);
+  const pending = { label: "check the post's words against its images", fam: "doc-claim", rows: [["Document check", { action: ["Read", () => {}] }]] };
+  const { notes, analysis } = studyNotes([...signs, pending]);
+  assert.deepEqual(analysis, ["quote-source"]);
+  const md = sidecarMarkdown(postMeta({ site: "x", handle: "a", text: "words", study: true, notes, analysis }), []);
+  assert.match(md, /^study: true$/m);
+  assert.match(md, /^analysis: \["quote-source"\]$/m);
+  assert.match(md, /## Analysis: quote not found in the index\n\nQuote: "He who has a why to live", credited to Nietzsche/);
+});

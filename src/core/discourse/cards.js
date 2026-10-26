@@ -64,3 +64,19 @@ export function correctionSign(ranked) {
   return [sign(`${ranked.length} ${ranked.length === 1 ? "reply brings a source or names" : "replies bring a source or name"} an error`, "correction-replies", "sources", correctionRows(ranked))];
 }
 
+
+// A sign's rows as plain text for a study note: "Heading: value", links as their addresses, and
+// buttons left out. The sidecar keeps these under "## Analysis: <label>" (project-docs/SIDECAR-FORMAT.md).
+function rowText([h, v]) {
+  if (v && typeof v === "object") return v.links ? `${h ? h + ": " : ""}${v.links.map(([t, u]) => `${t} (${u})`).join("; ")}` : null;
+  return h ? `${h}: ${v}` : String(v);
+}
+
+// The discourse signs of one post as study notes and the ids of the analyses they carry.
+export function studyNotes(signs) {
+  const keep = (signs || []).filter((s) => s && s.fam && s.rows && !s.rows.some(([, v]) => v && typeof v === "object" && v.action));
+  return {
+    notes: keep.map((s) => ({ label: `Analysis: ${s.label}`, text: s.rows.map(rowText).filter(Boolean).join("\n") })),
+    analysis: [...new Set(keep.map((s) => s.fam))],
+  };
+}
