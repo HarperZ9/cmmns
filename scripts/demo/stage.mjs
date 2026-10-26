@@ -87,6 +87,29 @@ export function pressureStage() {
   return { url: `https://x.com/${PRESSURE[0][0]}/status/${root}`, html: page("Post", posts), json: { TweetDetail: detail(tweets) } };
 }
 
+// A discourse thread for the discourse checks (src/core/discourse/): a persona account quoting the
+// Meditations, a reply with counts, a correction with a source, a list of one-line sayings, a listed
+// misattribution and an insult. Every account is invented.
+const DISCOURSE = [
+  ["schopenhauer_q", "Arthur Schopenhauer Quotes", "Schopenhauer wrote this in 1851:\n\n“A man can be himself only so long as he is alone.”"],
+  ["green_lab", "Green Lab", "Steering one neuron: 45/50 replies mention green, against 3/50 unsteered."],
+  ["long_reader", "Long Reader", "In fact that line is from Counsels and Maxims, chapter II, in T. Bailey Saunders' translation; the full sentence goes on about solitude.", "https://www.gutenberg.org/ebooks/10715"],
+  ["life_lists", "Life Lists", "What is life?\n- Dostoevsky: It's hell.\n- Nietzsche: It's power.\n- Schopenhauer: It's suffering.\n- Kafka: It's just the beginning."],
+  ["daily_stoic_x", "Daily Reader", "Marcus Aurelius wrote this over 1800 years ago: “Do not disturb yourself by imagining your whole life at once.”"],
+  ["stoic_vibes", "Stoic Vibes", "“Everything we hear is an opinion, not a fact. Everything we see is a perspective, not the truth.” Marcus Aurelius"],
+  ["loud_one", "Loud One", "You clearly know nothing about any of this."],
+].map(([h, name, text, link]) => [demo(h), name, text, link]);
+
+export function discourseStage() {
+  const root = "1900000000000000700", tweets = [];
+  DISCOURSE.forEach(([h, name, text, link], i) => {
+    const id = i ? String(BigInt(root) + BigInt(i)) : root;
+    tweets.push(tweet(id, user(h, { name, joinDate: "2019-01-01", about: { basedIn: "United States" } }), text, { conv: root, replyTo: i ? root : null, replyToHandle: DISCOURSE[0][0], at: new Date(BASE + i * 53000).toISOString(), links: link ? [link] : [] }));
+  });
+  const posts = DISCOURSE.map(([h, name, text, link], i) => ({ h, name, text, id: tweets[i].rest_id, root: i === 0, link }));
+  return { url: `https://x.com/${DISCOURSE[0][0]}/status/${root}`, html: page("Post", posts), json: { TweetDetail: detail(tweets) } };
+}
+
 // A launch: the company's post, its quotes and its reposters. kind "campaign" uses the farm and paid
 // quotes; kind "organic" uses varied people and is the "run it on us" control.
 export function launchStage(kind) {
@@ -145,7 +168,7 @@ main{max-width:600px;margin:0 auto;border-inline:1px solid var(--line);min-heigh
 article{position:relative;padding:12px 16px 12px 68px;border-bottom:1px solid var(--line)}
 article::before{content:"";position:absolute;left:16px;top:14px;width:40px;height:40px;border-radius:50%;background:var(--av,#cfd9de)}
 article.root [data-testid="tweetText"]{font-size:19px}
-[data-testid="User-Name"]{font-weight:700}[data-testid="User-Name"] a{color:var(--ink);text-decoration:none}
+[data-testid="tweetText"]{white-space:pre-wrap}[data-testid="User-Name"]{font-weight:700}[data-testid="User-Name"] a{color:var(--ink);text-decoration:none}
 [data-testid="User-Name"] span,[data-testid="User-Name"] span a{color:var(--soft);font-weight:400}
 .paid{display:inline-block;margin-top:6px;font-size:13px;color:var(--soft)}.quoted{margin-top:8px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;color:var(--soft);font-size:14px}
 .counts{margin-top:10px;color:var(--soft);font-size:14px;display:flex;gap:20px}
@@ -155,7 +178,7 @@ const P=${rows},tones=["#cfd9de","#d8cbb8","#bfcabd","#cfc3cf","#c4ccd6","#d6d0c
 const k=(n)=>n>=1000?(Math.round(n/100)/10)+"K":String(n);
 const draw=(r,i)=>{const a=document.createElement("article");a.setAttribute("data-testid","tweet");a.tabIndex=0;if(r.root)a.className="root";a.style.setProperty("--av",r.root?"#20242b":tones[i%tones.length]);
 a.innerHTML='<div data-testid="User-Name"><a href="/'+r.h+'"></a> <span>@'+r.h+' · <a href="/'+r.h+'/status/'+r.id+'"><time datetime="2026-10-22T15:00:00Z">'+(r.root?"2h":(i*4+1)+"m")+'</time></a></span></div><div data-testid="tweetText" lang="en" dir="auto"></div>';
-a.querySelector('[data-testid="User-Name"] a').textContent=r.h.replace(/^demo_/,"").replace(/_/g," ");a.querySelector('[data-testid="tweetText"]').textContent=r.text;
+{const n=document.createElement("span");n.textContent=r.name||r.h.replace(/^demo_/,"").replace(/_/g," ");a.querySelector('[data-testid="User-Name"] a').append(n);}a.querySelector('[data-testid="tweetText"]').textContent=r.text;
 if(r.link){const t=a.querySelector('[data-testid="tweetText"]'),l=document.createElement("a");l.href=r.link;l.textContent=" "+r.link.slice(8);t.append(l);}
 if(r.quoteOf){const q=document.createElement("div");q.className="quoted";q.textContent="Quoting @"+r.quoteOf;a.append(q);}
 if(r.paid){const s=document.createElement("span");s.className="paid";s.textContent="Paid partnership";a.append(s);}
@@ -171,7 +194,7 @@ for(const op of ["TweetDetail","Retweeters"]) fetch("/i/api/graphql/demo/"+op+"?
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const out = process.argv[2];
   if (!out) { console.error("usage: node scripts/demo/stage.mjs <out dir>"); process.exit(2); }
-  const stages = { thread: threadStage(), pressure: pressureStage(), campaign: launchStage("campaign"), ours: launchStage("organic"), long: longStage(Number(process.env.STAGE_LONG_N) || 600) };
+  const stages = { thread: threadStage(), pressure: pressureStage(), discourse: discourseStage(), campaign: launchStage("campaign"), ours: launchStage("organic"), long: longStage(Number(process.env.STAGE_LONG_N) || 600) };
   mkdirSync(out, { recursive: true });
   const index = {};
   for (const [name, s] of Object.entries(stages)) {

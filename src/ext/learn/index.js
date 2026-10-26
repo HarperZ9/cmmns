@@ -10,6 +10,7 @@ import { ACCOUNT_LESSONS } from "./lessons-account.js";
 import { MEDIA_LESSONS } from "./lessons-media.js";
 import { REPORT_LESSONS } from "./lessons-reports.js";
 import { TECHNIQUE_LESSONS } from "./lessons-techniques.js";
+import { DISCOURSE_LESSONS } from "./lessons-discourse.js";
 
 // Spoken pace, in words a minute. The inoculation videos ran about 90 seconds.
 export const WORDS_PER_MINUTE = 150;
@@ -31,10 +32,11 @@ export const GROUPS = [
   ["Place", ["mismatch", "written-in", "store-elsewhere", "flag-elsewhere", "profile-location-elsewhere", "hours-elsewhere"]],
   ["Posting", ["fast-replier", "automation-app", "no-sleep-gap", "repost-only", "high-volume"]],
   ["Account", ["new-account", "name-changes", "default-handle", "follow-pattern", "low-karma", "brand-lookalike"]],
+  ["Quotes, counts and documents", DISCOURSE_LESSONS.map((l) => l.id)],
   ["The thread", ["thread-report"]],
 ];
 
-export const LESSONS = [...LANGUAGE_LESSONS, ...PERSUASION_LESSONS, ...SPREAD_LESSONS, ...REPORT_LESSONS, ...MEDIA_LESSONS, ...TECHNIQUE_LESSONS, ...ACCOUNT_LESSONS];
+export const LESSONS = [...LANGUAGE_LESSONS, ...PERSUASION_LESSONS, ...SPREAD_LESSONS, ...REPORT_LESSONS, ...MEDIA_LESSONS, ...TECHNIQUE_LESSONS, ...ACCOUNT_LESSONS, ...DISCOURSE_LESSONS];
 const BY_ID = new Map(LESSONS.map((l) => [l.id, l]));
 
 export const lesson = (id) => BY_ID.get(id) || null;

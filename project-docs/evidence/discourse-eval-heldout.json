@@ -1,0 +1,142 @@
+{
+ "date": "2026-10-25",
+ "cases": 16,
+ "precision": {
+  "right": 8,
+  "of": 8,
+  "interval": [
+   0.676,
+   1
+  ]
+ },
+ "recall": {
+  "right": 8,
+  "of": 11,
+  "interval": [
+   0.434,
+   0.903
+  ]
+ },
+ "falseFoundOnAbsent": {
+  "wrong": 0,
+  "of": 5
+ },
+ "curatedLists": {
+  "right": 0,
+  "of": 0
+ },
+ "rows": [
+  {
+   "q": "Very little is needed to make a happy life.",
+   "expect": "found",
+   "got": "not-found",
+   "placed": null,
+   "right": false
+  },
+  {
+   "q": "Loss is nothing else but change.",
+   "expect": "found",
+   "got": "found",
+   "placed": "aurelius-long | Book IX, section 35",
+   "right": true
+  },
+  {
+   "q": "The universe is change; our life is what our thoughts make i",
+   "expect": "found",
+   "got": "not-found",
+   "placed": null,
+   "right": false
+  },
+  {
+   "q": "That which is not good for the swarm, neither is it good for",
+   "expect": "found",
+   "got": "found",
+   "placed": "aurelius-long | Book VI, section 54",
+   "right": true
+  },
+  {
+   "q": "The hour of departure has arrived, and we go our ways, I to ",
+   "expect": "found",
+   "got": "found",
+   "placed": "plato-apology | paragraph 60",
+   "right": true
+  },
+  {
+   "q": "I neither know nor think that I know.",
+   "expect": "found",
+   "got": "found",
+   "placed": "plato-apology | paragraph 7",
+   "right": true
+  },
+  {
+   "q": "Man is the cruellest animal.",
+   "expect": "found",
+   "got": "found",
+   "placed": "nietzsche-zarathustra | Third Part, LVII. The Convalescent",
+   "right": true
+  },
+  {
+   "q": "Insanity in individuals is something rare, but in groups, pa",
+   "expect": "found",
+   "got": "found",
+   "placed": "nietzsche-bge | Chapter IV. Apophthegms And Interludes, section 156",
+   "right": true
+  },
+  {
+   "q": "Wealth is like sea-water; the more we drink, the thirstier w",
+   "expect": "found",
+   "got": "found",
+   "placed": "schopenhauer-wisdom | Chapter III",
+   "right": true
+  },
+  {
+   "q": "Twice two makes four is not life, gentlemen, but is the begi",
+   "expect": "found",
+   "got": "found",
+   "placed": "dostoevsky-underground | Part I, chapter IX",
+   "right": true
+  },
+  {
+   "q": "That which does not kill us makes us stronger.",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "Luck is what happens when preparation meets opportunity.",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "To live is the rarest thing in the world. Most people exist,",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "The mind is everything. What you think you become.",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "Pain and suffering are always inevitable for a large intelli",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "Whoever fights monsters must take care that he does not beco",
+   "expect": "found",
+   "got": "not-found",
+   "placed": null,
+   "right": false
+  }
+ ]
+}

@@ -116,7 +116,7 @@
       if (reading) readings.push(reading);
       rows.push({ id: r.id, author: r.author, text: r.text, extreme: an.extreme, techniques: an.persuasion.map((h) => h.technique), machine: an.machine.machineLike, about: !!(reading && (reading.aboutRead || reading.basedIn)), basedIn: reading && reading.basedIn, joinDate: reading && reading.joinDate, flags: reading || !site.hasLocation ? flags : null });
     }
-    if (root) models.push([root.node, { site, node: root.node, tweets, postId: root.id, threadKey, text: root.text, handle: root.author, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, PBLogs.trail()), claims: PBLogs.claimsOf(root.id), reading: cache[root.author.toLowerCase()] || (site.reading ? site.reading(root.author) : null), flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
+    if (root) models.push([root.node, { site, node: root.node, tweets, postId: root.id, threadKey, text: root.text, handle: root.author, display: root.display, tweet: tweets.get(root.id), trail: PB.trailFor(tweets.get(root.id), tweets, PBLogs.trail()), claims: PBLogs.claimsOf(root.id), reading: cache[root.author.toLowerCase()] || (site.reading ? site.reading(root.author) : null), flags: [], lookingUp: lookingUp.has(root.author) }, root.anchor]);
     PBLogs.ensureProfiles(readings).catch((e) => PBGuard.report("profile lookup failed", e));
     // Thread context for the window's comparison: median account age, labels and flags among the
     // accounts read here.
@@ -131,6 +131,8 @@
     for (const [, model] of models) Object.assign(model, tech.perPost(model));
     const lens = PBLens.read([root && { ...root, root: true }, ...replies].filter(Boolean), { feed: !!feed, settings });
     for (const [, model] of models) model.lens = lens.by.get(model.postId) || [];
+    // The discourse checks (src/ext/discourse.js): correction replies under the root, then quotes and names.
+    if (globalThis.PBDiscourse && settings.discourse) { if (root) PBDiscourse.readReplies(root, replies, tweets); PBDiscourse.want(models.map(([, m]) => m), settings); }
     PBLens.paint(items, lens.by);
     drawn = models;
     drawVisible();

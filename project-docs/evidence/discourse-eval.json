@@ -1,0 +1,282 @@
+{
+ "date": "2026-10-25",
+ "cases": 36,
+ "precision": {
+  "right": 14,
+  "of": 14,
+  "interval": [
+   0.785,
+   1
+  ]
+ },
+ "recall": {
+  "right": 14,
+  "of": 15,
+  "interval": [
+   0.702,
+   0.988
+  ]
+ },
+ "falseFoundOnAbsent": {
+  "wrong": 0,
+  "of": 12
+ },
+ "curatedLists": {
+  "right": 9,
+  "of": 9
+ },
+ "rows": [
+  {
+   "q": "Do not disturb yourself by imagining your whole life at once",
+   "expect": "found",
+   "got": "close",
+   "placed": "aurelius-long | Book VIII, section 36",
+   "right": true
+  },
+  {
+   "q": "No longer talk at all about the kind of man that a good man ",
+   "expect": "found",
+   "got": "found",
+   "placed": "aurelius-long | Book X, section 16",
+   "right": true
+  },
+  {
+   "q": "The best way of avenging yourself is not to become like the ",
+   "expect": "found",
+   "got": "found",
+   "placed": "aurelius-long | Book VI, section 6",
+   "right": true
+  },
+  {
+   "q": "The best revenge is not to be like your enemy.",
+   "expect": "found",
+   "got": "close",
+   "placed": "aurelius-casaubon | The Sixth Book, section V",
+   "right": true
+  },
+  {
+   "q": "Waste no more time arguing about what a good man should be. ",
+   "expect": "found",
+   "got": "not-found",
+   "placed": null,
+   "right": false
+  },
+  {
+   "q": "Of my grandfather Verus I have learned to be gentle and meek",
+   "expect": "found",
+   "got": "found",
+   "placed": "aurelius-casaubon | The First Book, section I",
+   "right": true
+  },
+  {
+   "q": "He who fights with monsters should be careful lest he thereb",
+   "expect": "found",
+   "got": "found",
+   "placed": "nietzsche-bge | Chapter IV. Apophthegms And Interludes, section 146",
+   "right": true
+  },
+  {
+   "q": "If you gaze long into an abyss, the abyss also gazes into yo",
+   "expect": "found",
+   "got": "found",
+   "placed": "nietzsche-bge | Chapter IV. Apophthegms And Interludes, section 146",
+   "right": true
+  },
+  {
+   "q": "One must still have chaos in oneself to be able to give birt",
+   "expect": "found",
+   "got": "close",
+   "placed": "nietzsche-zarathustra | First Part, Zarathustra’s Prologue",
+   "right": true
+  },
+  {
+   "q": "I am a sick man. I am a spiteful man. I am an unattractive m",
+   "expect": "found",
+   "got": "found",
+   "placed": "dostoevsky-underground | Part I, chapter I",
+   "right": true
+  },
+  {
+   "q": "The unexamined life is not worth living.",
+   "expect": "found",
+   "got": "found",
+   "placed": "plato-apology | paragraph 53",
+   "right": true
+  },
+  {
+   "q": "A man can be himself only so long as he is alone.",
+   "expect": "found",
+   "got": "found",
+   "placed": "schopenhauer-counsels | Chapter II",
+   "right": true
+  },
+  {
+   "q": "Opinion is like a pendulum and obeys the same law.",
+   "expect": "found",
+   "got": "found",
+   "placed": "schopenhauer-pessimism | Further Psychological Observations",
+   "right": true
+  },
+  {
+   "q": "Men are disturbed not by things, but by the opinions about t",
+   "expect": "found",
+   "got": "found",
+   "placed": "epictetus-long | The Encheiridion, Or Manual",
+   "right": true
+  },
+  {
+   "q": "I had time to embrace Plestcheiev and Dourov, who stood near",
+   "expect": "found",
+   "got": "found",
+   "placed": "dostoevsky-letters-mayne | Letter XX, To his Brothei* Michael",
+   "right": true
+  },
+  {
+   "q": "Everything we hear is an opinion, not a fact. Everything we ",
+   "expect": "misattributed",
+   "got": "misattributed",
+   "placed": "aurelius-opinion-perspective",
+   "right": true
+  },
+  {
+   "q": "All truth passes through three stages. First, it is ridicule",
+   "expect": "misattributed",
+   "got": "misattributed",
+   "placed": "schopenhauer-three-stages",
+   "right": true
+  },
+  {
+   "q": "Those who were seen dancing were thought to be insane by tho",
+   "expect": "misattributed",
+   "got": "misattributed",
+   "placed": "nietzsche-dancing",
+   "right": true
+  },
+  {
+   "q": "The secret of change is to focus all your energy not on figh",
+   "expect": "misattributed",
+   "got": "misattributed",
+   "placed": "socrates-secret-of-change",
+   "right": true
+  },
+  {
+   "q": "Be kind, for everyone you meet is fighting a hard battle.",
+   "expect": "misattributed",
+   "got": "misattributed",
+   "placed": "plato-be-kind",
+   "right": true
+  },
+  {
+   "q": "The degree of civilization in a society can be judged by ent",
+   "expect": "misattributed",
+   "got": "misattributed",
+   "placed": "dostoevsky-prisons",
+   "right": true
+  },
+  {
+   "q": "Insanity is doing the same thing over and over and expecting",
+   "expect": "misattributed",
+   "got": "misattributed",
+   "placed": "einstein-insanity",
+   "right": true
+  },
+  {
+   "q": "You must be the change you wish to see in the world.",
+   "expect": "misattributed",
+   "got": "misattributed",
+   "placed": "gandhi-be-the-change",
+   "right": true
+  },
+  {
+   "q": "every minute can be an eternity of happiness",
+   "expect": "attested",
+   "got": "attested",
+   "placed": "dostoevsky-1849-letter",
+   "right": true
+  },
+  {
+   "q": "He who has a why to live can bear almost any how.",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "Life swings like a pendulum backward and forward between pai",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "God is dead. God remains dead. And we have killed him.",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "Beauty will save the world, and pain and suffering are alway",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "Talent hits a target no one else can hit; genius hits a targ",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "The problem of how the future of the German nation can be se",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "Intense focus on inventing better AI systems that accelerate",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "The problem isn't that AI is intelligent. The problem is tha",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "The truth is metaphysical and essentially spiritual. There i",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "We already see it in the kind of surveillance state that is ",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "Hitler was a far left socialist, literally in the name of hi",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  },
+  {
+   "q": "Two years of insane maniacally intense focus on changing the",
+   "expect": "absent",
+   "got": "not-found",
+   "placed": null,
+   "right": true
+  }
+ ]
+}

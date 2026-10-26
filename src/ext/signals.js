@@ -199,7 +199,8 @@
   const feedback = (x, m) => (globalThis.PBFeedback && x.fam ? PBFeedback.rows(x, m) : []);
   function all(m, settings) {
     const shown = (x) => !settings || !PB.areaOn || PB.areaOn(settings, x.cat);
-    return [...checks(m), ...campaign(m), ...language(m), ...links(m), ...post(m), ...account(m)].filter(shown)
+    const discourse = globalThis.PBDiscourse ? PBDiscourse.signs(m, settings) : [];
+    return [...checks(m), ...campaign(m), ...language(m), ...links(m), ...post(m), ...account(m), ...discourse].filter(shown)
       .map((x) => ({ ...x, rows: [...x.rows, ["Measured", (x.lang ? "in English: " : "") + measured(x.fam)], ...feedback(x, m), ...learn(x.fam)] }))
       .sort((a, b) => ORDER[a.level] - ORDER[b.level]);
   }

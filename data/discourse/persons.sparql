@@ -1,0 +1,32 @@
+# The persona marker's name list (scripts/discourse-data.mjs query, run against the QLever Wikidata
+# endpoint). Six queries; MIN_SITELINKS is replaced from data/discourse/persons.json at run time.
+# Wikidata is CC0 1.0. Years follow Wikidata's numbering, where 0 is 1 BCE.
+
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+#@ people
+SELECT ?item ?label ?sl (MIN(YEAR(?b)) AS ?by) (MIN(YEAR(?d)) AS ?dy) WHERE {
+  ?item wikibase:sitelinks ?sl . FILTER(?sl >= MIN_SITELINKS)
+  ?item wdt:P31 wd:Q5 ; wdt:P570 ?d .
+  ?item rdfs:label ?label . FILTER(LANG(?label) = "en")
+  OPTIONAL { ?item wdt:P569 ?b }
+} GROUP BY ?item ?label ?sl
+
+#@ aliases
+SELECT ?item ?alias WHERE {
+  ?item wikibase:sitelinks ?sl . FILTER(?sl >= MIN_SITELINKS)
+  ?item wdt:P31 wd:Q5 ; wdt:P570 ?d .
+  ?item skos:altLabel ?alias . FILTER(LANG(?alias) = "en")
+}
+
+#@ homonyms SRC=rdfs:label,skos:altLabel DST=rdfs:label,skos:altLabel
+SELECT ?item ?name ?other (MIN(YEAR(?ob)) AS ?oby) (MIN(YEAR(?od)) AS ?ody) WHERE {
+  ?item wikibase:sitelinks ?sl . FILTER(?sl >= MIN_SITELINKS)
+  ?item wdt:P31 wd:Q5 ; wdt:P570 ?d ; SRC ?name . FILTER(LANG(?name) = "en")
+  ?other DST ?name ; wdt:P31 wd:Q5 . FILTER(?other != ?item)
+  OPTIONAL { ?other wdt:P569 ?ob } OPTIONAL { ?other wdt:P570 ?od }
+} GROUP BY ?item ?name ?other
