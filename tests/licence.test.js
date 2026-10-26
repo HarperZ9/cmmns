@@ -42,8 +42,8 @@ test("every font a package ships is under the OFL with its licence text beside i
   const names = listFiles().map(([n]) => n);
   assert.ok(!names.some((n) => /conso/i.test(n)), "a Conso file is in the package");
   const fonts = names.filter((n) => /\.(woff2?|ttf|otf)$/i.test(n));
-  assert.deepEqual(fonts, ["fonts/hanken-grotesk.woff2", "fonts/jetbrains-mono-regular.woff2"]);
-  for (const txt of ["fonts/OFL-hanken-grotesk.txt", "fonts/OFL-jetbrains-mono.txt"]) {
+  assert.deepEqual(fonts, ["fonts/AccessionStencil.woff2", "fonts/hanken-grotesk.woff2", "fonts/jetbrains-mono-regular.woff2"]);
+  for (const txt of ["fonts/OFL-accession.txt", "fonts/OFL-hanken-grotesk.txt", "fonts/OFL-jetbrains-mono.txt"]) {
     const body = listFiles().find(([n]) => n === txt);
     assert.ok(body && /SIL OPEN FONT LICENSE Version 1\.1/i.test(body[1].toString("utf8")), txt);
   }

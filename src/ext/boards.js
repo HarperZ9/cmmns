@@ -24,11 +24,11 @@
     if (current.kind === "moodboard") {
       b = { ...current.board, plates: current.board.plates };
       b.running_head = { left: $("title").value || current.moodboard.name, right: ($("lane").value || "moodboard").toUpperCase() };
-      b.lane = $("lane").value || "moodboard"; b.keyword_line = words().length ? words() : current.board.keyword_line; b.layout = $("layout").value;
+      b.lane = $("lane").value || "moodboard"; b.keyword_line = words().length ? words() : current.board.keyword_line; b.layout = $("layout").value; b.head = $("head").value;
     } else {
       const site = $("site").value, study = $("study").checked;
       const entries = current.entries.filter((e) => (!site || e.sidecar.front.site === site) && (!study || e.sidecar.front.study));
-      b = PB.boardFrom(entries, { title: $("title").value || "Study board", lane: $("lane").value || "research", keywords: words(), layout: $("layout").value });
+      b = PB.boardFrom(entries, { title: $("title").value || "Study board", lane: $("lane").value || "research", keywords: words(), layout: $("layout").value, head: $("head").value });
     }
     return b;
   }
@@ -42,7 +42,7 @@
     if (!b) return;
     $("view").srcdoc = PB.boardHtml(b, { url: urlFor, fonts });
     status(b.plates.length === 1 ? "1 plate." : `${b.plates.length} plates.`);
-    if (current.kind === "moodboard") PBMediaStore.putBoard({ ...current.moodboard, lane: b.lane, keywords: b.keyword_line, layout: b.layout }).catch(() => {});
+    if (current.kind === "moodboard") PBMediaStore.putBoard({ ...current.moodboard, lane: b.lane, keywords: b.keyword_line, layout: b.layout, head: b.head }).catch(() => {});
   }
 
   async function useFolder(handle) {
@@ -67,13 +67,13 @@
     if (!v.startsWith("mb:")) return;
     const r = await PBBoardsRead.fromMoodboard(v.slice(3));
     current = { kind: "moodboard", ...r };
-    $("title").value = r.moodboard.name; $("lane").value = r.board.lane; $("keywords").value = r.board.keyword_line.join(", "); $("layout").value = r.board.layout;
+    $("title").value = r.moodboard.name; $("lane").value = r.board.lane; $("keywords").value = r.board.keyword_line.join(", "); $("layout").value = r.board.layout; $("head").value = r.moodboard.head || "grotesk";
     $("write").hidden = true;
     draw();
   }));
   const asked = new URLSearchParams(location.search).get("mb");
   if (asked && boards.some((x) => x.id === asked)) { $("source").value = "mb:" + asked; $("source").dispatchEvent(new Event("change")); }
-  for (const id of ["title", "lane", "keywords", "layout", "site", "study"]) $(id).addEventListener("change", draw);
+  for (const id of ["title", "lane", "keywords", "layout", "head", "site", "study"]) $(id).addEventListener("change", draw);
 
   $("print").addEventListener("click", () => { if ($("view").contentWindow) $("view").contentWindow.print(); });
 
@@ -88,7 +88,7 @@
     const inline = new Map();
     for (const [k, u] of current.urls) inline.set(k, await dataUrl(await (await fetch(u)).blob()));
     let html = PB.boardHtml(b, { url: (m) => inline.get(m.path) || "", fonts: "" });
-    for (const f of ["hanken-grotesk.woff2", "jetbrains-mono-regular.woff2"]) html = html.replace(`url("${f}")`, `url("${await dataUrl(await (await fetch(fonts + f)).blob())}")`);
+    for (const f of ["AccessionStencil.woff2", "hanken-grotesk.woff2", "jetbrains-mono-regular.woff2"]) html = html.replace(`url("${f}")`, `url("${await dataUrl(await (await fetch(fonts + f)).blob())}")`);
     // Through the worker, which names every Daylight download (<save folder>/boards/<title>.html).
     const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
     const r = await chrome.runtime.sendMessage({ type: "pb-qs-download", url, filename: slug(b.running_head.left) + ".html", site: "boards" });
@@ -115,7 +115,7 @@
       for (const [name, file] of Object.entries(e.file)) if (b.plates.some((p) => p.media.some((m) => m.path === name))) await put(plates, name, file, "plates/");
       if (e.text && b.plates.some((p) => p.unit === e.sidecarName)) await put(notes, e.sidecarName, e.text, "sidecars/");
     }
-    for (const f of ["hanken-grotesk.woff2", "jetbrains-mono-regular.woff2"]) await put(fontDir, f, await (await fetch(fonts + f)).blob(), "fonts/");
+    for (const f of ["AccessionStencil.woff2", "hanken-grotesk.woff2", "jetbrains-mono-regular.woff2", "OFL-accession.txt", "OFL-hanken-grotesk.txt", "OFL-jetbrains-mono.txt"]) await put(fontDir, f, await (await fetch(fonts + f)).blob(), "fonts/");
     await put(dir, "board.json", JSON.stringify(b, null, 2) + "\n");
     await put(dir, "index.html", PB.boardHtml(b));
     const lines = listed.sort((x, y) => (x[0] < y[0] ? -1 : 1)).map(([p, hex]) => `${hex}  ${p}`);

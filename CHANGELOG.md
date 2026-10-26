@@ -5,7 +5,25 @@ were not published to a store.
 
 ## Unreleased
 
+Nothing yet.
+
+## 3.7.0 (2026-10-26)
+
+Capture a post as evidence, turn saves into study boards, and check where a quote comes from.
+
 ### Added
+- **Capture as evidence.** Right-click a picture, video or sound and choose "Capture as evidence".
+  The file and its note are saved as usual, with a picture of the visible page and a capture record
+  beside them. The record keeps the file's SHA-256 taken before any words were written into it, the
+  counts and account the page showed, the local time, and a list of what the capture kept and what
+  it lost, part by part. Every capture adds a line to a chain kept in your browser, each line naming
+  the one before. `daylight capture verify <folder>` checks every file, picture, record and line, and
+  says which changed. Nothing is sent anywhere. Not yet: a full-page picture, a page snapshot, a
+  signed log and trusted time.
+- An evidence board prints each claim over its sources with the same sheet engine as the discourse
+  sheets: each source's ink band is its share of the widest reach. Each source's provenance line is
+  as opaque as the source is backed by the claim's other sources from other sites or accounts, and
+  says how many.
 - **Study boards.** Saved items become numbered plates in a board you can print, save as one web
   page or keep as a folder: a book with running heads, numbered plates, captions and a keyword line;
   a grid; or a timeline in posted order with long silences drawn as breaks. Open one from the
@@ -16,6 +34,9 @@ were not published to a store.
   layout for a case (each claim drawn over its sources, more widely seen sources drawn more opaque),
   Share clean plates, a PDF and a SHA-256 manifest. `daylight board render <board.json>` draws a
   board made by the reference library. One format, `refdb.board/1`, for both.
+- A board's running heads and titles take the face you pick: Hanken Grotesk, Accession Stencil or
+  JetBrains Mono. Accession Stencil now ships with Daylight Commons under the SIL Open Font License
+  1.1.
 - **Discourse checks** (options, off by default), all on this device; project-docs/DISCOURSE.md.
   - Where a quote comes from: a signed index of 11 public-domain works (8,681 passages), 12 sourced
     misattributions and one attested quote. Held out: 8 of 8 placed quotes right, 8 of 11 found,

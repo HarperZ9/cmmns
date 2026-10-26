@@ -86,6 +86,16 @@ test("the page escapes captions, carries no script and draws every layout", () =
   assert.match(boardHtml(b, { layout: "book" }), /plates\/a\.jpg/);
 });
 
+test("the heading face is a choice, and Accession loads only when a board uses it", () => {
+  const b = boardFrom([entry({ site: "x" })], { title: "T" });
+  assert.equal(b.head, "grotesk");
+  assert.doesNotMatch(boardHtml(b), /AccessionStencil/);
+  assert.match(boardHtml(b, { head: "accession" }), /AccessionStencil\.woff2[\s\S]*--head: "Accession Stencil"/);
+  assert.match(boardHtml(b, { head: "mono" }), /--head: var\(--mono\)/);
+  assert.equal(boardFrom([], { head: "comic" }).head, "grotesk");
+  assert.match(boardHtml(b, { head: "</style><b>" }), /--head: var\(--sans\)/);
+});
+
 test("board make and board render write the page, board.json and a manifest", async () => {
   const dir = mkdtempSync(join(tmpdir(), "board-"));
   try {
@@ -95,7 +105,7 @@ test("board make and board render write the page, board.json and a manifest", as
     writeFileSync(join(saves, "a.jpg.md"), sidecar({ format: "daylight.sidecar/1", site: "x", files: ["a.jpg"], posted: "2026-01-01T00:00:00Z" }));
     const made = await makeBoard(join(dir, "saves"), { title: "Shore", out: join(dir, "out") }, {});
     assert.equal(made.board.plates.length, 1);
-    for (const f of ["index.html", "board.json", "MANIFEST.sha256", "fonts/hanken-grotesk.woff2"]) assert.ok(existsSync(join(dir, "out", f)), f);
+    for (const f of ["index.html", "board.json", "MANIFEST.sha256", "fonts/hanken-grotesk.woff2", "fonts/OFL-accession.txt"]) assert.ok(existsSync(join(dir, "out", f)), f);
     assert.equal(JSON.parse(readFileSync(join(dir, "out", "board.json"), "utf8")).format, "refdb.board/1");
 
     const spec = { format: "refdb.board/1", kind: "concept", key: "tide", running_head: { left: "Tide", right: "RESEARCH" }, lane: "research", keyword_line: ["tide"],
@@ -107,4 +117,27 @@ test("board make and board render write the page, board.json and a manifest", as
     assert.match(readFileSync(join(dir, "spec", "index.html"), "utf8"), /Tide pool/);
     await assert.rejects(renderSpec(join(saves, "a.jpg.md").replace(".jpg.md", ".bad.json")), /ENOENT/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("the claim sheet pairs reach (sheet opacity) with corroboration (provenance opacity, said in words)", () => {
+  const b = boardFrom([entry({ post: "https://x.com/a/status/1", engagement: { views: 50 } }, ["a.jpg"]), entry({ post: "https://www.reuters.com/world/flood", engagement: { views: 5 } }, ["b.jpg"]), entry({ post: "https://x.com/a/status/2" }, ["c.jpg"])]);
+  const caseData = { sources: [{ id: "S1", url: "https://x.com/a/status/1" }, { id: "S2", url: "https://www.reuters.com/world/flood" }, { id: "S3", url: "https://x.com/a/status/2" }], claims: [{ id: "C1", text: "Flood", rung: "documented", source: "S1 S2 S3" }] };
+  const [sheet] = evidencePlan(b.plates, caseData).sheets;
+  const by = Object.fromEntries(sheet.layers.map((l) => [l.source, l]));
+  assert.equal(by.S1.corroborated_by, 1, "the same account twice is one origin");
+  assert.equal(by.S2.corroborated_by, 1);
+  assert.equal(by.S1.provenance_opacity, 0.5);
+  const html = boardHtml(b, { layout: "evidence", caseData });
+  assert.match(html, /class="prov" style="opacity:0\.5">Corroborated by 1 other origin among this claim's sources\./);
+});
+
+test("the evidence board prints through the shared sheet engine: ink bands by reach, no CSS opacity on sheets", () => {
+  const b = boardFrom([entry({ post: "https://x.com/a/status/1", engagement: { views: 1000 } }, ["a.jpg"]), entry({ post: "https://www.reuters.com/world/flood", engagement: { views: 250 } }, ["b.jpg"])]);
+  const caseData = { sources: [{ id: "S1", url: "https://x.com/a/status/1" }, { id: "S2", url: "https://www.reuters.com/world/flood" }], claims: [{ id: "C1", text: "Flood", rung: "documented", source: "S1 S2" }] };
+  const html = boardHtml(b, { layout: "evidence", caseData });
+  const bands = [...html.matchAll(/<div class="ink" aria-hidden="true"><span style="background:(#[0-9a-f]{6});width:([\d.]+)%">/g)];
+  assert.equal(bands.length, 2);
+  assert.deepEqual(bands.map((m) => Number(m[2])), [100, 25]);
+  assert.doesNotMatch(html, /class="layer"[^>]*opacity/);
+  assert.match(html, /25% of the widest reach/);
 });

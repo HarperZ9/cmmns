@@ -19,3 +19,5 @@ export { wrapLines, cardPlan, CARD, CARD_FOOT } from "./media-card.js";
 export { threadChain, continuationStatus } from "./media-thread.js";
 export { parseSidecar, boardFrom, boardFromMoodboard, plateCaption, bookPages, timelineRows, sheetOpacity, evidencePlan, BOARD_FORMAT, LAYOUTS, LANES } from "./board.js";
 export { boardHtml } from "./board-html.js";
+export { captureRecord, transparencyRecord, custodyLine, verifyCustody, captureCanonical, CAPTURE_FORMAT, CUSTODY_FORMAT } from "./capture.js";
+export { corroboration, corroborationOpacity, headlineMetamer, clippedQuote, originCollapse } from "./claim-checks.js";

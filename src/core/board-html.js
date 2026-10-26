@@ -1,21 +1,24 @@
 // A study board (refdb.board/1) as one HTML page: book spreads, a grid, a timeline, or an evidence
 // board of sheets. The page stands alone, needs no script, and prints to A4 pages. House type:
-// Accession Stencil for running heads and titles (JetBrains Mono when it is absent), Hanken Grotesk
+// Accession Stencil for running heads and titles, Hanken Grotesk
 // for captions and text, JetBrains Mono for numbers. Ink on paper; the one hot mark is the right-hand
-// running head. In the evidence board each claim is a sheet over its sources, opacity from reach.
+// running head. In the evidence board each claim is printed as sheets over its sources with the one
+// sheet engine Daylight has (src/core/discourse/sheets.js): ink coverage from reach.
 
 import { bookPages, timelineRows, evidencePlan, plateCaption } from "./board.js";
+import { buildSheets } from "./discourse/sheets.js";
 
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const num = (n) => `( ${n} )`;
 // Where a plate's media is, from the page: plates/<file name> unless the caller maps it (blob URLs).
 const defaultUrl = (m) => `plates/${encodeURIComponent(String(m.path || m.id).split(/[\\/]/).pop())}`;
 
-const CSS = (fonts, accession) => `${accession ? `@font-face { font-family: "Accession Stencil"; src: url("${fonts}AccessionStencil.woff2") format("woff2"); font-weight: 100 900; }
+const HEADS = { grotesk: "var(--sans)", accession: "\"Accession Stencil\", var(--mono)", mono: "var(--mono)" };
+const CSS = (fonts, head) => `${head === "accession" ? `@font-face { font-family: "Accession Stencil"; src: url("${fonts}AccessionStencil.woff2") format("woff2"); font-weight: 300 900; }
 ` : ""}@font-face { font-family: "Hanken Grotesk"; src: url("${fonts}hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; }
 @font-face { font-family: "JetBrains Mono"; src: url("${fonts}jetbrains-mono-regular.woff2") format("woff2"); }
 :root { --paper: #ebe5d8; --ink: #16130f; --soft: #4a443b; --rule: #c9bfab; --hot: #8f3a19; --ground: #d8cfbc;
-  --sans: "Hanken Grotesk", "Segoe UI", sans-serif; --mono: "JetBrains Mono", Consolas, monospace; --head: "Accession Stencil", var(--mono); }
+  --sans: "Hanken Grotesk", "Segoe UI", sans-serif; --mono: "JetBrains Mono", Consolas, monospace; --head: ${HEADS[head] || HEADS.grotesk}; }
 * { box-sizing: border-box; }
 html { background: var(--ground); color: var(--ink); font: 400 15px/1.5 var(--sans); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 body { margin: 0; padding: 32px 16px 64px; }
@@ -53,9 +56,12 @@ a { color: inherit; text-decoration-color: var(--rule); }
 .claim { padding: 28px 0; border-top: 1px solid var(--rule); }
 .claim > p { margin: 6px 0 14px; font-size: 18px; line-height: 1.35; }
 .stack { position: relative; display: grid; gap: 0; }
-.layer { position: relative; display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 12px; background: var(--paper); border: 1px solid var(--ink); margin-top: -36px; transition: opacity .2s; }
+.layer { position: relative; display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 12px; background: var(--paper); border: 1px solid var(--ink); margin-top: -36px; }
 .layer:first-child { margin-top: 0; }
-.layer:hover, .layer:focus-within { opacity: 1 !important; z-index: 9 !important; }
+.layer:hover, .layer:focus-within { z-index: 99 !important; }
+.ink { grid-column: 1 / -1; height: 10px; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.ink span { display: block; height: 100%; }
+.prov { font: 500 12px/1.4 var(--mono); margin-top: 6px; }
 .layer img, .layer video { width: 140px; height: 140px; object-fit: contain; }
 @page { size: A4; margin: 0; }
 @media print {
@@ -113,20 +119,27 @@ function timeline(board, url) {
   return `<main class="sheet">${header(board)}${rows.join("\n")}</main>`;
 }
 
-// Each claim a sheet over its sources; the most-seen source on top, every layer as opaque as its
-// reach. Pointing at a layer lifts it to full opacity.
+// Each claim printed as sheets over its sources (the shared sheet engine): the most-seen source on
+// top, each sheet's ink band as wide as its share of the widest reach and coloured as it looks through
+// the sheets above it. Each provenance line is as opaque as the source is corroborated by other
+// origins, and says so in words. Pointing at a sheet brings it to the front.
 function evidence(board, url, caseData) {
   const plan = evidencePlan(board.plates, caseData);
-  const sheets = plan.sheets.map((s) => `<section class="claim"><div class="rung">${esc(s.claim.rung)} ${esc(s.claim.id)}</div><p>${esc(s.claim.text)}</p>
-<div class="stack">${s.layers.map((l, i) => `<div class="layer" tabindex="0" style="opacity:${l.opacity};z-index:${s.layers.length - i};margin-left:${i * 28}px">${media(l.plate, url)}<div><div class="n">${num(l.plate.n)} ${esc(l.source)}</div>${caption(l.plate)}
-<div class="hash">${l.plate.source && l.plate.source.reach != null ? esc(Number(l.plate.source.reach).toLocaleString("en-US")) + " views shown. " : ""}${l.plate.source && l.plate.source.sha256 ? "SHA-256 " + esc(l.plate.source.sha256) : ""}</div></div></div>`).join("")}</div></section>`);
+  const sheets = plan.sheets.map((s) => {
+    // Every layer is its own origin here (its address), so the engine merges nothing the plan kept apart.
+    const printed = buildSheets({ claim: { text: s.claim.text, reach: null }, corrections: s.layers.map((l) => ({ text: l.source, reach: l.plate.source.reach, origin: l.plate.source.post || l.plate.source.media || `plate ${l.plate.n}` })) }).slice(1);
+    return `<section class="claim"><div class="rung">${esc(s.claim.rung)} ${esc(s.claim.id)}</div><p>${esc(s.claim.text)}</p>
+<div class="stack">${s.layers.map((l, i) => { const p = printed[i] || {}; return `<div class="layer" tabindex="0" style="z-index:${s.layers.length - i};margin-left:${i * 28}px"><div class="ink" aria-hidden="true"><span style="background:${esc(p.seen || "transparent")};width:${p.cover ? Math.round(p.cover * 1000) / 10 : 0}%"></span></div>${media(l.plate, url)}<div><div class="n">${num(l.plate.n)} ${esc(l.source)}${p.share != null && p.share > 0 ? ` · ${p.share}% of the widest reach` : ""}</div>${caption(l.plate)}
+<div class="prov" style="opacity:${l.provenance_opacity}">${l.corroborated_by ? `Corroborated by ${l.corroborated_by} other ${l.corroborated_by === 1 ? "origin" : "origins"} among this claim's sources.` : "No other origin among this claim's sources."}</div>
+<div class="hash">${l.plate.source && l.plate.source.reach != null ? esc(Number(l.plate.source.reach).toLocaleString("en-US")) + " views shown. " : ""}${l.plate.source && l.plate.source.sha256 ? "SHA-256 " + esc(l.plate.source.sha256) : ""}</div></div></div>`; }).join("")}</div></section>`;
+  });
   const rest = board.plates.filter((p) => plan.unmatched.includes(p.n)).map((p) => `<div class="row"><div class="when">${num(p.n)}</div>${media(p, url)}${caption(p)}</div>`);
   return `<main class="sheet">${header(board)}${sheets.join("\n")}${rest.join("\n")}</main>`;
 }
 
-// The page. opts: { fonts: "fonts/", url: (media, plate) => address, caseData, layout, accession }.
-// accession: true only where AccessionStencil.woff2 sits beside the other fonts.
-export function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData = null, layout = board.layout || "book", accession = false } = {}) {
+// The page. opts: { fonts: "fonts/", url: (media, plate) => address, caseData, layout, head }.
+// head: the face for running heads and titles (grotesk, accession or mono), else the board's own.
+export function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData = null, layout = board.layout || "book", head = board.head || "grotesk" } = {}) {
   const body = layout === "grid" ? grid(board, url) : layout === "timeline" ? timeline(board, url) : layout === "evidence" ? evidence(board, url, caseData) : book(board, url);
   return `<!doctype html>
 <html lang="en">
@@ -135,7 +148,7 @@ export function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Daylight Commons study board (${esc(board.format)})">
 <title>${esc(board.running_head.left)}</title>
-<style>${CSS(fonts, accession)}</style>
+<style>${CSS(fonts, head)}</style>
 </head>
 <body>
 ${body}

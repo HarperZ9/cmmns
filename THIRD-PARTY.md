@@ -9,6 +9,7 @@ code.
 
 | Item | Files | Licence | Notes |
 |---|---|---|---|
+| Accession Stencil font (variable, 0.1.0) | `src/ext/fonts/AccessionStencil.woff2` | SIL Open Font License 1.1 (`LICENSES/OFL-1.1.txt`, and `OFL-accession.txt` beside it) | Copyright 2026 Zain Dana Harper. The house face, licensed under the OFL by its author on 2026-10-26; sets the running heads and titles of study boards. |
 | Hanken Grotesk font | `src/ext/fonts/hanken-grotesk.woff2`, `docs/fonts/hanken-grotesk.woff2` | SIL Open Font License 1.1 (`LICENSES/OFL-1.1.txt`, and `OFL-hanken-grotesk.txt` beside each copy) | Copyright 2021 The Hanken Grotesk Project Authors. |
 | JetBrains Mono font (Regular, 2.304) | `src/ext/fonts/jetbrains-mono-regular.woff2`, `docs/fonts/jetbrains-mono-regular.woff2` | SIL Open Font License 1.1 (`LICENSES/OFL-1.1.txt`, and `OFL-jetbrains-mono.txt` beside each copy) | Copyright 2020 The JetBrains Mono Project Authors. Replaced the Conso font in 3.0.0; see `src/ext/fonts/FONTS.md`. |
 | Unicode confusables table (UTS #39) | `data/snapshots/unicode-confusables.txt`, and the table built from it in `src/core/confusables-data.js` | Unicode License v3 (`LICENSES/Unicode-3.0.txt`; notice also in `data/confusables.README.md`) | Copyright 1991-2026 Unicode, Inc. |

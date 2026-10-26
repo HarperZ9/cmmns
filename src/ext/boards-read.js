@@ -15,6 +15,7 @@ globalThis.PBBoardsRead = (() => {
     const board = PB.boardFromMoodboard(mb, records, { layout: mb.layout || "grid" });
     if (mb.lane) { board.lane = mb.lane; board.running_head.right = mb.lane.toUpperCase(); }
     if (mb.keywords) board.keyword_line = mb.keywords;
+    if (mb.head) board.head = mb.head;
     return { board, urls, moodboard: mb };
   }
 

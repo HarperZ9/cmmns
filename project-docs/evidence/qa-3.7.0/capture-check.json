@@ -1,0 +1,106 @@
+{
+  "captures": [
+    {
+      "page": "https://en.wikipedia.org/wiki/Mount_Rainier",
+      "note": "Captured as evidence: Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg, the visible page, and custody line 1. 3 of 9 parts kept in full; the rest are listed in the record.",
+      "files": [
+        "Mount-Rainier-Wikipedia-960px-Rainier20200906.capture.json",
+        "Mount-Rainier-Wikipedia-960px-Rainier20200906.capture.png",
+        "Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg",
+        "Mount-Rainier-Wikipedia-960px-Rainier20200906.md"
+      ]
+    },
+    {
+      "page": "https://en.wikipedia.org/wiki/Mount_Hood",
+      "note": "Captured as evidence: Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.jpg, the visible page, and custody line 2. 3 of 9 parts kept in full; the rest are listed in the record.",
+      "files": [
+        "Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.capture.json",
+        "Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.capture.png",
+        "Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.jpg",
+        "Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.md"
+      ]
+    },
+    {
+      "page": "https://x.com/NASA/status/2113655288687431819",
+      "note": "No picture, GIF or video was found under the pointer.",
+      "files": []
+    }
+  ],
+  "custody_lines": [
+    [
+      1,
+      null,
+      "09f493a0"
+    ],
+    [
+      2,
+      "09f493a0",
+      "bb0de4b9"
+    ]
+  ],
+  "transparency": {
+    "en.wikipedia.org": {
+      "rows": [
+        [
+          "file Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg",
+          1,
+          "full"
+        ],
+        [
+          "embedded copy Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg",
+          1,
+          "full"
+        ],
+        [
+          "text",
+          null,
+          "n/a"
+        ],
+        [
+          "engagement",
+          null,
+          "n/a"
+        ],
+        [
+          "account as shown",
+          null,
+          "n/a"
+        ],
+        [
+          "page picture",
+          0.03,
+          "partial"
+        ],
+        [
+          "page snapshot",
+          0,
+          "none"
+        ],
+        [
+          "local time",
+          1,
+          "full"
+        ],
+        [
+          "trusted time",
+          0,
+          "none"
+        ]
+      ],
+      "mean": [
+        0.51,
+        6,
+        9
+      ]
+    }
+  },
+  "verify": [
+    0,
+    "Checked 2 captures and 2 custody lines.\nEvery file matches its capture and the custody lines found are intact."
+  ],
+  "verify_after_one_byte": [
+    1,
+    "Checked 2 captures and 2 custody lines.\nProblem  Daylight/en.wikipedia.org/Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.capture.json: Mount-Hood-Wikipedia-960px-Oregon-Mount-Hood-from-Trillium-La.jpg has changed since it was captured"
+  ],
+  "note": "Chrome over CDP, test copy with <all_urls>; the harness calls the menu handler as Chrome would. X: the right-click path found no media under the pointer for both Capture and the existing Download media here, so X capture is unverified."
+}

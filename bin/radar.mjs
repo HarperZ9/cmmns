@@ -22,7 +22,8 @@ import { readable, verdictLines, chainLines } from "./lib/report.mjs";
 import { validate } from "./lib/jsonschema.mjs";
 import { runExport } from "./lib/export.mjs";
 import { runCaseCommand } from "./lib/case.mjs";
-import { TOP_HELP, MEDIA_HELP, SIDECAR_HELP, BOARD_HELP, helpText, friendly } from "./lib/help.mjs";
+import { verifyCaptures, verifyLines } from "./lib/capture-verify.mjs";
+import { TOP_HELP, MEDIA_HELP, SIDECAR_HELP, BOARD_HELP, CAPTURE_HELP, helpText, friendly } from "./lib/help.mjs";
 import { runMedia } from "./lib/media.mjs";
 import { cleanCommand, protectCommand, selfAuditCommand, PROTECT_USAGE } from "./lib/protect.mjs";
 import { runFetch } from "./lib/media-fetch.mjs";
@@ -40,7 +41,8 @@ const USAGE = `Usage:
   daylight media compress <file> [the same options]
   daylight media fetch <page address> [--dir folder]       (needs a system yt-dlp)
   daylight sidecar check <folder>                          (flags unproved thread continuations)
-  daylight board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--pdf]
+  daylight capture verify <folder>                         (checks evidence captures and their custody chain)
+  daylight board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--head grotesk|accession|mono] [--pdf]
   daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
   daylight case <command>   an investigation case folder; "daylight case help" lists the commands
@@ -63,7 +65,7 @@ export function parseArgs(argv) {
     const a = argv[i];
     if (!a.startsWith("--")) { out._.push(a); continue; }
     const [k, v] = a.slice(2).split("=");
-    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate", "title", "lane", "keywords", "layout", "site", "since", "until", "case", "dir"].includes(k) ? argv[++i] : true;
+    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate", "title", "lane", "keywords", "layout", "head", "site", "since", "until", "case", "dir"].includes(k) ? argv[++i] : true;
   }
   return out;
 }
@@ -128,6 +130,13 @@ export async function main(argv) {
     if (flags.help || !dir) { print(helpText(BOARD_HELP, "daylight board make")); return dir || flags.help ? 0 : 2; }
     print((await makeBoard(dir, flags)).line);
     return 0;
+  }
+  if (argv[0] === "capture" && argv[1] === "verify") {
+    const { _: [dir], flags } = parseArgs(argv.slice(2));
+    if (flags.help || !dir) { print(helpText(CAPTURE_HELP, "daylight capture verify")); return dir || flags.help ? 0 : 2; }
+    const r = await verifyCaptures(dir);
+    print(flags.json ? asJson(r) : verifyLines(r));
+    return r.chain.ok ? 0 : 1;
   }
   if (argv[0] === "sidecar" && argv[1] === "check") {
     const { _: [dir], flags } = parseArgs(argv.slice(2));

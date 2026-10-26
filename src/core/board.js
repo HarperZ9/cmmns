@@ -5,8 +5,12 @@
 // Daylight, the command line and the site render the same boards. Daylight's plates add `source`, the
 // sidecar's facts. 3.6.0 moodboards become boards of kind "moodboard". Pure: no files, no network.
 
+import { corroboration } from "./claim-checks.js";
+
 export const BOARD_FORMAT = "refdb.board/1";
 export const LAYOUTS = ["book", "grid", "timeline", "evidence"];
+// The face for running heads and titles: one choice among the shipped faces, never a fixed house look.
+export const HEAD_FACES = ["grotesk", "accession", "mono"];
 export const LANES = ["design", "research", "journalism", "sound", "writing", "film", "science", "history"];
 
 // A sidecar's front matter and the parts of its body a plate needs (daylight.sidecar/1).
@@ -57,11 +61,11 @@ function platesOf(entry) {
 const words = (v) => [...new Set((Array.isArray(v) ? v : String(v || "").split(",")).map((w) => String(w).trim()).filter(Boolean))].slice(0, 8);
 
 // The board. opts: { title, lane, keywords, layout, kind, key, created }.
-export function boardFrom(entries, { title = "Study board", lane = "research", keywords = [], layout = "book", kind = "saves", key = null, created = new Date().toISOString() } = {}) {
+export function boardFrom(entries, { title = "Study board", lane = "research", keywords = [], layout = "book", head = "grotesk", kind = "saves", key = null, created = new Date().toISOString() } = {}) {
   const plates = entries.filter((e) => e && e.sidecar).flatMap(platesOf).map((p, i) => ({ n: i + 1, ...p }));
   const t = String(title).slice(0, 120), l = String(lane || "research").slice(0, 60);
   return { format: BOARD_FORMAT, kind, key: key || t, running_head: { left: t, right: l.toUpperCase() }, lane: l, keyword_line: words(keywords),
-    plates, also_in: { documents: 0, units: 0 }, sources: { daylight: { from: "saves" } }, layout: LAYOUTS.includes(layout) ? layout : "book", created };
+    plates, also_in: { documents: 0, units: 0 }, sources: { daylight: { from: "saves" } }, layout: LAYOUTS.includes(layout) ? layout : "book", head: HEAD_FACES.includes(head) ? head : "grotesk", created };
 }
 
 // A 3.6.0 moodboard (src/ext/media-store.js: the board and its records) as a board.
@@ -135,6 +139,9 @@ export function evidencePlan(plates, caseData) {
     const layers = String(c.source || "").split(/[,\s]+/).filter(Boolean).map((id) => ({ id, plate: plateOf.get(id) || null }))
       .filter((l) => l.plate).map((l) => ({ source: l.id, plate: l.plate, opacity: sheetOpacity(Number(l.plate.source.reach || 0), max) }))
       .sort((a, b) => b.opacity - a.opacity);
+    // Provenance: how far each source is corroborated by the claim's other sources from other origins.
+    const cor = corroboration(layers.map((l) => ({ id: l.source, url: l.plate.source.post || l.plate.source.media, handle: l.plate.source.handle })));
+    layers.forEach((l, i) => { l.corroborated_by = cor[i].corroborated_by; l.provenance_opacity = cor[i].opacity; });
     return { claim: { id: c.id, text: c.text, rung: c.rung }, layers };
   }).filter((s) => s.layers.length);
   const used = new Set(sheets.flatMap((s) => s.layers.map((l) => l.plate.n)));
