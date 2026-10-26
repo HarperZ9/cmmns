@@ -13109,6 +13109,187 @@ function continuationStatus(markdown) {
 return { threadChain, continuationStatus };
 })();
 
+// ---- claim-checks.js
+const M_claim_checks = (() => {
+// Checks on a claim and its sources, for the claim sheet (a claim drawn over its sources) and the
+// evidence board. Pure; no network.
+// - corroboration: how many of a claim's other sources come from a different origin (another site
+//   or another account); its opacity is the provenance layer's opacity on the sheet.
+// - headlineMetamer: the same headline over different sourcing. The readout matches; the sources
+//   do not, so the match says nothing about whether the two rest on the same evidence.
+// - clippedQuote: a quote cut from its source so that a nearby negation or qualifier falls away.
+//   The same words in a different arrangement give a different meaning.
+
+// An origin is a site and, where the address names one, the account: x.com/<handle>/status/...,
+// bsky.app/profile/<handle>/..., reddit.com/user/<name>/... A news site's origin is the site.
+const ACCOUNT = { "x.com": 0, "bsky.app": 1, "reddit.com": 1, "youtube.com": 0, "tiktok.com": 0, "instagram.com": 0 };
+function originOf(s) {
+  let site = "", parts = [];
+  try { const u = new URL(String((s && (s.url || s.post)) || "")); site = u.hostname.toLowerCase().replace(/^(www|mobile|old|m)\./, "").replace("twitter.com", "x.com"); parts = u.pathname.split("/").filter(Boolean); } catch { /* not an address */ }
+  const at = ACCOUNT[site];
+  const handle = (s && s.handle) || (at != null && parts[at] && !(site === "reddit.com" && parts[0] !== "user") ? parts[at] : "");
+  return `${site}|${String(handle).replace(/^@/, "").toLowerCase()}`;
+}
+
+// Opacity from the count of independent corroborating sources: faint alone, full at three or more.
+const corroborationOpacity = (k) => Math.round((0.25 + 0.75 * Math.min(Math.max(k, 0), 3) / 3) * 100) / 100;
+
+// sources: [{ id, url, handle? }]. -> [{ id, origin, corroborated_by, opacity }]
+function corroboration(sources) {
+  const origins = sources.map(originOf);
+  return sources.map((s, i) => {
+    const k = new Set(origins.filter((o, j) => j !== i && o !== origins[i])).size;
+    return { id: s.id, origin: origins[i], corroborated_by: k, opacity: corroborationOpacity(k) };
+  });
+}
+
+const norm = (t) => String(t || "").normalize("NFKC").toLowerCase().replace(/[‘’“”"']/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+const addr = (u) => String(u || "").replace(/^https?:\/\/(www\.|mobile\.)?/, "").replace(/[?#].*$/, "").replace(/\/$/, "").toLowerCase();
+
+// a, b: { headline, sources: [url] }. -> { metamer, same_headline, shared, only_a, only_b }
+function headlineMetamer(a, b) {
+  const same = norm(a.headline) !== "" && norm(a.headline) === norm(b.headline);
+  const sa = new Set((a.sources || []).map(addr)), sb = new Set((b.sources || []).map(addr));
+  const shared = [...sa].filter((x) => sb.has(x)), onlyA = [...sa].filter((x) => !sb.has(x)), onlyB = [...sb].filter((x) => !sa.has(x));
+  return { metamer: same && (onlyA.length > 0 || onlyB.length > 0), same_headline: same, shared, only_a: onlyA, only_b: onlyB };
+}
+
+const TURNS = /\b(not|no|never|none|nor|neither|without|false|untrue|denied|denies|deny|but|however|although|though|unless|except|if|whether|allegedly|reportedly|claimed|claims|rumou?r)\b|n't\b/i;
+
+// quote: the words as quoted; source: the full text they came from. window: words kept either side.
+// -> { found, clipped, turns: [words], before, after }
+function clippedQuote(quote, source, window = 6) {
+  const q = norm(quote), s = norm(source);
+  const i = q ? s.indexOf(q) : -1;
+  if (i < 0) return { found: false, clipped: false, turns: [], before: null, after: null };
+  const before = s.slice(0, i).trim().split(" ").filter(Boolean).slice(-window).join(" ");
+  const after = s.slice(i + q.length).trim().split(" ").filter(Boolean).slice(0, window).join(" ");
+  const turns = [...`${before} ${after}`.matchAll(new RegExp(TURNS.source, "gi"))].map((m) => m[0].toLowerCase());
+  return { found: true, clipped: turns.length > 0, turns: [...new Set(turns)], before: before || null, after: after || null };
+}
+
+// Origin collapse: many items that relay one upstream source. items: [{ id, url, cites: [url] }].
+// An item that cites exactly one upstream counts toward that upstream; the readout is the number of
+// independent upstreams behind the items, against the number of items. -> { items, upstreams,
+// collapsed: [{ upstream, relays: [id] }] } where collapsed lists upstreams relayed by three or more.
+function originCollapse(items, least = 3) {
+  const by = new Map(), own = [];
+  for (const it of items) {
+    const cites = [...new Set((it.cites || []).map(addr))];
+    if (cites.length === 1) { if (!by.has(cites[0])) by.set(cites[0], []); by.get(cites[0]).push(it.id); }
+    else own.push(it.id);
+  }
+  const collapsed = [...by].filter(([, ids]) => ids.length >= least).map(([upstream, relays]) => ({ upstream, relays }));
+  return { items: items.length, upstreams: by.size + own.length, collapsed };
+}
+
+return { corroborationOpacity, corroboration, headlineMetamer, clippedQuote, originCollapse };
+})();
+
+// ---- capture.js
+const M_capture = (() => {
+// Evidence capture (project-docs/EVIDENCE-CAPTURE.md): one record per capture, daylight.capture/1,
+// holding the artifact's hashes, the words and counts the page showed, the screenshot, the local
+// time and the transparency record (what survived the capture, property by property, as a clarity
+// from 0 to 1 where it can be measured and null where it cannot). Captures are linked by a custody
+// chain: each log line names the SHA-256 of the line before it, so a removed or edited line breaks
+// the chain. Pure: hashing goes through Web Crypto, present in browsers and in Node.
+
+const CAPTURE_FORMAT = "daylight.capture/1";
+const CUSTODY_FORMAT = "daylight.custody/1";
+const ENGAGEMENT_KEYS = ["replies", "reposts", "quotes", "likes", "views", "bookmarks"];
+
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+async function sha256Text(s) { return hex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s))); }
+
+// One fixed serialisation, so the same object always hashes the same: keys sorted at every level.
+function captureCanonical(v) {
+  if (Array.isArray(v)) return `[${v.map(captureCanonical).join(",")}]`;
+  if (v && typeof v === "object") return `{${Object.keys(v).sort().filter((k) => v[k] !== undefined).map((k) => `${JSON.stringify(k)}:${captureCanonical(v[k])}`).join(",")}}`;
+  return JSON.stringify(v === undefined ? null : v);
+}
+
+const round = (x) => Math.round(x * 100) / 100;
+
+// What survived, per property: { property, clarity (0..1 or null), kept: "full" | "partial" | "none" | "n/a", measure }.
+// clarity is a measured fraction; null means the loss is known but its size is not.
+function transparencyRecord(meta = {}, { files = [], screenshot = null, transformed = null } = {}) {
+  const rows = [];
+  const row = (property, clarity, kept, measure) => rows.push({ property, clarity: clarity == null ? null : round(clarity), kept, measure });
+  for (const f of files) {
+    if (f.made) row(`file ${f.name}`, null, "partial", `made in the page (${f.made}); the page's own media was not saved byte for byte`);
+    else row(`file ${f.name}`, 1, "full", "the bytes the page served, SHA-256 taken before any words were written into the file");
+    if (f.saved_sha256 && f.saved_sha256 !== f.sha256) row(`embedded copy ${f.name}`, 1, "full", "the saved file carries the description, so its own hash differs; the original hash is kept");
+  }
+  if (transformed) row("media form", null, "partial", transformed);
+  row("text", meta.kind === "media" && !meta.text ? null : meta.textComplete === false ? null : 1, meta.textComplete === false ? "partial" : meta.text ? "full" : "n/a",
+    meta.textComplete === false ? "the page showed only the start of the text" : meta.text ? "the text as the page showed it" : "no text on the post");
+  if (meta.threadComplete === true) row("thread", 1, "full", "each part answers the one before");
+  else if (meta.threadComplete === "unknown") row("thread", null, "partial", "the page may hold more of the thread than could be proved");
+  // Counts and the account are measured where the page is a post; a page with neither (an article,
+  // a gallery) has nothing to keep, so those rows are n/a rather than a loss.
+  const e = meta.engagement || null, shown = e ? ENGAGEMENT_KEYS.filter((k) => e[k] != null).length : 0;
+  const a = meta.author || {}, acc = [a.name, a.handle].filter(Boolean).length, post = !!(meta.postUrl || acc || e);
+  if (post) row("engagement", shown / ENGAGEMENT_KEYS.length, shown === ENGAGEMENT_KEYS.length ? "full" : shown ? "partial" : "none", `${shown} of ${ENGAGEMENT_KEYS.length} counts read from the page`);
+  else row("engagement", null, "n/a", "not a post; no counts on the page");
+  if (post) row("account as shown", acc / 2, acc === 2 ? "full" : acc ? "partial" : "none", `${acc} of 2 (display name, handle)`);
+  else row("account as shown", null, "n/a", "not a post; no account on the page");
+  if (screenshot && screenshot.page_height > 0) {
+    const c = Math.min(1, screenshot.viewport_height / screenshot.page_height);
+    row("page picture", c, c >= 1 ? "full" : "partial", `the visible part of the page: ${screenshot.viewport_height} of ${screenshot.page_height} px high`);
+  } else row("page picture", 0, "none", "no screenshot");
+  row("page snapshot", 0, "none", "MHTML or WARC snapshot not taken in this release");
+  row("local time", 1, "full", "this computer's clock, UTC and offset");
+  row("trusted time", 0, "none", "no RFC 3161 or OpenTimestamps proof requested");
+  const measured = rows.filter((r) => r.clarity != null);
+  return { rows, mean: measured.length ? round(measured.reduce((s, r) => s + r.clarity, 0) / measured.length) : null, measured: measured.length, of: rows.length };
+}
+
+// The capture record. files: [{ name, sha256, saved_sha256?, bytes, mime, made? }];
+// screenshot: { name, sha256, viewport_height, page_height, scroll_y } | null.
+function captureRecord({ meta = {}, files = [], screenshot = null, page = {}, tool = {}, transformed = null, now = new Date(), offsetMinutes = 0 }) {
+  return {
+    format: CAPTURE_FORMAT,
+    captured: { utc: new Date(now).toISOString(), offset_minutes: offsetMinutes },
+    page: { url: page.url || meta.pageUrl || null, title: page.title || null },
+    tool: { name: "Daylight Commons", version: tool.version || null, browser: tool.browser || null },
+    artifact: files.map((f) => ({ name: f.name, sha256: f.sha256, saved_sha256: f.saved_sha256 || f.sha256, bytes: f.bytes, mime: f.mime || null, made: f.made || null })),
+    words: { site: meta.site || null, post: meta.postUrl || null, media: meta.mediaUrl || null, text: meta.text || null, text_complete: meta.textComplete !== false, posted: meta.postedAt || null },
+    engagement: meta.engagement || null,
+    account: { name: (meta.author && meta.author.name) || null, handle: (meta.author && meta.author.handle) || null },
+    thread: { parent: meta.parent ? meta.parent.url || null : null, quoted: meta.quoted ? meta.quoted.url || null : null, parts: (meta.thread || []).length, complete: meta.threadComplete ?? null },
+    screenshot,
+    transparency: transparencyRecord(meta, { files, screenshot, transformed }),
+    // Filled after hashing: the custody line naming this record's hash (custodyLine).
+    custody: null,
+  };
+}
+
+// The custody log line for one event. prevLine: the line before (null for the first).
+// event: { what: "capture" | "export" | "note" | "correction", page, hashes: [hex], key_id? }.
+async function custodyLine(prevLine, event, now = new Date()) {
+  const body = { format: CUSTODY_FORMAT, seq: prevLine ? prevLine.seq + 1 : 1, at: new Date(now).toISOString(), what: event.what, page: event.page || null,
+    hashes: [...(event.hashes || [])], key_id: event.key_id || null, tool: event.tool || null, prev: prevLine ? prevLine.hash : null };
+  return { ...body, hash: await sha256Text(captureCanonical(body)) };
+}
+
+// Checks a log: every line's hash matches its body, and each names the one before.
+// { ok, lines, broken_at (seq or null), reason }.
+async function verifyCustody(lines) {
+  let prev = null;
+  for (const l of lines) {
+    const { hash, ...body } = l;
+    if ((await sha256Text(captureCanonical(body))) !== hash) return { ok: false, lines: lines.length, broken_at: l.seq, reason: "this line was changed after it was written" };
+    if (l.prev !== (prev ? prev.hash : null)) return { ok: false, lines: lines.length, broken_at: l.seq, reason: "the line before it is missing or was changed" };
+    if (prev && l.seq !== prev.seq + 1) return { ok: false, lines: lines.length, broken_at: l.seq, reason: "a line is missing before this one" };
+    prev = l;
+  }
+  return { ok: true, lines: lines.length, broken_at: null, reason: null };
+}
+
+return { CAPTURE_FORMAT, CUSTODY_FORMAT, sha256Text, captureCanonical, transparencyRecord, captureRecord, custodyLine, verifyCustody };
+})();
+
 // ---- board.js
 const M_board = (() => {
 // Study boards: saved items gathered into numbered plates that keep each item's source, author, time
@@ -13117,6 +13298,8 @@ const M_board = (() => {
 // unit, item_ids, media: [{ id, kind, path }], caption, medium, concepts }], also_in, sources }), so
 // Daylight, the command line and the site render the same boards. Daylight's plates add `source`, the
 // sidecar's facts. 3.6.0 moodboards become boards of kind "moodboard". Pure: no files, no network.
+
+const { corroboration } = M_claim_checks;
 
 const BOARD_FORMAT = "refdb.board/1";
 const LAYOUTS = ["book", "grid", "timeline", "evidence"];
@@ -13250,6 +13433,9 @@ function evidencePlan(plates, caseData) {
     const layers = String(c.source || "").split(/[,\s]+/).filter(Boolean).map((id) => ({ id, plate: plateOf.get(id) || null }))
       .filter((l) => l.plate).map((l) => ({ source: l.id, plate: l.plate, opacity: sheetOpacity(Number(l.plate.source.reach || 0), max) }))
       .sort((a, b) => b.opacity - a.opacity);
+    // Provenance: how far each source is corroborated by the claim's other sources from other origins.
+    const cor = corroboration(layers.map((l) => ({ id: l.source, url: l.plate.source.post || l.plate.source.media, handle: l.plate.source.handle })));
+    layers.forEach((l, i) => { l.corroborated_by = cor[i].corroborated_by; l.provenance_opacity = cor[i].opacity; });
     return { claim: { id: c.id, text: c.text, rung: c.rung }, layers };
   }).filter((s) => s.layers.length);
   const used = new Set(sheets.flatMap((s) => s.layers.map((l) => l.plate.n)));
@@ -13320,6 +13506,7 @@ a { color: inherit; text-decoration-color: var(--rule); }
 .layer { position: relative; display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 12px; background: var(--paper); border: 1px solid var(--ink); margin-top: -36px; transition: opacity .2s; }
 .layer:first-child { margin-top: 0; }
 .layer:hover, .layer:focus-within { opacity: 1 !important; z-index: 9 !important; }
+.prov { font: 500 12px/1.4 var(--mono); margin-top: 6px; }
 .layer img, .layer video { width: 140px; height: 140px; object-fit: contain; }
 @page { size: A4; margin: 0; }
 @media print {
@@ -13378,11 +13565,13 @@ function timeline(board, url) {
 }
 
 // Each claim a sheet over its sources; the most-seen source on top, every layer as opaque as its
-// reach. Pointing at a layer lifts it to full opacity.
+// reach. Each layer's provenance line is as opaque as the source is corroborated by other origins,
+// and says so in words. Pointing at a layer lifts it to full opacity.
 function evidence(board, url, caseData) {
   const plan = evidencePlan(board.plates, caseData);
   const sheets = plan.sheets.map((s) => `<section class="claim"><div class="rung">${esc(s.claim.rung)} ${esc(s.claim.id)}</div><p>${esc(s.claim.text)}</p>
 <div class="stack">${s.layers.map((l, i) => `<div class="layer" tabindex="0" style="opacity:${l.opacity};z-index:${s.layers.length - i};margin-left:${i * 28}px">${media(l.plate, url)}<div><div class="n">${num(l.plate.n)} ${esc(l.source)}</div>${caption(l.plate)}
+<div class="prov" style="opacity:${l.provenance_opacity}">${l.corroborated_by ? `Corroborated by ${l.corroborated_by} other ${l.corroborated_by === 1 ? "origin" : "origins"} among this claim's sources.` : "No other origin among this claim's sources."}</div>
 <div class="hash">${l.plate.source && l.plate.source.reach != null ? esc(Number(l.plate.source.reach).toLocaleString("en-US")) + " views shown. " : ""}${l.plate.source && l.plate.source.sha256 ? "SHA-256 " + esc(l.plate.source.sha256) : ""}</div></div></div>`).join("")}</div></section>`);
   const rest = board.plates.filter((p) => plan.unmatched.includes(p.n)).map((p) => `<div class="row"><div class="when">${num(p.n)}</div>${media(p, url)}${caption(p)}</div>`);
   return `<main class="sheet">${header(board)}${sheets.join("\n")}${rest.join("\n")}</main>`;
@@ -16356,5 +16545,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

@@ -115,7 +115,7 @@
       for (const [name, file] of Object.entries(e.file)) if (b.plates.some((p) => p.media.some((m) => m.path === name))) await put(plates, name, file, "plates/");
       if (e.text && b.plates.some((p) => p.unit === e.sidecarName)) await put(notes, e.sidecarName, e.text, "sidecars/");
     }
-    for (const f of ["AccessionStencil.woff2", "hanken-grotesk.woff2", "jetbrains-mono-regular.woff2"]) await put(fontDir, f, await (await fetch(fonts + f)).blob(), "fonts/");
+    for (const f of ["AccessionStencil.woff2", "hanken-grotesk.woff2", "jetbrains-mono-regular.woff2", "OFL-accession.txt", "OFL-hanken-grotesk.txt", "OFL-jetbrains-mono.txt"]) await put(fontDir, f, await (await fetch(fonts + f)).blob(), "fonts/");
     await put(dir, "board.json", JSON.stringify(b, null, 2) + "\n");
     await put(dir, "index.html", PB.boardHtml(b));
     const lines = listed.sort((x, y) => (x[0] < y[0] ? -1 : 1)).map(([p, hex]) => `${hex}  ${p}`);

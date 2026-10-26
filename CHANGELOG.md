@@ -5,7 +5,23 @@ were not published to a store.
 
 ## Unreleased
 
+Nothing yet.
+
+## 3.7.0 (2026-10-26)
+
+Capture a post as evidence, and turn saves into study boards.
+
 ### Added
+- **Capture as evidence.** Right-click a picture, video or sound and choose "Capture as evidence".
+  The file and its note are saved as usual, with a picture of the visible page and a capture record
+  beside them. The record keeps the file's SHA-256 taken before any words were written into it, the
+  counts and account the page showed, the local time, and a list of what the capture kept and what
+  it lost, part by part. Every capture adds a line to a chain kept in your browser, each line naming
+  the one before. `daylight capture verify <folder>` checks every file, picture, record and line, and
+  says which changed. Nothing is sent anywhere. Not yet: a full-page picture, a page snapshot, a
+  signed log and trusted time.
+- On an evidence board, each source's provenance line is as opaque as the source is backed by the
+  claim's other sources from other sites or accounts, and says how many.
 - **Study boards.** Saved items become numbered plates in a board you can print, save as one web
   page or keep as a folder: a book with running heads, numbered plates, captions and a keyword line;
   a grid; or a timeline in posted order with long silences drawn as breaks. Open one from the

@@ -1,7 +1,73 @@
-# Evidence capture mode (design for 3.7.0)
+# Evidence capture mode (3.7.0)
 
-Status: design. Nothing here is built yet. It builds on the one-click save (3.6.x), the sidecar
+Status: the first part is built in 3.7.0; "What 3.7.0 builds" below says which parts. The rest of
+this page is the design it follows. It builds on the one-click save (3.6.x), the sidecar
 format (`project-docs/SIDECAR-FORMAT.md`) and the case workbench (`daylight case`, `src/investigate/`).
+
+## What 3.7.0 builds
+
+- **Capture as evidence**, a right-click item on a picture, video or sound. It saves the file and its
+  note as a normal save, then adds `<name>.capture.png` (the visible part of the page) and
+  `<name>.capture.json` (the record, `daylight.capture/1`) beside them in `<save folder>/<site>/`.
+  The right-click grants the page picture (activeTab); the hover and in-post buttons do not, so they
+  do not capture.
+- **Hashes before words.** Each file's SHA-256 is taken on the bytes the page served, before the
+  description is written into the file; the saved copy's own hash is kept beside it.
+- **The transparency record**: for every part of the capture, what survived, as a clarity from 0 to
+  1 where it can be measured (the file 1; engagement as the share of the six counts the page showed;
+  the account as display name and handle out of 2; the page picture as visible height over page
+  height) and null where the loss is known but not its size (a text the page cut off, a thread that
+  could not be proved, a GIF made in the page). Parts not taken in this release say so with 0: the
+  page snapshot and trusted time.
+- **Custody chain**: one line per capture, kept in this browser, each naming the SHA-256 of the line
+  before; the record's own hash is in its line. `daylight capture verify <folder>` re-hashes every
+  file, picture and record, checks every line and link, and names lines saved elsewhere as gaps.
+- **Not built yet:** the stitched full-page picture, the MHTML or WARC snapshot (it needs the
+  `pageCapture` permission), the signed log (the case key lives with `daylight case`; the browser has
+  no key yet), RFC 3161 and OpenTimestamps time, the Internet Archive request, and filing captures
+  into a case. Without a signature, someone who rewrites the last line and its hash is not caught;
+  every earlier change is.
+
+## The claim view: a claim over its sources
+
+The evidence board (`daylight board make --layout evidence --case ...`) draws each claim as a sheet
+over the plates of the sources it cites. Two readouts, paired: the sheet's opacity is the source's
+reach (the views the page showed, on a log scale), and the provenance line's opacity is how far the
+source is corroborated by the claim's other sources from other origins (another site or another
+account; 0.25 alone, full at three). The line also says it in words, so neither readout depends on
+seeing opacity.
+
+## Two checks on the sourcing (src/core/claim-checks.js)
+
+- **Same headline, different sourcing** (`headlineMetamer`): two items whose headlines read the same
+  but rest on different sources. The matching readout hides the difference; listing the shared and
+  unshared sources splits it.
+- **A quote clipped from its source** (`clippedQuote`): the quoted words appear in the source, but a
+  negation or qualifier within six words either side (not, never, but, unless, allegedly, ...) was
+  left out. The same words in a different arrangement can carry the opposite meaning.
+
+Both are tested on constructed examples (`tests/capture.test.js`). Neither is wired into a view yet;
+they flag, and the person reads the source.
+
+- **Origin collapse** (`originCollapse`, built and tested): many items that each cite one and the same
+  upstream source count as one upstream. Five outlets relaying one wire story read as 5 items, 1
+  upstream. Corroboration on the claim sheet already counts origins, not copies.
+
+## Claim language as readouts (design notes)
+
+Language indicators are readouts, each with its measured rates, never verdicts. They apply to every
+actor, country and side on the same terms, and they describe posts, never the people who wrote them.
+
+| Indicator | State in 3.7.0 | Ground |
+|---|---|---|
+| Dehumanising terms | built (the reading lens) | precision 92.5% (37/40; 80.1 to 97.4) and a 0.2% false-positive rate (12/5,046) in project-docs/EVALUATION.md |
+| Coordinated phrasing | built (the campaign lens) as indicators | not measured: project-docs/CAMPAIGN-LENS.md claims no precision or recall yet |
+| Loaded framing | built as weak families (conspiracy, absolutist, essentialise); weak families never label a post alone | shown as context only: the corpora label hostility, not framing (project-docs/EVALUATION.md) |
+| Emergency language | design only | no detector and no measured rate yet; it ships only with a rate on known cases |
+| Paraphrase metamer (one claim in different words across posts) | design only | needs a meaning readout (an entailment check), with a control that splits a real paraphrase from a near one; word overlap is a bag-of-words readout and cannot tell them apart, so it is not used |
+
+Any risk reading that combines indicators must state its base rate and its record on past cases
+(hits, misses, false alarms) before it is shown. Without that it stays a design note.
 
 ## The problem
 
@@ -80,7 +146,7 @@ The capture records nothing about the person saving beyond the key id they chose
 versions. Screenshots can include the capturing account's own name in the page chrome; the capture
 crops to the page content, and Share clean removes the rest.
 
-## Build plan (after 3.6.1 ships)
+## Build plan (the design's original order; items 1, 3 (in part), 5 (verify) and 6 are built)
 
 1. `src/core/capture.js`: the capture record and the log line, pure, with tests for the hash chain.
 2. Page side: engagement and account readers per site (X, Reddit, Bluesky first), from what is shown.

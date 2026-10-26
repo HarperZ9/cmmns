@@ -33,6 +33,10 @@ export const BOARD_HELP = ["Make a study board from saved items and their Daylig
   "daylight board make ~/Downloads/Daylight/study --title \"Observing mind\" --lane design --keywords contextual,intuitive,human --pdf",
   "Writes index.html, board.json (refdb.board/1, the reference library's format), plates/, fonts/, sidecars/ and MANIFEST.sha256. --clean saves Share clean copies of the plates. --pdf needs Chrome or Edge on this computer. daylight board render <board.json> [--layout ...] [--out folder] draws a board the reference library made."];
 
+// `daylight capture verify` (bin/lib/capture-verify.mjs).
+export const CAPTURE_HELP = ["Check the evidence captures Daylight Commons saved: each file and page picture still has the hash its capture recorded, each record is the one its custody line names, and the custody lines found form one unbroken chain.",
+  "daylight capture verify <folder> [--json]", "daylight capture verify ~/Downloads/Daylight", "Reads local files only. Exits with 1 when a file or line has changed. Lines saved in other folders are listed as not here, not as broken."];
+
 // `daylight sidecar check` (bin/lib/sidecar-check.mjs).
 export const SIDECAR_HELP = ["Check the notes Daylight Commons saved beside your files. Flags notes whose \"Continued by the author\" parts were not proved to be one thread (3.6.0 could join unrelated posts saved from a profile or timeline page).",
   "daylight sidecar check <folder> [--json]", "daylight sidecar check ~/Downloads/Daylight", "Reads local files only. Exits with 1 when a note needs checking."];

@@ -78,7 +78,9 @@ Moodboards keep working on the collections page as before.
   over the plates of the sources it cites, as stacked sheets, and each sheet's opacity comes from that
   source's reach on a log scale (`0.25 + 0.75 × log(1 + reach) / log(1 + widest reach)`; unknown reach
   is faint at 0.25). A widely seen post covers a little-seen correction the way it does in the feed;
-  hovering or focusing a sheet lifts it to full. Every plate shows its SHA-256, and plates no claim
+  hovering or focusing a sheet lifts it to full. Paired with it, each layer's provenance line is as
+  opaque as the source is corroborated by the claim's other sources from other origins (another site
+  or account: 0.25 alone, full at three) and says the count in words. Every plate shows its SHA-256, and plates no claim
   cites are listed after the sheets.
 
 ## Exports

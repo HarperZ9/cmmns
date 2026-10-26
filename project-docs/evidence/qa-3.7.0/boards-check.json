@@ -1,0 +1,59 @@
+{
+  "status": "3 plates.",
+  "plates_grid": 3,
+  "accession_loaded": true,
+  "head_right": true,
+  "moodboard_after": {
+    "id": "mb-mvorix7r90de",
+    "name": "Kilns and clay",
+    "created": "2026-10-26T04:34:43.239Z",
+    "note": "",
+    "lane": "design",
+    "keywords": [
+      "clay",
+      "fire"
+    ],
+    "layout": "timeline",
+    "head": "accession"
+  },
+  "page_status": "Saved as one web page in your Downloads.",
+  "saved": [
+    "Daylight\\boards\\kilns-and-clay.html"
+  ],
+  "saved_images_inline": 3,
+  "saved_font_inline": true,
+  "saved_has_script": false,
+  "saved_images_loaded": 3,
+  "folder": {
+    "entries": 1,
+    "plates": 1,
+    "text": "a heron at dawn",
+    "file": [
+      "heron.png"
+    ],
+    "kept_text": true
+  },
+  "folder_status": "1 plate.",
+  "write_visible": true,
+  "write_status": "Saved in /boards/shore.",
+  "written": [
+    "MANIFEST.sha256",
+    "board.json",
+    "fonts/AccessionStencil.woff2",
+    "fonts/hanken-grotesk.woff2",
+    "fonts/jetbrains-mono-regular.woff2",
+    "index.html",
+    "plates/heron.png",
+    "sidecars/heron.png.md"
+  ],
+  "manifest": [
+    "c2c8b0dcf83d627c438e4f1aa855245f9fe5683febaebe8667be4551099041b8  board.json",
+    "7e6c643fa9c4ea49a19fe3ee948288516dd83821e1dca56a5ae1253bba490963  fonts/AccessionStencil.woff2",
+    "e9201eddf1d41d0b62253295d869ce3cf65768f7102b797f02c7f8c876b4a9d5  fonts/hanken-grotesk.woff2",
+    "a9cb1cd82332b23a47e3a1239d25d13c86d16c4220695e34b243effa999f45f2  fonts/jetbrains-mono-regular.woff2",
+    "c1dc020b8dba0f0950fd47538fe38cf7e6c2a48ed5a2a215c828515c653fc461  index.html",
+    "4e1bdf9fd84b6398968670810bae838166e0911219d88c9b35e14aebf6358b49  plates/heron.png",
+    "f1d84bc50d86086957a1951a1582a0973ce3f62b12f428dd99e3fa8d5cbaed7c  sidecars/heron.png.md"
+  ],
+  "console_errors": []
+}

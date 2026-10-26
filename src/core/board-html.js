@@ -57,6 +57,7 @@ a { color: inherit; text-decoration-color: var(--rule); }
 .layer { position: relative; display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding: 12px; background: var(--paper); border: 1px solid var(--ink); margin-top: -36px; transition: opacity .2s; }
 .layer:first-child { margin-top: 0; }
 .layer:hover, .layer:focus-within { opacity: 1 !important; z-index: 9 !important; }
+.prov { font: 500 12px/1.4 var(--mono); margin-top: 6px; }
 .layer img, .layer video { width: 140px; height: 140px; object-fit: contain; }
 @page { size: A4; margin: 0; }
 @media print {
@@ -115,11 +116,13 @@ function timeline(board, url) {
 }
 
 // Each claim a sheet over its sources; the most-seen source on top, every layer as opaque as its
-// reach. Pointing at a layer lifts it to full opacity.
+// reach. Each layer's provenance line is as opaque as the source is corroborated by other origins,
+// and says so in words. Pointing at a layer lifts it to full opacity.
 function evidence(board, url, caseData) {
   const plan = evidencePlan(board.plates, caseData);
   const sheets = plan.sheets.map((s) => `<section class="claim"><div class="rung">${esc(s.claim.rung)} ${esc(s.claim.id)}</div><p>${esc(s.claim.text)}</p>
 <div class="stack">${s.layers.map((l, i) => `<div class="layer" tabindex="0" style="opacity:${l.opacity};z-index:${s.layers.length - i};margin-left:${i * 28}px">${media(l.plate, url)}<div><div class="n">${num(l.plate.n)} ${esc(l.source)}</div>${caption(l.plate)}
+<div class="prov" style="opacity:${l.provenance_opacity}">${l.corroborated_by ? `Corroborated by ${l.corroborated_by} other ${l.corroborated_by === 1 ? "origin" : "origins"} among this claim's sources.` : "No other origin among this claim's sources."}</div>
 <div class="hash">${l.plate.source && l.plate.source.reach != null ? esc(Number(l.plate.source.reach).toLocaleString("en-US")) + " views shown. " : ""}${l.plate.source && l.plate.source.sha256 ? "SHA-256 " + esc(l.plate.source.sha256) : ""}</div></div></div>`).join("")}</div></section>`);
   const rest = board.plates.filter((p) => plan.unmatched.includes(p.n)).map((p) => `<div class="row"><div class="when">${num(p.n)}</div>${media(p, url)}${caption(p)}</div>`);
   return `<main class="sheet">${header(board)}${sheets.join("\n")}${rest.join("\n")}</main>`;

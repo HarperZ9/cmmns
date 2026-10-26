@@ -100,6 +100,12 @@ segments. Each file goes into an investigation case, with its SHA-256, address, 
 optional Internet Archive copy, or into a moodboard with tags and notes. **Collections** shows them as
 a grid. Protected media (DRM or encrypted streams) is never saved, and Daylight Commons says so.
 
+**Capture as evidence** (right-click a picture, video or sound) saves the file and its note, a
+picture of the visible page and a capture record: the file's SHA-256 before any words went in, what
+the page showed, the time, and what the capture kept and lost, part by part. Each capture adds a
+line to a hash chain in your browser; `daylight capture verify <folder>` checks them all. Details:
+[project-docs/EVIDENCE-CAPTURE.md](project-docs/EVIDENCE-CAPTURE.md).
+
 **Study boards** turn a moodboard or a folder of saves into numbered plates with their source,
 author, time and link: a book with running heads and captions, a grid, or a timeline in posted order.
 Print it, save it as one web page, or keep it as a folder with a SHA-256 manifest. On the command

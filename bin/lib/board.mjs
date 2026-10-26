@@ -16,7 +16,9 @@ import { loadCase } from "../../src/investigate/store.js";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 // The three faces that ship with Daylight Commons, all under the SIL Open Font License 1.1: Accession
 // Stencil for running heads and titles, Hanken Grotesk for words, JetBrains Mono for figures.
-const FONTS = [["AccessionStencil.woff2", "src/ext/fonts/AccessionStencil.woff2"], ["hanken-grotesk.woff2", "src/ext/fonts/hanken-grotesk.woff2"], ["jetbrains-mono-regular.woff2", "src/ext/fonts/jetbrains-mono-regular.woff2"]];
+const FONTS = [["AccessionStencil.woff2", "src/ext/fonts/AccessionStencil.woff2"], ["hanken-grotesk.woff2", "src/ext/fonts/hanken-grotesk.woff2"], ["jetbrains-mono-regular.woff2", "src/ext/fonts/jetbrains-mono-regular.woff2"],
+  // The SIL Open Font License travels with every copy of the fonts.
+  ...["accession", "hanken-grotesk", "jetbrains-mono"].map((n) => [`OFL-${n}.txt`, `src/ext/fonts/OFL-${n}.txt`])];
 const sha = (b) => createHash("sha256").update(b).digest("hex");
 
 function* notes(dir, depth = 0) {
