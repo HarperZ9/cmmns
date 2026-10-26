@@ -14707,7 +14707,7 @@ const TOUR_GAP_MS = 60 * 60 * 1000;
 const DAY_MS = 86400000;
 
 const ID = /^[a-z][a-z0-9-]{1,40}$/;
-const PAGES = new Set(["learn.html", "quiz.html"]);
+const PAGES = new Set(["learn.html", "quiz.html", "sheets.html"]);
 
 // The lesson page for a sign family, or null for an id that cannot be a lesson.
 function lessonPath(fam) {

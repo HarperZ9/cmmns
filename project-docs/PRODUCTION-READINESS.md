@@ -179,8 +179,11 @@ fresh profile, on the demo stage's discourse thread (every account invented) wit
 | 77 | Counts | Wilson intervals; dates and scores left alone | `tests/discourse.stats.test.js` | pass |
 | 78 | Documents | The study's letter: post terms against the four images | `project-docs/evidence/discourse-letter-check.json`; recogniser confidence 0.987 to 0.994 | 5 post terms on no page; the name on images 1 and 3 |
 | 79 | Corrections | Same ranking with the sides of each thread swapped; likes never read | `tests/discourse.symmetry.test.js`, `tests/discourse.corrections.test.js` | pass |
-| 80 | Window | All five signs, and a study save, in the packaged extension | `discourse_shot.py`, nine checks | 9 of 9 |
+| 80 | Window | All five signs, and a study save, in the packaged extension | `discourse_shot.py` | 14 of 14 on 2026-10-26 (the nine below plus rows 82 and 83). One earlier run on a loaded machine missed the persona sign: the first answer loads and checks 3.8 MB of signed data, and the window was read before it arrived |
 | 81 | Network | No request from the discourse code but the extension's own files | `tests/discourse.data.test.js` | pass |
+| 82 | Sheets | The post over the reply that brings a source over the document it links; each band as wide as its reach; a sheet lifts | `discourse_shot.py` on a thread shaped like the 2026-10-26 worked example (230,300 and 627 views); `tests/discourse.sheets.test.js` | the correction drawn at 0.27%, the assessment as the ground, lift works |
+| 83 | Sheets | The medium's engine, unchanged; replies with one source are one sheet | `tests/discourse.sheets.test.js` against the medium's module under all four laws | equal to nine decimals |
+| 84 | Parts | Results as a `refdb.parts/1` tree beside each study save, every property labelled with its method | `tests/discourse.sheets.test.js` | pass |
 
 Not tested: the checks on real X threads signed in, Firefox, and a measured precision for the
 persona marker, counts, document check and correction ranking on real posts.

@@ -26,7 +26,9 @@ were not published to a store.
   - The post's words against the document images it shows.
   - Replies that bring a source or name an error, ranked without likes, with a side-swap test.
   - Save the post with its analysis as a study item: `analysis` field and `## Analysis` sections
-    in `daylight.sidecar/1`.
+    in `daylight.sidecar/1`, and the results as a `refdb.parts/1` parts tree beside the note.
+  - Truth as sheets: the post over the replies that bring a source over the documents they link,
+    each sheet inked by its reach, liftable; replies that share a source are one sheet.
 - Six lessons for the new signs. A discourse thread on the demo stage and `scripts/qa/discourse_shot.py`.
 
 ## 3.6.2 (2026-10-26)

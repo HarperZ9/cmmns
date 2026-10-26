@@ -9,7 +9,7 @@ export const CORRECTIONS_DOES_NOT_PROVE = "A reply that brings a source or names
 
 // Reference and primary-record hosts. A link to one of these is the strongest kind of source a reply
 // can bring; any other web page counts for less; links to social posts count for nothing.
-const PRIMARY = /(^|\.)(doi\.org|arxiv\.org|pubmed\.ncbi\.nlm\.nih\.gov|ncbi\.nlm\.nih\.gov|courtlistener\.com|supremecourt\.gov|legislation\.gov\.uk|eur-lex\.europa\.eu|congress\.gov|govinfo\.gov|sec\.gov|census\.gov|gutenberg\.org|archive\.org|loc\.gov|nationalarchives\.gov\.uk|un\.org|who\.int|oecd\.org|worldbank\.org|imf\.org|data\.gov)$/;
+const PRIMARY = /(^|\.)(doi\.org|arxiv\.org|pubmed\.ncbi\.nlm\.nih\.gov|ncbi\.nlm\.nih\.gov|courtlistener\.com|supremecourt\.gov|legislation\.gov\.uk|eur-lex\.europa\.eu|congress\.gov|govinfo\.gov|dni\.gov|ohchr\.org|sec\.gov|census\.gov|gutenberg\.org|archive\.org|loc\.gov|nationalarchives\.gov\.uk|un\.org|who\.int|oecd\.org|worldbank\.org|imf\.org|data\.gov)$/;
 const REFERENCE = /(^|\.)(wikipedia\.org|britannica\.com|plato\.stanford\.edu|iep\.utm\.edu|oxfordreference\.com|jstor\.org|nature\.com|science\.org|thelancet\.com|nejm\.org|bmj\.com|cell\.com|springer\.com|wiley\.com|tandfonline\.com|sciencedirect\.com|quoteinvestigator\.com|wikiquote\.org|snopes\.com|factcheck\.org|fullfact\.org|politifact\.com)$|\.(gov|edu|mil|int)$|\.(gov|ac|edu)\.[a-z]{2}$/;
 const SOCIAL = /(^|\.)(x\.com|twitter\.com|t\.co|facebook\.com|instagram\.com|tiktok\.com|threads\.(net|com)|bsky\.app|reddit\.com|youtube\.com|youtu\.be)$/;
 
@@ -48,7 +48,10 @@ export function readReply(postText, r) {
   const specific = common.length >= 2;
   const score = (best ? KIND_SCORE[best] : 0) + (quoted ? 1.5 : 0) + (cues && specific ? 1 + Math.min(1, common.length / 6) : 0);
   const raised = (best && best !== "social" && (common.length >= 1 || cues > 0)) || (quoted && specific) || (cues > 0 && specific);
-  return { id: r.id, author: r.author, score: Math.round(score * 100) / 100, raised: !!raised, source: best, quoted: !!quoted, cues, shared: common.slice(0, 6) };
+  // The reply's origin: the host of its best link. Replies with the same origin are one witness, not
+  // several (src/core/discourse/sheets.js independence).
+  const origin = best && best !== "social" ? hostOf((r.links || []).find((u) => sourceKind(u) === best)) : null;
+  return { id: r.id, author: r.author, score: Math.round(score * 100) / 100, raised: !!raised, source: best, origin, quoted: !!quoted, cues, shared: common.slice(0, 6) };
 }
 
 // The raised replies, best source first; ties keep the page's order. Likes are never read.

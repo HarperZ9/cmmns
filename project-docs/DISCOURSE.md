@@ -144,13 +144,49 @@ through the same path as the Study button, with every finished analysis on the p
 `## Analysis: <label>` section and an `analysis` field listing the sign families
 (`project-docs/SIDECAR-FORMAT.md`). The reference library reads study items first.
 
+## The parts tree
+
+A study save also writes `<name>.parts.json` beside the note: the same results as a parts tree in the
+reference library's study format (`refdb.parts/1`: concept, layer, part, property, each property
+labelled observed, measured or inferred, with its method). `src/core/discourse/parts.js` builds it.
+Layers are quotes, document pages, counts, correction replies and account. A claim study is then the
+same kind of object as an art study and joins the same concept layers. The library's shared schema
+document was still being written on 2026-10-26; this follows the format its studies already use, and
+will follow the schema when it lands.
+
+## Truth as sheets
+
+The correction sign offers "Open the post and what lies under it as sheets" (`src/ext/sheets.html`).
+The post is the top sheet, the replies that bring a source lie beneath it, and the primary documents
+they link are the ground. Each sheet's ink band is as wide as its reach, the views the site showed,
+as a share of the most-seen sheet, so a claim seen 230,300 times covers a correction seen 627 times
+(0.27% inked). "Lift to see under it" moves the sheets above out of the way. The reach figure is
+written beside every band, so the reading never depends on the ink.
+
+- **One compositing engine.** The colour at each depth comes from the workspace medium's sheet engine
+  (`composite`, copied unchanged into `src/core/discourse/sheets.js`): each sheet carries its own law,
+  and every sheet here uses the same one, weber (Albers XX-1, a = 29.75). With `SUPERFRAME_SHEETS`
+  pointing at the medium's module, `tests/discourse.sheets.test.js` checks both give the same colours
+  under all four laws; the copy matched to nine decimal places on 2026-10-26.
+- **Ink by sourcing only.** A post that links a primary record or a reference work prints in the
+  canon's verified ink, one that does not in drift, whoever wrote it and whatever it says. A document
+  prints no ink: it has no reach figure, so it is the ground.
+- **Many outlets, one origin.** Replies that cite the same source are one sheet, labelled with how
+  many replies carry it: one witness, however many voices repeat it. The page states the count of
+  replies against the count of independent sources. This is the metamer of independence: different
+  posts, one origin, the same readout.
+- **Reach never ranks.** Views decide only how wide a band is drawn. The correction ranking reads no
+  likes, views or followers.
+
 ## Browser check
 
 `scripts/qa/discourse_shot.py` runs the packaged extension in Chrome on the demo stage's discourse
 thread (`scripts/demo/stage.mjs`, every account invented): persona on the root, quote found in
 Counsels and Maxims, the Meditations paraphrase placed at Book VIII, 36, the correction raised, the
 counts with intervals, the list counted, the misattribution named, and a study save written. All nine
-passed on 2026-10-25 against the 3.6.1 base.
+passed on 2026-10-25 against the 3.6.1 base. On 2026-10-26 the check added the sheets page (drawn, a
+sheet lifts) and a thread shaped like the author's worked example (a 230,300-view claim, a 627-view
+correction linking the declassified assessment): see the readiness rows for the result.
 
 ## Rebuilding the data
 
@@ -177,5 +213,6 @@ daily, so a later query gives a different list; the date of the run is in
 - An interval says nothing about how a sample was chosen.
 - A word missing from the pages shown does not mean the document never says it.
 - A raised reply can be wrong. The ranking is by the kind of source, not by who is right.
+- A sheet's width is reach, not truth: a wide sheet was seen more, nothing else.
 - None of the five has been measured on real threads. The quote finder's figures are on labelled
   sets of 36 and 16 quotes.

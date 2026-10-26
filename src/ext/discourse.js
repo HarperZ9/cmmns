@@ -43,7 +43,10 @@
   function readReplies(root, replies, tweets) {
     if (!root || !replies || !replies.length) return;
     const links = (r) => { const T = tweets && tweets.get ? tweets.get(r.id) : null; return (T && T.links && T.links.length ? T.links : (r.domains || []).map((d) => `https://${d}/`)); };
-    corrections.set(root.id, PBD.rankCorrections({ text: root.text, author: root.author }, replies.map((r) => ({ id: r.id, author: r.author, text: r.text, links: links(r) }))));
+    const ranked = PBD.rankCorrections({ text: root.text, author: root.author }, replies.map((r) => ({ id: r.id, author: r.author, text: r.text, links: links(r) })));
+    // reach as the site showed it, for the sheets view only: it never enters the ranking above
+    const views = (id) => { const T = tweets && tweets.get ? tweets.get(id) : null; return T && T.views != null ? T.views : null; };
+    corrections.set(root.id, ranked.map((x) => ({ ...x, reach: views(x.id), links: links(replies.find((r) => r.id === x.id)) })));
   }
 
   const images = (m) => (globalThis.PBMedia && m.node ? PBMedia.inPost(m.node, m.tweet).filter((x) => x.type === "image" && x.src) : []);
@@ -67,7 +70,31 @@
     }
     const pages = st.srcs.map((s) => { const t = PBMedia.textOf(s); return t && t.state === "done" ? (t.result && t.result.text ? t.result : { text: "" }) : null; });
     if (pages.some((p) => p === null)) return [{ label: "reading the post's images", fam: "doc-claim", level: "info", cat: "sources", rows: [["Document check", `${pages.filter(Boolean).length} of ${pages.length} images read`]] }];
-    return PBD.docSign(PBD.checkDocument(m.text, pages));
+    return PBD.docSign(docResult(m));
+  }
+
+  // The finished document check for a post, or null.
+  function docResult(m) {
+    const st = docs.get(m.postId);
+    if (!st) return null;
+    const pages = st.srcs.map((s) => { const t = PBMedia.textOf(s); return t && t.state === "done" ? (t.result && t.result.text ? t.result : { text: "" }) : null; });
+    return pages.some((p) => p === null) ? null : PBD.checkDocument(m.text, pages);
+  }
+
+  // Every finished result for a post, for the parts tree and the sheets.
+  function results(m) {
+    const ranked = corrections.get(m.postId) || null;
+    return { quotes: quotes.get(m.postId) || null, doc: docResult(m), counts: PBD.findCounts(m.text), corrections: ranked,
+      independence: ranked ? PBD.independence(PBD.buildSheets({ claim: {}, corrections: ranked.map((x) => ({ reach: x.reach, origin: x.origin })) })) : null, persona: personas.get(keyOf(m)) || null };
+  }
+
+  // The post over the replies that bring a source over the primary documents they link, for sheets.html.
+  async function openSheets(m) {
+    const ranked = corrections.get(m.postId) || [];
+    const docs = [...new Set(ranked.flatMap((x) => x.links || []).filter((u) => PBD.sourceKind(u) === "primary"))].slice(0, 6).map((u) => ({ title: u.replace(/^https?:\/\//, "").slice(0, 80), url: u }));
+    const thread = { claim: { text: m.text, reach: m.tweet && m.tweet.views != null ? m.tweet.views : null }, corrections: ranked.map((x) => ({ text: x.text, reach: x.reach, origin: x.origin })), documents: docs };
+    await chrome.storage.local.set({ "pb.sheets.view": { thread, at: new Date().toISOString() } });
+    await chrome.runtime.sendMessage({ type: "pb-open-page", path: "sheets.html" });
   }
 
   function countSigns(m) {
@@ -82,7 +109,13 @@
     const { notes, analysis } = PBD.studyNotes(collect(m, settings));
     const raw = (globalThis.PBQuickSites && m.node && PBQuickSites.postMetaOf(m.node)) || { site: location.hostname.replace(/^www\./, ""), text: m.text, handle: m.handle, pageUrl: location.href };
     if (!globalThis.PBQuickText) throw new Error("the study save is not loaded on this page");
-    return PBQuickText.run("study", { raw: { ...raw, kind: "text", notes, analysis } });
+    const res = await PBQuickText.run("study", { raw: { ...raw, kind: "text", notes, analysis } });
+    // the same results as a parts tree beside the note (refdb.parts/1), for the reference library
+    if (res && res.ok && res.name && globalThis.PBQuickSave) {
+      const parts = PBD.discourseParts({ site: res.meta && res.meta.site, postUrl: res.meta && res.meta.postUrl, handle: m.handle }, results(m));
+      await PBQuickSave.saveText(new TextEncoder().encode(JSON.stringify(parts, null, 1)), "application/json", res.name.replace(/\.md$/, ".parts.json"), res.meta && res.meta.site, true);
+    }
+    return res;
   }
 
   // The signs for one post, with a "save as study" row on each finished analysis.
@@ -90,7 +123,8 @@
     if (!settings || !settings.discourse || !globalThis.PBD) return [];
     const out = collect(m, settings);
     const save = ["Study", { action: ["Save the post with this analysis for study", () => saveStudy(m, settings).catch((e) => console.warn("[daylight-commons] study save failed", e)), "Saving…"] }];
-    return out.map((s) => (s.rows.some(([, v]) => v && typeof v === "object" && v.action) ? s : { ...s, rows: [...s.rows, save] }));
+    const sheets = ["Sheets", { action: ["Open the post and what lies under it as sheets", () => openSheets(m).catch((e) => console.warn("[daylight-commons] sheets failed", e)), "Opening…"] }];
+    return out.map((s) => (s.rows.some(([, v]) => v && typeof v === "object" && v.action) ? s : { ...s, rows: [...s.rows, ...(s.fam === "correction-replies" ? [sheets] : []), save] }));
   }
 
   function collect(m, settings) {

@@ -110,6 +110,26 @@ export function discourseStage() {
   return { url: `https://x.com/${DISCOURSE[0][0]}/status/${root}`, html: page("Post", posts), json: { TweetDetail: detail(tweets) } };
 }
 
+// The sheets thread, shaped like the author's worked example of 2026-10-26: a claim with no source seen
+// 230,300 times, a correction that links the declassified assessment seen 627 times, a counter-claim
+// and a question. Handles invented, wording paraphrased, reach in the real proportions.
+const SHEETS = [
+  ["claim_poster", "Claim Poster", "A named official hired a hitman to kill a journalist who was investigating his ties to a foreign prince", 230300],
+  ["careful_reader", "Careful Reader", "The claim is false. No credible evidence says the official hired a hitman to kill the journalist. What is established: the declassified 2021 assessment concluded the prince approved an operation to capture or kill the journalist. The official's ties to the prince are documented.", 627, "https://www.dni.gov/files/ODNI/documents/assessments/Assessment-Saudi-Gov-Role-in-JK-Death-20210226v2.pdf"],
+  ["spade_caller", "Spade Caller", "he didn't hire a hitman, he sent an army", 2300],
+  ["asking_aloud", "Asking Aloud", "Is this confirmed? The journalist was killed at the wrong embassy, I heard.", 1100],
+].map(([h, name, text, views, link]) => [demo(h), name, text, views, link]);
+
+export function sheetsStage() {
+  const root = "1900000000000000800", tweets = [];
+  SHEETS.forEach(([h, name, text, views, link], i) => {
+    const id = i ? String(BigInt(root) + BigInt(i)) : root;
+    tweets.push(tweet(id, user(h, { name, joinDate: "2018-01-01", about: { basedIn: "United States" } }), text, { conv: root, replyTo: i ? root : null, replyToHandle: SHEETS[0][0], at: new Date(BASE + i * 61000).toISOString(), links: link ? [link] : [], counts: { reposts: 1, likes: 1, replies: 0, quotes: 0, bookmarks: 0, views } }));
+  });
+  const posts = SHEETS.map(([h, name, text, , link], i) => ({ h, name, text, id: tweets[i].rest_id, root: i === 0, link }));
+  return { url: `https://x.com/${SHEETS[0][0]}/status/${root}`, html: page("Post", posts), json: { TweetDetail: detail(tweets) } };
+}
+
 // A launch: the company's post, its quotes and its reposters. kind "campaign" uses the farm and paid
 // quotes; kind "organic" uses varied people and is the "run it on us" control.
 export function launchStage(kind) {
@@ -194,7 +214,7 @@ for(const op of ["TweetDetail","Retweeters"]) fetch("/i/api/graphql/demo/"+op+"?
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const out = process.argv[2];
   if (!out) { console.error("usage: node scripts/demo/stage.mjs <out dir>"); process.exit(2); }
-  const stages = { thread: threadStage(), pressure: pressureStage(), discourse: discourseStage(), campaign: launchStage("campaign"), ours: launchStage("organic"), long: longStage(Number(process.env.STAGE_LONG_N) || 600) };
+  const stages = { thread: threadStage(), pressure: pressureStage(), discourse: discourseStage(), sheets: sheetsStage(), campaign: launchStage("campaign"), ours: launchStage("organic"), long: longStage(Number(process.env.STAGE_LONG_N) || 600) };
   mkdirSync(out, { recursive: true });
   const index = {};
   for (const [name, s] of Object.entries(stages)) {

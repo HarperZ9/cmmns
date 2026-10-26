@@ -476,7 +476,7 @@ const CORRECTIONS_DOES_NOT_PROVE = "A reply that brings a source or names an err
 
 // Reference and primary-record hosts. A link to one of these is the strongest kind of source a reply
 // can bring; any other web page counts for less; links to social posts count for nothing.
-const PRIMARY = /(^|\.)(doi\.org|arxiv\.org|pubmed\.ncbi\.nlm\.nih\.gov|ncbi\.nlm\.nih\.gov|courtlistener\.com|supremecourt\.gov|legislation\.gov\.uk|eur-lex\.europa\.eu|congress\.gov|govinfo\.gov|sec\.gov|census\.gov|gutenberg\.org|archive\.org|loc\.gov|nationalarchives\.gov\.uk|un\.org|who\.int|oecd\.org|worldbank\.org|imf\.org|data\.gov)$/;
+const PRIMARY = /(^|\.)(doi\.org|arxiv\.org|pubmed\.ncbi\.nlm\.nih\.gov|ncbi\.nlm\.nih\.gov|courtlistener\.com|supremecourt\.gov|legislation\.gov\.uk|eur-lex\.europa\.eu|congress\.gov|govinfo\.gov|dni\.gov|ohchr\.org|sec\.gov|census\.gov|gutenberg\.org|archive\.org|loc\.gov|nationalarchives\.gov\.uk|un\.org|who\.int|oecd\.org|worldbank\.org|imf\.org|data\.gov)$/;
 const REFERENCE = /(^|\.)(wikipedia\.org|britannica\.com|plato\.stanford\.edu|iep\.utm\.edu|oxfordreference\.com|jstor\.org|nature\.com|science\.org|thelancet\.com|nejm\.org|bmj\.com|cell\.com|springer\.com|wiley\.com|tandfonline\.com|sciencedirect\.com|quoteinvestigator\.com|wikiquote\.org|snopes\.com|factcheck\.org|fullfact\.org|politifact\.com)$|\.(gov|edu|mil|int)$|\.(gov|ac|edu)\.[a-z]{2}$/;
 const SOCIAL = /(^|\.)(x\.com|twitter\.com|t\.co|facebook\.com|instagram\.com|tiktok\.com|threads\.(net|com)|bsky\.app|reddit\.com|youtube\.com|youtu\.be)$/;
 
@@ -515,7 +515,10 @@ function readReply(postText, r) {
   const specific = common.length >= 2;
   const score = (best ? KIND_SCORE[best] : 0) + (quoted ? 1.5 : 0) + (cues && specific ? 1 + Math.min(1, common.length / 6) : 0);
   const raised = (best && best !== "social" && (common.length >= 1 || cues > 0)) || (quoted && specific) || (cues > 0 && specific);
-  return { id: r.id, author: r.author, score: Math.round(score * 100) / 100, raised: !!raised, source: best, quoted: !!quoted, cues, shared: common.slice(0, 6) };
+  // The reply's origin: the host of its best link. Replies with the same origin are one witness, not
+  // several (src/core/discourse/sheets.js independence).
+  const origin = best && best !== "social" ? hostOf((r.links || []).find((u) => sourceKind(u) === best)) : null;
+  return { id: r.id, author: r.author, score: Math.round(score * 100) / 100, raised: !!raised, source: best, origin, quoted: !!quoted, cues, shared: common.slice(0, 6) };
 }
 
 // The raised replies, best source first; ties keep the page's order. Likes are never read.
@@ -627,5 +630,147 @@ function studyNotes(signs) {
 return { quoteSigns, personaSign, countSigns, docSign, correctionSign, studyNotes };
 })();
 
-globalThis.PBD = Object.freeze({ ...M_text, ...M_quotes, ...M_persona, ...M_stats, ...M_docclaim, ...M_corrections, ...M_cards });
+// ---- sheets.js
+const M_sheets = (() => {
+// Truth as sheets (project-docs/DISCOURSE.md): a claim is a sheet laid over what it rests on. The
+// post sits on top, the replies that bring a source beneath it, the primary documents at the ground.
+// Each sheet's ink coverage is its reach, so a claim seen 230,000 times covers a correction seen 627
+// times. Lifting a sheet shows what lies under it.
+//
+// The compositing engine is the workspace medium's sheet engine (lib/medium/sheets.mjs), copied here
+// unchanged so the extension ships with no dependency. It has no single law: each sheet carries its own
+// (multiply, density_add, weber, screen), and where sheets meet each applies its own on its side. Every
+// sheet here is a post seen through the ones above it, so every sheet uses the same law, weber
+// (Albers XX-1, a = 29.75). tests/discourse.sheets.test.js holds the constants and, when
+// SUPERFRAME_SHEETS points at the original module, checks the two give the same colours.
+
+const DENSITY_W = 0.243;
+const WEBER = 29.75;
+const hexLin = (h) => { const n = parseInt(h.slice(1), 16); return [16, 8, 0].map((s) => { const c = ((n >> s) & 255) / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); };
+const perceived = (D, unit) => (unit > 1e-6 ? unit * Math.log1p(WEBER * D / unit) / Math.log1p(WEBER) : D);
+
+// one pixel: paper (linear rgb) under the sheets in print order (copied from the medium's composite)
+function composite(paper, sheets) {
+  const c = paper.slice(), D = [0, 0, 0], U = [0, 0, 0];
+  let inked = 0, anyWeber = false;
+  for (const s of sheets) {
+    const law = s.law ?? "multiply", cov = s.cover ?? 1;
+    if (cov <= 0) continue;
+    for (let k = 0; k < 3; k++) {
+      const t = 1 - cov * (1 - s.ink[k]);
+      if (law === "multiply") c[k] *= t;
+      else if (law === "density_add") c[k] *= inked > 0 ? Math.pow(Math.max(1e-4, t), 1 - (1 - DENSITY_W) * inked) : t;
+      else if (law === "screen") c[k] = 1 - (1 - c[k]) * (1 - cov * s.ink[k]);
+      else { const d = -Math.log(Math.max(1e-4, t)); D[k] += d; if (d > U[k]) U[k] = d; anyWeber = true; }
+    }
+    if (law === "density_add") inked = Math.min(1, inked + cov);
+  }
+  if (anyWeber) for (let k = 0; k < 3; k++) c[k] *= Math.exp(-perceived(D[k], U[k]));
+  return c;
+}
+
+// The medium's printSheets: a paper colour and sheets, each sheet's own law or the default.
+function printSheets(paper, sheets, { law = "weber" } = {}) {
+  const P = typeof paper === "string" ? hexLin(paper) : paper;
+  return composite(P, sheets.map((s) => ({ ...s, law: s.law ?? law })));
+}
+const toHex = (lin) => "#" + lin.map((c) => Math.round(255 * (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055))).map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("");
+
+// The canon's ground and verdict inks. The verdict is about sourcing only, the same for every sheet:
+// a post that links a primary record or a reference work prints in verified, one that does not in
+// drift, whatever it says and whoever wrote it. A primary document is the ground.
+const PAPER = "#ebe5d8";
+const INKS = { sourced: "#0a6b61", unsourced: "#8f3a19", document: "#16130f" };
+
+// thread: { claim: { text, reach }, corrections: [{ text, reach, origin }], documents: [{ title, url }] }
+// reach is the views the site showed (null when it showed none). Corrections that share an origin are
+// one sheet: many replies from one source are a metamer of independence, not several witnesses.
+function buildSheets(thread) {
+  const claim = thread.claim || {}, top = Math.max(1, Number(claim.reach) || 0, ...(thread.corrections || []).map((c) => Number(c.reach) || 0));
+  const byOrigin = new Map();
+  for (const c of thread.corrections || []) {
+    const k = c.origin || `reply:${byOrigin.size}`, g = byOrigin.get(k);
+    if (g) { g.replies += 1; g.reach += Number(c.reach) || 0; } else byOrigin.set(k, { kind: "correction", text: c.text, origin: c.origin || null, sourced: !!c.origin, replies: 1, reach: Number(c.reach) || 0 });
+  }
+  const sheets = [
+    { kind: "claim", text: claim.text || "", origin: claim.origin || null, sourced: !!claim.origin, replies: 1, reach: Number(claim.reach) || 0 },
+    ...byOrigin.values(),
+    ...(thread.documents || []).map((d) => ({ kind: "document", text: d.title, origin: d.url || null, replies: 0, reach: null })),
+  ].map((s) => ({ ...s, cover: s.reach == null ? 0 : s.reach / top, ink: s.kind === "document" ? INKS.document : s.sourced ? INKS.sourced : INKS.unsourced }));
+  // A document has no reach readout, so it prints no ink: it is the ground the sheets lie on, named.
+  // What each sheet looks like with everything above it lifted: it over the sheets beneath it, printed
+  // from the ground up (documents first, the claim last).
+  return sheets.map((s, i) => {
+    const under = sheets.slice(i).reverse().map((x) => ({ ink: hexLin(x.ink), cover: x.cover }));
+    return { ...s, seen: toHex(printSheets(PAPER, under)), share: s.reach == null ? null : Math.round(s.cover * 10000) / 100 };
+  });
+}
+
+// How many independent origins the corrections rest on, against how many replies carry them.
+function independence(sheets) {
+  const c = sheets.filter((s) => s.kind === "correction");
+  return { replies: c.reduce((a, s) => a + s.replies, 0), origins: c.length };
+}
+
+return { DENSITY_W, WEBER, hexLin, composite, printSheets, PAPER, INKS, buildSheets, independence };
+})();
+
+// ---- parts.js
+const M_parts = (() => {
+// The discourse results as a parts tree (refdb.parts/1, the reference library's study format: concept
+// > layer > part > property, each property labelled observed, measured or inferred with its method),
+// so a claim study is the same kind of object as an art study and joins the same concept layers.
+const prop = (property, value, label, method, unit = null) => ({ property, value, ...(unit ? { unit } : {}), label, method });
+
+function quoteLayer(q) {
+  if (!q || (!q.results.length && !q.list)) return null;
+  const parts = q.results.map((r) => ({ name: r.quote.slice(0, 120), tags: [r.status], properties: [
+    prop("status", r.status, "measured", "quote finder: rarity-weighted word match over the bundled index"),
+    ...(r.by ? [prop("credited to", r.by, "observed", "the post's own words")] : []),
+    ...(r.work ? [prop("source", `${r.work.title}, ${r.work.author}${r.work.translator ? `, trans. ${r.work.translator}` : ""}, ${r.locator}`, "measured", "index match"), prop("share of meaning words", r.share, "measured", "rarity-weighted share", "0..1")] : []),
+    ...(r.entry ? [prop("finding", r.entry.finding, "observed", `cited: ${r.entry.source}`)] : []),
+  ] }));
+  if (q.list) parts.push({ name: "list of attributions", tags: ["quote-list"], properties: [prop("lines", q.list.lines, "measured", "line count"), prop("sourced", q.list.sourced, "measured", "lines with a source"), prop("too short to look up", q.list.short, "measured", "lines under five words")] });
+  return { name: "quotes", parts };
+}
+
+function docLayer(d) {
+  if (!d) return null;
+  return { name: "document pages", parts: [
+    ...d.absent.map((x) => ({ name: x.term, tags: ["absent", x.kind], properties: [prop("on the pages shown", false, "measured", `word match over ${d.read} of ${d.images} images read by Daylight's recogniser`)] })),
+    ...d.found.map((x) => ({ name: x.term, tags: ["found", x.kind], properties: [prop("images", x.images, "measured", "word match"), prop("line", x.snippet, "observed", "recogniser output")] })),
+  ] };
+}
+
+function countLayer(counts) {
+  if (!counts || !counts.length) return null;
+  return { name: "counts", parts: counts.map((c) => ({ name: c.text.trim(), tags: c.small ? ["small sample"] : [], properties: [prop("k", c.k, "observed", "the post"), prop("n", c.n, "observed", "the post"), prop("95% interval", c.interval.map((v) => Math.round(v * 1000) / 1000), "measured", "Wilson score", "proportion")] })) };
+}
+
+function correctionLayer(ranked, independence) {
+  if (!ranked || !ranked.length) return null;
+  return { name: "correction replies", parts: [
+    ...ranked.map((x) => ({ name: `@${x.author}`, tags: [x.source || "no link"], properties: [prop("score", x.score, "measured", "source kind, then specificity; likes not read"), prop("shared terms", x.shared, "measured", "content words shared with the post")] })),
+    ...(independence ? [{ name: "independence", tags: ["metamer"], properties: [prop("replies", independence.replies, "measured", "raised replies"), prop("independent origins", independence.origins, "measured", "distinct sources; replies from one source count once")] }] : []),
+  ] };
+}
+
+function personaLayer(p) {
+  return p ? { name: "account", parts: [{ name: p.person.name, tags: ["persona"], properties: [prop("uses the name of", `${p.person.name} (${p.person.qid})`, "measured", "Wikidata name match with a second cue"), prop("cue", p.cue, "observed", "handle or display name")] }] } : null;
+}
+
+// post: { site, postUrl, handle, author }; r: the results for one post.
+function discourseParts(post, r) {
+  const layers = [quoteLayer(r.quotes), docLayer(r.doc), countLayer(r.counts), correctionLayer(r.corrections, r.independence), personaLayer(r.persona)].filter(Boolean);
+  return {
+    format: "refdb.parts/1", study: null,
+    source: { site: post.site || null, postUrl: post.postUrl || null, author: { name: post.author || null, handle: post.handle || null } },
+    concepts: [{ name: "Discourse checks", label: "measured", by: "code", layers }],
+  };
+}
+
+return { discourseParts };
+})();
+
+globalThis.PBD = Object.freeze({ ...M_text, ...M_quotes, ...M_persona, ...M_stats, ...M_docclaim, ...M_corrections, ...M_cards, ...M_sheets, ...M_parts });
 })();
