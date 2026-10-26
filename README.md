@@ -100,6 +100,12 @@ segments. Each file goes into an investigation case, with its SHA-256, address, 
 optional Internet Archive copy, or into a moodboard with tags and notes. **Collections** shows them as
 a grid. Protected media (DRM or encrypted streams) is never saved, and Daylight Commons says so.
 
+**Study boards** turn a moodboard or a folder of saves into numbered plates with their source,
+author, time and link: a book with running heads and captions, a grid, or a timeline in posted order.
+Print it, save it as one web page, or keep it as a folder with a SHA-256 manifest. On the command
+line, `daylight board make Downloads/Daylight --title "Shore" --layout book --pdf` does the same, and
+adds an evidence layout for a case. Details: [project-docs/STUDY-BOARDS.md](project-docs/STUDY-BOARDS.md).
+
 **Convert or compress a file** changes pictures among PNG, JPEG, WebP and AVIF, turns a GIF into MP4
 or WebM, makes video smaller as WebM or MP4, and turns sound into Opus. It runs in your browser with no
 upload, shows the size before and after, and keeps a hash chain from every copy to the original. On

@@ -55,6 +55,7 @@
     $("usage").textContent = `${u.records} saved items, ${u.files} files, ${PB.sizeText(u.bytes)} in this browser.`;
     $("export").disabled = !mine.length;
     $("clean-all").disabled = !mine.length;
+    $("study-board").href = view.which.startsWith("moodboard:") ? "boards.html?mb=" + encodeURIComponent(view.which.slice(10)) : "boards.html";
   }
 
   await PBSettings.ready;

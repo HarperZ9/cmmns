@@ -17,3 +17,5 @@ export { embedDescription, readDescription, xmpPacket } from "./media-embed.js";
 export { saveFolder, savePath, SIDECAR_FORMAT } from "./media-meta.js";
 export { wrapLines, cardPlan, CARD, CARD_FOOT } from "./media-card.js";
 export { threadChain, continuationStatus } from "./media-thread.js";
+export { parseSidecar, boardFrom, boardFromMoodboard, plateCaption, bookPages, timelineRows, sheetOpacity, evidencePlan, BOARD_FORMAT, LAYOUTS, LANES } from "./board.js";
+export { boardHtml } from "./board-html.js";
