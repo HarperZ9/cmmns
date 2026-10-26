@@ -23,7 +23,15 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
 
+  // Share clean (share-clean.js): a copy with its metadata removed. In source-protection mode
+  // Download gives the clean copy too.
+  async function clean(rec) {
+    const r = await PBShareClean.download(rec);
+    $("summary").textContent = r.ok ? `Share clean copy saved as ${r.name}. Removed: ${r.removed.join("; ") || "nothing; it carried no metadata"}. ${PB.CLEAN_LIMITS}` : `Not cleaned, so nothing was saved: ${r.reason}.`;
+  }
+
   async function act(what, rec) {
+    if (what === "clean" || (what === "download" && PBSettings.get().protection)) { await clean(rec); return; }
     if (what === "download") { const b = await PBMediaStore.blob(rec.sha256); if (b) download(PB.fileNameFor(rec), b); return; }
     if (what === "convert") { location.href = "convert.html#" + encodeURIComponent(rec.id); return; }
     if (what === "delete") { if (confirm("Delete this saved file from this browser?")) { await PBMediaStore.remove(rec.id); draw(); } return; }
@@ -46,8 +54,10 @@
     const u = await PBMediaStore.usage();
     $("usage").textContent = `${u.records} saved items, ${u.files} files, ${PB.sizeText(u.bytes)} in this browser.`;
     $("export").disabled = !mine.length;
+    $("clean-all").disabled = !mine.length;
   }
 
+  await PBSettings.ready;
   await fillWhich();
   for (const id of ["which", "kind"]) $(id).addEventListener("change", () => { view.which = $("which").value; view.tag = null; draw(); });
   $("q").addEventListener("input", () => draw());
@@ -59,6 +69,12 @@
     const c = parse(view.which), list = PB.filterItems(await PBMediaStore.items(), { collection: c });
     const doc = { format: "daylight-collection/1", collection: c, exported: new Date().toISOString(), items: list, lineageProblems: PB.checkLineage(list) };
     download(`daylight-${c.type}-${c.id}.json`, new Blob([JSON.stringify(doc, null, 2) + "\n"], { type: "application/json" }));
+  });
+  $("clean-all").addEventListener("click", async () => {
+    const list = PB.filterItems(await PBMediaStore.items(), { collection: parse(view.which) });
+    $("summary").textContent = "Cleaning on this deviceâ€¦";
+    const r = await PBShareClean.downloadAll(list);
+    $("summary").textContent = `share-clean.zip saved: ${r.files} files Share clean${r.left ? `, ${r.left} left out because Share clean cannot read them` : ""}. The saved files here keep everything, as your evidence copies.`;
   });
   $("clear").addEventListener("click", async () => {
     if (!confirm("Delete every saved file, moodboard and record from this browser? This cannot be undone.")) return;

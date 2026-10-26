@@ -19,6 +19,8 @@ globalThis.PBMediaFetch = (() => {
   }
 
   async function get(url, range, as = "bytes") {
+    // Source-protection mode: no request to any host. Only what the page holds in memory is read.
+    if (globalThis.PBSettings && PBSettings.get().protection && !/^(data|blob):/i.test(url)) throw new Error(`Source-protection mode is on, so Daylight Commons did not download this again from ${new URL(url).host}: that request would tell the host. Save it with your browser's own Save as, then add the file to the case.`);
     const headers = range ? { Range: `bytes=${range.offset}-${range.offset + range.length - 1}` } : {};
     const res = await fetch(url, { headers, credentials: "include", signal: AbortSignal.timeout(TIMEOUT_MS) });
     if (!res.ok) throw new Error(`HTTP ${res.status} from ${new URL(url).host}`);

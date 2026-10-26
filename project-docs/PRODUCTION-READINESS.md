@@ -94,6 +94,53 @@ reached only a tag page and saved an animated WebP thumbnail from it), were not 
 Not tested for 3.6.0: the media toolkit, downloads and ad blocking in Firefox; the download path on
 reddit.com itself and on signed-in X; a real right-click menu by hand.
 
+## Protection additions (unreleased)
+
+Checked 2026-10-25 on `feat/protect`. Browser rows: Google Chrome 155 on Windows 11 with the
+unpacked extension, `scripts/qa/protect_check.py` against a local server that logs every request it
+receives, beside the browser's own network events. Results and screenshots:
+`project-docs/evidence/qa-protect/`.
+
+| # | Area | Check | How | Result |
+|---|---|---|---|---|
+| 53 | Wayback | `case add` makes no Wayback request by default; `--archive` and `case settings archive on` make one; `--no-archive` still works | `tests/protection.test.js`, every request recorded by an injected fetch | pass |
+| 54 | Protection, CLI | With protection on, `case add <url>`, `--archive`, `case watch` and a remote model are refused, and a whole `case run` on two URL seeds calls the fetch zero times | `tests/protection.test.js` | pass |
+| 55 | Protection, CLI | Exports: Share clean, carrier-safe bundle that verifies, day-only times, no public-figure handle, lineage outside the export | `tests/protection.test.js` | pass |
+| 56 | Protection, browser | Control first: with protection off a save downloads the photo again (1 request at the server). With it on, the same save, the right-click Download and an evidence lookup send nothing | `protect_check.py`: 1 request off; 0 at the server and 0 in the browser's network events on; the menu shows its refusal; lookup answers "off" | pass |
+| 57 | Protection, browser | Indicator | toolbar badge reads P; popup line and the protection page say it is on | pass |
+| 58 | Share clean | Every planted value gone from JPEG, PNG, GIF, WebP, MP4, MOV, WebM, PDF, DOCX, ODT; a second pass finds nothing; the caller's bytes unchanged | `tests/clean.test.js`, byte scan of DLSECRET markers including UTF-16 and inside zip parts | pass, 10 formats |
+| 59 | Share clean | Nothing re-encoded | `tests/clean.test.js` (JPEG tables and scan, PNG scanlines, GIF frames, WebP VP8L, MP4 samples, WebM blocks); `scripts/qa/clean_check.py` decoded with Pillow and ffmpeg 7.1 framemd5 | identical in every format: 32 units each for MP4 and MOV, 54 for WebM, every image frame |
+| 60 | Share clean | From the case UI | `protect_check.py`: Collections, Share clean one file and Share clean all (zip); no marker in either; the saved file gains its lineage record | pass |
+| 61 | Self-audit | Refuses a signed-out page and someone else's profile; runs on your own signed-in profile; makes no request | `protect_check.py` on X-like fixtures: 0 signals, 0 signals, 8 signals; 0 requests during each | pass |
+| 62 | Self-audit | No handle can be typed or passed | `tests/self-audit.test.js` (only file inputs in the page; the CLI refuses `@name` and URLs) | pass |
+| 63 | Boundaries | No face recognition names in the code, no requests from the protection modules, no account linking, GPS read only by Share clean and never reported | `tests/protect.boundaries.test.js` | pass |
+
+Found and fixed while checking: Share clean edited a Node Buffer's bytes in place (a Buffer's
+`slice` is a view), so `daylight clean` wrote a lineage record whose original hash was the clean
+hash. The cleaner now works on a private copy, and a test holds it. Case exports carried private
+handles in `export.json` (row in CHANGELOG, Fixed).
+
+Not tested here: protection mode in Firefox; real camera and phone files beyond the fixtures;
+`exiftool -all=` as a reference (not installed on the check machine); an independent security
+review (project-docs/SECURITY-REVIEW.md).
+
+### Every path that fetches or archives for the user
+
+| Path | What it sends, to whom | Default | In source protection |
+|---|---|---|---|
+| `case add <url>`, `case run` capture | the page, from the user's connection; X posts' public post-data endpoint | on the user's command | refused; add saved files |
+| `case add --archive`, `case run --archive`, the archive stage | the address to web.archive.org/save | **off** (was on up to 3.6) | refused |
+| `case watch` | each source again; open leads' search addresses | on the user's command | refused |
+| `case watch` archive lookup | each source address to archive.org/wayback/available | off unless the case's archive setting is on | refused |
+| `case run` with a model endpoint | source text to the configured endpoint | `models.provider: none` | refused unless on localhost |
+| Extension: X About reads (in page and in the worker window) | X's own request for each account | automatic reads on | off |
+| Extension: Reddit account reads | `/user/<name>/about.json` on reddit.com | on | off |
+| Extension: evidence lookups | repo names and domains to GitHub, rdap.org, web.archive.org | off | off |
+| Extension: Other coverage | the chosen outlets' feeds | off | off |
+| Extension: Save to Daylight | the file from its host | on the user's click | refused except what the page holds in memory |
+| Extension: "Ask the Internet Archive" on a case save | the file's address to web.archive.org | off (unticked) | disabled |
+| Extension: Download, Download as GIF, Copy, the post Download button | the file from its host | on the user's click; buttons on | buttons off; menu items refused with a message |
+
 ## What could not be tested here
 
 - **X, Facebook, Instagram and TikTok on real pages.** They show posts only to a signed-in viewer,

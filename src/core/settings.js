@@ -50,7 +50,16 @@ export const DEFAULTS = Object.freeze({
   mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
   // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
   mediaFolder: "Daylight",
+  // Source-protection mode (project-docs/SECURITY-REVIEW.md): off by default. While on, every
+  // switch in PROTECTION_FORCES is held off, and the save page and Share clean behave as it says.
+  protection: false,
 });
+
+// What source-protection mode holds off while it is on: evidence lookups (GitHub, RDAP, the Internet
+// Archive), Other coverage (outlets' feeds), reading About pages automatically, and one-click
+// downloads (which fetch the file again from its host). Turning the mode off leaves them off until
+// the user turns each one back on.
+export const PROTECTION_FORCES = Object.freeze({ evidence: false, coverage: false, feedConsent: false, auto: false, mediaButtons: false });
 // A folder path inside Downloads: letters, digits, spaces, dots, hyphens, underscores and slashes,
 // no ".." part, at most 120 characters.
 const folder = (v, d) => (typeof v !== "string" ? d
@@ -68,7 +77,7 @@ const switches = (v, allowed) => {
 
 export function normalizeSettings(raw) {
   const s = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
-  return {
+  const out = {
     paused: bool(s.paused, DEFAULTS.paused), feeds: bool(s.feeds, DEFAULTS.feeds), auto: bool(s.auto, DEFAULTS.auto),
     sites: switches(s.sites), areas: switches(s.areas, AREA_IDS),
     historyDays: days(s.historyDays, DEFAULTS.historyDays, RETENTION.historyDays),
@@ -85,7 +94,9 @@ export function normalizeSettings(raw) {
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
     mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder),
+    protection: bool(s.protection, DEFAULTS.protection),
   };
+  return out.protection ? { ...out, ...PROTECTION_FORCES } : out;
 }
 
 // The fixture harness behaves as an X page, so it follows the X switch.

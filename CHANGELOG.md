@@ -5,7 +5,48 @@ were not published to a store.
 
 ## Unreleased
 
-Nothing yet.
+Protection for the people who use Daylight Commons and their sources: the case workbench stops
+telling the Internet Archive and the target's server who is investigating, a clean copy of any file
+to share, one switch for source protection, and a look at what Daylight's own signals show about
+your account. Plans for the next two: project-docs/REDACTION-PLAN.md and
+project-docs/PROVENANCE-TRACING-PLAN.md.
+
+### Changed
+- **`daylight case add` and `case run` no longer ask the Wayback Machine for a copy by default.**
+  A save request tells the page's server and the Internet Archive who is looking and when, and the
+  copy is public. Ask for one with `--archive`, or for a whole case with
+  `daylight case settings archive on`. `case watch` asks the Archive whether it holds a copy only
+  with that setting on.
+  **Migration:** scripts that relied on the old default add `--archive`. `--no-archive` still works
+  and wins over the case setting. Cases made before this release have no `archive` key in
+  `case.json` and read as off; set it to `true` to keep the old behaviour.
+
+### Added
+- **Share clean.** A copy of a file with everything it says about itself removed: EXIF with GPS,
+  XMP, IPTC, colour-profile text, PNG text chunks, GIF comments, MP4 user data and creation times,
+  WebM tags, PDF document information and XMP, Word, Excel, PowerPoint and OpenDocument authors,
+  and the description Daylight writes into saved files. Nothing is re-encoded: pictures, frames and
+  samples stay the same bytes. A file it cannot read is refused, never passed as clean. In
+  Collections (one file, or the whole collection as a zip), on the save page's result, with
+  `daylight clean <file>`, and with `daylight case export --clean`. Each clean copy's lineage
+  (original hash to clean hash) stays with the evidence copy and never goes in the shared file.
+- **Source protection.** One switch (toolbar menu, Source protection; `daylight protect on`, or
+  `daylight case settings protection on` for one case). While on, Daylight makes no request of its
+  own: no About or Reddit account reads, evidence lookups, Other coverage, Archive copies or
+  downloads from a host; the toolbar button shows a P. Exports are Share clean and carrier-safe,
+  the case's history names the investigator only as "investigator" with the day, and every account
+  in an export is a pseudonym unless marked `--keep-name`. Its page lists what it cannot protect
+  against and points to Tor Browser, SecureDrop and the Access Now Digital Security Helpline. Not
+  yet independently reviewed: project-docs/SECURITY-REVIEW.md is the reviewer's checklist.
+- **What Daylight shows about you.** Daylight's account signals (place label, app store country,
+  renames, account age, posting clock, posting apps, volume, repeated wording) on your own account
+  only, each with what it reveals and how to reduce it. Your own signed-in profile on X, or your own
+  data export (`daylight self-audit tweets.js account.js`). There is no field to type an account.
+
+### Fixed
+- **Case exports named private accounts in `export.json`.** The export's snapshot (and
+  `CHANGES.md` from the second version on) carried claim text with private handles unredacted.
+  Both now use the same pseudonyms as the export's files.
 
 ## 3.6.0 (2026-10-25)
 

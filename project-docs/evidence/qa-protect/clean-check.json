@@ -1,0 +1,82 @@
+[
+  {
+    "file": "anim.gif",
+    "compared": "decoded pixels, every frame",
+    "units": 2,
+    "identical": true,
+    "original_bytes": 1279,
+    "clean_bytes": 875
+  },
+  {
+    "file": "clip.mov",
+    "compared": "ffmpeg framemd5 of every decoded video frame and audio packet",
+    "units": 32,
+    "identical": true,
+    "original_bytes": 13839,
+    "clean_bytes": 13839
+  },
+  {
+    "file": "clip.mp4",
+    "compared": "ffmpeg framemd5 of every decoded video frame and audio packet",
+    "units": 32,
+    "identical": true,
+    "original_bytes": 13488,
+    "clean_bytes": 13488
+  },
+  {
+    "file": "clip.webm",
+    "compared": "ffmpeg framemd5 of every decoded video frame and audio packet",
+    "units": 54,
+    "identical": true,
+    "original_bytes": 9329,
+    "clean_bytes": 9329
+  },
+  {
+    "file": "doc.pdf",
+    "compared": "decoded pixels of the embedded photo",
+    "units": 1,
+    "identical": true,
+    "original_bytes": 3758,
+    "clean_bytes": 3758
+  },
+  {
+    "file": "letter.docx",
+    "compared": "every part except the property parts, unzipped",
+    "units": 3,
+    "identical": true,
+    "original_bytes": 1693,
+    "clean_bytes": 1669
+  },
+  {
+    "file": "note.odt",
+    "compared": "every part except the property parts, unzipped",
+    "units": 3,
+    "identical": true,
+    "original_bytes": 804,
+    "clean_bytes": 813
+  },
+  {
+    "file": "photo.jpg",
+    "compared": "decoded pixels, every frame",
+    "units": 1,
+    "identical": true,
+    "original_bytes": 2314,
+    "clean_bytes": 1496
+  },
+  {
+    "file": "picture.png",
+    "compared": "decoded pixels, every frame",
+    "units": 1,
+    "identical": true,
+    "original_bytes": 1159,
+    "clean_bytes": 301
+  },
+  {
+    "file": "picture.webp",
+    "compared": "decoded pixels, every frame",
+    "units": 1,
+    "identical": true,
+    "original_bytes": 1162,
+    "clean_bytes": 486
+  }
+]

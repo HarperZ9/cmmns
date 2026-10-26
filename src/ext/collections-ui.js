@@ -33,7 +33,7 @@ globalThis.PBCollectionsUi = (() => {
     if (rec.tags.length) li.append(el("span", { class: "facts mono" }, rec.tags.map((t) => "#" + t).join(" ")));
     if (rec.note) li.append(el("span", { class: "note" }, rec.note));
     const row = el("div", { class: "tile-actions" });
-    for (const [label, act] of [["Details", "detail"], ["Download", "download"], ["Convert", "convert"], ["Delete", "delete"]]) {
+    for (const [label, act] of [["Details", "detail"], ["Download", "download"], ["Share clean", "clean"], ["Convert", "convert"], ["Delete", "delete"]]) {
       const b = el("button", { type: "button", class: act === "delete" ? "quiet" : "" }, label);
       b.addEventListener("click", () => on(act, rec));
       row.append(b);
@@ -57,6 +57,7 @@ globalThis.PBCollectionsUi = (() => {
       ["Address", rec.source.url || "none"], ["Page", rec.source.page || "none"], ["Saved", rec.source.savedAt]];
     if (rec.source.stream) rows.push(["Stream", `${rec.source.stream.type.toUpperCase()}, ${rec.source.stream.role || "media"} track, ${rec.source.stream.segments || "?"} segments`]);
     if (rec.archive) rows.push(["Internet Archive", rec.archive.url || `not kept: ${rec.archive.error}`]);
+    (rec.cleanCopies || []).forEach((c) => rows.push(["Share clean copy", `${c.clean.sha256.slice(0, 12)} on ${String(c.at).slice(0, 10)}; removed ${c.removed.join("; ") || "nothing"}`]));
     (rec.lineage || []).forEach((l, i) => rows.push([`Step ${i + 1}`, `${l.op} ${JSON.stringify(l.params)} with ${l.tool || "unknown"}: ${l.from.slice(0, 12)} to ${l.to.slice(0, 12)}, ${PB.sizeLine(l.bytesBefore, l.bytesAfter)}`]));
     const mine = problems.filter((p) => p.id === rec.id);
     rows.push(["Lineage check", mine.length ? mine.map((p) => p.problem).join("; ") : "every step links by hash back to the original"]);

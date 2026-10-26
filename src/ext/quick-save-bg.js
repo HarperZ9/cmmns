@@ -32,6 +32,8 @@ globalThis.PBQuickBg = (() => {
   async function onClick(info, tab) {
     const id = info.menuItemId;
     if (!tab || !ITEMS.some(([x]) => x === id)) return;
+    // Source-protection mode: no download from a host. The page is told why, never left silent.
+    if (!/copy-(link|caption)$/.test(id) && (await settings()).protection) { chrome.scripting.executeScript({ target: { tabId: tab.id }, args: [PROTECTED_SAVE], func: (t) => alert(t) }).catch(() => {}); return; }
     try {
       const target = await inject(tab.id, info.frameId);
       const args = { srcUrl: info.srcUrl || null, linkUrl: info.linkUrl || null, asGif: id === "pb-dl-gif", copy: id === "pb-copy", link: id === "pb-copy-link", caption: id === "pb-copy-caption" };
@@ -47,6 +49,8 @@ globalThis.PBQuickBg = (() => {
     }
   }
 
+  const PROTECTED_SAVE = "Source protection is on, so Daylight Commons did not download this: the request would tell the host. Use your browser's own Save as, and add the file to your case.";
+
   async function settings() {
     const k = PB.SETTINGS_KEY;
     try { return PB.normalizeSettings((await chrome.storage.local.get(k))[k]); } catch { return PB.normalizeSettings(null); }
@@ -57,6 +61,7 @@ globalThis.PBQuickBg = (() => {
   async function download({ url, filename: name, site, fixExt }) {
     if (!chrome.downloads) throw new Error("This browser did not give Daylight Commons the downloads permission.");
     const s = await settings();
+    if (s.protection && /^https?:/i.test(url)) throw new Error(PROTECTED_SAVE);
     const filename = name ? PB.saveFolder(s.mediaFolder, site) + name.replace(/[\\/]/g, "-") : null;
     const opts = { url, saveAs: !!s.mediaAskWhere, conflictAction: "uniquify", ...(filename ? { filename } : {}) };
     pending.set(url, { fixExt: !!fixExt, filename });

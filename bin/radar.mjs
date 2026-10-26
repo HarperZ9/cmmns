@@ -24,6 +24,7 @@ import { runExport } from "./lib/export.mjs";
 import { runCaseCommand } from "./lib/case.mjs";
 import { TOP_HELP, MEDIA_HELP, helpText, friendly } from "./lib/help.mjs";
 import { runMedia } from "./lib/media.mjs";
+import { cleanCommand, protectCommand, selfAuditCommand, PROTECT_USAGE } from "./lib/protect.mjs";
 
 const USAGE = `Usage:
   daylight analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
@@ -37,7 +38,7 @@ const USAGE = `Usage:
   daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
   daylight case <command>   an investigation case folder; "daylight case help" lists the commands
-<file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
+${PROTECT_USAGE}<file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 CSV, a Mastodon outbox.json or a Bluesky repository .car. verify checks a signed evidence bundle
 or an evidence chain saved from the extension ("Save evidence chain"). Daylight Commons reads local
 files only. --carrier-safe signs the bundle with a one-time key that is never saved, keeps only
@@ -108,6 +109,8 @@ async function verify(file, f) {
 
 export async function main(argv) {
   if (argv[0] === "case") { const r = await runCaseCommand(argv.slice(1)); print(r.out); return process.exitCode || r.code; }
+  if (argv[0] === "protect" && argv[1] && !argv.includes("--help")) { print(protectCommand(argv[1])); return 0; }
+  if (argv[0] === "self-audit" && !argv.includes("--help")) { const { _: files, flags } = parseArgs(argv.slice(1)); print(selfAuditCommand(files, flags)); return 0; }
   if (argv[0] === "media" && (argv[1] === "convert" || argv[1] === "compress")) {
     const { _: [file], flags } = parseArgs(argv.slice(2));
     if (flags.help || !file) { print(helpText(MEDIA_HELP[argv[1]], `daylight media ${argv[1]}`)); return file || flags.help ? 0 : 2; }
@@ -121,6 +124,7 @@ export async function main(argv) {
   if (cmd === "analyze") { await analyze(arg, flags); return 0; }
   if (cmd === "verify") return verify(arg, flags);
   if (cmd === "site") { loadTables({ claims: false }); const r = siteInfo(arg); if (!r) throw new Error("No domain given."); print(flags.json ? asJson(r) : readable(r)); return 0; }
+  if (cmd === "clean") { print(await cleanCommand(arg, flags)); return 0; }
   if (cmd === "export") { const r = await runExport(arg, flags); print(`Wrote ${r.files.length} files to ${r.out}: ${r.files.join(", ")}.
 `); return 0; }
   if (cmd === "media") { const r = await checkMedia(readFileSync(arg)); print(flags.json ? asJson(r) : readable(r)); return 0; }

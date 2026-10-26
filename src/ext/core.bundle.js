@@ -12967,6 +12967,662 @@ function readDescription(bytes) {
 return { xmpPacket, embedDescription, readDescription };
 })();
 
+// ---- clean-util.js
+const M_clean_util = (() => {
+// Byte helpers shared by the Share clean modules (clean.js and its format readers). Pure: no DOM,
+// no network, no file system. Every function takes and returns Uint8Array.
+
+const cleanEnc = new TextEncoder();
+const cleanDec = new TextDecoder("latin1");
+
+function cleanCat(list) {
+  const out = new Uint8Array(list.reduce((s, x) => s + x.length, 0));
+  let p = 0;
+  for (const x of list) { out.set(x, p); p += x.length; }
+  return out;
+}
+
+const be16 = (b, at) => (b[at] << 8) | b[at + 1];
+const be32 = (b, at) => ((b[at] << 24) >>> 0) + (b[at + 1] << 16) + (b[at + 2] << 8) + b[at + 3];
+const le16 = (b, at) => b[at] | (b[at + 1] << 8);
+const le32 = (b, at) => (b[at] | (b[at + 1] << 8) | (b[at + 2] << 16) | (b[at + 3] << 24)) >>> 0;
+const putBe32 = (v) => Uint8Array.of(v >>> 24, (v >> 16) & 255, (v >> 8) & 255, v & 255);
+const putLe32 = (v) => Uint8Array.of(v & 255, (v >> 8) & 255, (v >> 16) & 255, v >>> 24);
+const putLe16 = (v) => Uint8Array.of(v & 255, (v >> 8) & 255);
+const asciiAt = (b, at, s) => at >= 0 && at + s.length <= b.length && [...s].every((c, k) => b[at + k] === c.charCodeAt(0));
+const latin1 = (b, at, n) => cleanDec.decode(b.subarray(at, at + n));
+
+let table = null;
+function cleanCrc32(bytes) {
+  if (!table) table = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+  let c = 0xffffffff;
+  for (const x of bytes) c = table[(c ^ x) & 255] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+// Index of the first occurrence of `needle` (string or bytes) in `hay`, or -1.
+function indexOfBytes(hay, needle, from = 0) {
+  const n = typeof needle === "string" ? cleanEnc.encode(needle) : needle;
+  if (!n.length) return -1;
+  outer: for (let i = from; i + n.length <= hay.length; i++) {
+    if (hay[i] !== n[0]) continue;
+    for (let k = 1; k < n.length; k++) if (hay[i + k] !== n[k]) continue outer;
+    return i;
+  }
+  return -1;
+}
+
+async function cleanSha256(bytes) {
+  const d = await globalThis.crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(d), (x) => x.toString(16).padStart(2, "0")).join("");
+}
+
+// zlib inflate and deflate through the platform's CompressionStream (browsers and Node 18+).
+async function streamThrough(bytes, stream) {
+  const out = new Response(new Blob([bytes]).stream().pipeThrough(stream));
+  return new Uint8Array(await out.arrayBuffer());
+}
+const zInflate = (bytes) => streamThrough(bytes, new DecompressionStream("deflate"));
+const zDeflate = (bytes) => streamThrough(bytes, new CompressionStream("deflate"));
+
+return { cleanEnc, cleanDec, cleanCat, be16, be32, le16, le32, putBe32, putLe32, putLe16, asciiAt, latin1, cleanCrc32, indexOfBytes, cleanSha256, zInflate, zDeflate };
+})();
+
+// ---- clean-icc.js
+const M_clean_icc = (() => {
+// An ICC colour profile with its free text blanked in place: the description, copyright, device
+// maker and model, viewing conditions and any other text tag. The colour data stays, so the
+// picture looks the same; only the words go. Lengths never change, so the profile stays valid.
+// The profile id (an MD5 over the profile) is set to zero, which the ICC spec reads as "not computed".
+
+const { be32, asciiAt } = M_clean_util;
+
+// Tags whose value is words written by a person or a device, never colour data.
+const TEXT_TAGS = new Set(["desc", "cprt", "dmnd", "dmdd", "vued", "scrd", "targ", "ciis", "meta"]);
+
+function blankText(p, start, end) { for (let i = start; i < end; i++) if (p[i] !== 0) p[i] = 0x20; }
+
+function blankMluc(p, at, end) {
+  const n = be32(p, at + 8), size = be32(p, at + 12);
+  for (let r = 0; r < n; r++) {
+    const rec = at + 16 + r * size;
+    if (rec + 12 > end) break;
+    const len = be32(p, rec + 4), off = be32(p, rec + 8);
+    for (let i = at + off; i + 1 < Math.min(end, at + off + len); i += 2) { p[i] = 0; p[i + 1] = 0x20; }
+  }
+}
+
+function blankDesc(p, at, end) {
+  const n = be32(p, at + 8);
+  blankText(p, at + 12, Math.min(end, at + 12 + Math.max(0, n - 1)));
+  // The Unicode and ScriptCode parts after the ASCII string: counts and characters to zero.
+  for (let i = at + 12 + n; i < end; i++) p[i] = 0;
+}
+
+// Returns { bytes, fields } where fields names each blanked tag; bytes is a new array.
+function blankIccText(profile) {
+  const p = new Uint8Array(profile);
+  const fields = [];
+  if (p.length < 132 || !asciiAt(p, 36, "acsp")) return { bytes: p, fields, problem: "not an ICC profile" };
+  const count = be32(p, 128);
+  for (let i = 0; i < count; i++) {
+    const t = 132 + i * 12;
+    if (t + 12 > p.length) break;
+    const sig = String.fromCharCode(...p.subarray(t, t + 4)), at = be32(p, t + 4), end = Math.min(p.length, at + be32(p, t + 8));
+    if (!TEXT_TAGS.has(sig) || at + 8 > p.length) continue;
+    const before = p.slice(at, end);
+    if (asciiAt(p, at, "mluc")) blankMluc(p, at, end);
+    else if (asciiAt(p, at, "desc")) blankDesc(p, at, end);
+    else if (asciiAt(p, at, "text")) blankText(p, at + 8, end - 1);
+    else for (let k = at + 8; k < end; k++) p[k] = 0;
+    if (p.subarray(at, end).some((x, k) => x !== before[k])) fields.push(`ICC ${sig}`);
+  }
+  // Header: creation time, device maker and model, creator and the profile id. None is colour data.
+  let header = false;
+  for (const [a, b] of [[24, 36], [48, 56], [80, 100]]) for (let k = a; k < b; k++) { if (p[k]) header = true; p[k] = 0; }
+  if (header) fields.push("ICC header time and device");
+  return { bytes: p, fields };
+}
+
+return { blankIccText };
+})();
+
+// ---- clean-image.js
+const M_clean_image = (() => {
+// Share clean for still images: JPEG, PNG, GIF and WebP. Metadata blocks are removed whole and the
+// image data is copied byte for byte, so nothing is decoded or re-encoded. Kept: what changes how
+// the picture looks (quantisation and Huffman tables, colour profile with its text blanked, gamma,
+// transparency, animation timing). Removed: EXIF with GPS and maker notes, XMP (with Daylight's
+// own description), IPTC and Photoshop blocks, comments, text chunks, Content Credentials, embedded
+// thumbnails and anything after the end of the image. Each function returns { bytes, removed }.
+
+const { be16, be32, le32, putBe32, putLe32, asciiAt, latin1, cleanCat, cleanCrc32, cleanEnc, zInflate, zDeflate } = M_clean_util;
+const { blankIccText } = M_clean_icc;
+
+const APP_NAMES = { 0xe1: "EXIF or XMP (APP1)", 0xe2: "APP2 block", 0xeb: "Content Credentials or JPEG extension (APP11)", 0xec: "Ducky (APP12)", 0xed: "IPTC and Photoshop (APP13)", 0xfe: "comment" };
+
+function jpegVerdict(m, seg) {
+  if (m === 0xfe && seg.subarray(4).every((x) => x === 0)) return "keep";
+  if (m === 0xe0) return asciiAt(seg, 4, "JFIF\0") ? (seg[16] || seg[17] ? "jfif-thumb" : "keep") : "drop";
+  if (m === 0xe2 && asciiAt(seg, 4, "ICC_PROFILE\0")) return "icc";
+  if (m === 0xee && asciiAt(seg, 4, "Adobe")) return "keep";
+  if ((m >= 0xe0 && m <= 0xef) || m === 0xfe) return "drop";
+  return "keep";
+}
+
+function jpegLabel(m, seg) {
+  if (m === 0xe1) return asciiAt(seg, 4, "Exif\0") ? "EXIF (camera, time, GPS, maker notes)" : asciiAt(seg, 4, "http://ns.adobe.com/x") ? "XMP" : "APP1 block";
+  if (m === 0xe2 && asciiAt(seg, 4, "MPF\0")) return "multi-picture index (MPF)";
+  if (m === 0xe0) return asciiAt(seg, 4, "JFXX") ? "JFIF thumbnail" : "APP0 block";
+  return APP_NAMES[m] || `APP${m - 0xe0} block`;
+}
+
+// The ICC profile split across APP2 segments, blanked, and written back into the same segments.
+function jpegIcc(b, segs, removed) {
+  const parts = segs.map((s) => b.subarray(s.at + 18, s.at + 2 + s.len));
+  const { bytes, fields } = blankIccText(cleanCat(parts));
+  removed.push(...fields);
+  let p = 0;
+  return segs.map((s, i) => { const seg = b.slice(s.at, s.at + 2 + s.len); seg.set(bytes.subarray(p, p + parts[i].length), 18); p += parts[i].length; return seg; });
+}
+
+function scanEnd(b, at) {
+  let e = at;
+  while (e + 1 < b.length && !(b[e] === 0xff && b[e + 1] !== 0 && !(b[e + 1] >= 0xd0 && b[e + 1] <= 0xd7))) e++;
+  return e;
+}
+
+// The same segment as an empty comment of the same length: used where the file must keep its size
+// (a JPEG inside a PDF, whose cross-reference table counts bytes).
+function comOver(seg) { const c = seg.slice(); c[1] = 0xfe; c.fill(0, 4); return c; }
+
+// opts.sameLength: removed blocks become zeroed comments, so the length never changes.
+function cleanJpeg(b, opts = {}) {
+  if (b[0] !== 0xff || b[1] !== 0xd8) throw new Error("not a JPEG");
+  const out = [b.subarray(0, 2)], removed = [], segs = [];
+  let at = 2;
+  while (at + 1 < b.length) {
+    if (b[at] !== 0xff) throw new Error(`JPEG: no marker at byte ${at}`);
+    const m = b[at + 1];
+    if (m === 0xff) { out.push(b.subarray(at, at + 1)); at++; continue; }
+    if (m === 0xd9) { out.push(b.subarray(at, at + 2)); at += 2; break; }
+    if ((m >= 0xd0 && m <= 0xd7) || m === 0x01) { out.push(b.subarray(at, at + 2)); at += 2; continue; }
+    const len = be16(b, at + 2), seg = b.subarray(at, at + 2 + len);
+    if (m === 0xda) { const e = scanEnd(b, at + 2 + len); out.push(b.subarray(at, e)); at = e; continue; }
+    const v = jpegVerdict(m, seg);
+    if (v === "keep") out.push(seg);
+    else if (v === "icc") { segs.push({ at, len, slot: out.length }); out.push(null); }
+    else if (opts.sameLength) { out.push(comOver(seg)); removed.push(v === "jfif-thumb" ? "JFIF thumbnail" : jpegLabel(m, seg)); }
+    else if (v === "jfif-thumb") { const j = seg.slice(0, 18); j[2] = 0; j[3] = 16; j[16] = 0; j[17] = 0; out.push(j); removed.push("JFIF thumbnail"); }
+    else removed.push(jpegLabel(m, seg));
+    at += 2 + len;
+  }
+  if (at < b.length) {
+    if (b.subarray(at).some((x) => x)) removed.push(`${b.length - at} bytes after the end of the image (appended pictures or data)`);
+    if (opts.sameLength) out.push(new Uint8Array(b.length - at));
+  }
+  if (segs.length) jpegIcc(b, segs, removed).forEach((seg, i) => { out[segs[i].slot] = seg; });
+  return { bytes: cleanCat(out), removed: [...new Set(removed)] };
+}
+
+// PNG: only the chunks that decide how the image looks stay.
+const PNG_KEEP = new Set(["IHDR", "PLTE", "IDAT", "IEND", "tRNS", "gAMA", "cHRM", "sRGB", "sBIT", "bKGD", "pHYs", "acTL", "fcTL", "fdAT", "cICP", "mDCv", "cLLi", "hIST"]);
+const PNG_NAMES = { tEXt: "text chunk (tEXt)", zTXt: "compressed text chunk (zTXt)", iTXt: "international text or XMP (iTXt)", eXIf: "EXIF (eXIf)", tIME: "last-modified time (tIME)", caBX: "Content Credentials (caBX)", sPLT: "suggested palette with its name (sPLT)" };
+
+function pngChunk(type, data) {
+  const td = cleanCat([cleanEnc.encode(type), data]);
+  return cleanCat([putBe32(data.length), td, putBe32(cleanCrc32(td))]);
+}
+
+async function pngIcc(data, removed) {
+  const nul = data.indexOf(0);
+  if (nul < 1 || data[nul + 1] !== 0) throw new Error("PNG iCCP chunk not understood");
+  const { bytes, fields } = blankIccText(await zInflate(data.subarray(nul + 2)));
+  if (latin1(data, 0, nul) !== "ICC profile") removed.push("ICC profile name");
+  if (!fields.length && latin1(data, 0, nul) === "ICC profile") return pngChunk("iCCP", data);
+  removed.push(...fields);
+  return pngChunk("iCCP", cleanCat([cleanEnc.encode("ICC profile"), Uint8Array.of(0, 0), await zDeflate(bytes)]));
+}
+
+async function cleanPng(b) {
+  if (!asciiAt(b, 1, "PNG")) throw new Error("not a PNG");
+  const out = [b.subarray(0, 8)], removed = [];
+  for (let at = 8; at + 12 <= b.length;) {
+    const len = be32(b, at), type = latin1(b, at + 4, 4), whole = b.subarray(at, at + 12 + len);
+    if (type === "iCCP") out.push(await pngIcc(b.subarray(at + 8, at + 8 + len), removed));
+    else if (PNG_KEEP.has(type)) out.push(whole);
+    else removed.push(PNG_NAMES[type] || `${type} chunk`);
+    at += 12 + len;
+    if (type === "IEND") { if (at < b.length) removed.push(`${b.length - at} bytes after the end of the image`); break; }
+  }
+  return { bytes: cleanCat(out), removed: [...new Set(removed)] };
+}
+
+function gifSubBlocks(b, at) { while (b[at]) at += 1 + b[at]; return at + 1; }
+
+function cleanGif(b) {
+  if (!asciiAt(b, 0, "GIF8")) throw new Error("not a GIF");
+  const gct = b[10] & 0x80 ? 3 * (2 << (b[10] & 7)) : 0, out = [b.subarray(0, 13 + gct)], removed = [];
+  let at = 13 + gct;
+  while (at < b.length && b[at] !== 0x3b) {
+    if (b[at] === 0x2c) {
+      const lct = b[at + 9] & 0x80 ? 3 * (2 << (b[at + 9] & 7)) : 0, end = gifSubBlocks(b, at + 10 + lct + 1);
+      out.push(b.subarray(at, end)); at = end; continue;
+    }
+    if (b[at] !== 0x21) throw new Error(`GIF: unknown block at byte ${at}`);
+    const label = b[at + 1], end = gifSubBlocks(b, at + 2);
+    const app = label === 0xff ? latin1(b, at + 3, 11) : "";
+    if (label === 0xf9 || label === 0x01 || app === "NETSCAPE2.0" || app === "ANIMEXTS1.0") out.push(b.subarray(at, end));
+    else removed.push(label === 0xfe ? "comment" : label === 0xff ? (app.startsWith("XMP Data") ? "XMP" : `application block ${app.trim()}`) : `extension 0x${label.toString(16)}`);
+    at = end;
+  }
+  out.push(Uint8Array.of(0x3b));
+  if (at + 1 < b.length) removed.push(`${b.length - at - 1} bytes after the end of the image`);
+  return { bytes: cleanCat(out), removed: [...new Set(removed)] };
+}
+
+const WEBP_KEEP = new Set(["VP8 ", "VP8L", "VP8X", "ALPH", "ANIM", "ANMF", "ICCP"]);
+
+function cleanWebp(b) {
+  if (!asciiAt(b, 0, "RIFF") || !asciiAt(b, 8, "WEBP")) throw new Error("not a WebP");
+  const out = [], removed = [];
+  const end = Math.min(b.length, 8 + le32(b, 4));
+  for (let at = 12; at + 8 <= end;) {
+    const type = latin1(b, at, 4), len = le32(b, at + 4), whole = b.subarray(at, at + 8 + len + (len & 1));
+    if (type === "ICCP") { const { bytes, fields } = blankIccText(b.subarray(at + 8, at + 8 + len)); out.push(cleanCat([b.subarray(at, at + 8), bytes, len & 1 ? Uint8Array.of(0) : new Uint8Array(0)])); removed.push(...fields); }
+    else if (type === "VP8X") { const x = whole.slice(); x[8] &= ~0x0c; out.push(x); }
+    else if (WEBP_KEEP.has(type)) out.push(whole);
+    else removed.push(type === "EXIF" ? "EXIF (camera, time, GPS)" : type === "XMP " ? "XMP" : `${type.trim()} chunk`);
+    at += 8 + len + (len & 1);
+  }
+  if (end < b.length) removed.push(`${b.length - end} bytes after the end of the image`);
+  const body = cleanCat(out);
+  return { bytes: cleanCat([cleanEnc.encode("RIFF"), putLe32(body.length + 4), cleanEnc.encode("WEBP"), body]), removed: [...new Set(removed)] };
+}
+
+return { cleanJpeg, cleanPng, cleanGif, cleanWebp };
+})();
+
+// ---- clean-av.js
+const M_clean_av = (() => {
+// Share clean for video and audio containers: MP4 and QuickTime (also M4A), and WebM or Matroska.
+// Nothing moves. A metadata box or element is overwritten in place by padding of the same length
+// (an MP4 "free" box, a Matroska Void element) with its content zeroed, so every chunk offset,
+// seek entry and cue stays valid and the coded frames and samples are the same bytes as before.
+// Each function returns { bytes, removed }.
+
+const { readBoxes, readEbml } = M_media_read;
+const { be32, asciiAt, indexOfBytes, cleanEnc } = M_clean_util;
+
+// Google's spherical-video uuid tells players how to project the picture; it is kept.
+const SPHERICAL_UUID = "ffcc8263f8554a938814587a02521fdd";
+const TIME_BOXES = new Set(["mvhd", "tkhd", "mdhd"]);
+
+function freeBox(out, box) {
+  out.set(cleanEnc.encode("free"), box.start + 4);
+  out.fill(0, box.start + box.headerSize, box.start + box.size);
+}
+
+function mp4Label(b, box) {
+  const inside = b.subarray(box.start, box.start + box.size);
+  const loc = indexOfBytes(inside, "location.ISO6709") >= 0 || indexOfBytes(inside, Uint8Array.of(0xa9, 0x78, 0x79, 0x7a)) >= 0;
+  const what = box.type === "udta" ? "user data (title, comment, device, Daylight's description)" : box.type === "meta" ? "metadata tags (ilst, keys)" : box.type === "uuid" ? "vendor block (uuid, often XMP)" : "leftover bytes in free space";
+  return loc ? `${what}, with a location` : what;
+}
+
+// Zeroes creation and modification times in mvhd, tkhd and mdhd. Version 1 uses 64-bit times.
+function zeroTimes(out, box) {
+  const at = box.start + box.headerSize, wide = out[at] === 1, end = at + 4 + (wide ? 16 : 8);
+  const set = out.subarray(at + 4, end).some((x) => x);
+  out.fill(0, at + 4, end);
+  return set;
+}
+
+function cleanMp4(b) {
+  const top = readBoxes(b);
+  if (!top.length || !top.some((x) => x.type === "moov" || x.type === "ftyp")) throw new Error("not an MP4 or QuickTime file");
+  const out = b.slice(), removed = [];
+  let times = 0;
+  const walk = (list) => {
+    for (const box of list) {
+      const uuid = box.type === "uuid" ? Array.from(b.subarray(box.start + box.headerSize, box.start + box.headerSize + 16), (x) => x.toString(16).padStart(2, "0")).join("") : null;
+      if (box.type === "udta" || box.type === "meta" || (uuid && uuid !== SPHERICAL_UUID)) { removed.push(mp4Label(b, box)); freeBox(out, box); continue; }
+      if ((box.type === "free" || box.type === "skip") && out.subarray(box.start + box.headerSize, box.start + box.size).some((x) => x)) { removed.push(mp4Label(b, box)); out.fill(0, box.start + box.headerSize, box.start + box.size); continue; }
+      if (TIME_BOXES.has(box.type) && zeroTimes(out, box)) times++;
+      if (box.children) walk(box.children);
+    }
+  };
+  walk(top);
+  if (times) removed.push(`creation and modification times (${times} boxes)`);
+  return { bytes: out, removed: [...new Set(removed)] };
+}
+
+// A Void element (0xEC) covering exactly [start, end): one size byte when it fits, else eight.
+function voidOver(out, start, end) {
+  const total = end - start;
+  if (total < 2) return false;
+  out.fill(0, start, end);
+  out[start] = 0xec;
+  if (total <= 128) { out[start + 1] = 0x80 | (total - 2); return true; }
+  if (total < 9) return false;
+  let n = total - 9;
+  out[start + 1] = 0x01;
+  for (let k = 8; k >= 2; k--) { out[start + k] = n % 256; n = Math.floor(n / 256); }
+  return true;
+}
+
+const WEBM_TEXT = { "7BA9": "title", "4D80": "muxing app", "5741": "writing app", "4461": "date made", "536E": "track name" };
+const WEBM_VOID = { "1254C367": "tags", "1941A469": "attachments" };
+
+function webmWalk(b, out, list, removed) {
+  for (const el of list) {
+    if (WEBM_VOID[el.id] && !el.unknownSize) { if (voidOver(out, el.start, el.end)) removed.push(WEBM_VOID[el.id]); continue; }
+    if (WEBM_TEXT[el.id]) { if (out.subarray(el.dataStart, el.end).some((x) => x)) removed.push(WEBM_TEXT[el.id]); out.fill(0, el.dataStart, el.end); continue; }
+    if (el.id === "EC" && out.subarray(el.dataStart, el.end).some((x) => x)) { out.fill(0, el.dataStart, el.end); removed.push("leftover bytes in padding"); continue; }
+    if (el.children && ["18538067", "1549A966", "1654AE6B", "AE"].includes(el.id)) webmWalk(b, out, el.children, removed);
+  }
+}
+
+function cleanWebm(b) {
+  if (be32(b, 0) !== 0x1a45dfa3) throw new Error("not a WebM or Matroska file");
+  const out = b.slice(), removed = [];
+  webmWalk(b, out, readEbml(b), removed);
+  return { bytes: out, removed: [...new Set(removed)] };
+}
+
+const isMp4Like = (b) => asciiAt(b, 4, "ftyp") || asciiAt(b, 4, "moov") || asciiAt(b, 4, "mdat") || asciiAt(b, 4, "free") || asciiAt(b, 4, "wide");
+
+return { cleanMp4, cleanWebm, isMp4Like };
+})();
+
+// ---- clean-pdf.js
+const M_clean_pdf = (() => {
+// Share clean for PDF. A PDF's cross-reference table counts bytes, so every change is made in
+// place at the same length: the document information dictionary (author, title, creator,
+// producer, dates) is emptied to spaces, each XMP metadata stream is overwritten with spaces and
+// its compression filter removed, the file identifiers are zeroed, and each embedded JPEG photo
+// loses its EXIF, XMP and comments as same-length empty comments. Page content is never touched.
+// Returns { bytes, removed }; throws for an encrypted PDF or when the information dictionary sits
+// inside a compressed object stream, which cannot be cleaned without rewriting the file.
+
+const { cleanDec } = M_clean_util;
+const { cleanJpeg } = M_clean_image;
+
+// The end (exclusive) of the dictionary that opens at s[at] === "<<".
+function dictEnd(s, at) {
+  let depth = 0, i = at;
+  while (i < s.length) {
+    const c = s[i];
+    if (c === "(") { let d = 1; i++; while (i < s.length && d) { if (s[i] === "\\") i++; else if (s[i] === "(") d++; else if (s[i] === ")") d--; i++; } continue; }
+    if (c === "<" && s[i + 1] === "<") { depth++; i += 2; continue; }
+    if (c === ">" && s[i + 1] === ">") { depth--; i += 2; if (!depth) return i; continue; }
+    if (c === "<") { i = s.indexOf(">", i) + 1 || s.length; continue; }
+    i++;
+  }
+  return -1;
+}
+
+const spaces = (out, a, b) => { for (let i = a; i < b; i++) if (out[i] !== 0x0a && out[i] !== 0x0d) out[i] = 0x20; };
+
+function objects(s) {
+  const out = [];
+  for (const m of s.matchAll(/(?<![0-9])(\d+)\s+(\d+)\s+obj\s*<</g)) {
+    const open = m.index + m[0].length - 2, end = dictEnd(s, open);
+    if (end > 0) out.push({ num: m[1], gen: m[2], open, end, dict: s.slice(open, end) });
+  }
+  return out;
+}
+
+function streamRange(s, end) {
+  const m = /^\s*stream\r?\n/.exec(s.slice(end, end + 32));
+  if (!m) return null;
+  const start = end + m[0].length;
+  let stop = s.indexOf("endstream", start);
+  if (stop < 0) return null;
+  if (s[stop - 1] === "\n") stop--;
+  if (s[stop - 1] === "\r") stop--;
+  return [start, stop];
+}
+
+function cleanInfo(s, out, objs, removed) {
+  const refs = [...s.matchAll(/\/Info\s+(\d+)\s+(\d+)\s+R/g)].map((m) => `${m[1]} ${m[2]}`);
+  for (const ref of new Set(refs)) {
+    const hits = objs.filter((o) => `${o.num} ${o.gen}` === ref);
+    if (!hits.length) throw new Error("the document information sits inside a compressed object stream; Share clean cannot remove it without rewriting the PDF");
+    let had = false;
+    for (const o of hits) { if (/\S/.test(o.dict.slice(2, -2))) had = true; spaces(out, o.open + 2, o.end - 2); }
+    if (had) removed.push("document information (author, title, creator, producer, dates)");
+  }
+}
+
+function cleanStreams(s, out, objs, removed) {
+  for (const o of objs) {
+    const isXmp = /\/Type\s*\/Metadata\b/.test(o.dict);
+    const dct = /\/Filter\s*(\/DCTDecode|\[\s*\/DCTDecode\s*\])/.test(o.dict);
+    if (!isXmp && !dct) continue;
+    const r = streamRange(s, o.end);
+    if (!r) continue;
+    if (isXmp) {
+      if (!/\S/.test(s.slice(r[0], r[1])) && !/\/Filter/.test(o.dict)) continue;
+      spaces(out, r[0], r[1]);
+      for (const m of o.dict.matchAll(/\/(Filter|DecodeParms)\s*(\/\w+|\[[^\]]*\]|<<[^>]*>>)/g)) spaces(out, o.open + m.index, o.open + m.index + m[0].length);
+      removed.push("XMP metadata");
+    } else {
+      try {
+        const c = cleanJpeg(out.subarray(r[0], r[1]), { sameLength: true });
+        if (c.removed.length && c.bytes.length === r[1] - r[0]) { out.set(c.bytes, r[0]); removed.push(...c.removed.map((x) => `embedded photo: ${x}`)); }
+      } catch { removed.push("an embedded photo could not be read and was left as it was"); }
+    }
+  }
+}
+
+function cleanPdf(b) {
+  const s = cleanDec.decode(b);
+  if (!s.startsWith("%PDF-")) throw new Error("not a PDF");
+  if (/\/Encrypt\s+\d+\s+\d+\s+R|\/Encrypt\s*<</.test(s)) throw new Error("the PDF is encrypted; Share clean cannot read its metadata");
+  const out = b.slice(), removed = [], objs = objects(s);
+  cleanInfo(s, out, objs, removed);
+  cleanStreams(s, out, objs, removed);
+  for (const m of s.matchAll(/\/ID\s*\[\s*<([0-9A-Fa-f]*)>\s*<([0-9A-Fa-f]*)>\s*\]/g)) {
+    if (!/[1-9A-Fa-f]/.test(m[1] + m[2])) continue;
+    for (let i = m.index; i < m.index + m[0].length; i++) if (/[0-9A-Fa-f]/.test(s[i]) && i > m.index + 3) out[i] = 0x30;
+    removed.push("file identifiers (/ID)");
+  }
+  return { bytes: out, removed: [...new Set(removed)] };
+}
+
+// What a cleaned PDF still says about its makers, read back. Empty when clean.
+function pdfResidue(b) {
+  const s = cleanDec.decode(b), left = [];
+  for (const o of objects(s)) {
+    if (/\/(Author|Creator|Producer|Title|Subject|Keywords|CreationDate|ModDate)\s*[(<]/.test(o.dict) && [...s.matchAll(/\/Info\s+(\d+)\s+(\d+)\s+R/g)].some((m) => m[1] === o.num)) left.push("document information");
+  }
+  if (/<x:xmpmeta|<\?xpacket begin/.test(s)) left.push("XMP");
+  return [...new Set(left)];
+}
+
+return { cleanPdf, pdfResidue };
+})();
+
+// ---- clean-zip.js
+const M_clean_zip = (() => {
+// Share clean for office documents: Word, Excel and PowerPoint (OOXML: .docx, .xlsx, .pptx) and
+// OpenDocument (.odt, .ods, .odp). Both are zip packages. The property parts that name people and
+// machines (docProps/core.xml, app.xml and custom.xml; ODF meta.xml) are replaced by empty ones,
+// and every zip entry loses its timestamps, extra fields (which hold more times and owner ids) and
+// comments. Every other part is copied as the same compressed bytes, so the content is unchanged.
+// Returns { bytes, removed, notes }.
+
+const { le16, le32, putLe16, putLe32, latin1, cleanCat, cleanEnc, cleanCrc32 } = M_clean_util;
+
+const EMPTY = {
+  "docProps/core.xml": '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"></cp:coreProperties>',
+  "docProps/app.xml": '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"></Properties>',
+  "docProps/custom.xml": '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"></Properties>',
+  "meta.xml": '<?xml version="1.0" encoding="UTF-8"?>\n<office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.2"><office:meta/></office:document-meta>',
+};
+const PART_NAMES = { "docProps/core.xml": "author, last editor, title and dates (core.xml)", "docProps/app.xml": "company, manager, application and editing time (app.xml)", "docProps/custom.xml": "custom properties (custom.xml)", "meta.xml": "author, dates, editing time and generator (meta.xml)" };
+const DOS_DATE = 0x21; // 1980-01-01, the earliest a zip can say
+const OFFICE_NOTE = "Comment authors, tracked-change authors and anything written in the document itself stay as they are.";
+
+function centralEntries(b) {
+  let e = -1;
+  for (let i = b.length - 22; i >= Math.max(0, b.length - 65557); i--) if (le32(b, i) === 0x06054b50) { e = i; break; }
+  if (e < 0) throw new Error("not a zip package");
+  const count = le16(b, e + 10), off = le32(b, e + 16);
+  if (count === 0xffff || off === 0xffffffff) throw new Error("zip64 packages are not supported");
+  const list = [];
+  for (let i = 0, p = off; i < count; i++) {
+    if (le32(b, p) !== 0x02014b50) throw new Error("zip central directory not understood");
+    const nl = le16(b, p + 28), xl = le16(b, p + 30), cl = le16(b, p + 32);
+    list.push({ flags: le16(b, p + 8), method: le16(b, p + 10), crc: le32(b, p + 16), csize: le32(b, p + 20), usize: le32(b, p + 24), intAttr: le16(b, p + 36), local: le32(b, p + 42), stamped: le16(b, p + 12) !== 0 || le16(b, p + 14) !== DOS_DATE || xl + cl > 0 || le32(b, p + 38) !== 0, name: new TextDecoder().decode(b.subarray(p + 46, p + 46 + nl)) });
+    p += 46 + nl + xl + cl;
+  }
+  const sorted = list.sort((a, c) => a.local - c.local);
+  sorted.comment = le16(b, e + 20);
+  return sorted;
+}
+
+
+function header(sig, e, nameBytes, offset) {
+  const common = [putLe16(20), putLe16(e.flags & 0x0800), putLe16(e.method), putLe16(0), putLe16(DOS_DATE), putLe32(e.crc), putLe32(e.csize), putLe32(e.usize), putLe16(nameBytes.length), putLe16(0)];
+  if (sig === 0x04034b50) return cleanCat([putLe32(sig), ...common, nameBytes]);
+  return cleanCat([putLe32(sig), putLe16(20), ...common, putLe16(0), putLe16(0), putLe16(e.intAttr), putLe32(0), putLe32(offset), nameBytes]);
+}
+
+function isOfficePackage(names) { return names.includes("[Content_Types].xml") || names.includes("mimetype"); }
+
+function zipNames(b) { return centralEntries(b).map((e) => e.name); }
+
+function cleanOffice(b) {
+  const entries = centralEntries(b);
+  if (!isOfficePackage(entries.map((e) => e.name))) throw new Error("a zip archive, not an office document; clean each file inside it on its own");
+  if (entries.some((e) => e.flags & 1)) throw new Error("the document is encrypted; Share clean cannot read its properties");
+  const locals = [], centrals = [], removed = [];
+  let at = 0, stamped = entries.comment > 0;
+  for (const e of entries) {
+    if (e.stamped || le16(b, e.local + 28) > 0) stamped = true;
+    const nameBytes = cleanEnc.encode(e.name);
+    let data;
+    if (EMPTY[e.name] !== undefined) {
+      data = cleanEnc.encode(EMPTY[e.name]);
+      if (!(e.method === 0 && e.crc === cleanCrc32(data))) removed.push(PART_NAMES[e.name]);
+      Object.assign(e, { method: 0, crc: cleanCrc32(data), csize: data.length, usize: data.length });
+    } else {
+      const start = e.local + 30 + le16(b, e.local + 26) + le16(b, e.local + 28);
+      data = b.subarray(start, start + e.csize);
+    }
+    const local = header(0x04034b50, e, nameBytes);
+    centrals.push(header(0x02014b50, e, nameBytes, at));
+    locals.push(local, data);
+    at += local.length + data.length;
+  }
+  const cd = cleanCat(centrals);
+  const end = cleanCat([putLe32(0x06054b50), putLe16(0), putLe16(0), putLe16(entries.length), putLe16(entries.length), putLe32(cd.length), putLe32(at), putLe16(0)]);
+  if (stamped) removed.push("file times, owner ids and comments in the package");
+  return { bytes: cleanCat([...locals, cd, end]), removed, notes: [OFFICE_NOTE] };
+}
+
+const zipSniff = (b) => b.length > 4 && le32(b, 0) === 0x04034b50 && latin1(b, 30, 1) !== "";
+
+// A zip of clean copies, stored without compression, with no times, extra fields or comments:
+// the package itself says nothing about when or where it was made. entries: [{ name, bytes }].
+function storedZip(entries) {
+  const locals = [], centrals = [];
+  let at = 0;
+  for (const { name, bytes } of entries) {
+    const nameBytes = cleanEnc.encode(name), e = { flags: 0x0800, method: 0, crc: cleanCrc32(bytes), csize: bytes.length, usize: bytes.length, intAttr: 0 };
+    const local = header(0x04034b50, e, nameBytes);
+    centrals.push(header(0x02014b50, e, nameBytes, at));
+    locals.push(local, bytes);
+    at += local.length + bytes.length;
+  }
+  const cd = cleanCat(centrals);
+  return cleanCat([...locals, cd, putLe32(0x06054b50), putLe16(0), putLe16(0), putLe16(entries.length), putLe16(entries.length), putLe32(cd.length), putLe32(at), putLe16(0)]);
+}
+
+return { OFFICE_NOTE, isOfficePackage, zipNames, cleanOffice, zipSniff, storedZip };
+})();
+
+// ---- clean.js
+const M_clean = (() => {
+// Share clean: a copy of a file to send to someone, with everything the file says about itself
+// removed: EXIF with GPS, XMP, IPTC, ICC profile text, PNG text chunks, GIF comments, MP4 user data
+// and creation times, WebM tags, PDF document information and XMP, office document authors, and
+// Daylight's own embedded description. Lossless wherever the format allows (every format here):
+// pictures, frames and samples are copied byte for byte. After cleaning, the copy is cleaned a
+// second time; anything that second pass would still remove means the copy is refused, never
+// passed as clean. The lineage (original hash to clean hash) is for the user's own evidence copy
+// and is never written into the clean file. Pure: bytes in, bytes out, nothing sent anywhere.
+
+const { cleanJpeg, cleanPng, cleanGif, cleanWebp } = M_clean_image;
+const { cleanMp4, cleanWebm, isMp4Like } = M_clean_av;
+const { cleanPdf } = M_clean_pdf;
+const { cleanOffice, zipNames, isOfficePackage } = M_clean_zip;
+const { asciiAt, be32, le32, cleanSha256 } = M_clean_util;
+
+const CLEAN_LINEAGE_FORMAT = "daylight.clean-lineage/1";
+const CLEAN_FORMATS = ["JPEG", "PNG", "GIF", "WebP", "MP4, MOV and M4A", "WebM and MKV", "PDF", "Word, Excel and PowerPoint (.docx, .xlsx, .pptx)", "OpenDocument (.odt, .ods, .odp)"];
+const CLEAN_LIMITS = "Share clean removes what the file says about itself. What the picture, sound or words show stays as it is: faces, voices, street signs, reflections, screens, a writing style, and the tracking dots some printers add to every page.";
+
+const CLEANERS = { jpeg: cleanJpeg, png: cleanPng, gif: cleanGif, webp: cleanWebp, mp4: cleanMp4, webm: cleanWebm, pdf: cleanPdf, office: cleanOffice };
+const EXT = { jpeg: "jpg", png: "png", gif: "gif", webp: "webp", mp4: "mp4", webm: "webm", pdf: "pdf" };
+
+// The format Share clean reads for these bytes, or null.
+function cleanFormat(b) {
+  if (!b || b.length < 12) return null;
+  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "jpeg";
+  if (b[0] === 0x89 && asciiAt(b, 1, "PNG")) return "png";
+  if (asciiAt(b, 0, "GIF8")) return "gif";
+  if (asciiAt(b, 0, "RIFF") && asciiAt(b, 8, "WEBP")) return "webp";
+  if (be32(b, 0) === 0x1a45dfa3) return "webm";
+  if (asciiAt(b, 0, "%PDF-")) return "pdf";
+  if (isMp4Like(b)) return "mp4";
+  if (le32(b, 0) === 0x04034b50) { try { return isOfficePackage(zipNames(b)) ? "office" : null; } catch { return null; } }
+  return null;
+}
+
+async function run(format, b) {
+  const r = await CLEANERS[format](b);
+  return { bytes: r.bytes, removed: r.removed || [], notes: r.notes || [] };
+}
+
+// { ok, format, bytes, removed, notes } or { ok: false, format, reason }. Never a silent pass.
+async function shareClean(input) {
+  // A private copy: the cleaners edit in place, and a Node Buffer's slice() is a view, so working on
+  // the caller's bytes could change their evidence copy.
+  const b = new Uint8Array(input);
+  const format = cleanFormat(b);
+  if (!format) return { ok: false, format: null, reason: `not cleaned: Share clean reads ${CLEAN_FORMATS.join(", ")}, and this file is none of them` };
+  let first;
+  try { first = await run(format, b); } catch (e) { return { ok: false, format, reason: `not cleaned: ${e.message}` }; }
+  let second;
+  try { second = await run(format, first.bytes); } catch (e) { return { ok: false, format, reason: `not cleaned: the cleaned copy could not be read back (${e.message})` }; }
+  if (second.removed.length) return { ok: false, format, reason: `not cleaned: the copy still carries ${second.removed.join(", ")}` };
+  return { ok: true, format, bytes: first.bytes, removed: first.removed, notes: [...first.notes, CLEAN_LIMITS] };
+}
+
+// A neutral name for the clean copy: nothing from the original name, which can say who and where.
+function cleanName(format, sha256, ext = null) {
+  const e = String(ext || EXT[format] || "bin").replace(/[^a-z0-9]/gi, "").toLowerCase() || "bin";
+  return `clean-${String(sha256).slice(0, 12)}.${e}`;
+}
+
+// The record that ties a clean copy to its original. It stays with the evidence copy, on this
+// device; it is never put inside the shared file or sent anywhere.
+async function cleanLineage(original, result, at = new Date().toISOString()) {
+  const o = original instanceof Uint8Array ? original : new Uint8Array(original);
+  return {
+    format: CLEAN_LINEAGE_FORMAT, at, fileFormat: result.format,
+    original: { sha256: await cleanSha256(o), bytes: o.length },
+    clean: { sha256: await cleanSha256(result.bytes), bytes: result.bytes.length },
+    removed: result.removed,
+  };
+}
+
+return { CLEAN_LINEAGE_FORMAT, CLEAN_FORMATS, CLEAN_LIMITS, cleanFormat, shareClean, cleanName, cleanLineage };
+})();
+
 // ---- adblock.js
 const M_adblock = (() => {
 // The per-site part of ad blocking (src/ext/adblock-bg.js): which site a page belongs to, whether
@@ -13273,7 +13929,16 @@ const DEFAULTS = Object.freeze({
   mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
   // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
   mediaFolder: "Daylight",
+  // Source-protection mode (project-docs/SECURITY-REVIEW.md): off by default. While on, every
+  // switch in PROTECTION_FORCES is held off, and the save page and Share clean behave as it says.
+  protection: false,
 });
+
+// What source-protection mode holds off while it is on: evidence lookups (GitHub, RDAP, the Internet
+// Archive), Other coverage (outlets' feeds), reading About pages automatically, and one-click
+// downloads (which fetch the file again from its host). Turning the mode off leaves them off until
+// the user turns each one back on.
+const PROTECTION_FORCES = Object.freeze({ evidence: false, coverage: false, feedConsent: false, auto: false, mediaButtons: false });
 // A folder path inside Downloads: letters, digits, spaces, dots, hyphens, underscores and slashes,
 // no ".." part, at most 120 characters.
 const folder = (v, d) => (typeof v !== "string" ? d
@@ -13291,7 +13956,7 @@ const switches = (v, allowed) => {
 
 function normalizeSettings(raw) {
   const s = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
-  return {
+  const out = {
     paused: bool(s.paused, DEFAULTS.paused), feeds: bool(s.feeds, DEFAULTS.feeds), auto: bool(s.auto, DEFAULTS.auto),
     sites: switches(s.sites), areas: switches(s.areas, AREA_IDS),
     historyDays: days(s.historyDays, DEFAULTS.historyDays, RETENTION.historyDays),
@@ -13308,7 +13973,9 @@ function normalizeSettings(raw) {
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
     mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder),
+    protection: bool(s.protection, DEFAULTS.protection),
   };
+  return out.protection ? { ...out, ...PROTECTION_FORCES } : out;
 }
 
 // The fixture harness behaves as an X page, so it follows the X switch.
@@ -13368,7 +14035,7 @@ const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "p
 const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1", "pb.packs.v1", "pb.packkeys.v1"]);
 const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));
 
-return { SETTINGS_KEY, SITES, SEARCH_ENGINES, AREA_IDS, RETENTION, DEFAULTS, normalizeSettings, siteOn, areaOn, searchOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
+return { SETTINGS_KEY, SITES, SEARCH_ENGINES, AREA_IDS, RETENTION, DEFAULTS, PROTECTION_FORCES, normalizeSettings, siteOn, areaOn, searchOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
 })();
 
 // ---- families.js
@@ -15107,5 +15774,136 @@ function importFile(name, bytes) {
 return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports });
+// ---- self-audit.js
+const M_self_audit = (() => {
+// "What Daylight shows about you": Daylight's own account signals, run on the user's own account
+// only, each with what it reveals and how to reduce it. Ownership is proved two ways and no other:
+// the page itself shows the signed-in account on its own profile (ownedProfile), or the input is
+// the platform's own data export, which only the account holder can download. There is no way to
+// name an account: no function here takes a handle from the user. Pure and local; nothing is sent.
+
+const { flagsFor, DOES_NOT_PROVE, storeCountry, nameFlags, ageDays } = M_flags;
+const { postingPattern } = M_pattern;
+const { xArchivePosts, redditExportPosts, mastodonOutboxPosts } = M_import_exports;
+
+const SELF_AUDIT_NOT_CHECKED = [
+  "what your photos and videos show (faces, places, screens, reflections)",
+  "who you follow and who follows you, by name",
+  "what friends tag you in or say about you",
+  "data brokers, leaks and the platform's own records",
+  "your writing style, which can identify a person across accounts",
+  "your other accounts: this audit never links accounts or platforms",
+];
+const SELF_AUDIT_REFUSED = "This works only on your own account: open your own profile while signed in (the page must show the signed-in account and its Edit profile button), or load the data export the platform gave you.";
+
+const clean = (h) => String(h || "").trim().replace(/^@/, "").toLowerCase();
+
+// The handle the page proves is the signed-in user's own profile, or null. markers: what the page
+// itself shows, read by src/ext/selfaudit-page.js: { signedIn (the account menu's profile link),
+// pageHandle (the profile being shown), editProfile (the Edit profile button is present) }.
+function ownedProfile(markers = {}) {
+  const a = clean(markers.signedIn), b = clean(markers.pageHandle);
+  if (!a || !b || a !== b || markers.editProfile !== true) return null;
+  return /^[a-z0-9_]{1,15}$/.test(a) ? a : null;
+}
+
+// The hours of the UTC day with posts, the longest quiet stretch and the UTC offset that puts it
+// around 01:00 to 07:00 local, the usual sleeping hours. hist: 24 counts.
+function postingClock(hist) {
+  if (!Array.isArray(hist) || hist.length !== 24 || !hist.some((x) => x > 0)) return null;
+  const total = hist.reduce((s, x) => s + x, 0), quiet = (h) => hist[h % 24] <= total * 0.01;
+  let best = { start: 0, len: 0 };
+  for (let s = 0; s < 24; s++) { let len = 0; while (len < 24 && quiet(s + len)) len++; if (len > best.len) best = { start: s, len }; }
+  if (best.len < 3) return { active: hist.filter((x) => x > 0).length, quietHours: best.len, offset: null };
+  const mid = (best.start + best.len / 2) % 24, off = ((Math.round(4 - mid) + 36) % 24) - 12;
+  return { active: hist.filter((x) => x > 0).length, quietHours: best.len, quietFromUtc: best.start, offset: off };
+}
+
+function row(id, title, shows, reveals, reduce) { return { id, title, shows, reveals, reduce }; }
+
+function placeRows(a) {
+  const out = [];
+  if (a.basedIn) out.push(row("place-label", "Place label", `The platform labels this account as based in ${a.basedIn}${a.proxyNote ? ", and notes the location may be inaccurate" : ""}.`, "Anyone who opens your About page sees this country or region, and Daylight shows it beside your replies.", "The platform sets it from its own data (sign-up, network, phone). You cannot edit it. A VPN changes what it sees from now on; the label can lag."));
+  const store = storeCountry(a.connectedVia);
+  if (store) out.push(row("app-store", "App store country", `Connected via ${a.connectedVia}.`, `The country of the app store your phone uses: ${store}.`, "It follows your app store account's country. It cannot be hidden from this page."));
+  if (a.profileLocation) out.push(row("profile-location", "Profile location", `Your profile says "${a.profileLocation}".`, "A place you typed yourself, shown to everyone.", "Edit your profile and clear the location, or make it vaguer."));
+  const flags = nameFlags(a.display);
+  if (flags.length) out.push(row("name-flag", "Flag in your name", `Your display name shows the flag of ${flags.join(", ")}.`, "A country you chose to show.", "Remove the flag from your display name if you do not want it read as where you are."));
+  return out;
+}
+
+function accountRows(a, now) {
+  const out = [], age = ageDays(a.joinDate, now);
+  if (age != null) out.push(row("account-age", "Account age", `Joined ${a.joinDate} (${age} days ago).`, "When you started, which can match a job, a move or an event.", "It cannot be changed. A new account starts a new date, and new accounts draw more suspicion."));
+  if (Number.isFinite(a.nameChanges)) out.push(row("renames", "Username changes", `Username changed ${a.nameChanges} time${a.nameChanges === 1 ? "" : "s"}.`, "The count is public, and old handles survive in archives, quotes and replies.", "Each change adds to the count. Old names cannot be removed from what others saved."));
+  if (Number.isFinite(a.followersCount) && Number.isFinite(a.followingCount)) out.push(row("follow-counts", "Follow counts", `${a.followersCount} followers, following ${a.followingCount}.`, "The size of your circle; the lists themselves are public unless the account is protected.", "A protected account hides the lists and posts from people you have not approved."));
+  return out;
+}
+
+function postingRows(p) {
+  const out = [];
+  if (!p) return out;
+  const clock = postingClock(p.hourHist);
+  if (clock) out.push(row("posting-clock", "Posting clock", clock.offset == null ? `Posts in ${clock.active} of the 24 hours of the day, with no long quiet stretch (${p.posts} posts).` : `Posts in ${clock.active} of 24 hours; quiet for ${clock.quietHours} hours from ${String(clock.quietFromUtc).padStart(2, "0")}:00 UTC (${p.posts} posts).`, clock.offset == null ? "Round-the-clock posting is one of the signs Daylight shows for automated accounts." : `Your quiet hours fit sleep at about UTC${clock.offset >= 0 ? "+" : ""}${clock.offset}, which points to your time zone and your sleeping hours.`, "Times cannot be hidden once posted. Scheduling posts at varied hours, or posting less from an account you keep apart, blurs the pattern."));
+  if (p.clients && p.clients.length) out.push(row("posting-apps", "Posting apps", `Posted from ${p.clients.map((c) => `${c.name} (${Math.round(c.share * 100)}%)`).join(", ")}.`, "The kind of phone or tool you use. The platform's data carries it even where the page no longer shows it.", "Posting from the web app makes it the same as most people's. Scheduling tools show up by name."));
+  if (Number.isFinite(p.perDay)) out.push(row("volume", "How often you post", `About ${p.perDay} posts a day over ${p.days} days.`, "How much time you spend here, and when you are busy.", "Volume shows over time; posting less, or in batches, changes it."));
+  return out;
+}
+
+function sameTextRows(posts) {
+  const seen = new Map();
+  for (const p of posts || []) { const t = String(p.text || "").trim().toLowerCase(); if (t.length >= 20) seen.set(t, (seen.get(t) || 0) + 1); }
+  const repeats = [...seen.values()].filter((n) => n > 1);
+  return repeats.length ? [row("repeated-text", "Words you repeat", `${repeats.length} of your texts were posted more than once.`, "Repeated wording links posts together and can link accounts that use it.", "Varying how you word things makes posts harder to link.")] : [];
+}
+
+// The audit. input: { site, source: "page" | "export", account, pattern | posts, now }.
+function selfAudit(input = {}) {
+  const a = input.account || {}, now = input.now || Date.now();
+  const pattern = input.pattern || (input.posts ? postingPattern(input.posts.map((p, i) => ({ id: p.id || String(i), posted: p.posted, client: p.client || null }))) : null);
+  const flags = flagsFor({ ...a, pattern }, { now }).map((f) => ({ id: f.id, evidence: f.evidence, doesNotProve: DOES_NOT_PROVE[f.id] || null }));
+  return {
+    site: input.site || null, source: input.source || null, local: true,
+    signals: [...placeRows(a), ...accountRows(a, now), ...postingRows(pattern), ...sameTextRows(input.posts)],
+    flags, notChecked: SELF_AUDIT_NOT_CHECKED,
+  };
+}
+
+// window.YTD.<part>.part0 = [...] from an X archive file, or null.
+function ytd(text, part) {
+  const s = String(text || ""), at = s.indexOf("=");
+  if (!new RegExp(`^\s*window\.YTD\.${part}\.`).test(s) || at < 0) return null;
+  try { return JSON.parse(s.slice(at + 1).trim().replace(/;\s*$/, "")); } catch { return null; }
+}
+
+// The app each post was sent from, which an X archive keeps in tweets.js as an HTML link.
+function withClients(posts, text) {
+  const rows = ytd(text, "tweets") || ytd(text, "tweet");
+  if (!rows) return posts;
+  const app = new Map(rows.map((r) => r.tweet || r).filter((t) => t && t.source).map((t) => [String(t.id_str || t.id), String(t.source).replace(/<[^>]*>/g, "").trim() || null]));
+  return posts.map((p) => ({ ...p, client: app.get(p.id) || null }));
+}
+
+// The audit input from the files of a platform's own data export: an X archive's tweets.js (with
+// account.js and profile.js when given), a Reddit export CSV or a Mastodon outbox.json. Returns
+// { ok, input } or { ok: false, reason }. files: [{ name, text }].
+function exportAuditInput(files = []) {
+  const account = {}, posts = [], sites = new Set();
+  let site = null;
+  for (const f of files) {
+    const acc = ytd(f.text, "account"), prof = ytd(f.text, "profile");
+    if (acc && acc[0] && acc[0].account) { site = "X"; sites.add("X"); Object.assign(account, { joinDate: String(acc[0].account.createdAt || "").slice(0, 10) || null, display: acc[0].account.accountDisplayName || null, handle: acc[0].account.username || null }); continue; }
+    if (prof && prof[0] && prof[0].profile) { site = "X"; sites.add("X"); account.profileLocation = (prof[0].profile.description || {}).location || null; continue; }
+    const got = xArchivePosts(f.text) || (/\.csv$/i.test(f.name) ? redditExportPosts(f.text) : null) || (() => { try { return mastodonOutboxPosts(JSON.parse(f.text)); } catch { return null; } })();
+    if (got && got.posts.length) { site = got.site || site; sites.add(site); posts.push(...withClients(got.posts, f.text)); }
+  }
+  if (sites.size > 1) return { ok: false, reason: `These files come from ${[...sites].join(" and ")}. The audit reads one platform at a time and never links accounts.` };
+  if (!posts.length && !Object.keys(account).length) return { ok: false, reason: `No posts or account found. ${SELF_AUDIT_REFUSED}` };
+  return { ok: true, input: { site, source: "export", account: Object.fromEntries(Object.entries(account).filter(([, v]) => v)), posts } };
+}
+
+return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
+})();
+
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

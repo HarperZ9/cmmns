@@ -136,6 +136,11 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <li>Protected media (DRM or encrypted streams) is never downloaded.</li>
 <li><strong>Convert and compress</strong> runs on this device. No file is uploaded.</li>
 <li><strong>Ad and tracker blocking</strong>, off until you turn it on, is done by your browser's own blocking engine with the bundled EasyList and EasyPrivacy rules. Daylight Commons does not see which requests were blocked. The sites where you allowed ads are kept with your settings.</li></ul>
+<h2>Source protection, Share clean and the self-audit</h2>
+<ul><li><strong>Source protection</strong>, off until you turn it on (toolbar menu, Source protection), stops every request in this policy that Daylight Commons makes on its own: no About pages or Reddit account data read for you, no evidence lookups, no Other coverage, no Internet Archive copy, and no file downloaded again from its host. Save to Daylight keeps only what the page already holds in memory. Download gives Share clean copies, and every evidence bundle is carrier-safe. The toolbar button shows a P while it is on. The sites you open still load their own pages and record what you do there; the mode's own page lists what it cannot protect against. It has not yet been independently reviewed.</li>
+<li><strong>Share clean</strong> (Collections, and the save page's result) makes a copy of a saved file with what the file says about itself removed: EXIF with GPS, XMP, IPTC, colour-profile text, comments, video tags and dates, PDF and office document authors, and the description Daylight Commons wrote into it. It runs on this device and sends nothing. The copy gets a neutral name. The saved file keeps everything, as your evidence copy, and its record gains a line tying the two hashes together.</li>
+<li><strong>What Daylight shows about you</strong> runs Daylight Commons' account signals on your own account: your profile as X already loaded it in this browser, read only when the page shows you signed in on your own profile, or the data export files you choose. It sends nothing and keeps nothing.</li>
+<li>On the command line, <code>daylight case add</code> no longer asks the Wayback Machine for a copy unless you pass <code>--archive</code> or turn the case's archive setting on.</li></ul>
 <h2>What Daylight Commons keeps, where, and for how long</h2>
 <p>Everything is kept in <code>chrome.storage.local</code> (Firefox: <code>browser.storage.local</code>) in the browser profile you installed Daylight Commons in, on this device.</p>
 <div class="scroll"><table><thead><tr><th scope="col">Store</th><th scope="col">What it holds</th><th scope="col">Kept for</th></tr></thead><tbody>
@@ -182,6 +187,7 @@ footer { margin-top: var(--s-7); padding-top: var(--s-4); border-top: 1px solid 
 <li>To the news outlets you chose: a feed download, when Other coverage is on and you click.</li>
 <li>To the host a saved file came from: the download of that file, when you click Save.</li>
 <li>To the Internet Archive: a saved file's address, when you tick &quot;Ask the Internet Archive to keep a copy&quot; on a case save.</li></ul>
+<p>With source protection on, the list is empty: only the sites you open load their own pages.</p>
 <p>That is the whole list. Your data serves the features above and stays out of advertising and sale. Account labels show what each site discloses about an account, kept per site; Daylight Commons leaves who runs an account, and anyone's age, gender, ethnicity, religion or politics, unguessed.</p>
 <h2>Changes</h2>
 <p>Changes to this policy are listed in <a href="https://github.com/HarperZ9/daylight-commons/blob/main/CHANGELOG.md">Daylight Commons' changelog</a> with the version that made them.</p>

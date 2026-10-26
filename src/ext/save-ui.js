@@ -50,6 +50,11 @@ globalThis.PBSaveUi = (() => {
       li.append(el("br"), el("code", { class: "hash" }, rec.sha256));
       const a = el("a", { href: `convert.html#${encodeURIComponent(rec.id)}` }, " Convert or compress");
       li.append(" ", a);
+      // Share clean (share-clean.js): a copy to send, with what the file says about itself removed.
+      const c = el("button", { type: "button", class: "quiet" }, "Share clean");
+      const said = el("span", { class: "muted", role: "status" });
+      c.addEventListener("click", async () => { const r = await PBShareClean.download(rec); said.textContent = r.ok ? ` Saved ${r.name}; removed ${r.removed.join("; ") || "nothing"}.` : ` Not cleaned: ${r.reason}.`; });
+      li.append(" ", c, said);
     }
     return li;
   }

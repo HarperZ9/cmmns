@@ -114,7 +114,7 @@ export const exportStage = {
     const data = ctx.data(), f = join(ctx.dir, "derived", "reading.json");
     const extra = { reading: existsSync(f) ? JSON.parse(readFileSync(f, "utf8")) : null };
     extra.summary = await summaryFor(ctx, data, extra);
-    const r = await writeExport(ctx.data(), profile, { ...extra, at: ctx.now(), tool: ctx.tool, sign: ctx.sign, history: ctx.history ? ctx.history() : null });
+    const r = await writeExport(ctx.data(), profile, { ...extra, ...(ctx.exportOpts || {}), at: ctx.now(), tool: ctx.tool, sign: ctx.sign, history: ctx.history ? ctx.history() : null });
     return r.written ? `wrote ${r.version}` : `unchanged (${r.version})`;
   },
 };

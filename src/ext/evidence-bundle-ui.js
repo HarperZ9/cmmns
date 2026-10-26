@@ -9,6 +9,9 @@
   const built = id ? await chrome.runtime.sendMessage({ type: "pb-card-get", id }) : null;
   if (!built || !built.ok || !built.bundleInput) return;
   $("bundle").hidden = false;
+  // Source-protection mode: every bundle is carrier-safe.
+  await PBSettings.ready;
+  if (PBSettings.get().protection) { $("bundle-carrier").checked = true; $("bundle-carrier").disabled = true; }
   const page = () => { $("bundle-page-row").hidden = !$("bundle-carrier").checked; };
   $("bundle-carrier").addEventListener("change", page);
   page();

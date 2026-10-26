@@ -69,7 +69,7 @@ export const capture = {
   async run(ctx, q, tag) {
     if (ctx.data().sources.some((s) => s.url === q.url)) return "already captured";
     let r;
-    try { r = await addSource(ctx.dir, q.url, { tag, now: ctx.now, fetchFn: ctx.fetchFn, archive: false, tier: q.tier }); } catch (e) { ctx.state.failed[q.url] = e.message; return `failed: ${e.message}`; }
+    try { r = await addSource(ctx.dir, q.url, { tag, now: ctx.now, fetchFn: ctx.fetchFn, archive: false, protection: !!ctx.opts.protection, tier: q.tier }); } catch (e) { ctx.state.failed[q.url] = e.message; return `failed: ${e.message}`; }
     const p = r.source.post;
     if (p && !p.deleted && xPostId(q.url) && q.depth < MAX_THREAD_DEPTH) {
       if (p.in_reply_to) enqueue(ctx.state, postUrl(p.in_reply_to.author, p.in_reply_to.id), q.depth + 1, r.source.id);
@@ -81,7 +81,7 @@ export const capture = {
 
 export const archive = {
   name: "archive",
-  items: (ctx) => (ctx.opts.archive === false ? [] : ctx.data().sources.filter((s) => s.url && !(s.archive && (s.archive.url || s.archive.attempts))).map((s) => ({ key: s.id, id: s.id, url: s.url }))),
+  items: (ctx) => (ctx.opts.archive !== true || ctx.opts.protection ? [] : ctx.data().sources.filter((s) => s.url && !(s.archive && (s.archive.url || s.archive.attempts))).map((s) => ({ key: s.id, id: s.id, url: s.url }))),
   async run(ctx, s) {
     const a = await requestSnapshot(s.url, { fetchFn: ctx.fetchFn, sleep: ctx.sleep, now: ctx.now });
     updateRow(ctx.dir, "sources", s.id, (r) => ({ ...r, archive: { service: "Wayback Machine", ...a } }));
@@ -116,7 +116,7 @@ async function followPrimary(ctx, src, tag) {
   for (const u of links) {
     const have = ctx.data().sources.find((s) => s.url === u);
     if (have) { out.push(have.id); continue; }
-    if (ctx.opts.followPrimary === false) continue;
+    if (ctx.opts.followPrimary === false || ctx.opts.protection) continue;
     try { out.push((await addSource(ctx.dir, u, { tag, now: ctx.now, fetchFn: ctx.fetchFn, archive: false, tier: `primary record candidate (${primaryKind(u).kind})` })).source.id); } catch (e) { ctx.state.failed[u] = e.message; }
   }
   return out;

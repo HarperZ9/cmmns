@@ -84,7 +84,7 @@ test("case add writes the capture, its hash, the access time and the derived edg
   initCase(c, "Add test", "2026-10-23T00:00:00Z");
   const post = { id_str: "99999", created_at: "2026-10-20T00:00:00Z", text: "quoting", user: { screen_name: "q" }, quoted_tweet: { id_str: "8", user: { screen_name: "r" } }, edit_control: { edit_tweet_ids: ["77777", "99999"] } };
   const fetchFn = async (url) => (url.includes("syndication") ? res(JSON.stringify(post), { type: "application/json" }) : res("", { headers: { "content-location": "/web/20261023000000/x" } }));
-  const r = await addSource(c, "https://x.com/q/status/99999", { fetchFn, sleep: async () => {}, now: () => "2026-10-23T01:00:00Z" });
+  const r = await addSource(c, "https://x.com/q/status/99999", { fetchFn, sleep: async () => {}, now: () => "2026-10-23T01:00:00Z", archive: true });
   const bytes = readFileSync(join(c, r.source.capture.file));
   assert.equal(r.source.capture.sha256, sha256(bytes));
   assert.equal(r.source.accessed, "2026-10-23T01:00:00Z");

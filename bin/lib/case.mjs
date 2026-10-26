@@ -15,10 +15,12 @@ import { clock, network, gitInit, gitCommit } from "./case-env.mjs";
 import { RUN_COMMANDS } from "./case-run.mjs";
 import { SCHEDULE_HELP } from "../../src/investigate/watch.js";
 import { CASE_HELP, helpText } from "./help.mjs";
+import { ProtectionBlocked } from "../../src/investigate/protection.js";
+import { protectEnv, settings } from "./case-protect.mjs";
 
 export const CASE_USAGE = `Usage: daylight case <command> [--case <folder>] [--json]
   init <name> [--dir <folder>]                 a new case folder with its own git repository
-  add <url|file> [--no-archive] [--origin O] [--tier T] [--date D] [--what W]
+  add <url|file> [--archive | --no-archive] [--origin O] [--tier T] [--date D] [--what W]
   claim "<text>" --source S01 --rung documented|inference|unproven|contradicted
         [--retells C01 | --corroborates C01] [--self-sourced] [--date D] [--key K]
   claims [--blind]                             the inventory; --blind hides rungs for labellers
@@ -30,13 +32,17 @@ export const CASE_USAGE = `Usage: daylight case <command> [--case <folder>] [--j
   lead "<question>" --record R --holder H --decisive 1-5 [--access public|request|legal|unknown] [--claims C01,C02]
   leads                                        ranked by how decisive the record would be
   absent ["<what>" --status deleted|edited|sealed|withheld|missing --custodian C [--source S]]
-  actor @handle [--name N] [--public-figure]   only public figures keep their handle in exports
+  actor @handle [--name N] [--public-figure] [--keep-name]  only public figures keep their handle
+                                               in exports; in protection mode only --keep-name
   export --profile newsroom|legal|research     signed, versioned; verify-export <folder>
   read                                         the Reading lens over every capture
-  run <seed...> [--no-archive] [--stop <stage>] the whole pipeline; resumes after a crash
+  run <seed...> [--archive] [--stop <stage>]   the whole pipeline; resumes after a crash
   review [--accept ids] [--reject ids]         the queue of machine proposals
   watch [--export]                             re-check captures and leads; see --schedule
   import <old-case-folder> [--with-captures]   a hand-made case into this format
+  settings [archive on|off] [protection on|off] Wayback requests (off by default) and
+                                               source-protection mode for this case
+  export ... [--clean]                         Share clean every file in the export
 `;
 
 const VALUE = new Set(["case", "dir", "source", "rung", "retells", "corroborates", "date", "key", "labeller", "gap", "from", "to", "type", "html", "record", "holder", "decisive", "access", "claims", "status", "custodian", "name", "profile", "origin", "tier", "what", "stop", "accept", "reject", "by", "key-file", "note", "path"]);
@@ -62,6 +68,16 @@ function init(env, { _: [name], f }) {
   return `Case "${meta.name}" opened in ${dir}${git ? " (its own git repository)" : ""}.\n`;
 }
 
+// A Wayback save request only when asked: --archive, or the case's archive setting. Never in
+// source-protection mode, where asking for one is an error rather than a silent skip.
+export function wantArchive(env, f) {
+  if (f.archive && f["no-archive"]) throw new Error("--archive and --no-archive contradict each other; choose one");
+  if (f.archive && env.protection) throw new ProtectionBlocked("a Wayback save request");
+  if (f.archive) return true;
+  if (f["no-archive"]) return false;
+  return env.settings.archive && !env.protection;
+}
+
 async function add(env, { _: [target], f }) {
   if (!target) throw new Error("case add needs a URL or a file");
   if (/\.jsonl$/i.test(target)) {
@@ -69,7 +85,7 @@ async function add(env, { _: [target], f }) {
     for (const u of inboxUrls(target)) if (!have.has(u)) out.push(await add(env, { _: [u], f: { ...f, json: false } }));
     return out.join("") || "Every address in the list is already in the case.\n";
   }
-  const r = await addSource(env.dir, target, { fetchFn: env.fetchFn, sleep: env.sleep, now: env.now, archive: !f["no-archive"], origin: f.origin, tier: f.tier, date: f.date, what: f.what });
+  const r = await addSource(env.dir, target, { fetchFn: env.fetchFn, sleep: env.sleep, now: env.now, archive: wantArchive(env, f), protection: env.protection, origin: f.origin, tier: f.tier, date: f.date, what: f.what });
   const s = r.source, extra = [...r.derived.edges.map((e) => `edge ${e.id}`), ...r.derived.absent.map((a) => `absence ${a.id}`)];
   env.commit(`case add ${s.id}`);
   return f.json ? asJson(r) : `${s.id} captured: ${s.capture.bytes} bytes, sha256 ${s.capture.sha256}. ${s.archive.url ? `Archived at ${s.archive.url}.` : s.archive.error ? `No archive copy: ${s.archive.error}.` : s.archive.note + "."}${extra.length ? ` Also recorded: ${extra.join(", ")}.` : ""}\n`;
@@ -153,12 +169,12 @@ function actor(env, { _: [handle], f }) {
   if (!handle) throw new Error("case actor needs a handle");
   const data = env.data(), h = handle.startsWith("@") ? handle : "@" + handle;
   const have = data.actors.find((a) => String(a.handle).toLowerCase() === h.toLowerCase());
-  const row = have ? updateRow(env.dir, "actors", have.id, (r) => ({ ...r, public_figure: !!f["public-figure"], name: f.name || r.name })) : addRow(env.dir, "actors", { handle: h, name: f.name || null, public_figure: !!f["public-figure"], note: f.note || null });
+  const row = have ? updateRow(env.dir, "actors", have.id, (r) => ({ ...r, public_figure: !!f["public-figure"], keep_name: !!f["keep-name"], name: f.name || r.name })) : addRow(env.dir, "actors", { handle: h, name: f.name || null, public_figure: !!f["public-figure"], keep_name: !!f["keep-name"], note: f.note || null });
   env.commit(`case actor ${row.handle}`);
   return `${row.handle}: ${row.public_figure ? "public figure, handle kept in exports" : "private, shown as a pseudonym in exports"}.\n`;
 }
 
-const COMMANDS = { add, claim, claims, label, labels, event, edge, lead, absent, actor, ...views, ...RUN_COMMANDS };
+const COMMANDS = { settings, add, claim, claims, label, labels, event, edge, lead, absent, actor, ...views, ...RUN_COMMANDS };
 const READ_ONLY = new Set(["claims", "labels", "trace", "timeline", "network", "leads", "verify-export"]);
 
 export async function runCaseCommand(argv, base = {}) {
@@ -176,8 +192,8 @@ ${CASE_USAGE}` };
   env.dir = resolve(typeof args.f.case === "string" ? args.f.case : base.cwd || process.cwd());
   if (cmd === "run" && !isCase(env.dir)) { initCase(env.dir, typeof args.f.name === "string" ? args.f.name : "Case from seeds", env.now()); if (!args.f["no-git"]) gitInit(env.dir); }
   env.data = () => loadCase(env.dir);
-  if (cmd !== "verify-export") env.data();   // an export checks on its own, outside any case
-  env.commit = args.f["no-commit"] || READ_ONLY.has(cmd) ? () => false : (msg) => gitCommit(env.dir, msg);
+  if (cmd !== "verify-export") Object.assign(env, protectEnv(env, env.data().meta, base.env || process.env));   // an export checks on its own, outside any case
+  env.commit = args.f["no-commit"] || READ_ONLY.has(cmd) ? () => false : (msg) => gitCommit(env.dir, msg, { anon: env.protection });
   return { code: 0, out: await fn(env, args) };
 }
 

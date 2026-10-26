@@ -29,7 +29,8 @@
     <div id="case-opts" class="field">
       <p class="muted">Each file joins the case list with its SHA-256, its address, the page and the time. "Save case list" in the toolbar menu writes case-inbox.jsonl for <code>daylight case add</code>, which captures and archives each address again.</p>
       <label><input type="checkbox" id="archive"> Ask the Internet Archive to keep a copy of each file's address now</label>
-      <p class="muted">Sends the file's address to web.archive.org, nothing else. Your browser asks for access to web.archive.org the first time.</p>
+      <p class="muted" id="archive-note">Asks the Internet Archive to save this page. The page's server and the Archive will see the request, and the copy is public. Your browser asks for access to web.archive.org the first time.</p>
+      <p class="muted" id="protection-note" hidden>Source protection is on: nothing is downloaded again and no copy is asked for. Daylight Commons keeps only what this page already holds in memory; for anything else, use your browser's own Save as and add the file to the case.</p>
     </div>
     <div id="board-opts" class="field" hidden>
       <label for="board">Moodboard</label>
@@ -68,6 +69,7 @@
 <script src="case-inbox.js"></script>
 <script src="media-store.js"></script>
 <script src="media-fetch.js"></script>
+<script src="share-clean.js"></script>
 <script src="save-ui.js"></script>
 <script src="save.js"></script>
 </body>
