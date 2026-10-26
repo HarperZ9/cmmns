@@ -22,6 +22,7 @@ path = [
   "docs/*.html",
   "docs/release-key.json",
   "src/ext/*.json",
+  "src/ext/discourse/*.json",
   "assets/**",
   "examples/**",
 ]

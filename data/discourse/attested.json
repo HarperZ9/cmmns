@@ -1,0 +1,8 @@
+{
+  "about": "Quotes from works the index does not hold, attested by a cited source. The quote is the common wording, kept short to identify it. Reviewed 2026-10-25.",
+  "attested": [
+    { "id": "dostoevsky-1849-letter", "quote": "Every minute could be an eternity of happiness.", "creditedTo": "Fyodor Dostoevsky",
+      "finding": "From Dostoevsky's letter to his brother Mikhail of 22 December 1849, written after the mock execution; translations vary (\"each minute might have been an age of happiness\"). The 1914 English edition in the index abridges this letter.",
+      "sourceTitle": "Lapham's Quarterly, \"Under the Gun\"", "source": "https://www.laphamsquarterly.org/time/under-gun" }
+  ]
+}

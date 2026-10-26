@@ -1,0 +1,6 @@
+{
+  "about": "Settings for the persona marker's name list (scripts/discourse-data.mjs query and persons). minSitelinks keeps people with articles in at least that many Wikipedias and sister projects.",
+  "endpoint": "https://qlever.cs.uni-freiburg.de/api/wikidata",
+  "minSitelinks": 70,
+  "retrieved": "2026-10-25"
+}

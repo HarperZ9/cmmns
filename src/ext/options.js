@@ -67,6 +67,7 @@
       switchRow("Every reading technique", `Marks each reading-lens technique on posts. Off, only techniques with held-out precision of 80% or more show: ${[...PB.readingOn()].map((id) => PB.TECHNIQUE_BY_ID.get(id).name.toLowerCase()).join(", ") || "none yet"}.`, s().lensAll, (on) => save({ lensAll: on })),
       switchRow("Pressure lens", "Marks pressure moves in messages, whoever wrote them: urgency, shrinking the ask, manufactured consensus, false even-handedness, burden shifting and deflection by label. On held-out messages it was right on 8 of 9 marks and found 8 of 47 moves, so a message without a mark can still carry pressure.", s().pressureLens, (on) => save({ pressureLens: on })),
       switchRow("Read text in images", "Adds \"Read text in this image\" to the window's Media area. Daylight Commons reads the words on this device, only when you click, in Latin-script languages; the image and its text never leave your browser.", s().imageText, (on) => save({ imageText: on })),
+      switchRow("Discourse checks", "Adds five checks to the window, all on this device: where a quoted line comes from, in a bundled index of public-domain texts and a sourced list of misattributions; accounts named after a well-known person who has died; counts such as 45/50 with their 95% interval; the post's words against the document pages it shows as images (with \"Read text in images\" on, on your click); and replies that bring a source or name an error. Not yet measured on real threads.", s().discourse, (on) => save({ discourse: on })),
     );
   }
 

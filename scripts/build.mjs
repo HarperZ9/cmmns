@@ -14,6 +14,9 @@ const PRODUCT = ["catalogue-data.js", "catalogue-links.js", "definitions.js", "s
 // The integration surface (radar-core, src/core/api.js) and its importers and bundles: they read the
 // modules above and nothing reads them, so they come after everything else.
 const INTEGRATION = ["api-words.js", "api-data.js", "api-site.js", "api-post.js", "api-thread.js", "api-media.js", "api.js", "bundle-verify.js", "evidence-bundle.js", "signing.js", "head.js", "import-html.js", "import-exports.js", "import-json.js", "import-car.js", "imports.js", "self-audit.js"];
+// The discourse checks (src/core/discourse/, project-docs/DISCOURSE.md): their own bundle and global
+// (PBD), loaded by the content scripts and the background worker after core.bundle.js.
+const DISCOURSE = ["text.js", "quotes.js", "persona.js", "stats.js", "docclaim.js", "corrections.js", "cards.js", "sheets.js", "parts.js"];
 const OCR = ["charset.js", "image.js", "binarize.js", "components.js", "segment.js", "gemm-wasm.js", "gemm.js", "model.js", "weights.js", "read.js"];
 const ident = (f) => "M_" + f.replace(/\.js$/, "").replace(/-/g, "_");
 
@@ -38,3 +41,4 @@ function bundle(dir, files, global, out) {
 
 bundle("src/core", [...ORDER, ...PRODUCT, ...INTEGRATION], "PB", "src/ext/core.bundle.js");
 bundle("src/ocr", OCR, "PBOCR", "src/ext/ocr.bundle.js");
+bundle("src/core/discourse", DISCOURSE, "PBD", "src/ext/discourse.bundle.js");

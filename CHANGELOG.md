@@ -16,6 +16,20 @@ were not published to a store.
   layout for a case (each claim drawn over its sources, more widely seen sources drawn more opaque),
   Share clean plates, a PDF and a SHA-256 manifest. `daylight board render <board.json>` draws a
   board made by the reference library. One format, `refdb.board/1`, for both.
+- **Discourse checks** (options, off by default), all on this device; project-docs/DISCOURSE.md.
+  - Where a quote comes from: a signed index of 11 public-domain works (8,681 passages), 12 sourced
+    misattributions and one attested quote. Held out: 8 of 8 placed quotes right, 8 of 11 found,
+    0 of 5 absent quotes wrongly found.
+  - Accounts named after someone who died, from Wikidata, needing a second cue; names a possibly
+    living person shares are dropped.
+  - Counts with their Wilson 95% interval and a small-sample note.
+  - The post's words against the document images it shows.
+  - Replies that bring a source or name an error, ranked without likes, with a side-swap test.
+  - Save the post with its analysis as a study item: `analysis` field and `## Analysis` sections
+    in `daylight.sidecar/1`, and the results as a `refdb.parts/1` parts tree beside the note.
+  - Truth as sheets: the post over the replies that bring a source over the documents they link,
+    each sheet inked by its reach, liftable; replies that share a source are one sheet.
+- Six lessons for the new signs. A discourse thread on the demo stage and `scripts/qa/discourse_shot.py`.
 
 ## 3.6.2 (2026-10-26)
 

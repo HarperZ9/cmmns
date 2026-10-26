@@ -62,6 +62,7 @@ hashtags: ["#space"]
 | `text_complete` | when false | `false` when the page showed only the start of the text and no fuller copy was loaded |
 | `study` | study saves | `true`; the file and note are in `<save folder>/study/<site>/` |
 | `note` | study saves with a note | the one line on what draws the person to it |
+| `analysis` | study saves from the discourse checks (a `<name>.parts.json` parts tree is saved beside the note) | the sign families whose analysis follows as `## Analysis: <label>` sections, such as `["quote-source", "doc-claim", "correction-replies"]` |
 
 Fields added within version 1 are optional and only ever added. Readers should ignore fields they do
 not know. Sections after the front matter may include `## Poll`, `## Link cards`, `## Chapters` and
