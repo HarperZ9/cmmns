@@ -5067,6 +5067,9 @@ function tweetsIn(json) {
         paidPartnership: (((v.content_disclosure || {}).advertising_disclosure) || {}).is_paid_promotion === true ? true : null,
         // the text as the response carries it: long posts keep their full text in note_tweet
         text: textOf(v),
+        // the whole text of a long post (X's note_tweet), kept apart so the 2,000-character text above,
+        // which the lenses read, does not change
+        fullText: textOf(v, Infinity) && textOf(v, Infinity).length > 2000 ? textOf(v, Infinity) : null,
       };
       out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined && !(Array.isArray(x) && !x.length))));
     }
@@ -5077,9 +5080,9 @@ function tweetsIn(json) {
 
 // A post's text from the response, capped. Lists the page has scrolled past are no longer in the
 // page, so the campaign lens reads quote text here rather than from the rendered post.
-function textOf(v) {
+function textOf(v, max = 2000) {
   const t = pick(((((v.note_tweet || {}).note_tweet_results || {}).result) || {}).text, (v.legacy || {}).full_text);
-  return t ? String(t).slice(0, 2000) : null;
+  return t ? String(t).slice(0, max) : null;
 }
 
 // The author of a Tweet object, from its embedded user (legacy or core fields).
@@ -12126,7 +12129,8 @@ function sniffMime(bytes) {
 }
 
 const extOfUrl = (url) => {
-  try { const m = /\.([a-z0-9]{2,5})$/i.exec(new URL(url).pathname); return m ? m[1].toLowerCase() : null; } catch { return null; }
+  // ".jpg", or Bluesky's "@jpeg" at the end of the path
+  try { const m = /[.@]([a-z0-9]{2,5})$/i.exec(new URL(url).pathname); return m ? m[1].toLowerCase() : null; } catch { return null; }
 };
 const GENERIC = /^(application\/octet-stream|binary\/octet-stream|text\/plain|application\/x-www-form-urlencoded)?$/;
 
@@ -12146,7 +12150,7 @@ const RESERVED = /^(con|prn|aux|nul|com\d|lpt\d)$/i;
 
 // Letters, digits and single hyphens; any script, never a path, at most `max` characters.
 function slug(s, max = 60) {
-  const out = String(s || "").normalize("NFKC").replace(/[\u0000-\u001f\u007f<>:"/\\|?*#%&{}$!'`@=+^~[\];,]+/g, " ")
+  const out = String(s || "").normalize("NFKC").replace(/[\u0000-\u001f\u007f<>:"/\\|?*#%&{}$!'`@=+^~[\];,()‐-―•]+/g, " ")
     .replace(/[\s._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, max).replace(/-+$/, "");
   return RESERVED.test(out) ? "_" + out : out;
 }
@@ -12268,7 +12272,7 @@ function downloadPlan(t, { asGif = false } = {}) {
     return { action: "none", reason: "This media has no file Daylight Commons can read to make a GIF." };
   }
   if (t.canvas) return { action: "canvas" };
-  if (web(t.url)) { const [url, ...alternatives] = sizeLadder(t.url); return { action: "url", url, alternatives }; }
+  if (web(t.url)) { const [url, ...alternatives] = sizeLadder(t.url); return { action: "url", url, alternatives: [...alternatives, ...(t.alternatives || [])] }; }
   if (t.url && /^data:/i.test(t.url)) return { action: "bytes", url: t.url };
   if (t.url && /^blob:/i.test(t.url) && t.kind !== "video" && t.kind !== "audio") return { action: "bytes", url: t.url };
   if (stream) return { action: "stream", stream };
@@ -12718,7 +12722,25 @@ function postMeta(m = {}, now = new Date().toISOString()) {
     alt: m.alt && !/^(image|video|gif|embedded video)$/i.test(String(m.alt).trim()) ? String(m.alt) : null,
     hashtags: [...new Set([...tags.hashtags, ...(m.hashtags || [])])], links: [...new Set([...(m.links || []), ...tags.links])],
     quoted: sub(m.quoted), parent: sub(m.parent), thread: (m.thread || []).map(clean).filter(Boolean),
-    subreddit: m.subreddit || null, item: m.total > 1 ? { index: (m.index || 0) + 1, total: m.total } : null,
+    subreddit: m.subreddit || null, flair: m.flair ? String(m.flair).slice(0, 120) : null,
+    item: m.total > 1 ? { index: (m.index || 0) + 1, total: m.total } : null,
+    // "text" for a post or a selection saved on its own, as a note with no file; else "media"
+    kind: m.kind === "text" ? "text" : "media", selection: !!m.selection,
+    // link cards as the page showed them, and a poll's options and results
+    cards: (m.cards || []).filter((c) => c && c.url).map((c) => ({ url: String(c.url), title: c.title ? String(c.title).slice(0, 300) : null })).slice(0, 20),
+    poll: m.poll && (m.poll.options || []).length ? { options: m.poll.options.map((o) => ({ label: String(o.label || "").slice(0, 200), result: o.result != null ? String(o.result) : null })),
+      total: m.poll.total != null ? String(m.poll.total) : null, status: m.poll.status ? String(m.poll.status) : null } : null,
+    // false when the page showed only the start of the text ("Show more") and no fuller copy was loaded
+    textComplete: m.textComplete !== false,
+    // true when the author's continuation is proved part by part; "unknown" when the page may hold
+    // more of the thread than could be proved; null when there is no thread
+    threadComplete: m.threadComplete === true ? true : m.threadComplete === "unknown" ? "unknown" : null,
+    // the counts the page showed, as it showed them, with the time they were read
+    engagement: m.engagement && typeof m.engagement === "object" ? { ...Object.fromEntries(Object.entries(m.engagement).filter(([, v]) => v != null).map(([k, v]) => [k, typeof v === "number" ? v : String(v)])), at: iso(now) || now } : null,
+    // Study: saved to study later; the optional line on what draws the person to it
+    study: !!m.study, studyNote: m.studyNote ? String(m.studyNote).replace(/\s+/g, " ").trim().slice(0, 300) || null : null,
+    // Further text the page showed, under its own heading (YouTube chapters and transcript).
+    notes: (m.notes || []).filter((n) => n && n.label && n.text).map((n) => ({ label: String(n.label).slice(0, 80), text: clean(n.text) })),
   };
 }
 
@@ -12747,10 +12769,14 @@ const quoteBlock = (t) => String(t).split("\n").map((l) => (l ? "> " + l : ">"))
 // The front matter that opens every .md sidecar: the fields a library indexes, one JSON value per
 // line (YAML reads them as they are), so a reader needs no Markdown parser.
 function frontMatter(meta, files) {
-  const rows = { format: SIDECAR_FORMAT, files, site: meta.site, handle: meta.author.handle, author: meta.author.name, posted: meta.postedAt, saved: meta.savedAt,
+  const rows = { format: SIDECAR_FORMAT, files, kind: meta.kind || "media", site: meta.site, handle: meta.author.handle, author: meta.author.name, posted: meta.postedAt, saved: meta.savedAt,
     post: meta.postUrl, media: meta.mediaUrl, page: meta.postUrl ? null : meta.pageUrl, subreddit: meta.subreddit, hashtags: meta.hashtags,
-    item: meta.item ? `${meta.item.index} of ${meta.item.total}` : null };
-  return ["---", ...Object.entries(rows).filter(([, v]) => v != null && !(Array.isArray(v) && !v.length)).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
+    item: meta.item ? `${meta.item.index} of ${meta.item.total}` : null,
+    flair: meta.flair || null, selection: meta.selection ? true : null,
+    thread_complete: meta.thread && meta.thread.length && meta.threadComplete === true ? true : meta.threadComplete === "unknown" ? "unknown" : null,
+    engagement: meta.engagement || null,
+    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null };
+  return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
 }
 
 // The sidecar a person reads: front matter, then the post's text first. fileNames: one name, or
@@ -12759,19 +12785,24 @@ function sidecarMarkdown(meta, fileNames = null) {
   const files = [].concat(fileNames || []).filter(Boolean);
   const m = files.length > 1 ? { ...meta, item: null } : meta;
   const who = [m.author.name, m.author.handle ? at(m.author.handle) : null].filter(Boolean).join(" ");
-  const out = [...frontMatter(m, files), `# ${who || m.title || "Saved media"}${m.item ? ` (item ${m.item.index} of ${m.item.total})` : ""}`, ""];
-  if (m.title && m.site === "reddit") out.push(`**${m.title}**`, "");
+  const out = [...frontMatter(m, files), `# ${who || m.title || (m.kind === "text" ? "Saved text" : "Saved media")}${m.item ? ` (item ${m.item.index} of ${m.item.total})` : ""}`, ""];
+  if (m.title && (m.site === "reddit" || m.site === "youtube" || m.selection)) out.push(`**${m.title}**`, "");
   if (m.text) out.push(quoteBlock(m.text), "");
+  if (m.textComplete === false) out.push("The page showed only the start of this text, and no fuller copy was loaded.", "");
+  if (m.studyNote) out.push(`What draws me to this: ${m.studyNote}`, "");
   for (const t of m.thread) out.push("Continued by the author:", "", quoteBlock(t), "");
   if (m.alt) out.push(`Alt text: ${m.alt}`, "");
+  for (const n of m.notes || []) out.push(`## ${n.label}`, "", n.text, "");
+  if (m.poll) out.push("## Poll", "", ...m.poll.options.map((o) => `- ${o.label}${o.result ? `: ${o.result}` : ""}`), ...(m.poll.total || m.poll.status ? ["", [m.poll.total, m.poll.status].filter(Boolean).join(", ")] : []), "");
+  if ((m.cards || []).length) out.push("## Link cards", "", ...m.cards.map((c) => `- ${c.title ? c.title + ": " : ""}${c.url}`), "");
   for (const [label, p] of [["Quoting", m.quoted], ["Replying to", m.parent]]) {
     if (!p) continue;
     out.push(`${label}${p.author ? " " + at(String(p.author).replace(/^@/, "")) : ""}${p.url ? ` (${p.url})` : ""}:`, "");
     if (p.text) out.push(quoteBlock(p.text), "");
   }
   const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
-    ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
-    ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
+    ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Flair", m.flair], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
+    ["Engagement at save", m.engagement ? Object.entries(m.engagement).filter(([k]) => k !== "at").map(([k, v]) => `${k} ${v}`).join(", ") : null], ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
   out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by Daylight Commons from what the page showed.", "");
   return out.join("\n");
 }
@@ -12965,6 +12996,109 @@ function readDescription(bytes) {
 }
 
 return { xmpPacket, embedDescription, readDescription };
+})();
+
+// ---- media-card.js
+const M_media_card = (() => {
+// A text card: a post's or a selection's words set as a picture, for sharing where only pictures
+// travel. It is a Daylight Commons rendering in the house type (Hanken Grotesk, JetBrains Mono for the
+// address) on the house paper, with no avatar, icon, button or layout of any platform, and it says
+// at its foot that it is a rendering and not a screenshot. Pure: the caller passes measure(text,
+// font) and draws the returned list.
+
+const CARD = Object.freeze({ width: 1200, pad: 80, paper: "#ebe5d8", ink: "#16130f", soft: "#4a443b", rule: "#c9bfab", maxBodyLines: 36 });
+const SANS = '"Hanken Grotesk", "Segoe UI", sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
+const CARD_FOOT = "Daylight Commons rendering of text the page showed. Not a screenshot of the post.";
+
+// Words wrapped to maxWidth; a word wider than a line is broken by characters. Blank lines stay.
+function wrapLines(text, measure, font, maxWidth) {
+  const out = [];
+  for (const para of String(text || "").replace(/\r\n?/g, "\n").split("\n")) {
+    if (!para.trim()) { out.push(""); continue; }
+    let line = "";
+    for (const word of para.split(/\s+/).filter(Boolean)) {
+      const next = line ? `${line} ${word}` : word;
+      if (measure(next, font) <= maxWidth) { line = next; continue; }
+      if (line) out.push(line);
+      line = word;
+      while (measure(line, font) > maxWidth && line.length > 1) {
+        let cut = line.length - 1;
+        while (cut > 1 && measure(line.slice(0, cut), font) > maxWidth) cut--;
+        out.push(line.slice(0, cut));
+        line = line.slice(cut);
+      }
+    }
+    if (line) out.push(line);
+  }
+  while (out.length && !out[out.length - 1]) out.pop();
+  return out;
+}
+
+// The drawing for one card: { width, height, background, items: [{ kind: "text" | "rule", ... }] }.
+function cardPlan(meta, measure) {
+  const { width, pad, maxBodyLines } = CARD, inner = width - pad * 2, items = [];
+  let y = pad;
+  const text = (s, font, size, color, x = pad, lead = 1.4) => { items.push({ kind: "text", text: s, font, size, color, x, y: y + size }); y += Math.round(size * lead); };
+  const who = [meta.author && meta.author.name, meta.author && meta.author.handle ? (/^u\//.test(meta.author.handle) ? meta.author.handle : "@" + meta.author.handle) : null].filter(Boolean).join("  ") || meta.site || "";
+  const f = (w, size, fam) => `${w} ${size}px ${fam}`;
+  if (who) text(who, f(700, 30, SANS), 30, CARD.ink);
+  const when = [meta.site, meta.postedAt ? meta.postedAt.slice(0, 10) : null].filter(Boolean).join(", ");
+  if (when) text(when, f(400, 22, SANS), 22, CARD.soft, pad, 2);
+  if (meta.title && (meta.site === "reddit" || meta.site === "youtube" || meta.selection)) for (const l of wrapLines(meta.title, measure, f(700, 34, SANS), inner)) text(l, f(700, 34, SANS), 34, CARD.ink);
+  const body = wrapLines([meta.text, ...(meta.thread || [])].filter(Boolean).join("\n\n"), measure, f(400, 34, SANS), inner);
+  const shown = body.slice(0, maxBodyLines);
+  if (body.length > maxBodyLines) shown[shown.length - 1] = `${shown[shown.length - 1]} …`;
+  for (const l of shown) text(l, f(400, 34, SANS), 34, CARD.ink, pad, 1.45);
+  if (body.length > maxBodyLines || meta.textComplete === false) text(meta.textComplete === false ? "The page showed only the start of this text." : "The rest is in the saved note.", f(400, 22, SANS), 22, CARD.soft);
+  if (meta.quoted && meta.quoted.text) {
+    y += 12;
+    const top = y;
+    for (const l of wrapLines(meta.quoted.text, measure, f(400, 26, SANS), inner - 32).slice(0, 10)) text(l, f(400, 26, SANS), 26, CARD.soft, pad + 32);
+    items.push({ kind: "rule", x: pad + 8, y: top, w: 3, h: y - top });
+  }
+  y += 24;
+  items.push({ kind: "rule", x: pad, y, w: inner, h: 1 });
+  y += 20;
+  const link = meta.postUrl || meta.pageUrl;
+  if (link) for (const l of wrapLines(link, measure, f(400, 20, MONO), inner)) text(l, f(400, 20, MONO), 20, CARD.ink);
+  text(CARD_FOOT, f(400, 18, SANS), 18, CARD.soft, pad, 1.6);
+  return { width, height: y + pad - 20, background: CARD.paper, items };
+}
+
+return { CARD, CARD_FOOT, wrapLines, cardPlan };
+})();
+
+// ---- media-thread.js
+const M_media_thread = (() => {
+// An author's own thread, proved part by part: each part answers the part before it (replyTo) and has
+// the same author. Posts that only sit next to each other on a page are never joined; on a profile or
+// a timeline they are unrelated posts by the same person (the 3.6.0 defect this replaces).
+
+// The ids and texts after rootId, in order. posts: tweet records ({ id, author, replyTo, text, fullText }).
+function threadChain(posts, rootId, author, max = 25) {
+  const list = [...posts], who = String(author || "").toLowerCase(), ids = [], texts = [];
+  for (let cur = String(rootId), i = 0; i < max; i++) {
+    const next = list.find((p) => p && p.replyTo === cur && p.author && p.author.toLowerCase() === who);
+    if (!next) break;
+    ids.push(next.id);
+    if (next.fullText || next.text) texts.push(next.fullText || next.text);
+    cur = next.id;
+  }
+  return { ids, texts };
+}
+
+// What a saved note's continuation can be trusted for, from its front matter and body:
+// "verified" (3.6.1 and later, proved), "unknown" (a thread may exist that could not be proved),
+// "unverified" (a continuation with no proof, as 3.6.0 wrote them on any page), or "none".
+function continuationStatus(markdown) {
+  const md = String(markdown || ""), front = md.split("\n---\n")[0];
+  const has = /\nContinued by the author:\n/.test(md);
+  if (/\nthread_complete: true\n|\nthread_complete: true$/.test(front + "\n")) return has ? "verified" : "none";
+  if (/\nthread_complete: "unknown"/.test(front + "\n")) return "unknown";
+  return has ? "unverified" : "none";
+}
+
+return { threadChain, continuationStatus };
 })();
 
 // ---- clean-util.js
@@ -13932,6 +14066,9 @@ const DEFAULTS = Object.freeze({
   // Source-protection mode (project-docs/SECURITY-REVIEW.md): off by default. While on, every
   // switch in PROTECTION_FORCES is held off, and the save page and Share clean behave as it says.
   protection: false,
+  // The hover Download control (src/ext/quick-hover.js): on by default; on every site once the user
+  // allows that access; never on the sites listed in hoverOffSites.
+  hoverDownload: true, hoverEverywhere: true, hoverOffSites: [],
 });
 
 // What source-protection mode holds off while it is on: evidence lookups (GitHub, RDAP, the Internet
@@ -13974,6 +14111,7 @@ function normalizeSettings(raw) {
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
     mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder),
     protection: bool(s.protection, DEFAULTS.protection),
+    hoverDownload: bool(s.hoverDownload, DEFAULTS.hoverDownload), hoverEverywhere: bool(s.hoverEverywhere, DEFAULTS.hoverEverywhere), hoverOffSites: siteList(s.hoverOffSites),
   };
   return out.protection ? { ...out, ...PROTECTION_FORCES } : out;
 }
@@ -15905,5 +16043,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

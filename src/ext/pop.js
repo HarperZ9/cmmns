@@ -224,6 +224,7 @@
     clearTimeout(closeTimer);
     if (owner === target && pop) return pop;
     const list = typeof sections === "function" ? sections() : sections;
+    if (list && globalThis.PBSide && PBSide.take(target, list, sections)) return null;   // shown in the side panel instead
     close(true);
     if (!list) return null;
     pop = build(list);
@@ -279,8 +280,7 @@
     if (!pop || !owner || !owner.__pbSections) return;
     const list = owner.__pbSections();
     if (!list) return;
-    const keep = pinned, old = pop, next = build(list);
-    next.style.left = old.style.left; next.style.top = old.style.top;
+    const keep = pinned, old = pop, next = build(list); next.style.left = old.style.left; next.style.top = old.style.top;
     next.classList.add("pb-in");
     old.replaceWith(next);
     pop = next; pinned = keep;
@@ -296,5 +296,5 @@
   document.addEventListener("pointerdown", (e) => { if (pop && pinned && !pop.contains(e.target) && !(e.target.closest && e.target.closest(".pb-tap"))) close(); }, true);
   window.addEventListener("scroll", () => { if (pop && !pinned) close(); }, { passive: true });
 
-  globalThis.PBPop = Object.freeze({ hover, show, close, el, refresh, tipBox, TOUCH });
+  globalThis.PBPop = Object.freeze({ hover, show, close, el, refresh, tipBox, TOUCH, render: build });
 })();

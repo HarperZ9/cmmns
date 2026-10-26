@@ -41,6 +41,9 @@
     return id;
   }
 
+  // "Save to Daylight" from the hover control (quick-hover-bg.js) opens the same save page.
+  globalThis.PBSaveToDaylight = open;
+
   if (chrome.contextMenus) chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId !== MENU || !tab) return;
     open(tab, info.srcUrl, info.mediaType, info.frameId).catch((e) => console.error("[daylight-commons] save to Daylight failed", e));

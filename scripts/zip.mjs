@@ -56,13 +56,27 @@ export function zip(files) {
 
 // The manifest each browser understands. Chrome runs a service worker and ignores Firefox's keys;
 // Firefox runs background scripts and needs version 128 for main-world content scripts.
+// Files the store packages (Chrome Web Store, Firefox Add-ons) leave out. Store policy forbids an
+// extension that downloads YouTube video, so its command line hand-off ships only unpacked and in the
+// self-distributed Firefox build. tests/store-build.test.js checks both packages.
+export const STORE_BUILDS = new Set(["chrome", "firefox"]);
+export const NOT_IN_STORE = new Set(["yt-handoff.js"]);
+export const filesFor = (files, browser) => (STORE_BUILDS.has(browser) ? files.filter(([n]) => !NOT_IN_STORE.has(n)) : files);
+
 export function browserManifest(source, browser) {
   const m = structuredClone(source);
+  if (STORE_BUILDS.has(browser)) {
+    m.content_scripts = m.content_scripts.map((c) => ({ ...c, js: c.js.filter((f) => !NOT_IN_STORE.has(f)) })).filter((c) => c.js.length);
+  }
   if (browser === "chrome") {
     m.background = { service_worker: m.background.service_worker };
     delete m.browser_specific_settings;
+    delete m.sidebar_action;   // Firefox's sidebar; Chrome has side_panel
   } else {
     m.background = { scripts: m.background.scripts };
+    // Chrome's side panel; Firefox opens the same page as its sidebar (sidebar_action).
+    delete m.side_panel;
+    m.permissions = m.permissions.filter((p) => p !== "sidePanel");
     const gecko = m.browser_specific_settings.gecko;
     if (!(parseFloat(gecko.strict_min_version) >= 128)) gecko.strict_min_version = "128.0";
     // The self-distributed build checks Daylight Commons' own site for updates. AMO-listed builds must not

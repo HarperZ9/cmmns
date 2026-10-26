@@ -1,0 +1,718 @@
+{
+ "tool": "scripts/qa/hover_check.py, scripts/qa/x_thread_check.py",
+ "run": "2026-10-25, Chrome 155, Windows 11, signed out, fresh profile",
+ "cases": [
+  {
+   "name": "instagram",
+   "url": "https://www.instagram.com/nasa/",
+   "media": {
+    "tag": "IMG",
+    "x": 164.83334350585938,
+    "y": 242.6666717529297,
+    "w": 310.66668701171875,
+    "h": 414.21875,
+    "src": "https://scontent-sea5-1.cdninstagram.com/v/t51.82787-15/842191580_18656578867049152_4200499629839780998_n.jpg?stp=dst-jp"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved NASA-(-nasa)-•-Instagram-photos-and-videos-842191580-18656578867049152-420049962983.jpg, 13 KB.",
+   "files": [
+    {
+     "name": "NASA-(-nasa)-•-Instagram-photos-and-videos-842191580-18656578867049152-420049962983.md",
+     "bytes": 1787,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    },
+    {
+     "name": "NASA-(-nasa)-•-Instagram-photos-and-videos-842191580-18656578867049152-420049962983.jpg",
+     "bytes": 13155,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       360,
+       640
+      ],
+      "frames": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "pinterest",
+   "url": "https://www.pinterest.com/ideas/",
+   "media": {
+    "tag": "IMG",
+    "x": 326.20001220703125,
+    "y": 216.9166717529297,
+    "w": 222.53128051757812,
+    "h": 466.7395935058594,
+    "src": "https://i.pinimg.com/236x/27/6c/9f/276c9f2197d42ac1f8637f4bee1500d8.jpg"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved Explore-the-best-of-Pinterest-276c9f2197d42ac1f8637f4bee1500d8.jpg, 354 KB.",
+   "files": [
+    {
+     "name": "Explore-the-best-of-Pinterest-276c9f2197d42ac1f8637f4bee1500d8.md",
+     "bytes": 732,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    },
+    {
+     "name": "Explore-the-best-of-Pinterest-276c9f2197d42ac1f8637f4bee1500d8.jpg",
+     "bytes": 362120,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       1000,
+       2100
+      ],
+      "frames": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "tumblr",
+   "url": "https://www.tumblr.com/explore/trending",
+   "media": {
+    "tag": "IMG",
+    "x": 292.5,
+    "y": 125.27083587646484,
+    "w": 284,
+    "h": 649.1354370117188,
+    "src": "https://64.media.tumblr.com/8a0b46cf8556f4a422e47396b760db71/13ac84c07ad179ac-8c/s500x750/cc6a1445e37576e1b5f515e4737db5"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved Tumblr-4b579463840feddd322c08dbedc8cab3aba1bfd8.jpg, 367 KB.",
+   "files": [
+    {
+     "name": "Tumblr-4b579463840feddd322c08dbedc8cab3aba1bfd8.md",
+     "bytes": 850,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    },
+    {
+     "name": "Tumblr-4b579463840feddd322c08dbedc8cab3aba1bfd8.jpg",
+     "bytes": 376019,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       896,
+       2048
+      ],
+      "frames": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "bluesky",
+   "url": "https://bsky.app/profile/bsky.app",
+   "media": {
+    "tag": "IMG",
+    "x": 297.3333435058594,
+    "y": 192.33334350585938,
+    "w": 512.6354370117188,
+    "h": 515,
+    "src": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:xrr5j2okn7ew2zvcwsxus3gb/bafkreifbrlsxlwxlggg6jhqlizlwfsexlnnene6b"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Downloading Bluesky-bsky-app-Bluesky-bafkreifbrlsxlwxlggg6jhqlizlwfsexlnnene6.bin",
+   "files": [
+    {
+     "name": "Bluesky-bsky-app-Bluesky-bafkreifbrlsxlwxlggg6jhqlizlwfsexlnnene6.md",
+     "bytes": 1129,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    },
+    {
+     "name": "Bluesky-bsky-app-Bluesky-bafkreifbrlsxlwxlggg6jhqlizlwfsexlnnene6.webp",
+     "bytes": 46192,
+     "sniffed": "webp",
+     "check": {
+      "opens": true,
+      "size": [
+       995,
+       1000
+      ],
+      "frames": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "tiktok",
+   "url": "https://www.tiktok.com/@nasa",
+   "media": {
+    "tag": "IMG",
+    "x": 272,
+    "y": 36,
+    "w": 172,
+    "h": 172,
+    "src": "https://p16-common-sign.tiktokcdn-us.com/tos-useast5-avt-0068-tx/e5143212a59c09a008bf50f487d54d1f~tplv-tiktokx-cropcente"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved NASA-(-nasa)-TikTok-e5143212a59c09a008bf50f487d54d1f-tplv-ti.jpg, 77 KB.",
+   "files": [
+    {
+     "name": "NASA-(-nasa)-TikTok-e5143212a59c09a008bf50f487d54d1f-tplv-ti.md",
+     "bytes": 1297,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    },
+    {
+     "name": "NASA-(-nasa)-TikTok-e5143212a59c09a008bf50f487d54d1f-tplv-ti.jpg",
+     "bytes": 78356,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       1080,
+       1080
+      ],
+      "frames": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "facebook",
+   "url": "https://www.facebook.com/NASA/",
+   "media": null,
+   "control": null,
+   "layout_unchanged": null,
+   "result": "no picture or video of 160 px or more on screen (sign-in wall or empty page)",
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": null,
+   "files": []
+  },
+  {
+   "name": "vimeo",
+   "url": "https://vimeo.com/channels/staffpicks",
+   "media": {
+    "tag": "IMG",
+    "x": 364.66668701171875,
+    "y": 263.10418701171875,
+    "w": 197.33334350585938,
+    "h": 374.4375,
+    "src": "https://i.vimeocdn.com/custom_asset/3d4ff09c3aec58abb8861cd80f9753f8?region=us"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved Vimeo-Staff-Picks-on-Vimeo-3d4ff09c3aec58abb8861cd80f9753f8.png, 314 KB.",
+   "files": [
+    {
+     "name": "Vimeo-Staff-Picks-on-Vimeo-3d4ff09c3aec58abb8861cd80f9753f8.png",
+     "bytes": 321099,
+     "sniffed": "png",
+     "check": {
+      "opens": true,
+      "size": [
+       480,
+       720
+      ],
+      "frames": 1
+     }
+    },
+    {
+     "name": "Vimeo-Staff-Picks-on-Vimeo-3d4ff09c3aec58abb8861cd80f9753f8.md",
+     "bytes": 741,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    }
+   ]
+  },
+  {
+   "name": "imgur",
+   "url": "https://imgur.com/",
+   "media": {
+    "tag": "VIDEO",
+    "x": 798.7708740234375,
+    "y": 183.33334350585938,
+    "w": 299.125,
+    "h": 533,
+    "src": "https://i.imgur.com/5F000Ih_lq.mp4"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved Imgur-The-magic-of-the-Internet-5F000Ih.mp4, 5.0 MB.",
+   "files": [
+    {
+     "name": "Imgur-The-magic-of-the-Internet-5F000Ih.md",
+     "bytes": 513,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    },
+    {
+     "name": "Imgur-The-magic-of-the-Internet-5F000Ih.mp4",
+     "bytes": 5290594,
+     "sniffed": "mp4/isom",
+     "check": {
+      "opens": true,
+      "duration": 35,
+      "size": [
+       480,
+       854
+      ],
+      "soundBytes": 44945
+     }
+    }
+   ]
+  },
+  {
+   "name": "youtube",
+   "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+   "media": {
+    "tag": "VIDEO",
+    "x": 17,
+    "y": 68,
+    "w": 896,
+    "h": 504,
+    "src": "blob:https://www.youtube.com/a19fd2ce-175c-43f2-8b8a-dea4dbe03eec"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved blenderofficial_2014-11-10_uhd-high-frame-rate-version-of-the-iconic-short.jpg, 107 KB.",
+   "files": [
+    {
+     "name": "blenderofficial_2014-11-10_uhd-high-frame-rate-version-of-the-iconic-short.md",
+     "bytes": 1158,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    },
+    {
+     "name": "blenderofficial_2014-11-10_uhd-high-frame-rate-version-of-the-iconic-short.jpg",
+     "bytes": 109221,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       1278,
+       720
+      ],
+      "frames": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Mount_Rainier",
+   "media": {
+    "tag": "IMG",
+    "x": 692.1875,
+    "y": 315.3645935058594,
+    "w": 272,
+    "h": 181,
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Rainier20200906.jpg/330px-Rainier20200906.jpg?utm_source=en.wik"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg, 94 KB.",
+   "files": [
+    {
+     "name": "Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg",
+     "bytes": 95825,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       960,
+       640
+      ],
+      "frames": 1
+     }
+    },
+    {
+     "name": "Mount-Rainier-Wikipedia-960px-Rainier20200906.md",
+     "bytes": 821,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    }
+   ]
+  },
+  {
+   "name": "plain-site",
+   "url": "https://www.nasa.gov/image-of-the-day/",
+   "media": {
+    "tag": "IMG",
+    "x": 24,
+    "y": 235.21875,
+    "w": 292.16668701171875,
+    "h": 300,
+    "src": "https://www.nasa.gov/wp-content/uploads/2026/10/ssc-20261021-s00947horig.jpg"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved Image-of-the-Day-NASA-ssc-20261021-s00947horig.jpg, 1.9 MB.",
+   "files": [
+    {
+     "name": "Image-of-the-Day-NASA-ssc-20261021-s00947horig.md",
+     "bytes": 811,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    },
+    {
+     "name": "Image-of-the-Day-NASA-ssc-20261021-s00947horig.jpg",
+     "bytes": 2014304,
+     "sniffed": "jpeg",
+     "check": {
+      "opens": true,
+      "size": [
+       5568,
+       3712
+      ],
+      "frames": 1
+     }
+    }
+   ]
+  },
+  {
+   "name": "right-click-blocked",
+   "url": "http://127.0.0.1:8765/noright.html",
+   "media": {
+    "tag": "IMG",
+    "x": 8,
+    "y": 8,
+    "w": 480,
+    "h": 360,
+    "src": "http://127.0.0.1:8765/pic.png"
+   },
+   "control": {
+    "host": true,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved No-right-click-here-pic.png, 3 KB.",
+   "files": [
+    {
+     "name": "No-right-click-here-pic.png",
+     "bytes": 3342,
+     "sniffed": "png",
+     "check": {
+      "opens": true,
+      "size": [
+       800,
+       600
+      ],
+      "frames": 1
+     }
+    },
+    {
+     "name": "No-right-click-here-pic.md",
+     "bytes": 479,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    }
+   ]
+  },
+  {
+   "name": "x-post-no-double",
+   "url": "https://x.com/NASA/status/2113655288687431819",
+   "media": {
+    "tag": "IMG",
+    "x": 286.3333435058594,
+    "y": 273,
+    "w": 568,
+    "h": 513.6979370117188,
+    "src": "https://pbs.twimg.com/media/HVU2SLKW0AA7q0a?format=webp&name=small"
+   },
+   "control": {
+    "host": false,
+    "hover": true
+   },
+   "layout_unchanged": true,
+   "result": "no hover control drawn (the X button covers this post)",
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": null,
+   "files": []
+  },
+  {
+   "name": "x-text-post",
+   "url": "https://x.com/StarshipDad/status/2113697702823297061",
+   "media": null,
+   "control": null,
+   "layout_unchanged": null,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved the text: starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.md",
+   "files": [
+    {
+     "name": "starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.md",
+     "bytes": 992,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    }
+   ]
+  },
+  {
+   "name": "selection-wikipedia",
+   "url": "https://en.wikipedia.org/wiki/Mount_Rainier",
+   "media": null,
+   "control": null,
+   "layout_unchanged": null,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved the text: Mount-Rainier-Wikipedia-selection.md",
+   "files": [
+    {
+     "name": "Mount-Rainier-Wikipedia-selection.md",
+     "bytes": 411,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    }
+   ]
+  },
+  {
+   "name": "text-card",
+   "url": "https://x.com/StarshipDad/status/2113697702823297061",
+   "media": null,
+   "control": null,
+   "layout_unchanged": null,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Saved the text: starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.md and starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.png",
+   "files": [
+    {
+     "name": "starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth.png",
+     "bytes": 120526,
+     "sniffed": "png",
+     "check": null
+    },
+    {
+     "name": "starshipdad_2026-10-23_why-moon-landings-are-hard-coming-home-to-earth (1).md",
+     "bytes": 992,
+     "sniffed": "unknown 2d2d2d0a666f726d",
+     "check": null
+    }
+   ]
+  },
+  {
+   "name": "side-panel",
+   "url": "https://x.com/StarshipDad/status/2113697702823297061",
+   "media": null,
+   "control": null,
+   "layout_unchanged": null,
+   "result": null,
+   "error": null,
+   "panel_text": "Side panel check\nOverview\nCheck\nRow\nshown in the side panel\nPress",
+   "in_page_window": false,
+   "button_ran_in_page": true,
+   "after_close": false,
+   "note": null,
+   "files": []
+  },
+  {
+   "name": "shortcut-alt-shift-d",
+   "url": "https://en.wikipedia.org/wiki/Mount_Rainier",
+   "media": null,
+   "control": null,
+   "layout_unchanged": null,
+   "result": null,
+   "error": null,
+   "panel_text": null,
+   "in_page_window": null,
+   "button_ran_in_page": null,
+   "after_close": null,
+   "note": "Already saved as Mount-Rainier-Wikipedia-960px-Rainier20200906.jpg.",
+   "files": []
+  }
+ ],
+ "axe": {
+  "closed menu": [
+   {
+    "id": "page-has-heading-one",
+    "impact": "moderate",
+    "n": 1
+   }
+  ],
+  "open menu": [
+   {
+    "id": "page-has-heading-one",
+    "impact": "moderate",
+    "n": 1
+   }
+  ],
+  "targets": [
+   [
+    "Download JPG picture",
+    28,
+    28
+   ],
+   [
+    "More ways to save",
+    28,
+    28
+   ],
+   [
+    "Study",
+    168,
+    28
+   ],
+   [
+    "Download as GIF",
+    168,
+    28
+   ],
+   [
+    "Copy",
+    168,
+    28
+   ],
+   [
+    "Copy link",
+    168,
+    28
+   ],
+   [
+    "Copy with caption",
+    168,
+    28
+   ],
+   [
+    "Save to Daylight",
+    168,
+    28
+   ],
+   [
+    "Never on this site",
+    168,
+    28
+   ],
+   [
+    "Turn off hover download",
+    168,
+    28
+   ]
+  ]
+ },
+ "x_thread": {
+  "profile_no_continuation": true,
+  "status_thread_in_order": true,
+  "status_thread_complete_true": true,
+  "engagement_recorded": true
+ }
+}

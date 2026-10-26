@@ -139,6 +139,9 @@ export function tweetsIn(json) {
         paidPartnership: (((v.content_disclosure || {}).advertising_disclosure) || {}).is_paid_promotion === true ? true : null,
         // the text as the response carries it: long posts keep their full text in note_tweet
         text: textOf(v),
+        // the whole text of a long post (X's note_tweet), kept apart so the 2,000-character text above,
+        // which the lenses read, does not change
+        fullText: textOf(v, Infinity) && textOf(v, Infinity).length > 2000 ? textOf(v, Infinity) : null,
       };
       out.set(r.id, Object.fromEntries(Object.entries(r).filter(([, x]) => x !== null && x !== undefined && !(Array.isArray(x) && !x.length))));
     }
@@ -149,9 +152,9 @@ export function tweetsIn(json) {
 
 // A post's text from the response, capped. Lists the page has scrolled past are no longer in the
 // page, so the campaign lens reads quote text here rather than from the rendered post.
-function textOf(v) {
+function textOf(v, max = 2000) {
   const t = pick(((((v.note_tweet || {}).note_tweet_results || {}).result) || {}).text, (v.legacy || {}).full_text);
-  return t ? String(t).slice(0, 2000) : null;
+  return t ? String(t).slice(0, max) : null;
 }
 
 // The author of a Tweet object, from its embedded user (legacy or core fields).

@@ -23,18 +23,19 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     } catch { return null; }
   }
 
-  let site = location.hostname;   // the folder inside the save folder; set per download in run()
+  // The folder inside the save folder, and whether this is a study save (Daylight/study/<site>/); set per download in run().
+  let site = location.hostname, study = false;
   async function viaBrowser(url, name, opts) {
-    const r = await msg({ type: "pb-qs-download", url, filename: name, site, fixExt: opts.fixExt || false });
+    const r = await msg({ type: "pb-qs-download", url, filename: name, site, study, overwrite: !!opts.overwrite, fixExt: opts.fixExt || false });
     if (!r || r.error) throw new Error(r && r.error ? r.error : "The browser did not start the download.");
     return r;
   }
 
   // Bytes made in the page: handed to the browser's downloads as a blob address; where the
   // browser cannot read the page's blob address, a download link in the page saves it instead.
-  async function saveBytes(bytes, mime, name) {
+  async function saveBytes(bytes, mime, name, o = {}) {
     const url = URL.createObjectURL(new Blob([bytes], { type: mime }));
-    try { await viaBrowser(url, name, {}); }
+    try { await viaBrowser(url, name, o); }
     catch (e) {
       const a = document.createElement("a");
       a.href = url; a.download = name; a.style.display = "none";
@@ -88,15 +89,15 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   }
   // The sidecar beside the file: the same name with .md, and .json when that setting is on.
   // For a whole gallery: one sidecar named after the post (the first file's name without "-1").
-  async function sidecars(meta, fileNames, p) {
+  async function sidecars(meta, fileNames, p, o = {}) {
     const list = [].concat(fileNames), stem = list[0].replace(/\.[a-z0-9]{1,5}$/i, "").replace(list.length > 1 ? /-1$/ : /$^/, "");
-    if (p.mediaSidecar) await saveBytes(new TextEncoder().encode(PB.sidecarMarkdown(meta, list)), "text/markdown", stem + ".md");
-    if (p.mediaSidecarJson) await saveBytes(new TextEncoder().encode(PB.sidecarJson(meta, list)), "application/json", stem + ".json");
+    if (p.mediaSidecar || meta.study) await saveBytes(new TextEncoder().encode(PB.sidecarMarkdown(meta, list)), "text/markdown", stem + ".md", o);
+    if (p.mediaSidecarJson) await saveBytes(new TextEncoder().encode(PB.sidecarJson(meta, list)), "application/json", stem + ".json", o);
   }
   // What the page says about media outside X and Reddit: its title, its description, the alt text.
   const pageMeta = (t) => ({ site: location.hostname.replace(/^www\./, ""), title: document.title || null, pageUrl: location.href, alt: (t.el && t.el.alt) || t.alt || null,
     text: (document.querySelector('meta[property="og:description"], meta[name="description"]') || {}).content || null });
-  const metaOf = (t, opts) => PB.postMeta({ ...(t.meta || pageMeta(t)), pageUrl: location.href, mediaUrl: t.url || null, index: opts.index || 0, total: opts.total || 1 });
+  const metaOf = (t, opts) => PB.postMeta({ ...(t.meta || pageMeta(t)), pageUrl: location.href, mediaUrl: t.url || null, index: opts.index || 0, total: opts.total || 1, study: !!opts.study });
 
   async function bytesOf(url) {
     const res = await fetch(url, { credentials: /^(data|blob):/.test(url) || new URL(url).origin === location.origin ? "include" : "omit" });
@@ -145,7 +146,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   // Resolves to { line, names, meta }; with oneSidecar the caller writes one sidecar for the post.
   async function run(t, opts = {}) {
     const plan = PB.downloadPlan(t, { asGif: !!opts.asGif }), p = await prefs(), meta = metaOf(t, opts);
-    site = meta.site || location.hostname;
+    site = meta.site || location.hostname; study = !!opts.study;
     const title = opts.title || t.title || document.title || location.hostname;
     const own = (u) => (/^https?:/i.test(String(u || "")) ? u : "");
     const name = (ext, url) => (meta.author.handle ? PB.metaName(meta, ext) : PB.downloadName({ title, url: url != null ? url : own(t.url), index: opts.index || 0, total: opts.total || 1, ext }));
@@ -154,7 +155,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     if (plan.action === "refuse") throw new PBQuickStream.Protected(plan.reason);
     if (plan.action === "none") throw new Error(plan.reason);
     const key = (opts.asGif ? "gif:" : "") + (plan.url || (plan.stream && plan.stream.url) || "");
-    const before = !opts.again && (await savedAs([key, opts.asGif ? null : own(t.url)]));
+    const before = !opts.again && !opts.study && (await savedAs([key, opts.asGif ? null : own(t.url)]));
     if (before) throw new Already(before);
     if (plan.action === "url") { const r = await plainFile(t, plan, { name, meta, p }); await side([r.name]); await remember([key, own(t.url)], r.name); return { line: r.line, names: [r.name], meta }; }
     let bytes, note = "", mime;
@@ -171,7 +172,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
       return { line: `Saved ${got.files.length > 1 ? got.files.length + " files" : names[0]}, ${size(got.files.reduce((s, f) => s + f.bytes.length, 0))}.${got.note}`, names, meta };
     }
     const hash = "sha256:" + (await PB.mediaSha256(bytes));
-    const dup = !opts.again && (await savedAs([hash]));
+    const dup = !opts.again && !opts.study && (await savedAs([hash]));
     if (dup) throw new Already(dup);
     const n = name(PB.downloadExt(mime) || "bin", plan.action === "bytes" && /^data:/.test(plan.url) ? "" : undefined);
     const out = withWords(bytes, mime, meta, p);
@@ -205,7 +206,8 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     toast(opts.asGif ? "Making a GIF" : "Downloading", { stay: 0 });
     try {
       const r = await run(t, opts);
-      if (!opts.quiet) toast(r.line, { tone: "ok" });
+      if (opts.study && !opts.quiet && r.names && r.names.length) noteAfter(r.meta, r.names);
+      else if (!opts.quiet) toast(r.line, { tone: "ok" });
       return { ok: true, ...r };
     } catch (e) {
       if (e instanceof Already) {
@@ -222,12 +224,37 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     }
   }
 
-  // From the right-click menu (media-bg.js). info: { srcUrl, linkUrl, asGif }.
-  function fromMenu(info) {
-    const t = PBQuickResolve.resolve(info);
-    if (!t) { toast("No picture, GIF or video was found under the pointer.", { tone: "no" }); return Promise.resolve({ ok: false, line: "nothing found" }); }
-    return start(t, { asGif: info.asGif });
+  // After a study save: the optional line on what draws the person to it. The file is already saved;
+  // a note, if typed, rewrites the sidecar in place.
+  function noteAfter(meta, names) {
+    toast(`Saved for study: ${names[0]}`, { tone: "ok", stay: 6000, input: { label: "What draws you to this? (optional, Enter to keep)", onSubmit: async (note) => {
+      study = true; site = meta.site || location.hostname;
+      try { await sidecars({ ...meta, studyNote: note }, names, await prefs(), { overwrite: true }); toast("Note kept with the study.", { tone: "ok" }); }
+      catch (e) { toast(`Note not kept: ${e.message}`, { tone: "no" }); }
+    } } });
   }
 
-  return Object.freeze({ start, run, fromMenu, keepReference, saveBytes, metaOf, postSidecar });
+  // From the right-click menu (media-bg.js). info: { srcUrl, linkUrl, asGif, study }.
+  function fromMenu(info) {
+    const t = PBQuickResolve.resolve(info);
+    // No picture or video here: a study keeps the text post (or selection) instead.
+    if (!t && info.study && globalThis.PBQuickText) return PBQuickText.run("study", info);
+    if (!t) { toast("No picture, GIF or video was found under the pointer.", { tone: "no" }); return Promise.resolve({ ok: false, line: "nothing found" }); }
+    return start(t, { asGif: info.asGif, study: !!info.study });
+  }
+
+  // A note or card made in the page (quick-text.js), saved to the site's folder or the study folder.
+  async function saveText(bytes, mime, name, toSite, toStudy, o = {}) {
+    site = toSite || location.hostname; study = !!toStudy;
+    return saveBytes(bytes, mime, name, o);
+  }
+  // After a text study: the same optional line, written into the note itself.
+  function noteAfterText(meta, name) {
+    toast(`Saved for study: ${name}`, { tone: "ok", stay: 6000, input: { label: "What draws you to this? (optional, Enter to keep)", onSubmit: async (note) => {
+      try { await saveText(new TextEncoder().encode(PB.sidecarMarkdown({ ...meta, studyNote: note }, [])), "text/markdown", name, meta.site, true, { overwrite: true }); toast("Note kept with the study.", { tone: "ok" }); }
+      catch (e) { toast(`Note not kept: ${e.message}`, { tone: "no" }); }
+    } } });
+  }
+
+  return Object.freeze({ start, run, fromMenu, keepReference, saveBytes, metaOf, postSidecar, saveText, noteAfterText });
 })();

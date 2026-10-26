@@ -55,6 +55,16 @@ hashtags: ["#space"]
 | `subreddit` | Reddit | `r/name` |
 | `hashtags` | when any | hashtags in the text |
 | `item` | a single item of a gallery | `"2 of 4"` |
+| `kind` | yes (from 3.6.1) | `"media"`, or `"text"` for a post or selection saved as a note with `files: []` |
+| `selection` | selections | `true` when the text is a selection from a page |
+| `flair` | Reddit | the post's flair |
+| `text_complete` | when false | `false` when the page showed only the start of the text and no fuller copy was loaded |
+| `study` | study saves | `true`; the file and note are in `<save folder>/study/<site>/` |
+| `note` | study saves with a note | the one line on what draws the person to it |
+
+Fields added within version 1 are optional and only ever added. Readers should ignore fields they do
+not know. Sections after the front matter may include `## Poll`, `## Link cards`, `## Chapters` and
+`## Transcript (as the page showed it)`.
 
 After the front matter, for people: a heading with the author, the post's text exactly as written
 (as a quote, line breaks kept), the author's own continuation of the thread where the page had

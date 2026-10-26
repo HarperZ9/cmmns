@@ -84,7 +84,10 @@ between its tabs, <kbd>Esc</kbd> to close it.
 
 ## Download, save, convert and keep media
 
-Right-click any picture, GIF or video and choose **Download**: it lands in your Downloads folder in one
+Rest the pointer on any picture, GIF or video for a moment and a small **Download** button shows in its
+corner, even where the site blocks right-click (Alt+Shift+D does the same from the keyboard). **Study**
+keeps it in a study folder, and text posts and selections save as notes. Or right-click any picture, GIF
+or video and choose **Download**: it lands in your Downloads folder in one
 click, with its real type and a name from the page. X and Reddit posts get a quiet **Download** button
 that saves every picture and video in the post, videos with their sound. **Download as GIF** makes a
 real GIF from the MP4 that sites send in place of GIFs. **Copy** and **Copy link** sit beside it.

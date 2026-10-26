@@ -15,3 +15,5 @@ export { parseMpd, dashProtection, pickRepresentation } from "./media-dash.js";
 export { postMeta, sidecarMarkdown, sidecarJson, metaName, captionText, embedText, textTags } from "./media-meta.js";
 export { embedDescription, readDescription, xmpPacket } from "./media-embed.js";
 export { saveFolder, SIDECAR_FORMAT } from "./media-meta.js";
+export { wrapLines, cardPlan, CARD, CARD_FOOT } from "./media-card.js";
+export { threadChain, continuationStatus } from "./media-thread.js";

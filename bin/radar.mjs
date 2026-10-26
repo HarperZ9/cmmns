@@ -22,9 +22,11 @@ import { readable, verdictLines, chainLines } from "./lib/report.mjs";
 import { validate } from "./lib/jsonschema.mjs";
 import { runExport } from "./lib/export.mjs";
 import { runCaseCommand } from "./lib/case.mjs";
-import { TOP_HELP, MEDIA_HELP, helpText, friendly } from "./lib/help.mjs";
+import { TOP_HELP, MEDIA_HELP, SIDECAR_HELP, helpText, friendly } from "./lib/help.mjs";
 import { runMedia } from "./lib/media.mjs";
 import { cleanCommand, protectCommand, selfAuditCommand, PROTECT_USAGE } from "./lib/protect.mjs";
+import { runFetch } from "./lib/media-fetch.mjs";
+import { checkSidecars, checkLines } from "./lib/sidecar-check.mjs";
 
 const USAGE = `Usage:
   daylight analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
@@ -35,6 +37,8 @@ const USAGE = `Usage:
   daylight media convert <file> --to <format> [--quality 0-1] [--max-side N] [--max-height N]
                [--bitrate 2M] [--audio-bitrate 96k] [--fps N] [--out file] [--json]
   daylight media compress <file> [the same options]
+  daylight media fetch <page address> [--dir folder]       (needs a system yt-dlp)
+  daylight sidecar check <folder>                          (flags unproved thread continuations)
   daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
   daylight case <command>   an investigation case folder; "daylight case help" lists the commands
@@ -111,6 +115,19 @@ export async function main(argv) {
   if (argv[0] === "case") { const r = await runCaseCommand(argv.slice(1)); print(r.out); return process.exitCode || r.code; }
   if (argv[0] === "protect" && argv[1] && !argv.includes("--help")) { print(protectCommand(argv[1])); return 0; }
   if (argv[0] === "self-audit" && !argv.includes("--help")) { const { _: files, flags } = parseArgs(argv.slice(1)); print(selfAuditCommand(files, flags)); return 0; }
+  if (argv[0] === "sidecar" && argv[1] === "check") {
+    const { _: [dir], flags } = parseArgs(argv.slice(2));
+    if (flags.help || !dir) { print(helpText(SIDECAR_HELP, "daylight sidecar check")); return dir || flags.help ? 0 : 2; }
+    const r = checkSidecars(dir);
+    print(flags.json ? asJson(r) : checkLines(r));
+    return r.counts.unverified ? 1 : 0;
+  }
+  if (argv[0] === "media" && argv[1] === "fetch") {
+    const { _: [url], flags } = parseArgs(argv.slice(2));
+    if (flags.help || !url) { print(helpText(MEDIA_HELP.fetch, "daylight media fetch")); return url || flags.help ? 0 : 2; }
+    print(runFetch(url, flags).line);
+    return 0;
+  }
   if (argv[0] === "media" && (argv[1] === "convert" || argv[1] === "compress")) {
     const { _: [file], flags } = parseArgs(argv.slice(2));
     if (flags.help || !file) { print(helpText(MEDIA_HELP[argv[1]], `daylight media ${argv[1]}`)); return file || flags.help ? 0 : 2; }

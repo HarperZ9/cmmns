@@ -10,6 +10,15 @@
   // How old the catalogue is: always shown, calm wording, never an alarm (src/ext/freshness.js).
   PBFreshness.ready.then((v) => { if (v) $("freshness").textContent = `Catalogue: ${v.label}. ${v.line}`; });
   $("options").addEventListener("click", () => { chrome.runtime.openOptionsPage(); window.close(); });
+  // The side panel (sidepanel.html): Chrome's side panel, Firefox's sidebar. Opened on this click.
+  $("side").hidden = !(chrome.sidePanel || (globalThis.browser && browser.sidebarAction));
+  // The window id is read first: the open call itself must run straight from the click.
+  let windowId = null;
+  if (chrome.sidePanel) chrome.windows.getCurrent().then((w) => { windowId = w.id; }, () => {});
+  $("side").addEventListener("click", () => {
+    const open = chrome.sidePanel ? chrome.sidePanel.open({ windowId }) : browser.sidebarAction.open();
+    open.then(() => window.close(), (e) => console.error("[daylight-commons] could not open the side panel", e));
+  });
 
   $("dashboard").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("dashboard.html") }); window.close(); });
   document.getElementById("history").addEventListener("click", () => { chrome.tabs.create({ url: chrome.runtime.getURL("history.html") }); window.close(); });

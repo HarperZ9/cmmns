@@ -9,7 +9,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { zip, browserManifest, listFiles, EXT } from "./zip.mjs";
+import { zip, browserManifest, listFiles, filesFor, EXT } from "./zip.mjs";
 
 export const DIST = join(EXT, "..", "..", "dist");
 export const VARIANTS = [["chrome", "zip"], ["firefox", "xpi"], ["firefox-self", "xpi"]];
@@ -22,7 +22,7 @@ export function buildPackages(files = listFiles()) {
   const out = [], inner = [];
   for (const [browser, ext] of VARIANTS) {
     const m = Buffer.from(JSON.stringify(browserManifest(manifest, browser), null, 2) + "\n");
-    const entries = files.map(([n, d]) => [n, n === "manifest.json" ? m : d]).sort(byName);
+    const entries = filesFor(files, browser).map(([n, d]) => [n, n === "manifest.json" ? m : d]).sort(byName);
     const name = `radar-${browser}-${manifest.version}.${ext}`;
     out.push([name, zip(entries)]);
     for (const [n, d] of entries) inner.push(`${sha(d)}  ${name}/${n}`);

@@ -5,14 +5,17 @@
 // "Always ask where to save" is on. Protected media references are kept in the collections store.
 globalThis.PBQuickBg = (() => {
   "use strict";
-  const PAGE = ["quick-toast.js", "quick-resolve.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-save.js", "quick-copy.js"];
+  const PAGE = ["quick-toast.js", "quick-resolve.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-save.js", "quick-copy.js", "quick-text.js"];
   const ITEMS = [
     ["pb-dl", "Download", ["image", "video", "audio"]],
     ["pb-dl-here", "Download media here", ["page", "link", "frame"]],
+    ["pb-study", "Study", ["image", "video", "audio", "page", "link", "frame", "selection"]],
+    ["pb-note", "Save as note", ["page", "link", "frame", "selection"]],
+    ["pb-card", "Save as card", ["page", "link", "frame", "selection"]],
     ["pb-dl-gif", "Download as GIF", ["image", "video"]],
     ["pb-copy", "Copy", ["image", "video", "page", "link", "frame"]],
     ["pb-copy-link", "Copy link", ["image", "video", "audio", "page", "link", "frame"]],
-    ["pb-copy-caption", "Copy with caption", ["image", "video", "page", "link", "frame"]],
+    ["pb-copy-caption", "Copy with caption", ["image", "video", "page", "link", "frame", "selection"]],
   ];
   const pending = new Map();   // download id or address -> { fixExt, filename }
 
@@ -36,8 +39,13 @@ globalThis.PBQuickBg = (() => {
     if (!/copy-(link|caption)$/.test(id) && (await settings()).protection) { chrome.scripting.executeScript({ target: { tabId: tab.id }, args: [PROTECTED_SAVE], func: (t) => alert(t) }).catch(() => {}); return; }
     try {
       const target = await inject(tab.id, info.frameId);
-      const args = { srcUrl: info.srcUrl || null, linkUrl: info.linkUrl || null, asGif: id === "pb-dl-gif", copy: id === "pb-copy", link: id === "pb-copy-link", caption: id === "pb-copy-caption" };
+      const args = { srcUrl: info.srcUrl || null, linkUrl: info.linkUrl || null, asGif: id === "pb-dl-gif", study: id === "pb-study", copy: id === "pb-copy", link: id === "pb-copy-link", caption: id === "pb-copy-caption",
+        selection: info.selectionText || null, text: id === "pb-note" ? "note" : id === "pb-card" ? "card" : null };
       await chrome.scripting.executeScript({ target, args: [args], func: (a) => {
+        // Text: a selection, a note or card of the post under the pointer, or a caption with no media.
+        if (a.text) return PBQuickText.run(a.text, a).then(() => true);
+        if (a.selection && (a.study || a.caption)) return PBQuickText.run(a.study ? "study" : "caption", a).then(() => true);
+        if (a.caption && !a.srcUrl && !PBQuickResolve.resolve(a)) return PBQuickText.run("caption", a).then(() => true);
         if (a.copy || a.link || a.caption) return PBQuickCopy.copy(PBQuickResolve.resolve(a), { link: a.link, caption: a.caption }).then(() => true);
         PBQuickSave.fromMenu(a);
         return true;
@@ -58,13 +66,15 @@ globalThis.PBQuickBg = (() => {
 
   // Starts a browser download. { url, filename, site, fixExt } -> { id }. The file goes to
   // "<save folder>/<site>/<name>" inside Downloads, so thousands of saves stay in one tree.
-  async function download({ url, filename: name, site, fixExt }) {
+  async function download({ url, filename: name, site, fixExt, study = false, overwrite = false }) {
     if (!chrome.downloads) throw new Error("This browser did not give Daylight Commons the downloads permission.");
     const s = await settings();
     if (s.protection && /^https?:/i.test(url)) throw new Error(PROTECTED_SAVE);
-    const filename = name ? PB.saveFolder(s.mediaFolder, site) + name.replace(/[\\/]/g, "-") : null;
-    const opts = { url, saveAs: !!s.mediaAskWhere, conflictAction: "uniquify", ...(filename ? { filename } : {}) };
-    pending.set(url, { fixExt: !!fixExt, filename });
+    // Study saves go to "<save folder>/study/<site>/"; the reference library reads them first.
+    const folder = study ? `${s.mediaFolder || "Daylight"}/study` : s.mediaFolder, conflict = overwrite ? "overwrite" : "uniquify";
+    const filename = name ? PB.saveFolder(folder, site) + name.replace(/[\\/]/g, "-") : null;
+    const opts = { url, saveAs: !!s.mediaAskWhere && !overwrite, conflictAction: conflict, ...(filename ? { filename } : {}) };
+    pending.set(url, { fixExt: !!fixExt, filename, conflict });
     const id = await chrome.downloads.download(opts);
     if (id === undefined) throw new Error((chrome.runtime.lastError && chrome.runtime.lastError.message) || "The browser refused the download.");
     pending.set(id, pending.get(url));
@@ -80,7 +90,7 @@ globalThis.PBQuickBg = (() => {
     const p = pending.get(item.id) || pending.get(item.url) || pending.get(item.finalUrl);
     if (!p || !p.filename) return;
     const ext = p.fixExt ? PB.downloadExt(item.mime) : null;
-    suggest({ filename: ext ? p.filename.replace(/\.[a-z0-9]{1,5}$/i, "") + "." + ext : p.filename, conflictAction: "uniquify" });
+    suggest({ filename: ext ? p.filename.replace(/\.[a-z0-9]{1,5}$/i, "") + "." + ext : p.filename, conflictAction: p.conflict || "uniquify" });
   }
 
   // A protected item's reference: kept on the "Protected references" moodboard with its label.
@@ -113,5 +123,5 @@ globalThis.PBQuickBg = (() => {
   if (chrome.contextMenus) chrome.contextMenus.onClicked.addListener((info, tab) => { onClick(info, tab); });
   if (chrome.downloads && chrome.downloads.onDeterminingFilename) chrome.downloads.onDeterminingFilename.addListener(onFilename);
   chrome.runtime.onMessage.addListener(onMessage);
-  return Object.freeze({ create, download, onClick, reference });
+  return Object.freeze({ create, download, onClick, reference, inject, settings });
 })();

@@ -12,6 +12,7 @@ Writes quick-save-check.json and one screenshot per case to <work>/out.
 """
 import asyncio
 import json
+import os
 import pathlib
 import shutil
 import socket
@@ -58,7 +59,9 @@ async def launch(p, work, port=None):
     dl.mkdir(parents=True)
     (prof / "Default").mkdir(parents=True)
     (prof / "Default" / "Preferences").write_text(json.dumps({"download": {"default_directory": str(dl), "prompt_for_download": False}}), encoding="utf-8")
-    rules = ", ".join(f"MAP {h} 127.0.0.1:8443" for h in fx.REDDIT_HOSTS)
+    # DC_MAP_X=1 also maps x.com to the fixture (hover_extra.x_thread_fixture); live X cases need it off.
+    hosts = fx.REDDIT_HOSTS + (("x.com",) if os.environ.get("DC_MAP_X") else ())
+    rules = ", ".join(f"MAP {h} 127.0.0.1:8443" for h in hosts)
     proc = subprocess.Popen([CHROME, "--window-position=-2400,0", f"--user-data-dir={prof}", f"--remote-debugging-port={port}", "--enable-unsafe-extension-debugging",
                              f"--host-resolver-rules={rules}", "--ignore-certificate-errors", "--no-first-run", "--no-default-browser-check",
                              "--autoplay-policy=no-user-gesture-required", "--window-size=1280,900", "about:blank"])

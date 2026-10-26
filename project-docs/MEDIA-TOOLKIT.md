@@ -30,6 +30,27 @@ page and `src/ext/quick-save-bg.js` in the background; the pure parts are the me
   showed; nothing is fetched for it.
 - **Protected media** is refused exactly as in Save below.
 
+## Hover control, Study, text and YouTube (3.6.1)
+
+- **Hover control** (`src/ext/quick-hover.js`, `quick-hover-ui.js`, `quick-hover-bg.js`): after 300 ms
+  on a picture, GIF, video or canvas of at least 120 by 120 px, found under the pointer through clear
+  layers and shadow roots. Drawn in a closed shadow root in the top layer, fixed, so it never moves
+  the page; only its two 28 px buttons take the pointer. On the sites Daylight Commons reads it is a
+  manifest content script; on every other https site it is a registered content script, only after
+  the user allows `https://*/*` in the settings. Not drawn on X and Reddit posts that have the button.
+- **Keyboard**: `Alt+Shift+D` (`commands`) reads the active tab once and saves the media under the
+  pointer in the frame the pointer was last in, or the focused media.
+- **Study**: the same save into `<save folder>/study/<site>/`, `study: true` in the note, and an
+  optional line typed into the note after the save (the note is rewritten in place).
+- **Text** (`src/ext/quick-text.js`, `src/core/media-card.js`): text posts and selections as notes with
+  `kind: "text"` and no file; the text card is drawn in the worker from a pure layout, in Hanken
+  Grotesk and JetBrains Mono, with a footer saying it is a rendering.
+- **YouTube** (`src/ext/yt-reference.js`): references only in store builds; the command line hand-off
+  (`yt-handoff.js`, `bin/lib/media-fetch.mjs`) only unpacked and self-distributed
+  (`tests/store-build.test.js`).
+- **Side panel** (`side-bridge.js`, `sidepanel.html`, `side-bg.js`): while open, `pop.js` hands each post
+  window to the panel as data; buttons run in the page.
+
 ## Save
 
 - **Where it starts.** The toolbar menu's **Save media from this page**, or **Save to Daylight** in the right-click menu on any image, GIF, video or audio. Either click lets the extension read the current tab once (`activeTab`). `src/ext/media-scan.js` lists the images, GIFs, video, audio and large CSS background images the page loaded, and the HLS and DASH addresses in the page's resource timing.

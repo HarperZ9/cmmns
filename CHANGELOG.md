@@ -48,6 +48,50 @@ project-docs/PROVENANCE-TRACING-PLAN.md.
   `CHANGES.md` from the second version on) carried claim text with private handles unredacted.
   Both now use the same pseudonyms as the export's files.
 
+## 3.6.1 (2026-10-25)
+
+Save from any site, save text too, and keep things for study.
+
+### Added
+- **A Download control on any picture, GIF or video.** Rest the pointer on one for a moment and a
+  small Download button shows in its corner, even where the site blocks right-click or lays a clear
+  layer over its pictures. Its second button offers Study, Download as GIF, Copy, Copy link, Copy with
+  caption and Save to Daylight. It never moves the page or takes its clicks. It shows on the sites
+  Daylight Commons reads; "Show it on every site" in the settings asks your browser once to allow all
+  sites. "Never on this site" and a switch turn it off. **Alt+Shift+D** saves the picture or video
+  under the pointer, or the focused one, on any site.
+- **Study.** Beside Download everywhere: the same save, into `Daylight/study/<site>/`, marked
+  `study: true`, with an optional line on what draws you to it. A study library can pick these up
+  first.
+- **Text is saved too.** X and Reddit text posts get the button: one note with the whole text, the
+  author, address and time, the quoted or parent post, the author's thread, link cards, hashtags, a
+  poll as shown, and on Reddit the title, subreddit and flair. Select text on any page and "Save
+  selection" keeps it with the page's title, address and author. **Save as card** renders the words
+  as a picture in the house type, marked as a Daylight Commons rendering, never as a screenshot.
+- **YouTube references.** The control on a YouTube video saves a reference: the thumbnail and a note
+  with the title, channel, the link at the current time, the whole description, chapters and any
+  transcript the page shows. Copy link at this time copies the address at the current second. The
+  store versions never download YouTube video. The unpacked build adds a command to copy for the new
+  `daylight media fetch <address>`, which uses your own yt-dlp and writes the same note.
+- **The side panel.** "Show windows in the side panel" in the toolbar menu moves the window for a post
+  to the browser's side panel, where it stays while you switch tabs. Close the panel and the window
+  returns to the page.
+- **Threads.** On a post's own page, the X button saves the author's whole thread below it: every
+  picture and video, or one note with every part in order, where X's own data shows the parts belong
+  together.
+- Notes keep the engagement the page showed at save time (replies, reposts, likes, views, bookmarks;
+  score and comments on Reddit), under `engagement`, with the time it was read.
+- `daylight sidecar check <folder>` lists the notes whose thread continuation was not proved.
+
+### Fixed
+- **Notes saved with 3.6.0 from a profile or timeline page could list unrelated posts by the same
+  author as "Continued by the author".** A continuation is now joined only where X's own data shows each
+  part answering the one before; otherwise the note holds none and, where a thread may exist, says
+  `thread_complete: "unknown"`. Run `daylight sidecar check <your Daylight folder>` to list the 3.6.0
+  notes to check against the post.
+- Long X posts are no longer cut short in the note. When the page showed only the start of a post and
+  no fuller copy was loaded, the note says `text_complete: false` and a line under the text says so.
+
 ## 3.6.0 (2026-10-25)
 
 A media toolkit for keeping and checking what you read, a pressure lens, and optional ad blocking.

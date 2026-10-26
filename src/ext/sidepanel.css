@@ -1,0 +1,6 @@
+/* The side panel (sidepanel.html): the post window drawn in place, without its floating frame. */
+body { margin: 0; padding: 12px; background: var(--paper); }
+.pb-pop { position: static !important; width: auto !important; max-height: none !important; box-shadow: none !important; opacity: 1 !important; transform: none !important; }
+.pb-ctl { display: none; }
+#empty { color: var(--soft); font: 400 var(--t-label)/1.5 var(--font-sans); margin: 8px 4px; }
+#from { color: var(--soft); font: 400 12px/1.4 var(--font-sans); margin: 0 4px 8px; overflow-wrap: anywhere; }

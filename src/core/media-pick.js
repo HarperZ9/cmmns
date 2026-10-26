@@ -92,7 +92,7 @@ export function downloadPlan(t, { asGif = false } = {}) {
     return { action: "none", reason: "This media has no file Daylight Commons can read to make a GIF." };
   }
   if (t.canvas) return { action: "canvas" };
-  if (web(t.url)) { const [url, ...alternatives] = sizeLadder(t.url); return { action: "url", url, alternatives }; }
+  if (web(t.url)) { const [url, ...alternatives] = sizeLadder(t.url); return { action: "url", url, alternatives: [...alternatives, ...(t.alternatives || [])] }; }
   if (t.url && /^data:/i.test(t.url)) return { action: "bytes", url: t.url };
   if (t.url && /^blob:/i.test(t.url) && t.kind !== "video" && t.kind !== "audio") return { action: "bytes", url: t.url };
   if (stream) return { action: "stream", stream };

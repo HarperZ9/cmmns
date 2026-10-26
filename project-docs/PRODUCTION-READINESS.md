@@ -141,6 +141,28 @@ review (project-docs/SECURITY-REVIEW.md).
 | Extension: "Ask the Internet Archive" on a case save | the file's address to web.archive.org | off (unticked) | disabled |
 | Extension: Download, Download as GIF, Copy, the post Download button | the file from its host | on the user's click; buttons on | buttons off; menu items refused with a message |
 
+## 3.6.1 additions
+
+Checked 2026-10-25 in Google Chrome 155 on Windows 11, window off screen, fresh profile, signed out
+everywhere, with `scripts/qa/hover_check.py` (real pointer moves and clicks on the drawn control, no
+simulated menu), `scripts/qa/x_thread_check.py` (x.com mapped to a local fixture) and axe-core 4.10.2.
+Summary: `project-docs/evidence/qa-3.6.1/hover-check.json`.
+
+| # | Area | Check | How | 3.6.1 |
+|---|---|---|---|---|
+| 64 | Hover control | Shows on media, saves on click, page does not move | 15 sites: scroll height, width, scroll position and the media's box equal before and after the control shows; the saved file reopened | pass on Wikipedia, NASA, TikTok, Instagram, Pinterest, Tumblr, Bluesky, Vimeo, Imgur, YouTube (reference), a page that blocks right-click; Facebook drew the control but its sign-in wall blocked the click |
+| 65 | Hover control | Never doubles the X and Reddit button | X post with the button: no control drawn | pass |
+| 66 | Hover control | Accessible | axe on the control and its open menu: no violations in the control; every button 28 by 28 px or wider; visible focus ring; no animation; Escape and arrow keys in the menu | pass |
+| 67 | Keyboard | Alt+Shift+D saves the media under the pointer | the command handler run with the tab Chrome passes (a script cannot press a browser shortcut) | pass (the file was already saved, so the duplicate note showed) |
+| 68 | Text | X text post, selection, text card | a real X text post saved as a note with `files: []`; a Wikipedia selection saved from the control; a card PNG with the rendering line, checked by eye | pass |
+| 69 | Thread defect | No continuation from adjacency | profile page with four unrelated posts by one author: no continuation; status page with X-shaped data: the two self-replies in order, `thread_complete: true`, another account's reply left out; `tests/media-thread.test.js` | pass |
+| 70 | Side panel | Window moves to the panel and back | the panel shows the post window, its button runs in the page, no window over the page while it is open, the page's state resets when it closes | pass |
+| 71 | YouTube | Reference only in store builds | a reference saved from a real video (thumbnail and note with the whole description); `tests/store-build.test.js` fails if either store package carries the command line hand-off | pass |
+| 72 | CLI | `daylight media fetch`, `daylight sidecar check` | unit tests for the fetch plan and the sidecar built from yt-dlp's record; the check run on the author's own notes flagged the 17 saved by 3.6.0 with an unproved continuation | pass |
+
+Not tested for 3.6.1: Firefox; signed-in sites; the shortcut pressed by hand; the control on
+Facebook past its sign-in wall.
+
 ## What could not be tested here
 
 - **X, Facebook, Instagram and TikTok on real pages.** They show posts only to a signed-in viewer,
