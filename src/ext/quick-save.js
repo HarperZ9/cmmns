@@ -77,6 +77,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     return { name, line: `Downloading ${name}` };
   }
 
+  const PROTECTED = "Source protection is on, so Daylight Commons did not download this: the request would tell the host. Use your browser's own Save as, and add the file to your case.";
   const EMBED = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4"]), EMBED_MAX = 300 * 1048576;
   async function prefs() {
     try { const k = PB.SETTINGS_KEY; return PB.normalizeSettings((await chrome.storage.local.get(k))[k]); } catch { return PB.normalizeSettings(null); }
@@ -154,6 +155,8 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const side = (names) => (opts.oneSidecar ? null : sidecars(meta, names[0], p));
     if (plan.action === "refuse") throw new PBQuickStream.Protected(plan.reason);
     if (plan.action === "none") throw new Error(plan.reason);
+    // Source-protection mode: no request to any host. Only what the page holds (data:, blob:, a canvas) is saved.
+    if (p.protection && (plan.action === "url" || plan.action === "stream" || (plan.action === "gif" && !/^(data|blob):/i.test(plan.url || "")))) throw new Error(PROTECTED);
     const key = (opts.asGif ? "gif:" : "") + (plan.url || (plan.stream && plan.stream.url) || "");
     const before = !opts.again && !opts.study && (await savedAs([key, opts.asGif ? null : own(t.url)]));
     if (before) throw new Already(before);
@@ -190,6 +193,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   // A reference to protected media: the page, its title, the time and pictures the page shows in the
   // clear, kept on a moodboard with its label. Never the media itself.
   async function keepReference(t, reason) {
+    if ((await prefs()).protection) throw new Error(PROTECTED);
     const imgs = [t.poster, ...(t.el ? [...(t.el.closest("article, section, main, body") || document).querySelectorAll("img")].slice(0, 6).map((i) => i.currentSrc || i.src) : [])];
     const previews = PBQuickResolve.loadedStreams("").map((s) => s.url).filter((u) => u !== (t.streams && t.streams[0] && t.streams[0].url));
     const ref = PB.referenceOf({ page: location.href, title: document.title, poster: t.poster || null, images: imgs, previews, reason });

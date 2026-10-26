@@ -56,7 +56,9 @@ globalThis.PBQuickCopy = globalThis.PBQuickCopy || (() => {
         toast("Copied the post's words and the link.", { tone: "ok" });
         return { ok: true, what: "caption" };
       }
-      const still = !link && t.kind === "image" && ["url", "bytes", "canvas"].includes(plan.action) && typeof ClipboardItem !== "undefined";
+      // Source-protection mode: no fetch for the picture itself; its address is copied instead.
+      const guarded = await chrome.storage.local.get(PB.SETTINGS_KEY).then((g) => PB.normalizeSettings(g[PB.SETTINGS_KEY]).protection, () => false);
+      const still = !guarded && !link && t.kind === "image" && ["url", "bytes", "canvas"].includes(plan.action) && typeof ClipboardItem !== "undefined";
       if (still) {
         try {
           const png = await pngOf(t, plan);

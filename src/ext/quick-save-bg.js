@@ -36,7 +36,7 @@ globalThis.PBQuickBg = (() => {
     const id = info.menuItemId;
     if (!tab || !ITEMS.some(([x]) => x === id)) return;
     // Source-protection mode: no download from a host. The page is told why, never left silent.
-    if (!/copy-(link|caption)$/.test(id) && (await settings()).protection) { chrome.scripting.executeScript({ target: { tabId: tab.id }, args: [PROTECTED_SAVE], func: (t) => alert(t) }).catch(() => {}); return; }
+    if (!/copy-(link|caption)$|^pb-(note|card)$/.test(id) && !(id === "pb-study" && info.selectionText) && (await settings()).protection) { chrome.scripting.executeScript({ target: { tabId: tab.id }, args: [PROTECTED_SAVE], func: (t) => alert(t) }).catch(() => {}); return; }
     try {
       const target = await inject(tab.id, info.frameId);
       const args = { srcUrl: info.srcUrl || null, linkUrl: info.linkUrl || null, asGif: id === "pb-dl-gif", study: id === "pb-study", copy: id === "pb-copy", link: id === "pb-copy-link", caption: id === "pb-copy-caption",

@@ -27,3 +27,8 @@ test("the sidecar from yt-dlp's info keeps the description, channel, date and ch
   assert.ok(md.includes("> Silica, alumina, flux.\n> The ratios that matter."));
   assert.ok(md.includes("## Chapters\n\n00:00:00 Intro\n00:01:35 Silica"));
 });
+
+test("source-protection mode stops a fetch before yt-dlp runs", async () => {
+  const { runFetch } = await import("../bin/lib/media-fetch.mjs");
+  assert.throws(() => runFetch("https://www.youtube.com/watch?v=abc", {}, { ...process.env, DAYLIGHT_PROTECT: "1", YTDLP: "no-such-yt-dlp" }), /Source-protection mode is on/);
+});

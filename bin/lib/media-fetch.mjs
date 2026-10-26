@@ -8,6 +8,7 @@ import { existsSync, readFileSync, writeFileSync, readdirSync, rmSync } from "no
 import { homedir } from "node:os";
 import { join, basename } from "node:path";
 import { postMeta, sidecarMarkdown, sidecarJson, saveFolder } from "../../src/core/media-meta.js";
+import { globalProtection } from "./case-protect.mjs";
 
 // The yt-dlp to run and its version, or null when there is none.
 export function findYtDlp(env = process.env) {
@@ -42,6 +43,7 @@ export function metaFromInfo(info, url, now = new Date().toISOString()) {
 // Runs one fetch. Returns { file, sidecar, line }. Throws with what to do next.
 export function runFetch(url, flags = {}, env = process.env) {
   const plan = fetchPlan(url, flags);
+  if (globalProtection(env)) throw new Error("Source-protection mode is on (daylight protect status), so nothing is downloaded: the request would tell the host.");
   const y = findYtDlp(env);
   if (!y) throw new Error("yt-dlp was not found. Install it (github.com/yt-dlp/yt-dlp) or set YTDLP to its path, then run this again.");
   const r = spawnSync(y.bin, plan.args, { encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] });

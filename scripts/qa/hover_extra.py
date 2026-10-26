@@ -144,3 +144,29 @@ async def shortcut(ctx, sw, url="https://en.wikipedia.org/wiki/Mount_Rainier"):
     finally:
         await page.close()
     return rec
+
+
+async def protection(ctx, sw, url="https://en.wikipedia.org/wiki/Mount_Rainier"):
+    """Source-protection mode on: the hover Download refuses with its sentence and nothing downloads."""
+    rec = {"name": "protection-on", "url": url}
+    await sw.evaluate("async () => { const k = PB.SETTINGS_KEY; const s = PB.normalizeSettings((await chrome.storage.local.get(k))[k]); await chrome.storage.local.set({ [k]: { ...s, protection: true } }); }")
+    page = await ctx.new_page()
+    await page.set_viewport_size({"width": 1280, "height": 900})
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        await asyncio.sleep(4)
+        box = await (await page.wait_for_selector(".infobox img")).bounding_box()
+        await page.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2, steps=3)
+        await asyncio.sleep(0.9)
+        before, read = await q.newest_ids(sw), await q.note_reader(sw, url)
+        bx = min(max(box["x"] + box["width"] - 70, box["x"] + 4, 4), 1280 - 66) + 16
+        by = min(max(box["y"] + 8, 4), 900 - 36) + 16
+        await page.mouse.move(bx, by)
+        await page.mouse.click(bx, by)
+        rec["files"], rec["note"] = await saved(sw, before, read, 1, timeout=12)
+    except Exception as e:
+        rec["error"] = f"{type(e).__name__}: {str(e)[:300]}"
+    finally:
+        await sw.evaluate("async () => { const k = PB.SETTINGS_KEY; const s = PB.normalizeSettings((await chrome.storage.local.get(k))[k]); await chrome.storage.local.set({ [k]: { ...s, protection: false } }); }")
+        await page.close()
+    return rec

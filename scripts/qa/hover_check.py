@@ -140,7 +140,7 @@ async def main(work, src, axe_src, only):
                 report["cases"].append(rec)
                 print(json.dumps(rec)[:500], flush=True)
             extras = [("x-text-post", lambda: hx.x_text_post(ctx, sw, X_TEXT)), ("selection-wikipedia", lambda: hx.selection(ctx, sw)),
-                      ("text-card", lambda: hx.card(ctx, sw, X_TEXT)), ("side-panel", lambda: hx.side_panel(ctx, sw, sw.ext_id, X_TEXT)), ("shortcut-alt-shift-d", lambda: hx.shortcut(ctx, sw))]
+                      ("text-card", lambda: hx.card(ctx, sw, X_TEXT)), ("side-panel", lambda: hx.side_panel(ctx, sw, sw.ext_id, X_TEXT)), ("shortcut-alt-shift-d", lambda: hx.shortcut(ctx, sw)), ("protection-on", lambda: hx.protection(ctx, sw))]
             for name, run in extras:
                 if only and name not in only:
                     continue
