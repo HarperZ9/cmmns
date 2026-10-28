@@ -195,10 +195,11 @@
   // Every sign links to its lesson (src/ext/learn.html), opened by the worker on click.
   const learn = (fam) => { const path = fam && PB.lessonPath ? PB.lessonPath(fam) : null; return path ? [["Learn", { open: ["How to spot it yourself, 1 to 2 minutes", path] }]] : []; };
   const measured = (fam) => (fam && PB.measuredLine ? PB.measuredLine(fam).text : "not measured yet");
-  // How often the sign finds its target in testing, and how readily it fires (families.js, catchLines).
+  // How often the sign finds its target in testing, how well it tells it apart (d') and how readily it
+  // fires, all on the test set the Measured line names (families.js, catchLines).
   const catches = (x) => {
     const c = x.fam && PB.catchLines ? PB.catchLines(x.fam) : null, pre = x.lang ? "in English: " : "";
-    return c ? [["Catch rate", pre + c.catches], ["Tendency", pre + c.tendency]] : [];
+    return c ? [["Catch rate", pre + c.catches], ["Sensitivity", pre + c.sensitivity], ["Tendency", pre + c.tendency]] : [];
   };
   // The user's own marks (src/ext/feedback.js) sit under the measured line and never replace it.
   const feedback = (x, m) => (globalThis.PBFeedback && x.fam ? PBFeedback.rows(x, m) : []);

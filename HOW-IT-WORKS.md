@@ -45,7 +45,8 @@ the lookup skips RDAP there. Its registration date would belong to GitHub.
 - The measurement page lists which signs have a measured precision, each with a 95% interval. The
   window marks every other sign "not measured yet".
 - Beside the precision, a measured sign's window shows its catch rate ("finds about 1 in 47 posts
-  calling for violence in testing") and how readily it fires. Every sign is cautious: it rarely
+  calling for violence in testing"), its sensitivity d' (0 is chance, 2 is good) and how readily it
+  fires. All four come from one test set, which the window names. Every sign is cautious: it rarely
   fires, so it misses most hostile posts. A quiet reply can still be hostile.
 - The launch campaign lens has no measured precision yet. Until a media lawyer has reviewed its
   wording, every claim reads "this launch" and names no company.

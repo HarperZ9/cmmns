@@ -63,26 +63,31 @@ export function measuredLine(id, table = MEASURED) {
   if (!valid(r)) return { measured: false, text: "not measured yet" };
   const ci = Number.isFinite(r.low) && Number.isFinite(r.high) ? ` (95% interval ${pc(r.low)} to ${pc(r.high)}%)` : "";
   const split = r.split === "test" ? ", held-out test set" : r.split ? `, ${r.split} set` : "";
-  return { measured: true, text: `precision ${pc(r.precision)}%${ci}, ${r.n} badges checked${split}` };
+  const on = r.basis && r.basis.corpus && r.basis.label ? `; measured on ${r.basis.corpus}, against ${r.basis.label}` : "";
+  return { measured: true, text: `precision ${pc(r.precision)}%${ci}, ${r.n} badges checked${on}${split}` };
 }
 
-// The catch rate and tendency the window shows under "Measured" (scripts/eval/sdt.mjs), or null.
-// The catch rate counts the sign's own label where the corpus has one, else general hostility, and
-// says so. The tendency reads bias c (how readily the sign fires) with the precision shown above it.
+// The catch rate, sensitivity and tendency the window shows under "Measured" (scripts/eval/sdt.mjs),
+// or null. They come from the same test set as the precision, which the "Measured" line names. The
+// tendency reads bias c (how readily the sign fires) with that precision. Under the 20-hit rule,
+// sensitivity and tendency read "not measured".
 const TARGET = { dehumanise: "dehumanising posts", violence: "posts calling for violence", stereotype: "posts stereotyping a group" };
 const fires = (c) => (c >= 2 ? "rarely fires" : c >= 1 ? "fires sparingly" : c >= 0 ? "fires readily" : "fires freely");
 const right = (p) => (p >= 0.8 ? "it is usually right" : p >= 0.6 ? "it is right more often than not" : "it is often wrong");
+const num = (x) => (x < 0 ? `−${Math.abs(x).toFixed(2)}` : x.toFixed(2));
 function share(k, n) {
   if (k / n >= 0.2) return `about ${pc(k / n)} in 100`;
   const x = n / k;
   return `about 1 in ${(x < 10 ? Math.round(x) : Number(x.toPrecision(2))).toLocaleString("en")}`;
 }
+const ciOk = (a) => Array.isArray(a) && a.length === 2 && a.every(Number.isFinite);
 
 export function catchLines(id, table = MEASURED) {
   const r = (table || {})[id], k = r && r.catch;
-  if (!valid(r) || !k || !Number.isInteger(k.hits) || !Number.isInteger(k.of) || k.hits <= 0 || k.of < k.hits || !Number.isFinite(k.c)) return null;
-  const own = k.against === "matched" && TARGET[id];
-  const what = own ? TARGET[id] : "hostile posts";
-  return { catches: `finds ${share(k.hits, k.of)} ${what} in testing${own ? "" : " (measured against general hostility)"}`,
-    tendency: `${fires(k.c)}; when it does, ${right(r.precision)}` };
+  if (!valid(r) || !k || !Number.isInteger(k.hits) || !Number.isInteger(k.of) || k.hits <= 0 || k.of < k.hits) return null;
+  const what = k.against === "matched" && TARGET[id] ? TARGET[id] : "hostile posts";
+  const ok = k.measured !== false && Number.isFinite(k.dprime) && Number.isFinite(k.c) && ciOk(k.dCI);
+  return { catches: `finds ${share(k.hits, k.of)} ${what} in testing`,
+    sensitivity: ok ? `d' ${num(k.dprime)} (${num(k.dCI[0])} to ${num(k.dCI[1])}); 0 is chance, 2 is good` : "not measured",
+    tendency: ok ? `${fires(k.c)}; when it does, ${right(r.precision)}` : "not measured" };
 }

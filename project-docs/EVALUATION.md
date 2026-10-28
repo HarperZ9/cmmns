@@ -98,6 +98,13 @@ and `node scripts/eval-sdt.mjs` reruns it on the committed results without the c
 - Both rates take the log-linear correction (0.5 added to each count) so that a rate of 0 or 1
   stays finite. The tables show the uncorrected rates with their counts. Intervals are 95%, from
   2,000 parametric bootstrap draws with a fixed seed (20261028), so a rerun gives the same numbers.
+- **What the window shows (2026-10-28).** Precision, catch rate, d' and tendency (read from c) all
+  come from one test set per sign, named in the window's "Measured" line: the sign's own label on
+  Measuring Hate Speech for dehumanising language, call for violence and group stereotype, and
+  Measuring Hate Speech's general hostility label for slurs. MHS is the largest English corpus, and
+  pooling inflates d' (below). So the window's precision for dehumanising language is 60% (12 of 20,
+  against its own label), where the pooled figure against general hostility, on the measurement page,
+  is 93%. The window and the measurement page now differ on purpose, and each says which set it uses.
 - d' and c are reported only where the sign fired at least 20 times, with at least one hit. Below
   that the correction alone moves d': a sign with no hits on a large corpus can show a positive d'.
 
