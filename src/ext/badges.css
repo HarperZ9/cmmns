@@ -182,3 +182,13 @@
 /* The window's own Pin and Close (pop.js). */
 .pb-ctl { display: flex; justify-content: flex-end; gap: 6px; margin: 0 0 6px; }
 .pb-ctl .pb-btn { padding: 1px 8px; font-size: 12px; }
+/* Library capture (library-ui.js): one bar in the lower left of library pages, on the window's ground. */
+.pb-lib { position: fixed; left: 16px; bottom: 16px; z-index: 2147483000; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: calc(100vw - 32px); box-sizing: border-box;
+  padding: 8px 10px; border-radius: 2px; background: var(--pb-ground); color: var(--pb-ink); box-shadow: var(--pb-shadow); font-family: var(--pb-sans); font-size: var(--pb-size); line-height: var(--pb-lh); }
+.pb-lib-count { font-variant-numeric: tabular-nums; }
+.pb-lib-up { color: var(--pb-muted); }
+.pb-lib-btn { font: inherit; font-weight: 600; padding: 3px 10px; border-radius: 2px; border: 1px solid var(--pb-rule); background: transparent; color: inherit; cursor: pointer; }
+.pb-lib-btn:hover { border-color: var(--pb-ink); }
+.pb-lib-btn:focus-visible, .pb-lib-cap:focus-visible { outline: 2px solid var(--pb-focus); outline-offset: 1px; }
+.pb-lib-btn:disabled { opacity: .5; cursor: progress; }
+.pb-lib-cap { width: 5em; padding: 2px 6px; border-radius: 2px; border: 1px solid var(--pb-rule); background: transparent; color: inherit; font-family: var(--pb-mono); font-size: inherit; }

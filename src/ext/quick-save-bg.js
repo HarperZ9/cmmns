@@ -67,13 +67,13 @@ globalThis.PBQuickBg = (() => {
 
   // Starts a browser download. { url, filename, site, fixExt } -> { id }. The file goes to
   // "<save folder>/<site>/<name>" inside Downloads, so thousands of saves stay in one tree.
-  async function download({ url, filename: name, site, fixExt, study = false, overwrite = false }) {
+  async function download({ url, filename: name, site, fixExt, study = false, overwrite = false, library = null }) {
     if (!chrome.downloads) throw new Error("This browser did not give CMMNS the downloads permission.");
     const s = await settings();
     if (s.protection && /^https?:/i.test(url)) throw new Error(PROTECTED_SAVE);
     // Study saves go to "<save folder>/study/<site>/"; the reference library reads them first.
     const conflict = overwrite ? "overwrite" : "uniquify";
-    const filename = name ? PB.savePath(s, site, study) + name.replace(/[\\/]/g, "-") : null;
+    const filename = name ? PB.savePath(s, site, study, library) + name.replace(/[\\/]/g, "-") : null;
     const opts = { url, saveAs: !!s.mediaAskWhere && !overwrite, conflictAction: conflict, ...(filename ? { filename } : {}) };
     pending.set(url, { fixExt: !!fixExt, filename, conflict });
     const id = await chrome.downloads.download(opts);
@@ -137,7 +137,7 @@ globalThis.PBQuickBg = (() => {
 
   // Bytes the page made, saved through the worker's own address: a blob address where the worker has
   // one (Firefox's background page), else a data: address (Chrome's service worker; under 2 MB).
-  async function fromBytes({ bytes, mime, filename, site, study, overwrite }) {
+  async function fromBytes({ bytes, mime, filename, site, study, overwrite, library }) {
     const b = Uint8Array.from(bytes || []);
     let url;
     if (typeof URL.createObjectURL === "function") url = URL.createObjectURL(new Blob([b], { type: mime }));
@@ -146,7 +146,7 @@ globalThis.PBQuickBg = (() => {
       let s = ""; for (let i = 0; i < b.length; i += 32768) s += String.fromCharCode(...b.subarray(i, i + 32768));
       url = `data:${mime || "application/octet-stream"};base64,${btoa(s)}`;
     }
-    return download({ url, filename, site, study, overwrite });
+    return download({ url, filename, site, study, overwrite, library });
   }
 
   // A protected item's reference: kept on the "Protected references" moodboard with its label.
@@ -180,7 +180,7 @@ globalThis.PBQuickBg = (() => {
   // After an install or update, pages that were already open keep the old scripts, which can no
   // longer reach the extension. The download parts are loaded into them again, so their buttons
   // and the hover control work at once and save into the right folder without a page reload.
-  const FRESH = ["core.bundle.js", "guard.js", "settings.js", ...PAGE, "yt-reference.js", "quick-inline.js", "quick-hover-ui.js", "quick-hover.js"];
+  const FRESH = ["core.bundle.js", "guard.js", "settings.js", ...PAGE, "yt-reference.js", "quick-inline.js", "quick-hover-ui.js", "quick-hover.js", "library-ui.js", "library.js"];
   async function refreshOpenTabs() {
     const sites = (chrome.runtime.getManifest().content_scripts || []).filter((c) => c.js.includes("quick-inline.js")).flatMap((c) => c.matches);
     const tabs = await chrome.tabs.query({ url: sites }).catch(() => []);

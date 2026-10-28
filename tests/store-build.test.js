@@ -30,3 +30,31 @@ test("the unpacked and self-distributed builds keep the hand-off, on YouTube onl
   }
   assert.ok(manifest.content_scripts.some((c) => c.js.includes("yt-handoff.js")), "the source manifest (Load unpacked) loads it");
 });
+
+// Library auto-scroll follows the same split: store policy and the sites' terms on automated access
+// would endanger the whole extension, so the store packages carry the collector (library.js) and
+// its bar, never the scroller (src/ext/library-scroll.js) or any of its words.
+const SCROLL_MARKS = ["PBLibraryScroll = ", "Scroll to the end", "behavior: \"smooth\""];
+
+test("the store packages carry no library auto-scroll", () => {
+  for (const browser of ["chrome", "firefox"]) {
+    const shipped = filesFor(files, browser), m = browserManifest(manifest, browser);
+    assert.ok(!shipped.some(([n]) => n === "library-scroll.js"), `${browser}: library-scroll.js is in the package`);
+    assert.ok(!m.content_scripts.some((c) => c.js.includes("library-scroll.js")), `${browser}: the manifest loads library-scroll.js`);
+    assert.ok(shipped.some(([n]) => n === "library.js") && m.content_scripts.some((c) => c.js.includes("library.js")), `${browser}: the collector must ship`);
+    for (const [n, d] of shipped) {
+      if (!/\.(js|html|json)$/.test(n)) continue;
+      const text = d.toString("utf8");
+      for (const mark of SCROLL_MARKS) assert.ok(!text.includes(mark), `${browser}: ${n} contains "${mark}"`);
+    }
+  }
+});
+
+test("the unpacked and self-distributed builds keep auto-scroll beside the collector", () => {
+  for (const m of [manifest, browserManifest(manifest, "firefox-self")]) {
+    const cs = m.content_scripts.find((c) => c.js.includes("library-scroll.js"));
+    assert.ok(cs, "library-scroll.js is loaded");
+    assert.ok(cs.js.indexOf("library.js") < cs.js.indexOf("library-ui.js") && cs.js.indexOf("library-scroll.js") < cs.js.indexOf("library-ui.js"));
+  }
+  assert.ok(filesFor(files, "firefox-self").some(([n]) => n === "library-scroll.js"));
+});

@@ -5,6 +5,7 @@ import { writeFileSync } from "node:fs";
 import { initCase, slug } from "../../src/investigate/layout.js";
 import { loadCase, addRow, updateRow, byId, isCase } from "../../src/investigate/store.js";
 import { addSource } from "../../src/investigate/add.js";
+import { addLibrary, addLibraryLines } from "../../src/investigate/library.js";
 import { inboxUrls } from "../../src/investigate/ingest.js";
 import { addClaim, addLabel, labelAgreement } from "../../src/investigate/claims.js";
 import { traceClaim, traceLines } from "../../src/investigate/trace.js";
@@ -21,6 +22,8 @@ import { protectEnv, settings } from "./case-protect.mjs";
 export const CASE_USAGE = `Usage: cmmns case <command> [--case <folder>] [--json]
   init <name> [--dir <folder>]                 a new case folder with its own git repository
   add <url|file> [--archive | --no-archive] [--origin O] [--tier T] [--date D] [--what W]
+  add-library <library-folder> [--copy-media]   every post a library capture saved, hashes checked;
+                                               evidence only: quotes and measures, no verdicts on people
   claim "<text>" --source S01 --rung documented|inference|unproven|contradicted
         [--retells C01 | --corroborates C01] [--self-sourced] [--date D] [--key K]
   claims [--blind]                             the inventory; --blind hides rungs for labellers
@@ -89,6 +92,14 @@ async function add(env, { _: [target], f }) {
   const s = r.source, extra = [...r.derived.edges.map((e) => `edge ${e.id}`), ...r.derived.absent.map((a) => `absence ${a.id}`)];
   env.commit(`case add ${s.id}`);
   return f.json ? asJson(r) : `${s.id} captured: ${s.capture.bytes} bytes, sha256 ${s.capture.sha256}. ${s.archive.url ? `Archived at ${s.archive.url}.` : s.archive.error ? `No archive copy: ${s.archive.error}.` : s.archive.note + "."}${extra.length ? ` Also recorded: ${extra.join(", ")}.` : ""}\n`;
+}
+
+// `case add-library`: a library the browser extension saved (CMMNS/library/<site>-<name>/).
+function addLib(env, { _: [folder], f }) {
+  if (!folder) throw new Error("case add-library needs a library folder (CMMNS/library/<site>-<name>)");
+  const r = addLibrary(env.dir, folder, { now: env.now, copyMedia: !!f["copy-media"], origin: f.origin, tier: f.tier, what: f.what });
+  if (r.added.length) env.commit(`case add-library ${r.folder} (${r.added.length} posts)`);
+  return f.json ? asJson(r) : addLibraryLines(r);
 }
 
 function claim(env, { _: [text], f }) {
@@ -174,7 +185,7 @@ function actor(env, { _: [handle], f }) {
   return `${row.handle}: ${row.public_figure ? "public figure, handle kept in exports" : "private, shown as a pseudonym in exports"}.\n`;
 }
 
-const COMMANDS = { settings, add, claim, claims, label, labels, event, edge, lead, absent, actor, ...views, ...RUN_COMMANDS };
+const COMMANDS = { settings, add, "add-library": addLib, claim, claims, label, labels, event, edge, lead, absent, actor, ...views, ...RUN_COMMANDS };
 const READ_ONLY = new Set(["claims", "labels", "trace", "timeline", "network", "leads", "verify-export"]);
 
 export async function runCaseCommand(argv, base = {}) {

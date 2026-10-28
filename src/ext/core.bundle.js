@@ -12810,9 +12810,11 @@ function sidecarMarkdown(meta, fileNames = null) {
 }
 
 // The folder for one save from the settings: "<folder>/<site>/", "<folder>/study/<site>/" for
-// Study, or "" only when the user turned on saving straight into Downloads.
-function savePath(settings, site, study = false) {
+// Study, "<folder>/library/<library>/" for a library capture (src/core/library.js), or "" only
+// when the user turned on saving straight into Downloads (a library still keeps its own folder).
+function savePath(settings, site, study = false, library = null) {
   const s = settings || {}, base = String(s.mediaFolder || "").trim() || "CMMNS";
+  if (library) return saveFolder(s.mediaToRoot ? "library" : `${base}/library`, library);
   if (s.mediaToRoot) return study ? saveFolder("study", site) : "";
   return saveFolder(study ? `${base}/study` : base, site);
 }
@@ -12856,6 +12858,133 @@ function sidecarStem(fileNames) {
 }
 
 return { SIDECAR_FORMAT, textTags, postMeta, metaName, sidecarMarkdown, savePath, saveFolder, sidecarJson, captionText, embedText, fileBase, sidecarStem };
+})();
+
+// ---- library.js
+const M_library = (() => {
+// Library capture (project-docs/LIBRARY-CAPTURE.md): a whole page's posts saved as one folder.
+// This module is the part with no page in it: which pages are library pages and what folder each
+// one fills, which posts a library keeps, the index.jsonl line for each saved post, and the
+// LIBRARY.md header. The page side is src/ext/library.js; the case hand-off is
+// `cmmns case add-library` (src/investigate/library.js).
+
+const LIBRARY_FORMAT = "daylight.library/1";
+const LIBRARY_CAP = 500;
+
+// The scope note carried by every LIBRARY.md and by the command line help (person mode, settled by
+// the author on 2026-10-28): about a person, the tools show only what can be measured or quoted from
+// their public material, each with its method and a link to the posts; they never say anything about
+// the person themself.
+const LIBRARY_SCOPE = [
+  "Scope: a library is the posts this page showed, saved as they were shown.",
+  "When the subject is a person, the tools show only evidence: what can be measured (with its method and denominator) or quoted from the public posts, each linked to the post it came from.",
+  "They never label a person's character, disposition, beliefs not stated, honesty or intent, never predict what a person will do, and never rank people on any of these. Two quotes on the same subject from different dates are shown side by side; a person reads them and judges.",
+];
+
+const X_RESERVED = new Set(["home", "explore", "notifications", "messages", "settings", "compose", "tos", "privacy", "login", "logout", "signup", "i", "search", "hashtag", "communities", "jobs", "premium", "account", "intent", "share", "who_to_follow"]);
+const X_TABS = new Set(["", "media", "with_replies", "highlights", "articles", "superfollows"]);
+const part = (s, max = 60) => String(s || "").normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, "-").replace(/^-+|-+$/g, "").slice(0, max).replace(/-+$/, "");
+
+function xLibrary(u, parts) {
+  const [first = "", second = "", third = ""] = parts;
+  if (first === "search") {
+    const q = u.searchParams.get("q");
+    return q && part(q) ? { site: "x", kind: "search", name: `search-${part(q, 48)}`, label: `X search "${q}"`, author: null } : null;
+  }
+  if (first === "hashtag" && second) return { site: "x", kind: "search", name: `hashtag-${part(second, 48)}`, label: `X hashtag #${second}`, author: null };
+  if (first === "i" && second === "lists" && /^\d+$/.test(third) && parts.length === 3) return { site: "x", kind: "list", name: `list-${third}`, label: `X list ${third}`, author: null };
+  if (!/^[A-Za-z0-9_]{1,15}$/.test(first) || X_RESERVED.has(first.toLowerCase()) || parts.length > 2 || !X_TABS.has(second)) return null;
+  return { site: "x", kind: "profile", name: first.toLowerCase(), label: `@${first} on X`, author: first };
+}
+
+function redditLibrary(parts) {
+  const [first = "", name = "", tab = "", ...rest] = parts;
+  if (!/^[A-Za-z0-9_-]{2,30}$/.test(name) || rest.length) return null;
+  if (first === "r" && ["", "hot", "new", "top", "rising", "controversial"].includes(tab)) return { site: "reddit", kind: "subreddit", name: `r-${name.toLowerCase()}`, label: `r/${name} on Reddit`, author: null };
+  if ((first === "user" || first === "u") && ["", "submitted", "posts", "overview"].includes(tab)) return { site: "reddit", kind: "user", name: `u-${name.toLowerCase()}`, label: `u/${name} on Reddit`, author: `u/${name}` };
+  return null;
+}
+
+// The library a page fills, or null when the page is not a profile, list, search, user or
+// subreddit page. { site, kind, name, label, author, folder }: folder is "<site>-<name>", the folder
+// under "<save folder>/library/". author is set where the library is one account's own posts.
+function libraryOf(href) {
+  let u;
+  try { u = new URL(href); } catch { return null; }
+  const host = u.hostname.replace(/^(www|mobile|old|new)\./, ""), parts = u.pathname.split("/").filter(Boolean);
+  const lib = host === "x.com" || host === "twitter.com" ? xLibrary(u, parts) : host === "reddit.com" ? redditLibrary(parts) : null;
+  return lib ? { ...lib, folder: `${lib.site}-${lib.name}` } : null;
+}
+
+// Why a post is left out, as the words LIBRARY.md counts it under; null to keep it.
+// post: { id, handle, promoted, repost }. One account's library keeps that account's own posts and
+// comments, and its reposts of other accounts' posts (kept as kind "repost", with the original's
+// author and id, so the account's own posts can still be filtered). Another account's post that the
+// feed shows for context (the post a reply answers) is skipped and counted.
+const SKIP = Object.freeze({
+  noId: "no post id on the page, so it could not be told apart from the others",
+  promoted: "a promoted post (an advert)",
+  other: "a post by another account shown in the feed for context (for example the post a reply answers)",
+});
+function librarySkip(lib, post) {
+  if (!post || !post.id) return SKIP.noId;
+  if (post.promoted) return SKIP.promoted;
+  const norm = (h) => String(h || "").replace(/^@/, "").replace(/^u\//i, "").toLowerCase();
+  if (lib.author && !post.repost && norm(post.handle) !== norm(lib.author)) return SKIP.other;
+  return null;
+}
+const LIBRARY_KINDS = Object.freeze(["post", "repost", "comment"]);
+
+// A new library's record, or the one kept from before (resumable).
+function libraryState(lib, kept = null, now = new Date().toISOString()) {
+  const base = kept && kept.format === LIBRARY_FORMAT && kept.folder === lib.folder ? kept : { format: LIBRARY_FORMAT, folder: lib.folder, site: lib.site, kind: lib.kind, label: lib.label, author: lib.author || null, created: now, sources: [], sessions: [], items: [], skipped: {} };
+  return { ...base, sources: [...base.sources], sessions: [...base.sessions], items: [...base.items], skipped: { ...base.skipped } };
+}
+
+// One saved post's line for index.jsonl. files: [{ name, sha256 }] in the order saved, the sidecar
+// last; sha256 is null for a file the host did not let the page read (the browser saved it as sent).
+// fields: what the site's own data says about the post beyond its words (language, edits, labels),
+// kept as the site gave it. kind: "post", "repost" (handle is the original's author, repost_by the
+// account that reposted it) or "comment" (with its parent post's id and the subreddit). content:
+// "media" when files besides the note were saved, else "text".
+function libraryLine({ id, url, handle = null, posted = null, saved, kind = "post", content = "media", files = [], missing = [], fields = null, repostBy = null, parentPost = null, subreddit = null }) {
+  const f = files.map((x) => ({ name: String(x.name), sha256: x.sha256 || null, ...(x.sha256 ? {} : { note: x.note || "not hashed: the host did not let the page read the file" }) }));
+  const k = LIBRARY_KINDS.includes(kind) ? kind : "post";
+  return { id: String(id), url: url || null, handle: handle || null, posted: posted || null, saved, kind: k, content: content === "text" ? "text" : "media", files: f,
+    ...(k === "repost" ? { repost_by: repostBy || null, original: { author: handle || null, id: String(id), url: url || null } } : {}),
+    ...(k === "comment" ? { parent_post: parentPost || null, subreddit: subreddit || null } : {}),
+    ...(missing.length ? { missing: missing.map(String) } : {}), ...(fields && Object.keys(fields).length ? { fields } : {}) };
+}
+
+// How many of each kind a library holds: { post, repost, comment }.
+function libraryKinds(items) {
+  const out = { post: 0, repost: 0, comment: 0 };
+  for (const l of items) out[LIBRARY_KINDS.includes(l.kind) ? l.kind : "post"]++;
+  return out;
+}
+
+const libraryIndex = (state) => state.items.map((l) => JSON.stringify(l)).join("\n") + (state.items.length ? "\n" : "");
+
+// The header a person reads first: where the posts came from, when, how many, and what was left out.
+function libraryMarkdown(state) {
+  const files = state.items.reduce((n, l) => n + l.files.length, 0), unhashed = state.items.reduce((n, l) => n + l.files.filter((f) => !f.sha256).length, 0);
+  const missing = state.items.filter((l) => (l.missing || []).length).length;
+  const L = ["---", `format: ${JSON.stringify(LIBRARY_FORMAT)}`, `library: ${JSON.stringify(state.folder)}`, `site: ${JSON.stringify(state.site)}`, `kind: ${JSON.stringify(state.kind)}`,
+    ...(state.author ? [`author: ${JSON.stringify(state.author)}`] : []), `posts: ${state.items.length}`, `own_posts: ${libraryKinds(state.items).post}`, `reposts: ${libraryKinds(state.items).repost}`, `comments: ${libraryKinds(state.items).comment}`, `created: ${JSON.stringify(state.created)}`, "---", "", `# Library: ${state.label}`, ""];
+  const k = libraryKinds(state.items), plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  L.push(`${state.items.length} item${state.items.length === 1 ? "" : "s"} saved, ${files} files: ${plural(k.post, "post")} of its own, ${plural(k.repost, "repost")}, ${plural(k.comment, "comment")}. Each item has its files and a sidecar note (daylight.sidecar/1); index.jsonl lists every item with its kind and the SHA-256 of each file, so reposts and comments can be filtered out or kept.`, "");
+  L.push("## Source pages", "", ...state.sources.map((s) => `- ${s}`), "");
+  L.push("## Sessions (UTC)", "", ...state.sessions.map((s) => `- ${s.started} to ${s.stopped || "still running, or the tab closed before Stop"}: ${s.saved || 0} saved, ${s.mode === "auto" ? "auto-scroll" : "collected while scrolling"}${s.why ? `; stopped: ${s.why}` : ""}`), "");
+  const skipped = Object.entries(state.skipped).filter(([, n]) => n > 0);
+  L.push("## Skipped", "", ...(skipped.length ? skipped.map(([why, n]) => `- ${n}: ${why}`) : ["- none"]));
+  if (missing) L.push(`- ${missing} saved post${missing === 1 ? " lacks" : "s lack"} some media; index.jsonl says why under "missing" (protected media is never downloaded).`);
+  if (unhashed) L.push(`- ${unhashed} file${unhashed === 1 ? "" : "s"} saved without a hash (the host did not let the page read them); \`cmmns case add-library\` hashes them from disk.`);
+  L.push("", "Only posts the page loaded are here. A feed that stopped loading, deleted or hidden posts, and anything past the cap are not.", "", "## Scope", "", ...LIBRARY_SCOPE.map((s) => `- ${s}`), "",
+    "Hand-off: `cmmns case add-library <this folder> --case <case folder>` adds every post, with its hashes, to a case.", "");
+  return L.join("\n");
+}
+
+return { LIBRARY_FORMAT, LIBRARY_CAP, LIBRARY_SCOPE, libraryOf, SKIP, librarySkip, LIBRARY_KINDS, libraryState, libraryLine, libraryKinds, libraryIndex, libraryMarkdown };
 })();
 
 // ---- media-embed.js
@@ -16684,5 +16813,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_library, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

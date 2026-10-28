@@ -98,7 +98,15 @@ globalThis.PBQuickSites = globalThis.PBQuickSites || (() => {
     const full = t.fullText || (t.text && t.text.length < 2000 ? t.text : null), shown = txt(langs[0]);
     const more = own(article, '[data-testid="tweet-text-show-more-link"]').length > 0 || own(article, "button, a, span[role=button]").some((e) => /^show more$/i.test(e.textContent.trim()));
     return { site: "x", text: full || (shown && t.text && t.text.length > shown.length ? t.text : shown || t.text || null), textComplete: !!full || !more, authorName: name, handle: ref.handle, postUrl: xUrl(ref.handle, ref.id),
-      postedAt: t.posted || (time && time.dateTime) || PB.snowflakeTime(ref.id), quoted, parent, thread: xThread(article, ref, t), threadComplete: xThreadOf(article, ref, t).complete, engagement: xEngagement(article, t), ...xExtras(article) };
+      postedAt: t.posted || (time && time.dateTime) || PB.snowflakeTime(ref.id), quoted, parent, thread: xThread(article, ref, t), threadComplete: xThreadOf(article, ref, t).complete, engagement: xEngagement(article, t), ...xExtras(article),
+      links: t.links || [], fields: xFields(t) };
+  }
+  // What X's own post data says beyond the words, as X records it: language, posting app, how many
+  // earlier versions, a Community Note, X's paid-partnership mark, a repost's original. Kept by a
+  // library (library.js) in its index; X's claims about the post, never ground truth.
+  function xFields(t) {
+    const f = { lang: t.lang, client: t.client, edits: t.edits, community_note: t.note, community_note_id: t.noteId, paid_partnership: t.paidPartnership, repost_of: t.repostOf, views: t.views };
+    return Object.fromEntries(Object.entries(f).filter(([, v]) => v != null));
   }
 
   // Replies, reposts, quotes, likes, bookmarks and views as the page or X's data shows them at save time.
@@ -201,8 +209,18 @@ globalThis.PBQuickSites = globalThis.PBQuickSites || (() => {
     const flair = post.querySelector("shreddit-post-flair, flair-tag, [slot='post-flair']");
     return { site: "reddit", title: a("post-title"), text: txt(post.querySelector('[slot="text-body"]')), handle: a("author") ? "u/" + a("author") : null,
       subreddit: a("subreddit-prefixed-name"), postUrl: link ? new URL(link, location.href).href : location.href, postedAt: a("created-timestamp"),
-      flair: flair ? txt(flair) : null,
+      flair: flair ? txt(flair) : null, links: redditLink(post), fields: redditFields(post),
       engagement: (() => { const e = {}; for (const [k, at] of [["score", "score"], ["comments", "comment-count"]]) if (a(at) != null) e[k] = a(at); return Object.keys(e).length ? e : null; })() };
+  }
+
+  // A link post's target, and what the post's own attributes say about it.
+  function redditLink(post) {
+    const h = post.getAttribute("content-href");
+    try { return h && !/(^|\.)reddit\.com$/.test(new URL(h, location.href).hostname) ? [new URL(h, location.href).href] : []; } catch { return []; }
+  }
+  function redditFields(post) {
+    const f = { post_type: post.getAttribute("post-type"), domain: post.getAttribute("domain"), nsfw: post.hasAttribute("nsfw") || null, spoiler: post.hasAttribute("spoiler") || null };
+    return Object.fromEntries(Object.entries(f).filter(([, v]) => v != null && v !== ""));
   }
 
   function redditTarget(el) {
@@ -225,8 +243,26 @@ globalThis.PBQuickSites = globalThis.PBQuickSites || (() => {
     return { title, items, gallery: !!gallery };
   }
 
+  // A comment on a Reddit user page: its words, author, time, and the post and subreddit it sits in,
+  // from the element's own attributes and its permalink (/r/<sub>/comments/<post>/<slug>/<comment>/).
+  const COMMENT = "shreddit-profile-comment, shreddit-comment";
+  function redditCommentMeta(node) {
+    const a = (...ks) => ks.map((k) => node.getAttribute(k)).find((v) => v) || null;
+    const anchor = node.querySelector('a[href*="/comments/"]'), link = a("permalink", "href", "comment-permalink") || (anchor && anchor.getAttribute("href"));
+    const m = /\/r\/([^/]+)\/comments\/([a-z0-9]+)\/[^/]*\/([a-z0-9]+)/i.exec(link || "");
+    const id = a("thingid", "comment-id") || (m ? "t1_" + m[3] : null), sub = a("subreddit-prefixed-name") || (m ? "r/" + m[1] : null);
+    const body = node.querySelector('[slot="comment"], [id$="-comment-rtjson-content"], [id$="-post-rtjson-content"], .md');
+    const time = node.querySelector("time[datetime], faceplate-timeago[ts]");
+    if (!id && !link) return null;
+    return { site: "reddit", kind: "text", id: id ? (/^t1_/.test(id) ? id : "t1_" + id) : null, text: txt(body || node), handle: a("author") ? "u/" + a("author") : null, subreddit: sub,
+      postUrl: link ? new URL(link, location.href).href : null, postedAt: a("created-timestamp") || (time && (time.getAttribute("datetime") || time.getAttribute("ts"))),
+      parentPost: a("post-id", "postid") || (m ? "t3_" + m[2] : null), parent: m ? { url: new URL(`/r/${m[1]}/comments/${m[2]}/`, location.href).href, text: a("post-title"), author: null } : null,
+      engagement: a("score") != null ? { score: a("score") } : null, fields: {} };
+  }
+
   return Object.freeze({
-    isX, isReddit,
+    isX, isReddit, COMMENT,
+    commentMetaOf: (node) => (isReddit ? redditCommentMeta(node) : null),
     targetFor: (el) => (isX ? xTargetTitled(el) : isReddit ? redditTarget(el) : null),
     postMedia: (node) => (isX ? xPost(node) : isReddit ? redditPost(node) : { title: document.title, items: [] }),
     // The post an element sits in, and that post's words, for a note of a text post.

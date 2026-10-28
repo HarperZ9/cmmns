@@ -126,9 +126,11 @@ export function sidecarMarkdown(meta, fileNames = null) {
 }
 
 // The folder for one save from the settings: "<folder>/<site>/", "<folder>/study/<site>/" for
-// Study, or "" only when the user turned on saving straight into Downloads.
-export function savePath(settings, site, study = false) {
+// Study, "<folder>/library/<library>/" for a library capture (src/core/library.js), or "" only
+// when the user turned on saving straight into Downloads (a library still keeps its own folder).
+export function savePath(settings, site, study = false, library = null) {
   const s = settings || {}, base = String(s.mediaFolder || "").trim() || "CMMNS";
+  if (library) return saveFolder(s.mediaToRoot ? "library" : `${base}/library`, library);
   if (s.mediaToRoot) return study ? saveFolder("study", site) : "";
   return saveFolder(study ? `${base}/study` : base, site);
 }
