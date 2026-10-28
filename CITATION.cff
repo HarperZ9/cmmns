@@ -3,7 +3,7 @@ message: "If you use this software, please cite it using these metadata."
 type: software
 title: "CMMNS"
 abstract: "CMMNS (formerly Daylight Commons, and Radar before that) is a browser extension that shows where social media replies come from, signs of coordination, how replies argue, and whether a fact-checker has reviewed the claim. Install it in Chrome, Edge, Brave or Firefox."
-version: "3.9.0"
+version: "3.9.1"
 date-released: "2026-10-28"
 authors:
   - family-names: "Harper"
