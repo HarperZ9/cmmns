@@ -1,12 +1,12 @@
 name: Challenge a definition or a badge
-description: Dispute a catalogue entry, an element match or a badge Daylight Commons showed. Every challenge gets a public decision with its reasons.
+description: Dispute a catalogue entry, an element match or a badge CMMNS showed. Every challenge gets a public decision with its reasons.
 title: "Challenge: "
 labels: ["challenge"]
 body:
   - type: markdown
     attributes:
       value: |
-        Daylight Commons compares visible conduct with published definitions, element by element. It never decides
+        CMMNS compares visible conduct with published definitions, element by element. It never decides
         that anyone broke a law or a rule. If an entry quotes its source wrongly, splits it into the wrong
         elements, cites the wrong signals, or a badge matched an element it should not have, tell us here.
 
@@ -21,7 +21,7 @@ body:
       label: What are you challenging?
       options:
         - A catalogue entry (its quote, source, elements or signals)
-        - A badge or element table Daylight Commons showed on a page
+        - A badge or element table CMMNS showed on a page
         - A missing definition or jurisdiction
     validations:
       required: true
@@ -55,7 +55,7 @@ body:
     id: evidence
     attributes:
       label: Your evidence
-      description: An official source (with a link), a disclosure Daylight Commons missed, or anything else that shows the entry or the badge is wrong.
+      description: An official source (with a link), a disclosure CMMNS missed, or anything else that shows the entry or the badge is wrong.
     validations:
       required: true
   - type: checkboxes

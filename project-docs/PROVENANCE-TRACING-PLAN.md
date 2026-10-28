@@ -7,7 +7,7 @@ tracing next." Source brief: the counter-repression brief of 2026-10-25, feature
 ## The problem
 
 Fabricated images and video are pushed by coordinated accounts. A reader needs two answers: is this
-image's origin known, and is a crowd carrying it? Daylight already reads Content Credentials (C2PA,
+image's origin known, and is a crowd carrying it? CMMNS already reads Content Credentials (C2PA,
 `src/core/c2pa-verify.js`) and IPTC "made with generative AI" metadata (`src/core/aimeta.js`), and it
 already measures coordination (the same text from many accounts, one upload carried by many). This
 plan joins the two.
@@ -35,8 +35,8 @@ Who it protects: readers facing fabricated evidence, and the people falsely show
 
 **No pixel-level AI-image classifier.** Detectors of generated images have unstable accuracy
 across generators, versions and ordinary processing (resizing, recompression, screenshots), and
-their error rates on real photos are not known for the images Daylight users see. A wrong
-"AI-made" label on a real photo of an atrocity is the worst error Daylight could make: it hands
+their error rates on real photos are not known for the images CMMNS users see. A wrong
+"AI-made" label on a real photo of an atrocity is the worst error CMMNS could make: it hands
 deniers a tool and harms the people in the photo. If a classifier is ever proposed, it ships under
 the reading lens rule: held-out precision of 80% or more from at least three hits, shown per
 generator, or it stays off, and its label never stands alone.

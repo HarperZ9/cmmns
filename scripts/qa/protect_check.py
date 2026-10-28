@@ -6,7 +6,7 @@ extension. Development only.
 A local server serves a page with a photo full of metadata and three X-like profile pages (your own
 signed-in profile, someone else's, signed out). The server logs every request it receives, and the
 browser's own network events are recorded too, so the check counts what went out:
-  1. protection off: Save to Daylight downloads the photo again (the control: a request is seen);
+  1. protection off: Save to CMMNS downloads the photo again (the control: a request is seen);
   2. protection on: the same save, the right-click Download and an evidence lookup make zero requests;
      the toolbar badge reads P;
   3. Share clean from Collections, one file and the whole case as a zip, with no metadata left;

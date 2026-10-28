@@ -1,5 +1,5 @@
 <!-- writing-profile: research -->
-# Production readiness: Daylight Commons 3.5.0
+# Production readiness: CMMNS 3.5.0
 
 Date: 2026-10-23. Checked on the release branch built from `main` at 3.4.0 (`4b8b743`), with every fix
 below applied. Each row is a check with how it was run, the result on 3.4.0 where it differs, and the
@@ -24,12 +24,12 @@ How it was run:
 | 2 | Install | Firefox self xpi installs in a fresh profile; first run, Options, Analyse a file, privacy page; an evidence chain checks; a reply's window opens on the stage | Firefox 154, BiDi, `firefox.mjs` | pass | pass |
 | 3 | Install | `web-ext lint` on the Firefox package | web-ext 8.10.0 | 0 errors, 0 warnings (2026-10-21) | 0 errors, 0 warnings, 0 notices |
 | 4 | First run | Welcome to the first useful sign in under 60 s | one click on Start, open a thread, rest the pointer on a reply until its window shows a sign | 4.2 s | 4.2 s (4.2 to 9.3 s over five runs; the slow run shared the machine with a second browser) |
-| 5 | First run | No console errors from Daylight Commons on X, YouTube, Reddit, Bluesky, Mastodon, Threads, Facebook, Instagram, TikTok | live check, errors and exceptions counted in the extension's own script context | not measured | 0 errors on the 8 sites that loaded; see row 6 |
+| 5 | First run | No console errors from CMMNS on X, YouTube, Reddit, Bluesky, Mastodon, Threads, Facebook, Instagram, TikTok | live check, errors and exceptions counted in the extension's own script context | not measured | 0 errors on the 8 sites that loaded; see row 6 |
 | 6 | First run | Each site's reader finds posts | live check, signed out, 3.5.0 package | not measured | YouTube 3 of 3 comments loaded (20 of 20 on an earlier run), Bluesky 49 of 49, Mastodon 60 of 60, Threads 15 of 15. X refused the signed-out headless visit (HTTP failure); Reddit served a bot check; Facebook, Instagram and TikTok showed a sign-in wall (Facebook's reader read 1 of the 2 items behind it). Those five are **not tested** on real posts here |
-| 7 | Robustness | A changed page cannot break the site or stop Daylight Commons silently | code review of every content script entry point | **fail**: the message listeners and `site.read()` ran unguarded; one throw ended the whole refresh; errors went to `console.error` | fixed: `guard.js` wraps readers and listeners, logs one `[daylight-commons]` warning per kind per minute, keeps the last 50 for the self-test, and pauses a page after five failed passes |
+| 7 | Robustness | A changed page cannot break the site or stop CMMNS silently | code review of every content script entry point | **fail**: the message listeners and `site.read()` ran unguarded; one throw ended the whole refresh; errors went to `console.error` | fixed: `guard.js` wraps readers and listeners, logs one `[cmmns]` warning per kind per minute, keeps the last 50 for the self-test, and pauses a page after five failed passes |
 | 8 | Robustness | Timeouts on every request a content script makes | code review | **fail**: Reddit account reads and X About requests had none | fixed: 10 s and 15 s `AbortSignal.timeout`; background lookups and feeds already had theirs |
-| 9 | Robustness | Memory bounded on a long scroll | 3,000-post scroll soak, heap after garbage collection, page keeps 60 posts like X | **fail** in principle: post, author and pattern caches were unbounded; 600 posts grew the heap 0.12 MB per 100 posts | fixed: caches capped. Heap 13.1 MB at 40 posts, 15.2 MB at 1,000, 15.8 MB at 3,000 (levels off); DOM nodes flat at 804; with Daylight Commons off, 2.4 to 2.8 MB |
-| 10 | Performance | Script cost per post in the browser | soak: script time with Daylight Commons on minus off, per post scrolled | 0.23 ms | 0.22 ms |
+| 9 | Robustness | Memory bounded on a long scroll | 3,000-post scroll soak, heap after garbage collection, page keeps 60 posts like X | **fail** in principle: post, author and pattern caches were unbounded; 600 posts grew the heap 0.12 MB per 100 posts | fixed: caches capped. Heap 13.1 MB at 40 posts, 15.2 MB at 1,000, 15.8 MB at 3,000 (levels off); DOM nodes flat at 804; with CMMNS off, 2.4 to 2.8 MB |
+| 10 | Performance | Script cost per post in the browser | soak: script time with CMMNS on minus off, per post scrolled | 0.23 ms | 0.22 ms |
 | 11 | Performance | Text work per post, first thread pass and each refresh, 500 replies | `scripts/qa/bench.mjs`, bundle in Node, three runs | 0.25 ms; 60 ms; 60 ms | 0.26 ms; 59 ms; 48 to 49 ms |
 | 12 | Performance | Budgets enforced in CI | `tests/budget.test.js` | **fail**: none | per post 4 ms, thread pass 1,500 ms, refresh 1,500 ms (about three times what a Windows CI runner took), and a linear-growth check |
 | 13 | Performance | Window open time | hover to first section heading, page clock, six replies | 474 ms median | 472 ms median, of which 450 ms is the deliberate hover delay (`pop.js` `OPEN_MS`), so about 22 ms of work |
@@ -44,7 +44,7 @@ How it was run:
 | 22 | Accessibility | axe on case dossier and network pages, light and dark | axe-core | 2 moderate (no main landmark) | 0 |
 | 23 | Accessibility | Keyboard path | focus a reply, Alt+R into the window, Tab stays inside, focus visible, Esc closes | pass | pass |
 | 24 | Accessibility | Contrast in light and dark | axe colour-contrast rule on every page above | pass | pass |
-| 25 | Workbench | `daylight case` end to end on Windows, Linux and macOS | `tests/investigate.*.test.js` in CI on all three | Windows and Linux only | all three |
+| 25 | Workbench | `cmmns case` end to end on Windows, Linux and macOS | `tests/investigate.*.test.js` in CI on all three | Windows and Linux only | all three |
 | 25b | Workbench | The command line runs when its path goes through a link | macOS CI: macOS temporary folders sit behind `/var` -> `/private/var` | **fail**: `bin/radar.mjs` exited 0 without running, so `verify` on an edited chain looked like a pass | fixed: the entry check compares real paths; found by the new macOS job |
 | 26 | Workbench | Errors tell the user what to do | missing file, not a case folder, unknown command | **fail**: raw `ENOENT`, "Run case init" without the program name | fixed: "No such file or folder ... Check the path", the help command to run next; tests |
 | 27 | Workbench | `--help` for every command | every case command and every top-level command | **fail**: one usage list only | fixed: what it does, usage and an example for each; `tests/cli.help.test.js` |
@@ -68,7 +68,7 @@ unchanged and still enforced by `tests/budget.test.js`.
 | 34 | Save | Protected media is refused, never fetched | element with MediaKeys: card disabled with the reason; AES-128 HLS: "Not saved", no segment kept; `tests/media-stream.test.js` for SAMPLE-AES, session keys, DASH ContentProtection, MP4 `encv` and WebM ContentEncryption | pass |
 | 35 | Convert | Local conversion, output decodes | PNG to WebP, GIF to MP4, MP4 to WebM 480p, MP4 to MP4 720p (H.264 and AAC), WAV to Ogg Opus; every output decoded by ffmpeg 7.1 with no errors | pass; sizes in `project-docs/MEDIA-TOOLKIT.md` |
 | 36 | Convert | Hash lineage | `checkLineage` over every saved item after the conversions: 0 problems; `tests/media-collect.test.js` rejects forged and broken chains | pass |
-| 37 | Convert | Command line | `daylight media convert` and `compress` on the same samples through ffmpeg; `tests/media-cli.test.js` runs a real conversion where ffmpeg is installed | pass |
+| 37 | Convert | Command line | `cmmns media convert` and `compress` on the same samples through ffmpeg; `tests/media-cli.test.js` runs a real conversion where ffmpeg is installed | pass |
 | 38 | Ad blocking | Off by default, blocks when on, per-site allow | two ad scripts on the fixture: loaded (off), blocked (on), loaded (on, site allowed); both rulesets ship disabled | pass |
 | 39 | Ad blocking | Rules match their pinned lists and stay in budget | `node scripts/adblock-build.mjs --check` (CI stage, skipped without the cached lists); 12,900 rules of a 30,000 budget; `tests/adblock.test.js` | pass |
 | 40 | Pressure lens | Off by default; held-out score reproduced | `tests/pressure.test.js`; precision 89% (8/9), recall 17% (8/47), 0 of 41 ordinary messages marked | pass for the check; recall is low, see READING-LENS.md |
@@ -82,7 +82,7 @@ unchanged and still enforced by `tests/budget.test.js`.
 | 48 | Download | Overlays, srcset, canvas, frames, real HLS and DASH | a WebP behind a clear layer and a `.jpg` address saved as `.webp`; Wikipedia's largest srcset; canvas as PNG; a cross-origin frame; Angel One over hls.js (fMP4, separate sound) and shaka (DASH) as one MP4 each, 60 s with sound; Mux's test stream as MPEG-TS (479 MB) | pass |
 | 49 | Download | Protected media refused, nothing saved | ClearKey MediaKeys on the element: "Protected, can't be saved", no download; `tests/media-quicksave.test.js`, `tests/media-demux.test.js` (encrypted HLS and Widevine DASH stop before any segment) | pass |
 | 50 | Download | The post's words travel with the file | `.md` sidecar per save, `daylight.sidecar/1` (`project-docs/SIDECAR-FORMAT.md`); description inside JPEG, PNG, WebP, GIF and MP4 read back after download; `tests/media-meta.test.js` round trips with every sample unchanged | pass |
-| 51 | Download | No duplicates; one folder tree | a second save of the same video: "Already saved as ..." with Save again; files under `Downloads/Daylight/<site>/` | pass |
+| 51 | Download | No duplicates; one folder tree | a second save of the same video: "Already saved as ..." with Save again; files under `Downloads/CMMNS/<site>/` | pass |
 | 52 | Copy | Copy, Copy link, Copy with caption | Wikipedia picture: clipboard holds `image/png`; Copy link holds the file's address | pass for Copy and Copy link; Copy with caption by unit test only |
 
 How the browser check stands in for the right-click menu: a script cannot open Chrome's own menu, so
@@ -116,7 +116,7 @@ receives, beside the browser's own network events. Results and screenshots:
 | 63 | Boundaries | No face recognition names in the code, no requests from the protection modules, no account linking, GPS read only by Share clean and never reported | `tests/protect.boundaries.test.js` | pass |
 
 Found and fixed while checking: Share clean edited a Node Buffer's bytes in place (a Buffer's
-`slice` is a view), so `daylight clean` wrote a lineage record whose original hash was the clean
+`slice` is a view), so `cmmns clean` wrote a lineage record whose original hash was the clean
 hash. The cleaner now works on a private copy, and a test holds it. Case exports carried private
 handles in `export.json` (row in CHANGELOG, Fixed).
 
@@ -137,7 +137,7 @@ review (project-docs/SECURITY-REVIEW.md).
 | Extension: Reddit account reads | `/user/<name>/about.json` on reddit.com | on | off |
 | Extension: evidence lookups | repo names and domains to GitHub, rdap.org, web.archive.org | off | off |
 | Extension: Other coverage | the chosen outlets' feeds | off | off |
-| Extension: Save to Daylight | the file from its host | on the user's click | refused except what the page holds in memory |
+| Extension: Save to CMMNS | the file from its host | on the user's click | refused except what the page holds in memory |
 | Extension: "Ask the Internet Archive" on a case save | the file's address to web.archive.org | off (unticked) | disabled |
 | Extension: Download, Download as GIF, Copy, the post Download button | the file from its host | on the user's click; buttons on | buttons off; menu items refused with a message |
 
@@ -158,11 +158,11 @@ Summary: `project-docs/evidence/qa-3.6.1/hover-check.json`.
 | 69 | Thread defect | No continuation from adjacency | profile page with four unrelated posts by one author: no continuation; status page with X-shaped data: the two self-replies in order, `thread_complete: true`, another account's reply left out; `tests/media-thread.test.js` | pass |
 | 70 | Side panel | Window moves to the panel and back | the panel shows the post window, its button runs in the page, no window over the page while it is open, the page's state resets when it closes | pass |
 | 71 | YouTube | Reference only in store builds | a reference saved from a real video (thumbnail and note with the whole description); `tests/store-build.test.js` fails if either store package carries the command line hand-off | pass |
-| 72 | CLI | `daylight media fetch`, `daylight sidecar check` | unit tests for the fetch plan and the sidecar built from yt-dlp's record; the check run on the author's own notes flagged the 17 saved by 3.6.0 with an unproved continuation | pass |
-| 74 | Save folder | Every save path keeps Daylight/<site>/ on a profile with 3.6.0 settings, and across an update with the page left open | `scripts/qa/folder_check.py`: right-click, hover, Study, text card, X button, text note, Reddit button, and the X button again after the extension was loaded anew with the tab open; no file in the Downloads root; `tests/save-folder.test.js`; summary in `project-docs/evidence/qa-3.6.2/folder-check.json` | pass |
-| 73 | Protection | The new paths make no request in source-protection mode | hover Download on Wikipedia with protection on: "Not saved: Source protection is on ...", no download; `daylight media fetch` refused before yt-dlp runs (`tests/media-fetch.test.js`) | pass |
+| 72 | CLI | `cmmns media fetch`, `cmmns sidecar check` | unit tests for the fetch plan and the sidecar built from yt-dlp's record; the check run on the author's own notes flagged the 17 saved by 3.6.0 with an unproved continuation | pass |
+| 74 | Save folder | Every save path keeps CMMNS/<site>/ on a profile with 3.6.0 settings, and across an update with the page left open | `scripts/qa/folder_check.py`: right-click, hover, Study, text card, X button, text note, Reddit button, and the X button again after the extension was loaded anew with the tab open; no file in the Downloads root; `tests/save-folder.test.js`; summary in `project-docs/evidence/qa-3.6.2/folder-check.json` | pass |
+| 73 | Protection | The new paths make no request in source-protection mode | hover Download on Wikipedia with protection on: "Not saved: Source protection is on ...", no download; `cmmns media fetch` refused before yt-dlp runs (`tests/media-fetch.test.js`) | pass |
 | 75 | Study boards | A moodboard or a folder of saves becomes a board; every export opens from disk | `scripts/qa/board_page_check.py`: a 3-plate moodboard drawn in book, grid and timeline with Accession heads loaded, the lane and layout kept on the moodboard, one-page save with 3 pictures and the fonts inline and no script, a folder source and a folder write with MANIFEST.sha256 and the OFL texts, no console errors; `tests/board.test.js`; summary in `project-docs/evidence/qa-3.7.0/boards-check.json` | pass |
-| 76 | Evidence capture | A capture saves the file, a picture of the visible page and a record whose hashes and custody chain verify, and a changed byte is caught | `scripts/qa/capture_check.py` on two Wikipedia pages: 4 files each, custody lines 1 and 2 linked, `daylight capture verify` exits 0, then 1 after one byte of a saved file changes; X right-click not verified; `tests/capture.test.js`; summary in `project-docs/evidence/qa-3.7.0/capture-check.json` | pass (X unverified) |
+| 76 | Evidence capture | A capture saves the file, a picture of the visible page and a record whose hashes and custody chain verify, and a changed byte is caught | `scripts/qa/capture_check.py` on two Wikipedia pages: 4 files each, custody lines 1 and 2 linked, `cmmns capture verify` exits 0, then 1 after one byte of a saved file changes; X right-click not verified; `tests/capture.test.js`; summary in `project-docs/evidence/qa-3.7.0/capture-check.json` | pass (X unverified) |
 | 77 | Fonts | Every shipped font is under the OFL with its text beside it | `tests/licence.test.js` lists Accession Stencil, Hanken Grotesk and JetBrains Mono with their OFL texts; Accession's name table carries the OFL (nameID 13) | pass |
 
 Not tested for 3.6.1: Firefox; signed-in sites; the shortcut pressed by hand; the control on

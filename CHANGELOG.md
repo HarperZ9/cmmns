@@ -1,9 +1,41 @@
 # Changelog
 
-All notable changes to Daylight Commons, named Radar before 2026-10-22. Dates are UTC. Versions before 1.0.0 were development builds and
+All notable changes to CMMNS, named Radar before 2026-10-22 and Daylight Commons before 2026-10-28. Dates are UTC. Versions before 1.0.0 were development builds and
 were not published to a store.
 
 ## Unreleased
+
+Nothing yet.
+
+## 3.9.0 (2026-10-28)
+
+Daylight Commons is now CMMNS, spoken "commons". Everything you saved, every case and every signed
+bundle from earlier versions still reads and verifies, and an existing install keeps its save folder.
+
+### Changed
+- **Daylight Commons is now CMMNS**, spoken "commons" (2026-10-28). The extension name, toolbar title,
+  pages, docs, store listing and command line say CMMNS. The repository moved to
+  `github.com/HarperZ9/cmmns` (GitHub redirects the old address) and the project pages to
+  `harperz9.github.io/cmmns/`; the old `/daylight-commons/` pages redirect. Nothing a saved file, an
+  installed extension or a signature depends on changed: the format ids (`daylight.sidecar/1`,
+  `daylight-case/1` and the rest), the `urn:daylight:` and `urn:radar:` ids, storage keys, the Firefox
+  add-on id `radar@harperz9.github.io`, `~/.radar`, the icon files and the data pack names stay, so
+  every sidecar, case, capture and signed bundle from 3.8.0 and earlier still verifies (tests in
+  `tests/rename-compat.test.js`).
+- The command line answers to `cmmns`; `daylight`, `daylight-commons` and `radar` run the same tool.
+  Environment variables read `CMMNS_*` first and `DAYLIGHT_*` after it (`CMMNS_PROTECT`,
+  `CMMNS_HOME`, `CMMNS_CASE_NOW`, `CMMNS_CASE_REPLAY`, `CMMNS_CASE_CRASH_AT`,
+  `CMMNS_DISCOURSE_CACHE`). `RADAR_*` variables are unchanged.
+- New installs save into `Downloads/CMMNS/<site>/`. A browser that had the extension before this
+  release keeps `Downloads/Daylight/<site>/`: the update stores that folder as its setting. `cmmns
+  media fetch` saves into `Downloads/CMMNS` unless only `Downloads/Daylight` exists. Every reader
+  (`capture verify`, `sidecar check`, `board make`) takes either folder.
+- Release files are named `cmmns-chrome-<version>.zip`, `cmmns-firefox-<version>.xpi`,
+  `cmmns-firefox-self-<version>.xpi`, `cmmns-cli-<version>.zip` and `cmmns-<version>.bundle`.
+  `verify-release` reads names from the signed list, so `radar-*` releases still verify. The project
+  key is labelled "CMMNS project key"; the key, its id and thumbprint are unchanged.
+- The self-distributed Firefox build checks `https://harperz9.github.io/ext/firefox/updates.json`,
+  one permanent address with no product name in it. No released build read an update address before.
 
 ### Fixed
 - **A note now names the files its own save wrote** (project-docs/SIDECAR-FORMAT.md, "Taken names").

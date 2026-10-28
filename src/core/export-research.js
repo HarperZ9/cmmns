@@ -48,10 +48,10 @@ export function croissant(ctx, dataHash, counts) {
   return {
     "@context": CROISSANT_CONTEXT,
     "@type": "sc:Dataset", conformsTo: "http://mlcommons.org/croissant/1.0",
-    name: "daylight-commons-evidence", description: `Receipts from one Daylight Commons evidence chain (root ${ctx.chain.root}), as features and identifiers only. Split counts: ${counts}.`,
+    name: "daylight-commons-evidence", description: `Receipts from one CMMNS evidence chain (root ${ctx.chain.root}), as features and identifiers only. Split counts: ${counts}.`,
     license: "https://creativecommons.org/licenses/by/4.0/", creator: { "@type": "sc:Organization", name: ctx.tool }, datePublished: ctx.at,
-    url: "https://github.com/HarperZ9/daylight-commons", version: "1.0.0",
-    citeAs: `Daylight Commons evidence chain, root ${ctx.chain.root}, exported ${ctx.at}.`,
+    url: "https://github.com/HarperZ9/cmmns", version: "1.0.0",
+    citeAs: `CMMNS evidence chain, root ${ctx.chain.root}, exported ${ctx.at}.`,
     distribution: [{ "@type": "cr:FileObject", "@id": "rows.jsonl", name: "rows.jsonl", contentUrl: "rows.jsonl", encodingFormat: "application/jsonlines", sha256: dataHash }],
     recordSet: [{ "@type": "cr:RecordSet", "@id": "rows", name: "rows",
       field: FIELDS.map(([name, type, description]) => ({ "@type": "cr:Field", "@id": `rows/${name}`, name, description, dataType: type,

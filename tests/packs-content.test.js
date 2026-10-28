@@ -1,5 +1,5 @@
-// What a data pack may add (src/core/packs-content.js) and how it joins Daylight Commons' tables: pack rows
-// carry their pack's name, pack operations never merge into Daylight Commons' own or into the trend counts.
+// What a data pack may add (src/core/packs-content.js) and how it joins CMMNS' tables: pack rows
+// carry their pack's name, pack operations never merge into CMMNS' own or into the trend counts.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { validatePackContent, packSummary, mergePackClaims, mergePackOps, setPackNotes, siteNotesOf, PACK_INDICATOR_KINDS, PACK_OPERATOR_TYPES } from "../src/core/packs-content.js";

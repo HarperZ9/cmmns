@@ -1,6 +1,6 @@
 {
-  "name": "daylight-commons",
-  "version": "3.8.0",
+  "name": "cmmns",
+  "version": "3.9.0",
   "private": true,
   "type": "module",
   "exports": {
@@ -12,11 +12,12 @@
     "./schema/evidence.v1.json": "./schema/evidence.v1.json"
   },
   "bin": {
+    "cmmns": "bin/radar.mjs",
     "daylight": "bin/radar.mjs",
     "daylight-commons": "bin/radar.mjs",
     "radar": "bin/radar.mjs"
   },
-  "description": "Evidence badges for social media replies: where an account is based, coordination signs, and a thread norm report.",
+  "description": "CMMNS (formerly Daylight Commons, and Radar before that): evidence beside social media posts, a capture and case workbench, and media saves with their provenance, all on your own machine.",
   "scripts": {
     "test": "node --test \"tests/*.test.js\"",
     "build": "node scripts/build.mjs",
@@ -46,12 +47,12 @@
     "firefox-extension",
     "chrome-extension"
   ],
-  "homepage": "https://harperz9.github.io/daylight-commons/install.html",
+  "homepage": "https://harperz9.github.io/cmmns/install.html",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HarperZ9/daylight-commons.git"
+    "url": "git+https://github.com/HarperZ9/cmmns.git"
   },
   "bugs": {
-    "url": "https://github.com/HarperZ9/daylight-commons/issues"
+    "url": "https://github.com/HarperZ9/cmmns/issues"
   }
 }

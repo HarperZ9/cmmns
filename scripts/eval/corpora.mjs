@@ -1,5 +1,5 @@
 // Loads the prepared corpora (scripts/eval/prep.py) and maps each corpus's human labels onto
-// Daylight Commons' families. Every mapping decision is here and in project-docs/evidence/CORPORA.md.
+// CMMNS' families. Every mapping decision is here and in project-docs/evidence/CORPORA.md.
 // Item shape: { corpus, id, text, split, gold: { hostile, severe, dehumanise, violence,
 // stereotype }, groups: [...], sides: Set("right-targets" | "left-targets" | "both") }.
 // A gold field is null when the corpus has no label for it.

@@ -1,4 +1,4 @@
-// `daylight board make <folder> --title ... --lane ... --keywords ... --layout book|grid|timeline|evidence
+// `cmmns board make <folder> --title ... --lane ... --keywords ... --layout book|grid|timeline|evidence
 // [--site x] [--study] [--since date] [--until date] [--case folder] [--clean] [--no-sidecars] [--pdf] --out <folder>`:
 // a study board (project-docs/STUDY-BOARDS.md) from saved items and their daylight.sidecar/1 notes.
 // Writes index.html, board.json, plates/, fonts/, sidecars/ and MANIFEST.sha256 into --out; with
@@ -14,7 +14,7 @@ import { shareClean } from "../../src/core/clean.js";
 import { loadCase } from "../../src/investigate/store.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-// The three faces that ship with Daylight Commons, all under the SIL Open Font License 1.1: Accession
+// The three faces that ship with CMMNS, all under the SIL Open Font License 1.1: Accession
 // Stencil for running heads and titles, Hanken Grotesk for words, JetBrains Mono for figures.
 const FONTS = [["AccessionStencil.woff2", "src/ext/fonts/AccessionStencil.woff2"], ["hanken-grotesk.woff2", "src/ext/fonts/hanken-grotesk.woff2"], ["jetbrains-mono-regular.woff2", "src/ext/fonts/jetbrains-mono-regular.woff2"],
   // The SIL Open Font License travels with every copy of the fonts.
@@ -93,10 +93,10 @@ function manifest(out) {
 
 // Makes the board. Returns { out, board, line }.
 export async function makeBoard(dir, f = {}, env = process.env) {
-  if (!dir || !existsSync(dir)) throw new Error(`No such folder: ${dir}. Point at a folder of Daylight saves, such as Downloads/Daylight.`);
+  if (!dir || !existsSync(dir)) throw new Error(`No such folder: ${dir}. Point at a folder of CMMNS saves, such as Downloads/CMMNS (or Downloads/Daylight from before 3.9.0).`);
   const out = resolve(typeof f.out === "string" ? f.out : join(dir, "boards", String(f.title || "study-board").replace(/[^\p{L}\p{N}]+/gu, "-").toLowerCase()));
   const items = collect(dir, f);
-  if (!items.length) throw new Error("No saved items with Daylight notes were found there (or none matched the filters).");
+  if (!items.length) throw new Error("No saved items with CMMNS notes were found there (or none matched the filters).");
   mkdirSync(out, { recursive: true });
   const { entries, lines } = await writePlates(out, items, f);
   const board = boardFrom(entries, { title: f.title, lane: f.lane, keywords: f.keywords, layout: f.layout, head: f.head });
@@ -120,7 +120,7 @@ export async function makeBoard(dir, f = {}, env = process.env) {
   return { out, board, line: `Board "${board.running_head.left}" (${board.layout}, ${board.plates.length} plates) written to ${out}.${pdf}\n${count} files listed in MANIFEST.sha256.${lines.length ? "\n" + lines.join("\n") : ""}\n` };
 }
 
-// `daylight board render <board.json>`: draws a refdb.board/1 spec made elsewhere (the reference
+// `cmmns board render <board.json>`: draws a refdb.board/1 spec made elsewhere (the reference
 // library's `refdb board`), copying each plate's media into plates/ beside the page.
 export async function renderSpec(specPath, f = {}, env = process.env) {
   const spec = JSON.parse(readFileSync(specPath, "utf8"));

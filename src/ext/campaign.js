@@ -1,7 +1,7 @@
 // The launch campaign lens in the page (project-docs/CAMPAIGN-LENS.md). X only. It gathers the
 // accounts and quotes the page itself loaded for one launch post: the repost list when the viewer
 // opens it (X's own Retweeters response, passed by src/ext/sniff.js), the quote list, and the
-// replies. Daylight Commons never pages through a list on its own and makes no request for this.
+// replies. CMMNS never pages through a list on its own and makes no request for this.
 // Cross-launch overlap is kept in chrome.storage.local only, as salted hashes (src/core/campaign-overlap.js).
 (() => {
   "use strict";

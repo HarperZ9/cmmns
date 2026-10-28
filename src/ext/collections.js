@@ -48,7 +48,7 @@
     const shown = PB.filterItems(mine, { kind: $("kind").value || null, tag: view.tag, q: $("q").value });
     $("tags").replaceChildren(...PBCollectionsUi.tags(mine, view.tag, (t) => { view.tag = t; draw(); }));
     const tiles = await Promise.all(shown.map((r) => PBCollectionsUi.tile(r, act)));
-    $("grid").replaceChildren(...(tiles.length ? tiles : [el("li", { class: "muted" }, mine.length ? "Nothing matches the filter." : "Nothing saved here yet. Right-click a picture or video and choose Save to Daylight.")]));
+    $("grid").replaceChildren(...(tiles.length ? tiles : [el("li", { class: "muted" }, mine.length ? "Nothing matches the filter." : "Nothing saved here yet. Right-click a picture or video and choose Save to CMMNS.")]));
     const problems = PB.checkLineage(all).filter((p) => mine.some((m) => m.id === p.id));
     $("summary").textContent = `${shown.length} of ${mine.length} shown. ${problems.length ? `${problems.length} lineage problem${problems.length > 1 ? "s" : ""}: open Details.` : "Lineage checked: every copy links by hash to its original."}`;
     const u = await PBMediaStore.usage();
@@ -69,7 +69,7 @@
   $("export").addEventListener("click", async () => {
     const c = parse(view.which), list = PB.filterItems(await PBMediaStore.items(), { collection: c });
     const doc = { format: "daylight-collection/1", collection: c, exported: new Date().toISOString(), items: list, lineageProblems: PB.checkLineage(list) };
-    download(`daylight-${c.type}-${c.id}.json`, new Blob([JSON.stringify(doc, null, 2) + "\n"], { type: "application/json" }));
+    download(`cmmns-${c.type}-${c.id}.json`, new Blob([JSON.stringify(doc, null, 2) + "\n"], { type: "application/json" }));
   });
   $("clean-all").addEventListener("click", async () => {
     const list = PB.filterItems(await PBMediaStore.items(), { collection: parse(view.which) });
@@ -85,4 +85,4 @@
     draw();
   });
   draw();
-})().catch((e) => console.error("[daylight-commons] collections failed", e));
+})().catch((e) => console.error("[cmmns] collections failed", e));

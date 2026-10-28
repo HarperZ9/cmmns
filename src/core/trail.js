@@ -1,7 +1,7 @@
 // Source trails: where a post's material came from, and how it spread across the posts the user has
 // viewed. Downstream copies point upstream through data X itself records: a quote points to the
 // quoted post, lifted media points to the post it came from, a media id stays the same wherever
-// that exact upload is reposted, and a link's real address survives X's t.co shortener. Daylight Commons
+// that exact upload is reposted, and a link's real address survives X's t.co shortener. CMMNS
 // follows those pointers back. It never guesses a source from wording or behaviour, and it cannot
 // see past the first upload (who filmed it, who paid for it).
 
@@ -89,9 +89,9 @@ export function upstream(items, tweets, log) {
   return { accounts: rank(acc).map((x) => ({ handle: x.k, n: x.n })), domains: rank(dom).map((x) => ({ domain: x.k, n: x.n })), uploads, recycled };
 }
 
-// "First seen" for each piece of media on a post: the earliest post Daylight Commons has seen carrying the same
+// "First seen" for each piece of media on a post: the earliest post CMMNS has seen carrying the same
 // upload (same media id, so the same file X stores), and the post X credits it to ("From @account").
-// The earliest of the two leads. Daylight Commons sees only what the user viewed; X's upload time comes from
+// The earliest of the two leads. CMMNS sees only what the user viewed; X's upload time comes from
 // the media id. [{ type, uploaded, from, seen, first }], where first is { handle, at, id, how }.
 export function firstSeen(t, tweets, log) {
   const table = (log && log.media) || {};

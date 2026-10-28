@@ -3,7 +3,7 @@
 // Accession Stencil for running heads and titles, Hanken Grotesk
 // for captions and text, JetBrains Mono for numbers. Ink on paper; the one hot mark is the right-hand
 // running head. In the evidence board each claim is printed as sheets over its sources with the one
-// sheet engine Daylight has (src/core/discourse/sheets.js): ink coverage from reach.
+// sheet engine CMMNS has (src/core/discourse/sheets.js): ink coverage from reach.
 
 import { bookPages, timelineRows, evidencePlan, plateCaption } from "./board.js";
 import { buildSheets } from "./discourse/sheets.js";
@@ -146,7 +146,7 @@ export function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData 
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="Daylight Commons study board (${esc(board.format)})">
+<meta name="generator" content="CMMNS study board (${esc(board.format)})">
 <title>${esc(board.running_head.left)}</title>
 <style>${CSS(fonts, head)}</style>
 </head>

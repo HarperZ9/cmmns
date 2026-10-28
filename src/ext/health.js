@@ -1,6 +1,6 @@
 // Adapter health in the page: after each read, content.js tells this file how many boxes the site
 // reader picked out and how many it could read. When a platform has changed its markup so that
-// Daylight Commons reads nothing where it should, a small notice says so plainly instead of Daylight Commons showing
+// CMMNS reads nothing where it should, a small notice says so plainly instead of CMMNS showing
 // nothing (verdicts from src/core/health.js). The toolbar popup can run the same check on demand
 // as a self-test. Counts only; no post text is kept or sent.
 (() => {
@@ -25,7 +25,7 @@
     }
     const p = document.createElement("p"); p.textContent = v.say;
     const help = document.createElement("p"); help.className = "pb-health-sub";
-    help.textContent = "The site's own page still works. Daylight Commons' toolbar button has a self-test with the counts.";
+    help.textContent = "The site's own page still works. CMMNS' toolbar button has a self-test with the counts.";
     const close = document.createElement("button"); close.type = "button"; close.className = "pb-btn"; close.textContent = "Hide";
     close.addEventListener("click", () => { hidden = location.pathname; n.remove(); });
     n.replaceChildren(p, help, close);

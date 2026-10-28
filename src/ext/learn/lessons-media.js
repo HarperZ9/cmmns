@@ -1,4 +1,4 @@
-// Lessons for the media checks Daylight Commons runs on click (src/core/mediacheck.js): Content Credentials
+// Lessons for the media checks CMMNS runs on click (src/core/mediacheck.js): Content Credentials
 // and AI-generation metadata. Examples describe made-up files.
 
 export const MEDIA_LESSONS = [
@@ -40,7 +40,7 @@ export const MEDIA_LESSONS = [
   },
   {
     id: "image-text", title: "Words inside a picture", research: [],
-    what: "This sign finds a claim posted as a picture: a screenshot, a cropped headline or a caption burned into an image. When you click, Daylight Commons reads the words on your device. Then it runs the same checks as on a post's own text.",
+    what: "This sign finds a claim posted as a picture: a screenshot, a cropped headline or a caption burned into an image. When you click, CMMNS reads the words on your device. Then it runs the same checks as on a post's own text.",
     examples: [
       { side: "none", topic: "health", kind: "sign", text: "A screenshot of a made-up headline about a cure, posted as an image so that searches for its words come up empty." },
       { side: "none", topic: "sport", kind: "ordinary", text: "A photo of a stadium scoreboard shared after a match, with the final score in the picture." },
@@ -48,6 +48,6 @@ export const MEDIA_LESSONS = [
     why: "Text in a picture escapes search, fact-check matching and most filters. A screenshot looks like a record, even when someone made up the original. People also post claims as images for honest reasons: it is quick and it keeps the layout.",
     spot: "Ask where the words in the picture first appeared. Search for a distinctive phrase from it. Look for the post or the article that the screenshot claims to show, on the site that it names.",
     counter: "Read the words as a claim that someone said them. Search for the original. Until you find it, treat the screenshot as unconfirmed, and say so if you share it.",
-    dnp: "The software can misread a word, and someone can edit a screenshot. The sign is about the words that Daylight Commons read from the picture. Find the original post to learn who wrote them.",
+    dnp: "The software can misread a word, and someone can edit a screenshot. The sign is about the words that CMMNS read from the picture. Find the original post to learn who wrote them.",
   },
 ];

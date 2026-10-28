@@ -1,6 +1,6 @@
 // Bluesky account and post data from the responses the Bluesky web app already loaded for the
 // page (app.bsky.unspecced.getPostThreadV2, app.bsky.feed.getPostThread, getProfile(s), feeds),
-// passed on by src/ext/bskysniff.js. Daylight Commons makes no request of its own. Field names follow the
+// passed on by src/ext/bskysniff.js. CMMNS makes no request of its own. Field names follow the
 // public AT Protocol lexicons (app.bsky.actor.defs#profileViewBasic, app.bsky.feed.defs#postView).
 
 function walk(json, visit, limit = 200000) {

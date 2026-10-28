@@ -3,7 +3,7 @@
 One import for any tool that needs to save media the way the extension does:
 
 ```js
-import { chooseType, downloadName, largestSource, downloadPlan, assembleStream, encodeGif } from "daylight-commons/media";
+import { chooseType, downloadName, largestSource, downloadPlan, assembleStream, encodeGif } from "cmmns/media";
 ```
 
 The modules live in `src/core/` and have no browser-extension calls. They run in Node 20 and later
@@ -52,7 +52,7 @@ An encrypted HLS key, a DASH `ContentProtection` element or MP4 and WebM encrypt
 `remuxMp4([file, file])` writes them into one plain MP4 with the toolkit's muxer (`media-mp4.js`).
 
 ```js
-import { assembleStream } from "daylight-commons/media";
+import { assembleStream } from "cmmns/media";
 const get = async (url, { range, as } = {}) => {
   const res = await fetch(url, { headers: range ? { Range: `bytes=${range.offset}-${range.offset + range.length - 1}` } : {} });
   return as === "text" ? res.text() : { bytes: new Uint8Array(await res.arrayBuffer()), type: res.headers.get("content-type") };

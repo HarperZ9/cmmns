@@ -58,7 +58,7 @@ test("no store text claims an error rate for every sign or that nothing ever lea
 });
 
 test("the listing points at the public privacy and transparency pages", () => {
-  for (const u of ["https://harperz9.github.io/daylight-commons/privacy.html", "https://harperz9.github.io/daylight-commons/transparency.html"]) assert.ok(md.includes(u), u);
+  for (const u of ["https://harperz9.github.io/cmmns/privacy.html", "https://harperz9.github.io/cmmns/transparency.html"]) assert.ok(md.includes(u), u);
 });
 
 test("the committed Firefox source package matches this version's source", async () => {

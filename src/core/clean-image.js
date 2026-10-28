@@ -1,7 +1,7 @@
 // Share clean for still images: JPEG, PNG, GIF and WebP. Metadata blocks are removed whole and the
 // image data is copied byte for byte, so nothing is decoded or re-encoded. Kept: what changes how
 // the picture looks (quantisation and Huffman tables, colour profile with its text blanked, gamma,
-// transparency, animation timing). Removed: EXIF with GPS and maker notes, XMP (with Daylight's
+// transparency, animation timing). Removed: EXIF with GPS and maker notes, XMP (with CMMNS's
 // own description), IPTC and Photoshop blocks, comments, text chunks, Content Credentials, embedded
 // thumbnails and anything after the end of the image. Each function returns { bytes, removed }.
 

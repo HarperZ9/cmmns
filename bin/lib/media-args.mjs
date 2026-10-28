@@ -1,4 +1,4 @@
-// The ffmpeg arguments for `daylight media convert` and `daylight media compress`, as a pure function
+// The ffmpeg arguments for `cmmns media convert` and `cmmns media compress`, as a pure function
 // so tests can check them without ffmpeg. Similar formats only: still images among PNG, JPEG, WebP and
 // AVIF; GIF to MP4 or WebM; video to WebM or MP4; audio to Opus in WebM or Ogg.
 
@@ -45,7 +45,7 @@ function videoArgs(to, { bitrate, audioBitrate, maxHeight, fps, gif }) {
 // input's own format. Throws with a plain sentence for a pair that is not similar.
 export function ffmpegPlan(op, inExt, flags = {}) {
   const kind = kindOfExt(inExt);
-  if (!kind) throw new Error(`Daylight Commons converts images, GIFs, video and audio; .${inExt} is none of these.`);
+  if (!kind) throw new Error(`CMMNS converts images, GIFs, video and audio; .${inExt} is none of these.`);
   const own = String(inExt).toLowerCase().replace(/^jpeg$/, "jpg");
   let to = String(flags.to || (op === "compress" ? own : "")).toLowerCase().replace(/^jpeg$/, "jpg");
   if (!to) throw new Error(`Say what to convert into with --to: ${TARGETS[kind].join(", ")}.`);

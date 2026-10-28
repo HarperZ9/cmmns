@@ -1,5 +1,5 @@
-// The command line tool as one release file, radar-cli-<version>.zip: bin/, src/core/,
-// src/investigate/ and the OCR it reads screenshots with (`daylight case`), the data
+// The command line tool as one release file, cmmns-cli-<version>.zip: bin/, src/core/,
+// src/investigate/ and the OCR it reads screenshots with (`cmmns case`), the data
 // tables it reads from src/ext/, schema/, the definition catalogue (for `export`), package.json and the licence. Unzip it anywhere with Node
 // 22 or later and run `node bin/radar.mjs verify <file>` to check a signed evidence bundle or a saved
 // evidence chain offline, or `analyze` on a saved thread or a data export. No npm install.

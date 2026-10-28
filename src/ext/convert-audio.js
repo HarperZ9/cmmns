@@ -1,6 +1,6 @@
 // Audio for the convert page, on this device: decode any file the browser can play (alone or as a
 // video's sound track) at 48 kHz, encode it with WebCodecs' AudioEncoder (Opus, or AAC for MP4 where
-// the browser has an AAC encoder), and wrap it in WebM or Ogg with Daylight Commons' own muxers
+// the browser has an AAC encoder), and wrap it in WebM or Ogg with CMMNS' own muxers
 // (src/core/media-webm.js, media-ogg.js). Nothing is uploaded.
 globalThis.PBConvertAudio = (() => {
   "use strict";

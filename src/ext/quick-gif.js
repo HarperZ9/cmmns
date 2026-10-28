@@ -1,7 +1,7 @@
 // "Download as GIF" on this device. Sites deliver most "GIFs" as MP4 or WebM: the file is read the
 // way the page's player reads it, played in a hidden muted <video> from memory, and stepped frame by
 // frame onto a canvas; animated WebP or AVIF pictures are read with the browser's ImageDecoder. The
-// frames go to Daylight Commons' own GIF writer (src/core/media-gif-encode.js). Nothing is sent.
+// frames go to CMMNS' own GIF writer (src/core/media-gif-encode.js). Nothing is sent.
 globalThis.PBQuickGif = globalThis.PBQuickGif || (() => {
   "use strict";
   const MAX_SECONDS = 20, FPS = 12, MAX_WIDTH = 480;

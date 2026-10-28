@@ -48,7 +48,7 @@ test("1. with the network blocked, the built page loads in Chrome and verifies t
   const good = await kit("real", { real: true });
   const bad = join(ROOT, "real-changed");
   cpSync(good, bad, { recursive: true });
-  const pkg = readdirSync(good).find((n) => /^radar-chrome-.*\.zip$/.test(n));
+  const pkg = readdirSync(good).find((n) => /^cmmns-chrome-.*\.zip$/.test(n));
   flip(bad, pkg);
   const cdp = await openChrome();
   await import("../scripts/offline-guard.mjs");   // from here the test process itself cannot reach the network

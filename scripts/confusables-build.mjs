@@ -1,5 +1,5 @@
 // Builds src/core/confusables-data.js from the Unicode confusables table (UTS #39,
-// confusables.txt). Daylight Commons keeps only single letters that look like a single letter of another
+// confusables.txt). CMMNS keeps only single letters that look like a single letter of another
 // script among Latin, Cyrillic, Greek, Armenian and Cherokee, matched by case, for folding
 // look-alike letters inside mixed-script words before matching (src/core/confusables.js).
 //   node scripts/confusables-build.mjs <path to confusables.txt>

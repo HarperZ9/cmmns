@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// radar: Daylight Commons' evidence from the command line, reading local files only. Nothing is fetched.
+// cmmns (also daylight, daylight-commons and radar): CMMNS' evidence from the command line, reading local files only. Nothing is fetched.
 //   radar analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
 //                [--carrier-safe [--page address]]
 //   radar verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
@@ -32,29 +32,30 @@ import { checkFiles, fileLines } from "./lib/sidecar-files.mjs";
 import { makeBoard, renderSpec } from "./lib/board.mjs";
 
 const USAGE = `Usage:
-  daylight analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
+  cmmns analyze <file> [--json] [--bundle out.json] [--include-text] [--key path] [--no-claims]
                [--carrier-safe [--page address]]
-  daylight verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
-  daylight site <domain> [--json]
-  daylight media <file> [--json]
-  daylight media convert <file> --to <format> [--quality 0-1] [--max-side N] [--max-height N]
+  cmmns verify <bundle.json | evidence-chain.json> [--key-id id] [--json]
+  cmmns site <domain> [--json]
+  cmmns media <file> [--json]
+  cmmns media convert <file> --to <format> [--quality 0-1] [--max-side N] [--max-height N]
                [--bitrate 2M] [--audio-bitrate 96k] [--fps N] [--out file] [--json]
-  daylight media compress <file> [the same options]
-  daylight media fetch <page address> [--dir folder]       (needs a system yt-dlp)
-  daylight sidecar check <folder> [--fix]                  (flags unproved threads and notes naming the wrong files)
-  daylight capture verify <folder>                         (checks evidence captures and their custody chain)
-  daylight board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--head grotesk|accession|mono] [--pdf]
-  daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
+  cmmns media compress <file> [the same options]
+  cmmns media fetch <page address> [--dir folder]       (needs a system yt-dlp)
+  cmmns sidecar check <folder> [--fix]                  (flags unproved threads and notes naming the wrong files)
+  cmmns capture verify <folder>                         (checks evidence captures and their custody chain)
+  cmmns board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--head grotesk|accession|mono] [--pdf]
+  cmmns export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
-  daylight case <command>   an investigation case folder; "daylight case help" lists the commands
+  cmmns case <command>   an investigation case folder; "cmmns case help" lists the commands
 ${PROTECT_USAGE}<file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 CSV, a Mastodon outbox.json or a Bluesky repository .car. verify checks a signed evidence bundle
-or an evidence chain saved from the extension ("Save evidence chain"). Daylight Commons reads local
+or an evidence chain saved from the extension ("Save evidence chain"). CMMNS reads local
 files only. --carrier-safe signs the bundle with a one-time key that is never saved, keeps only
 the day it was made, and leaves out the page address unless you give one with --page; its
 signature then proves the bundle is unchanged and says nothing about who made it. export writes a saved evidence chain as a legal dossier, a technical PROV record, a
 journalistic write-up or a research dataset, into a new folder; it refuses a chain that fails its
-check. "daylight <command> --help" shows one command with an example.
+check. "cmmns <command> --help" shows one command with an example. CMMNS was formerly Daylight
+Commons, and Radar before that; the daylight, daylight-commons and radar commands run the same tool.
 `;
 // Version 2 is current; version 1 bundles (items with doesNotProve) still verify against their own schema.
 const SCHEMAS = { "urn:radar:evidence:v1": "evidence.v1.json", "urn:radar:evidence:v2": "evidence.v2.json" };
@@ -87,7 +88,7 @@ async function writeBundle(result, imp, f) {
   const quoted = [...(imp.input.quoted || []), ...[imp.input.root, ...imp.input.replies].filter((p) => p && p.quoted && typeof p.quoted === "object").map((p) => p.quoted)];
   const texts = Object.fromEntries([imp.input.root, ...imp.input.replies, ...quoted].filter(Boolean).map((p, i) => [p.id != null ? String(p.id) : "p" + i, p.text]));
   const carrier = !!f["carrier-safe"];
-  const built = makeBundle(result, { tool: `Daylight Commons ${radarVersion()} (CLI)`, dataLock: await dataLock(), source: imp.source === "export" ? "export" : "thread", includeText: !!f["include-text"], texts, ...(carrier ? { profile: CARRIER_SAFE, typedPage: typeof f.page === "string" ? f.page : null } : {}) });
+  const built = makeBundle(result, { tool: `CMMNS ${radarVersion()} (CLI)`, dataLock: await dataLock(), source: imp.source === "export" ? "export" : "thread", includeText: !!f["include-text"], texts, ...(carrier ? { profile: CARRIER_SAFE, typedPage: typeof f.page === "string" ? f.page : null } : {}) });
   if (!built.ok) throw new Error(built.reason);
   if (carrier) {
     const signed = await signCarrierSafe(built.bundle);
@@ -122,45 +123,45 @@ export async function main(argv) {
   if (argv[0] === "self-audit" && !argv.includes("--help")) { const { _: files, flags } = parseArgs(argv.slice(1)); print(selfAuditCommand(files, flags)); return 0; }
   if (argv[0] === "board" && argv[1] === "render") {
     const { _: [spec], flags } = parseArgs(argv.slice(2));
-    if (flags.help || !spec) { print(helpText(BOARD_HELP, "daylight board")); return spec || flags.help ? 0 : 2; }
+    if (flags.help || !spec) { print(helpText(BOARD_HELP, "cmmns board")); return spec || flags.help ? 0 : 2; }
     print((await renderSpec(spec, flags)).line);
     return 0;
   }
   if (argv[0] === "board" && argv[1] === "make") {
     const { _: [dir], flags } = parseArgs(argv.slice(2));
-    if (flags.help || !dir) { print(helpText(BOARD_HELP, "daylight board make")); return dir || flags.help ? 0 : 2; }
+    if (flags.help || !dir) { print(helpText(BOARD_HELP, "cmmns board make")); return dir || flags.help ? 0 : 2; }
     print((await makeBoard(dir, flags)).line);
     return 0;
   }
   if (argv[0] === "capture" && argv[1] === "verify") {
     const { _: [dir], flags } = parseArgs(argv.slice(2));
-    if (flags.help || !dir) { print(helpText(CAPTURE_HELP, "daylight capture verify")); return dir || flags.help ? 0 : 2; }
+    if (flags.help || !dir) { print(helpText(CAPTURE_HELP, "cmmns capture verify")); return dir || flags.help ? 0 : 2; }
     const r = await verifyCaptures(dir);
     print(flags.json ? asJson(r) : verifyLines(r));
     return r.chain.ok ? 0 : 1;
   }
   if (argv[0] === "sidecar" && argv[1] === "check") {
     const { _: [dir], flags } = parseArgs(argv.slice(2));
-    if (flags.help || !dir) { print(helpText(SIDECAR_HELP, "daylight sidecar check")); return dir || flags.help ? 0 : 2; }
+    if (flags.help || !dir) { print(helpText(SIDECAR_HELP, "cmmns sidecar check")); return dir || flags.help ? 0 : 2; }
     const r = checkSidecars(dir), files = checkFiles(dir, { fix: !!flags.fix });
     print(flags.json ? asJson({ ...r, files }) : checkLines(r) + fileLines(files, !!flags.fix));
     return r.counts.unverified || (flags.fix ? files.unresolved : files.wrong) ? 1 : 0;
   }
   if (argv[0] === "media" && argv[1] === "fetch") {
     const { _: [url], flags } = parseArgs(argv.slice(2));
-    if (flags.help || !url) { print(helpText(MEDIA_HELP.fetch, "daylight media fetch")); return url || flags.help ? 0 : 2; }
+    if (flags.help || !url) { print(helpText(MEDIA_HELP.fetch, "cmmns media fetch")); return url || flags.help ? 0 : 2; }
     print(runFetch(url, flags).line);
     return 0;
   }
   if (argv[0] === "media" && (argv[1] === "convert" || argv[1] === "compress")) {
     const { _: [file], flags } = parseArgs(argv.slice(2));
-    if (flags.help || !file) { print(helpText(MEDIA_HELP[argv[1]], `daylight media ${argv[1]}`)); return file || flags.help ? 0 : 2; }
+    if (flags.help || !file) { print(helpText(MEDIA_HELP[argv[1]], `cmmns media ${argv[1]}`)); return file || flags.help ? 0 : 2; }
     const r = runMedia(argv[1], file, flags);
     print(flags.json ? asJson(r.lineage) : r.line);
     return 0;
   }
   const { _: [cmd, arg], flags } = parseArgs(argv);
-  if (cmd && flags.help && TOP_HELP[cmd]) { print(helpText(TOP_HELP[cmd], `daylight ${cmd}`)); return 0; }
+  if (cmd && flags.help && TOP_HELP[cmd]) { print(helpText(TOP_HELP[cmd], `cmmns ${cmd}`)); return 0; }
   if (!cmd || flags.help || !arg) { print(USAGE); return cmd && !flags.help ? 2 : 0; }
   if (cmd === "analyze") { await analyze(arg, flags); return 0; }
   if (cmd === "verify") return verify(arg, flags);
@@ -177,5 +178,5 @@ export async function main(argv) {
 // (/var is /private/var), so the path in argv and this module's own path can differ in spelling only.
 const real = (p) => { try { return realpathSync(p); } catch { return p; } };
 if (process.argv[1] && real(process.argv[1]) === real(fileURLToPath(import.meta.url))) {
-  main(process.argv.slice(2)).then((code) => { process.exitCode = code; }, (e) => { const a = process.argv.slice(2); process.stderr.write(`daylight: ${friendly(e, a[0] === "case" ? (a[1] ? `case ${a[1]}` : "case") : a[0])}\n`); process.exitCode = 1; });
+  main(process.argv.slice(2)).then((code) => { process.exitCode = code; }, (e) => { const a = process.argv.slice(2); process.stderr.write(`cmmns: ${friendly(e, a[0] === "case" ? (a[1] ? `case ${a[1]}` : "case") : a[0])}\n`); process.exitCode = 1; });
 }

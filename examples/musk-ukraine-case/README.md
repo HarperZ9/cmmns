@@ -1,6 +1,7 @@
 # Case: Musk, Ukraine and the Democrats
 
-Opened 2026-10-23. Made with `daylight case` (Daylight Commons).
+Opened 2026-10-23. Made with `daylight case` (Daylight Commons 3.4.0, now CMMNS; `cmmns case` runs the same
+commands).
 
 ## Files
 
@@ -19,11 +20,11 @@ Opened 2026-10-23. Made with `daylight case` (Daylight Commons).
 
 ## Commands
 
-    daylight case add <url|file>
-    daylight case claim "<text>" --source S01 --rung documented
-    daylight case trace C01
-    daylight case timeline
-    daylight case export --profile newsroom
+    cmmns case add <url|file>
+    cmmns case claim "<text>" --source S01 --rung documented
+    cmmns case trace C01
+    cmmns case timeline
+    cmmns case export --profile newsroom
 
 Every command except `add <url>` works offline. `add <url>` fetches that page and asks the
 Wayback Machine to save it, unless you pass --no-archive.

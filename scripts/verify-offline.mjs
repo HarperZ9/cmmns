@@ -1,5 +1,5 @@
 // Builds docs/verify-offline.html: one file that checks an offline kit with no network. The trusted
-// key set, Daylight Commons' own signing code (src/core/sig.js, signing.js, head.js, bundle-verify.js,
+// key set, CMMNS' own signing code (src/core/sig.js, signing.js, head.js, bundle-verify.js,
 // kit-verify.js),
 // the styles and the Hanken Grotesk font are all inside it. No fetch, no external script, no
 // external font, no address of any kind, so it works from a USB stick with the network off.
@@ -30,7 +30,7 @@ export function inlineModules(files = MODULES) {
 
 // The trusted key set from public JWKs: [{ keyId, label, jwk }], only public members.
 export function trustedSet(keys) {
-  return keys.map((k) => ({ keyId: String(k.keyId).replace(/\s/g, ""), label: k.label || "Daylight Commons project key", jwk: { kty: k.kty, crv: k.crv, x: k.x, y: k.y } }));
+  return keys.map((k) => ({ keyId: String(k.keyId).replace(/\s/g, ""), label: k.label || "CMMNS project key", jwk: { kty: k.kty, crv: k.crv, x: k.x, y: k.y } }));
 }
 
 const UI = `const { checkKit, checkBundleFile } = M_kit_verify;
@@ -49,7 +49,7 @@ async function run(list) {
   for (const f of list) files.set(f.name, new Uint8Array(await f.arrayBuffer()));
   show(await checkKit(files, { trusted: TRUSTED }));
 }
-const fail = (e) => { console.error("[daylight-commons] kit check failed", e); show({ ok: false, lines: [{ kind: "bad", text: "The check could not run: " + e.message }] }); };
+const fail = (e) => { console.error("[cmmns] kit check failed", e); show({ ok: false, lines: [{ kind: "bad", text: "The check could not run: " + e.message }] }); };
 for (const id of ["kit-files", "kit-folder"]) $(id).addEventListener("change", (e) => run(e.target.files).catch(fail));
 $("bundle-file").addEventListener("change", (e) => {
   const f = e.target.files[0];
@@ -75,7 +75,7 @@ export function render({ keys = [JSON.parse(readFileSync(join(ROOT, "docs", "rel
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Check a Daylight Commons kit</title>
+<title>Check a CMMNS kit</title>
 <style>
 @font-face{font-family:"Hanken Grotesk";src:url(data:font/woff2;base64,${font}) format("woff2");font-weight:100 900;font-display:swap}
 ${CSS}
@@ -83,8 +83,8 @@ ${CSS}
 </head>
 <body>
 <main>
-<h1>Check a Daylight Commons kit</h1>
-<p>This page checks the files in a Daylight Commons kit on this device. It needs no network and sends nothing. The key below is built into this file.</p>
+<h1>Check a CMMNS kit</h1>
+<p>This page checks the files in a CMMNS kit on this device. It needs no network and sends nothing. The key below is built into this file.</p>
 ${ids}
 <p>Compare that key with the printed card or a second source, such as a person you trust or a different website. A key that came in the same download as the files can be swapped along with them. If the two differ, stop.</p>
 <h2>Pick the kit</h2>
@@ -93,7 +93,7 @@ ${ids}
 <label for="kit-files">Or every file in it</label>
 <input type="file" id="kit-files" multiple>
 <h2>Or check one evidence bundle</h2>
-<label for="bundle-file">A signed bundle saved by Daylight Commons</label>
+<label for="bundle-file">A signed bundle saved by CMMNS</label>
 <input type="file" id="bundle-file" accept=".json,application/json">
 <ul id="kit-out" aria-live="polite"></ul>
 <h2>What a pass shows</h2>

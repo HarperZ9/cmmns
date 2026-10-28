@@ -1,9 +1,9 @@
 // The worker's side of the hover Download control and the keyboard shortcut (Alt+Shift+D).
-// - On the sites Daylight Commons already reads, the control is a manifest content script. On every
+// - On the sites CMMNS already reads, the control is a manifest content script. On every
 //   other site it runs only after the user allows "every site" in the options (the optional
 //   https://*/* access), and then as a registered content script; turning it off unregisters it.
 // - A press on the control sends the point it was over; this file reads that tab once and runs the
-//   same download, copy or Save to Daylight as the right-click menu (quick-save-bg.js).
+//   same download, copy or Save to CMMNS as the right-click menu (quick-save-bg.js).
 // - The shortcut reads the current tab (activeTab) and saves the media under the pointer, or the
 //   focused media, in the frame the pointer was last in.
 globalThis.PBHoverBg = (() => {
@@ -24,7 +24,7 @@ globalThis.PBHoverBg = (() => {
         await chrome.scripting.registerContentScripts([{ ...script, persistAcrossSessions: true }]).catch(() => chrome.scripting.registerContentScripts([script]));
       }
       if (!want && have.length) await chrome.scripting.unregisterContentScripts({ ids: [ID] });
-    } catch (e) { console.warn("[daylight-commons] could not update the hover control's sites", e); }
+    } catch (e) { console.warn("[cmmns] could not update the hover control's sites", e); }
   }
 
   async function patch(change) {
@@ -62,7 +62,7 @@ globalThis.PBHoverBg = (() => {
     const seen = await chrome.scripting.executeScript({ target: { tabId: t.id, allFrames: true }, func: () => { const p = globalThis.PBHover && PBHover.lastPoint(); return p ? p.at : 0; } }).catch(() => []);
     const best = seen.filter((r) => r && r.result).sort((a, b) => b.result - a.result)[0];
     try { await run(t.id, best ? best.frameId : 0, { action: "download" }); }
-    catch (e) { console.warn("[daylight-commons] the shortcut could not read this page", e); }
+    catch (e) { console.warn("[cmmns] the shortcut could not read this page", e); }
   }
 
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {

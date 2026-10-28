@@ -1,4 +1,4 @@
-// Check a downloaded Daylight Commons release with no network and no code host: the signed head
+// Check a downloaded CMMNS release with no network and no code host: the signed head
 // first (version, expiry, the hash of SHA256SUMS), then the signature over SHA256SUMS against a
 // public key, then every listed file's hash, then the git bundle.
 //   node scripts/verify-release.mjs <release directory> [--key <release-key.json>] [--state <file> | --no-state]

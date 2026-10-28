@@ -27,7 +27,7 @@ export async function runExport(file, f) {
   const out = typeof f.out === "string" ? f.out : `export-${profile}`;
   if (existsSync(out) && readdirSync(out).length) throw new Error(`${out} is not empty; choose a new folder with --out`);
   const r = await exportProfile(readJson(file, "evidence chain"), profile, {
-    tool: `Daylight Commons ${radarVersion()} (CLI)`, definitions: catalogueEntries(),
+    tool: `CMMNS ${radarVersion()} (CLI)`, definitions: catalogueEntries(),
     replies: typeof f.reply === "string" ? readJson(f.reply, "right-of-reply log") : [],
     corrections: typeof f.corrections === "string" ? readJson(f.corrections, "corrections") : [],
     seed: typeof f.seed === "string" ? f.seed : undefined,

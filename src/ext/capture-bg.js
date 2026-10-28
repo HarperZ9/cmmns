@@ -20,7 +20,7 @@ globalThis.PBCaptureBg = (() => {
     const record = PB.captureRecord({ meta, files, screenshot, page, transformed, offsetMinutes, tool: { version: chrome.runtime.getManifest().version, browser: navigator.userAgent } });
     const recordHash = await PB.mediaSha256(new TextEncoder().encode(PB.captureCanonical(record)));
     const log = ((await chrome.storage.local.get(LOG))[LOG]) || [];
-    const line = await PB.custodyLine(log[log.length - 1] || null, { what: "capture", page: page.url, hashes: [...files.map((f) => f.sha256), screenshot.sha256, recordHash], tool: `Daylight Commons ${record.tool.version}` });
+    const line = await PB.custodyLine(log[log.length - 1] || null, { what: "capture", page: page.url, hashes: [...files.map((f) => f.sha256), screenshot.sha256, recordHash], tool: `CMMNS ${record.tool.version}` });
     await chrome.storage.local.set({ [LOG]: [...log, line] });
     const site = meta.site || null;
     await PBQuickBg.download({ url: shot, filename: screenshot.name, site });
@@ -30,14 +30,14 @@ globalThis.PBCaptureBg = (() => {
     return { seq: line.seq, kept: `${kept} of ${record.transparency.rows.length} parts kept in full; the rest are listed in the record.` };
   }
 
-  // The whole chain, for export and for `daylight capture verify`.
+  // The whole chain, for export and for `cmmns capture verify`.
   async function log() { return ((await chrome.storage.local.get(LOG))[LOG]) || []; }
 
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg || msg.type !== "pb-qs-capture" || !sender.tab) return false;
     const run = queue.then(() => capture(msg, sender.tab));
     queue = run.catch(() => {});
-    run.then(sendResponse, (e) => { console.error("[daylight-commons] evidence capture failed", e); sendResponse({ error: e.message }); });
+    run.then(sendResponse, (e) => { console.error("[cmmns] evidence capture failed", e); sendResponse({ error: e.message }); });
     return true;
   });
 

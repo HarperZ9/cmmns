@@ -1,4 +1,4 @@
-// Shared by scripts/transparency.mjs and scripts/privacy.mjs: the page shell for Daylight Commons' public
+// Shared by scripts/transparency.mjs and scripts/privacy.mjs: the page shell for CMMNS' public
 // pages, a small Markdown reader for the subset the project's docs use, and the writer that puts
 // each page both inside the extension (src/ext) and in docs/ for the public site.
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -6,8 +6,8 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-export const REPO = "https://github.com/HarperZ9/daylight-commons";
-export const SITE = "https://harperz9.github.io/daylight-commons";
+export const REPO = "https://github.com/HarperZ9/cmmns";
+export const SITE = "https://harperz9.github.io/cmmns";
 
 export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -91,14 +91,14 @@ ${CSS}${css ? "\n" + css : ""}
 <h1>${esc(title)}</h1>
 <p class="muted">Updated ${esc(updated)}.</p>
 ${body}
-<footer>Daylight Commons reads the site you are on. Other coverage and evidence lookups reach further once you turn them on. <a href="${REPO}">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+<footer>CMMNS reads the site you are on. Other coverage and evidence lookups reach further once you turn them on. <a href="${REPO}">Source</a> · <a href="transparency.html">How CMMNS is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
 </main>
 </body>
 </html>
 `;
 }
 
-// The public site's copy of a page (docs/, served under harperz9.github.io/daylight-commons/). It is
+// The public site's copy of a page (docs/, served under harperz9.github.io/cmmns/). It is
 // set in the author's site canon: the site's own document cascade (/system/doc.css, with its
 // Hanken Grotesk and Conso), its navigation (/system/nav.js), its light and dark grounds, the mast
 // and the heading rail. The extension cannot load those, so its copy keeps page() above.
@@ -118,8 +118,12 @@ export function sections(html) {
     const m = p.match(/^<h2>(.*?)<\/h2>/);
     if (!m) return p;
     const id = m[1].replace(/<[^>]+>/g, "").toLowerCase().replace(/&[a-z]+;/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    // A heading that names the product kept its old id before the CMMNS rename; an empty anchor
+    // with that id keeps old deep links (#what-daylight-commons-reads) landing on the same section.
+    const old = id.includes("cmmns") ? `<span id="${id.replace(/cmmns/g, "daylight-commons")}"></span>
+` : "";
     return `<section aria-labelledby="${id}">
-${p.replace(/^<h2>/, `<h2 id="${id}">`).trim()}
+${old}${p.replace(/^<h2>/, `<h2 id="${id}">`).trim()}
 </section>
 `;
   }).join("");
@@ -133,7 +137,7 @@ export function sitePage({ file, title, role, description, updated, body, css = 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<title>${esc(title)} | Daylight Commons</title>
+<title>${esc(title)} | CMMNS</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${SITE}/${file}">
 <link rel="preload" href="/system/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
@@ -154,10 +158,10 @@ ${SITE_CSS}${css ? "\n" + css : ""}
 <h1>${esc(title)}</h1>
 <p class="role">${esc(role || description)}</p>
 </header>
-<nav class="dc-local" aria-label="Daylight Commons">${local} <a href="${REPO}">Source</a></nav>
+<nav class="dc-local" aria-label="CMMNS">${local} <a href="${REPO}">Source</a></nav>
 <p class="dc-updated">Updated ${esc(updated)}.</p>
 ${sections(body.replace(/<table>/g, '<table class="data data--wide">'))}
-<p class="dc-foot">Daylight Commons reads the site you are on. It contacts anything else only when you turn on Other coverage or evidence lookups and click. Free and open source under the AGPL-3.0.</p>
+<p class="dc-foot">CMMNS reads the site you are on. It contacts anything else only when you turn on Other coverage or evidence lookups and click. Free and open source under the AGPL-3.0.</p>
 </article>
 </main>
 </body>

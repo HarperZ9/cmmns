@@ -5,7 +5,7 @@
 // the same order). A raised reply is a challenge to read, never a verdict.
 import { content, fold } from "./text.js";
 
-export const CORRECTIONS_DOES_NOT_PROVE = "A reply that brings a source or names an error can still be wrong. Daylight Commons ranks replies by the kind of source they cite and how specifically they answer the post, not by whether they are right.";
+export const CORRECTIONS_DOES_NOT_PROVE = "A reply that brings a source or names an error can still be wrong. CMMNS ranks replies by the kind of source they cite and how specifically they answer the post, not by whether they are right.";
 
 // Reference and primary-record hosts. A link to one of these is the strongest kind of source a reply
 // can bring; any other web page counts for less; links to social posts count for nothing.

@@ -1,6 +1,6 @@
-// Runs in the page's own context on TikTok and on Mastodon servers the user turned Daylight Commons on for
+// Runs in the page's own context on TikTok and on Mastodon servers the user turned CMMNS on for
 // (world MAIN, document_start). Copies the JSON of the comment, thread and timeline responses the
-// site's web app already requested and posts it to Daylight Commons' content scripts. Daylight Commons makes no request
+// site's web app already requested and posts it to CMMNS' content scripts. CMMNS makes no request
 // of its own, and never reads request headers or tokens. Errors are swallowed so the site never breaks.
 (() => {
   "use strict";

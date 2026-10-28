@@ -5,7 +5,7 @@ import { wilson } from "../../src/core/report.js";
 const r3 = (x) => Math.round(x * 1000) / 1000;
 export const rate = (k, n) => ({ k, n, value: n ? r3(k / n) : null, ci: n ? wilson(k, n).map(r3) : null });
 
-// The families Daylight Commons emits, and the gold field each one is checked against. "hostile" is the
+// The families CMMNS emits, and the gold field each one is checked against. "hostile" is the
 // broad label (any group-directed hostility the annotators saw); the specific fields are stricter.
 export const FAMILIES = ["dehumanise", "violence", "vigilante", "slur", "slurSoft", "stereotype", "motive", "essentialise",
   "conspiracy", "absolutist", "contempt"];

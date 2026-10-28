@@ -5,8 +5,8 @@
 import { score } from "./rhetoric.js";
 import { persuasion } from "./persuasion.js";
 
-export const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Daylight Commons' own text recogniser. The image and its text stay in your browser.";
-export const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in Daylight Commons' options to read the words inside an image on this device.";
+export const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with CMMNS' own text recogniser. The image and its text stay in your browser.";
+export const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in CMMNS' options to read the words inside an image on this device.";
 export const IMAGE_TEXT_DOES_NOT_PROVE = "Software read these words, so a letter can change a word or a word can drop out. The image itself can be edited, screenshots of posts included.";
 const MAX_SHOWN = 280;
 
@@ -23,14 +23,14 @@ const percent = (c) => `${Math.round(100 * Math.max(0, Math.min(1, c || 0)))}%`;
 export function imageTextRows(result) {
   if (!result) return [];
   if (result.error) return [["Text in the image", `could not read it: ${result.error}`]];
-  if (!result.text) return [["Text in the image", "none found. Daylight Commons reads printed Latin-script text, such as English, French or Spanish; handwriting and other scripts are not read yet."]];
+  if (!result.text) return [["Text in the image", "none found. CMMNS reads printed Latin-script text, such as English, French or Spanish; handwriting and other scripts are not read yet."]];
   const shown = result.text.length > MAX_SHOWN ? result.text.slice(0, MAX_SHOWN).replace(/\s+\S*$/, "") + " …" : result.text;
   const unsure = (result.lines || []).filter((l) => l.low).length;
   return [
     ["Text in the image", `"${shown}"`],
     ["Confidence", `${percent(result.confidence)}, the recogniser's own average over the lines it kept; not a measured accuracy`],
     ...(unsure ? [["Left out", `${unsure} ${unsure === 1 ? "line" : "lines"} the recogniser was unsure of`]] : []),
-    ["Read by", `Daylight Commons' own recogniser on this device, in ${Math.max(1, Math.round(result.ms || 0))} ms`],
+    ["Read by", `CMMNS' own recogniser on this device, in ${Math.max(1, Math.round(result.ms || 0))} ms`],
   ];
 }
 

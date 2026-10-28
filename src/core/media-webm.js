@@ -17,7 +17,7 @@ const ID = {
   CueClusterPosition: 0xf1,
 };
 const VIDEO_CODECS = ["V_VP8", "V_VP9", "V_AV1"];
-const APP_NAME = "Daylight Commons";
+const APP_NAME = "CMMNS";
 
 // Element ids are written as given, marker bits included.
 function idBytes(id) {

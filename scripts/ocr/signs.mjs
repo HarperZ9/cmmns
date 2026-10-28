@@ -1,6 +1,6 @@
 // Do the matchers find the same signs in text read from a screenshot as in the typed text? Makes
 // screenshot pages of made-up posts that carry a named theory's stock line, a persuasion cue or a
-// claim from Daylight Commons' own fact-check table, then compares the signs found on each side. R&D only.
+// claim from CMMNS' own fact-check table, then compares the signs found on each side. R&D only.
 //
 //   node scripts/ocr/signs.mjs make PAGES_DIR      (then eval.mjs PAGES_DIR OUT_DIR)
 //   node scripts/ocr/signs.mjs score OUT_DIR

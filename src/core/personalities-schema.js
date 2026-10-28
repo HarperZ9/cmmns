@@ -20,13 +20,13 @@ export const TOPICS = ["politics and current affairs", "lifestyle with political
 export const MAX_QUOTE_WORDS = 30;
 export const MATCHED = new Set(["exact", "loose"]);
 
-// Words Daylight Commons never uses about a person, even inside a quote, and words that turn association into a
+// Words CMMNS never uses about a person, even inside a quote, and words that turn association into a
 // claim of backing.
 export const LOADED = /\b(propagandists?|propaganda|shills?|bots?|trolls?|puppets?|stooges?|mouthpieces?|conspiracy theorists?)\b/i;
 export const ASSOCIATION = /\b(appeared (?:on|at|with)|follows|followed by|met with|attended|spoke at|was seen with|is close to|ties to)\b/i;
 // Fields that would carry private or personal data. None may appear on a person, a row or a source.
 export const PRIVATE_KEYS = /^(address|street|home|phone|mobile|email|e-mail|salary|pay|income|networth|net_worth|netWorth|wealth|spouse|wife|husband|partner|children|child|kids|family|relatives|parents|birthdate|birthday|dob|dateOfBirth|age|ssn|passport|bank|iban)$/i;
-// Money in Daylight Commons' own words is allowed only where a filing is the backing itself.
+// Money in CMMNS' own words is allowed only where a filing is the backing itself.
 const MONEY = /[$€£₹]\s?\d|\b\d[\d,.]*\s?(million|billion|dollars|euros|pounds|rupees)\b/i;
 const MONEY_OK = new Set(["FARA filing", "campaign finance", "lobbying", "court record", "grant", "nonprofit funding", "government advertising"]);
 
@@ -51,7 +51,7 @@ export function sourceProblems(s, where) {
   if (s && s.date != null && !/^\d{4}(-\d{2}(-\d{2})?)?$/.test(s.date)) out.push(`${where}: date must be YYYY, YYYY-MM or YYYY-MM-DD`);
   if (!s || !text(s.quote, 2)) out.push(`${where}: no quote of the supporting sentence`);
   else if (words(s.quote) > MAX_QUOTE_WORDS) out.push(`${where}: quote over ${MAX_QUOTE_WORDS} words`);
-  if (s && LOADED.test(s.quote || "")) out.push(`${where}: quote carries a word Daylight Commons never shows about a person`);
+  if (s && LOADED.test(s.quote || "")) out.push(`${where}: quote carries a word CMMNS never shows about a person`);
   return out;
 }
 
@@ -70,7 +70,7 @@ export function rowProblems(row, where) {
   if (!STATUSES.includes(row.status)) out.push(`${where}: status must be one of ${STATUSES.join(", ")}`);
   else if (!statusAllowed(row).includes(row.status)) out.push(`${where}: status ${row.status} is stronger than its sources allow`);
   for (const k of ["who", "summary", "doesNotProve"]) if (!text(row[k], k === "who" ? 2 : 20)) out.push(`${where}: no ${k}`);
-  for (const k of ["who", "summary", "doesNotProve"]) if (LOADED.test(row[k] || "")) out.push(`${where}: ${k} carries a word Daylight Commons never uses about a person`);
+  for (const k of ["who", "summary", "doesNotProve"]) if (LOADED.test(row[k] || "")) out.push(`${where}: ${k} carries a word CMMNS never uses about a person`);
   if (ASSOCIATION.test(row.summary || "")) out.push(`${where}: summary infers backing from association`);
   if (MONEY.test(row.summary || "") && !MONEY_OK.has(row.kind)) out.push(`${where}: summary states an amount; amounts appear only where a filing is the backing`);
   if (!Array.isArray(row.sources) || !row.sources.length) out.push(`${where}: no source`);
@@ -85,7 +85,7 @@ export function personProblems(p) {
   const out = privateKeys(p).map((k) => `${where}: private field ${k}`);
   if (!ID.test(p.id || "")) out.push(`${where}: bad id`);
   if (!text(p.name, 2) || !text(p.role, 3)) out.push(`${where}: needs a public name and a public role`);
-  if (LOADED.test(p.role || "")) out.push(`${where}: role carries a word Daylight Commons never uses about a person`);
+  if (LOADED.test(p.role || "")) out.push(`${where}: role carries a word CMMNS never uses about a person`);
   if (!SELECTIONS.includes(p.selection)) out.push(`${where}: selection must be one of ${SELECTIONS.join(", ")}`);
   if (!TOPICS.includes(p.topic)) out.push(`${where}: topic must be one of ${TOPICS.join(", ")}`);
   for (const a of p.accounts || []) {

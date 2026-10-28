@@ -6,7 +6,7 @@ links a post-level readout to the risk of mass atrocity is a hypothesis.
 
 ## The question
 
-How often do Daylight Commons' post-level readouts (dehumanising language, calls for violence,
+How often do CMMNS' post-level readouts (dehumanising language, calls for violence,
 coordinated messaging, the claim and gap markers) fire in the media of periods that ended in mass
 atrocities, and how often in periods of high tension that did not? The answer calibrates what a
 readout is worth. It never becomes a forecast or a risk score for any group, country or person.
@@ -15,7 +15,7 @@ readout is worth. It never becomes a forecast or a risk score for any group, cou
 
 Stanton's ten stages (Genocide Watch: "predictable but not inexorable", "not linear"), the UN Framework
 of Analysis for Atrocity Crimes (2014; 14 unranked risk factors), and the propaganda-model filters.
-Cited, with their confidence, in the counter-repression brief, section 4b. Daylight touches only the
+Cited, with their confidence, in the counter-repression brief, section 4b. CMMNS touches only the
 readouts a post carries; the context that splits two identical readouts (institutions, the record of
 violence) is not in a post.
 
@@ -55,7 +55,7 @@ reason and for copyright.
    rate. The design needs at least as many matched control periods with full samples.
 3. **An outside reviewer** (the author's step) checks the case list, the outcome coding and the scoring
    before any result is read.
-4. **Language.** RTLM broadcast in Kinyarwanda and French; Daylight's markers read French and the
+4. **Language.** RTLM broadcast in Kinyarwanda and French; CMMNS's markers read French and the
    English translations, not Kinyarwanda. Kenyan corpora mix English, Swahili and Sheng.
 
 The scoring, once corpora exist: run each readout over each window blind to the outcome, count hits

@@ -43,9 +43,9 @@ export function render(md = readFileSync(join(ROOT, "HOW-IT-WORKS.md"), "utf8"))
   const findings = `<h2>What each finding shows</h2>
 <p>Each still is the installed extension on a made-up page. Every account in them is invented.</p>
 ${FINDINGS.map(([src, title, what, read]) => `<h3>${esc(title)}</h3>
-${figure(src, `${title}: Daylight Commons' window on a synthetic page`, what)}${read ? `\n<p class="dc-read">${esc(read)}</p>` : ""}`).join("\n")}`;
+${figure(src, `${title}: CMMNS' window on a synthetic page`, what)}${read ? `\n<p class="dc-read">${esc(read)}</p>` : ""}`).join("\n")}`;
   const body = [intro, diagram, ...rest.slice(0, 2), film, findings, ...rest.slice(2)].join("\n");
-  return sitePage({ file: "how-it-works.html", title: "How Daylight Commons works", role: "What the extension reads, where each sign comes from, what leaves your browser, and how anyone can check a receipt without us.", description: "How Daylight Commons works: each finding type on a real window, the path a reply takes, and receipts anyone can check offline.", updated, body, css: CSS });
+  return sitePage({ file: "how-it-works.html", title: "How CMMNS works", role: "What the extension reads, where each sign comes from, what leaves your browser, and how anyone can check a receipt without us.", description: "How CMMNS works: each finding type on a real window, the path a reply takes, and receipts anyone can check offline.", updated, body, css: CSS });
 }
 
 export const missingStills = () => FINDINGS.map(([src]) => src).filter((f) => !existsSync(join(ROOT, "docs", "demo", f)));

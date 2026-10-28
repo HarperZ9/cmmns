@@ -1,7 +1,7 @@
 <!-- writing-profile: research -->
 # Media toolkit and ad blocking (3.6.0)
 
-Daylight Commons 3.6.0 keeps the media people need to revisit: for an investigation, for reference, or for a design moodboard. It saves what a page loaded, converts and compresses it on the device, and records a hash chain from every copy back to the original. Ad and tracker blocking is a separate switch. Machine results of the browser check are in `project-docs/evidence/qa-3.6.0/`.
+CMMNS 3.6.0 keeps the media people need to revisit: for an investigation, for reference, or for a design moodboard. It saves what a page loaded, converts and compresses it on the device, and records a hash chain from every copy back to the original. Ad and tracker blocking is a separate switch. Machine results of the browser check are in `project-docs/evidence/qa-3.6.0/`.
 
 ## Download in one click
 
@@ -20,7 +20,8 @@ page and `src/ext/quick-save-bg.js` in the background; the pure parts are the me
   HLS stream put together with its sound; Reddit's packaged MP4 with sound, or its DASH video and
   sound rewrapped into one MP4 (`src/core/media-demux.js`, no re-encoding); canvas drawings as PNG.
   The type comes from the file's first bytes.
-- **Where it goes.** `Downloads/Daylight/<site>/`, named `<handle>_<date>_<first words>`, through the
+- **Where it goes.** `Downloads/CMMNS/<site>/` (an install from before 3.9.0 keeps
+  `Downloads/Daylight/<site>/`), named `<handle>_<date>_<first words>`, through the
   browser's downloads API with no dialog unless "Always ask where to save" is on. A file already saved
   (same address, or the same SHA-256 for a file made on the device) is skipped with a note and a
   "Save again" button.
@@ -35,7 +36,7 @@ page and `src/ext/quick-save-bg.js` in the background; the pure parts are the me
 - **Hover control** (`src/ext/quick-hover.js`, `quick-hover-ui.js`, `quick-hover-bg.js`): after 300 ms
   on a picture, GIF, video or canvas of at least 120 by 120 px, found under the pointer through clear
   layers and shadow roots. Drawn in a closed shadow root in the top layer, fixed, so it never moves
-  the page; only its two 28 px buttons take the pointer. On the sites Daylight Commons reads it is a
+  the page; only its two 28 px buttons take the pointer. On the sites CMMNS reads it is a
   manifest content script; on every other https site it is a registered content script, only after
   the user allows `https://*/*` in the settings. Not drawn on X and Reddit posts that have the button.
 - **Keyboard**: `Alt+Shift+D` (`commands`) reads the active tab once and saves the media under the
@@ -53,11 +54,11 @@ page and `src/ext/quick-save-bg.js` in the background; the pure parts are the me
 
 ## Save
 
-- **Where it starts.** The toolbar menu's **Save media from this page**, or **Save to Daylight** in the right-click menu on any image, GIF, video or audio. Either click lets the extension read the current tab once (`activeTab`). `src/ext/media-scan.js` lists the images, GIFs, video, audio and large CSS background images the page loaded, and the HLS and DASH addresses in the page's resource timing.
+- **Where it starts.** The toolbar menu's **Save media from this page**, or **Save to CMMNS** in the right-click menu on any image, GIF, video or audio. Either click lets the extension read the current tab once (`activeTab`). `src/ext/media-scan.js` lists the images, GIFs, video, audio and large CSS background images the page loaded, and the HLS and DASH addresses in the page's resource timing.
 - **Video.** A direct file address is fetched as it is. A video the page builds in memory (a `blob:` source) is saved from the HLS or DASH manifest the page fetched: `src/core/media-hls.js` and `media-dash.js` read master and media playlists, SegmentTemplate (with `$Number$`, `$Time$`, SegmentTimeline and width tags), SegmentList and single-file BaseURL manifests, and `src/ext/media-fetch.js` fetches the segments four at a time and joins them. HLS becomes an MPEG-TS file or, with an init map, a fragmented MP4; a separate audio rendition or DASH audio set is saved as its own file. A live stream saves what it lists at that moment, and the result says so. Streams larger than 1.5 GB are refused.
 - **Protected media is never touched.** The save stops, with a plain sentence, when the page plays the element through Encrypted Media Extensions (MediaKeys attached), when an HLS playlist carries any `EXT-X-KEY` or `EXT-X-SESSION-KEY` other than `METHOD=NONE` (AES-128 and SAMPLE-AES alike), when a DASH manifest has any `ContentProtection`, or when the fetched file carries MP4 encryption boxes (`encv`, `enca`, `sinf`, `tenc`, `pssh`, `senc`, read only inside `moov` and `moof`) or WebM ContentEncryption. Nothing in the settings changes that (`src/core/media-protect.js`, `tests/media-stream.test.js`).
 - **Access.** The Save click asks the browser for the one host the file or manifest comes from; a stream whose segments sit on another host asks again on a second click. Files are fetched as the page fetched them, with the browser's cookies for that host.
-- **Collections.** Each file is hashed (SHA-256) and kept in this browser's IndexedDB (`src/ext/media-store.js`), once per hash. A case save also adds a row to the case list with the address, page, time, hash and lineage; `daylight case add case-inbox.jsonl` captures and archives each address again on the command line. A tick box asks the Internet Archive to keep a copy of the file's address at save time (web.archive.org access asked on that click). A moodboard save takes tags and a note. The collections page shows a grid per case or moodboard, filters by kind, tag and text, and writes a JSON list with every hash and step.
+- **Collections.** Each file is hashed (SHA-256) and kept in this browser's IndexedDB (`src/ext/media-store.js`), once per hash. A case save also adds a row to the case list with the address, page, time, hash and lineage; `cmmns case add case-inbox.jsonl` captures and archives each address again on the command line. A tick box asks the Internet Archive to keep a copy of the file's address at save time (web.archive.org access asked on that click). A moodboard save takes tags and a note. The collections page shows a grid per case or moodboard, filters by kind, tag and text, and writes a JSON list with every hash and step.
 
 ## Convert and compress
 
@@ -66,15 +67,15 @@ Fully local, with no server and no new runtime dependency. `src/ext/convert.html
 | From | To | How |
 |---|---|---|
 | PNG, JPEG, WebP, AVIF, GIF first frame | PNG, JPEG, WebP, AVIF where the browser can write it | `createImageBitmap`, OffscreenCanvas, `convertToBlob` with a quality; a browser that hands back PNG for a format it cannot write is caught and told |
-| GIF | MP4 (H.264) or WebM (VP9, else VP8) | Daylight Commons' own GIF decoder (`src/core/media-gif.js`), WebCodecs `VideoEncoder`, Daylight Commons' own muxer |
+| GIF | MP4 (H.264) or WebM (VP9, else VP8) | CMMNS' own GIF decoder (`src/core/media-gif.js`), WebCodecs `VideoEncoder`, CMMNS' own muxer |
 | Video | WebM (VP9 and Opus) or MP4 (H.264 and AAC, else Opus) at a lower height, bitrate or frame rate | the browser plays the file muted and hands each frame to `VideoEncoder` (`requestVideoFrameCallback`); the sound is decoded at 48 kHz and re-encoded with `AudioEncoder` |
-| Audio | Opus in WebM or in Ogg | `decodeAudioData` at 48 kHz, `AudioEncoder`, Daylight Commons' Ogg writer |
+| Audio | Opus in WebM or in Ogg | `decodeAudioData` at 48 kHz, `AudioEncoder`, CMMNS' Ogg writer |
 
 The muxers are hand-written: `media-webm.js` (EBML with Cues), `media-mp4.js` and `media-mp4-boxes.js` (moov before mdat, `ctts` when needed, `co64` past 4 GB, `esds` and `dOps`), `media-ogg.js` (RFC 7845 granules and page CRCs). Their tests read every output back (`tests/media-mux*.test.js`); on CI runners with ffprobe they are also probed.
 
 Every result shows the size before and after, both hashes and the step. A copy of a saved item is kept beside it with `lineage`: each step's operation, parameters, tool, time, sizes and the hashes it went from and to. `checkLineage` (`src/core/media-collect.js`) rejects a chain whose steps do not link, and the collections page runs it on every draw.
 
-`daylight media convert <file> --to <format>` and `daylight media compress <file>` do the same on the command line through a system ffmpeg (`FFMPEG` names another binary), write `<new file>.lineage.json`, and never replace the original.
+`cmmns media convert <file> --to <format>` and `cmmns media compress <file>` do the same on the command line through a system ffmpeg (`FFMPEG` names another binary), write `<new file>.lineage.json`, and never replace the original.
 
 ### Sizes on three sample files (Chrome 155, headless, 2026-10-24)
 
@@ -90,7 +91,7 @@ Two more ran in the same check: the same MP4 to MP4 at 720p and 2 Mbit/s (7.6 MB
 
 `declarativeNetRequest` static rulesets compiled from EasyList and EasyPrivacy by `scripts/adblock-build.mjs` (12,900 rules from list versions 202610240032 and 202610240036; `data/adblock-lock.json` pins each list's SHA-256 and every skip reason). Cosmetic filters, regular expressions and options the engine cannot express are skipped and counted. Host filters that share options are merged into `requestDomains` rules, so no filter was dropped for the 30,000-rule budget. No rule blocks a page the user opened (`main_frame`).
 
-Both rulesets ship disabled. The **Block ads and trackers** switch (toolbar menu and Options) turns them on; it is separate from every reading feature. **Allow ads on this site** adds one `allowAllRequests` rule for that site and its subdomains, above every list rule. Pausing Daylight Commons turns the rulesets off too. The browser does the matching; the extension holds no `declarativeNetRequestFeedback` permission and never sees which requests were blocked. In the browser check, two ad scripts loaded with blocking off, both were blocked with it on, and both loaded again once the site was allowed.
+Both rulesets ship disabled. The **Block ads and trackers** switch (toolbar menu and Options) turns them on; it is separate from every reading feature. **Allow ads on this site** adds one `allowAllRequests` rule for that site and its subdomains, above every list rule. Pausing CMMNS turns the rulesets off too. The browser does the matching; the extension holds no `declarativeNetRequestFeedback` permission and never sees which requests were blocked. In the browser check, two ad scripts loaded with blocking off, both were blocked with it on, and both loaded again once the site was allowed.
 
 ## Limits
 

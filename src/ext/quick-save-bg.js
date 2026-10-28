@@ -1,5 +1,5 @@
 // The right-click entries Download, Download as GIF, Copy, Copy link and Copy with caption, and
-// the browser download each one asks for. A click lets Daylight Commons read the clicked tab once (activeTab): the
+// the browser download each one asks for. A click lets CMMNS read the clicked tab once (activeTab): the
 // in-page scripts (quick-*.js) find the media under the pointer and make the file; this worker
 // hands addresses to chrome.downloads, which saves to the Downloads folder without a dialog unless
 // "Always ask where to save" is on. Protected media references are kept in the collections store.
@@ -52,13 +52,13 @@ globalThis.PBQuickBg = (() => {
         return true;
       } });
     } catch (e) {
-      console.warn("[daylight-commons] could not read the page for the download", e);
+      console.warn("[cmmns] could not read the page for the download", e);
       // Browser pages and extension stores cannot be read; a picture's own address still downloads.
       if (id === "pb-dl" && info.srcUrl && /^https?:/.test(info.srcUrl)) download({ url: info.srcUrl, filename: null, fixExt: true }).catch(() => {});
     }
   }
 
-  const PROTECTED_SAVE = "Source protection is on, so Daylight Commons did not download this: the request would tell the host. Use your browser's own Save as, and add the file to your case.";
+  const PROTECTED_SAVE = "Source protection is on, so CMMNS did not download this: the request would tell the host. Use your browser's own Save as, and add the file to your case.";
 
   async function settings() {
     const k = PB.SETTINGS_KEY;
@@ -68,7 +68,7 @@ globalThis.PBQuickBg = (() => {
   // Starts a browser download. { url, filename, site, fixExt } -> { id }. The file goes to
   // "<save folder>/<site>/<name>" inside Downloads, so thousands of saves stay in one tree.
   async function download({ url, filename: name, site, fixExt, study = false, overwrite = false }) {
-    if (!chrome.downloads) throw new Error("This browser did not give Daylight Commons the downloads permission.");
+    if (!chrome.downloads) throw new Error("This browser did not give CMMNS the downloads permission.");
     const s = await settings();
     if (s.protection && /^https?:/i.test(url)) throw new Error(PROTECTED_SAVE);
     // Study saves go to "<save folder>/study/<site>/"; the reference library reads them first.

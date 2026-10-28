@@ -2,7 +2,7 @@
 // EasyPrivacy rulesets compiled by scripts/adblock-build.mjs (src/ext/rules/), switched on and off
 // with the "adblock" setting, which is off until the user turns it on. Sites in "adblockAllow" get
 // one dynamic allowAllRequests rule above every list rule, so nothing on those pages is blocked.
-// The browser matches requests itself; Daylight Commons never sees which requests were blocked.
+// The browser matches requests itself; CMMNS never sees which requests were blocked.
 (() => {
   "use strict";
   const KEY = PB.SETTINGS_KEY, RULESETS = ["easylist", "easyprivacy"], ALLOW_ID = 1, ALLOW_PRIORITY = 100;
@@ -23,7 +23,7 @@
     const hosts = s.adblockAllow || [];
     await dnr.updateDynamicRules({ removeRuleIds: [ALLOW_ID], addRules: hosts.length ? [allowRule(hosts)] : [] });
   }
-  const sync = () => settings().then(apply).catch((e) => console.error("[daylight-commons] ad blocking could not update", e));
+  const sync = () => settings().then(apply).catch((e) => console.error("[cmmns] ad blocking could not update", e));
 
   chrome.runtime.onInstalled.addListener(sync);
   if (chrome.runtime.onStartup) chrome.runtime.onStartup.addListener(sync);

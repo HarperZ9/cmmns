@@ -1,4 +1,4 @@
-"""Install a packaged Daylight Commons build into a fresh Chrome profile and answer x.com with the demo
+"""Install a packaged CMMNS build into a fresh Chrome profile and answer x.com with the demo
 stage (scripts/demo/stage.mjs), for scripts/demo/capture.py. Development tool only: needs Playwright
 for Python and Google Chrome; nothing here ships in the extension.
 
@@ -84,9 +84,9 @@ class Session:
                     return await r.fulfill(path=str(self.stage_dir / f"{name}.html"), content_type="text/html")
             self.requests.append((u, "stage 404"))
             return await r.fulfill(status=404, body="")
-        if u.startswith("https://harperz9.github.io/daylight-commons/"):
+        if u.startswith("https://harperz9.github.io/cmmns/"):
             # The project's own pages, answered from this checkout's docs/.
-            f = pathlib.Path(__file__).resolve().parents[2] / "docs" / u.split("/daylight-commons/")[1].split("?")[0].split("#")[0]
+            f = pathlib.Path(__file__).resolve().parents[2] / "docs" / u.split("/cmmns/")[1].split("?")[0].split("#")[0]
             self.requests.append((u, "local docs"))
             if f.is_file():
                 return await r.fulfill(path=str(f))

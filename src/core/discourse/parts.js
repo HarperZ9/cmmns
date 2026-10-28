@@ -18,7 +18,7 @@ function quoteLayer(q) {
 function docLayer(d) {
   if (!d) return null;
   return { name: "document pages", parts: [
-    ...d.absent.map((x) => ({ name: x.term, tags: ["absent", x.kind], properties: [prop("on the pages shown", false, "measured", `word match over ${d.read} of ${d.images} images read by Daylight's recogniser`)] })),
+    ...d.absent.map((x) => ({ name: x.term, tags: ["absent", x.kind], properties: [prop("on the pages shown", false, "measured", `word match over ${d.read} of ${d.images} images read by CMMNS's recogniser`)] })),
     ...d.found.map((x) => ({ name: x.term, tags: ["found", x.kind], properties: [prop("images", x.images, "measured", "word match"), prop("line", x.snippet, "observed", "recogniser output")] })),
   ] };
 }

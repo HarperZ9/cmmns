@@ -32,7 +32,7 @@ test("the current API writes version 2: schema v2, API 2.x, bundle version 2, it
 
 test("a signed version 1 bundle verifies, fits the v1 schema and reads as version 2", async () => {
   const key = await newBundleKey();
-  const v1 = await signBundle(asVersion1(makeBundle(result, { tool: "Daylight Commons test", dataLock: LOCK }).bundle), key);
+  const v1 = await signBundle(asVersion1(makeBundle(result, { tool: "CMMNS test", dataLock: LOCK }).bundle), key);
   const v = await verifyBundle(v1);
   assert.equal(v.ok, true, JSON.stringify(v.checks));
   assert.deepEqual(validate(schema(1), v1), []);
@@ -49,7 +49,7 @@ test("a signed version 1 bundle verifies, fits the v1 schema and reads as versio
 
 test("radar verify accepts a version 1 bundle against its own schema", async () => {
   const key = await newBundleKey();
-  const v1 = await signBundle(asVersion1(makeBundle(result, { tool: "Daylight Commons test", dataLock: LOCK }).bundle), key);
+  const v1 = await signBundle(asVersion1(makeBundle(result, { tool: "CMMNS test", dataLock: LOCK }).bundle), key);
   const file = join(mkdtempSync(join(tmpdir(), "radar-v1-")), "v1.json");
   writeFileSync(file, JSON.stringify(v1));
   const r = spawnSync(process.execPath, [fileURLToPath(new URL("../bin/radar.mjs", import.meta.url)), "verify", file], { encoding: "utf8" });

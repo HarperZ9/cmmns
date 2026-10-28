@@ -24,7 +24,7 @@ export async function requestSnapshot(target, { fetchFn = globalThis.fetch, slee
   for (let i = 0; i < tries; i++) {
     out.attempts = i + 1;
     try {
-      const res = await fetchFn(WAYBACK_SAVE + target, { method: "GET", redirect: "follow", headers: { "user-agent": "daylight-case (+https://github.com/HarperZ9/daylight-commons)" } });
+      const res = await fetchFn(WAYBACK_SAVE + target, { method: "GET", redirect: "follow", headers: { "user-agent": "cmmns-case (+https://github.com/HarperZ9/cmmns)" } });
       const snap = snapshotFrom(res);
       if (snap) return { ...out, ...snap, error: null };
       out.error = `HTTP ${res.status}, no snapshot address in the response`;

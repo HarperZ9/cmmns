@@ -1,5 +1,5 @@
 // The document-image claim check (project-docs/DISCOURSE.md). A post shows a letter, a filing or a
-// report as pictures and says what it says. Daylight Commons reads each picture with its own text
+// report as pictures and says what it says. CMMNS reads each picture with its own text
 // recogniser, on this device, then sets the post's key terms against the words on the pages: which
 // appear, on which image, and which do not. It compares words, not meaning.
 import { fold, containsNear, editDistance, STOP, snippet } from "./text.js";

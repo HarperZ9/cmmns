@@ -2,12 +2,12 @@
 // ask for the same file name. "uniquify" saves the second as "name (1).jpg", and its sidecar must
 // list that file, never the first post's "name.jpg". The page script and the worker run together
 // over a simulated chrome.downloads (tests/downloads-sim.js), in Chrome's and Firefox's manner.
-// Control: with DAYLIGHT_SIM_SRC pointing at a checkout from before the fix, the collision tests fail.
+// Control: with CMMNS_SIM_SRC (or DAYLIGHT_SIM_SRC) pointing at a checkout from before the fix, the collision tests fail.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { makeBrowser, post, listed } from "./downloads-sim.js";
 
-const DIR = "Daylight/x/", STEM = "horacioaltuna_2026-10-28_frederic-pillot";
+const DIR = "CMMNS/x/", STEM = "horacioaltuna_2026-10-28_frederic-pillot";
 const settings = { mediaEmbed: false, mediaSidecar: true };
 
 for (const flavour of ["chrome", "firefox"]) {

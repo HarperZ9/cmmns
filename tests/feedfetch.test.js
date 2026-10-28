@@ -19,7 +19,7 @@ test("a request carries no cookies, no referrer and no body, and follows no redi
   for (const [k, v] of Object.entries(FEED_REQUEST)) assert.equal(opts[k], v, k);
   assert.equal(opts.credentials, "omit");
   assert.equal(opts.redirect, "manual");
-  assert.equal(opts.headers, undefined, "Daylight Commons adds no header, so nothing about the user rides along");
+  assert.equal(opts.headers, undefined, "CMMNS adds no header, so nothing about the user rides along");
   assert.equal(opts.body, undefined);
 });
 

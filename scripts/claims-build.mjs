@@ -1,5 +1,5 @@
 // Builds src/ext/claims.json, the fact-checked claims table src/core/claims.js matches against.
-// Run at build time only. Daylight Commons never fetches fact-check data from the browser.
+// Run at build time only. CMMNS never fetches fact-check data from the browser.
 //
 // Source: the Data Commons fact-check feed, ClaimReview markup published by fact-checkers and
 // collected by Google's Fact Check Tools. Data Commons publishes the feed under CC BY 4.0

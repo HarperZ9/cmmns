@@ -1,5 +1,7 @@
 # Demonstration material
 
+These recordings predate the rename to CMMNS (2026-10-28) and show the name Daylight Commons.
+
 Every image and recording here is the installed Daylight Commons 3.0.0 Chrome package, running on
 synthetic pages where every account, post and company is invented and every handle starts with
 `demo_`. The one exception is the "run it on us" lookup: a synthetic post links Daylight Commons'

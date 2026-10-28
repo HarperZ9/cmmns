@@ -3,9 +3,9 @@
 
 Every challenge filed against a catalogue entry, a badge or a finding gets a decision here, with the
 reasoning, in public. Anyone can file one, including an organisation a badge names. Use the
-[challenge template](https://github.com/HarperZ9/daylight-commons/issues/new?template=challenge.yml)
+[challenge template](https://github.com/HarperZ9/cmmns/issues/new?template=challenge.yml)
 for an entry, and the
-[finding template](https://github.com/HarperZ9/daylight-commons/issues/new?template=dispute-finding.yml)
+[finding template](https://github.com/HarperZ9/cmmns/issues/new?template=dispute-finding.yml)
 for a badge or a finding on a page.
 
 `scripts/decisions-check.mjs` reads this file in CI. It fails when a decision is malformed, when it

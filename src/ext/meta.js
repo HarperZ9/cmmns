@@ -5,7 +5,7 @@
 // - Facebook: the "Page transparency" section of a Page, read when the viewer opens it.
 // - Bluesky: the app's own thread, profile and feed responses (src/ext/bskysniff.js).
 // - Mastodon and TikTok: the web app's own status, thread and comment responses (src/ext/fedisniff.js).
-// Daylight Commons makes no request of its own on these sites.
+// CMMNS makes no request of its own on these sites.
 (() => {
   "use strict";
   const KEY = "pb.meta.v1", KEEP_DAYS = 14, DAY = 86400000;
@@ -40,7 +40,7 @@
       lastText = d.innerText;
       const path = location.pathname.match(/^\/([A-Za-z0-9._]{1,30})\/?$/);
       const r = PB.igAbout(d.innerText, path ? path[1] : null);
-      if (r) put("instagram", r); else console.warn("[daylight-commons] nothing readable in Instagram's About this account; the layout may have changed");
+      if (r) put("instagram", r); else console.warn("[cmmns] nothing readable in Instagram's About this account; the layout may have changed");
     }
     if (FB) {
       // The main column is read only on a Page's transparency view; dialogs anywhere.

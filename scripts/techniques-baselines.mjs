@@ -26,7 +26,7 @@ const RAW = join(DATA, "pheme", "PHEME_veracity.tar.bz2");
 const rate = (k, n) => ({ k, n, share: n ? Math.round((k / n) * 10000) / 10000 : null, ci: n ? wilson(k, n).map((x) => Math.round(x * 10000) / 10000) : null });
 const iso = (t) => new Date(t * 1000).toISOString();
 
-// One thread's signs, with the account rate at the time of each reply, as Daylight Commons reads it at view time.
+// One thread's signs, with the account rate at the time of each reply, as CMMNS reads it at view time.
 export function threadSigns(th) {
   const replies = th.replies.filter((r) => r.user && Number.isFinite(r.t));
   const rows = replies.map((r, i) => ({ id: String(i), author: r.user, posted: iso(r.t), lang: r.lang, text: "", links: r.links || [], media: (r.media || []).map((m) => ({ url: m })), claims: [] }));

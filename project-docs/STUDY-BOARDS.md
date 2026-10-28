@@ -6,7 +6,7 @@ Status: design, then build in the same release as evidence capture (`project-doc
 
 People save pictures, posts and selections to study them later: a designer gathering references for
 a brand, a researcher collecting sources on a topic, a journalist building a timeline. Today the saves
-sit in `Daylight/<site>/` as files and notes. Putting them in front of someone, or in print, means
+sit in `CMMNS/<site>/` as files and notes. Putting them in front of someone, or in print, means
 rebuilding by hand what the notes already hold: who made each item, where, when, and why it was kept.
 
 A study board turns a set of saves into a document that keeps every item's source. It grows the
@@ -23,8 +23,8 @@ the look is ours.
 
 ## The board
 
-One format serves Daylight, the command line and the site: the reference library's `refdb board`
-spec, `refdb.board/1`. Daylight writes it and draws it, and draws one made by `refdb board`.
+One format serves CMMNS, the command line and the site: the reference library's `refdb board`
+spec, `refdb.board/1`. CMMNS writes it and draws it, and draws one made by `refdb board`.
 
 | Field | Meaning |
 |---|---|
@@ -34,10 +34,10 @@ spec, `refdb.board/1`. Daylight writes it and draws it, and draws one made by `r
 | `lane` | the topic or medium: design, research, journalism, sound, or any name |
 | `keyword_line` | up to eight words, the line at the foot of every page |
 | `plates` | in order; each has `n`, `unit` (the sidecar or record it came from), `item_ids`, `media` (`[{ id, kind, path }]`, kind `still`, `motion`, `audio` or `text`), `caption`, `medium` and `concepts` |
-| `also_in`, `sources` | the reference library's cross-references and measured summary; Daylight writes its own provenance under `sources.daylight` (`{ from: "saves" }` or `{ from: "moodboard", id }`) so it never collides with the library's keys |
-| `layout`, `head`, `created` | Daylight's additions: the layout to draw, the face for running heads and titles (`grotesk`, `accession` or `mono`), and when the board was made |
+| `also_in`, `sources` | the reference library's cross-references and measured summary; CMMNS writes its own provenance under `sources.daylight` (`{ from: "saves" }` or `{ from: "moodboard", id }`) so it never collides with the library's keys |
+| `layout`, `head`, `created` | CMMNS's additions: the layout to draw, the face for running heads and titles (`grotesk`, `accession` or `mono`), and when the board was made |
 
-Daylight's plates add `source`: the sidecar's facts (site, handle, author, posted, saved, post
+CMMNS's plates add `source`: the sidecar's facts (site, handle, author, posted, saved, post
 address, media address, title, quoted text, alt text, item "2 of 4", study flag, note, SHA-256, and
 reach, the views the page showed at save time). A reader that knows only `refdb.board/1` ignores it
 and still draws the board from `caption` and `media`. A plate may also carry `parts` (the library's
@@ -73,8 +73,8 @@ Moodboards keep working on the collections page as before.
   than the board's usual spacing (three times the median gap and at least a day) is drawn as a break
   with its length, so silences and bursts show. For journalism: the order things were posted, not
   saved.
-- **Evidence.** With a case (`daylight case`): each plate matched to the case's source by address.
-  The layout prints through Daylight's one sheet engine (`src/core/discourse/sheets.js`, shared with
+- **Evidence.** With a case (`cmmns case`): each plate matched to the case's source by address.
+  The layout prints through CMMNS's one sheet engine (`src/core/discourse/sheets.js`, shared with
   the discourse sheets page): each claim over the plates of the sources it cites, as stacked sheets,
   the most-seen on top. Each sheet's ink band is as wide as its share of the widest reach and coloured
   as it looks through the sheets above it; a sheet with no reach figure prints no ink. A widely seen
@@ -107,9 +107,9 @@ Moodboards keep working on the collections page as before.
   keywords, choose book, grid or timeline, then print or save as PDF through the browser, save one
   self-contained web page (plates and type inside it) into `<save folder>/boards/`, or, for a picked
   folder, write the portable folder into `boards/<title>/` beside the saves.
-- **Command line:** `daylight board make <folder> --title ... --lane ... --keywords ... --layout
+- **Command line:** `cmmns board make <folder> --title ... --lane ... --keywords ... --layout
   book|grid|timeline|evidence [--site ...] [--study] [--since ...] [--until ...] [--case <folder>]
-  [--clean] [--pdf] --out <folder>`, and `daylight board render <board.json>` to draw a
+  [--clean] [--pdf] --out <folder>`, and `cmmns board render <board.json>` to draw a
   `refdb.board/1` spec made by the reference library, copying each plate's media beside the page and
   naming any it could not find.
 - **Library:** `boardFrom`, `parseSidecar`, the layout planners and `boardHtml` in `src/core`, with

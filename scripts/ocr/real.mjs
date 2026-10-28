@@ -1,4 +1,4 @@
-// A real-interface test set that is licence-clean: screenshots of Daylight Commons' own published pages
+// A real-interface test set that is licence-clean: screenshots of CMMNS' own published pages
 // (docs/privacy.html, docs/transparency.html), the author's own text in the product's own fonts,
 // which training never saw. The truth for each line comes from the page's own text and layout.
 // Writes OUT/images and OUT/truth.json in the format eval.mjs --skip-capture reads. R&D only.

@@ -1,8 +1,9 @@
-// What `daylight case` needs from the machine: the clock, the network (or a replay of saved
+// What `cmmns case` needs from the machine: the clock, the network (or a replay of saved
 // responses), git, the signing key and the analyser. Kept apart from the commands so tests and
 // replays swap them without touching the case logic.
-//   DAYLIGHT_CASE_NOW=<ISO time>      fixes the clock (reproducible runs and tests)
-//   DAYLIGHT_CASE_REPLAY=<map.json>   serves every request from saved files; nothing is fetched.
+//   CMMNS_CASE_NOW=<ISO time>      fixes the clock (reproducible runs and tests)
+//   CMMNS_CASE_REPLAY=<map.json>   serves every request from saved files; nothing is fetched.
+//   The DAYLIGHT_ names of both still work (src/core/env-names.js).
 //     Keys are URLs, "x:<post id>" for an X post's record, and "wayback:*" for any save request.
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve, isAbsolute } from "node:path";
@@ -11,9 +12,10 @@ import { signBundle } from "../../src/core/evidence-bundle.js";
 import { analyzeText } from "../../src/core/api.js";
 import { loadTables, radarVersion } from "./data.mjs";
 import { loadOrMakeKey, DEFAULT_KEY } from "./keys.mjs";
+import { envValue } from "../../src/core/env-names.js";
 
 export function clock(env = process.env) {
-  const fixed = env.DAYLIGHT_CASE_NOW;
+  const fixed = envValue(env, "CASE_NOW");
   return fixed ? () => new Date(fixed).toISOString() : () => new Date().toISOString();
 }
 
@@ -33,7 +35,8 @@ export function replayFetch(mapFile) {
 }
 
 export function network(env = process.env) {
-  if (env.DAYLIGHT_CASE_REPLAY) return { fetchFn: replayFetch(env.DAYLIGHT_CASE_REPLAY), sleep: async () => {}, replay: true };
+  const replay = envValue(env, "CASE_REPLAY");
+  if (replay) return { fetchFn: replayFetch(replay), sleep: async () => {}, replay: true };
   return { fetchFn: globalThis.fetch, sleep: (ms) => new Promise((r) => setTimeout(r, ms)), replay: false };
 }
 
@@ -44,7 +47,7 @@ export const hasGit = (dir) => existsSync(join(dir, ".git"));
 // Git identity: the user's own when set; a neutral local one otherwise, so a commit never fails.
 function idArgs(dir) {
   const name = git(dir, "config", "user.name").stdout.trim(), mail = git(dir, "config", "user.email").stdout.trim();
-  return name && mail ? [] : ["-c", "user.name=Daylight case", "-c", "user.email=case@localhost"];
+  return name && mail ? [] : ["-c", "user.name=CMMNS case", "-c", "user.email=case@localhost"];
 }
 
 export function gitInit(dir) {
@@ -86,4 +89,4 @@ export function analyzer() {
   return (text, opts) => analyzeText(text, opts);
 }
 
-export const toolName = () => `Daylight Commons ${radarVersion()} (daylight case)`;
+export const toolName = () => `CMMNS ${radarVersion()} (cmmns case)`;

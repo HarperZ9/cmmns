@@ -1,6 +1,6 @@
 # ops.json: documented influence operations
 
-Built 2026-10-21 for Daylight Commons by `scripts/ops-build.mjs` from the hand-kept records in
+Built 2026-10-21 for CMMNS by `scripts/ops-build.mjs` from the hand-kept records in
 `data/ops-sources/*.json`. The build writes `data/ops.json` and the copy the extension loads,
 `src/ext/ops.json`. It reads no network.
 
@@ -119,7 +119,7 @@ DOJ press releases about them are filed as `government`.
 - VIGINUM (French government): no reuse licence stated in the documents read. Doubtful; only
   domain names, dates and short quotes are used.
 
-What Daylight Commons redistributes is facts (names, domains, dates), paraphrased summaries, and quotes of 25
+What CMMNS redistributes is facts (names, domains, dates), paraphrased summaries, and quotes of 25
 words or fewer with their source. Em dashes in source text are shown as a spaced hyphen.
 
 ## Judgement calls to review

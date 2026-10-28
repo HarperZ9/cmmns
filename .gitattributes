@@ -8,3 +8,5 @@
 *.mp4 binary
 # Pinned upstream snapshots keep their exact bytes, so their SHA-256 matches data/LOCK.json.
 data/snapshots/** -text
+# Files the v3.8.0 release wrote, kept byte for byte so their hashes and signatures still check.
+tests/fixtures/v3.8.0/** -text

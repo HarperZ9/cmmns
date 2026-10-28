@@ -80,7 +80,7 @@ test("acronyms that look like stopwords are kept (WHO, US)", () => {
   assert.ok(t.named.has("who"));
 });
 
-test("the card never gives Daylight Commons' own verdict and always carries the does-not-prove line", () => {
+test("the card never gives CMMNS' own verdict and always carries the does-not-prove line", () => {
   const m = top("The 2020 election was stolen through millions of fake mail-in ballots in Arizona");
   const card = claimCard(m);
   assert.equal(card.label, "A fact-checker reviewed a similar claim");
@@ -88,7 +88,7 @@ test("the card never gives Daylight Commons' own verdict and always carries the 
   assert.ok(text.includes("Pants on Fire") && text.includes("Checker A") && text.includes("https://a.example/1"));
   assert.ok(text.includes(CLAIM_DOES_NOT_PROVE));
   assert.match(CLAIM_DOES_NOT_PROVE, /similar wording to a reviewed claim/i);
-  // Daylight Commons' own words never rate the post: strip the checker's rating and look for verdict words.
+  // CMMNS' own words never rate the post: strip the checker's rating and look for verdict words.
   const own = text.replaceAll(m.rating, "").replaceAll(m.claim, "");
   assert.doesNotMatch(own, /\b(false|fake|untrue|lie|misinformation|disinformation|debunked)\b/i);
 });

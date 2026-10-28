@@ -1,4 +1,4 @@
-// daylight case from the command line, end to end on local files only: init, add, claim, trace,
+// cmmns case from the command line, end to end on local files only: init, add, claim, trace,
 // timeline, edge, network, lead, absent, actor, label, export in all three profiles, verify-export,
 // a tampered export failing, versioning with CHANGES.md, redaction, the legal bundle withholding a
 // private account's capture, and the worked Musk and Ukraine example verifying offline.

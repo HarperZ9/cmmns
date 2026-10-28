@@ -10,14 +10,14 @@
     if (!ready) ready = Promise.all([get("sites.json"), get("owners.json"), get("state.json")]).then(([sites, owners, state]) => {
       PB.setSiteTable(sites); PB.setOwnerRows(owners.rows); PB.setStateRows(state.rows);
       return true;
-    }).catch((e) => { console.error("[daylight-commons] site tables failed to load", e); ready = null; return false; });
+    }).catch((e) => { console.error("[cmmns] site tables failed to load", e); ready = null; return false; });
     return ready;
   }
   // Site notes from enabled data packs (packs-bg.js) are set alongside the bundled tables.
   const withPacks = () => Promise.all([tables(), globalThis.PBPacks ? PBPacks.enabled() : null]);
   const settings = async () => PB.normalizeSettings((await chrome.storage.local.get(PB.SETTINGS_KEY))[PB.SETTINGS_KEY]);
 
-  // Everything Daylight Commons knows about one site, from the bundled tables only.
+  // Everything CMMNS knows about one site, from the bundled tables only.
   function infoOf(domain, full) {
     const host = PB.hostOf("https://" + String(domain).replace(/^https?:\/\//, "")) || String(domain);
     const rec = PB.siteRecord(host);
@@ -59,13 +59,13 @@
       if (!want && have.has(sid)) await chrome.scripting.unregisterContentScripts({ ids: [sid] });
     }
   }
-  const sync = () => syncSearch().catch((e) => console.error("[daylight-commons] could not update search-result scripts", e));
+  const sync = () => syncSearch().catch((e) => console.error("[cmmns] could not update search-result scripts", e));
   chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch[PB.SETTINGS_KEY]) sync(); });
   if (chrome.permissions.onRemoved) chrome.permissions.onRemoved.addListener(sync);
   if (chrome.permissions.onAdded) chrome.permissions.onAdded.addListener(sync);
   sync();
 
-  const answer = (p, sendResponse) => { p.then(sendResponse, (e) => { console.error("[daylight-commons] site request failed", e); sendResponse({ error: String(e && e.message || e) }); }); return true; };
+  const answer = (p, sendResponse) => { p.then(sendResponse, (e) => { console.error("[cmmns] site request failed", e); sendResponse({ error: String(e && e.message || e) }); }); return true; };
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg || typeof msg.type !== "string") return undefined;
     if (msg.type === "pb-sites") return answer(withPacks().then(() => Object.fromEntries((msg.domains || []).slice(0, 60).map((d) => [d, infoOf(d)]))), sendResponse);

@@ -69,7 +69,7 @@ export const RESEARCH = {
 // How the lessons follow the research, in the order a lesson reads.
 export const METHOD = [
   "Each lesson names one move before you meet it in the wild, then shows a small, made-up example. The inoculation studies above use the same order: a warning, a refutation and a weakened dose.",
-  "The examples are synthetic, written for these lessons. The 2022 video study used made-up, non-political examples so that every viewer felt their own side was spared. Daylight Commons adds examples from left, right and centre in equal numbers, so the move is visible whoever makes it. A test counts them.",
+  "The examples are synthetic, written for these lessons. The 2022 video study used made-up, non-political examples so that every viewer felt their own side was spared. CMMNS adds examples from left, right and centre in equal numbers, so the move is visible whoever makes it. A test counts them.",
   "Later studies found a catch. Bad News players got more suspicious of everything, true posts included, and no better at telling true from false. So every lesson here also shows a fair use of the same words, or an ordinary account that trips the same sign, and every lesson says the sign can sit on a true post.",
   "The self-check mixes posts that lean on a move with posts that give real support, in equal numbers. It counts both kinds of answer, so calling everything suspect scores at chance. It runs hard to easy and explains every answer.",
   "The self-check is optional, and your answers stay in this browser. In the long-term study, people who came back to practise kept the skill for months.",

@@ -1,11 +1,11 @@
 """Store screenshots from the real extension on real public posts (docs/store/README.md). Development
 tool only. A fresh, signed-out Chrome profile with the packaged extension opens public posts by
 organisations' own accounts, rests the pointer on a reply, and saves a 1280x800 PNG. Before each shot,
-every reply author's picture, name and handle are blurred on the page and in Daylight Commons' window,
+every reply author's picture, name and handle are blurred on the page and in CMMNS' window,
 so no private person is identifiable; the organisation's own account stays readable. Nothing is
 clicked on the sites and nothing is posted.
 
-    python scripts/qa/store_shots.py --out docs/store/screenshots [--package dist/radar-chrome-<v>.zip]
+    python scripts/qa/store_shots.py --out docs/store/screenshots [--package dist/cmmns-chrome-<v>.zip]
 """
 import argparse
 import asyncio
@@ -21,7 +21,7 @@ from live_sites import Live  # noqa: E402
 
 VERSION = json.loads((ROOT / "src/ext/manifest.json").read_text(encoding="utf-8"))["version"]
 WINDOW = ".pb-pop section.pb-sec h3"
-# Daylight Commons' own window names the account it describes; that line and its links are blurred.
+# CMMNS' own window names the account it describes; that line and its links are blurred.
 OURS = ".pb-g-who, .pb-pop a, .pb-panel a"
 # [file, caption, start page, link to follow, post selector, which post, blur CSS, what to show:
 #  a window tab name, "panel" for the thread panel, or "link" to rest on a link for its site card]
@@ -126,7 +126,7 @@ async def shot(s, out, name, caption, start, follow, post_sel, nth, blur, show):
 async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
-    ap.add_argument("--package", default=str(ROOT / "dist" / f"radar-chrome-{VERSION}.zip"))
+    ap.add_argument("--package", default=str(ROOT / "dist" / f"cmmns-chrome-{VERSION}.zip"))
     ap.add_argument("--only", default="")
     a = ap.parse_args()
     out = pathlib.Path(a.out)

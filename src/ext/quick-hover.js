@@ -73,14 +73,14 @@ globalThis.PBHover = globalThis.PBHover || (() => {
   function act(action) {
     if (!shown) return;
     // A page opened before an update keeps this old script: it cannot reach the extension any more.
-    if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) { PBHoverUi.show(shown.el ? shown.el.getBoundingClientRect() : { left: shown.at.x, right: shown.at.x + 70, top: shown.at.y, bottom: shown.at.y + 40 }, "Daylight Commons was updated: reload this page", () => {}, [null]); return; }
+    if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) { PBHoverUi.show(shown.el ? shown.el.getBoundingClientRect() : { left: shown.at.x, right: shown.at.x + 70, top: shown.at.y, bottom: shown.at.y + 40 }, "CMMNS was updated: reload this page", () => {}, [null]); return; }
     const s = shown, p = s.at;
     // A selection's actions carry its words: the click may have cleared it by the time they run.
     if (s.kind === "selection" && action === "download") action = "text-note";
     const selection = s.kind === "selection" ? s.text : null;
     if (selection || action === "never" || action === "off") hide();
     chrome.runtime.sendMessage({ type: "pb-hover-action", action, at: { x: p.x, y: p.y }, selection, src: s.src && /^https?:/.test(s.src) ? s.src : null })
-      .catch((e) => console.warn("[daylight-commons] the download control could not reach the extension", e));
+      .catch((e) => console.warn("[cmmns] the download control could not reach the extension", e));
   }
 
   function hide() { clearTimeout(timer); shown = null; if (globalThis.PBHoverUi) PBHoverUi.hide(); }
@@ -107,7 +107,7 @@ globalThis.PBHover = globalThis.PBHover || (() => {
     if (e.pointerType === "touch") return;
     last = { x: e.clientX, y: e.clientY, at: Date.now() };
     if (raf) return;
-    raf = requestAnimationFrame(() => { raf = 0; try { consider(last.x, last.y); } catch (err) { console.warn("[daylight-commons] hover control", err); } });
+    raf = requestAnimationFrame(() => { raf = 0; try { consider(last.x, last.y); } catch (err) { console.warn("[cmmns] hover control", err); } });
   }, { capture: true, passive: true });
   // The control follows its media on scroll and resize, and leaves with the page.
   const follow = () => { lastTop = null; if (shown && shown.kind === "selection") { hide(); return; } if (shown) { const r = shown.el.getBoundingClientRect(); if (!r.width || r.bottom < 0 || r.top > innerHeight) hide(); else PBHoverUi.place(r); } };

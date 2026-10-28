@@ -1,4 +1,4 @@
-// Span-level precision of Daylight Commons' persuasion cues against the PTC gold spans. A Daylight Commons span counts
+// Span-level precision of CMMNS' persuasion cues against the PTC gold spans. A CMMNS span counts
 // as correct when it overlaps a gold span whose label is in the technique's GOLD_OF list. Gold
 // annotations are not exhaustive, so an unlabelled true use counts as a miss: the figures lean low.
 //   chance: the share of word tokens that sit inside a gold span of the technique, the precision a

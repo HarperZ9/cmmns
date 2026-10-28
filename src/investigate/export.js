@@ -1,5 +1,5 @@
 // `case export --profile legal|newsroom|research`. Each export is a new numbered version under
-// exports/<profile>/, with a SHA256SUMS file and a signed Daylight Commons evidence bundle whose
+// exports/<profile>/, with a SHA256SUMS file and a signed CMMNS evidence bundle whose
 // items are the content address (sha256 and size) of every file in the export. The bundle checks
 // offline in docs/verify-offline.html or with `radar verify`; `case verify-export` also rehashes
 // the files. A new version is written only when the case changed; CHANGES.md lists what changed.
@@ -60,7 +60,7 @@ export function exportBundle(data, profile, files, ctx) {
   const names = Object.keys(files).sort();
   const evidence = names.map((n, i) => {
     const b = Buffer.isBuffer(files[n]) ? files[n] : Buffer.from(files[n], "utf8");
-    return { id: `e${i + 1}`, kind: "case-file", scope: "file", level: "info", label: n, shows: `sha256 ${sha256(b)}, ${b.length} bytes`, source: `daylight case export, profile ${profile}, case "${data.meta.name}"`, context: "A matching hash shows this file is the one exported. It does not show that its content is true.", posts: [n], spans: [], data: { path: n, sha256: sha256(b), bytes: b.length } };
+    return { id: `e${i + 1}`, kind: "case-file", scope: "file", level: "info", label: n, shows: `sha256 ${sha256(b)}, ${b.length} bytes`, source: `cmmns case export, profile ${profile}, case "${data.meta.name}"`, context: "A matching hash shows this file is the one exported. It does not show that its content is true.", posts: [n], spans: [], data: { path: n, sha256: sha256(b), bytes: b.length } };
   });
   const out = {
     kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: EVIDENCE_SCHEMA, api: API_VERSION, tool: ctx.tool, savedAt: ctx.at, dataLock: null,

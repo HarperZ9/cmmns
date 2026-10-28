@@ -19,7 +19,7 @@ function freeBox(out, box) {
 function mp4Label(b, box) {
   const inside = b.subarray(box.start, box.start + box.size);
   const loc = indexOfBytes(inside, "location.ISO6709") >= 0 || indexOfBytes(inside, Uint8Array.of(0xa9, 0x78, 0x79, 0x7a)) >= 0;
-  const what = box.type === "udta" ? "user data (title, comment, device, Daylight's description)" : box.type === "meta" ? "metadata tags (ilst, keys)" : box.type === "uuid" ? "vendor block (uuid, often XMP)" : "leftover bytes in free space";
+  const what = box.type === "udta" ? "user data (title, comment, device, CMMNS's description)" : box.type === "meta" ? "metadata tags (ilst, keys)" : box.type === "uuid" ? "vendor block (uuid, often XMP)" : "leftover bytes in free space";
   return loc ? `${what}, with a location` : what;
 }
 

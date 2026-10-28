@@ -44,7 +44,7 @@ looked up in three places, in this order:
    meaning, weighted by rarity, and at least three of its rarer words with some word pairs in order.
    Anything less is **not found**, which says where it looked and that this proves nothing.
 
-A list of three or more "Name: words" lines is counted instead: lines, names Daylight Commons knows,
+A list of three or more "Name: words" lines is counted instead: lines, names CMMNS knows,
 lines with any source, and lines too short to look up. The study's "What is life?" list reads "13
 lines credited to names, 0 sourced".
 
@@ -99,11 +99,11 @@ that a display name alone never marks anyone.
 
 ## Counts and their sample size
 
-"45/50", "8 of 47", "62% of 1,200" and "n = 40" get a Wilson 95% interval, the same interval Daylight
+"45/50", "8 of 47", "62% of 1,200" and "n = 40" get a Wilson 95% interval, the same interval CMMNS
 Commons prints for its own figures. Two counts with the same denominator are read as two arms and
 compared. A count under 30 says one more or one fewer moves the figure a lot. Fractions that look
 like dates or scores are left alone unless a count word follows ("replies", "people", "patients").
-Counts in an image are read too once the user has had Daylight read that image.
+Counts in an image are read too once the user has had CMMNS read that image.
 
 ## Document pages against the post
 
@@ -114,7 +114,7 @@ on the pages shown, with the image number and the line around it, or not on them
 appear whole; a long word may be one letter off, for the recogniser's slips. Images over 2,400 pixels
 a side are scaled down to read, as before.
 
-On the study's demand letter (six pages in four images), Daylight's recogniser read each image at a
+On the study's demand letter (six pages in four images), CMMNS's recogniser read each image at a
 confidence between 0.987 and 0.994. "Classified information", "security clearances", "illegal
 access" and "admitting" are on none of them; the name in the post is on images 1 and 3
 (`project-docs/evidence/discourse-letter-check.json`). The single word

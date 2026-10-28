@@ -1,4 +1,4 @@
-// Daylight Commons' word lists, kept apart from the matching code so they can be reviewed and updated in
+// CMMNS' word lists, kept apart from the matching code so they can be reviewed and updated in
 // one place. Every list covers targets in every direction; tests/rhetoric.symmetry.test.js holds
 // the scoring to equal treatment. Sources for slurs and coded terms: the ADL Hate Symbols
 // database, Hatebase, GNET and ISD extremism glossaries; terms added for side recall on 2026-10-21 cite

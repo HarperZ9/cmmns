@@ -35,8 +35,8 @@
 
   async function read(msg) {
     const s = PB.normalizeSettings((await chrome.storage.local.get(PB.SETTINGS_KEY))[PB.SETTINGS_KEY]);
-    if (!s.imageText) return { error: "reading text in images is off in Daylight Commons' options" };
-    if (typeof msg.bytes !== "string" || msg.bytes.length > (MAX_BYTES * 4) / 3 + 4) return { error: "the image is larger than Daylight Commons reads" };
+    if (!s.imageText) return { error: "reading text in images is off in CMMNS' options" };
+    if (typeof msg.bytes !== "string" || msg.bytes.length > (MAX_BYTES * 4) / 3 + 4) return { error: "the image is larger than CMMNS reads" };
     const [m, img] = await Promise.all([load(), pixels(bytesOf(msg.bytes))]);
     const r = PBOCR.readImage(m, { data: img.data, width: img.width, height: img.height }, { now: () => performance.now() });
     return { text: r.text, confidence: r.confidence, ms: r.ms, lines: r.lines.map((l) => ({ text: l.text, confidence: l.confidence, low: l.low })) };
@@ -45,7 +45,7 @@
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg || msg.type !== "pb-ocr" || !sender.tab) return undefined;
     read(msg).then(sendResponse, (e) => {
-      console.error("[daylight-commons] reading text in an image failed", e);
+      console.error("[cmmns] reading text in an image failed", e);
       sendResponse({ error: e && e.name === "InvalidStateError" ? "the browser could not decode this image" : "the reader failed on this image" });
     });
     return true;

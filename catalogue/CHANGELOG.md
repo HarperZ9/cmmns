@@ -6,6 +6,15 @@ here, with the date and the reason. A badge names the entry and version it used
 (`<id>@<version>`), so an old badge can always be read against the text it was built from.
 Challenges and their decisions are linked from the line they changed.
 
+## Product name in notes (2026-10-28)
+
+The project was renamed CMMNS. Six entries' own notes (`eu-dsa-art26-advertising`,
+`eu-dsa-art39-ad-repository`, `eu-ucpd-annex1-11-advertorial`, `us-ftc-endorsement-material-connection`,
+`x-authenticity-engagement-spam`, `x-paid-partnerships`) and the catalogue schema title now say
+CMMNS where they said Daylight Commons. Only the product name changed: quotes, elements, signals,
+sources and hashes are untouched, so no entry version moved and every badge still reads against
+the same text.
+
 ## 1.0.1 entries (2026-10-23)
 
 Plain-language rewrite of Daylight Commons' own notes, on the author's direction of 2026-10-23. Each entry's

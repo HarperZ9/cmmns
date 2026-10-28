@@ -18,7 +18,7 @@ open-weight model (kappa = x), n cases." The kit builds that sentence and cannot
 
 - Make a run folder outside this repository and run `git init` in it. Everything below lives
   there. Page captures hold other people's posts, so they never enter this repository.
-- In the author's Chrome, turn Daylight Commons off for the run. It stays off until step 7.
+- In the author's Chrome, turn CMMNS off for the run. It stays off until step 7.
 - Check that the local model answers. In the Flywheel checkout:
   `python -m harness.local_agent_cli --health`. Pull a model from a different family from Claude,
   for example `ollama pull qwen3:8b` (Qwen, Alibaba) or `olmo2:7b` (OLMo, Ai2).
@@ -96,7 +96,7 @@ fixed before the detector ran.
 
 ## 7. Join the detector output
 
-Turn Daylight Commons on. Open each post and write its campaign status to `lens.jsonl`: `kind`
+Turn CMMNS on. Open each post and write its campaign status to `lens.jsonl`: `kind`
 `lens`, `case`, `lens` (`strong`, `one`, `thin`, `coordinated`, `none` or `undefined`).
 
 ```

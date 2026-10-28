@@ -17,7 +17,7 @@ archive copy and a page-text capture whose hash the case file fixes before label
 
 1. **Campaign.** One of four.
    - `paid-disclosed`: the post or its quotes carry X's Paid partnership label.
-   - `paid-undisclosed`: the capture includes evidence from outside Daylight Commons that the
+   - `paid-undisclosed`: the capture includes evidence from outside CMMNS that the
      promotion was bought without labels. Accepted kinds: an agency's own case study, a platform
      enforcement notice, a court or regulator record, the company's own statement. Pick the kind.
    - `organic`: nothing suggests the attention was bought.
@@ -36,12 +36,12 @@ the region the post addresses when it says so, or `unstated`; never guess from n
 
 ## The hard rule on evidence
 
-An impression from the same signs Daylight Commons reads is not evidence for `paid-undisclosed`.
+An impression from the same signs CMMNS reads is not evidence for `paid-undisclosed`.
 Using it would grade the lens against itself. In that case, choose `unsure`.
 
 ## Blind, then hashed
 
-- Neither labeller sees the detector's output. The browser runs without Daylight Commons until the
+- Neither labeller sees the detector's output. The browser runs without CMMNS until the
   labels, the resolutions and their hashes are recorded.
 - Labeller B never sees labeller A's labels. It reads only the capture.
 - Each file is recorded in the ledger (`scripts/label/ledger.mjs`) in a fixed order: the case set,

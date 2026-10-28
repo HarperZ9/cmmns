@@ -1,5 +1,5 @@
 // Reads account metadata out of the data X's own web app has already downloaded for the page (its
-// GraphQL responses). Daylight Commons makes no request of its own for this: src/ext/sniff.js passes copies of
+// GraphQL responses). CMMNS makes no request of its own for this: src/ext/sniff.js passes copies of
 // X's responses to the content script, and this module walks them for User objects.
 // X has moved fields between `legacy` and `core` over time, so both places are read. Since the
 // live check of 2026-10-22, User objects in X's web responses carry no `legacy` block at all: the
@@ -20,7 +20,7 @@ const pick = (...vals) => vals.find((v) => v !== undefined && v !== null && v !=
 const n = (v) => (Number.isFinite(v) ? v : null);
 const pickN = (...vals) => { for (const v of vals) if (Number.isFinite(v)) return v; return null; };
 
-// One X User object -> Daylight Commons' reading (only the fields that are present).
+// One X User object -> CMMNS' reading (only the fields that are present).
 export function userReading(u) {
   const L = u.legacy || {}, C = u.core || {}, A = u.about_profile || {};
   const RC = u.relationship_counts || {}, TC = u.tweet_counts || {}, AC = u.action_counts || {};
@@ -47,7 +47,7 @@ export function userReading(u) {
     mediaCount: pickN(TC.media_tweets, L.media_count),
     withheldIn: Array.isArray(L.withheld_in_countries) && L.withheld_in_countries.length ? L.withheld_in_countries.join(", ") : null,
     // X's own disclosures about how the account operates. Payment and tip-jar handles are left
-    // out on purpose: they identify people, and Daylight Commons describes accounts.
+    // out on purpose: they identify people, and CMMNS describes accounts.
     identityVerified: ((u.verification_info || {}).is_identity_verified === true) ? true : null,
     verifiedReason: pick((((((u.verification_info || {}).reason || {}).description) || {}).text)),
     professionalType: pick((u.professional || {}).professional_type),
@@ -65,7 +65,7 @@ export function userReading(u) {
   return Object.fromEntries(Object.entries(r).filter(([, v]) => v !== null && v !== undefined));
 }
 
-// The "About this account" block anywhere in a response (X's AboutAccountQuery), as Daylight Commons'
+// The "About this account" block anywhere in a response (X's AboutAccountQuery), as CMMNS'
 // fields, or null. location_accurate false means X suspects a VPN or proxy.
 export function aboutIn(json) {
   const stack = [json];

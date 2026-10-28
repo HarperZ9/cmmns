@@ -122,7 +122,7 @@ let provider = null;
 export function setPromoTemplateProvider(fn) { provider = typeof fn === "function" ? fn : null; }
 export function promoCues(text) {
   if (provider) {
-    try { return provider(text).cues || []; } catch (e) { console.error("[daylight-commons] promo-template provider failed; using the local list", e); }
+    try { return provider(text).cues || []; } catch (e) { console.error("[cmmns] promo-template provider failed; using the local list", e); }
   }
   return localProvider(text).cues;
 }

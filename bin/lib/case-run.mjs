@@ -1,4 +1,4 @@
-// The `daylight case` commands that run the pipeline or write exports: run, review, watch, export,
+// The `cmmns case` commands that run the pipeline or write exports: run, review, watch, export,
 // verify-export, read and import.
 import { readFileSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -86,7 +86,7 @@ async function run(env, { _: seeds, f }) {
   gitCommit(env.dir, `case run (${r.state.runs})`, { anon: env.protection });
   const waiting = pending(env.data()).length, refused = Object.keys(r.state.failed || {}).length;
   if (env.protection) lines.push(`Source-protection mode is on: no request was made${refused ? `, and ${refused} address${refused === 1 ? " was" : "es were"} not captured. Open them in your browser, save them, and add the files` : ""}.`);
-  return `${lines.join("\n")}\nRun ${r.state.runs} finished. ${waiting} item${waiting === 1 ? "" : "s"} wait for review: daylight case review\n`;
+  return `${lines.join("\n")}\nRun ${r.state.runs} finished. ${waiting} item${waiting === 1 ? "" : "s"} wait for review: cmmns case review\n`;
 }
 
 // One key per item: a accept, r reject, s skip, q stop.

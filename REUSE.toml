@@ -1,6 +1,6 @@
 version = 1
-SPDX-PackageName = "Daylight Commons"
-SPDX-PackageDownloadLocation = "https://github.com/HarperZ9/daylight-commons"
+SPDX-PackageName = "CMMNS"
+SPDX-PackageDownloadLocation = "https://github.com/HarperZ9/cmmns"
 
 # Which licence covers which files. When several entries match a file, the last one wins.
 # Code is AGPL-3.0-only. Data, the catalogue, schemas and documentation are CC BY 4.0.
@@ -8,7 +8,7 @@ SPDX-PackageDownloadLocation = "https://github.com/HarperZ9/daylight-commons"
 
 [[annotations]]
 path = "**"
-SPDX-FileCopyrightText = "2026 Zain Dana Harper and the Daylight Commons contributors"
+SPDX-FileCopyrightText = "2026 Zain Dana Harper and the CMMNS contributors"
 SPDX-License-Identifier = "AGPL-3.0-only"
 
 [[annotations]]
@@ -27,12 +27,12 @@ path = [
   "assets/**",
   "examples/**",
 ]
-SPDX-FileCopyrightText = "2026 Zain Dana Harper and the Daylight Commons contributors"
+SPDX-FileCopyrightText = "2026 Zain Dana Harper and the CMMNS contributors"
 SPDX-License-Identifier = "CC-BY-4.0"
 
 [[annotations]]
 path = ["src/ext/manifest.json", "package.json", "src/ext/LICENSE.txt", "LICENSE"]
-SPDX-FileCopyrightText = "2026 Zain Dana Harper and the Daylight Commons contributors"
+SPDX-FileCopyrightText = "2026 Zain Dana Harper and the CMMNS contributors"
 SPDX-License-Identifier = "AGPL-3.0-only"
 
 [[annotations]]
@@ -56,7 +56,7 @@ SPDX-FileCopyrightText = "2020 The JetBrains Mono Project Authors"
 SPDX-License-Identifier = "OFL-1.1"
 
 # EasyList and EasyPrivacy, dual-licensed GPL-3.0-or-later or CC BY-SA 3.0 or later by their
-# authors; Daylight Commons ships the compiled rules under the GPL option (THIRD-PARTY.md).
+# authors; CMMNS ships the compiled rules under the GPL option (THIRD-PARTY.md).
 [[annotations]]
 path = ["src/ext/rules/easylist.json", "src/ext/rules/easyprivacy.json"]
 SPDX-FileCopyrightText = "The EasyList authors <https://easylist.to/>"

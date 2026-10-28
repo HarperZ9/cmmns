@@ -6,9 +6,9 @@
   await PBSettings.ready;
   const show = (s) => {
     $("protection").checked = s.protection;
-    $("state").textContent = s.protection ? "Source protection is on. Daylight Commons makes no request, and the toolbar button shows a P." : "Source protection is off.";
+    $("state").textContent = s.protection ? "Source protection is on. CMMNS makes no request, and the toolbar button shows a P." : "Source protection is off.";
   };
   show(PBSettings.get());
   PBSettings.onChange(show);
-  $("protection").addEventListener("change", () => PBSettings.save({ protection: $("protection").checked }).catch((e) => console.error("[daylight-commons] could not save source protection", e)));
-})().catch((e) => console.error("[daylight-commons] protection page failed", e));
+  $("protection").addEventListener("change", () => PBSettings.save({ protection: $("protection").checked }).catch((e) => console.error("[cmmns] could not save source protection", e)));
+})().catch((e) => console.error("[cmmns] protection page failed", e));

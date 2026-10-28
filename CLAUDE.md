@@ -1,4 +1,4 @@
-# CLAUDE.md: Daylight Commons
+# CLAUDE.md: CMMNS
 
 A browser extension that adds evidence badges to social media replies. It shows where an
 account says or is labelled to be based, signs of coordination, and a per-thread report on

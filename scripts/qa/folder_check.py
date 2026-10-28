@@ -1,4 +1,4 @@
-"""3.6.2 check: every save path lands in Downloads/Daylight/<site>/ on a profile that carries
+"""3.6.2 check: every save path lands in Downloads/CMMNS/<site>/ on a profile that carries
 3.6.0 settings, and a tab left open across an extension update still saves into the folder.
 Development tool only.
 

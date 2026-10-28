@@ -1,6 +1,8 @@
-// Write docs/firefox/updates.json, the update manifest a self-distributed Daylight Commons in Firefox checks
-// (the update_url in the radar-firefox-self build, scripts/zip.mjs). Run it on the xpi Mozilla
-// signed, since signing changes the file and Firefox checks the hash of what it downloads.
+// Write docs/firefox/updates.json, the update manifest a self-distributed CMMNS in Firefox checks
+// (the update_url in the cmmns-firefox-self build, scripts/zip.mjs). Run it on the xpi Mozilla
+// signed, since signing changes the file and Firefox checks the hash of what it downloads. Then copy
+// the file to the site repository (HarperZ9/HarperZ9.github.io) as ext/firefox/updates.json, the
+// address in FIREFOX_UPDATE_URL.
 //   node scripts/firefox-updates.mjs <signed.xpi> [--link <download address>]
 // The default download address is the GitHub release asset; a mirror can pass its own.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
@@ -28,7 +30,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (!xpi || !existsSync(xpi)) { console.error("usage: node scripts/firefox-updates.mjs <signed.xpi> [--link <url>]"); process.exit(2); }
   const version = JSON.parse(readFileSync(join(ROOT, "src", "ext", "manifest.json"), "utf8")).version;
   const args = process.argv.slice(2);
-  const link = (args.includes("--link") && args[args.indexOf("--link") + 1]) || `https://github.com/HarperZ9/daylight-commons/releases/download/v${version}/${basename(xpi)}`;
+  const link = (args.includes("--link") && args[args.indexOf("--link") + 1]) || `https://github.com/HarperZ9/cmmns/releases/download/v${version}/${basename(xpi)}`;
   if (!/^https:\/\//.test(link)) { console.error("the download address must be https"); process.exit(2); }
   const sha256 = createHash("sha256").update(readFileSync(xpi)).digest("hex");
   const current = existsSync(UPDATES) ? JSON.parse(readFileSync(UPDATES, "utf8")) : null;

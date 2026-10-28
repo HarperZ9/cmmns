@@ -2,7 +2,7 @@
 
 Status: the first part is built in 3.7.0; "What 3.7.0 builds" below says which parts. The rest of
 this page is the design it follows. It builds on the one-click save (3.6.x), the sidecar
-format (`project-docs/SIDECAR-FORMAT.md`) and the case workbench (`daylight case`, `src/investigate/`).
+format (`project-docs/SIDECAR-FORMAT.md`) and the case workbench (`cmmns case`, `src/investigate/`).
 
 ## What 3.7.0 builds
 
@@ -20,18 +20,18 @@ format (`project-docs/SIDECAR-FORMAT.md`) and the case workbench (`daylight case
   could not be proved, a GIF made in the page). Parts not taken in this release say so with 0: the
   page snapshot and trusted time.
 - **Custody chain**: one line per capture, kept in this browser, each naming the SHA-256 of the line
-  before; the record's own hash is in its line. `daylight capture verify <folder>` re-hashes every
+  before; the record's own hash is in its line. `cmmns capture verify <folder>` re-hashes every
   file, picture and record, checks every line and link, and names lines saved elsewhere as gaps.
 - **Not built yet:** the stitched full-page picture, the MHTML or WARC snapshot (it needs the
-  `pageCapture` permission), the signed log (the case key lives with `daylight case`; the browser has
+  `pageCapture` permission), the signed log (the case key lives with `cmmns case`; the browser has
   no key yet), RFC 3161 and OpenTimestamps time, the Internet Archive request, and filing captures
   into a case. Without a signature, someone who rewrites the last line and its hash is not caught;
   every earlier change is.
 
 ## The claim view: a claim over its sources
 
-The evidence board (`daylight board make --layout evidence --case ...`) draws each claim as a sheet
-over the plates of the sources it cites, printed by the one sheet engine Daylight has
+The evidence board (`cmmns board make --layout evidence --case ...`) draws each claim as a sheet
+over the plates of the sources it cites, printed by the one sheet engine CMMNS has
 (`src/core/discourse/sheets.js`). Two readouts, paired: the sheet's ink coverage is the source's
 reach (the views the page showed, as a share of the widest), and the provenance line's opacity is how far the
 source is corroborated by the claim's other sources from other origins (another site or another
@@ -106,9 +106,9 @@ evidence lookups do (`project-docs/EVIDENCE-LAYER.md`).
 
 - Each case keeps an append-only log, one JSON line per event: who (the user's case key id, not a
   name), what (capture, export, note, correction), when, from where (page address, browser and
-  version, Daylight Commons version), and the hashes involved. Each line names the hash of the line
+  version, CMMNS version), and the hashes involved. Each line names the hash of the line
   before it, so a removed or edited line breaks the chain.
-- The log is signed with the user's case key (`bin/lib/keys.mjs`), the same key `daylight case`
+- The log is signed with the user's case key (`bin/lib/keys.mjs`), the same key `cmmns case`
   already uses for signed bundles. The key stays on the computer.
 - Exports reuse the existing legal, newsroom and research profiles (`bin/lib/export.mjs`): every file is listed in the manifest with its SHA-256, and the
   manifest is signed.
@@ -130,7 +130,7 @@ preservation and verification guidance:
 | Keep a chain of custody | the append-only signed log, exports with hashed manifests |
 | Protect the investigator and sources | no data leaves the machine unless an opt-in is on; Share clean |
 
-This is an alignment note, not a certification. No body has reviewed Daylight Commons against the
+This is an alignment note, not a certification. No body has reviewed CMMNS against the
 Protocol.
 
 ## Does not prove
@@ -153,5 +153,5 @@ crops to the page content, and Share clean removes the rest.
 2. Page side: engagement and account readers per site (X, Reddit, Bluesky first), from what is shown.
 3. Worker side: stitched screenshot, MHTML, case write through the existing case store.
 4. Opt-ins: RFC 3161 client and OpenTimestamps client, both sending only a hash.
-5. `daylight case` reads captures, verifies the chain and exports with the existing profiles.
+5. `cmmns case` reads captures, verifies the chain and exports with the existing profiles.
 6. Browser check on real public posts; a tamper test that edits one byte and one log line.

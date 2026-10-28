@@ -1,5 +1,5 @@
 // Injected into the current tab only when the user clicks "Save media" in the toolbar popup or
-// "Save to Daylight" in the right-click menu (activeTab). Lists the images, GIFs, videos and audio
+// "Save to CMMNS" in the right-click menu (activeTab). Lists the images, GIFs, videos and audio
 // the page has loaded, with any HLS or DASH address the page fetched, and marks media that plays
 // through Encrypted Media Extensions as protected. Reads the page; changes nothing and sends nothing.
 globalThis.PBMediaScan = globalThis.PBMediaScan || (() => {

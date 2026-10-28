@@ -2,7 +2,7 @@
 // News Sites, T0097.202 News Outlet Persona). A post that names a real outlet ("The Washington Post
 // reports...") while its link goes to a look-alike address borrows the outlet's trust twice: in
 // the words and in the address. Doppelganger posts did this with copied outlets on addresses such as
-// washingtonpost.pm. Daylight Commons joins two checks it already has: the look-alike address (lookalike.js)
+// washingtonpost.pm. CMMNS joins two checks it already has: the look-alike address (lookalike.js)
 // and the published reports that named the address (ops.js). Wording that names the outlet is the
 // only new part, and it is matched on the outlet's own name, never on a topic or side.
 

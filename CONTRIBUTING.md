@@ -1,6 +1,6 @@
-# Contributing to Daylight Commons
+# Contributing to CMMNS
 
-Thank you for helping. Daylight Commons is a tool for the commons, so how contributions come in matters as
+Thank you for helping. CMMNS is a tool for the commons, so how contributions come in matters as
 much as what they change.
 
 ## Licence of your contribution
@@ -11,7 +11,7 @@ AGPL-3.0-only for code, CC BY 4.0 for data, the catalogue, schemas and documenta
 
 ## Sign off every commit (Developer Certificate of Origin)
 
-Daylight Commons uses the Developer Certificate of Origin (DCO) 1.1, printed in full below. Add a sign-off line
+CMMNS uses the Developer Certificate of Origin (DCO) 1.1, printed in full below. Add a sign-off line
 to every commit to certify that you wrote the change or have the right to submit it:
 
 ```
@@ -36,8 +36,8 @@ request with an unsigned commit cannot be merged until it is signed off
 ### Why a DCO and no CLA
 
 A contributor licence agreement usually hands one party the right to relicense everyone's work,
-including under closed terms. Daylight Commons has none. Each contributor keeps their copyright and licenses
-it under the AGPL or CC BY 4.0, exactly as everyone else receives it. Changing Daylight Commons' licence
+including under closed terms. CMMNS has none. Each contributor keeps their copyright and licenses
+it under the AGPL or CC BY 4.0, exactly as everyone else receives it. Changing CMMNS' licence
 would need every copyright holder's consent, so no single party, the author included, can take
 contributions closed. The DCO records only that you had the right to contribute.
 

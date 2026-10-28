@@ -216,7 +216,7 @@ const M_confusables = (() => {
 // Styled letters that stand for plain ones (fullwidth "Ｈｅｌｌｏ", mathematical bold "𝐇𝐞𝐥𝐥𝐨",
 // circled letters) are read as the plain letters, and invisible characters used to split words
 // (zero-width space, soft hyphen, word joiner) are removed. The text shown to the user never
-// changes; folding applies to the copy Daylight Commons matches against.
+// changes; folding applies to the copy CMMNS matches against.
 
 const { TO_LATIN, TO_CYRILLIC, TO_GREEK } = M_confusables_data;
 
@@ -1050,7 +1050,7 @@ function flagsFor(account, context = {}) {
   if (Number.isFinite(account.followingCount) && Number.isFinite(account.followersCount) && account.followingCount >= 2000 && account.followersCount < 100) {
     out.push({ id: "follow-pattern", evidence: `follows ${account.followingCount.toLocaleString()} accounts; ${account.followersCount} follow back` });
   }
-  // Inferred: when the account posts (from threads Daylight Commons has seen) against where it is labelled.
+  // Inferred: when the account posts (from threads CMMNS has seen) against where it is labelled.
   const act = context.activity && context.activity.activeHours;
   const range = account.basedIn && REGION_OFFSETS[(parseLabel(account.basedIn) || {}).region];
   if (act && range && act.fit >= 0.8 && (act.utcOffset < range[0] - 2 || act.utcOffset > range[1] + 2)) {
@@ -1126,7 +1126,7 @@ return { NEW_ACCOUNT_DAYS, MANY_NAME_CHANGES, HIGH_VOLUME_PER_DAY, DEFAULT_HANDL
 
 // ---- lexicon.js
 const M_lexicon = (() => {
-// Daylight Commons' word lists, kept apart from the matching code so they can be reviewed and updated in
+// CMMNS' word lists, kept apart from the matching code so they can be reviewed and updated in
 // one place. Every list covers targets in every direction; tests/rhetoric.symmetry.test.js holds
 // the scoring to equal treatment. Sources for slurs and coded terms: the ADL Hate Symbols
 // database, Hatebase, GNET and ISD extremism glossaries; terms added for side recall on 2026-10-21 cite
@@ -2817,7 +2817,7 @@ const { COERCION_PATTERNS, coercionSkipped } = M_theories_coercion;
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
 const AP_QANON = S("AP, QAnon's 'Save the Children' morphs into popular slogan", "https://www.wsls.com/news/politics/2020/10/28/qanons-save-the-children-morphs-into-popular-slogan/", "2020-10-28");
-const NAMING = "People also name these theories to quote, mock or argue against them, and Daylight Commons skips obvious debunking.";
+const NAMING = "People also name these theories to quote, mock or argue against them, and CMMNS skips obvious debunking.";
 
 const THEORY_DOES_NOT_PROVE = `The post names this theory. ${NAMING} The rest of the post can still be true.`;
 
@@ -3352,7 +3352,7 @@ function langLine(code) {
   const r = MEASURED_LANGS[code];
   if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;
   if (r.n < MIN_N) return `Found by the ${name} word list. Not measured in ${name}: ${r.n} of these signs in labelled text.`;
-  return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of the strong signs Daylight Commons found were on text people labelled ` +
+  return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of the strong signs CMMNS found were on text people labelled ` +
     `hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
 }
 
@@ -4347,7 +4347,7 @@ const M_framing = (() => {
 // thematic coverage leads them to hold society or government responsible. The operational split
 // follows the narrative-frame part of the codebook of Mendelsohn, Budak and Jurgens, "Modeling
 // Framing in Immigration Discourse on Social Media" (NAACL 2021), which codes a post episodic when
-// it centres a specific person or event and thematic when it gives broader context. Daylight Commons cites
+// it centres a specific person or event and thematic when it gives broader context. CMMNS cites
 // that codebook and copies none of its text.
 //
 // A cue names no group, person, party, side or issue: the same sentence reads alike whatever it is
@@ -4622,7 +4622,7 @@ return { parseJoined, parseNameChanges, parseAbout };
 // ---- meta.js
 const M_meta = (() => {
 // Account context Meta shows the viewer on Facebook and Instagram, read from the text the site
-// renders when the viewer opens it. Daylight Commons makes no request of its own for it.
+// renders when the viewer opens it. CMMNS makes no request of its own for it.
 // - Instagram: "About this account" (profile menu): date joined, "Account based in", former
 //   usernames, verified. Layout checked live 2026-10-21: each label on its own line, then its value.
 // - Facebook: "Page transparency" on a Page: creation date, name changes, and the countries of the
@@ -4731,7 +4731,7 @@ return { parseFullDate, igAbout, pageTransparency, fbKey, fbProfile };
 const M_bsky = (() => {
 // Bluesky account and post data from the responses the Bluesky web app already loaded for the
 // page (app.bsky.unspecced.getPostThreadV2, app.bsky.feed.getPostThread, getProfile(s), feeds),
-// passed on by src/ext/bskysniff.js. Daylight Commons makes no request of its own. Field names follow the
+// passed on by src/ext/bskysniff.js. CMMNS makes no request of its own. Field names follow the
 // public AT Protocol lexicons (app.bsky.actor.defs#profileViewBasic, app.bsky.feed.defs#postView).
 
 function walk(json, visit, limit = 200000) {
@@ -4789,7 +4789,7 @@ return { bskyAuthors, bskyPosts };
 // ---- fedi.js
 const M_fedi = (() => {
 // Mastodon and TikTok data from the responses each site's own web app already loaded, passed on by
-// src/ext/fedisniff.js. Daylight Commons makes no request of its own. Field names follow Mastodon's public REST
+// src/ext/fedisniff.js. CMMNS makes no request of its own. Field names follow Mastodon's public REST
 // API (Account and Status entities) and the comment list TikTok's web app requests.
 
 function walk(json, visit, limit = 200000) {
@@ -4852,7 +4852,7 @@ function mastodonProbe(p) {
   return version ? { version, domain } : null;
 }
 
-// The origin pattern Daylight Commons asks permission for, from a tab's URL; null for anything but https.
+// The origin pattern CMMNS asks permission for, from a tab's URL; null for anything but https.
 function instanceOrigin(url) {
   let u;
   try { u = new URL(url); } catch (_) { return null; }
@@ -4884,7 +4884,7 @@ const M_owners = (() => {
 // so nothing about what the user reads leaves the browser.
 //
 // What this does not show: who funds an individual creator. Sponsors, investors and donors are
-// mostly undisclosed; Daylight Commons shows them only where a platform labels it on the page (ad, paid
+// mostly undisclosed; CMMNS shows them only where a platform labels it on the page (ad, paid
 // partnership) or a public record is in the table.
 
 let BY_DOMAIN = new Map(), BY_HANDLE = new Map();
@@ -4892,8 +4892,8 @@ let BY_DOMAIN = new Map(), BY_HANDLE = new Map();
 // A row corrected by data/owner-corrections.json (scripts/owner-corrections.mjs) carries
 // `correction`: { source, checked, reason, upstream, factsWrong? }. The window says so, with the
 // correction's own source, instead of crediting Wikidata.
-const ownerSourceShort = (o) => (o && o.correction ? `Daylight Commons correction, checked ${o.correction.checked}` : "Wikidata");
-const ownerSource = (o) => (o && o.correction ? `Daylight Commons correction, checked ${o.correction.checked}: ${o.correction.source}. Wikidata said "${o.correction.upstream.owner}". ${o.correction.reason}`
+const ownerSourceShort = (o) => (o && o.correction ? `CMMNS correction, checked ${o.correction.checked}` : "Wikidata");
+const ownerSource = (o) => (o && o.correction ? `CMMNS correction, checked ${o.correction.checked}: ${o.correction.source}. Wikidata said "${o.correction.upstream.owner}". ${o.correction.reason}`
   : `Wikidata${o && o.source ? `: ${o.source}` : ""}`);
 
 // rows: [{ name, domain, owner, source, x? }]
@@ -4927,7 +4927,7 @@ return { ownerSourceShort, ownerSource, setOwnerRows, ownerOfDomain, ownerOfHand
 // ---- xdata.js
 const M_xdata = (() => {
 // Reads account metadata out of the data X's own web app has already downloaded for the page (its
-// GraphQL responses). Daylight Commons makes no request of its own for this: src/ext/sniff.js passes copies of
+// GraphQL responses). CMMNS makes no request of its own for this: src/ext/sniff.js passes copies of
 // X's responses to the content script, and this module walks them for User objects.
 // X has moved fields between `legacy` and `core` over time, so both places are read. Since the
 // live check of 2026-10-22, User objects in X's web responses carry no `legacy` block at all: the
@@ -4948,7 +4948,7 @@ const pick = (...vals) => vals.find((v) => v !== undefined && v !== null && v !=
 const n = (v) => (Number.isFinite(v) ? v : null);
 const pickN = (...vals) => { for (const v of vals) if (Number.isFinite(v)) return v; return null; };
 
-// One X User object -> Daylight Commons' reading (only the fields that are present).
+// One X User object -> CMMNS' reading (only the fields that are present).
 function userReading(u) {
   const L = u.legacy || {}, C = u.core || {}, A = u.about_profile || {};
   const RC = u.relationship_counts || {}, TC = u.tweet_counts || {}, AC = u.action_counts || {};
@@ -4975,7 +4975,7 @@ function userReading(u) {
     mediaCount: pickN(TC.media_tweets, L.media_count),
     withheldIn: Array.isArray(L.withheld_in_countries) && L.withheld_in_countries.length ? L.withheld_in_countries.join(", ") : null,
     // X's own disclosures about how the account operates. Payment and tip-jar handles are left
-    // out on purpose: they identify people, and Daylight Commons describes accounts.
+    // out on purpose: they identify people, and CMMNS describes accounts.
     identityVerified: ((u.verification_info || {}).is_identity_verified === true) ? true : null,
     verifiedReason: pick((((((u.verification_info || {}).reason || {}).description) || {}).text)),
     professionalType: pick((u.professional || {}).professional_type),
@@ -4993,7 +4993,7 @@ function userReading(u) {
   return Object.fromEntries(Object.entries(r).filter(([, v]) => v !== null && v !== undefined));
 }
 
-// The "About this account" block anywhere in a response (X's AboutAccountQuery), as Daylight Commons'
+// The "About this account" block anywhere in a response (X's AboutAccountQuery), as CMMNS'
 // fields, or null. location_accurate false means X suspects a VPN or proxy.
 function aboutIn(json) {
   const stack = [json];
@@ -5242,9 +5242,9 @@ return { threadKey };
 
 // ---- network.js
 const M_network = (() => {
-// Connections and activity across the threads the user has viewed. Daylight Commons keeps a small local log
+// Connections and activity across the threads the user has viewed. CMMNS keeps a small local log
 // (chrome.storage.local, this browser only): which accounts replied in which thread, and how many
-// seconds after the original post. From it Daylight Commons shows, per account, how often it turns up, which
+// seconds after the original post. From it CMMNS shows, per account, how often it turns up, which
 // accounts it keeps turning up alongside, and how fast it replies; per thread, groups of accounts
 // that have appeared together before. Entries older than RETAIN_DAYS are dropped; the user can
 // clear the log. Nothing is linked across platforms.
@@ -5318,7 +5318,7 @@ function returningGroups(log, threadKey, handles, min = 2) {
   return pairs.sort((x, y) => y.n - x.n).slice(0, 10);
 }
 
-// Inferred from posting times Daylight Commons has seen: the UTC offset whose waking day (08:00 to 24:00 local)
+// Inferred from posting times CMMNS has seen: the UTC offset whose waking day (08:00 to 24:00 local)
 // holds the most posts. Needs MIN_POSTS posts over MIN_DAYS days; otherwise null. This is an
 // inference about when the account is operated, not where anyone lives: shift workers, night
 // owls, schedulers and teams across time zones all break it.
@@ -5381,7 +5381,7 @@ return { RETAIN_DAYS, recordThread, activity, returningGroups, MIN_POSTS, active
 const M_ytdata = (() => {
 // Reads metadata out of the data YouTube's own web app has already downloaded for the page
 // (ytInitialData, ytInitialPlayerResponse and its /youtubei/v1 responses), passed on by
-// src/ext/ytsniff.js. Daylight Commons makes no request of its own. YouTube renames these structures often,
+// src/ext/ytsniff.js. CMMNS makes no request of its own. YouTube renames these structures often,
 // so every field is optional and the walkers look for both the old and new comment shapes.
 
 const txt = (v) => (!v ? null : typeof v === "string" ? v : v.simpleText || v.content || (Array.isArray(v.runs) ? v.runs.map((r) => r.text).join("") : null));
@@ -5678,7 +5678,7 @@ return { BASELINE_SOURCE, baselineFor, baselineLine, pairsLine };
 const M_pace = (() => {
 // Pacing for automatic About lookups, from X's own rate-limit headers.
 // x-rate-limit-remaining and x-rate-limit-reset (epoch seconds) come back on every GraphQL
-// response. Daylight Commons spreads what is left over the window and stops RESERVE requests short, so the
+// response. CMMNS spreads what is left over the window and stops RESERVE requests short, so the
 // viewer's own use of X is never the thing that gets limited. Without headers it keeps its base gap.
 
 const BASE_GAP_MS = 1500;
@@ -5750,7 +5750,7 @@ const M_state = (() => {
 //   state-owned       the outlet's ownership chain on Wikidata ends at a government or state body
 //   named-in-report   a platform or government report named the domain or account in an influence
 //                     operation it took down or attributed (each row cites the report)
-// The same rule applies to every country. Daylight Commons does not attribute a reply, an account or a
+// The same rule applies to every country. CMMNS does not attribute a reply, an account or a
 // narrative to a state from what it says or how it behaves: that would be a guess presented as a
 // finding. It shows a link or an account that a cited source ties to a state, and nothing more.
 
@@ -5941,7 +5941,7 @@ function setBackingTable(table) {
   }
 }
 
-// Daylight Commons' site ids are the platform names the table uses ("fixture" behaves as X).
+// CMMNS' site ids are the platform names the table uses ("fixture" behaves as X).
 const PLATFORM_OF = { fixture: "x" };
 const backingOf = (site, handle) => BY_HANDLE.get(key(PLATFORM_OF[site] || site, handle)) || null;
 const backingOfChannel = (id) => (id && BY_CHANNEL.get(id)) || null;
@@ -5957,7 +5957,7 @@ const sourceCount = (p) => new Set((p.rows || []).flatMap((r) => r.sources.map((
 const backingLabel = (p) => { const n = sourceCount(p); return `Backing on record: ${n} source${n === 1 ? "" : "s"}`; };
 
 const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person, each row dated when it was read. Allegations in court records are claims, and records go out of date.";
-const CORRECTIONS_PATH = "https://github.com/HarperZ9/daylight-commons/blob/dev/data/owner-corrections.json";
+const CORRECTIONS_PATH = "https://github.com/HarperZ9/cmmns/blob/dev/data/owner-corrections.json";
 
 const STATUS_WORDS = { documented: "documented in a primary record", reported: "reported by the press", alleged: "alleged, not proven" };
 const quoteLine = (s) => `${s.publisher}${s.date ? ` (${s.date})` : ""}, read ${s.read}: "${s.quote}"`;
@@ -5987,7 +5987,7 @@ const M_cloned = (() => {
 // News Sites, T0097.202 News Outlet Persona). A post that names a real outlet ("The Washington Post
 // reports...") while its link goes to a look-alike address borrows the outlet's trust twice: in
 // the words and in the address. Doppelganger posts did this with copied outlets on addresses such as
-// washingtonpost.pm. Daylight Commons joins two checks it already has: the look-alike address (lookalike.js)
+// washingtonpost.pm. CMMNS joins two checks it already has: the look-alike address (lookalike.js)
 // and the published reports that named the address (ops.js). Wording that names the outlet is the
 // only new part, and it is matched on the outlet's own name, never on a topic or side.
 
@@ -6031,7 +6031,7 @@ const M_trail = (() => {
 // Source trails: where a post's material came from, and how it spread across the posts the user has
 // viewed. Downstream copies point upstream through data X itself records: a quote points to the
 // quoted post, lifted media points to the post it came from, a media id stays the same wherever
-// that exact upload is reposted, and a link's real address survives X's t.co shortener. Daylight Commons
+// that exact upload is reposted, and a link's real address survives X's t.co shortener. CMMNS
 // follows those pointers back. It never guesses a source from wording or behaviour, and it cannot
 // see past the first upload (who filmed it, who paid for it).
 
@@ -6119,9 +6119,9 @@ function upstream(items, tweets, log) {
   return { accounts: rank(acc).map((x) => ({ handle: x.k, n: x.n })), domains: rank(dom).map((x) => ({ domain: x.k, n: x.n })), uploads, recycled };
 }
 
-// "First seen" for each piece of media on a post: the earliest post Daylight Commons has seen carrying the same
+// "First seen" for each piece of media on a post: the earliest post CMMNS has seen carrying the same
 // upload (same media id, so the same file X stores), and the post X credits it to ("From @account").
-// The earliest of the two leads. Daylight Commons sees only what the user viewed; X's upload time comes from
+// The earliest of the two leads. CMMNS sees only what the user viewed; X's upload time comes from
 // the media id. [{ type, uploaded, from, seen, first }], where first is { handle, at, id, how }.
 function firstSeen(t, tweets, log) {
   const table = (log && log.media) || {};
@@ -6145,7 +6145,7 @@ const M_crosslang = (() => {
 // different languages from different accounts. RAND's "firehose" model and Rauch's account of
 // flooding both describe one claim pushed through many channels at once; a campaign that reaches
 // several language communities with the same material leaves this trace (project-docs/TECHNIQUES.md).
-// Daylight Commons matches the material, never the wording: a translation of a claim matches only when a
+// CMMNS matches the material, never the wording: a translation of a claim matches only when a
 // fact-checker reviewed the claim and both posts match that review. Language comes from the
 // platform's own code (X's "lang"); without one, a distinct writing system stands in, and Latin
 // text without a code counts as unknown. The rule is the same for every language and account.
@@ -6255,7 +6255,7 @@ return { MIN_ACCOUNTS, CROSS_DOES_NOT_PROVE, scriptOf, langOf, crossLanguage, ac
 const M_flooding = (() => {
 // The flooding sign. RAND's "firehose of falsehood" (Paul and Matthews 2016) names high volume
 // across many channels and rapid, continuous repetition; Rauch calls the aim "flooding the zone"
-// so that people stop believing anything (project-docs/TECHNIQUES.md). In one thread Daylight Commons can see
+// so that people stop believing anything (project-docs/TECHNIQUES.md). In one thread CMMNS can see
 // two traces of it: several accounts posting at very high rates carry a large share of the
 // replies (volume), or a timing burst (src/core/timing.js) is made of such accounts (speed).
 // The rate is the account's own post count over its age, the same figure as the "very high post
@@ -6313,7 +6313,7 @@ return { FLOOD_MIN_ACCOUNTS, FLOOD_DOES_NOT_PROVE, ratePerDay, floodSign };
 // ---- swarming.js
 const M_swarming = (() => {
 // The swarming sign (project-docs/TECHNIQUES.md, technique 7; DISARM T0049.005 Conduct Swarming and
-// T0048 Harass). Rauch describes trolling as a pile-on that manufactures a crowd. In one thread Daylight Commons
+// T0048 Harass). Rauch describes trolling as a pile-on that manufactures a crowd. In one thread CMMNS
 // can see one trace of it: many new or flagged accounts converging on one post within minutes.
 // The sign is about the thread, never about an account: it carries counts only, no handles, so it
 // cannot become a list to pile on in turn (DESIGN-MAP R12). Thresholds were set on the dev half of
@@ -6326,7 +6326,7 @@ const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN_KNOWN 
 const SWARM_DOES_NOT_PROVE = "This describes how the replies arrived. A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once on its own.";
 
 // rows: [{ author, posted, timePrecision? }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
-// null when Daylight Commons has not read the account. precision: the thread's timePrecision. Returns null or
+// null when CMMNS has not read the account. precision: the thread's timePrecision. Returns null or
 // { from, to, accounts, known, marked, newAccounts, flagged, windowSec } for the densest window.
 function swarmSign(rows, markOf, { windowSec = SWARM_WINDOW_SEC, precision } = {}) {
   if (!observable(timePrecision(rows, precision).precision, "swarming")) return null;
@@ -6598,7 +6598,7 @@ let provider = null;
 function setPromoTemplateProvider(fn) { provider = typeof fn === "function" ? fn : null; }
 function promoCues(text) {
   if (provider) {
-    try { return provider(text).cues || []; } catch (e) { console.error("[daylight-commons] promo-template provider failed; using the local list", e); }
+    try { return provider(text).cues || []; } catch (e) { console.error("[cmmns] promo-template provider failed; using the local list", e); }
   }
   return localProvider(text).cues;
 }
@@ -6955,7 +6955,7 @@ const CAMPAIGN_PLATFORMS = {
   },
   instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, which leaves the shape unread." },
   tiktok: { status: "not defined", notes: "Not defined yet." },
-  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons runs on other sites for now." },
+  linkedin: { status: "not defined", notes: "Engagement pods. CMMNS runs on other sites for now." },
 };
 
 function campaignPlatform(id) {
@@ -6992,7 +6992,7 @@ const CAMPAIGN_LEADS = {
   thin: "Too few accounts loaded to read. Open the post's reposts or quotes to load more.",
   undefined: "The campaign lens for this site is still to come.",
 };
-const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/daylight-commons/issues. Corrections are made in the open.";
+const CAMPAIGN_DISPUTE = "Think this is wrong? Report it at https://github.com/HarperZ9/cmmns/issues. Corrections are made in the open.";
 
 // The accusation ladder (project-docs/CAMPAIGN-LENS.md, "Accusation ladder"). Only an account the
 // platform itself discloses as an organisation (X's gold Business or grey Government checkmark, or
@@ -7052,7 +7052,7 @@ function sampleRows(s) {
     "default-avatar": (x) => `Context: ${x.n} of ${x.of} accounts use the default picture.`,
   };
   const row = (x) => ({ id: x.id, text: text[x.id](x), dnp: SAMPLE_DOES_NOT_PROVE[x.id] });
-  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "Daylight Commons reads what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
+  return { ind: s.indicators.map(row), ctx: [{ id: "sample", text: `Sample: ${s.n} accounts from the lists this page loaded, ${s.bios} with a bio.`, dnp: "CMMNS reads what the platform showed you, in the order it chose." }, ...s.context.map(row)] };
 }
 
 function quoteRows(q) {
@@ -7062,7 +7062,7 @@ function quoteRows(q) {
   if (q.disclosed) ctx.push({ id: "disclosed-paid", text: `${q.disclosed} of ${q.n} quotes carry X's Paid partnership label. Disclosed promotion is the honest path.`, dnp: "The label is the poster's own disclosure; who paid and how much stay off the page." });
   // Any launch with five quotes has a narrowest window; only a tight one is coordination context.
   if (q.bunch.kWindowMs != null) ctx.push({ id: q.bunch.kWindowMs <= BUNCH_TIGHT_MS ? "quote-bunching" : "quote-timing", text: `${q.bunch.k} quotes within ${mins(q.bunch.kWindowMs)}; busiest hour ${q.bunch.hourMax} of ${q.n}.`, dnp: QUOTES_DOES_NOT_PROVE });
-  for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "Daylight Commons' local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
+  for (const c of q.cues.slice(0, 2)) ctx.push({ id: "promo-cue", text: `${c.n} quotes use the "${c.id}" phrasing (${c.source === "radar-local" ? "CMMNS' local list" : c.source}).`, dnp: QUOTES_DOES_NOT_PROVE });
   return { ind, ctx };
 }
 
@@ -7159,7 +7159,7 @@ const M_evidence_github = (() => {
 // date and star count from the public repository endpoint, and star bursts from the stargazers
 // list with timestamps. Checked 2026-10-22: the repository endpoint answers without a login; the
 // stargazers list answers 401 "Requires authentication", so star timestamps need the user's own
-// GitHub token, which Daylight Commons keeps on this device and sends only to api.github.com.
+// GitHub token, which CMMNS keeps on this device and sends only to api.github.com.
 
 const GITHUB_API = "https://api.github.com";
 const STAR_MAX_PAGES = 10, STAR_PER_PAGE = 100;
@@ -7179,7 +7179,7 @@ function reposIn(textOrLinks) {
   return [...out.values()];
 }
 
-// The repository endpoint's JSON -> the facts Daylight Commons keeps.
+// The repository endpoint's JSON -> the facts CMMNS keeps.
 function repoFacts(json) {
   if (!json || !json.full_name) return null;
   return { repo: json.full_name, created: json.created_at || null, pushed: json.pushed_at || null, stars: Number.isFinite(json.stargazers_count) ? json.stargazers_count : null, forks: Number.isFinite(json.forks_count) ? json.forks_count : null };
@@ -7284,9 +7284,9 @@ return { RDAP_BASE, CDX_BASE, DOMAIN_DOES_NOT_PROVE, WAYBACK_DOES_NOT_PROVE, HOS
 
 // ---- evidence-ads.js
 const M_evidence_ads = (() => {
-// Ad transparency libraries for the evidence layer (project-docs/EVIDENCE-LAYER.md). Daylight Commons fetches
+// Ad transparency libraries for the evidence layer (project-docs/EVIDENCE-LAYER.md). CMMNS fetches
 // none of them: each needs a login, an approved key, or has no public API, and their terms limit
-// automated access. Daylight Commons builds a search link the user opens in a tab of their own, and says which
+// automated access. CMMNS builds a search link the user opens in a tab of their own, and says which
 // libraries offer an API and what it needs. Status checked 2026-10-22 (HTTP status of the search
 // page to a script, and each provider's API documentation).
 
@@ -7391,7 +7391,7 @@ async function getJson(fetchFn, url, headers = {}) {
     if (!r.ok) return { status: r.status };
     return { status: r.status, json: await r.json() };
   } catch (e) {
-    console.error("[daylight-commons] evidence lookup failed", url, e);
+    console.error("[cmmns] evidence lookup failed", url, e);
     return { status: "error" };
   } finally { if (timer) clearTimeout(timer); }
 }
@@ -7408,7 +7408,7 @@ async function github(fetchFn, { owner, repo }, token, postedAt) {
   const plan = starPages(facts.stars), times = [];
   for (const p of plan.pages) {
     const s = await getJson(fetchFn, `${base}/stargazers?per_page=100&page=${p}`, { Accept: "application/vnd.github.star+json", Authorization: `Bearer ${token}` });
-    if (!s.json) { notes.push(`GitHub stopped the star list at page ${p} (${s.status}); Daylight Commons does not retry around a limit.`); break; }
+    if (!s.json) { notes.push(`GitHub stopped the star list at page ${p} (${s.status}); CMMNS does not retry around a limit.`); break; }
     times.push(...starTimes(s.json));
   }
   const bursts = starBursts(times);
@@ -7546,7 +7546,7 @@ async function exportSeal(seal, { title = null, at = new Date().toISOString() } 
 
 // Offline check of an export: the seal, the head, the root and every proof.
 async function verifyExport(x) {
-  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Daylight Commons evidence chain"] };
+  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a CMMNS evidence chain"] };
   if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file lacks a seal or its proofs"] };
   const s = await verifySeal(x.seal), problems = [...s.problems];
   const hashes = x.seal.entries.map((e) => e.receipt.hash);
@@ -7561,7 +7561,7 @@ async function verifyExport(x) {
 // root, checks: [{ name, ok, text }], receipts: [{ kind, subject, source, at }], dnp }. Each line is
 // one property a reader can recheck by hand; the receipts list says what the chain holds.
 async function chainChecks(x) {
-  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, size: 0, root: null, checks: [{ name: "format", ok: false, text: "not a Daylight Commons evidence chain" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
+  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, size: 0, root: null, checks: [{ name: "format", ok: false, text: "not a CMMNS evidence chain" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const entries = (x.seal && Array.isArray(x.seal.entries)) ? x.seal.entries : null;
   if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file lacks a seal or its proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const n = entries.length, hashes = entries.map((e) => (e && e.receipt && e.receipt.hash) || "");
@@ -7593,16 +7593,16 @@ return { SEAL_FORMAT, SEAL_DOES_NOT_PROVE, merkleRoot, inclusionProof, verifyInc
 // ---- chain.js
 const M_chain = (() => {
 // The laundering chain: a post, the accounts and sites its material passed through, and the
-// earliest origin Daylight Commons can see. Laundering is what makes one source look like many independent
+// earliest origin CMMNS can see. Laundering is what makes one source look like many independent
 // ones (Rauch's "artificial copies"; DISARM T0128.004, Launder Information Assets). The chain uses
-// only pointers the platform records and Daylight Commons' own first-seen log (src/core/trail.js): a quote
+// only pointers the platform records and CMMNS' own first-seen log (src/core/trail.js): a quote
 // or repost points upstream, "media from" names the post the media came from, the same upload or
 // the same link seen earlier names an earlier sharer. It never infers a source from wording, and
 // it stops where the platform's pointers stop.
 
 const { trailFor, firstSeen, normLink } = M_trail;
 
-const CHAIN_DOES_NOT_PROVE = "The chain starts at the first upload or link Daylight Commons has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.";
+const CHAIN_DOES_NOT_PROVE = "The chain starts at the first upload or link CMMNS has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.";
 
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return null; } };
 const hours = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 360000) / 10;
@@ -7752,8 +7752,8 @@ return { HISTORY_RETAIN_DAYS, snapshot, addSnapshot, summarize, HISTORY_DOES_NOT
 // ---- claims.js
 const M_claims = (() => {
 // Fact-checked claims. A post is matched to a claim a fact-checker has already reviewed, from a
-// table bundled with Daylight Commons (src/ext/claims.json, built by scripts/claims-build.mjs from the Data
-// Commons ClaimReview feed). Daylight Commons shows the fact-checker's rating in the fact-checker's own
+// table bundled with CMMNS (src/ext/claims.json, built by scripts/claims-build.mjs from the Data
+// Commons ClaimReview feed). CMMNS shows the fact-checker's rating in the fact-checker's own
 // words, with a link. It never rates a post itself.
 //
 // Matching is on content words (function words in six languages removed, a light stemmer), each
@@ -8437,7 +8437,7 @@ const M_c2pa_verify = (() => {
 // Checks a C2PA manifest without a network call: the claim signature (COSE_Sign1 over the claim,
 // with the key in the signer's certificate), the hash of every assertion the claim lists, and the
 // hard binding that ties the claim to the file's bytes (c2pa.hash.data, or c2pa.hash.bmff for MP4).
-// Each check is { ok: true | false | null, text }: null means Daylight Commons could not check it here.
+// Each check is { ok: true | false | null, text }: null means CMMNS could not check it here.
 // Not checked here: whether the certificate chains to a trusted issuer, revocation, and the
 // time-stamp authority's signature.
 
@@ -8524,7 +8524,7 @@ async function verifyWith([name, hash, salt], cert, sig, tbs) {
 
 // c2pa.hash.data: the file's bytes outside the exclusion ranges.
 async function checkDataHash(file, a, complete) {
-  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
+  if (!complete) return { ok: null, text: "CMMNS read part of the file, so the byte comparison was skipped" };
   const parts = [];
   let p = 0;
   for (const e of [...(a.exclusions || [])].sort((x, y) => x.start - y.start)) {
@@ -8583,10 +8583,10 @@ function exclusionRanges(file, rules) {
 // c2pa.hash.bmff: the file without its excluded boxes; v2 and later put the 8-byte offset of each
 // top-level box that is hashed before it.
 async function checkBmffHash(file, a, label, complete) {
-  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
+  if (!complete) return { ok: null, text: "CMMNS read part of the file, so the byte comparison was skipped" };
   const rules = a.exclusions || [];
   if (!a.hash || a.merkle || rules.some((r) => !/^(\/[\w ]{4})+$/.test(r.xpath || ""))) {
-    return { ok: null, text: "this video uses a hash layout Daylight Commons skips for now (fragments or partial exclusions)" };
+    return { ok: null, text: "this video uses a hash layout CMMNS skips for now (fragments or partial exclusions)" };
   }
   const withOffsets = /\.v[2-9]$/.test(label), ex = exclusionRanges(file, rules);
   const top = new Set(ex.filter((e) => e[2] === 0 && e[3]).map((e) => e[0]));
@@ -8609,7 +8609,7 @@ return { resolveUri, checkAssertions, checkSignature, checkDataHash, checkBmffHa
 // ---- c2pa.js
 const M_c2pa = (() => {
 // Reads Content Credentials (C2PA 2.x manifests) from a media file's bytes and says what they claim
-// and which parts Daylight Commons could check. It never calls a file authentic: a valid credential shows who
+// and which parts CMMNS could check. It never calls a file authentic: a valid credential shows who
 // signed a claim and that the file has not changed since, not that the claim is true. A missing
 // credential is the common case, because most platforms strip metadata on upload.
 
@@ -8618,7 +8618,7 @@ const { findManifestStore, parseStore, childByLabel } = M_jumbf;
 const { checkAssertions, checkSignature, checkDataHash, checkBmffHash } = M_c2pa_verify;
 const { sourceType, aiMetadata } = M_aimeta;
 
-const OLDER_FORMAT = "could not fully verify (older manifest format): Daylight Commons still needs a test against the reference checker on version 1 manifests in video";
+const OLDER_FORMAT = "could not fully verify (older manifest format): CMMNS still needs a test against the reference checker on version 1 manifests in video";
 const content = (box) => (box && box.content && box.content[0]) || null;
 function decodeBox(box) { const c = content(box); if (!c) return null; try { return c.type === "json" ? JSON.parse(new TextDecoder().decode(c.data)) : cborDecode(c.data); } catch { return null; } }
 const assertionsOf = (m) => (childByLabel(m, "c2pa.assertions") || {}).content || [];
@@ -8666,7 +8666,7 @@ async function binding(file, m, complete, store, ranges, depth = 0) {
     const label = base(a.label), v = decodeBox(a);
     if (label === "c2pa.hash.data" && v) return checkDataHash(file, v, complete);
     if (/^c2pa\.hash\.bmff/.test(label) && v) return checkBmffHash(file, v, label, complete);
-    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is on Daylight Commons' list to check later` };
+    if (/^c2pa\.hash\./.test(label)) return { ok: null, text: `binding type ${label} is on CMMNS' list to check later` };
   }
   return { ok: false, text: "the manifest lacks a hard binding to the file's bytes" };
 }
@@ -8712,7 +8712,7 @@ async function readCredentials(bytes, { complete = true } = {}) {
   };
 }
 
-// The overall state, in words Daylight Commons can stand behind: "unchanged", "changed", "unchecked", "remote" or "none".
+// The overall state, in words CMMNS can stand behind: "unchanged", "changed", "unchecked", "remote" or "none".
 function credentialState(r) {
   if (r && !r.found && r.remote) return "remote";
   if (!r || !r.found) return "none";
@@ -8755,7 +8755,7 @@ function credentialRows(r) {
   if (r.error) return [["Content Credentials", r.error]];
   const rows = [], state = credentialState(r);
   if (state === "none") rows.push(["Content Credentials", NO_CREDENTIALS]);
-  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}, which Daylight Commons leaves unfetched.`]);
+  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}, which CMMNS leaves unfetched.`]);
   else if (r.broken) rows.push(["Content Credentials", `found, but ${r.broken}`]);
   else {
     rows.push(["Content Credentials", state === "unchanged" ? "found and checked: the file is unchanged since it was signed"
@@ -8783,15 +8783,15 @@ function credentialSignals(r) {
   if (!r || r.error) return [];
   const out = [], state = credentialState(r);
   if (r.found && r.aiAnywhere) {
-    out.push({ label: "credentials: made with AI", fam: "c2pa", level: "warn", cat: "media", rows: [["What Daylight Commons read", r.active.ai ? `The file's Content Credentials say it was ${made(r)}.` : "The credentials say an earlier version of this file was made with generative AI."], ["Signed by", who(r.active.cert && r.active.cert.subject)], ["Checks", state === "unchanged" ? "signature, assertions and file bytes all match" : state], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+    out.push({ label: "credentials: made with AI", fam: "c2pa", level: "warn", cat: "media", rows: [["What CMMNS read", r.active.ai ? `The file's Content Credentials say it was ${made(r)}.` : "The credentials say an earlier version of this file was made with generative AI."], ["Signed by", who(r.active.cert && r.active.cert.subject)], ["Checks", state === "unchanged" ? "signature, assertions and file bytes all match" : state], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   } else if (r.found && state === "unchanged") {
     const m = made(r);
-    out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What Daylight Commons read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+    out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What CMMNS read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   }
-  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Daylight Commons found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms also break credentials in ordinary use.")] });
+  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What CMMNS found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms also break credentials in ordinary use.")] });
   const ai = ((r.meta && r.meta.sourceTypes) || []).find((t) => t.kind === "ai");
   if (ai || ((r.meta && r.meta.generators) || []).length) {
-    out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What Daylight Commons read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
+    out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What CMMNS read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
   }
   return out;
 }
@@ -8801,10 +8801,10 @@ return { CREDENTIALS_DO_NOT_PROVE, NO_CREDENTIALS, credentialRows, credentialSig
 
 // ---- survival.js
 const M_survival = (() => {
-// Content Credentials survival: of the media files Daylight Commons checked (on the user's click), how many
+// Content Credentials survival: of the media files CMMNS checked (on the user's click), how many
 // still carried intact credentials, per platform. Platforms often strip credentials on upload; a
 // count of what survived tells the user how much the credentials check can do on each site.
-// Daylight Commons keeps one entry per file: a short hash of its address (not the address), the site, the
+// CMMNS keeps one entry per file: a short hash of its address (not the address), the site, the
 // outcome and the time, in chrome.storage.local ("pb.media.v1"), pruned with the history setting.
 
 const { credentialState } = M_c2pa;
@@ -8814,7 +8814,7 @@ const MEDIA_KEY = "pb.media.v1", MAX_MEDIA = 5000;
 
 // The outcome of one check: intact (found and every check passed), partial (found, not every part
 // could be checked), changed, remote (the file points to credentials online), none, or null for a
-// file Daylight Commons could not read, which counts nowhere.
+// file CMMNS could not read, which counts nowhere.
 function outcomeOf(result) {
   if (!result || result.error) return null;
   return { unchanged: "intact", unchecked: "partial", changed: "changed", remote: "remote", none: "none" }[credentialState(result)] || null;
@@ -9132,14 +9132,14 @@ function dayAdd(m, at, v) {
   e.posts += v.posts; e.strong += v.strong || 0; e.strongN += v.strongN; e.threads += v.threads || 0; e.feedPosts += v.feedPosts || 0;
 }
 
-const FEED_DOES_NOT_SHOW = "These counts cover the posts and threads you opened with Daylight Commons on, in the order each platform chose to show them: your own feed, one view of each platform. A site's share says how often it was linked. A strong-rhetoric sign is about wording.";
+const FEED_DOES_NOT_SHOW = "These counts cover the posts and threads you opened with CMMNS on, in the order each platform chose to show them: your own feed, one view of each platform. A site's share says how often it was linked. A strong-rhetoric sign is about wording.";
 
 return { FEED_RETAIN_DAYS, addFeedPosts, threadContext, feedDashboard, FEED_DOES_NOT_SHOW };
 })();
 
 // ---- sig.js
 const M_sig = (() => {
-// The one copy of Daylight Commons' hashing and signing primitives, shared by sealed evidence cards
+// The one copy of CMMNS' hashing and signing primitives, shared by sealed evidence cards
 // (evidence.js), signed evidence bundles (evidence-bundle.js) and signed data packs (packs.js).
 // WebCrypto only, so the same code runs in Chrome, Firefox and node with no dependency.
 //   canonicalJSON: sorted keys at every level, no spacing, undefined object fields dropped and
@@ -9285,10 +9285,10 @@ function dedupe(claims) { const seen = new Set(); return claims.filter((c) => c 
 function sourcesOf(card, input) {
   const day = String(input.savedAt || "").slice(0, 10);
   return [
-    `Replies and posts as ${card.thread.site} showed them to this viewer on ${day}, read by Daylight Commons in this browser.`,
-    "Account flags: what each platform discloses on profiles and About pages, read by Daylight Commons in this browser. Rules and measured error rates: Daylight Commons' EVALUATION.md.",
+    `Replies and posts as ${card.thread.site} showed them to this viewer on ${day}, read by CMMNS in this browser.`,
+    "Account flags: what each platform discloses on profiles and About pages, read by CMMNS in this browser. Rules and measured error rates: CMMNS' EVALUATION.md.",
     card.claims.length ? CLAIM_ATTRIBUTION : null,
-    card.sites.some((s) => s.owner) ? "Outlet owners: Daylight Commons' ownership table, built from Wikidata; each row links its Wikidata item." : null,
+    card.sites.some((s) => s.owner) ? "Outlet owners: CMMNS' ownership table, built from Wikidata; each row links its Wikidata item." : null,
     card.sites.some((s) => s.state.length) ? "State links: Wikidata ownership chains, and the platform or government reports each link cites." : null,
     "Media: whether an upload was first posted by another account, from the posts this viewer's page loaded.",
     card.media.credentials ? "Content Credentials: C2PA manifests read and checked in this browser from files the viewer chose to check." : null,
@@ -9328,7 +9328,7 @@ const pc = (x) => `${Math.round(x * 100)}%`;
 function cardLines(card) {
   const R = card.report, L = [];
   const push = (kind, text) => { if (text) L.push({ kind, text }); };
-  push("title", "Daylight Commons thread card");
+  push("title", "CMMNS thread card");
   push("meta", `${card.thread.site} thread · ${card.thread.page} · saved ${String(card.savedAt).slice(0, 16).replace("T", " ")} UTC`);
   push("head", "Thread report");
   push("body", R.sentence);
@@ -9361,7 +9361,7 @@ const M_hosts = (() => {
 // archives pages, it shortens links), with the same treatment for services of every country and
 // every direction.
 
-// Two-part public suffixes Daylight Commons meets in the feed and in links. Not the full Public Suffix List:
+// Two-part public suffixes CMMNS meets in the feed and in links. Not the full Public Suffix List:
 // a missing suffix files "x.co.zz" under "co.zz", which matches no table row and shows nothing.
 const SUFFIX2 = new Set(("co.uk org.uk gov.uk ac.uk me.uk com.au net.au org.au gov.au edu.au co.nz govt.nz org.nz co.in gov.in org.in net.in nic.in " +
   "co.jp or.jp ne.jp go.jp com.br gov.br org.br jus.br leg.br co.za gov.za org.za com.mx gob.mx org.mx com.ar gob.ar com.tr gov.tr org.tr " +
@@ -9507,7 +9507,7 @@ return { hostOf, siteKey, hostedKind, unwrapArchive, appearanceSite, reviewSites
 // ---- packs.js
 const M_packs = (() => {
 // Signed data packs (project-docs/DATA-SOVEREIGNTY.md). A pack is one JSON file: a manifest, the
-// content it adds (claims, operation indicators, site notes) or, for Daylight Commons' own bundled data, the
+// content it adds (claims, operation indicators, site notes) or, for CMMNS' own bundled data, the
 // SHA-256 of each bundled file, the signer's public key and an ECDSA P-256 signature over the
 // manifest. WebCrypto only, so the same code verifies in Chrome, Firefox and node with no
 // dependency. A valid signature says who signed the pack and that nothing changed since; it never
@@ -9580,7 +9580,7 @@ async function hashProblems(pack) {
   return out;
 }
 
-// A file pack (Daylight Commons' bundled data): readBytes(name) resolves to the file's bytes. Line ends are
+// A file pack (CMMNS' bundled data): readBytes(name) resolves to the file's bytes. Line ends are
 // hashed as LF (sig.js lfBytes), the same as data/LOCK.json and evidence bundles.
 async function verifyFiles(pack, readBytes) {
   const out = [];
@@ -9597,11 +9597,11 @@ return { PACK_FORMAT, PACK_DOES_NOT_PROVE, keyIdOf, keyFingerprint, generateKeyP
 
 // ---- packs-content.js
 const M_packs_content = (() => {
-// What a signed data pack (src/core/packs.js) may add, and how it joins Daylight Commons' own tables. Three
+// What a signed data pack (src/core/packs.js) may add, and how it joins CMMNS' own tables. Three
 // parts, each a list: claims (fact-checks: the claim, the rating in the checker's words, the
 // checker, the review URL), ops (a domain or account a cited document names as part of an
 // operation) and siteNotes (a sourced note about a site). Every row must cite an https source.
-// Pack rows are kept apart from Daylight Commons' own: each carries the pack's name, and operations from
+// Pack rows are kept apart from CMMNS' own: each carries the pack's name, and operations from
 // packs never enter the trend counts.
 
 // The same lists as src/core/ops-schema.js (tests/packs-content.test.js keeps them equal); that
@@ -9616,7 +9616,7 @@ const https = (v) => { try { return new URL(v).protocol === "https:"; } catch { 
 const day = (v) => v == null || /^\d{4}-\d{2}-\d{2}$/.test(v);
 const DOMAIN = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}$/;
 const HANDLE = /^\w{1,30}$/;
-// Daylight Commons shows no em dash anywhere a user reads (tests/canon.test.js); pack text is cleaned the same way.
+// CMMNS shows no em dash anywhere a user reads (tests/canon.test.js); pack text is cleaned the same way.
 const clean = (s) => String(s).replace(/\s*—\s*/g, " - ");
 
 function claimProblems(c) {
@@ -9686,7 +9686,7 @@ function mergePackClaims(table, packs = []) {
 }
 
 // ops.json ({ docs, ops, indicators }) with pack indicators added. Each pack operation gets its own
-// id ("pack:<key id>:<id>") and a `pack` field, so it never merges into one of Daylight Commons' operations.
+// id ("pack:<key id>:<id>") and a `pack` field, so it never merges into one of CMMNS' operations.
 function mergePackOps(table, packs = []) {
   const docs = [...((table && table.docs) || [])], ops = [...((table && table.ops) || [])], indicators = [...((table && table.indicators) || [])];
   const byId = new Map();
@@ -9727,12 +9727,12 @@ return { PACK_INDICATOR_KINDS, PACK_OPERATOR_TYPES, PACK_LIMITS, validatePackCon
 
 // ---- pack-keys.js
 const M_pack_keys = (() => {
-// The public half of Daylight Commons' project key, which signs the data that ships inside Daylight Commons
+// The public half of CMMNS' project key, which signs the data that ships inside CMMNS
 // (src/ext/radar-data.pack.json, scripts/pack.mjs bundled). The private half never enters this
 // repository (tests/no-private-keys.test.js). Anyone can check a download against this key id.
 const PROJECT_KEY = {
   keyId: "0e5e19840565840c977e0f036c9ac021",
-  label: "Daylight Commons project key",
+  label: "CMMNS project key",
   jwk: { kty: "EC", crv: "P-256", x: "0iyHwn2zRDoP7RfuuxvKGxhRYmAXiS7NelteWFPo8CM", y: "8n431mx6HCqh1hNM1xZmJeDX2ZPckhNUlIBezeKro_k" },
 };
 
@@ -9743,7 +9743,7 @@ return { PROJECT_KEY };
 const M_sites = (() => {
 // Site context for a link or the page being read: who owns the site, what kind of owner, when and
 // where it was founded, any state link, and the site's fact-check record. Every row names its
-// source. Daylight Commons adds no score or rating of its own.
+// source. CMMNS adds no score or rating of its own.
 //
 // The table (src/ext/sites.json, built by scripts/sites-build.mjs) has two parts:
 //   facts    from Wikidata (CC0): name, founding date, country, and the owner type Wikidata states
@@ -9820,7 +9820,7 @@ const typeSource = (info) => ((info.state || []).some((h) => h.basis !== "named-
 // One line per state link, in the source's own terms.
 const stateRows = (rows) => (rows || []).map((h) => ["State link", `${stateLabel(h).says} Source: ${h.source && h.source.title}${h.source && h.source.date ? ` (${h.source.date})` : ""}.`]);
 
-// The rows for one site, for Daylight Commons' window. info: { domain, owner, state, facts, record }.
+// The rows for one site, for CMMNS' window. info: { domain, owner, state, facts, record }.
 // opts.onList opens the full list of reviews.
 function siteInfoRows(info, opts = {}) {
   const { domain, owner, facts, record } = info;
@@ -9835,8 +9835,8 @@ function siteInfoRows(info, opts = {}) {
     ...stateRows(info.state),
     ...packNoteRows(info.notes),
   ];
-  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "Daylight Commons lacks a Wikidata entry for this site, so its owner, founding date and country stay blank." }]);
-  rows.push(["Fact-check record", recordLine(record) || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."]);
+  if (!owner && !facts && !(info.state || []).length) rows.push([null, { note: "CMMNS lacks a Wikidata entry for this site, so its owner, founding date and country stay blank." }]);
+  rows.push(["Fact-check record", recordLine(record) || "Zero reviews in CMMNS' table list this site as where a claim appeared."]);
   for (const r of (record && (record.latest || record.reviews.slice(0, 3))) || []) rows.push(["Review", `"${r.rating}": ${r.checker}, ${r.date || "date not given"}`]);
   if (record && record.n && opts.onList) rows.push(["Reviews", { action: [`Show all ${record.n.toLocaleString("en")}`, opts.onList, "Opened in a new tab"] }]);
   rows.push(["Source", SITE_SOURCES], ["What it shows", SITE_RECORD_DOES_NOT_PROVE]);
@@ -9844,7 +9844,7 @@ function siteInfoRows(info, opts = {}) {
 }
 
 // Notes from data packs the user imported and trusts (src/core/packs-content.js), each with its
-// pack's name and source, kept apart from Daylight Commons' own rows.
+// pack's name and source, kept apart from CMMNS' own rows.
 const PACK_NOTE_CAVEAT = "From a data pack you imported and trust, written and checked by its publisher.";
 function packNoteRows(notes) {
   if (!notes || !notes.length) return [];
@@ -9884,18 +9884,18 @@ return { setSiteTable, siteFacts, siteRecord, recordSummary, recordLine, SITE_RE
 // ---- outlets.js
 const M_outlets = (() => {
 // The suggested outlets for Other coverage: news organisations that publish their own feed, so
-// Daylight Commons can ask each publisher directly with no aggregator in between. The user turns each one on
-// or off and can add any RSS or Atom address. Daylight Commons requests a feed only on the user's click.
+// CMMNS can ask each publisher directly with no aggregator in between. The user turns each one on
+// or off and can add any RSS or Atom address. CMMNS requests a feed only on the user's click.
 //
 // How the list was chosen (project-docs/INDEPENDENCE.md has the full method and its limits):
 //   1. An original newsroom with general or world news in English.
 //   2. A public RSS or Atom feed at a stable https address on the outlet's own host that answered
 //      with entries and without a redirect when checked on 2026-10-21.
-//   3. The outlet's site is in Daylight Commons' bundled site tables (src/ext/sites.json), so the card can say
+//   3. The outlet's site is in CMMNS' bundled site tables (src/ext/sites.json), so the card can say
 //      what the tables state about its owner and owner type. Where they state no owner, it says so.
 //   4. Spread: several countries and every owner type the tables give, with the count of outlets
 //      across the range of published media-bias charts kept even by the maintainer at curation.
-//      No rating is stored here or shown anywhere: Daylight Commons labels outlets by owner type only.
+//      No rating is stored here or shown anywhere: CMMNS labels outlets by owner type only.
 // The order is alphabetical by id, so position in the list says nothing.
 
 // [id, name, feed address, site in the tables, country as the outlet states it]
@@ -9980,7 +9980,7 @@ return { FEED_OUTLETS, OUTLETS_CHECKED, MAX_CUSTOM_FEEDS, feedOrigin, cleanFeedU
 
 // ---- feeds.js
 const M_feeds = (() => {
-// A small reader for news feeds: RSS 2.0, RSS 1.0 (RDF) and Atom. Daylight Commons' background worker has no
+// A small reader for news feeds: RSS 2.0, RSS 1.0 (RDF) and Atom. CMMNS' background worker has no
 // DOMParser (Chrome's service workers do not offer one), so this reads the text itself. It takes
 // only what Other coverage needs from each entry: the title, the link, the date and a short
 // summary. Everything else in the feed is ignored. Nothing here touches the network.
@@ -10052,7 +10052,7 @@ function dateOf(block) {
 }
 
 // Feed text to { title, items: [{ title, link, published, summary }] }. kind is "rss", "atom" or
-// null when the text is not a feed Daylight Commons can read.
+// null when the text is not a feed CMMNS can read.
 function parseFeed(text) {
   const src = String(text || "").slice(0, FEED_MAX_BYTES).replace(/<!--[\s\S]*?-->/g, "");
   const kind = /<feed\b[^>]*>/i.test(src) && !/<rss\b|<rdf:RDF\b/i.test(src) ? "atom" : /<rss\b|<rdf:RDF\b|<channel\b/i.test(src) ? "rss" : null;
@@ -10079,7 +10079,7 @@ return { FEED_MAX_BYTES, FEED_MAX_ITEMS, plainText, safeLink, parseFeed };
 const M_feedfetch = (() => {
 // Requests for Other coverage, run by the background worker only on the user's click. Each request
 // goes to one feed address the user chose, with no cookies, no referrer, no added headers and no
-// body, and Daylight Commons does not follow a redirect to another address the user never allowed. The fetch
+// body, and CMMNS does not follow a redirect to another address the user never allowed. The fetch
 // and permission functions are passed in, so tests run without a network.
 
 const { parseFeed, FEED_MAX_BYTES } = M_feeds;
@@ -10155,19 +10155,19 @@ return { FEED_TIMEOUT_MS, FEED_CACHE_MS, FEED_REQUEST, fetchFeed, feedFetcher };
 const M_coverage = (() => {
 // "Other coverage": other outlets reporting the same story, read from each outlet's own feed. There
 // is no aggregator in between. The user picks the outlets (src/core/outlets.js) and may add any RSS
-// or Atom address; on the user's click, Daylight Commons' background worker requests each chosen feed from
+// or Atom address; on the user's click, CMMNS' background worker requests each chosen feed from
 // its publisher, and this module matches the article's title against the entries on this device.
-// Daylight Commons sends nothing from the page: not the title, not the address, not any post. Each publisher
+// CMMNS sends nothing from the page: not the title, not the address, not any post. Each publisher
 // sees a plain request for its own feed.
 //
 // Each outlet is labelled by its owner and owner type as the bundled site tables state them
-// (src/core/sites.js). Daylight Commons never labels an outlet by a left or right position.
+// (src/core/sites.js). CMMNS never labels an outlet by a left or right position.
 
 const { ownerType, OWNER_TYPES } = M_sites;
 const { siteKey, hostOf } = M_hosts;
 const { feedOrigin } = M_outlets;
 
-const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, Daylight Commons asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. Daylight Commons sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or Daylight Commons server is involved. Nothing is requested until you click.";
+const COVERAGE_PRIVACY = "Other coverage is off unless you turn it on. When it is on and you click \"Find other coverage\" on an article, CMMNS asks each outlet you chose for its public news feed, at the feed's own address, and compares the article's title with the feed's headlines on your device. CMMNS sends nothing from the page: not the title, not the page address, not your history, not any post. Each outlet receives an ordinary request for its feed, so it sees your IP address, the time and your browser's standard headers, and could guess you were reading news at that moment. No aggregator or CMMNS server is involved. Nothing is requested until you click.";
 
 const COVERAGE_DOES_NOT_PROVE = "A match shares words with the headline, so it can be a different event with similar words, and a story told in other words is missed. Each feed holds an outlet's latest entries, from the outlets you chose. Owner and owner type are what the site tables state.";
 
@@ -10247,11 +10247,11 @@ function coverageGroups(list) {
 }
 
 const FEED_ERRORS = Object.freeze({
-  "no-permission": "The browser blocked Daylight Commons from this feed's host.",
-  redirect: "The feed answered with a redirect to another address, which Daylight Commons leaves alone. Check the outlet's site for its current feed.",
+  "no-permission": "The browser blocked CMMNS from this feed's host.",
+  redirect: "The feed answered with a redirect to another address, which CMMNS leaves alone. Check the outlet's site for its current feed.",
   http: "The feed answered with an error.",
   "not-a-feed": "The answer was some other format than RSS or Atom.",
-  "too-large": "The feed was larger than Daylight Commons reads.",
+  "too-large": "The feed was larger than CMMNS reads.",
   timeout: "The feed took longer than 10 seconds to answer.",
   network: "The feed could not be reached.",
 });
@@ -10261,7 +10261,7 @@ return { COVERAGE_PRIVACY, COVERAGE_DOES_NOT_PROVE, titleWords, bestMatch, cover
 
 // ---- health.js
 const M_health = (() => {
-// Adapter health: whether Daylight Commons' reader for a site still finds what the site shows. Platforms
+// Adapter health: whether CMMNS' reader for a site still finds what the site shows. Platforms
 // change their page markup without notice, and a reader that finds nothing would otherwise show
 // nothing, which looks the same as a quiet thread. This module turns what a reader found into a
 // plain verdict and the sentence the panel shows. It reads counts only, never post text.
@@ -10278,9 +10278,9 @@ function adapterHealth(site, found) {
   const f = found || {}, name = (site && site.name) || "This site";
   const cand = f.candidates | 0, read = f.read | 0, w = what(f.page);
   if (!site || f.page === "other" || !f.page) return { state: "idle", say: null };
-  if (cand > 0 && read === 0) return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: "boxes found, none readable" };
-  if (cand >= 6 && read / cand < 0.3) return { state: "partial", say: `${name} changed part of its page; Daylight Commons reads ${read} of ${cand} ${w} here.`, reason: "most boxes unreadable" };
-  if (read >= 5 && (f.withText | 0) / read < 0.2) return { state: "partial", say: `${name} changed part of its page; Daylight Commons finds ${w} here but cannot read their text.`, reason: "text missing" };
+  if (cand > 0 && read === 0) return { state: "changed", say: `${name} changed its page; CMMNS cannot read ${w} here yet.`, reason: "boxes found, none readable" };
+  if (cand >= 6 && read / cand < 0.3) return { state: "partial", say: `${name} changed part of its page; CMMNS reads ${read} of ${cand} ${w} here.`, reason: "most boxes unreadable" };
+  if (read >= 5 && (f.withText | 0) / read < 0.2) return { state: "partial", say: `${name} changed part of its page; CMMNS finds ${w} here but cannot read their text.`, reason: "text missing" };
   if (read > 0) return { state: "ok", say: null };
   if ((f.sinceMs || 0) < HEALTH_SETTLE_MS) return { state: "waiting", say: null };
   const s = f.structure || {};
@@ -10288,7 +10288,7 @@ function adapterHealth(site, found) {
   // stamp or article box at all is more likely a sign-in wall or a removed post than a redesign.
   const expectsRoot = f.page === "thread" && !!(site.hasLocation || site.rootFirst) && ((s.times | 0) >= 1 || (s.articles | 0) >= 1);
   if (expectsRoot || (s.times | 0) >= 3 || (s.articles | 0) >= 3) {
-    return { state: "changed", say: `${name} changed its page; Daylight Commons cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was missing" : "the page shows post-like boxes outside Daylight Commons' reader" };
+    return { state: "changed", say: `${name} changed its page; CMMNS cannot read ${w} here yet.`, reason: expectsRoot ? "the post itself was missing" : "the page shows post-like boxes outside CMMNS' reader" };
   }
   return { state: "empty", say: null };
 }
@@ -10306,23 +10306,23 @@ function selfTestLines(r) {
     ["With text", pct(r.withText, r.read)],
     ["With id", pct(r.withId, r.read)],
     ["Page shape", `${r.structure.times} time stamps, ${r.structure.articles} article boxes`],
-    ["Result", v.say || (v.state === "ok" ? "Daylight Commons reads this page." : v.state === "empty" ? "No posts loaded here; nothing points to a change." : v.state === "waiting" ? "The page is still loading." : "Nothing to read on this page.")],
+    ["Result", v.say || (v.state === "ok" ? "CMMNS reads this page." : v.state === "empty" ? "No posts loaded here; nothing points to a change." : v.state === "waiting" ? "The page is still loading." : "Nothing to read on this page.")],
     ["Checked", r.at],
   ];
 }
 
-const HEALTH_DOES_NOT_PROVE = "The self-test counts what Daylight Commons' reader finds on this page now. A page that loads posts later can fail and then pass. The test reads layout on this device and sends nothing.";
+const HEALTH_DOES_NOT_PROVE = "The self-test counts what CMMNS' reader finds on this page now. A page that loads posts later can fail and then pass. The test reads layout on this device and sends nothing.";
 
 return { HEALTH_SETTLE_MS, HEALTH_STATES, adapterHealth, selfTestLines, HEALTH_DOES_NOT_PROVE };
 })();
 
 // ---- generic.js
 const M_generic = (() => {
-// The generic reader, for article and comment pages on sites Daylight Commons has no reader for. It runs only
+// The generic reader, for article and comment pages on sites CMMNS has no reader for. It runs only
 // when the user opens the site card on a page (src/ext/generic-page.js walks the page and passes
 // plain summaries here). It finds the article body as the block with the most paragraph text, and
 // comments as the largest run of sibling boxes that share a shape and carry an author link or a
-// time stamp. Then it runs the same text checks Daylight Commons runs on replies. Nothing leaves the browser.
+// time stamp. Then it runs the same text checks CMMNS runs on replies. Nothing leaves the browser.
 //
 // These are structural guesses, not a site reader: they can miss comments, take a list of related
 // links for comments, or read a sidebar as the article. The card says so beside every count.
@@ -10534,7 +10534,7 @@ const ID = {
   CueClusterPosition: 0xf1,
 };
 const VIDEO_CODECS = ["V_VP8", "V_VP9", "V_AV1"];
-const APP_NAME = "Daylight Commons";
+const APP_NAME = "CMMNS";
 
 // Element ids are written as given, marker bits included.
 function idBytes(id) {
@@ -10834,7 +10834,7 @@ function packPages(packets, serial, firstSequence) {
 // Granules count decoded 48 kHz samples from 0, so they include the pre-skip samples that a
 // player drops. With totalSamples (the source PCM length) the last page trims the end to
 // preSkip + totalSamples, never past what the packets decode to.
-function muxOggOpus({ sampleRate = 48000, channels, preSkip = 3840, packets = [], totalSamples, serial = 0x44434f4d, vendor = "Daylight Commons", head } = {}) {
+function muxOggOpus({ sampleRate = 48000, channels, preSkip = 3840, packets = [], totalSamples, serial = 0x44434f4d, vendor = "CMMNS", head } = {}) {
   if (!(channels > 0)) throw new Error("muxOggOpus: channels is required");
   const headBytes = head instanceof Uint8Array ? head : opusHead({ channels, sampleRate, preSkip });
   const headPage = { flags: FLAG_BOS, granule: 0, serial, sequence: 0, lacing: laceOne(headBytes.length), body: headBytes };
@@ -11652,7 +11652,7 @@ return { readXml, xmlAll, xmlChild, xmlChildren };
 // ---- media-hls.js
 const M_media_hls = (() => {
 // HLS playlists (RFC 8216): reads a master or media playlist into plain data, says whether the
-// stream is encrypted, and lists the segment addresses to fetch. Daylight Commons saves only
+// stream is encrypted, and lists the segment addresses to fetch. CMMNS saves only
 // unencrypted streams: any EXT-X-KEY or EXT-X-SESSION-KEY with a METHOD other than NONE means the
 // stream is protected, and it is never fetched. Pure: no network.
 
@@ -11758,7 +11758,7 @@ return { hlsAttrs, parseM3u8, hlsProtection, pickVariant, audioFor, hlsFetchList
 const M_media_dash = (() => {
 // DASH manifests (MPD, ISO/IEC 23009-1): reads the representations of a static manifest, says
 // whether any is protected, and builds each representation's segment list. A ContentProtection
-// element anywhere means the media is encrypted, and Daylight Commons does not fetch it.
+// element anywhere means the media is encrypted, and CMMNS does not fetch it.
 // Handles SegmentTemplate (with $Number$, $Time$, SegmentTimeline and format tags like
 // $Number%05d$), SegmentList and a single BaseURL file. Pure: no network.
 
@@ -11872,7 +11872,7 @@ return { isoSeconds, dashFill, parseMpd, dashProtection, pickRepresentation };
 
 // ---- media-protect.js
 const M_media_protect = (() => {
-// Protected media, found before anything is saved. Daylight Commons never touches DRM or Encrypted
+// Protected media, found before anything is saved. CMMNS never touches DRM or Encrypted
 // Media Extensions streams: it says plainly that the media is protected and stops. Three places can
 // show protection: the page element (a video with MediaKeys attached plays through EME), the
 // manifest (HLS keys, DASH ContentProtection, media-hls.js and media-dash.js), and the file itself
@@ -11880,7 +11880,7 @@ const M_media_protect = (() => {
 
 const { readBoxes } = M_media_read;
 
-const PROTECTED_LINE = "This media is protected (DRM or encrypted). Daylight Commons does not save protected media, and there is nothing to change in the settings to allow it.";
+const PROTECTED_LINE = "This media is protected (DRM or encrypted). CMMNS does not save protected media, and there is nothing to change in the settings to allow it.";
 
 // The four-character codes that only appear in encrypted MP4: protected sample entries, the
 // protection scheme box, the track encryption box and the system-specific header.
@@ -11947,7 +11947,7 @@ return { PROTECTED_LINE, mp4Encryption, webmEncryption, elementProtection, media
 
 // ---- media-collect.js
 const M_media_collect = (() => {
-// Collections of saved media: an investigation case (rows that `daylight case add case-inbox.jsonl`
+// Collections of saved media: an investigation case (rows that `cmmns case add case-inbox.jsonl`
 // captures, archives and verifies) or a moodboard (tags and notes, shown as a grid). Every saved
 // file keeps its SHA-256, where it came from and when; every converted or compressed file keeps
 // its own hash and the chain of steps back to the original. Pure records; storage is in the
@@ -12269,14 +12269,14 @@ function downloadPlan(t, { asGif = false } = {}) {
     if (t.kind === "gif" && (web(t.url) || /^(data|blob):/.test(t.url || ""))) return { action: web(t.url) ? "url" : "bytes", url: t.url };
     if (t.url && (t.kind === "video" || t.kind === "image")) return { action: "gif", from: t.kind, url: t.url };
     if (stream) return { action: "gif", from: "stream", stream };
-    return { action: "none", reason: "This media has no file Daylight Commons can read to make a GIF." };
+    return { action: "none", reason: "This media has no file CMMNS can read to make a GIF." };
   }
   if (t.canvas) return { action: "canvas" };
   if (web(t.url)) { const [url, ...alternatives] = sizeLadder(t.url); return { action: "url", url, alternatives: [...alternatives, ...(t.alternatives || [])] }; }
   if (t.url && /^data:/i.test(t.url)) return { action: "bytes", url: t.url };
   if (t.url && /^blob:/i.test(t.url) && t.kind !== "video" && t.kind !== "audio") return { action: "bytes", url: t.url };
   if (stream) return { action: "stream", stream };
-  return { action: "none", reason: "The page builds this media in memory from a stream Daylight Commons cannot find, so it cannot be saved as one file." };
+  return { action: "none", reason: "The page builds this media in memory from a stream CMMNS cannot find, so it cannot be saved as one file." };
 }
 
 const REFERENCE_LABEL = "Protected source. Reference only, not for redistribution.";
@@ -12551,7 +12551,7 @@ function fragmentSamples(b, top, trex) {
 function demuxMp4(bytes) {
   const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
   const top = readBoxes(b), moov = top.find((x) => x.type === "moov");
-  if (!moov) throw new Error("The file has no movie header (moov), so it is not an MP4 Daylight Commons can read.");
+  if (!moov) throw new Error("The file has no movie header (moov), so it is not an MP4 CMMNS can read.");
   const tracks = (moov.children || kids(b, moov)).filter((x) => x.type === "trak").map((t) => trackInfo(b, t)).filter((t) => t.kind && t.entry);
   const trex = new Map();
   const mvex = child(b, moov, "mvex");
@@ -12577,8 +12577,8 @@ function remuxMp4(files) {
   const find = (kind) => { for (const d of parsed) { const t = d.tracks.find((x) => x.kind === kind && d.samples.get(x.id).length); if (t) return { d, t }; } return null; };
   const v = find("video"), a = find("audio");
   if (!v && !a) throw new Error("No video or audio samples were found.");
-  if (v && !MUXABLE_VIDEO[v.t.entry.codec]) throw new Error(`The video is ${v.t.entry.codec}, which Daylight Commons cannot rewrap yet.`);
-  if (a && (!MUXABLE_AUDIO[a.t.entry.codec] || !a.t.entry.description)) throw new Error(`The sound is ${a.t.entry.codec}, which Daylight Commons cannot rewrap yet.`);
+  if (v && !MUXABLE_VIDEO[v.t.entry.codec]) throw new Error(`The video is ${v.t.entry.codec}, which CMMNS cannot rewrap yet.`);
+  if (a && (!MUXABLE_AUDIO[a.t.entry.codec] || !a.t.entry.description)) throw new Error(`The sound is ${a.t.entry.codec}, which CMMNS cannot rewrap yet.`);
   const video = v && { codec: MUXABLE_VIDEO[v.t.entry.codec], width: v.t.entry.width, height: v.t.entry.height, description: v.t.entry.description };
   const audio = a && { codec: "mp4a", channels: a.t.entry.channels || 2, sampleRate: a.t.entry.sampleRate || a.t.timescale, description: a.t.entry.description };
   const chunks = [...(v ? chunksOf(v.d, v.t, "video") : []), ...(a ? chunksOf(a.d, a.t, "audio") : [])];
@@ -12805,14 +12805,14 @@ function sidecarMarkdown(meta, fileNames = null) {
   const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
     ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Flair", m.flair], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
     ["Engagement at save", m.engagement ? Object.entries(m.engagement).filter(([k]) => k !== "at").map(([k, v]) => `${k} ${v}`).join(", ") : null], ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
-  out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by Daylight Commons from what the page showed.", "");
+  out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by CMMNS from what the page showed.", "");
   return out.join("\n");
 }
 
 // The folder for one save from the settings: "<folder>/<site>/", "<folder>/study/<site>/" for
 // Study, or "" only when the user turned on saving straight into Downloads.
 function savePath(settings, site, study = false) {
-  const s = settings || {}, base = String(s.mediaFolder || "").trim() || "Daylight";
+  const s = settings || {}, base = String(s.mediaFolder || "").trim() || "CMMNS";
   if (s.mediaToRoot) return study ? saveFolder("study", site) : "";
   return saveFolder(study ? `${base}/study` : base, site);
 }
@@ -13023,14 +13023,14 @@ return { xmpPacket, embedDescription, readDescription };
 // ---- media-card.js
 const M_media_card = (() => {
 // A text card: a post's or a selection's words set as a picture, for sharing where only pictures
-// travel. It is a Daylight Commons rendering in the house type (Hanken Grotesk, JetBrains Mono for the
+// travel. It is a CMMNS rendering in the house type (Hanken Grotesk, JetBrains Mono for the
 // address) on the house paper, with no avatar, icon, button or layout of any platform, and it says
 // at its foot that it is a rendering and not a screenshot. Pure: the caller passes measure(text,
 // font) and draws the returned list.
 
 const CARD = Object.freeze({ width: 1200, pad: 80, paper: "#ebe5d8", ink: "#16130f", soft: "#4a443b", rule: "#c9bfab", maxBodyLines: 36 });
 const SANS = '"Hanken Grotesk", "Segoe UI", sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
-const CARD_FOOT = "Daylight Commons rendering of text the page showed. Not a screenshot of the post.";
+const CARD_FOOT = "CMMNS rendering of text the page showed. Not a screenshot of the post.";
 
 // Words wrapped to maxWidth; a word wider than a line is broken by characters. Blank lines stay.
 function wrapLines(text, measure, font, maxWidth) {
@@ -13266,7 +13266,7 @@ function captureRecord({ meta = {}, files = [], screenshot = null, page = {}, to
     format: CAPTURE_FORMAT,
     captured: { utc: new Date(now).toISOString(), offset_minutes: offsetMinutes },
     page: { url: page.url || meta.pageUrl || null, title: page.title || null },
-    tool: { name: "Daylight Commons", version: tool.version || null, browser: tool.browser || null },
+    tool: { name: "CMMNS", version: tool.version || null, browser: tool.browser || null },
     artifact: files.map((f) => ({ name: f.name, sha256: f.sha256, saved_sha256: f.saved_sha256 || f.sha256, bytes: f.bytes, mime: f.mime || null, made: f.made || null })),
     words: { site: meta.site || null, post: meta.postUrl || null, media: meta.mediaUrl || null, text: meta.text || null, text_complete: meta.textComplete !== false, posted: meta.postedAt || null },
     engagement: meta.engagement || null,
@@ -13395,7 +13395,7 @@ const M_board = (() => {
 // and link (project-docs/STUDY-BOARDS.md). One format with the reference library's `refdb board`:
 // refdb.board/1 ({ format, kind, key, running_head: { left, right }, lane, keyword_line, plates: [{ n,
 // unit, item_ids, media: [{ id, kind, path }], caption, medium, concepts }], also_in, sources }), so
-// Daylight, the command line and the site render the same boards. Daylight's plates add `source`, the
+// CMMNS, the command line and the site render the same boards. CMMNS's plates add `source`, the
 // sidecar's facts. 3.6.0 moodboards become boards of kind "moodboard". Pure: no files, no network.
 
 const { corroboration } = M_claim_checks;
@@ -13480,7 +13480,7 @@ function captionLine(s) {
   return first.length > 140 ? first.slice(0, 139).replace(/\s+\S*$/, "") + " …" : first;
 }
 
-// The caption: from the plate's source when it has one (Daylight), else the spec's own caption (refdb).
+// The caption: from the plate's source when it has one (CMMNS), else the spec's own caption (refdb).
 function plateCaption(p) {
   const s = p.source;
   if (!s) return { meta: [p.medium, (p.concepts || []).slice(0, 4).join(", ")].filter(Boolean).join(", "), line: p.caption || "" };
@@ -13551,7 +13551,7 @@ const M_board_html = (() => {
 // Accession Stencil for running heads and titles, Hanken Grotesk
 // for captions and text, JetBrains Mono for numbers. Ink on paper; the one hot mark is the right-hand
 // running head. In the evidence board each claim is printed as sheets over its sources with the one
-// sheet engine Daylight has (src/core/discourse/sheets.js): ink coverage from reach.
+// sheet engine CMMNS has (src/core/discourse/sheets.js): ink coverage from reach.
 
 const { bookPages, timelineRows, evidencePlan, plateCaption } = M_board;
 const { buildSheets } = M_discourse_sheets;
@@ -13694,7 +13694,7 @@ function boardHtml(board, { fonts = "fonts/", url = defaultUrl, caseData = null,
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="Daylight Commons study board (${esc(board.format)})">
+<meta name="generator" content="CMMNS study board (${esc(board.format)})">
 <title>${esc(board.running_head.left)}</title>
 <style>${CSS(fonts, head)}</style>
 </head>
@@ -13833,7 +13833,7 @@ const M_clean_image = (() => {
 // Share clean for still images: JPEG, PNG, GIF and WebP. Metadata blocks are removed whole and the
 // image data is copied byte for byte, so nothing is decoded or re-encoded. Kept: what changes how
 // the picture looks (quantisation and Huffman tables, colour profile with its text blanked, gamma,
-// transparency, animation timing). Removed: EXIF with GPS and maker notes, XMP (with Daylight's
+// transparency, animation timing). Removed: EXIF with GPS and maker notes, XMP (with CMMNS's
 // own description), IPTC and Photoshop blocks, comments, text chunks, Content Credentials, embedded
 // thumbnails and anything after the end of the image. Each function returns { bytes, removed }.
 
@@ -14007,7 +14007,7 @@ function freeBox(out, box) {
 function mp4Label(b, box) {
   const inside = b.subarray(box.start, box.start + box.size);
   const loc = indexOfBytes(inside, "location.ISO6709") >= 0 || indexOfBytes(inside, Uint8Array.of(0xa9, 0x78, 0x79, 0x7a)) >= 0;
-  const what = box.type === "udta" ? "user data (title, comment, device, Daylight's description)" : box.type === "meta" ? "metadata tags (ilst, keys)" : box.type === "uuid" ? "vendor block (uuid, often XMP)" : "leftover bytes in free space";
+  const what = box.type === "udta" ? "user data (title, comment, device, CMMNS's description)" : box.type === "meta" ? "metadata tags (ilst, keys)" : box.type === "uuid" ? "vendor block (uuid, often XMP)" : "leftover bytes in free space";
   return loc ? `${what}, with a location` : what;
 }
 
@@ -14290,7 +14290,7 @@ const M_clean = (() => {
 // Share clean: a copy of a file to send to someone, with everything the file says about itself
 // removed: EXIF with GPS, XMP, IPTC, ICC profile text, PNG text chunks, GIF comments, MP4 user data
 // and creation times, WebM tags, PDF document information and XMP, office document authors, and
-// Daylight's own embedded description. Lossless wherever the format allows (every format here):
+// CMMNS's own embedded description. Lossless wherever the format allows (every format here):
 // pictures, frames and samples are copied byte for byte. After cleaning, the copy is cleaned a
 // second time; anything that second pass would still remove means the copy is refused, never
 // passed as clean. The lineage (original hash to clean hash) is for the user's own evidence copy
@@ -14395,11 +14395,11 @@ return { adblockSite, adblockAllowed, adblockToggle };
 const M_catalogue_data = (() => {
 // Generated by scripts/catalogue-data.mjs from catalogue/. Do not edit; run the script after
 // changing an entry. Licence: CC-BY-4.0, as the catalogue (REUSE.toml).
-const SIGNAL_REGISTRY = {"version":"1.1.0","note":"Every signal a catalogue element may cite. A signal is something Daylight Commons can show from the page or from a receipt. Signals in the same family read the same evidence and count once. Context-only signals never evidence any element.","signals":[{"id":"shape-outlier-own","family":"shape","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Reposts per like far above the author's own posts seen on this device."},{"id":"bio-template","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Groups of sampled bios cut from one template."},{"id":"stock-persona","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"A large share of sampled bios combine stock persona cues."},{"id":"join-cluster","family":"joins","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Many sampled accounts joined within the same 14 days."},{"id":"topic-mismatch","family":"topic","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled bios are dominated by a topic the post does not share."},{"id":"undisclosed-lookalike","family":"quotes","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts without a Paid partnership label share a template with labelled ones, or with each other inside two hours."},{"id":"cross-launch","family":"overlap","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled accounts were seen amplifying two or more other launches the viewer opened."},{"id":"disclosed-paid","family":"disclosure","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts carry X's Paid partnership label, the posters' own disclosure."},{"id":"promo-cue","family":"promotion","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts use promotional template phrasing."},{"id":"product-promotion","family":"promotion","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The viewer opened the launch lens on this post, or quotes carry promotional phrasing or a Paid partnership label."},{"id":"actor-organisation","family":"actor","kind":"context","source":"src/core/campaign.js (actorOf)","observes":"The platform discloses the launch account as an organisation or official account."},{"id":"online-post","family":"medium","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The conduct is a post published on an online platform."},{"id":"quote-bunching","family":"timing","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts arrived close together in time. Needs times to the minute; with coarser times it is not observable at this time precision and never shows.","needs_precision":"minute","context_only":true},{"id":"timing-burst","family":"timing","kind":"context","source":"src/core/timing.js (thread evidence)","observes":"Several accounts replied within seconds, tighter than the thread's pace explains. Needs times to the second; times worked out from rounded ages such as 14h or 1d share one second by construction, so with coarser times it is not observable at this time precision and never fires.","needs_precision":"second","context_only":true},{"id":"overlap","family":"overlap","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Some sampled accounts were seen on other launches, below the indicator threshold.","context_only":true},{"id":"random-suffix","family":"handles","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Handles ending in a number-and-letter tail. People choose these for privacy too.","context_only":true},{"id":"default-avatar","family":"avatar","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"X's own default-image disclosure.","context_only":true},{"id":"ad-library-link","family":"ad-library","kind":"context","source":"src/core/evidence-ads.js (evidence layer, PR #47)","observes":"A search link to an advertiser's entries in a public ad repository, opened by the user.","pending":"Lands with the evidence layer (PR #47), which is not merged into main yet."}]};
+const SIGNAL_REGISTRY = {"version":"1.1.0","note":"Every signal a catalogue element may cite. A signal is something CMMNS can show from the page or from a receipt. Signals in the same family read the same evidence and count once. Context-only signals never evidence any element.","signals":[{"id":"shape-outlier-own","family":"shape","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Reposts per like far above the author's own posts seen on this device."},{"id":"bio-template","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Groups of sampled bios cut from one template."},{"id":"stock-persona","family":"bios","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"A large share of sampled bios combine stock persona cues."},{"id":"join-cluster","family":"joins","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Many sampled accounts joined within the same 14 days."},{"id":"topic-mismatch","family":"topic","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled bios are dominated by a topic the post does not share."},{"id":"undisclosed-lookalike","family":"quotes","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts without a Paid partnership label share a template with labelled ones, or with each other inside two hours."},{"id":"cross-launch","family":"overlap","kind":"indicator","source":"src/core/campaign.js (campaign lens)","observes":"Sampled accounts were seen amplifying two or more other launches the viewer opened."},{"id":"disclosed-paid","family":"disclosure","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts carry X's Paid partnership label, the posters' own disclosure."},{"id":"promo-cue","family":"promotion","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts use promotional template phrasing."},{"id":"product-promotion","family":"promotion","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The viewer opened the launch lens on this post, or quotes carry promotional phrasing or a Paid partnership label."},{"id":"actor-organisation","family":"actor","kind":"context","source":"src/core/campaign.js (actorOf)","observes":"The platform discloses the launch account as an organisation or official account."},{"id":"online-post","family":"medium","kind":"context","source":"src/core/definitions.js (signalsFromCampaign)","observes":"The conduct is a post published on an online platform."},{"id":"quote-bunching","family":"timing","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Quote posts arrived close together in time. Needs times to the minute; with coarser times it is not observable at this time precision and never shows.","needs_precision":"minute","context_only":true},{"id":"timing-burst","family":"timing","kind":"context","source":"src/core/timing.js (thread evidence)","observes":"Several accounts replied within seconds, tighter than the thread's pace explains. Needs times to the second; times worked out from rounded ages such as 14h or 1d share one second by construction, so with coarser times it is not observable at this time precision and never fires.","needs_precision":"second","context_only":true},{"id":"overlap","family":"overlap","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Some sampled accounts were seen on other launches, below the indicator threshold.","context_only":true},{"id":"random-suffix","family":"handles","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"Handles ending in a number-and-letter tail. People choose these for privacy too.","context_only":true},{"id":"default-avatar","family":"avatar","kind":"context","source":"src/core/campaign.js (campaign lens)","observes":"X's own default-image disclosure.","context_only":true},{"id":"ad-library-link","family":"ad-library","kind":"context","source":"src/core/evidence-ads.js (evidence layer, PR #47)","observes":"A search link to an advertiser's entries in a public ad repository, opened by the user.","pending":"Lands with the evidence layer (PR #47), which is not merged into main yet."}]};
 const CATALOGUE_ENTRIES = [
-  {"id":"eu-dsa-art26-advertising","version":"1.0.1","status":"active","verification":"verified","role":"context","title":"Advertising transparency on online platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 26(1) and 26(2)","kind":"regulation","binding_note":"A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. Daylight Commons shows them as context. They tell the reader where the platform must show a disclosure or an ad record.","in_force":{"status":"in force","since":"2024-02-17","note":"Article 93(2): the Regulation applies from 17 February 2024. A listed set of provisions applied from 16 November 2022. Article 26 applies from 17 February 2024."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 26(1)(a) to (c)","text":"Providers of online platforms that present advertisements on their online interfaces shall ensure that, for each specific advertisement presented to each individual recipient, the recipients of the service are able to identify, in a clear, concise and unambiguous manner and in real time, the following: (a) that the information is an advertisement, including through prominent markings, which might follow standards pursuant to Article 44; (b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement if that person is different from the natural or legal person referred to in point (b);"},{"source":0,"locator":"Article 26(2), first subparagraph","text":"Providers of online platforms shall provide recipients of the service with a functionality to declare whether the content they provide is or contains commercial communications."}],"elements":[{"id":"A","label":"The platform offers a way to declare commercial content, and some posts carry that declaration","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"]},{"id":"B","label":"Posts that look commercial carry no such declaration","observable_from":"page","required":false,"strength":"indicative","signals":["undisclosed-lookalike"]}],"does_not_prove":"Context: Article 26 sets duties for the platform, and the post shows where to look for its ad declaration. A match compares visible elements with the published text. Courts and consumer authorities decide whether the duty was met.","related":["eu-dsa-art39-ad-repository","x-paid-partnerships"]},
-  {"id":"eu-dsa-art39-ad-repository","version":"1.0.1","status":"active","verification":"verified","role":"context","title":"Advertisement repositories of very large platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 39(1) and 39(2)","kind":"regulation","binding_note":"A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. Daylight Commons shows them as context. They tell the reader where the platform must show a disclosure or an ad record.","in_force":{"status":"in force","since":null,"note":"Article 93(2) sets general application from 17 February 2024. Article 33(6): obligations in the very-large-platform section apply four months after the provider is notified of its designation. Each platform's date follows its own designation, which sits outside this entry."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 39(1), first sentence","text":"Providers of very large online platforms or of very large online search engines that present advertisements on their online interfaces shall compile and make publicly available in a specific section of their online interface, through a searchable and reliable tool that allows multicriteria queries and through application programming interfaces, a repository containing the information referred to in paragraph 2, for the entire period during which they present an advertisement and until one year after the advertisement was presented for the last time on their online interfaces."},{"source":0,"locator":"Article 39(2)(b), (c) and (f)","text":"(b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement, if that person is different from the person referred to in point (b); (f) the commercial communications published on the very large online platforms and identified pursuant to Article 26(2);"}],"elements":[{"id":"A","label":"An ad repository exists where the advertiser and payer of an ad can be looked up","observable_from":"public-record","required":true,"strength":"direct","signals":["ad-library-link"],"note":"Daylight Commons builds a search link to the repository. The user opens it and reads the results."}],"does_not_prove":"Context: the repository lists the ads a very large platform recorded. A search shows those records, and organic posts sit outside them. A match compares visible elements with the published text. Courts and consumer authorities decide whether the duty was met.","related":["eu-dsa-art26-advertising"]},
-  {"id":"eu-ucpd-annex1-11-advertorial","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Paid editorial content not made clear (advertorial)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026","section":"Annex I, point 11","kind":"directive","binding_note":"A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader.","in_force":{"status":"in force","since":null,"note":"Original Annex I point, in the 2005 text and unchanged in the consolidated version of 27.09.2026."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"}],"quotes":[{"source":0,"locator":"Annex I, point 11 (footnote reference omitted)","text":"Using editorial content in the media to promote a product where a trader has paid for the promotion without making that clear in the content or by images or sounds clearly identifiable by the consumer (advertorial)."}],"elements":[{"id":"A","label":"Content presented as editorial or ordinary content is used to promote a product","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","promo-cue","undisclosed-lookalike"],"note":"Whether a social media post counts as \"editorial content in the media\" is a legal question for courts."},{"id":"B","label":"A trader paid for the promotion","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts, where the poster disclosed the payment. Payment for unlabelled posts sits in records off the page."},{"id":"C","label":"The payment is not made clear in the content or by images or sounds the consumer can clearly identify","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"Daylight Commons checks for the platform's own paid label. A disclosure can also take other forms."}],"does_not_prove":"For unlabelled posts, elements B and C rest on look-alike evidence. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.","related":["uk-dmcc-sch20-12-advertorial","us-ftc-endorsement-material-connection","eu-dsa-art26-advertising"]},
+  {"id":"eu-dsa-art26-advertising","version":"1.0.1","status":"active","verification":"verified","role":"context","title":"Advertising transparency on online platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 26(1) and 26(2)","kind":"regulation","binding_note":"A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. CMMNS shows them as context. They tell the reader where the platform must show a disclosure or an ad record.","in_force":{"status":"in force","since":"2024-02-17","note":"Article 93(2): the Regulation applies from 17 February 2024. A listed set of provisions applied from 16 November 2022. Article 26 applies from 17 February 2024."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 26(1)(a) to (c)","text":"Providers of online platforms that present advertisements on their online interfaces shall ensure that, for each specific advertisement presented to each individual recipient, the recipients of the service are able to identify, in a clear, concise and unambiguous manner and in real time, the following: (a) that the information is an advertisement, including through prominent markings, which might follow standards pursuant to Article 44; (b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement if that person is different from the natural or legal person referred to in point (b);"},{"source":0,"locator":"Article 26(2), first subparagraph","text":"Providers of online platforms shall provide recipients of the service with a functionality to declare whether the content they provide is or contains commercial communications."}],"elements":[{"id":"A","label":"The platform offers a way to declare commercial content, and some posts carry that declaration","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"]},{"id":"B","label":"Posts that look commercial carry no such declaration","observable_from":"page","required":false,"strength":"indicative","signals":["undisclosed-lookalike"]}],"does_not_prove":"Context: Article 26 sets duties for the platform, and the post shows where to look for its ad declaration. A match compares visible elements with the published text. Courts and consumer authorities decide whether the duty was met.","related":["eu-dsa-art39-ad-repository","x-paid-partnerships"]},
+  {"id":"eu-dsa-art39-ad-repository","version":"1.0.1","status":"active","verification":"verified","role":"context","title":"Advertisement repositories of very large platforms (context)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Digital Services Act, Regulation (EU) 2022/2065","section":"Article 39(1) and 39(2)","kind":"regulation","binding_note":"A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. CMMNS shows them as context. They tell the reader where the platform must show a disclosure or an ad record.","in_force":{"status":"in force","since":null,"note":"Article 93(2) sets general application from 17 February 2024. Article 33(6): obligations in the very-large-platform section apply four months after the provider is notified of its designation. Each platform's date follows its own designation, which sits outside this entry."},"sources":[{"url":"https://eur-lex.europa.eu/eli/reg/2022/2065/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32022R2065","retrieved_at":"2026-10-22","sha256":"11b119a7d45f3a10cd41714061f9d907839ef5d1634e41774490f00b95856bbf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","note":"Cellar also lists a consolidated version 02022R2065-20221027; Articles 26 and 39 were read from the Official Journal text.","text_sha256":"d4002674e8b0241388512915e12ae1ad780fe0b26eca565fc953339c8e4d8b1f"}],"quotes":[{"source":0,"locator":"Article 39(1), first sentence","text":"Providers of very large online platforms or of very large online search engines that present advertisements on their online interfaces shall compile and make publicly available in a specific section of their online interface, through a searchable and reliable tool that allows multicriteria queries and through application programming interfaces, a repository containing the information referred to in paragraph 2, for the entire period during which they present an advertisement and until one year after the advertisement was presented for the last time on their online interfaces."},{"source":0,"locator":"Article 39(2)(b), (c) and (f)","text":"(b) the natural or legal person on whose behalf the advertisement is presented; (c) the natural or legal person who paid for the advertisement, if that person is different from the person referred to in point (b); (f) the commercial communications published on the very large online platforms and identified pursuant to Article 26(2);"}],"elements":[{"id":"A","label":"An ad repository exists where the advertiser and payer of an ad can be looked up","observable_from":"public-record","required":true,"strength":"direct","signals":["ad-library-link"],"note":"CMMNS builds a search link to the repository. The user opens it and reads the results."}],"does_not_prove":"Context: the repository lists the ads a very large platform recorded. A search shows those records, and organic posts sit outside them. A match compares visible elements with the published text. Courts and consumer authorities decide whether the duty was met.","related":["eu-dsa-art26-advertising"]},
+  {"id":"eu-ucpd-annex1-11-advertorial","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Paid editorial content not made clear (advertorial)","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026","section":"Annex I, point 11","kind":"directive","binding_note":"A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader.","in_force":{"status":"in force","since":null,"note":"Original Annex I point, in the 2005 text and unchanged in the consolidated version of 27.09.2026."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"}],"quotes":[{"source":0,"locator":"Annex I, point 11 (footnote reference omitted)","text":"Using editorial content in the media to promote a product where a trader has paid for the promotion without making that clear in the content or by images or sounds clearly identifiable by the consumer (advertorial)."}],"elements":[{"id":"A","label":"Content presented as editorial or ordinary content is used to promote a product","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","promo-cue","undisclosed-lookalike"],"note":"Whether a social media post counts as \"editorial content in the media\" is a legal question for courts."},{"id":"B","label":"A trader paid for the promotion","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts, where the poster disclosed the payment. Payment for unlabelled posts sits in records off the page."},{"id":"C","label":"The payment is not made clear in the content or by images or sounds the consumer can clearly identify","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"CMMNS checks for the platform's own paid label. A disclosure can also take other forms."}],"does_not_prove":"For unlabelled posts, elements B and C rest on look-alike evidence. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.","related":["uk-dmcc-sch20-12-advertorial","us-ftc-endorsement-material-connection","eu-dsa-art26-advertising"]},
   {"id":"eu-ucpd-annex1-22-posing-as-consumer","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Falsely representing oneself as a consumer","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC, consolidated text of 27.09.2026","section":"Annex I, point 22","kind":"directive","binding_note":"A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader.","in_force":{"status":"in force","since":null,"note":"Original Annex I point, in the 2005 text and unchanged in the consolidated version of 27.09.2026."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"}],"quotes":[{"source":0,"locator":"Annex I, point 22","text":"Falsely claiming or creating the impression that the trader is not acting for purposes relating to his trade, business, craft or profession, or falsely representing oneself as a consumer."}],"elements":[{"id":"A","label":"Posts present the speaker as an ordinary consumer giving their own view","observable_from":"page","required":true,"strength":"direct","signals":["undisclosed-lookalike","promo-cue"]},{"id":"B","label":"The speaker is in fact a trader, or acts in the name of or on behalf of one","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"For unlabelled posts, contracts or agency records show this element."},{"id":"C","label":"The impression is false","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Falsity depends on element B and on how the impression was created."}],"does_not_prove":"A fan-style post that shares a template with paid posts is look-alike evidence of payment. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.","related":["uk-dmcc-sch20-25-posing-as-consumer","eu-ucpd-annex1-11-advertorial"]},
   {"id":"eu-ucpd-annex1-23c-false-reviews-endorsements","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"False consumer reviews or endorsements, or misrepresented social endorsements","jurisdiction":{"code":"EU","name":"European Union (applies where consumers in the EU are reached)"},"instrument":"Unfair Commercial Practices Directive 2005/29/EC as amended by Directive (EU) 2019/2161 (the Omnibus Directive), consolidated text of 27.09.2026","section":"Annex I, point 23c","kind":"directive","binding_note":"A directive that each Member State applies through its national law. Annex I lists practices that are unfair in all circumstances. The same single list applies in all Member States. It covers practices from a business to consumers, so the party must be a trader. Recital 49 of Directive 2019/2161 gives 'likes' on social media as an example of an endorsement.","in_force":{"status":"in force","since":"2022-05-28","note":"Inserted by Article 3 of Directive (EU) 2019/2161. Article 7 of that Directive: Member States \"shall apply those measures from 28 May 2022\"."},"sources":[{"url":"https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02005L0029-20260927","retrieved_url":"https://publications.europa.eu/resource/celex/02005L0029-20260927","retrieved_at":"2026-10-22","sha256":"1ebbb7b9f2c7c7712b0c3bd19f4319cb5a52ac9514dc008bd34084c550f77138","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), consolidated text","note":"EUR-Lex answered scripted requests with an empty 202 challenge, so the same document was read from the Publications Office repository that serves EUR-Lex. Consolidated version 02005L0029-20260927, the latest listed in Cellar on the retrieval date (earlier: 20220528). The consolidated text states it has no legal effect; the Official Journal texts are authentic.","text_sha256":"c2a71254a71bb3f40cbe2a2df8a3c1795c5ff1cf5c32c86742ef3b970294b0ae"},{"url":"https://eur-lex.europa.eu/eli/dir/2019/2161/oj","retrieved_url":"https://publications.europa.eu/resource/celex/32019L2161","retrieved_at":"2026-10-22","sha256":"4f2987a941a32c9fae499098554b206e93b26365fea60353e2f886084174b1ac","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Publications Office of the European Union (Cellar), Official Journal text","text_sha256":"90f61e53584b248a1e560458561a916da4aa68be17c69a25de69313df2b64570"}],"quotes":[{"source":0,"locator":"Annex I, point 23c","text":"Submitting or commissioning another legal or natural person to submit false consumer reviews or endorsements, or misrepresenting consumer reviews or social endorsements, in order to promote products."},{"source":1,"locator":"Directive (EU) 2019/2161, recital 49, first sentence","text":"Traders should also be prohibited from submitting fake consumer reviews and endorsements, such as ‘likes’ on social media, or commissioning others to do so in order to promote their products, as well as from manipulating consumer reviews and endorsements, such as publishing only positive reviews and deleting the negative ones."}],"elements":[{"id":"A","label":"Consumer reviews or social endorsements are involved (likes, reposts, quote posts)","observable_from":"page","required":true,"strength":"direct","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch","undisclosed-lookalike"]},{"id":"B","label":"They are false, or are misrepresented","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch","undisclosed-lookalike"],"min_families":2,"note":"Page signals are consistent with false endorsements. They describe the sample as a whole."},{"id":"C","label":"A trader submitted them or commissioned another person to submit them","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"Records off the page show who commissioned the engagement."},{"id":"D","label":"In order to promote products","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion"]}],"does_not_prove":"Bought-looking engagement can come from the trader, from rivals or from vendors acting on their own. A match compares visible elements with the published text. Courts and consumer authorities decide whether the rule was broken.","related":["us-ftc-fake-social-media-indicators","uk-dmcc-sch20-13-fake-reviews","x-authenticity-engagement-spam"]},
   {"id":"uk-dmcc-sch20-12-advertorial","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Paid editorial content not made clear (advertorial)","jurisdiction":{"code":"UK","name":"United Kingdom"},"instrument":"Digital Markets, Competition and Consumers Act 2024","section":"Schedule 20, paragraph 12","kind":"statute","binding_note":"Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders.","in_force":{"status":"in force","since":"2025-04-06","note":"The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20","retrieved_url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml","retrieved_at":"2026-10-22","sha256":"5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.","text_sha256":"c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"},{"url":"https://www.legislation.gov.uk/uksi/2025/272/made","retrieved_url":"https://www.legislation.gov.uk/uksi/2025/272/made/data.xml","retrieved_at":"2026-10-22","sha256":"8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk","text_sha256":"e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"}],"quotes":[{"source":0,"locator":"Schedule 20, paragraph 12","text":"Using editorial content in the media to promote a product where a trader has paid for the promotion without making that clear in the content or by images or sounds clearly identifiable by the consumer."},{"source":1,"locator":"SI 2025/272, regulation 2(3)","text":"Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."}],"elements":[{"id":"A","label":"Content presented as editorial or ordinary content is used to promote a product","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","promo-cue","undisclosed-lookalike"],"note":"Whether a social media post counts as \"editorial content in the media\" is a legal question for courts."},{"id":"B","label":"A trader paid for the promotion","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts."},{"id":"C","label":"The payment is not made clear in the content or by images or sounds the consumer can clearly identify","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"]}],"does_not_prove":"For unlabelled posts, payment rests on look-alike evidence. A match compares visible elements with the published text. Courts, the CMA and trading standards services decide whether the rule was broken.","related":["eu-ucpd-annex1-11-advertorial","us-ftc-endorsement-material-connection"]},
@@ -14407,11 +14407,11 @@ const CATALOGUE_ENTRIES = [
   {"id":"uk-dmcc-sch20-25-posing-as-consumer","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Falsely representing oneself as a consumer","jurisdiction":{"code":"UK","name":"United Kingdom"},"instrument":"Digital Markets, Competition and Consumers Act 2024","section":"Schedule 20, paragraph 25","kind":"statute","binding_note":"Schedule 20 lists commercial practices which are in all circumstances considered unfair (section 225). It applies to traders.","in_force":{"status":"in force","since":"2025-04-06","note":"The Digital Markets, Competition and Consumers Act 2024 (Commencement No. 2) Regulations 2025 (SI 2025/272), regulation 2(3), bring Chapter 1 of Part 4 into force on 6 April 2025 (except sections 232, 234 and 235). Section 225 and Schedule 20 sit in that Chapter, and the revised XML gives the same start date."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20","retrieved_url":"https://www.legislation.gov.uk/ukpga/2024/13/schedule/20/data.xml","retrieved_at":"2026-10-22","sha256":"5877aa445ee67ccd6bd271d78ae0d7abf0c063ee493623ca99a26c8008ef6743","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"Revised text as held on legislation.gov.uk; the XML carries extent E+W+S+N.I. and a start date of 2025-04-06 for paragraphs 12, 13 and 25.","text_sha256":"c7a588471b371f535020218800bdf9b71264f1005db25a5ea949e58df1c13803"},{"url":"https://www.legislation.gov.uk/uksi/2025/272/made","retrieved_url":"https://www.legislation.gov.uk/uksi/2025/272/made/data.xml","retrieved_at":"2026-10-22","sha256":"8e237f493901da6307155f56f5e0bf8a42ae7ade2bd30e66ee93f62447f8bf46","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk","text_sha256":"e5d46847af22315d8e9df538762776a1679e2bbbb1ae10a63300719a01e3ea47"}],"quotes":[{"source":0,"locator":"Schedule 20, paragraph 25","text":"Falsely claiming or creating the false impression that the trader is not acting for purposes relating to the trader’s business or falsely representing oneself as a consumer."},{"source":1,"locator":"SI 2025/272, regulation 2(3)","text":"Chapter 1 (protection from unfair trading) of Part 4 (consumer rights and disputes), except sections 232, 234 and 235."}],"elements":[{"id":"A","label":"Posts present the speaker as an ordinary consumer giving their own view","observable_from":"page","required":true,"strength":"direct","signals":["undisclosed-lookalike","promo-cue"]},{"id":"B","label":"The speaker is in fact a trader, or acts for one","observable_from":"public-record","required":true,"strength":"direct","signals":[]},{"id":"C","label":"The impression is false","observable_from":"not-observable","required":true,"strength":"direct","signals":[]}],"does_not_prove":"A fan-style post that shares a template with paid posts is look-alike evidence of payment. A match compares visible elements with the published text. Courts, the CMA and trading standards services decide whether the rule was broken.","related":["eu-ucpd-annex1-22-posing-as-consumer"]},
   {"id":"uk-fraud-act-2006-s2","version":"1.0.1","status":"active","verification":"verified","role":"comparison","title":"Fraud by false representation (for comparison)","jurisdiction":{"code":"UK-EW-NI","name":"England and Wales, and Northern Ireland"},"instrument":"Fraud Act 2006","section":"Section 2(1) and 2(2)","kind":"statute","binding_note":"A criminal provision, and courts decide whether it applies. The extent recorded on legislation.gov.uk is England and Wales, and Northern Ireland.","in_force":{"status":"in force","since":"2007-01-15","note":"Start date as recorded in the legislation.gov.uk XML for section 2."},"sources":[{"url":"https://www.legislation.gov.uk/ukpga/2006/35/section/2","retrieved_url":"https://www.legislation.gov.uk/ukpga/2006/35/section/2/data.xml","retrieved_at":"2026-10-22","sha256":"8158f865b2b975a0a84a907b74abb3686d57145d1b9f19c4186ad6853c0c7aaf","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"The National Archives, legislation.gov.uk (revised text)","note":"The XML gives section 2 an extent of England and Wales and Northern Ireland, from 2007-01-15.","text_sha256":"60421b98c1cbe52a652ce2db9f744fb758ef4e035aaa7accd77e8a1a41d2c158"}],"quotes":[{"source":0,"locator":"Section 2(1)","text":"(1) A person is in breach of this section if he— (a) dishonestly makes a false representation, and (b) intends, by making the representation— (i) to make a gain for himself or another, or (ii) to cause loss to another or to expose another to a risk of loss."},{"source":0,"locator":"Section 2(2)","text":"(2) A representation is false if— (a) it is untrue or misleading, and (b) the person making it knows that it is, or might be, untrue or misleading."}],"elements":[{"id":"A","label":"A representation is made (express or implied)","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","undisclosed-lookalike","disclosed-paid"]},{"id":"B","label":"The representation is untrue or misleading","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Whether the engagement or the posts misled anyone is a finding about facts behind the page."},{"id":"C","label":"The person making it knows it is, or might be, untrue or misleading","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"D","label":"Made dishonestly","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"E","label":"With intent to make a gain, or to cause loss or risk of loss","observable_from":"not-observable","required":true,"strength":"direct","signals":[]}],"does_not_prove":"Shown for comparison. Four of the five elements concern falsity, knowledge, dishonesty and intent. Those sit behind the page, so the table keeps this definition as a comparison. The section turns on intent, and reliance and loss sit outside its elements. Courts decide whether it applies.","related":["us-wire-fraud-18usc1343","uk-dmcc-sch20-13-fake-reviews"]},
   {"id":"us-ftc-act-s5-deception","version":"1.0.1","status":"active","verification":"verified","role":"comparison","title":"Deceptive acts or practices (general standard)","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"Federal Trade Commission Act section 5, 15 U.S.C. 45, read with the FTC Policy Statement on Deception (October 14, 1983)","section":"15 U.S.C. 45(a)(1); Policy Statement on Deception, part I (Summary)","kind":"statute","binding_note":"The statute sets the standard. The Policy Statement is the Commission's own account of the elements it applies; courts have their own formulations.","in_force":{"status":"in force","since":null,"note":"United States Code, 2024 edition, as published on govinfo."},"sources":[{"url":"https://www.govinfo.gov/link/uscode/15/45","retrieved_url":"https://www.govinfo.gov/content/pkg/USCODE-2024-title15/html/USCODE-2024-title15-chap2-subchapI-sec45.htm","retrieved_at":"2026-10-22","sha256":"28de76e074dde70c74930d24738fda83a837c04bba6304c148051d1600679546","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"US Government Publishing Office, govinfo (United States Code, 2024 edition)","text_sha256":"6d18041cecfb47e3f97602089881ca7729f09bf9486f205a52875c4466b8df25"},{"url":"https://www.ftc.gov/legal-library/browse/ftc-policy-statement-deception","retrieved_url":"https://www.ftc.gov/system/files/documents/public_statements/410531/831014deceptionstmt.pdf","retrieved_at":"2026-10-22","sha256":"b39a62b96f46f66681f5081242215fe741b2dcb72f26b4b1fbc159a899a5d26f","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"Federal Trade Commission","note":"ftc.gov answered scripted requests with a 404 page, so the PDF was read in a browser and hashed there (79,535 bytes). Text extracted with pdf.js; line breaks normalised."}],"quotes":[{"source":0,"locator":"15 U.S.C. 45(a)(1)","text":"Unfair methods of competition in or affecting commerce, and unfair or deceptive acts or practices in or affecting commerce, are hereby declared unlawful."},{"source":1,"locator":"Policy Statement on Deception, I. Summary, closing sentence","text":"Thus, the Commission will find deception if there is a representation, omission or practice that is likely to mislead the consumer acting reasonably in the circumstances, to the consumer's detriment."},{"source":1,"locator":"Policy Statement on Deception, I. Summary, third element","text":"Third, the representation, omission, or practice must be a \"material\" one. The basic question is whether the act or practice is likely to affect the consumer's conduct or decision with regard to a product or service."}],"elements":[{"id":"A","label":"A representation, omission or practice","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","undisclosed-lookalike","disclosed-paid"]},{"id":"B","label":"Likely to mislead a consumer acting reasonably in the circumstances","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"This is judged from the reasonable consumer's point of view, a question for the Commission and courts."},{"id":"C","label":"Material: likely to affect the consumer's conduct or decision about a product or service","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"D","label":"In or affecting commerce","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","actor-organisation"]}],"does_not_prove":"Section 5 is the general standard behind the more specific entries. Its two central elements, likely to mislead and material, are judgements for the Commission and courts. A match compares visible elements with the published text.","related":["us-ftc-endorsement-material-connection","us-ftc-fake-social-media-indicators"]},
-  {"id":"us-ftc-endorsement-material-connection","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Undisclosed material connection in an endorsement","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"FTC Guides Concerning Use of Endorsements and Testimonials in Advertising, 16 CFR Part 255","section":"16 CFR 255.5(a), with the definition in 255.0(b)","kind":"agency-guides","binding_note":"The Guides are the FTC's administrative interpretation of section 5 of the FTC Act (16 CFR 255.0(a)). They guide how the Commission applies section 5 and sit under it.","in_force":{"status":"in force","since":"2023-07-26","note":"Current text from 88 FR 48102, July 26, 2023, per the eCFR source note. The date is the Federal Register publication date, and the effective date is still to be checked."},"sources":[{"url":"https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255","retrieved_url":"https://www.ecfr.gov/api/versioner/v1/full/2026-10-19/title-16.xml?part=255","retrieved_at":"2026-10-22","sha256":"feb1c8cfee82158c16c4210ef320bc93ffb2f414aa2bdce6e6772a77064180ea","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Office of the Federal Register and GPO, eCFR","note":"eCFR point-in-time XML for 2026-10-19, the latest issue date eCFR listed for Title 16 on the retrieval date. eCFR is an editorial compilation; the official annual edition is on govinfo.","text_sha256":"bf8ee515e45bdc40dd4269b73ec61e3790c762688a197eb9537d891225663b07"}],"quotes":[{"source":0,"locator":"16 CFR 255.5(a), first two sentences and the significant-minority sentence","text":"When there exists a connection between the endorser and the seller of the advertised product that might materially affect the weight or credibility of the endorsement, and that connection is not reasonably expected by the audience, such connection must be disclosed clearly and conspicuously. Material connections can include a business, family, or personal relationship. … A material connection needs to be disclosed when a significant minority of the audience for an endorsement does not understand or expect the connection."},{"source":0,"locator":"16 CFR 255.0(b), first sentence","text":"For purposes of this part, an “endorsement” means any advertising, marketing, or promotional message for a product that consumers are likely to believe reflects the opinions, beliefs, findings, or experiences of a party other than the sponsoring advertiser, even if the views expressed by that party are identical to those of the sponsoring advertiser."}],"elements":[{"id":"A","label":"An endorsement: a promotional message for a product that readers are likely to take as a third party's own view","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid","undisclosed-lookalike","promo-cue"]},{"id":"B","label":"A connection between the endorser and the seller","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"The Paid partnership label shows a connection for the labelled posts. For unlabelled look-alikes the connection is an inference from shared template and timing. Contracts and agency rosters in the public record would show it."},{"id":"C","label":"The connection might materially affect the weight or credibility of the endorsement","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Materiality turns on how the audience weighs the message, a question about readers."},{"id":"D","label":"The connection is not reasonably expected by the audience","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Audience expectation is a question about readers, answered with evidence from outside the page."},{"id":"E","label":"The connection is not disclosed clearly and conspicuously","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"Daylight Commons sees whether a quote carries the Paid partnership label. A disclosure can also sit in an image or a linked page."}],"does_not_prove":"Daylight Commons sees labels and look-alike posts. Contracts, payments and audience expectation sit off the page. A match compares visible elements with the published text. Courts and the Commission decide whether the rule was broken.","related":["us-ftc-act-s5-deception","x-paid-partnerships","eu-ucpd-annex1-11-advertorial","uk-dmcc-sch20-12-advertorial"]},
+  {"id":"us-ftc-endorsement-material-connection","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Undisclosed material connection in an endorsement","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"FTC Guides Concerning Use of Endorsements and Testimonials in Advertising, 16 CFR Part 255","section":"16 CFR 255.5(a), with the definition in 255.0(b)","kind":"agency-guides","binding_note":"The Guides are the FTC's administrative interpretation of section 5 of the FTC Act (16 CFR 255.0(a)). They guide how the Commission applies section 5 and sit under it.","in_force":{"status":"in force","since":"2023-07-26","note":"Current text from 88 FR 48102, July 26, 2023, per the eCFR source note. The date is the Federal Register publication date, and the effective date is still to be checked."},"sources":[{"url":"https://www.ecfr.gov/current/title-16/chapter-I/subchapter-B/part-255","retrieved_url":"https://www.ecfr.gov/api/versioner/v1/full/2026-10-19/title-16.xml?part=255","retrieved_at":"2026-10-22","sha256":"feb1c8cfee82158c16c4210ef320bc93ffb2f414aa2bdce6e6772a77064180ea","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Office of the Federal Register and GPO, eCFR","note":"eCFR point-in-time XML for 2026-10-19, the latest issue date eCFR listed for Title 16 on the retrieval date. eCFR is an editorial compilation; the official annual edition is on govinfo.","text_sha256":"bf8ee515e45bdc40dd4269b73ec61e3790c762688a197eb9537d891225663b07"}],"quotes":[{"source":0,"locator":"16 CFR 255.5(a), first two sentences and the significant-minority sentence","text":"When there exists a connection between the endorser and the seller of the advertised product that might materially affect the weight or credibility of the endorsement, and that connection is not reasonably expected by the audience, such connection must be disclosed clearly and conspicuously. Material connections can include a business, family, or personal relationship. … A material connection needs to be disclosed when a significant minority of the audience for an endorsement does not understand or expect the connection."},{"source":0,"locator":"16 CFR 255.0(b), first sentence","text":"For purposes of this part, an “endorsement” means any advertising, marketing, or promotional message for a product that consumers are likely to believe reflects the opinions, beliefs, findings, or experiences of a party other than the sponsoring advertiser, even if the views expressed by that party are identical to those of the sponsoring advertiser."}],"elements":[{"id":"A","label":"An endorsement: a promotional message for a product that readers are likely to take as a third party's own view","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid","undisclosed-lookalike","promo-cue"]},{"id":"B","label":"A connection between the endorser and the seller","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"The Paid partnership label shows a connection for the labelled posts. For unlabelled look-alikes the connection is an inference from shared template and timing. Contracts and agency rosters in the public record would show it."},{"id":"C","label":"The connection might materially affect the weight or credibility of the endorsement","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Materiality turns on how the audience weighs the message, a question about readers."},{"id":"D","label":"The connection is not reasonably expected by the audience","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Audience expectation is a question about readers, answered with evidence from outside the page."},{"id":"E","label":"The connection is not disclosed clearly and conspicuously","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"CMMNS sees whether a quote carries the Paid partnership label. A disclosure can also sit in an image or a linked page."}],"does_not_prove":"CMMNS sees labels and look-alike posts. Contracts, payments and audience expectation sit off the page. A match compares visible elements with the published text. Courts and the Commission decide whether the rule was broken.","related":["us-ftc-act-s5-deception","x-paid-partnerships","eu-ucpd-annex1-11-advertorial","uk-dmcc-sch20-12-advertorial"]},
   {"id":"us-ftc-fake-social-media-indicators","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"Misuse of fake indicators of social media influence","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"FTC Trade Regulation Rule on the Use of Consumer Reviews and Testimonials, 16 CFR Part 465","section":"16 CFR 465.8(b), with definitions in 465.1(h) and 465.1(j)","kind":"regulation","binding_note":"A trade regulation rule issued under 15 U.S.C. 57a. In the eCFR text retrieved, section 465.8 is headed \"Misuse of fake indicators of social media influence\".","in_force":{"status":"in force","since":null,"note":"Source: 89 FR 68077, Aug. 22, 2024, per the eCFR source note. The retrieved text leaves the effective date out, so it is still to be checked."},"sources":[{"url":"https://www.ecfr.gov/current/title-16/chapter-I/subchapter-D/part-465","retrieved_url":"https://www.ecfr.gov/api/versioner/v1/full/2026-10-19/title-16.xml?part=465","retrieved_at":"2026-10-22","sha256":"0ed274f696f88713e0a1560408acb9b9c611b90959fb686b2afe547df568d6c4","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"Office of the Federal Register and GPO, eCFR","note":"eCFR point-in-time XML for 2026-10-19.","text_sha256":"8a17e77e242835bf309049b0286f8d76d01dc38747b0b8aca39d3f994b247e30"}],"quotes":[{"source":0,"locator":"16 CFR 465.8","text":"It is an unfair or deceptive act or practice and a violation of this part for anyone to: (a) Sell or distribute fake indicators of social media influence that they knew or should have known to be fake and that can be used by individuals or businesses to materially misrepresent their influence or importance for a commercial purpose; or (b) Purchase or procure fake indicators of social media influence that they knew or should have known to be fake and that materially misrepresent their influence or importance for a commercial purpose."},{"source":0,"locator":"16 CFR 465.1(h)","text":"Fake indicators of social media influence means indicators of social media influence generated by bots, purported individual accounts not associated with a real individual, accounts created with a real individual's personal information without their consent, or hijacked accounts, or that otherwise do not reflect a real individual's or entity's activities, opinions, findings, or experiences."},{"source":0,"locator":"16 CFR 465.1(j)","text":"Indicators of social media influence means any metrics used by the public to make assessments of an individual's or entity's social media influence, such as followers, friends, connections, subscribers, views, plays, likes, saves, shares, reposts, and comments."}],"elements":[{"id":"A","label":"The conduct concerns indicators of social media influence (reposts, likes, followers, comments)","observable_from":"page","required":true,"strength":"direct","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"]},{"id":"B","label":"Those indicators are fake: they do not reflect real people's or entities' activities or opinions","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"],"min_families":2,"note":"Page signals are consistent with fake indicators. They describe the sample as a whole. Two independent signal families are needed before this element is shown as matched."},{"id":"C","label":"The party purchased or procured them","observable_from":"public-record","required":true,"strength":"direct","signals":[],"note":"A purchase shows in records such as vendor invoices or enforcement filings."},{"id":"D","label":"The party knew or should have known they were fake","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"E","label":"They materially misrepresent the party's influence or importance","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Materiality is a judgement about how the public reads the numbers."},{"id":"F","label":"For a commercial purpose","observable_from":"page","required":true,"strength":"direct","signals":["product-promotion","actor-organisation"]}],"does_not_prove":"Engagement that looks bought can come from the account owner, rivals, fans or vendors acting on their own. A match compares visible elements with the published text. Courts and the Commission decide whether the rule was broken.","related":["eu-ucpd-annex1-23c-false-reviews-endorsements","uk-dmcc-sch20-13-fake-reviews","x-authenticity-engagement-spam"]},
   {"id":"us-wire-fraud-18usc1343","version":"1.0.1","status":"active","verification":"verified","role":"comparison","title":"Fraud by wire, radio, or television (for comparison)","jurisdiction":{"code":"US","name":"United States (federal)"},"instrument":"18 U.S.C. 1343, with the elements as summarised in the DOJ Criminal Resource Manual 941 (archived)","section":"18 U.S.C. 1343","kind":"statute","binding_note":"A criminal statute, and courts decide whether it applies. The circuits state the elements in different words; the DOJ page lists several formulations.","in_force":{"status":"in force","since":null,"note":"United States Code, 2024 edition, as published on govinfo."},"sources":[{"url":"https://www.govinfo.gov/link/uscode/18/1343","retrieved_url":"https://www.govinfo.gov/content/pkg/USCODE-2024-title18/html/USCODE-2024-title18-partI-chap63-sec1343.htm","retrieved_at":"2026-10-22","sha256":"1a43985c3f9ca2e28680336d3889d8801a87db2afa7bf16231fde4c0fdfb1594","hash_method":"raw-bytes","retrieved_with":"curl","publisher":"US Government Publishing Office, govinfo (United States Code, 2024 edition)","text_sha256":"d9243b2adbea08b7838d4ad1d13b99f523741cf930ae8539a98a729ad45d6785"},{"url":"https://www.justice.gov/archives/jm/criminal-resource-manual-941-18-usc-1343-elements-wire-fraud","retrieved_url":"https://www.justice.gov/archives/jm/criminal-resource-manual-941-18-usc-1343-elements-wire-fraud","retrieved_at":"2026-10-22","sha256":"08b307acc432d022471e05252e68bd66ccc2b464364a8920b898bf09fc9cd769","hash_method":"rendered-text","retrieved_with":"browser","publisher":"US Department of Justice (archived Criminal Resource Manual)","note":"Scripted fetches got a changing 2.7 KB challenge page, so the hash is SHA-256 over the UTF-8 text of the rendered <main> element (2,585 bytes). The page is marked archived and may be outdated."}],"quotes":[{"source":0,"locator":"18 U.S.C. 1343, first sentence (penalty clause omitted)","text":"Whoever, having devised or intending to devise any scheme or artifice to defraud, or for obtaining money or property by means of false or fraudulent pretenses, representations, or promises, transmits or causes to be transmitted by means of wire, radio, or television communication in interstate or foreign commerce, any writings, signs, signals, pictures, or sounds for the purpose of executing such scheme or artifice,"},{"source":1,"locator":"CRM 941, quoting United States v. Maxwell, 920 F.2d 1028, 1035 (D.C. Cir. 1990)","text":"Wire fraud requires proof of (1) a scheme to defraud; and (2) the use of an interstate wire communication to further the scheme."}],"elements":[{"id":"A","label":"A scheme or artifice to defraud, or to obtain money or property by false pretenses","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"A scheme is a plan. Visible posts can be part of one, and the plan itself sits behind the page."},{"id":"B","label":"Intent to defraud","observable_from":"not-observable","required":true,"strength":"direct","signals":[]},{"id":"C","label":"Use of an interstate wire communication (an online post is a communication sent by wire)","observable_from":"page","required":true,"strength":"direct","signals":["online-post"],"note":"Almost any online conduct shows this element, so it carries little weight alone."},{"id":"D","label":"The communication was made to further the scheme","observable_from":"not-observable","required":true,"strength":"direct","signals":[]}],"does_not_prove":"Shown for comparison. The elements that give this definition its meaning, the scheme and the intent, sit behind the page, so the table keeps it as a comparison. Courts decide whether it applies.","related":["uk-fraud-act-2006-s2","us-ftc-act-s5-deception"]},
-  {"id":"x-authenticity-engagement-spam","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"X's Authenticity policy: engagement spam and account metric inflation","jurisdiction":{"code":"platform:x","name":"X's own rules (applies on X wherever the user is)"},"instrument":"X Help Center, Authenticity (formerly the platform manipulation and spam policy)","section":"Inauthentic Behaviors: Engagement Spam; Inauthentic Accounts: Fake personas","kind":"platform-policy","binding_note":"X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.","in_force":{"status":"published","since":null,"note":"The page is headed \"April 2025\". Recorded as read on 2026-10-22."},"sources":[{"url":"https://help.x.com/en/rules-and-policies/authenticity","retrieved_url":"https://help.x.com/en/rules-and-policies/authenticity","retrieved_at":"2026-10-22","sha256":"075e496e31a9ff197727f23d0d9efe007edaab31695a4482190734cf58a90f22","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"X Corp., X Help Center","note":"help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 260,886 bytes. The older address help.x.com/en/rules-and-policies/platform-manipulation redirects here."}],"quotes":[{"source":0,"locator":"Inauthentic Behaviors, Engagement Spam","text":"Engagement Spam: We prohibit inauthentic use of [X] engagement features to artificially impact traffic or disrupt people’s experience."},{"source":0,"locator":"Engagement Spam, Not Allowed, third item","text":"coordinating with and/or compensating others to conduct account metric inflation in any [X] features, including Likes, Polls, Replies, Reposts, Lists, Views, or Follows;"},{"source":0,"locator":"Inauthentic Accounts, Fake personas","text":"Fake personas: You may not use manufactured identities to engage in disruptive or deceptive behavior. This may include using stock, stolen or AI-generated profile photos, copied or stolen profile bios, and/or misleading profile information for the purpose of deceiving others."}],"elements":[{"id":"A","label":"Account metrics (likes, replies, reposts, views, follows) on the post are inflated","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"],"min_families":2,"note":"Page signals are consistent with inflation. Two independent signal families are needed before this element is shown as matched."},{"id":"B","label":"Accounts with copied or templated profile bios take part","observable_from":"page","required":false,"strength":"indicative","signals":["bio-template","stock-persona"],"note":"The policy names copied bios as one possible sign of a fake persona, for the purpose of deceiving others. Daylight Commons reads bio templates, and avatars, names, languages and places stay out of it."},{"id":"C","label":"Someone coordinated with or compensated others to conduct the inflation","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Records off the page show who arranged the engagement and whether anyone was paid."}],"does_not_prove":"Templated bios and bursts of reposts also come from real communities and from vendors acting on their own. A platform policy is the platform's own rule. A match compares visible elements with the published policy text, and X decides whether its policy was broken.","related":["us-ftc-fake-social-media-indicators","eu-ucpd-annex1-23c-false-reviews-endorsements"]},
-  {"id":"x-paid-partnerships","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"X's Paid Partnerships policy: undisclosed paid partnership","jurisdiction":{"code":"platform:x","name":"X's own rules (applies on X wherever the user is)"},"instrument":"X Help Center, Paid Partnerships Policy","section":"What are Paid Partnerships?; Rules for Paid Partnerships","kind":"platform-policy","binding_note":"X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.","in_force":{"status":"published","since":null,"note":"The page is undated. Recorded as read on 2026-10-22."},"sources":[{"url":"https://help.x.com/en/rules-and-policies/paid-partnerships-policy","retrieved_url":"https://help.x.com/en/rules-and-policies/paid-partnerships-policy","retrieved_at":"2026-10-22","sha256":"06403ae56a3966a359c4c494aba9b4125958a65dcb873b34995809f636cf92ac","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"X Corp., X Help Center","note":"help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 233,829 bytes. The page shows no revision date."}],"quotes":[{"source":0,"locator":"What are Paid Partnerships?","text":"[X] defines paid partnerships as the involvement of a third-party brand providing compensation or incentives to a user, such as an influencer or content creator, to promote their product or service."},{"source":0,"locator":"Rules for Paid Partnerships, second rule","text":"Posts that are part of a Paid Partnership published as an organic Post must have the “Paid Partnership” disclosure on."}],"elements":[{"id":"A","label":"The post is part of a paid partnership: a brand gave the poster compensation or incentives to promote its product","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts, by the poster's own disclosure. A partnership behind an unlabelled post sits off the page."},{"id":"B","label":"It was published as an organic post","observable_from":"page","required":true,"strength":"direct","signals":["online-post"]},{"id":"C","label":"The \"Paid Partnership\" disclosure is not on","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"Daylight Commons sees unlabelled posts that share a template with labelled ones. That fits a missing disclosure, and it also fits fans copying a paid post."}],"does_not_prove":"A platform policy is the platform's own rule. A match compares visible elements with the published policy text, and X decides whether its policy was broken.","related":["us-ftc-endorsement-material-connection","eu-dsa-art26-advertising"]},
+  {"id":"x-authenticity-engagement-spam","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"X's Authenticity policy: engagement spam and account metric inflation","jurisdiction":{"code":"platform:x","name":"X's own rules (applies on X wherever the user is)"},"instrument":"X Help Center, Authenticity (formerly the platform manipulation and spam policy)","section":"Inauthentic Behaviors: Engagement Spam; Inauthentic Accounts: Fake personas","kind":"platform-policy","binding_note":"X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.","in_force":{"status":"published","since":null,"note":"The page is headed \"April 2025\". Recorded as read on 2026-10-22."},"sources":[{"url":"https://help.x.com/en/rules-and-policies/authenticity","retrieved_url":"https://help.x.com/en/rules-and-policies/authenticity","retrieved_at":"2026-10-22","sha256":"075e496e31a9ff197727f23d0d9efe007edaab31695a4482190734cf58a90f22","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"X Corp., X Help Center","note":"help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 260,886 bytes. The older address help.x.com/en/rules-and-policies/platform-manipulation redirects here."}],"quotes":[{"source":0,"locator":"Inauthentic Behaviors, Engagement Spam","text":"Engagement Spam: We prohibit inauthentic use of [X] engagement features to artificially impact traffic or disrupt people’s experience."},{"source":0,"locator":"Engagement Spam, Not Allowed, third item","text":"coordinating with and/or compensating others to conduct account metric inflation in any [X] features, including Likes, Polls, Replies, Reposts, Lists, Views, or Follows;"},{"source":0,"locator":"Inauthentic Accounts, Fake personas","text":"Fake personas: You may not use manufactured identities to engage in disruptive or deceptive behavior. This may include using stock, stolen or AI-generated profile photos, copied or stolen profile bios, and/or misleading profile information for the purpose of deceiving others."}],"elements":[{"id":"A","label":"Account metrics (likes, replies, reposts, views, follows) on the post are inflated","observable_from":"page","required":true,"strength":"indicative","signals":["shape-outlier-own","bio-template","stock-persona","join-cluster","topic-mismatch","cross-launch"],"min_families":2,"note":"Page signals are consistent with inflation. Two independent signal families are needed before this element is shown as matched."},{"id":"B","label":"Accounts with copied or templated profile bios take part","observable_from":"page","required":false,"strength":"indicative","signals":["bio-template","stock-persona"],"note":"The policy names copied bios as one possible sign of a fake persona, for the purpose of deceiving others. CMMNS reads bio templates, and avatars, names, languages and places stay out of it."},{"id":"C","label":"Someone coordinated with or compensated others to conduct the inflation","observable_from":"not-observable","required":true,"strength":"direct","signals":[],"note":"Records off the page show who arranged the engagement and whether anyone was paid."}],"does_not_prove":"Templated bios and bursts of reposts also come from real communities and from vendors acting on their own. A platform policy is the platform's own rule. A match compares visible elements with the published policy text, and X decides whether its policy was broken.","related":["us-ftc-fake-social-media-indicators","eu-ucpd-annex1-23c-false-reviews-endorsements"]},
+  {"id":"x-paid-partnerships","version":"1.0.1","status":"active","verification":"verified","role":"match","title":"X's Paid Partnerships policy: undisclosed paid partnership","jurisdiction":{"code":"platform:x","name":"X's own rules (applies on X wherever the user is)"},"instrument":"X Help Center, Paid Partnerships Policy","section":"What are Paid Partnerships?; Rules for Paid Partnerships","kind":"platform-policy","binding_note":"X's own terms for users of X. Policies change without notice; the retrieval date and hash record the version read.","in_force":{"status":"published","since":null,"note":"The page is undated. Recorded as read on 2026-10-22."},"sources":[{"url":"https://help.x.com/en/rules-and-policies/paid-partnerships-policy","retrieved_url":"https://help.x.com/en/rules-and-policies/paid-partnerships-policy","retrieved_at":"2026-10-22","sha256":"06403ae56a3966a359c4c494aba9b4125958a65dcb873b34995809f636cf92ac","hash_method":"raw-bytes","retrieved_with":"browser","publisher":"X Corp., X Help Center","note":"help.x.com answered scripted requests with a Cloudflare challenge (403), so the page was read in a browser. The hash is over the HTML bytes the browser fetched with credentials omitted; two fetches gave the same hash. The page shows the X logo as an image where the name appears; quotes write it as [X]. 233,829 bytes. The page shows no revision date."}],"quotes":[{"source":0,"locator":"What are Paid Partnerships?","text":"[X] defines paid partnerships as the involvement of a third-party brand providing compensation or incentives to a user, such as an influencer or content creator, to promote their product or service."},{"source":0,"locator":"Rules for Paid Partnerships, second rule","text":"Posts that are part of a Paid Partnership published as an organic Post must have the “Paid Partnership” disclosure on."}],"elements":[{"id":"A","label":"The post is part of a paid partnership: a brand gave the poster compensation or incentives to promote its product","observable_from":"page","required":true,"strength":"direct","signals":["disclosed-paid"],"note":"Shown for labelled posts, by the poster's own disclosure. A partnership behind an unlabelled post sits off the page."},{"id":"B","label":"It was published as an organic post","observable_from":"page","required":true,"strength":"direct","signals":["online-post"]},{"id":"C","label":"The \"Paid Partnership\" disclosure is not on","observable_from":"page","required":true,"strength":"indicative","signals":["undisclosed-lookalike"],"note":"CMMNS sees unlabelled posts that share a template with labelled ones. That fits a missing disclosure, and it also fits fans copying a paid post."}],"does_not_prove":"A platform policy is the platform's own rule. A match compares visible elements with the published policy text, and X decides whether its policy was broken.","related":["us-ftc-endorsement-material-connection","eu-dsa-art26-advertising"]},
 ];
 
 return { SIGNAL_REGISTRY, CATALOGUE_ENTRIES };
@@ -14419,11 +14419,11 @@ return { SIGNAL_REGISTRY, CATALOGUE_ENTRIES };
 
 // ---- catalogue-links.js
 const M_catalogue_links = (() => {
-// Links from what Daylight Commons shows to the open catalogue (catalogue/, catalogue/DECISIONS.md).
+// Links from what CMMNS shows to the open catalogue (catalogue/, catalogue/DECISIONS.md).
 // A badge in the launch campaign lens is named by its signal id; it links to every active catalogue
 // entry that cites the signal, at the version shown, and to the dispute templates with the entry or
 // the signal filled in. Pure: no DOM, no network. A link opens only when the user clicks it.
-const REPO_URL = "https://github.com/HarperZ9/daylight-commons";
+const REPO_URL = "https://github.com/HarperZ9/cmmns";
 const DECISIONS_URL = `${REPO_URL}/blob/main/catalogue/DECISIONS.md`;
 const SIGNALS_URL = `${REPO_URL}/blob/main/catalogue/signals.json`;
 const TEMPLATES = Object.freeze({
@@ -14473,7 +14473,7 @@ const M_definitions = (() => {
 // signals, build an element table for each published definition. Each element is matched, not
 // matched or not observable, with the evidence behind it.
 //
-// The phrasing is "matches elements A and B of [definition]". Daylight Commons compares visible conduct with a
+// The phrasing is "matches elements A and B of [definition]". CMMNS compares visible conduct with a
 // published definition; a court, a regulator or the platform decides whether a rule was broken.
 // No text built here ever says the conduct was committed, or that anyone is guilty or liable:
 // VERDICT_WORDS is checked by tests/definitions.test.js on every table the catalogue can produce.
@@ -14482,10 +14482,10 @@ const M_definitions = (() => {
 const VERDICT_WORDS = /\b(?:committed|commits?|guilty|is (?:a )?fraud|fraudulent|violat\w*|illegal|unlawful|liable|liability|crimes?|criminal|convict\w*|breach\w*|offen[cs]es?)\b/i;
 const DEFINITION_FRAME = "This compares visible conduct with a published definition, element by element. Findings belong to courts, regulators and the platform.";
 const LEGAL_NOTE = "Not legal advice. A media lawyer should review this wording before any public release.";
-const CHALLENGE = "Challenge this entry or this badge at https://github.com/HarperZ9/daylight-commons/issues/new?template=challenge.yml. Every decision is published with its reasons, and corrections are dated.";
+const CHALLENGE = "Challenge this entry or this badge at https://github.com/HarperZ9/cmmns/issues/new?template=challenge.yml. Every decision is published with its reasons, and corrections are dated.";
 const STATUSES = ["matched", "not-matched", "not-observable"];
 
-// The words Daylight Commons must never produce about conduct, found in a piece of generated text.
+// The words CMMNS must never produce about conduct, found in a piece of generated text.
 function verdictHits(text) {
   const out = [], re = new RegExp(VERDICT_WORDS.source, "gi");
   for (const m of String(text || "").matchAll(re)) out.push(m[0]);
@@ -14567,7 +14567,7 @@ function elementTable(entry, finding, registry) {
   };
 }
 
-// Every jurisdiction that applies, with why. Daylight Commons shows all of them and never picks the harshest.
+// Every jurisdiction that applies, with why. CMMNS shows all of them and never picks the harshest.
 // actor and audience are jurisdiction codes ("US", "EU", "UK") or null when not public.
 function applicableJurisdictions({ platform = null, actor = null, audience = null } = {}) {
   const out = [], notes = [];
@@ -14607,8 +14607,8 @@ function signalsFromCampaign(lens, { launch = true, actor = null } = {}) {
   return { signals };
 }
 
-// Every piece of text Daylight Commons itself wrote into a table (quotes from the source are left out: they are
-// the law's words, not Daylight Commons').
+// Every piece of text CMMNS itself wrote into a table (quotes from the source are left out: they are
+// the law's words, not CMMNS').
 function generatedText(table) {
   return [table.summary, table.dnp, table.legal_note, table.challenge, ...table.rows.flatMap((r) => [r.label, r.note || ""])].join("\n");
 }
@@ -14618,7 +14618,7 @@ return { VERDICT_WORDS, DEFINITION_FRAME, LEGAL_NOTE, CHALLENGE, STATUSES, verdi
 
 // ---- settings.js
 const M_settings = (() => {
-// Daylight Commons' settings, in one normalised shape for the toolbar popup, the first-run and options pages
+// CMMNS' settings, in one normalised shape for the toolbar popup, the first-run and options pages
 // and the content scripts, plus the retention prune the background worker runs. Settings live in
 // chrome.storage.local under SETTINGS_KEY, on this machine only.
 
@@ -14626,11 +14626,11 @@ const { FEED_OUTLETS, cleanFeedUrl, MAX_CUSTOM_FEEDS } = M_outlets;
 
 const SETTINGS_KEY = "pb.settings";
 
-// Sites Daylight Commons has an adapter for. A site added later starts on unless the user switches it off.
+// Sites CMMNS has an adapter for. A site added later starts on unless the user switches it off.
 const SITES = [["x", "X"], ["youtube", "YouTube"], ["reddit", "Reddit"], ["facebook", "Facebook"], ["instagram", "Instagram"], ["bluesky", "Bluesky"], ["threads", "Threads"],
   ["mastodon", "Mastodon"], ["tiktok", "TikTok"]];
 
-// Search engines where Daylight Commons can show site cards on result links. Each is off until the user turns
+// Search engines where CMMNS can show site cards on result links. Each is off until the user turns
 // it on in the options page, which asks the browser for access to that engine's result pages.
 // [id, name, result-page matches, origin the browser grants]
 const SEARCH_ENGINES = [["google", "Google", ["https://www.google.com/search*"], "https://www.google.com/*"], ["bing", "Bing", ["https://www.bing.com/search*"], "https://www.bing.com/*"], ["duckduckgo", "DuckDuckGo", ["https://duckduckgo.com/*"], "https://duckduckgo.com/*"]];
@@ -14675,7 +14675,7 @@ const DEFAULTS = Object.freeze({
   // default; a .json sidecar for tools, off by default.
   mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
   // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
-  mediaFolder: "Daylight",
+  mediaFolder: "CMMNS",
   // Saving straight into Downloads, with no folders, is its own switch, never an empty folder name.
   mediaToRoot: false,
   // Source-protection mode (project-docs/SECURITY-REVIEW.md): off by default. While on, every
@@ -14685,6 +14685,29 @@ const DEFAULTS = Object.freeze({
   // allows that access; never on the sites listed in hoverOffSites.
   hoverDownload: true, hoverEverywhere: true, hoverOffSites: [],
 });
+
+// The save folder before the 2026-10-28 rename to CMMNS, and the release that renamed it. A browser
+// that had the extension before that release keeps saving into Downloads/Daylight: on its update,
+// src/ext/lifecycle.js stores the folder it used (legacyFolderPatch). New installs save under CMMNS.
+// Readers of saved files take any folder, so both trees read the same.
+const LEGACY_MEDIA_FOLDER = "Daylight";
+const MEDIA_FOLDERS = Object.freeze([DEFAULTS.mediaFolder, LEGACY_MEDIA_FOLDER]);
+const FOLDER_RENAMED_IN = "3.9.0";
+
+const older = (a, b) => {
+  const pa = String(a).split(".").map(Number), pb = String(b).split(".").map(Number);
+  for (let i = 0; i < 3; i++) if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) < (pb[i] || 0);
+  return false;
+};
+
+// On an update from previousVersion: the settings to store so the save folder does not move, or
+// null when nothing needs writing (a version from after the rename, or a folder already stored).
+function legacyFolderPatch(raw, previousVersion) {
+  if (!previousVersion || !/^\d+(\.\d+){0,3}$/.test(String(previousVersion)) || !older(previousVersion, FOLDER_RENAMED_IN)) return null;
+  const s = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  if (typeof s.mediaFolder === "string" && s.mediaFolder.trim()) return null;
+  return { ...s, mediaFolder: LEGACY_MEDIA_FOLDER };
+}
 
 // What source-protection mode holds off while it is on: evidence lookups (GitHub, RDAP, the Internet
 // Archive), Other coverage (outlets' feeds), reading About pages automatically, and one-click
@@ -14743,7 +14766,7 @@ function siteOn(s, id) {
 const areaOn = (s, area) => s.areas[area] !== false;
 const searchOn = (s, id) => !s.paused && s.search[id] === true;
 
-// The toolbar icon: paused when Daylight Commons is paused or off for this site, reading while it is reading
+// The toolbar icon: paused when CMMNS is paused or off for this site, reading while it is reading
 // accounts, idle otherwise.
 function iconState({ paused, siteOff, reading } = {}) {
   if (paused || siteOff) return "paused";
@@ -14784,20 +14807,20 @@ function pruneStore(store, settings, now = Date.now()) {
 
 const PRUNED_KEYS = ["pb.history.v1", "pb.net.v1", "pb.net.v2", "pb.feed.v1", "pb.media.v1", "pb.trail.v1", "pb.about.v1", "pb.reddit.v1"];
 
-// "Clear all Daylight Commons data": every Daylight Commons key except the settings themselves. The Mastodon servers the
+// "Clear all CMMNS data": every CMMNS key except the settings themselves. The Mastodon servers the
 // user turned on (pb.instances.v1) are settings too, removed in the options page with their access.
 // The tour's "No more tips" (pb.tour, src/core/learn.js) is a choice like a setting, so clearing data keeps it.
 // Imported data packs and the keys the user trusts (src/ext/packs-bg.js) are choices too.
 const KEPT = new Set([SETTINGS_KEY, "pb.tour", "pb.instances.v1", "pb.packs.v1", "pb.packkeys.v1"]);
 const dataKeys = (keys) => keys.filter((k) => k.startsWith("pb.") && !KEPT.has(k));
 
-return { SETTINGS_KEY, SITES, SEARCH_ENGINES, AREA_IDS, RETENTION, DEFAULTS, PROTECTION_FORCES, normalizeSettings, siteOn, areaOn, searchOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
+return { SETTINGS_KEY, SITES, SEARCH_ENGINES, AREA_IDS, RETENTION, DEFAULTS, LEGACY_MEDIA_FOLDER, MEDIA_FOLDERS, FOLDER_RENAMED_IN, legacyFolderPatch, PROTECTION_FORCES, normalizeSettings, siteOn, areaOn, searchOn, iconState, pruneStore, PRUNED_KEYS, dataKeys };
 })();
 
 // ---- families.js
 const M_families = (() => {
 // Badge families: every kind of signal the window can show, which area of the strip it sits in, and
-// what sort of evidence it is. A detector is Daylight Commons' own rule and can be measured for precision; a
+// what sort of evidence it is. A detector is CMMNS' own rule and can be measured for precision; a
 // platform family repeats the site's own label; a table family is a match against a cited table.
 // measuredLine() gives the line the window and the options page show for a family.
 
@@ -14854,7 +14877,7 @@ const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.
 function measuredLine(id, table = MEASURED) {
   const f = BY_ID.get(id);
   if (f && f.kind === P) return { measured: false, text: "the site's own label, shown as the site gives it" };
-  if (f && f.kind === F) return { measured: false, text: "what the file itself declares, with its signature checked by Daylight Commons" };
+  if (f && f.kind === F) return { measured: false, text: "what the file itself declares, with its signature checked by CMMNS" };
   if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
   if (f && f.kind === TECH) { const st = techniqueStatus(id); return { measured: st.shown, text: st.text }; }
   const r = (table || {})[id];
@@ -14948,7 +14971,7 @@ function calibrationLine(store, family, min = CALIBRATION_MIN) {
   return c ? `Your feedback: ${c.right} of ${c.total} right` : null;
 }
 
-const FEEDBACK_ABOUT = "Your marks on Daylight Commons' signs, saved from this browser. It stays on your device until you send it, for example as an attachment to an issue on Daylight Commons' repository. Post text appears for marks where you ticked \"include the text\".";
+const FEEDBACK_ABOUT = "Your marks on CMMNS' signs, saved from this browser. It stays on your device until you send it, for example as an attachment to an issue on CMMNS' repository. Post text appears for marks where you ticked \"include the text\".";
 
 // The opt-in export: a JSON object the options page saves as a file when the user clicks.
 function buildExport(store, { version = null, now = Date.now() } = {}) {
@@ -15016,7 +15039,7 @@ function lessonPath(fam) {
   return typeof fam === "string" && ID.test(fam) ? `learn.html#${fam}` : null;
 }
 
-// A content script asks the worker to open one of Daylight Commons' own pages. Only these pages, with an
+// A content script asks the worker to open one of CMMNS' own pages. Only these pages, with an
 // optional lesson id, pass; anything else is refused, so a page cannot be made to open other URLs.
 function safePage(path) {
   if (typeof path !== "string") return null;
@@ -15031,7 +15054,7 @@ const TIPS = [
   { id: "hover", where: "window", step: 1,
     text: "Tip 1 of 3. This window opens when you rest the pointer on a post. The dots at the top are areas. Click one to open its evidence." },
   { id: "report", where: "panel", step: 2,
-    text: "Tip 2 of 3. The Daylight Commons button opens a report on the whole thread. It compares the harshest replies with the rest and shows the interval." },
+    text: "Tip 2 of 3. The CMMNS button opens a report on the whole thread. It compares the harshest replies with the rest and shows the interval." },
   { id: "lesson", where: "window", step: 3,
     text: "Tip 3 of 3. Every sign has a Learn link. Each lesson takes about a minute and shows how to spot the move yourself." },
 ];
@@ -15133,8 +15156,8 @@ const M_imagetext = (() => {
 const { score } = M_rhetoric;
 const { persuasion } = M_persuasion;
 
-const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with Daylight Commons' own text recogniser. The image and its text stay in your browser.";
-const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in Daylight Commons' options to read the words inside an image on this device.";
+const IMAGE_TEXT_NOTE = "Reads the image this page already loaded, on this device, with CMMNS' own text recogniser. The image and its text stay in your browser.";
+const IMAGE_TEXT_OFF = "Off. Turn on \"Read text in images\" in CMMNS' options to read the words inside an image on this device.";
 const IMAGE_TEXT_DOES_NOT_PROVE = "Software read these words, so a letter can change a word or a word can drop out. The image itself can be edited, screenshots of posts included.";
 const MAX_SHOWN = 280;
 
@@ -15151,14 +15174,14 @@ const percent = (c) => `${Math.round(100 * Math.max(0, Math.min(1, c || 0)))}%`;
 function imageTextRows(result) {
   if (!result) return [];
   if (result.error) return [["Text in the image", `could not read it: ${result.error}`]];
-  if (!result.text) return [["Text in the image", "none found. Daylight Commons reads printed Latin-script text, such as English, French or Spanish; handwriting and other scripts are not read yet."]];
+  if (!result.text) return [["Text in the image", "none found. CMMNS reads printed Latin-script text, such as English, French or Spanish; handwriting and other scripts are not read yet."]];
   const shown = result.text.length > MAX_SHOWN ? result.text.slice(0, MAX_SHOWN).replace(/\s+\S*$/, "") + " …" : result.text;
   const unsure = (result.lines || []).filter((l) => l.low).length;
   return [
     ["Text in the image", `"${shown}"`],
     ["Confidence", `${percent(result.confidence)}, the recogniser's own average over the lines it kept; not a measured accuracy`],
     ...(unsure ? [["Left out", `${unsure} ${unsure === 1 ? "line" : "lines"} the recogniser was unsure of`]] : []),
-    ["Read by", `Daylight Commons' own recogniser on this device, in ${Math.max(1, Math.round(result.ms || 0))} ms`],
+    ["Read by", `CMMNS' own recogniser on this device, in ${Math.max(1, Math.round(result.ms || 0))} ms`],
   ];
 }
 
@@ -15204,8 +15227,8 @@ const FLAG_LABEL = {
   "platform-label": "moderation label", "brand-lookalike": "name borrows a brand",
 };
 
-const SRC_RULES = "Daylight Commons' own rules, run on this device. Rules and measured error rates: Daylight Commons' EVALUATION.md.";
-const SRC_POSTS = "The posts in the input, as given, read by Daylight Commons on this device.";
+const SRC_RULES = "CMMNS' own rules, run on this device. Rules and measured error rates: CMMNS' EVALUATION.md.";
+const SRC_POSTS = "The posts in the input, as given, read by CMMNS on this device.";
 const SRC_ACCOUNTS = "Account details given in the input: what each platform discloses on profiles and About pages.";
 const SRC_FILE = "The file's bytes, read on this device: Content Credentials (C2PA) and IPTC or XMP metadata.";
 
@@ -15265,7 +15288,7 @@ return { useData, claimIndex, dataLoaded };
 const M_api_site = (() => {
 // Site context as evidence items: who owns a site, any state link a cited source makes, whether
 // its address imitates a listed outlet, and its fact-check record. Every item names its source.
-// Daylight Commons adds no score or rating of its own. Reads only the tables handed to useData().
+// CMMNS adds no score or rating of its own. Reads only the tables handed to useData().
 
 const { siteFacts, siteRecord, recordSummary, recordLine, ownerHeading, ownerType, SITE_SOURCES, SITE_RECORD_DOES_NOT_PROVE } = M_sites;
 const { ownerOfDomain, ownerSource } = M_owners;
@@ -15285,7 +15308,7 @@ function cleanDomain(d) {
 const stateLevel = (h) => (h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" || h.basis === "designated" ? "flag" : "info");
 const sourceLine = (s) => (s ? `${s.title}${s.date ? ` (${s.date})` : ""}${s.url ? `: ${s.url}` : ""}` : "the cited report");
 
-// What Daylight Commons' tables hold for one domain: { domain, facts, owner, state, record, lookalike }.
+// What CMMNS' tables hold for one domain: { domain, facts, owner, state, record, lookalike }.
 function siteSummary(domain) {
   const d = cleanDomain(domain);
   if (!d) return null;
@@ -15308,7 +15331,7 @@ function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   if (S.lookalike) {
     const L = S.lookalike;
     out.push({ ...base, kind: "lookalike-domain", level: "flag", label: `look-alike of ${L.official}`,
-      shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "Daylight Commons' list of outlet addresses, matched on this device.",
+      shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "CMMNS' list of outlet addresses, matched on this device.",
       context: LOOKALIKE_DOES_NOT_PROVE, data: { domain: S.domain, outlet: L.outlet, official: L.official, how: L.how } });
   }
   for (const h of S.state) {
@@ -15324,7 +15347,7 @@ function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   const line = recordLine(S.record);
   if (line || (!quiet && S.facts)) {
     out.push({ ...base, kind: "site-record", level: "info", label: `site record: ${S.domain}`,
-      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."].join(": ") + ".",
+      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "Zero reviews in CMMNS' table list this site as where a claim appeared."].join(": ") + ".",
       source: SITE_SOURCES, context: SITE_RECORD_DOES_NOT_PROVE,
       data: { domain: S.domain, reviews: S.record ? S.record.n : 0, checkers: S.record ? S.record.m : 0, since: S.record ? S.record.since : null, founded: S.facts ? S.facts.founded : null, country: S.facts ? S.facts.country : null } });
   }
@@ -15377,7 +15400,7 @@ function language(id, text) {
 function machine(id, text) {
   const M = machineSigns(text), out = [];
   if (M.leak) out.push(item(id, "leaked-ai", "warn", "leaked AI text", "Text a chatbot writes, posted without editing.", SRC_RULES, LEAK_DOES_NOT_PROVE, [spanOf(id, text, M.leak)]));
-  else if (M.machineLike) out.push(item(id, "machine-writing", "flag", "machine-writing signs", `Signs: ${M.signs.join("; ")}. Daylight Commons counts three or more independent signs in a post of at least 25 words.`, SRC_RULES, MACHINE_DOES_NOT_PROVE, [], { signs: M.signs }));
+  else if (M.machineLike) out.push(item(id, "machine-writing", "flag", "machine-writing signs", `Signs: ${M.signs.join("; ")}. CMMNS counts three or more independent signs in a post of at least 25 words.`, SRC_RULES, MACHINE_DOES_NOT_PROVE, [], { signs: M.signs }));
   if (M.spam) out.push(item(id, "spam-pattern", "warn", "spam pattern", "A pattern common in scam and spam posts: giveaways, crypto, contact bait.", SRC_RULES, SPAM_DOES_NOT_PROVE, [spanOf(id, text, M.spam)]));
   return { items: out, machineLike: !!(M.leak || M.machineLike) };
 }
@@ -15426,7 +15449,7 @@ const thread = (kind, level, label, shows, source, context, posts, data = {}) =>
   ({ kind, scope: "thread", level, label, shows, source, context, posts, spans: [], data });
 const withBase = (text, sign, replies) => { const b = baselineLine(sign, { replies }); return b ? `${text} ${b}` : text; };
 
-// Flags for one reply: the input's own list (ids or { id, evidence }), or Daylight Commons' rules over the
+// Flags for one reply: the input's own list (ids or { id, evidence }), or CMMNS' rules over the
 // account details given, or null when neither was given (the account was not read).
 function flagsOf(reply, now) {
   if (Array.isArray(reply.flags)) return reply.flags.map((f) => (typeof f === "string" ? { id: f } : f)).filter((f) => f && f.id);
@@ -15479,8 +15502,8 @@ function burstItems(replies, precision) {
 const SIGNAL_NAME = { "timing-burst": "Timing bursts", swarming: "Swarming" };
 const BASIS = {
   declared: "The input, or the platform format it was read from, gives this precision.",
-  inferred: (p) => `Daylight Commons inferred this from the times: most of them fall on the same point of the ${p === "day" ? "day" : p === "hour" ? "hour" : "minute"}, as times worked out from rounded ages such as "14h" do.`,
-  "declared and inferred": "The input gives the precision for some posts; for the rest Daylight Commons inferred it from the times.",
+  inferred: (p) => `CMMNS inferred this from the times: most of them fall on the same point of the ${p === "day" ? "day" : p === "hour" ? "hour" : "minute"}, as times worked out from rounded ages such as "14h" do.`,
+  "declared and inferred": "The input gives the precision for some posts; for the rest CMMNS inferred it from the times.",
   unknown: "Too few posts carry a time to tell how precise the times are.",
 };
 function coarseItem(replies, root, P) {
@@ -15555,11 +15578,11 @@ function mediaItems(r) {
   const out = credentialSignals(r).map((s) => ({
     kind: s.fam === "c2pa" && /AI/.test(s.label) ? "credentials-ai" : KIND[s.fam] || s.fam,
     scope: "file", level: s.level, label: s.label,
-    shows: [row(s.rows, "What Daylight Commons read") || row(s.rows, "What Daylight Commons found"), row(s.rows, "Signed by") ? `Signed by ${row(s.rows, "Signed by")}.` : null].filter(Boolean).join(" "),
+    shows: [row(s.rows, "What CMMNS read") || row(s.rows, "What CMMNS found"), row(s.rows, "Signed by") ? `Signed by ${row(s.rows, "Signed by")}.` : null].filter(Boolean).join(" "),
     source: SRC_FILE, context: row(s.rows, "What it shows") || CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state },
   }));
   if (state === "none") out.push({ kind: "no-credentials", scope: "file", level: "info", label: "no content credentials", shows: NO_CREDENTIALS, source: SRC_FILE, context: "Most platforms remove credentials on upload, so this is the usual case.", posts: [], spans: [], data: { state } });
-  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online, which Daylight Commons leaves unfetched.", source: SRC_FILE, context: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
+  if (state === "remote") out.push({ kind: "remote-credentials", scope: "file", level: "info", label: "credentials stored online", shows: "The file points to Content Credentials stored online, which CMMNS leaves unfetched.", source: SRC_FILE, context: CREDENTIALS_DO_NOT_PROVE, posts: [], spans: [], data: { state } });
   return out;
 }
 
@@ -15575,15 +15598,15 @@ return { mediaItems, mediaReading };
 
 // ---- api.js
 const M_api = (() => {
-// radar-core: the public API. One zero-dependency ES module over Daylight Commons' pure core, for anyone
-// who wants Daylight Commons' evidence without the browser extension. No DOM, no network, no storage: the
+// radar-core: the public API. One zero-dependency ES module over CMMNS' pure core, for anyone
+// who wants CMMNS' evidence without the browser extension. No DOM, no network, no storage: the
 // caller hands in the posts, the file bytes and (optionally) the data tables, and gets back
 // evidence objects that match schema/evidence.v2.json. project-docs/INTEGRATION.md documents it.
 //
 //   analyzeThread({ site, root, replies })   evidence about a thread
 //   analyzeText(text)                        evidence about one piece of text
 //   checkMedia(bytes)                        Content Credentials and AI metadata of a file
-//   siteInfo(domain)                         what Daylight Commons' tables hold about a site
+//   siteInfo(domain)                         what CMMNS' tables hold about a site
 //   useData({ sites, owners, state, claims, claimParts })   load the tables (optional)
 //
 // Every evidence item states what it shows, its source and what it does not prove. None names an
@@ -15665,7 +15688,7 @@ function analyzeThread(input, opts = {}) {
 // bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
 async function checkMedia(bytes) {
   const M = await mediaReading(bytes);
-  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made."] });
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["CMMNS read this file on this device. Credentials and metadata describe how the file says it was made."] });
 }
 
 // domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
@@ -15745,11 +15768,11 @@ async function signatureOk(bundle) {
 // { ok, keyId, checks: [{ name, ok, text }] }; ok is true only when every check passes.
 async function verifyBundle(bundle, opts = {}) {
   const checks = [];
-  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this file lacks the Daylight Commons evidence bundle kind" }] };
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this file lacks the CMMNS evidence bundle kind" }] };
   const known = BUNDLE_VERSIONS.includes(bundle.version);
-  checks.push({ name: "version", ok: known, text: known ? `bundle version ${bundle.version}` : `bundle version ${bundle.version}; this Daylight Commons reads versions ${BUNDLE_VERSIONS.join(" and ")}` });
+  checks.push({ name: "version", ok: known, text: known ? `bundle version ${bundle.version}` : `bundle version ${bundle.version}; this CMMNS reads versions ${BUNDLE_VERSIONS.join(" and ")}` });
   checks.push({ name: "signature", ...(await signatureOk(bundle)) });
-  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is unknown to this Daylight Commons` });
+  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is unknown to this CMMNS` });
   const keyId = bundle.signer ? bundle.signer.keyId : null;
   if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
   const C = bundleConsistency(bundle);
@@ -15762,8 +15785,8 @@ return { BUNDLE_KIND, BUNDLE_VERSION, BUNDLE_VERSIONS, EVIDENCE_V1, BUNDLE_SIG_A
 
 // ---- evidence-bundle.js
 const M_evidence_bundle = (() => {
-// Signed evidence bundles: what Daylight Commons found on a thread, as a file anyone can check offline. A
-// bundle carries post ids, the evidence with the matched spans needed to check it, the Daylight Commons and
+// Signed evidence bundles: what CMMNS found on a thread, as a file anyone can check offline. A
+// bundle carries post ids, the evidence with the matched spans needed to check it, the CMMNS and
 // API versions, a hash of the data tables used, and the time; it is signed with a per-install
 // ECDSA P-256 key through WebCrypto, and the public key travels inside the bundle.
 //
@@ -15815,8 +15838,8 @@ async function publicKeyOf(publicKey) {
 // a clock time with a zone or am/pm ("at 12:10 UTC", "9:05 pm"). A ratio or verse number is kept.
 const TIME_OF_DAY = /(?:(?<=\d{4}-\d{2}-\d{2})[T ]|T)\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:\s?(?:Z|UTC|[+-]\d{2}:?\d{2}))?|\b\d{1,2}:\d{2}(?::\d{2})?\s?(?:UTC|GMT|Z|am|pm)\b/gi;
 const blankTimes = (v) => (typeof v === "string" ? v.replace(TIME_OF_DAY, (m) => " ".repeat(m.length)) : Array.isArray(v) ? v.map(blankTimes) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, blankTimes(x)])) : v);
-// "Daylight Commons 3.1.0 (CLI)" becomes "Daylight Commons 3".
-const carrierTool = (tool) => { const m = String(tool || "").match(/^(.*?)(\d+)\.\d+(\.\d+)?/); return m ? `${m[1]}${m[2]}`.trim() : "Daylight Commons"; };
+// "CMMNS 3.1.0 (CLI)" becomes "CMMNS 3".
+const carrierTool = (tool) => { const m = String(tool || "").match(/^(.*?)(\d+)\.\d+(\.\d+)?/); return m ? `${m[1]}${m[2]}`.trim() : "CMMNS"; };
 
 // result: an analyzeThread or analyzeText envelope. opts: { tool, dataLock, savedAt, page, texts,
 // includeText, source, profile, typedPage }. texts: { postId: text }, used only when includeText
@@ -15831,7 +15854,7 @@ function makeBundle(result, opts = {}) {
   const ids = (result.posts && result.posts.ids) ? [...result.posts.ids, ...(result.posts.quoted || [])] : [...new Set(result.evidence.flatMap((e) => e.posts))];
   const texts = opts.includeText ? opts.texts || {} : {};
   const bundle = {
-    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "Daylight Commons",
+    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "CMMNS",
     savedAt: opts.savedAt || new Date().toISOString(), dataLock: opts.dataLock || null,
     input: { kind: result.kind, site: result.site || null, page: opts.page || null, source: archive ? "export" : "thread", accounts: result.posts ? result.posts.accounts : null },
     posts: ids.map((id) => (opts.includeText && texts[id] != null ? { id, text: String(texts[id]) } : { id })),
@@ -15867,7 +15890,7 @@ return { dataLockOf, dataLockFromHashes, newBundleKey, publicKeyOf, carrierTool,
 // ---- signing.js
 const M_signing = (() => {
 // Release signatures: detached ECDSA P-256 signatures over a release's SHA256SUMS, made and checked
-// with Daylight Commons' one copy of the signing primitives (src/core/sig.js), the same code that signs data
+// with CMMNS' one copy of the signing primitives (src/core/sig.js), the same code that signs data
 // packs and evidence bundles. It runs in node (scripts/release.mjs, scripts/verify-release.mjs), in
 // the extension and on the public install page (docs/signing.js, a generated copy). No library, no
 // network.
@@ -16264,7 +16287,7 @@ function redditExportPosts(text) {
     const url = pick("url"), text = [pick("title"), pick("body")].filter(Boolean).join("\n");
     return { id: pick("id"), author: EXPORT_AUTHOR, text, posted: iso(pick("date")), links: /^https?:\/\//.test(url) && !/reddit\.com\//.test(url) ? [url] : [] };
   }).filter((p) => p.id && p.text && p.text !== "[deleted]" && p.text !== "[removed]");
-  return { site: "Reddit", posts, notes: col("ip") >= 0 ? ["The export's ip column was left out; Daylight Commons keeps and shows no IP address."] : [] };
+  return { site: "Reddit", posts, notes: col("ip") >= 0 ? ["The export's ip column was left out; CMMNS keeps and shows no IP address."] : [] };
 }
 
 // outbox.json: { orderedItems: [{ type: "Create", object: { id, content, published, tag } }] }.
@@ -16289,7 +16312,7 @@ return { EXPORT_AUTHOR, xArchivePosts, parseCsv, redditExportPosts, mastodonOutb
 const M_import_json = (() => {
 // Threads from JSON a platform's own web app or API returned, saved by the user: X's GraphQL
 // TweetDetail, Bluesky's app.bsky.feed.getPostThread, a Mastodon status context, or a thread in
-// Daylight Commons' own input shape ({ site, root, replies }). Field names follow each platform's public
+// CMMNS' own input shape ({ site, root, replies }). Field names follow each platform's public
 // formats; the readers walk the JSON, so a wrapper around the response does not matter.
 
 const { htmlText } = M_import_html;
@@ -16358,10 +16381,10 @@ function mastoThread(json) {
 
 const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r) => r && typeof r.text === "string");
 
-// Returns { site, root, replies } or null when the JSON holds no thread Daylight Commons can read.
+// Returns { site, root, replies } or null when the JSON holds no thread CMMNS can read.
 function threadFromJson(json) {
   if (!json || typeof json !== "object") return null;
-  // Daylight Commons' own shape is typed or assembled by hand: its timePrecision is kept as given, and
+  // CMMNS' own shape is typed or assembled by hand: its timePrecision is kept as given, and
   // when it is missing the times are not assumed to be second-precise (precision.js infers it).
   if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies, ...(Array.isArray(json.quoted) ? { quoted: json.quoted } : {}), ...(json.timePrecision ? { timePrecision: json.timePrecision } : {}) };
   const text = JSON.stringify(json).slice(0, 2000000);
@@ -16377,7 +16400,7 @@ return { threadFromJson };
 // ---- import-car.js
 const M_import_car = (() => {
 // Posts from a Bluesky repository export (Settings > Export my data gives a .car file). A CAR v1
-// file is a header and a list of blocks, each a CID and DAG-CBOR bytes. Daylight Commons decodes every block,
+// file is a header and a list of blocks, each a CID and DAG-CBOR bytes. CMMNS decodes every block,
 // keeps the app.bsky.feed.post records, and names each post by its record key, read from the
 // repository's key tree (MST). Everything in the file is the user's own data.
 
@@ -16477,9 +16500,9 @@ return { varint, carBlocks, blueskyCarPosts };
 // ---- imports.js
 const M_imports = (() => {
 // One entry for every file the offline analyser and the CLI read: it decides what the file is from
-// its name and its first bytes, and returns posts in Daylight Commons' input shape. Nothing is fetched.
+// its name and its first bytes, and returns posts in CMMNS' input shape. Nothing is fetched.
 //   saved page (.html, .htm)            X or Reddit thread, or any page as one text
-//   thread JSON                         Daylight Commons' shape, X GraphQL, Bluesky getPostThread, Mastodon context
+//   thread JSON                         CMMNS' shape, X GraphQL, Bluesky getPostThread, Mastodon context
 //   X archive tweets.js                 the user's own posts
 //   Reddit export comments.csv / posts.csv
 //   Mastodon archive outbox.json
@@ -16504,20 +16527,20 @@ const fromThread = (format, t, notes = []) => (t && (t.replies.length || t.root)
 function fromJson(name, text) {
   let json;
   try { json = JSON.parse(text); } catch { return fail(`${name} is not valid JSON.`); }
-  if (json && json.kind === "radar-evidence-bundle") return fail("This is a Daylight Commons evidence bundle. Use Check a bundle to verify it.");
-  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`Daylight Commons found zero readable posts in ${name}.`);
+  if (json && json.kind === "radar-evidence-bundle") return fail("This is a CMMNS evidence bundle. Use Check a bundle to verify it.");
+  return fromExport("Mastodon outbox.json", mastodonOutboxPosts(json)) || fromThread("thread JSON", threadFromJson(json)) || fail(`CMMNS found zero readable posts in ${name}.`);
 }
 
 function fromBytes(name, bytes) {
   const lower = String(name || "").toLowerCase();
   if (lower.endsWith(".car") && typeof bytes !== "string") return fromExport("Bluesky repository .car", blueskyCarPosts(bytes)) || fail(`${name} is unreadable as a Bluesky repository export.`);
   const text = asText(bytes).replace(/^﻿/, ""), head = text.slice(0, 400).trimStart();
-  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds zero posts Daylight Commons can read.`);
+  if (/^window\.YTD\./.test(head)) return fromExport("X archive tweets.js", xArchivePosts(text)) || fail(`${name} holds zero posts CMMNS can read.`);
   if (lower.endsWith(".csv")) return fromExport("Reddit export CSV", redditExportPosts(text)) || fail(`${name} lacks the id, permalink and body columns of a Reddit export.`);
   if (/^[[{]/.test(head)) return fromJson(name, text);
   // A saved X or Reddit page carries machine-readable times (datetime and created attributes) to the second.
-  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); if (p.kind === "thread") p.timePrecision = "second"; return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["Daylight Commons read this page as one text, its fallback for pages outside the thread readers."] : [] }; }
-  return fail(`Daylight Commons reads these kinds of file: ${IMPORT_FORMATS.join(", ")}.`);
+  if (/^<|<html|<!doctype/i.test(head)) { const p = postsFromHtml(text); if (p.kind === "thread") p.timePrecision = "second"; return { ok: true, format: "saved page", source: p.kind === "thread" ? "thread" : "page", site: p.site, input: p, notes: p.kind === "page" ? ["CMMNS read this page as one text, its fallback for pages outside the thread readers."] : [] }; }
+  return fail(`CMMNS reads these kinds of file: ${IMPORT_FORMATS.join(", ")}.`);
 }
 
 // name: the file name; bytes: Uint8Array, ArrayBuffer or string. Returns { ok: true, format,
@@ -16532,7 +16555,7 @@ return { IMPORT_FORMATS, MAX_IMPORT_POSTS, importFile };
 
 // ---- self-audit.js
 const M_self_audit = (() => {
-// "What Daylight shows about you": Daylight's own account signals, run on the user's own account
+// "What CMMNS shows about you": CMMNS's own account signals, run on the user's own account
 // only, each with what it reveals and how to reduce it. Ownership is proved two ways and no other:
 // the page itself shows the signed-in account on its own profile (ownedProfile), or the input is
 // the platform's own data export, which only the account holder can download. There is no way to
@@ -16579,7 +16602,7 @@ function row(id, title, shows, reveals, reduce) { return { id, title, shows, rev
 
 function placeRows(a) {
   const out = [];
-  if (a.basedIn) out.push(row("place-label", "Place label", `The platform labels this account as based in ${a.basedIn}${a.proxyNote ? ", and notes the location may be inaccurate" : ""}.`, "Anyone who opens your About page sees this country or region, and Daylight shows it beside your replies.", "The platform sets it from its own data (sign-up, network, phone). You cannot edit it. A VPN changes what it sees from now on; the label can lag."));
+  if (a.basedIn) out.push(row("place-label", "Place label", `The platform labels this account as based in ${a.basedIn}${a.proxyNote ? ", and notes the location may be inaccurate" : ""}.`, "Anyone who opens your About page sees this country or region, and CMMNS shows it beside your replies.", "The platform sets it from its own data (sign-up, network, phone). You cannot edit it. A VPN changes what it sees from now on; the label can lag."));
   const store = storeCountry(a.connectedVia);
   if (store) out.push(row("app-store", "App store country", `Connected via ${a.connectedVia}.`, `The country of the app store your phone uses: ${store}.`, "It follows your app store account's country. It cannot be hidden from this page."));
   if (a.profileLocation) out.push(row("profile-location", "Profile location", `Your profile says "${a.profileLocation}".`, "A place you typed yourself, shown to everyone.", "Edit your profile and clear the location, or make it vaguer."));
@@ -16600,7 +16623,7 @@ function postingRows(p) {
   const out = [];
   if (!p) return out;
   const clock = postingClock(p.hourHist);
-  if (clock) out.push(row("posting-clock", "Posting clock", clock.offset == null ? `Posts in ${clock.active} of the 24 hours of the day, with no long quiet stretch (${p.posts} posts).` : `Posts in ${clock.active} of 24 hours; quiet for ${clock.quietHours} hours from ${String(clock.quietFromUtc).padStart(2, "0")}:00 UTC (${p.posts} posts).`, clock.offset == null ? "Round-the-clock posting is one of the signs Daylight shows for automated accounts." : `Your quiet hours fit sleep at about UTC${clock.offset >= 0 ? "+" : ""}${clock.offset}, which points to your time zone and your sleeping hours.`, "Times cannot be hidden once posted. Scheduling posts at varied hours, or posting less from an account you keep apart, blurs the pattern."));
+  if (clock) out.push(row("posting-clock", "Posting clock", clock.offset == null ? `Posts in ${clock.active} of the 24 hours of the day, with no long quiet stretch (${p.posts} posts).` : `Posts in ${clock.active} of 24 hours; quiet for ${clock.quietHours} hours from ${String(clock.quietFromUtc).padStart(2, "0")}:00 UTC (${p.posts} posts).`, clock.offset == null ? "Round-the-clock posting is one of the signs CMMNS shows for automated accounts." : `Your quiet hours fit sleep at about UTC${clock.offset >= 0 ? "+" : ""}${clock.offset}, which points to your time zone and your sleeping hours.`, "Times cannot be hidden once posted. Scheduling posts at varied hours, or posting less from an account you keep apart, blurs the pattern."));
   if (p.clients && p.clients.length) out.push(row("posting-apps", "Posting apps", `Posted from ${p.clients.map((c) => `${c.name} (${Math.round(c.share * 100)}%)`).join(", ")}.`, "The kind of phone or tool you use. The platform's data carries it even where the page no longer shows it.", "Posting from the web app makes it the same as most people's. Scheduling tools show up by name."));
   if (Number.isFinite(p.perDay)) out.push(row("volume", "How often you post", `About ${p.perDay} posts a day over ${p.days} days.`, "How much time you spend here, and when you are busy.", "Volume shows over time; posting less, or in batches, changes it."));
   return out;

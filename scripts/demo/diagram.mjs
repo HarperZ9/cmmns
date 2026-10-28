@@ -1,4 +1,4 @@
-// The "How Daylight Commons works" diagram, drawn in the author's site canon: ink line-work on the
+// The "How CMMNS works" diagram, drawn in the author's site canon: ink line-work on the
 // site's paper and void grounds, Hanken Grotesk for words and the mono face for code, square
 // corners, and one hot mark per view (the signal colour, on the check that passes). Writes a light
 // and a dark SVG with the font embedded, so each file stands alone.
@@ -49,9 +49,9 @@ export function diagram(theme) {
   parts.push(label(t, 780, 830, "No server of ours, no account, no analytics.", "k"));
   parts.push(label(t, 780, 860, "A receipt shows what a source said and when.", "k"));
   parts.push(label(t, 780, 890, "It does not show that the source was right.", "k"));
-  parts.push(`<text x="40" y="58" class="t" fill="${t.ink}">How Daylight Commons works</text>`);
+  parts.push(`<text x="40" y="58" class="t" fill="${t.ink}">How CMMNS works</text>`);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 970" width="1600" height="970" role="img" aria-labelledby="dt dd">
-<title id="dt">How Daylight Commons works</title>
+<title id="dt">How CMMNS works</title>
 <desc id="dd">The page you read goes to the reader, then the rules, then the window beside the reply, all inside your browser. Evidence lookups and Other coverage leave the browser only on your click. Looked-up facts become hashed receipts in a chain on your device; you can save the chain, and anyone can check it offline.</desc>
 <defs><style>@font-face{font-family:"DC Hanken";src:url(data:font/woff2;base64,${FONT}) format("woff2");font-weight:100 900}
 @font-face{font-family:"DC Mono";src:url(data:font/woff2;base64,${MONO}) format("woff2")}

@@ -1,6 +1,6 @@
 // Pacing for automatic About lookups, from X's own rate-limit headers.
 // x-rate-limit-remaining and x-rate-limit-reset (epoch seconds) come back on every GraphQL
-// response. Daylight Commons spreads what is left over the window and stops RESERVE requests short, so the
+// response. CMMNS spreads what is left over the window and stops RESERVE requests short, so the
 // viewer's own use of X is never the thing that gets limited. Without headers it keeps its base gap.
 
 export const BASE_GAP_MS = 1500;

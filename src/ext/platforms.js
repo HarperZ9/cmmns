@@ -1,7 +1,7 @@
 // One adapter per site. Each knows how to find the replies the site has rendered, read their
 // author and text, and where to put the badge. X labels where accounts are based on every
 // reply; Instagram and Facebook show it only when the viewer opens an account's About or
-// Page transparency view (src/ext/meta.js), and Daylight Commons then remembers it. `reading(author)` gives
+// Page transparency view (src/ext/meta.js), and CMMNS then remembers it. `reading(author)` gives
 // a site's account reading; `rootFirst` means the first item is the post replied to.
 // Selectors are written from each site's public markup and need a live check
 // (project-docs/LIVE-CHECKS.md); a site redesign can break them.
@@ -18,7 +18,7 @@
     onThread: () => /^\/[A-Za-z0-9_]{1,15}\/status\/\d+/.test(location.pathname),
     // Timelines, profiles, likes, lists and search: any other page that shows posts.
     onFeed: () => !/^\/(?:settings|messages|i\/(?:flow|keyboard_shortcuts|display))/.test(location.pathname),
-    // Layered so a redesign does not blind Daylight Commons (RADAR-VISION, "Independence in perpetuity"):
+    // Layered so a redesign does not blind CMMNS (RADAR-VISION, "Independence in perpetuity"):
     // X's test ids first, then semantic structure and the accessibility tree (an <article> or
     // role="article" holding a status link with a <time>). The same layers are tested against
     // rotated markup in tests/x-live-shapes.test.js through src/core/import-html.js.
@@ -44,7 +44,7 @@
         // X's own paid-placement label, and link domains shown in the post or its card
         paid: [...node.querySelectorAll("span")].some((sp) => /^(Ad|Promoted)$/.test(sp.textContent.trim())),
         // X's "Paid partnership" label under a post: X's record of the poster's own disclosure, a
-        // platform claim Daylight Commons records and checks, never ground truth (campaign lens)
+        // platform claim CMMNS records and checks, never ground truth (campaign lens)
         paidPartnership: [...node.querySelectorAll("span")].some((sp) => sp.textContent.trim() === "Paid partnership"),
         domains: PB.domainsIn(node.innerText),
         // shown by X beside the reply: the language it was written in, and account labels

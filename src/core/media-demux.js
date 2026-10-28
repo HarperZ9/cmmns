@@ -134,7 +134,7 @@ function fragmentSamples(b, top, trex) {
 export function demuxMp4(bytes) {
   const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
   const top = readBoxes(b), moov = top.find((x) => x.type === "moov");
-  if (!moov) throw new Error("The file has no movie header (moov), so it is not an MP4 Daylight Commons can read.");
+  if (!moov) throw new Error("The file has no movie header (moov), so it is not an MP4 CMMNS can read.");
   const tracks = (moov.children || kids(b, moov)).filter((x) => x.type === "trak").map((t) => trackInfo(b, t)).filter((t) => t.kind && t.entry);
   const trex = new Map();
   const mvex = child(b, moov, "mvex");
@@ -160,8 +160,8 @@ export function remuxMp4(files) {
   const find = (kind) => { for (const d of parsed) { const t = d.tracks.find((x) => x.kind === kind && d.samples.get(x.id).length); if (t) return { d, t }; } return null; };
   const v = find("video"), a = find("audio");
   if (!v && !a) throw new Error("No video or audio samples were found.");
-  if (v && !MUXABLE_VIDEO[v.t.entry.codec]) throw new Error(`The video is ${v.t.entry.codec}, which Daylight Commons cannot rewrap yet.`);
-  if (a && (!MUXABLE_AUDIO[a.t.entry.codec] || !a.t.entry.description)) throw new Error(`The sound is ${a.t.entry.codec}, which Daylight Commons cannot rewrap yet.`);
+  if (v && !MUXABLE_VIDEO[v.t.entry.codec]) throw new Error(`The video is ${v.t.entry.codec}, which CMMNS cannot rewrap yet.`);
+  if (a && (!MUXABLE_AUDIO[a.t.entry.codec] || !a.t.entry.description)) throw new Error(`The sound is ${a.t.entry.codec}, which CMMNS cannot rewrap yet.`);
   const video = v && { codec: MUXABLE_VIDEO[v.t.entry.codec], width: v.t.entry.width, height: v.t.entry.height, description: v.t.entry.description };
   const audio = a && { codec: "mp4a", channels: a.t.entry.channels || 2, sampleRate: a.t.entry.sampleRate || a.t.timescale, description: a.t.entry.description };
   const chunks = [...(v ? chunksOf(v.d, v.t, "video") : []), ...(a ? chunksOf(a.d, a.t, "audio") : [])];

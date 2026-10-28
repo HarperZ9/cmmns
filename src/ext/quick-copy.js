@@ -65,7 +65,7 @@ globalThis.PBQuickCopy = globalThis.PBQuickCopy || (() => {
           await navigator.clipboard.write([new ClipboardItem({ "image/png": png })]);
           toast("Copied the picture.", { tone: "ok" });
           return { ok: true, what: "image" };
-        } catch (e) { console.warn("[daylight-commons] could not copy the picture itself; copying its address", e); }
+        } catch (e) { console.warn("[cmmns] could not copy the picture itself; copying its address", e); }
       }
       const l = linkOf(t, plan);
       await writeText(l.text);

@@ -1,6 +1,6 @@
 // Fact-checked claims. A post is matched to a claim a fact-checker has already reviewed, from a
-// table bundled with Daylight Commons (src/ext/claims.json, built by scripts/claims-build.mjs from the Data
-// Commons ClaimReview feed). Daylight Commons shows the fact-checker's rating in the fact-checker's own
+// table bundled with CMMNS (src/ext/claims.json, built by scripts/claims-build.mjs from the Data
+// Commons ClaimReview feed). CMMNS shows the fact-checker's rating in the fact-checker's own
 // words, with a link. It never rates a post itself.
 //
 // Matching is on content words (function words in six languages removed, a light stemmer), each

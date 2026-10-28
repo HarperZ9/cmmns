@@ -1,6 +1,6 @@
-// The protection commands: `daylight clean <file>` (Share clean), `daylight protect on|off|status|
-// limits` (source-protection mode for every case), and `daylight self-audit <export files>` (what
-// Daylight's signals show about your own account, from the data export the platform gave you).
+// The protection commands: `cmmns clean <file>` (Share clean), `cmmns protect on|off|status|
+// limits` (source-protection mode for every case), and `cmmns self-audit <export files>` (what
+// CMMNS's signals show about your own account, from the data export the platform gave you).
 // All three read and write local files only.
 import { readFileSync, writeFileSync, existsSync, mkdirSync, appendFileSync, unlinkSync } from "node:fs";
 import { dirname, join, basename, extname, resolve } from "node:path";
@@ -8,6 +8,7 @@ import { shareClean, cleanName, cleanLineage, CLEAN_FORMATS } from "../../src/co
 import { selfAudit, exportAuditInput, SELF_AUDIT_REFUSED } from "../../src/core/self-audit.js";
 import { PROTECTION_LIMITS } from "../../src/investigate/protection.js";
 import { protectFile, globalProtection } from "./case-protect.mjs";
+import { envSource } from "../../src/core/env-names.js";
 
 export const CLEAN_LINEAGE_NAME = "clean-lineage.jsonl";
 
@@ -33,31 +34,32 @@ export function protectCommand(sub, env = process.env) {
     else if (existsSync(f)) unlinkSync(f);
     const lines = [`Source-protection mode is ${sub} for every case on this computer.`];
     if (sub === "on") lines.push("", PROTECTION_LIMITS);
-    if (env.DAYLIGHT_PROTECT) lines.push(`DAYLIGHT_PROTECT=${env.DAYLIGHT_PROTECT} is set and decides over this switch while it is set.`);
+    const v = envSource(env, "PROTECT");
+    if (v) lines.push(`${v}=${env[v]} is set and decides over this switch while it is set.`);
     return lines.join("\n") + "\n";
   }
-  if (sub === "status") return `Source-protection mode: ${globalProtection(env) ? "on" : "off"} for every case${env.DAYLIGHT_PROTECT ? ` (set by DAYLIGHT_PROTECT=${env.DAYLIGHT_PROTECT})` : ""}. A case can also turn it on for itself: daylight case settings protection on\n`;
+  if (sub === "status") return `Source-protection mode: ${globalProtection(env) ? "on" : "off"} for every case${envSource(env, "PROTECT") ? ` (set by ${envSource(env, "PROTECT")}=${env[envSource(env, "PROTECT")]})` : ""}. A case can also turn it on for itself: cmmns case settings protection on\n`;
   if (sub === "limits") return PROTECTION_LIMITS + "\n";
-  throw new Error('daylight protect takes "on", "off", "status" or "limits"');
+  throw new Error('cmmns protect takes "on", "off", "status" or "limits"');
 }
 
 // Only files: an argument that is not an existing file is refused, so no account can be named.
 export function selfAuditCommand(files, f, now = Date.now()) {
-  if (!files.length) throw new Error(`daylight self-audit needs the files of your own data export. ${SELF_AUDIT_REFUSED}`);
+  if (!files.length) throw new Error(`cmmns self-audit needs the files of your own data export. ${SELF_AUDIT_REFUSED}`);
   for (const x of files) if (/^@|^https?:\/\//i.test(x) || !existsSync(x)) throw new Error(`"${x}" is not a file. ${SELF_AUDIT_REFUSED}`);
   const got = exportAuditInput(files.map((x) => ({ name: basename(x), text: readFileSync(x, "utf8") })));
   if (!got.ok) throw new Error(got.reason);
   const a = selfAudit({ ...got.input, now });
   if (f.json) return JSON.stringify(a, null, 2) + "\n";
-  const L = [`What Daylight shows about you, from your ${a.site || "platform"} data export. Worked out on this computer; nothing was sent.`, ""];
+  const L = [`What CMMNS shows about you, from your ${a.site || "platform"} data export. Worked out on this computer; nothing was sent.`, ""];
   for (const s of a.signals) L.push(`${s.title}`, `  Shows: ${s.shows}`, `  Reveals: ${s.reveals}`, `  To reduce it: ${s.reduce}`, "");
-  if (a.flags.length) L.push("Signs Daylight's window would show beside your replies:", ...a.flags.map((x) => `  ${x.id}: ${x.evidence}. ${x.doesNotProve || ""}`), "");
+  if (a.flags.length) L.push("Signs CMMNS's window would show beside your replies:", ...a.flags.map((x) => `  ${x.id}: ${x.evidence}. ${x.doesNotProve || ""}`), "");
   L.push("Not checked here:", ...a.notChecked.map((x) => `  - ${x}`));
   return L.join("\n") + "\n";
 }
 
-export const PROTECT_USAGE = `  daylight clean <file> [--out file] [--json]   Share clean: a copy with its metadata removed
+export const PROTECT_USAGE = `  cmmns clean <file> [--out file] [--json]   Share clean: a copy with its metadata removed
                (${CLEAN_FORMATS.join(", ")})
-  daylight protect on|off|status|limits        source-protection mode for every case
-  daylight self-audit <your export files...>   what Daylight shows about your own account
+  cmmns protect on|off|status|limits        source-protection mode for every case
+  cmmns self-audit <your export files...>   what CMMNS shows about your own account
 `;

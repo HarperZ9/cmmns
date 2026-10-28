@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIR = join(ROOT, "catalogue", "definitions");
-const UA = "Daylight Commons definition catalogue check (https://github.com/HarperZ9/daylight-commons)";
+const UA = "CMMNS definition catalogue check (https://github.com/HarperZ9/cmmns)";
 const LABEL = /\((?:[0-9]+[a-z]?|[a-z]{1,4}|[A-Z])\)\s*/;
 
 // The same text normalisation the catalogue's quotes were checked with.

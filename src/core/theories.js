@@ -18,7 +18,7 @@ import { COERCION_PATTERNS, coercionSkipped } from "./theories-coercion.js";
 const S = (title, url, date) => ({ title, url, date });
 const ENDERS = S("Enders et al., Are Republicans and Conservatives More Likely to Believe Conspiracy Theories? Political Behavior 45", "https://doi.org/10.1007/s11109-022-09812-3", "2023");
 const AP_QANON = S("AP, QAnon's 'Save the Children' morphs into popular slogan", "https://www.wsls.com/news/politics/2020/10/28/qanons-save-the-children-morphs-into-popular-slogan/", "2020-10-28");
-const NAMING = "People also name these theories to quote, mock or argue against them, and Daylight Commons skips obvious debunking.";
+const NAMING = "People also name these theories to quote, mock or argue against them, and CMMNS skips obvious debunking.";
 
 export const THEORY_DOES_NOT_PROVE = `The post names this theory. ${NAMING} The rest of the post can still be true.`;
 

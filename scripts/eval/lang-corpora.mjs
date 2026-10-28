@@ -1,5 +1,5 @@
 // Loads the prepared corpora for the Arabic, Russian, Ukrainian, Chinese and Hindi evaluation
-// (scripts/eval/prep-langs.py) and maps each corpus's human labels onto Daylight Commons' families. Every
+// (scripts/eval/prep-langs.py) and maps each corpus's human labels onto CMMNS' families. Every
 // mapping decision is here and in project-docs/evidence/CORPORA.md. Item shape as in corpora.mjs:
 // { corpus, lang, id, text, split, gold: { hostile, severe, dehumanise, violence, slur, groupAttack } }.
 // A gold field is null when the corpus has no label for it.

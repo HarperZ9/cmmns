@@ -71,7 +71,7 @@ export function findAllLines(gray, w, h) {
 export function readImage(model, image, { now = () => Date.now() } = {}) {
   const t0 = now();
   const { width: w, height: h } = image;
-  if (w > MAX_SIDE || h > MAX_SIDE) throw new Error(`image is ${w} by ${h}; Daylight Commons reads images up to ${MAX_SIDE} pixels a side`);
+  if (w > MAX_SIDE || h > MAX_SIDE) throw new Error(`image is ${w} by ${h}; CMMNS reads images up to ${MAX_SIDE} pixels a side`);
   const gray = luminance(image.data, w, h);
   const lines = [];
   for (const l of findAllLines(gray, w, h).slice(0, MAX_LINES)) {

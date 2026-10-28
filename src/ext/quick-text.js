@@ -2,8 +2,8 @@
 // "Save as note" writes a daylight.sidecar/1 note with kind "text" and no file: the whole text (or the
 // selection), who wrote it, where and when, the quoted or parent post, the author's thread, link
 // cards, hashtags and a poll as shown. "Save as card" also renders the words as a picture in the
-// house type (src/core/media-card.js), marked as a Daylight rendering. Study files either under
-// Daylight/study/. Copy with caption puts the words and the link on the clipboard. Read from the page
+// house type (src/core/media-card.js), marked as a CMMNS rendering. Study files either under
+// CMMNS/study/. Copy with caption puts the words and the link on the clipboard. Read from the page
 // only, on the click.
 globalThis.PBQuickText = globalThis.PBQuickText || (() => {
   "use strict";
@@ -61,14 +61,14 @@ globalThis.PBQuickText = globalThis.PBQuickText || (() => {
 
   // From the right-click menu, the hover control and the post buttons. action: note | study | card | caption.
   async function run(action, info = {}) {
-    if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) { toast("Daylight Commons was updated. Reload this page, then save again.", { tone: "no", stay: 9000 }); return { ok: false }; }
+    if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) { toast("CMMNS was updated. Reload this page, then save again.", { tone: "no", stay: 9000 }); return { ok: false }; }
     const raw = info.raw || source(info);
     if (!raw) { toast("Select some text, or point at a post, then try again.", { tone: "no" }); return { ok: false }; }
     try {
       if (action === "caption") return await caption(raw);
       return await save(raw, { study: action === "study", card: action === "card" });
     } catch (e) {
-      console.warn("[daylight-commons] could not save the text", e);
+      console.warn("[cmmns] could not save the text", e);
       toast(`Not saved: ${e.message}`, { tone: "no" });
       return { ok: false, line: e.message };
     }

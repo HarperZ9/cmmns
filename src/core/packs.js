@@ -1,5 +1,5 @@
 // Signed data packs (project-docs/DATA-SOVEREIGNTY.md). A pack is one JSON file: a manifest, the
-// content it adds (claims, operation indicators, site notes) or, for Daylight Commons' own bundled data, the
+// content it adds (claims, operation indicators, site notes) or, for CMMNS' own bundled data, the
 // SHA-256 of each bundled file, the signer's public key and an ECDSA P-256 signature over the
 // manifest. WebCrypto only, so the same code verifies in Chrome, Firefox and node with no
 // dependency. A valid signature says who signed the pack and that nothing changed since; it never
@@ -72,7 +72,7 @@ async function hashProblems(pack) {
   return out;
 }
 
-// A file pack (Daylight Commons' bundled data): readBytes(name) resolves to the file's bytes. Line ends are
+// A file pack (CMMNS' bundled data): readBytes(name) resolves to the file's bytes. Line ends are
 // hashed as LF (sig.js lfBytes), the same as data/LOCK.json and evidence bundles.
 export async function verifyFiles(pack, readBytes) {
   const out = [];

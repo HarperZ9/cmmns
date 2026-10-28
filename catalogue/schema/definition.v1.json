@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/HarperZ9/daylight-commons/catalogue/schema/definition.v1.json",
-  "title": "Daylight Commons definition catalogue entry, version 1",
-  "description": "One published definition, quoted from its official source, split into elements that Daylight Commons compares with visible conduct. Checked by src/core/definitions-schema.js and tests/definitions.test.js.",
+  "$id": "https://github.com/HarperZ9/cmmns/catalogue/schema/definition.v1.json",
+  "title": "CMMNS definition catalogue entry, version 1",
+  "description": "One published definition, quoted from its official source, split into elements that CMMNS compares with visible conduct. Checked by src/core/definitions-schema.js and tests/definitions.test.js.",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "version", "status", "verification", "role", "title", "jurisdiction", "instrument", "section", "kind", "binding_note", "in_force", "sources", "quotes", "elements", "does_not_prove", "related"],

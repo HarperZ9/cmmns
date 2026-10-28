@@ -1,5 +1,5 @@
 // Builds examples/musk-ukraine-case: the hand-made Musk and Ukraine case of 2026-10-23, moved
-// into the `daylight case` format as a worked example. It imports the old sources and timeline
+// into the `cmmns case` format as a worked example. It imports the old sources and timeline
 // (the old folder is only read), then records the claims, edges, leads, absences and actors
 // from the old CASE.md with the same commands a person would type.
 //   node scripts/case-example-musk.mjs <old-case-folder> [--out examples/musk-ukraine-case] [--key path]

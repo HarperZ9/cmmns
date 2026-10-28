@@ -16,7 +16,7 @@ where it occurs. The catalog remains always neutral, and always readily visible 
 And: "If an action is visible, and it matches the definition there is no reason to skirt that."
 
 The campaign lens shows signs. A reader then asks what the conduct amounts to. Calling it "fraud" is
-a verdict Daylight Commons cannot give. Saying nothing hides a fair comparison. The catalogue gives
+a verdict CMMNS cannot give. Saying nothing hides a fair comparison. The catalogue gives
 the comparison: the published definition, quoted from its official source, split into elements, and for
 each element whether the visible evidence matches it, does not, or cannot be seen from a page.
 
@@ -43,7 +43,7 @@ Each entry carries:
 - `quotes`: the definition text, word for word, with a locator;
 - `elements`: the definition split into rows. Each row has `observable_from` (`page`,
   `public-record` or `not-observable`), a `strength` (`direct`, or `indicative` when the signals
-  are consistent with the element without showing it), and the Daylight Commons signals that can
+  are consistent with the element without showing it), and the CMMNS signals that can
   evidence it.
   An indicative row can require two or more independent signal families (`min_families`);
 - `does_not_prove`.
@@ -160,5 +160,5 @@ version they used.
 ## What it does not prove
 
 A table compares visible conduct with a published definition. It does not show that anyone broke a
-law or a rule, and it says nothing about the elements Daylight Commons cannot see. Only a court, a
+law or a rule, and it says nothing about the elements CMMNS cannot see. Only a court, a
 regulator or the platform decides that.

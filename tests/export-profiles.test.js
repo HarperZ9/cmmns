@@ -26,7 +26,7 @@ async function chainOf(extra = []) {
   const a = await makeReceipt({ kind: "domain-age", subject: "example.org", observed: { registered: "2026-09-30", daysBeforePost: 21 }, source: "RDAP", url: "https://rdap.example/domain/example.org", at: "2026-10-23T00:00:00Z", dnp: "A registration date says when the name was bought.", raw: { r: 1 } });
   const who = await pseudonymFor("salt-1", "someone");
   const b = await makeReceipt({ kind: "bio-template", subject: who, subjectKind: "private-pseudonym", observed: { groupSize: 12 }, source: "the page the user loaded", at: "2026-10-23T00:01:00Z", dnp: "A shared template is a pattern, not a person.", labeller: "L1", stratum: "en/tech" });
-  const c = await makeReceipt({ kind: "finding", subject: "this launch", observed: { families: 2 }, source: "Daylight Commons campaign lens", at: "2026-10-23T00:02:00Z", dnp: "Two families agreeing is an inference.", cites: [a.hash, b.hash], catalogue: DEF });
+  const c = await makeReceipt({ kind: "finding", subject: "this launch", observed: { families: 2 }, source: "CMMNS campaign lens", at: "2026-10-23T00:02:00Z", dnp: "Two families agreeing is an inference.", cites: [a.hash, b.hash], catalogue: DEF });
   let seal = emptySeal();
   for (const r of [a, b, c, ...extra]) seal = await appendSeal(seal, r);
   return exportSeal(seal, { title: "test", at: "2026-10-23T00:03:00Z" });

@@ -14,7 +14,7 @@
   const protectedMode = PBSettings.get().protection;
   if (protectedMode) { $("archive").checked = false; $("archive").disabled = true; $("protection-note").hidden = false; }
 
-  if (!job) { $("from").textContent = "Nothing to save here. Use \"Save to Daylight\" on a picture or video, or \"Save media from this page\" in the toolbar menu."; $("save").disabled = true; return; }
+  if (!job) { $("from").textContent = "Nothing to save here. Use \"Save to CMMNS\" on a picture or video, or \"Save media from this page\" in the toolbar menu."; $("save").disabled = true; return; }
   $("from").textContent = job.error || `From ${job.title || "this page"} (${job.page || "unknown address"}). ${job.items.length} item${job.items.length === 1 ? "" : "s"} found.`;
   job.items.forEach((item, i) => $("found").append(PBSaveUi.card(item, i, job.target ? i === 0 : job.items.length <= 6)));
   if (!job.items.length) { $("save").disabled = true; status("No images, GIFs, videos or audio were found on the page."); }
@@ -77,7 +77,7 @@
       if (e instanceof PBMediaFetch.NeedsAccess) { pending = { items: [item], where, opts, origins: e.origins }; $("more").hidden = false; $("more").textContent = `Allow ${e.origins.map((o) => o.replace(/^https?:\/\/|\/\*$/g, "")).join(", ")} and continue`; return; }
       const prot = e instanceof PBMediaFetch.Protected;
       $("results").append(PBSaveUi.result(prot ? `Not saved. ${e.reason} ${PB.PROTECTED_LINE}` : `Not saved: ${e.message}`, null, prot ? "v-drift" : ""));
-      if (!prot) console.warn("[daylight-commons] save failed", item.url, e);
+      if (!prot) console.warn("[cmmns] save failed", item.url, e);
     }
   }
 
@@ -112,4 +112,4 @@
     const p = pending; pending = null; $("more").hidden = true;
     chrome.permissions.request({ origins: p.origins }).then((ok) => (ok ? run(p.items, p.where, p.opts) : status("Access was not given for the segments."))).catch((e) => status(e.message));
   });
-})().catch((e) => console.error("[daylight-commons] save page failed", e));
+})().catch((e) => console.error("[cmmns] save page failed", e));

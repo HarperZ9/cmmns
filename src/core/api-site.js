@@ -1,6 +1,6 @@
 // Site context as evidence items: who owns a site, any state link a cited source makes, whether
 // its address imitates a listed outlet, and its fact-check record. Every item names its source.
-// Daylight Commons adds no score or rating of its own. Reads only the tables handed to useData().
+// CMMNS adds no score or rating of its own. Reads only the tables handed to useData().
 
 import { siteFacts, siteRecord, recordSummary, recordLine, ownerHeading, ownerType, SITE_SOURCES, SITE_RECORD_DOES_NOT_PROVE } from "./sites.js";
 import { ownerOfDomain, ownerSource } from "./owners.js";
@@ -20,7 +20,7 @@ export function cleanDomain(d) {
 const stateLevel = (h) => (h.basis === "named-in-report" ? "warn" : h.basis === "state-owned" || h.basis === "designated" ? "flag" : "info");
 const sourceLine = (s) => (s ? `${s.title}${s.date ? ` (${s.date})` : ""}${s.url ? `: ${s.url}` : ""}` : "the cited report");
 
-// What Daylight Commons' tables hold for one domain: { domain, facts, owner, state, record, lookalike }.
+// What CMMNS' tables hold for one domain: { domain, facts, owner, state, record, lookalike }.
 export function siteSummary(domain) {
   const d = cleanDomain(domain);
   if (!d) return null;
@@ -43,7 +43,7 @@ export function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   if (S.lookalike) {
     const L = S.lookalike;
     out.push({ ...base, kind: "lookalike-domain", level: "flag", label: `look-alike of ${L.official}`,
-      shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "Daylight Commons' list of outlet addresses, matched on this device.",
+      shows: `${S.domain} looks like ${L.official}, the address of ${L.outlet} (${L.how}).`, source: "CMMNS' list of outlet addresses, matched on this device.",
       context: LOOKALIKE_DOES_NOT_PROVE, data: { domain: S.domain, outlet: L.outlet, official: L.official, how: L.how } });
   }
   for (const h of S.state) {
@@ -59,7 +59,7 @@ export function siteEvidence(domain, posts = [], { quiet = false } = {}) {
   const line = recordLine(S.record);
   if (line || (!quiet && S.facts)) {
     out.push({ ...base, kind: "site-record", level: "info", label: `site record: ${S.domain}`,
-      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "Zero reviews in Daylight Commons' table list this site as where a claim appeared."].join(": ") + ".",
+      shows: [S.facts && S.facts.name ? `${S.facts.name} (${S.domain})` : S.domain, line || "Zero reviews in CMMNS' table list this site as where a claim appeared."].join(": ") + ".",
       source: SITE_SOURCES, context: SITE_RECORD_DOES_NOT_PROVE,
       data: { domain: S.domain, reviews: S.record ? S.record.n : 0, checkers: S.record ? S.record.m : 0, since: S.record ? S.record.since : null, founded: S.facts ? S.facts.founded : null, country: S.facts ? S.facts.country : null } });
   }

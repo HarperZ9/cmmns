@@ -1,6 +1,6 @@
 // "Save as card": draws a post's or a selection's words as a PNG in the worker, from the plan in
 // src/core/media-card.js, in the house type shipped with the extension (fonts/), and saves it through
-// the same downloads path as every other file. The card names itself a Daylight Commons rendering.
+// the same downloads path as every other file. The card names itself a CMMNS rendering.
 globalThis.PBCardBg = (() => {
   "use strict";
   let fontsReady = null;
@@ -15,7 +15,7 @@ globalThis.PBCardBg = (() => {
       if (set) set.add(face);
     };
     fontsReady = Promise.all([load("Hanken Grotesk", "fonts/hanken-grotesk.woff2", "100 900"), load("JetBrains Mono", "fonts/jetbrains-mono-regular.woff2")])
-      .catch((e) => { console.warn("[daylight-commons] card fonts did not load; the system type is used", e); });
+      .catch((e) => { console.warn("[cmmns] card fonts did not load; the system type is used", e); });
     return fontsReady;
   }
 
@@ -44,7 +44,7 @@ globalThis.PBCardBg = (() => {
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg || msg.type !== "pb-card" || !sender.tab) return false;
     render(msg.meta).then((png) => PBQuickBg.download({ url: dataUrl(png), filename: msg.filename, site: msg.site, study: !!msg.study }))
-      .then(sendResponse, (e) => { console.warn("[daylight-commons] could not make the card", e); sendResponse({ error: e.message }); });
+      .then(sendResponse, (e) => { console.warn("[cmmns] could not make the card", e); sendResponse({ error: e.message }); });
     return true;
   });
 

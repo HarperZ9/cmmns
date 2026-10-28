@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "note": "Every signal a catalogue element may cite. A signal is something Daylight Commons can show from the page or from a receipt. Signals in the same family read the same evidence and count once. Context-only signals never evidence any element.",
+  "note": "Every signal a catalogue element may cite. A signal is something CMMNS can show from the page or from a receipt. Signals in the same family read the same evidence and count once. Context-only signals never evidence any element.",
   "signals": [
     { "id": "shape-outlier-own", "family": "shape", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "Reposts per like far above the author's own posts seen on this device." },
     { "id": "bio-template", "family": "bios", "kind": "indicator", "source": "src/core/campaign.js (campaign lens)", "observes": "Groups of sampled bios cut from one template." },

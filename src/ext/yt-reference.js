@@ -1,4 +1,4 @@
-// YouTube: "Save reference" and "Copy link at this time". Daylight Commons does not download YouTube
+// YouTube: "Save reference" and "Copy link at this time". CMMNS does not download YouTube
 // video in any store build. A reference keeps what the watch page shows in the clear: title,
 // channel, the address at the current time, description, chapters, the transcript when its panel
 // is open, and the thumbnail, saved as the thumbnail image with a daylight.sidecar/1 note beside it.

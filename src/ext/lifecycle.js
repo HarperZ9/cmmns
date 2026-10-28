@@ -7,7 +7,14 @@
   const KEY = PB.SETTINGS_KEY;
   const SIZES = [16, 32, 48, 128];
   const paths = (state) => Object.fromEntries(SIZES.map((n) => [n, `icons/radar${state === "idle" ? "" : "-" + state}-${n}.png`]));
-  const TITLES = { idle: "Daylight Commons", reading: "Daylight Commons: reading accounts", paused: "Daylight Commons: paused" };
+  const TITLES = { idle: "CMMNS", reading: "CMMNS: reading accounts", paused: "CMMNS: paused" };
+
+  async function keepFolder(previousVersion) {
+    try {
+      const patch = PB.legacyFolderPatch((await chrome.storage.local.get(KEY))[KEY], previousVersion);
+      if (patch) await chrome.storage.local.set({ [KEY]: patch });
+    } catch (e) { console.error("[cmmns] could not keep the save folder", e); }
+  }
 
   async function settings() { return PB.normalizeSettings((await chrome.storage.local.get(KEY))[KEY]); }
 
@@ -16,27 +23,29 @@
       const store = await chrome.storage.local.get(PB.PRUNED_KEYS);
       const changed = PB.pruneStore(store, await settings());
       if (Object.keys(changed).length) await chrome.storage.local.set(changed);
-    } catch (e) { console.error("[daylight-commons] retention prune failed", e); }
+    } catch (e) { console.error("[cmmns] retention prune failed", e); }
   }
 
   let protectedMode = false;
   function setIcon(state, tabId) {
     const opts = tabId != null ? { tabId } : {};
-    chrome.action.setIcon({ ...opts, path: paths(state) }).catch((e) => console.error("[daylight-commons] could not set the icon", e));
-    chrome.action.setTitle({ ...opts, title: (TITLES[state] || "Daylight Commons") + (protectedMode ? " (source protection on)" : "") }).catch(() => {});
+    chrome.action.setIcon({ ...opts, path: paths(state) }).catch((e) => console.error("[cmmns] could not set the icon", e));
+    chrome.action.setTitle({ ...opts, title: (TITLES[state] || "CMMNS") + (protectedMode ? " (source protection on)" : "") }).catch(() => {});
   }
   // Source-protection mode shows on the toolbar button on every tab: a badge reading P.
   function setProtection(on) {
     protectedMode = !!on;
     chrome.action.setBadgeText({ text: on ? "P" : "" }).catch(() => {});
     if (on && chrome.action.setBadgeBackgroundColor) chrome.action.setBadgeBackgroundColor({ color: "#16130f" }).catch(() => {});
-    chrome.action.setTitle({ title: on ? "Daylight Commons (source protection on)" : "Daylight Commons" }).catch(() => {});
+    chrome.action.setTitle({ title: on ? "CMMNS (source protection on)" : "CMMNS" }).catch(() => {});
   }
 
   chrome.runtime.onInstalled.addListener((d) => {
-    if (d.reason === "install") chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") }).catch((e) => console.error("[daylight-commons] could not open the first-run page", e));
+    if (d.reason === "install") chrome.tabs.create({ url: chrome.runtime.getURL("welcome.html") }).catch((e) => console.error("[cmmns] could not open the first-run page", e));
     // 3.0 replaced the GDELT lookup with the outlets' own feeds: give back any access granted for it.
     if (d.reason === "update") chrome.permissions.remove({ origins: ["https://api.gdeltproject.org/*"] }).catch(() => {});
+    // 3.9.0 renamed the default save folder to CMMNS: an install from before keeps Downloads/Daylight.
+    if (d.reason === "update") keepFolder(d.previousVersion);
     prune();
   });
   if (chrome.runtime.onStartup) chrome.runtime.onStartup.addListener(prune);
@@ -49,10 +58,10 @@
   });
   chrome.runtime.onMessage.addListener((msg, sender) => {
     if (msg && msg.type === "pb-icon" && sender.tab) setIcon(msg.state, sender.tab.id);
-    // A lesson or the self-check, asked for from a page. Only Daylight Commons' own pages pass PB.safePage.
+    // A lesson or the self-check, asked for from a page. Only CMMNS' own pages pass PB.safePage.
     if (msg && msg.type === "pb-open-page" && sender.tab) {
       const path = PB.safePage(msg.path);
-      if (path) chrome.tabs.create({ url: chrome.runtime.getURL(path), index: sender.tab.index + 1 }).catch((e) => console.error("[daylight-commons] could not open", path, e));
+      if (path) chrome.tabs.create({ url: chrome.runtime.getURL(path), index: sender.tab.index + 1 }).catch((e) => console.error("[cmmns] could not open", path, e));
     }
   });
   settings().then((s) => { setProtection(s.protection); if (s.paused) setIcon("paused"); }).catch(() => {});

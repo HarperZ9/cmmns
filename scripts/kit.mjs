@@ -25,7 +25,7 @@ export function keyCard({ version, keys }) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Daylight Commons key card</title>
+<title>CMMNS key card</title>
 <style>
 body{margin:0;background:#fff;color:#000;font:400 16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 main{max-width:34rem;margin:0 auto;padding:1.5rem 1rem}h1{font-size:1.5rem;margin:0 0 .5rem}
@@ -36,7 +36,7 @@ ol{padding-left:1.25rem}@media print{main{padding:0}}
 </head>
 <body>
 <main>
-<h1>Daylight Commons key card</h1>
+<h1>CMMNS key card</h1>
 <p>Release ${esc(version)}. Print this, or copy the key id by hand, and keep it apart from the kit.</p>
 ${rows}
 <ol>
@@ -51,12 +51,12 @@ ${rows}
 `;
 }
 
-export const GUIDE = `DAYLIGHT COMMONS: USING IT WITHOUT THE INTERNET
+export const GUIDE = `CMMNS: USING IT WITHOUT THE INTERNET
 
 Draft guidance. A security partner has not reviewed it yet. The kit and its
 checker have had no independent security audit.
 
-WHAT DAYLIGHT COMMONS DOES WHEN THE INTERNET IS DOWN
+WHAT CMMNS DOES WHEN THE INTERNET IS DOWN
 It keeps working on what it already has: it checks posts against its stored
 catalogue and shows how old that catalogue is. It cannot fetch new data until
 you reconnect or someone gives you an update.
@@ -86,7 +86,7 @@ WHAT THIS TOOL CANNOT PROTECT
   anything.
 
 IF YOU HOLD INFORMATION THAT COULD PUT YOU AT RISK
-- Do not send it through Daylight Commons. It does not run a secure channel.
+- Do not send it through CMMNS. It does not run a secure channel.
 - Use a newsroom's SecureDrop, or a GlobaLeaks site, reached through Tor
   Browser. If you can, use Tails on a device that is not your usual one.
 - Remove hidden data first: photo location, document author names, tracked

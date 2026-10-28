@@ -1,6 +1,6 @@
 // The radar command line tool (bin/radar.mjs): analyze prints a report or JSON from local files,
 // writes a signed bundle with a key kept outside the repository, and verify checks a bundle and
-// fails on a changed one. The offline analyser page loads only Daylight Commons' own scripts and tables.
+// fails on a changed one. The offline analyser page loads only CMMNS' own scripts and tables.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
@@ -53,19 +53,19 @@ test("site, media, a refused file and the usage text", () => {
   assert.match(run("media", join(ROOT, "tests", "fixtures", "c2pa", "ai.jpg")).stdout, /marked as made with AI/);
   const refused = run("analyze", join(ROOT, "package.json"));
   assert.equal(refused.status, 1);
-  assert.match(refused.stderr, /^daylight: Daylight Commons found zero readable posts/);
+  assert.match(refused.stderr, /^cmmns: CMMNS found zero readable posts/);
   assert.match(execFileSync(process.execPath, [CLI], { encoding: "utf8" }), /^Usage:/);
   assert.deepEqual(parseArgs(["analyze", "f", "--json", "--bundle", "o.json", "--key-id=abc"]), { _: ["analyze", "f"], flags: { json: true, bundle: "o.json", "key-id": "abc" } });
 });
 
-test("the offline analyser page loads only Daylight Commons' own files and never writes markup from a file", () => {
+test("the offline analyser page loads only CMMNS' own files and never writes markup from a file", () => {
   const html = readFileSync(join(ROOT, "src/ext/analyze.html"), "utf8");
   for (const m of html.matchAll(/<script src="([^"]+)"/g)) assert.ok(existsSync(join(ROOT, "src/ext", m[1])), m[1]);
   assert.doesNotMatch(html, /https?:\/\/(?!json-schema)/, "no remote resource");
   for (const f of ["analyze.js", "analyze-view.js", "signing.js", "evidence-bundle-ui.js"]) {
     const src = readFileSync(join(ROOT, "src/ext", f), "utf8");
     assert.doesNotMatch(src, /innerHTML|outerHTML|insertAdjacentHTML|document\.write/, f);
-    for (const m of src.matchAll(/fetch\(([^)]*)\)/g)) assert.match(m[1], /^url\(/, `${f}: fetch reads Daylight Commons' own package only`);
+    for (const m of src.matchAll(/fetch\(([^)]*)\)/g)) assert.match(m[1], /^url\(/, `${f}: fetch reads CMMNS' own package only`);
   }
   assert.match(readFileSync(join(ROOT, "src/ext/popup.js"), "utf8"), /analyze\.html/);
 });

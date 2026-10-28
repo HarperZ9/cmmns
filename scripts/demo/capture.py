@@ -4,7 +4,7 @@
     npm run package
     python scripts/demo/capture.py --stage <stage dir> --out docs/demo [--only stills|film|pages]
 
-Installs dist/radar-chrome-<version>.zip into a fresh Chrome profile, answers x.com with the synthetic
+Installs dist/cmmns-chrome-<version>.zip into a fresh Chrome profile, answers x.com with the synthetic
 stage, and writes PNG stills of each finding type, the extension's own pages in light and dark, a
 screen recording (WebM and GIF) of install, page, badge, evidence, receipt and offline check, and
 requests.json: every request the browser made and what happened to it.
@@ -22,14 +22,14 @@ from record import Recorder, caption
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 VERSION = json.loads((ROOT / "src/ext/manifest.json").read_text(encoding="utf-8"))["version"]
-PACKAGE = ROOT / "dist" / f"radar-chrome-{VERSION}.zip"
+PACKAGE = ROOT / "dist" / f"cmmns-chrome-{VERSION}.zip"
 FFMPEG = pathlib.Path.home() / "AppData/Local/ms-playwright/ffmpeg-1011/ffmpeg-win64.exe"
 # Evidence lookups are the only requests the demo lets out, and only to the services they name.
 # The author's site serves the install page's shared style and navigation (the page itself comes
 # from this checkout's docs/).
 ALLOW = ("https://api.github.com/", "https://rdap.org/", "https://web.archive.org/", "https://harperz9.github.io/")
 ARCHIVE = ["https://web.archive.org/*"]
-INSTALL_URL = "https://harperz9.github.io/daylight-commons/install.html"
+INSTALL_URL = "https://harperz9.github.io/cmmns/install.html"
 # Thread rows (stage.mjs THREAD order) and the window section whose first sign each still opens.
 FINDINGS = [
     ("place", 2, "Place"),
@@ -175,13 +175,13 @@ async def film(s, out, stage_dir):
     # every extension installed in the machine's Chrome.
     await pg.goto(INSTALL_URL)
     await settle(pg, 1500)
-    await caption(pg, f"1. Install: download Daylight Commons {VERSION} from the release and load it.")
+    await caption(pg, f"1. Install: download CMMNS {VERSION} from the release and load it.")
     await settle(pg, 3000)
     await pg.goto(s.url("welcome.html"))
     await settle(pg, 800)
     await caption(pg, "2. First run: what it shows, what it never does, and which sites it runs on.")
     await settle(pg, 3500)
-    await pg.get_by_role("button", name="Start Daylight Commons").click()
+    await pg.get_by_role("button", name="Start CMMNS").click()
     await settle(pg, 800)
     await s.settings({"auto": False})
     await pg.goto(s.stages["thread"]["url"])
@@ -212,7 +212,7 @@ async def film_receipts(s, pg, out):
     await panel(pg)
     sec = pg.locator("#pb-panel .pb-evidence")
     await sec.first.scroll_into_view_if_needed()
-    await caption(pg, "6. Run it on us: a synthetic post linking Daylight Commons' own repository and site.")
+    await caption(pg, "6. Run it on us: a synthetic post linking CMMNS' own repository and site.")
     await settle(pg, 3000)
     await pg.get_by_role("button", name="Allow and look up").first.click()
     await settle(pg, 8000)

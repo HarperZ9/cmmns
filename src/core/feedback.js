@@ -77,7 +77,7 @@ export function calibrationLine(store, family, min = CALIBRATION_MIN) {
   return c ? `Your feedback: ${c.right} of ${c.total} right` : null;
 }
 
-export const FEEDBACK_ABOUT = "Your marks on Daylight Commons' signs, saved from this browser. It stays on your device until you send it, for example as an attachment to an issue on Daylight Commons' repository. Post text appears for marks where you ticked \"include the text\".";
+export const FEEDBACK_ABOUT = "Your marks on CMMNS' signs, saved from this browser. It stays on your device until you send it, for example as an attachment to an issue on CMMNS' repository. Post text appears for marks where you ticked \"include the text\".";
 
 // The opt-in export: a JSON object the options page saves as a file when the user clicks.
 export function buildExport(store, { version = null, now = Date.now() } = {}) {

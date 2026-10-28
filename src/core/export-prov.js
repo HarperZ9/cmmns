@@ -28,7 +28,7 @@ function receiptNodes(row, doc) {
 
 export function provDocument(ctx) {
   const { chain, rows } = ctx;
-  const doc = { prefix: { dc: "https://github.com/HarperZ9/daylight-commons/blob/main/project-docs/EVIDENCE-LAYER.md#", prov: "http://www.w3.org/ns/prov#" },
+  const doc = { prefix: { dc: "https://github.com/HarperZ9/cmmns/blob/main/project-docs/EVIDENCE-LAYER.md#", prov: "http://www.w3.org/ns/prov#" },
     entity: {}, activity: {}, agent: {}, wasGeneratedBy: {}, wasAssociatedWith: {}, wasDerivedFrom: {}, hadMember: {} };
   for (const row of rows) receiptNodes(row, doc);
   const chainId = `${NS}:chain-${chain.root}`;

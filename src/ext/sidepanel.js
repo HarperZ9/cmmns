@@ -1,4 +1,4 @@
-// Daylight Commons' side panel: the window for the post under the pointer, beside the page instead
+// CMMNS' side panel: the window for the post under the pointer, beside the page instead
 // of over it. It follows the active tab and keeps each tab's last post, so switching tabs and back
 // shows it again. Sections come from side-bridge.js in the page; a button press goes back there.
 (() => {
@@ -27,7 +27,7 @@
     if (!got) { view.replaceChildren(); return; }
     from.textContent = got.page;
     try { view.replaceChildren(PBPop.render(live(got.sections, active))); }
-    catch (e) { console.warn("[daylight-commons] could not draw the side panel", e); }
+    catch (e) { console.warn("[cmmns] could not draw the side panel", e); }
   }
 
   // ?tab=<id> holds the panel on one tab, for the page opened on its own (scripts/qa/hover_check.py).

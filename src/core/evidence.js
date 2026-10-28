@@ -73,10 +73,10 @@ function dedupe(claims) { const seen = new Set(); return claims.filter((c) => c 
 function sourcesOf(card, input) {
   const day = String(input.savedAt || "").slice(0, 10);
   return [
-    `Replies and posts as ${card.thread.site} showed them to this viewer on ${day}, read by Daylight Commons in this browser.`,
-    "Account flags: what each platform discloses on profiles and About pages, read by Daylight Commons in this browser. Rules and measured error rates: Daylight Commons' EVALUATION.md.",
+    `Replies and posts as ${card.thread.site} showed them to this viewer on ${day}, read by CMMNS in this browser.`,
+    "Account flags: what each platform discloses on profiles and About pages, read by CMMNS in this browser. Rules and measured error rates: CMMNS' EVALUATION.md.",
     card.claims.length ? CLAIM_ATTRIBUTION : null,
-    card.sites.some((s) => s.owner) ? "Outlet owners: Daylight Commons' ownership table, built from Wikidata; each row links its Wikidata item." : null,
+    card.sites.some((s) => s.owner) ? "Outlet owners: CMMNS' ownership table, built from Wikidata; each row links its Wikidata item." : null,
     card.sites.some((s) => s.state.length) ? "State links: Wikidata ownership chains, and the platform or government reports each link cites." : null,
     "Media: whether an upload was first posted by another account, from the posts this viewer's page loaded.",
     card.media.credentials ? "Content Credentials: C2PA manifests read and checked in this browser from files the viewer chose to check." : null,
@@ -116,7 +116,7 @@ const pc = (x) => `${Math.round(x * 100)}%`;
 export function cardLines(card) {
   const R = card.report, L = [];
   const push = (kind, text) => { if (text) L.push({ kind, text }); };
-  push("title", "Daylight Commons thread card");
+  push("title", "CMMNS thread card");
   push("meta", `${card.thread.site} thread · ${card.thread.page} · saved ${String(card.savedAt).slice(0, 16).replace("T", " ")} UTC`);
   push("head", "Thread report");
   push("body", R.sentence);

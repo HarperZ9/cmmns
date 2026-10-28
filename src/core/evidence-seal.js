@@ -94,7 +94,7 @@ export async function exportSeal(seal, { title = null, at = new Date().toISOStri
 
 // Offline check of an export: the seal, the head, the root and every proof.
 export async function verifyExport(x) {
-  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a Daylight Commons evidence chain"] };
+  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, problems: ["not a CMMNS evidence chain"] };
   if (!x.seal || !Array.isArray(x.seal.entries) || !Array.isArray(x.proofs)) return { ok: false, problems: ["the file lacks a seal or its proofs"] };
   const s = await verifySeal(x.seal), problems = [...s.problems];
   const hashes = x.seal.entries.map((e) => e.receipt.hash);
@@ -109,7 +109,7 @@ export async function verifyExport(x) {
 // root, checks: [{ name, ok, text }], receipts: [{ kind, subject, source, at }], dnp }. Each line is
 // one property a reader can recheck by hand; the receipts list says what the chain holds.
 export async function chainChecks(x) {
-  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, size: 0, root: null, checks: [{ name: "format", ok: false, text: "not a Daylight Commons evidence chain" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
+  if (!x || x.format !== EXPORT_FORMAT) return { ok: false, size: 0, root: null, checks: [{ name: "format", ok: false, text: "not a CMMNS evidence chain" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const entries = (x.seal && Array.isArray(x.seal.entries)) ? x.seal.entries : null;
   if (!entries || !Array.isArray(x.proofs)) return { ok: false, size: 0, root: x.root || null, checks: [{ name: "format", ok: false, text: "the file lacks a seal or its proofs" }], receipts: [], dnp: SEAL_DOES_NOT_PROVE };
   const n = entries.length, hashes = entries.map((e) => (e && e.receipt && e.receipt.hash) || "");

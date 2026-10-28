@@ -11,7 +11,7 @@ const sign = { fam: "slur", label: "slur or coded hate term" };
 const at = Date.UTC(2026, 9, 21, 12);
 const entry = (over = {}) => makeEntry({ sign, postId: "123", threadKey: "x:999", verdict: "wrong", at, ...over });
 
-test("the key is a Daylight Commons data key, so Clear all deletes it", () => {
+test("the key is a CMMNS data key, so Clear all deletes it", () => {
   assert.ok(FEEDBACK_KEY.startsWith("pb.") && FEEDBACK_KEY !== "pb.settings");
 });
 

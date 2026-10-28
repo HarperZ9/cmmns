@@ -31,11 +31,11 @@
     queue = { posts: new Map(), accounts: new Map() };
     try {
       const r = await chrome.runtime.sendMessage(msg);
-      if (!r || r.error) { if (r && r.error) console.warn("[daylight-commons] discourse checks:", r.error); return; }
+      if (!r || r.error) { if (r && r.error) console.warn("[cmmns] discourse checks:", r.error); return; }
       for (const [id, v] of Object.entries(r.quotes || {})) quotes.set(id, v);
       for (const [k, v] of Object.entries(r.personas || {})) personas.set(k, v);
       if (globalThis.PBPop) PBPop.refresh();
-    } catch (e) { console.warn("[daylight-commons] the discourse checks could not reach the background worker", e); }
+    } catch (e) { console.warn("[cmmns] the discourse checks could not reach the background worker", e); }
   }
 
   // The replies under a root post that bring a source or name an error. Links come from the post data
@@ -66,7 +66,7 @@
       const off = !settings.imageText;
       return [{ label: "check the post's words against its images", fam: "doc-claim", level: "info", cat: "sources", rows: [
         ["Document check", off ? "Turn on \"Read text in images\" in the options to read the pages this post shows." : { action: [`Read the ${imgs.length} ${imgs.length === 1 ? "image" : "images"} and compare`, () => checkDocument(m), "Reading…"] }],
-        ["How", "Daylight Commons reads each image on this device with its own text recogniser, then looks for the post's key terms in the text."]] }];
+        ["How", "CMMNS reads each image on this device with its own text recogniser, then looks for the post's key terms in the text."]] }];
     }
     const pages = st.srcs.map((s) => { const t = PBMedia.textOf(s); return t && t.state === "done" ? (t.result && t.result.text ? t.result : { text: "" }) : null; });
     if (pages.some((p) => p === null)) return [{ label: "reading the post's images", fam: "doc-claim", level: "info", cat: "sources", rows: [["Document check", `${pages.filter(Boolean).length} of ${pages.length} images read`]] }];
@@ -125,8 +125,8 @@
   function signs(m, settings) {
     if (!settings || !settings.discourse || !globalThis.PBD) return [];
     const out = collect(m, settings);
-    const save = ["Study", { action: ["Save the post with this analysis for study", () => saveStudy(m, settings).catch((e) => console.warn("[daylight-commons] study save failed", e)), "Saving…"] }];
-    const sheets = ["Sheets", { action: ["Open the post and what lies under it as sheets", () => openSheets(m).catch((e) => console.warn("[daylight-commons] sheets failed", e)), "Opening…"] }];
+    const save = ["Study", { action: ["Save the post with this analysis for study", () => saveStudy(m, settings).catch((e) => console.warn("[cmmns] study save failed", e)), "Saving…"] }];
+    const sheets = ["Sheets", { action: ["Open the post and what lies under it as sheets", () => openSheets(m).catch((e) => console.warn("[cmmns] sheets failed", e)), "Opening…"] }];
     return out.map((s) => (s.rows.some(([, v]) => v && typeof v === "object" && v.action) ? s : { ...s, rows: [...s.rows, ...(s.fam === "correction-replies" ? [sheets] : []), save] }));
   }
 

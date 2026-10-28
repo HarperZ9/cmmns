@@ -89,14 +89,14 @@ export function downloadPlan(t, { asGif = false } = {}) {
     if (t.kind === "gif" && (web(t.url) || /^(data|blob):/.test(t.url || ""))) return { action: web(t.url) ? "url" : "bytes", url: t.url };
     if (t.url && (t.kind === "video" || t.kind === "image")) return { action: "gif", from: t.kind, url: t.url };
     if (stream) return { action: "gif", from: "stream", stream };
-    return { action: "none", reason: "This media has no file Daylight Commons can read to make a GIF." };
+    return { action: "none", reason: "This media has no file CMMNS can read to make a GIF." };
   }
   if (t.canvas) return { action: "canvas" };
   if (web(t.url)) { const [url, ...alternatives] = sizeLadder(t.url); return { action: "url", url, alternatives: [...alternatives, ...(t.alternatives || [])] }; }
   if (t.url && /^data:/i.test(t.url)) return { action: "bytes", url: t.url };
   if (t.url && /^blob:/i.test(t.url) && t.kind !== "video" && t.kind !== "audio") return { action: "bytes", url: t.url };
   if (stream) return { action: "stream", stream };
-  return { action: "none", reason: "The page builds this media in memory from a stream Daylight Commons cannot find, so it cannot be saved as one file." };
+  return { action: "none", reason: "The page builds this media in memory from a stream CMMNS cannot find, so it cannot be saved as one file." };
 }
 
 export const REFERENCE_LABEL = "Protected source. Reference only, not for redistribution.";

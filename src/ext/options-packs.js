@@ -1,6 +1,6 @@
 // Options for data packs (src/core/packs.js, src/ext/packs-bg.js): import a pack file the user
 // picks, see which key signed it and what it adds, trust the key, turn packs on and off, remove
-// them, and check Daylight Commons' own bundled data against the project key. Nothing is downloaded.
+// them, and check CMMNS' own bundled data against the project key. Nothing is downloaded.
 (async () => {
   "use strict";
   const { el } = PBPages;
@@ -8,7 +8,7 @@
   const PACKS = "pb.packs.v1", KEYS = "pb.packkeys.v1", MAX_BYTES = 20 * 1024 * 1024;
   const store = async () => { const g = await chrome.storage.local.get([PACKS, KEYS]); return { packs: g[PACKS] || [], keys: g[KEYS] || [] }; };
   const put = (patch) => chrome.storage.local.set(patch);
-  const fail = (what) => (e) => { console.error(`[daylight-commons] ${what}`, e); $("packPreview").replaceChildren(el("p", { class: "status" }, `Could not ${what}: ${e.message}`)); };
+  const fail = (what) => (e) => { console.error(`[cmmns] ${what}`, e); $("packPreview").replaceChildren(el("p", { class: "status" }, `Could not ${what}: ${e.message}`)); };
   const button = (text, onClick, cls) => { const b = el("button", { type: "button", ...(cls ? { class: cls } : {}) }, text); b.addEventListener("click", onClick); return b; };
   const signer = (m, keyId) => `key ${PB.keyFingerprint(keyId)}${m.author && m.author.name ? `, which calls itself "${m.author.name}"` : ""}`;
 
@@ -22,7 +22,7 @@
       li.append(button(e.enabled ? "Turn off" : "Turn on", () => setPack(i, { enabled: !e.enabled }), "quiet"), " ", button("Remove", () => removePack(i), "quiet"));
       ul.append(li);
     });
-    if (!keys.length) kl.append(el("li", { class: "muted" }, "None. Daylight Commons' own data is checked against its project key, which is built in."));
+    if (!keys.length) kl.append(el("li", { class: "muted" }, "None. CMMNS' own data is checked against its project key, which is built in."));
     keys.forEach((k) => {
       const li = el("li", {}, `${k.label}: ${PB.keyFingerprint(k.keyId)}, trusted since ${k.added}. `);
       li.append(button("Stop trusting", () => distrust(k.keyId), "quiet"));
@@ -54,7 +54,7 @@
     const nextKeys = trustKey && !keys.some((k) => k.keyId === keyId) ? [...keys, { keyId, jwk: PB.publicJwk(pack.publicKey), label, added: today }] : keys;
     const rest = packs.filter((e) => !(e.pack.manifest.name === pack.manifest.name && e.pack.manifest.author.keyId === keyId));
     await put({ [KEYS]: nextKeys, [PACKS]: [...rest, { pack, enabled: true, imported: today }] });
-    $("packPreview").replaceChildren(el("p", { class: "status" }, `Added ${pack.manifest.name}. It is on; Daylight Commons uses it from the next page you open.`));
+    $("packPreview").replaceChildren(el("p", { class: "status" }, `Added ${pack.manifest.name}. It is on; CMMNS uses it from the next page you open.`));
     renderLists();
   }
 
@@ -65,14 +65,14 @@
     try { pack = JSON.parse(await file.text()); } catch { throw new Error("the file is not JSON"); }
     const { keys } = await store();
     const v = await PB.verifyPack(pack, keys);
-    const problems = [...v.problems, ...(pack && pack.content ? PB.validatePackContent(pack.content) : ["the pack needs a content section Daylight Commons can add"])];
+    const problems = [...v.problems, ...(pack && pack.content ? PB.validatePackContent(pack.content) : ["the pack needs a content section CMMNS can add"])];
     const m = (pack && pack.manifest) || {}, box = $("packPreview");
     box.replaceChildren(el("h3", { class: "sub" }, `${m.name || "Unnamed pack"} ${m.version || ""}`));
     if (m.description) box.append(el("p", {}, m.description));
     box.append(el("p", {}, `Signed by ${signer(m, v.keyId)}. ${v.trusted ? "You trust this key." : "You do not trust this key yet. Only the key id is checked; the name is what the signer wrote."}`));
     box.append(el("p", {}, `Adds ${PB.packSummary(pack && pack.content)}. Created ${m.created || "on a date not given"}.`));
     if (problems.length) {
-      box.append(el("p", { class: "status" }, "Daylight Commons will not use this pack:"));
+      box.append(el("p", { class: "status" }, "CMMNS will not use this pack:"));
       const ul = el("ul", { class: "plain" });
       for (const p of problems.slice(0, 12)) ul.append(el("li", {}, p));
       box.append(ul);
@@ -84,7 +84,7 @@
     box.append(row);
   }
 
-  // Daylight Commons' own tables against the signed list of their hashes (src/ext/radar-data.pack.json).
+  // CMMNS' own tables against the signed list of their hashes (src/ext/radar-data.pack.json).
   async function checkBundled() {
     const say = (t) => { $("bundled").textContent = t; };
     say("Checking...");
@@ -93,13 +93,13 @@
     const v = await PB.verifyPack(pack, [PB.PROJECT_KEY]);
     const files = await PB.verifyFiles(pack, async (n) => (await get(n)).arrayBuffer());
     const n = Object.keys(pack.manifest.files || {}).length;
-    say(v.trusted && !files.length ? `Daylight Commons' own data: signed by the Daylight Commons project key ${PB.keyFingerprint(v.keyId)}; all ${n} tables match the signed copy (${pack.manifest.created}). This checks the files against each other. A tampered install could carry a different key, so compare the key with the one published in Daylight Commons' repository.`
-      : `Daylight Commons' own data fails its signature check: ${[...v.problems, ...files].join("; ") || "the key differs from the project key"}. Reinstall Daylight Commons from a source you trust.`);
+    say(v.trusted && !files.length ? `CMMNS' own data: signed by the CMMNS project key ${PB.keyFingerprint(v.keyId)}; all ${n} tables match the signed copy (${pack.manifest.created}). This checks the files against each other. A tampered install could carry a different key, so compare the key with the one published in CMMNS' repository.`
+      : `CMMNS' own data fails its signature check: ${[...v.problems, ...files].join("; ") || "the key differs from the project key"}. Reinstall CMMNS from a source you trust.`);
   }
 
   $("packCaveat").textContent = PB.PACK_DOES_NOT_PROVE;
   $("packPick").addEventListener("click", () => $("packFile").click());
   $("packFile").addEventListener("change", () => { const f = $("packFile").files[0]; $("packFile").value = ""; if (f) preview(f).catch(fail("read the pack")); });
-  $("bundledCheck").addEventListener("click", () => checkBundled().catch((e) => { console.error("[daylight-commons] bundled data check failed", e); $("bundled").textContent = "Could not check Daylight Commons' own data: " + e.message; }));
+  $("bundledCheck").addEventListener("click", () => checkBundled().catch((e) => { console.error("[cmmns] bundled data check failed", e); $("bundled").textContent = "Could not check CMMNS' own data: " + e.message; }));
   renderLists().catch(fail("list the packs"));
-})().catch((e) => console.error("[daylight-commons] data pack options failed", e));
+})().catch((e) => console.error("[cmmns] data pack options failed", e));

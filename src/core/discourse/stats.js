@@ -1,5 +1,5 @@
 // Numbers with their sample size (project-docs/DISCOURSE.md): "45/50 replies", "8 of 25", "62% of
-// 1,200 people", "n = 40". Each count gets a Wilson 95% interval, the same interval Daylight
+// 1,200 people", "n = 40". Each count gets a Wilson 95% interval, the same interval CMMNS
 // Commons prints for its own figures, and a note when the sample is small.
 export const STATS_DOES_NOT_PROVE = "An interval shows how much a count of this size can move by chance alone. It says nothing about how the sample was chosen, how the question was asked, or whether the result holds elsewhere.";
 export const SMALL_N = 30;

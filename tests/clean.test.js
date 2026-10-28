@@ -136,7 +136,7 @@ test("office documents keep their body and every part, with empty property parts
   assert.equal(Buffer.from((await shareClean(load("note.odt"))).bytes).toString("latin1", 30, 38), "mimetype", "ODF mimetype stays first");
 });
 
-test("Daylight's own embedded description is removed from every format it writes", async () => {
+test("CMMNS's own embedded description is removed from every format it writes", async () => {
   const desc = { description: "DLSECRET-DAYLIGHT post words", creator: "@DLSECRET-HANDLE", source: "https://x.com/a/status/1" };
   for (const [f, mime] of [["photo.jpg", "image/jpeg"], ["picture.png", "image/png"], ["picture.webp", "image/webp"], ["anim.gif", "image/gif"], ["clip.mp4", "video/mp4"]]) {
     const plain = (await shareClean(load(f))).bytes, embedded = embedDescription(plain, mime, desc);

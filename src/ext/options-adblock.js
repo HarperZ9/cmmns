@@ -6,7 +6,7 @@
   const { el, switchRow } = PBPages;
   const $ = (id) => document.getElementById(id);
   await PBSettings.ready;
-  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[daylight-commons] could not save settings", e));
+  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[cmmns] could not save settings", e));
   $("adblock").append(switchRow("Block ads and trackers", "Off by default. The toolbar menu can allow ads on the site you are on.", PBSettings.get().adblock, (on) => save({ adblock: on })));
 
   function list() {
@@ -21,4 +21,4 @@
   }
   PBSettings.onChange(list);
   list();
-})().catch((e) => console.error("[daylight-commons] ad blocking options failed", e));
+})().catch((e) => console.error("[cmmns] ad blocking options failed", e));

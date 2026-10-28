@@ -20,7 +20,7 @@ globalThis.PBMediaFetch = (() => {
 
   async function get(url, range, as = "bytes") {
     // Source-protection mode: no request to any host. Only what the page holds in memory is read.
-    if (globalThis.PBSettings && PBSettings.get().protection && !/^(data|blob):/i.test(url)) throw new Error(`Source-protection mode is on, so Daylight Commons did not download this again from ${new URL(url).host}: that request would tell the host. Save it with your browser's own Save as, then add the file to the case.`);
+    if (globalThis.PBSettings && PBSettings.get().protection && !/^(data|blob):/i.test(url)) throw new Error(`Source-protection mode is on, so CMMNS did not download this again from ${new URL(url).host}: that request would tell the host. Save it with your browser's own Save as, then add the file to the case.`);
     const headers = range ? { Range: `bytes=${range.offset}-${range.offset + range.length - 1}` } : {};
     const res = await fetch(url, { headers, credentials: "include", signal: AbortSignal.timeout(TIMEOUT_MS) });
     if (!res.ok) throw new Error(`HTTP ${res.status} from ${new URL(url).host}`);
@@ -38,7 +38,7 @@ globalThis.PBMediaFetch = (() => {
         const i = next++;
         out[i] = (await get(list[i].url, list[i].range)).bytes;
         total += out[i].length;
-        if (total > MAX_BYTES) throw new Error("The stream is larger than 1.5 GB, more than Daylight Commons saves in a browser. Use a smaller quality.");
+        if (total > MAX_BYTES) throw new Error("The stream is larger than 1.5 GB, more than CMMNS saves in a browser. Use a smaller quality.");
         if (onProgress) onProgress(++done, list.length);
       }
     }
@@ -105,7 +105,7 @@ globalThis.PBMediaFetch = (() => {
     } else if (item.streams && item.streams.length) {
       const s = item.streams[item.streams.length - 1];
       got = await (s.type === "hls" ? hls : dash)(s.url, opts);
-    } else throw new Error("This media has no address Daylight Commons can read: the page builds it in memory.");
+    } else throw new Error("This media has no address CMMNS can read: the page builds it in memory.");
     for (const p of got.parts) { const why = PB.fileProtection(p.bytes); if (why) throw new Protected(why); }
     return got;
   }

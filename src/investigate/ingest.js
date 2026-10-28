@@ -56,7 +56,7 @@ export function transcribe(path, ocr) {
   if (t != null) return { text: t.trim(), method: "transcription file", confidence: null };
   if (extname(path).toLowerCase() === ".png" && ocr) {
     const r = ocr(readFileSync(path));
-    if (r && r.text.trim()) return { text: r.text.trim(), method: "built-in OCR (Daylight Commons latin model)", confidence: Number(r.confidence.toFixed(3)) };
+    if (r && r.text.trim()) return { text: r.text.trim(), method: "built-in OCR (CMMNS latin model)", confidence: Number(r.confidence.toFixed(3)) };
   }
   return null;
 }

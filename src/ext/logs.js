@@ -1,4 +1,4 @@
-// Daylight Commons' local logs and lookups, shared by the content script: the owner and state tables for
+// CMMNS' local logs and lookups, shared by the content script: the owner and state tables for
 // what is on screen, the connections log, source trails, per-thread history snapshots, and the
 // report export. Everything stays in chrome.storage.local on this machine.
 (() => {
@@ -28,7 +28,7 @@
     for (const p of got.people) backingParts.set(p.id, p);
     PB.setBackingTable({ people: [...backingParts.values()] });
   }
-  // Websites, bio domains and bio @handles of the accounts Daylight Commons has read, asked once each.
+  // Websites, bio domains and bio @handles of the accounts CMMNS has read, asked once each.
   async function ensureProfiles(readings) {
     const all = readings.map(PB.profileLinks);
     const domains = [...new Set(all.flatMap((p) => p.domains))].filter((d) => !askedOwners.has(d));
@@ -140,7 +140,7 @@
   // each does not prove, and where the data came from. Reply text is left out.
   function exportReport(site, report, clusters, rows, video, pushed) {
     const out = {
-      tool: "Daylight Commons " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), page: location.href, site: site.name,
+      tool: "CMMNS " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), page: location.href, site: site.name,
       report, video, pushedLinks: pushed,
       sameTextGroups: clusters.map((c) => ({ size: c.ids.length, authors: c.authors })),
       accounts: rows.map((r) => ({ handle: r.author, basedIn: r.basedIn || null, joinDate: r.joinDate || null, machineSigns: r.machine, flags: (r.flags || []).map((f) => ({ id: f.id, evidence: f.evidence, doesNotProve: f.doesNotProve })) })),
@@ -169,7 +169,7 @@
       domain: l.domain, n: l.n, owner: PB.ownerOfDomain(l.domain) ? PB.ownerOfDomain(l.domain).owner : null,
       state: [...new Set(PB.stateLinksOfDomain(l.domain).map((h) => PB.stateLabel(h).chip))],
     }));
-    const built = PB.evidenceCard({ tool: "Daylight Commons " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), site: site.name, page: location.href, thread: true,
+    const built = PB.evidenceCard({ tool: "CMMNS " + chrome.runtime.getManifest().version, savedAt: new Date().toISOString(), site: site.name, page: location.href, thread: true,
       authors: replies.map((r) => r.author), report, sameText: clusters.length, claims, sites, media });
     if (built.ok) built.bundleInput = bundleInput(site, root, replies, rows);
     chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => PBGuard.report("could not open the card page", e));

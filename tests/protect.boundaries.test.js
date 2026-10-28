@@ -1,5 +1,5 @@
 // The boundaries of the protection features (project-docs/SECURITY-REVIEW.md and the
-// counter-repression brief): Daylight never targets, tracks, locates or deanonymises a person.
+// counter-repression brief): CMMNS never targets, tracks, locates or deanonymises a person.
 // These checks hold the line in code: no face recognition, no named-person search, no account
 // linking, and no reading of location from other people's files. Each one fails the build if a
 // change crosses it.

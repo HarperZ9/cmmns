@@ -2,7 +2,7 @@
 // signals, build an element table for each published definition. Each element is matched, not
 // matched or not observable, with the evidence behind it.
 //
-// The phrasing is "matches elements A and B of [definition]". Daylight Commons compares visible conduct with a
+// The phrasing is "matches elements A and B of [definition]". CMMNS compares visible conduct with a
 // published definition; a court, a regulator or the platform decides whether a rule was broken.
 // No text built here ever says the conduct was committed, or that anyone is guilty or liable:
 // VERDICT_WORDS is checked by tests/definitions.test.js on every table the catalogue can produce.
@@ -11,10 +11,10 @@
 export const VERDICT_WORDS = /\b(?:committed|commits?|guilty|is (?:a )?fraud|fraudulent|violat\w*|illegal|unlawful|liable|liability|crimes?|criminal|convict\w*|breach\w*|offen[cs]es?)\b/i;
 export const DEFINITION_FRAME = "This compares visible conduct with a published definition, element by element. Findings belong to courts, regulators and the platform.";
 export const LEGAL_NOTE = "Not legal advice. A media lawyer should review this wording before any public release.";
-export const CHALLENGE = "Challenge this entry or this badge at https://github.com/HarperZ9/daylight-commons/issues/new?template=challenge.yml. Every decision is published with its reasons, and corrections are dated.";
+export const CHALLENGE = "Challenge this entry or this badge at https://github.com/HarperZ9/cmmns/issues/new?template=challenge.yml. Every decision is published with its reasons, and corrections are dated.";
 export const STATUSES = ["matched", "not-matched", "not-observable"];
 
-// The words Daylight Commons must never produce about conduct, found in a piece of generated text.
+// The words CMMNS must never produce about conduct, found in a piece of generated text.
 export function verdictHits(text) {
   const out = [], re = new RegExp(VERDICT_WORDS.source, "gi");
   for (const m of String(text || "").matchAll(re)) out.push(m[0]);
@@ -96,7 +96,7 @@ export function elementTable(entry, finding, registry) {
   };
 }
 
-// Every jurisdiction that applies, with why. Daylight Commons shows all of them and never picks the harshest.
+// Every jurisdiction that applies, with why. CMMNS shows all of them and never picks the harshest.
 // actor and audience are jurisdiction codes ("US", "EU", "UK") or null when not public.
 export function applicableJurisdictions({ platform = null, actor = null, audience = null } = {}) {
   const out = [], notes = [];
@@ -136,8 +136,8 @@ export function signalsFromCampaign(lens, { launch = true, actor = null } = {}) 
   return { signals };
 }
 
-// Every piece of text Daylight Commons itself wrote into a table (quotes from the source are left out: they are
-// the law's words, not Daylight Commons').
+// Every piece of text CMMNS itself wrote into a table (quotes from the source are left out: they are
+// the law's words, not CMMNS').
 export function generatedText(table) {
   return [table.summary, table.dnp, table.legal_note, table.challenge, ...table.rows.flatMap((r) => [r.label, r.note || ""])].join("\n");
 }

@@ -6,7 +6,7 @@ only; nothing here ships. Needs Python 3 with Playwright, Google Chrome, and axe
     npm run package
     python scripts/qa/prod_check.py --stage <stage dir> --axe <axe.min.js> --out <dir>
 
-Installs dist/radar-chrome-<version>.zip into a fresh Chrome profile (scripts/demo/browser.py), answers
+Installs dist/cmmns-chrome-<version>.zip into a fresh Chrome profile (scripts/demo/browser.py), answers
 x.com with the synthetic stage, and measures: first run to the first sign, the window's open time,
 console errors on every page, axe on each page in light and dark, and a 600-post scroll soak with
 the heap after garbage collection. Writes results.json to --out.
@@ -57,7 +57,7 @@ async def first_run(s, con):
     pg = await s.page()
     con.watch(pg, "welcome")
     await pg.goto(s.url("welcome.html"))
-    await pg.get_by_role("button", name="Start Daylight Commons").click()
+    await pg.get_by_role("button", name="Start CMMNS").click()
     await pg.wait_for_selector("#done p", timeout=10000)
     t_started = time.perf_counter() - t0
     await pg.goto(s.stages["thread"]["url"])
@@ -176,7 +176,7 @@ async def main():
     ap.add_argument("--stage", required=True)
     ap.add_argument("--axe", required=True)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--package", default=str(ROOT / "dist" / f"radar-chrome-{VERSION}.zip"))
+    ap.add_argument("--package", default=str(ROOT / "dist" / f"cmmns-chrome-{VERSION}.zip"))
     ap.add_argument("--only", default="first,window,keyboard,axe,pages,soak", help="comma list of stages")
     a = ap.parse_args()
     out = pathlib.Path(a.out)

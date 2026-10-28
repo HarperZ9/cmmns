@@ -1,5 +1,5 @@
 // The swarming sign (project-docs/TECHNIQUES.md, technique 7; DISARM T0049.005 Conduct Swarming and
-// T0048 Harass). Rauch describes trolling as a pile-on that manufactures a crowd. In one thread Daylight Commons
+// T0048 Harass). Rauch describes trolling as a pile-on that manufactures a crowd. In one thread CMMNS
 // can see one trace of it: many new or flagged accounts converging on one post within minutes.
 // The sign is about the thread, never about an account: it carries counts only, no handles, so it
 // cannot become a list to pile on in turn (DESIGN-MAP R12). Thresholds were set on the dev half of
@@ -12,7 +12,7 @@ export const SWARM_WINDOW_SEC = 600, SWARM_MIN = 6, SWARM_SHARE = 0.5, SWARM_MIN
 export const SWARM_DOES_NOT_PROVE = "This describes how the replies arrived. A breaking story, a celebrity post or a link shared in a group chat draws many new accounts at once on its own.";
 
 // rows: [{ author, posted, timePrecision? }] replying to one post; markOf(handle, postedMs) -> { new, flagged } or
-// null when Daylight Commons has not read the account. precision: the thread's timePrecision. Returns null or
+// null when CMMNS has not read the account. precision: the thread's timePrecision. Returns null or
 // { from, to, accounts, known, marked, newAccounts, flagged, windowSec } for the densest window.
 export function swarmSign(rows, markOf, { windowSec = SWARM_WINDOW_SEC, precision } = {}) {
   if (!observable(timePrecision(rows, precision).precision, "swarming")) return null;

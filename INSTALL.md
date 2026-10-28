@@ -1,28 +1,28 @@
-# Install Daylight Commons without a store
+# Install CMMNS without a store
 
 Last updated: 2026-10-23.
 
-Every Daylight Commons release can be downloaded, checked and installed without a browser store, and its
+CMMNS was formerly Daylight Commons, and Radar before that. Every CMMNS release can be downloaded, checked and installed without a browser store, and its
 source can be rebuilt without any code host. This page says how, and says plainly where a browser
 maker still stands in the way.
 
 ## What a release holds
 
-- `radar-chrome-<version>.zip`: the Chrome, Edge and Brave build.
-- `radar-firefox-<version>.xpi`: the Firefox build sent to Mozilla's add-on store.
-- `radar-firefox-self-<version>.xpi`: the Firefox build for installing from this site once Mozilla has signed it. It checks this site for updates.
-- `radar-cli-<version>.zip`: the command line tool. Unzip it anywhere and run `node bin/radar.mjs verify <file>` with Node 22 or later to check a signed evidence bundle or a saved evidence chain offline. No install step.
+- `cmmns-chrome-<version>.zip`: the Chrome, Edge and Brave build.
+- `cmmns-firefox-<version>.xpi`: the Firefox build sent to Mozilla's add-on store.
+- `cmmns-firefox-self-<version>.xpi`: the Firefox build for installing from this site once Mozilla has signed it. It checks this site for updates.
+- `cmmns-cli-<version>.zip`: the command line tool. Unzip it anywhere and run `node bin/radar.mjs verify <file>` with Node 22 or later to check a signed evidence bundle or a saved evidence chain offline. No install step.
 - `FILES-<version>.sha256`: the hash of every file inside each package.
-- `radar-<version>.bundle`: the whole source history at the release commit, as one git file. Commits before 3.0.0 also hold the Conso font, under its designer's licence; 3.0.0 and later ship only fonts under the SIL Open Font License.
+- `cmmns-<version>.bundle`: the whole source history at the release commit, as one git file. Commits before 3.0.0 also hold the Conso font, under its designer's licence; 3.0.0 and later ship only fonts under the SIL Open Font License.
 - `SOURCE`: the commit and the Node version the release was built with.
-- `release-key.json`: Daylight Commons' public signing key.
-- `SHA256SUMS` and `SHA256SUMS.sig`: the hash of every file above, and Daylight Commons' signature over that list.
+- `release-key.json`: CMMNS' public signing key.
+- `SHA256SUMS` and `SHA256SUMS.sig`: the hash of every file above, and CMMNS' signature over that list.
 - `verify-offline.html`, `KEY-CARD.html` and `KIT-GUIDE.txt`, from 3.2.0: the offline kit's checker, a printable key card with a QR copy of the key id, and plain guidance for use without the internet. `SHA256SUMS` covers them like every other file.
 - `HEAD.json` and `HEAD.sig`, from 3.2.0: the signed head. It names `SHA256SUMS` and the catalogue by hash, with a version number that only goes up, the time it was signed and a date it expires, 90 days after the release commit.
 
 ## Check a download
 
-Daylight Commons signs `SHA256SUMS` with its project key, an ECDSA P-256 key whose private half never enters
+CMMNS signs `SHA256SUMS` with its project key, an ECDSA P-256 key whose private half never enters
 the repository or any server. The key id is:
 
 **{{KEY_ID}}**
@@ -34,7 +34,7 @@ nothing on its own.
 The signed head stops an old release from passing as the current one. Each device keeps the
 highest head version it has accepted. A lower version, a different head under the same version, or
 a release with no head after one with a head, is refused, and the refusal names the rule in one
-sentence. A head past its expiry still verifies and is marked Expired: Daylight Commons keeps
+sentence. A head past its expiry still verifies and is marked Expired: CMMNS keeps
 working and says "Catalogue dated 2026-10-22. Newer campaigns may be missing." The expiry is the
 signer's claim. A device with a wrong clock uses the latest signed time it has seen.
 
@@ -77,7 +77,7 @@ release folder with Node, run `node scripts/kit.mjs <release folder> --out <kit 
 
 The packages are reproducible: entries sorted, fixed timestamps, no extra fields. From the bundle:
 
-- `git clone radar-<version>.bundle radar`
+- `git clone cmmns-<version>.bundle cmmns`
 - `cd radar` and `npm run ci` to run every check the project runs on GitHub, with no network.
 - `npm run package`, then compare `dist/SHA256SUMS` with the release.
 
@@ -92,31 +92,31 @@ Chrome installs extensions from outside the Chrome Web Store only in two ways, b
 - **Developer mode.** Unzip the package, open `chrome://extensions`, turn on Developer mode, press
   Load unpacked and pick the folder. Chrome may show a warning about developer-mode extensions, and
   this copy does not update itself: install each new release the same way.
-- **Enterprise policy.** A managed computer can force-install Daylight Commons from a self-hosted address
+- **Enterprise policy.** A managed computer can force-install CMMNS from a self-hosted address
   with the `ExtensionInstallForcelist` policy. This needs an administrator.
 
 There is no other way around the store for an ordinary Chrome install. That is Google's rule, and
-Daylight Commons cannot change it.
+CMMNS cannot change it.
 
 ## Install in Firefox
 
 Release versions of Firefox install only add-ons that Mozilla has signed, even when the file comes
-from somewhere other than Mozilla's store. Mozilla signs `radar-firefox-self` without listing it in
+from somewhere other than Mozilla's store. Mozilla signs `cmmns-firefox-self` without listing it in
 its store; once signed, open the file in Firefox to install it, and Firefox checks
-`firefox/updates.json` on this site for new versions.
+`https://harperz9.github.io/ext/firefox/updates.json` for new versions.
 
-No release so far carries a Mozilla-signed file, 3.8.0 included, and `firefox/updates.json` is not
-published yet. Until Mozilla signs the self-distributed build or lists Daylight Commons on Firefox
+No release so far carries a Mozilla-signed file, 3.9.0 included, and the update list at
+`ext/firefox/updates.json` names no version yet. Until Mozilla signs the self-distributed build or lists CMMNS on Firefox
 Add-ons, release Firefox can load it only for one session: open `about:debugging`, choose This
 Firefox, then Load Temporary Add-on, and pick the `.xpi`. Firefox Developer Edition, Nightly and
 unbranded builds can turn signing checks off.
 
-That signature is Mozilla's requirement. Daylight Commons cannot remove it, and a Mozilla signature says
+That signature is Mozilla's requirement. CMMNS cannot remove it, and a Mozilla signature says
 only that Mozilla's automated review passed.
 
 ## If the code host goes away
 
-Daylight Commons' source is hosted on GitHub today. Each release's bundle holds the whole history, so the
+CMMNS' source is hosted on GitHub today. Each release's bundle holds the whole history, so the
 project survives without it: clone the bundle, then push it to any git host. Any mirror that
 serves the same bundle and the same signed `SHA256SUMS` is as good as the original, because the
 signature is what you check, wherever the files came from. `node scripts/mirror-check.mjs <url>...`
@@ -125,7 +125,7 @@ head under the same version, or serves a file whose bytes differ from the signed
 
 ## What this does not prove
 
-A valid signature shows the files were signed by the holder of Daylight Commons' key and have not changed
+A valid signature shows the files were signed by the holder of CMMNS' key and have not changed
 since. A valid head shows the signer chose these files at that time. It does not show the files are safe.
 The offline checker cannot show its own key is right if the kit came from an attacker: the printed
 card and a second source are the defence. The kit and its checker have had no independent security

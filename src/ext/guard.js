@@ -1,8 +1,8 @@
 // Failure and memory guards for the content scripts. Loaded first after core.bundle.js on every
 // supported site (manifest content_scripts). A platform can change its page or its data at any
-// time; when one of our readers stops matching, Daylight Commons must go quiet on that part and
+// time; when one of our readers stops matching, CMMNS must go quiet on that part and
 // leave the page working. So:
-// - report(): one console.warn per kind of failure per minute, prefixed "[daylight-commons]", and
+// - report(): one console.warn per kind of failure per minute, prefixed "[cmmns]", and
 //   a ring of the last 50 failures that the toolbar self-test reads. Never console.error, which a
 //   site's own error tooling would count as its own fault.
 // - run() and wrap(): try/catch around a callback, with report() on failure.
@@ -15,7 +15,7 @@
 //   five failed passes pauses automatic refresh on this page until the next navigation.
 (() => {
   "use strict";
-  const PREFIX = "[daylight-commons]";
+  const PREFIX = "[cmmns]";
   const ring = [];
   const lastWarn = new Map();
   let failedRuns = 0;

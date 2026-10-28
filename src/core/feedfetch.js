@@ -1,6 +1,6 @@
 // Requests for Other coverage, run by the background worker only on the user's click. Each request
 // goes to one feed address the user chose, with no cookies, no referrer, no added headers and no
-// body, and Daylight Commons does not follow a redirect to another address the user never allowed. The fetch
+// body, and CMMNS does not follow a redirect to another address the user never allowed. The fetch
 // and permission functions are passed in, so tests run without a network.
 
 import { parseFeed, FEED_MAX_BYTES } from "./feeds.js";

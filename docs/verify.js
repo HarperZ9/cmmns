@@ -1,6 +1,6 @@
 // The release checker on the install page. It reads the files the visitor picks, on their device,
-// and checks SHA256SUMS.sig against Daylight Commons' public key, then every file's hash against SHA256SUMS.
-// It sends nothing. signing.js is Daylight Commons' src/core/sig.js and src/core/signing.js joined (scripts/install-page.mjs).
+// and checks SHA256SUMS.sig against CMMNS' public key, then every file's hash against SHA256SUMS.
+// It sends nothing. signing.js is CMMNS' src/core/sig.js and src/core/signing.js joined (scripts/install-page.mjs).
 import { verifySums, sha256Hex, parseSums, signingKeyId, SIGNATURE_DOES_NOT_PROVE } from "./signing.js";
 
 const $ = (id) => document.getElementById(id);

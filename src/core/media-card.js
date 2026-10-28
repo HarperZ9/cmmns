@@ -1,12 +1,12 @@
 // A text card: a post's or a selection's words set as a picture, for sharing where only pictures
-// travel. It is a Daylight Commons rendering in the house type (Hanken Grotesk, JetBrains Mono for the
+// travel. It is a CMMNS rendering in the house type (Hanken Grotesk, JetBrains Mono for the
 // address) on the house paper, with no avatar, icon, button or layout of any platform, and it says
 // at its foot that it is a rendering and not a screenshot. Pure: the caller passes measure(text,
 // font) and draws the returned list.
 
 export const CARD = Object.freeze({ width: 1200, pad: 80, paper: "#ebe5d8", ink: "#16130f", soft: "#4a443b", rule: "#c9bfab", maxBodyLines: 36 });
 const SANS = '"Hanken Grotesk", "Segoe UI", sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
-export const CARD_FOOT = "Daylight Commons rendering of text the page showed. Not a screenshot of the post.";
+export const CARD_FOOT = "CMMNS rendering of text the page showed. Not a screenshot of the post.";
 
 // Words wrapped to maxWidth; a word wider than a line is broken by characters. Blank lines stay.
 export function wrapLines(text, measure, font, maxWidth) {

@@ -1,10 +1,10 @@
 """Live-site smoke check of the packaged extension (project-docs/PRODUCTION-READINESS.md). Development
 tool only. Opens one public page per supported site in a fresh, signed-out Chrome profile with the
-extension installed, and records for each: whether the page loaded, whether Daylight Commons' reader
+extension installed, and records for each: whether the page loaded, whether CMMNS' reader
 found posts, every error the extension's own scripts raised, and every warning it logged. It reads
 only what a signed-out visitor sees and clicks nothing on the sites. Writes live.json to --out.
 
-    python scripts/qa/live_sites.py --out <dir> [--package dist/radar-chrome-<version>.zip]
+    python scripts/qa/live_sites.py --out <dir> [--package dist/cmmns-chrome-<version>.zip]
 """
 import argparse
 import asyncio
@@ -67,7 +67,7 @@ async def visit(s, name, url, follow):
         await pg.wait_for_timeout(3000)
         out["final_url"] = pg.url
         for cid, cname in list(contexts.items()):
-            if cname == "Daylight Commons":
+            if cname == "CMMNS":
                 ours.add(cid)
                 try:
                     r = await cdp.send("Runtime.evaluate", {"expression": PROBE, "contextId": cid, "returnByValue": True})
@@ -87,7 +87,7 @@ async def visit(s, name, url, follow):
 async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
-    ap.add_argument("--package", default=str(ROOT / "dist" / f"radar-chrome-{VERSION}.zip"))
+    ap.add_argument("--package", default=str(ROOT / "dist" / f"cmmns-chrome-{VERSION}.zip"))
     ap.add_argument("--stage", default=str(ROOT / "scripts" / "demo"))
     a = ap.parse_args()
     out = pathlib.Path(a.out)

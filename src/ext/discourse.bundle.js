@@ -297,10 +297,10 @@ function personaOf(index, account) {
     person: p, cue: inHandle ? "handle" : "display",
     label: `uses the name of ${p.name} (died ${yearText(p.died)})`,
     rows: [
-      ["What Daylight Commons sees", `This account's name is the name of ${p.name} (${years}), who died ${p.died < 0 || p.died < 1900 ? "long before social media" : "in " + yearText(p.died)}. It is not that person writing.`],
+      ["What CMMNS sees", `This account's name is the name of ${p.name} (${years}), who died ${p.died < 0 || p.died < 1900 ? "long before social media" : "in " + yearText(p.died)}. It is not that person writing.`],
       ["Why it shows", inHandle ? `The display name and the handle both carry the name ("${inHandle}").` : `The display name adds "${kindWord}" to the name.`],
       ...(account.verified ? [["The checkmark", CHECKMARK_NOTE]] : []),
-      ["Source", `Wikidata ${p.qid}, from the name list that ships inside Daylight Commons.`],
+      ["Source", `Wikidata ${p.qid}, from the name list that ships inside CMMNS.`],
       ["What it shows", PERSONA_DOES_NOT_PROVE],
     ],
   };
@@ -317,7 +317,7 @@ return { PERSONA_DOES_NOT_PROVE, CHECKMARK_NOTE, buildPersons, personaOf, yearTe
 // ---- stats.js
 const M_stats = (() => {
 // Numbers with their sample size (project-docs/DISCOURSE.md): "45/50 replies", "8 of 25", "62% of
-// 1,200 people", "n = 40". Each count gets a Wilson 95% interval, the same interval Daylight
+// 1,200 people", "n = 40". Each count gets a Wilson 95% interval, the same interval CMMNS
 // Commons prints for its own figures, and a note when the sample is small.
 const STATS_DOES_NOT_PROVE = "An interval shows how much a count of this size can move by chance alone. It says nothing about how the sample was chosen, how the question was asked, or whether the result holds elsewhere.";
 const SMALL_N = 30;
@@ -386,7 +386,7 @@ return { STATS_DOES_NOT_PROVE, SMALL_N, wilson, findCounts, compareArms, countRo
 // ---- docclaim.js
 const M_docclaim = (() => {
 // The document-image claim check (project-docs/DISCOURSE.md). A post shows a letter, a filing or a
-// report as pictures and says what it says. Daylight Commons reads each picture with its own text
+// report as pictures and says what it says. CMMNS reads each picture with its own text
 // recogniser, on this device, then sets the post's key terms against the words on the pages: which
 // appear, on which image, and which do not. It compares words, not meaning.
 const { fold, containsNear, editDistance, STOP, snippet } = M_text;
@@ -472,7 +472,7 @@ const M_corrections = (() => {
 // the same order). A raised reply is a challenge to read, never a verdict.
 const { content, fold } = M_text;
 
-const CORRECTIONS_DOES_NOT_PROVE = "A reply that brings a source or names an error can still be wrong. Daylight Commons ranks replies by the kind of source they cite and how specifically they answer the post, not by whether they are right.";
+const CORRECTIONS_DOES_NOT_PROVE = "A reply that brings a source or names an error can still be wrong. CMMNS ranks replies by the kind of source they cite and how specifically they answer the post, not by whether they are right.";
 
 // Reference and primary-record hosts. A link to one of these is the strongest kind of source a reply
 // can bring; any other web page counts for less; links to social posts count for nothing.
@@ -595,7 +595,7 @@ function quoteSigns(results, list) {
   const out = (results || []).map((r) => sign(STATUS[r.status], "quote-source", "sources", [...quoteRows(r), ["What it shows", QUOTE_DOES_NOT_PROVE]]));
   if (list && list.lines >= 3) {
     out.push(sign(`${list.lines} lines credited to names, ${list.sourced} sourced`, "quote-list", "sources", [
-      ["What Daylight Commons sees", `${list.lines} lines each credit a named person${list.named ? ` (${list.named} of them names Daylight Commons knows)` : ""}. ${list.sourced === 0 ? "None gives" : `${list.sourced} give`} a source.`],
+      ["What CMMNS sees", `${list.lines} lines each credit a named person${list.named ? ` (${list.named} of them names CMMNS knows)` : ""}. ${list.sourced === 0 ? "None gives" : `${list.sourced} give`} a source.`],
       ...(list.short ? [["Too short to look up", `${list.short} ${list.short === 1 ? "line is" : "lines are"} under five words, too short to find in any text.`]] : []),
       ["What it shows", "A list of one-line sayings without sources is a common format for misattributed quotes. Some lines may still be fair summaries of a person's view."],
     ]));
@@ -610,7 +610,7 @@ function personaSign(p) {
 function countSigns(counts, fromImage = false) {
   if (!counts || !counts.length) return [];
   return [sign(`${counts.length === 1 ? "a count" : counts.length + " counts"} with ${counts.length === 1 ? "its" : "their"} sample size${fromImage ? " (in image)" : ""}`, "sample-size", "sources",
-    [...countRows(counts), ...(fromImage ? [["Read from", "the image, by Daylight Commons' own text recogniser"]] : []), ["What it shows", STATS_DOES_NOT_PROVE]])];
+    [...countRows(counts), ...(fromImage ? [["Read from", "the image, by CMMNS' own text recogniser"]] : []), ["What it shows", STATS_DOES_NOT_PROVE]])];
 }
 
 function docSign(r) {
@@ -791,7 +791,7 @@ function quoteLayer(q) {
 function docLayer(d) {
   if (!d) return null;
   return { name: "document pages", parts: [
-    ...d.absent.map((x) => ({ name: x.term, tags: ["absent", x.kind], properties: [prop("on the pages shown", false, "measured", `word match over ${d.read} of ${d.images} images read by Daylight's recogniser`)] })),
+    ...d.absent.map((x) => ({ name: x.term, tags: ["absent", x.kind], properties: [prop("on the pages shown", false, "measured", `word match over ${d.read} of ${d.images} images read by CMMNS's recogniser`)] })),
     ...d.found.map((x) => ({ name: x.term, tags: ["found", x.kind], properties: [prop("images", x.images, "measured", "word match"), prop("line", x.snippet, "observed", "recogniser output")] })),
   ] };
 }

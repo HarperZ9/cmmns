@@ -1,4 +1,4 @@
-// "What Daylight shows about you": Daylight's own account signals, run on the user's own account
+// "What CMMNS shows about you": CMMNS's own account signals, run on the user's own account
 // only, each with what it reveals and how to reduce it. Ownership is proved two ways and no other:
 // the page itself shows the signed-in account on its own profile (ownedProfile), or the input is
 // the platform's own data export, which only the account holder can download. There is no way to
@@ -45,7 +45,7 @@ function row(id, title, shows, reveals, reduce) { return { id, title, shows, rev
 
 function placeRows(a) {
   const out = [];
-  if (a.basedIn) out.push(row("place-label", "Place label", `The platform labels this account as based in ${a.basedIn}${a.proxyNote ? ", and notes the location may be inaccurate" : ""}.`, "Anyone who opens your About page sees this country or region, and Daylight shows it beside your replies.", "The platform sets it from its own data (sign-up, network, phone). You cannot edit it. A VPN changes what it sees from now on; the label can lag."));
+  if (a.basedIn) out.push(row("place-label", "Place label", `The platform labels this account as based in ${a.basedIn}${a.proxyNote ? ", and notes the location may be inaccurate" : ""}.`, "Anyone who opens your About page sees this country or region, and CMMNS shows it beside your replies.", "The platform sets it from its own data (sign-up, network, phone). You cannot edit it. A VPN changes what it sees from now on; the label can lag."));
   const store = storeCountry(a.connectedVia);
   if (store) out.push(row("app-store", "App store country", `Connected via ${a.connectedVia}.`, `The country of the app store your phone uses: ${store}.`, "It follows your app store account's country. It cannot be hidden from this page."));
   if (a.profileLocation) out.push(row("profile-location", "Profile location", `Your profile says "${a.profileLocation}".`, "A place you typed yourself, shown to everyone.", "Edit your profile and clear the location, or make it vaguer."));
@@ -66,7 +66,7 @@ function postingRows(p) {
   const out = [];
   if (!p) return out;
   const clock = postingClock(p.hourHist);
-  if (clock) out.push(row("posting-clock", "Posting clock", clock.offset == null ? `Posts in ${clock.active} of the 24 hours of the day, with no long quiet stretch (${p.posts} posts).` : `Posts in ${clock.active} of 24 hours; quiet for ${clock.quietHours} hours from ${String(clock.quietFromUtc).padStart(2, "0")}:00 UTC (${p.posts} posts).`, clock.offset == null ? "Round-the-clock posting is one of the signs Daylight shows for automated accounts." : `Your quiet hours fit sleep at about UTC${clock.offset >= 0 ? "+" : ""}${clock.offset}, which points to your time zone and your sleeping hours.`, "Times cannot be hidden once posted. Scheduling posts at varied hours, or posting less from an account you keep apart, blurs the pattern."));
+  if (clock) out.push(row("posting-clock", "Posting clock", clock.offset == null ? `Posts in ${clock.active} of the 24 hours of the day, with no long quiet stretch (${p.posts} posts).` : `Posts in ${clock.active} of 24 hours; quiet for ${clock.quietHours} hours from ${String(clock.quietFromUtc).padStart(2, "0")}:00 UTC (${p.posts} posts).`, clock.offset == null ? "Round-the-clock posting is one of the signs CMMNS shows for automated accounts." : `Your quiet hours fit sleep at about UTC${clock.offset >= 0 ? "+" : ""}${clock.offset}, which points to your time zone and your sleeping hours.`, "Times cannot be hidden once posted. Scheduling posts at varied hours, or posting less from an account you keep apart, blurs the pattern."));
   if (p.clients && p.clients.length) out.push(row("posting-apps", "Posting apps", `Posted from ${p.clients.map((c) => `${c.name} (${Math.round(c.share * 100)}%)`).join(", ")}.`, "The kind of phone or tool you use. The platform's data carries it even where the page no longer shows it.", "Posting from the web app makes it the same as most people's. Scheduling tools show up by name."));
   if (Number.isFinite(p.perDay)) out.push(row("volume", "How often you post", `About ${p.perDay} posts a day over ${p.days} days.`, "How much time you spend here, and when you are busy.", "Volume shows over time; posting less, or in batches, changes it."));
   return out;

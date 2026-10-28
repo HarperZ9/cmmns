@@ -1,7 +1,7 @@
-// Mastodon servers the user turned Daylight Commons on for, in the background. Daylight Commons has no access to any
-// server until the user clicks "Turn on Daylight Commons here" in the toolbar popup on that server's page and
+// Mastodon servers the user turned CMMNS on for, in the background. CMMNS has no access to any
+// server until the user clicks "Turn on CMMNS here" in the toolbar popup on that server's page and
 // the browser asks them to allow it (an optional host permission, one server at a time). Then this
-// worker registers Daylight Commons' content scripts for that server alone. Removing the server in the
+// worker registers CMMNS' content scripts for that server alone. Removing the server in the
 // options page, or revoking the permission in the browser, unregisters them.
 (() => {
   "use strict";
@@ -30,7 +30,7 @@
     try {
       await chrome.scripting.registerContentScripts([{ id: idOf(host) + "-sniff", matches, js: ["fedisniff.js"], runAt: "document_start",
         world: "MAIN", persistAcrossSessions: true }]);
-    } catch (e) { console.warn("[daylight-commons] main-world script not available for", host, e); }
+    } catch (e) { console.warn("[cmmns] main-world script not available for", host, e); }
   }
 
   async function enable(host, tabId) {
@@ -40,7 +40,7 @@
     if (tabId != null) {
       const { js, css } = files();
       await chrome.scripting.insertCSS({ target: { tabId }, files: css }).catch(() => {});
-      await chrome.scripting.executeScript({ target: { tabId }, files: js }).catch((e) => console.warn("[daylight-commons] could not start on this tab", e));
+      await chrome.scripting.executeScript({ target: { tabId }, files: js }).catch((e) => console.warn("[cmmns] could not start on this tab", e));
     }
     return { ok: true };
   }
@@ -58,7 +58,7 @@
     const job = msg.type === "pb-instance-add" && host ? enable(host, msg.tabId)
       : msg.type === "pb-instance-remove" && host ? disable(host)
       : msg.type === "pb-instance-list" ? list() : Promise.resolve(null);
-    job.then(reply).catch((e) => { console.error("[daylight-commons] server setting failed", e); reply({ ok: false, error: String(e) }); });
+    job.then(reply).catch((e) => { console.error("[cmmns] server setting failed", e); reply({ ok: false, error: String(e) }); });
     return true;
   });
 
@@ -69,7 +69,7 @@
     for (const host of (p.origins || []).map(hostOf).filter(Boolean)) {
       if (pending && pending.host === host && Date.now() - pending.at < 120000) {
         await chrome.storage.local.remove(PENDING);
-        await enable(host, pending.tabId).catch((e) => console.error("[daylight-commons] could not turn on", host, e));
+        await enable(host, pending.tabId).catch((e) => console.error("[cmmns] could not turn on", host, e));
       }
     }
   });
@@ -83,7 +83,7 @@
   // for every server whose permission is still granted.
   const restore = async () => {
     for (const host of await list()) {
-      if (await chrome.permissions.contains({ origins: [`https://${host}/*`] })) await register(host).catch((e) => console.error("[daylight-commons] restore failed", host, e));
+      if (await chrome.permissions.contains({ origins: [`https://${host}/*`] })) await register(host).catch((e) => console.error("[cmmns] restore failed", host, e));
     }
   };
   chrome.runtime.onStartup.addListener(restore);

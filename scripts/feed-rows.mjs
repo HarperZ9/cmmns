@@ -1,6 +1,6 @@
 // Shared by scripts/claims-build.mjs and scripts/sites-build.mjs: reads the Data Commons
 // ClaimReview feed into rows, each with the sites where the fact-checker said the claim appeared
-// (src/core/hosts.js reviewSites). Build time only; Daylight Commons never fetches the feed from the browser.
+// (src/core/hosts.js reviewSites). Build time only; CMMNS never fetches the feed from the browser.
 import { readFileSync } from "node:fs";
 import { claimTokens, MIN_CLAIM_TOKENS } from "../src/core/claims.js";
 import { reviewSites, siteKey, hostOf } from "../src/core/hosts.js";
@@ -17,7 +17,7 @@ export function arg(name, fallback) {
 export async function loadFeed() {
   const file = arg("--in", null);
   if (file) return JSON.parse(readFileSync(file, "utf8"));
-  const res = await fetch(FEED, { headers: { "User-Agent": "Daylight Commons table builder (local, manual run)" } });
+  const res = await fetch(FEED, { headers: { "User-Agent": "CMMNS table builder (local, manual run)" } });
   if (!res.ok) throw new Error(`feed download failed: ${res.status}`);
   return res.json();
 }

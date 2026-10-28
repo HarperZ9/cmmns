@@ -1,5 +1,5 @@
 // Text kept without any picture: a text post or a selection as a daylight.sidecar/1 note with
-// kind "text" and no file, and the text card, a Daylight rendering that never looks like a platform.
+// kind "text" and no file, and the text card, a CMMNS rendering that never looks like a platform.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { postMeta, sidecarMarkdown, metaName, captionText } from "../src/core/media-meta.js";

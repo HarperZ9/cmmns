@@ -1,9 +1,9 @@
 <!-- writing-profile: research -->
-# Daylight Commons: a lens for a place the senses cannot see
+# CMMNS: a lens for a place the senses cannot see
 
-The author's long-range direction for Daylight Commons, set 2026-10-22. Product direction, not shipped behaviour: what exists today is in the README and the other project-docs.
+The author's long-range direction for CMMNS, set 2026-10-22. Product direction, not shipped behaviour: what exists today is in the README and the other project-docs.
 
-The author's direction, verbatim, 2026-10-22: "Lets take this as far as possible. Daylight Commons should be a capable watch dog protecting the liberties, and independent thought of users who browse these platforms; and it should act as a healthy objective lens to view these social platforms from so as to help discern ones own takeaways from being influenced by this type of digital social environment. Such as the shared reference; the poster recognizes that an adequate sense of visualization and characterization and recognition of the self-concept. Sometimes being able to adequately interface with landscapes in which our senses do not have dominion makes things difficult. It creates blind spots."
+The author's direction, verbatim, 2026-10-22: "Lets take this as far as possible. CMMNS should be a capable watch dog protecting the liberties, and independent thought of users who browse these platforms; and it should act as a healthy objective lens to view these social platforms from so as to help discern ones own takeaways from being influenced by this type of digital social environment. Such as the shared reference; the poster recognizes that an adequate sense of visualization and characterization and recognition of the self-concept. Sometimes being able to adequately interface with landscapes in which our senses do not have dominion makes things difficult. It creates blind spots."
 
 The shared reference is a post by a writer on 90s cyberpunk, which understood that going online meant going somewhere: an environment with secret passageways, friends, enemies and dangers, requiring psychic and infrastructural security.
 
@@ -13,9 +13,9 @@ A feed is a place, and the user cannot see its shape. In a room you can tell who
 
 The platform sees the whole room. The user sees a slot. That gap is the blind spot. Engineered amplification, paid voices and coordinated crowds work inside it.
 
-Daylight Commons' job is to give the user senses for that place, so their conclusions stay their own.
+CMMNS' job is to give the user senses for that place, so their conclusions stay their own.
 
-## Five senses Daylight Commons adds
+## Five senses CMMNS adds
 
 1. **Sight of the room.** A small map beside the conversation, like a game's minimap:
    - who is in this thread, grouped by behaviour, never by identity;
@@ -47,22 +47,22 @@ Daylight Commons' job is to give the user senses for that place, so their conclu
 A watchdog that becomes another influence engine has failed. These are rules of the build, not aspirations.
 
 - **It accuses when the evidence earns it, and never past the legal line.** The author, verbatim, 2026-10-22: "I am alright with accusations as long asbthey are grounded and plausible, and do not tread the threads of legality. But I am willing to confidently walk right up to the line, and spit in the faces of those who weaponize legality for their manipulation of language, ethics, and culture." The accusation ladder:
-  1. **Documented fact, stated flatly and named.** A paid-partnership label, an ad-library entry, a domain registered three weeks before "two years building", star bursts with timestamps. "This launch ran paid promotion while presenting itself as organic." Truth is the defence, so Daylight Commons shows the receipt.
+  1. **Documented fact, stated flatly and named.** A paid-partnership label, an ad-library entry, a domain registered three weeks before "two years building", star bursts with timestamps. "This launch ran paid promotion while presenting itself as organic." Truth is the defence, so CMMNS shows the receipt.
   2. **Strong inference, named, said as an inference with its evidence.** Several independent signals agree. "The repost wave on this launch is consistent with purchased engagement: here are the four signals, and here is what they do not prove." This is opinion grounded in disclosed facts, and it stands about the campaign and the organisation that ran it.
   3. **Weak signal: no accusation.** Context only.
 - **Who can be accused.** Companies, brands, campaigns, agencies, official accounts and public figures acting commercially or politically. They face accusation at ladder steps 1 and 2. Ordinary private accounts are not named or called bots individually. They appear only as part of a pattern, such as "38 of the 50 reposters share a bio template".
 - **The voice can be blunt.** "Paid buzz dressed as organic" is fair comment when the receipts are attached. Every accusation carries its evidence and a dispute route, and corrections are made in the open. That is both just and the strongest legal position.
 - **Definition matching, not verdicts.** The author, verbatim, 2026-10-22: "this could be highlighted honestly as 'What could be considered fraud, if looking at the definition rather than the judgement.' If an action is visible, and it matches the definition there is no reason to skirt that."
-  - Daylight Commons quotes a published definition, then shows element by element which parts the visible conduct matches, which parts are not observable, and the evidence for each. The wording is "This conduct matches elements 1 and 2 of [definition, source]; element 3 (knowledge or intent) is not observable from here."
+  - CMMNS quotes a published definition, then shows element by element which parts the visible conduct matches, which parts are not observable, and the evidence for each. The wording is "This conduct matches elements 1 and 2 of [definition, source]; element 3 (knowledge or intent) is not observable from here."
   - The most precise definitions for visible conduct are regulatory, and they are often closer fits than the word "fraud". To verify and cite before use:
     - the US FTC Endorsement Guides (16 CFR Part 255) on undisclosed material connections;
     - the FTC rule on consumer reviews and testimonials (16 CFR Part 465), which bans buying or selling fake indicators of social media influence for commercial use;
     - EU Unfair Commercial Practices Directive Annex I, on falsely presenting oneself as a consumer;
     - the UK DMCC Act 2024 fake-review provisions;
     - each platform's own manipulation and paid-partnership policies.
-  - General fraud definitions are matched the same way. Their intent and reliance elements usually show as "not observable", and Daylight Commons says that plainly rather than omitting the comparison.
-- **The legal line.** Defamation law varies: the UK and EU are stricter than the US. A media lawyer reviews the accusation ladder and its wording before public release. Daylight Commons never claims a crime, which needs a court. It never reveals private identities. It never publishes what it cannot evidence.
-- **It decides nothing for the user.** Daylight Commons gives evidence, technique and its accusations with their receipts. The takeaway stays the user's.
+  - General fraud definitions are matched the same way. Their intent and reliance elements usually show as "not observable", and CMMNS says that plainly rather than omitting the comparison.
+- **The legal line.** Defamation law varies: the UK and EU are stricter than the US. A media lawyer reviews the accusation ladder and its wording before public release. CMMNS never claims a crime, which needs a court. It never reveals private identities. It never publishes what it cannot evidence.
+- **It decides nothing for the user.** CMMNS gives evidence, technique and its accusations with their receipts. The takeaway stays the user's.
 - **It is neutral by construction.** Every signal is defined without reference to topic or side. Fairness audits per platform, language and region are run before any claim. The author's own views are never an input.
 - **It never violates privacy, the user's or anyone else's.**
   - Everything is local by default.
@@ -70,13 +70,13 @@ A watchdog that becomes another influence engine has failed. These are rules of 
   - No identity resolution, no profiles of individuals, no hidden data.
 - **It never becomes engagement bait.** It follows the ecosystem's canon, "secure, not anxious". No alarms, red counters, streaks or outrage. It is calm, quiet, and dismissible, and it returns the user's time.
 - **Every mark can be checked.** Each badge opens to its evidence and its "does not prove" note. A wrong badge can be reported, and it gets corrected in the open.
-- **It is honest about limits.** No accuracy claim before the hand-labelled, stratified evaluation. Where the baseline is thin, Daylight Commons says "insufficient baseline".
+- **It is honest about limits.** No accuracy claim before the hand-labelled, stratified evaluation. Where the baseline is thin, CMMNS says "insufficient baseline".
 
 ## Jurisdiction and the open catalogue
 
 The author, verbatim, 2026-10-22: "We will walk every line confidently and highlight every action by it's definition in the jurisdiction of where it occurs. The catalog remains always neutral, and always readily visible and challengeable."
 
-- **Definitions by jurisdiction.** Every definition in the catalogue carries its jurisdiction, source, version and retrieval date. Online conduct often touches several jurisdictions at once: where the actor is based, where the platform operates, and where the audience is reached (for example EU consumers under the UCPD and DSA). Daylight Commons shows each jurisdiction that applies and the elements matched under each, and never picks the most damning one alone. Where the actor's location is not public, it says so, and shows the audience's jurisdiction as the user's own.
+- **Definitions by jurisdiction.** Every definition in the catalogue carries its jurisdiction, source, version and retrieval date. Online conduct often touches several jurisdictions at once: where the actor is based, where the platform operates, and where the audience is reached (for example EU consumers under the UCPD and DSA). CMMNS shows each jurisdiction that applies and the elements matched under each, and never picks the most damning one alone. Where the actor's location is not public, it says so, and shows the audience's jurisdiction as the user's own.
 - **The catalogue in the open.** Techniques, signals, thresholds, definitions and their versions live in a public repository with a changelog. Every badge links to the exact catalogue entry and version that produced it.
 - **Challengeable by anyone.** A challenge process for entries and for individual badges, with public reasoning for each decision, accepted or rejected, and dated corrections. Organisations named by a badge get the same route.
 - **Neutral by test.** The fairness audit and a symmetry check: the same technique produces the same finding whatever the topic or side. Results are published with each catalogue release.
@@ -93,8 +93,8 @@ Every finding must survive a hostile check later, after the post is deleted, edi
   - when (a timestamp);
   - how (the capture method: page read, public API, or screenshot OCR, with the screenshot's own hash).
 - **Seal.** Observations go into an append-only, hash-chained log on the user's device, using Flywheel's existing receipt and inclusion-proof path, so an edit to any past entry breaks the chain. A finding cites the observation hashes it rests on, and the catalogue entry and version that judged them.
-- **Witness.** For public pages, the user can choose to request an independent archive copy (the Wayback Machine's save function) and record its URL in the receipt. That way a third party holds the evidence, and Daylight Commons is not the only witness. Nothing self-warrants.
-- **Verify.** Anyone holding a receipt can recheck it: the hashes, the chain, the catalogue version and the archive copy. A verifier tool ships with Daylight Commons, and its controls must reject a tampered receipt.
+- **Witness.** For public pages, the user can choose to request an independent archive copy (the Wayback Machine's save function) and record its URL in the receipt. That way a third party holds the evidence, and CMMNS is not the only witness. Nothing self-warrants.
+- **Verify.** Anyone holding a receipt can recheck it: the hashes, the chain, the catalogue version and the archive copy. A verifier tool ships with CMMNS, and its controls must reject a tampered receipt.
 - **Export.** One click produces an evidence bundle: findings, receipts, catalogue entries, definitions with jurisdiction, and archive links. It is readable by a journalist, a regulator or a court, and it carries its "does not prove" notes.
 
 ## Write-ups, dossiers and an open research commons
@@ -136,11 +136,11 @@ The author, verbatim, 2026-10-22: "It could be used as a true epistemic knowledg
 - **Two separate worlds.** The protected channel and the open commons never share infrastructure, accounts or logs. A source's identity, and anything that could identify them, never enters the commons. Only verified, redacted findings cross over, by a human editorial decision.
 - **Strip and redact by default.** Remove file metadata (EXIF, document author fields, revision history, printer tracking dots in scans). Detect writing style that could identify a source and warn about it; Articulate's style analysis can serve as a privacy check here. Then a human redaction review.
 - **Threat modelling before launch.** Adversaries include states, employers and platforms. Get an independent security audit and a legal review of protections by jurisdiction. Protections vary widely: the EU Whistleblower Directive (2019/1937), US federal whistleblower statutes and refugee law each cover different people and conduct. Never promise protection the law does not give. Tell people plainly what the platform can and cannot protect.
-- **Not built by us first.** This part launches only with a security partner and legal counsel. Until then, Daylight Commons can point people to the established channels.
+- **Not built by us first.** This part launches only with a security partner and legal counsel. Until then, CMMNS can point people to the established channels.
 
 ## Universal discernment
 
-The author, verbatim, 2026-10-22: "This type of media and social manipulation happens in many ways, shapes, and forms across all sorts of mediums. And if Daylight Commons can act as a universal discernment assistant; it could help the world immensely."
+The author, verbatim, 2026-10-22: "This type of media and social manipulation happens in many ways, shapes, and forms across all sorts of mediums. And if CMMNS can act as a universal discernment assistant; it could help the world immensely."
 
 **One core, many adapters.** The core is medium-agnostic:
 - a versioned taxonomy of manipulation techniques, each with a definition, its observable signals, its "does not prove" note and any matching legal or policy definition;
@@ -165,7 +165,7 @@ Each medium gets an adapter that extracts observable features into the same shap
 
 **Form factors**, in order:
 1. The browser extension, which exists now.
-2. A share target and screenshot reader on the phone: share a post, link or screenshot to Daylight Commons and it reads it locally, with OCR on screenshots. This meets people where they already are; the author's own evidence arrives as phone screenshots.
+2. A share target and screenshot reader on the phone: share a post, link or screenshot to CMMNS and it reads it locally, with OCR on screenshots. This meets people where they already are; the author's own evidence arrives as phone screenshots.
 3. A desktop companion.
 4. An open API and the taxonomy as an open dataset, for researchers and journalists.
 
@@ -177,7 +177,7 @@ Each medium gets an adapter that extracts observable features into the same shap
 
 ## Phases
 
-1. **Now:** the campaign lens. Daylight Commons PR in progress; Articulate's campaign detectors in progress.
+1. **Now:** the campaign lens. CMMNS PR in progress; Articulate's campaign detectors in progress.
 2. **The evidence layer:** GitHub star history, domain age (RDAP, first Wayback capture), ad transparency libraries (DSA repositories, Meta, Google), and the local engagement-history ledger.
 3. **The room map:** the minimap of a thread, behaviour groups, and arrival timing.
 4. **The technique lens:** Articulate's rhetorical technique detectors, stance-neutral, with a fairness audit.
@@ -188,4 +188,4 @@ Each medium gets an adapter that extracts observable features into the same shap
 ## Does not prove
 
 - This is a product direction. Nothing in it has been measured yet.
-- Inoculation research effects are reported in the literature. Daylight Commons' own effect on independent judgement would need its own study before any public claim.
+- Inoculation research effects are reported in the literature. CMMNS' own effect on independent judgement would need its own study before any public claim.
