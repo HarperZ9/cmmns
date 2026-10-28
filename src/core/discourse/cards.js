@@ -105,6 +105,7 @@ export function claimTypeSign(types) {
   const kinds = [...new Set(types.map((t) => t.type))];
   return [sign(`claims: ${kinds.join(", ")}`, "claim-type", "language", [
     ...types.slice(0, 8).map((t) => [t.type, `"${t.text.length > 120 ? t.text.slice(0, 120) + " …" : t.text}" (${t.cue})`]),
+    ...types.flatMap((t) => t.labels || []).filter((h) => h.status === "label").slice(0, 5).map((h) => [`label (${h.kind})`, `"${h.text}": the epithet "${h.epithet}", ${h.severity} ${h.severity === 1 ? "word" : "words"}`]),
     ["What it shows", "A claim type is read from wording cues, so a sentence can carry two kinds, and irony or quotation can mislead the cue. It says what kind of claim the words make, not whether the claim is true."],
   ])];
 }

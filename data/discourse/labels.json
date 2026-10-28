@@ -1,0 +1,564 @@
+{
+ "format": "daylight.labels/1",
+ "reviewed": "2026-10-28",
+ "about": "The epithet lexicon for the label marker (src/core/discourse/labels.js, project-docs/ARGUMENT-LENS.md). A head is an epithet that can name a person; a modifier makes an epithet compound (\"radical-left lunatic\") and counts toward severity only on a head; an intensifier may sit between without counting. aim says which side an entry is usually aimed at: it exists for the balance test and is never shipped to the rule (scripts/labels-data.mjs drops it). Every aimed entry names its mirror on the other side. institutions are capitalised words that, right after an epithet, mark a proper-noun or historical use (\"Communist Party\"), not a person. source is the word's dictionary entry; why is the reason it is in the list.",
+ "heads": [
+  {
+   "word": "liar",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/liar",
+   "why": "Accuses a person of lying; the most common non-political label in the 2026-10-28 study notes."
+  },
+  {
+   "word": "crook",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/crook",
+   "why": "Accuses a person of crime or dishonesty without stating the act."
+  },
+  {
+   "word": "traitor",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/traitor",
+   "why": "Accuses betrayal of a country or cause; used against every side."
+  },
+  {
+   "word": "fraud",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/fraud",
+   "why": "Calls a person a fake or a cheat."
+  },
+  {
+   "word": "thug",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/thug",
+   "why": "Calls a person violent or criminal; also used as a coded slur, which this lexicon does not separate."
+  },
+  {
+   "word": "grifter",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/grifter",
+   "why": "Calls a person a swindler who profits from a cause."
+  },
+  {
+   "word": "con artist",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/con_artist",
+   "why": "Calls a person a swindler.",
+   "plural": "con artists"
+  },
+  {
+   "word": "con man",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/con_man",
+   "why": "Calls a person a swindler.",
+   "plural": "con men"
+  },
+  {
+   "word": "charlatan",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/charlatan",
+   "why": "Calls a person a fake expert."
+  },
+  {
+   "word": "clown",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/clown",
+   "why": "Ridicules a person as not serious."
+  },
+  {
+   "word": "moron",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/moron",
+   "why": "Insults a person's intelligence."
+  },
+  {
+   "word": "idiot",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/idiot",
+   "why": "Insults a person's intelligence."
+  },
+  {
+   "word": "imbecile",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/imbecile",
+   "why": "Insults a person's intelligence."
+  },
+  {
+   "word": "hypocrite",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/hypocrite",
+   "why": "Accuses a person of holding others to rules they break."
+  },
+  {
+   "word": "coward",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/coward",
+   "why": "Insults a person's courage."
+  },
+  {
+   "word": "criminal",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/criminal",
+   "why": "Calls a person a criminal with no conviction named."
+  },
+  {
+   "word": "scumbag",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/scumbag",
+   "why": "General contempt."
+  },
+  {
+   "word": "puppet",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/puppet",
+   "why": "Says a person is controlled by someone else."
+  },
+  {
+   "word": "shill",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/shill",
+   "why": "Says a person is paid to promote a view."
+  },
+  {
+   "word": "stooge",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/stooge",
+   "why": "Says a person serves someone else's ends."
+  },
+  {
+   "word": "lunatic",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/lunatic",
+   "why": "Calls a person insane; used against every side."
+  },
+  {
+   "word": "psycho",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/psycho",
+   "why": "Calls a person insane or dangerous."
+  },
+  {
+   "word": "maniac",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/maniac",
+   "why": "Calls a person wild or insane."
+  },
+  {
+   "word": "nutjob",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/nutjob",
+   "why": "Calls a person insane."
+  },
+  {
+   "word": "crackpot",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/crackpot",
+   "why": "Calls a person eccentric to the point of being unserious."
+  },
+  {
+   "word": "loser",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/loser",
+   "why": "General contempt."
+  },
+  {
+   "word": "hack",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/hack",
+   "why": "Calls a person a mercenary or incompetent writer or official."
+  },
+  {
+   "word": "demagogue",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/demagogue",
+   "why": "Says a person manipulates crowds; used against every side."
+  },
+  {
+   "word": "extremist",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/extremist",
+   "why": "Puts a person outside the accepted range; side-free on its own, sided by a modifier."
+  },
+  {
+   "word": "terrorist",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/terrorist",
+   "why": "Accuses political violence; side-free on its own, sided by a modifier."
+  },
+  {
+   "word": "radical",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/radical",
+   "why": "Puts a person outside the mainstream; side-free on its own, sided by a modifier."
+  },
+  {
+   "word": "cultist",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/cultist",
+   "why": "Says a person follows a leader blindly; sided only by a modifier such as MAGA or woke."
+  },
+  {
+   "word": "zealot",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/zealot",
+   "why": "Says a person holds a view fanatically."
+  },
+  {
+   "word": "bully",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/bully",
+   "why": "Says a person intimidates others."
+  },
+  {
+   "word": "snake",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/snake",
+   "why": "Calls a person treacherous."
+  },
+  {
+   "word": "rat",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/rat",
+   "why": "Calls a person a traitor or informer."
+  },
+  {
+   "word": "communist",
+   "aim": "aimed-left",
+   "mirror": "fascist",
+   "source": "https://en.wiktionary.org/wiki/communist",
+   "why": "Used against people on the left as an epithet, beyond membership of a communist party."
+  },
+  {
+   "word": "fascist",
+   "aim": "aimed-right",
+   "mirror": "communist",
+   "source": "https://en.wiktionary.org/wiki/fascist",
+   "why": "Used against people on the right as an epithet, beyond the historical movement."
+  },
+  {
+   "word": "commie",
+   "aim": "aimed-left",
+   "mirror": "fash",
+   "source": "https://en.wiktionary.org/wiki/commie",
+   "why": "Slang clipping of communist, used as an insult."
+  },
+  {
+   "word": "fash",
+   "aim": "aimed-right",
+   "mirror": "commie",
+   "source": "https://en.wiktionary.org/wiki/fash",
+   "why": "Slang clipping of fascist, used as an insult."
+  },
+  {
+   "word": "socialist",
+   "aim": "aimed-left",
+   "mirror": "reactionary",
+   "source": "https://en.wiktionary.org/wiki/socialist",
+   "why": "Used against the left as an epithet (the study's case); a neutral party use is left to the proper-noun guard."
+  },
+  {
+   "word": "reactionary",
+   "aim": "aimed-right",
+   "mirror": "socialist",
+   "source": "https://en.wiktionary.org/wiki/reactionary",
+   "why": "Used against the right as an epithet for opposing change."
+  },
+  {
+   "word": "Marxist",
+   "aim": "aimed-left",
+   "mirror": "Nazi",
+   "source": "https://en.wiktionary.org/wiki/Marxist",
+   "why": "Used against the left as an epithet beyond scholarship on Marx."
+  },
+  {
+   "word": "Nazi",
+   "aim": "aimed-right",
+   "mirror": "Marxist",
+   "source": "https://en.wiktionary.org/wiki/Nazi",
+   "why": "Used against the right as an epithet beyond the historical party."
+  },
+  {
+   "word": "Stalinist",
+   "aim": "aimed-left",
+   "mirror": "neo-Nazi",
+   "source": "https://en.wiktionary.org/wiki/Stalinist",
+   "why": "Accuses the left of authoritarian communism."
+  },
+  {
+   "word": "neo-Nazi",
+   "aim": "aimed-right",
+   "mirror": "Stalinist",
+   "source": "https://en.wiktionary.org/wiki/neo-Nazi",
+   "why": "Accuses the right of revived Nazism."
+  },
+  {
+   "word": "Maoist",
+   "aim": "aimed-left",
+   "mirror": "white supremacist",
+   "source": "https://en.wiktionary.org/wiki/Maoist",
+   "why": "Accuses the left of Maoist authoritarianism."
+  },
+  {
+   "word": "white supremacist",
+   "aim": "aimed-right",
+   "mirror": "Maoist",
+   "source": "https://en.wiktionary.org/wiki/white_supremacist",
+   "why": "Accuses the right of racial supremacism.",
+   "plural": "white supremacists"
+  },
+  {
+   "word": "leftist",
+   "aim": "aimed-left",
+   "mirror": "rightist",
+   "source": "https://en.wiktionary.org/wiki/leftist",
+   "why": "Used as a pejorative for the left."
+  },
+  {
+   "word": "rightist",
+   "aim": "aimed-right",
+   "mirror": "leftist",
+   "source": "https://en.wiktionary.org/wiki/rightist",
+   "why": "Used as a pejorative for the right."
+  },
+  {
+   "word": "libtard",
+   "aim": "aimed-left",
+   "mirror": "Rethuglican",
+   "source": "https://en.wiktionary.org/wiki/libtard",
+   "why": "Slur blending liberal and a slur for disability, aimed at the left."
+  },
+  {
+   "word": "Rethuglican",
+   "aim": "aimed-right",
+   "mirror": "libtard",
+   "source": "https://en.wiktionary.org/wiki/Rethuglican",
+   "why": "Slur blending Republican and thug, aimed at the right."
+  },
+  {
+   "word": "snowflake",
+   "aim": "aimed-left",
+   "mirror": "deplorable",
+   "source": "https://en.wiktionary.org/wiki/snowflake",
+   "why": "Insult for the left as easily offended."
+  },
+  {
+   "word": "deplorable",
+   "aim": "aimed-right",
+   "mirror": "snowflake",
+   "source": "https://en.wiktionary.org/wiki/deplorable",
+   "why": "Insult for the right, from a 2016 campaign remark."
+  },
+  {
+   "word": "anarchist",
+   "aim": "aimed-left",
+   "mirror": "authoritarian",
+   "source": "https://en.wiktionary.org/wiki/anarchist",
+   "why": "Used against the left as an epithet for disorder."
+  },
+  {
+   "word": "authoritarian",
+   "aim": "aimed-right",
+   "mirror": "anarchist",
+   "source": "https://en.wiktionary.org/wiki/authoritarian",
+   "why": "Used against the right as an epithet for strongman rule."
+  }
+ ],
+ "modifiers": [
+  {
+   "word": "far-left",
+   "aim": "aimed-left",
+   "mirror": "far-right",
+   "source": "https://en.wiktionary.org/wiki/far-left",
+   "why": "Places the target at the left extreme."
+  },
+  {
+   "word": "far-right",
+   "aim": "aimed-right",
+   "mirror": "far-left",
+   "source": "https://en.wiktionary.org/wiki/far-right",
+   "why": "Places the target at the right extreme."
+  },
+  {
+   "word": "radical-left",
+   "aim": "aimed-left",
+   "mirror": "radical-right",
+   "source": "https://en.wiktionary.org/wiki/radical",
+   "why": "Places the target at the left extreme. No dictionary entry for the compound; the source is the entry for radical."
+  },
+  {
+   "word": "radical-right",
+   "aim": "aimed-right",
+   "mirror": "radical-left",
+   "source": "https://en.wiktionary.org/wiki/radical",
+   "why": "Places the target at the right extreme. No dictionary entry for the compound; the source is the entry for radical."
+  },
+  {
+   "word": "hard-left",
+   "aim": "aimed-left",
+   "mirror": "hard-right",
+   "source": "https://en.wiktionary.org/wiki/hard-left",
+   "why": "Places the target at the left extreme."
+  },
+  {
+   "word": "hard-right",
+   "aim": "aimed-right",
+   "mirror": "hard-left",
+   "source": "https://en.wiktionary.org/wiki/hard-right",
+   "why": "Places the target at the right extreme."
+  },
+  {
+   "word": "ultra-left",
+   "aim": "aimed-left",
+   "mirror": "ultra-right",
+   "source": "https://en.wiktionary.org/wiki/ultra-",
+   "why": "Places the target at the left extreme. No dictionary entry for the compound; the source is the entry for the prefix ultra-."
+  },
+  {
+   "word": "ultra-right",
+   "aim": "aimed-right",
+   "mirror": "ultra-left",
+   "source": "https://en.wiktionary.org/wiki/ultra-",
+   "why": "Places the target at the right extreme. No dictionary entry for the compound; the source is the entry for the prefix ultra-."
+  },
+  {
+   "word": "left-wing",
+   "aim": "aimed-left",
+   "mirror": "right-wing",
+   "source": "https://en.wiktionary.org/wiki/left-wing",
+   "why": "Sides an epithet head to the left."
+  },
+  {
+   "word": "right-wing",
+   "aim": "aimed-right",
+   "mirror": "left-wing",
+   "source": "https://en.wiktionary.org/wiki/right-wing",
+   "why": "Sides an epithet head to the right."
+  },
+  {
+   "word": "woke",
+   "aim": "aimed-left",
+   "mirror": "MAGA",
+   "source": "https://en.wiktionary.org/wiki/woke",
+   "why": "Pejorative modifier for the left."
+  },
+  {
+   "word": "MAGA",
+   "aim": "aimed-right",
+   "mirror": "woke",
+   "source": "https://en.wiktionary.org/wiki/MAGA",
+   "why": "Pejorative modifier for the right."
+  },
+  {
+   "word": "lying",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/lying",
+   "why": "Accuses lying as a modifier."
+  },
+  {
+   "word": "corrupt",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/corrupt",
+   "why": "Accuses corruption as a modifier."
+  },
+  {
+   "word": "crooked",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/crooked",
+   "why": "Accuses dishonesty as a modifier."
+  },
+  {
+   "word": "deranged",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/deranged",
+   "why": "Calls the target insane as a modifier."
+  },
+  {
+   "word": "extreme",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/extreme",
+   "why": "Puts the target outside the mainstream as a modifier."
+  },
+  {
+   "word": "radical",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/radical",
+   "why": "Puts the target outside the mainstream as a modifier."
+  },
+  {
+   "word": "dangerous",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/dangerous",
+   "why": "Calls the target a threat as a modifier."
+  },
+  {
+   "word": "treasonous",
+   "aim": "none",
+   "source": "https://en.wiktionary.org/wiki/treasonous",
+   "why": "Accuses treason as a modifier."
+  }
+ ],
+ "intensifiers": [
+  "total",
+  "complete",
+  "absolute",
+  "utter",
+  "known",
+  "real",
+  "pathological",
+  "serial",
+  "habitual",
+  "proven",
+  "typical",
+  "proud",
+  "full-blown",
+  "outright",
+  "certified",
+  "card-carrying",
+  "self-described",
+  "little",
+  "big",
+  "damn",
+  "fucking"
+ ],
+ "institutions": [
+  "Party",
+  "Parties",
+  "Era",
+  "Regime",
+  "Movement",
+  "Revolution",
+  "Manifesto",
+  "International",
+  "League",
+  "Union",
+  "Republic",
+  "State",
+  "States",
+  "Government",
+  "Front",
+  "Bloc",
+  "Youth",
+  "Army",
+  "Caucus",
+  "Club",
+  "Society",
+  "Alliance",
+  "Congress",
+  "Federation",
+  "Council",
+  "Germany",
+  "Italy",
+  "China",
+  "Russia",
+  "Cuba",
+  "Spain",
+  "Period",
+  "Age",
+  "Group",
+  "Association",
+  "Platform",
+  "Coalition",
+  "List",
+  "Ticket"
+ ]
+}

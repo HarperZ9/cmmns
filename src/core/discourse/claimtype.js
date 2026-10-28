@@ -7,6 +7,7 @@
 // runs them with the sides swapped).
 import { readArgument, segment, guessLang } from "./argument.js";
 import { content } from "./text.js";
+import { labelsIn } from "./labels.js";
 
 export const CLAIM_DOES_NOT_PROVE = "A claim type is read from wording cues, so a sentence can carry two kinds, and irony or quotation can mislead the cue. It says what kind of claim the words make, not whether the claim is true.";
 export const GAP_DOES_NOT_PROVE = "An inference can be sound even when its words are new, and a claim about someone's intent can be right. The marker shows where the post goes beyond what it states; it does not say the conclusion is wrong.";
@@ -27,18 +28,22 @@ const LINK = /https?:\/\/|\b\w+\.(?:com|org|gov|edu|net)\/\S+/iu;
 // Words too general to count as fresh in a conclusion.
 const PLAIN = new Set(["claim", "mean", "would", "could", "thing", "fact", "point", "case", "make", "made"]);
 
-// One sentence's type: { type, cue }.
-export function claimTypeOf(sentence) {
-  const s = sentence.trim();
-  for (const [type, re, cue] of RULES) if (re.test(s)) return { type, cue };
+// One sentence's type: { type, cue }. An epithet the sentence applies (labels.js) also makes it a
+// classification, in the classification rule's place; negated, self, quoted and reported ones do not.
+export function claimTypeOf(sentence, labels = labelsIn(sentence)) {
+  const s = sentence.trim(), applied = labels.find((h) => h.status === "label");
+  for (const [type, re, cue] of RULES) {
+    if (type === "classification" && applied) return { type, cue: `applies an epithet to a person or group ("${applied.text}")` };
+    if (re.test(s)) return { type, cue };
+  }
   if (FACT.test(s)) return LINK.test(s) ? { type: "factual claim with a link", cue: "a statement of fact with a link" } : { type: "factual claim, no source", cue: "a statement of fact with no source given" };
   return { type: "statement", cue: "no cue for a narrower type" };
 }
 
-// Every sentence of a post, typed.
+// Every sentence of a post, typed, with the epithet hits in it (spans relative to the sentence).
 export function claimTypes(text) {
   const t = String(text || "");
-  return segment(t, guessLang(t)).flatMap((s) => s.text.split(/\n+/)).map((x) => x.trim()).filter((x) => x.length > 3).map((x) => ({ text: x, ...claimTypeOf(x) }));
+  return segment(t, guessLang(t)).flatMap((s) => s.text.split(/\n+/)).map((x) => x.trim()).filter((x) => x.length > 3).map((x) => { const labels = labelsIn(x); return { text: x, ...claimTypeOf(x, labels), labels }; });
 }
 
 // Claims about a third party's mind: knowing, wanting, intending, fearing, lying on purpose.

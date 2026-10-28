@@ -1,0 +1,355 @@
+{
+ "about": "Planted sentences for the label marker (src/core/discourse/labels.js). Every name is invented. Positives must give exactly `labels` applied hits of `kind` with that severity; controls must give no applied hit, and where a hit is expected at all its `status` is given. Written with the rule, so this is development data: the held-out set is labels-heldout.json.",
+ "positives": [
+  {
+   "kind": "appositive-before",
+   "text": "Democrat, communist Jane Talbot wants your guns.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "appositive-before",
+   "text": "Republican, fascist Odell Fenn wants your vote.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "appositive-before",
+   "text": "Senator, crook Hugo Sarn voted again.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "appositive-before",
+   "text": "Then deranged traitor Bea Quill spoke for an hour.",
+   "labels": 1,
+   "severity": 2
+  },
+  {
+   "kind": "appositive-before",
+   "text": "We watched far-left lunatic Mel Okafor on the panel.",
+   "labels": 1,
+   "severity": 2
+  },
+  {
+   "kind": "appositive-before",
+   "text": "Everyone knows lying grifter Rory Vance by now.",
+   "labels": 1,
+   "severity": 2
+  },
+  {
+   "kind": "appositive-after",
+   "text": "Pat Doe, a known liar, spoke first.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "appositive-after",
+   "text": "The board heard from Ines Varga, a total fraud, on Monday.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "appositive-after",
+   "text": "Cass Lindqvist, the MAGA cultist from accounting, is back.",
+   "labels": 1,
+   "severity": 2
+  },
+  {
+   "kind": "appositive-after",
+   "text": "Our mayor, Dana Pell, a woke snowflake, banned the fair.",
+   "labels": 1,
+   "severity": 2
+  },
+  {
+   "kind": "appositive-after",
+   "text": "They invited Lou Brandt, a corrupt hack.",
+   "labels": 1,
+   "severity": 2
+  },
+  {
+   "kind": "predicate",
+   "text": "This woman is a liar.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "That guy is a fraud.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "These people are traitors.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "Those clowns are just thugs.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "He is a crook.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "She's a total hypocrite.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "They are communists.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "They are fascists.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "You're a moron.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "Tamsin Rook is a grifter.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "Hugo Sarn was always a coward.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "I think she is a crook.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "He is a radical-left lunatic.",
+   "labels": 1,
+   "severity": 2
+  },
+  {
+   "kind": "predicate",
+   "text": "She is a far-right extremist.",
+   "labels": 1,
+   "severity": 2
+  },
+  {
+   "kind": "predicate",
+   "text": "They're hard left zealots.",
+   "labels": 1,
+   "severity": 2
+  },
+  {
+   "kind": "predicate",
+   "text": "You are a lying, corrupt crook.",
+   "labels": 1,
+   "severity": 3
+  },
+  {
+   "kind": "predicate",
+   "text": "Rory Vance is a socialist.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "Mel Okafor is a white supremacist.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "She was a Marxist.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "predicate",
+   "text": "He is a Nazi.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "naming",
+   "text": "I call him a fraud.",
+   "labels": 1,
+   "severity": 1
+  },
+  {
+   "kind": "naming",
+   "text": "We call them deplorables.",
+   "labels": 1,
+   "severity": 1
+  }
+ ],
+ "controls": [
+  {
+   "class": "descriptor",
+   "text": "Jane Talbot is a Democrat from Texas.",
+   "status": null
+  },
+  {
+   "class": "descriptor",
+   "text": "Odell Fenn is a Republican senator.",
+   "status": null
+  },
+  {
+   "class": "descriptor",
+   "text": "The Labour candidate Ana Ruiz spoke at noon.",
+   "status": null
+  },
+  {
+   "class": "descriptor",
+   "text": "She is a senator from Ohio.",
+   "status": null
+  },
+  {
+   "class": "descriptor",
+   "text": "He is a conservative and she is a liberal.",
+   "status": null
+  },
+  {
+   "class": "proper",
+   "text": "The Communist Party of China met today.",
+   "status": null
+  },
+  {
+   "class": "proper",
+   "text": "Socialist Party candidate Ana Ruiz won the seat.",
+   "status": null
+  },
+  {
+   "class": "proper",
+   "text": "In the Fascist era the trains ran late.",
+   "status": null
+  },
+  {
+   "class": "proper",
+   "text": "The Nazi regime fell in 1945.",
+   "status": null
+  },
+  {
+   "class": "proper",
+   "text": "Communist Party Chairman Wei Lan spoke.",
+   "status": null
+  },
+  {
+   "class": "proper",
+   "text": "Nazi Germany invaded Poland in 1939.",
+   "status": null
+  },
+  {
+   "class": "proper",
+   "text": "Hugo Sarn wrote a history of the Marxist movement.",
+   "status": null
+  },
+  {
+   "class": "negation",
+   "text": "She is not a liar.",
+   "status": "negated"
+  },
+  {
+   "class": "negation",
+   "text": "He isn't a crook.",
+   "status": "negated"
+  },
+  {
+   "class": "negation",
+   "text": "They were never fascists.",
+   "status": "negated"
+  },
+  {
+   "class": "negation",
+   "text": "He is no communist.",
+   "status": "negated"
+  },
+  {
+   "class": "negation",
+   "text": "Pat Doe has never been a fraud.",
+   "status": "negated"
+  },
+  {
+   "class": "negation",
+   "text": "You are not a moron.",
+   "status": "negated"
+  },
+  {
+   "class": "self",
+   "text": "I am a proud socialist.",
+   "status": "self"
+  },
+  {
+   "class": "self",
+   "text": "We're communists and proud of it.",
+   "status": "self"
+  },
+  {
+   "class": "self",
+   "text": "As a Marxist, I disagree.",
+   "status": "self"
+  },
+  {
+   "class": "self",
+   "text": "Call me a snowflake if you like.",
+   "status": "self"
+  },
+  {
+   "class": "self",
+   "text": "I'm an idiot for trusting the map.",
+   "status": "self"
+  },
+  {
+   "class": "quoted",
+   "text": "He said \"she is a liar\" and left.",
+   "status": "quoted"
+  },
+  {
+   "class": "quoted",
+   "text": "The word \"traitor\" gets thrown around a lot.",
+   "status": null
+  },
+  {
+   "class": "reported",
+   "text": "He denied being a liar.",
+   "status": "reported"
+  },
+  {
+   "class": "reported",
+   "text": "Critics accused her of being a communist.",
+   "status": "reported"
+  },
+  {
+   "class": "reported",
+   "text": "She called him a fraud.",
+   "status": "reported"
+  },
+  {
+   "class": "reported",
+   "text": "Critics said she is a crook.",
+   "status": "reported"
+  },
+  {
+   "class": "reported",
+   "text": "The ad branded Odell Fenn a fascist.",
+   "status": "reported"
+  }
+ ]
+}
