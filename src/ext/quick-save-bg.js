@@ -81,7 +81,34 @@ globalThis.PBQuickBg = (() => {
     pending.set(id, pending.get(url));
     pending.delete(url);
     setTimeout(() => pending.delete(id), 600000);
-    return { id };
+    // The name the browser wrote, which "uniquify" may have changed: the caller lists it in the sidecar.
+    const written = await writtenName(id, opts.saveAs ? 600000 : 30000);
+    return { id, filename: written || (filename ? PB.fileBase(filename) : null), confirmed: !!written };
+  }
+
+  // With "uniquify" a name already taken becomes "name (1).jpg". The final path is read back from
+  // the browser (downloads.search, or the filename change Chrome reports once it has chosen), so a
+  // sidecar never names another post's file. Resolves to the file name, or null when none came.
+  function writtenName(id, wait) {
+    if (!chrome.downloads.search) return Promise.resolve(null);
+    return new Promise((resolve) => {
+      let done = false;
+      const finish = (path) => {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        if (chrome.downloads.onChanged) chrome.downloads.onChanged.removeListener(changed);
+        resolve(path ? PB.fileBase(path) : null);
+      };
+      const look = () => Promise.resolve(chrome.downloads.search({ id })).then((items) => { const it = items && items[0]; if (it && it.filename) finish(it.filename); else if (it && it.state === "interrupted") finish(null); }, () => {});
+      const changed = (d) => {
+        if (!d || d.id !== id) return;
+        if (d.filename && d.filename.current) finish(d.filename.current);
+        else if (d.state || d.error) look();
+      };
+      const timer = setTimeout(() => finish(null), wait);
+      if (chrome.downloads.onChanged) chrome.downloads.onChanged.addListener(changed);
+      look();
+    });
   }
 
   // Chrome only. While any extension listens here, Chrome drops the name passed to download(), so
