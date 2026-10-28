@@ -252,6 +252,25 @@ node scripts/serve.mjs   # the fixture thread at http://127.0.0.1:8742/tests/fix
 To run from source, load `src/ext` as an unpacked extension. Design notes are in
 `project-docs/DESIGN.md`. Icons are drawn by `scripts/render-icons.py` from `assets/icons/`.
 
+## Responsible use and legal
+
+CMMNS distills: it takes material apart into its cleanest measurable parts, each part
+sourced and measured, so you can build your own understanding and new work from them. These pages
+say how to use it well and where the project stands. Each is a draft awaiting a lawyer's review:
+none is in force or part of CMMNS' terms yet.
+
+- [Acceptable use](ACCEPTABLE-USE.md): what it is for, the few uses the project does not support,
+  and what happens on a misuse report.
+- [Responsible use](RESPONSIBLE-USE.md): verification, reading a record, fair quotation, right of
+  reply and source protection, for journalists, researchers and creators.
+- [Creators and IP](CREATORS-AND-IP.md): how study and decomposition treat other people's work.
+- [Platform capture](PLATFORM-CAPTURE.md): what it reads and saves on each site, and your part under
+  each site's terms.
+- [Data protection](DATA-PROTECTION.md): who the controller is, every network request in the code,
+  and the exemptions for personal, journalistic and research use.
+- [Requests from people named or shown](SUBJECT-REQUESTS.md): corrections, objections and removals.
+- [Legal notice](LEGAL-NOTICE.md): warranty, liability, no advice, and the project's name.
+
 ## Licence
 
 The code is under the [GNU Affero General Public License v3.0 only](LICENSE). The data tables, the
