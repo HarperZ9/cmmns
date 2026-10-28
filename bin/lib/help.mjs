@@ -38,8 +38,8 @@ export const CAPTURE_HELP = ["Check the evidence captures Daylight Commons saved
   "daylight capture verify <folder> [--json]", "daylight capture verify ~/Downloads/Daylight", "Reads local files only. Exits with 1 when a file or line has changed. Lines saved in other folders are listed as not here, not as broken."];
 
 // `daylight sidecar check` (bin/lib/sidecar-check.mjs).
-export const SIDECAR_HELP = ["Check the notes Daylight Commons saved beside your files. Flags notes whose \"Continued by the author\" parts were not proved to be one thread (3.6.0 could join unrelated posts saved from a profile or timeline page).",
-  "daylight sidecar check <folder> [--json]", "daylight sidecar check ~/Downloads/Daylight", "Reads local files only. Exits with 1 when a note needs checking."];
+export const SIDECAR_HELP = ["Check the notes Daylight Commons saved beside your files. Flags notes whose \"Continued by the author\" parts were not proved to be one thread (3.6.0 could join unrelated posts saved from a profile or timeline page), and notes that name a file that is missing or was written by another save (3.8.0 and earlier saved a taken name as \"name (1).jpg\" while the note still named \"name.jpg\"). --fix repairs a note's file names only where a file carries the note's post address and was written in the note's save window.",
+  "daylight sidecar check <folder> [--fix] [--json]", "daylight sidecar check ~/Downloads/Daylight", "Reads local files only; --fix rewrites only the files line of the notes it can prove. Exits with 1 when a note needs checking."];
 
 // `daylight media convert` and `compress` (bin/lib/media.mjs), through a system ffmpeg.
 export const MEDIA_HELP = {

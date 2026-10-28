@@ -12843,7 +12843,19 @@ function embedText(meta) {
     [who, meta.postedAt, meta.postUrl || meta.pageUrl].filter(Boolean).join(", ")].filter(Boolean).join("\n\n");
 }
 
-return { SIDECAR_FORMAT, textTags, postMeta, metaName, sidecarMarkdown, savePath, saveFolder, sidecarJson, captionText, embedText };
+// The file name at the end of a path the browser reports ("C:\Users\a\Downloads\x\n (1).jpg").
+const fileBase = (path) => String(path || "").split(/[\\/]/).pop() || null;
+
+// The sidecar's name, without ".md", from the names the browser wrote: the first file's name, and
+// for a post saved together the first file's name without "-1". A suffix the browser added to a
+// name already taken stays, so "name-1 (1).jpg" gets "name (1).md", beside its own files.
+function sidecarStem(fileNames) {
+  const list = [].concat(fileNames || []).filter(Boolean);
+  const stem = String(list[0] || "").replace(/\.[a-z0-9]{1,5}$/i, "");
+  return list.length > 1 ? stem.replace(/-1(?=(?: \(\d+\))?$)/, "") : stem;
+}
+
+return { SIDECAR_FORMAT, textTags, postMeta, metaName, sidecarMarkdown, savePath, saveFolder, sidecarJson, captionText, embedText, fileBase, sidecarStem };
 })();
 
 // ---- media-embed.js

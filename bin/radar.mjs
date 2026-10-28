@@ -28,6 +28,7 @@ import { runMedia } from "./lib/media.mjs";
 import { cleanCommand, protectCommand, selfAuditCommand, PROTECT_USAGE } from "./lib/protect.mjs";
 import { runFetch } from "./lib/media-fetch.mjs";
 import { checkSidecars, checkLines } from "./lib/sidecar-check.mjs";
+import { checkFiles, fileLines } from "./lib/sidecar-files.mjs";
 import { makeBoard, renderSpec } from "./lib/board.mjs";
 
 const USAGE = `Usage:
@@ -40,7 +41,7 @@ const USAGE = `Usage:
                [--bitrate 2M] [--audio-bitrate 96k] [--fps N] [--out file] [--json]
   daylight media compress <file> [the same options]
   daylight media fetch <page address> [--dir folder]       (needs a system yt-dlp)
-  daylight sidecar check <folder>                          (flags unproved thread continuations)
+  daylight sidecar check <folder> [--fix]                  (flags unproved threads and notes naming the wrong files)
   daylight capture verify <folder>                         (checks evidence captures and their custody chain)
   daylight board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--head grotesk|accession|mono] [--pdf]
   daylight export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
@@ -141,9 +142,9 @@ export async function main(argv) {
   if (argv[0] === "sidecar" && argv[1] === "check") {
     const { _: [dir], flags } = parseArgs(argv.slice(2));
     if (flags.help || !dir) { print(helpText(SIDECAR_HELP, "daylight sidecar check")); return dir || flags.help ? 0 : 2; }
-    const r = checkSidecars(dir);
-    print(flags.json ? asJson(r) : checkLines(r));
-    return r.counts.unverified ? 1 : 0;
+    const r = checkSidecars(dir), files = checkFiles(dir, { fix: !!flags.fix });
+    print(flags.json ? asJson({ ...r, files }) : checkLines(r) + fileLines(files, !!flags.fix));
+    return r.counts.unverified || (flags.fix ? files.unresolved : files.wrong) ? 1 : 0;
   }
   if (argv[0] === "media" && argv[1] === "fetch") {
     const { _: [url], flags } = parseArgs(argv.slice(2));

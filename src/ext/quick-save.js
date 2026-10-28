@@ -41,15 +41,18 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   // <save folder>/<site>/. Where the browser cannot read the page's blob address, the bytes go to the
   // worker, which hands over its own. Never a download link in the page: that saves into the
   // Downloads root, which is how 3.6.1 lost the folder after an update (pages kept the old script).
+  // Resolves to the name the browser wrote, which differs from `name` when that one was taken.
   async function saveBytes(bytes, mime, name, o = {}) {
     alive();
     const url = URL.createObjectURL(new Blob([bytes], { type: mime }));
-    try { await viaBrowser(url, name, o); }
+    let r;
+    try { r = await viaBrowser(url, name, o); }
     catch (e) {
       alive();
-      const r = await msg({ type: "pb-qs-bytes", bytes: Array.from(bytes), mime, filename: name, site, study, overwrite: !!o.overwrite });
+      r = await msg({ type: "pb-qs-bytes", bytes: Array.from(bytes), mime, filename: name, site, study, overwrite: !!o.overwrite });
       if (!r || r.error) throw new Error(r && r.error ? r.error : e.message);
     } finally { setTimeout(() => URL.revokeObjectURL(url), 120000); }
+    return (r && r.filename) || name;
   }
 
   async function plainFile(t, plan0, c) {
@@ -76,14 +79,14 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
         const b = await bytesOf(plan.url);
         if (b.bytes.length <= EMBED_MAX || mismatch || c.capture) {
           const out = withWords(b.bytes, type.mime, c.meta, c.p);
-          await saveBytes(out, type.mime, name);
-          if (c.capture) await c.capture.add(name, b.bytes, out, type.mime);
-          return { name, line: `Saved ${name}, ${size(out.length)}.` };
+          const written = await saveBytes(out, type.mime, name);
+          if (c.capture) await c.capture.add(written, b.bytes, out, type.mime);
+          return { name: written, line: `Saved ${written}, ${size(out.length)}.` };
         }
       } catch (e) { if (c.capture) throw new Error(`The file could not be read for the capture: ${e.message}`); console.warn("[daylight-commons] could not read the file to add its description; the browser downloads it as it is", e); }
     }
-    await viaBrowser(plan.url, name, { fixExt: type.from !== "bytes" });
-    return { name, line: `Downloading ${name}` };
+    const written = (await viaBrowser(plan.url, name, { fixExt: type.from !== "bytes" })).filename || name;
+    return { name: written, line: `Downloading ${written}` };
   }
 
   const PROTECTED = "Source protection is on, so Daylight Commons did not download this: the request would tell the host. Use your browser's own Save as, and add the file to your case.";
@@ -99,10 +102,12 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   }
   // The sidecar beside the file: the same name with .md, and .json when that setting is on.
   // For a whole gallery: one sidecar named after the post (the first file's name without "-1").
+  // fileNames are the names the browser wrote. Resolves to the .md name written (o.stem rewrites it).
   async function sidecars(meta, fileNames, p, o = {}) {
-    const list = [].concat(fileNames), stem = list[0].replace(/\.[a-z0-9]{1,5}$/i, "").replace(list.length > 1 ? /-1$/ : /$^/, "");
-    if (p.mediaSidecar || meta.study) await saveBytes(new TextEncoder().encode(PB.sidecarMarkdown(meta, list)), "text/markdown", stem + ".md", o);
+    const list = [].concat(fileNames), stem = o.stem || PB.sidecarStem(list);
+    const md = p.mediaSidecar || meta.study ? await saveBytes(new TextEncoder().encode(PB.sidecarMarkdown(meta, list)), "text/markdown", stem + ".md", o) : null;
     if (p.mediaSidecarJson) await saveBytes(new TextEncoder().encode(PB.sidecarJson(meta, list)), "application/json", stem + ".json", o);
+    return md;
   }
   // What the page says about media outside X and Reddit: its title, its description, the alt text.
   const pageMeta = (t) => ({ site: location.hostname.replace(/^www\./, ""), title: document.title || null, pageUrl: location.href, alt: (t.el && t.el.alt) || t.alt || null,
@@ -161,7 +166,8 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const own = (u) => (/^https?:/i.test(String(u || "")) ? u : "");
     const name = (ext, url) => (meta.author.handle ? PB.metaName(meta, ext) : PB.downloadName({ title, url: url != null ? url : own(t.url), index: opts.index || 0, total: opts.total || 1, ext }));
     const progress = (line) => toast(line, { stay: 0 });
-    const side = (names) => (opts.oneSidecar ? null : sidecars(meta, names[0], p));
+    // Every file this save wrote, under the names the browser gave them.
+    const side = (names) => (opts.oneSidecar ? null : sidecars(meta, names, p));
     // Evidence capture: each file's hash before and after its words are written in (quick-capture.js).
     const capture = opts.capture ? PBQuickCapture.collector() : null;
     if (plan.action === "refuse") throw new PBQuickStream.Protected(plan.reason);
@@ -171,7 +177,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const key = (opts.asGif ? "gif:" : "") + (plan.url || (plan.stream && plan.stream.url) || "");
     const before = !opts.again && !opts.study && !capture && (await savedAs([key, opts.asGif ? null : own(t.url)]));
     if (before) throw new Already(before);
-    if (plan.action === "url") { const r = await plainFile(t, plan, { name, meta, p, capture }); await side([r.name]); await remember([key, own(t.url)], r.name); return { line: r.line, names: [r.name], meta, files: capture && capture.files }; }
+    if (plan.action === "url") { const r = await plainFile(t, plan, { name, meta, p, capture }); const sidecar = await side([r.name]); await remember([key, own(t.url)], r.name); return { line: r.line, names: [r.name], meta, sidecar, files: capture && capture.files }; }
     let bytes, note = "", mime;
     if (plan.action === "bytes") { const b = await bytesOf(plan.url); bytes = b.bytes; mime = PB.chooseType({ bytes, contentType: b.type }).mime; }
     else if (plan.action === "canvas") { bytes = await canvasPng(t.el); mime = "image/png"; }
@@ -181,19 +187,18 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
       const got = await PBQuickStream.assemble(plan.stream, (d, n) => progress(`Fetching part ${d} of ${n}`), t.streams || []);
       meta.mediaUrl = plan.stream.url;
       const names = got.files.map((f) => name(PB.downloadExt(f.mime) || "bin", "").replace(/(\.[a-z0-9]+)$/i, got.files.length > 1 ? `-${f.role}$1` : "$1"));
-      for (const [i, f] of got.files.entries()) { const out = withWords(f.bytes, f.mime, meta, p); await saveBytes(out, f.mime, names[i]); if (capture) await capture.add(names[i], f.bytes, out, f.mime, "put together from the stream's parts"); }
-      await side(names); await remember([key], names[0]);
-      return { line: `Saved ${got.files.length > 1 ? got.files.length + " files" : names[0]}, ${size(got.files.reduce((s, f) => s + f.bytes.length, 0))}.${got.note}`, names, meta, files: capture && capture.files };
+      for (const [i, f] of got.files.entries()) { const out = withWords(f.bytes, f.mime, meta, p); names[i] = await saveBytes(out, f.mime, names[i]); if (capture) await capture.add(names[i], f.bytes, out, f.mime, "put together from the stream's parts"); }
+      const sidecar = await side(names); await remember([key], names[0]);
+      return { line: `Saved ${got.files.length > 1 ? got.files.length + " files" : names[0]}, ${size(got.files.reduce((s, f) => s + f.bytes.length, 0))}.${got.note}`, names, meta, sidecar, files: capture && capture.files };
     }
     const hash = "sha256:" + (await PB.mediaSha256(bytes));
     const dup = !opts.again && !opts.study && !capture && (await savedAs([hash]));
     if (dup) throw new Already(dup);
-    const n = name(PB.downloadExt(mime) || "bin", plan.action === "bytes" && /^data:/.test(plan.url) ? "" : undefined);
     const out = withWords(bytes, mime, meta, p);
-    await saveBytes(out, mime, n);
+    const n = await saveBytes(out, mime, name(PB.downloadExt(mime) || "bin", plan.action === "bytes" && /^data:/.test(plan.url) ? "" : undefined));
     if (capture) await capture.add(n, bytes, out, mime, plan.action === "gif" ? "a GIF made in the page" : plan.action === "canvas" ? "a picture of the canvas" : null);
-    await side([n]); await remember([key, hash], n);
-    return { line: `Saved ${n}, ${size(out.length)}.${note}`, names: [n], meta, files: capture && capture.files, transformed: plan.action === "gif" ? "made into a GIF in the page" : null };
+    const sidecar = await side([n]); await remember([key, hash], n);
+    return { line: `Saved ${n}, ${size(out.length)}.${note}`, names: [n], meta, sidecar, files: capture && capture.files, transformed: plan.action === "gif" ? "made into a GIF in the page" : null };
   }
 
   // One sidecar for every file of a post saved together (the inline button on a gallery).
@@ -224,7 +229,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     try {
       const r = await run(t, opts);
       if (opts.capture) { toast("Capturing the page as evidence", { stay: 0 }); r.line = await PBQuickCapture.finish(r); if (!opts.quiet) toast(r.line, { tone: "ok", stay: 7000 }); }
-      else if (opts.study && !opts.quiet && r.names && r.names.length) noteAfter(r.meta, r.names);
+      else if (opts.study && !opts.quiet && r.names && r.names.length) noteAfter(r.meta, r.names, r.sidecar);
       else if (!opts.quiet) toast(r.line, { tone: "ok" });
       return { ok: true, ...r };
     } catch (e) {
@@ -244,10 +249,10 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
 
   // After a study save: the optional line on what draws the person to it. The file is already saved;
   // a note, if typed, rewrites the sidecar in place.
-  function noteAfter(meta, names) {
+  function noteAfter(meta, names, sidecar) {
     toast(`Saved for study: ${names[0]}`, { tone: "ok", stay: 6000, input: { label: "What draws you to this? (optional, Enter to keep)", onSubmit: async (note) => {
       study = true; site = meta.site || location.hostname;
-      try { await sidecars({ ...meta, studyNote: note }, names, await prefs(), { overwrite: true }); toast("Note kept with the study.", { tone: "ok" }); }
+      try { await sidecars({ ...meta, studyNote: note }, names, await prefs(), { overwrite: true, stem: sidecar ? sidecar.replace(/\.md$/i, "") : null }); toast("Note kept with the study.", { tone: "ok" }); }
       catch (e) { toast(`Note not kept: ${e.message}`, { tone: "no" }); }
     } } });
   }

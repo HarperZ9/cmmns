@@ -21,6 +21,16 @@ date (UTC). `-n` numbers the files of one post. Other pages give `<page title>-<
 A post saved with the Download button gets one sidecar for all its files, named after the post (the
 first file's name without `-1`). A single file gets its own.
 
+### Taken names
+
+When a name is already taken, the browser saves the file as `name (1).jpg` (then `(2)`, and so on).
+`files` and the File line list the names the browser wrote, read back from it after each download,
+and the sidecar takes the same suffix: `name (1).md` beside `name (1).jpg`, and `name (1).md` for a
+post whose first file became `name-1 (1).jpg`. Notes saved by 3.8.0 and earlier could list the name asked for
+instead. `daylight sidecar check <folder>` reports them, and `--fix` repairs a note only when a file
+carries the note's post address and was written within its save's time (from a minute before
+`saved` to 15 minutes after).
+
 ## The Markdown file
 
 It opens with front matter: one field per line, each value a JSON value (string, array), so YAML

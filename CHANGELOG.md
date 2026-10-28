@@ -6,6 +6,18 @@ were not published to a store.
 ## Unreleased
 
 ### Fixed
+- **A note now names the files its own save wrote** (project-docs/SIDECAR-FORMAT.md, "Taken names").
+  When a file name was taken, the browser saved the file as `name (1).jpg`, but the note beside it
+  still listed `name.jpg`, a file of another save and sometimes of another post. Galleries saved
+  twice and single images saved from a saved gallery listed the first save's files the same way.
+  The worker now reads back the name the browser wrote (`downloads.search`, and the filename change
+  Chrome reports) and the note lists that name and takes the same suffix (`name (1).md`). A stream
+  saved as separate video and audio files now lists both. Planted tests run the page script and the
+  worker over a simulated `chrome.downloads` in Chrome's and Firefox's manner; the saver from before
+  the fix fails the six collision tests and passes the two no-collision tests.
+- `daylight sidecar check <folder>` also reports notes that name a missing file or one from another
+  save, and `--fix` repairs a note only when the replacement file carries the note's post address
+  and was written in the note's save window; anything less is reported and left as it is.
 - **The label marker catches name-calling it used to miss** (project-docs/ARGUMENT-LENS.md, "The label
   marker"). A private study of two TV news episodes found that the classification rule fired once in
   18,658 words: it read only "is a ...-ist". `src/core/discourse/labels.js` now finds, with spans, an
