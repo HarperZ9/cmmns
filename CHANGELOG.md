@@ -5,7 +5,27 @@ were not published to a store.
 
 ## Unreleased
 
-Nothing yet.
+### Fixed
+- **The label marker catches name-calling it used to miss** (project-docs/ARGUMENT-LENS.md, "The label
+  marker"). A private study of two TV news episodes found that the classification rule fired once in
+  18,658 words: it read only "is a ...-ist". `src/core/discourse/labels.js` now finds, with spans, an
+  epithet before a name (with or without a party or role word and a comma), after a name ("Pat Doe, a
+  known liar"), as a predicate on a pronoun, a demonstrative phrase or a name ("this woman is a liar",
+  "they are traitors"), in a naming frame ("I call him a fraud"), and in compounds ("radical-left
+  lunatic"). Severity is the number of epithet words. A label the post applies makes its sentence a
+  classification and shows on the claim card; negated, self-described, quoted and reported ones are
+  kept with their status and do not count.
+- The check that no discourse module names a side had a backspace where its word boundary should be
+  and matched nothing. It now matches, and reads "left" and "right" only in their sided forms.
+
+### Added
+- The epithet lexicon, `data/discourse/labels.json`: 36 non-political insults and 20 political
+  pejoratives, 10 aimed at each side with a named mirror, plus 20 modifiers, each with a dictionary
+  source and a reason. `scripts/labels-data.mjs` ships the words only, never the side.
+- Planted tests for every shape and every control class, a blind round written by a separate model
+  session (first score 37 of 37 precision, 37 of 43 recall; 42 of 43 after the fixes), 134 mirrored
+  pairs that must read the same, a lexicon balance test, and a shuffled-lexicon control that drops
+  recall to a mean of 0.14 to 0.16 (`node scripts/eval-labels.mjs`).
 
 ## 3.8.0 (2026-10-26)
 

@@ -53,6 +53,13 @@ test("the document check, the counts and quote extraction read the same either w
 test("no discourse module names a party, an ideology or a side", async () => {
   const { readFileSync, readdirSync } = await import("node:fs");
   const dir = new URL("../src/core/discourse/", import.meta.url);
-  const words = new RegExp(`\b(${PAIRS.flat().join("|")})\b`, "i");
-  for (const f of readdirSync(dir).filter((x) => x.endsWith(".js"))) assert.doesNotMatch(readFileSync(new URL(f, dir), "utf8"), words, f);
+  // "\\b" in a template literal: a bare "\b" there is a backspace character, and until 2026-10-28 the
+  // check matched nothing. Bare "left" and "right" are ordinary English ("buttons left out", "can be
+  // right"), so the check reads them only in their sided forms.
+  const plain = PAIRS.flat().filter((w) => !/^(?:left|right)$/i.test(w));
+  const words = new RegExp(`\\b(${plain.join("|")}|(?:far|hard|ultra|alt|radical)[\\s-](?:left|right)|(?:left|right)[\\s-]wing)\\b`, "i");
+  for (const s of ["a socialist", "the far-left", "right-wing"]) assert.match(s, words, "the check can fail");
+  // labels-data.js is the label marker's word list, which names epithets from every side by design; its
+  // balance and its lack of any side field are checked in tests/discourse.labels.symmetry.test.js.
+  for (const f of readdirSync(dir).filter((x) => x.endsWith(".js") && x !== "labels-data.js")) assert.doesNotMatch(readFileSync(new URL(f, dir), "utf8"), words, f);
 });

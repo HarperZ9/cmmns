@@ -16,7 +16,7 @@ const PRODUCT = ["catalogue-data.js", "catalogue-links.js", "definitions.js", "s
 const INTEGRATION = ["api-words.js", "api-data.js", "api-site.js", "api-post.js", "api-thread.js", "api-media.js", "api.js", "bundle-verify.js", "evidence-bundle.js", "signing.js", "head.js", "import-html.js", "import-exports.js", "import-json.js", "import-car.js", "imports.js", "self-audit.js"];
 // The discourse checks (src/core/discourse/, project-docs/DISCOURSE.md): their own bundle and global
 // (PBD), loaded by the content scripts and the background worker after core.bundle.js.
-const DISCOURSE = ["text.js", "quotes.js", "persona.js", "stats.js", "docclaim.js", "corrections.js", "argument-measured.js", "cards.js", "sheets.js", "parts.js", "argument-cues.js", "argument.js", "claimtype.js", "isomer.js"];
+const DISCOURSE = ["text.js", "quotes.js", "persona.js", "stats.js", "docclaim.js", "corrections.js", "argument-measured.js", "cards.js", "sheets.js", "parts.js", "argument-cues.js", "argument.js", "labels-data.js", "labels.js", "claimtype.js", "isomer.js"];
 const OCR = ["charset.js", "image.js", "binarize.js", "components.js", "segment.js", "gemm-wasm.js", "gemm.js", "model.js", "weights.js", "read.js"];
 const ident = (f) => "M_" + f.replace(/\.js$/, "").replace(/[-/]/g, "_");
 

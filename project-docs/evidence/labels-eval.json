@@ -1,0 +1,61 @@
+{
+ "firstScore": {
+  "set": "labels-round1.json, scored once before any fix, 2026-10-28",
+  "tp": 37,
+  "fp": 0,
+  "fn": 6,
+  "precision": 1,
+  "recall": 0.86,
+  "misses": [
+   "adjective not in the lexicon between the article and the head (shameless, spineless, corporate, bigoted, brainwashed): 5",
+   "a hyphenated surname with a second capital (Okafor-Lyle), in one of those five sentences",
+   "two coordinated subjects with one predicate, counted as two targets: 1"
+  ]
+ },
+ "current": {
+  "planted": {
+   "tp": 33,
+   "fp": 0,
+   "fn": 0,
+   "precision": 1,
+   "recall": 1,
+   "precisionInterval": [
+    0.896,
+    1
+   ],
+   "recallInterval": [
+    0.896,
+    1
+   ]
+  },
+  "round1": {
+   "tp": 42,
+   "fp": 0,
+   "fn": 1,
+   "precision": 1,
+   "recall": 0.9767441860465116,
+   "precisionInterval": [
+    0.916,
+    1
+   ],
+   "recallInterval": [
+    0.879,
+    0.996
+   ]
+  },
+  "shuffled": {
+   "planted": {
+    "seeds": 20,
+    "vocabulary": 681,
+    "mean": 0.1439393939393939,
+    "max": 0.45454545454545453
+   },
+   "round1": {
+    "seeds": 20,
+    "vocabulary": 681,
+    "mean": 0.1569767441860465,
+    "max": 0.37209302325581395
+   }
+  }
+ }
+}

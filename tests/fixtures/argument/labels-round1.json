@@ -1,0 +1,327 @@
+{
+ "about": "Written blind on 2026-10-28 by a separate model session from a one-page spec of the label marker, without the code. Every name is invented. Scored once before any fix (project-docs/evidence/labels-eval.json, firstScore); the misses were then fixed, so this set is now development data. labels is the number of labelled targets in a sentence.",
+ "positives": [
+  {
+   "text": "Councilman, crook Derrin Halvorsen took another envelope of cash last week.",
+   "labels": 1
+  },
+  {
+   "text": "Communist Maribel Ostrander wants to seize every family farm in the county.",
+   "labels": 1
+  },
+  {
+   "text": "Grifter Tobias Penhallow is selling commemorative coins to his own donors again.",
+   "labels": 1
+  },
+  {
+   "text": "Fascist Renata Kowalczyk marched her supporters straight into the statehouse lobby.",
+   "labels": 1
+  },
+  {
+   "text": "Mayor, idiot Clement Strathorne forgot to fund the snowplows for the third winter.",
+   "labels": 1
+  },
+  {
+   "text": "Libtard Jordy Ferrante posted another tearful rant about plastic straws this morning.",
+   "labels": 1
+  },
+  {
+   "text": "Our neighbor Hollis Vantreese, a total con artist, sold my uncle a fake roof warranty.",
+   "labels": 1
+  },
+  {
+   "text": "Bettina Quarrels, a Marxist, spent the whole meeting demanding we abolish private property.",
+   "labels": 1
+  },
+  {
+   "text": "Desmond Okafor-Lyle, a shameless hypocrite, flew a private jet to the climate summit.",
+   "labels": 1
+  },
+  {
+   "text": "Lionel Brackwater, a white supremacist, is running for school board again.",
+   "labels": 1
+  },
+  {
+   "text": "Senator Ingrid Faulhaber, a spineless coward, skipped the vote she promised to lead.",
+   "labels": 1
+  },
+  {
+   "text": "Ramsey Thibodeaux is a liar and everyone in this town knows it.",
+   "labels": 1
+  },
+  {
+   "text": "She is a fraud who invented half the credentials on her campaign website.",
+   "labels": 1
+  },
+  {
+   "text": "They are deplorables, and they proved it again at the rally on Saturday.",
+   "labels": 1
+  },
+  {
+   "text": "He's a radical-left lunatic who wants to defund every police department in the state.",
+   "labels": 1
+  },
+  {
+   "text": "Councilwoman Petra Albescu is a far-right extremist with a militia on speed dial.",
+   "labels": 1
+  },
+  {
+   "text": "This woman is a dangerous socialist, and she must never get near the treasury.",
+   "labels": 1
+  },
+  {
+   "text": "That guy is a complete moron, so stop asking him for budget advice.",
+   "labels": 1
+  },
+  {
+   "text": "These people are snowflakes who melt the moment anyone disagrees with them.",
+   "labels": 1
+  },
+  {
+   "text": "You're a clown, Gideon, and your whole campaign is a circus.",
+   "labels": 1
+  },
+  {
+   "text": "Quentin Marlowe was a traitor who sold the union's strike plans to management.",
+   "labels": 1
+  },
+  {
+   "text": "Those protesters were thugs, smashing windows up and down Delmore Avenue.",
+   "labels": 1
+  },
+  {
+   "text": "They're commies who would hand every factory to a central committee.",
+   "labels": 1
+  },
+  {
+   "text": "Commissioner Ottoline Varga is a corporate shill for the pipeline company.",
+   "labels": 1
+  },
+  {
+   "text": "Yusuf Albright is a puppet of the downtown developers and always has been.",
+   "labels": 1
+  },
+  {
+   "text": "That man is a lying scumbag who stole from his own veterans' charity.",
+   "labels": 1
+  },
+  {
+   "text": "Nazi Ferris Holloway handed out leaflets outside the synagogue again on Friday.",
+   "labels": 1
+  },
+  {
+   "text": "Ellery Danforth is a criminal, plain and simple, and belongs behind bars.",
+   "labels": 1
+  },
+  {
+   "text": "Far-left extremist Corinne Ashby wants to ban gas stoves in every kitchen.",
+   "labels": 1
+  },
+  {
+   "text": "Far-right lunatic Brannock Hale says the moon landing was staged by the UN.",
+   "labels": 1
+  },
+  {
+   "text": "Activist, terrorist Malik Durrant planned the pipeline bombing from his garage.",
+   "labels": 1
+  },
+  {
+   "text": "Weston Pryor and Delia Mott are crooks who looted the county pension fund.",
+   "labels": 2
+  },
+  {
+   "text": "Fascist Arvid Lund and communist Selma Ketterer spent the debate shouting at each other.",
+   "labels": 2
+  },
+  {
+   "text": "Anson Greer is a grifter, and his brother Rolf Greer is a con artist.",
+   "labels": 2
+  },
+  {
+   "text": "He was a socialist puppet of the teachers' union from his first day in office.",
+   "labels": 1
+  },
+  {
+   "text": "She's a neo-Nazi who lectures on heritage from her lakeside mansion.",
+   "labels": 1
+  },
+  {
+   "text": "They were cowards who abandoned the flood volunteers when the cameras left.",
+   "labels": 1
+  },
+  {
+   "text": "Pastor Wendell Crane, a bigoted fraud, preached that only donors get into heaven.",
+   "labels": 1
+  },
+  {
+   "text": "This guy is a brainwashed MAGA cultist who cheers whatever the rally speaker says.",
+   "labels": 1
+  },
+  {
+   "text": "Ophelia Brandt, a fascist, wants to ban every book in the county library.",
+   "labels": 1
+  }
+ ],
+ "negatives": [
+  {
+   "text": "Republican senator Harlan Voss introduced a bill to expand rural broadband funding.",
+   "class": "descriptor"
+  },
+  {
+   "text": "Delphine Arceneaux, a Democrat from Ohio, chairs the agriculture committee this session.",
+   "class": "descriptor"
+  },
+  {
+   "text": "The Labour candidate, Imogen Thwaite, opened her campaign office near the train station.",
+   "class": "descriptor"
+  },
+  {
+   "text": "She is a progressive Democrat who has represented the district for twelve years.",
+   "class": "descriptor"
+  },
+  {
+   "text": "He is a conservative economist who teaches at the state university.",
+   "class": "descriptor"
+  },
+  {
+   "text": "Tobin Marchetti, a Green Party organizer, spent Saturday registering voters downtown.",
+   "class": "descriptor"
+  },
+  {
+   "text": "The libertarian delegate from Nevada abstained on the final budget vote.",
+   "class": "descriptor"
+  },
+  {
+   "text": "They are moderate independents who split their votes between both parties.",
+   "class": "descriptor"
+  },
+  {
+   "text": "Arturo Delgado joined the Communist Party of Cuba as a young engineer.",
+   "class": "proper"
+  },
+  {
+   "text": "The Socialist Workers Party ran a candidate named Hester Lund in the mayoral race.",
+   "class": "proper"
+  },
+  {
+   "text": "Our history class spent three weeks on the rise of the Nazi Party in Bavaria.",
+   "class": "proper"
+  },
+  {
+   "text": "Italian schoolbooks from the Fascist period praised the regime's land drainage projects.",
+   "class": "proper"
+  },
+  {
+   "text": "Pilar Ostrova studied the archives of the Marxist-Leninist Party of Germany for her thesis.",
+   "class": "proper"
+  },
+  {
+   "text": "The Democratic Socialists of America chapter met in the library basement on Tuesday.",
+   "class": "proper"
+  },
+  {
+   "text": "The Communist Manifesto was assigned reading in Professor Ilse Brandauer's political theory seminar.",
+   "class": "proper"
+  },
+  {
+   "text": "Grandfather Emil fled the Nazi occupation of his village in 1942.",
+   "class": "proper"
+  },
+  {
+   "text": "Rosalind Achterberg is not a liar, whatever the anonymous flyers claim.",
+   "class": "negation"
+  },
+  {
+   "text": "He isn't a crook; the audit cleared every one of his expense reports.",
+   "class": "negation"
+  },
+  {
+   "text": "Those volunteers were never fascists, just tired parents who wanted a stop sign.",
+   "class": "negation"
+  },
+  {
+   "text": "Calvin Moreau is no communist, despite his fondness for public libraries.",
+   "class": "negation"
+  },
+  {
+   "text": "She was not a traitor, and the court records prove it.",
+   "class": "negation"
+  },
+  {
+   "text": "They aren't snowflakes for asking the landlord to fix the heating.",
+   "class": "negation"
+  },
+  {
+   "text": "You are not an idiot for trusting a contractor who lied to you.",
+   "class": "negation"
+  },
+  {
+   "text": "This man has never been a white supremacist, and his voting record shows it.",
+   "class": "negation"
+  },
+  {
+   "text": "I am a socialist, and I want public transit that runs past midnight.",
+   "class": "self"
+  },
+  {
+   "text": "We're proud communists and we will keep organizing the warehouse workers.",
+   "class": "self"
+  },
+  {
+   "text": "Speaking as a Marxist, I find the new tax plan oddly timid.",
+   "class": "self"
+  },
+  {
+   "text": "I'm a proud deplorable, and I'll wear the hat to every town meeting.",
+   "class": "self"
+  },
+  {
+   "text": "Call me a snowflake if you like, but I cried at the shelter adoption event.",
+   "class": "self"
+  },
+  {
+   "text": "We are democratic socialists, and our platform starts with affordable childcare.",
+   "class": "self"
+  },
+  {
+   "text": "I was a commie in college and I still sing the old union songs.",
+   "class": "self"
+  },
+  {
+   "text": "Honestly, I'm an idiot for leaving my keys in the car again.",
+   "class": "self"
+  },
+  {
+   "text": "Garrick Osei denied being a liar during the tense press conference on Monday.",
+   "class": "reported"
+  },
+  {
+   "text": "She called him a fraud in front of the entire zoning board.",
+   "class": "reported"
+  },
+  {
+   "text": "Critics accused Lorna Featherstone of being a closet communist after her housing speech.",
+   "class": "reported"
+  },
+  {
+   "text": "The flyer described the councilman as a 'radical-left lunatic' in bold red letters.",
+   "class": "reported"
+  },
+  {
+   "text": "Opponents labeled Thaddeus Rook a fascist, a charge he rejected in a long statement.",
+   "class": "reported"
+  },
+  {
+   "text": "Several commenters claimed the new principal was a Marxist, without offering any evidence.",
+   "class": "reported"
+  },
+  {
+   "text": "Whenever someone called her a 'deplorable', Nadia Persson just laughed and kept canvassing.",
+   "class": "reported"
+  },
+  {
+   "text": "The lawsuit alleges that the station falsely branded Ivo Kranjc a white supremacist.",
+   "class": "reported"
+  }
+ ]
+}

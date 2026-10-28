@@ -75,6 +75,72 @@ of their meaning words fresh (at least four words).
 `node scripts/eval-argument.mjs` scores both. The labels are model labels, a pilot and not the human
 gold the gate asks for.
 
+### The label marker
+
+A private study of 2026-10-28 ran the classification rule over 18,658 words of two TV news episodes.
+It fired once. The rule read only the shape "is a ...-ist", so it missed a party word and an epithet set
+before a name, and a demonstrative phrase with "is a" and an epithet. No broadcast text is in this
+repository; the examples here are invented. `src/core/discourse/labels.js` now finds an epithet applied to a person or group, with its
+span, in four shapes:
+
+| Shape | Example (invented names) |
+|---|---|
+| Before a name, with or without a descriptor | "Democrat, communist Jane Talbot", "deranged traitor Bea Quill" |
+| After a name | "Pat Doe, a known liar," |
+| Predicate on a pronoun, a demonstrative phrase or a name | "This woman is a liar", "they are traitors", "Tamsin Rook is a grifter" |
+| Naming frame | "I call him a fraud" |
+
+A label can be a compound: "radical-left lunatic", "a lying, corrupt crook". Its severity is the number
+of epithet words in it: the head and each pejorative modifier. Intensifiers ("total", "known") and other
+adjectives ("shameless") may sit inside a label without counting. Before a name the rule asks for a
+first and last name, so "Nazi Germany" is not a person; an epithet followed by an institution word
+("Communist Party", "Socialist Party candidate") is a proper noun and gives no hit.
+
+The words come from `data/discourse/labels.json`: 56 heads and 20 modifiers, each with its dictionary
+entry and the reason it is listed. 36 heads are non-political insults (liar, crook, traitor, fraud,
+thug, extremist and others). The rest are political pejoratives, 10 usually aimed at the left and 10 at
+the right, and every one names its mirror on the other side (communist and fascist, Marxist and Nazi,
+libtard and Rethuglican, snowflake and deplorable). The modifiers pair the same way (far-left and
+far-right, woke and MAGA). "Socialist" is listed because it is used as an epithet; the rule cannot tell
+the epithet from the plain description, and the proper-noun guard handles only the party name.
+"Racist" and "bigot" are left out: they name conduct a post can show, and the shape rule still types
+"is a racist" as a classification. `node scripts/labels-data.mjs` writes the words, and only the words,
+into `src/core/discourse/labels-data.js`, so the rule never sees which side an entry is aimed at.
+
+Every hit carries a status. Only a hit the post applies itself counts, makes its sentence a
+classification and shows on the claim card.
+
+| Status | When | Why it does not count |
+|---|---|---|
+| `label` | The post applies the epithet, including "I think she is a crook" and "we call them traitors" | It counts |
+| `negated` | "she is not a liar", "he isn't a crook", "is no communist", "has never been a fraud" | The sentence denies the label |
+| `self` | "I am a proud socialist", "as a Marxist, I", "call me a snowflake" | Self-description is not name-calling |
+| `quoted` | The hit sits inside quotation marks | The post shows the words; it may not use them |
+| `reported` | "critics said she is a crook", "she called him a fraud", "accused of being", "denied being" | Someone else applied it; the post reports that |
+
+"He denied being a liar" is a mention of a label, so it is kept as a `reported` hit with its span and
+not dropped: the word is in the post, and a reader may want to see where. It does not count, because
+the post's own claim is about the denial. A post can launder a label through "people are saying", and
+the marker will mark that as reported; the status is shown so a reader can judge.
+
+`node scripts/eval-labels.mjs` scores hits on two sets (`project-docs/evidence/labels-eval.json`):
+
+| Set | Precision | Recall |
+|---|---|---|
+| Planted, 33 positives in every shape and 30 controls in every class, written with the rule | 33 of 33 | 33 of 33 |
+| Round 1, 40 positives and 40 controls written blind by a separate model session from a spec, scored once before any fix | 37 of 37 | 37 of 43 |
+| Round 1 after the fixes (now development data) | 42 of 42 | 42 of 43 |
+
+The first round-1 score missed adjectives outside the lexicon between the article and the head
+("a spineless coward") and a hyphenated surname; both are fixed. It still misses two subjects that
+share one predicate ("Weston Pryor and Delia Mott are crooks" gives one hit, not two). No human
+labels exist yet, and no real thread has been scored.
+
+The shuffled-lexicon control moves epithet status to words drawn at random, with the same number of
+heads and modifiers, from the 681 words of both sets and the lexicon. Over 20 seeds the planted recall
+falls from 1.0 to a mean of 0.14 and the round-1 recall from 0.98 to 0.16, so the rule's hits come from
+the lexicon and not from the sentence shapes alone.
+
 | Set | Labels | Types right | Gap precision | Gap recall |
 |---|---|---|---|---|
 | Development (20) | Claude Opus 5.5 | 19 of 20 | 5 of 5 | 5 of 5 |
@@ -102,6 +168,16 @@ and right, socialist and nationalist, communist and fascist, party names, named 
 and requires the same claim types, gaps, roles and reframing reading. The classification rule reads a
 word's shape (-ist, -ism, extremist, terrorist), not which category it is. No rule names a side.
 
+`tests/discourse.labels.symmetry.test.js` builds 134 mirrored pairs from the lexicon's own mirror field,
+with party words traded too (Democrat and Republican, Labour and Tory, liberal and conservative), in
+eleven shapes for heads and four for modifiers: applied, negated, self, reported and proper-noun. Each
+pair must give the same hits, statuses and severity, and the totals must match. The test also requires
+equal aimed entries on each side with a mirror for each, a shipped word list with no side field, and
+no party, ideology or sided word in `labels.js` or `claimtype.js`. The rule's only option is a word
+list. The older check that no discourse module names a side had a backspace where its word boundary
+should be and matched nothing; it is fixed, and it skips `labels-data.js`, whose balance this test
+checks.
+
 ## What these readings do not prove
 
 - A connective is what the author says links two claims; the lens shows that the author marks a part
@@ -110,3 +186,5 @@ word's shape (-ist, -ism, extremist, terrorist), not which category it is. No ru
 - An inference gap can sit on a sound step, and a claim about intent can be right.
 - A reframing shows only that the post goes past its sources; sources can be incomplete.
 - The F7 and F9 figures are on 60 short sentences with model labels.
+- A label says how a post names someone, not whether the word fits. The label figures are on synthetic
+  sentences; the one blind round was written by a model, and only its first score was held out.
