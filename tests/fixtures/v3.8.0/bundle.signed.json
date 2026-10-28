@@ -1,0 +1,165 @@
+{
+  "kind": "radar-evidence-bundle",
+  "version": 2,
+  "schema": "urn:radar:evidence:v2",
+  "api": "2.0.0",
+  "tool": "Daylight Commons 3.8.0 (CLI)",
+  "savedAt": "2026-10-28T09:18:50.413Z",
+  "dataLock": null,
+  "input": {
+    "kind": "thread",
+    "site": "x",
+    "page": null,
+    "source": "thread",
+    "accounts": 10
+  },
+  "posts": [
+    {
+      "id": "root"
+    },
+    {
+      "id": "10"
+    },
+    {
+      "id": "11"
+    },
+    {
+      "id": "12"
+    },
+    {
+      "id": "13"
+    },
+    {
+      "id": "14"
+    },
+    {
+      "id": "15"
+    },
+    {
+      "id": "16"
+    },
+    {
+      "id": "17"
+    },
+    {
+      "id": "18"
+    },
+    {
+      "id": "19"
+    }
+  ],
+  "textIncluded": false,
+  "evidence": [
+    {
+      "id": "e1",
+      "kind": "thread-report",
+      "scope": "thread",
+      "level": "info",
+      "label": "thread report",
+      "shows": "Too few extreme replies to compare (0; the report needs 10). 10 replies are left out until the accounts are looked up.",
+      "source": "The posts in the input, as given, read by Daylight Commons on this device. Account details given in the input: what each platform discloses on profiles and About pages.",
+      "context": "A skew compares the thread as a whole, separate from any one reply or account. It can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event.",
+      "posts": [
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19"
+      ],
+      "spans": [],
+      "data": {
+        "replies": 10,
+        "accountsRead": 0,
+        "notRead": 10,
+        "verdict": "too-few",
+        "extreme": {
+          "n": 0,
+          "flagged": 0,
+          "ci": [
+            0,
+            0
+          ]
+        },
+        "others": {
+          "n": 0,
+          "flagged": 0,
+          "ci": [
+            0,
+            0
+          ]
+        },
+        "machineSigns": 0
+      }
+    },
+    {
+      "id": "e2",
+      "kind": "same-text",
+      "scope": "thread",
+      "level": "flag",
+      "label": "near-identical replies, 5 accounts",
+      "shows": "5 replies from 5 different accounts share most of their wording (similarity at least 0.82). In ordinary threads with 5 to 19 replies, a group of near-identical replies from different accounts showed up in 0.5% of threads (95% interval 0.3 to 0.8%, 3,087 threads).",
+      "source": "The posts in the input, as given, read by Daylight Commons on this device.",
+      "context": "Other accounts posted identical replies. That shows copying or coordination, and people also share text they agree with.",
+      "posts": [
+        "10",
+        "12",
+        "14",
+        "16",
+        "18"
+      ],
+      "spans": [],
+      "data": {
+        "posts": 5,
+        "accounts": 5,
+        "similarity": 0.82
+      }
+    },
+    {
+      "id": "e3",
+      "kind": "same-text",
+      "scope": "thread",
+      "level": "flag",
+      "label": "near-identical replies, 5 accounts",
+      "shows": "5 replies from 5 different accounts share most of their wording (similarity at least 1). In ordinary threads with 5 to 19 replies, a group of near-identical replies from different accounts showed up in 0.5% of threads (95% interval 0.3 to 0.8%, 3,087 threads).",
+      "source": "The posts in the input, as given, read by Daylight Commons on this device.",
+      "context": "Other accounts posted identical replies. That shows copying or coordination, and people also share text they agree with.",
+      "posts": [
+        "11",
+        "13",
+        "15",
+        "17",
+        "19"
+      ],
+      "spans": [],
+      "data": {
+        "posts": 5,
+        "accounts": 5,
+        "similarity": 1
+      }
+    }
+  ],
+  "limits": [
+    "This covers the posts in the input as given, in the order and selection the platform showed.",
+    "A skew compares the thread as a whole, separate from any one reply or account. It can come from how the platform ranks replies, from which accounts were looked up, or from real people who joined during the event.",
+    "A valid signature shows the holder of this key signed the bundle and that it is unchanged since. Check the key id with the signer by another route, and read each span against its post."
+  ],
+  "signer": {
+    "alg": "ECDSA P-256 SHA-256",
+    "keyId": "5f1cfe9ed768eaab",
+    "publicKey": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "Tbj0j4EZBK-N__W3nvFzBg9NafpTgXXFrNW-zr7c3vs",
+      "y": "ORJb5ZGm4u8mV7s0jBO7thBoMFIY_OmmXhYPyDFXwD8"
+    }
+  },
+  "signature": {
+    "of": "canonical JSON of this bundle without the signature field (sorted keys, no spaces)",
+    "value": "raqyrl0Wc_5ZKDV036ZNCJz5t7nkH9cc9_ZLQZez67clX4_uBv2jZXNOa95P8SAeGnql98oOkceBCq2w-DXRbQ"
+  }
+}

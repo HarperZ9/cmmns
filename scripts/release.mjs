@@ -38,12 +38,12 @@ writePackages(dir);
 rmSync(join(dir, SUMS));   // remade over every file below
 
 // The command line tool, so anyone can check a bundle or an evidence chain without the repository.
-writeFileSync(join(dir, `radar-cli-${version}.zip`), cliZip());
+writeFileSync(join(dir, `cmmns-cli-${version}.zip`), cliZip());
 
 // The whole history at HEAD, so the source survives without any code host.
 const commit = git("rev-parse", "HEAD");
-git("bundle", "create", join(dir, `radar-${version}.bundle`), "HEAD");
-git("bundle", "verify", join(dir, `radar-${version}.bundle`));
+git("bundle", "create", join(dir, `cmmns-${version}.bundle`), "HEAD");
+git("bundle", "verify", join(dir, `cmmns-${version}.bundle`));
 writeFileSync(join(dir, "SOURCE"), `commit ${commit}\nversion ${version}\nbuilt with node ${process.version}\n`);
 copyFileSync(PUBLIC_KEY, join(dir, "release-key.json"));
 // The offline kit's own files (scripts/kit.mjs), written before the sums so the signature covers them.
@@ -67,4 +67,4 @@ console.log(`signed ${names.length} files in ${dir}`);
 console.log(`key id ${keyId}`);
 console.log(`head version ${head.version}, valid until ${head.expires.slice(0, 10)}`);
 console.log(`SHA256SUMS sha256 ${createHash("sha256").update(readFileSync(join(dir, SUMS))).digest("hex")}`);
-console.log(`next: node scripts/kit.mjs ${dir} --out <kit folder> for the offline kit; attach every file to the release; send radar-firefox-self to Mozilla's unlisted signing; then node scripts/firefox-updates.mjs <signed.xpi>`);
+console.log(`next: node scripts/kit.mjs ${dir} --out <kit folder> for the offline kit; attach every file to the release; send cmmns-firefox-self to Mozilla's unlisted signing; then node scripts/firefox-updates.mjs <signed.xpi>`);

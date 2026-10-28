@@ -1,4 +1,4 @@
-// Builds Daylight Commons' transparency page from the evaluation results: every sign with its measured precision and
+// Builds CMMNS' transparency page from the evaluation results: every sign with its measured precision and
 // recall, intervals, corpus and licence; the side-balance table; what is not measured; the known
 // limits; documented influence operations by year and country (data/ops.json). Inputs: project-docs/evidence/eval-results.json and persuasion-results.json (written by
 // scripts/eval.mjs and scripts/eval-persuasion.mjs), families.js, EVALUATION.md and CORPORA.md.
@@ -19,7 +19,7 @@ const read = (p) => readFileSync(join(ROOT, p), "utf8");
 const pct = (x) => `${(x * 100).toFixed(1)}%`;
 const rate = (r) => (r && r.n ? `${pct(r.value)} (${r.k.toLocaleString("en")} of ${r.n.toLocaleString("en")}; ${pct(r.ci[0])} to ${pct(r.ci[1])})` : "not measured");
 const AREA = (a) => a[0].toUpperCase() + a.slice(1);
-const KIND = { detector: "Daylight Commons' own rule", platform: "The site's own label", table: "Match against a cited table", technique: "Persuasion technique" };
+const KIND = { detector: "CMMNS' own rule", platform: "The site's own label", table: "Match against a cited table", technique: "Persuasion technique" };
 const row = (cells) => `<tr>${cells.map((c) => (typeof c === "object" ? `<td class="${c.cls}">${c.html}</td>` : `<td>${c}</td>`)).join("")}</tr>`;
 const tbl = (head, rows) => `<div class="scroll"><table><thead><tr>${head.map((h) => `<th scope="col">${esc(h)}</th>`).join("")}</tr></thead><tbody>\n${rows.join("\n")}\n</tbody></table></div>`;
 const num = (html) => ({ cls: "num", html });
@@ -88,10 +88,10 @@ function notMeasured(fams) {
   const synthetic = new Set(["duplicates", "mismatch"]);
   const open = FAMILIES.filter((f) => f.kind === "detector" && !measuredLine(f.id).measured && !synthetic.has(f.id)).map((f) => f.name);
   return [
-    `Daylight Commons' own rules still to measure: ${open.join(", ")}. The window marks each of them as waiting for a measurement.`,
+    `CMMNS' own rules still to measure: ${open.join(", ")}. The window marks each of them as waiting for a measurement.`,
     "Same text as other replies, and speaks as local, labelled elsewhere: tested on cases written alongside the rules (below). Measuring them on real replies needs live threads labelled by hand.",
     "Live threads: every figure here comes from public research corpora. Threads from X, YouTube, Reddit, Facebook, Instagram and Bluesky still need labelling by hand.",
-    "French language signs: the French corpus has too few hits to measure. Persuasion cues in French: waiting for a corpus whose licence Daylight Commons can use.",
+    "French language signs: the French corpus has too few hits to measure. Persuasion cues in French: waiting for a corpus whose licence CMMNS can use.",
     fams.vigilante && !fams.vigilante.measured ? "Call for vigilantes: under the 20 hits in the test split that a measurement needs." : null,
     "Site labels (Community Notes, ads, posting app, X's spam label) and matches against cited tables (outlet owners, state links) carry the site's or the cited source's own judgement, and their evidence is that site or source.",
   ].filter(Boolean);
@@ -128,11 +128,11 @@ export function render(target = "ext") {
   const lead = leadSigns({ D, ptc, B, fold: { ...FOLD_SEEDED, ...B.fold } });
   const limits = [...bullets(evalMd, "### What the numbers do not prove"), ...bullets(evalMd, "### What the persuasion numbers do not prove")];
   const body = `
-<p class="lead">Every sign in Daylight Commons' window carries one of two labels: how often it was right when people checked by hand, or "not measured yet". Below is every sign, the data it was checked on and that data's licence, and how evenly the signs fire whichever side a post targets.</p>
+<p class="lead">Every sign in CMMNS' window carries one of two labels: how often it was right when people checked by hand, or "not measured yet". Below is every sign, the data it was checked on and that data's licence, and how evenly the signs fire whichever side a post targets.</p>
 <h2>How to read the numbers</h2>
 <ul>
-<li><strong>Precision</strong> is the share of signs Daylight Commons showed that the human annotators of a public research corpus agreed with. It answers "when Daylight Commons shows this, how often is it right?"</li>
-<li><strong>Recall</strong> is the share of the annotated cases that Daylight Commons found. Daylight Commons is built for precision: a wrong sign on an honest reply is the harm it avoids most, so recall is low.</li>
+<li><strong>Precision</strong> is the share of signs CMMNS showed that the human annotators of a public research corpus agreed with. It answers "when CMMNS shows this, how often is it right?"</li>
+<li><strong>Recall</strong> is the share of the annotated cases that CMMNS found. CMMNS is built for precision: a wrong sign on an honest reply is the harm it avoids most, so recall is low.</li>
 <li>Each figure gives the count and a 95% interval (Wilson). A wide interval means few cases were checked.</li>
 <li>All figures come from a held-out test split (seed <code>${esc(D.seed)}</code>). Rules were tuned on a separate split, and the test split was read once, after tuning. Measured ${esc(D.generated)}.</li>
 </ul>
@@ -161,7 +161,7 @@ ${more("Every technique, with counts", tbl(["Technique", "Precision (95% interva
 ${tbl(["Corpus", "Recall, right's usual targets", "Recall, left's usual targets", "Precision, right's usual targets", "Precision, left's usual targets", "Result"], sideRows(D.sides))}
 <p class="muted">Precision agrees across sides within the intervals. Where a gap remains, the thread report undercounts extreme replies aimed at the side with lower recall.</p>
 <h2>Every sign</h2>
-<p>Each of Daylight Commons' ${FAMILIES.length} signs, with the line its window shows beside it.</p>
+<p>Each of CMMNS' ${FAMILIES.length} signs, with the line its window shows beside it.</p>
 ${more("Every sign and its measured line", tbl(["Sign", "Area", "Kind", "What the window says"], everySignRows()))}
 ${opsSection(JSON.parse(read("data/ops.json")))}
 <h2>Still to measure</h2>
@@ -172,10 +172,10 @@ ${ul(limits, inline)}
 <p>Each sign in the window has "This was right" and "This was wrong". Your marks stay in your browser. After 10 marks on one kind of sign, the window shows your own count under the measured figure. The figures on this page stay as measured. You can save your marks to a file from the options page and choose whether to share it.</p>
 <h2>Data used</h2>
 ${tbl(["Corpus", "Licence"], sources.map((s) => row([`<a href="${esc(s.url)}">${esc(s.name)}</a>`, esc(s.licence)])))}
-<p>The repository holds counts, rates and file hashes; the corpus text stays with each publisher. Download the corpora, run the evaluation scripts in <a href="${REPO}">Daylight Commons' repository</a>, and every number on this page comes back.</p>`;
-  const description = "Every Daylight Commons sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.";
-  if (target === "site") return sitePage({ file: "transparency.html", title: "How Daylight Commons is measured", role: "Each sign's measured precision and recall with its interval, the data behind it, the side-balance check and the known limits.", description, updated: D.generated, body, css: FIGURE_CSS });
-  return page({ title: "How Daylight Commons is measured", description, updated: D.generated, body, css: FIGURE_CSS });
+<p>The repository holds counts, rates and file hashes; the corpus text stays with each publisher. Download the corpora, run the evaluation scripts in <a href="${REPO}">CMMNS' repository</a>, and every number on this page comes back.</p>`;
+  const description = "Every CMMNS sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.";
+  if (target === "site") return sitePage({ file: "transparency.html", title: "How CMMNS is measured", role: "Each sign's measured precision and recall with its interval, the data behind it, the side-balance check and the known limits.", description, updated: D.generated, body, css: FIGURE_CSS });
+  return page({ title: "How CMMNS is measured", description, updated: D.generated, body, css: FIGURE_CSS });
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -1,7 +1,7 @@
 <!-- writing-profile: readme -->
 # Questions and answers
 
-**What does Daylight Commons do for me?**
+**What does CMMNS do for me?**
 It shows the evidence behind the replies you read: where an account is based by the site's own
 label, signs that several accounts post the same words, what fact-checkers said about a similar
 claim, and who owns a linked site. Each sign names its source, so you can check it and decide.
@@ -18,13 +18,13 @@ names and domains to GitHub, RDAP and the Internet Archive. There is no account,
 [PRIVACY.md](../../PRIVACY.md) lists everything it keeps.
 
 **How do I delete what it kept?**
-Options, then **Clear all Daylight Commons data**. Account details expire after 14 days and thread
+Options, then **Clear all CMMNS data**. Account details expire after 14 days and thread
 history after 60, and you can shorten both.
 
 **How accurate is it?**
 Each sign shows its measured precision with a 95% interval where it has been measured against posts
 people checked, and "not measured yet" where it has not. The measurement page has the results and the
-data behind them: [transparency](https://harperz9.github.io/daylight-commons/transparency.html).
+data behind them: [transparency](https://harperz9.github.io/cmmns/transparency.html).
 
 **Why are the Reading lens techniques off?**
 A technique shows by default only after it is right at least 80% of the time on posts it was never
@@ -54,11 +54,11 @@ you got another way.
 Yes. The code is AGPL-3.0, and the data and docs are CC BY 4.0.
 
 **What is the workbench for?**
-`daylight case` keeps an investigation in one folder: sources with their hashes and archive copies,
+`cmmns case` keeps an investigation in one folder: sources with their hashes and archive copies,
 claims with how well each is supported, a timeline, a network of who quoted whom, and leads. Its
 exports are signed, so a newsroom, a lawyer or a researcher can check them offline.
 
 **Something looks wrong. Where do I report it?**
 Press **This was wrong** under the sign for your own count, and open an issue at
-[github.com/HarperZ9/daylight-commons/issues](https://github.com/HarperZ9/daylight-commons/issues)
+[github.com/HarperZ9/cmmns/issues](https://github.com/HarperZ9/cmmns/issues)
 for a fix. Security reports go through [SECURITY.md](../../SECURITY.md).

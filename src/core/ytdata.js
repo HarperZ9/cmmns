@@ -1,6 +1,6 @@
 // Reads metadata out of the data YouTube's own web app has already downloaded for the page
 // (ytInitialData, ytInitialPlayerResponse and its /youtubei/v1 responses), passed on by
-// src/ext/ytsniff.js. Daylight Commons makes no request of its own. YouTube renames these structures often,
+// src/ext/ytsniff.js. CMMNS makes no request of its own. YouTube renames these structures often,
 // so every field is optional and the walkers look for both the old and new comment shapes.
 
 const txt = (v) => (!v ? null : typeof v === "string" ? v : v.simpleText || v.content || (Array.isArray(v.runs) ? v.runs.map((r) => r.text).join("") : null));

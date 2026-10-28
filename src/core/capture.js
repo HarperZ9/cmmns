@@ -62,7 +62,7 @@ export function captureRecord({ meta = {}, files = [], screenshot = null, page =
     format: CAPTURE_FORMAT,
     captured: { utc: new Date(now).toISOString(), offset_minutes: offsetMinutes },
     page: { url: page.url || meta.pageUrl || null, title: page.title || null },
-    tool: { name: "Daylight Commons", version: tool.version || null, browser: tool.browser || null },
+    tool: { name: "CMMNS", version: tool.version || null, browser: tool.browser || null },
     artifact: files.map((f) => ({ name: f.name, sha256: f.sha256, saved_sha256: f.saved_sha256 || f.sha256, bytes: f.bytes, mime: f.mime || null, made: f.made || null })),
     words: { site: meta.site || null, post: meta.postUrl || null, media: meta.mediaUrl || null, text: meta.text || null, text_complete: meta.textComplete !== false, posted: meta.postedAt || null },
     engagement: meta.engagement || null,

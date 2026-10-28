@@ -1,6 +1,6 @@
 // Where a board's plates come from, for the Boards page: a 3.6.0 moodboard in this browser's
 // collections (opened as a board, nothing rewritten), or a folder of saves the person picks (the
-// Daylight folder, or one site's or the study folder), read with the browser's folder picker. Each
+// CMMNS folder, or one site's or the study folder), read with the browser's folder picker. Each
 // plate's file becomes a blob address for the page; nothing leaves the browser.
 globalThis.PBBoardsRead = (() => {
   "use strict";

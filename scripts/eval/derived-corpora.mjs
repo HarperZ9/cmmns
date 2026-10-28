@@ -28,7 +28,7 @@ const hatemapTr = (dir) => readJsonl(dir, "derive-hatemap-tr.jsonl").map((r) =>
 
 // K-MHaS: 0 origin, 1 physical, 2 politics, 3 profanity, 4 age, 5 gender, 6 race, 7 religion, 8 not hate.
 // Group hate is any class but profanity, physical appearance and not-hate. Profanity alone, and
-// remarks on one person's looks, are hostile only: Daylight Commons' markers are about groups.
+// remarks on one person's looks, are hostile only: CMMNS' markers are about groups.
 const KMHAS = ["origin", "physical", "politics", "profanity", "age", "gender", "race", "religion"];
 const kmhas = (dir) => readJsonl(dir, "derive-kmhas.jsonl").map((r) => {
   const t = r.labels.filter((l) => l !== 1 && l !== 3 && l !== 8).map((l) => KMHAS[l]);

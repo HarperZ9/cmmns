@@ -26,7 +26,7 @@ export function credentialRows(r) {
   if (r.error) return [["Content Credentials", r.error]];
   const rows = [], state = credentialState(r);
   if (state === "none") rows.push(["Content Credentials", NO_CREDENTIALS]);
-  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}, which Daylight Commons leaves unfetched.`]);
+  else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}, which CMMNS leaves unfetched.`]);
   else if (r.broken) rows.push(["Content Credentials", `found, but ${r.broken}`]);
   else {
     rows.push(["Content Credentials", state === "unchanged" ? "found and checked: the file is unchanged since it was signed"
@@ -54,15 +54,15 @@ export function credentialSignals(r) {
   if (!r || r.error) return [];
   const out = [], state = credentialState(r);
   if (r.found && r.aiAnywhere) {
-    out.push({ label: "credentials: made with AI", fam: "c2pa", level: "warn", cat: "media", rows: [["What Daylight Commons read", r.active.ai ? `The file's Content Credentials say it was ${made(r)}.` : "The credentials say an earlier version of this file was made with generative AI."], ["Signed by", who(r.active.cert && r.active.cert.subject)], ["Checks", state === "unchanged" ? "signature, assertions and file bytes all match" : state], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+    out.push({ label: "credentials: made with AI", fam: "c2pa", level: "warn", cat: "media", rows: [["What CMMNS read", r.active.ai ? `The file's Content Credentials say it was ${made(r)}.` : "The credentials say an earlier version of this file was made with generative AI."], ["Signed by", who(r.active.cert && r.active.cert.subject)], ["Checks", state === "unchanged" ? "signature, assertions and file bytes all match" : state], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   } else if (r.found && state === "unchanged") {
     const m = made(r);
-    out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What Daylight Commons read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
+    out.push({ label: "content credentials", fam: "c2pa", level: "info", cat: "media", rows: [["What CMMNS read", m ? `The credentials say it was ${m}.` : "The file carries signed credentials."], ["Signed by", who(r.active.cert && r.active.cert.subject)], dnp(CREDENTIALS_DO_NOT_PROVE)] });
   }
-  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What Daylight Commons found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms also break credentials in ordinary use.")] });
+  if (r.found && state === "changed") out.push({ label: "credentials do not match", fam: "c2pa-changed", level: "flag", cat: "media", rows: [["What CMMNS found", failed(r).join("; ") || r.broken], dnp("Editing tools and platforms also break credentials in ordinary use.")] });
   const ai = ((r.meta && r.meta.sourceTypes) || []).find((t) => t.kind === "ai");
   if (ai || ((r.meta && r.meta.generators) || []).length) {
-    out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What Daylight Commons read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
+    out.push({ label: "metadata: made with AI", fam: "ai-metadata", level: "flag", cat: "media", rows: [["What CMMNS read", ai ? `The file's metadata says it was ${ai.says} (IPTC ${ai.code}).` : r.meta.generators.join("; ")], dnp("Metadata is unsigned: anyone can add, copy or remove it.")] });
   }
   return out;
 }

@@ -1,4 +1,4 @@
-// `daylight case <command>`: an investigation folder from the command line. Every command except
+// `cmmns case <command>`: an investigation folder from the command line. Every command except
 // `add <url>`, `run` and `watch` works offline. project-docs/INVESTIGATE.md documents the format.
 import { resolve } from "node:path";
 import { writeFileSync } from "node:fs";
@@ -18,7 +18,7 @@ import { CASE_HELP, helpText } from "./help.mjs";
 import { ProtectionBlocked } from "../../src/investigate/protection.js";
 import { protectEnv, settings } from "./case-protect.mjs";
 
-export const CASE_USAGE = `Usage: daylight case <command> [--case <folder>] [--json]
+export const CASE_USAGE = `Usage: cmmns case <command> [--case <folder>] [--json]
   init <name> [--dir <folder>]                 a new case folder with its own git repository
   add <url|file> [--archive | --no-archive] [--origin O] [--tier T] [--date D] [--what W]
   claim "<text>" --source S01 --rung documented|inference|unproven|contradicted
@@ -179,8 +179,8 @@ const READ_ONLY = new Set(["claims", "labels", "trace", "timeline", "network", "
 
 export async function runCaseCommand(argv, base = {}) {
   const args = parseCaseArgs(argv), cmd = args._.shift();
-  if (cmd === "help" && CASE_HELP[args._[0]]) return { code: 0, out: helpText(CASE_HELP[args._[0]], `daylight case ${args._[0]}`) };
-  if (cmd && args.f.help && CASE_HELP[cmd]) return { code: 0, out: helpText(CASE_HELP[cmd], `daylight case ${cmd}`) };
+  if (cmd === "help" && CASE_HELP[args._[0]]) return { code: 0, out: helpText(CASE_HELP[args._[0]], `cmmns case ${args._[0]}`) };
+  if (cmd && args.f.help && CASE_HELP[cmd]) return { code: 0, out: helpText(CASE_HELP[cmd], `cmmns case ${cmd}`) };
   if (!cmd || cmd === "help" || args.f.help) return { code: cmd ? 0 : 2, out: CASE_USAGE };
   const net = network(base.env || process.env);
   const env = { now: clock(base.env || process.env), ...net, ...base };

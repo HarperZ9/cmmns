@@ -1,0 +1,193 @@
+{
+  "kind": "radar-evidence-bundle",
+  "version": 2,
+  "schema": "urn:radar:evidence:v2",
+  "api": "2.0.0",
+  "tool": "Daylight Commons 3.8.0 (daylight case)",
+  "savedAt": "2026-10-26T12:00:00.000Z",
+  "dataLock": null,
+  "input": {
+    "kind": "text",
+    "site": null,
+    "page": null,
+    "source": "export",
+    "accounts": null
+  },
+  "posts": [
+    {
+      "id": "CHANGES.md"
+    },
+    {
+      "id": "DOSSIER.html"
+    },
+    {
+      "id": "DOSSIER.md"
+    },
+    {
+      "id": "SHA256SUMS"
+    },
+    {
+      "id": "export.json"
+    },
+    {
+      "id": "network.html"
+    },
+    {
+      "id": "network.json"
+    }
+  ],
+  "textIncluded": false,
+  "evidence": [
+    {
+      "id": "e1",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "CHANGES.md",
+      "shows": "sha256 91c711aa9808441ebbe5a81d5128f78fc234a7b2117c273dce241286e529d52f, 64 bytes",
+      "source": "daylight case export, profile newsroom, case \"Harbour sale\"",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "CHANGES.md"
+      ],
+      "spans": [],
+      "data": {
+        "path": "CHANGES.md",
+        "sha256": "91c711aa9808441ebbe5a81d5128f78fc234a7b2117c273dce241286e529d52f",
+        "bytes": 64
+      }
+    },
+    {
+      "id": "e2",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "DOSSIER.html",
+      "shows": "sha256 5be2647d6b64fca04c6667eea22963d14c79428cd3b04a5831bd5c2839b08403, 2361 bytes",
+      "source": "daylight case export, profile newsroom, case \"Harbour sale\"",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "DOSSIER.html"
+      ],
+      "spans": [],
+      "data": {
+        "path": "DOSSIER.html",
+        "sha256": "5be2647d6b64fca04c6667eea22963d14c79428cd3b04a5831bd5c2839b08403",
+        "bytes": 2361
+      }
+    },
+    {
+      "id": "e3",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "DOSSIER.md",
+      "shows": "sha256 b767bf3d9b2e51a538efae1ed3ab2be27948058f9a994215f1ff5e3bc6b3f186, 1524 bytes",
+      "source": "daylight case export, profile newsroom, case \"Harbour sale\"",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "DOSSIER.md"
+      ],
+      "spans": [],
+      "data": {
+        "path": "DOSSIER.md",
+        "sha256": "b767bf3d9b2e51a538efae1ed3ab2be27948058f9a994215f1ff5e3bc6b3f186",
+        "bytes": 1524
+      }
+    },
+    {
+      "id": "e4",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "SHA256SUMS",
+      "shows": "sha256 1e425a0cb8403a7cf53e0c682fcca2ee1a88e5a36f7279aab5a7dc126a501086, 469 bytes",
+      "source": "daylight case export, profile newsroom, case \"Harbour sale\"",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "SHA256SUMS"
+      ],
+      "spans": [],
+      "data": {
+        "path": "SHA256SUMS",
+        "sha256": "1e425a0cb8403a7cf53e0c682fcca2ee1a88e5a36f7279aab5a7dc126a501086",
+        "bytes": 469
+      }
+    },
+    {
+      "id": "e5",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "export.json",
+      "shows": "sha256 01c5518b44520388d345536d19255247c2beb5797175cb463b475ec5cd0c4540, 739 bytes",
+      "source": "daylight case export, profile newsroom, case \"Harbour sale\"",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "export.json"
+      ],
+      "spans": [],
+      "data": {
+        "path": "export.json",
+        "sha256": "01c5518b44520388d345536d19255247c2beb5797175cb463b475ec5cd0c4540",
+        "bytes": 739
+      }
+    },
+    {
+      "id": "e6",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "network.html",
+      "shows": "sha256 5026f2588c6f221b72cc706fa9cd11d1374bec1eb2e1326b622904939a9be433, 1617 bytes",
+      "source": "daylight case export, profile newsroom, case \"Harbour sale\"",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "network.html"
+      ],
+      "spans": [],
+      "data": {
+        "path": "network.html",
+        "sha256": "5026f2588c6f221b72cc706fa9cd11d1374bec1eb2e1326b622904939a9be433",
+        "bytes": 1617
+      }
+    },
+    {
+      "id": "e7",
+      "kind": "case-file",
+      "scope": "file",
+      "level": "info",
+      "label": "network.json",
+      "shows": "sha256 ef036d5be4aca83008ba1ac9e2118eec8b6c2d793b1e3eaddab5ec6ee511d3ba, 221 bytes",
+      "source": "daylight case export, profile newsroom, case \"Harbour sale\"",
+      "context": "A matching hash shows this file is the one exported. It does not show that its content is true.",
+      "posts": [
+        "network.json"
+      ],
+      "spans": [],
+      "data": {
+        "path": "network.json",
+        "sha256": "ef036d5be4aca83008ba1ac9e2118eec8b6c2d793b1e3eaddab5ec6ee511d3ba",
+        "bytes": 221
+      }
+    }
+  ],
+  "limits": [
+    "Case export, profile newsroom. Rehash each file and compare with its item to check it.",
+    "A valid signature shows the holder of this key signed the bundle and that it is unchanged since. Check the key id with the signer by another route, and read each span against its post."
+  ],
+  "signer": {
+    "alg": "ECDSA P-256 SHA-256",
+    "keyId": "2b7df91ef30bb819",
+    "publicKey": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "1ywGfKAQkC2dThcTjVicSQRbtSp7u-6bajVlnM6Tm0o",
+      "y": "i5weDCrsyawwrG8fVrgFvniKLko8zlgCWm9xR6k46HY"
+    }
+  },
+  "signature": {
+    "of": "canonical JSON of this bundle without the signature field (sorted keys, no spaces)",
+    "value": "eB5A_QTwCOi06sLXXUyb7I5UcoIC2CptbtxUeVOmewcBXC_dWYjsepQx0DutKHcLE_Z8WMkkV2VgJycQhaxJIA"
+  }
+}

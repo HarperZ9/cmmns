@@ -1,4 +1,4 @@
-// Protected media, found before anything is saved. Daylight Commons never touches DRM or Encrypted
+// Protected media, found before anything is saved. CMMNS never touches DRM or Encrypted
 // Media Extensions streams: it says plainly that the media is protected and stops. Three places can
 // show protection: the page element (a video with MediaKeys attached plays through EME), the
 // manifest (HLS keys, DASH ContentProtection, media-hls.js and media-dash.js), and the file itself
@@ -6,7 +6,7 @@
 
 import { readBoxes } from "./media-read.js";
 
-export const PROTECTED_LINE = "This media is protected (DRM or encrypted). Daylight Commons does not save protected media, and there is nothing to change in the settings to allow it.";
+export const PROTECTED_LINE = "This media is protected (DRM or encrypted). CMMNS does not save protected media, and there is nothing to change in the settings to allow it.";
 
 // The four-character codes that only appear in encrypted MP4: protected sample entries, the
 // protection scheme box, the track encryption box and the system-specific header.

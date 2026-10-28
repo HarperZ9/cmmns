@@ -1,4 +1,4 @@
-// `daylight sidecar check` on the files a note names: a note left naming another save's file is
+// `cmmns sidecar check` on the files a note names: a note left naming another save's file is
 // found, and repaired only when a file carries the note's post address and was written in its
 // save's window. A file with no address inside, or two that could fit, is reported and left alone.
 import test from "node:test";

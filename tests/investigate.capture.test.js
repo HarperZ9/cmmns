@@ -1,4 +1,4 @@
-// daylight case, capture side (src/investigate/capture.js, wayback.js, add.js, ingest.js): pages and
+// cmmns case, capture side (src/investigate/capture.js, wayback.js, add.js, ingest.js): pages and
 // posts are hashed as captured, login walls are refused, the Wayback request retries with backoff,
 // and screenshots and seeds are read the way the hand-made cases read them. No test touches the network.
 import test from "node:test";

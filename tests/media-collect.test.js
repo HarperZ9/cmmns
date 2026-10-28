@@ -1,6 +1,6 @@
 // Collections and hash lineage (src/core/media-collect.js): a saved file keeps its hash, source
 // and time; every converted copy keeps its own hash and a chain of steps back to the original;
-// checkLineage finds a broken or forged chain; a case row carries what `daylight case` checks.
+// checkLineage finds a broken or forged chain; a case row carries what `cmmns case` checks.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";

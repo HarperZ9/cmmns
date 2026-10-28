@@ -12,7 +12,7 @@ export const REPORT_LESSONS = [
       { side: "none", topic: "war", kind: "sign", text: "A reply links to a site that a takedown report listed among an operation's fake news outlets, with an article that appeared on that site alone." },
       { side: "none", topic: "media", kind: "fair", text: "A researcher links the same site to show readers what the operation published, and says so in the post." },
     ],
-    why: "These operations hide who speaks. They build outlets and personas that look local and independent. So a claim seems to come from many people when one paymaster sent it. Reports name the assets so anyone can check them. Sources often disagree on who ran an operation: one says linked to, another says directed by. Daylight Commons shows each one.",
+    why: "These operations hide who speaks. They build outlets and personas that look local and independent. So a claim seems to come from many people when one paymaster sent it. Reports name the assets so anyone can check them. Sources often disagree on who ran an operation: one says linked to, another says directed by. CMMNS shows each one.",
     spot: "Read the report's own words on attribution. Linked to is weaker than run by. Note the date, because a domain can expire and someone else can buy it.",
     counter: "Ask who first published the claim, and who checked it since. Find the story at outlets that sign their work and correct their errors.",
     dnp: "The report dates from its publication, and people sell domains on. The person who shares the link can be warning others about it.",

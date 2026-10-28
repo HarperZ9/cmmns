@@ -1,5 +1,5 @@
 // Posts from a Bluesky repository export (Settings > Export my data gives a .car file). A CAR v1
-// file is a header and a list of blocks, each a CID and DAG-CBOR bytes. Daylight Commons decodes every block,
+// file is a header and a list of blocks, each a CID and DAG-CBOR bytes. CMMNS decodes every block,
 // keeps the app.bsky.feed.post records, and names each post by its record key, read from the
 // repository's key tree (MST). Everything in the file is the user's own data.
 

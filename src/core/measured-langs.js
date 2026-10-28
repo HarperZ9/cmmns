@@ -50,6 +50,6 @@ export function langLine(code) {
   const r = MEASURED_LANGS[code];
   if (!r || !r.n) return `Found by the ${name} word list. Not measured in ${name}.`;
   if (r.n < MIN_N) return `Found by the ${name} word list. Not measured in ${name}: ${r.n} of these signs in labelled text.`;
-  return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of the strong signs Daylight Commons found were on text people labelled ` +
+  return `Found by the ${name} word list. In ${name}, ${pc(r.precision)}% of the strong signs CMMNS found were on text people labelled ` +
     `hostile (95% interval ${pc(r.low)} to ${pc(r.high)}%, ${r.n} checked, ${r.sources}).`;
 }

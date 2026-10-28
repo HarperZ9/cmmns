@@ -10,7 +10,7 @@ import { resolveObjectURL } from "node:buffer";
 import vm from "node:vm";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const src = (f) => readFileSync(resolve(root, process.env.DAYLIGHT_SIM_SRC || ".", f), "utf8");
+const src = (f) => readFileSync(resolve(root, process.env.CMMNS_SIM_SRC || process.env.DAYLIGHT_SIM_SRC || ".", f), "utf8");
 const DOWNLOADS = "C:\\Users\\reader\\Downloads\\";
 
 const listeners = () => { const l = []; return { l, addListener: (f) => l.push(f), removeListener: (f) => { const i = l.indexOf(f); if (i >= 0) l.splice(i, 1); } }; };

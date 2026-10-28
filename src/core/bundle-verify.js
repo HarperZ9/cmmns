@@ -60,11 +60,11 @@ async function signatureOk(bundle) {
 // { ok, keyId, checks: [{ name, ok, text }] }; ok is true only when every check passes.
 export async function verifyBundle(bundle, opts = {}) {
   const checks = [];
-  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this file lacks the Daylight Commons evidence bundle kind" }] };
+  if (!bundle || bundle.kind !== BUNDLE_KIND) return { ok: false, keyId: null, checks: [{ name: "kind", ok: false, text: "this file lacks the CMMNS evidence bundle kind" }] };
   const known = BUNDLE_VERSIONS.includes(bundle.version);
-  checks.push({ name: "version", ok: known, text: known ? `bundle version ${bundle.version}` : `bundle version ${bundle.version}; this Daylight Commons reads versions ${BUNDLE_VERSIONS.join(" and ")}` });
+  checks.push({ name: "version", ok: known, text: known ? `bundle version ${bundle.version}` : `bundle version ${bundle.version}; this CMMNS reads versions ${BUNDLE_VERSIONS.join(" and ")}` });
   checks.push({ name: "signature", ...(await signatureOk(bundle)) });
-  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is unknown to this Daylight Commons` });
+  if (bundle.profile !== undefined) checks.push(bundle.profile === CARRIER_SAFE ? { name: "profile", ok: true, text: CARRIER_SAFE_NOTE } : { name: "profile", ok: false, text: `profile "${bundle.profile}" is unknown to this CMMNS` });
   const keyId = bundle.signer ? bundle.signer.keyId : null;
   if (opts.keyId) checks.push({ name: "key", ok: opts.keyId === keyId, text: opts.keyId === keyId ? "signed by the key you expected" : `signed by key ${keyId}, not ${opts.keyId}` });
   const C = bundleConsistency(bundle);

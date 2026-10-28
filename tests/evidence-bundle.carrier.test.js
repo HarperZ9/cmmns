@@ -22,7 +22,7 @@ const THREAD = JSON.parse(readFileSync(join(ROOT, "tests", "fixtures", "integrat
 const result = analyzeThread(THREAD, { now: Date.parse("2026-10-02T00:00:00Z") });
 const LOCK = { alg: "SHA-256", of: "test", value: "0".repeat(64) };
 const PAGE = "https://x.com/someone/status/1234567890123456789";
-const carrier = (opts = {}) => makeBundle(result, { profile: "carrier-safe", tool: "Daylight Commons 3.1.0 (CLI)", dataLock: LOCK, savedAt: "2026-10-23T14:05:09.123Z", page: PAGE, ...opts }).bundle;
+const carrier = (opts = {}) => makeBundle(result, { profile: "carrier-safe", tool: "CMMNS 3.1.0 (CLI)", dataLock: LOCK, savedAt: "2026-10-23T14:05:09.123Z", page: PAGE, ...opts }).bundle;
 const dir = mkdtempSync(join(tmpdir(), "radar-carrier-"));
 test.after(() => rmSync(dir, { recursive: true, force: true }));
 const cli = (args, env = {}) => spawnSync(process.execPath, [join(ROOT, "bin", "radar.mjs"), ...args], { encoding: "utf8", env: { ...process.env, ...env } });
@@ -45,10 +45,10 @@ test("2. no carrier-safe bundle carries a time of day, anywhere in the file", as
   const verse = await signCarrierSafe(carrier({ includeText: true, texts: { [THREAD.root.id]: "John 3:16 at 9:05 pm" } }));
   assert.equal(verse.posts.find((p) => p.id === THREAD.root.id).text, "John 3:16 at " + " ".repeat("9:05 pm".length), "a clock time is blanked to its length; a verse number is not a time");
   assert.equal(b.savedAt, "2026-10-23");
-  assert.equal(b.tool, "Daylight Commons 3");
+  assert.equal(b.tool, "CMMNS 3");
   assert.equal(b.profile, "carrier-safe");
   assert.deepEqual(validate(SCHEMA, b), [], "a day-only savedAt fits the schema");
-  const ordinary = makeBundle(result, { tool: "Daylight Commons 3.1.0", dataLock: LOCK, savedAt: "2026-10-23T14:05:09.123Z" }).bundle;
+  const ordinary = makeBundle(result, { tool: "CMMNS 3.1.0", dataLock: LOCK, savedAt: "2026-10-23T14:05:09.123Z" }).bundle;
   assert.match(JSON.stringify(ordinary), /T\d\d:\d\d/, "the ordinary profile still keeps the exact time");
 });
 

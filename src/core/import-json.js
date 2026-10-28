@@ -1,6 +1,6 @@
 // Threads from JSON a platform's own web app or API returned, saved by the user: X's GraphQL
 // TweetDetail, Bluesky's app.bsky.feed.getPostThread, a Mastodon status context, or a thread in
-// Daylight Commons' own input shape ({ site, root, replies }). Field names follow each platform's public
+// CMMNS' own input shape ({ site, root, replies }). Field names follow each platform's public
 // formats; the readers walk the JSON, so a wrapper around the response does not matter.
 
 import { htmlText } from "./import-html.js";
@@ -69,10 +69,10 @@ function mastoThread(json) {
 
 const isRadarShape = (j) => j && Array.isArray(j.replies) && j.replies.every((r) => r && typeof r.text === "string");
 
-// Returns { site, root, replies } or null when the JSON holds no thread Daylight Commons can read.
+// Returns { site, root, replies } or null when the JSON holds no thread CMMNS can read.
 export function threadFromJson(json) {
   if (!json || typeof json !== "object") return null;
-  // Daylight Commons' own shape is typed or assembled by hand: its timePrecision is kept as given, and
+  // CMMNS' own shape is typed or assembled by hand: its timePrecision is kept as given, and
   // when it is missing the times are not assumed to be second-precise (precision.js infers it).
   if (isRadarShape(json)) return { site: json.site || null, root: json.root || null, replies: json.replies, ...(Array.isArray(json.quoted) ? { quoted: json.quoted } : {}), ...(json.timePrecision ? { timePrecision: json.timePrecision } : {}) };
   const text = JSON.stringify(json).slice(0, 2000000);

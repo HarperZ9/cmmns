@@ -76,7 +76,7 @@ test("WebM with VP9 video and Opus audio reads back block for block", () => {
   const info = one(seg.children, "1549A966").children;
   assert.equal(readEbmlUint(bytes, one(info, "2AD7B1")), 1000000);
   assert.equal(readEbmlFloat(bytes, one(info, "4489")), 3000);
-  assert.equal(readEbmlText(bytes, one(info, "4D80")), "Daylight Commons");
+  assert.equal(readEbmlText(bytes, one(info, "4D80")), "CMMNS");
   const entries = byId(one(seg.children, "1654AE6B").children, "AE");
   assert.equal(entries.length, 2);
   assert.deepEqual(entries.map((e) => readEbmlText(bytes, one(e.children, "86"))), ["V_VP9", "A_OPUS"]);
@@ -175,7 +175,7 @@ test("Ogg Opus pages: CRCs, BOS and EOS, granules and a packet spanning pages", 
   assert.ok(pages[pages.length - 1].eos && pages.slice(0, -1).every((p) => !p.eos));
   assert.deepEqual(bytes.slice(pages[0].bodyStart, pages[0].bodyStart + pages[0].bodySize), opusHead({ channels: 2, sampleRate: 48000 }));
   const tags = new TextDecoder().decode(bytes.subarray(pages[1].bodyStart, pages[1].bodyStart + pages[1].bodySize));
-  assert.ok(tags.startsWith("OpusTags") && tags.includes("Daylight Commons"));
+  assert.ok(tags.startsWith("OpusTags") && tags.includes("CMMNS"));
   assert.equal(pages[0].granule, 0);
   assert.equal(pages[pages.length - 1].granule, 120 * 960, "granules count decoded samples, pre-skip included");
   const trimmed = readOggPages(muxOggOpus({ channels: 2, preSkip: 3840, packets, totalSamples: 110000 }));

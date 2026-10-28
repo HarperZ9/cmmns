@@ -60,7 +60,7 @@ test("the three real coarse-time runs are all here and fire no timing burst", ()
 
 test("the case-study run, as a bundle, carries no burst either", () => {
   const r = analyseFile("case-study-t01.json");
-  const built = makeBundle(r, { tool: "Daylight Commons test", dataLock: null, source: "thread" });
+  const built = makeBundle(r, { tool: "CMMNS test", dataLock: null, source: "thread" });
   assert.equal(built.ok, true, built.reason);
   assert.ok(!built.bundle.evidence.some((e) => e.kind === "timing-burst"));
   assert.ok(built.bundle.evidence.some((e) => e.kind === "timing-not-observable"));
@@ -165,7 +165,7 @@ test("a posting pattern from day-precise times shows no hours and no round-the-c
   assert.ok(flagsFor({ handle: "a", pattern: bySecond }).some((f) => f.id === "no-sleep-gap"));
 });
 
-test("platform formats carry their own precision; Daylight Commons' own shape keeps what it is given", () => {
+test("platform formats carry their own precision; CMMNS' own shape keeps what it is given", () => {
   const fx = (f) => importFile(f, readFileSync(join(ROOT, "tests", "fixtures", "integration", f)));
   assert.equal(fx("x-saved.html").input.timePrecision, "second");
   assert.equal(fx("thread.json").input.timePrecision, "second");

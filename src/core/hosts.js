@@ -5,7 +5,7 @@
 // archives pages, it shortens links), with the same treatment for services of every country and
 // every direction.
 
-// Two-part public suffixes Daylight Commons meets in the feed and in links. Not the full Public Suffix List:
+// Two-part public suffixes CMMNS meets in the feed and in links. Not the full Public Suffix List:
 // a missing suffix files "x.co.zz" under "co.zz", which matches no table row and shows nothing.
 const SUFFIX2 = new Set(("co.uk org.uk gov.uk ac.uk me.uk com.au net.au org.au gov.au edu.au co.nz govt.nz org.nz co.in gov.in org.in net.in nic.in " +
   "co.jp or.jp ne.jp go.jp com.br gov.br org.br jus.br leg.br co.za gov.za org.za com.mx gob.mx org.mx com.ar gob.ar com.tr gov.tr org.tr " +

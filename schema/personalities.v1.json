@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:radar:personalities:v1",
-  "title": "Daylight Commons personalities table, version 1",
+  "title": "CMMNS personalities table, version 1",
   "description": "src/ext/personalities.json: documented backing of public media personalities, built by scripts/personalities-build.mjs. Every row quotes its sources, gives the date each was read and says what it does not prove. There is no field for a person's political position, and none for private data. data/personalities.README.md documents the method.",
   "type": "object",
   "required": ["about", "built", "wikidataFetched", "quotesChecked", "people"],

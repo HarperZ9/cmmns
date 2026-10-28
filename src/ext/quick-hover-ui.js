@@ -24,7 +24,7 @@ svg { width: 16px; height: 16px; fill: currentColor; }
   .menu button:focus-visible { outline-color: #ece5d6; } .menu hr { border-top-color: #38363b; } }`;
   const DOWN = "M12 3.5a1 1 0 0 1 1 1v8.09l2.8-2.8a1 1 0 1 1 1.4 1.42l-4.5 4.5a1 1 0 0 1-1.4 0l-4.5-4.5a1 1 0 0 1 1.4-1.42l2.8 2.8V4.5a1 1 0 0 1 1-1zM5 18.5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1z";
   const MORE = "M6 10.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z";
-  const ITEMS = [["study", "Study"], ["gif", "Download as GIF"], ["copy", "Copy"], ["link", "Copy link"], ["caption", "Copy with caption"], ["daylight", "Save to Daylight"], null, ["never", "Never on this site"], ["off", "Turn off hover download"]];
+  const ITEMS = [["study", "Study"], ["gif", "Download as GIF"], ["copy", "Copy"], ["link", "Copy link"], ["caption", "Copy with caption"], ["daylight", "Save to CMMNS"], null, ["never", "Never on this site"], ["off", "Turn off hover download"]];
   let host = null, root = null, bar = null, menu = null, onAction = () => {}, items = ITEMS;
 
   function icon(d) {
@@ -92,7 +92,7 @@ svg { width: 16px; height: 16px; fill: currentColor; }
     onAction = handler; items = menuItems || ITEMS;
     if (!bar) {
       bar = document.createElement("div");
-      bar.className = "bar"; bar.setAttribute("role", "group"); bar.setAttribute("aria-label", "Daylight Commons");
+      bar.className = "bar"; bar.setAttribute("role", "group"); bar.setAttribute("aria-label", "CMMNS");
       const dl = button("Download", DOWN, () => onAction("download"));
       const more = button("More ways to save", MORE, () => (menu ? closeMenu() : openMenu(more)), { "aria-haspopup": "menu" });
       bar.append(dl, more);

@@ -1,4 +1,4 @@
-// "What Daylight shows about you" (src/core/self-audit.js, bin/lib/protect.mjs, src/ext/selfaudit.*).
+// "What CMMNS shows about you" (src/core/self-audit.js, bin/lib/protect.mjs, src/ext/selfaudit.*).
 // The audit runs only on the user's own account: proved by the page's own signed-in markers or by
 // the platform's own data export. These tests hold that line: no handle can be typed or passed.
 import { test } from "node:test";

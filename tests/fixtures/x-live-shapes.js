@@ -32,6 +32,6 @@ export const liveTweet = (id, handle, extra = {}) => ({
   ...extra,
 });
 
-// The Retweeters response wraps users in timeline entries; only the walk matters to Daylight Commons.
+// The Retweeters response wraps users in timeline entries; only the walk matters to CMMNS.
 export const retweetersResponse = (handles) => ({ data: { retweeters_timeline: { timeline: { instructions: [{ type: "TimelineAddEntries",
   entries: handles.map((h, i) => ({ entryId: `user-${i}`, content: { itemContent: { itemType: "TimelineUser", user_results: { result: liveUser(h) } } } })) }] } } } });

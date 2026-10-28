@@ -28,7 +28,7 @@ field against the limits below and fails on placeholders.
 **Name**
 
 <!-- field:name -->
-Daylight Commons
+CMMNS
 <!-- /field -->
 
 **Summary** (CWS takes it from the manifest `description`; the test keeps the two identical)
@@ -46,12 +46,14 @@ See the evidence behind the replies you read on X, YouTube, Reddit, Facebook, In
 **Description**
 
 <!-- field:description -->
-Daylight Commons shows you the evidence behind the replies you read, right beside them. Rest the pointer on a reply and see where the site places the account, whether other accounts post the same words, and what fact-checkers said about a similar claim. Each sign names its source, so you can check it and decide for yourself.
+CMMNS shows you the evidence behind the replies you read, right beside them. Rest the pointer on a reply and see where the site places the account, whether other accounts post the same words, and what fact-checkers said about a similar claim. Each sign names its source, so you can check it and decide for yourself.
 
-Free and open source (AGPL-3.0). It runs in your browser, with no account and no analytics. It asks only the site you are on. What it keeps stays in your browser, and "Clear all Daylight Commons data" deletes it.
+Formerly Daylight Commons, and Radar before that.
+
+Free and open source (AGPL-3.0). It runs in your browser, with no account and no analytics. It asks only the site you are on. What it keeps stays in your browser, and "Clear all CMMNS data" deletes it.
 
 Evidence with its source. Never a score.
-Every sign says where its data came from and what it shows. Where Daylight Commons has measured a sign against examples people checked by hand, the sign shows how often it was right, with a 95% interval. Other signs say "not measured yet". The transparency page has the full results, the data behind them and their licences.
+Every sign says where its data came from and what it shows. Where CMMNS has measured a sign against examples people checked by hand, the sign shows how often it was right, with a 95% interval. Other signs say "not measured yet". The transparency page has the full results, the data behind them and their licences.
 
 Rest the pointer on a reply on X, YouTube, Reddit, Facebook, Instagram or Bluesky. A window opens beside it with:
 - Place: where the site labels the account as based, and replies that speak as a local of another place.
@@ -60,19 +62,19 @@ Rest the pointer on a reply on X, YouTube, Reddit, Facebook, Instagram or Bluesk
 - Sources: outlet owners, state links where a cited report or official document names them, Community Notes, and fact-checks of similar claims with the fact-checker's own rating.
 - Language: slurs, calls for violence and dehumanising language, measured on public research data.
 - Site cards: rest the pointer on a link to see who owns the site, its owner type, founding date and country from Wikidata, any cited state link, and its fact-check record ("N reviews by M fact-checkers since a date"), with every rating in the fact-checker's own words. Press "Site card for this page" for the news site you are reading. You can also turn on labels under Google, Bing or DuckDuckGo results.
-- Other coverage, when you turn it on: on your click, Daylight Commons reads the news feeds of outlets you choose. It finds the ones that cover the same story and labels each by owner and owner type (state media, public broadcaster, nonprofit, commercial). The page itself stays on your device, and the options page names every outlet it asks.
+- Other coverage, when you turn it on: on your click, CMMNS reads the news feeds of outlets you choose. It finds the ones that cover the same story and labels each by owner and owner type (state media, public broadcaster, nonprofit, commercial). The page itself stays on your device, and the options page names every outlet it asks.
 - A thread report: whether the most extreme replies come mostly from flagged accounts, with intervals. It says "skewed" when the intervals stand apart.
 - Launch campaigns on X, not measured yet: how a launch post's engagement compares with the account's own posts, shared bio templates and join-date waves among the accounts the page loaded, and Paid partnership labels. It states an inference when two or more independent signs agree, and it names accounts the platform discloses as organisations.
 - Evidence receipts, when you turn them on: on your click, a linked repository's creation date, a domain's registration date and its first Internet Archive capture. Each answer is kept as a receipt in a hash chain. You can save the chain and check it offline with the free command line tool.
 
 Protecting you and your sources:
 - Share clean: a copy of any saved file with what it says about itself removed (camera and GPS data, XMP, IPTC, comments, video tags and dates, PDF and office document authors), without re-encoding the picture or sound. Your saved copy keeps everything as evidence.
-- Source protection: one switch that stops every request Daylight Commons would make on its own, makes every download a clean copy and every evidence bundle carrier-safe, and says plainly what it cannot protect against. Not yet independently reviewed.
-- What Daylight shows about you: the same signals, run on your own account only (your own signed-in profile, or your own data export), with what each reveals and how to reduce it.
+- Source protection: one switch that stops every request CMMNS would make on its own, makes every download a clean copy and every evidence bundle carrier-safe, and says plainly what it cannot protect against. Not yet independently reviewed.
+- What CMMNS shows about you: the same signals, run on your own account only (your own signed-in profile, or your own data export), with what each reveals and how to reduce it.
 
-Tell Daylight Commons when it is wrong. Each sign has "This was right" and "This was wrong". Your marks stay in your browser. After ten marks on one kind of sign, the window shows your own count beside the measured figure. You can save your marks to a file and choose whether to share them.
+Tell CMMNS when it is wrong. Each sign has "This was right" and "This was wrong". Your marks stay in your browser. After ten marks on one kind of sign, the window shows your own count beside the measured figure. You can save your marks to a file and choose whether to share them.
 
-How Daylight Commons treats people:
+How CMMNS treats people:
 - It describes posts and accounts. It leaves labels such as bot, propagandist or extremist to you.
 - The same words count the same whoever they target. Political side is never an input, and the transparency page shows how evenly each side is covered.
 - It reads what the site shows. Age, gender, ethnicity, religion and politics stay out of it.
@@ -80,9 +82,9 @@ How Daylight Commons treats people:
 
 Keyboard: focus a post to open its window, Alt+R to move into it, Esc to close it.
 
-How Daylight Commons is measured: https://harperz9.github.io/daylight-commons/transparency.html
-Privacy policy: https://harperz9.github.io/daylight-commons/privacy.html
-Source code: https://github.com/HarperZ9/daylight-commons
+How CMMNS is measured: https://harperz9.github.io/cmmns/transparency.html
+Privacy policy: https://harperz9.github.io/cmmns/privacy.html
+Source code: https://github.com/HarperZ9/cmmns
 <!-- /field -->
 
 | Field | CWS | AMO |
@@ -90,9 +92,9 @@ Source code: https://github.com/HarperZ9/daylight-commons
 | Category | Social & Communication | Social & Communication |
 | Language | English | English |
 | Visibility | Public | Listed |
-| Homepage | https://github.com/HarperZ9/daylight-commons | https://github.com/HarperZ9/daylight-commons |
-| Support | https://github.com/HarperZ9/daylight-commons/issues | https://github.com/HarperZ9/daylight-commons/issues |
-| Privacy policy | https://harperz9.github.io/daylight-commons/privacy.html | https://harperz9.github.io/daylight-commons/privacy.html |
+| Homepage | https://github.com/HarperZ9/cmmns | https://github.com/HarperZ9/cmmns |
+| Support | https://github.com/HarperZ9/cmmns/issues | https://github.com/HarperZ9/cmmns/issues |
+| Privacy policy | https://harperz9.github.io/cmmns/privacy.html | https://harperz9.github.io/cmmns/privacy.html |
 | Mature content | Off | n/a |
 | Licence | n/a | GNU Affero General Public License v3.0 only (AGPL-3.0-only) |
 | Tags (AMO) | n/a | misinformation, fact-check, privacy, social media, transparency |
@@ -117,24 +119,24 @@ Shows the evidence behind the posts and accounts in the social media threads the
 | Host `https://www.reddit.com/*` | Reads comments and Reddit's public account data for comment authors, one account every 2 seconds. |
 | Host `https://www.facebook.com/*`, `https://www.instagram.com/*` | Reads comments and the account transparency details Meta shows when the user opens them. |
 | Host `https://bsky.app/*` | Reads replies, account data and moderation labels the Bluesky app loaded. |
-| `scripting` | Injects the site card into the current tab when the user presses "Site card for this page", and registers the search-result labels only for the engines the user turned on. Also runs Daylight Commons on a Mastodon server only after the user turns it on for that server, and checks, when the user opens the toolbar button on such a page, whether it is the Mastodon web app (its root element, version and domain, nothing else). |
-| `activeTab` | Lets the site card and that one check read the current tab when the user opens the toolbar button, and no other time. The same grant lets "Save media from this page" and the right-click "Save to Daylight" list the images, GIFs, video and audio that tab loaded, once, on that click. |
-| `contextMenus` | Adds right-click items on pictures, video and audio, and on the page for media under a clear layer: Download, Download media here, Study, Download as GIF, Copy, Copy link, Copy with caption and Save to Daylight. Nothing runs until the user picks one. |
+| `scripting` | Injects the site card into the current tab when the user presses "Site card for this page", and registers the search-result labels only for the engines the user turned on. Also runs CMMNS on a Mastodon server only after the user turns it on for that server, and checks, when the user opens the toolbar button on such a page, whether it is the Mastodon web app (its root element, version and domain, nothing else). |
+| `activeTab` | Lets the site card and that one check read the current tab when the user opens the toolbar button, and no other time. The same grant lets "Save media from this page" and the right-click "Save to CMMNS" list the images, GIFs, video and audio that tab loaded, once, on that click. |
+| `contextMenus` | Adds right-click items on pictures, video and audio, and on the page for media under a clear layer: Download, Download media here, Study, Download as GIF, Copy, Copy link, Copy with caption and Save to CMMNS. Nothing runs until the user picks one. |
 | `sidePanel` | Chrome only (Firefox uses `sidebar_action`, which needs no permission). Shows the window for the post under the pointer in the browser's side panel instead of over the page, when the user opens it from the toolbar menu. The panel reads nothing itself; the page sends it what the window would show. |
 | `downloads` | Saves the file the user chose with Download straight to the Downloads folder, named from the page and typed from the file's own first bytes, with no new tab and no second click. Used only on that click. |
 | `clipboardWrite` | Copy and Copy link put the chosen picture (as PNG) or the file's address on the clipboard, only on that click. |
-| `declarativeNetRequest` | Ad and tracker blocking, off until the user turns it on: the EasyList and EasyPrivacy filter lists, compiled into two static rulesets the browser matches itself, and one allow rule for the sites where the user allowed ads. Daylight Commons never reads which requests were blocked and needs no host access for it. |
+| `declarativeNetRequest` | Ad and tracker blocking, off until the user turns it on: the EasyList and EasyPrivacy filter lists, compiled into two static rulesets the browser matches itself, and one allow rule for the sites where the user allowed ads. CMMNS never reads which requests were blocked and needs no host access for it. |
 | Host `https://www.threads.com/*`, `https://www.threads.net/*` | Reads the posts and replies Threads shows on the page. |
 | Host `https://www.tiktok.com/*` | Reads the comments TikTok shows and the comment list its app already loaded. |
-| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on Daylight Commons here" on that server; the browser shows its own prompt. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for one news feed's host at a time (for example `https://feeds.bbci.co.uk/*`) only when the user chooses that outlet or adds that feed for Other coverage, which on the user's click downloads the feed and sends nothing from the page. It is asked for `https://web.archive.org/*` only when the user turns on Evidence lookups, because the Internet Archive's capture index answers a browser extension only with host access, or ticks "Ask the Internet Archive to keep a copy" on a case save. When the user saves media, it is asked for the one host the file or stream comes from (for example `https://pbs.twimg.com/*`), on the Save click, so the save page can download the file the page already loaded; a stream whose segments sit on another host asks again on a second click. The one request for all of `https://*/*` is "Show it on every site" for the hover Download control in the options, asked only when the user turns that on: the control then runs on every https page, reads nothing until the pointer rests on a picture or video, and reads that one file only when the user clicks it. |
+| Optional host `https://*/*` | Asked for one Mastodon server at a time, only when the user clicks "Turn on CMMNS here" on that server; the browser shows its own prompt. The options page lists the servers and takes access back. The same optional permission is asked for `https://www.google.com/*`, `https://www.bing.com/*` or `https://duckduckgo.com/*` only when the user turns on result labels for that engine, and for one news feed's host at a time (for example `https://feeds.bbci.co.uk/*`) only when the user chooses that outlet or adds that feed for Other coverage, which on the user's click downloads the feed and sends nothing from the page. It is asked for `https://web.archive.org/*` only when the user turns on Evidence lookups, because the Internet Archive's capture index answers a browser extension only with host access, or ticks "Ask the Internet Archive to keep a copy" on a case save. When the user saves media, it is asked for the one host the file or stream comes from (for example `https://pbs.twimg.com/*`), on the Save click, so the save page can download the file the page already loaded; a stream whose segments sit on another host asks again on a second click. The one request for all of `https://*/*` is "Show it on every site" for the hover Download control in the options, asked only when the user turns that on: the control then runs on every https page, reads nothing until the pointer rests on a picture or video, and reads that one file only when the user clicks it. |
 
-The APIs Daylight Commons also calls (`action`, `commands` for the Alt+Shift+D shortcut, `tabs.create`,
+The APIs CMMNS also calls (`action`, `commands` for the Alt+Shift+D shortcut, `tabs.create`,
 `tabs.query`, `tabs.sendMessage`, `windows.create`) need no manifest permission.
 
 **YouTube.** The store packages never download YouTube video. On YouTube the hover control saves a
 reference (the thumbnail and a note with the title, channel, link at the current time, description,
 chapters and any transcript the page shows) and copies links. The unpacked and self-distributed
-builds add one menu item that copies a command for Daylight Commons' command line, which uses the
+builds add one menu item that copies a command for CMMNS' command line, which uses the
 user's own yt-dlp; that file (`yt-handoff.js`) is left out of the Chrome Web Store and Firefox
 Add-ons packages, and `tests/store-build.test.js` fails if either package carries it. `tests/store-listing.test.js` fails when the
 manifest asks for a host or permission this table does not justify.
@@ -142,14 +144,14 @@ manifest asks for a host or permission this table does not justify.
 **Remote code:** No, I am not using remote code. Every script ships in the package.
 
 **Data usage.** The CWS user-data FAQ says disclosure applies "even when data is processed or stored
-locally". Tick these, because Daylight Commons reads and keeps them in the browser:
+locally". Tick these, because CMMNS reads and keeps them in the browser:
 
 | CWS category | Ticked | Why |
 |---|---|---|
 | Website content | Yes | Reads the replies and account details on the page; keeps summaries and, only when the user ticks it, a post's text with a feedback mark |
 | Web browsing activity | Yes | Keeps a summary of each thread the user opened, for the history page, and the page address beside each media file the user saves |
 | Website content, sent | Yes | Only with evidence lookups, off by default: on the user's click, the repository names and web domains the post links to go to api.github.com, rdap.org and web.archive.org. Other coverage downloads the feeds of outlets the user chose and sends nothing from the page. A case save with "Ask the Internet Archive" ticked sends the saved file's address to web.archive.org |
-| Personally identifiable information, Health, Financial and payment, Authentication, Personal communications, Location, User activity | No | Daylight Commons reads none of these. The location labels are the sites' public labels about accounts, not the user's location. "What Daylight shows about you" shows the user their own account's public label on their own device and keeps nothing. Share clean reads a file's GPS data only to remove it, and never shows it |
+| Personally identifiable information, Health, Financial and payment, Authentication, Personal communications, Location, User activity | No | CMMNS reads none of these. The location labels are the sites' public labels about accounts, not the user's location. "What CMMNS shows about you" shows the user their own account's public label on their own device and keeps nothing. Share clean reads a file's GPS data only to remove it, and never shows it |
 
 Certifications (tick all three): not sold or transferred to third parties outside the approved use
 cases; not used or transferred for purposes unrelated to the single purpose; not used or
@@ -159,7 +161,7 @@ transferred to determine creditworthiness or for lending.
 
 | Field | Value |
 |---|---|
-| Package | `radar-firefox-<version>.xpi` from the GitHub release, or `npm run package`; AMO signs it |
+| Package | `cmmns-firefox-<version>.xpi` from the GitHub release, or `npm run package`; AMO signs it |
 | Add-on ID | `radar@harperz9.github.io`. Permanent: see DESIGN.md, "Add-on identity" |
 | Minimum version | Firefox 128 (main-world content scripts) |
 | Data collection | `"required": ["none"], "optional": ["websiteContent", "browsingActivity"]`. Nothing is sent by default. A case save with "Ask the Internet Archive to keep a copy" ticked (Firefox then asks for browsing activity) sends the saved file's address to web.archive.org. Evidence lookups, when the user turns them on in Options (Firefox then asks for website content), send the repository names and web domains a post links to GitHub, rdap.org and the Internet Archive. Other coverage downloads public news feeds from hosts the user approved one by one and sends nothing from the page |
@@ -167,7 +169,7 @@ transferred to determine creditworthiness or for lending.
 | Source code | Upload `docs/store/amo-source-<version>.zip` (`node scripts/amo-source.mjs`): `src/core`, `src/ocr`, the build script and `REVIEWER.md`, whose steps remake both generated files byte for byte; nothing is minified |
 | Notes to reviewer | Run `node scripts/serve.mjs` and open `http://127.0.0.1:8742/tests/fixtures/thread.html` to see the window without any account. On a real site, Firefox asks for site access on the first-run page |
 
-Daylight Commons 2.x declared `websiteContent` under `optional` for the GDELT lookup, which sent title
+CMMNS 2.x declared `websiteContent` under `optional` for the GDELT lookup, which sent title
 words. 3.0.0 removed that lookup, and declares `websiteContent` under `optional` again for evidence
 lookups. Any future feature that sends user data must add its data type here first.
 
@@ -176,7 +178,7 @@ lookups. Any future feature that sends user data must add its data type here fir
 Five screenshots in `docs/store/screenshots/`, each 1280x800 (the size CWS requires and AMO
 recommends; use the same files for both stores, in this order). They are of the installed 3.5.0
 Chrome package on real public posts, taken signed out on 2026-10-23 by `scripts/qa/store_shots.py`.
-Every private person's picture, name and handle is blurred, on the page and in Daylight Commons'
+Every private person's picture, name and handle is blurred, on the page and in CMMNS'
 window; the posting organisations (AP, The Guardian, Mastodon) stay readable. Please look through
 them before uploading: blurring is checked by eye, not by a test.
 
@@ -205,7 +207,7 @@ accepting each store's developer agreement and pressing submit are the author's 
 **Chrome Web Store**
 1. Sign in at chrome.google.com/webstore/devconsole with the account that will own the listing.
    Pay the one-time registration fee and accept the developer agreement if this is the first item.
-2. New item: upload `radar-chrome-3.8.0.zip` from the GitHub release v3.8.0. Check its SHA-256
+2. New item: upload `cmmns-chrome-3.9.0.zip` from the GitHub release v3.9.0. Check its SHA-256
    against the release's `SHA256SUMS` first.
 3. Store listing tab: the summary comes from the manifest; paste "Description" from above;
    category Social & Communication; language English; upload the five screenshots in order and the
@@ -218,9 +220,9 @@ accepting each store's developer agreement and pressing submit are the author's 
 **Firefox Add-ons (listed)**
 1. Sign in at addons.mozilla.org/developers with the account that will own the add-on, and accept
    the distribution agreement.
-2. Submit a new add-on, "On this site": upload `radar-firefox-3.8.0.xpi` from the release. The
+2. Submit a new add-on, "On this site": upload `cmmns-firefox-3.9.0.xpi` from the release. The
    add-on id `radar@harperz9.github.io` is set in the package; it must never change.
-3. Source code: answer yes and upload `docs/store/amo-source-3.8.0.zip` (also attached to the
+3. Source code: answer yes and upload `docs/store/amo-source-3.9.0.zip` (also attached to the
    release). Its `REVIEWER.md` gives the steps that remake `core.bundle.js` and `ocr.bundle.js` byte
    for byte from `src/core` and `src/ocr`; nothing is minified.
 4. Paste the name, the AMO summary and the description; licence AGPL-3.0-only; tags from the table;
@@ -232,11 +234,11 @@ accepting each store's developer agreement and pressing submit are the author's 
 1. At addons.mozilla.org/developers/addon/api/key, create an API key and secret. Keep them out of
    the repository, for example in environment variables `WEB_EXT_API_KEY` and
    `WEB_EXT_API_SECRET`.
-2. `npx web-ext sign --channel unlisted --source-dir <unzipped radar-firefox-self-3.8.0.xpi>`, or
+2. `npx web-ext sign --channel unlisted --source-dir <unzipped cmmns-firefox-self-3.9.0.xpi>`, or
    upload that xpi as "On your own" in the developer hub.
-3. Attach the signed file Mozilla returns to the v3.8.0 release, then run
-   `node scripts/firefox-updates.mjs <signed.xpi>` and commit `docs/firefox/updates.json`, so
-   installed copies find the next version.
+3. Attach the signed file Mozilla returns to the v3.9.0 release, then run
+   `node scripts/firefox-updates.mjs <signed.xpi>` and copy `docs/firefox/updates.json` to the site
+   repository as `ext/firefox/updates.json`, so installed copies find the next version.
 
 ## Before each later submission
 

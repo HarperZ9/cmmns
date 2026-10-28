@@ -1,7 +1,7 @@
-// Daylight Commons' window: it fades in beside a post when the pointer rests on the post, stays while the
+// CMMNS' window: it fades in beside a post when the pointer rests on the post, stays while the
 // pointer is on the post or the window, and fades out when it leaves. Clicking inside the window
 // keeps it open until Escape or a click elsewhere. On a touch screen, where nothing hovers, each post
-// gets one small "Daylight Commons" button that opens the window on a tap; otherwise nothing is drawn on the
+// gets one small "CMMNS" button that opens the window on a tap; otherwise nothing is drawn on the
 // page itself. The window has Pin and Close. Content is built from data with textContent only,
 // never innerHTML, so nothing a post says can inject markup.
 (() => {
@@ -46,7 +46,7 @@
     return null;
   }
 
-  // Daylight Commons' own pages (a lesson, the self-check) open in a new tab through the worker, which
+  // CMMNS' own pages (a lesson, the self-check) open in a new tab through the worker, which
   // accepts only those pages (PB.safePage). A content script cannot link to them directly.
   function openButton(label, path) {
     const b = el("button", "pb-link pb-open", label); b.type = "button";
@@ -71,7 +71,7 @@
   }
 
   // A row value is text, { links }, { action: [label, fn, busyLabel] }, { actions: [[label, fn]] },
-  // { feedback }, { open }, { image: dataUrl } (a frame Daylight Commons took from the page's own video), { note }, or a chart.
+  // { feedback }, { open }, { image: dataUrl } (a frame CMMNS took from the page's own video), { note }, or a chart.
   function renderRow(box, h, t) {
     if (!t) return;
     const row = el("div", "pb-row");
@@ -156,13 +156,13 @@
     p.append(controls());
     p.setAttribute("role", "dialog");
     const g = (sections.find((s) => s.glance) || {}).glance;
-    p.setAttribute("aria-label", g && g.who ? `Daylight Commons: ${g.who}` : "Daylight Commons");
+    p.setAttribute("aria-label", g && g.who ? `CMMNS: ${g.who}` : "CMMNS");
     p.tabIndex = -1;
     const n = ++uid;
     const panes = new Map(TABS.map(([id]) => { const pane = el("div", "pb-pane"); pane.id = `pb-pane-${n}-${id}`; pane.setAttribute("role", "tabpanel"); pane.setAttribute("aria-labelledby", `pb-tab-${n}-${id}`); return [id, pane]; }));
     const tabbar = el("div", "pb-tabs");
     tabbar.setAttribute("role", "tablist");
-    tabbar.setAttribute("aria-label", "Daylight Commons sections");
+    tabbar.setAttribute("aria-label", "CMMNS sections");
     const select = (id, area) => {
       lastTab = id;
       for (const [k, pane] of panes) pane.hidden = k !== id;
@@ -219,7 +219,7 @@
     requestAnimationFrame(() => p.classList.add("pb-in"));
   }
 
-  // Returns the window, or null when there is nothing to show (Daylight Commons is off for the site).
+  // Returns the window, or null when there is nothing to show (CMMNS is off for the site).
   function show(target, sections) {
     clearTimeout(closeTimer);
     if (owner === target && pop) return pop;
@@ -263,9 +263,9 @@
   // never reaches the site, so it does not open the post.
   function tap(target, anchor) {
     if (!anchor || !anchor.isConnected || anchor.querySelector(":scope > .pb-tap")) return;
-    const b = el("button", "pb-tap", "Daylight Commons");
+    const b = el("button", "pb-tap", "CMMNS");
     b.type = "button";
-    b.setAttribute("aria-label", "Show what Daylight Commons knows about this post");
+    b.setAttribute("aria-label", "Show what CMMNS knows about this post");
     b.addEventListener("click", (e) => {
       e.preventDefault(); e.stopPropagation();
       if (owner === target && pop) { close(); return; }

@@ -166,7 +166,7 @@
   }
 
   // The swarming sign's marks (src/core/swarming.js): an account is new when it joined under
-  // NEW_ACCOUNT_DAYS before its reply, flagged when Daylight Commons flagged it. Unread accounts are unknown.
+  // NEW_ACCOUNT_DAYS before its reply, flagged when CMMNS flagged it. Unread accounts are unknown.
   function swarmMarks(rows) {
     const by = new Map(rows.filter((r) => r.joinDate || r.flags).map((r) => [String(r.author).toLowerCase(), r]));
     return (h, at) => {
@@ -178,7 +178,7 @@
   }
 
   // Feed dashboard (src/core/feed.js): each feed post once per day, with what it linked and the
-  // signs Daylight Commons read in it. Post ids and counts only; no text is kept.
+  // signs CMMNS read in it. Post ids and counts only; no text is kept.
   const noteOf = (id) => (tweets.get(id) || {}).note || null;
   function recordFeed(site, items) {
     PBLogs.recordFeed(site.name, items.map((r) => {
@@ -194,7 +194,7 @@
 
   // A video with no comments (or comments turned off) still has its own context: the channel,
   // YouTube's funding and paid-promotion labels. Live check 2026-10-21: a state-funded
-  // broadcaster's videos with comments off showed no Daylight Commons panel at all.
+  // broadcaster's videos with comments off showed no CMMNS panel at all.
   function videoOnly(site, feed) {
     // A repost list shows accounts, not posts: the launch campaign lens still reads it.
     if (!feed && globalThis.PBCampaign && PBCampaign.onList()) {
@@ -275,7 +275,7 @@
     if (msg && msg.type === "pb-export" && lastExport) lastExport();
     if (msg && msg.type === "pb-about-result") {
       lookingUp.delete(msg.handle);
-      if (!msg.reading) { failed.add(msg.handle); console.warn("[daylight-commons] lookup gave no reading for", msg.handle, msg.error || ""); }
+      if (!msg.reading) { failed.add(msg.handle); console.warn("[cmmns] lookup gave no reading for", msg.handle, msg.error || ""); }
       schedule();
     }
   });

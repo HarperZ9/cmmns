@@ -92,7 +92,7 @@ function packPages(packets, serial, firstSequence) {
 // Granules count decoded 48 kHz samples from 0, so they include the pre-skip samples that a
 // player drops. With totalSamples (the source PCM length) the last page trims the end to
 // preSkip + totalSamples, never past what the packets decode to.
-export function muxOggOpus({ sampleRate = 48000, channels, preSkip = 3840, packets = [], totalSamples, serial = 0x44434f4d, vendor = "Daylight Commons", head } = {}) {
+export function muxOggOpus({ sampleRate = 48000, channels, preSkip = 3840, packets = [], totalSamples, serial = 0x44434f4d, vendor = "CMMNS", head } = {}) {
   if (!(channels > 0)) throw new Error("muxOggOpus: channels is required");
   const headBytes = head instanceof Uint8Array ? head : opusHead({ channels, sampleRate, preSkip });
   const headPage = { flags: FLAG_BOS, granule: 0, serial, sequence: 0, lacing: laceOne(headBytes.length), body: headBytes };

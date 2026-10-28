@@ -1,6 +1,6 @@
 // Neutral by test (project-docs/VISION.md, "Jurisdiction and the open catalogue"): the same campaign
 // structure gives the same element tables whatever the post is about or which side it argues. And no
-// catalogue text Daylight Commons wrote names a party, a side or a topic.
+// catalogue text CMMNS wrote names a party, a side or a topic.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { elementTables, signalsFromCampaign } from "../src/core/definitions.js";
@@ -44,7 +44,7 @@ test("the quote wording's topic does not change the tables either", () => {
   assert.deepEqual(a, b);
 });
 
-test("Daylight Commons' own catalogue text names no party, side or topic", () => {
+test("CMMNS' own catalogue text names no party, side or topic", () => {
   const SIDE = /\b(?:left|right[- ]wing|liberal|conservative|progressive|democrat\w*|republican\w*|labour|tory|tories|socialist|maga|woke|leftist|immigra\w*|abortion|religio\w*|christian|muslim|jewish|islam\w*)\b/i;
   for (const e of list) {
     const own = [e.title, e.binding_note, e.does_not_prove, ...e.elements.flatMap((el) => [el.label, el.note || ""])].join("\n");

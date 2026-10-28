@@ -1,5 +1,5 @@
 // Upstream-change guard: compares a freshly built (or fetched) table with the locked one and
-// prints a reviewable diff, so an upstream editor cannot silently change what Daylight Commons tells users.
+// prints a reviewable diff, so an upstream editor cannot silently change what CMMNS tells users.
 // It flags, for a person to read before the lock is refreshed:
 //   - mass removal: many keys gone at once;
 //   - bulk edit: many keys changed at once;

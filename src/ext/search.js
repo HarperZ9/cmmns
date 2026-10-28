@@ -1,7 +1,7 @@
 // Site labels on search results. Runs only on the engines the user turned on in the options page
 // (registered by src/ext/sources-bg.js after the browser grants access). Each result link gets a
-// short line of labels from Daylight Commons' bundled tables, such as the owner and any state link, and the
-// full site card on hover. Nothing is sent anywhere: lookups go to Daylight Commons' background worker.
+// short line of labels from CMMNS' bundled tables, such as the owner and any state link, and the
+// full site card on hover. Nothing is sent anywhere: lookups go to CMMNS' background worker.
 (() => {
   "use strict";
   if (globalThis.PBSearch) return;
@@ -26,7 +26,7 @@
         if (!chips.length || !a.isConnected) return;
         const line = document.createElement("div");
         line.className = "pb-site-line";
-        line.textContent = "Daylight Commons: " + chips.join(" · ");
+        line.textContent = "CMMNS: " + chips.join(" · ");
         line.tabIndex = 0;
         line.setAttribute("role", "note");
         const block = a.closest("h2, h3") || a;

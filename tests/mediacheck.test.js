@@ -67,7 +67,7 @@ test("XMP-only AI label: a metadata flag that says metadata is unsigned", async 
   assert.match(text(credentialRows(r)), new RegExp(NO_CREDENTIALS.slice(0, 20)));
 });
 
-test("First seen: the earliest post Daylight Commons saw with the same upload, and X's From credit", () => {
+test("First seen: the earliest post CMMNS saw with the same upload, and X's From credit", () => {
   const vid = { type: "video", url: "https://pbs.twimg.com/amplify_video_thumb/7/img/a.jpg", uploaded: "2026-01-01T00:00:00.000Z" };
   const posts = [{ id: "1", author: "early", posted: "2026-01-02T00:00:00Z", media: [vid] }, { id: "2", author: "later", posted: "2026-03-01T00:00:00Z", media: [vid] }];
   const log = recordSpread({}, posts);

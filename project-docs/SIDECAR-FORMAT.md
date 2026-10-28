@@ -1,7 +1,7 @@
 # Sidecar format: daylight.sidecar/1
 
 Every download saves a Markdown file beside the media, with the same name and `.md`. It is the
-contract between Daylight Commons and any library that reads saved media: the reference library, a
+contract between CMMNS and any library that reads saved media: the reference library, a
 search index, a notes app. The format is versioned. A change that removes or renames a field, or
 changes a field's meaning, raises the number; new optional fields may be added within version 1.
 
@@ -10,8 +10,8 @@ Written by `sidecarMarkdown` and `sidecarJson` in `src/core/media-meta.js`; test
 
 ## Where files go
 
-`Downloads/<save folder>/<site>/` (the save folder is a setting, `Daylight` by default; left empty
-it goes back to `Daylight`). Study saves go to `<save folder>/study/<site>/`. The switch "Save
+`Downloads/<save folder>/<site>/` (the save folder is a setting, `CMMNS` by default; left empty
+it goes back to `CMMNS`). Study saves go to `<save folder>/study/<site>/`. The switch "Save
 straight into Downloads" puts files in Downloads itself (Study in `study/<site>/`). `<site>` is `x`, `reddit`, or the host name of the page.
 
 File names are `<handle>_<date>_<first words of the text>[-n].<ext>` for posts with an author, for
@@ -27,7 +27,7 @@ When a name is already taken, the browser saves the file as `name (1).jpg` (then
 `files` and the File line list the names the browser wrote, read back from it after each download,
 and the sidecar takes the same suffix: `name (1).md` beside `name (1).jpg`, and `name (1).md` for a
 post whose first file became `name-1 (1).jpg`. Notes saved by 3.8.0 and earlier could list the name asked for
-instead. `daylight sidecar check <folder>` reports them, and `--fix` repairs a note only when a file
+instead. `cmmns sidecar check <folder>` reports them, and `--fix` repairs a note only when a file
 carries the note's post address and was written within its save's time (from a minute before
 `saved` to 15 minutes after).
 
@@ -98,7 +98,7 @@ The same description, as one paragraph, is written into the file without re-enco
 `dc:description`, `dc:creator` and `dc:source` in JPEG, PNG and WebP; `©cmt`, `desc` and `©ART` in
 MP4; a comment block in GIF. A file that already carries its own XMP or MP4 metadata is left as it is.
 
-**Share clean removes it.** A copy made with Share clean (Collections, the save page, `daylight
+**Share clean removes it.** A copy made with Share clean (Collections, the save page, `cmmns
 clean <file>`, `case export --clean`) has this description removed along with every other piece of
 file metadata. The `.md` sidecar stays on your disk unless you choose to send it, and the evidence
 copy keeps the description. `tests/clean.test.js` embeds a description in each of the five formats

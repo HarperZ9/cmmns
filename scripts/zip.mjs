@@ -6,7 +6,11 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const FIREFOX_UPDATE_URL = "https://harperz9.github.io/daylight-commons/firefox/updates.json";
+// The update manifest a self-distributed Firefox build checks. It is served from the user site
+// (HarperZ9/HarperZ9.github.io, ext/firefox/updates.json), not from the project Pages, so the address
+// never carries a product or repository name and survives any rename. The add-on id stays
+// radar@harperz9.github.io. The older /radar/firefox/updates.json stays on the site, unread.
+export const FIREFOX_UPDATE_URL = "https://harperz9.github.io/ext/firefox/updates.json";
 export const EXT = join(dirname(fileURLToPath(import.meta.url)), "..", "src", "ext");
 const DOS_TIME = 0, DOS_DATE = (0 << 9) | (1 << 5) | 1;
 
@@ -79,7 +83,7 @@ export function browserManifest(source, browser) {
     m.permissions = m.permissions.filter((p) => p !== "sidePanel");
     const gecko = m.browser_specific_settings.gecko;
     if (!(parseFloat(gecko.strict_min_version) >= 128)) gecko.strict_min_version = "128.0";
-    // The self-distributed build checks Daylight Commons' own site for updates. AMO-listed builds must not
+    // The self-distributed build checks CMMNS' own site for updates. AMO-listed builds must not
     // carry an update address, so only this variant has one.
     if (browser === "firefox-self") gecko.update_url = FIREFOX_UPDATE_URL;
   }

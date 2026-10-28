@@ -1,4 +1,4 @@
-// Property: Daylight Commons' verdict is never more favourable than the reference checker's (c2patool) on any
+// Property: CMMNS' verdict is never more favourable than the reference checker's (c2patool) on any
 // c2pa-rs test fixture. The fixtures are not committed; CI fetches them at a pinned commit (the
 // c2pa-reference job) and sets C2PA_FIXTURES. Without it this test is skipped, not passed.
 import test from "node:test";
@@ -26,7 +26,7 @@ test("never more favourable than c2patool on any c2pa-rs fixture", { skip: dir ?
     const state = credentialState(await readCredentials(new Uint8Array(readFileSync(p))));
     // Only "unchanged" is a favourable verdict. It needs a reference pass.
     if (state === "unchanged" && r.verdict !== "pass") worse.push(`${name}: radar unchanged, c2patool ${r.verdict}`);
-    // A file the reference finds no manifest in must not gain one in Daylight Commons.
+    // A file the reference finds no manifest in must not gain one in CMMNS.
     if (r.verdict === "none" && state !== "none") worse.push(`${name}: radar ${state}, c2patool none`);
   }
   assert.deepEqual(worse, []);
@@ -35,7 +35,7 @@ test("never more favourable than c2patool on any c2pa-rs fixture", { skip: dir ?
 // The feed page's survival count (src/core/survival.js) sorts each checked file by whether its
 // credentials survived. On the fixtures, "present" (intact, partly checked, changed or stored
 // online) must agree with c2patool finding a manifest, "intact" needs a reference pass, and the one
-// known miss stays the only one: a manifest c2patool finds in a deeply nested MP4 box that Daylight Commons
+// known miss stays the only one: a manifest c2patool finds in a deeply nested MP4 box that CMMNS
 // does not reach, which the count would show as "none found".
 test("the survival count agrees with c2patool on which fixtures still carry credentials", { skip: dir ? false : "set C2PA_FIXTURES to the c2pa-rs sdk/tests/fixtures folder" }, async () => {
   const misses = [], table = {};

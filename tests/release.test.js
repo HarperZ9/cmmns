@@ -17,18 +17,18 @@ const manifest = JSON.parse(readFileSync(new URL("../src/ext/manifest.json", imp
 test("two builds of the same tree give byte-identical packages and per-file hashes", () => {
   const files = [["manifest.json", Buffer.from(JSON.stringify(manifest))], ["a.js", Buffer.from("x".repeat(500))], ["icons/i.png", Buffer.from([1, 2, 3])]];
   const one = buildPackages(files), two = buildPackages([...files].reverse());
-  assert.deepEqual(one.files.map(([n]) => n), [`radar-chrome-${manifest.version}.zip`, `radar-firefox-${manifest.version}.xpi`, `radar-firefox-self-${manifest.version}.xpi`, `FILES-${manifest.version}.sha256`]);
+  assert.deepEqual(one.files.map(([n]) => n), [`cmmns-chrome-${manifest.version}.zip`, `cmmns-firefox-${manifest.version}.xpi`, `cmmns-firefox-self-${manifest.version}.xpi`, `FILES-${manifest.version}.sha256`]);
   one.files.forEach(([n, d], i) => assert.ok(d.equals(two.files[i][1]), n));
   assert.equal(sumsOf(one.files), sumsOf(two.files));
   const list = one.files.at(-1)[1].toString("utf8");
-  assert.match(list, /^[0-9a-f]{64} {2}radar-chrome-[\d.]+\.zip\/a\.js$/m, "the per-file list names every file inside each package");
+  assert.match(list, /^[0-9a-f]{64} {2}cmmns-chrome-[\d.]+\.zip\/a\.js$/m, "the per-file list names every file inside each package");
 });
 
-test("only the self-distributed Firefox build carries an update address, and it is https on Daylight Commons' site", () => {
+test("only the self-distributed Firefox build carries an update address, and it is https on CMMNS' site", () => {
   assert.equal(browserManifest(manifest, "firefox").browser_specific_settings.gecko.update_url, undefined, "AMO-listed builds must not carry one");
   assert.equal(browserManifest(manifest, "chrome").browser_specific_settings, undefined);
   assert.equal(browserManifest(manifest, "firefox-self").browser_specific_settings.gecko.update_url, FIREFOX_UPDATE_URL);
-  assert.match(FIREFOX_UPDATE_URL, /^https:\/\/harperz9\.github\.io\/daylight-commons\//);
+  assert.equal(FIREFOX_UPDATE_URL, "https://harperz9.github.io/ext/firefox/updates.json", "one permanent address with no product name in it");
 });
 
 test("a signed release directory verifies; a changed file, changed sums or another key do not", async () => {
@@ -50,6 +50,22 @@ test("a signed release directory verifies; a changed file, changed sums or anoth
     writeFileSync(join(dir, "SHA256SUMS"), readFileSync(join(dir, "SHA256SUMS"), "utf8").replace(/^./, "0"));
     assert.equal((await verifyDir(dir, publicJwk)).signature, false, "edited sums");
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+// Releases before the CMMNS rename (3.8.0 and earlier) name their files radar-*; later ones cmmns-*.
+// The checker reads names from the signed list, so both verify, side by side or apart.
+test("a release with the old radar-* file names and one with cmmns-* names both verify", async () => {
+  const { privateJwk, publicJwk } = await generateSigningKey();
+  for (const names of [["radar-chrome-3.8.0.zip", "radar-cli-3.8.0.zip", "radar-3.8.0.bundle"], ["cmmns-chrome-3.9.0.zip", "cmmns-cli-3.9.0.zip", "cmmns-3.9.0.bundle"]]) {
+    const dir = mkdtempSync(join(tmpdir(), "cmmns-release-"));
+    try {
+      for (const n of names) writeFileSync(join(dir, n), `${n} bytes`);
+      await signDir(dir, privateJwk);
+      const r = await verifyDir(dir, publicJwk);
+      assert.equal(r.ok, true, names[0]);
+      assert.deepEqual(r.files.map((f) => f.name).sort(), [...names].sort());
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  }
 });
 
 test("a signing key is refused inside the repository and accepted outside it", () => {

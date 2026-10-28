@@ -38,7 +38,7 @@ function claimsSection(data, sources) {
   const L = ["## Claims", ""];
   if (!live.length) L.push("No claims recorded yet.", "");
   L.push(...sorted(reviewed).map((c) => claimBlock(c, data, sources)));
-  if (proposed.length) L.push("## Proposed claims, not yet reviewed by a person", "", "A machine step proposed these. Each quotes the text it came from. Run `daylight case review` to accept or reject them.", "", ...sorted(proposed).map((c) => claimBlock(c, data, sources)));
+  if (proposed.length) L.push("## Proposed claims, not yet reviewed by a person", "", "A machine step proposed these. Each quotes the text it came from. Run `cmmns case review` to accept or reject them.", "", ...sorted(proposed).map((c) => claimBlock(c, data, sources)));
   return L.join("\n");
 }
 

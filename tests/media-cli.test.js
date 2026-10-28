@@ -1,4 +1,4 @@
-// `daylight media convert|compress` (bin/lib/media.mjs, media-args.mjs): the ffmpeg arguments for
+// `cmmns media convert|compress` (bin/lib/media.mjs, media-args.mjs): the ffmpeg arguments for
 // each similar-format pair, plain refusals, and, where ffmpeg is installed, a real conversion whose
 // lineage file holds the right hashes.
 import test from "node:test";

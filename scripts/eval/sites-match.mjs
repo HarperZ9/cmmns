@@ -1,4 +1,4 @@
-// How many news links resolve to a row in Daylight Commons' site tables. Samples links from Google News
+// How many news links resolve to a row in CMMNS' site tables. Samples links from Google News
 // search feeds (sources named in each item) across 14 editions and 8 topics, and from GDELT's
 // article lists, then counts links whose site has an owner row (owners.json), Wikidata facts or
 // a state link (sites.json, state.json). Raw links stay outside the repository (--out).
@@ -19,7 +19,7 @@ setOwnerRows(load("owners.json").rows); setSiteTable(load("sites.json")); setSta
 const EDITIONS = [["en-US", "US", "US:en"], ["en-GB", "GB", "GB:en"], ["en-IN", "IN", "IN:en"], ["en-NG", "NG", "NG:en"], ["en-AU", "AU", "AU:en"], ["en-CA", "CA", "CA:en"],
   ["en-ZA", "ZA", "ZA:en"], ["en-PH", "PH", "PH:en"], ["fr", "FR", "FR:fr"], ["de", "DE", "DE:de"], ["pt-BR", "BR", "BR:pt-419"], ["es-419", "MX", "MX:es-419"], ["ru", "RU", "RU:ru"], ["ar", "AE", "AE:ar"]];
 const TOPICS = ["election", "economy", "health", "climate", "war", "court", "football", "technology"];
-const UA = { "User-Agent": "Daylight Commons evaluation (local, manual run)" };
+const UA = { "User-Agent": "CMMNS evaluation (local, manual run)" };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function google() {

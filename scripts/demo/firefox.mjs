@@ -1,7 +1,7 @@
 // Firefox check over WebDriver BiDi (scripts/demo/README.md). Development tool only. Installs the release
 // xpi as a temporary add-on in a fresh headless profile, then shoots the first-run, Options, Analyse a
 // file and privacy pages, checks a saved evidence chain, and opens a reply's window on the demo stage.
-//   node scripts/demo/firefox.mjs <radar-firefox-<v>.xpi> <stage dir> <out dir> <evidence-chain.json>
+//   node scripts/demo/firefox.mjs <cmmns-firefox-<v>.xpi> <stage dir> <out dir> <evidence-chain.json>
 import { spawn } from "node:child_process";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

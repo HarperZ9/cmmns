@@ -1,6 +1,6 @@
-// `daylight media fetch <url>`: saves a video from a page address with a yt-dlp the user installed
-// (YTDLP names another binary), into the same folder tree as the extension (Downloads/Daylight/<site>/,
-// or --dir), with the same daylight.sidecar/1 note beside it, built from yt-dlp's own description of
+// `cmmns media fetch <url>`: saves a video from a page address with a yt-dlp the user installed
+// (YTDLP names another binary), into the same folder tree as the extension (Downloads/CMMNS/<site>/,
+// or Downloads/Daylight/<site>/ when only that folder exists, or --dir), with the same daylight.sidecar/1 note beside it, built from yt-dlp's own description of
 // the video. yt-dlp refuses DRM-protected video, and so does this. The extension never downloads
 // YouTube video itself; on YouTube its unpacked build copies this command for the user to run.
 import { spawnSync } from "node:child_process";
@@ -9,6 +9,13 @@ import { homedir } from "node:os";
 import { join, basename } from "node:path";
 import { postMeta, sidecarMarkdown, sidecarJson, saveFolder } from "../../src/core/media-meta.js";
 import { globalProtection } from "./case-protect.mjs";
+import { MEDIA_FOLDERS } from "../../src/core/settings.js";
+
+// The save folder inside Downloads: CMMNS, or Daylight, the name before the 2026-10-28 rename, when
+// only that folder exists there, so saves from the command line land beside the extension's.
+export function saveRoot(home = homedir(), exists = existsSync) {
+  return MEDIA_FOLDERS.find((f) => exists(join(home, "Downloads", f))) || MEDIA_FOLDERS[0];
+}
 
 // The yt-dlp to run and its version, or null when there is none.
 export function findYtDlp(env = process.env) {
@@ -25,7 +32,7 @@ const siteOf = (url) => {
 // The folder and the yt-dlp arguments for one address. Pure, so it is tested without a network.
 export function fetchPlan(url, flags = {}, home = homedir()) {
   if (!/^https?:\/\//i.test(String(url || ""))) throw new Error("Give the page's address, starting with https://.");
-  const dir = typeof flags.dir === "string" ? flags.dir : join(home, "Downloads", saveFolder("Daylight", siteOf(url)));
+  const dir = typeof flags.dir === "string" ? flags.dir : join(home, "Downloads", saveFolder(saveRoot(home), siteOf(url)));
   const out = join(dir, "%(uploader_id,channel_id,uploader)s_%(upload_date>%Y-%m-%d)s_%(title).60B.%(ext)s");
   const args = ["--no-playlist", "--no-overwrites", "--write-info-json", "--restrict-filenames", "--merge-output-format", "mp4", "-o", out, "--print", "after_move:filepath", url];
   return { dir, args, site: siteOf(url) };
@@ -43,7 +50,7 @@ export function metaFromInfo(info, url, now = new Date().toISOString()) {
 // Runs one fetch. Returns { file, sidecar, line }. Throws with what to do next.
 export function runFetch(url, flags = {}, env = process.env) {
   const plan = fetchPlan(url, flags);
-  if (globalProtection(env)) throw new Error("Source-protection mode is on (daylight protect status), so nothing is downloaded: the request would tell the host.");
+  if (globalProtection(env)) throw new Error("Source-protection mode is on (cmmns protect status), so nothing is downloaded: the request would tell the host.");
   const y = findYtDlp(env);
   if (!y) throw new Error("yt-dlp was not found. Install it (github.com/yt-dlp/yt-dlp) or set YTDLP to its path, then run this again.");
   const r = spawnSync(y.bin, plan.args, { encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] });

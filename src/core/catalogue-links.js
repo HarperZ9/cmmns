@@ -1,8 +1,8 @@
-// Links from what Daylight Commons shows to the open catalogue (catalogue/, catalogue/DECISIONS.md).
+// Links from what CMMNS shows to the open catalogue (catalogue/, catalogue/DECISIONS.md).
 // A badge in the launch campaign lens is named by its signal id; it links to every active catalogue
 // entry that cites the signal, at the version shown, and to the dispute templates with the entry or
 // the signal filled in. Pure: no DOM, no network. A link opens only when the user clicks it.
-export const REPO_URL = "https://github.com/HarperZ9/daylight-commons";
+export const REPO_URL = "https://github.com/HarperZ9/cmmns";
 export const DECISIONS_URL = `${REPO_URL}/blob/main/catalogue/DECISIONS.md`;
 export const SIGNALS_URL = `${REPO_URL}/blob/main/catalogue/signals.json`;
 export const TEMPLATES = Object.freeze({

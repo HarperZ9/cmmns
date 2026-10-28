@@ -1,4 +1,4 @@
-// `daylight sidecar check <folder> [--fix]`, the file half: does each note name the files its own
+// `cmmns sidecar check <folder> [--fix]`, the file half: does each note name the files its own
 // save wrote? In 3.8.0 and earlier a save whose name was taken was written as "name (1).jpg" while its note
 // still listed "name.jpg", a file of another save, sometimes of another post. A listed file is
 // wrong when it is missing, when its bytes carry another post's address, or when it was written

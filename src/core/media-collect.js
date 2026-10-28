@@ -1,4 +1,4 @@
-// Collections of saved media: an investigation case (rows that `daylight case add case-inbox.jsonl`
+// Collections of saved media: an investigation case (rows that `cmmns case add case-inbox.jsonl`
 // captures, archives and verifies) or a moodboard (tags and notes, shown as a grid). Every saved
 // file keeps its SHA-256, where it came from and when; every converted or compressed file keeps
 // its own hash and the chain of steps back to the original. Pure records; storage is in the

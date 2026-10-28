@@ -36,7 +36,7 @@ export function quoteSigns(results, list) {
   const out = (results || []).map((r) => sign(STATUS[r.status], "quote-source", "sources", [...quoteRows(r), ["What it shows", QUOTE_DOES_NOT_PROVE]]));
   if (list && list.lines >= 3) {
     out.push(sign(`${list.lines} lines credited to names, ${list.sourced} sourced`, "quote-list", "sources", [
-      ["What Daylight Commons sees", `${list.lines} lines each credit a named person${list.named ? ` (${list.named} of them names Daylight Commons knows)` : ""}. ${list.sourced === 0 ? "None gives" : `${list.sourced} give`} a source.`],
+      ["What CMMNS sees", `${list.lines} lines each credit a named person${list.named ? ` (${list.named} of them names CMMNS knows)` : ""}. ${list.sourced === 0 ? "None gives" : `${list.sourced} give`} a source.`],
       ...(list.short ? [["Too short to look up", `${list.short} ${list.short === 1 ? "line is" : "lines are"} under five words, too short to find in any text.`]] : []),
       ["What it shows", "A list of one-line sayings without sources is a common format for misattributed quotes. Some lines may still be fair summaries of a person's view."],
     ]));
@@ -51,7 +51,7 @@ export function personaSign(p) {
 export function countSigns(counts, fromImage = false) {
   if (!counts || !counts.length) return [];
   return [sign(`${counts.length === 1 ? "a count" : counts.length + " counts"} with ${counts.length === 1 ? "its" : "their"} sample size${fromImage ? " (in image)" : ""}`, "sample-size", "sources",
-    [...countRows(counts), ...(fromImage ? [["Read from", "the image, by Daylight Commons' own text recogniser"]] : []), ["What it shows", STATS_DOES_NOT_PROVE]])];
+    [...countRows(counts), ...(fromImage ? [["Read from", "the image, by CMMNS' own text recogniser"]] : []), ["What it shows", STATS_DOES_NOT_PROVE]])];
 }
 
 export function docSign(r) {

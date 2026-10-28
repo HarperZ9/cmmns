@@ -15,13 +15,14 @@ import { buildQuotes } from "./discourse/texts.mjs";
 import { buildPersons } from "./discourse/persons.mjs";
 import { signPack, keyFingerprint } from "../src/core/packs.js";
 import { sha256Hex, lfBytes } from "../src/core/sig.js";
+import { envValue } from "../src/core/env-names.js";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA = join(ROOT, "data/discourse"), OUT = join(ROOT, "src/ext/discourse");
 export const PACK = join(OUT, "discourse-data.pack.json");
 export const PACK_FILES = ["quotes.json", "persons.json"];
 const arg = (k, d = null) => { const i = process.argv.indexOf(k); return i > 0 && process.argv[i + 1] ? process.argv[i + 1] : d; };
-const cacheDir = () => arg("--cache", process.env.DAYLIGHT_DISCOURSE_CACHE || join(ROOT, ".cache/discourse"));
+const cacheDir = () => arg("--cache", envValue(process.env, "DISCOURSE_CACHE") || join(ROOT, ".cache/discourse"));
 const json = (p) => JSON.parse(readFileSync(p, "utf8"));
 const sha = (b) => createHash("sha256").update(b).digest("hex");
 const ENDPOINT = "https://qlever.cs.uni-freiburg.de/api/wikidata";
@@ -80,7 +81,7 @@ async function sign() {
   const files = {};
   for (const f of PACK_FILES) files[f] = await sha256Hex(lfBytes(readFileSync(join(OUT, f))));
   const created = process.env.RADAR_BUILT || new Date().toISOString().slice(0, 10);
-  const pack = await signPack({ name: "Daylight Commons discourse data", version: created.replace(/-/g, "."), description: "The quote finder's index of public-domain texts with its sourced lists, and the persona marker's names of people who have died, from Wikidata.", authorName: "Daylight Commons project key", created }, priv, { files });
+  const pack = await signPack({ name: "CMMNS discourse data", version: created.replace(/-/g, "."), description: "The quote finder's index of public-domain texts with its sourced lists, and the persona marker's names of people who have died, from Wikidata.", authorName: "CMMNS project key", created }, priv, { files });
   writeFileSync(PACK, JSON.stringify(pack, null, 1) + "\n");
   console.log(`discourse-data.pack.json signed by ${keyFingerprint(pack.manifest.author.keyId)}`);
 }

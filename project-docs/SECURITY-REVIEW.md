@@ -11,7 +11,7 @@ security contact (SECURITY.md); the coordinated-disclosure terms there apply.
 | Feature | Claim | Code | Tested by |
 |---|---|---|---|
 | Wayback opt-in | `case add` and `case run` make no Wayback save request unless `--archive` or the case's archive setting asks; `case watch` asks the Archive's availability API only with the setting on | `src/investigate/add.js`, `stages-gather.js`, `watch.js`, `bin/lib/case.mjs` | `tests/protection.test.js` records every request |
-| Protection, command line | With `daylight protect on`, `DAYLIGHT_PROTECT=1` or `case settings protection on`, no case command makes a request: `case add <url>`, `--archive` and `case watch` are refused, `case run` blocks every capture, and a remote model endpoint is refused | `src/investigate/protection.js`, `bin/lib/case-protect.mjs`, `case-run.mjs` | the same test: the injected fetch is never called |
+| Protection, command line | With `cmmns protect on`, `DAYLIGHT_PROTECT=1` or `case settings protection on`, no case command makes a request: `case add <url>`, `--archive` and `case watch` are refused, `case run` blocks every capture, and a remote model endpoint is refused | `src/investigate/protection.js`, `bin/lib/case-protect.mjs`, `case-run.mjs` | the same test: the injected fetch is never called |
 | Protection, exports | Exports are Share clean, signed with a one-time key (carrier-safe), keep the day of every time only, pseudonymise every account unless `--keep-name`, and record the investigator as "investigator" in git with the day only | `src/investigate/export.js`, `export-clean.js`, `bin/lib/case-env.mjs` | `tests/protection.test.js` |
 | Protection, extension | While on, the extension makes no request of its own: no About lookups (worker window or the in-page request), no Reddit account reads, no evidence lookups, no Other coverage, no Archive copy, no download from a host (save page, one-click Download, the right-click Download menu) | `src/core/settings.js` (`PROTECTION_FORCES`), `src/ext/background.js`, `auto.js`, `reddit.js`, `media-fetch.js`, `quick-save-bg.js`, `save.js` | `scripts/qa/protect_check.py`: network capture during a save in protection mode |
 | Share clean | The copy carries none of the file's own metadata in JPEG, PNG, GIF, WebP, MP4/MOV/M4A, WebM/MKV, PDF, OOXML and ODF; pixels, frames and samples are byte-identical; a second pass finds nothing; a file it cannot read is refused | `src/core/clean*.js` | `tests/clean.test.js` (byte scan of planted markers, structural identity), `scripts/qa/clean_check.py` (decoded frames with Pillow and ffmpeg) |
@@ -21,7 +21,7 @@ security contact (SECURITY.md); the coordinated-disclosure terms there apply.
 
 1. **A request in protection mode.** Find any path that reaches the network while the mode is on:
    a content script, a background listener, a page, a CLI command. Include prefetching by the browser
-   that Daylight triggers (for example an `<img>` or `<video>` it builds with a remote address).
+   that CMMNS triggers (for example an `<img>` or `<video>` it builds with a remote address).
 2. **Metadata that survives Share clean.** Formats and placements we may have missed: JPEG APP
    segments after the first scan, MPF secondary images, HEIC/AVIF (not supported: they should be
    refused, check that), PNG chunks after IDAT, fragmented MP4 (`moof` with `meta`), QuickTime
@@ -43,7 +43,7 @@ security contact (SECURITY.md); the coordinated-disclosure terms there apply.
 
 - No Tor or network anonymity is built in; users are pointed to Tor Browser.
 - The device, the platforms' own logs, screenshots, faces, voices and writing style are out of reach.
-- A user's own browsing still loads each site's pages; protection covers what Daylight itself sends.
+- A user's own browsing still loads each site's pages; protection covers what CMMNS itself sends.
 - PDF annotation authors, OOXML comment and tracked-change authors, and printer tracking dots are
   not removed by Share clean.
 - Turning protection off leaves the switched-off features off until the user turns each back on.

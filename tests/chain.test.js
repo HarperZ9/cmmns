@@ -1,5 +1,5 @@
 // The laundering chain (src/core/chain.js): post, then the accounts and sites its material passed
-// through, then the earliest origin Daylight Commons can see. Built only from pointers the platform records
+// through, then the earliest origin CMMNS can see. Built only from pointers the platform records
 // (quotes, reposts, "media from", the same upload, the same link), never from wording.
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -39,7 +39,7 @@ test("an upload seen earlier from another account is the origin; the post's own 
   assert.equal(c.hops[2].how, "same upload seen earlier");
 });
 
-test("a link names the site as an intermediary and an earlier sharer as the origin Daylight Commons saw", () => {
+test("a link names the site as an intermediary and an earlier sharer as the origin CMMNS saw", () => {
   const L = "https://news.example/a";
   const first = tw("1", "seed", "2026-10-01T00:00:00Z", { links: [L] });
   const post = tw("3", "poster", "2026-10-02T00:00:00Z", { links: [L] });

@@ -1,7 +1,7 @@
 // Checks a C2PA manifest without a network call: the claim signature (COSE_Sign1 over the claim,
 // with the key in the signer's certificate), the hash of every assertion the claim lists, and the
 // hard binding that ties the claim to the file's bytes (c2pa.hash.data, or c2pa.hash.bmff for MP4).
-// Each check is { ok: true | false | null, text }: null means Daylight Commons could not check it here.
+// Each check is { ok: true | false | null, text }: null means CMMNS could not check it here.
 // Not checked here: whether the certificate chains to a trusted issuer, revocation, and the
 // time-stamp authority's signature.
 
@@ -88,7 +88,7 @@ async function verifyWith([name, hash, salt], cert, sig, tbs) {
 
 // c2pa.hash.data: the file's bytes outside the exclusion ranges.
 export async function checkDataHash(file, a, complete) {
-  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
+  if (!complete) return { ok: null, text: "CMMNS read part of the file, so the byte comparison was skipped" };
   const parts = [];
   let p = 0;
   for (const e of [...(a.exclusions || [])].sort((x, y) => x.start - y.start)) {
@@ -147,10 +147,10 @@ function exclusionRanges(file, rules) {
 // c2pa.hash.bmff: the file without its excluded boxes; v2 and later put the 8-byte offset of each
 // top-level box that is hashed before it.
 export async function checkBmffHash(file, a, label, complete) {
-  if (!complete) return { ok: null, text: "Daylight Commons read part of the file, so the byte comparison was skipped" };
+  if (!complete) return { ok: null, text: "CMMNS read part of the file, so the byte comparison was skipped" };
   const rules = a.exclusions || [];
   if (!a.hash || a.merkle || rules.some((r) => !/^(\/[\w ]{4})+$/.test(r.xpath || ""))) {
-    return { ok: null, text: "this video uses a hash layout Daylight Commons skips for now (fragments or partial exclusions)" };
+    return { ok: null, text: "this video uses a hash layout CMMNS skips for now (fragments or partial exclusions)" };
   }
   const withOffsets = /\.v[2-9]$/.test(label), ex = exclusionRanges(file, rules);
   const top = new Set(ex.filter((e) => e[2] === 0 && e[3]).map((e) => e[0]));

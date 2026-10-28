@@ -1,4 +1,4 @@
-// Shared by Daylight Commons' first-run and options pages: the aperture drawing, switch rows, and the sites
+// Shared by CMMNS' first-run and options pages: the aperture drawing, switch rows, and the sites
 // this build runs on (read from the manifest, so a site added later shows up by itself).
 (() => {
   "use strict";

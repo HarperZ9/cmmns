@@ -1,4 +1,4 @@
-// daylight case run: the whole pipeline on a fixture folder of three screenshots (one read by the
+// cmmns case run: the whole pipeline on a fixture folder of three screenshots (one read by the
 // built-in OCR, two with transcription files) and two URLs, served from a replay so nothing is
 // fetched. A second run is killed in the middle of a stage, resumed, and must match the clean run.
 // Then review, watch and a model provider plugged in through a command.

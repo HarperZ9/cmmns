@@ -13,7 +13,7 @@
 </style>
 <script>
   // ?site=threads | mastodon | mastodon5 | tiktok. Every account, name and comment here is
-  // invented. The markup copies only the structure Daylight Commons reads on each site: Threads and Mastodon
+  // invented. The markup copies only the structure CMMNS reads on each site: Threads and Mastodon
   // as read live on 2026-10-21, TikTok from its public data-e2e attributes (not yet seen live).
   const SITE = new URLSearchParams(location.search).get("site") || "threads";
   document.documentElement.dataset.pbFixture = SITE.replace(/\d$/, "");
@@ -29,7 +29,7 @@
 </head>
 <body>
 <main>
-  <div class="note">Fixture: invented posts in the structure Daylight Commons reads on Threads, Mastodon (4.x and 5.0) or TikTok. Switch with ?site=threads, ?site=mastodon, ?site=mastodon5 or ?site=tiktok.</div>
+  <div class="note">Fixture: invented posts in the structure CMMNS reads on Threads, Mastodon (4.x and 5.0) or TikTok. Switch with ?site=threads, ?site=mastodon, ?site=mastodon5 or ?site=tiktok.</div>
   <div id="thread" role="main"></div>
 </main>
 <script>

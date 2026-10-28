@@ -77,6 +77,6 @@ export async function watchCase(ctx) {
 }
 
 export const SCHEDULE_HELP = `Run case watch on a schedule with the system's own scheduler, for example daily at 07:00:
-  Linux or macOS (crontab -e):  0 7 * * * cd /path/to/case && daylight case watch --export >> watch.log 2>&1
-  Windows (one line):           schtasks /Create /SC DAILY /ST 07:00 /TN "daylight-watch" /TR "cmd /c cd /d C:\\path\\to\\case && daylight case watch --export"
+  Linux or macOS (crontab -e):  0 7 * * * cd /path/to/case && cmmns case watch --export >> watch.log 2>&1
+  Windows (one line):           schtasks /Create /SC DAILY /ST 07:00 /TN "cmmns-watch" /TR "cmd /c cd /d C:\\path\\to\\case && cmmns case watch --export"
 `;

@@ -21,7 +21,7 @@ export const CAMPAIGN_PLATFORMS = {
   },
   instagram: { status: "not defined", notes: "Engagement pods: the same commenters across one creator's posts. Like counts are often hidden, which leaves the shape unread." },
   tiktok: { status: "not defined", notes: "Not defined yet." },
-  linkedin: { status: "not defined", notes: "Engagement pods. Daylight Commons runs on other sites for now." },
+  linkedin: { status: "not defined", notes: "Engagement pods. CMMNS runs on other sites for now." },
 };
 
 export function campaignPlatform(id) {

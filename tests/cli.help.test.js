@@ -17,28 +17,28 @@ test("every case command in the usage has its own help", async () => {
     assert.ok(CASE_HELP[c], `no help for ${c}`);
     const r = await runCaseCommand([c, "--help"], { cwd: tmpdir() });
     assert.equal(r.code, 0, c);
-    assert.match(r.out, /Usage:\n {2}daylight case /, c);
-    assert.match(r.out, /Example:\n {2}daylight case /, c);
+    assert.match(r.out, /Usage:\n {2}cmmns case /, c);
+    assert.match(r.out, /Example:\n {2}cmmns case /, c);
   }
   const viaHelp = await runCaseCommand(["help", "trace"], { cwd: tmpdir() });
-  assert.match(viaHelp.out, /^daylight case trace: /);
+  assert.match(viaHelp.out, /^cmmns case trace: /);
 });
 
 test("every top-level command has its own help", () => {
   for (const c of Object.keys(TOP_HELP)) {
     const out = execFileSync(process.execPath, [BIN, c, "--help"], { encoding: "utf8" });
-    assert.match(out, new RegExp(`^daylight ${c}: `), c);
+    assert.match(out, new RegExp(`^cmmns ${c}: `), c);
   }
 });
 
 test("errors say what happened and what to do", () => {
   const missing = spawnSync(process.execPath, [BIN, "verify", join(tmpdir(), "no-such-file-dc.json")], { encoding: "utf8" });
   assert.equal(missing.status, 1);
-  assert.match(missing.stderr, /^daylight: No such file or folder: .*Check the path/);
-  assert.match(missing.stderr, /daylight verify --help/);
+  assert.match(missing.stderr, /^cmmns: No such file or folder: .*Check the path/);
+  assert.match(missing.stderr, /cmmns verify --help/);
   const notCase = spawnSync(process.execPath, [BIN, "case", "claims", "--case", mkdtempSync(join(tmpdir(), "dc-nc-"))], { encoding: "utf8" });
   assert.equal(notCase.status, 1);
-  assert.match(notCase.stderr, /is not a case folder.*daylight case init/);
+  assert.match(notCase.stderr, /is not a case folder.*cmmns case init/);
   const unknown = spawnSync(process.execPath, [BIN, "case", "nosuch"], { encoding: "utf8" });
   assert.match(unknown.stdout, /Unknown case command "nosuch"/);
 });

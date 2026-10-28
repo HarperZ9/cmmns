@@ -2,7 +2,7 @@
 
     python scripts/qa/clean_check.py <work folder>
 
-Runs `daylight clean` on every fixture in tests/fixtures/clean/, then decodes the original and the
+Runs `cmmns clean` on every fixture in tests/fixtures/clean/, then decodes the original and the
 clean copy and compares what a viewer sees and hears: Pillow for pictures (every frame of a GIF,
 the photo inside the PDF), ffmpeg's framemd5 for every video and audio stream (the decoded frames
 and samples, hashed one by one). Writes clean-check.json to the work folder.

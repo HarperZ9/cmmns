@@ -35,9 +35,9 @@
   async function run() {
     const to = $("to").value, k = state.kind, n = (id) => Number($(id).value);
     if (k === "image" || (k === "gif" && ["webp", "png"].includes(to))) return { ...(await PBConvertImage.convert(state.blob, { to, quality: n("quality"), maxSide: n("maxSide") })), tool: "browser canvas encoder" };
-    if (k === "gif") return { ...(await PBConvertVideo.fromGif(state.bytes, { to, maxHeight: n("maxHeight"), bitrate: n("bitrate") }, status)), tool: "Daylight Commons GIF decoder, WebCodecs VideoEncoder, Daylight Commons muxer" };
-    if (k === "video") return { ...(await PBConvertVideo.fromVideo(state.blob, state.bytes, { to, maxHeight: n("maxHeight"), bitrate: n("bitrate"), fps: n("fps"), audioBitrate: n("audioBitrate") }, status)), tool: "WebCodecs VideoEncoder and AudioEncoder, Daylight Commons muxer" };
-    return { ...(await PBConvertAudio.convert(state.bytes, { to, bitrate: n("audioBitrate") }, status)), tool: "WebCodecs AudioEncoder, Daylight Commons muxer" };
+    if (k === "gif") return { ...(await PBConvertVideo.fromGif(state.bytes, { to, maxHeight: n("maxHeight"), bitrate: n("bitrate") }, status)), tool: "CMMNS GIF decoder, WebCodecs VideoEncoder, CMMNS muxer" };
+    if (k === "video") return { ...(await PBConvertVideo.fromVideo(state.blob, state.bytes, { to, maxHeight: n("maxHeight"), bitrate: n("bitrate"), fps: n("fps"), audioBitrate: n("audioBitrate") }, status)), tool: "WebCodecs VideoEncoder and AudioEncoder, CMMNS muxer" };
+    return { ...(await PBConvertAudio.convert(state.bytes, { to, bitrate: n("audioBitrate") }, status)), tool: "WebCodecs AudioEncoder, CMMNS muxer" };
   }
 
   async function finish(out) {
@@ -65,7 +65,7 @@
     status("Working on this device.");
     const t0 = performance.now();
     try { await finish(await run()); status(`Done in ${((performance.now() - t0) / 1000).toFixed(1)} s.`); }
-    catch (e) { status(`Not converted: ${e.message}`); console.warn("[daylight-commons] convert failed", e); }
+    catch (e) { status(`Not converted: ${e.message}`); console.warn("[cmmns] convert failed", e); }
     finally { $("go").disabled = false; }
   });
   $("lineage").addEventListener("click", () => {
@@ -85,4 +85,4 @@
     if (rec && blob) await show(blob, rec); else facts($("source"), [["Not found", "That item is not in your collections any more."]]);
   }
   globalThis.PBConvertPage = Object.freeze({ show });
-})().catch((e) => console.error("[daylight-commons] convert page failed", e));
+})().catch((e) => console.error("[cmmns] convert page failed", e));

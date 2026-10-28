@@ -89,7 +89,7 @@ export function loginGated({ status, finalUrl, html }) {
 }
 
 async function fetchBytes(fetchFn, url) {
-  const res = await fetchFn(url, { redirect: "follow", credentials: "omit", headers: { "user-agent": "daylight-case (+https://github.com/HarperZ9/daylight-commons)" } });
+  const res = await fetchFn(url, { redirect: "follow", credentials: "omit", headers: { "user-agent": "cmmns-case (+https://github.com/HarperZ9/cmmns)" } });
   return { res, bytes: Buffer.from(await res.arrayBuffer()) };
 }
 

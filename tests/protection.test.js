@@ -149,7 +149,7 @@ test("history lines lose the name and the time of day", () => {
   assert.deepEqual(anonHistory(["abc123 2026-10-25T14:03:11+02:00 Jane Reporter: case add S01"]), ["abc123 2026-10-25 investigator: case add S01"]);
 });
 
-test("daylight clean writes the copy beside the original and the lineage beside the evidence copy", async () => {
+test("cmmns clean writes the copy beside the original and the lineage beside the evidence copy", async () => {
   const d = tmp(), src = join(d, "photo.jpg");
   copyFileSync(join(FIX, "photo.jpg"), src);
   const out = await cleanCommand(src, {}, () => NOW);

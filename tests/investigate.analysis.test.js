@@ -1,4 +1,4 @@
-// daylight case, analysis side: claims and blind labels, origin and drift tracing, the timeline's
+// cmmns case, analysis side: claims and blind labels, origin and drift tracing, the timeline's
 // flags, the network, leads, absences, redaction, rule and model extraction, and primary records.
 import test from "node:test";
 import assert from "node:assert/strict";

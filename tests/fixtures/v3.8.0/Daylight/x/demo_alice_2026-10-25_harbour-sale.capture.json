@@ -1,0 +1,123 @@
+{
+  "format": "daylight.capture/1",
+  "captured": {
+    "utc": "2026-10-26T12:00:00.000Z",
+    "offset_minutes": 0
+  },
+  "page": {
+    "url": "https://x.com/demo_alice/status/1900000000000000042",
+    "title": "Alice Demo on X"
+  },
+  "tool": {
+    "name": "Daylight Commons",
+    "version": "3.8.0",
+    "browser": "chrome"
+  },
+  "artifact": [
+    {
+      "name": "demo_alice_2026-10-25_harbour-sale.jpg",
+      "sha256": "0491ede79f633421c6e6508e11db0c5650b0bde5de47f631b63d2e988b0986f3",
+      "saved_sha256": "0491ede79f633421c6e6508e11db0c5650b0bde5de47f631b63d2e988b0986f3",
+      "bytes": 52,
+      "mime": "image/jpeg",
+      "made": null
+    }
+  ],
+  "words": {
+    "site": "x",
+    "post": "https://x.com/demo_alice/status/1900000000000000042",
+    "media": "https://pbs.twimg.com/media/demo.jpg",
+    "text": "The harbour sale passed 7-2 tonight.",
+    "text_complete": true,
+    "posted": "2026-10-25T20:00:00.000Z"
+  },
+  "engagement": null,
+  "account": {
+    "name": "Alice Demo",
+    "handle": "demo_alice"
+  },
+  "thread": {
+    "parent": null,
+    "quoted": null,
+    "parts": 0,
+    "complete": null
+  },
+  "screenshot": {
+    "name": "demo_alice_2026-10-25_harbour-sale.capture.png",
+    "sha256": "063ac8b68a1d2d22833cef6fa62effae349220cd7abaa9b478f43e6af55e1c4f",
+    "viewport_height": 900,
+    "page_height": 900,
+    "scroll_y": 0
+  },
+  "transparency": {
+    "rows": [
+      {
+        "property": "file demo_alice_2026-10-25_harbour-sale.jpg",
+        "clarity": 1,
+        "kept": "full",
+        "measure": "the bytes the page served, SHA-256 taken before any words were written into the file"
+      },
+      {
+        "property": "text",
+        "clarity": 1,
+        "kept": "full",
+        "measure": "the text as the page showed it"
+      },
+      {
+        "property": "engagement",
+        "clarity": 0,
+        "kept": "none",
+        "measure": "0 of 6 counts read from the page"
+      },
+      {
+        "property": "account as shown",
+        "clarity": 1,
+        "kept": "full",
+        "measure": "2 of 2 (display name, handle)"
+      },
+      {
+        "property": "page picture",
+        "clarity": 1,
+        "kept": "full",
+        "measure": "the visible part of the page: 900 of 900 px high"
+      },
+      {
+        "property": "page snapshot",
+        "clarity": 0,
+        "kept": "none",
+        "measure": "MHTML or WARC snapshot not taken in this release"
+      },
+      {
+        "property": "local time",
+        "clarity": 1,
+        "kept": "full",
+        "measure": "this computer's clock, UTC and offset"
+      },
+      {
+        "property": "trusted time",
+        "clarity": 0,
+        "kept": "none",
+        "measure": "no RFC 3161 or OpenTimestamps proof requested"
+      }
+    ],
+    "mean": 0.63,
+    "measured": 8,
+    "of": 8
+  },
+  "custody": {
+    "format": "daylight.custody/1",
+    "seq": 1,
+    "at": "2026-10-26T12:00:00.000Z",
+    "what": "capture",
+    "page": "https://x.com/demo_alice/status/1900000000000000042",
+    "hashes": [
+      "0491ede79f633421c6e6508e11db0c5650b0bde5de47f631b63d2e988b0986f3",
+      "063ac8b68a1d2d22833cef6fa62effae349220cd7abaa9b478f43e6af55e1c4f",
+      "5a76b0f21825cce9d53fcdaddc8656cc69c1e8410695457105e8d5a1965bff09"
+    ],
+    "key_id": null,
+    "tool": "Daylight Commons 3.8.0",
+    "prev": null,
+    "hash": "e344d9a139528aef2f518bc477591a55b662373e6047a006fbf5d4000f5b9440"
+  }
+}

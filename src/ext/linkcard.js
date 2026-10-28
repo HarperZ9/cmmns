@@ -1,6 +1,6 @@
-// Site cards on links. Resting the pointer on an outbound link (or focusing it) opens Daylight Commons'
+// Site cards on links. Resting the pointer on an outbound link (or focusing it) opens CMMNS'
 // window for the linked site: owner, owner type, founding date, country, state links and the site's
-// fact-check record, each sourced. Lookups go to Daylight Commons' background worker and its bundled tables;
+// fact-check record, each sourced. Lookups go to CMMNS' background worker and its bundled tables;
 // nothing leaves the browser. Links to the page's own site and to platforms are skipped.
 (() => {
   "use strict";
@@ -43,7 +43,7 @@
     return [{ glance: PB.siteGlance(i) }, { tab: "overview", title: "Site", rows: PB.siteInfoRows(i, { onList: openList(i.domain) }) }, ...extra];
   }
 
-  // Dark pages get Daylight Commons' dark palette, read from the page's own background. The social sites set
+  // Dark pages get CMMNS' dark palette, read from the page's own background. The social sites set
   // it themselves (src/ext/ui.js).
   function theme() {
     const bg = getComputedStyle(document.body || document.documentElement).backgroundColor.match(/\d+/g);
@@ -73,6 +73,6 @@
   const cached = (domain) => { const v = cache.get(domain); return v && !(v instanceof Promise) ? v : null; };
   globalThis.PBLinkCard = Object.freeze({ start, siteOfLink, info, cached, sections, theme, openList });
 
-  // On the social sites Daylight Commons reads, cards follow the site switch and the Sources area switch.
+  // On the social sites CMMNS reads, cards follow the site switch and the Sources area switch.
   if (globalThis.PBSites && globalThis.PBSettings) start(() => { const s = PBSites.current(), set = PBSettings.get(); return !!s && PB.siteOn(set, s.id) && PB.areaOn(set, "sources"); });
 })();

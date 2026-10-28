@@ -39,7 +39,7 @@ changing them leaves every score unchanged:
 - language or script of a bio, a post or a name;
 - any country, city or place, including places named in a bio;
 - name origin, display name style, or a "non-English bio";
-- avatar appearance. Daylight Commons does not guess whether an avatar is AI-made. The only avatar fact used is
+- avatar appearance. CMMNS does not guess whether an avatar is AI-made. The only avatar fact used is
   X's own `default_profile_image` disclosure, and it is context, never an indicator.
 
 The screenshots invite all of these (bios naming two African countries, bios in Japanese). A
@@ -49,7 +49,7 @@ template, the timing and the topic mismatch.
 ## Signals
 
 Each sign is computed on accounts the viewer's page loaded: the repost list, the quote list and the
-replies X rendered. Daylight Commons never pages through lists on its own.
+replies X rendered. CMMNS never pages through lists on its own.
 
 ### 1. Engagement shape (post level)
 
@@ -66,7 +66,7 @@ against three references, in this order:
    news, 5,920 posts with 20 or more interactions, by follower stratum
    (`scripts/campaign-baselines.mjs`). Measured result: in that corpus reposts usually exceeded
    likes (median reposts per like 2.3 to 3.0 by stratum, 95th percentile 7.4 to 11.7). The intuition
-   that "likes run well above reposts" holds for today's X by common observation, but Daylight Commons has not
+   that "likes run well above reposts" holds for today's X by common observation, but CMMNS has not
    measured it, and the 2014 news baseline contradicts it. That is why the historical line is
    context only and never feeds the lead.
 
@@ -113,7 +113,7 @@ Across launches the viewer opened, the share of this launch's sampled accounts a
 amplifying 2 or more other launches. Storage: `chrome.storage.local` only, key `pb.campaign.v1`,
 30 days, at most 200 launches. Accounts are stored as salted hashes (a random salt made on the
 device, never exported), so the store cannot be read back as a list of handles. "Forget launches I
-viewed" in the panel and "Clear all Daylight Commons data" in the options wipe it.
+viewed" in the panel and "Clear all CMMNS data" in the options wipe it.
 
 Indicator: `cross-launch` when 5 or more sampled accounts and 20% or more of the sample were seen on
 2 or more other launches.
@@ -160,7 +160,7 @@ Who can be named: only the launch's own account, and only when X discloses it as
 (gold Business or grey Government checkmark, or a Business professional profile; `actorOf` in
 `src/core/campaign.js`). Otherwise the copy says "this launch". Sampled accounts are never named and
 never called bots; they appear only inside counts. Every claim sits above its evidence, each sign's
-"does not prove" line, and the dispute route ("Report it at github.com/HarperZ9/daylight-commons/issues.
+"does not prove" line, and the dispute route ("Report it at github.com/HarperZ9/cmmns/issues.
 Corrections are made in the open."). The lens never claims a crime and never reveals a private
 identity. Tests check that the output contains no handle of a sampled account and none of "bot",
 "fraud", "crime", "illegal" or "scam".

@@ -27,7 +27,7 @@ These do not move for any feature below. A row that would cross one is out of sc
 2. Local by default. Each network feature is named, off by default and says what it sends.
 3. No engagement mechanics: no alarms, counters, streaks or notifications.
 4. Naming of organisations stays held (`NAMING_HELD`) until a media lawyer has reviewed the wording.
-5. The whistleblower channel is never built in-house. Daylight Commons only points to audited systems.
+5. The whistleblower channel is never built in-house. CMMNS only points to audited systems.
 6. Platform terms are respected: no account farms, no rate-limit evasion, no logged-out crawling.
 7. Fairness strata: organic false-positive rates are reported per language and region stratum, and
    a stratum that breaks the 5-point bound keeps the lead off.

@@ -1,7 +1,7 @@
-// Content Credentials survival: of the media files Daylight Commons checked (on the user's click), how many
+// Content Credentials survival: of the media files CMMNS checked (on the user's click), how many
 // still carried intact credentials, per platform. Platforms often strip credentials on upload; a
 // count of what survived tells the user how much the credentials check can do on each site.
-// Daylight Commons keeps one entry per file: a short hash of its address (not the address), the site, the
+// CMMNS keeps one entry per file: a short hash of its address (not the address), the site, the
 // outcome and the time, in chrome.storage.local ("pb.media.v1"), pruned with the history setting.
 
 import { credentialState } from "./c2pa.js";
@@ -11,7 +11,7 @@ export const MEDIA_KEY = "pb.media.v1", MAX_MEDIA = 5000;
 
 // The outcome of one check: intact (found and every check passed), partial (found, not every part
 // could be checked), changed, remote (the file points to credentials online), none, or null for a
-// file Daylight Commons could not read, which counts nowhere.
+// file CMMNS could not read, which counts nowhere.
 export function outcomeOf(result) {
   if (!result || result.error) return null;
   return { unchanged: "intact", unchecked: "partial", changed: "changed", remote: "remote", none: "none" }[credentialState(result)] || null;

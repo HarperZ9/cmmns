@@ -12,7 +12,7 @@
   "instrument": "Digital Services Act, Regulation (EU) 2022/2065",
   "section": "Article 39(1) and 39(2)",
   "kind": "regulation",
-  "binding_note": "A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. Daylight Commons shows them as context. They tell the reader where the platform must show a disclosure or an ad record.",
+  "binding_note": "A regulation that applies directly in every Member State. Articles 26 and 39 set duties for platform providers. CMMNS shows them as context. They tell the reader where the platform must show a disclosure or an ad record.",
   "in_force": {
     "status": "in force",
     "since": null,
@@ -53,7 +53,7 @@
       "signals": [
         "ad-library-link"
       ],
-      "note": "Daylight Commons builds a search link to the repository. The user opens it and reads the results."
+      "note": "CMMNS builds a search link to the repository. The user opens it and reads the results."
     }
   ],
   "does_not_prove": "Context: the repository lists the ads a very large platform recorded. A search shows those records, and organic posts sit outside them. A match compares visible elements with the published text. Courts and consumer authorities decide whether the duty was met.",

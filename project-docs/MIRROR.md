@@ -12,7 +12,7 @@ repository creates the account or stores a Codeberg token.
 
 1. Sign up at https://codeberg.org with the email the author uses for the project.
 2. Turn on two-factor authentication under Settings, Security.
-3. Create a repository named `daylight-commons`. Leave it empty: no README, no licence, no
+3. Create a repository named `cmmns`. Leave it empty: no README, no licence, no
    `.gitignore`.
 4. In the repository's settings, set the description to the GitHub one and add the GitHub address
    as the website.
@@ -28,7 +28,7 @@ Option A, push at each release (recommended). No token is stored anywhere but th
 2. Add the remote once:
 
    ```
-   git remote add codeberg git@codeberg.org:<account>/daylight-commons.git
+   git remote add codeberg git@codeberg.org:<account>/cmmns.git
    ```
 
 3. After each release, push the default branch and every tag:
@@ -41,7 +41,7 @@ Option A, push at each release (recommended). No token is stored anywhere but th
 Option B, a pull mirror on Codeberg. Codeberg fetches from GitHub on a schedule.
 
 1. On Codeberg, choose New migration, then GitHub.
-2. Enter `https://github.com/HarperZ9/daylight-commons.git` and tick the mirror option. GitHub
+2. Enter `https://github.com/HarperZ9/cmmns.git` and tick the mirror option. GitHub
    needs no token for a public repository; leave the token field empty.
 3. Set the interval no shorter than 8 hours.
 
@@ -53,8 +53,8 @@ repositories only, and nothing else. Keep it out of this repository and out of G
 Run both commands. Every branch and tag line must match, hash for hash.
 
 ```
-git ls-remote --heads --tags https://github.com/HarperZ9/daylight-commons.git | sort
-git ls-remote --heads --tags https://codeberg.org/<account>/daylight-commons.git | sort
+git ls-remote --heads --tags https://github.com/HarperZ9/cmmns.git | sort
+git ls-remote --heads --tags https://codeberg.org/<account>/cmmns.git | sort
 ```
 
 Then download one release zip from each host and compare its SHA-256 with `SHA256SUMS` from the

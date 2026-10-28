@@ -1,12 +1,12 @@
 # Firefox for Android
 
-Daylight Commons' Firefox package (`dist/radar-firefox-<version>.xpi`, from `npm run package`) declares
+CMMNS' Firefox package (`dist/cmmns-firefox-<version>.xpi`, from `npm run package`) declares
 `browser_specific_settings.gecko_android` with a minimum of Firefox 128, the first version with
 main-world content scripts. The same package serves desktop and Android.
 
 ## What changes on a phone
 - **Opening the window.** A phone cannot hover. When the main pointer cannot hover (CSS
-  `(hover: none)`), each post gets one small "Daylight Commons" button beside its text. A tap opens the window
+  `(hover: none)`), each post gets one small "CMMNS" button beside its text. A tap opens the window
   and holds it open; a tap anywhere else closes it. The tap does not reach the site, so it does not
   open the post. Mouse and keyboard paths are unchanged on desktop. (`src/ext/pop.js`)
 - **The window** is never wider than the screen less 16 px, and goes below the post when there is
@@ -15,8 +15,8 @@ main-world content scripts. The same package serves desktop and Android.
   follows the screen and its buttons are at least 44 px tall.
 - **X account lookups** read profiles in a background tab, since Firefox for Android has no
   windows API; on desktop they still use a minimised window. (`src/ext/background.js`)
-- **Mastodon servers** are turned on the same way: open the server, open Daylight Commons from the menu, tap
-  "Turn on Daylight Commons here", and allow the browser's prompt.
+- **Mastodon servers** are turned on the same way: open the server, open CMMNS from the menu, tap
+  "Turn on CMMNS here", and allow the browser's prompt.
 
 ## How to test
 Steps from Mozilla's extension workshop documentation, from memory and not re-run for this
@@ -30,10 +30,10 @@ release; check the current page before relying on them.
    `web-ext run -t firefox-android --android-device <id-from-adb> --firefox-apk org.mozilla.fenix`
    (`org.mozilla.firefox` for release, `org.mozilla.firefox_beta` for Beta).
 4. Check, on a phone screen:
-   - a thread on X, Bluesky, Threads and a Mastodon server shows one "Daylight Commons" button per post;
+   - a thread on X, Bluesky, Threads and a Mastodon server shows one "CMMNS" button per post;
    - a tap opens the window inside the screen, a second tap closes it, and the post did not open;
-   - the popup page lists what Daylight Commons sees and its buttons work;
-   - on a Mastodon server, "Turn on Daylight Commons here" shows the browser's prompt, and after a reload the
+   - the popup page lists what CMMNS sees and its buttons work;
+   - on a Mastodon server, "Turn on CMMNS here" shows the browser's prompt, and after a reload the
      buttons appear; Options, Mastodon servers, Remove takes it away again.
 5. Record the result in `LIVE-CHECKS.md` (row 42).
 

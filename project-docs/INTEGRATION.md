@@ -1,6 +1,6 @@
-# Integrating Daylight Commons
+# Integrating CMMNS
 
-Daylight Commons' evidence is available outside the browser extension. A newsroom tool, a research pipeline
+CMMNS' evidence is available outside the browser extension. A newsroom tool, a research pipeline
 or a moderation dashboard can call the same rules the extension runs, get the same evidence with
 the same wording, and check a colleague's findings offline. Nothing here needs a server, an
 account, a network connection or a third-party package.
@@ -39,7 +39,7 @@ const result = analyzeThread({
 for (const e of result.evidence) console.log(e.label, e.shows, e.context);
 ```
 
-The package exports the same entry as `radar/core` (`package.json` `exports`). Daylight Commons is not
+The package exports the same entry as `radar/core` (`package.json` `exports`). CMMNS is not
 published to npm; use it from a clone or a release archive.
 
 ## The API
@@ -61,7 +61,7 @@ A post is `{ id, author, text, posted, links, flags, account }`. Only `text` is 
 is used to tell accounts apart for the thread comparisons and never appears in the output.
 `flags` is a list of flag ids (or `{ id, evidence }` objects) when you have already read the
 account; `account` gives the details a platform discloses (`joinDate`, `postsCount`,
-`followersCount`, `basedIn` and the rest of `src/core/flags.js`) and Daylight Commons works out the flags.
+`followersCount`, `basedIn` and the rest of `src/core/flags.js`) and CMMNS works out the flags.
 With neither, the account counts as not read, as in the extension.
 
 ### Time precision
@@ -72,11 +72,11 @@ copied from a screen often come from rounded ages ("14h", "1d") and are good onl
 the day, yet they look like any other timestamp. Several replies then share one second by
 rounding, and before 3.2.1 the burst test read that as a burst (p < 0.000001).
 
-When `timePrecision` is missing, Daylight Commons infers it:
+When `timePrecision` is missing, CMMNS infers it:
 
 - from the input format: X (GraphQL, archive, saved page), Reddit and Mastodon give seconds,
   Bluesky gives milliseconds;
-- for a thread typed or assembled in Daylight Commons' own shape, from the times themselves. If at
+- for a thread typed or assembled in CMMNS' own shape, from the times themselves. If at
   least half the distinct times, and at least three, fall on the same point of the day, hour or
   minute, the times are taken as rounded to that unit. Fewer than three distinct times give
   unknown. Typed times are never taken as second-precise without that evidence.
@@ -96,7 +96,7 @@ A thread envelope reports what was used in `posts.timePrecision`: `{ value, basi
 `value` is a precision or `null` for unknown and `basis` is `declared`, `inferred`, `declared and
 inferred` or `unknown` (API 1.1.0 on).
 
-`useData` loads Daylight Commons' tables: the site facts and records (`src/ext/sites.json`), ownership
+`useData` loads CMMNS' tables: the site facts and records (`src/ext/sites.json`), ownership
 (`owners.json`), state links (`state.json`) and the fact-check table (`claims.json` and the parts
 it names). Without them, evidence that needs a table is left out, never guessed. The CLI loads them
 from disk; the extension from its own package.
@@ -116,7 +116,7 @@ from disk; the extension from its own package.
 ```
 
 `limits` gives the context for the whole result. A `media` envelope adds
-`media: { state, ai, format }`; a `site` envelope carries `site`, the rows Daylight Commons' tables hold.
+`media: { state, ai, format }`; a `site` envelope carries `site`, the rows CMMNS' tables hold.
 
 ### An evidence item
 
@@ -128,7 +128,7 @@ from disk; the extension from its own package.
   "level": "flag",
   "label": "timing burst, 5 accounts",
   "shows": "5 accounts replied within 8 s at 12:10 UTC. Chance at this thread's pace: p < 0.000001. In ordinary threads with 5 to 19 replies, ...",
-  "source": "The posts in the input, as given, read by Daylight Commons on this device.",
+  "source": "The posts in the input, as given, read by CMMNS on this device.",
   "context": "Replies that arrived within the same seconds, as they also do after a viral post or a mass notification. ...",
   "posts": ["100", "101", "102", "103", "104"],
   "spans": [],
@@ -158,7 +158,7 @@ from disk; the extension from its own package.
 | `swarming` | thread | Many new or flagged accounts converging on one post within minutes; counts only |
 | `strong-language` | post | Slurs, dehumanising language, calls for violence or vigilantes, group stereotypes |
 | `names-theory` | post | A documented conspiracy theory named, with what the record shows |
-| `persuasion` | post | A persuasion technique that passed Daylight Commons' measurement bar |
+| `persuasion` | post | A persuasion technique that passed CMMNS' measurement bar |
 | `leaked-ai`, `machine-writing` | post | Chatbot text posted unedited; several independent machine-writing signs |
 | `spam-pattern` | post | Giveaway, crypto and contact-bait patterns |
 | `fact-check` | post | A fact-checker reviewed a similar claim; the rating is theirs |
@@ -166,14 +166,14 @@ from disk; the extension from its own package.
 | `state-link` | post or site | A cited source ties the site to a state |
 | `site-owner`, `site-record` | post or site | The owner on Wikidata; the site's fact-check record |
 | `content-credentials`, `credentials-ai`, `credentials-changed`, `ai-metadata`, `no-credentials`, `remote-credentials` | file | What the file's Content Credentials and metadata say |
-| `case-file` | file | One file of a `daylight case` export: its path, sha256 and size (project-docs/INVESTIGATE.md) |
+| `case-file` | file | One file of a `cmmns case` export: its path, sha256 and size (project-docs/INVESTIGATE.md) |
 
 ## The schema
 
 `schema/evidence.v2.json` (JSON Schema 2020-12, `$id` `urn:radar:evidence:v2`) covers the envelope,
 the item and the bundle. `schema/evidence.v1.json` (`urn:radar:evidence:v1`) stays in the repository
 for version 1 documents. Any validator works. The CLI and the tests use a short checker
-(`bin/lib/jsonschema.mjs`) so Daylight Commons needs no package; it reads `type`, `const`, `enum`,
+(`bin/lib/jsonschema.mjs`) so CMMNS needs no package; it reads `type`, `const`, `enum`,
 `pattern`, `minLength`, `minimum`, `required`, `properties`, `additionalProperties`, `items`,
 `minItems`, `anyOf`, `oneOf` and local `$ref`. The tests check real outputs against the schema
 and check that the checker rejects missing limits, unknown kinds, an account field and bad spans.
@@ -189,7 +189,7 @@ version.
   import formats. The schema's `kind` list grows in the same release. Treat a kind you do not know
   as context.
 - **Major** (3.0.0): removing or renaming a field or kind, changing a field's type or meaning, or
-  changing how a bundle is signed. The schema id changes to `urn:radar:evidence:v3`, and Daylight Commons
+  changing how a bundle is signed. The schema id changes to `urn:radar:evidence:v3`, and CMMNS
   keeps verifying earlier bundles.
 
 API 2.0.0 (2026-10-23) is the first major release. It renames the item field `doesNotProve` to
@@ -216,10 +216,10 @@ check, 2 for a usage error.
 |---|---|
 | `analyze <file>` | Reads any supported file (below) and prints the evidence. `--no-claims` skips the fact-check table (faster). `--bundle out.json` also writes a signed bundle; `--include-text` puts full post text in it; `--key path` chooses the key file; `--carrier-safe` signs with a one-time key that is never saved, keeps the day only and leaves the page address out unless `--page <address>` gives one |
 | `verify <bundle>` | Checks the signature, the key id (`--key-id`), the bundle's own consistency and the schema |
-| `site <domain>` | What Daylight Commons' tables hold about a site |
+| `site <domain>` | What CMMNS' tables hold about a site |
 | `media <file>` | Content Credentials and AI-generation metadata |
 
-### Files Daylight Commons reads
+### Files CMMNS reads
 
 | File | Where it comes from | Read as |
 |---|---|---|
@@ -234,10 +234,10 @@ check, 2 for a usage error.
 
 ## Signed evidence bundles
 
-A bundle is a JSON file holding what Daylight Commons found on one thread or export:
+A bundle is a JSON file holding what CMMNS found on one thread or export:
 
 - the post ids, and each evidence item with its matched words;
-- the Daylight Commons version and the API version;
+- the CMMNS version and the API version;
 - `dataLock`: a SHA-256 over the data tables used (lines `<sha256>  <file>` sorted by name, each
   file hashed with LF line ends so Windows and Linux checkouts agree). The per-file hashes are the
   ones `data/LOCK.json` pins for those tables and the project key signs in
@@ -285,14 +285,14 @@ has not changed since that key signed it.
 
 ## What this does not prove, and what is not done
 
-- The evidence describes posts as given. Daylight Commons cannot tell whether a saved page or an export was
+- The evidence describes posts as given. CMMNS cannot tell whether a saved page or an export was
   edited before it reached it. A signature covers the bundle, not the input.
 - Every item's limit applies here as it does in the extension: a sign is something to look at,
   never a finding about a person.
 - The saved-page readers are tested on synthetic pages built to match X's and Reddit's current
   markup, not on a corpus of real saved pages. Old Reddit, Mastodon and Bluesky saved pages read as
-  one text. A site redesign can break a reader until Daylight Commons is updated.
+  one text. A site redesign can break a reader until CMMNS is updated.
 - The Bluesky `.car` reader is tested on a synthetic repository built in the test, not on a real
   export.
 - Media bundles are not offered: a media result names no posts.
-- Daylight Commons is not on npm. The API is versioned and the schema is published in this repository.
+- CMMNS is not on npm. The API is versioned and the schema is published in this repository.

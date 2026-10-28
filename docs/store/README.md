@@ -13,7 +13,7 @@ submit are the author's steps; nothing here has been submitted.
 | Five screenshots, 1280x800, with captions | `screenshots/01` to `05`, captions in `LISTING.md` | CWS and AMO |
 | Small promo tile, 440x280 | `promo-tile.png` | CWS |
 | Firefox reviewer source package | `amo-source-<version>.zip` (made by `node scripts/amo-source.mjs`) | AMO "Source code" |
-| Packages | `radar-chrome-<version>.zip`, `radar-firefox-<version>.xpi` from the GitHub release | CWS; AMO |
+| Packages | `cmmns-chrome-<version>.zip`, `cmmns-firefox-<version>.xpi` from the GitHub release | CWS; AMO |
 | Step-by-step submission | `LISTING.md`, "Submission steps for the author" | |
 
 `tests/store-listing.test.js` keeps the copy within each store's limits, the summary identical to the

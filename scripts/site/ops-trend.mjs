@@ -17,7 +17,7 @@ export function opsSection(t) {
   const indicators = t.indicators.length, domains = t.indicators.filter((i) => i.d).length;
   return `
 <h2>Documented influence operations</h2>
-<p>Daylight Commons carries ${T.total} influence operations from ${T.byState.length} attributed countries, first published between ${T.byYear[0].year} and ${T.byYear[T.byYear.length - 1].year}, and ${indicators.toLocaleString("en")} domains and accounts their sources named (${domains.toLocaleString("en")} domains). A link or account that a report named shows "Named in a published report", with who the sources say ran it, in each source's own words.</p>
+<p>CMMNS carries ${T.total} influence operations from ${T.byState.length} attributed countries, first published between ${T.byYear[0].year} and ${T.byYear[T.byYear.length - 1].year}, and ${indicators.toLocaleString("en")} domains and accounts their sources named (${domains.toLocaleString("en")} domains). A link or account that a report named shows "Named in a published report", with who the sources say ran it, in each source's own words.</p>
 <p><strong>What the counts mean.</strong> ${esc(OPS_TREND_CAVEAT)}</p>
 <p>Every operation meets the same bar, whatever the country: at least one primary source that was read (a platform report, a research lab, a court or government document, or reporting that names its sources), an operator type that a source itself states, and a cited source for every field. A test enforces this on the data.</p>
 <h3>By year of first report</h3>

@@ -1,6 +1,6 @@
 """Build the text the recogniser trains and tests on, from the author's own documents only.
 
-No one else's posts are used. Sentences come from Daylight Commons' docs and lessons and the author's
+No one else's posts are used. Sentences come from CMMNS' docs and lessons and the author's
 workspace notes; held-out files never feed training. Writes train.txt and test.txt (one
 sentence per line) into the output folder. R&D only: nothing here ships.
 

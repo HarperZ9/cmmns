@@ -1,0 +1,33 @@
+{
+  "format": "daylight-case-export/1",
+  "profile": "newsroom",
+  "at": "2026-10-26T12:00:00.000Z",
+  "tool": "Daylight Commons 3.8.0 (daylight case)",
+  "state": "44684f958715e775a55966b9d52d4358061d58c3bf3ae104d503cf1739419dcf",
+  "previous": null,
+  "redacted_accounts": 0,
+  "snapshot": {
+    "claims": [
+      {
+        "id": "C01",
+        "text": "The council voted 7-2 on October 19 to sell the harbour land",
+        "rung": "documented",
+        "status": null,
+        "source": "S01"
+      }
+    ],
+    "sources": [
+      {
+        "id": "S01",
+        "text": null,
+        "rung": null,
+        "status": null,
+        "source": null
+      }
+    ],
+    "leads": [],
+    "absent": [],
+    "edges": [],
+    "events": []
+  }
+}

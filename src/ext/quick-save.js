@@ -23,11 +23,11 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     } catch { return null; }
   }
 
-  // The folder inside the save folder, and whether this is a study save (Daylight/study/<site>/); set per download in run().
+  // The folder inside the save folder, and whether this is a study save (CMMNS/study/<site>/); set per download in run().
   let site = location.hostname, study = false;
-  // After Daylight Commons is updated or reloaded, a page opened before keeps the old script, which
+  // After CMMNS is updated or reloaded, a page opened before keeps the old script, which
   // can no longer reach the extension. It says so instead of saving somewhere unexpected.
-  const RELOAD = "Daylight Commons was updated. Reload this page, then save again.";
+  const RELOAD = "CMMNS was updated. Reload this page, then save again.";
   function alive() { if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) throw new Error(RELOAD); }
   async function viaBrowser(url, name, opts) {
     const r = await msg({ type: "pb-qs-download", url, filename: name, site, study, overwrite: !!opts.overwrite, fixExt: opts.fixExt || false });
@@ -83,13 +83,13 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
           if (c.capture) await c.capture.add(written, b.bytes, out, type.mime);
           return { name: written, line: `Saved ${written}, ${size(out.length)}.` };
         }
-      } catch (e) { if (c.capture) throw new Error(`The file could not be read for the capture: ${e.message}`); console.warn("[daylight-commons] could not read the file to add its description; the browser downloads it as it is", e); }
+      } catch (e) { if (c.capture) throw new Error(`The file could not be read for the capture: ${e.message}`); console.warn("[cmmns] could not read the file to add its description; the browser downloads it as it is", e); }
     }
     const written = (await viaBrowser(plan.url, name, { fixExt: type.from !== "bytes" })).filename || name;
     return { name: written, line: `Downloading ${written}` };
   }
 
-  const PROTECTED = "Source protection is on, so Daylight Commons did not download this: the request would tell the host. Use your browser's own Save as, and add the file to your case.";
+  const PROTECTED = "Source protection is on, so CMMNS did not download this: the request would tell the host. Use your browser's own Save as, and add the file to your case.";
   const EMBED = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4"]), EMBED_MAX = 300 * 1048576;
   async function prefs() {
     try { const k = PB.SETTINGS_KEY; return PB.normalizeSettings((await chrome.storage.local.get(k))[k]); } catch { return PB.normalizeSettings(null); }
@@ -153,7 +153,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
       const list = Object.entries(all);
       const kept = list.length > SAVED_MAX ? Object.fromEntries(list.sort((a, b) => b[1][1] - a[1][1]).slice(0, SAVED_MAX)) : all;
       await chrome.storage.local.set({ [SAVED]: kept });
-    } catch (e) { console.warn("[daylight-commons] could not note the saved file", e); }
+    } catch (e) { console.warn("[cmmns] could not note the saved file", e); }
   }
   class Already extends Error { constructor(name) { super(`Already saved as ${name}.`); this.fileName = name; } }
 
@@ -241,7 +241,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
         toast(`Protected, can't be saved. ${e.reason}`, { tone: "no", actions: [["Save reference", () => keepReference(t, e.reason).then((l) => toast(l, { tone: "ok", stay: 7000 }), (x) => toast(`No reference kept: ${x.message}`, { tone: "no" }))]] });
         return { ok: false, protected: true, line: e.reason };
       }
-      console.warn("[daylight-commons] download failed", e);
+      console.warn("[cmmns] download failed", e);
       toast(`Not saved: ${e.message}`, { tone: "no", stay: 7000 });
       return { ok: false, line: e.message };
     }

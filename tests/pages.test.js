@@ -51,9 +51,9 @@ test("the known limits come from EVALUATION.md, and corpora from CORPORA.md", ()
 test("the privacy page is dated and links the changelog and issues", () => {
   const html = pages["privacy.html"];
   assert.match(html, /Updated \d{4}-\d{2}-\d{2}\./);
-  assert.match(html, /github\.com\/HarperZ9\/daylight-commons\/issues/);
+  assert.match(html, /github\.com\/HarperZ9\/cmmns\/issues/);
   assert.match(html, /pb\.feedback\.v1/);
-  assert.throws(() => privacy("ext", "# Daylight Commons privacy policy\n\nNo date here.\n"));
+  assert.throws(() => privacy("ext", "# CMMNS privacy policy\n\nNo date here.\n"));
 });
 
 test("the Markdown reader handles the shapes the docs use", () => {

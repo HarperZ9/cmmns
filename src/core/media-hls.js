@@ -1,5 +1,5 @@
 // HLS playlists (RFC 8216): reads a master or media playlist into plain data, says whether the
-// stream is encrypted, and lists the segment addresses to fetch. Daylight Commons saves only
+// stream is encrypted, and lists the segment addresses to fetch. CMMNS saves only
 // unencrypted streams: any EXT-X-KEY or EXT-X-SESSION-KEY with a METHOD other than NONE means the
 // stream is protected, and it is never fetched. Pure: no network.
 

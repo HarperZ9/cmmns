@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Daylight Commons options</title>
+<title>CMMNS options</title>
 <link rel="stylesheet" href="canon.css">
 <link rel="stylesheet" href="pages.css">
 </head>
@@ -12,8 +12,8 @@
   <header class="hero">
     <div id="art"></div>
     <div>
-      <h1>Daylight Commons options</h1>
-      <p class="lead">Choose where Daylight Commons runs, what its window shows and how long it keeps what it has read. Changes apply at once.</p>
+      <h1>CMMNS options</h1>
+      <p class="lead">Choose where CMMNS runs, what its window shows and how long it keeps what it has read. Changes apply at once.</p>
     </div>
   </header>
 
@@ -21,7 +21,7 @@
     <h2 id="h-sites">Sites</h2>
     <div id="sites" class="switches"></div>
     <h3 id="h-servers">Mastodon servers</h3>
-    <p class="hint">Daylight Commons runs on a Mastodon server only after you open it, click the Daylight Commons button and allow it. Removing a server here takes the access back.</p>
+    <p class="hint">CMMNS runs on a Mastodon server only after you open it, click the CMMNS button and allow it. Removing a server here takes the access back.</p>
     <ul id="servers" class="servers" aria-labelledby="h-servers"></ul>
   </section>
 
@@ -40,7 +40,7 @@
 
   <section aria-labelledby="h-adblock">
     <h2 id="h-adblock">Ad blocking</h2>
-    <p class="muted">Blocks ads and trackers with the EasyList and EasyPrivacy lists, compiled into your browser's own blocking engine. The browser does the matching; Daylight Commons never sees which requests were blocked. Separate from everything Daylight Commons reads.</p>
+    <p class="muted">Blocks ads and trackers with the EasyList and EasyPrivacy lists, compiled into your browser's own blocking engine. The browser does the matching; CMMNS never sees which requests were blocked. Separate from everything CMMNS reads.</p>
     <div id="adblock" class="switches"></div>
     <h3 class="sub">Sites where ads are allowed</h3>
     <ul id="adblock-allow" class="plain"></ul>
@@ -48,7 +48,7 @@
 
   <section aria-labelledby="h-sitecards">
     <h2 id="h-sitecards">Site cards</h2>
-    <p class="muted">Rest the pointer on a link in a post to see who owns the site, what kind of owner it has, when and where it was founded, any state link, and its fact-check record. To see the same card for a news site you are reading, press <strong>Site card for this page</strong> in Daylight Commons' toolbar menu. On news sites, the card appears when you press that button.</p>
+    <p class="muted">Rest the pointer on a link in a post to see who owns the site, what kind of owner it has, when and where it was founded, any state link, and its fact-check record. To see the same card for a news site you are reading, press <strong>Site card for this page</strong> in CMMNS' toolbar menu. On news sites, the card appears when you press that button.</p>
     <h3 class="sub">Search results</h3>
     <p class="muted">Turn an engine on to add a line of labels under each of its results. The browser asks for access to that engine's result pages, and the labels are worked out in this browser.</p>
     <div id="search" class="switches"></div>
@@ -73,11 +73,11 @@
 
   <section aria-labelledby="h-packs">
     <h2 id="h-packs">Data packs</h2>
-    <p class="muted">A data pack adds fact-checks, operation indicators or site notes from someone you choose. Pick the file, and Daylight Commons checks its signature and shows which key signed it and what it adds. The pack takes effect once you trust that key.</p>
+    <p class="muted">A data pack adds fact-checks, operation indicators or site notes from someone you choose. Pick the file, and CMMNS checks its signature and shows which key signed it and what it adds. The pack takes effect once you trust that key.</p>
     <p class="status muted" id="bundled" role="status" aria-live="polite"></p>
     <div class="row">
       <button id="packPick" type="button">Import a pack file</button>
-      <button id="bundledCheck" type="button" class="quiet">Check Daylight Commons' own data</button>
+      <button id="bundledCheck" type="button" class="quiet">Check CMMNS' own data</button>
       <input id="packFile" type="file" accept=".json,application/json" hidden>
     </div>
     <div id="packPreview" aria-live="polite"></div>
@@ -97,13 +97,13 @@
   </section>
 
   <section aria-labelledby="h-keep">
-    <h2 id="h-keep">What Daylight Commons keeps</h2>
+    <h2 id="h-keep">What CMMNS keeps</h2>
     <p class="muted">Everything stays in this browser profile. Older entries are deleted on the next start and whenever you change these numbers.</p>
     <div class="field"><label for="historyDays">History, connections and source trails, in days<span class="hint muted" id="historyHint"></span></label><input id="historyDays" type="number" inputmode="numeric"></div>
     <div class="field"><label for="aboutDays">Account details read from About pages, in days</label><input id="aboutDays" type="number" inputmode="numeric"></div>
     <p class="status muted figure" id="usage" aria-live="polite"></p>
     <div class="row">
-      <button id="clear" type="button" class="quiet">Clear all Daylight Commons data</button>
+      <button id="clear" type="button" class="quiet">Clear all CMMNS data</button>
       <span id="clearStatus" role="status" aria-live="polite"></span>
     </div>
   </section>
@@ -126,14 +126,14 @@
 
   <section aria-labelledby="h-feedback">
     <h2 id="h-feedback">Your feedback on signs</h2>
-    <p class="muted">Every sign in the window has <strong>This was right</strong> and <strong>This was wrong</strong>. Your marks stay in this browser. Daylight Commons keeps the sign, its kind, the thread it was in and your mark. It keeps the post text only when you tick "include the text" before marking.</p>
+    <p class="muted">Every sign in the window has <strong>This was right</strong> and <strong>This was wrong</strong>. Your marks stay in this browser. CMMNS keeps the sign, its kind, the thread it was in and your mark. It keeps the post text only when you tick "include the text" before marking.</p>
     <p class="muted" id="fbRule"></p>
     <p class="status muted figure" id="fbCount" aria-live="polite"></p>
     <table>
       <thead><tr><th scope="col">Sign</th><th scope="col">Right</th><th scope="col">Wrong</th></tr></thead>
       <tbody id="fbFamilies"></tbody>
     </table>
-    <p class="muted">Saving writes a JSON file to your computer. Daylight Commons never sends it. If you want to help measure Daylight Commons, you can attach the file to an issue on <a href="https://github.com/HarperZ9/daylight-commons/issues" target="_blank" rel="noopener noreferrer">Daylight Commons' repository</a>. Read it first: it holds the threads you marked, and the text of any post you chose to include.</p>
+    <p class="muted">Saving writes a JSON file to your computer. CMMNS never sends it. If you want to help measure CMMNS, you can attach the file to an issue on <a href="https://github.com/HarperZ9/cmmns/issues" target="_blank" rel="noopener noreferrer">CMMNS' repository</a>. Read it first: it holds the threads you marked, and the text of any post you chose to include.</p>
     <div class="row">
       <button id="fbExport" type="button">Save feedback to a file</button>
       <button id="fbClear" type="button" class="quiet">Clear feedback</button>
@@ -141,7 +141,7 @@
     </div>
   </section>
 
-  <footer id="foot">Daylight Commons reads the site you are on. Other coverage and evidence lookups reach further once you turn them on.</footer>
+  <footer id="foot">CMMNS reads the site you are on. Other coverage and evidence lookups reach further once you turn them on.</footer>
 </main>
 <script src="core.bundle.js"></script>
 <script src="guard.js"></script>

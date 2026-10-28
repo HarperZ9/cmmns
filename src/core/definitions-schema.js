@@ -54,7 +54,7 @@ function elementProblems(el, i, reg, where) {
     const fams = new Set(el.signals.map((id) => (reg.get(id) || {}).family)).size;
     if (!(el.min_families >= 2) || el.min_families > fams) out.push(`${w}: min_families must be 2 or more and no more than the families its signals cover (${fams})`);
   }
-  for (const t of [el.label, el.note || ""]) if (VERDICT_WORDS.test(t)) out.push(`${w}: verdict word in Daylight Commons' own text`);
+  for (const t of [el.label, el.note || ""]) if (VERDICT_WORDS.test(t)) out.push(`${w}: verdict word in CMMNS' own text`);
   return out;
 }
 
@@ -81,7 +81,7 @@ export function entryProblems(e, { registry, ids = new Set(), file = null } = {}
   else e.elements.forEach((el, i) => out.push(...elementProblems(el || {}, i, reg, w)));
   if (!str(e.does_not_prove, 40)) out.push(`${w}: does_not_prove is required`);
   for (const r of e.related || []) if (ids.size && !ids.has(r)) out.push(`${w}: related entry ${r} does not exist`);
-  for (const t of [e.title, e.binding_note, e.does_not_prove, e.instrument, e.section]) if (String(t).includes(DASH)) out.push(`${w}: em dash in Daylight Commons' own text`);
+  for (const t of [e.title, e.binding_note, e.does_not_prove, e.instrument, e.section]) if (String(t).includes(DASH)) out.push(`${w}: em dash in CMMNS' own text`);
   if (VERDICT_WORDS.test(e.does_not_prove) || VERDICT_WORDS.test(e.title)) out.push(`${w}: verdict word in title or does_not_prove`);
   return out;
 }

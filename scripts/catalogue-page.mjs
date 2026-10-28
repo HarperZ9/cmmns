@@ -89,7 +89,7 @@ function contents(groups) {
 }
 
 function intro(entries) {
-  return `<p>Daylight Commons compares what a page shows with published definitions from law and platform policy, element by element. This page lists every definition in the catalogue: ${entries.length} entries, each quoted from its official source, with the date it was retrieved and a hash of what was retrieved. A badge names the entry and version it used, so it can always be read against the text below.</p>
+  return `<p>CMMNS compares what a page shows with published definitions from law and platform policy, element by element. This page lists every definition in the catalogue: ${entries.length} entries, each quoted from its official source, with the date it was retrieved and a hash of what was retrieved. A badge names the entry and version it used, so it can always be read against the text below.</p>
 <p>${esc(DEFINITION_FRAME)} ${esc(LEGAL_NOTE)}</p>
 <p>Anyone can challenge an entry or a badge through the <a href="${CHALLENGE_URL}">challenge form</a>. Changes are listed in the <a href="${REPO}/blob/main/catalogue/CHANGELOG.md">catalogue changelog</a>, and the whole catalogue is CC BY 4.0 in <a href="${REPO}/tree/main/catalogue">the repository</a>.</p>`;
 }
@@ -112,8 +112,8 @@ export function render(entries = loadEntries(), date = updated()) {
   return sitePage({
     file: "catalogue.html",
     title: "Definition catalogue",
-    role: "Every published definition Daylight Commons compares a page with: its source, version, retrieval date and elements.",
-    description: "The open catalogue of legal and platform definitions behind Daylight Commons' badges, each with its official source, version and elements.",
+    role: "Every published definition CMMNS compares a page with: its source, version, retrieval date and elements.",
+    description: "The open catalogue of legal and platform definitions behind CMMNS' badges, each with its official source, version and elements.",
     updated: date, body, css: CSS,
   });
 }

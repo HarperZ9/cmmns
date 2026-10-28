@@ -1,7 +1,7 @@
-// Video for the convert page, on this device: frames come from Daylight Commons' own GIF decoder
+// Video for the convert page, on this device: frames come from CMMNS' own GIF decoder
 // (src/core/media-gif.js) or from the browser playing the file muted, are scaled on a canvas,
 // encoded with WebCodecs' VideoEncoder (VP9 or VP8 for WebM, H.264 for MP4), and muxed with
-// Daylight Commons' own WebM and MP4 writers. Sound is decoded and re-encoded by convert-audio.js.
+// CMMNS' own WebM and MP4 writers. Sound is decoded and re-encoded by convert-audio.js.
 globalThis.PBConvertVideo = (() => {
   "use strict";
   const CODECS = { webm: [["vp09.00.40.08", "V_VP9"], ["vp8", "V_VP8"]], mp4: [["avc1.640028", "avc1"], ["avc1.4d4028", "avc1"], ["avc1.42e028", "avc1"], ["avc1.42e01f", "avc1"]] };
@@ -14,7 +14,7 @@ globalThis.PBConvertVideo = (() => {
 
   // The first codec this browser can encode at this size, as { codec, track, config }.
   async function pick(to, w, h, bitrate, fps) {
-    if (typeof VideoEncoder === "undefined") throw new Error("This browser has no video encoder (WebCodecs). The command line can convert video with ffmpeg: daylight media convert.");
+    if (typeof VideoEncoder === "undefined") throw new Error("This browser has no video encoder (WebCodecs). The command line can convert video with ffmpeg: cmmns media convert.");
     for (const [codec, track] of CODECS[to]) {
       const config = { codec, width: w, height: h, bitrate, framerate: fps, latencyMode: "quality", ...(track === "avc1" ? { avc: { format: "avc" } } : {}) };
       try { if ((await VideoEncoder.isConfigSupported(config)).supported) return { codec, track, config }; } catch { /* try the next codec */ }
@@ -106,7 +106,7 @@ globalThis.PBConvertVideo = (() => {
 
   // Video to WebM or MP4, smaller if asked. opts: { to, maxHeight, bitrate, fps, audioBitrate }.
   async function fromVideo(blob, bytes, { to = "webm", maxHeight = 0, bitrate = 2000000, fps = 0, audioBitrate = 96000 } = {}, onProgress = () => {}) {
-    if (typeof HTMLVideoElement === "undefined" || !("requestVideoFrameCallback" in HTMLVideoElement.prototype)) throw new Error("This browser cannot hand video frames to the encoder. Use the command line: daylight media convert.");
+    if (typeof HTMLVideoElement === "undefined" || !("requestVideoFrameCallback" in HTMLVideoElement.prototype)) throw new Error("This browser cannot hand video frames to the encoder. Use the command line: cmmns media convert.");
     const video = await load(blob);
     const [w, h] = size(video.videoWidth, video.videoHeight, Number(maxHeight) || 0);
     const choice = await pick(to, w, h, bitrate, Number(fps) || 30);

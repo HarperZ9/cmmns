@@ -1,14 +1,14 @@
 // The laundering chain: a post, the accounts and sites its material passed through, and the
-// earliest origin Daylight Commons can see. Laundering is what makes one source look like many independent
+// earliest origin CMMNS can see. Laundering is what makes one source look like many independent
 // ones (Rauch's "artificial copies"; DISARM T0128.004, Launder Information Assets). The chain uses
-// only pointers the platform records and Daylight Commons' own first-seen log (src/core/trail.js): a quote
+// only pointers the platform records and CMMNS' own first-seen log (src/core/trail.js): a quote
 // or repost points upstream, "media from" names the post the media came from, the same upload or
 // the same link seen earlier names an earlier sharer. It never infers a source from wording, and
 // it stops where the platform's pointers stop.
 
 import { trailFor, firstSeen, normLink } from "./trail.js";
 
-export const CHAIN_DOES_NOT_PROVE = "The chain starts at the first upload or link Daylight Commons has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.";
+export const CHAIN_DOES_NOT_PROVE = "The chain starts at the first upload or link CMMNS has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.";
 
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return null; } };
 const hours = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 360000) / 10;

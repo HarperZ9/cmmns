@@ -1,4 +1,4 @@
-// `daylight capture verify <folder>`: checks every evidence capture (daylight.capture/1) under a
+// `cmmns capture verify <folder>`: checks every evidence capture (daylight.capture/1) under a
 // folder. For each: the saved files and the page picture still have the hashes the capture recorded,
 // the record itself is the one its custody line names, and the line's own hash is intact. Across
 // captures: the lines found form one chain, and any line not in the folder is named by number.

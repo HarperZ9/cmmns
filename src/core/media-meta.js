@@ -121,14 +121,14 @@ export function sidecarMarkdown(meta, fileNames = null) {
   const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
     ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Flair", m.flair], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
     ["Engagement at save", m.engagement ? Object.entries(m.engagement).filter(([k]) => k !== "at").map(([k, v]) => `${k} ${v}`).join(", ") : null], ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
-  out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by Daylight Commons from what the page showed.", "");
+  out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by CMMNS from what the page showed.", "");
   return out.join("\n");
 }
 
 // The folder for one save from the settings: "<folder>/<site>/", "<folder>/study/<site>/" for
 // Study, or "" only when the user turned on saving straight into Downloads.
 export function savePath(settings, site, study = false) {
-  const s = settings || {}, base = String(s.mediaFolder || "").trim() || "Daylight";
+  const s = settings || {}, base = String(s.mediaFolder || "").trim() || "CMMNS";
   if (s.mediaToRoot) return study ? saveFolder("study", site) : "";
   return saveFolder(study ? `${base}/study` : base, site);
 }

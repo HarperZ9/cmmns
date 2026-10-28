@@ -1,5 +1,5 @@
 // Badge families: every kind of signal the window can show, which area of the strip it sits in, and
-// what sort of evidence it is. A detector is Daylight Commons' own rule and can be measured for precision; a
+// what sort of evidence it is. A detector is CMMNS' own rule and can be measured for precision; a
 // platform family repeats the site's own label; a table family is a match against a cited table.
 // measuredLine() gives the line the window and the options page show for a family.
 
@@ -56,7 +56,7 @@ const valid = (r) => r && Number.isFinite(r.precision) && r.precision >= 0 && r.
 export function measuredLine(id, table = MEASURED) {
   const f = BY_ID.get(id);
   if (f && f.kind === P) return { measured: false, text: "the site's own label, shown as the site gives it" };
-  if (f && f.kind === F) return { measured: false, text: "what the file itself declares, with its signature checked by Daylight Commons" };
+  if (f && f.kind === F) return { measured: false, text: "what the file itself declares, with its signature checked by CMMNS" };
   if (f && f.kind === T) return { measured: false, text: "a match against a cited table; the source link is the evidence" };
   if (f && f.kind === TECH) { const st = techniqueStatus(id); return { measured: st.shown, text: st.text }; }
   const r = (table || {})[id];

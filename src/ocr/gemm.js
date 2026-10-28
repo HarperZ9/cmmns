@@ -36,7 +36,7 @@ function kernel() {
   try {
     const bin = Uint8Array.from(atob(GEMM_WASM), (c) => c.charCodeAt(0)), memory = new WebAssembly.Memory({ initial: 64 });
     simd = { gemm: new WebAssembly.Instance(new WebAssembly.Module(bin), { env: { memory } }).exports.gemm, memory };
-  } catch (e) { simd = null; console.warn("[daylight-commons] WebAssembly SIMD is not available here; reading text in plain JavaScript", e && e.message); }
+  } catch (e) { simd = null; console.warn("[cmmns] WebAssembly SIMD is not available here; reading text in plain JavaScript", e && e.message); }
   return simd;
 }
 

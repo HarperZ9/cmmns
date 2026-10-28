@@ -1,4 +1,4 @@
-// Adapter health (src/core/health.js): when a platform changes its markup, Daylight Commons says so plainly
+// Adapter health (src/core/health.js): when a platform changes its markup, CMMNS says so plainly
 // instead of showing nothing, and a quiet page or a sign-in wall is not mistaken for a change.
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -10,11 +10,11 @@ const settled = HEALTH_SETTLE_MS + 1;
 test("boxes found but none readable: the site changed its page", () => {
   const v = adapterHealth(REDDIT, { page: "thread", candidates: 12, read: 0, sinceMs: 100 });
   assert.equal(v.state, "changed");
-  assert.equal(v.say, "Reddit changed its page; Daylight Commons cannot read replies here yet.");
+  assert.equal(v.say, "Reddit changed its page; CMMNS cannot read replies here yet.");
   assert.match(adapterHealth(X, { page: "feed", candidates: 3, read: 0 }).say, /cannot read posts here/);
 });
 
-test("a post page that should show its post but shows nothing Daylight Commons can find, once settled", () => {
+test("a post page that should show its post but shows nothing CMMNS can find, once settled", () => {
   assert.equal(adapterHealth(X, { page: "thread", candidates: 0, read: 0, sinceMs: 1000, structure: { times: 4, articles: 4 } }).state, "waiting");
   assert.equal(adapterHealth(X, { page: "thread", candidates: 0, read: 0, sinceMs: settled, structure: { times: 2, articles: 1 } }).state, "changed");
   assert.equal(adapterHealth(BSKY, { page: "thread", candidates: 0, read: 0, sinceMs: settled, structure: { times: 1, articles: 0 } }).state, "changed");
@@ -36,7 +36,7 @@ test("many unreadable boxes, or posts with no text, are a partial change", () =>
   assert.match(adapterHealth(REDDIT, { page: "thread", candidates: 10, read: 10, withText: 0 }).say, /cannot read their text/);
 });
 
-test("a page Daylight Commons reads well, and pages that are not posts, say nothing", () => {
+test("a page CMMNS reads well, and pages that are not posts, say nothing", () => {
   assert.deepEqual(adapterHealth(X, { page: "thread", candidates: 10, read: 10, withText: 9 }), { state: "ok", say: null });
   assert.equal(adapterHealth(X, { page: "other" }).state, "idle");
   assert.equal(adapterHealth(null, { page: "thread" }).state, "idle");

@@ -8,9 +8,9 @@
   const $ = (id) => document.getElementById(id);
   await PBSettings.ready;
   const s = () => PBSettings.get();
-  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[daylight-commons] could not save settings", e));
+  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[cmmns] could not save settings", e));
   const say = (t) => { $("coverageStatus").textContent = t; };
-  const asked = (e) => { console.error("[daylight-commons] permission request failed", e); say("Could not ask the browser: " + e.message); return false; };
+  const asked = (e) => { console.error("[cmmns] permission request failed", e); say("Could not ask the browser: " + e.message); return false; };
 
   // Called from a change or click event, so the browser sees a user gesture.
   function grant(on, input, perms, patch, status) {
@@ -65,7 +65,7 @@
     const url = PB.cleanFeedUrl($("customUrl").value);
     if (!url) { say("Enter an https feed address, such as https://example.org/feed.xml."); return; }
     if (s().customFeeds.includes(url)) { say("That feed is already on the list."); return; }
-    if (s().customFeeds.length >= PB.MAX_CUSTOM_FEEDS) { say(`Daylight Commons keeps at most ${PB.MAX_CUSTOM_FEEDS} of your own feeds.`); return; }
+    if (s().customFeeds.length >= PB.MAX_CUSTOM_FEEDS) { say(`CMMNS keeps at most ${PB.MAX_CUSTOM_FEEDS} of your own feeds.`); return; }
     chrome.permissions.request({ origins: [PB.feedOrigin(url)] }).then(async (ok) => {
       if (!ok) { say("The feed needs the browser's access to its host. Add it again and choose Allow."); return; }
       await save({ customFeeds: [...s().customFeeds, url], feedConsent: false });
@@ -92,7 +92,7 @@
   function show() { $("feeds").hidden = !s().coverage; if (s().coverage) { outlets(); custom(); } }
 
   $("coverageText").textContent = PB.COVERAGE_PRIVACY;
-  $("outletsText").textContent = `Suggested outlets publish their own feed on their own host, have an owner on record in Daylight Commons' tables, and together span several countries, owner types and editorial positions. Each one starts off, and you choose which to use. Feeds checked ${PB.OUTLETS_CHECKED}.`;
-  $("coverage").append(switchRow("Find other coverage on click", "When you click on a page where you opened the site card, Daylight Commons downloads the public feeds of the outlets you choose. Each request is a plain download of the feed address.", s().coverage, (on) => switched(on)));
+  $("outletsText").textContent = `Suggested outlets publish their own feed on their own host, have an owner on record in CMMNS' tables, and together span several countries, owner types and editorial positions. Each one starts off, and you choose which to use. Feeds checked ${PB.OUTLETS_CHECKED}.`;
+  $("coverage").append(switchRow("Find other coverage on click", "When you click on a page where you opened the site card, CMMNS downloads the public feeds of the outlets you choose. Each request is a plain download of the feed address.", s().coverage, (on) => switched(on)));
   show();
-})().catch((e) => console.error("[daylight-commons] site options failed", e));
+})().catch((e) => console.error("[cmmns] site options failed", e));

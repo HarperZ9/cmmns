@@ -1,4 +1,4 @@
-// The "How Daylight Commons works" page (scripts/how-it-works.mjs): built fresh, every still it
+// The "How CMMNS works" page (scripts/how-it-works.mjs): built fresh, every still it
 // shows is in docs/demo, each finding has a caption and at most one plain line on how to read it, and
 // the page follows the author's site canon like the other public pages.
 import test from "node:test";

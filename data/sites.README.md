@@ -1,6 +1,6 @@
 # Site table: sources, rules and measured coverage
 
-`src/ext/sites.json` is built by `scripts/sites-build.mjs` at build time. Daylight Commons never calls Wikidata
+`src/ext/sites.json` is built by `scripts/sites-build.mjs` at build time. CMMNS never calls Wikidata
 or the fact-check feed from the browser. Built 2026-10-21.
 
 | Part | Source | Licence | What a row keeps |
@@ -13,7 +13,7 @@ or the fact-check feed from the browser. Built 2026-10-21.
 As Wikidata states it, in this order: the item is a public broadcaster; the item or its legal form
 is a nonprofit organisation or a business; its current owner (P127 without an end date) is one.
 The item's own statement wins over its owner's; when one level states both, the type reads
-"nonprofit and commercial". Daylight Commons' state table (`state.json`) comes first in the window: a cited
+"nonprofit and commercial". CMMNS' state table (`state.json`) comes first in the window: a cited
 state-ownership or designation row reads "state media", a public-broadcaster row "public
 broadcaster", a regional government owner "regional govt". A report naming a site in an operation
 is shown as a state link, never as an owner type. Of the 48,341 sites, 45,909 have no owner type

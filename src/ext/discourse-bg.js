@@ -41,7 +41,7 @@
   // posts: [{ id, text }] -> { [id]: { results, list } }; accounts: [{ key, display, handle, verified }] -> { [key]: persona }
   async function answer(msg) {
     const s = PB.normalizeSettings((await chrome.storage.local.get(PB.SETTINGS_KEY))[PB.SETTINGS_KEY]);
-    if (!s.discourse) return { error: "the discourse checks are off in Daylight Commons' options" };
+    if (!s.discourse) return { error: "the discourse checks are off in CMMNS' options" };
     const d = await load(), out = { quotes: {}, personas: {} };
     for (const p of (msg.posts || []).slice(0, MAX_ITEMS)) {
       const text = String(p.text || "").slice(0, MAX_TEXT), names = d.names.concat(d.surnames).filter((n) => text.includes(n));
@@ -55,7 +55,7 @@
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg || msg.type !== "pb-discourse" || !sender.tab) return undefined;
     answer(msg).then(sendResponse, (e) => {
-      console.error("[daylight-commons] the discourse checks failed", e);
+      console.error("[cmmns] the discourse checks failed", e);
       sendResponse({ error: String((e && e.message) || e) });
     });
     return true;

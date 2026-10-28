@@ -1,4 +1,4 @@
-// The thread panel: a small floating "Daylight Commons" button that opens into a summary of the thread. It
+// The thread panel: a small floating "CMMNS" button that opens into a summary of the thread. It
 // starts collapsed and remembers the user's choice for the session. Sections read top-down: what
 // it means, where accounts are based, signs of coordination, links and video, then actions.
 (() => {
@@ -48,7 +48,7 @@
   function flooding(f, base) {
     if (!f) return [];
     return [
-      f.volume ? `${f.volume.accounts.length} accounts posting ${f.threshold} or more times a day wrote ${Math.round(f.volume.share * 100)}% of the ${f.volume.known} replies whose account rate Daylight Commons knows.` : null,
+      f.volume ? `${f.volume.accounts.length} accounts posting ${f.threshold} or more times a day wrote ${Math.round(f.volume.share * 100)}% of the ${f.volume.known} replies whose account rate CMMNS knows.` : null,
       f.speed ? `${f.speed.highRate} of the ${f.speed.accounts} accounts in a burst at ${f.speed.from.slice(11, 16)} UTC post ${f.threshold} or more times a day.` : null,
       f.repeaters.length ? `Context: ${f.repeaters.map((x) => `@${x.handle} replied ${x.n} times`).join(", ")}. Conversations do this too.` : null,
       base("flood", true),
@@ -62,7 +62,7 @@
     if (!w) return [];
     const parts = [w.newAccounts ? `${w.newAccounts} new` : null, w.flagged ? `${w.flagged} flagged` : null].filter(Boolean).join(", ");
     return [
-      `${w.marked} of ${w.known} accounts Daylight Commons read in a ${Math.round(w.windowSec / 60)}-minute window from ${w.from.slice(11, 16)} UTC were new or flagged (${parts}), all replying to this post.`,
+      `${w.marked} of ${w.known} accounts CMMNS read in a ${Math.round(w.windowSec / 60)}-minute window from ${w.from.slice(11, 16)} UTC were new or flagged (${parts}), all replying to this post.`,
       base("swarm", true),
       PB.SWARM_DOES_NOT_PROVE,
     ];
@@ -110,7 +110,7 @@
     s.append(el("p", "pb-foot", c.dnp), el("p", "pb-foot", c.dispute));
     if (PB.DECISIONS_URL) s.append(links(el("p", "pb-foot", `${PB.DECISIONS_NOTE} `), [["Decisions log", PB.DECISIONS_URL]]));
     if (globalThis.PBDefinitionsView) PBDefinitionsView.section(s, PBDefinitionsView.model(c));
-    if (c.onForget) s.append(button("Forget launches I viewed", "Deletes the launch overlap Daylight Commons keeps in this browser, stored as hashed accounts.", () => c.onForget()));
+    if (c.onForget) s.append(button("Forget launches I viewed", "Deletes the launch overlap CMMNS keeps in this browser, stored as hashed accounts.", () => c.onForget()));
     if (globalThis.PBEvidenceView) PBEvidenceView.section(s, c.evidence, rerender);
     p.append(s);
   }
@@ -124,7 +124,7 @@
     const signs = (report.bursts || []).length + clusters.length + (report.state || []).length;
     // A platform funding label is source context worth seeing without opening the panel.
     const funded = stats.video && stats.video.funding ? " · funding label" : "";
-    const head = el("button", "pb-panel-head", open ? "Daylight Commons" : `Daylight Commons · ${report.replies}${signs ? ` · ${signs} sign${signs === 1 ? "" : "s"}` : ""}${funded}`);
+    const head = el("button", "pb-panel-head", open ? "CMMNS" : `CMMNS · ${report.replies}${signs ? ` · ${signs} sign${signs === 1 ? "" : "s"}` : ""}${funded}`);
     head.type = "button";
     head.setAttribute("aria-expanded", String(open));
     head.addEventListener("click", () => { open = !open; try { sessionStorage.setItem("pb.panel.open", open ? "1" : "0"); } catch (_) { /* ignore */ } render(report, clusters, stats, onLookupAll); });
@@ -145,7 +145,7 @@
         facebook: `${report.lookedUp} of ${report.replies} accounts have Page transparency you opened. Facebook shows it for Pages.`,
         bluesky: `${report.lookedUp} of ${report.replies} accounts have Bluesky data (join date, moderation labels). Bluesky keeps account location off its profiles.`,
       }[stats.site.id] || `${stats.site.name} shows no account location; this view uses coordination signs only.`) : `${report.lookedUp} of ${report.replies} accounts read so far.`,
-      stats.paused ? "X is limiting requests; Daylight Commons paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
+      stats.paused ? "X is limiting requests; CMMNS paused for a few minutes." : stats.scanning ? `Reading ${stats.scanning} more…` : null,
     ]);
     const coord = coordination(report, clusters, stats.viewed);
     campaign(p, report.campaign, () => render(report, clusters, stats, onLookupAll));
@@ -166,7 +166,7 @@
     if (!stats.scanning && !stats.paused && stats.pending) acts.append(button(`Read ${Math.min(stats.pending, 200)} accounts`, "Reads each account's profile and About page in one minimised window.", onLookupAll));
     if (stats.onExport) acts.append(button("Save report", "Saves the report and each account's flags to a JSON file on this computer.", stats.onExport));
     if (stats.onCard) acts.append(button("Save card", "Makes a card about this thread as a whole to read, then save or share as an image and a JSON file.", stats.onCard));
-    if (stats.onClearHistory) acts.append(button("Clear history", "Forgets which accounts Daylight Commons has seen in which threads, in this browser.", stats.onClearHistory));
+    if (stats.onClearHistory) acts.append(button("Clear history", "Forgets which accounts CMMNS has seen in which threads, in this browser.", stats.onClearHistory));
     p.append(acts);
     p.append(el("p", "pb-foot", PB.REPORT_DOES_NOT_PROVE));
   }

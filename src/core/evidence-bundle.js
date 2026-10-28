@@ -1,5 +1,5 @@
-// Signed evidence bundles: what Daylight Commons found on a thread, as a file anyone can check offline. A
-// bundle carries post ids, the evidence with the matched spans needed to check it, the Daylight Commons and
+// Signed evidence bundles: what CMMNS found on a thread, as a file anyone can check offline. A
+// bundle carries post ids, the evidence with the matched spans needed to check it, the CMMNS and
 // API versions, a hash of the data tables used, and the time; it is signed with a per-install
 // ECDSA P-256 key through WebCrypto, and the public key travels inside the bundle.
 //
@@ -51,8 +51,8 @@ export async function publicKeyOf(publicKey) {
 // a clock time with a zone or am/pm ("at 12:10 UTC", "9:05 pm"). A ratio or verse number is kept.
 const TIME_OF_DAY = /(?:(?<=\d{4}-\d{2}-\d{2})[T ]|T)\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:\s?(?:Z|UTC|[+-]\d{2}:?\d{2}))?|\b\d{1,2}:\d{2}(?::\d{2})?\s?(?:UTC|GMT|Z|am|pm)\b/gi;
 const blankTimes = (v) => (typeof v === "string" ? v.replace(TIME_OF_DAY, (m) => " ".repeat(m.length)) : Array.isArray(v) ? v.map(blankTimes) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, blankTimes(x)])) : v);
-// "Daylight Commons 3.1.0 (CLI)" becomes "Daylight Commons 3".
-export const carrierTool = (tool) => { const m = String(tool || "").match(/^(.*?)(\d+)\.\d+(\.\d+)?/); return m ? `${m[1]}${m[2]}`.trim() : "Daylight Commons"; };
+// "CMMNS 3.1.0 (CLI)" becomes "CMMNS 3".
+export const carrierTool = (tool) => { const m = String(tool || "").match(/^(.*?)(\d+)\.\d+(\.\d+)?/); return m ? `${m[1]}${m[2]}`.trim() : "CMMNS"; };
 
 // result: an analyzeThread or analyzeText envelope. opts: { tool, dataLock, savedAt, page, texts,
 // includeText, source, profile, typedPage }. texts: { postId: text }, used only when includeText
@@ -67,7 +67,7 @@ export function makeBundle(result, opts = {}) {
   const ids = (result.posts && result.posts.ids) ? [...result.posts.ids, ...(result.posts.quoted || [])] : [...new Set(result.evidence.flatMap((e) => e.posts))];
   const texts = opts.includeText ? opts.texts || {} : {};
   const bundle = {
-    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "Daylight Commons",
+    kind: BUNDLE_KIND, version: BUNDLE_VERSION, schema: result.schema, api: result.api, tool: opts.tool || "CMMNS",
     savedAt: opts.savedAt || new Date().toISOString(), dataLock: opts.dataLock || null,
     input: { kind: result.kind, site: result.site || null, page: opts.page || null, source: archive ? "export" : "thread", accounts: result.posts ? result.posts.accounts : null },
     posts: ids.map((id) => (opts.includeText && texts[id] != null ? { id, text: String(texts[id]) } : { id })),

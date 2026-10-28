@@ -1,4 +1,4 @@
-// `daylight media convert <file> --to <format>` and `daylight media compress <file>`: the extension's
+// `cmmns media convert <file> --to <format>` and `cmmns media compress <file>`: the extension's
 // convert page on the command line, through a system ffmpeg when one is installed (FFMPEG names
 // another binary). Writes the new file beside the original, never over it, and a lineage file with
 // both SHA-256 hashes, the step, its parameters and the ffmpeg version. Runs locally; sends nothing.

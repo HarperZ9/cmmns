@@ -21,7 +21,7 @@ can open shows its source and its measured precision, or "not measured yet".
 
 What it does: tells you whether the most extreme replies come mostly from flagged accounts.
 
-1. On a post's page, find the Daylight Commons panel at the side of the page.
+1. On a post's page, find the CMMNS panel at the side of the page.
 2. Click its heading to open it.
 
 You should see the thread report, with 95% intervals. It says "skewed" only when the intervals do
@@ -99,8 +99,8 @@ explains one, with an example.
 
 ## Use it on a Mastodon server
 
-1. Open the server in your browser and click the Daylight Commons toolbar button.
-2. Press **Turn on Daylight Commons here** and allow access when the browser asks.
+1. Open the server in your browser and click the CMMNS toolbar button.
+2. Press **Turn on CMMNS here** and allow access when the browser asks.
 3. **Options** lists the servers and takes access back.
 
 ## Check a release you downloaded

@@ -19,7 +19,7 @@ globalThis.PBQuickSites = globalThis.PBQuickSites || (() => {
       }
       while (xPosts.size > 3000) xPosts.delete(xPosts.keys().next().value);
       while (xByThumb.size > 6000) xByThumb.delete(xByThumb.keys().next().value);
-    } catch (err) { console.warn("[daylight-commons] could not read X's media list", err); }
+    } catch (err) { console.warn("[cmmns] could not read X's media list", err); }
   });
 
   // What X loaded before this script started (sniff.js keeps the last few responses).

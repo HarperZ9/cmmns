@@ -1,5 +1,5 @@
-// Package Daylight Commons: dist/radar-chrome-<version>.zip and dist/radar-firefox-<version>.xpi (unsigned,
-// for the stores), dist/radar-firefox-self-<version>.xpi (with an update address on Daylight Commons' own
+// Package CMMNS: dist/cmmns-chrome-<version>.zip and dist/cmmns-firefox-<version>.xpi (unsigned,
+// for the stores), dist/cmmns-firefox-self-<version>.xpi (with an update address on CMMNS' own
 // site, for Mozilla's unlisted signing and self-distribution), from src/ext, with dist/SHA256SUMS
 // and dist/FILES-<version>.sha256 (the hash of every file inside each package).
 // Deterministic: the same source tree gives the same bytes and the same hashes on the same zlib;
@@ -23,7 +23,7 @@ export function buildPackages(files = listFiles()) {
   for (const [browser, ext] of VARIANTS) {
     const m = Buffer.from(JSON.stringify(browserManifest(manifest, browser), null, 2) + "\n");
     const entries = filesFor(files, browser).map(([n, d]) => [n, n === "manifest.json" ? m : d]).sort(byName);
-    const name = `radar-${browser}-${manifest.version}.${ext}`;
+    const name = `cmmns-${browser}-${manifest.version}.${ext}`;
     out.push([name, zip(entries)]);
     for (const [n, d] of entries) inner.push(`${sha(d)}  ${name}/${n}`);
   }

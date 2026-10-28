@@ -1,4 +1,4 @@
-// While Daylight Commons' side panel is open, the window for a post shows there instead of over the
+// While CMMNS' side panel is open, the window for a post shows there instead of over the
 // page (pop.js asks take() first). The post's sections go to the panel as plain data; each button in
 // them becomes a number the panel sends back, and the press runs here, in the page, as it would in
 // the window. Close the panel and the window returns to the page. Nothing leaves the browser.
@@ -21,7 +21,7 @@ globalThis.PBSide = globalThis.PBSide || (() => {
     if (!open || !current) return;
     fns = [];
     let list = current.sections;
-    if (typeof current.source === "function") { try { list = current.source() || list; } catch (e) { console.warn("[daylight-commons] could not refresh the side panel", e); } }
+    if (typeof current.source === "function") { try { list = current.source() || list; } catch (e) { console.warn("[cmmns] could not refresh the side panel", e); } }
     const sections = plain((list || []).filter((s) => !s.tip));
     chrome.runtime.sendMessage({ type: "pb-side-sections", sections, page: location.href, at: Date.now() }).catch(() => {});
   }
@@ -39,7 +39,7 @@ globalThis.PBSide = globalThis.PBSide || (() => {
     if (msg.type === "pb-side") { open = !!msg.open; if (open && globalThis.PBPop) PBPop.close(true); sendResponse({ ok: true }); return false; }
     if (msg.type === "pb-side-ask") { publish(); sendResponse({ ok: true }); return false; }
     if (msg.type === "pb-side-call" && fns[msg.fn]) {
-      try { fns[msg.fn](); } catch (e) { console.warn("[daylight-commons] a side panel button failed", e); }
+      try { fns[msg.fn](); } catch (e) { console.warn("[cmmns] a side panel button failed", e); }
       setTimeout(publish, 1200);   // checks and lookups finish later; show their result
       sendResponse({ ok: true });
     }

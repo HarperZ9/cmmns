@@ -54,7 +54,7 @@ globalThis.PBQuickToast = globalThis.PBQuickToast || (() => {
       }
       clearTimeout(timer);
       if (stay) timer = setTimeout(hide, actions.length ? Math.max(stay, 9000) : stay);
-    } catch (e) { console.warn("[daylight-commons] could not show the download note", e); }
+    } catch (e) { console.warn("[cmmns] could not show the download note", e); }
   }
   function hide() { clearTimeout(timer); if (host) host.remove(); host = null; }
 

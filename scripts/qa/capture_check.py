@@ -1,6 +1,6 @@
 """3.7.0 check: "Capture as evidence" on two public pictures saves each file, its note, a picture of
 the visible page and a capture record; the custody chain in the browser has a line per capture; and
-`daylight capture verify` passes on the folder, then fails after one byte of a saved file changes.
+`cmmns capture verify` passes on the folder, then fails after one byte of a saved file changes.
 Development tool only. The test copy of the extension carries <all_urls>, as the other checks do;
 in use, the right-click itself grants the page picture (activeTab).
 

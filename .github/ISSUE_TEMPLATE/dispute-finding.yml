@@ -1,12 +1,12 @@
 name: Dispute a badge or a finding
-description: Dispute a sign, a campaign reading or an element table Daylight Commons showed on a page. Every dispute gets a public decision with its reasons.
+description: Dispute a sign, a campaign reading or an element table CMMNS showed on a page. Every dispute gets a public decision with its reasons.
 title: "Dispute: "
 labels: ["challenge", "finding"]
 body:
   - type: markdown
     attributes:
       value: |
-        Daylight Commons shows signs from what a page loaded, each with what it does not prove. If a sign
+        CMMNS shows signs from what a page loaded, each with what it does not prove. If a sign
         or a reading is wrong for this page, tell us here. The decision and its reasoning go into
         `catalogue/DECISIONS.md`, in public.
 
@@ -28,7 +28,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Daylight Commons version
+      label: CMMNS version
       description: From the extension's options page or `radar --version`.
       placeholder: 3.0.0
   - type: input

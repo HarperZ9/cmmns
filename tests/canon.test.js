@@ -1,5 +1,5 @@
 // The design canon (project-docs/DESIGN-CANON-CHECK.md): no em dash anywhere a user reads, every
-// page on the shared tokens, and no colour outside the canon's set in Daylight Commons' own styles.
+// page on the shared tokens, and no colour outside the canon's set in CMMNS' own styles.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
@@ -9,10 +9,10 @@ const ROOT = join(import.meta.dirname, "..");
 const list = (dir, re) => readdirSync(join(ROOT, dir)).filter((f) => re.test(f)).map((f) => join(dir, f));
 const read = (p) => readFileSync(join(ROOT, p), "utf8");
 
-// Everything a user can read: pages, scripts that build text, styles, Daylight Commons' own data files, the
+// Everything a user can read: pages, scripts that build text, styles, CMMNS' own data files, the
 // store listing, the README and the privacy policy. Left out: the claims, owners and sites tables, which
 // quote fact-checkers and Wikidata word for word; the rhetoric grammars and word lists, where a
-// dash is the copula Daylight Commons matches in Russian and Ukrainian and is never shown; the core
+// dash is the copula CMMNS matches in Russian and Ukrainian and is never shown; the core
 // bundle, which is built from the core files checked here; and the catalogue copy, whose quotes are
 // the statutes' own words (UK legislation writes "if—"), generated from catalogue/.
 const SKIP = /^(claims(-\d+)?\.json|owners\.json|sites\.json|core\.bundle\.js|catalogue-data\.js|(rhetoric|lexicon)(-[a-z]+)?\.js)$/;
@@ -42,7 +42,7 @@ test("the em dash check catches an em dash in text and skips one in a pattern", 
   assert.ok(!strip(`if (s.match(/${DASH}/g)) n++;`).includes(DASH));
 });
 
-test("every Daylight Commons page loads the shared tokens before its own styles", () => {
+test("every CMMNS page loads the shared tokens before its own styles", () => {
   for (const p of list("src/ext", /\.html$/).filter((f) => !/(transparency|privacy)\.html$/.test(f))) {
     const html = read(p), canon = html.indexOf('href="canon.css"');
     assert.ok(canon > 0, `${p} links canon.css`);
@@ -55,13 +55,13 @@ test("every Daylight Commons page loads the shared tokens before its own styles"
 });
 
 // The canon's colours: the site's light and dark tokens, the window's adapted grounds for X, and
-// the art's bone and void. Anything else in Daylight Commons' own styles is a deviation.
+// the art's bone and void. Anything else in CMMNS' own styles is a deviation.
 const CANON = new Set(["#ebe5d8", "#e4ddcd", "#e2dac9", "#d8cfbc", "#16130f", "#4a443b", "#5f584d", "#c9bfab", "#7b7262",
   "#0a6b61", "#8f3a19", "#4e4d85", "#060608", "#0c0c0f", "#111114", "#1a1a1e", "#ece5d6", "#b8b0a0", "#958e80", "#29282c",
   "#6f6a61", "#63d4ce", "#e29472", "#b3b1e6", "#f1ece1", "#0a0a0d", "#38363b", "#1e2732", "#3a4550", "#fff6e6",
   "#fff", "#000", "#333", "#444", "#aaa", "#555", "#006b73", "#8a3219", "#4b4b7a"]);
 
-test("Daylight Commons' styles use only canon colours", () => {
+test("CMMNS' styles use only canon colours", () => {
   for (const p of [...list("src/ext", /\.css$/), "src/ext/pages.js", "src/ext/evidence-card.js"]) {
     const off = [...read(p).matchAll(/#[0-9a-f]{3,6}\b/gi)].map((m) => m[0].toLowerCase()).filter((c) => !CANON.has(c));
     assert.deepEqual(off, [], p);

@@ -3,9 +3,9 @@
 `src/core/confusables-data.js` is built by `scripts/confusables-build.mjs` from `confusables.txt`,
 Unicode Security Mechanisms (UTS #39) version 18.0.0, dated 2026-08-06, downloaded on 2026-10-21
 from https://www.unicode.org/Public/security/latest/confusables.txt (SHA-256
-`6ed3ee967c9dfdf6677d563c9985182fbc50a2efb7d6059cd57b2e2ce18f5b92`). Daylight Commons keeps only single
+`6ed3ee967c9dfdf6677d563c9985182fbc50a2efb7d6059cd57b2e2ce18f5b92`). CMMNS keeps only single
 letters among Latin, Cyrillic, Greek, Armenian and Cherokee that look like a single letter of
-another of those scripts, matched by case. Daylight Commons never fetches the table while it runs.
+another of those scripts, matched by case. CMMNS never fetches the table while it runs.
 
 The table is distributed under the Unicode License v3. Its notice, as the licence requires:
 

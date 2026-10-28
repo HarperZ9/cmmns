@@ -60,7 +60,7 @@ test("the reader runs in the background worker only, from files inside the exten
   const m = JSON.parse(read("src/ext/manifest.json"));
   for (const cs of m.content_scripts) assert.ok(!cs.js.some((f) => /ocr/.test(f)), "no OCR code in a content script");
   assert.ok(m.background.scripts.includes("ocr.bundle.js") && m.background.scripts.includes("ocr-bg.js"));
-  // The one policy change: compiling Daylight Commons' own WebAssembly kernel. No remote script source.
+  // The one policy change: compiling CMMNS' own WebAssembly kernel. No remote script source.
   assert.equal(m.content_security_policy.extension_pages, "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'");
   assert.match(read("src/ext/background.js"), /importScripts\([^)]*"ocr\.bundle\.js", "ocr-bg\.js"[,)]/);
   for (const f of readdirSync(new URL("../src/ocr/", import.meta.url))) {
@@ -73,7 +73,7 @@ test("the reader runs in the background worker only, from files inside the exten
   assert.match(bg, /!sender\.tab/);
 });
 
-test("the content script sends the image only to Daylight Commons' own worker, and only from the click", () => {
+test("the content script sends the image only to CMMNS' own worker, and only from the click", () => {
   const media = read("src/ext/media.js");
   const fn = media.slice(media.indexOf("async function readText"), media.indexOf("const textsFor"));
   assert.match(fn, /chrome\.runtime\.sendMessage\(\{ type: "pb-ocr"/);

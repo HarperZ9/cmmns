@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<title>Install Daylight Commons | Daylight Commons</title>
-<meta name="description" content="Download, check and install Daylight Commons without a browser store, and rebuild it from source without a code host.">
-<link rel="canonical" href="https://harperz9.github.io/daylight-commons/install.html">
+<title>Install CMMNS | CMMNS</title>
+<meta name="description" content="Download, check and install CMMNS without a browser store, and rebuild it from source without a code host.">
+<link rel="canonical" href="https://harperz9.github.io/cmmns/install.html">
 <link rel="preload" href="/system/fonts/hanken-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/system/doc.css">
 <link rel="stylesheet" href="/system/art.css">
@@ -29,32 +29,32 @@
 <main id="main">
 <article class="sheet doc-rail">
 <header class="mast">
-<h1>Install Daylight Commons</h1>
+<h1>Install CMMNS</h1>
 <p class="role">Download a release, check it, install it in Chrome, Edge, Brave or Firefox, and rebuild it from source.</p>
 </header>
-<nav class="dc-local" aria-label="Daylight Commons"><a href="how-it-works.html">How it works</a> <a href="install.html" aria-current="page">Install</a> <a href="privacy.html">Privacy</a> <a href="transparency.html">How it is measured</a> <a href="catalogue.html">Catalogue</a> <a href="https://github.com/HarperZ9/daylight-commons">Source</a></nav>
+<nav class="dc-local" aria-label="CMMNS"><a href="how-it-works.html">How it works</a> <a href="install.html" aria-current="page">Install</a> <a href="privacy.html">Privacy</a> <a href="transparency.html">How it is measured</a> <a href="catalogue.html">Catalogue</a> <a href="https://github.com/HarperZ9/cmmns">Source</a></nav>
 <p class="dc-updated">Updated 2026-10-23.</p>
-<p>Every Daylight Commons release can be downloaded, checked and installed without a browser store, and its source can be rebuilt without any code host. This page says how, and says plainly where a browser maker still stands in the way.</p>
+<p>CMMNS was formerly Daylight Commons, and Radar before that. Every CMMNS release can be downloaded, checked and installed without a browser store, and its source can be rebuilt without any code host. This page says how, and says plainly where a browser maker still stands in the way.</p>
 <section aria-labelledby="what-a-release-holds">
 <h2 id="what-a-release-holds">What a release holds</h2>
-<ul><li><code>radar-chrome-&lt;version&gt;.zip</code>: the Chrome, Edge and Brave build.</li>
-<li><code>radar-firefox-&lt;version&gt;.xpi</code>: the Firefox build sent to Mozilla's add-on store.</li>
-<li><code>radar-firefox-self-&lt;version&gt;.xpi</code>: the Firefox build for installing from this site once Mozilla has signed it. It checks this site for updates.</li>
-<li><code>radar-cli-&lt;version&gt;.zip</code>: the command line tool. Unzip it anywhere and run <code>node bin/radar.mjs verify &lt;file&gt;</code> with Node 22 or later to check a signed evidence bundle or a saved evidence chain offline. No install step.</li>
+<ul><li><code>cmmns-chrome-&lt;version&gt;.zip</code>: the Chrome, Edge and Brave build.</li>
+<li><code>cmmns-firefox-&lt;version&gt;.xpi</code>: the Firefox build sent to Mozilla's add-on store.</li>
+<li><code>cmmns-firefox-self-&lt;version&gt;.xpi</code>: the Firefox build for installing from this site once Mozilla has signed it. It checks this site for updates.</li>
+<li><code>cmmns-cli-&lt;version&gt;.zip</code>: the command line tool. Unzip it anywhere and run <code>node bin/radar.mjs verify &lt;file&gt;</code> with Node 22 or later to check a signed evidence bundle or a saved evidence chain offline. No install step.</li>
 <li><code>FILES-&lt;version&gt;.sha256</code>: the hash of every file inside each package.</li>
-<li><code>radar-&lt;version&gt;.bundle</code>: the whole source history at the release commit, as one git file. Commits before 3.0.0 also hold the Conso font, under its designer's licence; 3.0.0 and later ship only fonts under the SIL Open Font License.</li>
+<li><code>cmmns-&lt;version&gt;.bundle</code>: the whole source history at the release commit, as one git file. Commits before 3.0.0 also hold the Conso font, under its designer's licence; 3.0.0 and later ship only fonts under the SIL Open Font License.</li>
 <li><code>SOURCE</code>: the commit and the Node version the release was built with.</li>
-<li><code>release-key.json</code>: Daylight Commons' public signing key.</li>
-<li><code>SHA256SUMS</code> and <code>SHA256SUMS.sig</code>: the hash of every file above, and Daylight Commons' signature over that list.</li>
+<li><code>release-key.json</code>: CMMNS' public signing key.</li>
+<li><code>SHA256SUMS</code> and <code>SHA256SUMS.sig</code>: the hash of every file above, and CMMNS' signature over that list.</li>
 <li><code>verify-offline.html</code>, <code>KEY-CARD.html</code> and <code>KIT-GUIDE.txt</code>, from 3.2.0: the offline kit's checker, a printable key card with a QR copy of the key id, and plain guidance for use without the internet. <code>SHA256SUMS</code> covers them like every other file.</li>
 <li><code>HEAD.json</code> and <code>HEAD.sig</code>, from 3.2.0: the signed head. It names <code>SHA256SUMS</code> and the catalogue by hash, with a version number that only goes up, the time it was signed and a date it expires, 90 days after the release commit.</li></ul>
 </section>
 <section aria-labelledby="check-a-download">
 <h2 id="check-a-download">Check a download</h2>
-<p>Daylight Commons signs <code>SHA256SUMS</code> with its project key, an ECDSA P-256 key whose private half never enters the repository or any server. The key id is:</p>
+<p>CMMNS signs <code>SHA256SUMS</code> with its project key, an ECDSA P-256 key whose private half never enters the repository or any server. The key id is:</p>
 <p><strong>0e5e 1984 0565 840c 977e 0f03 6c9a c021</strong></p>
 <p>Compare that id with one you got another way: this site, the repository's <code>docs/release-key.json</code>, a mirror, or a person you trust. A key that arrives in the same download as the files proves nothing on its own.</p>
-<p>The signed head stops an old release from passing as the current one. Each device keeps the highest head version it has accepted. A lower version, a different head under the same version, or a release with no head after one with a head, is refused, and the refusal names the rule in one sentence. A head past its expiry still verifies and is marked Expired: Daylight Commons keeps working and says &quot;Catalogue dated 2026-10-22. Newer campaigns may be missing.&quot; The expiry is the signer's claim. A device with a wrong clock uses the latest signed time it has seen.</p>
+<p>The signed head stops an old release from passing as the current one. Each device keeps the highest head version it has accepted. A lower version, a different head under the same version, or a release with no head after one with a head, is refused, and the refusal names the rule in one sentence. A head past its expiry still verifies and is marked Expired: CMMNS keeps working and says &quot;Catalogue dated 2026-10-22. Newer campaigns may be missing.&quot; The expiry is the signer's claim. A device with a wrong clock uses the latest signed time it has seen.</p>
 <p>In the extension, the options page has <strong>Check a signed head</strong>: pick <code>HEAD.json</code> and <code>HEAD.sig</code>. The account card and the toolbar popup then show the catalogue date, when the head was last seen, its expiry and how many signatures it carried, as Current, Aging (head older than 30 days) or Expired. Releases today carry one signature, and the line says &quot;single-signer release&quot;.</p>
 <p>To check in this browser, use the checker at the end of this page. It runs on your device and sends nothing. To check with Node 22 from a copy of the source, run <code>node scripts/verify-release.mjs &lt;folder&gt;</code>; it checks the head first, then prints the key id, checks the signature, then every file's hash, then the bundle. It keeps the highest head version in <code>~/.radar/head-state.json</code>; add <code>--no-state</code> to look at an old release on purpose.</p>
 </section>
@@ -68,7 +68,7 @@
 <section aria-labelledby="rebuild-it-yourself">
 <h2 id="rebuild-it-yourself">Rebuild it yourself</h2>
 <p>The packages are reproducible: entries sorted, fixed timestamps, no extra fields. From the bundle:</p>
-<ul><li><code>git clone radar-&lt;version&gt;.bundle radar</code></li>
+<ul><li><code>git clone cmmns-&lt;version&gt;.bundle cmmns</code></li>
 <li><code>cd radar</code> and <code>npm run ci</code> to run every check the project runs on GitHub, with no network.</li>
 <li><code>npm run package</code>, then compare <code>dist/SHA256SUMS</code> with the release.</li></ul>
 <p>The same commit gives the same bytes on the same zlib build. A different zlib can compress differently; the per-file list in <code>FILES-&lt;version&gt;.sha256</code> does not depend on zlib, so compare that when the package hashes differ.</p>
@@ -77,22 +77,22 @@
 <h2 id="install-in-chrome-edge-or-brave">Install in Chrome, Edge or Brave</h2>
 <p>Chrome installs extensions from outside the Chrome Web Store only in two ways, both set by Google:</p>
 <ul><li><strong>Developer mode.</strong> Unzip the package, open <code>chrome://extensions</code>, turn on Developer mode, press Load unpacked and pick the folder. Chrome may show a warning about developer-mode extensions, and this copy does not update itself: install each new release the same way.</li>
-<li><strong>Enterprise policy.</strong> A managed computer can force-install Daylight Commons from a self-hosted address with the <code>ExtensionInstallForcelist</code> policy. This needs an administrator.</li></ul>
-<p>There is no other way around the store for an ordinary Chrome install. That is Google's rule, and Daylight Commons cannot change it.</p>
+<li><strong>Enterprise policy.</strong> A managed computer can force-install CMMNS from a self-hosted address with the <code>ExtensionInstallForcelist</code> policy. This needs an administrator.</li></ul>
+<p>There is no other way around the store for an ordinary Chrome install. That is Google's rule, and CMMNS cannot change it.</p>
 </section>
 <section aria-labelledby="install-in-firefox">
 <h2 id="install-in-firefox">Install in Firefox</h2>
-<p>Release versions of Firefox install only add-ons that Mozilla has signed, even when the file comes from somewhere other than Mozilla's store. Mozilla signs <code>radar-firefox-self</code> without listing it in its store; once signed, open the file in Firefox to install it, and Firefox checks <code>firefox/updates.json</code> on this site for new versions.</p>
-<p>No release so far carries a Mozilla-signed file, 3.8.0 included, and <code>firefox/updates.json</code> is not published yet. Until Mozilla signs the self-distributed build or lists Daylight Commons on Firefox Add-ons, release Firefox can load it only for one session: open <code>about:debugging</code>, choose This Firefox, then Load Temporary Add-on, and pick the <code>.xpi</code>. Firefox Developer Edition, Nightly and unbranded builds can turn signing checks off.</p>
-<p>That signature is Mozilla's requirement. Daylight Commons cannot remove it, and a Mozilla signature says only that Mozilla's automated review passed.</p>
+<p>Release versions of Firefox install only add-ons that Mozilla has signed, even when the file comes from somewhere other than Mozilla's store. Mozilla signs <code>cmmns-firefox-self</code> without listing it in its store; once signed, open the file in Firefox to install it, and Firefox checks <code>https://harperz9.github.io/ext/firefox/updates.json</code> for new versions.</p>
+<p>No release so far carries a Mozilla-signed file, 3.9.0 included, and the update list at <code>ext/firefox/updates.json</code> names no version yet. Until Mozilla signs the self-distributed build or lists CMMNS on Firefox Add-ons, release Firefox can load it only for one session: open <code>about:debugging</code>, choose This Firefox, then Load Temporary Add-on, and pick the <code>.xpi</code>. Firefox Developer Edition, Nightly and unbranded builds can turn signing checks off.</p>
+<p>That signature is Mozilla's requirement. CMMNS cannot remove it, and a Mozilla signature says only that Mozilla's automated review passed.</p>
 </section>
 <section aria-labelledby="if-the-code-host-goes-away">
 <h2 id="if-the-code-host-goes-away">If the code host goes away</h2>
-<p>Daylight Commons' source is hosted on GitHub today. Each release's bundle holds the whole history, so the project survives without it: clone the bundle, then push it to any git host. Any mirror that serves the same bundle and the same signed <code>SHA256SUMS</code> is as good as the original, because the signature is what you check, wherever the files came from. <code>node scripts/mirror-check.mjs &lt;url&gt;...</code> compares mirrors: it names a mirror that is unreachable, serves an older head, serves a different head under the same version, or serves a file whose bytes differ from the signed list.</p>
+<p>CMMNS' source is hosted on GitHub today. Each release's bundle holds the whole history, so the project survives without it: clone the bundle, then push it to any git host. Any mirror that serves the same bundle and the same signed <code>SHA256SUMS</code> is as good as the original, because the signature is what you check, wherever the files came from. <code>node scripts/mirror-check.mjs &lt;url&gt;...</code> compares mirrors: it names a mirror that is unreachable, serves an older head, serves a different head under the same version, or serves a file whose bytes differ from the signed list.</p>
 </section>
 <section aria-labelledby="what-this-does-not-prove">
 <h2 id="what-this-does-not-prove">What this does not prove</h2>
-<p>A valid signature shows the files were signed by the holder of Daylight Commons' key and have not changed since. A valid head shows the signer chose these files at that time. It does not show the files are safe. The offline checker cannot show its own key is right if the kit came from an attacker: the printed card and a second source are the defence. The kit and its checker have had no independent security audit. It does not show who holds the key, that the key was never stolen, or that the code is safe. A reproducible build shows the package came from the published source; it does not show the source is free of mistakes. Read the source, or ask someone you trust who has.</p>
+<p>A valid signature shows the files were signed by the holder of CMMNS' key and have not changed since. A valid head shows the signer chose these files at that time. It does not show the files are safe. The offline checker cannot show its own key is right if the kit came from an attacker: the printed card and a second source are the defence. The kit and its checker have had no independent security audit. It does not show who holds the key, that the key was never stolen, or that the code is safe. A reproducible build shows the package came from the published source; it does not show the source is free of mistakes. Read the source, or ask someone you trust who has.</p>
 </section>
 <section aria-labelledby="check-a-release-here">
 <h2 id="check-a-release-here">Check a release here</h2>
@@ -102,7 +102,7 @@
 <script type="module" src="verify.js"></script>
 </section>
 
-<p class="dc-foot">Daylight Commons reads the site you are on. It contacts anything else only when you turn on Other coverage or evidence lookups and click. Free and open source under the AGPL-3.0.</p>
+<p class="dc-foot">CMMNS reads the site you are on. It contacts anything else only when you turn on Other coverage or evidence lookups and click. Free and open source under the AGPL-3.0.</p>
 </article>
 </main>
 </body>

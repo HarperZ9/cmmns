@@ -11,13 +11,13 @@ test("the committed install page matches a fresh build", () => {
   assert.equal(read("docs/install.html"), render(), "run `npm run pages`");
 });
 
-test("the page's checker uses the same signing code as Daylight Commons", () => {
+test("the page's checker uses the same signing code as CMMNS", () => {
   assert.equal(read("docs/signing.js"), signingForPage(), "run `npm run pages`");
   assert.ok(read("docs/signing.js").includes(read("src/core/sig.js")), "the page carries sig.js unchanged");
   assert.match(read("docs/verify.js"), /from "\.\/signing\.js"/);
 });
 
-test("the page's copy signs and verifies like Daylight Commons' own, with no imports", async () => {
+test("the page's copy signs and verifies like CMMNS' own, with no imports", async () => {
   assert.doesNotMatch(read("docs/signing.js"), /^import /m);
   const page = await import("../docs/signing.js");
   const core = await import("../src/core/signing.js");

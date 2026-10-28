@@ -2,7 +2,7 @@
 // writing signs (src/core/machine.js). Examples are made up and mild on purpose: a weakened dose,
 // as in the inoculation studies. Hateful terms are never printed; a placeholder stands in. Each
 // rhetoric lesson has a sign example read as left, right and centre, and a fair example that uses
-// similar words without the move (often reported speech, which Daylight Commons does not count).
+// similar words without the move (often reported speech, which CMMNS does not count).
 
 const WORDS_DNP = "People also quote these words, use them as irony, or report what someone else said. This sign describes the words in the post. The writer and the motive are a separate question.";
 
@@ -16,7 +16,7 @@ export const LANGUAGE_LESSONS = [
       { side: "centre", topic: "local", kind: "sign", text: "The protesters are a plague on this city, a pack of animals." },
       { side: "none", topic: "media", kind: "fair", text: "The councillor called tenants \"parasites\" at Tuesday's meeting, and he has since apologised. Video of the meeting is linked." },
     ],
-    why: "When a post calls a group less than human, harm to that group feels less like harm. Historians of mass violence find this language before atrocities again and again. So Daylight Commons treats it as strong.",
+    why: "When a post calls a group less than human, harm to that group feels less like harm. Historians of mass violence find this language before atrocities again and again. So CMMNS treats it as strong.",
     spot: "Look for a group name next to a word for pests, disease or animals. Then check if the post says it or reports what someone else said.",
     counter: "Put a group you belong to in the sentence and read it again. If it now sounds like an attack, it was an attack before. You can criticise what people do and still call them people.",
     dnp: WORDS_DNP,
@@ -65,7 +65,7 @@ export const LANGUAGE_LESSONS = [
   },
   {
     id: "slur", title: "Slur or coded hate term", research: ["badnews-2019"],
-    what: "This sign finds a slur, a dog whistle or a coined term with a documented hateful meaning. Daylight Commons matches against cited lists such as the ADL Hate Symbols database and Hatebase.",
+    what: "This sign finds a slur, a dog whistle or a coined term with a documented hateful meaning. CMMNS matches against cited lists such as the ADL Hate Symbols database and Hatebase.",
     examples: [
       { side: "left", topic: "elections", kind: "sign", text: "Another post from the [coined insult for rural conservatives] crowd." },
       { side: "right", topic: "elections", kind: "sign", text: "Another post from the [coined insult for city liberals] crowd." },
@@ -103,17 +103,17 @@ export const LANGUAGE_LESSONS = [
   },
   {
     id: "conspiracy-theory", title: "Named conspiracy theory", research: ["enders-2023", "badnews-2019"],
-    what: "This sign finds a documented conspiracy theory, by name or by its stock line: chemtrails, a stolen election, a staged shooting, a hidden cure. Daylight Commons names the theory and shows what checkers found.",
+    what: "This sign finds a documented conspiracy theory, by name or by its stock line: chemtrails, a stolen election, a staged shooting, a hidden cure. CMMNS names the theory and shows what checkers found.",
     examples: [
       { side: "left", topic: "elections", kind: "sign", text: "Satellites flipped the votes in the swing states. That is how they stole it." },
       { side: "right", topic: "elections", kind: "sign", text: "The machines flipped the votes overnight. That is how they stole it." },
       { side: "centre", topic: "health", kind: "sign", text: "Look up. Those trails are chemicals, and they are spraying us." },
       { side: "none", topic: "elections", kind: "fair", text: "Every audit in the state matched the machine count within a few votes. The full report is on the election office site." },
     ],
-    why: "A theory gives a messy event one hidden author. That feels better than chance or failure. Survey studies find that people on the left and the right accept these claims at similar rates when the story stays the same and only the villain changes. Daylight Commons matches every direction the same way.",
+    why: "A theory gives a messy event one hidden author. That feels better than chance or failure. Survey studies find that people on the left and the right accept these claims at similar rates when the story stays the same and only the villain changes. CMMNS matches every direction the same way.",
     spot: "Look for a secret plan, a hidden group and a claim that someone hid the evidence too. Then open the sources in the window and read what investigators found.",
     counter: "Ask what evidence would change the writer's mind. If the answer is none, nobody can check the claim. Real wrongdoing leaves records, court cases and named people, and you can look those up.",
-    dnp: "People also name these theories to quote, mock or argue against them. Daylight Commons skips the obvious debunking. This sign is still unmeasured, so the thread report leaves it out.",
+    dnp: "People also name these theories to quote, mock or argue against them. CMMNS skips the obvious debunking. This sign is still unmeasured, so the thread report leaves it out.",
   },
   {
     id: "spam-pattern", title: "Spam pattern", research: [],
@@ -129,12 +129,12 @@ export const LANGUAGE_LESSONS = [
   },
   {
     id: "x-spam", title: "X: probable spam", research: [],
-    what: "X itself filed this reply under \"Probable spam\". Daylight Commons shows the site's own label as it is.",
+    what: "X itself filed this reply under \"Probable spam\". CMMNS shows the site's own label as it is.",
     examples: [
       { side: "none", topic: "sport", kind: "sign", text: "A reply under a match result, offering free streams, hidden by X behind \"Show probable spam\"." },
       { side: "none", topic: "sport", kind: "ordinary", text: "A fan's ordinary reply, hidden in the same section because it had a link." },
     ],
-    why: "Sites hide replies that they think are spam, and many readers skip that section. Daylight Commons shows the label, so you know the site made a decision and which way it went.",
+    why: "Sites hide replies that they think are spam, and many readers skip that section. CMMNS shows the label, so you know the site made a decision and which way it went.",
     spot: "At the bottom of a thread on X, look for \"Show probable spam\" or \"Show more replies\". X filed the replies in that section.",
     counter: "Treat the label as one opinion from the site. Read the reply and the account, and decide for yourself. The filter misses some spam and catches some real people.",
     dnp: "X's spam filter makes mistakes in both directions.",

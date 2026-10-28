@@ -12,7 +12,7 @@ const report = { replies: 40, lookedUp: 30, notLookedUp: 10, verdict: "no-clear-
   bursts: [{ authors: ["alice_1", "bob_2", "carol_3"], from: "2026-10-20T10:00:00Z", to: "2026-10-20T10:00:30Z", p: 0.001 }],
   machine: { n: 2 }, upstream: { accounts: [{ handle: "source_acct", n: 3 }], domains: [], uploads: 4, recycled: 1 }, groups: [{ a: "alice_1", b: "bob_2", n: 3 }] };
 const authors = ["alice_1", "bob_2", "carol_3", "dave_4", "erin_5", "frank_6"];
-const input = (over = {}) => ({ tool: "Daylight Commons test", savedAt: "2026-10-20T12:00:00.000Z", site: "X", page: "https://x.com/someone/status/123", thread: true, authors, report, sameText: 1,
+const input = (over = {}) => ({ tool: "CMMNS test", savedAt: "2026-10-20T12:00:00.000Z", site: "X", page: "https://x.com/someone/status/123", thread: true, authors, report, sameText: 1,
   claims: [{ claim: "A claim the checker reviewed", rating: "False", checker: "Checker", url: "https://check.example/1", date: "2026-10-01", coverage: 0.9 }],
   sites: [{ domain: "rt.com", n: 3, owner: null, state: ["State-owned (Russia)"] }], ...over });
 

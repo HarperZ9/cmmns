@@ -21,7 +21,7 @@ globalThis.PBQuickStream = globalThis.PBQuickStream || (() => {
     let last = null;
     for (const s of [stream, ...others.filter((o) => o !== stream).reverse()]) {
       try { return await PB.assembleStream(s, { get, onProgress }); }
-      catch (e) { if (e instanceof Protected) throw e; last = e; console.warn("[daylight-commons] stream could not be put together", s.url, e); }
+      catch (e) { if (e instanceof Protected) throw e; last = e; console.warn("[cmmns] stream could not be put together", s.url, e); }
     }
     throw last;
   }

@@ -1,5 +1,5 @@
-// "Save to Daylight" in the right-click menu on any image, GIF, video or audio, and the popup's
-// "Save media from this page". Either click lets Daylight Commons read the current tab once
+// "Save to CMMNS" in the right-click menu on any image, GIF, video or audio, and the popup's
+// "Save media from this page". Either click lets CMMNS read the current tab once
 // (activeTab): media-scan.js lists what the page loaded, and the save page opens with that list.
 // Nothing is fetched here; the save page fetches only after the user picks a collection and clicks.
 (() => {
@@ -11,7 +11,7 @@
     if (!chrome.contextMenus) return;
     chrome.contextMenus.removeAll(() => {
       if (globalThis.PBQuickBg) PBQuickBg.create();   // Download, Download as GIF, Copy, Copy link come first
-      chrome.contextMenus.create({ id: MENU, title: "Save to Daylight", contexts: ["image", "video", "audio"] }, () => void chrome.runtime.lastError);
+      chrome.contextMenus.create({ id: MENU, title: "Save to CMMNS", contexts: ["image", "video", "audio"] }, () => void chrome.runtime.lastError);
     });
   }
   chrome.runtime.onInstalled.addListener(menus);
@@ -26,8 +26,8 @@
     };
     try { return await run(frameId ? [frameId] : null); } catch (e) {
       if (frameId) { try { return await run(null); } catch { /* fall through to the address only */ } }
-      console.warn("[daylight-commons] could not read the page's media", e);
-      return { page: tab.url || null, title: tab.title || null, items: [], streams: [], error: "Daylight Commons could not read this page. Browser pages and the extension stores cannot be read." };
+      console.warn("[cmmns] could not read the page's media", e);
+      return { page: tab.url || null, title: tab.title || null, items: [], streams: [], error: "CMMNS could not read this page. Browser pages and the extension stores cannot be read." };
     }
   }
 
@@ -41,12 +41,12 @@
     return id;
   }
 
-  // "Save to Daylight" from the hover control (quick-hover-bg.js) opens the same save page.
+  // "Save to CMMNS" from the hover control (quick-hover-bg.js) opens the same save page.
   globalThis.PBSaveToDaylight = open;
 
   if (chrome.contextMenus) chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId !== MENU || !tab) return;
-    open(tab, info.srcUrl, info.mediaType, info.frameId).catch((e) => console.error("[daylight-commons] save to Daylight failed", e));
+    open(tab, info.srcUrl, info.mediaType, info.frameId).catch((e) => console.error("[cmmns] save to CMMNS failed", e));
   });
 
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {

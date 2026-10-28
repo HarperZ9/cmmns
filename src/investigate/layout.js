@@ -11,7 +11,7 @@ export const DIRS = ["captures", "exports"];
 export function readme(name, created) {
   return `# Case: ${name}
 
-Opened ${created.slice(0, 10)}. Made with \`daylight case\` (Daylight Commons).
+Opened ${created.slice(0, 10)}. Made with \`cmmns case\` (CMMNS).
 
 ## Files
 
@@ -30,16 +30,16 @@ Opened ${created.slice(0, 10)}. Made with \`daylight case\` (Daylight Commons).
 
 ## Commands
 
-    daylight case add <url|file>
-    daylight case claim "<text>" --source S01 --rung documented
-    daylight case trace C01
-    daylight case timeline
-    daylight case export --profile newsroom
+    cmmns case add <url|file>
+    cmmns case claim "<text>" --source S01 --rung documented
+    cmmns case trace C01
+    cmmns case timeline
+    cmmns case export --profile newsroom
 
 Every command except \`add <url>\`, \`run\` and \`watch\` works offline. \`add <url>\` fetches that
 page from your connection. It asks the Wayback Machine to save it only with --archive, or when
-\`daylight case settings --archive on\` is set; the page's server and the Archive then see the
-request, and the copy is public. \`daylight case settings --protection on\` stops every request.
+\`cmmns case settings --archive on\` is set; the page's server and the Archive then see the
+request, and the copy is public. \`cmmns case settings --protection on\` stops every request.
 `;
 }
 

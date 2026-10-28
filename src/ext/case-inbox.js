@@ -1,6 +1,6 @@
 // "Add to case" in the toolbar popup: keeps the address and title of the page you are on, with the
 // time you added it, in this browser's own storage. "Save case list" writes them as
-// case-inbox.jsonl, which `daylight case add case-inbox.jsonl` or `daylight case run` captures.
+// case-inbox.jsonl, which `cmmns case add case-inbox.jsonl` or `cmmns case run` captures.
 // Nothing is sent anywhere, and the page itself is not read.
 globalThis.PBCaseInbox = (() => {
   "use strict";

@@ -18,7 +18,7 @@ export function setBackingTable(table) {
   }
 }
 
-// Daylight Commons' site ids are the platform names the table uses ("fixture" behaves as X).
+// CMMNS' site ids are the platform names the table uses ("fixture" behaves as X).
 const PLATFORM_OF = { fixture: "x" };
 export const backingOf = (site, handle) => BY_HANDLE.get(key(PLATFORM_OF[site] || site, handle)) || null;
 export const backingOfChannel = (id) => (id && BY_CHANNEL.get(id)) || null;
@@ -34,7 +34,7 @@ export const sourceCount = (p) => new Set((p.rows || []).flatMap((r) => r.source
 export const backingLabel = (p) => { const n = sourceCount(p); return `Backing on record: ${n} source${n === 1 ? "" : "s"}`; };
 
 export const BACKING_DOES_NOT_PROVE = "A record of who employs, owns, funds or contracted with a person, each row dated when it was read. Allegations in court records are claims, and records go out of date.";
-export const CORRECTIONS_PATH = "https://github.com/HarperZ9/daylight-commons/blob/dev/data/owner-corrections.json";
+export const CORRECTIONS_PATH = "https://github.com/HarperZ9/cmmns/blob/dev/data/owner-corrections.json";
 
 const STATUS_WORDS = { documented: "documented in a primary record", reported: "reported by the press", alleged: "alleged, not proven" };
 const quoteLine = (s) => `${s.publisher}${s.date ? ` (${s.date})` : ""}, read ${s.read}: "${s.quote}"`;

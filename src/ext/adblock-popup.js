@@ -4,7 +4,7 @@
 globalThis.PBAdblockPopup = (() => {
   "use strict";
   const $ = (id) => document.getElementById(id);
-  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[daylight-commons] could not save settings", e));
+  const save = (patch) => PBSettings.save(patch).catch((e) => console.error("[cmmns] could not save settings", e));
 
   function wire(tab) {
     const s = PBSettings.get(), site = PB.adblockSite(tab && tab.url);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Save to Daylight · Daylight Commons</title>
+<title>Save to CMMNS · CMMNS</title>
 <link rel="stylesheet" href="canon.css">
 <link rel="stylesheet" href="pages.css">
 <link rel="stylesheet" href="media.css">
@@ -11,12 +11,12 @@
 <body>
 <main class="wide">
   <header>
-    <h1>Save to Daylight</h1>
+    <h1>Save to CMMNS</h1>
     <p class="lead" id="from">Reading what the page loaded.</p>
   </header>
   <section aria-labelledby="h-pick">
     <h2 id="h-pick">Media on the page</h2>
-    <p class="muted" id="pick-hint">Tick what to keep. Daylight Commons downloads each file from the host the page loaded it from, on your click, and keeps it in this browser.</p>
+    <p class="muted" id="pick-hint">Tick what to keep. CMMNS downloads each file from the host the page loaded it from, on your click, and keeps it in this browser.</p>
     <ul id="found" class="media-grid" aria-label="Media found on the page"></ul>
   </section>
   <section aria-labelledby="h-where">
@@ -27,10 +27,10 @@
       <label><input type="radio" name="where" value="moodboard"> Moodboard</label>
     </fieldset>
     <div id="case-opts" class="field">
-      <p class="muted">Each file joins the case list with its SHA-256, its address, the page and the time. "Save case list" in the toolbar menu writes case-inbox.jsonl for <code>daylight case add</code>, which captures and archives each address again.</p>
+      <p class="muted">Each file joins the case list with its SHA-256, its address, the page and the time. "Save case list" in the toolbar menu writes case-inbox.jsonl for <code>cmmns case add</code>, which captures and archives each address again.</p>
       <label><input type="checkbox" id="archive"> Ask the Internet Archive to keep a copy of each file's address now</label>
       <p class="muted" id="archive-note">Asks the Internet Archive to save this page. The page's server and the Archive will see the request, and the copy is public. Your browser asks for access to web.archive.org the first time.</p>
-      <p class="muted" id="protection-note" hidden>Source protection is on: nothing is downloaded again and no copy is asked for. Daylight Commons keeps only what this page already holds in memory; for anything else, use your browser's own Save as and add the file to the case.</p>
+      <p class="muted" id="protection-note" hidden>Source protection is on: nothing is downloaded again and no copy is asked for. CMMNS keeps only what this page already holds in memory; for anything else, use your browser's own Save as and add the file to the case.</p>
     </div>
     <div id="board-opts" class="field" hidden>
       <label for="board">Moodboard</label>
@@ -61,7 +61,7 @@
     <ul id="results" class="plain results"></ul>
   </section>
 </main>
-<footer>Protected media (DRM or encrypted streams) is never saved. Daylight Commons says so and stops.</footer>
+<footer>Protected media (DRM or encrypted streams) is never saved. CMMNS says so and stops.</footer>
 <script src="core.bundle.js"></script>
 <script src="guard.js"></script>
 <script src="settings.js"></script>

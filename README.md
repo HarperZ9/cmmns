@@ -1,31 +1,32 @@
-# Daylight Commons
+# CMMNS
 
 A browser extension that shows where social media replies come from. Rest the pointer on a reply on
 X, YouTube, Reddit, Facebook, Instagram, Bluesky, Threads, TikTok or a Mastodon server you turn it
 on for, and a window opens beside it: where the platform places the account, signs of coordination,
 how the account posts, how the reply argues, and whether a fact-checker has reviewed the claim. On a
-phone, tap the post's Daylight Commons button. Formerly Radar, so release files still carry that name.
+phone, tap the post's CMMNS button. CMMNS, spoken "commons", was formerly Daylight Commons, and Radar
+before that. Releases from 3.9.0 name their files `cmmns-*`; earlier ones keep `radar-*`.
 
-![Daylight Commons installed, a synthetic thread, a reply's window and its evidence, a lookup's receipts, and the saved chain checked offline](docs/demo/demo-install-to-verify.gif)
+![CMMNS installed, a synthetic thread, a reply's window and its evidence, a lookup's receipts, and the saved chain checked offline](docs/demo/demo-install-to-verify.gif)
 
 ## Install
 
 **Chrome, Edge or Brave**
-1. Download `radar-chrome-<version>.zip` from the latest release and unzip it.
+1. Download `cmmns-chrome-<version>.zip` from the latest release and unzip it.
 2. Open `chrome://extensions` (Edge: `edge://extensions`) and turn on **Developer mode**.
 3. Click **Load unpacked** and choose the unzipped folder.
-4. Pick your sites on the first-run page and press **Start Daylight Commons**.
+4. Pick your sites on the first-run page and press **Start CMMNS**.
 
 **Firefox (128 or later)**
-1. Download `radar-firefox-<version>.xpi` from the latest release.
+1. Download `cmmns-firefox-<version>.xpi` from the latest release.
 2. Open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and pick the file.
    Firefox removes temporary add-ons on restart until a signed build is published.
 
 To check a download, compare it with the signed `SHA256SUMS` from the same release, either on the
-[install page](https://harperz9.github.io/daylight-commons/install.html) or offline with
+[install page](https://harperz9.github.io/cmmns/install.html) or offline with
 `node scripts/verify-release.mjs <folder>`. Release key id `0e5e 1984 0565 840c 977e 0f03 6c9a c021`.
 
-**Command line, no install step.** Unzip `radar-cli-<version>.zip` from a release and run it with
+**Command line, no install step.** Unzip `cmmns-cli-<version>.zip` from a release and run it with
 Node 22 or later on a saved thread or your own export:
 
 ```
@@ -77,7 +78,7 @@ cover the rest.
 
 Each sign shows its measured precision from the evaluation in `project-docs/EVALUATION.md`, or "not
 measured yet". The options page lists every sign with its figure. Every finding type is explained on
-the [how it works page](https://harperz9.github.io/daylight-commons/how-it-works.html).
+the [how it works page](https://harperz9.github.io/cmmns/how-it-works.html).
 
 Keyboard: focus a post to open its window, <kbd>Alt</kbd>+<kbd>R</kbd> to move into it, arrow keys
 between its tabs, <kbd>Esc</kbd> to close it.
@@ -114,31 +115,31 @@ or video and choose **Download**: it lands in your Downloads folder in one
 click, with its real type and a name from the page. X and Reddit posts get a quiet **Download** button
 that saves every picture and video in the post, videos with their sound. **Download as GIF** makes a
 real GIF from the MP4 that sites send in place of GIFs. **Copy** and **Copy link** sit beside it.
-Other tools can use the same code: `import { assembleStream, encodeGif } from "daylight-commons/media"`
+Other tools can use the same code: `import { assembleStream, encodeGif } from "cmmns/media"`
 ([project-docs/MEDIA-LIBRARY.md](project-docs/MEDIA-LIBRARY.md)).
 
-To keep a file as evidence instead, right-click any image, GIF, video or audio and choose **Save to Daylight**, or use **Save media from
+To keep a file as evidence instead, right-click any image, GIF, video or audio and choose **Save to CMMNS**, or use **Save media from
 this page** in the toolbar menu. A video the page streams is put together from its HLS or DASH
 segments. Each file goes into an investigation case, with its SHA-256, address, page and time and an
 optional Internet Archive copy, or into a moodboard with tags and notes. **Collections** shows them as
-a grid. Protected media (DRM or encrypted streams) is never saved, and Daylight Commons says so.
+a grid. Protected media (DRM or encrypted streams) is never saved, and CMMNS says so.
 
 **Capture as evidence** (right-click a picture, video or sound) saves the file and its note, a
 picture of the visible page and a capture record: the file's SHA-256 before any words went in, what
 the page showed, the time, and what the capture kept and lost, part by part. Each capture adds a
-line to a hash chain in your browser; `daylight capture verify <folder>` checks them all. Details:
+line to a hash chain in your browser; `cmmns capture verify <folder>` checks them all. Details:
 [project-docs/EVIDENCE-CAPTURE.md](project-docs/EVIDENCE-CAPTURE.md).
 
 **Study boards** turn a moodboard or a folder of saves into numbered plates with their source,
 author, time and link: a book with running heads and captions, a grid, or a timeline in posted order.
 Print it, save it as one web page, or keep it as a folder with a SHA-256 manifest. On the command
-line, `daylight board make Downloads/Daylight --title "Shore" --layout book --pdf` does the same, and
+line, `cmmns board make Downloads/CMMNS --title "Shore" --layout book --pdf` does the same, and
 adds an evidence layout for a case. Details: [project-docs/STUDY-BOARDS.md](project-docs/STUDY-BOARDS.md).
 
 **Convert or compress a file** changes pictures among PNG, JPEG, WebP and AVIF, turns a GIF into MP4
 or WebM, makes video smaller as WebM or MP4, and turns sound into Opus. It runs in your browser with no
 upload, shows the size before and after, and keeps a hash chain from every copy to the original. On
-the command line, `daylight media convert clip.gif --to mp4` and `daylight media compress talk.mp4
+the command line, `cmmns media convert clip.gif --to mp4` and `cmmns media compress talk.mp4
 --max-height 720` do the same with ffmpeg. Details: [project-docs/MEDIA-TOOLKIT.md](project-docs/MEDIA-TOOLKIT.md).
 
 **Block ads and trackers**, off until you turn it on, uses EasyList and EasyPrivacy in your browser's
@@ -146,11 +147,11 @@ own blocking engine, with **Allow ads on this site** in the toolbar menu.
 
 ## What it sends and keeps
 
-Daylight Commons reads what the site shows you and requests account details only from the site you
+CMMNS reads what the site shows you and requests account details only from the site you
 are on. Two features reach further, and only after you turn them on and click: Other coverage reads
 the feeds of the outlets you chose, and evidence lookups send the repository names and domains a post
 links to GitHub, RDAP and the Internet Archive. Account details stay in your browser for 14 days and
-thread history for 60, both adjustable, and **Clear all Daylight Commons data** removes everything.
+thread history for 60, both adjustable, and **Clear all CMMNS data** removes everything.
 Details are in [PRIVACY.md](PRIVACY.md).
 
 ## Options
@@ -165,7 +166,7 @@ everything, reduce motion and enlarge text.
   region.
 - Local-claim patterns cover English and some French. Other languages read as "no claim".
 - It sees only the replies the site rendered, in the site's order.
-- On Mastodon it runs on a server only after you open it, click the Daylight Commons button and
+- On Mastodon it runs on a server only after you open it, click the CMMNS button and
   allow it. Options lists the servers and takes access back.
 - TikTok comments are not checked live yet. A site redesign can break any adapter until the next
   update.
@@ -200,7 +201,7 @@ fits `schema/evidence.v2.json`. The API, schema and bundle format are in
 
 ## Investigate: case folders
 
-`daylight case` keeps an investigation in one folder with its own git history: each source captured
+`cmmns case` keeps an investigation in one folder with its own git history: each source captured
 with its hash, access time and Wayback copy; each claim on a rung (documented, inference, unproven,
 contradicted) with its source; the chain from a retelling back to its origin with a word diff per
 hop; a timeline with gaps and contradictions flagged; who quoted or replied to whom; ranked leads;
@@ -235,7 +236,7 @@ The format, pipeline and a test against a hand-built case are in
 npm test                 # every test
 npm run build            # rebuild src/ext/core.bundle.js from src/core
 npm run ci               # exactly what GitHub Actions runs
-npm run package          # dist/radar-chrome-<v>.zip, the two Firefox xpis, dist/SHA256SUMS
+npm run package          # dist/cmmns-chrome-<v>.zip, the two Firefox xpis, dist/SHA256SUMS
 npm run release          # a signed release folder with a git bundle (key kept outside the repo)
 node scripts/serve.mjs   # the fixture thread at http://127.0.0.1:8742/tests/fixtures/thread.html
 ```
@@ -252,7 +253,7 @@ licence, and [THIRD-PARTY.md](THIRD-PARTY.md) lists the parts with their own ter
 come in under the [Developer Certificate of Origin](CONTRIBUTING.md). Governance is in
 [GOVERNANCE.md](GOVERNANCE.md).
 
-If you redistribute Daylight Commons, including through a browser store, ship `LICENSE.txt` (every
+If you redistribute CMMNS, including through a browser store, ship `LICENSE.txt` (every
 package from `npm run package` includes it), offer the complete source and build scripts for the
 exact version, keep the copyright and licence notices, and mark your changes.
 

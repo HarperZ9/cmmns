@@ -13,7 +13,7 @@ import { opProblems } from "../src/core/ops-schema.js";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 export const MAX_BYTES = 450_000;
 const SRC = join(ROOT, "data/ops-sources");
-// Em dashes become a spaced hyphen: Daylight Commons shows no em dash anywhere a user reads (tests/canon.test.js).
+// Em dashes become a spaced hyphen: CMMNS shows no em dash anywhere a user reads (tests/canon.test.js).
 const clean = (v) => (typeof v === "string" ? v.replace(/\s*—\s*/g, " - ") : Array.isArray(v) ? v.map(clean) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, clean(x)])) : v);
 
 export function loadSources(dir = SRC) {

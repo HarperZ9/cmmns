@@ -82,7 +82,7 @@ test("a not-observable element is never matched, whatever the signals", () => {
   assert.deepEqual(row.evidence, []);
 });
 
-test("word ban: no table Daylight Commons can build says committed, guilty, is fraud or any verdict", () => {
+test("word ban: no table CMMNS can build says committed, guilty, is fraud or any verdict", () => {
   for (const sample of ["committed fraud", "This is fraud", "guilty", "violated the rule", "illegal", "liable", "a crime", "in breach"]) assert.ok(verdictHits(sample).length, sample);
   for (const finding of [allSignals, { signals: [] }, signalsFromCampaign(strongLens(actorOf({ handle: "examplecorp", verifiedType: "Business" })))]) {
     for (const e of list) {

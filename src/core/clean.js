@@ -1,7 +1,7 @@
 // Share clean: a copy of a file to send to someone, with everything the file says about itself
 // removed: EXIF with GPS, XMP, IPTC, ICC profile text, PNG text chunks, GIF comments, MP4 user data
 // and creation times, WebM tags, PDF document information and XMP, office document authors, and
-// Daylight's own embedded description. Lossless wherever the format allows (every format here):
+// CMMNS's own embedded description. Lossless wherever the format allows (every format here):
 // pictures, frames and samples are copied byte for byte. After cleaning, the copy is cleaned a
 // second time; anything that second pass would still remove means the copy is refused, never
 // passed as clean. The lineage (original hash to clean hash) is for the user's own evidence copy

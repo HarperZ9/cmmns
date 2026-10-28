@@ -1,6 +1,6 @@
 // DASH manifests (MPD, ISO/IEC 23009-1): reads the representations of a static manifest, says
 // whether any is protected, and builds each representation's segment list. A ContentProtection
-// element anywhere means the media is encrypted, and Daylight Commons does not fetch it.
+// element anywhere means the media is encrypted, and CMMNS does not fetch it.
 // Handles SegmentTemplate (with $Number$, $Time$, SegmentTimeline and format tags like
 // $Number%05d$), SegmentList and a single BaseURL file. Pure: no network.
 

@@ -1,5 +1,5 @@
-// `daylight sidecar check <folder>`: reads every daylight.sidecar/1 note under a folder and flags the
-// ones whose "Continued by the author" parts cannot be trusted. Daylight Commons 3.6.0 joined posts
+// `cmmns sidecar check <folder>`: reads every daylight.sidecar/1 note under a folder and flags the
+// ones whose "Continued by the author" parts cannot be trusted. CMMNS 3.6.0 joined posts
 // that only sat next to each other on the page, so a note saved from a profile or timeline page may
 // hold unrelated posts as a continuation. Notes from 3.6.1 on mark a proved thread
 // (thread_complete: true). Reads local files only.

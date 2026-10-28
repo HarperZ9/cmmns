@@ -2,7 +2,7 @@
 // and link (project-docs/STUDY-BOARDS.md). One format with the reference library's `refdb board`:
 // refdb.board/1 ({ format, kind, key, running_head: { left, right }, lane, keyword_line, plates: [{ n,
 // unit, item_ids, media: [{ id, kind, path }], caption, medium, concepts }], also_in, sources }), so
-// Daylight, the command line and the site render the same boards. Daylight's plates add `source`, the
+// CMMNS, the command line and the site render the same boards. CMMNS's plates add `source`, the
 // sidecar's facts. 3.6.0 moodboards become boards of kind "moodboard". Pure: no files, no network.
 
 import { corroboration } from "./claim-checks.js";
@@ -87,7 +87,7 @@ function captionLine(s) {
   return first.length > 140 ? first.slice(0, 139).replace(/\s+\S*$/, "") + " …" : first;
 }
 
-// The caption: from the plate's source when it has one (Daylight), else the spec's own caption (refdb).
+// The caption: from the plate's source when it has one (CMMNS), else the spec's own caption (refdb).
 export function plateCaption(p) {
   const s = p.source;
   if (!s) return { meta: [p.medium, (p.concepts || []).slice(0, 4).join(", ")].filter(Boolean).join(", "), line: p.caption || "" };

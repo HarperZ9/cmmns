@@ -50,5 +50,5 @@
     const v = g[KEY];
     if (!v || !v.thread) { $("lead").textContent = "Open this page from a post's window, under Discourse checks."; return; }
     draw(v);
-  }).catch((e) => { console.error("[daylight-commons] could not read the sheets", e); $("lead").textContent = "Could not read the sheets."; });
+  }).catch((e) => { console.error("[cmmns] could not read the sheets", e); $("lead").textContent = "Could not read the sheets."; });
 })();

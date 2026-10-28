@@ -1,12 +1,12 @@
-// radar-core: the public API. One zero-dependency ES module over Daylight Commons' pure core, for anyone
-// who wants Daylight Commons' evidence without the browser extension. No DOM, no network, no storage: the
+// radar-core: the public API. One zero-dependency ES module over CMMNS' pure core, for anyone
+// who wants CMMNS' evidence without the browser extension. No DOM, no network, no storage: the
 // caller hands in the posts, the file bytes and (optionally) the data tables, and gets back
 // evidence objects that match schema/evidence.v2.json. project-docs/INTEGRATION.md documents it.
 //
 //   analyzeThread({ site, root, replies })   evidence about a thread
 //   analyzeText(text)                        evidence about one piece of text
 //   checkMedia(bytes)                        Content Credentials and AI metadata of a file
-//   siteInfo(domain)                         what Daylight Commons' tables hold about a site
+//   siteInfo(domain)                         what CMMNS' tables hold about a site
 //   useData({ sites, owners, state, claims, claimParts })   load the tables (optional)
 //
 // Every evidence item states what it shows, its source and what it does not prove. None names an
@@ -88,7 +88,7 @@ export function analyzeThread(input, opts = {}) {
 // bytes: the whole file as a Uint8Array or ArrayBuffer. Resolves to the evidence envelope.
 export async function checkMedia(bytes) {
   const M = await mediaReading(bytes);
-  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["Daylight Commons read this file on this device. Credentials and metadata describe how the file says it was made."] });
+  return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["CMMNS read this file on this device. Credentials and metadata describe how the file says it was made."] });
 }
 
 // domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.

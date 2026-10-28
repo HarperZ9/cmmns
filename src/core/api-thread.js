@@ -15,7 +15,7 @@ const thread = (kind, level, label, shows, source, context, posts, data = {}) =>
   ({ kind, scope: "thread", level, label, shows, source, context, posts, spans: [], data });
 const withBase = (text, sign, replies) => { const b = baselineLine(sign, { replies }); return b ? `${text} ${b}` : text; };
 
-// Flags for one reply: the input's own list (ids or { id, evidence }), or Daylight Commons' rules over the
+// Flags for one reply: the input's own list (ids or { id, evidence }), or CMMNS' rules over the
 // account details given, or null when neither was given (the account was not read).
 export function flagsOf(reply, now) {
   if (Array.isArray(reply.flags)) return reply.flags.map((f) => (typeof f === "string" ? { id: f } : f)).filter((f) => f && f.id);
@@ -68,8 +68,8 @@ function burstItems(replies, precision) {
 const SIGNAL_NAME = { "timing-burst": "Timing bursts", swarming: "Swarming" };
 const BASIS = {
   declared: "The input, or the platform format it was read from, gives this precision.",
-  inferred: (p) => `Daylight Commons inferred this from the times: most of them fall on the same point of the ${p === "day" ? "day" : p === "hour" ? "hour" : "minute"}, as times worked out from rounded ages such as "14h" do.`,
-  "declared and inferred": "The input gives the precision for some posts; for the rest Daylight Commons inferred it from the times.",
+  inferred: (p) => `CMMNS inferred this from the times: most of them fall on the same point of the ${p === "day" ? "day" : p === "hour" ? "hour" : "minute"}, as times worked out from rounded ages such as "14h" do.`,
+  "declared and inferred": "The input gives the precision for some posts; for the rest CMMNS inferred it from the times.",
   unknown: "Too few posts carry a time to tell how precise the times are.",
 };
 function coarseItem(replies, root, P) {

@@ -41,7 +41,7 @@
       meta = meta || r.meta || null;
     }
     // One sidecar for the whole post, listing every file in order.
-    if (many && meta) await PBQuickSave.postSidecar(meta, names).catch((e) => console.warn("[daylight-commons] could not write the post's sidecar", e));
+    if (many && meta) await PBQuickSave.postSidecar(meta, names).catch((e) => console.warn("[cmmns] could not write the post's sidecar", e));
     btn.disabled = false;
     const was = already ? ` ${already} ${already === 1 ? "was" : "were"} already saved.` : "";
     if (many) PBQuickToast.show(ok === items.length ? `Saved all ${items.length} files${gallery ? " from the gallery" : thread ? " from the thread" : ""}.${was}` : `Saved ${ok} of ${items.length} files. ${last}`, { tone: ok === items.length ? "ok" : "no" });
@@ -117,7 +117,7 @@
     try {
       if (PBQuickSites.isX) for (const a of document.querySelectorAll("article")) decorateX(a);
       else for (const p of document.querySelectorAll("shreddit-post")) decorateReddit(p);
-    } catch (e) { console.warn("[daylight-commons] could not place a download button", e); }
+    } catch (e) { console.warn("[cmmns] could not place a download button", e); }
   }
   const later = () => { if (!queued) { queued = true; requestAnimationFrame(() => setTimeout(scan, 50)); } };
   new MutationObserver(later).observe(document.documentElement, { childList: true, subtree: true });

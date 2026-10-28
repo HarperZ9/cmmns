@@ -79,7 +79,7 @@ export function check({ root = ROOT, md = null, issues = null, now = Date.now() 
 }
 
 function githubIssues() {
-  const repo = process.env.GITHUB_REPOSITORY || "HarperZ9/daylight-commons";
+  const repo = process.env.GITHUB_REPOSITORY || "HarperZ9/cmmns";
   const out = execFileSync("gh", ["issue", "list", "-R", repo, "--label", "challenge", "--state", "all", "--limit", "1000", "--json", "number,state,createdAt"], { encoding: "utf8" });
   return JSON.parse(out);
 }

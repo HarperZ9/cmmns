@@ -5,7 +5,7 @@
 export const TECHNIQUE_LESSONS = [
   {
     id: "cross-language", title: "Same link or upload in several languages", research: [],
-    what: "This sign finds replies in different languages, from different accounts, with the same link, the same uploaded file or a claim that the same fact-checker reviewed. Daylight Commons uses the language that the site assigns. It leaves out the material of the post that the replies answer.",
+    what: "This sign finds replies in different languages, from different accounts, with the same link, the same uploaded file or a claim that the same fact-checker reviewed. CMMNS uses the language that the site assigns. It leaves out the material of the post that the replies answer.",
     examples: [
       { side: "none", topic: "health", kind: "sign", text: "Within an hour, one video about a clinic appears under a news story in Turkish, Indonesian and Korean replies, each from an account whose other posts are in another language." },
       { side: "none", topic: "climate", kind: "ordinary", text: "A weather agency's storm map is shared by people in English, Spanish and French along a coast that speaks all three." },
@@ -17,7 +17,7 @@ export const TECHNIQUE_LESSONS = [
   },
   {
     id: "laundered", title: "Material passed through other accounts", research: [],
-    what: "This sign finds material that reached the post through other accounts or a linked site, while the post leaves out the earliest source Daylight Commons saw. Daylight Commons follows what the site records: quotes, reposts, \"media from\", and the same upload or link seen earlier.",
+    what: "This sign finds material that reached the post through other accounts or a linked site, while the post leaves out the earliest source CMMNS saw. CMMNS follows what the site records: quotes, reposts, \"media from\", and the same upload or link seen earlier.",
     examples: [
       { side: "none", topic: "economy", kind: "sign", text: "A chart first posted by an anonymous account is quoted by a mid-sized account, then shared by a large one as \"reports say\", with the first post dropped from view." },
       { side: "none", topic: "science", kind: "ordinary", text: "A teacher shares a science magazine's post, which quotes the university that ran the study." },
@@ -25,11 +25,11 @@ export const TECHNIQUE_LESSONS = [
     why: "A claim gains weight each time it passes through a voice that people trust. After two or three steps, the original source drops out of sight. Then one source looks like several independent sources.",
     spot: "Open the origin in the chain. Ask who said it first and what they based it on. Ask if each step added evidence or only reach.",
     counter: "If every step adds a source or a check, the chain is reporting. If each step repeats the step before, you are looking at one claim with many voices.",
-    dnp: "The chain starts at the first upload or link Daylight Commons has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.",
+    dnp: "The chain starts at the first upload or link CMMNS has seen; who filmed, wrote or paid for the material sits further back. Passing material along through other accounts is also how ordinary sharing works.",
   },
   {
     id: "person-story", title: "One person's story, no wider picture", research: [],
-    what: "This sign finds a post that explains an issue through one person's case alone: a name, an age, what happened to them. The post leaves out numbers, trends, causes and policies. Iyengar called this episodic framing. He called the opposite, which puts the issue in context, thematic framing. Daylight Commons will show this sign when it has a labelled check.",
+    what: "This sign finds a post that explains an issue through one person's case alone: a name, an age, what happened to them. The post leaves out numbers, trends, causes and policies. Iyengar called this episodic framing. He called the opposite, which puts the issue in context, thematic framing. CMMNS will show this sign when it has a labelled check.",
     examples: [
       { side: "left", topic: "housing", kind: "sign", text: "A 71-year-old widow was evicted on Tuesday after 30 years in her flat. This is what the new rules do." },
       { side: "right", topic: "immigration", kind: "sign", text: "This father lost his son to a driver who had been told to leave. Meet the family the system forgot." },

@@ -18,7 +18,7 @@ export const ACCOUNT_LESSONS = [
   },
   {
     id: "written-in", title: "Written in another language", research: [],
-    what: "X translated this post from a language that fits a different place from the account's base. Daylight Commons shows the language that X reported, next to the account's label.",
+    what: "X translated this post from a language that fits a different place from the account's base. CMMNS shows the language that X reported, next to the account's label.",
     examples: [
       { side: "none", topic: "elections", kind: "sign", text: "A reply about a city council vote in Spain, first written in a language rarely spoken there, from an account that posts about that vote alone." },
       { side: "none", topic: "elections", kind: "ordinary", text: "A reply about the same vote, first written in Romanian, from a Romanian family who live in that city." },
@@ -66,14 +66,14 @@ export const ACCOUNT_LESSONS = [
   },
   {
     id: "hours-elsewhere", title: "Active hours fit elsewhere", research: [],
-    what: "The account's posting times fit a waking day in a different time zone from its label. Daylight Commons reads the times of the posts that the site loaded.",
+    what: "The account's posting times fit a waking day in a different time zone from its label. CMMNS reads the times of the posts that the site loaded.",
     examples: [
       { side: "none", topic: "economy", kind: "sign", text: "An account labelled in New York posts almost only between 3 and 9 in the morning, New York time, every day for a month." },
       { side: "none", topic: "economy", kind: "ordinary", text: "A New York nurse on night shifts posts between 2 and 6 in the morning on work days." },
     ],
     why: "Accounts run from far away keep the hours of the people who run them. Hours are hard to fake for many weeks, so a clear shifted day tells you something.",
     spot: "Scroll the account's posts and write down the times. Most sites show a time on each post when you hover over the date. Ten or twenty posts are enough to see a pattern.",
-    counter: "Look at the hour chart in Daylight Commons' card, or at your own notes. A clear, shifted day is worth a note. A scattered pattern tells you very little.",
+    counter: "Look at the hour chart in CMMNS' card, or at your own notes. A clear, shifted day is worth a note. A scattered pattern tells you very little.",
     dnp: "",
   },
   {
@@ -96,7 +96,7 @@ export const ACCOUNT_LESSONS = [
       { side: "none", topic: "media", kind: "ordinary", text: "A local newspaper that schedules its headlines through the same service." },
     ],
     why: "Automation lets one operator run many accounts that answer strangers. Readers think the replies come from people who talk in the moment.",
-    spot: "X hides the app name on the page, so Daylight Commons reads it from the loaded data. By eye, look for other signs of a schedule: exact, even gaps between posts, and the same wording.",
+    spot: "X hides the app name on the page, so CMMNS reads it from the loaded data. By eye, look for other signs of a schedule: exact, even gaps between posts, and the same wording.",
     counter: "Check what the account posts. A brand or a news desk that uses automation is normal. Automated replies to strangers on hot topics deserve a second look.",
     dnp: "",
   },
@@ -126,7 +126,7 @@ export const ACCOUNT_LESSONS = [
   },
   {
     id: "high-volume", title: "Very high post rate", research: [],
-    what: "This sign finds an account that posts far more each day than most people can. Daylight Commons measures the rate over the account's whole life.",
+    what: "This sign finds an account that posts far more each day than most people can. CMMNS measures the rate over the account's whole life.",
     examples: [
       { side: "none", topic: "health", kind: "sign", text: "A two-month-old account averaging 300 posts a day, nearly all replies about one health policy." },
       { side: "none", topic: "sport", kind: "ordinary", text: "A sports results account that posts every score from every match automatically." },
@@ -145,7 +145,7 @@ export const ACCOUNT_LESSONS = [
     ],
     why: "Sites ban accounts, and campaigns replace them with new ones. So campaigns use fresh accounts. Many new accounts in one thread tell you more than one new account.",
     spot: "Every profile shows a join date. Check it for some of the loudest replies. If most of them joined in the same few weeks, write that down.",
-    counter: "Look at Daylight Commons' thread report for a join burst. One new account means little, because news events bring real people online. Many accounts that join in the same week make the pattern.",
+    counter: "Look at CMMNS' thread report for a join burst. One new account means little, because news events bring real people online. Many accounts that join in the same week make the pattern.",
     dnp: "",
   },
   {
@@ -167,9 +167,9 @@ export const ACCOUNT_LESSONS = [
       { side: "none", topic: "media", kind: "sign", text: "Twelve replies in one thread from handles like \"Name48213907\", all joined the same month." },
       { side: "none", topic: "local", kind: "ordinary", text: "A grandfather whose handle is still \"Name19570412\", the one the site picked for him at sign-up." },
     ],
-    why: "Accounts made in bulk often keep the suggested handle, because a change takes effort. One such handle tells you very little. So Daylight Commons shows it as faint context.",
+    why: "Accounts made in bulk often keep the suggested handle, because a change takes effort. One such handle tells you very little. So CMMNS shows it as faint context.",
     spot: "Look for a name and then about eight digits. Then look at the join dates of those accounts. Many such handles that joined together tell you more than one handle.",
-    counter: "Treat this sign as faint context. Daylight Commons leaves it out of the \"flagged\" count. Weigh it next to stronger signs on the same account.",
+    counter: "Treat this sign as faint context. CMMNS leaves it out of the \"flagged\" count. Weigh it next to stronger signs on the same account.",
     dnp: "",
   },
   {
@@ -181,7 +181,7 @@ export const ACCOUNT_LESSONS = [
     ],
     why: "Mass following collects followers fast, because some people follow back. Growth schemes use it often. People who use the site to read also follow many accounts.",
     spot: "Every profile shows the two numbers. On a young account, a following count far above the follower count is the sign.",
-    counter: "Treat this sign as faint context. Daylight Commons leaves it out of the \"flagged\" count. It matters next to stronger signs on the same account.",
+    counter: "Treat this sign as faint context. CMMNS leaves it out of the \"flagged\" count. It matters next to stronger signs on the same account.",
     dnp: "",
   },
   {

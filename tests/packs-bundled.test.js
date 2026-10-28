@@ -1,4 +1,4 @@
-// Daylight Commons' own data ships as a pack signed by the project key (src/ext/radar-data.pack.json). This
+// CMMNS' own data ships as a pack signed by the project key (src/ext/radar-data.pack.json). This
 // fails when a bundled table changes without being signed again: run `node scripts/pack.mjs bundled`
 // with the project key, which lives outside the repository.
 import test from "node:test";
@@ -19,7 +19,7 @@ test("the project key id is the hash of the project public key", async () => {
   assert.ok(!("d" in PROJECT_KEY.jwk));
 });
 
-test("Daylight Commons' bundled data is signed by the project key and matches every shipped table", async () => {
+test("CMMNS' bundled data is signed by the project key and matches every shipped table", async () => {
   const v = await verifyPack(pack, [PROJECT_KEY]);
   assert.deepEqual(v.problems, []);
   assert.equal(v.trusted, true);

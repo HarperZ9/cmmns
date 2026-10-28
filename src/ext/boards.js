@@ -34,7 +34,7 @@
   }
 
   // Every button reports its failure on the page and in the console.
-  const act = (fn) => async () => { try { await fn(); } catch (e) { console.error("[daylight-commons] study board:", e); status(e.message || String(e)); } };
+  const act = (fn) => async () => { try { await fn(); } catch (e) { console.error("[cmmns] study board:", e); status(e.message || String(e)); } };
 
   const urlFor = (m) => current.urls.get(m.path) || "";
   function draw() {
@@ -59,7 +59,7 @@
   }
 
   $("folder").addEventListener("click", async () => {
-    if (typeof showDirectoryPicker !== "function") { status("This browser cannot open a folder here. Use Chrome or Edge, or make the board with: daylight board make <folder>."); return; }
+    if (typeof showDirectoryPicker !== "function") { status("This browser cannot open a folder here. Use Chrome or Edge, or make the board with: cmmns board make <folder>."); return; }
     try { await useFolder(await showDirectoryPicker({ id: "daylight-saves", mode: "read" })); } catch (e) { if (e.name !== "AbortError") status(e.message); }
   });
   $("source").addEventListener("change", act(async () => {
@@ -89,7 +89,7 @@
     for (const [k, u] of current.urls) inline.set(k, await dataUrl(await (await fetch(u)).blob()));
     let html = PB.boardHtml(b, { url: (m) => inline.get(m.path) || "", fonts: "" });
     for (const f of ["AccessionStencil.woff2", "hanken-grotesk.woff2", "jetbrains-mono-regular.woff2"]) html = html.replace(`url("${f}")`, `url("${await dataUrl(await (await fetch(fonts + f)).blob())}")`);
-    // Through the worker, which names every Daylight download (<save folder>/boards/<title>.html).
+    // Through the worker, which names every CMMNS download (<save folder>/boards/<title>.html).
     const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
     const r = await chrome.runtime.sendMessage({ type: "pb-qs-download", url, filename: slug(b.running_head.left) + ".html", site: "boards" });
     if (r && r.error) throw new Error(r.error);
@@ -122,4 +122,4 @@
     const m = await (await dir.getFileHandle("MANIFEST.sha256", { create: true })).createWritable(); await m.write(lines.join("\n") + "\n"); await m.close();
     status(`Saved in ${h.name}/boards/${slug(b.running_head.left)}.`);
   }));
-})().catch((e) => console.error("[daylight-commons] the Boards page failed", e));
+})().catch((e) => console.error("[cmmns] the Boards page failed", e));

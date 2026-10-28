@@ -1,12 +1,12 @@
 # personalities.json: documented backing of public media personalities
 
-Built 2026-10-21 for Daylight Commons by `scripts/personalities-build.mjs` from the hand-kept records in
+Built 2026-10-21 for CMMNS by `scripts/personalities-build.mjs` from the hand-kept records in
 `data/personalities-sources/`. The build writes `src/ext/personalities.json`, which ships inside the
 signed data pack. It reads no network, and the extension fetches nothing live for it.
 
 ## What it does for the user
 
-On the account of a public media personality (X, YouTube, TikTok and the other sites Daylight Commons reads),
+On the account of a public media personality (X, YouTube, TikTok and the other sites CMMNS reads),
 the post's window carries a sign such as "Backing on record: 3 sources". Opening it shows each record:
 who employs the person, who owns their outlet, investors, licensing deals, filings, court records,
 sanctions and government labels. Each record gives its sources' own words, the date each page was
@@ -52,10 +52,10 @@ and that everyone at one outlet gets the same outlet rows.
 - Investigative reporting needs two independent outlets. A claim that met no bar is a lead, marked
   UNVERIFIED in the records, and never ships.
 - No private data: no address, phone, email, salary, contract amount, net worth or family field,
-  anywhere (`tests/personalities.data.test.js` checks every key). Amounts appear in Daylight Commons' own words
+  anywhere (`tests/personalities.data.test.js` checks every key). Amounts appear in CMMNS' own words
   only where a filing or court record is the backing itself.
 - No inference from association: a summary that says "appeared on", "met with", "attended" or
-  "follows" fails the build. No label: Daylight Commons' own words never say propagandist, propaganda, shill,
+  "follows" fails the build. No label: CMMNS' own words never say propagandist, propaganda, shill,
   bot, troll or puppet about anyone, and a quote that carries one of those words is not shipped.
 - Every claim names its source ("the indictment alleges", "Fortune and TheWrap report").
 
@@ -153,7 +153,7 @@ campaign's name, the content type and the dates, never copies of the content. Tw
   filing says Viral Nation "sourced the social media influencers and created the content". The
   technique mapping (T0100) is the research pass's reading; the filing itself names none.
 
-`project-docs/TECHNIQUES.md` section 10 maps these to Daylight Commons' technique taxonomy.
+`project-docs/TECHNIQUES.md` section 10 maps these to CMMNS' technique taxonomy.
 
 ## Leads, including names the author suspects
 

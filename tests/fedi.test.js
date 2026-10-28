@@ -57,7 +57,7 @@ test("TikTok comment list: id, author, text and time from seconds", () => {
   assert.equal(r.posted, new Date(1760000000 * 1000).toISOString());
 });
 
-test("clearing Daylight Commons' data keeps the settings and the Mastodon servers the user turned on", () => {
+test("clearing CMMNS' data keeps the settings and the Mastodon servers the user turned on", () => {
   assert.deepEqual(dataKeys(["pb.settings", "pb.instances.v1", "pb.meta.v1", "pb.history.v1", "other"]), ["pb.meta.v1", "pb.history.v1"]);
   for (const id of ["threads", "mastodon", "tiktok"]) assert.ok(SITES.some(([s]) => s === id), id);
 });

@@ -47,7 +47,7 @@ export async function exportProfile(chain, profile, opts = {}) {
     const p = receiptProblem(rows[i].receipt, i);
     if (p) return { ok: false, reason: p };
   }
-  const ctx = { chain, check, rows, profile, at: opts.at || new Date().toISOString(), tool: opts.tool || "Daylight Commons",
+  const ctx = { chain, check, rows, profile, at: opts.at || new Date().toISOString(), tool: opts.tool || "CMMNS",
     definitions: citedDefinitions(rows, opts.definitions), replies: opts.replies || [], corrections: opts.corrections || [],
     seed: opts.seed || "daylight-export-1", dnp: EXPORT_DOES_NOT_PROVE, sealDnp: SEAL_DOES_NOT_PROVE };
   const files = await BUILDERS[profile](ctx);
@@ -59,7 +59,7 @@ export async function exportProfile(chain, profile, opts = {}) {
 export function verifySteps() {
   return [
     "Install Node.js 22 or later. The tool runs on Node alone.",
-    "Download the Daylight Commons command line tool (radar-cli-<version>.zip) from the project's releases and unpack it.",
+    "Download the CMMNS command line tool (cmmns-cli-<version>.zip) from the project's releases and unpack it.",
     "Run: node bin/radar.mjs verify evidence-chain.json",
     "Every line must read ok: each receipt matches its own hash, each entry follows the one before, the head and the Merkle root match, and each inclusion proof places its receipt under the root.",
     "Any edit, removal, swap or reordering of a receipt makes a line fail.",

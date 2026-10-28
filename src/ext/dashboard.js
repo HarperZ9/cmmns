@@ -21,7 +21,7 @@
     const ask = { domains: [...domains], handles: [] };
     const [owners, states] = await Promise.all([chrome.runtime.sendMessage({ type: "pb-owners", ...ask }), chrome.runtime.sendMessage({ type: "pb-state", ...ask })]);
     PB.setOwnerRows(owners || []); PB.setStateRows(states || []);
-  } catch (e) { console.error("[daylight-commons] label lookup failed", e); }
+  } catch (e) { console.error("[cmmns] label lookup failed", e); }
   const isState = (d) => PB.stateLinksOfDomain(d).length > 0;
   const known = (d) => [PB.ownerOfDomain(d) ? `owned by ${PB.ownerOfDomain(d).owner}` : null, ...new Set(PB.stateLinksOfDomain(d).map((h) => PB.stateLabel(h).chip))].filter(Boolean).join("; ");
 
@@ -65,12 +65,12 @@
 
   // Documented operations: the whole table's counts, and which of the logged sites a report named.
   let opsAll = null;
-  try { opsAll = await chrome.runtime.sendMessage({ type: "pb-ops", all: true }); } catch (e) { console.error("[daylight-commons] ops table failed", e); }
+  try { opsAll = await chrome.runtime.sendMessage({ type: "pb-ops", all: true }); } catch (e) { console.error("[cmmns] ops table failed", e); }
   function operations() {
     if (!opsAll || !opsAll.ops || !opsAll.ops.length) { $("ops-say").textContent = "The operations table did not load."; return; }
     const T = PB.opsTrend(opsAll), named = PB.opsLookup(opsAll, { domains: [...domains] });
     const sites = new Set(named.indicators.map((i) => i.d));
-    $("ops-say").textContent = `Daylight Commons carries ${plural(T.total, "operation", "operations")} from ${plural(T.byState.length, "attributed country", "attributed countries")}, each cited to the reports that found it. ` +
+    $("ops-say").textContent = `CMMNS carries ${plural(T.total, "operation", "operations")} from ${plural(T.byState.length, "attributed country", "attributed countries")}, each cited to the reports that found it. ` +
       (sites.size ? `${plural(sites.size, "site", "sites")} in your logs ${sites.size === 1 ? "was" : "were"} named in one of those reports: ${[...sites].slice(0, 5).join(", ")}.` : "Sites in your logs that those reports name are listed here.");
     $("ops-caveat").textContent = PB.OPS_TREND_CAVEAT;
     bars($("ops-years"), T.byYear.map((y) => ({ ...y, label: String(y.year) })), (r) => r.label);
@@ -80,7 +80,7 @@
   function rhetoric(d) {
     $("strong-say").textContent = d.strong
       ? `${plural(d.strong.k, "post or reply", "posts and replies")} of ${d.strong.n.toLocaleString()} showed strong rhetoric signs: dehumanising words, calls for violence, slurs, or two weaker signs together.`
-      : "Open a thread with Daylight Commons on, and its posts and replies are counted here.";
+      : "Open a thread with CMMNS on, and its posts and replies are counted here.";
     shareBar($("strong"), d.strong, "posts and replies with strong signs");
     const box = $("days"), tb = $("days-table").querySelector("tbody");
     box.replaceChildren(); tb.replaceChildren();
@@ -117,7 +117,7 @@
   function framing(d) {
     const F = d.framing || { shown: false, status: "held back: not measured" };
     $("framing-say").textContent = !F.shown
-      ? `Daylight Commons can read whether a feed post tells an issue through one person's story or explains it through trends, numbers and policy. That reading is ${F.status.replace(/^held back: /, "")}, and it starts here once it passes the same bar as every other sign.`
+      ? `CMMNS can read whether a feed post tells an issue through one person's story or explains it through trends, numbers and policy. That reading is ${F.status.replace(/^held back: /, "")}, and it starts here once it passes the same bar as every other sign.`
       : F.read ? `Of ${plural(F.read, "feed post", "feed posts")} long enough to read, the first bar shows those told purely through one person's story and the second those explained purely through structure. The rest mixed the two or took another form. ${PB.FRAMING_DOES_NOT_PROVE}` : "Feed posts long enough to read are counted here.";
     shareBar($("framing-person"), F.shown ? F.personStory : null, "posts told only as a person's story");
     shareBar($("framing-structure"), F.shown ? F.structural : null, "posts explained only through structure");
@@ -126,7 +126,7 @@
   function checks(d) {
     $("flag-say").textContent = d.flagged
       ? `${plural(d.flagged.k, "account", "accounts")} of ${d.flagged.n.toLocaleString()} read were flagged: one strong sign, such as a very new account or a reply that speaks as a local from somewhere else, or two different weaker signs.`
-      : "Accounts Daylight Commons reads in this window are counted here.";
+      : "Accounts CMMNS reads in this window are counted here.";
     shareBar($("flag"), d.flagged, "accounts read with a flag");
     $("checks-say").textContent = d.notes
       ? `${plural(d.notes.k, "post", "posts")} of ${d.notes.n.toLocaleString()} carried a Community Note, and ${plural(d.claims.k, "post", "posts")} closely matched a claim a fact-checker had already reviewed.`
@@ -150,7 +150,7 @@
     $("media").hidden = !rows.length;
     const n = rows.reduce((a, r) => a + r.n, 0), k = rows.reduce((a, r) => a + r.intact, 0);
     $("media-say").textContent = n
-      ? `Of ${plural(n, "file", "files")} you asked Daylight Commons to check, ${k.toLocaleString()} carried Content Credentials that were intact. Platforms often strip credentials on upload, so read "none found" as missing data about the file. The count covers the files you checked.`
+      ? `Of ${plural(n, "file", "files")} you asked CMMNS to check, ${k.toLocaleString()} carried Content Credentials that were intact. Platforms often strip credentials on upload, so read "none found" as missing data about the file. The count covers the files you checked.`
       : "In a post's window, \"Check this file\" reads a file's Content Credentials and adds it here.";
   }
 
@@ -169,13 +169,13 @@
   function render(days) {
     const d = PB.feedDashboard(store[KEYS.reports], store[KEYS.feed], store[KEYS.net], { days, isState });
     const held = Math.min(days, keep);
-    $("scope").textContent = `${plural(d.threads, "thread", "threads")} and ${plural(d.feedPosts, "feed post", "feed posts")}, ${d.from} to ${d.to}.` + (held < days ? ` Daylight Commons keeps ${keep} days (Options), so this covers ${keep}.` : "");
+    $("scope").textContent = `${plural(d.threads, "thread", "threads")} and ${plural(d.feedPosts, "feed post", "feed posts")}, ${d.from} to ${d.to}.` + (held < days ? ` CMMNS keeps ${keep} days (Options), so this covers ${keep}.` : "");
     sites(d); operations(); rhetoric(d); techniques(d); lens(d); framing(d); checks(d); media(days);
     for (const b of document.querySelectorAll(".window button")) b.setAttribute("aria-pressed", String(+b.dataset.days === days));
   }
 
   for (const b of document.querySelectorAll(".window button")) b.addEventListener("click", () => render(+b.dataset.days));
   $("not-show").textContent = PB.FEED_DOES_NOT_SHOW;
-  $("foot").textContent = `Daylight Commons ${chrome.runtime.getManifest().version}. Kept ${keep} days in this browser; accounts seen together, 30 days at most.`;
+  $("foot").textContent = `CMMNS ${chrome.runtime.getManifest().version}. Kept ${keep} days in this browser; accounts seen together, 30 days at most.`;
   render(7);
-})().catch((e) => { console.error("[daylight-commons] feed page failed", e); document.getElementById("scope").textContent = "Could not read the logs: " + e.message; });
+})().catch((e) => { console.error("[cmmns] feed page failed", e); document.getElementById("scope").textContent = "Could not read the logs: " + e.message; });

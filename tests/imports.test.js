@@ -1,5 +1,5 @@
 // The importers (src/core/imports.js and its readers): every supported file gives posts in
-// Daylight Commons' input shape, the user's own exports come back with one author, other people's reposts
+// CMMNS' input shape, the user's own exports come back with one author, other people's reposts
 // are left out, Reddit's ip column is dropped, and a page script is never treated as text.
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -13,7 +13,7 @@ import { varint } from "../src/core/import-car.js";
 const fx = (f) => readFileSync(new URL(`./fixtures/integration/${f}`, import.meta.url));
 const read = (f) => importFile(f, fx(f));
 
-test("a thread in Daylight Commons' own shape reads as it is", () => {
+test("a thread in CMMNS' own shape reads as it is", () => {
   const r = read("thread.json");
   assert.equal(r.ok, true);
   assert.equal(r.source, "thread");
@@ -118,7 +118,7 @@ test("a Bluesky repository .car gives the user's posts named by record key", () 
   assert.deepEqual(varint(Uint8Array.of(0xac, 0x02), 0), [300, 2]);
 });
 
-test("files Daylight Commons cannot read are refused with a reason, never guessed at", () => {
+test("files CMMNS cannot read are refused with a reason, never guessed at", () => {
   for (const [name, body] of [["x.json", "{not json"], ["x.json", "{\"a\":1}"], ["x.bin", "\u0001\u0002"], ["x.csv", "a,b\n1,2\n"]]) {
     const r = importFile(name, body);
     assert.equal(r.ok, false, name);

@@ -18,7 +18,7 @@ export function lessonPath(fam) {
   return typeof fam === "string" && ID.test(fam) ? `learn.html#${fam}` : null;
 }
 
-// A content script asks the worker to open one of Daylight Commons' own pages. Only these pages, with an
+// A content script asks the worker to open one of CMMNS' own pages. Only these pages, with an
 // optional lesson id, pass; anything else is refused, so a page cannot be made to open other URLs.
 export function safePage(path) {
   if (typeof path !== "string") return null;
@@ -33,7 +33,7 @@ export const TIPS = [
   { id: "hover", where: "window", step: 1,
     text: "Tip 1 of 3. This window opens when you rest the pointer on a post. The dots at the top are areas. Click one to open its evidence." },
   { id: "report", where: "panel", step: 2,
-    text: "Tip 2 of 3. The Daylight Commons button opens a report on the whole thread. It compares the harshest replies with the rest and shows the interval." },
+    text: "Tip 2 of 3. The CMMNS button opens a report on the whole thread. It compares the harshest replies with the rest and shows the interval." },
   { id: "lesson", where: "window", step: 3,
     text: "Tip 3 of 3. Every sign has a Learn link. Each lesson takes about a minute and shows how to spot the move yourself." },
 ];

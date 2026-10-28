@@ -19,7 +19,7 @@ globalThis.PBQuickCapture = globalThis.PBQuickCapture || (() => {
   // r: what PBQuickSave.run returned ({ names, meta, files, transformed }). Resolves to the line to show.
   async function finish(r) {
     if (!r.files || !r.files.length) throw new Error("Nothing was saved, so there is nothing to capture.");
-    // Daylight's own controls (the toast, the hover bar, the in-post buttons) stay out of the picture.
+    // CMMNS's own controls (the toast, the hover bar, the in-post buttons) stay out of the picture.
     PBQuickToast.hide && PBQuickToast.hide();
     if (globalThis.PBHover) PBHover.hide();
     const veil = document.createElement("style");

@@ -37,7 +37,7 @@ globalThis.PBSaveUi = (() => {
     box.disabled = !!item.protected || (!item.url && !(item.streams && item.streams.length));
     label.append(box, preview(item), el("span", { class: "facts" }, facts(item)));
     if (item.protected) label.append(el("span", { class: "why v-drift" }, `Protected: ${item.protected} ${PB.PROTECTED_LINE}`));
-    else if (box.disabled) label.append(el("span", { class: "why" }, "The page builds this media in memory from a source Daylight Commons cannot read."));
+    else if (box.disabled) label.append(el("span", { class: "why" }, "The page builds this media in memory from a source CMMNS cannot read."));
     else label.append(el("span", { class: "addr mono" }, (item.url || item.streams[item.streams.length - 1].url).slice(0, 140)));
     li.append(label);
     return li;

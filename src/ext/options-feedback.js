@@ -33,7 +33,7 @@
       document.body.append(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
       $("fbStatus").textContent = "Saved to your downloads. Nothing was sent.";
-    } catch (e) { console.error("[daylight-commons] feedback export failed", e); $("fbStatus").textContent = "Could not save: " + e.message; }
+    } catch (e) { console.error("[cmmns] feedback export failed", e); $("fbStatus").textContent = "Could not save: " + e.message; }
   });
 
   // Two steps, as with clearing all data.
@@ -42,10 +42,10 @@
   const disarm = () => { armed = false; b.textContent = "Clear feedback"; b.classList.remove("hot"); };
   b.addEventListener("click", async () => {
     if (!armed) { armed = true; b.textContent = "Click again to delete your marks"; b.classList.add("hot"); return; }
-    try { await chrome.storage.local.remove(KEY); $("fbStatus").textContent = "Your marks are deleted."; } catch (e) { console.error("[daylight-commons] could not clear feedback", e); $("fbStatus").textContent = "Could not clear: " + e.message; }
+    try { await chrome.storage.local.remove(KEY); $("fbStatus").textContent = "Your marks are deleted."; } catch (e) { console.error("[cmmns] could not clear feedback", e); $("fbStatus").textContent = "Could not clear: " + e.message; }
     disarm(); paint();
   });
   b.addEventListener("blur", () => { if (armed) disarm(); });
   chrome.storage.onChanged.addListener((ch, area) => { if (area === "local" && ch[KEY]) paint(); });
   await paint();
-})().catch((e) => console.error("[daylight-commons] feedback options failed", e));
+})().catch((e) => console.error("[cmmns] feedback options failed", e));

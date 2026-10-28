@@ -13,7 +13,7 @@
   ];
   const SEARCH_NOTE = "Each link opens in a new tab. Clicking one sends this image's address to that service; nothing is sent before you click.";
   const CHECK_NOTE = "Reads the file this page already loaded, from the same address, without cookies, and keeps it on this device.";
-  const FRAME_NOTE = "Daylight Commons copies the frame to your clipboard and opens the service in a new tab. Paste it there (Ctrl+V); nothing is sent until you do.";
+  const FRAME_NOTE = "CMMNS copies the frame to your clipboard and opens the service in a new tab. Paste it there (Ctrl+V); nothing is sent until you do.";
   const open = (id) => ({ links: [["open post", `https://x.com/i/status/${id}`]] });
 
   function seenRows(f) {

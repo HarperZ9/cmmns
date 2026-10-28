@@ -5,7 +5,7 @@
 export const SPREAD_LESSONS = [
   {
     id: "duplicates", flag: "same-text", title: "Same text as other replies", research: ["badnews-2019"],
-    what: "This sign finds several accounts in one thread that posted the same words, or nearly the same words. Daylight Commons compares replies word by word. It needs a close match from different accounts.",
+    what: "This sign finds several accounts in one thread that posted the same words, or nearly the same words. CMMNS compares replies word by word. It needs a close match from different accounts.",
     examples: [
       { side: "none", topic: "tech", kind: "sign", text: "Five replies under a phone review read \"Switched last month, battery lasts two days, best phone I've owned\", from five accounts that joined the same week." },
       { side: "none", topic: "sport", kind: "ordinary", text: "Forty fans reply \"What a goal!\" under the same clip." },
@@ -17,7 +17,7 @@ export const SPREAD_LESSONS = [
   },
   {
     id: "copied-elsewhere", title: "Same words in other threads", research: [],
-    what: "This sign finds an account that posted the same words in other threads you viewed. Daylight Commons keeps a log of what it saw, stored in this browser.",
+    what: "This sign finds an account that posted the same words in other threads you viewed. CMMNS keeps a log of what it saw, stored in this browser.",
     examples: [
       { side: "none", topic: "health", kind: "sign", text: "One account posts \"My cousin had the same reaction, the media is hiding this\" under six different health stories in a day." },
       { side: "none", topic: "local", kind: "ordinary", text: "A charity posts the same appeal for blood donors under several local news stories." },
@@ -65,7 +65,7 @@ export const SPREAD_LESSONS = [
   },
   {
     id: "community-note", title: "Community Note", research: [],
-    what: "A Community Note is a note that X users wrote and rated as helpful, attached to this post. Daylight Commons shows it first because people from different viewpoints agreed on it.",
+    what: "A Community Note is a note that X users wrote and rated as helpful, attached to this post. CMMNS shows it first because people from different viewpoints agreed on it.",
     examples: [
       { side: "none", topic: "science", kind: "sign", text: "A note under a chart: \"The chart cuts off before 2010, which hides the earlier peak. Full data: link.\"" },
       { side: "none", topic: "health", kind: "ordinary", text: "A note that adds a missing date to an accurate post." },
@@ -73,11 +73,11 @@ export const SPREAD_LESSONS = [
     why: "A note travels with the post, and it is often the fastest context you can get. X shows a note when raters who usually disagree find it helpful.",
     spot: "Notes appear under the post as \"Readers added context\". On X you can rate notes yourself when you join the program.",
     counter: "Open the note's source links. A note is a summary by other users, and the links are the evidence. Some notes add context to a true post.",
-    dnp: "A note shows what X users from different viewpoints rated helpful. It is a crowd rating, separate from any ruling by X or Daylight Commons.",
+    dnp: "A note shows what X users from different viewpoints rated helpful. It is a crowd rating, separate from any ruling by X or CMMNS.",
   },
   {
     id: "fact-check", title: "Fact-checked claim", research: [],
-    what: "This sign finds a claim that a fact-checker reviewed, worded like this one. Daylight Commons shows the rating in the fact-checker's own words, with the date and a link.",
+    what: "This sign finds a claim that a fact-checker reviewed, worded like this one. CMMNS shows the rating in the fact-checker's own words, with the date and a link.",
     examples: [
       { side: "none", topic: "health", kind: "sign", text: "A post says a common painkiller was banned in Europe. A fact-checker rated a near-identical claim false in March." },
       { side: "none", topic: "health", kind: "ordinary", text: "A post reports that a painkiller was recalled in one country, which is a different claim from a ban, and true." },

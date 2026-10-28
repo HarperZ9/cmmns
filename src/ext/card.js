@@ -1,4 +1,4 @@
-// The account card: everything the site discloses about the account and the post, plus Daylight Commons'
+// The account card: everything the site discloses about the account and the post, plus CMMNS'
 // evidence, in plain sections. It never shows or guesses demographics (race, religion, ethnicity,
 // gender, age): the platforms do not disclose them, and guessing them about a person is profiling.
 (() => {
@@ -111,12 +111,12 @@
     const A = m.activity;
     if (!A || !A.threads) return [];
     return [
-      ["Seen by Daylight Commons", `in ${A.threads} thread${A.threads === 1 ? "" : "s"} you viewed since ${A.firstSeen}` + (A.medianDelay != null ? `; replies a median ${A.medianDelay} s after the post` : "")],
+      ["Seen by CMMNS", `in ${A.threads} thread${A.threads === 1 ? "" : "s"} you viewed since ${A.firstSeen}` + (A.medianDelay != null ? `; replies a median ${A.medianDelay} s after the post` : "")],
       ["Often alongside", A.alongside.length ? A.alongside.map((x) => `@${x.handle} (${x.n})`).join(", ") : null],
     ];
   }
 
-  // How this account compares with the other repliers Daylight Commons has read in this thread.
+  // How this account compares with the other repliers CMMNS has read in this thread.
   function compare(m) {
     const C = m.thread, R = m.reading || {};
     if (!C || C.n < 5) return [];

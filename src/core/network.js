@@ -1,6 +1,6 @@
-// Connections and activity across the threads the user has viewed. Daylight Commons keeps a small local log
+// Connections and activity across the threads the user has viewed. CMMNS keeps a small local log
 // (chrome.storage.local, this browser only): which accounts replied in which thread, and how many
-// seconds after the original post. From it Daylight Commons shows, per account, how often it turns up, which
+// seconds after the original post. From it CMMNS shows, per account, how often it turns up, which
 // accounts it keeps turning up alongside, and how fast it replies; per thread, groups of accounts
 // that have appeared together before. Entries older than RETAIN_DAYS are dropped; the user can
 // clear the log. Nothing is linked across platforms.
@@ -74,7 +74,7 @@ export function returningGroups(log, threadKey, handles, min = 2) {
   return pairs.sort((x, y) => y.n - x.n).slice(0, 10);
 }
 
-// Inferred from posting times Daylight Commons has seen: the UTC offset whose waking day (08:00 to 24:00 local)
+// Inferred from posting times CMMNS has seen: the UTC offset whose waking day (08:00 to 24:00 local)
 // holds the most posts. Needs MIN_POSTS posts over MIN_DAYS days; otherwise null. This is an
 // inference about when the account is operated, not where anyone lives: shift workers, night
 // owls, schedulers and teams across time zones all break it.

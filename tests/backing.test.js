@@ -70,6 +70,6 @@ test("wiring: the worker answers pb-backing from the bundled table, pages ask, t
 test("nothing is fetched live: the matcher and the build name no remote address and make no request", () => {
   for (const f of ["src/core/backing.js", "scripts/personalities-build.mjs", "src/core/personalities-schema.js"]) {
     const code = read(f);
-    assert.doesNotMatch(code, /\bfetch\(|XMLHttpRequest|https?:\/\/(?!github\.com\/HarperZ9\/daylight-commons)/, f);
+    assert.doesNotMatch(code, /\bfetch\(|XMLHttpRequest|https?:\/\/(?!github\.com\/HarperZ9\/cmmns)/, f);
   }
 });

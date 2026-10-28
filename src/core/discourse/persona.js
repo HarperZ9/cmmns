@@ -65,10 +65,10 @@ export function personaOf(index, account) {
     person: p, cue: inHandle ? "handle" : "display",
     label: `uses the name of ${p.name} (died ${yearText(p.died)})`,
     rows: [
-      ["What Daylight Commons sees", `This account's name is the name of ${p.name} (${years}), who died ${p.died < 0 || p.died < 1900 ? "long before social media" : "in " + yearText(p.died)}. It is not that person writing.`],
+      ["What CMMNS sees", `This account's name is the name of ${p.name} (${years}), who died ${p.died < 0 || p.died < 1900 ? "long before social media" : "in " + yearText(p.died)}. It is not that person writing.`],
       ["Why it shows", inHandle ? `The display name and the handle both carry the name ("${inHandle}").` : `The display name adds "${kindWord}" to the name.`],
       ...(account.verified ? [["The checkmark", CHECKMARK_NOTE]] : []),
-      ["Source", `Wikidata ${p.qid}, from the name list that ships inside Daylight Commons.`],
+      ["Source", `Wikidata ${p.qid}, from the name list that ships inside CMMNS.`],
       ["What it shows", PERSONA_DOES_NOT_PROVE],
     ],
   };

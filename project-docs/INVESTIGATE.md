@@ -1,21 +1,21 @@
 <!-- writing-profile: research -->
 # Investigate: case folders for open-source investigation
 
-`daylight case` keeps an investigation in one folder: every source captured and hashed, every
+`cmmns case` keeps an investigation in one folder: every source captured and hashed, every
 claim on a rung with its source, the chain from each retelling back to its origin, a timeline, an
-amplification network, ranked leads and a log of missing records. `daylight case run` builds all
+amplification network, ranked leads and a log of missing records. `cmmns case run` builds all
 of that from screenshots, URLs or a claim with nobody at the keyboard, and exports a dossier that
 anyone can check offline. The extension adds one button, "Add to case", which keeps the address of
 the page you are on for a later `case add`.
 
-Five commands (`npm link` once makes `daylight` the same as `node bin/radar.mjs`; inside a case
+Five commands (`npm link` once makes `cmmns` (and the older `daylight`) the same as `node bin/radar.mjs`; inside a case
 folder `--case` can be left out):
 
-    daylight case init "Harbour sale"
-    daylight case add https://example.org/council-minutes --case harbour-sale
-    daylight case claim "The council voted 7-2 to sell" --source S01 --rung documented --case harbour-sale
-    daylight case trace C01 --case harbour-sale
-    daylight case export --profile newsroom --case harbour-sale
+    cmmns case init "Harbour sale"
+    cmmns case add https://example.org/council-minutes --case harbour-sale
+    cmmns case claim "The council voted 7-2 to sell" --source S01 --rung documented --case harbour-sale
+    cmmns case trace C01 --case harbour-sale
+    cmmns case export --profile newsroom --case harbour-sale
 
 The rest of this file covers the record format, the pipeline, the safety defaults, how the tool
 compares with what journalists use now, the targets that follow, and a test against a case built
@@ -94,7 +94,7 @@ it), `rung-conflict` (one key, one documented claim and one contradicted).
 - **research**: JSON Lines tables, W3C PROV-O provenance (`prov.jsonld`) and MLCommons Croissant
   1.0 metadata (`croissant.json`) with a sha256 per file. Capture text is left out.
 
-Every export carries `SHA256SUMS` and `case.evidence-bundle.json`, a signed Daylight Commons
+Every export carries `SHA256SUMS` and `case.evidence-bundle.json`, a signed CMMNS
 evidence bundle whose items are the content address of every file. It checks offline in
 `docs/verify-offline.html` or with `radar verify`; `case verify-export <folder>` also rehashes each
 file. The signature shows the export is unchanged since the holder of the key signed it. It does
@@ -102,7 +102,7 @@ not show who holds the key or that any source told the truth.
 
 ## The pipeline: `case run`
 
-    daylight case run screenshots/ urls.txt "a claim to check"
+    cmmns case run screenshots/ urls.txt "a claim to check"
 
 Seeds: a folder (screenshots, URL lists, saved X records, the extension's `case-inbox.jsonl`), a
 URL (an X post brings its reply and quote chain), or a claim in quotes. Twelve stages run in order:
@@ -152,12 +152,12 @@ offline from its captures. `DAYLIGHT_CASE_NOW` fixes the clock.
   copy is public. `--no-archive` still works and wins over the setting. `case watch` asks the
   Archive whether it holds a copy only when the archive setting is on. A configured model endpoint
   receives source text. Every other command works offline.
-- **Source-protection mode** (`case settings protection on`, or `daylight protect on` for every
+- **Source-protection mode** (`case settings protection on`, or `cmmns protect on` for every
   case) refuses every request: add pages you saved in your browser as files. Exports are Share clean
   (`lineage/clean.jsonl` in the case keeps each original-to-clean hash pair, outside the export),
   carrier-safe (a one-time key, the day only), every account is a pseudonym unless marked
   `--keep-name`, and the case's own history names the investigator only as "investigator" with the
-  day. `daylight protect limits` lists what it cannot protect against. Not yet independently
+  day. `cmmns protect limits` lists what it cannot protect against. Not yet independently
   reviewed: project-docs/SECURITY-REVIEW.md. The extension's "Add to case" keeps addresses in the browser
   and sends nothing.
 
@@ -165,7 +165,7 @@ offline from its captures. `DAYLIGHT_CASE_NOW` fixes the clock.
 
 Checked 2026-10-23 against each project's own site or repository; licences from the GitHub API.
 
-| Tool | What it does well | Where Daylight can lead |
+| Tool | What it does well | Where CMMNS can lead |
 |---|---|---|
 | Hunchly | Captures every page visited automatically, with URL, time and hash; tagging, search and reports with an audit trail; local storage with a cloud option. Commercial, paid. | Free and AGPL; claim, rung, drift and origin records that Hunchly does not model; exports that verify offline with no account. |
 | Bellingcat Auto Archiver (MIT) | Archives posts and pages in volume (over 150,000 items by Aug 2025), video through yt-dlp, Wayback backup, chain of custody and perceptual hashing since its 2025 update. | Analysis on top of capture: claims, origins, drift, timeline, leads; a dossier per profile. Its capture breadth (video, many platforms) is ahead of ours. |
@@ -181,11 +181,11 @@ Checked 2026-10-23 against each project's own site or repository; licences from 
 
 ## Targets, feature by feature
 
-Each line names the best competitor for the feature today, where Daylight stands, and the target.
+Each line names the best competitor for the feature today, where CMMNS stands, and the target.
 "Ahead" and "behind" are about the feature, measured on our own fixtures; none of these is a claim
 about a competitor's internals.
 
-| Feature | Best now | Daylight 3.4.0 | Target |
+| Feature | Best now | CMMNS 3.4.0 | Target |
 |---|---|---|---|
 | Automatic page capture while browsing | Hunchly | one-click "Add to case", capture later | capture with hash on the click, still nothing sent |
 | Platform breadth (video, Telegram, TikTok) | Auto Archiver | web pages, X posts, local files | the extension's own platform readers as capture sources |

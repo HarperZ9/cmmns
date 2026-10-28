@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How Daylight Commons is measured</title>
-<meta name="description" content="Every Daylight Commons sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.">
+<title>How CMMNS is measured</title>
+<meta name="description" content="Every CMMNS sign with its measured precision, recall and interval, the data behind it, the side-balance check and the known limits.">
 <style>
 @font-face { font-family: "Hanken Grotesk"; src: url("fonts/hanken-grotesk.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
 @font-face { font-family: "JetBrains Mono"; src: url("fonts/jetbrains-mono-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
@@ -120,14 +120,14 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </head>
 <body>
 <main>
-<h1>How Daylight Commons is measured</h1>
+<h1>How CMMNS is measured</h1>
 <p class="muted">Updated 2026-10-23.</p>
 
-<p class="lead">Every sign in Daylight Commons' window carries one of two labels: how often it was right when people checked by hand, or "not measured yet". Below is every sign, the data it was checked on and that data's licence, and how evenly the signs fire whichever side a post targets.</p>
+<p class="lead">Every sign in CMMNS' window carries one of two labels: how often it was right when people checked by hand, or "not measured yet". Below is every sign, the data it was checked on and that data's licence, and how evenly the signs fire whichever side a post targets.</p>
 <h2>How to read the numbers</h2>
 <ul>
-<li><strong>Precision</strong> is the share of signs Daylight Commons showed that the human annotators of a public research corpus agreed with. It answers "when Daylight Commons shows this, how often is it right?"</li>
-<li><strong>Recall</strong> is the share of the annotated cases that Daylight Commons found. Daylight Commons is built for precision: a wrong sign on an honest reply is the harm it avoids most, so recall is low.</li>
+<li><strong>Precision</strong> is the share of signs CMMNS showed that the human annotators of a public research corpus agreed with. It answers "when CMMNS shows this, how often is it right?"</li>
+<li><strong>Recall</strong> is the share of the annotated cases that CMMNS found. CMMNS is built for precision: a wrong sign on an honest reply is the harm it avoids most, so recall is low.</li>
 <li>Each figure gives the count and a 95% interval (Wilson). A wide interval means few cases were checked.</li>
 <li>All figures come from a held-out test split (seed <code>radar-eval-2026-10-21</code>). Rules were tuned on a separate split, and the test split was read once, after tuning. Measured 2026-10-23.</li>
 </ul>
@@ -135,27 +135,27 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <p>Each sign leads with what its measurement means when you see it. The figure draws the 95% interval as a band and the measured value as a mark; a dashed line is the bar a sign must clear to show. Counts, data and limits sit under "How we know".</p>
 <section class="sign">
 <h3>Slur or coded hate term</h3>
-<p class="takeaway">When Daylight Commons shows this sign, the people who labelled the test comments agreed 91 times in 100.</p>
+<p class="takeaway">When CMMNS shows this sign, the people who labelled the test comments agreed 91 times in 100.</p>
 <svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Slur or coded hate term, precision: 91%, 95% interval 90.1% to 91.8%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="354.0" y="10" width="6.5" height="12"/><line class="point" x1="357.4" y1="6" x2="357.4" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
 <details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>3,996 of 4,393; 95% interval 90.1% to 91.8%</dd><dt>Range across corpora</dt><dd>34.0% to 95.3%</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Read it as</dt><dd>A sign describes the words in the post, which can be quoted, ironic or reported speech.</dd></dl></details>
 </section>
 <section class="sign">
 <h3>Call for violence</h3>
-<p class="takeaway">When Daylight Commons shows this sign, the people who labelled the test comments agreed 88 times in 100.</p>
+<p class="takeaway">When CMMNS shows this sign, the people who labelled the test comments agreed 88 times in 100.</p>
 <svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Call for violence, precision: 87.5%, 95% interval 79% to 92.9%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="311.4" y="10" width="53.4" height="12"/><line class="point" x1="344.0" y1="6" x2="344.0" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
-<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>77 of 88; 95% interval 79.0% to 92.9%</dd><dt>Range across corpora</dt><dd>96.7% to 96.7%</dd><dt>Recall</dt><dd>2.1% (39 of 1,819; 95% interval 1.6% to 2.9%). Daylight Commons is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Read it as</dt><dd>A sign describes the words in the post, which can be quoted, ironic or reported speech.</dd></dl></details>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>77 of 88; 95% interval 79.0% to 92.9%</dd><dt>Range across corpora</dt><dd>96.7% to 96.7%</dd><dt>Recall</dt><dd>2.1% (39 of 1,819; 95% interval 1.6% to 2.9%). CMMNS is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Read it as</dt><dd>A sign describes the words in the post, which can be quoted, ironic or reported speech.</dd></dl></details>
 </section>
 <section class="sign">
 <h3>Dehumanising language</h3>
-<p class="takeaway">When Daylight Commons shows this sign, the people who labelled the test comments agreed 93 times in 100.</p>
+<p class="takeaway">When CMMNS shows this sign, the people who labelled the test comments agreed 93 times in 100.</p>
 <svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Dehumanising language, precision: 92.5%, 95% interval 80.1% to 97.4%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="315.6" y="10" width="66.4" height="12"/><line class="point" x1="363.2" y1="6" x2="363.2" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
-<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>37 of 40; 95% interval 80.1% to 97.4%</dd><dt>Range across corpora</dt><dd>90.0% to 90.0%</dd><dt>Recall</dt><dd>0.2% (12 of 5,046; 95% interval 0.1% to 0.4%). Daylight Commons is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Read it as</dt><dd>A sign describes the words in the post, which can be quoted, ironic or reported speech.</dd></dl></details>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>37 of 40; 95% interval 80.1% to 97.4%</dd><dt>Range across corpora</dt><dd>90.0% to 90.0%</dd><dt>Recall</dt><dd>0.2% (12 of 5,046; 95% interval 0.1% to 0.4%). CMMNS is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Read it as</dt><dd>A sign describes the words in the post, which can be quoted, ironic or reported speech.</dd></dl></details>
 </section>
 <section class="sign">
 <h3>Group stereotype</h3>
-<p class="takeaway">When Daylight Commons shows this sign, the people who labelled the test comments agreed 84 times in 100.</p>
+<p class="takeaway">When CMMNS shows this sign, the people who labelled the test comments agreed 84 times in 100.</p>
 <svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Group stereotype, precision: 84.2%, 95% interval 76.4% to 89.8%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="301.4" y="10" width="51.5" height="12"/><line class="point" x1="331.3" y1="6" x2="331.3" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
-<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>96 of 114; 95% interval 76.4% to 89.8%</dd><dt>Range across corpora</dt><dd>77.3% to 92.5%</dd><dt>Recall</dt><dd>0.7% (58 of 8,368; 95% interval 0.5% to 0.9%). Daylight Commons is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Read it as</dt><dd>A sign describes the words in the post, which can be quoted, ironic or reported speech.</dd></dl></details>
+<details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Precision</dt><dd>96 of 114; 95% interval 76.4% to 89.8%</dd><dt>Range across corpora</dt><dd>77.3% to 92.5%</dd><dt>Recall</dt><dd>0.7% (58 of 8,368; 95% interval 0.5% to 0.9%). CMMNS is built for precision, so it misses most cases.</dd><dt>Data</dt><dd>Measuring Hate Speech, HateXplain and Civil Comments, held-out test split</dd><dt>Read it as</dt><dd>A sign describes the words in the post, which can be quoted, ironic or reported speech.</dd></dl></details>
 </section>
 <section class="sign">
 <h3>The thread report's &quot;extreme&quot;</h3>
@@ -171,7 +171,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </section>
 <section class="sign">
 <h3>Burst of replies</h3>
-<p class="takeaway">In ordinary threads with 20 to 49 replies, a burst like those Daylight Commons reports shows up in 2.2% of threads.</p>
+<p class="takeaway">In ordinary threads with 20 to 49 replies, a burst like those CMMNS reports shows up in 2.2% of threads.</p>
 <svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Bursts, ordinary threads of 20 to 49 replies: 2.2%, 95% interval 1.6% to 3.2%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="69.4" y="10" width="61.4" height="12"/><line class="point" x1="92.5" y1="6" x2="92.5" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">10%</text></svg>
 <details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>5-19 replies</dt><dd>39 of 3,087; 95% interval 0.9% to 1.7%</dd><dt>20-49 replies</dt><dd>31 of 1,384; 95% interval 1.6% to 3.2%</dd><dt>50-99 replies</dt><dd>2 of 181; 95% interval 0.3% to 3.9%</dd><dt>100+ replies</dt><dd>2 of 60; 95% interval 0.9% to 11.4%</dd><dt>Independent posting</dt><dd>A simulation where each reply is timed on its own, at the thread's own pace, fires in 2.8%, 3.6%, 5.3%, 12.2% of threads by size.</dd><dt>Source</dt><dd>Ordinary threads: the PHEME corpus of Twitter threads from 2014 and 2015 news events (CC BY 4.0), a public research corpus from an earlier X.</dd></dl></details>
 </section>
@@ -183,7 +183,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </section>
 <section class="sign">
 <h3>Look-alike letters</h3>
-<p class="takeaway">Copies with one letter swapped for a Cyrillic or Greek look-alike: Daylight Commons now finds 100 in 100, up from 75.</p>
+<p class="takeaway">Copies with one letter swapped for a Cyrillic or Greek look-alike: CMMNS now finds 100 in 100, up from 75.</p>
 <svg class="ci-fig" viewBox="0 0 400 44" role="img" aria-label="Copies found after folding look-alike letters: 100%, 95% interval 96.3% to 100%."><line class="axis" x1="8" y1="16" x2="392" y2="16"/><line class="tick" x1="8" y1="12" x2="8" y2="20"/><line class="tick" x1="392" y1="12" x2="392" y2="20"/><rect class="band" x="377.8" y="10" width="14.2" height="12"/><line class="point" x1="392.0" y1="6" x2="392.0" y2="26"/><text x="8" y="42">0</text><text x="392" y="42" text-anchor="end">100%</text></svg>
 <details class="how-we-know"><summary>How we know</summary><dl class="hwk-list"><dt>Seeded copies</dt><dd>100 of 100 found after folding, 75 of 100 before</dd><dt>Ordinary text</dt><dd>6 of 96,337 replies in ordinary threads changed at all, mostly fullwidth letters and digits read as plain ones</dd><dt>Test cases</dt><dd>Same text, cases written for the test: 85 of 87; 95% interval 92.0% to 99.4%</dd><dt>Data</dt><dd>Unicode confusables table (UTS #39), Unicode License v3</dd></dl></details>
 </section>
@@ -274,58 +274,58 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </tbody></table></div>
 <p class="muted">Precision agrees across sides within the intervals. Where a gap remains, the thread report undercounts extreme replies aimed at the side with lower recall.</p>
 <h2>Every sign</h2>
-<p>Each of Daylight Commons' 62 signs, with the line its window shows beside it.</p>
+<p>Each of CMMNS' 62 signs, with the line its window shows beside it.</p>
 <details class="how-we-know"><summary>Every sign and its measured line</summary>
 <div class="scroll"><table><thead><tr><th scope="col">Sign</th><th scope="col">Area</th><th scope="col">Kind</th><th scope="col">What the window says</th></tr></thead><tbody>
-<tr><td>Slur or coded hate term</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 91% (95% interval 90 to 92%), 4393 badges checked, held-out test set</td></tr>
-<tr><td>Group stereotype</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 84% (95% interval 76 to 90%), 114 badges checked, held-out test set</td></tr>
-<tr><td>Dehumanising language</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 93% (95% interval 80 to 97%), 40 badges checked, held-out test set</td></tr>
-<tr><td>Call for violence</td><td>Language</td><td>Daylight Commons' own rule</td><td>precision 88% (95% interval 79 to 93%), 88 badges checked, held-out test set</td></tr>
-<tr><td>Call for vigilantes</td><td>Language</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Named conspiracy theory</td><td>Language</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Leaked AI text</td><td>Language</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Machine-writing signs</td><td>Language</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Spam pattern</td><td>Language</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
+<tr><td>Slur or coded hate term</td><td>Language</td><td>CMMNS' own rule</td><td>precision 91% (95% interval 90 to 92%), 4393 badges checked, held-out test set</td></tr>
+<tr><td>Group stereotype</td><td>Language</td><td>CMMNS' own rule</td><td>precision 84% (95% interval 76 to 90%), 114 badges checked, held-out test set</td></tr>
+<tr><td>Dehumanising language</td><td>Language</td><td>CMMNS' own rule</td><td>precision 93% (95% interval 80 to 97%), 40 badges checked, held-out test set</td></tr>
+<tr><td>Call for violence</td><td>Language</td><td>CMMNS' own rule</td><td>precision 88% (95% interval 79 to 93%), 88 badges checked, held-out test set</td></tr>
+<tr><td>Call for vigilantes</td><td>Language</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Named conspiracy theory</td><td>Language</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Leaked AI text</td><td>Language</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Machine-writing signs</td><td>Language</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Spam pattern</td><td>Language</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
 <tr><td>X: probable spam</td><td>Language</td><td>The site's own label</td><td>the site's own label, shown as the site gives it</td></tr>
-<tr><td>Hate symbol in name</td><td>Language</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Media older than the post</td><td>Media</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
+<tr><td>Hate symbol in name</td><td>Language</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Media older than the post</td><td>Media</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
 <tr><td>Media from another post</td><td>Media</td><td>The site's own label</td><td>the site's own label, shown as the site gives it</td></tr>
-<tr><td>Same upload, many accounts</td><td>Coordination</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Same text as other replies</td><td>Coordination</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Same words in other threads</td><td>Coordination</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Same link or upload in several languages</td><td>Coordination</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>One person's story, no wider picture</td><td>Language</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Material passed through other accounts</td><td>Sources</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
+<tr><td>Same upload, many accounts</td><td>Coordination</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Same text as other replies</td><td>Coordination</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Same words in other threads</td><td>Coordination</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Same link or upload in several languages</td><td>Coordination</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>One person's story, no wider picture</td><td>Language</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Material passed through other accounts</td><td>Sources</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
 <tr><td>Community Note</td><td>Sources</td><td>The site's own label</td><td>the site's own label, shown as the site gives it</td></tr>
-<tr><td>Fact-checked claim</td><td>Sources</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
+<tr><td>Fact-checked claim</td><td>Sources</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
 <tr><td>Ad label</td><td>Sources</td><td>The site's own label</td><td>the site's own label, shown as the site gives it</td></tr>
 <tr><td>State link</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
 <tr><td>Named in a published report</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
 <tr><td>Backing on record</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
-<tr><td>Look-alike news address</td><td>Sources</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
+<tr><td>Look-alike news address</td><td>Sources</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
 <tr><td>Outlet owner</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
 <tr><td>Site facts and fact-check record</td><td>Sources</td><td>Match against a cited table</td><td>a match against a cited table; the source link is the evidence</td></tr>
 <tr><td>Posting app</td><td>Posting</td><td>The site's own label</td><td>the site's own label, shown as the site gives it</td></tr>
 <tr><td>Written in another language</td><td>Place</td><td>The site's own label</td><td>the site's own label, shown as the site gives it</td></tr>
-<tr><td>Speaks as local, labelled elsewhere</td><td>Place</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>App store elsewhere</td><td>Place</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Flag of another country</td><td>Place</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Profile says elsewhere</td><td>Place</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Active hours fit elsewhere</td><td>Place</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Replies within a minute</td><td>Posting</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Posts through an automation app</td><td>Posting</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Posts around the clock</td><td>Posting</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Almost only reposts</td><td>Posting</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Very high post rate</td><td>Posting</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>New account</td><td>Account</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Renamed</td><td>Account</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Sign-up handle</td><td>Account</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Follows many, few follow back</td><td>Account</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Low karma for its age</td><td>Account</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Name borrows a brand</td><td>Account</td><td>Daylight Commons' own rule</td><td>not measured yet</td></tr>
-<tr><td>Content Credentials</td><td>Media</td><td>file</td><td>what the file itself declares, with its signature checked by Daylight Commons</td></tr>
-<tr><td>Credentials do not match</td><td>Media</td><td>file</td><td>what the file itself declares, with its signature checked by Daylight Commons</td></tr>
-<tr><td>AI-generation metadata</td><td>Media</td><td>file</td><td>what the file itself declares, with its signature checked by Daylight Commons</td></tr>
+<tr><td>Speaks as local, labelled elsewhere</td><td>Place</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>App store elsewhere</td><td>Place</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Flag of another country</td><td>Place</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Profile says elsewhere</td><td>Place</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Active hours fit elsewhere</td><td>Place</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Replies within a minute</td><td>Posting</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Posts through an automation app</td><td>Posting</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Posts around the clock</td><td>Posting</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Almost only reposts</td><td>Posting</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Very high post rate</td><td>Posting</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>New account</td><td>Account</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Renamed</td><td>Account</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Sign-up handle</td><td>Account</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Follows many, few follow back</td><td>Account</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Low karma for its age</td><td>Account</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Name borrows a brand</td><td>Account</td><td>CMMNS' own rule</td><td>not measured yet</td></tr>
+<tr><td>Content Credentials</td><td>Media</td><td>file</td><td>what the file itself declares, with its signature checked by CMMNS</td></tr>
+<tr><td>Credentials do not match</td><td>Media</td><td>file</td><td>what the file itself declares, with its signature checked by CMMNS</td></tr>
+<tr><td>AI-generation metadata</td><td>Media</td><td>file</td><td>what the file itself declares, with its signature checked by CMMNS</td></tr>
 <tr><td>Persuasion: loaded language</td><td>Language</td><td>Persuasion technique</td><td>held back (precision under 80%): precision 60% (95% interval 52 to 68%), 136 spans checked, held-out news articles</td></tr>
 <tr><td>Persuasion: name calling</td><td>Language</td><td>Persuasion technique</td><td>held back (precision under 80%): precision 49% (95% interval 35 to 63%), 43 spans checked, held-out news articles</td></tr>
 <tr><td>Persuasion: bandwagon</td><td>Language</td><td>Persuasion technique</td><td>held back (fewer than 20 hits): precision 0% (95% interval 0 to 56%), 3 spans checked, held-out news articles</td></tr>
@@ -343,7 +343,7 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 </details>
 
 <h2>Documented influence operations</h2>
-<p>Daylight Commons carries 98 influence operations from 27 attributed countries, first published between 2018 and 2026, and 1,237 domains and accounts their sources named (1,194 domains). A link or account that a report named shows "Named in a published report", with who the sources say ran it, in each source's own words.</p>
+<p>CMMNS carries 98 influence operations from 27 attributed countries, first published between 2018 and 2026, and 1,237 domains and accounts their sources named (1,194 domains). A link or account that a report named shows "Named in a published report", with who the sources say ran it, in each source's own words.</p>
 <p><strong>What the counts mean.</strong> These are operations that investigators found and published, counted by the year of the first report. The counts follow where people looked: platforms look harder in some places and languages than others, and some governments publish takedowns while others keep them quiet.</p>
 <p>Every operation meets the same bar, whatever the country: at least one primary source that was read (a platform report, a research lab, a court or government document, or reporting that names its sources), an operator type that a source itself states, and a cited source for every field. A test enforces this on the data.</p>
 <h3>By year of first report</h3>
@@ -390,20 +390,20 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td>Uganda</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td></tr>
 </tbody></table></div>
 <h2>Still to measure</h2>
-<ul><li>Daylight Commons' own rules still to measure: Call for vigilantes, Named conspiracy theory, Leaked AI text, Machine-writing signs, Spam pattern, Hate symbol in name, Media older than the post, Same upload, many accounts, Same words in other threads, Same link or upload in several languages, One person's story, no wider picture, Material passed through other accounts, Fact-checked claim, Look-alike news address, App store elsewhere, Flag of another country, Profile says elsewhere, Active hours fit elsewhere, Replies within a minute, Posts through an automation app, Posts around the clock, Almost only reposts, Very high post rate, New account, Renamed, Sign-up handle, Follows many, few follow back, Low karma for its age, Name borrows a brand. The window marks each of them as waiting for a measurement.</li>
+<ul><li>CMMNS' own rules still to measure: Call for vigilantes, Named conspiracy theory, Leaked AI text, Machine-writing signs, Spam pattern, Hate symbol in name, Media older than the post, Same upload, many accounts, Same words in other threads, Same link or upload in several languages, One person's story, no wider picture, Material passed through other accounts, Fact-checked claim, Look-alike news address, App store elsewhere, Flag of another country, Profile says elsewhere, Active hours fit elsewhere, Replies within a minute, Posts through an automation app, Posts around the clock, Almost only reposts, Very high post rate, New account, Renamed, Sign-up handle, Follows many, few follow back, Low karma for its age, Name borrows a brand. The window marks each of them as waiting for a measurement.</li>
 <li>Same text as other replies, and speaks as local, labelled elsewhere: tested on cases written alongside the rules (below). Measuring them on real replies needs live threads labelled by hand.</li>
 <li>Live threads: every figure here comes from public research corpora. Threads from X, YouTube, Reddit, Facebook, Instagram and Bluesky still need labelling by hand.</li>
-<li>French language signs: the French corpus has too few hits to measure. Persuasion cues in French: waiting for a corpus whose licence Daylight Commons can use.</li>
+<li>French language signs: the French corpus has too few hits to measure. Persuasion cues in French: waiting for a corpus whose licence CMMNS can use.</li>
 <li>Call for vigilantes: under the 20 hits in the test split that a measurement needs.</li>
 <li>Site labels (Community Notes, ads, posting app, X's spam label) and matches against cited tables (outlet owners, state links) carry the site's or the cited source's own judgement, and their evidence is that site or source.</li></ul>
 <h2>Known limits</h2>
 <ul><li><strong>Precision.</strong> The corpora come from Reddit, Twitter, Gab, YouTube and news comments, several years old. Two of them were sampled to be rich in hate speech (about 61% hostile). On Civil Comments, where 8% of comments are hostile, about a third of strong labels (23 of 68) fell on text the raters called toxic. Real reply threads sit somewhere between. Some Civil &quot;false positives&quot; are quoted or ironic uses that raters scored below 0.5, so 34% is a floor more than a point estimate.</li>
-<li><strong>Recall.</strong> Daylight Commons is a hand-built lexicon and grammar, tuned for precision. It finds a small share of hostile text: MHS item recall is under 3% for every family. A quiet thread can still hold hostile replies.</li>
+<li><strong>Recall.</strong> CMMNS is a hand-built lexicon and grammar, tuned for precision. It finds a small share of hostile text: MHS item recall is under 3% for every family. A quiet thread can still hold hostile replies.</li>
 <li><strong>Weak families.</strong> Conspiracy, absolutist and essentialise describe framing. The corpora label hostility, so their figures show how often the framing lands on hostile text, as context.</li>
 <li><strong>Extreme.</strong> The thread report's extreme count finds about one severe reply in six (17% recall on MHS). Treat it as a floor.</li>
 <li><strong>Synthetic.</strong> The duplicate and mismatch figures come from cases the rules' author wrote and labelled alongside the rules.</li>
 <li>PTC is news articles from 48 outlets, mostly 2017 to 2019. Replies are shorter and blunter, and precision on them is still to be measured. It could be higher or lower.</li>
-<li>PTC's annotators marked most uses and missed some. A true use they missed counts against Daylight Commons, so precision leans low.</li>
+<li>PTC's annotators marked most uses and missed some. A true use they missed counts against CMMNS Commons, so precision leans low.</li>
 <li>A technique describes how a post argues, and true claims use techniques too.</li></ul>
 <h2>Your own feedback</h2>
 <p>Each sign in the window has "This was right" and "This was wrong". Your marks stay in your browser. After 10 marks on one kind of sign, the window shows your own count under the measured figure. The figures on this page stay as measured. You can save your marks to a file from the options page and choose whether to share it.</p>
@@ -431,8 +431,8 @@ dl.hwk-list dd { margin: 0; font-variant-numeric: tabular-nums; }
 <tr><td><a href="https://huggingface.co/datasets/Exqrch/IndoDiscourse">IndoDiscourse, formerly IndoToxic2024 (Susanto et al. 2025), Indonesian</a></td><td>Apache-2.0; the card adds &quot;for research purposes only&quot;</td></tr>
 <tr><td><a href="https://github.com/ialfina/id-hatespeech-detection">IDHSD (Alfina et al., ICACSIS 2017), Indonesian</a></td><td>Free use without permission; no public copies (README)</td></tr>
 </tbody></table></div>
-<p>The repository holds counts, rates and file hashes; the corpus text stays with each publisher. Download the corpora, run the evaluation scripts in <a href="https://github.com/HarperZ9/daylight-commons">Daylight Commons' repository</a>, and every number on this page comes back.</p>
-<footer>Daylight Commons reads the site you are on. Other coverage and evidence lookups reach further once you turn them on. <a href="https://github.com/HarperZ9/daylight-commons">Source</a> · <a href="transparency.html">How Daylight Commons is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
+<p>The repository holds counts, rates and file hashes; the corpus text stays with each publisher. Download the corpora, run the evaluation scripts in <a href="https://github.com/HarperZ9/cmmns">CMMNS' repository</a>, and every number on this page comes back.</p>
+<footer>CMMNS reads the site you are on. Other coverage and evidence lookups reach further once you turn them on. <a href="https://github.com/HarperZ9/cmmns">Source</a> · <a href="transparency.html">How CMMNS is measured</a> · <a href="privacy.html">Privacy</a> · <a href="https://harperz9.github.io/">Zain Dana Harper</a></footer>
 </main>
 </body>
 </html>

@@ -3,6 +3,7 @@
 // It is written to a temporary file and renamed, so a crash never leaves half a state file.
 import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { envValue } from "../core/env-names.js";
 
 export const RUN_DIR = ".run";
 const STALE_MS = 10 * 60 * 1000;
@@ -49,10 +50,10 @@ export function withTimeout(promise, ms, what) {
   return Promise.race([promise, new Promise((_, rej) => { t = setTimeout(() => rej(new Error(`watchdog: ${what} took longer than ${Math.round(ms / 1000)} s`)), ms); })]).finally(() => clearTimeout(t));
 }
 
-// A deliberate crash for the resume test: DAYLIGHT_CASE_CRASH_AT="<stage>:<n>" exits after the
+// A deliberate crash for the resume test: CMMNS_CASE_CRASH_AT (or DAYLIGHT_CASE_CRASH_AT) ="<stage>:<n>" exits after the
 // n-th item of that stage has done its work and before its checkpoint is written.
 export function crashHook(env = process.env) {
-  const spec = env.DAYLIGHT_CASE_CRASH_AT;
+  const spec = envValue(env, "CASE_CRASH_AT");
   if (!spec) return () => {};
   const [stage, n] = spec.split(":"), counts = {};
   return (s) => { if (s !== stage) return; counts[s] = (counts[s] || 0) + 1; if (counts[s] === Number(n)) { process.stderr.write(`case run: simulated crash in ${s} after item ${n}\n`); process.exit(99); } };

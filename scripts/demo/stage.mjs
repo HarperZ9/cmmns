@@ -136,10 +136,10 @@ export function launchStage(kind) {
   const campaign = kind === "campaign";
   const org = campaign ? "demo_examplelab" : "demo_daylight";
   const root = campaign ? "1900000000000000200" : "1900000000000000300";
-  const links = campaign ? ["https://example.org/beta"] : ["https://github.com/HarperZ9/daylight-commons", "https://harperz9.github.io/daylight-commons/"];
-  const text = campaign ? LAUNCH_TEXT : "Daylight Commons 3.0 is out: evidence beside the replies you read, each sign with its source and what it does not prove. Free and open source.";
+  const links = campaign ? ["https://example.org/beta"] : ["https://github.com/HarperZ9/cmmns", "https://harperz9.github.io/cmmns/"];
+  const text = campaign ? LAUNCH_TEXT : "CMMNS 3.0 is out: evidence beside the replies you read, each sign with its source and what it does not prove. Free and open source.";
   const counts = campaign ? { reposts: 5200, likes: 631, replies: 131, quotes: 12, bookmarks: 426, views: 211000 } : { reposts: 31, likes: 402, replies: 44, quotes: 12, bookmarks: 60, views: 25000 };
-  const orgUser = user(org, { name: campaign ? "Example Lab" : "Daylight demo", joinDate: "2019-06-01", about: { basedIn: "United States" }, business: true, followers: 40000 });
+  const orgUser = user(org, { name: campaign ? "Example Lab" : "CMMNS demo", joinDate: "2019-06-01", about: { basedIn: "United States" }, business: true, followers: 40000 });
   const NAMES = ["ada", "bram", "cleo", "dev", "esme", "finn", "gus", "hana", "ivo", "jun", "kai", "lena", "milo", "nia", "otto", "pia", "quin", "rosa", "sami", "tess"];
   const people = campaign ? farmAccounts(38) : organicAccounts(38).map((a, i) => ({ ...a, handle: `${NAMES[i % 20]}_${["reads", "codes", "writes"][Math.floor(i / 20) % 3]}` }));
   const crowd = people.map((a) => user(demo(a.handle), { bio: a.bio, joinDate: a.joinDate, about: { basedIn: campaign ? ["South Asia", "Eastern Europe", "West Africa"][a.handle.length % 3] : "United Kingdom" } }));

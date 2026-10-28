@@ -1,5 +1,5 @@
 // Options: check a signed head (src/core/head.js) the user picked, from a release or the offline
-// kit. The head must be signed by Daylight Commons' project key, carry a version no lower than one
+// kit. The head must be signed by CMMNS' project key, carry a version no lower than one
 // accepted here, and name the catalogue this install carries. Expired heads are accepted and
 // marked Expired. The accepted state stays in this browser (pb.head.v1). Nothing is downloaded.
 (async () => {
@@ -24,7 +24,7 @@
   }
   const PBHeadKey = "pb.head.v1";
   $("headPick").addEventListener("click", () => $("headFile").click());
-  $("headFile").addEventListener("change", (e) => check(e.target.files).catch((err) => { console.error("[daylight-commons] head check failed", err); say("Could not check the head: " + err.message); }));
+  $("headFile").addEventListener("change", (e) => check(e.target.files).catch((err) => { console.error("[cmmns] head check failed", err); say("Could not check the head: " + err.message); }));
   $("headCaveat").textContent = PB.HEAD_DOES_NOT_PROVE;
   await show();
-})().catch((e) => console.error("[daylight-commons] signed head section failed", e));
+})().catch((e) => console.error("[cmmns] signed head section failed", e));
