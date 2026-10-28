@@ -117,12 +117,15 @@ staying with its reason. `[x]` means done. "stays" means kept on purpose.
 
 ## G. The site repository (HarperZ9/HarperZ9.github.io)
 
-- [ ] `cmmns.html`, built by `scripts/build-cmmns.mjs` from the CMMNS record in `discover.json`.
-- [ ] `daylight.html` becomes a redirect stub to `cmmns.html`.
-- [ ] `daylight-commons/*.html` redirect stubs to `/cmmns/<page>`, keeping the `#fragment`.
-- [ ] `ext/firefox/updates.json` with id `radar@harperz9.github.io` and an empty update list.
-- [ ] Nav entry, sitemap, `llms.txt`, `llms-full.txt`, home, hire, site index, routes.
-- [ ] Career and resume lines: "CMMNS (formerly Daylight Commons)".
+- [x] `cmmns.html`, built by `scripts/build-cmmns.mjs` from the CMMNS record in `discover.json`.
+- [x] `daylight.html` becomes a redirect stub to `cmmns.html`.
+- [x] `daylight-commons/*.html` redirect stubs to `/cmmns/<page>`, keeping the `#fragment`, and a copy
+  of the public `release-key.json` at its old path.
+- [x] `ext/firefox/updates.json` with id `radar@harperz9.github.io` and an empty update list.
+- [x] Nav entry, sitemap, `llms.txt`, `llms-full.txt`, workshop build, hire, site index, routes, link
+  cards.
+- [x] Career and resume lines: "CMMNS (formerly Daylight Commons)". A named past release keeps the
+  name it shipped under ("Daylight Commons 3.2.2"). PDF and DOCX rebuilt.
 - [ ] stays: `radar/firefox/updates.json`, `media/daylight-commons/`, `tests/release-pins/media/daylight-commons/`.
 - [ ] stays: `world/alive/vendor/daylight-gif/`. Its header says FSL-1.1-MIT while the source is
   AGPL-3.0-only. That mismatch is the author's call and is outside this rename.
@@ -134,5 +137,21 @@ staying with its reason. `[x]` means done. "stays" means kept on purpose.
 - [x] `C:/dev/CLAUDE.md`, `AGENTS.md`, `WORKSPACE-INDEX.md`, `ECOSYSTEM.md`: grepped, none names the
   project or the old repository. Nothing to change.
 - [ ] stays: the local folder `C:/dev/provenance-badges` and worktree paths. Only the remote changes.
-- [ ] Remotes in every checkout and worktree, after the GitHub rename.
+- [x] GitHub rename to `HarperZ9/cmmns`. Remotes updated in `C:/dev/provenance-badges` (shared by all
+  59 worktrees, `E:/daylight-wt/*` and `.claude/worktrees/` included) and in the separate clone
+  `C:/dev/wt-dc-m2`.
+- [ ] open: the world pages are imported from mission-control sources
+  (`2026-10-23-ui-direction/shell/template.html` and the universe pages). The site copies say CMMNS;
+  the sources still carry the old menu entry, so a full re-import brings it back until they change.
 - Memory, MEMORY.md and mission-control CONSENSUS are handled by the coordinating session.
+
+## Release (step 10)
+
+- [x] v3.9.0 released on 2026-10-28 from merge a812346 (PR #97), assets named `cmmns-*`.
+  `verify-release.mjs` passed on the downloaded assets: RELEASE VERIFIED. It also passed on the
+  downloaded v3.8.0 `radar-*` assets with `--no-state`.
+- [x] The released `cmmns-cli-3.9.0.zip` verified the v3.8.0 fixtures: capture and custody chain,
+  signed bundle, and case export. Read only, it gave the same sidecar-check counts as the v3.8.0 CLI
+  on a real folder of 771 notes.
+- [ ] open: a real Chrome or Firefox upgrade from an installed 3.8.0 was not run. The unit tests
+  cover the folder pin (`legacyFolderPatch`). Storage keys and the Firefox id are unchanged.
