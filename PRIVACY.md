@@ -1,6 +1,6 @@
 # CMMNS privacy policy
 
-Last updated: 2026-10-25.
+Last updated: 2026-10-28.
 
 CMMNS, formerly Daylight Commons and Radar before that, runs in your browser, and everything it reads or works out stays there. It talks
 to the site you are on, with that site's own session. Two features reach further, and both stay off
@@ -248,6 +248,16 @@ That is the whole list. Your data serves the features above and stays out of adv
 sale. Account labels show what each site discloses about an account, kept per site; CMMNS
 Commons leaves who runs an account, and anyone's age, gender, ethnicity, religion or politics,
 unguessed.
+
+## More detail
+
+Drafts that go further are being written and await a lawyer's review. They are not in force and
+change nothing in this policy:
+[Data protection](https://github.com/HarperZ9/cmmns/blob/main/DATA-PROTECTION.md) (who is
+responsible for which data, and the exemptions for personal, journalistic and research use),
+[Requests from people named or shown](https://github.com/HarperZ9/cmmns/blob/main/SUBJECT-REQUESTS.md),
+the [acceptable use policy](https://github.com/HarperZ9/cmmns/blob/main/ACCEPTABLE-USE.md) and the
+[legal notice](https://github.com/HarperZ9/cmmns/blob/main/LEGAL-NOTICE.md).
 
 ## Changes
 

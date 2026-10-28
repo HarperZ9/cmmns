@@ -28,6 +28,13 @@ were not published to a store.
   shared page state, so a save that waits on the network and another save started meanwhile can no
   longer swap folders (`tests/library.browser.test.js` fails on the old code).
 
+### Documentation
+- Drafts of a legal and responsible-use pack (acceptable use, responsible use, legal notice, requests
+  from people named or shown, data protection, platform capture, creators and IP) and a checklist for
+  the lawyer who reviews them (`project-docs/LEGAL-REVIEW-CHECKLIST.md`). Each is marked as a draft
+  awaiting that review and is not in force. The privacy policy links them under "More detail" with the
+  same label and is otherwise unchanged.
+
 ## 3.9.1 (2026-10-28)
 
 The Download buttons start at once and say why when a save fails. Timings come from
