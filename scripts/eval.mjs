@@ -13,7 +13,9 @@ import { fileURLToPath } from "node:url";
 import { LOADERS, SEED } from "./eval/corpora.mjs";
 import { evaluateCorpus } from "./eval/rhetoric-eval.mjs";
 import { evaluateDuplicates, evaluateMismatch } from "./eval/synthetic.mjs";
-import { familySummary, writeMeasured } from "./eval/summarise.mjs";
+import { familySummary, writeMeasured, ENGLISH } from "./eval/summarise.mjs";
+import { sdtBlock } from "./eval/sdt.mjs";
+import { spliceSdt } from "./eval/sdt-report.mjs";
 import { EXTREME_AT } from "../src/core/rhetoric.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -78,11 +80,14 @@ function main() {
     sides: sidesSummary(corpora),
     duplicates: { synthetic: true, precision: duplicates.precision, recall: duplicates.recall },
     mismatch: { synthetic: true, precision: mismatch.precision, recall: mismatch.recall } };
+  const sdt = sdtBlock(corpora, ENGLISH);
   if (!WRITE) return;
   writeFileSync(join(root, "project-docs/evidence/eval-results.json"),
-    JSON.stringify({ ...summary, inputs, corpora, duplicatesDetail: duplicates, mismatchDetail: mismatch }, null, 1) + "\n");
-  writeMeasured(join(root, "src/core/measured.js"), summary);
-  console.log("\nwrote project-docs/evidence/eval-results.json and src/core/measured.js");
+    JSON.stringify({ ...summary, inputs, corpora, duplicatesDetail: duplicates, mismatchDetail: mismatch, sdt }, null, 1) + "\n");
+  writeMeasured(join(root, "src/core/measured.js"), summary, sdt);
+  const evalMd = join(root, "project-docs/EVALUATION.md");
+  writeFileSync(evalMd, spliceSdt(readFileSync(evalMd, "utf8"), sdt));
+  console.log("\nwrote project-docs/evidence/eval-results.json, src/core/measured.js and EVALUATION.md's signal detection tables");
 }
 
 main();

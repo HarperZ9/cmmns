@@ -3241,6 +3241,9 @@ const M_measured = (() => {
 //   { precision, low, high, n, split: "test", recall?, side?, date?, source? }
 //   precision, low, high: 0 to 1 (low and high are the 95% interval); n: badges checked.
 //   range: [lowest, highest] precision across corpora with at least 20 hits, or null.
+//   catch: { against: "matched" | "hostile", hits, of, dprime, c }: how many of the labelled posts
+//   the sign found, and its signal detection figures (scripts/eval/sdt.mjs). "matched" is the
+//   sign's own label; "hostile" is general hostility, which the window says.
 // MEASURED_DETAIL holds every family (weak ones too), the side comparison and the SYNTHETIC
 // duplicate and mismatch pilots, which are not human-labelled and get no row in MEASURED.
 
@@ -3262,10 +3265,10 @@ const MEASURED_PERSUASION = {
 };
 // persuasion:end
 const MEASURED = {
-  "dehumanise": {"precision":0.925,"low":0.801,"high":0.974,"n":40,"split":"test","recall":0.002,"range":[0.9,0.9],"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "violence": {"precision":0.875,"low":0.79,"high":0.929,"n":88,"split":"test","recall":0.021,"range":[0.967,0.967],"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "slur": {"precision":0.91,"low":0.901,"high":0.918,"n":4393,"split":"test","recall":null,"range":[0.34,0.953],"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "stereotype": {"precision":0.842,"low":0.764,"high":0.898,"n":114,"split":"test","recall":0.007,"range":[0.773,0.925],"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "dehumanise": {"precision":0.925,"low":0.801,"high":0.974,"n":40,"split":"test","recall":0.002,"range":[0.9,0.9],"catch":{"against":"matched","hits":12,"of":5046,"dprime":0.44,"c":3.03},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "violence": {"precision":0.875,"low":0.79,"high":0.929,"n":88,"split":"test","recall":0.021,"range":[0.967,0.967],"catch":{"against":"matched","hits":39,"of":1819,"dprime":1,"c":2.52},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "slur": {"precision":0.91,"low":0.901,"high":0.918,"n":4393,"split":"test","recall":null,"range":[0.34,0.953],"catch":{"against":"hostile","hits":3996,"of":22456,"dprime":1.53,"c":1.69},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "stereotype": {"precision":0.842,"low":0.764,"high":0.898,"n":114,"split":"test","recall":0.007,"range":[0.773,0.925],"catch":{"against":"matched","hits":58,"of":8368,"dprime":0.43,"c":2.67},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
 };
 
 const MEASURED_DETAIL = {
@@ -15016,7 +15019,28 @@ function measuredLine(id, table = MEASURED) {
   return { measured: true, text: `precision ${pc(r.precision)}%${ci}, ${r.n} badges checked${split}` };
 }
 
-return { FAMILIES, familyOf, measuredLine };
+// The catch rate and tendency the window shows under "Measured" (scripts/eval/sdt.mjs), or null.
+// The catch rate counts the sign's own label where the corpus has one, else general hostility, and
+// says so. The tendency reads bias c (how readily the sign fires) with the precision shown above it.
+const TARGET = { dehumanise: "dehumanising posts", violence: "posts calling for violence", stereotype: "posts stereotyping a group" };
+const fires = (c) => (c >= 2 ? "rarely fires" : c >= 1 ? "fires sparingly" : c >= 0 ? "fires readily" : "fires freely");
+const right = (p) => (p >= 0.8 ? "it is usually right" : p >= 0.6 ? "it is right more often than not" : "it is often wrong");
+function share(k, n) {
+  if (k / n >= 0.2) return `about ${pc(k / n)} in 100`;
+  const x = n / k;
+  return `about 1 in ${(x < 10 ? Math.round(x) : Number(x.toPrecision(2))).toLocaleString("en")}`;
+}
+
+function catchLines(id, table = MEASURED) {
+  const r = (table || {})[id], k = r && r.catch;
+  if (!valid(r) || !k || !Number.isInteger(k.hits) || !Number.isInteger(k.of) || k.hits <= 0 || k.of < k.hits || !Number.isFinite(k.c)) return null;
+  const own = k.against === "matched" && TARGET[id];
+  const what = own ? TARGET[id] : "hostile posts";
+  return { catches: `finds ${share(k.hits, k.of)} ${what} in testing${own ? "" : " (measured against general hostility)"}`,
+    tendency: `${fires(k.c)}; when it does, ${right(r.precision)}` };
+}
+
+return { FAMILIES, familyOf, measuredLine, catchLines };
 })();
 
 // ---- feedback.js

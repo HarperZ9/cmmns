@@ -6503,5 +6503,1447 @@
     0.607
    ]
   }
+ },
+ "sdt": {
+  "method": "signal detection: log-linear correction, parametric bootstrap 95% intervals",
+  "seed": 20261028,
+  "draws": 2000,
+  "minFlagged": 20,
+  "rows": [
+   {
+    "corpus": "mhs",
+    "family": "dehumanise",
+    "against": "specific",
+    "tp": 12,
+    "fp": 8,
+    "fn": 5034,
+    "tn": 14735,
+    "hit": 0.0025,
+    "fa": 0.00058,
+    "dprime": 0.44,
+    "c": 3.03,
+    "dCI": [
+     0.15,
+     0.75
+    ],
+    "cCI": [
+     2.93,
+     3.21
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "dehumanise",
+    "against": "hostile",
+    "tp": 18,
+    "fp": 2,
+    "fn": 12277,
+    "tn": 7492,
+    "hit": 0.0015,
+    "fa": 0.00033,
+    "dprime": 0.44,
+    "c": 3.18,
+    "dCI": [
+     0.15,
+     0.91
+    ],
+    "cCI": [
+     3.06,
+     3.43
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "violence",
+    "against": "specific",
+    "tp": 39,
+    "fp": 22,
+    "fn": 1780,
+    "tn": 17948,
+    "hit": 0.0217,
+    "fa": 0.00125,
+    "dprime": 1,
+    "c": 2.52,
+    "dCI": [
+     0.82,
+     1.2
+    ],
+    "cCI": [
+     2.44,
+     2.63
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "violence",
+    "against": "hostile",
+    "tp": 59,
+    "fp": 2,
+    "fn": 12236,
+    "tn": 7492,
+    "hit": 0.0048,
+    "fa": 0.00033,
+    "dprime": 0.82,
+    "c": 2.99,
+    "dCI": [
+     0.58,
+     1.27
+    ],
+    "cCI": [
+     2.88,
+     3.23
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "vigilante",
+    "against": "hostile",
+    "tp": 2,
+    "fp": 0,
+    "fn": 12293,
+    "tn": 7494,
+    "hit": 0.0002,
+    "fa": 0.00007,
+    "dprime": 0.28,
+    "c": 3.68,
+    "dCI": [
+     -0.12,
+     0.5
+    ],
+    "cCI": [
+     3.57,
+     3.88
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mhs",
+    "family": "slur",
+    "against": "hostile",
+    "tp": 1086,
+    "fp": 53,
+    "fn": 11209,
+    "tn": 7441,
+    "hit": 0.0884,
+    "fa": 0.00714,
+    "dprime": 1.1,
+    "c": 1.9,
+    "dCI": [
+     1.01,
+     1.21
+    ],
+    "cCI": [
+     1.86,
+     1.96
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "slurSoft",
+    "against": "hostile",
+    "tp": 355,
+    "fp": 32,
+    "fn": 11940,
+    "tn": 7462,
+    "hit": 0.0289,
+    "fa": 0.00434,
+    "dprime": 0.73,
+    "c": 2.26,
+    "dCI": [
+     0.61,
+     0.87
+    ],
+    "cCI": [
+     2.2,
+     2.33
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "stereotype",
+    "against": "specific",
+    "tp": 58,
+    "fp": 22,
+    "fn": 8310,
+    "tn": 11399,
+    "hit": 0.007,
+    "fa": 0.00197,
+    "dprime": 0.43,
+    "c": 2.67,
+    "dCI": [
+     0.28,
+     0.61
+    ],
+    "cCI": [
+     2.6,
+     2.76
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "stereotype",
+    "against": "hostile",
+    "tp": 74,
+    "fp": 6,
+    "fn": 12221,
+    "tn": 7488,
+    "hit": 0.0061,
+    "fa": 0.00087,
+    "dprime": 0.62,
+    "c": 2.82,
+    "dCI": [
+     0.43,
+     0.99
+    ],
+    "cCI": [
+     2.73,
+     3.01
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "motive",
+    "against": "hostile",
+    "tp": 18,
+    "fp": 4,
+    "fn": 12277,
+    "tn": 7490,
+    "hit": 0.0015,
+    "fa": 0.0006,
+    "dprime": 0.27,
+    "c": 3.1,
+    "dCI": [
+     0.03,
+     0.8
+    ],
+    "cCI": [
+     2.98,
+     3.38
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "essentialise",
+    "against": "hostile",
+    "tp": 33,
+    "fp": 14,
+    "fn": 12262,
+    "tn": 7480,
+    "hit": 0.0027,
+    "fa": 0.00193,
+    "dprime": 0.11,
+    "c": 2.83,
+    "dCI": [
+     -0.08,
+     0.35
+    ],
+    "cCI": [
+     2.76,
+     2.96
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "conspiracy",
+    "against": "hostile",
+    "tp": 17,
+    "fp": 4,
+    "fn": 12278,
+    "tn": 7490,
+    "hit": 0.0014,
+    "fa": 0.0006,
+    "dprime": 0.25,
+    "c": 3.11,
+    "dCI": [
+     -0.01,
+     0.8
+    ],
+    "cCI": [
+     3,
+     3.39
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "absolutist",
+    "against": "hostile",
+    "tp": 33,
+    "fp": 10,
+    "fn": 12262,
+    "tn": 7484,
+    "hit": 0.0027,
+    "fa": 0.0014,
+    "dprime": 0.21,
+    "c": 2.88,
+    "dCI": [
+     0.01,
+     0.48
+    ],
+    "cCI": [
+     2.8,
+     3.03
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "contempt",
+    "against": "hostile",
+    "tp": 65,
+    "fp": 6,
+    "fn": 12230,
+    "tn": 7488,
+    "hit": 0.0053,
+    "fa": 0.00087,
+    "dprime": 0.58,
+    "c": 2.84,
+    "dCI": [
+     0.38,
+     0.96
+    ],
+    "cCI": [
+     2.75,
+     3.03
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mhs",
+    "family": "strong",
+    "against": "hostile",
+    "tp": 1216,
+    "fp": 63,
+    "fn": 11079,
+    "tn": 7431,
+    "hit": 0.0989,
+    "fa": 0.00847,
+    "dprime": 1.1,
+    "c": 1.84,
+    "dCI": [
+     1.01,
+     1.2
+    ],
+    "cCI": [
+     1.79,
+     1.89
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "dehumanise",
+    "against": "hostile",
+    "tp": 18,
+    "fp": 0,
+    "fn": 6164,
+    "tn": 3835,
+    "hit": 0.003,
+    "fa": 0.00013,
+    "dprime": 0.9,
+    "c": 3.2,
+    "dCI": [
+     0.72,
+     1.02
+    ],
+    "cCI": [
+     3.14,
+     3.29
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "violence",
+    "against": "hostile",
+    "tp": 15,
+    "fp": 3,
+    "fn": 6167,
+    "tn": 3832,
+    "hit": 0.0025,
+    "fa": 0.00091,
+    "dprime": 0.31,
+    "c": 2.96,
+    "dCI": [
+     0.02,
+     0.88
+    ],
+    "cCI": [
+     2.83,
+     3.24
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "vigilante",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 6182,
+    "tn": 3835,
+    "hit": 0.0001,
+    "fa": 0.00013,
+    "dprime": -0.12,
+    "c": 3.71,
+    "dCI": [
+     -0.12,
+     -0.12
+    ],
+    "cCI": [
+     3.71,
+     3.71
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "slur",
+    "against": "hostile",
+    "tp": 2894,
+    "fp": 313,
+    "fn": 3288,
+    "tn": 3522,
+    "hit": 0.4681,
+    "fa": 0.08173,
+    "dprime": 1.31,
+    "c": 0.74,
+    "dCI": [
+     1.25,
+     1.38
+    ],
+    "cCI": [
+     0.7,
+     0.77
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "slurSoft",
+    "against": "hostile",
+    "tp": 440,
+    "fp": 244,
+    "fn": 5742,
+    "tn": 3591,
+    "hit": 0.0712,
+    "fa": 0.06374,
+    "dprime": 0.06,
+    "c": 1.5,
+    "dCI": [
+     -0.02,
+     0.13
+    ],
+    "cCI": [
+     1.46,
+     1.53
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "stereotype",
+    "against": "hostile",
+    "tp": 17,
+    "fp": 5,
+    "fn": 6165,
+    "tn": 3830,
+    "hit": 0.0028,
+    "fa": 0.00143,
+    "dprime": 0.21,
+    "c": 2.87,
+    "dCI": [
+     -0.08,
+     0.69
+    ],
+    "cCI": [
+     2.76,
+     3.14
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "motive",
+    "against": "hostile",
+    "tp": 9,
+    "fp": 4,
+    "fn": 6173,
+    "tn": 3831,
+    "hit": 0.0015,
+    "fa": 0.00117,
+    "dprime": 0.08,
+    "c": 3,
+    "dCI": [
+     -0.25,
+     0.66
+    ],
+    "cCI": [
+     2.87,
+     3.3
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "essentialise",
+    "against": "hostile",
+    "tp": 18,
+    "fp": 6,
+    "fn": 6164,
+    "tn": 3829,
+    "hit": 0.003,
+    "fa": 0.00169,
+    "dprime": 0.18,
+    "c": 2.84,
+    "dCI": [
+     -0.09,
+     0.57
+    ],
+    "cCI": [
+     2.73,
+     3.05
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "conspiracy",
+    "against": "hostile",
+    "tp": 16,
+    "fp": 1,
+    "fn": 6166,
+    "tn": 3834,
+    "hit": 0.0027,
+    "fa": 0.00039,
+    "dprime": 0.57,
+    "c": 3.07,
+    "dCI": [
+     0.22,
+     0.97
+    ],
+    "cCI": [
+     2.93,
+     3.28
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "absolutist",
+    "against": "hostile",
+    "tp": 48,
+    "fp": 9,
+    "fn": 6134,
+    "tn": 3826,
+    "hit": 0.0078,
+    "fa": 0.00248,
+    "dprime": 0.39,
+    "c": 2.61,
+    "dCI": [
+     0.19,
+     0.7
+    ],
+    "cCI": [
+     2.52,
+     2.76
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "contempt",
+    "against": "hostile",
+    "tp": 27,
+    "fp": 2,
+    "fn": 6155,
+    "tn": 3833,
+    "hit": 0.0044,
+    "fa": 0.00065,
+    "dprime": 0.6,
+    "c": 2.92,
+    "dCI": [
+     0.33,
+     1.09
+    ],
+    "cCI": [
+     2.79,
+     3.17
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "hatexplain",
+    "family": "strong",
+    "against": "hostile",
+    "tp": 2926,
+    "fp": 321,
+    "fn": 3256,
+    "tn": 3514,
+    "hit": 0.4733,
+    "fa": 0.08381,
+    "dprime": 1.31,
+    "c": 0.72,
+    "dCI": [
+     1.25,
+     1.38
+    ],
+    "cCI": [
+     0.69,
+     0.76
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "civil",
+    "family": "dehumanise",
+    "against": "hostile",
+    "tp": 1,
+    "fp": 1,
+    "fn": 3978,
+    "tn": 44680,
+    "hit": 0.0004,
+    "fa": 0.00003,
+    "dprime": 0.62,
+    "c": 3.68,
+    "dCI": [
+     0.2,
+     1.01
+    ],
+    "cCI": [
+     3.5,
+     3.95
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "civil",
+    "family": "violence",
+    "against": "specific",
+    "tp": 0,
+    "fp": 9,
+    "fn": 115,
+    "tn": 48536,
+    "hit": 0.0043,
+    "fa": 0.0002,
+    "dprime": 0.92,
+    "c": 3.09,
+    "dCI": [
+     0.79,
+     1.17
+    ],
+    "cCI": [
+     3.02,
+     3.21
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "civil",
+    "family": "violence",
+    "against": "hostile",
+    "tp": 3,
+    "fp": 6,
+    "fn": 3976,
+    "tn": 44675,
+    "hit": 0.0009,
+    "fa": 0.00015,
+    "dprime": 0.5,
+    "c": 3.38,
+    "dCI": [
+     -0.07,
+     0.92
+    ],
+    "cCI": [
+     3.25,
+     3.68
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "civil",
+    "family": "vigilante",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 1,
+    "fn": 3979,
+    "tn": 44680,
+    "hit": 0.0001,
+    "fa": 0.00003,
+    "dprime": 0.33,
+    "c": 3.82,
+    "dCI": [
+     0.12,
+     0.58
+    ],
+    "cCI": [
+     3.72,
+     3.95
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "civil",
+    "family": "slur",
+    "against": "hostile",
+    "tp": 16,
+    "fp": 31,
+    "fn": 3963,
+    "tn": 44650,
+    "hit": 0.0041,
+    "fa": 0.0007,
+    "dprime": 0.55,
+    "c": 2.92,
+    "dCI": [
+     0.32,
+     0.74
+    ],
+    "cCI": [
+     2.83,
+     3.04
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "civil",
+    "family": "slurSoft",
+    "against": "hostile",
+    "tp": 42,
+    "fp": 165,
+    "fn": 3937,
+    "tn": 44516,
+    "hit": 0.0107,
+    "fa": 0.0037,
+    "dprime": 0.38,
+    "c": 2.49,
+    "dCI": [
+     0.24,
+     0.49
+    ],
+    "cCI": [
+     2.43,
+     2.56
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "civil",
+    "family": "stereotype",
+    "against": "hostile",
+    "tp": 5,
+    "fp": 7,
+    "fn": 3974,
+    "tn": 44674,
+    "hit": 0.0014,
+    "fa": 0.00017,
+    "dprime": 0.59,
+    "c": 3.29,
+    "dCI": [
+     0.12,
+     0.99
+    ],
+    "cCI": [
+     3.17,
+     3.59
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "civil",
+    "family": "motive",
+    "against": "hostile",
+    "tp": 2,
+    "fp": 3,
+    "fn": 3977,
+    "tn": 44678,
+    "hit": 0.0006,
+    "fa": 0.00008,
+    "dprime": 0.55,
+    "c": 3.5,
+    "dCI": [
+     0.01,
+     1.01
+    ],
+    "cCI": [
+     3.36,
+     3.82
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "civil",
+    "family": "essentialise",
+    "against": "hostile",
+    "tp": 8,
+    "fp": 23,
+    "fn": 3971,
+    "tn": 44658,
+    "hit": 0.0021,
+    "fa": 0.00053,
+    "dprime": 0.42,
+    "c": 3.07,
+    "dCI": [
+     0.09,
+     0.65
+    ],
+    "cCI": [
+     2.97,
+     3.24
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "civil",
+    "family": "conspiracy",
+    "against": "hostile",
+    "tp": 3,
+    "fp": 81,
+    "fn": 3976,
+    "tn": 44600,
+    "hit": 0.0009,
+    "fa": 0.00182,
+    "dprime": -0.22,
+    "c": 3.02,
+    "dCI": [
+     -0.77,
+     -0.01
+    ],
+    "cCI": [
+     2.91,
+     3.29
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "civil",
+    "family": "absolutist",
+    "against": "hostile",
+    "tp": 56,
+    "fp": 114,
+    "fn": 3923,
+    "tn": 44567,
+    "hit": 0.0142,
+    "fa": 0.00256,
+    "dprime": 0.61,
+    "c": 2.5,
+    "dCI": [
+     0.48,
+     0.72
+    ],
+    "cCI": [
+     2.44,
+     2.56
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "civil",
+    "family": "contempt",
+    "against": "hostile",
+    "tp": 1,
+    "fp": 0,
+    "fn": 3978,
+    "tn": 44681,
+    "hit": 0.0004,
+    "fa": 0.00001,
+    "dprime": 0.87,
+    "c": 3.8,
+    "dCI": [
+     0.58,
+     1.11
+    ],
+    "cCI": [
+     3.68,
+     3.95
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "civil",
+    "family": "strong",
+    "against": "hostile",
+    "tp": 25,
+    "fp": 46,
+    "fn": 3954,
+    "tn": 44635,
+    "hit": 0.0064,
+    "fa": 0.00104,
+    "dprime": 0.59,
+    "c": 2.78,
+    "dCI": [
+     0.41,
+     0.75
+    ],
+    "cCI": [
+     2.71,
+     2.88
+    ],
+    "measured": true
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "dehumanise",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 1584,
+    "tn": 422,
+    "hit": 0.0003,
+    "fa": 0.00118,
+    "dprime": -0.38,
+    "c": 3.23,
+    "dCI": [
+     -0.38,
+     -0.38
+    ],
+    "cCI": [
+     3.23,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "violence",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 1584,
+    "tn": 422,
+    "hit": 0.0003,
+    "fa": 0.00118,
+    "dprime": -0.38,
+    "c": 3.23,
+    "dCI": [
+     -0.38,
+     -0.38
+    ],
+    "cCI": [
+     3.23,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "vigilante",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 1584,
+    "tn": 422,
+    "hit": 0.0003,
+    "fa": 0.00118,
+    "dprime": -0.38,
+    "c": 3.23,
+    "dCI": [
+     -0.38,
+     -0.38
+    ],
+    "cCI": [
+     3.23,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "slur",
+    "against": "hostile",
+    "tp": 8,
+    "fp": 1,
+    "fn": 1576,
+    "tn": 421,
+    "hit": 0.0054,
+    "fa": 0.00355,
+    "dprime": 0.14,
+    "c": 2.62,
+    "dCI": [
+     -0.3,
+     0.63
+    ],
+    "cCI": [
+     2.44,
+     2.9
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "slurSoft",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 1584,
+    "tn": 422,
+    "hit": 0.0003,
+    "fa": 0.00118,
+    "dprime": -0.38,
+    "c": 3.23,
+    "dCI": [
+     -0.38,
+     -0.38
+    ],
+    "cCI": [
+     3.23,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "stereotype",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 1584,
+    "tn": 422,
+    "hit": 0.0003,
+    "fa": 0.00118,
+    "dprime": -0.38,
+    "c": 3.23,
+    "dCI": [
+     -0.38,
+     -0.38
+    ],
+    "cCI": [
+     3.23,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "motive",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 1584,
+    "tn": 422,
+    "hit": 0.0003,
+    "fa": 0.00118,
+    "dprime": -0.38,
+    "c": 3.23,
+    "dCI": [
+     -0.38,
+     -0.38
+    ],
+    "cCI": [
+     3.23,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "essentialise",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 1584,
+    "tn": 422,
+    "hit": 0.0003,
+    "fa": 0.00118,
+    "dprime": -0.38,
+    "c": 3.23,
+    "dCI": [
+     -0.38,
+     -0.38
+    ],
+    "cCI": [
+     3.23,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "conspiracy",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 1,
+    "fn": 1584,
+    "tn": 421,
+    "hit": 0.0003,
+    "fa": 0.00355,
+    "dprime": -0.73,
+    "c": 3.06,
+    "dCI": [
+     -1.02,
+     -0.38
+    ],
+    "cCI": [
+     2.91,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "absolutist",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 1584,
+    "tn": 422,
+    "hit": 0.0003,
+    "fa": 0.00118,
+    "dprime": -0.38,
+    "c": 3.23,
+    "dCI": [
+     -0.38,
+     -0.38
+    ],
+    "cCI": [
+     3.23,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "contempt",
+    "against": "hostile",
+    "tp": 0,
+    "fp": 0,
+    "fn": 1584,
+    "tn": 422,
+    "hit": 0.0003,
+    "fa": 0.00118,
+    "dprime": -0.38,
+    "c": 3.23,
+    "dCI": [
+     -0.38,
+     -0.38
+    ],
+    "cCI": [
+     3.23,
+     3.23
+    ],
+    "measured": false
+   },
+   {
+    "corpus": "mlma-fr",
+    "family": "strong",
+    "against": "hostile",
+    "tp": 8,
+    "fp": 1,
+    "fn": 1576,
+    "tn": 421,
+    "hit": 0.0054,
+    "fa": 0.00355,
+    "dprime": 0.14,
+    "c": 2.62,
+    "dCI": [
+     -0.3,
+     0.63
+    ],
+    "cCI": [
+     2.45,
+     2.9
+    ],
+    "measured": false
+   }
+  ],
+  "pooled": {
+   "dehumanise": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 37,
+    "fp": 3,
+    "fn": 22419,
+    "tn": 56007,
+    "hit": 0.0017,
+    "fa": 0.00006,
+    "dprime": 0.9,
+    "c": 3.39,
+    "dCI": [
+     0.69,
+     1.38
+    ],
+    "cCI": [
+     3.29,
+     3.61
+    ],
+    "measured": true
+   },
+   "violence": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 77,
+    "fp": 11,
+    "fn": 22379,
+    "tn": 55999,
+    "hit": 0.0035,
+    "fa": 0.00021,
+    "dprime": 0.83,
+    "c": 3.12,
+    "dCI": [
+     0.68,
+     1.05
+    ],
+    "cCI": [
+     3.05,
+     3.23
+    ],
+    "measured": true
+   },
+   "vigilante": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 2,
+    "fp": 1,
+    "fn": 22454,
+    "tn": 56009,
+    "hit": 0.0001,
+    "fa": 0.00003,
+    "dprime": 0.35,
+    "c": 3.87,
+    "dCI": [
+     -0.16,
+     0.75
+    ],
+    "cCI": [
+     3.72,
+     4.19
+    ],
+    "measured": false
+   },
+   "slur": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 3996,
+    "fp": 397,
+    "fn": 18460,
+    "tn": 55613,
+    "hit": 0.178,
+    "fa": 0.0071,
+    "dprime": 1.53,
+    "c": 1.69,
+    "dCI": [
+     1.49,
+     1.57
+    ],
+    "cCI": [
+     1.67,
+     1.71
+    ],
+    "measured": true
+   },
+   "slurSoft": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 837,
+    "fp": 441,
+    "fn": 21619,
+    "tn": 55569,
+    "hit": 0.0373,
+    "fa": 0.00788,
+    "dprime": 0.63,
+    "c": 2.1,
+    "dCI": [
+     0.59,
+     0.68
+    ],
+    "cCI": [
+     2.08,
+     2.12
+    ],
+    "measured": true
+   },
+   "stereotype": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 96,
+    "fp": 18,
+    "fn": 22360,
+    "tn": 55992,
+    "hit": 0.0043,
+    "fa": 0.00033,
+    "dprime": 0.78,
+    "c": 3.02,
+    "dCI": [
+     0.65,
+     0.95
+    ],
+    "cCI": [
+     2.95,
+     3.1
+    ],
+    "measured": true
+   },
+   "motive": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 29,
+    "fp": 11,
+    "fn": 22427,
+    "tn": 55999,
+    "hit": 0.0013,
+    "fa": 0.00021,
+    "dprime": 0.52,
+    "c": 3.27,
+    "dCI": [
+     0.34,
+     0.74
+    ],
+    "cCI": [
+     3.19,
+     3.39
+    ],
+    "measured": true
+   },
+   "essentialise": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 59,
+    "fp": 43,
+    "fn": 22397,
+    "tn": 55967,
+    "hit": 0.0026,
+    "fa": 0.00078,
+    "dprime": 0.38,
+    "c": 2.98,
+    "dCI": [
+     0.26,
+     0.5
+    ],
+    "cCI": [
+     2.92,
+     3.04
+    ],
+    "measured": true
+   },
+   "conspiracy": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 36,
+    "fp": 86,
+    "fn": 22420,
+    "tn": 55924,
+    "hit": 0.0016,
+    "fa": 0.00154,
+    "dprime": 0.02,
+    "c": 2.95,
+    "dCI": [
+     -0.11,
+     0.12
+    ],
+    "cCI": [
+     2.9,
+     3.02
+    ],
+    "measured": true
+   },
+   "absolutist": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 137,
+    "fp": 133,
+    "fn": 22319,
+    "tn": 55877,
+    "hit": 0.0061,
+    "fa": 0.00238,
+    "dprime": 0.32,
+    "c": 2.66,
+    "dCI": [
+     0.24,
+     0.4
+    ],
+    "cCI": [
+     2.62,
+     2.71
+    ],
+    "measured": true
+   },
+   "contempt": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 93,
+    "fp": 8,
+    "fn": 22363,
+    "tn": 56002,
+    "hit": 0.0042,
+    "fa": 0.00015,
+    "dprime": 0.97,
+    "c": 3.13,
+    "dCI": [
+     0.82,
+     1.25
+    ],
+    "cCI": [
+     3.06,
+     3.27
+    ],
+    "measured": true
+   },
+   "strong": {
+    "corpora": [
+     "mhs",
+     "hatexplain",
+     "civil"
+    ],
+    "tp": 4167,
+    "fp": 430,
+    "fn": 18289,
+    "tn": 55580,
+    "hit": 0.1856,
+    "fa": 0.00769,
+    "dprime": 1.53,
+    "c": 1.66,
+    "dCI": [
+     1.49,
+     1.57
+    ],
+    "cCI": [
+     1.64,
+     1.68
+    ],
+    "measured": true
+   }
+  }
  }
 }

@@ -5,6 +5,8 @@ import { ciFigure, signBlock } from "./figures.mjs";
 import { SHIP_PRECISION } from "../../src/core/persuasion.js";
 import { BASELINE_SOURCE } from "../../src/core/baselines.js";
 import { wilson } from "../../src/core/report.js";
+import { catchLines } from "../../src/core/families.js";
+import { catchFields } from "../eval/summarise.mjs";
 
 const pct = (x) => `${(x * 100).toFixed(1)}%`;
 const per100 = (x) => Math.round(x * 100);
@@ -12,13 +14,22 @@ const counts = (r) => `${r.k.toLocaleString("en")} of ${r.n.toLocaleString("en")
 const LANG = { slur: "Slur or coded hate term", violence: "Call for violence", dehumanise: "Dehumanising language", stereotype: "Group stereotype" };
 const DNP_LANG = "A sign describes the words in the post, which can be quoted, ironic or reported speech.";
 
-function languageSigns(fams) {
+// The window's catch rate and tendency lines, with d' and c, from the same rows the window reads.
+function catchRows(id, d, sdt) {
+  const k = catchFields(id, sdt).catch;
+  if (!k) return [];
+  const line = catchLines(id, { [id]: { precision: d.precision.value, n: d.precision.n, catch: k } });
+  return line ? [["Catch rate", esc(line.catches)], ["Tendency", esc(line.tendency)], ["Sensitivity and bias", esc(`d' ${k.dprime.toFixed(2)}, c ${k.c.toFixed(2)}`)]] : [];
+}
+
+function languageSigns(fams, sdt) {
   return Object.entries(LANG).filter(([id]) => fams[id] && fams[id].measured).map(([id, name]) => {
     const d = fams[id], r = d.precision;
     return signBlock({ title: name, takeaway: `When CMMNS shows this sign, the people who labelled the test comments agreed ${per100(r.value)} times in 100.`,
       figure: ciFigure({ value: r.value, ci: r.ci, what: `${name}, precision` }),
       details: [["Precision", esc(counts(r))], d.precisionRange ? ["Range across corpora", esc(d.precisionRange.map(pct).join(" to "))] : null,
         d.recall ? ["Recall", esc(`${pct(d.recall.value)} (${counts(d.recall)}). CMMNS is built for precision, so it misses most cases.`)] : null,
+        ...catchRows(id, d, sdt),
         ["Data", "Measuring Hate Speech, HateXplain and Civil Comments, held-out test split"], ["Read it as", esc(DNP_LANG)]] });
   });
 }
@@ -53,7 +64,7 @@ function coordinationSigns(B) {
 export function leadSigns({ D, ptc, B, fold }) {
   const f = fold, s = D.duplicates.precision;
   return [
-    ...languageSigns(D.families),
+    ...languageSigns(D.families, D.sdt),
     signBlock({ title: "The thread report's \"extreme\"", takeaway: `When the report counts a reply as extreme, the corpus labelled it severe ${per100(D.extreme.precision.value)} times in 100.`,
       figure: ciFigure({ value: D.extreme.precision.value, ci: D.extreme.precision.ci, what: "Extreme, precision" }),
       details: [["Precision", esc(counts(D.extreme.precision))], ["Recall", esc(counts(D.extreme.recall))], ["Data", "Measuring Hate Speech severity labels"]] }),
