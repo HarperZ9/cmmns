@@ -25,7 +25,14 @@ were not published to a store.
 - **Catch rate and tendency in the window.** Under each measured sign's precision, "Catch rate" says
   how much of the labelled test text it found ("finds about 1 in 47 posts calling for violence in
   testing") and "Tendency" how readily it fires ("rarely fires; when it does, it is usually right").
-  The catch rate uses the sign's own label where one exists, else general hostility, and then says so.
+  A "Sensitivity" row gives d' with its 95% interval ("d' 1.00 (0.82 to 1.20); 0 is chance, 2 is
+  good"), or "not measured" under the 20-hit rule.
+- **One test set per sign in the window.** Precision, catch rate, d' and tendency now all come from
+  one test set, named in the "Measured" line: the sign's own label on Measuring Hate Speech where it
+  has one (dehumanising, violence, stereotype), else Measuring Hate Speech's general hostility label
+  (slurs). The window's precision for dehumanising language moves from 93% (pooled, against general
+  hostility) to 60% (against its own label), call for violence from 88% to 64%, group stereotype from
+  84% to 73% and slurs from 91% to 95%. The pooled figures stay on the measurement page, labelled.
 - **Signal detection measures in the evaluation** (`scripts/eval/sdt.mjs`, `node scripts/eval-sdt.mjs`).
   Hit rate, false-alarm rate, sensitivity d' and bias c with 95% bootstrap intervals, per sign and
   corpus, in `eval-results.json`, EVALUATION.md and the measurement page. Every sign is very

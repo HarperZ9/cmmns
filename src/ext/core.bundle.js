@@ -3241,9 +3241,10 @@ const M_measured = (() => {
 //   { precision, low, high, n, split: "test", recall?, side?, date?, source? }
 //   precision, low, high: 0 to 1 (low and high are the 95% interval); n: badges checked.
 //   range: [lowest, highest] precision across corpora with at least 20 hits, or null.
-//   catch: { against: "matched" | "hostile", hits, of, dprime, c }: how many of the labelled posts
-//   the sign found, and its signal detection figures (scripts/eval/sdt.mjs). "matched" is the
-//   sign's own label; "hostile" is general hostility, which the window says.
+//   basis: { corpus, label }: the one test set every figure in the row comes from.
+//   catch: { against: "matched" | "hostile", hits, of, measured, dprime, dCI, c, cCI }: how many of
+//   the labelled posts the sign found, and its signal detection figures (scripts/eval/sdt.mjs) on
+//   that same test set. measured is false under the 20-hit rule.
 // MEASURED_DETAIL holds every family (weak ones too), the side comparison and the SYNTHETIC
 // duplicate and mismatch pilots, which are not human-labelled and get no row in MEASURED.
 
@@ -3265,10 +3266,10 @@ const MEASURED_PERSUASION = {
 };
 // persuasion:end
 const MEASURED = {
-  "dehumanise": {"precision":0.925,"low":0.801,"high":0.974,"n":40,"split":"test","recall":0.002,"range":[0.9,0.9],"catch":{"against":"matched","hits":12,"of":5046,"dprime":0.44,"c":3.03},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "violence": {"precision":0.875,"low":0.79,"high":0.929,"n":88,"split":"test","recall":0.021,"range":[0.967,0.967],"catch":{"against":"matched","hits":39,"of":1819,"dprime":1,"c":2.52},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "slur": {"precision":0.91,"low":0.901,"high":0.918,"n":4393,"split":"test","recall":null,"range":[0.34,0.953],"catch":{"against":"hostile","hits":3996,"of":22456,"dprime":1.53,"c":1.69},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "stereotype": {"precision":0.842,"low":0.764,"high":0.898,"n":114,"split":"test","recall":0.007,"range":[0.773,0.925],"catch":{"against":"matched","hits":58,"of":8368,"dprime":0.43,"c":2.67},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "dehumanise": {"precision":0.6,"low":0.387,"high":0.781,"n":20,"split":"test","recall":0.002,"basis":{"corpus":"Measuring Hate Speech","label":"its own dehumanising label"},"catch":{"against":"matched","hits":12,"of":5046,"measured":true,"dprime":0.44,"dCI":[0.15,0.75],"c":3.03,"cCI":[2.93,3.21]},"date":"2026-10-23","source":"Measuring Hate Speech, held-out test split; see project-docs/EVALUATION.md"},
+  "violence": {"precision":0.639,"low":0.514,"high":0.748,"n":61,"split":"test","recall":0.021,"basis":{"corpus":"Measuring Hate Speech","label":"its own violence label"},"catch":{"against":"matched","hits":39,"of":1819,"measured":true,"dprime":1,"dCI":[0.82,1.2],"c":2.52,"cCI":[2.44,2.63]},"date":"2026-10-23","source":"Measuring Hate Speech, held-out test split; see project-docs/EVALUATION.md"},
+  "slur": {"precision":0.953,"low":0.94,"high":0.964,"n":1139,"split":"test","recall":0.088,"basis":{"corpus":"Measuring Hate Speech","label":"general hostility"},"catch":{"against":"hostile","hits":1086,"of":12295,"measured":true,"dprime":1.1,"dCI":[1.01,1.21],"c":1.9,"cCI":[1.86,1.96]},"date":"2026-10-23","source":"Measuring Hate Speech, held-out test split; see project-docs/EVALUATION.md"},
+  "stereotype": {"precision":0.725,"low":0.619,"high":0.811,"n":80,"split":"test","recall":0.007,"basis":{"corpus":"Measuring Hate Speech","label":"its own stereotype label"},"catch":{"against":"matched","hits":58,"of":8368,"measured":true,"dprime":0.43,"dCI":[0.28,0.61],"c":2.67,"cCI":[2.6,2.76]},"date":"2026-10-23","source":"Measuring Hate Speech, held-out test split; see project-docs/EVALUATION.md"},
 };
 
 const MEASURED_DETAIL = {
@@ -3296,7 +3297,7 @@ const MEASURED_DETAIL = {
  },
 };
 
-const MEASURED_DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), and it can differ on this site and other topics. Precision says how often a marker sat on text the annotators judged hostile to a group.";
+const MEASURED_DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), and it can differ on this site and other topics. Each figure in the window comes from one test set, named beside it: precision says how often the sign sat on text the annotators gave that label.";
 
 return { MEASURED_AT, MEASURED_PERSUASION, MEASURED, MEASURED_DETAIL, MEASURED_DOES_NOT_PROVE };
 })();
@@ -15016,28 +15017,33 @@ function measuredLine(id, table = MEASURED) {
   if (!valid(r)) return { measured: false, text: "not measured yet" };
   const ci = Number.isFinite(r.low) && Number.isFinite(r.high) ? ` (95% interval ${pc(r.low)} to ${pc(r.high)}%)` : "";
   const split = r.split === "test" ? ", held-out test set" : r.split ? `, ${r.split} set` : "";
-  return { measured: true, text: `precision ${pc(r.precision)}%${ci}, ${r.n} badges checked${split}` };
+  const on = r.basis && r.basis.corpus && r.basis.label ? `; measured on ${r.basis.corpus}, against ${r.basis.label}` : "";
+  return { measured: true, text: `precision ${pc(r.precision)}%${ci}, ${r.n} badges checked${on}${split}` };
 }
 
-// The catch rate and tendency the window shows under "Measured" (scripts/eval/sdt.mjs), or null.
-// The catch rate counts the sign's own label where the corpus has one, else general hostility, and
-// says so. The tendency reads bias c (how readily the sign fires) with the precision shown above it.
+// The catch rate, sensitivity and tendency the window shows under "Measured" (scripts/eval/sdt.mjs),
+// or null. They come from the same test set as the precision, which the "Measured" line names. The
+// tendency reads bias c (how readily the sign fires) with that precision. Under the 20-hit rule,
+// sensitivity and tendency read "not measured".
 const TARGET = { dehumanise: "dehumanising posts", violence: "posts calling for violence", stereotype: "posts stereotyping a group" };
 const fires = (c) => (c >= 2 ? "rarely fires" : c >= 1 ? "fires sparingly" : c >= 0 ? "fires readily" : "fires freely");
 const right = (p) => (p >= 0.8 ? "it is usually right" : p >= 0.6 ? "it is right more often than not" : "it is often wrong");
+const num = (x) => (x < 0 ? `−${Math.abs(x).toFixed(2)}` : x.toFixed(2));
 function share(k, n) {
   if (k / n >= 0.2) return `about ${pc(k / n)} in 100`;
   const x = n / k;
   return `about 1 in ${(x < 10 ? Math.round(x) : Number(x.toPrecision(2))).toLocaleString("en")}`;
 }
+const ciOk = (a) => Array.isArray(a) && a.length === 2 && a.every(Number.isFinite);
 
 function catchLines(id, table = MEASURED) {
   const r = (table || {})[id], k = r && r.catch;
-  if (!valid(r) || !k || !Number.isInteger(k.hits) || !Number.isInteger(k.of) || k.hits <= 0 || k.of < k.hits || !Number.isFinite(k.c)) return null;
-  const own = k.against === "matched" && TARGET[id];
-  const what = own ? TARGET[id] : "hostile posts";
-  return { catches: `finds ${share(k.hits, k.of)} ${what} in testing${own ? "" : " (measured against general hostility)"}`,
-    tendency: `${fires(k.c)}; when it does, ${right(r.precision)}` };
+  if (!valid(r) || !k || !Number.isInteger(k.hits) || !Number.isInteger(k.of) || k.hits <= 0 || k.of < k.hits) return null;
+  const what = k.against === "matched" && TARGET[id] ? TARGET[id] : "hostile posts";
+  const ok = k.measured !== false && Number.isFinite(k.dprime) && Number.isFinite(k.c) && ciOk(k.dCI);
+  return { catches: `finds ${share(k.hits, k.of)} ${what} in testing`,
+    sensitivity: ok ? `d' ${num(k.dprime)} (${num(k.dCI[0])} to ${num(k.dCI[1])}); 0 is chance, 2 is good` : "not measured",
+    tendency: ok ? `${fires(k.c)}; when it does, ${right(r.precision)}` : "not measured" };
 }
 
 return { FAMILIES, familyOf, measuredLine, catchLines };

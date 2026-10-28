@@ -5,7 +5,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { invNorm, point, sdtRows, sdtBlock, SDT_MIN_FLAGGED } from "../scripts/eval/sdt.mjs";
-import { ENGLISH, catchFields } from "../scripts/eval/summarise.mjs";
+import { ENGLISH } from "../scripts/eval/summarise.mjs";
 import { spliceSdt, markdownTables } from "../scripts/eval/sdt-report.mjs";
 import { MEASURED } from "../src/core/measured.js";
 
@@ -53,15 +53,23 @@ test("the committed sdt block, measured.js and EVALUATION.md match a fresh run",
   assert.deepEqual(R.sdt, sdtBlock(R.corpora, ENGLISH), "run node scripts/eval-sdt.mjs");
   const md = read("project-docs/EVALUATION.md");
   assert.equal(spliceSdt(md, R.sdt), md, "run node scripts/eval-sdt.mjs");
-  for (const f of Object.keys(MEASURED)) assert.deepEqual(MEASURED[f].catch, catchFields(f, R.sdt).catch, f);
 });
 
-test("the window uses the matched label where Measuring Hate Speech has one, else pooled hostility", () => {
-  assert.deepEqual(MEASURED.violence.catch, { against: "matched", hits: 39, of: 1819, dprime: 1, c: 2.52 });
-  assert.equal(MEASURED.dehumanise.catch.against, "matched");
-  assert.equal(MEASURED.stereotype.catch.against, "matched");
-  assert.equal(MEASURED.slur.catch.against, "hostile");
-  assert.equal(MEASURED.slur.catch.of, ENGLISH.reduce((s, c) => s + R.corpora[c].families.slur.againstHostile.tp + R.corpora[c].families.slur.againstHostile.fn, 0));
+test("every window figure for a sign comes from one test set on Measuring Hate Speech", () => {
+  const own = { dehumanise: "dehumanise", violence: "violence", stereotype: "stereotype" };
+  for (const [f, row] of Object.entries(MEASURED)) {
+    const fam = R.corpora.mhs.families[f], against = own[f] ? "specific" : "hostile";
+    const m = own[f] ? fam.againstSpecific : fam.againstHostile, r = find("mhs", f, against);
+    assert.equal(row.n, m.tp + m.fp, `${f}: precision counts the same flags`);
+    assert.equal(row.precision, m.precision.value, f);
+    assert.deepEqual([row.catch.hits, row.catch.of], [m.tp, m.tp + m.fn], f);
+    assert.deepEqual([row.catch.dprime, row.catch.dCI, row.catch.c, row.catch.measured], [r.dprime, r.dCI, r.c, r.measured], f);
+    assert.equal(row.catch.against, own[f] ? "matched" : "hostile", f);
+    assert.equal(row.basis.corpus, "Measuring Hate Speech", f);
+  }
+  assert.deepEqual(MEASURED.dehumanise.basis, { corpus: "Measuring Hate Speech", label: "its own dehumanising label" });
+  assert.deepEqual(MEASURED.slur.basis, { corpus: "Measuring Hate Speech", label: "general hostility" });
+  assert.deepEqual([MEASURED.dehumanise.precision, MEASURED.dehumanise.n], [0.6, 20], "not the pooled 93% against hostility");
 });
 
 test("the tables mark rows scored against general hostility and carry no em dashes", () => {

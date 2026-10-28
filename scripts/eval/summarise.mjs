@@ -17,7 +17,7 @@ const pool = (results, f) => {
 
 export const DOES_NOT_PROVE = "Measured on public research corpora (Reddit, Twitter, Gab, YouTube and news comments), " +
   "and it can differ on this site and other topics. " +
-  "Precision says how often a marker sat on text the annotators judged hostile to a group.";
+  "Each figure in the window comes from one test set, named beside it: precision says how often the sign sat on text the annotators gave that label.";
 
 export function familySummary(results) {
   const out = {};
@@ -43,25 +43,33 @@ export function familySummary(results) {
 // families never label a post, and the duplicate and mismatch pilots are synthetic, so neither
 // gets a row: their badges keep saying "not measured yet".
 export const SHOWN = ["dehumanise", "violence", "vigilante", "slur", "stereotype"];
-const SOURCE = "Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md";
+// Every figure the window shows for a sign (precision, catch rate, d' and tendency) comes from one
+// test set: the sign's own label on Measuring Hate Speech where the corpus has one, else Measuring
+// Hate Speech's general hostility label. MHS is the largest English corpus; pooling the three corpora
+// inflates d' (EVALUATION.md, "Hit rate, false alarms, sensitivity and bias"), so the window does not.
+const OWN_LABEL = { dehumanise: "dehumanising", violence: "violence", stereotype: "stereotype" };
+const SOURCE = "Measuring Hate Speech, held-out test split; see project-docs/EVALUATION.md";
+const sdtRow = (sdt, f, against) => sdt.rows.find((r) => r.corpus === "mhs" && r.family === f && r.against === against);
 
-// How often the sign finds its target, and how readily it fires (scripts/eval/sdt.mjs). The matched
-// label on Measuring Hate Speech where there is one; otherwise general hostility, pooled as precision is.
-export function catchFields(f, sdt) {
-  if (!sdt) return {};
-  const spec = sdt.rows.find((r) => r.corpus === "mhs" && r.family === f && r.against === "specific" && r.measured);
-  const r = spec || (sdt.pooled[f] && sdt.pooled[f].measured ? sdt.pooled[f] : null);
-  if (!r) return {};
-  return { catch: { against: spec ? "matched" : "hostile", hits: r.tp, of: r.tp + r.fn, dprime: r.dprime, c: r.c } };
+// The one test set for family f: { against, label, precision (k, n, value, ci), sdt row } or null.
+export function windowBasis(f, x, sdt) {
+  const spec = x.specific && OWN_LABEL[f] ? sdtRow(sdt, f, "specific") : null;
+  if (spec) return { against: "matched", label: `its own ${OWN_LABEL[f]} label`, precision: x.specific.precision, r: spec };
+  const r = sdtRow(sdt, f, "hostile"), p = x.byCorpus && x.byCorpus.mhs;
+  return r && p ? { against: "hostile", label: "general hostility", precision: p, r } : null;
 }
 
+const r3 = (v) => Math.round(v * 1000) / 1000;
 export function tableRows(summary, sdt) {
   const rows = {};
   for (const f of SHOWN) {
-    const x = summary.families[f];
-    if (!x || !x.measured) continue;
-    rows[f] = { precision: x.precision.value, low: x.precision.ci[0], high: x.precision.ci[1], n: x.precision.n, split: "test",
-      recall: x.recall ? x.recall.value : null, range: x.precisionRange, ...catchFields(f, sdt), date: summary.generated, source: SOURCE };
+    const x = summary.families[f], B = x && windowBasis(f, x, sdt);
+    if (!B || !B.precision.n || B.precision.n < MIN_N) continue;
+    const { precision: p, r } = B;
+    rows[f] = { precision: p.value, low: p.ci[0], high: p.ci[1], n: p.n, split: "test", recall: r3(r.tp / (r.tp + r.fn)),
+      basis: { corpus: "Measuring Hate Speech", label: B.label },
+      catch: { against: B.against, hits: r.tp, of: r.tp + r.fn, measured: r.measured, dprime: r.dprime, dCI: r.dCI, c: r.c, cCI: r.cCI },
+      date: summary.generated, source: SOURCE };
   }
   return rows;
 }
@@ -80,9 +88,10 @@ export function writeMeasured(path, summary, sdt) {
 //   { precision, low, high, n, split: "test", recall?, side?, date?, source? }
 //   precision, low, high: 0 to 1 (low and high are the 95% interval); n: badges checked.
 //   range: [lowest, highest] precision across corpora with at least 20 hits, or null.
-//   catch: { against: "matched" | "hostile", hits, of, dprime, c }: how many of the labelled posts
-//   the sign found, and its signal detection figures (scripts/eval/sdt.mjs). "matched" is the
-//   sign's own label; "hostile" is general hostility, which the window says.
+//   basis: { corpus, label }: the one test set every figure in the row comes from.
+//   catch: { against: "matched" | "hostile", hits, of, measured, dprime, dCI, c, cCI }: how many of
+//   the labelled posts the sign found, and its signal detection figures (scripts/eval/sdt.mjs) on
+//   that same test set. measured is false under the 20-hit rule.
 // MEASURED_DETAIL holds every family (weak ones too), the side comparison and the SYNTHETIC
 // duplicate and mismatch pilots, which are not human-labelled and get no row in MEASURED.
 
