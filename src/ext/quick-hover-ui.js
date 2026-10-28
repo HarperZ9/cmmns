@@ -9,6 +9,9 @@ globalThis.PBHoverUi = globalThis.PBHoverUi || (() => {
   overflow: visible; background: transparent; z-index: 2147483646; pointer-events: none; }
 .bar { position: fixed; display: flex; gap: 2px; padding: 2px; border-radius: 4px; background: rgba(22,19,15,.78); pointer-events: auto;
   font: 600 12px/16px "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.bar[hidden], .note[hidden] { display: none; }
+.note { position: fixed; max-width: 260px; padding: 6px 10px; border-radius: 4px; background: #ebe5d8; color: #16130f; border-left: 3px solid #8f3a19; pointer-events: none;
+  box-shadow: 0 10px 30px rgba(22,19,15,.2); font: 500 13px/18px "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 button { all: unset; box-sizing: border-box; min-width: 28px; height: 28px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center;
   gap: 4px; border-radius: 3px; color: #ebe5d8; cursor: pointer; }
 button:hover { background: rgba(235,229,216,.16); }
@@ -21,7 +24,7 @@ svg { width: 16px; height: 16px; fill: currentColor; }
 .menu button:focus-visible { outline-color: #16130f; }
 .menu hr { border: 0; border-top: 1px solid #c9bfab; margin: 4px 2px; }
 @media (prefers-color-scheme: dark) { .menu { background: #111114; color: #ece5d6; } .menu button { color: #ece5d6; } .menu button:hover { background: rgba(236,229,214,.1); }
-  .menu button:focus-visible { outline-color: #ece5d6; } .menu hr { border-top-color: #38363b; } }`;
+  .menu button:focus-visible { outline-color: #ece5d6; } .menu hr { border-top-color: #38363b; } .note { background: #111114; color: #ece5d6; border-left-color: #e29472; } }`;
   const DOWN = "M12 3.5a1 1 0 0 1 1 1v8.09l2.8-2.8a1 1 0 1 1 1.4 1.42l-4.5 4.5a1 1 0 0 1-1.4 0l-4.5-4.5a1 1 0 0 1 1.4-1.42l2.8 2.8V4.5a1 1 0 0 1 1-1zM5 18.5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1z";
   const MORE = "M6 10.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm6 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z";
   const ITEMS = [["study", "Study"], ["gif", "Download as GIF"], ["copy", "Copy"], ["link", "Copy link"], ["caption", "Copy with caption"], ["daylight", "Save to CMMNS"], null, ["never", "Never on this site"], ["off", "Turn off hover download"]];
@@ -110,6 +113,19 @@ svg { width: 16px; height: 16px; fill: currentColor; }
   }
 
   function hide() { closeMenu(); if (bar) bar.hidden = true; }
+
+  // A short line under where the control was: why a save from it did not happen. Stays 6 s.
+  let noteEl = null, noteTimer = 0;
+  function note(text) {
+    mount();
+    if (!noteEl) { noteEl = document.createElement("div"); noteEl.className = "note"; noteEl.setAttribute("role", "status"); root.append(noteEl); }
+    const r = bar && !bar.hidden ? bar.getBoundingClientRect() : { left: 16, bottom: 16 };
+    noteEl.textContent = text;
+    noteEl.style.left = `${Math.max(4, Math.min(r.left, innerWidth - 268))}px`; noteEl.style.top = `${Math.min(r.bottom + 6, innerHeight - 60)}px`;
+    noteEl.hidden = false;
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => { noteEl.hidden = true; }, 6000);
+  }
   // True when the point is over the control or its menu (the pointer may leave the media for them).
   function covers(x, y) {
     return [bar, menu].some((el) => { if (!el || el.hidden) return false; const r = el.getBoundingClientRect(); return x >= r.left - 4 && x <= r.right + 4 && y >= r.top - 4 && y <= r.bottom + 4; });
@@ -117,5 +133,5 @@ svg { width: 16px; height: 16px; fill: currentColor; }
   const menuOpen = () => !!menu;
   const isHost = (el) => el === host;
 
-  return Object.freeze({ show, place, hide, covers, menuOpen, isHost, ITEMS });
+  return Object.freeze({ show, place, hide, note, covers, menuOpen, isHost, ITEMS });
 })();

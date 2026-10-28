@@ -149,6 +149,7 @@
         "quick-sites.js",
         "quick-stream.js",
         "quick-gif.js",
+        "quick-saved.js",
         "quick-save.js",
         "quick-capture.js",
         "quick-copy.js",
