@@ -65,3 +65,24 @@ export function measuredLine(id, table = MEASURED) {
   const split = r.split === "test" ? ", held-out test set" : r.split ? `, ${r.split} set` : "";
   return { measured: true, text: `precision ${pc(r.precision)}%${ci}, ${r.n} badges checked${split}` };
 }
+
+// The catch rate and tendency the window shows under "Measured" (scripts/eval/sdt.mjs), or null.
+// The catch rate counts the sign's own label where the corpus has one, else general hostility, and
+// says so. The tendency reads bias c (how readily the sign fires) with the precision shown above it.
+const TARGET = { dehumanise: "dehumanising posts", violence: "posts calling for violence", stereotype: "posts stereotyping a group" };
+const fires = (c) => (c >= 2 ? "rarely fires" : c >= 1 ? "fires sparingly" : c >= 0 ? "fires readily" : "fires freely");
+const right = (p) => (p >= 0.8 ? "it is usually right" : p >= 0.6 ? "it is right more often than not" : "it is often wrong");
+function share(k, n) {
+  if (k / n >= 0.2) return `about ${pc(k / n)} in 100`;
+  const x = n / k;
+  return `about 1 in ${(x < 10 ? Math.round(x) : Number(x.toPrecision(2))).toLocaleString("en")}`;
+}
+
+export function catchLines(id, table = MEASURED) {
+  const r = (table || {})[id], k = r && r.catch;
+  if (!valid(r) || !k || !Number.isInteger(k.hits) || !Number.isInteger(k.of) || k.hits <= 0 || k.of < k.hits || !Number.isFinite(k.c)) return null;
+  const own = k.against === "matched" && TARGET[id];
+  const what = own ? TARGET[id] : "hostile posts";
+  return { catches: `finds ${share(k.hits, k.of)} ${what} in testing${own ? "" : " (measured against general hostility)"}`,
+    tendency: `${fires(k.c)}; when it does, ${right(r.precision)}` };
+}

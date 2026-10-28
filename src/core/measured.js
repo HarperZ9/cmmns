@@ -6,6 +6,9 @@
 //   { precision, low, high, n, split: "test", recall?, side?, date?, source? }
 //   precision, low, high: 0 to 1 (low and high are the 95% interval); n: badges checked.
 //   range: [lowest, highest] precision across corpora with at least 20 hits, or null.
+//   catch: { against: "matched" | "hostile", hits, of, dprime, c }: how many of the labelled posts
+//   the sign found, and its signal detection figures (scripts/eval/sdt.mjs). "matched" is the
+//   sign's own label; "hostile" is general hostility, which the window says.
 // MEASURED_DETAIL holds every family (weak ones too), the side comparison and the SYNTHETIC
 // duplicate and mismatch pilots, which are not human-labelled and get no row in MEASURED.
 
@@ -27,10 +30,10 @@ export const MEASURED_PERSUASION = {
 };
 // persuasion:end
 export const MEASURED = {
-  "dehumanise": {"precision":0.925,"low":0.801,"high":0.974,"n":40,"split":"test","recall":0.002,"range":[0.9,0.9],"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "violence": {"precision":0.875,"low":0.79,"high":0.929,"n":88,"split":"test","recall":0.021,"range":[0.967,0.967],"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "slur": {"precision":0.91,"low":0.901,"high":0.918,"n":4393,"split":"test","recall":null,"range":[0.34,0.953],"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
-  "stereotype": {"precision":0.842,"low":0.764,"high":0.898,"n":114,"split":"test","recall":0.007,"range":[0.773,0.925],"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "dehumanise": {"precision":0.925,"low":0.801,"high":0.974,"n":40,"split":"test","recall":0.002,"range":[0.9,0.9],"catch":{"against":"matched","hits":12,"of":5046,"dprime":0.44,"c":3.03},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "violence": {"precision":0.875,"low":0.79,"high":0.929,"n":88,"split":"test","recall":0.021,"range":[0.967,0.967],"catch":{"against":"matched","hits":39,"of":1819,"dprime":1,"c":2.52},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "slur": {"precision":0.91,"low":0.901,"high":0.918,"n":4393,"split":"test","recall":null,"range":[0.34,0.953],"catch":{"against":"hostile","hits":3996,"of":22456,"dprime":1.53,"c":1.69},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
+  "stereotype": {"precision":0.842,"low":0.764,"high":0.898,"n":114,"split":"test","recall":0.007,"range":[0.773,0.925],"catch":{"against":"matched","hits":58,"of":8368,"dprime":0.43,"c":2.67},"date":"2026-10-23","source":"Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md"},
 };
 
 export const MEASURED_DETAIL = {

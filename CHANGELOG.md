@@ -22,6 +22,16 @@ were not published to a store.
   in the unpacked and self-distributed builds, never in the store packages (`tests/store-build.test.js`).
 - **`cmmns case add-library <folder> [--copy-media]`**: every post of a library becomes a case source,
   each file's hash checked against the index, so `timeline`, `claim`, `trace` and `read` run over it.
+- **Catch rate and tendency in the window.** Under each measured sign's precision, "Catch rate" says
+  how much of the labelled test text it found ("finds about 1 in 47 posts calling for violence in
+  testing") and "Tendency" how readily it fires ("rarely fires; when it does, it is usually right").
+  The catch rate uses the sign's own label where one exists, else general hostility, and then says so.
+- **Signal detection measures in the evaluation** (`scripts/eval/sdt.mjs`, `node scripts/eval-sdt.mjs`).
+  Hit rate, false-alarm rate, sensitivity d' and bias c with 95% bootstrap intervals, per sign and
+  corpus, in `eval-results.json`, EVALUATION.md and the measurement page. Every sign is very
+  conservative (c mostly 2.5 to 3.5); the best d' is about 1.0 to 1.3. Rows scored against general
+  hostility are marked, and the French corpus reads "not measured". Deterministic and
+  dependency-free; the committed figures match the 2026-10-28 study exactly.
 
 ### Fixed
 - One-click saves pass their folder (site, study or library) with each save instead of keeping it in

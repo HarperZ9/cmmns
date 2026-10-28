@@ -1,6 +1,6 @@
 # How CMMNS works
 
-Last updated: 2026-10-23.
+Last updated: 2026-10-28.
 
 CMMNS (formerly Daylight Commons, and Radar before that) is a browser extension. Rest the pointer on a reply on X, Reddit, YouTube,
 Bluesky, Mastodon and a few other sites, and a window opens beside it. The window shows where the
@@ -44,6 +44,9 @@ the lookup skips RDAP there. Its registration date would belong to GitHub.
   region.
 - The measurement page lists which signs have a measured precision, each with a 95% interval. The
   window marks every other sign "not measured yet".
+- Beside the precision, a measured sign's window shows its catch rate ("finds about 1 in 47 posts
+  calling for violence in testing") and how readily it fires. Every sign is cautious: it rarely
+  fires, so it misses most hostile posts. A quiet reply can still be hostile.
 - The launch campaign lens has no measured precision yet. Until a media lawyer has reviewed its
   wording, every claim reads "this launch" and names no company.
 - A site redesign can break a reader until the next update. The extension says so when it reads

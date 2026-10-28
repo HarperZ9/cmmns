@@ -14,6 +14,7 @@ import { TECHNIQUES, PERSUASION_DOES_NOT_PROVE } from "../src/core/persuasion.js
 import { FIGURE_CSS } from "./site/figures.mjs";
 import { leadSigns } from "./site/signs.mjs";
 import { opsSection } from "./site/ops-trend.mjs";
+import { htmlTables } from "./eval/sdt-report.mjs";
 
 const read = (p) => readFileSync(join(ROOT, p), "utf8");
 const pct = (x) => `${(x * 100).toFixed(1)}%`;
@@ -145,6 +146,10 @@ ${more("Every language sign, with counts", tbl(["Sign", "Precision (95% interval
 <p class="muted">${esc(MEASURED_DOES_NOT_PROVE)}</p>
 <h3>Weaker signs that count only toward a reply being "extreme"</h3>
 ${more("Weaker signs, with counts", tbl(["Sign", "Share on hostile text (95% interval)", "Range across corpora"], weakRows(fams)))}
+<h3>How often each sign fires</h3>
+<p>Precision says how often a sign is right when it shows. The <strong>hit rate</strong> says how much of the labelled text it finds, and the <strong>false-alarm rate</strong> how much of the rest it flags. From the two, <strong>d'</strong> measures how well a sign tells the two apart (0 is chance, 1 is modest, 2 is good), and <strong>c</strong>, the bias, measures how readily it fires (above 0 means reluctant). Bias here means only that; political side is never an input. Every sign is very conservative: c sits between 2.5 and 3.5 on most rows, and most signs find under 3% of the hostile text. d' and c are shown only where a sign fired at least 20 times.</p>
+<p>Only some rows score a sign against its own label: dehumanising, violence and stereotype on Measuring Hate Speech, and threats on Civil Comments. The rest score it against general hostility, which conspiracy framing, motive attribution, absolutist wording and essentialising do not try to detect, so a low d' there says the corpora lack a matching label. The French corpus gave too few hits to measure. Method and caveats: EVALUATION.md, "Hit rate, false alarms, sensitivity and bias".</p>
+${more("Every sign's hit rate, false-alarm rate, d' and c, per corpus", htmlTables(D.sdt, esc))}
 <h3>The thread report's "extreme"</h3>
 <p>Precision against Measuring Hate Speech severity labels: <span class="mono">${rate(D.extreme.precision)}</span>. Recall: <span class="mono">${rate(D.extreme.recall)}</span>. On HateXplain: precision <span class="mono">${rate(D.extreme.byCorpus.hatexplain)}</span>.</p>
 <h3>Word lists derived from labelled data</h3>

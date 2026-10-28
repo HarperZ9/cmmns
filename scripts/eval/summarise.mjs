@@ -6,7 +6,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { rate, FAMILIES } from "./metrics.mjs";
 import { currentBlock } from "./summarise-persuasion.mjs";
 
-const ENGLISH = ["mhs", "hatexplain", "civil"];
+export const ENGLISH = ["mhs", "hatexplain", "civil"];
 const MIN_N = 20;
 
 const pool = (results, f) => {
@@ -45,13 +45,23 @@ export function familySummary(results) {
 export const SHOWN = ["dehumanise", "violence", "vigilante", "slur", "stereotype"];
 const SOURCE = "Measuring Hate Speech, HateXplain and Civil Comments, pooled; see project-docs/EVALUATION.md";
 
-export function tableRows(summary) {
+// How often the sign finds its target, and how readily it fires (scripts/eval/sdt.mjs). The matched
+// label on Measuring Hate Speech where there is one; otherwise general hostility, pooled as precision is.
+export function catchFields(f, sdt) {
+  if (!sdt) return {};
+  const spec = sdt.rows.find((r) => r.corpus === "mhs" && r.family === f && r.against === "specific" && r.measured);
+  const r = spec || (sdt.pooled[f] && sdt.pooled[f].measured ? sdt.pooled[f] : null);
+  if (!r) return {};
+  return { catch: { against: spec ? "matched" : "hostile", hits: r.tp, of: r.tp + r.fn, dprime: r.dprime, c: r.c } };
+}
+
+export function tableRows(summary, sdt) {
   const rows = {};
   for (const f of SHOWN) {
     const x = summary.families[f];
     if (!x || !x.measured) continue;
     rows[f] = { precision: x.precision.value, low: x.precision.ci[0], high: x.precision.ci[1], n: x.precision.n, split: "test",
-      recall: x.recall ? x.recall.value : null, range: x.precisionRange, date: summary.generated, source: SOURCE };
+      recall: x.recall ? x.recall.value : null, range: x.precisionRange, ...catchFields(f, sdt), date: summary.generated, source: SOURCE };
   }
   return rows;
 }
@@ -59,7 +69,7 @@ export function tableRows(summary) {
 const lines = (obj) => "{\n" + Object.entries(obj).map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},`).join("\n") + "\n}";
 
 // The persuasion rows come from scripts/eval-persuasion.mjs and are kept as they are.
-export function writeMeasured(path, summary) {
+export function writeMeasured(path, summary, sdt) {
   const { families, ...rest } = summary;
   const persuasion = currentBlock(existsSync(path) ? readFileSync(path, "utf8") : "");
   const src = `// Measured accuracy per badge family, from the held-out test split in project-docs/EVALUATION.md.
@@ -70,12 +80,15 @@ export function writeMeasured(path, summary) {
 //   { precision, low, high, n, split: "test", recall?, side?, date?, source? }
 //   precision, low, high: 0 to 1 (low and high are the 95% interval); n: badges checked.
 //   range: [lowest, highest] precision across corpora with at least 20 hits, or null.
+//   catch: { against: "matched" | "hostile", hits, of, dprime, c }: how many of the labelled posts
+//   the sign found, and its signal detection figures (scripts/eval/sdt.mjs). "matched" is the
+//   sign's own label; "hostile" is general hostility, which the window says.
 // MEASURED_DETAIL holds every family (weak ones too), the side comparison and the SYNTHETIC
 // duplicate and mismatch pilots, which are not human-labelled and get no row in MEASURED.
 
 export const MEASURED_AT = ${JSON.stringify(summary.generated)};
 ${persuasion}
-export const MEASURED = ${lines(tableRows(summary))};
+export const MEASURED = ${lines(tableRows(summary, sdt))};
 
 export const MEASURED_DETAIL = {
  ${Object.entries(rest).map(([k, v]) => `${JSON.stringify(k)}: ${JSON.stringify(v)},`).join("\n ")}
