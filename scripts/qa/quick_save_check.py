@@ -44,7 +44,8 @@ def sniff(path):
 def ext_copy(work):
     d = work / "ext"
     shutil.rmtree(d, ignore_errors=True)
-    shutil.copytree(ROOT / "src" / "ext", d)
+    # DC_EXT_SRC loads another copy of src/ext (a build from before a fix, for a before-and-after timing).
+    shutil.copytree(pathlib.Path(os.environ.get("DC_EXT_SRC") or ROOT / "src" / "ext"), d)
     m = json.loads((d / "manifest.json").read_text(encoding="utf-8"))
     m["host_permissions"] = m["host_permissions"] + ["<all_urls>"]
     (d / "manifest.json").write_text(json.dumps(m, indent=2), encoding="utf-8")
@@ -61,10 +62,16 @@ async def launch(p, work, port=None):
     (prof / "Default" / "Preferences").write_text(json.dumps({"download": {"default_directory": str(dl), "prompt_for_download": False}}), encoding="utf-8")
     # DC_MAP_X=1 also maps x.com to the fixture (hover_extra.x_thread_fixture); live X cases need it off.
     hosts = fx.REDDIT_HOSTS + (("x.com",) if os.environ.get("DC_MAP_X") else ())
+    # DC_MAP_HOSTS="a.com,b.com" maps more hosts to the fixture server (download_timing.py).
+    hosts += tuple(h for h in os.environ.get("DC_MAP_HOSTS", "").split(",") if h and h not in hosts)
     rules = ", ".join(f"MAP {h} 127.0.0.1:8443" for h in hosts)
     proc = subprocess.Popen([CHROME, "--window-position=-2400,0", f"--user-data-dir={prof}", f"--remote-debugging-port={port}", "--enable-unsafe-extension-debugging",
                              f"--host-resolver-rules={rules}", "--ignore-certificate-errors", "--no-first-run", "--no-default-browser-check",
-                             "--autoplay-policy=no-user-gesture-required", "--window-size=1280,900", "about:blank"])
+                             "--autoplay-policy=no-user-gesture-required", "--window-size=1280,900",
+                             # DC_HEADLESS=1 for fixture-only runs (download_timing.py): no window to hide or throttle.
+                             *(["--headless=new"] if os.environ.get("DC_HEADLESS") else []),
+                             # Timings need full-rate timers and frames in a window the system does not show.
+                             "--disable-background-timer-throttling", "--disable-renderer-backgrounding", "--disable-backgrounding-occluded-windows", "about:blank"])
     for _ in range(100):
         try:
             socket.create_connection(("127.0.0.1", port), 0.2).close()
@@ -92,8 +99,9 @@ class Worker:
         self.ctx, self.ext_id = ctx, ext_id
 
     async def evaluate(self, js, arg=None):
-        for _ in range(3):
-            sws = [w for w in self.ctx.service_workers if self.ext_id in w.url]
+        stale = set()
+        for _ in range(6):
+            sws = [w for w in self.ctx.service_workers if self.ext_id in w.url and id(w) not in stale]
             if not sws:
                 page = await self.ctx.new_page()
                 await page.goto(f"chrome-extension://{self.ext_id}/options.html")
@@ -104,8 +112,9 @@ class Worker:
             try:
                 return await sws[0].evaluate(js, arg)
             except Exception as e:
-                if "closed" not in str(e):
+                if "closed" not in str(e) and "destroyed" not in str(e):
                     raise
+                stale.add(id(sws[0]))   # a stopped worker can stay listed: wake a new one
         raise RuntimeError("the service worker could not be reached")
 
 

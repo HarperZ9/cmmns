@@ -7,6 +7,47 @@ were not published to a store.
 
 Nothing yet.
 
+## 3.9.1 (2026-10-28)
+
+The Download buttons start at once and say why when a save fails. Timings come from
+`scripts/qa/download_timing.py`: Chrome with the extension, on local copies of an X post, an
+Instagram post and a plain site, 60 ms per request and 80 Mbit/s, ten tries per pointer path.
+
+### Fixed
+- **The hover control stayed on screen after it was hidden**, and a click on it then did nothing. The
+  control's bar sets `display: flex`, which beats the browser's `[hidden]` rule. In 3.9.0, 49 of 50
+  tries began with the last control still drawn. It now leaves with the pointer.
+- **The hover control did not show on pictures under one clear layer** (X, Instagram) when the
+  pointer came in over the post's header or caption, or on a picture that loaded to full size under
+  the pointer: a miss was kept for as long as the topmost element stayed the same. With the first
+  fix alone, 0 of 10 tries showed it on each of these paths; now 10 of 10, after 300 to 311 ms.
+- **Small movements of a hand kept the hover control away.** Every pointer move restarted the 300 ms
+  wait; with 1 to 3 px moves or a slow glide, 0 of 10 tries showed it. It now waits for the pointer
+  to rest within 24 px of one point: 10 of 10, after 304 ms.
+- **A gallery's files save four at a time.** From the click on the X Download button to the last
+  file handed to the browser: 1,173 ms before, 452 ms now; the closing note at 669 ms, was 1,288 ms.
+  The note counts the files as they land, and the button is released even when a save fails.
+- **A long video starts downloading at once.** A video over 32 MB is handed to the browser, which
+  shows its own progress, instead of being read into the page first to write the post's words inside
+  it; the words stay in the sidecar. A 48 MB video: the download starts after 176 ms, was 5,642 ms.
+  A smaller file read in the page shows "Reading 3.1 MB of 12.0 MB". A file over the 300 MB embed
+  limit is no longer fetched twice.
+- **A download the browser stopped was reported as saved.** A 403, a dropped connection or a full disk
+  before the file was named now shows "Not saved" with the browser's reason.
+- **The list of saved files no longer slows each save or loses entries.** It is read once per page
+  and written after the note, one write at a time (`src/ext/quick-saved.js`, same `pb.saved.v1` key).
+  With 20,000 entries the closing note came 864 ms after the click, now 691 ms. Four files saved at
+  once used to overwrite each other's entries.
+- A click the hover control could not carry out (a frame the browser would not let CMMNS read, the
+  extension updated under the page) is said beside the control instead of only in the console.
+- An X post that holds another post's article gets its own button in its own row.
+
+### Not changed, measured
+- The first hover click on a site CMMNS does not name loads the page scripts on that click: 326 ms
+  to the download, against 262 ms for the next click, so the scripts still load only after a click.
+  With the service worker stopped, the X button still saved: the first file reached the disk 386 to
+  435 ms after the click.
+
 ## 3.9.0 (2026-10-28)
 
 Daylight Commons is now CMMNS, spoken "commons". Everything you saved, every case and every signed

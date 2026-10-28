@@ -21,30 +21,50 @@
     return s;
   }
 
+  // The button is busy (and says so to screen readers) until the save ends, even when it fails.
+  const busy = (btn, on) => { btn.disabled = on; btn.setAttribute("aria-busy", on ? "true" : "false"); };
+
+  // Up to `width` saves at once, results in the items' order.
+  async function inTurns(items, width, fn) {
+    const out = new Array(items.length);
+    let next = 0;
+    const lane = async () => { while (next < items.length) { const i = next++; out[i] = await fn(items[i], i); } };
+    await Promise.all(Array.from({ length: Math.min(width, items.length) }, lane));
+    return out;
+  }
+
+  // A text post (or a thread of them): one note with the whole text, every part in order.
+  async function saveText(node, btn, study) {
+    const raw = PBQuickSites.postMetaOf(node);
+    if (!raw || !(raw.text || raw.title)) { PBQuickToast.show("Nothing to save in this post yet. Let it load, then try again.", { tone: "no" }); return; }
+    busy(btn, true);
+    try { await PBQuickText.run(study ? "study" : "note", { raw: { ...raw, kind: "text" } }); } finally { busy(btn, false); }
+  }
+
+  // Every file of the post, four at a time (a gallery on X holds four at most), with a count as they land.
   async function saveAll(node, btn, study = false) {
     const { title, items, gallery, thread } = PBQuickSites.postMedia(node);
-    // A text post (or a thread of them): one note with the whole text, every part in order.
-    if (!items.length) {
-      const raw = PBQuickSites.postMetaOf(node);
-      if (raw && (raw.text || raw.title)) { btn.disabled = true; await PBQuickText.run(study ? "study" : "note", { raw: { ...raw, kind: "text" } }); btn.disabled = false; return; }
-      PBQuickToast.show("Nothing to save in this post yet. Let it load, then try again.", { tone: "no" });
-      return;
-    }
-    btn.disabled = true;
-    let ok = 0, last = "", already = 0, meta = null;
-    const names = [], many = items.length > 1;
-    for (const [index, t] of items.entries()) {
-      const r = await PBQuickSave.start(t, { title, index, total: items.length, quiet: many, oneSidecar: many, study });
-      if (r.ok) ok++; else last = r.line;
-      if (r.already) already++;
-      if (r.names) names.push(...r.names);
-      meta = meta || r.meta || null;
-    }
-    // One sidecar for the whole post, listing every file in order.
-    if (many && meta) await PBQuickSave.postSidecar(meta, names).catch((e) => console.warn("[cmmns] could not write the post's sidecar", e));
-    btn.disabled = false;
-    const was = already ? ` ${already} ${already === 1 ? "was" : "were"} already saved.` : "";
-    if (many) PBQuickToast.show(ok === items.length ? `Saved all ${items.length} files${gallery ? " from the gallery" : thread ? " from the thread" : ""}.${was}` : `Saved ${ok} of ${items.length} files. ${last}`, { tone: ok === items.length ? "ok" : "no" });
+    if (!items.length) return saveText(node, btn, study);
+    busy(btn, true);
+    try {
+      const many = items.length > 1;
+      let done = 0;
+      if (many) PBQuickToast.show(`Downloading ${items.length} files`, { stay: 0 });
+      const results = await inTurns(items, 4, async (t, index) => {
+        const r = await PBQuickSave.start(t, { title, index, total: items.length, quiet: many, oneSidecar: many, study });
+        if (many && ++done < items.length) PBQuickToast.show(`Downloading: ${done} of ${items.length} files saved`, { stay: 0 });
+        return r;
+      });
+      const ok = results.filter((r) => r.ok).length, already = results.filter((r) => r.already).length;
+      const last = (results.filter((r) => !r.ok).pop() || {}).line || "";
+      const names = results.flatMap((r) => r.names || []), meta = (results.find((r) => r.meta) || {}).meta || null;
+      // One sidecar for the whole post, listing every file in order.
+      let side = null;
+      if (many && meta) await PBQuickSave.postSidecar(meta, names).catch((e) => { console.warn("[cmmns] could not write the post's sidecar", e); side = e; });
+      const was = already ? ` ${already} ${already === 1 ? "was" : "were"} already saved.` : "";
+      if (side) PBQuickToast.show(`Saved ${ok} of ${items.length} files, but not the post's sidecar: ${side.message}`, { tone: "no", stay: 7000 });
+      else if (many) PBQuickToast.show(ok === items.length ? `Saved all ${items.length} files${gallery ? " from the gallery" : thread ? " from the thread" : ""}.${was}` : `Saved ${ok} of ${items.length} files. ${last}`, { tone: ok === items.length ? "ok" : "no" });
+    } finally { busy(btn, false); }
   }
 
   // Download, or Study (the same save, kept apart for study later) when study is true.
@@ -67,9 +87,11 @@
     .filter((m) => m.closest("article") === article);
   function decorateX(article) {
     const media = xMedia(article);
-    if (article.querySelector(".dc-dl")) return;
+    // This post's own button and row: a post nested inside (a quoted article) has its own.
+    const mine = (el) => el.closest("article") === article;
+    if ([...article.querySelectorAll(".dc-dl")].some(mine)) return;
     if (!media.length && !article.querySelector('[data-testid="tweetText"], div[lang], div.whitespace-pre-wrap')) return;
-    const row = [...article.querySelectorAll('[role="group"]')].find((g) => g.querySelector('[data-testid="reply"], [data-testid="like"], [data-testid="unlike"]'));
+    const row = [...article.querySelectorAll('[role="group"]')].filter(mine).find((g) => g.querySelector('[data-testid="reply"], [data-testid="like"], [data-testid="unlike"]'));
     if (row) {
       const cell = document.createElement("div");
       cell.className = "dc-dl-cell";

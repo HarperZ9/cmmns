@@ -6,7 +6,7 @@
 // Nothing is read or sent until that click. Not drawn where the X and Reddit Download button shows.
 globalThis.PBHover = globalThis.PBHover || (() => {
   "use strict";
-  const MIN = 120, DELAY = 300, KEY = "pb.settings";
+  const MIN = 120, DELAY = 300, NEAR = 24, MISS_MS = 120, KEY = "pb.settings";
   const host = location.hostname.replace(/^www\./, "");
   let settings = {}, last = null, timer = 0, shown = null, raf = 0;
 
@@ -79,26 +79,45 @@ globalThis.PBHover = globalThis.PBHover || (() => {
     if (s.kind === "selection" && action === "download") action = "text-note";
     const selection = s.kind === "selection" ? s.text : null;
     if (selection || action === "never" || action === "off") hide();
+    // Every failure is said beside the control: the worker's reason, or that it could not be reached.
+    const fail = (why) => { console.warn("[cmmns] the download control:", why); PBHoverUi.note(`Not saved: ${why}`); };
     chrome.runtime.sendMessage({ type: "pb-hover-action", action, at: { x: p.x, y: p.y }, selection, src: s.src && /^https?:/.test(s.src) ? s.src : null })
-      .catch((e) => console.warn("[cmmns] the download control could not reach the extension", e));
+      .then((r) => { if (r && r.error) fail(r.error); }, (e) => fail(/context invalidated/i.test(String(e && e.message)) ? "CMMNS was updated: reload this page" : `CMMNS could not be reached (${e && e.message})`));
   }
 
-  function hide() { clearTimeout(timer); shown = null; if (globalThis.PBHoverUi) PBHoverUi.hide(); }
+  function hide() { clearTimeout(timer); anchor = null; shown = null; if (globalThis.PBHoverUi) PBHoverUi.hide(); }
 
-  // The topmost element last looked at: while it stays the same, so does the media under it.
-  let lastTop = null, lastMedia = null;
+  // The media last found under the pointer. While the topmost element stays the same and the point is
+  // still inside that media, it is the same media. A miss holds only within 4 px of where it was
+  // found and for MISS_MS: one clear layer can cover a caption and a picture alike, and a picture can
+  // grow under it as it loads.
+  let lastTop = null, lastMedia = null, lastAt = 0, lastX = 0, lastY = 0;
+  const inside = (r, x, y) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  function mediaUnder(x, y) {
+    const top = document.elementFromPoint(x, y), now = Date.now();
+    const same = top === lastTop && (lastMedia ? inside(lastMedia.el.getBoundingClientRect(), x, y) : now - lastAt < MISS_MS && Math.abs(x - lastX) <= 4 && Math.abs(y - lastY) <= 4);
+    if (same) return lastMedia;
+    lastTop = top; lastMedia = mediaAt(x, y); lastAt = now; lastX = x; lastY = y;
+    return lastMedia;
+  }
+
+  // The control shows once the pointer has rested within NEAR px of one point for DELAY ms. The small
+  // moves of a hand on a mouse or trackpad do not start the wait again; a move further away does.
+  let anchor = null;
   function consider(x, y) {
     if (shown && (shown.kind === "selection" || PBHoverUi.covers(x, y) || PBHoverUi.menuOpen())) return;
-    const top = document.elementFromPoint(x, y);
-    const m = off() ? null : top === lastTop && lastMedia !== undefined ? lastMedia : mediaAt(x, y);
-    lastTop = top; lastMedia = m;
+    const m = off() ? null : mediaUnder(x, y);
     if (shown && m && m.el === shown.el) { shown.at = { x, y, at: Date.now() }; return; }
     if (shown && !m) { hide(); return; }
+    if (!m) { clearTimeout(timer); anchor = null; return; }
+    if (anchor && anchor.el === m.el && Math.abs(anchor.x - x) <= NEAR && Math.abs(anchor.y - y) <= NEAR) return;
     clearTimeout(timer);
-    if (!m) return;
+    anchor = { el: m.el, x, y };
     timer = setTimeout(() => {
-      if (!last || Math.abs(last.x - x) > 24 || Math.abs(last.y - y) > 24) return;   // the pointer moved on
-      shown = { ...m, at: { x, y, at: Date.now() } };
+      const a = anchor;
+      anchor = null;
+      if (!a || !last || Math.abs(last.x - a.x) > NEAR || Math.abs(last.y - a.y) > NEAR) return;   // the pointer moved on
+      shown = { ...m, at: { x: last.x, y: last.y, at: Date.now() } };
       PBHoverUi.show(m.el.getBoundingClientRect(), m.label, act, m.menu || null);
     }, DELAY);
   }

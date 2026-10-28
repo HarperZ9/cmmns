@@ -105,7 +105,7 @@ from somewhere other than Mozilla's store. Mozilla signs `cmmns-firefox-self` wi
 its store; once signed, open the file in Firefox to install it, and Firefox checks
 `https://harperz9.github.io/ext/firefox/updates.json` for new versions.
 
-No release so far carries a Mozilla-signed file, 3.9.0 included, and the update list at
+No release so far carries a Mozilla-signed file, 3.9.1 included, and the update list at
 `ext/firefox/updates.json` names no version yet. Until Mozilla signs the self-distributed build or lists CMMNS on Firefox
 Add-ons, release Firefox can load it only for one session: open `about:debugging`, choose This
 Firefox, then Load Temporary Add-on, and pick the `.xpi`. Firefox Developer Edition, Nightly and

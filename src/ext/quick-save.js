@@ -19,7 +19,9 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
       let n = 0;
       while (n < 65536) { const { done, value } = await reader.read(); if (done) break; parts.push(value); n += value.length; }
       reader.cancel().catch(() => {});
-      return { bytes: PB.concatBytes(parts).subarray(0, 65536), type: res.headers.get("content-type") || "" };
+      // The whole file's size: "bytes 0-65535/TOTAL" when the host answered the range, else its length.
+      const total = Number((/\/(\d+)$/.exec(res.headers.get("content-range") || "") || [])[1] || (res.status === 200 && res.headers.get("content-length")) || 0);
+      return { bytes: PB.concatBytes(parts).subarray(0, 65536), type: res.headers.get("content-type") || "", total };
     } catch { return null; }
   }
 
@@ -74,10 +76,15 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     // the bytes show (a WebP sent as image/jpeg), which the browser would otherwise rename.
     const said = head && PB.chooseType({ contentType: head.type }).ext;
     const mismatch = type.from === "bytes" && said && said !== "bin" && said !== type.ext;
-    if (c.capture || (head && (mismatch || (c.p.mediaEmbed && EMBED.has(type.mime))))) {
+    // A file over EMBED_READ_MAX (a long video) is not read into the page to write the words inside it:
+    // the browser downloads it at once, with its own progress, and the words stay in the sidecar. The
+    // size comes from the probe, else from the full answer's length before its body is read. A capture
+    // and a mislabelled type always read the bytes.
+    const must = c.capture || mismatch, limit = must ? 0 : EMBED_READ_MAX;
+    if (must || (head && c.p.mediaEmbed && EMBED.has(type.mime) && !(head.total > limit))) {
       try {
-        const b = await bytesOf(plan.url);
-        if (b.bytes.length <= EMBED_MAX || mismatch || c.capture) {
+        const b = await bytesOf(plan.url, c.progress, limit);
+        if (b && (b.bytes.length <= EMBED_MAX || must)) {
           const out = withWords(b.bytes, type.mime, c.meta, c.p);
           const written = await saveBytes(out, type.mime, name);
           if (c.capture) await c.capture.add(written, b.bytes, out, type.mime);
@@ -90,7 +97,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   }
 
   const PROTECTED = "Source protection is on, so CMMNS did not download this: the request would tell the host. Use your browser's own Save as, and add the file to your case.";
-  const EMBED = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4"]), EMBED_MAX = 300 * 1048576;
+  const EMBED = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4"]), EMBED_MAX = 300 * 1048576, EMBED_READ_MAX = 32 * 1048576;
   async function prefs() {
     try { const k = PB.SETTINGS_KEY; return PB.normalizeSettings((await chrome.storage.local.get(k))[k]); } catch { return PB.normalizeSettings(null); }
   }
@@ -114,10 +121,23 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     text: (document.querySelector('meta[property="og:description"], meta[name="description"]') || {}).content || null });
   const metaOf = (t, opts) => PB.postMeta({ ...(t.meta || pageMeta(t)), pageUrl: location.href, mediaUrl: t.url || null, index: opts.index || 0, total: opts.total || 1, study: !!opts.study });
 
-  async function bytesOf(url) {
+  // A file's bytes. With onProgress, a file over 2 MB reports "Reading 3.1 MB of 12.0 MB" as it comes.
+  // With a limit, a file whose length is over it is not read: resolves to null.
+  async function bytesOf(url, onProgress = null, limit = 0) {
     const res = await fetch(url, { credentials: /^(data|blob):/.test(url) || new URL(url).origin === location.origin ? "include" : "omit" });
     if (!res.ok) throw new Error(`${new URL(url).host} answered ${res.status}`);
-    return { bytes: new Uint8Array(await res.arrayBuffer()), type: res.headers.get("content-type") || "" };
+    const type = res.headers.get("content-type") || "", total = Number(res.headers.get("content-length") || 0);
+    if (limit && total > limit) { if (res.body) res.body.cancel().catch(() => {}); return null; }
+    if (!onProgress || !res.body || total < 2097152) return { bytes: new Uint8Array(await res.arrayBuffer()), type };
+    const reader = res.body.getReader(), parts = [];
+    let n = 0, shown = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      parts.push(value); n += value.length;
+      if (Date.now() - shown > 250) { shown = Date.now(); onProgress(`Reading ${size(n)} of ${size(total)}`); }
+    }
+    return { bytes: PB.concatBytes(parts), type };
   }
 
   async function canvasPng(el) {
@@ -140,22 +160,9 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     return PBQuickGif.fromVideoBytes(src.bytes, type.mime, progress);
   }
 
-  // Files already saved, so a library of thousands keeps one copy of each: the direct address and,
-  // for files made here, the content hash, in this browser only (chrome.storage.local).
-  const SAVED = "pb.saved.v1", SAVED_MAX = 20000;
-  async function savedAs(keys) {
-    try { const all = (await chrome.storage.local.get(SAVED))[SAVED] || {}; const k = keys.find((x) => x && all[x]); return k ? all[k][0] : null; } catch { return null; }
-  }
-  async function remember(keys, name) {
-    try {
-      const all = (await chrome.storage.local.get(SAVED))[SAVED] || {};
-      for (const k of keys.filter(Boolean)) all[k] = [name, Date.now()];
-      const list = Object.entries(all);
-      const kept = list.length > SAVED_MAX ? Object.fromEntries(list.sort((a, b) => b[1][1] - a[1][1]).slice(0, SAVED_MAX)) : all;
-      await chrome.storage.local.set({ [SAVED]: kept });
-    } catch (e) { console.warn("[cmmns] could not note the saved file", e); }
-  }
-  class Already extends Error { constructor(name) { super(`Already saved as ${name}.`); this.fileName = name; } }
+  // Files already saved (quick-saved.js), so a library of thousands keeps one copy of each. The
+  // save does not wait for the list to be written.
+  const { savedAs, remember, Already } = PBQuickSaved;
 
   // Downloads one target with its words. opts: { asGif, title, index, total, quiet, again, oneSidecar }.
   // Resolves to { line, names, meta }; with oneSidecar the caller writes one sidecar for the post.
@@ -177,7 +184,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const key = (opts.asGif ? "gif:" : "") + (plan.url || (plan.stream && plan.stream.url) || "");
     const before = !opts.again && !opts.study && !capture && (await savedAs([key, opts.asGif ? null : own(t.url)]));
     if (before) throw new Already(before);
-    if (plan.action === "url") { const r = await plainFile(t, plan, { name, meta, p, capture }); const sidecar = await side([r.name]); await remember([key, own(t.url)], r.name); return { line: r.line, names: [r.name], meta, sidecar, files: capture && capture.files }; }
+    if (plan.action === "url") { const r = await plainFile(t, plan, { name, meta, p, capture, progress: opts.quiet ? null : progress }); const sidecar = await side([r.name]); remember([key, own(t.url)], r.name); return { line: r.line, names: [r.name], meta, sidecar, files: capture && capture.files }; }
     let bytes, note = "", mime;
     if (plan.action === "bytes") { const b = await bytesOf(plan.url); bytes = b.bytes; mime = PB.chooseType({ bytes, contentType: b.type }).mime; }
     else if (plan.action === "canvas") { bytes = await canvasPng(t.el); mime = "image/png"; }
@@ -188,7 +195,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
       meta.mediaUrl = plan.stream.url;
       const names = got.files.map((f) => name(PB.downloadExt(f.mime) || "bin", "").replace(/(\.[a-z0-9]+)$/i, got.files.length > 1 ? `-${f.role}$1` : "$1"));
       for (const [i, f] of got.files.entries()) { const out = withWords(f.bytes, f.mime, meta, p); names[i] = await saveBytes(out, f.mime, names[i]); if (capture) await capture.add(names[i], f.bytes, out, f.mime, "put together from the stream's parts"); }
-      const sidecar = await side(names); await remember([key], names[0]);
+      const sidecar = await side(names); remember([key], names[0]);
       return { line: `Saved ${got.files.length > 1 ? got.files.length + " files" : names[0]}, ${size(got.files.reduce((s, f) => s + f.bytes.length, 0))}.${got.note}`, names, meta, sidecar, files: capture && capture.files };
     }
     const hash = "sha256:" + (await PB.mediaSha256(bytes));
@@ -197,7 +204,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const out = withWords(bytes, mime, meta, p);
     const n = await saveBytes(out, mime, name(PB.downloadExt(mime) || "bin", plan.action === "bytes" && /^data:/.test(plan.url) ? "" : undefined));
     if (capture) await capture.add(n, bytes, out, mime, plan.action === "gif" ? "a GIF made in the page" : plan.action === "canvas" ? "a picture of the canvas" : null);
-    const sidecar = await side([n]); await remember([key, hash], n);
+    const sidecar = await side([n]); remember([key, hash], n);
     return { line: `Saved ${n}, ${size(out.length)}.${note}`, names: [n], meta, sidecar, files: capture && capture.files, transformed: plan.action === "gif" ? "made into a GIF in the page" : null };
   }
 

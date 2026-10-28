@@ -207,7 +207,7 @@ accepting each store's developer agreement and pressing submit are the author's 
 **Chrome Web Store**
 1. Sign in at chrome.google.com/webstore/devconsole with the account that will own the listing.
    Pay the one-time registration fee and accept the developer agreement if this is the first item.
-2. New item: upload `cmmns-chrome-3.9.0.zip` from the GitHub release v3.9.0. Check its SHA-256
+2. New item: upload `cmmns-chrome-3.9.1.zip` from the GitHub release v3.9.1. Check its SHA-256
    against the release's `SHA256SUMS` first.
 3. Store listing tab: the summary comes from the manifest; paste "Description" from above;
    category Social & Communication; language English; upload the five screenshots in order and the
@@ -220,9 +220,9 @@ accepting each store's developer agreement and pressing submit are the author's 
 **Firefox Add-ons (listed)**
 1. Sign in at addons.mozilla.org/developers with the account that will own the add-on, and accept
    the distribution agreement.
-2. Submit a new add-on, "On this site": upload `cmmns-firefox-3.9.0.xpi` from the release. The
+2. Submit a new add-on, "On this site": upload `cmmns-firefox-3.9.1.xpi` from the release. The
    add-on id `radar@harperz9.github.io` is set in the package; it must never change.
-3. Source code: answer yes and upload `docs/store/amo-source-3.9.0.zip` (also attached to the
+3. Source code: answer yes and upload `docs/store/amo-source-3.9.1.zip` (also attached to the
    release). Its `REVIEWER.md` gives the steps that remake `core.bundle.js` and `ocr.bundle.js` byte
    for byte from `src/core` and `src/ocr`; nothing is minified.
 4. Paste the name, the AMO summary and the description; licence AGPL-3.0-only; tags from the table;
@@ -234,9 +234,9 @@ accepting each store's developer agreement and pressing submit are the author's 
 1. At addons.mozilla.org/developers/addon/api/key, create an API key and secret. Keep them out of
    the repository, for example in environment variables `WEB_EXT_API_KEY` and
    `WEB_EXT_API_SECRET`.
-2. `npx web-ext sign --channel unlisted --source-dir <unzipped cmmns-firefox-self-3.9.0.xpi>`, or
+2. `npx web-ext sign --channel unlisted --source-dir <unzipped cmmns-firefox-self-3.9.1.xpi>`, or
    upload that xpi as "On your own" in the developer hub.
-3. Attach the signed file Mozilla returns to the v3.9.0 release, then run
+3. Attach the signed file Mozilla returns to the v3.9.1 release, then run
    `node scripts/firefox-updates.mjs <signed.xpi>` and copy `docs/firefox/updates.json` to the site
    repository as `ext/firefox/updates.json`, so installed copies find the next version.
 

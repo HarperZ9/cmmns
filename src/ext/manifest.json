@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CMMNS",
-  "version": "3.9.0",
+  "version": "3.9.1",
   "description": "See the evidence behind social media replies: where accounts are based, coordination and fact-checks, each with its source.",
   "homepage_url": "https://github.com/HarperZ9/cmmns",
   "icons": {
@@ -149,6 +149,7 @@
         "quick-sites.js",
         "quick-stream.js",
         "quick-gif.js",
+        "quick-saved.js",
         "quick-save.js",
         "quick-capture.js",
         "quick-copy.js",

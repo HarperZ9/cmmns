@@ -28,7 +28,14 @@ page and `src/ext/quick-save-bg.js` in the background; the pure parts are the me
 - **The post's words.** A `.md` sidecar with the post's text, author, times, alt text, links, quoted or
   parent post and the author's own continuation, and the same description inside JPEG, PNG, WebP, GIF
   and MP4 files without re-encoding (`src/core/media-meta.js`, `media-embed.js`). Only what the page
-  showed; nothing is fetched for it.
+  showed; nothing is fetched for it. From 3.9.1 a file over 32 MB (a long video) is not read into the
+  page to write the words inside it: the browser downloads it at once, with its own progress, and the
+  words stay in the sidecar. A smaller file read in the page shows "Reading 3.1 MB of 12.0 MB".
+- **Speed and failures (3.9.1).** The files of one post save four at a time, with a count as they
+  land. The list of saved files (`pb.saved.v1`, `src/ext/quick-saved.js`) is read once per page and
+  written after the note, one write at a time. A download the browser stops before naming it (a 403,
+  a dropped connection, a full disk) shows "Not saved" with the reason instead of a success.
+  `scripts/qa/download_timing.py` measures the buttons in Chrome on local fixtures.
 - **Protected media** is refused exactly as in Save below.
 
 ## Hover control, Study, text and YouTube (3.6.1)
@@ -39,6 +46,8 @@ page and `src/ext/quick-save-bg.js` in the background; the pure parts are the me
   the page; only its two 28 px buttons take the pointer. On the sites CMMNS reads it is a
   manifest content script; on every other https site it is a registered content script, only after
   the user allows `https://*/*` in the settings. Not drawn on X and Reddit posts that have the button.
+  It shows once the pointer has rested within 24 px of one point for 300 ms, so the small moves of a
+  hand do not restart the wait (3.9.1). A click it could not carry out says why beside it.
 - **Keyboard**: `Alt+Shift+D` (`commands`) reads the active tab once and saves the media under the
   pointer in the frame the pointer was last in, or the focused media.
 - **Study**: the same save into `<save folder>/study/<site>/`, `study: true` in the note, and an

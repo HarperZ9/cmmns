@@ -5,7 +5,7 @@
 // "Always ask where to save" is on. Protected media references are kept in the collections store.
 globalThis.PBQuickBg = (() => {
   "use strict";
-  const PAGE = ["quick-toast.js", "quick-resolve.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-save.js", "quick-capture.js", "quick-copy.js", "quick-text.js"];
+  const PAGE = ["quick-toast.js", "quick-resolve.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-saved.js", "quick-save.js", "quick-capture.js", "quick-copy.js", "quick-text.js"];
   const ITEMS = [
     ["pb-dl", "Download", ["image", "video", "audio"]],
     ["pb-dl-here", "Download media here", ["page", "link", "frame"]],
@@ -82,28 +82,42 @@ globalThis.PBQuickBg = (() => {
     pending.delete(url);
     setTimeout(() => pending.delete(id), 600000);
     // The name the browser wrote, which "uniquify" may have changed: the caller lists it in the sidecar.
+    // A download the browser stopped before naming it is an error the page shows, never a success.
     const written = await writtenName(id, opts.saveAs ? 600000 : 30000);
-    return { id, filename: written || (filename ? PB.fileBase(filename) : null), confirmed: !!written };
+    if (written.error) throw new Error(stopped(written.error));
+    return { id, filename: written.name || (filename ? PB.fileBase(filename) : null), confirmed: !!written.name };
   }
+
+  // The browser's reason for stopping a download, in words (chrome.downloads InterruptReason).
+  const REASONS = { NETWORK_FAILED: "the connection failed", NETWORK_TIMEOUT: "the connection timed out", NETWORK_DISCONNECTED: "the connection dropped",
+    SERVER_FORBIDDEN: "the site refused it (403)", SERVER_UNAUTHORIZED: "the site asked for a sign-in", SERVER_BAD_CONTENT: "the site sent no file",
+    SERVER_FAILED: "the site failed to send it", FILE_ACCESS_DENIED: "the save folder cannot be written", FILE_NO_SPACE: "the disk is full",
+    FILE_NAME_TOO_LONG: "the file name is too long", FILE_BLOCKED: "the browser blocked the file", USER_CANCELED: "it was cancelled" };
+  const stopped = (why) => `The browser stopped the download: ${REASONS[why] || String(why).toLowerCase().replace(/_/g, " ")}.`;
 
   // With "uniquify" a name already taken becomes "name (1).jpg". The final path is read back from
   // the browser (downloads.search, or the filename change Chrome reports once it has chosen), so a
-  // sidecar never names another post's file. Resolves to the file name, or null when none came.
+  // sidecar never names another post's file. Resolves to { name } (null when none came in time), or
+  // { error } with the browser's reason when it stopped the download before naming it.
   function writtenName(id, wait) {
-    if (!chrome.downloads.search) return Promise.resolve(null);
+    if (!chrome.downloads.search) return Promise.resolve({ name: null });
     return new Promise((resolve) => {
       let done = false;
-      const finish = (path) => {
+      const finish = (path, error = null) => {
         if (done) return;
         done = true; clearTimeout(timer);
         if (chrome.downloads.onChanged) chrome.downloads.onChanged.removeListener(changed);
-        resolve(path ? PB.fileBase(path) : null);
+        resolve(error ? { error } : { name: path ? PB.fileBase(path) : null });
       };
-      const look = () => Promise.resolve(chrome.downloads.search({ id })).then((items) => { const it = items && items[0]; if (it && it.filename) finish(it.filename); else if (it && it.state === "interrupted") finish(null); }, () => {});
+      const look = () => Promise.resolve(chrome.downloads.search({ id })).then((items) => {
+        const it = items && items[0];
+        if (it && it.state === "interrupted") finish(null, it.error || "INTERRUPTED");
+        else if (it && it.filename) finish(it.filename);
+      }, () => {});
       const changed = (d) => {
         if (!d || d.id !== id) return;
-        if (d.filename && d.filename.current) finish(d.filename.current);
-        else if (d.state || d.error) look();
+        if (d.state || d.error) look();
+        else if (d.filename && d.filename.current) finish(d.filename.current);
       };
       const timer = setTimeout(() => finish(null), wait);
       if (chrome.downloads.onChanged) chrome.downloads.onChanged.addListener(changed);
