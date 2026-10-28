@@ -36,7 +36,7 @@ source-protection mode; turning protection on stops a running library.
 | `reddit.com/r/<name>` (any sort) | `reddit-r-<name>` |
 | `reddit.com/user/<name>` (Overview, Posts) | `reddit-u-<name>` |
 
-The folder is `<save folder>/library/<library>/` inside Downloads (`Daylight/library/x-<handle>/` by
+The folder is `<save folder>/library/<library>/` inside Downloads (`CMMNS/library/x-<handle>/` by
 default). `src/core/library.js` `libraryOf` decides; `tests/library.test.js` lists what is and is not a
 library page.
 
@@ -85,7 +85,7 @@ on Stop. The library's record is kept in this browser (`chrome.storage.local`, k
 
 ## Hand-off to a case
 
-    daylight case add-library ~/Downloads/Daylight/library/x-<handle> --case <case folder> [--copy-media]
+    cmmns case add-library ~/Downloads/CMMNS/library/x-<handle> --case <case folder> [--copy-media]
 
 Every post becomes a source (`kind: "library-post"`) with its date, author and address, so `timeline`,
 `claim`, `trace` and `read` run over it. The sidecar note is the capture. Each file's hash on disk is
@@ -100,7 +100,7 @@ denominator, or quoted from the public posts, each linked to the post it came fr
 person's character, disposition, beliefs not stated, honesty or intent, never predict what a person
 will do, and never rank people on any of these. Two quotes on the same subject from different dates are
 shown side by side, and a person reads them and judges. This note is in every LIBRARY.md and in
-`daylight case add-library --help` (`LIBRARY_SCOPE` in `src/core/library.js`).
+`cmmns case add-library --help` (`LIBRARY_SCOPE` in `src/core/library.js`).
 
 This release captures and imports. The measures over a library (cadence, topics, language, sources,
 interaction counts, claim pairs over time, each with shuffled-date and shuffled-author controls) are

@@ -12866,7 +12866,7 @@ const M_library = (() => {
 // This module is the part with no page in it: which pages are library pages and what folder each
 // one fills, which posts a library keeps, the index.jsonl line for each saved post, and the
 // LIBRARY.md header. The page side is src/ext/library.js; the case hand-off is
-// `daylight case add-library` (src/investigate/library.js).
+// `cmmns case add-library` (src/investigate/library.js).
 
 const LIBRARY_FORMAT = "daylight.library/1";
 const LIBRARY_CAP = 500;
@@ -12978,9 +12978,9 @@ function libraryMarkdown(state) {
   const skipped = Object.entries(state.skipped).filter(([, n]) => n > 0);
   L.push("## Skipped", "", ...(skipped.length ? skipped.map(([why, n]) => `- ${n}: ${why}`) : ["- none"]));
   if (missing) L.push(`- ${missing} saved post${missing === 1 ? " lacks" : "s lack"} some media; index.jsonl says why under "missing" (protected media is never downloaded).`);
-  if (unhashed) L.push(`- ${unhashed} file${unhashed === 1 ? "" : "s"} saved without a hash (the host did not let the page read them); \`daylight case add-library\` hashes them from disk.`);
+  if (unhashed) L.push(`- ${unhashed} file${unhashed === 1 ? "" : "s"} saved without a hash (the host did not let the page read them); \`cmmns case add-library\` hashes them from disk.`);
   L.push("", "Only posts the page loaded are here. A feed that stopped loading, deleted or hidden posts, and anything past the cap are not.", "", "## Scope", "", ...LIBRARY_SCOPE.map((s) => `- ${s}`), "",
-    "Hand-off: `daylight case add-library <this folder> --case <case folder>` adds every post, with its hashes, to a case.", "");
+    "Hand-off: `cmmns case add-library <this folder> --case <case folder>` adds every post, with its hashes, to a case.", "");
   return L.join("\n");
 }
 

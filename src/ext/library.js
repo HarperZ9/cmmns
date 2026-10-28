@@ -12,7 +12,7 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
   const listeners = [];
   let run = null;   // the library being filled, or null
 
-  const changed = () => { for (const f of listeners) try { f(status()); } catch (e) { console.warn("[daylight-commons] library view", e); } };
+  const changed = () => { for (const f of listeners) try { f(status()); } catch (e) { console.warn("[cmmns] library view", e); } };
   function status() {
     if (!run) return { running: false };
     return { running: !run.stopped, folder: run.state.folder, label: run.state.label, saved: run.session.saved, total: run.state.items.length,
@@ -113,9 +113,9 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
           if (run.session.saved % FLUSH_EVERY === 0) await flush();
           await persist();
         } catch (e) {
-          console.warn("[daylight-commons] library: a post was not saved", e);
+          console.warn("[cmmns] library: a post was not saved", e);
           skip(`not saved: ${String(e.message).slice(0, 160)}`, ref.id);
-          if (/updated\. Reload this page/.test(e.message)) { await stop("Daylight Commons was updated; reload the page to continue"); break; }
+          if (/updated\. Reload this page/.test(e.message)) { await stop("CMMNS was updated; reload the page to continue"); break; }
         } finally { run && run.queued.delete(ref.id); changed(); }
       }
     } finally { if (run) run.busy = false; }
@@ -124,7 +124,7 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
   async function persist() {
     const st = run.state;
     st.skippedIds = [...run.skippedIds].slice(-SKIPPED_IDS_MAX);
-    try { await store().set({ [KEY(st.folder)]: st }); } catch (e) { console.warn("[daylight-commons] library: the record could not be kept in this browser", e); }
+    try { await store().set({ [KEY(st.folder)]: st }); } catch (e) { console.warn("[cmmns] library: the record could not be kept in this browser", e); }
   }
 
   // index.jsonl and LIBRARY.md, written whole each time (the browser cannot append to a file).
@@ -140,8 +140,8 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
   // Starts (or continues) the library this page fills. mode: "collect" or "auto".
   async function start(lib, mode = "collect") {
     if (run && !run.stopped) return status();
-    if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) throw new Error("Daylight Commons was updated. Reload this page, then start again.");
-    if (globalThis.PBSettings && PBSettings.get().protection) throw new Error("Source protection is on, so Daylight Commons does not download from the page's hosts.");
+    if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) throw new Error("CMMNS was updated. Reload this page, then start again.");
+    if (globalThis.PBSettings && PBSettings.get().protection) throw new Error("Source protection is on, so CMMNS does not download from the page's hosts.");
     const kept = (await store().get(KEY(lib.folder)))[KEY(lib.folder)] || null;
     const state = PB.libraryState(lib, kept);
     if (!state.sources.includes(location.href)) state.sources.push(location.href);
@@ -166,7 +166,7 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
     while (run.busy) await new Promise((r) => setTimeout(r, 200));
     run.session.stopped = new Date().toISOString(); run.session.why = why;
     await persist();
-    try { await flush(); } catch (e) { console.warn("[daylight-commons] library: index not written", e); run.session.why += "; index.jsonl not written: " + e.message; }
+    try { await flush(); } catch (e) { console.warn("[cmmns] library: index not written", e); run.session.why += "; index.jsonl not written: " + e.message; }
     changed();
     return status();
   }

@@ -63,7 +63,7 @@ function sourceRow(dir, caseDir, id, line, files, head, opts) {
 // opts: { now, copyMedia, origin, tier, what }. Returns { added, already, checks, folder, head }.
 export function addLibrary(caseDir, libDir, opts = {}) {
   const dir = resolve(libDir), index = join(dir, "index.jsonl");
-  if (!existsSync(index)) throw new Error(`${dir} has no index.jsonl; point at a library folder the extension saved (Daylight/library/<site>-<name>)`);
+  if (!existsSync(index)) throw new Error(`${dir} has no index.jsonl; point at a library folder the extension saved (CMMNS/library/<site>-<name>)`);
   const head = libraryHeader(dir), folder = head.library || basename(dir), now = opts.now || (() => new Date().toISOString());
   const have = new Set(readJsonl(join(caseDir, TABLES.sources[0])).filter((s) => s.library).map((s) => `${s.library.folder}/${s.library.post}`));
   const out = { folder, head, added: [], kinds: { post: 0, repost: 0, comment: 0 }, already: 0, checks: { match: 0, differs: [], missing: [], "hashed-now": 0 } };

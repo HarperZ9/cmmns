@@ -94,9 +94,9 @@ async function add(env, { _: [target], f }) {
   return f.json ? asJson(r) : `${s.id} captured: ${s.capture.bytes} bytes, sha256 ${s.capture.sha256}. ${s.archive.url ? `Archived at ${s.archive.url}.` : s.archive.error ? `No archive copy: ${s.archive.error}.` : s.archive.note + "."}${extra.length ? ` Also recorded: ${extra.join(", ")}.` : ""}\n`;
 }
 
-// `case add-library`: a library the browser extension saved (Daylight/library/<site>-<name>/).
+// `case add-library`: a library the browser extension saved (CMMNS/library/<site>-<name>/).
 function addLib(env, { _: [folder], f }) {
-  if (!folder) throw new Error("case add-library needs a library folder (Daylight/library/<site>-<name>)");
+  if (!folder) throw new Error("case add-library needs a library folder (CMMNS/library/<site>-<name>)");
   const r = addLibrary(env.dir, folder, { now: env.now, copyMedia: !!f["copy-media"], origin: f.origin, tier: f.tier, what: f.what });
   if (r.added.length) env.commit(`case add-library ${r.folder} (${r.added.length} posts)`);
   return f.json ? asJson(r) : addLibraryLines(r);

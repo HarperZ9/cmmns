@@ -4,7 +4,7 @@ A browser extension that shows where social media replies come from. Rest the po
 X, YouTube, Reddit, Facebook, Instagram, Bluesky, Threads, TikTok or a Mastodon server you turn it
 on for, and a window opens beside it: where the platform places the account, signs of coordination,
 how the account posts, how the reply argues, and whether a fact-checker has reviewed the claim. On a
-phone, tap the post's CMMNS button. CMMNS, spoken "commons", was formerly Daylight Commons, and Radar
+phone, tap the post's CMMNS button. CMMNS, spoken "commons", was formerly CMMNS, and Radar
 before that. Releases from 3.9.0 name their files `cmmns-*`; earlier ones keep `radar-*`.
 
 ![CMMNS installed, a synthetic thread, a reply's window and its evidence, a lookup's receipts, and the saved chain checked offline](docs/demo/demo-install-to-verify.gif)
@@ -133,7 +133,7 @@ line to a hash chain in your browser; `cmmns capture verify <folder>` checks the
 **Save page as library** keeps a whole X profile, list or search, or a Reddit user or subreddit, as
 one folder: each post the page loads is saved once with its files and its note, and `index.jsonl`
 lists every file's SHA-256. Come back later and it carries on where it stopped. In the unpacked build,
-**Scroll to the end** fills it for you, up to a cap. `daylight case add-library <folder>` adds every post
+**Scroll to the end** fills it for you, up to a cap. `cmmns case add-library <folder>` adds every post
 to a case with its hashes checked. When the subject is a person, the tools show measured and quoted
 evidence with links and never label the person. Details:
 [project-docs/LIBRARY-CAPTURE.md](project-docs/LIBRARY-CAPTURE.md).

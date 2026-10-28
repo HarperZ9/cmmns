@@ -46,11 +46,11 @@ test("a one-account library keeps its own posts and its reposts; context posts, 
 });
 
 test("library files go to <save folder>/library/<site>-<name>/, even with saving into Downloads on", () => {
-  assert.equal(savePath({}, "x", false, "x-meditincolor"), "Daylight/library/x-meditincolor/");
+  assert.equal(savePath({}, "x", false, "x-meditincolor"), "CMMNS/library/x-meditincolor/");
   assert.equal(savePath({ mediaFolder: "Saves" }, "x", false, "reddit-r-art"), "Saves/library/reddit-r-art/");
   assert.equal(savePath({ mediaToRoot: true }, "x", false, "x-a"), "library/x-a/");
   assert.doesNotMatch(savePath({}, "x", false, "../../evil"), /(^|\/)\.\.(\/|$)/, "no way out of the library folder");
-  assert.equal(savePath({}, "x"), "Daylight/x/", "ordinary saves are unchanged");
+  assert.equal(savePath({}, "x"), "CMMNS/x/", "ordinary saves are unchanged");
 });
 
 const LIB = libraryOf("https://x.com/MeditInColor");
@@ -80,7 +80,7 @@ test("index.jsonl has one line per post with each file's hash; LIBRARY.md says w
   assert.deepEqual(lines[1].missing, ["item 2 of 2: Protected"]);
   const md = libraryMarkdown(st);
   for (const want of ['library: "x-meditincolor"', "posts: 4", "own_posts: 2", "reposts: 1", "comments: 1", "4 items saved, 6 files: 2 posts of its own, 1 repost, 1 comment", "https://x.com/MeditInColor/media", "2026-10-28T10:00:00.000Z to 2026-10-28T10:20:00.000Z", "auto-scroll",
-    "the cap of 2 posts was reached", `3: ${SKIP.other}`, "1 saved post lacks some media", "1 file saved without a hash", "daylight case add-library", ...LIBRARY_SCOPE]) assert.ok(md.includes(want), want);
+    "the cap of 2 posts was reached", `3: ${SKIP.other}`, "1 saved post lacks some media", "1 file saved without a hash", "cmmns case add-library", ...LIBRARY_SCOPE]) assert.ok(md.includes(want), want);
   assert.doesNotMatch(md, /—/, "no em-dashes");
   assert.match(LIBRARY_SCOPE.join(" "), /never label a person's character, disposition, beliefs not stated, honesty or intent/);
 });
