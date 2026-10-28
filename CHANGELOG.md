@@ -5,7 +5,21 @@ were not published to a store.
 
 ## Unreleased
 
-Nothing yet.
+### Added
+- **Library capture** (project-docs/LIBRARY-CAPTURE.md). A **Save page as library** bar on X profile,
+  list, search and hashtag pages and Reddit user and subreddit pages. Every post the page loads is saved
+  once, by post id, with its media and its daylight.sidecar/1 note, into
+  `Daylight/library/<site>-<name>/`, with `index.jsonl` (each post's files and their SHA-256) and
+  `LIBRARY.md` (source pages, sessions, counts, what was skipped and why, and the evidence-only scope
+  note). Each post keeps every field the page delivers in the clear: full text, media at the largest
+  size served, quoted and parent posts, link targets, engagement, and from X's post data the language,
+  posting app, earlier versions, Community Note and paid-partnership mark (`fields` in the index; one-click
+  saves now also list each link's target). Reopening the page continues the same library. An account's library skips reposts of other
+  accounts' posts and adverts, and counts them.
+- **Scroll to the end** for a library, with a cap (500 by default), at a reading pace with jitter; only
+  in the unpacked and self-distributed builds, never in the store packages (`tests/store-build.test.js`).
+- **`daylight case add-library <folder> [--copy-media]`**: every post of a library becomes a case source,
+  each file's hash checked against the index, so `timeline`, `claim`, `trace` and `read` run over it.
 
 ## 3.9.1 (2026-10-28)
 

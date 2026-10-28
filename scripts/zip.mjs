@@ -62,9 +62,11 @@ export function zip(files) {
 // Firefox runs background scripts and needs version 128 for main-world content scripts.
 // Files the store packages (Chrome Web Store, Firefox Add-ons) leave out. Store policy forbids an
 // extension that downloads YouTube video, so its command line hand-off ships only unpacked and in the
-// self-distributed Firefox build. tests/store-build.test.js checks both packages.
+// self-distributed Firefox build. Library auto-scroll (library-scroll.js) is held back the same way:
+// store policy and the sites' terms on automated access would endanger the whole extension; the
+// library collector itself (library.js) ships everywhere. tests/store-build.test.js checks both.
 export const STORE_BUILDS = new Set(["chrome", "firefox"]);
-export const NOT_IN_STORE = new Set(["yt-handoff.js"]);
+export const NOT_IN_STORE = new Set(["yt-handoff.js", "library-scroll.js"]);
 export const filesFor = (files, browser) => (STORE_BUILDS.has(browser) ? files.filter(([n]) => !NOT_IN_STORE.has(n)) : files);
 
 export function browserManifest(source, browser) {

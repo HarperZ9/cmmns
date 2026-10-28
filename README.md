@@ -130,6 +130,14 @@ the page showed, the time, and what the capture kept and lost, part by part. Eac
 line to a hash chain in your browser; `cmmns capture verify <folder>` checks them all. Details:
 [project-docs/EVIDENCE-CAPTURE.md](project-docs/EVIDENCE-CAPTURE.md).
 
+**Save page as library** keeps a whole X profile, list or search, or a Reddit user or subreddit, as
+one folder: each post the page loads is saved once with its files and its note, and `index.jsonl`
+lists every file's SHA-256. Come back later and it carries on where it stopped. In the unpacked build,
+**Scroll to the end** fills it for you, up to a cap. `daylight case add-library <folder>` adds every post
+to a case with its hashes checked. When the subject is a person, the tools show measured and quoted
+evidence with links and never label the person. Details:
+[project-docs/LIBRARY-CAPTURE.md](project-docs/LIBRARY-CAPTURE.md).
+
 **Study boards** turn a moodboard or a folder of saves into numbered plates with their source,
 author, time and link: a book with running heads and captions, a grid, or a timeline in posted order.
 Print it, save it as one web page, or keep it as a folder with a SHA-256 manifest. On the command

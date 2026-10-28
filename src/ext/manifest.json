@@ -158,6 +158,9 @@
         "quick-inline.js",
         "quick-hover-ui.js",
         "quick-hover.js",
+        "library.js",
+        "library-scroll.js",
+        "library-ui.js",
         "content.js"
       ],
       "css": [
