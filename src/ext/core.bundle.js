@@ -12917,20 +12917,23 @@ function libraryOf(href) {
 }
 
 // Why a post is left out, as the words LIBRARY.md counts it under; null to keep it.
-// post: { id, handle, promoted }. One account's library keeps that account's own posts only, so a
-// repost of someone else's post (which the profile also shows) is skipped and counted.
+// post: { id, handle, promoted, repost }. One account's library keeps that account's own posts and
+// comments, and its reposts of other accounts' posts (kept as kind "repost", with the original's
+// author and id, so the account's own posts can still be filtered). Another account's post that the
+// feed shows for context (the post a reply answers) is skipped and counted.
 const SKIP = Object.freeze({
   noId: "no post id on the page, so it could not be told apart from the others",
   promoted: "a promoted post (an advert)",
-  other: "a post by another account (a repost, or another account's post shown in the feed)",
+  other: "a post by another account shown in the feed for context (for example the post a reply answers)",
 });
 function librarySkip(lib, post) {
   if (!post || !post.id) return SKIP.noId;
   if (post.promoted) return SKIP.promoted;
   const norm = (h) => String(h || "").replace(/^@/, "").replace(/^u\//i, "").toLowerCase();
-  if (lib.author && norm(post.handle) !== norm(lib.author)) return SKIP.other;
+  if (lib.author && !post.repost && norm(post.handle) !== norm(lib.author)) return SKIP.other;
   return null;
 }
+const LIBRARY_KINDS = Object.freeze(["post", "repost", "comment"]);
 
 // A new library's record, or the one kept from before (resumable).
 function libraryState(lib, kept = null, now = new Date().toISOString()) {
@@ -12941,10 +12944,23 @@ function libraryState(lib, kept = null, now = new Date().toISOString()) {
 // One saved post's line for index.jsonl. files: [{ name, sha256 }] in the order saved, the sidecar
 // last; sha256 is null for a file the host did not let the page read (the browser saved it as sent).
 // fields: what the site's own data says about the post beyond its words (language, edits, labels),
-// kept as the site gave it.
-function libraryLine({ id, url, handle = null, posted = null, saved, kind = "media", files = [], missing = [], fields = null }) {
+// kept as the site gave it. kind: "post", "repost" (handle is the original's author, repost_by the
+// account that reposted it) or "comment" (with its parent post's id and the subreddit). content:
+// "media" when files besides the note were saved, else "text".
+function libraryLine({ id, url, handle = null, posted = null, saved, kind = "post", content = "media", files = [], missing = [], fields = null, repostBy = null, parentPost = null, subreddit = null }) {
   const f = files.map((x) => ({ name: String(x.name), sha256: x.sha256 || null, ...(x.sha256 ? {} : { note: x.note || "not hashed: the host did not let the page read the file" }) }));
-  return { id: String(id), url: url || null, handle: handle || null, posted: posted || null, saved, kind, files: f, ...(missing.length ? { missing: missing.map(String) } : {}), ...(fields && Object.keys(fields).length ? { fields } : {}) };
+  const k = LIBRARY_KINDS.includes(kind) ? kind : "post";
+  return { id: String(id), url: url || null, handle: handle || null, posted: posted || null, saved, kind: k, content: content === "text" ? "text" : "media", files: f,
+    ...(k === "repost" ? { repost_by: repostBy || null, original: { author: handle || null, id: String(id), url: url || null } } : {}),
+    ...(k === "comment" ? { parent_post: parentPost || null, subreddit: subreddit || null } : {}),
+    ...(missing.length ? { missing: missing.map(String) } : {}), ...(fields && Object.keys(fields).length ? { fields } : {}) };
+}
+
+// How many of each kind a library holds: { post, repost, comment }.
+function libraryKinds(items) {
+  const out = { post: 0, repost: 0, comment: 0 };
+  for (const l of items) out[LIBRARY_KINDS.includes(l.kind) ? l.kind : "post"]++;
+  return out;
 }
 
 const libraryIndex = (state) => state.items.map((l) => JSON.stringify(l)).join("\n") + (state.items.length ? "\n" : "");
@@ -12954,8 +12970,9 @@ function libraryMarkdown(state) {
   const files = state.items.reduce((n, l) => n + l.files.length, 0), unhashed = state.items.reduce((n, l) => n + l.files.filter((f) => !f.sha256).length, 0);
   const missing = state.items.filter((l) => (l.missing || []).length).length;
   const L = ["---", `format: ${JSON.stringify(LIBRARY_FORMAT)}`, `library: ${JSON.stringify(state.folder)}`, `site: ${JSON.stringify(state.site)}`, `kind: ${JSON.stringify(state.kind)}`,
-    ...(state.author ? [`author: ${JSON.stringify(state.author)}`] : []), `posts: ${state.items.length}`, `created: ${JSON.stringify(state.created)}`, "---", "", `# Library: ${state.label}`, ""];
-  L.push(`${state.items.length} post${state.items.length === 1 ? "" : "s"} saved, ${files} files. Each post has its files and a sidecar note (daylight.sidecar/1); index.jsonl lists every post with the SHA-256 of each file.`, "");
+    ...(state.author ? [`author: ${JSON.stringify(state.author)}`] : []), `posts: ${state.items.length}`, `own_posts: ${libraryKinds(state.items).post}`, `reposts: ${libraryKinds(state.items).repost}`, `comments: ${libraryKinds(state.items).comment}`, `created: ${JSON.stringify(state.created)}`, "---", "", `# Library: ${state.label}`, ""];
+  const k = libraryKinds(state.items), plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  L.push(`${state.items.length} item${state.items.length === 1 ? "" : "s"} saved, ${files} files: ${plural(k.post, "post")} of its own, ${plural(k.repost, "repost")}, ${plural(k.comment, "comment")}. Each item has its files and a sidecar note (daylight.sidecar/1); index.jsonl lists every item with its kind and the SHA-256 of each file, so reposts and comments can be filtered out or kept.`, "");
   L.push("## Source pages", "", ...state.sources.map((s) => `- ${s}`), "");
   L.push("## Sessions (UTC)", "", ...state.sessions.map((s) => `- ${s.started} to ${s.stopped || "still running, or the tab closed before Stop"}: ${s.saved || 0} saved, ${s.mode === "auto" ? "auto-scroll" : "collected while scrolling"}${s.why ? `; stopped: ${s.why}` : ""}`), "");
   const skipped = Object.entries(state.skipped).filter(([, n]) => n > 0);
@@ -12967,7 +12984,7 @@ function libraryMarkdown(state) {
   return L.join("\n");
 }
 
-return { LIBRARY_FORMAT, LIBRARY_CAP, LIBRARY_SCOPE, libraryOf, SKIP, librarySkip, libraryState, libraryLine, libraryIndex, libraryMarkdown };
+return { LIBRARY_FORMAT, LIBRARY_CAP, LIBRARY_SCOPE, libraryOf, SKIP, librarySkip, LIBRARY_KINDS, libraryState, libraryLine, libraryKinds, libraryIndex, libraryMarkdown };
 })();
 
 // ---- media-embed.js

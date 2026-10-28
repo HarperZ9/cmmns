@@ -243,8 +243,26 @@ globalThis.PBQuickSites = globalThis.PBQuickSites || (() => {
     return { title, items, gallery: !!gallery };
   }
 
+  // A comment on a Reddit user page: its words, author, time, and the post and subreddit it sits in,
+  // from the element's own attributes and its permalink (/r/<sub>/comments/<post>/<slug>/<comment>/).
+  const COMMENT = "shreddit-profile-comment, shreddit-comment";
+  function redditCommentMeta(node) {
+    const a = (...ks) => ks.map((k) => node.getAttribute(k)).find((v) => v) || null;
+    const anchor = node.querySelector('a[href*="/comments/"]'), link = a("permalink", "href", "comment-permalink") || (anchor && anchor.getAttribute("href"));
+    const m = /\/r\/([^/]+)\/comments\/([a-z0-9]+)\/[^/]*\/([a-z0-9]+)/i.exec(link || "");
+    const id = a("thingid", "comment-id") || (m ? "t1_" + m[3] : null), sub = a("subreddit-prefixed-name") || (m ? "r/" + m[1] : null);
+    const body = node.querySelector('[slot="comment"], [id$="-comment-rtjson-content"], [id$="-post-rtjson-content"], .md');
+    const time = node.querySelector("time[datetime], faceplate-timeago[ts]");
+    if (!id && !link) return null;
+    return { site: "reddit", kind: "text", id: id ? (/^t1_/.test(id) ? id : "t1_" + id) : null, text: txt(body || node), handle: a("author") ? "u/" + a("author") : null, subreddit: sub,
+      postUrl: link ? new URL(link, location.href).href : null, postedAt: a("created-timestamp") || (time && (time.getAttribute("datetime") || time.getAttribute("ts"))),
+      parentPost: a("post-id", "postid") || (m ? "t3_" + m[2] : null), parent: m ? { url: new URL(`/r/${m[1]}/comments/${m[2]}/`, location.href).href, text: a("post-title"), author: null } : null,
+      engagement: a("score") != null ? { score: a("score") } : null, fields: {} };
+  }
+
   return Object.freeze({
-    isX, isReddit,
+    isX, isReddit, COMMENT,
+    commentMetaOf: (node) => (isReddit ? redditCommentMeta(node) : null),
     targetFor: (el) => (isX ? xTargetTitled(el) : isReddit ? redditTarget(el) : null),
     postMedia: (node) => (isX ? xPost(node) : isReddit ? redditPost(node) : { title: document.title, items: [] }),
     // The post an element sits in, and that post's words, for a note of a text post.

@@ -42,11 +42,15 @@ library page.
 
 ## What is kept and what is skipped
 
-An account's library keeps that account's own posts. Reposts of other accounts' posts, adverts, and
-posts the page drew without an id are skipped and counted in LIBRARY.md by reason. A list, search or
-subreddit keeps every author. Media that cannot be saved (protected by DRM, or refused by the host) is
-left out; the post's note is still saved, and index.jsonl says why under `missing`. Reddit comments
-are not collected.
+An account's library keeps everything the account put on its page, each item marked with its kind:
+its own posts (`kind: "post"`), its reposts of other accounts' posts (`kind: "repost"`, with the
+original's author, id and address under `original` and the reposting account under `repost_by`), and
+on a Reddit user page its comments (`kind: "comment"`, with the parent post's id under `parent_post`
+and the subreddit). Filtering on `kind` gives the account's own posts alone. Other accounts' posts that
+the feed shows only for context (the post a reply answers), adverts, and posts drawn without an id are
+skipped and counted in LIBRARY.md by reason. A list, search or subreddit keeps every author's posts; a
+subreddit page collects no comments. Media that cannot be saved (protected by DRM, or refused by the
+host) is left out; the item's note is still saved, and index.jsonl says why under `missing`.
 
 ## What each post keeps
 
@@ -67,11 +71,12 @@ access control is worked around.
   the post id added so two posts never share a name.
 - `<handle>_<date>_<words>_<post id>.md`: the post's sidecar note, listing its files.
 - `index.jsonl`: one line per saved post, in the order saved:
-  `{"id", "url", "handle", "posted", "saved", "kind": "media"|"text", "files": [{"name", "sha256"}], "missing"?, "fields"?}`.
+  `{"id", "url", "handle", "posted", "saved", "kind": "post"|"repost"|"comment", "content": "media"|"text", "files": [{"name", "sha256"}], "repost_by"?, "original"?, "parent_post"?, "subreddit"?, "missing"?, "fields"?}`.
+  For a repost `handle` is the original's author.
   The sidecar is the last file. `sha256` is of the bytes written; it is null, with a `note`, for a file
   the host did not let the page read, which the browser saved as sent.
 - `LIBRARY.md`: front matter (`format: "daylight.library/1"`, library, site, kind, author, posts,
-  created), the source page addresses, each session's start and stop times and why it stopped, the
+  own_posts, reposts, comments, created), the source page addresses, each session's start and stop times and why it stopped, the
   skipped counts, and the scope note below.
 
 The browser cannot add to a file, so index.jsonl and LIBRARY.md are written whole every 10 posts and
@@ -107,8 +112,16 @@ specified separately and are not built here.
   resuming, the auto-scroll pace and stop rules, and `case add-library` with matching, changed, missing
   and unhashed files.
 - `tests/library.browser.test.js`: the page scripts in headless Chrome on a fixture page served at
-  `x.com`, with `chrome.*` recorded: the bar, one save per post, a repost skipped, a post loaded later
-  saved, X's post data (an edit, a Community Note, a link target) in the index and the note,
-  index.jsonl and LIBRARY.md on Stop with hashes that match the bytes, and a reload continuing.
-- Not yet checked on live X or Reddit pages, signed in or out, and the Reddit side has no browser test.
+  `x.com`, with `chrome.*` recorded: the bar, one save per post, a repost kept as `repost` with its
+  original, a context post skipped, a post loaded later saved, X's post data (an edit, a Community Note,
+  a link target) in the index and the note, index.jsonl and LIBRARY.md on Stop with hashes that match
+  the bytes, a reload continuing, and two overlapping saves (a library's and a study note) each landing
+  in its own folder. That last test fails on the code before this change, which kept the folder in
+  shared state.
+- `tests/library.reddit.browser.test.js`: a Reddit user page (posts and comments in one index, each
+  comment with its parent post and subreddit, a link post's target) and a subreddit page (every author,
+  no comments).
+- Not yet checked on live X or Reddit pages, signed in or out. The fixtures use the markup
+  quick-sites.js reads; the Reddit comment element (`shreddit-profile-comment`) and its attributes are
+  read defensively but have not been checked against Reddit's live markup.
   The fixture uses the markup quick-sites.js already reads; X and Reddit change theirs.

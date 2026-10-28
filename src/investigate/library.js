@@ -53,7 +53,9 @@ function sourceRow(dir, caseDir, id, line, files, head, opts) {
     tier: opts.tier || null, origin: opts.origin || null, what: opts.what || null,
     capture: { file, sha256: sha256(bytes), bytes: bytes.length, text_file: textFile, text_sha256: sha256(Buffer.from(text, "utf8")) },
     archive: { service: null, note: "saved by the browser extension from the page; nothing requested" },
-    library: { folder: head.library || basename(dir), post: String(line.id), kind: line.kind || null, files, ...(copied.length ? { copied } : {}), ...(line.missing ? { missing: line.missing } : {}) },
+    library: { folder: head.library || basename(dir), post: String(line.id), kind: line.kind || "post", content: line.content || null, files,
+      ...(line.kind === "repost" ? { repost_by: line.repost_by || null, original: line.original || null } : {}),
+      ...(line.kind === "comment" ? { parent_post: line.parent_post || null, subreddit: line.subreddit || null } : {}), ...(copied.length ? { copied } : {}), ...(line.missing ? { missing: line.missing } : {}) },
     post: null,
   };
 }
@@ -64,7 +66,7 @@ export function addLibrary(caseDir, libDir, opts = {}) {
   if (!existsSync(index)) throw new Error(`${dir} has no index.jsonl; point at a library folder the extension saved (Daylight/library/<site>-<name>)`);
   const head = libraryHeader(dir), folder = head.library || basename(dir), now = opts.now || (() => new Date().toISOString());
   const have = new Set(readJsonl(join(caseDir, TABLES.sources[0])).filter((s) => s.library).map((s) => `${s.library.folder}/${s.library.post}`));
-  const out = { folder, head, added: [], already: 0, checks: { match: 0, differs: [], missing: [], "hashed-now": 0 } };
+  const out = { folder, head, added: [], kinds: { post: 0, repost: 0, comment: 0 }, already: 0, checks: { match: 0, differs: [], missing: [], "hashed-now": 0 } };
   for (const line of readJsonl(index)) {
     if (!line || !line.id) continue;
     if (have.has(`${folder}/${line.id}`)) { out.already++; continue; }
@@ -78,6 +80,7 @@ export function addLibrary(caseDir, libDir, opts = {}) {
     if (row.id !== id) throw new Error(`source id changed while writing (${id} -> ${row.id}); another process is writing this case`);
     have.add(`${folder}/${line.id}`);
     out.added.push(row.id);
+    out.kinds[["repost", "comment"].includes(line.kind) ? line.kind : "post"]++;
   }
   return out;
 }
@@ -85,6 +88,7 @@ export function addLibrary(caseDir, libDir, opts = {}) {
 export function addLibraryLines(r) {
   const c = r.checks, L = [];
   L.push(r.added.length ? `Added ${r.added.length} post${r.added.length === 1 ? "" : "s"} from library ${r.folder} as ${r.added[0]}${r.added.length > 1 ? ` to ${r.added[r.added.length - 1]}` : ""}.` : `No new posts in library ${r.folder}.`);
+  if (r.added.length && (r.kinds.repost || r.kinds.comment)) L.push(`${r.kinds.post} own posts, ${r.kinds.repost} reposts (author is the original's; library.repost_by names the reposter), ${r.kinds.comment} comments (library.parent_post and library.subreddit).`);
   if (r.already) L.push(`${r.already} already in the case, skipped.`);
   L.push(`Hashes: ${c.match} match the library index${c["hashed-now"] ? `, ${c["hashed-now"]} were saved unhashed and are hashed now` : ""}.`);
   if (c.differs.length) L.push(`${c.differs.length} file${c.differs.length === 1 ? " differs" : "s differ"} from the hash recorded at save (changed since): ${c.differs.slice(0, 8).join(", ")}${c.differs.length > 8 ? ", ..." : ""}`);

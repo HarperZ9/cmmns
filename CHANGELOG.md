@@ -14,12 +14,19 @@ were not published to a store.
   note). Each post keeps every field the page delivers in the clear: full text, media at the largest
   size served, quoted and parent posts, link targets, engagement, and from X's post data the language,
   posting app, earlier versions, Community Note and paid-partnership mark (`fields` in the index; one-click
-  saves now also list each link's target). Reopening the page continues the same library. An account's library skips reposts of other
-  accounts' posts and adverts, and counts them.
+  saves now also list each link's target). Reopening the page continues the same library.
+  An account's library keeps its own posts, its reposts (`kind: "repost"`, with the original's author
+  and id) and, on a Reddit user page, its comments (`kind: "comment"`, with the parent post and
+  subreddit), so the account's own posts can still be filtered; context posts and adverts are counted.
 - **Scroll to the end** for a library, with a cap (500 by default), at a reading pace with jitter; only
   in the unpacked and self-distributed builds, never in the store packages (`tests/store-build.test.js`).
 - **`daylight case add-library <folder> [--copy-media]`**: every post of a library becomes a case source,
   each file's hash checked against the index, so `timeline`, `claim`, `trace` and `read` run over it.
+
+### Fixed
+- One-click saves pass their folder (site, study or library) with each save instead of keeping it in
+  shared page state, so a save that waits on the network and another save started meanwhile can no
+  longer swap folders (`tests/library.browser.test.js` fails on the old code).
 
 ## 3.9.1 (2026-10-28)
 

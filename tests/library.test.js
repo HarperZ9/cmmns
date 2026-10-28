@@ -33,10 +33,12 @@ test("profile, list and search pages on X, and user and subreddit pages on Reddi
     "https://www.reddit.com/r/Art/comments/abc/title/", "https://www.youtube.com/@chan", "not a url"]) assert.equal(libraryOf(no), null, no);
 });
 
-test("a one-account library keeps that account's own posts; reposts, adverts and posts with no id are counted, not saved", () => {
+test("a one-account library keeps its own posts and its reposts; context posts, adverts and posts with no id are counted, not saved", () => {
   const mine = libraryOf("https://x.com/MeditInColor"), sub = libraryOf("https://www.reddit.com/r/Art/");
   assert.equal(librarySkip(mine, { id: "1", handle: "meditincolor" }), null);
-  assert.equal(librarySkip(mine, { id: "2", handle: "someone_else" }), SKIP.other);
+  assert.equal(librarySkip(mine, { id: "2", handle: "someone_else" }), SKIP.other, "another account's post shown for context");
+  assert.equal(librarySkip(mine, { id: "4", handle: "someone_else", repost: true }), null, "a repost is kept");
+  assert.equal(librarySkip(libraryOf("https://www.reddit.com/user/Someone"), { id: "t1_c", handle: "u/Someone" }), null, "the user's own comment is kept");
   assert.equal(librarySkip(mine, { id: "3", handle: "MeditInColor", promoted: true }), SKIP.promoted);
   assert.equal(librarySkip(mine, { handle: "MeditInColor" }), SKIP.noId);
   assert.equal(librarySkip(sub, { id: "t3_x", handle: "u/anyone" }), null, "a subreddit keeps every author");
@@ -58,21 +60,26 @@ function filled() {
   st.sessions.push({ started: "2026-10-28T10:00:00.000Z", stopped: "2026-10-28T10:20:00.000Z", saved: 2, mode: "auto", why: "the cap of 2 posts was reached" });
   st.items.push(libraryLine({ id: "11", url: "https://x.com/MeditInColor/status/11", handle: "MeditInColor", posted: "2026-01-02T00:00:00.000Z", saved: "2026-10-28T10:01:00.000Z",
     files: [{ name: "a_11.jpg", sha256: "aa" }, { name: "a_11.md", sha256: "bb" }] }));
-  st.items.push(libraryLine({ id: "12", url: "https://x.com/MeditInColor/status/12", saved: "2026-10-28T10:02:00.000Z", kind: "text",
+  st.items.push(libraryLine({ id: "12", url: "https://x.com/MeditInColor/status/12", saved: "2026-10-28T10:02:00.000Z", content: "text",
     files: [{ name: "b_12.mp4", sha256: null }, { name: "b_12.md", sha256: "cc" }], missing: ["item 2 of 2: Protected"] }));
+  st.items.push(libraryLine({ id: "13", url: "https://x.com/painter/status/13", handle: "painter", saved: "2026-10-28T10:03:00.000Z", kind: "repost", repostBy: "MeditInColor", files: [{ name: "c_13.md", sha256: "dd" }] }));
+  st.items.push(libraryLine({ id: "t1_c", url: "https://www.reddit.com/r/Art/comments/p1/s/c/", handle: "u/m", saved: "2026-10-28T10:04:00.000Z", kind: "comment", content: "text", parentPost: "t3_p1", subreddit: "r/Art", files: [{ name: "d.md", sha256: "ee" }] }));
   st.skipped[SKIP.other] = 3;
   return st;
 }
 
 test("index.jsonl has one line per post with each file's hash; LIBRARY.md says where, when, how many and what was left out", () => {
   const st = filled(), lines = libraryIndex(st).trim().split("\n").map((l) => JSON.parse(l));
-  assert.deepEqual(lines.map((l) => l.id), ["11", "12"]);
-  assert.deepEqual(Object.keys(lines[0]), ["id", "url", "handle", "posted", "saved", "kind", "files"]);
+  assert.deepEqual(lines.map((l) => [l.id, l.kind, l.content]), [["11", "post", "media"], ["12", "post", "text"], ["13", "repost", "media"], ["t1_c", "comment", "text"]]);
+  assert.deepEqual(Object.keys(lines[0]), ["id", "url", "handle", "posted", "saved", "kind", "content", "files"]);
+  assert.deepEqual([lines[2].repost_by, lines[2].original], ["MeditInColor", { author: "painter", id: "13", url: "https://x.com/painter/status/13" }]);
+  assert.deepEqual([lines[3].parent_post, lines[3].subreddit], ["t3_p1", "r/Art"]);
+  assert.equal(libraryLine({ id: "9", saved: "x", kind: "anything" }).kind, "post", "an unknown kind is a post");
   assert.deepEqual(lines[0].files, [{ name: "a_11.jpg", sha256: "aa" }, { name: "a_11.md", sha256: "bb" }]);
   assert.match(lines[1].files[0].note, /not hashed/);
   assert.deepEqual(lines[1].missing, ["item 2 of 2: Protected"]);
   const md = libraryMarkdown(st);
-  for (const want of ['library: "x-meditincolor"', "posts: 2", "https://x.com/MeditInColor/media", "2026-10-28T10:00:00.000Z to 2026-10-28T10:20:00.000Z", "auto-scroll",
+  for (const want of ['library: "x-meditincolor"', "posts: 4", "own_posts: 2", "reposts: 1", "comments: 1", "4 items saved, 6 files: 2 posts of its own, 1 repost, 1 comment", "https://x.com/MeditInColor/media", "2026-10-28T10:00:00.000Z to 2026-10-28T10:20:00.000Z", "auto-scroll",
     "the cap of 2 posts was reached", `3: ${SKIP.other}`, "1 saved post lacks some media", "1 file saved without a hash", "daylight case add-library", ...LIBRARY_SCOPE]) assert.ok(md.includes(want), want);
   assert.doesNotMatch(md, /—/, "no em-dashes");
   assert.match(LIBRARY_SCOPE.join(" "), /never label a person's character, disposition, beliefs not stated, honesty or intent/);
@@ -81,9 +88,9 @@ test("index.jsonl has one line per post with each file's hash; LIBRARY.md says w
 test("reopening the same page continues the same library; another library starts fresh", () => {
   const kept = JSON.parse(JSON.stringify(filled()));
   const again = libraryState(LIB, kept);
-  assert.equal(again.items.length, 2);
-  again.items.push({ id: "13" });
-  assert.equal(kept.items.length, 2, "the kept record is not changed in place");
+  assert.equal(again.items.length, 4);
+  again.items.push({ id: "14" });
+  assert.equal(kept.items.length, 4, "the kept record is not changed in place");
   assert.equal(libraryState(libraryOf("https://x.com/other"), kept).items.length, 0);
 });
 
@@ -120,7 +127,7 @@ test("case add-library adds every post with its hashes checked, skips posts alre
     for (const [n, b] of Object.entries(files)) writeFileSync(join(lib, n), b);
     const st = filled();
     st.items = [libraryLine({ id: "11", url: "https://x.com/m/status/11", handle: "MeditInColor", posted: "2026-01-02T00:00:00.000Z", saved: "2026-10-28T10:01:00.000Z", files: [{ name: "m_11.jpg", sha256: hex(files["m_11.jpg"]) }, { name: "m_11.md", sha256: hex(files["m_11.md"]) }] }),
-      libraryLine({ id: "12", url: "https://x.com/m/status/12", handle: "MeditInColor", posted: "2026-03-04T00:00:00.000Z", saved: "2026-10-28T10:02:00.000Z", files: [{ name: "m_12.mp4", sha256: null }, { name: "m_12.md", sha256: "0".repeat(64) }, { name: "gone.jpg", sha256: "ff" }] })];
+      libraryLine({ id: "12", url: "https://x.com/painter/status/12", handle: "painter", posted: "2026-03-04T00:00:00.000Z", saved: "2026-10-28T10:02:00.000Z", kind: "repost", repostBy: "MeditInColor", files: [{ name: "m_12.mp4", sha256: null }, { name: "m_12.md", sha256: "0".repeat(64) }, { name: "gone.jpg", sha256: "ff" }] })];
     writeFileSync(join(lib, "index.jsonl"), libraryIndex(st));
     writeFileSync(join(lib, "LIBRARY.md"), libraryMarkdown(st));
     const r = await runCaseCommand(["add-library", lib, "--case", cs, "--no-commit"], { env: { DAYLIGHT_CASE_NOW: "2026-10-28T12:00:00Z", DAYLIGHT_CASE_REPLAY: join(root, "none.json") } });
@@ -134,6 +141,8 @@ test("case add-library adds every post with its hashes checked, skips posts alre
     assert.equal(a.kind, "library-post"); assert.equal(a.author, "MeditInColor"); assert.equal(a.source_date, "2026-01-02T00:00:00.000Z");
     assert.equal(a.capture.sha256, hex(files["m_11.md"]), "the sidecar is the capture");
     assert.deepEqual(b.library.files.map((f) => f.check), ["hashed-now", "differs", "missing"]);
+    assert.deepEqual([a.library.kind, b.library.kind, b.author, b.library.repost_by, b.library.original.id], ["post", "repost", "painter", "MeditInColor", "12"], "a repost's author is the original's");
+    assert.match(r.out, /1 own posts, 1 reposts/);
     assert.equal(b.library.files[0].disk, hex(files["m_12.mp4"]));
     assert.ok(readdirSync(join(cs, "captures")).includes("S01.md"));
     assert.deepEqual(buildTimeline(data).events.filter((e) => e.from === "source").map((e) => e.id), ["S01", "S02"]);

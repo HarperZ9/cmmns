@@ -20,13 +20,29 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
   }
 
   // The posts on the page now, each with what decides whether it is kept.
-  const nodes = () => [...document.querySelectorAll(PBQuickSites.isX ? "article" : "shreddit-post")];
+  // Reddit comments are collected on a user's own page, where they are that user's words.
+  const nodes = () => [...document.querySelectorAll(PBQuickSites.isX ? "article" : run && run.lib.kind === "user" ? `shreddit-post, ${PBQuickSites.COMMENT}` : "shreddit-post")];
+  const isComment = (node) => PBQuickSites.isReddit && node.matches(PBQuickSites.COMMENT);
+  // X draws a repost with a line above it ("<name> reposted") linking to the account that reposted it.
+  function repostBy(node) {
+    if (!PBQuickSites.isX) return null;
+    const ctx = [...node.querySelectorAll('[data-testid="socialContext"]')].find((c) => c.closest("article") === node);
+    if (!ctx) return null;
+    const a = ctx.closest("a[href]") || ctx.querySelector("a[href]"), h = a && (/^\/([A-Za-z0-9_]{1,15})$/.exec(a.getAttribute("href")) || [])[1];
+    return h || (/repost/i.test(ctx.textContent) ? (run && run.lib.author) || "unknown" : null);
+  }
   const isAd = (node) => (PBQuickSites.isX ? [...node.querySelectorAll("span")].some((s) => s.closest("article") === node && /^(Ad|Promoted)$/.test(s.textContent.trim())) : node.hasAttribute("promoted"));
   function refOf(node) {
+    if (isComment(node)) {
+      const c = PBQuickSites.commentMetaOf(node);
+      return c ? { id: c.id, handle: c.handle, url: c.postUrl, posted: c.postedAt, promoted: false, kind: "comment", meta: c } : null;
+    }
     const meta = PBQuickSites.postMetaOf(node);
     if (!meta) return null;
     const id = PBQuickSites.isX ? (/\/status\/(\d+)/.exec(meta.postUrl || "") || [])[1] : node.getAttribute("id") || (/\/comments\/(\w+)/.exec(meta.postUrl || "") || [])[1];
-    return { id: id || null, handle: meta.handle, url: meta.postUrl, posted: meta.postedAt, promoted: isAd(node), meta };
+    const by = repostBy(node), norm = (h) => String(h || "").toLowerCase();
+    const repost = !!by && norm(by) !== norm(meta.handle);
+    return { id: id || null, handle: meta.handle, url: meta.postUrl, posted: meta.postedAt, promoted: isAd(node), repost, repostBy: repost ? by : null, kind: repost ? "repost" : "post", meta };
   }
 
   function skip(why, id) {
@@ -62,19 +78,21 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
 
   // One post: each picture or video, then the sidecar note listing them, then its index line.
   async function savePost(node, ref) {
-    const { items, title } = PBQuickSites.postMedia(node), col = collector(), missing = [];
+    const { items, title } = ref.kind === "comment" ? { items: [], title: null } : PBQuickSites.postMedia(node), col = collector(), missing = [];
     let meta = null;
     for (const [index, t] of items.entries()) {
       try { const r = await PBQuickSave.run(t, { title, index, total: items.length, oneSidecar: true, library: run.state.folder, collector: col, nameTag: ref.id }); meta = meta || r.meta; }
       catch (e) { missing.push(`item ${index + 1} of ${items.length}: ${e.reason || e.message}`); }
     }
     meta = { ...(meta || PBQuickSave.metaOf({ meta: { ...ref.meta, kind: items.length ? "media" : "text" } }, {})), item: null };
-    meta.notes = [...(meta.notes || []), ...labelNotes(ref.meta.fields || {})];
+    meta.notes = [...(meta.notes || []), ...(ref.repostBy ? [{ label: "Reposted", text: `Reposted by @${ref.repostBy}; the post above is @${ref.handle}'s.` }] : []),
+      ...(ref.kind === "comment" ? [{ label: "Comment", text: `A comment in ${ref.meta.subreddit || "a subreddit"} on post ${ref.meta.parentPost || "unknown"}.` }] : []), ...labelNotes(ref.meta.fields || {})];
     const names = col.files.map((f) => f.name);
     const side = PB.metaName(meta, "md").replace(/\.md$/, `_${ref.id}.md`), bytes = new TextEncoder().encode(PB.sidecarMarkdown(meta, names));
     await PBQuickSave.saveText(bytes, "text/markdown", side, meta.site, false, { library: run.state.folder, overwrite: true });
     const files = [...col.files, { name: side, sha256: await PB.mediaSha256(bytes) }];
-    return PB.libraryLine({ id: ref.id, url: ref.url, handle: ref.handle, posted: meta.postedAt, saved: new Date().toISOString(), kind: items.length ? "media" : "text", files, missing, fields: ref.meta.fields });
+    return PB.libraryLine({ id: ref.id, url: ref.url, handle: ref.handle, posted: meta.postedAt, saved: new Date().toISOString(), kind: ref.kind, content: items.length ? "media" : "text", files, missing, fields: ref.meta.fields,
+      repostBy: ref.repostBy, parentPost: ref.meta.parentPost, subreddit: ref.meta.subreddit });
   }
 
   // The labels the site put on the post, under their own headings in the note.

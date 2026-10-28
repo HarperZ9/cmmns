@@ -1,129 +1,87 @@
-// Library capture in a real (headless) Chrome: the extension's own page scripts (core.bundle.js,
-// quick-sites.js, quick-save.js, library.js, library-ui.js) run on a page served at
-// https://x.com/MeditInColor, with chrome.* replaced by a recorder. The page and its pictures
-// are a fixture answered through DevTools, so nothing is fetched from X: this checks the collector,
-// not X's live markup. It checks the "Save page as library" bar, one save per post, the repost
-// skipped, a post loaded later saved too, index.jsonl and LIBRARY.md written on Stop with each file's
-// hash, and a reload continuing the same library without saving the same posts again.
+// Library capture in a real (headless) Chrome on an X profile fixture (tests/library-page.js): the
+// "Save page as library" bar, one save per post, a repost kept as kind "repost" with its original,
+// another account's post shown for context skipped, a post loaded later saved too, X's post data in
+// the index and the note, index.jsonl and LIBRARY.md on Stop with each file's hash, a reload
+// continuing the same library, and two overlapping saves each landing in its own folder.
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { createHash } from "node:crypto";
-import { browserSkip, openChrome, evaluate } from "./browser.js";
+import { browserSkip } from "./browser.js";
+import { page, withSite } from "./library-page.js";
 
-const EXT = join(import.meta.dirname, "..", "src", "ext");
-const SCRIPTS = ["core.bundle.js", "guard.js", "quick-toast.js", "quick-resolve.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-save.js", "quick-capture.js", "library.js", "library-scroll.js", "library-ui.js"];
-const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
-
-// A recorder for chrome.*: downloads keep their bytes; storage lives in localStorage, so it outlasts a reload.
-const STUB = `globalThis.__dl = [];
-globalThis.chrome = { runtime: { id: "test", sendMessage: async (m) => {
-  if (m.type !== "pb-qs-download" && m.type !== "pb-qs-bytes") return { error: "unexpected " + m.type };
-  const bytes = m.bytes ? new Uint8Array(m.bytes) : new Uint8Array(await (await fetch(m.url)).arrayBuffer());
-  __dl.push({ filename: m.filename, library: m.library, overwrite: !!m.overwrite, text: /\\.(md|jsonl)$/.test(m.filename) ? new TextDecoder().decode(bytes) : null, size: bytes.length });
-  return { id: __dl.length }; } },
-  storage: { local: { get: async (k) => { const v = localStorage.getItem(k); return v ? { [k]: JSON.parse(v) } : {}; }, set: async (o) => { for (const [k, v] of Object.entries(o)) localStorage.setItem(k, JSON.stringify(v)); } } } };`;
-
-const post = (handle, id, text, media = true) => `<article><a href="/${handle}"><span>Meditations</span></a><a href="/${handle}/status/${id}"><time datetime="2026-0${id % 9 + 1}-02T10:00:00.000Z"></time></a>
+const post = (handle, id, text, media = true, repostedBy = null) => `<article>${repostedBy ? `<div><a href="/${repostedBy}"><span data-testid="socialContext">${repostedBy} reposted</span></a></div>` : ""}
+  <a href="/${handle}"><span>Meditations</span></a><a href="/${handle}/status/${id}"><time datetime="2026-0${id % 9 + 1}-02T10:00:00.000Z"></time></a>
   <div data-testid="tweetText" lang="en">${text}</div>${media ? `<img alt="a colour study" src="https://pbs.twimg.com/media/P${id}?format=jpg&name=small" width="200" height="200">` : ""}</article>`;
-const PAGE = `<!doctype html><html><head><meta charset="utf-8"><title>Meditations in Color (@MeditInColor) / X</title><script>${STUB}</script>
-${SCRIPTS.map((s) => `<script src="/__dc/${s}"></script>`).join("\n")}</head><body><main id="feed">
-${post("MeditInColor", 111, "Blue first, then the gold.")}${post("someone", 222, "A repost the profile shows.")}${post("MeditInColor", 333, "Only words today.", false)}
-</main></body></html>`;
-
+const PAGE = page("Meditations in Color (@MeditInColor) / X", post("MeditInColor", 111, "Blue first, then the gold.") + post("someone", 222, "The post a reply answers.")
+  + post("MeditInColor", 333, "Only words today.", false) + post("painter", 555, "A study in ochre.", true, "MeditInColor"));
 const X_DATA = { data: { tweetResult: { result: { __typename: "Tweet", rest_id: "111", source: "<a href=\"https://x.com\">Web App</a>", views: { count: "1200" },
   edit_control: { edit_tweet_ids: ["110", "111"] }, birdwatch_pivot: { subtitle: { text: "Readers added context." } },
   legacy: { created_at: "Thu Apr 02 10:00:00 +0000 2026", full_text: "Blue first, then the gold. https://t.co/abc", lang: "en", entities: { urls: [{ url: "https://t.co/abc", expanded_url: "https://example.org/palette" }] } } } } } };
+const URL_ = "https://x.com/MeditInColor";
 
-// Answers every paused request: the page, the extension's scripts, the pictures.
-function answer(url) {
-  const u = new URL(url);
-  if (u.hostname === "pbs.twimg.com") return { body: PNG, type: "image/png" };
-  if (u.pathname.startsWith("/__dc/")) return { body: readFileSync(join(EXT, u.pathname.slice(6))), type: "text/javascript" };
-  if (u.pathname === "/MeditInColor") return { body: Buffer.from(PAGE), type: "text/html; charset=utf-8" };
-  return { body: Buffer.from(""), type: "text/plain", status: 404 };
-}
+test("Save page as library on X: own posts and reposts kept by kind, context skipped, index on Stop, a reload continues", { skip: browserSkip, timeout: 120000 }, () => withSite(["x.com"], { "/MeditInColor": PAGE }, async (s) => {
+  await s.open(URL_);
+  assert.equal(await s.js("document.querySelector('.pb-lib button').textContent"), "Save page as library");
+  // X's own post data for post 111, as sniff.js passes it on: an edit, a Community Note, a link target.
+  await s.js(`window.postMessage({ source: "radar-sniff", json: ${JSON.stringify(X_DATA)} }, location.origin), true`);
+  await new Promise((ok) => setTimeout(ok, 300));
+  await s.click("Save page as library");
+  await s.until("PBLibrary.status().saved === 3");
+  assert.match(await s.js("document.querySelector('.pb-lib-count').textContent"), /^Library x-meditincolor: 3 saved, 1 skipped/);
+  assert.ok(await s.js("[...document.querySelectorAll('.pb-lib button')].some((b) => b.textContent === 'Scroll to the end')"), "the unpacked build offers auto-scroll");
+  // A post the page loads later is saved too, and a redrawn one is not saved twice.
+  await s.js(`document.getElementById('feed').insertAdjacentHTML('beforeend', ${JSON.stringify(post("MeditInColor", 444, "Gold now.") + post("MeditInColor", 111, "Blue first, then the gold."))}), true`);
+  await s.until("PBLibrary.status().saved === 4");
+  await s.click("Stop");
+  await s.until("__dl.some((d) => d.filename === 'LIBRARY.md')");
+  const dl = await s.downloads(), index = await s.index();
+  assert.ok(dl.every((d) => d.library === "x-meditincolor" && d.overwrite && !d.study), "every file goes to the library folder, written in place");
+  assert.deepEqual(index.map((l) => [l.id, l.kind, l.content]), [["111", "post", "media"], ["333", "post", "text"], ["555", "repost", "media"], ["444", "post", "media"]]);
+  assert.deepEqual([index[2].handle, index[2].repost_by, index[2].original], ["painter", "MeditInColor", { author: "painter", id: "555", url: "https://x.com/painter/status/555" }]);
+  assert.match(dl.find((d) => d.filename === index[2].files.at(-1).name).text, /## Reposted\n\nReposted by @MeditInColor; the post above is @painter's\./);
+  assert.match(index[0].files[0].name, /^meditincolor_2026-04-02_blue-first-then-the-gold_111\.png$/);
+  assert.equal(index[0].files[0].sha256.length, 64);
+  const side = dl.find((d) => d.filename === index[0].files[1].name);
+  assert.equal(index[0].files[1].sha256, createHash("sha256").update(side.text).digest("hex"), "the sidecar's hash is of the bytes saved");
+  assert.match(side.text, /^---\nformat: "daylight\.sidecar\/1"/);
+  // Every field the page delivered: X's data on the post goes into the index and the note.
+  assert.deepEqual(index[0].fields, { lang: "en", client: "Web App", edits: 1, community_note: "Readers added context.", views: 1200 });
+  assert.match(side.text, /## Community Note\n\nReaders added context\./);
+  assert.match(side.text, /## Edited\n\nX lists 1 earlier version of this post\./);
+  assert.match(side.text, /https:\/\/example\.org\/palette/, "the link's target, not only the short link");
+  const md = dl.filter((d) => d.filename === "LIBRARY.md").pop().text;
+  assert.match(md, /4 items saved, \d+ files: 3 posts of its own, 1 repost, 0 comments/);
+  assert.match(md, /reposts: 1/);
+  assert.match(md, /- 1: a post by another account shown in the feed for context/);
+  assert.match(md, /never label a person's character/);
 
-async function serve(cdp, stop) {
-  let seen = 0;
-  while (!stop.done) {
-    for (; seen < cdp.events.length; seen++) {
-      const e = cdp.events[seen];
-      if (e.method !== "Fetch.requestPaused") continue;
-      const a = answer(e.params.request.url);
-      cdp.send("Fetch.fulfillRequest", { requestId: e.params.requestId, responseCode: a.status || 200, body: a.body.toString("base64"),
-        responseHeaders: [{ name: "Content-Type", value: a.type }, { name: "Access-Control-Allow-Origin", value: "*" }] }).catch(() => {});
-    }
-    await new Promise((ok) => setTimeout(ok, 10));
-  }
-}
+  // Reopening the page continues the library: the posts on it are counted, not saved again.
+  await s.open(URL_);
+  await s.click("Save page as library");
+  await s.until("PBLibrary.status().already === 3");
+  await new Promise((ok) => setTimeout(ok, 1500));
+  assert.equal(await s.js("PBLibrary.status().saved"), 0);
+  assert.equal(await s.js("__dl.length"), 0, "nothing downloaded again");
+  await s.click("Stop");
+  await s.until("__dl.some((d) => d.filename === 'LIBRARY.md')");
+  assert.equal((await s.index()).length, 4);
+  assert.match((await s.downloads()).find((d) => d.filename === "LIBRARY.md").text, /## Sessions \(UTC\)\n\n- .+: 4 saved, collected while scrolling; stopped: Stop pressed\n- .+: 0 saved/);
+}));
 
-const until = async (cdp, expr, ms = 15000) => {
-  for (let t = 0; t < ms; t += 100) { if (await evaluate(cdp, expr)) return true; await new Promise((ok) => setTimeout(ok, 100)); }
-  throw new Error(`timed out waiting for ${expr}`);
-};
-const open = async (cdp) => {
-  await cdp.send("Page.navigate", { url: "https://x.com/MeditInColor" });
-  await until(cdp, "document.readyState === 'complete' && !!document.querySelector('.pb-lib button')");
-};
-const click = (cdp, label) => evaluate(cdp, `[...document.querySelectorAll('.pb-lib button')].find((b) => b.textContent === ${JSON.stringify(label)}).click(), true`);
-
-test("Save page as library in Chrome: one save per post, reposts skipped, index written on Stop, a reload continues", { skip: browserSkip, timeout: 120000 }, async () => {
-  const cdp = await openChrome(), stop = { done: false };
-  const server = serve(cdp, stop);
-  try {
-    await cdp.send("Fetch.enable", { patterns: [{ urlPattern: "https://x.com/*" }, { urlPattern: "https://pbs.twimg.com/*" }] });
-    await open(cdp);
-    assert.equal(await evaluate(cdp, "document.querySelector('.pb-lib button').textContent"), "Save page as library");
-    assert.ok(await evaluate(cdp, "!!globalThis.PBLibraryScroll && !!document.querySelector('.pb-lib')"));
-    // X's own post data for post 111, as sniff.js passes it on: an edit, a Community Note, a link target.
-    await evaluate(cdp, `window.postMessage({ source: "radar-sniff", json: ${JSON.stringify(X_DATA)} }, location.origin), true`);
-    await until(cdp, "true");
-    await new Promise((ok) => setTimeout(ok, 300));
-    await click(cdp, "Save page as library");
-    await until(cdp, "PBLibrary.status().saved === 2");
-    assert.match(await evaluate(cdp, "document.querySelector('.pb-lib-count').textContent"), /^Library x-meditincolor: 2 saved, 1 skipped/);
-    assert.ok(await evaluate(cdp, "[...document.querySelectorAll('.pb-lib button')].some((b) => b.textContent === 'Scroll to the end')"), "the unpacked build offers auto-scroll");
-    // A post the page loads later (as when the user scrolls) is saved too, and a redrawn one is not saved twice.
-    await evaluate(cdp, `document.getElementById('feed').insertAdjacentHTML('beforeend', ${JSON.stringify(post("MeditInColor", 444, "Gold now.") + post("MeditInColor", 111, "Blue first, then the gold."))}), true`);
-    await until(cdp, "PBLibrary.status().saved === 3");
-    await click(cdp, "Stop");
-    await until(cdp, "__dl.some((d) => d.filename === 'LIBRARY.md')");
-    const dl = await evaluate(cdp, "__dl");
-    assert.ok(dl.every((d) => d.library === "x-meditincolor" && d.overwrite), "every file goes to the library folder, written in place");
-    const index = dl.filter((d) => d.filename === "index.jsonl").pop().text.trim().split("\n").map((l) => JSON.parse(l));
-    assert.deepEqual(index.map((l) => l.id), ["111", "333", "444"]);
-    assert.deepEqual(index.map((l) => l.kind), ["media", "text", "media"]);
-    const pic = dl.find((d) => d.filename === index[0].files[0].name);
-    assert.match(index[0].files[0].name, /^meditincolor_2026-04-02_blue-first-then-the-gold_111\.png$/);
-    assert.equal(pic.size > 0 && index[0].files[0].sha256.length, 64);
-    const side = dl.find((d) => d.filename === index[0].files[1].name);
-    assert.equal(index[0].files[1].sha256, createHash("sha256").update(side.text).digest("hex"), "the sidecar's hash is of the bytes saved");
-    assert.match(side.text, /^---\nformat: "daylight\.sidecar\/1"/);
-    assert.match(side.text, /> Blue first, then the gold\./);
-    // Every field the page delivered: X's data on the post goes into the index and the note.
-    assert.deepEqual(index[0].fields, { lang: "en", client: "Web App", edits: 1, community_note: "Readers added context.", views: 1200 });
-    assert.match(side.text, /## Community Note\n\nReaders added context\./);
-    assert.match(side.text, /## Edited\n\nX lists 1 earlier version of this post\./);
-    assert.match(side.text, /https:\/\/example\.org\/palette/, "the link's target, not only the short link");
-    const md = dl.filter((d) => d.filename === "LIBRARY.md").pop().text;
-    assert.match(md, /3 posts saved/);
-    assert.match(md, /- 1: a post by another account/);
-    assert.match(md, /https:\/\/x\.com\/MeditInColor/);
-    assert.match(md, /never label a person's character/);
-
-    // Reopening the page continues the library: the three posts are counted, not saved again.
-    await open(cdp);
-    await click(cdp, "Save page as library");
-    await until(cdp, "PBLibrary.status().already === 2");
-    await new Promise((ok) => setTimeout(ok, 1500));
-    assert.equal(await evaluate(cdp, "PBLibrary.status().saved"), 0);
-    assert.equal(await evaluate(cdp, "__dl.length"), 0, "nothing downloaded again");
-    await click(cdp, "Stop");
-    await until(cdp, "__dl.some((d) => d.filename === 'index.jsonl')");
-    const again = (await evaluate(cdp, "__dl")).find((d) => d.filename === "index.jsonl").text.trim().split("\n");
-    assert.equal(again.length, 3);
-    assert.match((await evaluate(cdp, "__dl")).find((d) => d.filename === "LIBRARY.md").text, /## Sessions \(UTC\)\n\n- .+: 3 saved, collected while scrolling; stopped: Stop pressed\n- .+: 0 saved/);
-  } finally { stop.done = true; await server; cdp.close(); }
-});
+// Before this fix the folder was shared state in quick-save.js, so a save that started for a library
+// and a study note saved while it waited for the network could swap folders.
+test("two overlapping saves each keep their own folder (library and study)", { skip: browserSkip, timeout: 60000 }, () => withSite(["x.com"], { "/MeditInColor": PAGE }, async (s) => {
+  await s.open(URL_);
+  await s.js(`(async () => {
+    const t = PBQuickSites.postMedia(document.querySelector("article")).items[0];
+    const col = { files: [], unhashed: [], lenient: true, add: async () => {} };
+    const a = PBQuickSave.run(t, { library: "race-lib", collector: col, nameTag: "race", oneSidecar: true });
+    await new Promise((ok) => setTimeout(ok, 300));   // the picture is held 1.5 s on the network
+    const b = PBQuickSave.saveText(new TextEncoder().encode("a study note"), "text/plain", "study-note.txt", "x", true);
+    await Promise.all([a, b]);
+    return true; })()`);
+  const dl = await s.downloads();
+  const pic = dl.find((d) => /_race\.png$/.test(d.filename)), note = dl.find((d) => d.filename === "study-note.txt");
+  assert.deepEqual([pic.library, pic.study], ["race-lib", false], "the library's picture stays in the library");
+  assert.deepEqual([note.library, note.study], [null, true], "the study note stays in the study folder");
+}, { mediaDelay: 1500 }));
