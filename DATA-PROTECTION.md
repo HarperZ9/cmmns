@@ -7,7 +7,7 @@ Drafted 2026-10-28. `PRIVACY.md` is the user-facing privacy policy and lists eve
 request in detail. This page answers the data protection questions behind it: who is responsible
 for which data, what the project itself processes, which legal exemptions apply to users, and how
 users should handle what they keep. The network list below was taken from the code on 2026-10-28
-(release 3.8.0).
+(after release 3.9.1).
 
 ## 1. Who the controller is
 

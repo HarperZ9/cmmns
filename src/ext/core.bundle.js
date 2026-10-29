@@ -12759,13 +12759,30 @@ function slugText(s, max) {
   return (at > max / 2 ? cut.slice(0, at) : full.slice(0, max)).replace(/-+$/, "");
 }
 
-// "<handle>_<date>_<slug-from-text>[-n].<ext>": sorts by person then day, and reads at a glance.
-function metaName(meta, ext) {
+// The post's own id from its address (X and Mastodon statuses, Reddit, Bluesky, YouTube, Instagram,
+// TikTok), else an 8-character FNV-1a hash of the post, media or page address; null with none.
+const ID_PATTERNS = [/\/status(?:es)?\/(\d+)/, /\/comments\/([a-z0-9]+)/i, /\/post\/([a-z0-9]+)/i, /[?&]v=([\w-]{6,})/, /youtu\.be\/([\w-]{6,})/,
+  /\/shorts\/([\w-]{6,})/, /\/(?:p|reel|reels|tv)\/([\w-]+)/, /\/video\/(\d+)/, /\/@[^/]+\/(\d+)/];
+function postTag(meta) {
+  const post = String((meta && meta.postUrl) || "");
+  for (const re of ID_PATTERNS) { const m = re.exec(post); if (m) return m[1].replace(/[^\w-]/g, "").slice(-24); }
+  const src = post || (meta && (meta.mediaUrl || meta.pageUrl)) || "";
+  if (!src) return null;
+  let h = 0x811c9dc5;
+  for (const c of new TextEncoder().encode(src)) h = Math.imul(h ^ c, 0x01000193) >>> 0;
+  return h.toString(16).padStart(8, "0");
+}
+
+// "<handle>_<date>_<slug-from-text>[-n]_<post id>.<ext>": sorts by person then day, and reads at a
+// glance. The post id (postTag, or the tag given) keeps two posts with the same first words, or none,
+// from asking for one name, so the browser never adds " (1)" and a note never names another file.
+function metaName(meta, ext, tag = undefined) {
   const handle = slugText(meta.author && meta.author.handle, 30) || slugText(meta.site, 30) || "media";
   const date = (meta.postedAt || meta.savedAt || "").slice(0, 10) || "undated";
   const words = slugText(meta.text || meta.title || meta.alt, 48) || "post";
   const n = meta.item ? `-${meta.item.index}` : "";
-  return `${handle}_${date}_${words}${n}.${String(ext || "bin").replace(/[^a-z0-9]/gi, "").toLowerCase() || "bin"}`;
+  const id = String((tag === undefined ? postTag(meta) : tag) || "").replace(/[^\w-]/g, "");
+  return `${handle}_${date}_${words}${n}${id ? "_" + id : ""}.${String(ext || "bin").replace(/[^a-z0-9]/gi, "").toLowerCase() || "bin"}`;
 }
 
 // "@name" on X, "u/name" on Reddit as Reddit writes it.
@@ -12853,15 +12870,16 @@ function embedText(meta) {
 const fileBase = (path) => String(path || "").split(/[\\/]/).pop() || null;
 
 // The sidecar's name, without ".md", from the names the browser wrote: the first file's name, and
-// for a post saved together the first file's name without "-1". A suffix the browser added to a
-// name already taken stays, so "name-1 (1).jpg" gets "name (1).md", beside its own files.
+// for a post saved together the first file's name without "-1" (before the post id, if any). A
+// suffix the browser added to a name already taken stays, so "name-1_id (1).jpg" gets "name_id (1).md",
+// beside its own files.
 function sidecarStem(fileNames) {
   const list = [].concat(fileNames || []).filter(Boolean);
   const stem = String(list[0] || "").replace(/\.[a-z0-9]{1,5}$/i, "");
-  return list.length > 1 ? stem.replace(/-1(?=(?: \(\d+\))?$)/, "") : stem;
+  return list.length > 1 ? stem.replace(/-1(?=(?:_[\w-]+)?(?: \(\d+\))?$)/, "") : stem;
 }
 
-return { SIDECAR_FORMAT, textTags, postMeta, metaName, sidecarMarkdown, savePath, saveFolder, sidecarJson, captionText, embedText, fileBase, sidecarStem };
+return { SIDECAR_FORMAT, textTags, postMeta, postTag, metaName, sidecarMarkdown, savePath, saveFolder, sidecarJson, captionText, embedText, fileBase, sidecarStem };
 })();
 
 // ---- library.js

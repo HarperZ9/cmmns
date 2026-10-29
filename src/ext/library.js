@@ -88,7 +88,7 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
     meta.notes = [...(meta.notes || []), ...(ref.repostBy ? [{ label: "Reposted", text: `Reposted by @${ref.repostBy}; the post above is @${ref.handle}'s.` }] : []),
       ...(ref.kind === "comment" ? [{ label: "Comment", text: `A comment in ${ref.meta.subreddit || "a subreddit"} on post ${ref.meta.parentPost || "unknown"}.` }] : []), ...labelNotes(ref.meta.fields || {})];
     const names = col.files.map((f) => f.name);
-    const side = PB.metaName(meta, "md").replace(/\.md$/, `_${ref.id}.md`), bytes = new TextEncoder().encode(PB.sidecarMarkdown(meta, names));
+    const side = PB.metaName(meta, "md", ref.id), bytes = new TextEncoder().encode(PB.sidecarMarkdown(meta, names));
     await PBQuickSave.saveText(bytes, "text/markdown", side, meta.site, false, { library: run.state.folder, overwrite: true });
     const files = [...col.files, { name: side, sha256: await PB.mediaSha256(bytes) }];
     return PB.libraryLine({ id: ref.id, url: ref.url, handle: ref.handle, posted: meta.postedAt, saved: new Date().toISOString(), kind: ref.kind, content: items.length ? "media" : "text", files, missing, fields: ref.meta.fields,

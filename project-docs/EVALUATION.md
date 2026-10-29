@@ -661,8 +661,8 @@ Wilson interval. It never changes "flagged", the extreme comparison or the verdi
 ### What the persuasion numbers do not prove
 - PTC is news articles from 48 outlets, mostly 2017 to 2019. Replies are shorter and blunter, and
   precision on them is still to be measured. It could be higher or lower.
-- PTC's annotators marked most uses and missed some. A true use they missed counts against CMMNS
-  Commons, so precision leans low.
+- PTC's annotators marked most uses and missed some. A true use they missed counts against CMMNS,
+  so precision leans low.
 - A technique describes how a post argues, and true claims use techniques too.
 
 ## Organic baselines for the coordination signs (2026-10-21)

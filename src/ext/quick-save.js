@@ -178,9 +178,9 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const dest = destOf({ site: meta.site, study: opts.study, library: opts.library });
     const title = opts.title || t.title || document.title || location.hostname;
     const own = (u) => (/^https?:/i.test(String(u || "")) ? u : "");
-    const name0 = (ext, url) => (meta.author.handle ? PB.metaName(meta, ext) : PB.downloadName({ title, url: url != null ? url : own(t.url), index: opts.index || 0, total: opts.total || 1, ext }));
-    // A library tags each name with the post id, so two posts never share a file name.
-    const name = (ext, url) => (opts.nameTag ? name0(ext, url).replace(/(\.[a-z0-9]+)$/i, `_${opts.nameTag}$1`) : name0(ext, url));
+    // A name carries the post id (PB.postTag, or a library's own tag), so two posts never share one.
+    const tagged = (n) => (opts.nameTag ? n.replace(/(\.[a-z0-9]+)$/i, `_${opts.nameTag}$1`) : n);
+    const name = (ext, url) => (meta.author.handle ? PB.metaName(meta, ext, opts.nameTag || undefined) : tagged(PB.downloadName({ title, url: url != null ? url : own(t.url), index: opts.index || 0, total: opts.total || 1, ext })));
     const ow = { overwrite: !!opts.library, dest };
     const progress = (line) => toast(line, { stay: 0 });
     // Every file this save wrote, under the names the browser gave them.

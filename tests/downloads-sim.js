@@ -81,7 +81,7 @@ export function makeBrowser({ flavour = "chrome", files = new Map(), settings = 
     setTimeout: (f, ms) => { const t = setTimeout(f, ms); if (ms > 1000) t.unref(); return t; },
     location: { hostname: "x.com", href: "https://x.com/home" }, document: { title: "Home / X", querySelector: () => null },
     PBQuickToast: { show() {} }, PBQuickStream: { Protected }, PBQuickResolve: { resolve: () => null }, PBQuickCapture: { collector: () => null } });
-  vm.runInContext(readFileSync(join(root, "src/ext/core.bundle.js"), "utf8"), ctx);
+  vm.runInContext(src("src/ext/core.bundle.js"), ctx);
   vm.runInContext(src("src/ext/quick-save-bg.js"), ctx);
   // The saved list moved to its own file in 3.9.1; a checkout from before keeps it inside quick-save.js.
   const saved = resolve(root, process.env.CMMNS_SIM_SRC || process.env.DAYLIGHT_SIM_SRC || ".", "src/ext/quick-saved.js");
