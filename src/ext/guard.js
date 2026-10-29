@@ -80,8 +80,12 @@
   const nextWait = (ms) => (ms === 0 ? 0 : Math.max(ms, wait));
 
   // A debounce that cannot starve: each call pushes the run back by the wait, but never more than
-  // HOLD_MS after the first call that is still waiting. A page that changes every few hundred
-  // milliseconds (a feed while scrolling, a playing video) still gets a pass at least that often.
+  // HOLD_MS (or the stretched wait, when slow passes stretched it past that) after the first call
+  // that is still waiting. A page that changes every few hundred milliseconds (a feed while
+  // scrolling, a playing video) still gets a pass that often, and a page whose passes are slow is
+  // not made to run them back to back. Measured live on a YouTube watch page with the page changing
+  // every 150 ms: the old debounce ran 2 passes in a minute and wired 0 of 60 comments; this one
+  // ran a pass about every 1.1 s and wired all 60 (project-docs/evidence/REFRESH-STARVATION.md).
   const HOLD_MS = 1000;
   function debounced(fn) {
     let timer = 0, first = null;
@@ -89,7 +93,7 @@
     return (ms = 250) => {
       const now = Date.now(), wanted = nextWait(ms);
       if (first === null) first = now;
-      const due = Math.min(now + wanted, first + HOLD_MS);
+      const due = Math.min(now + wanted, first + Math.max(HOLD_MS, wait));
       clearTimeout(timer);
       timer = setTimeout(fire, Math.max(0, due - now));
     };

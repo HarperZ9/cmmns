@@ -62,3 +62,16 @@ test("time spent waiting before lap() does not count as a slow pass", async () =
   await waits(); await waits(); await waits();
   assert.equal(G.nextWait(250), 250, "only the 20 ms after lap() should be measured");
 });
+
+test("after slow passes the hold follows the stretched wait, so slow passes never run back to back", async () => {
+  const now = { t: 0 }, { G, advance } = load(now);
+  const slowPass = G.measured(async () => { now.t += 500; });
+  for (let i = 0; i < 9; i++) await slowPass();   // each slow pass stretches the wait, up to 2 s
+  assert.equal(G.nextWait(250), 2000);
+  const runs = [];
+  const schedule = G.debounced(() => runs.push(now.t));
+  const t0 = now.t;
+  for (let i = 0; i < 50; i++) { schedule(); advance(100); }   // 5 s of constant change
+  assert.ok(runs.length >= 2, `still runs under constant change: ${runs.length}`);
+  assert.ok(runs[0] - t0 >= 1900 && runs[0] - t0 <= 2000, `first pass at ${runs[0] - t0} ms, held to the stretched wait`);
+});
