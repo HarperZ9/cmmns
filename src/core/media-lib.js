@@ -12,7 +12,7 @@ export { muxMp4 } from "./media-mp4.js";
 export { fileProtection, mediaProtection, PROTECTED_LINE } from "./media-protect.js";
 export { parseM3u8, hlsProtection, pickVariant } from "./media-hls.js";
 export { parseMpd, dashProtection, pickRepresentation } from "./media-dash.js";
-export { postMeta, sidecarMarkdown, sidecarJson, metaName, captionText, embedText, textTags } from "./media-meta.js";
+export { postMeta, sidecarMarkdown, sidecarJson, metaName, postTag, captionText, embedText, textTags } from "./media-meta.js";
 export { embedDescription, readDescription, xmpPacket } from "./media-embed.js";
 export { saveFolder, savePath, SIDECAR_FORMAT, sidecarStem, fileBase } from "./media-meta.js";
 export { wrapLines, cardPlan, CARD, CARD_FOOT } from "./media-card.js";

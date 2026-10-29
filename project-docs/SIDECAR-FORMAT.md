@@ -14,9 +14,16 @@ Written by `sidecarMarkdown` and `sidecarJson` in `src/core/media-meta.js`; test
 it goes back to `CMMNS`). Study saves go to `<save folder>/study/<site>/`. The switch "Save
 straight into Downloads" puts files in Downloads itself (Study in `study/<site>/`). `<site>` is `x`, `reddit`, or the host name of the page.
 
-File names are `<handle>_<date>_<first words of the text>[-n].<ext>` for posts with an author, for
-example `nasa_2026-10-23_ahh-blue-lagoon-this-deep-blue-sea-of-gas-and.jpg`. The date is the post's
-date (UTC). `-n` numbers the files of one post. Other pages give `<page title>-<file name>.<ext>`.
+File names are `<handle>_<date>_<first words of the text>[-n]_<post id>.<ext>` for posts with an
+author, for example `nasa_2026-10-23_ahh-blue-lagoon-this-deep-blue-sea-of-gas-and_1981234567890123456.jpg`.
+The date is the post's date (UTC). `-n` numbers the files of one post. The post id comes from the
+post's address (an X or Mastodon status number, a Reddit, Bluesky, YouTube, Instagram or TikTok id);
+when the address has none, it is an 8-character hash (FNV-1a) of the post, media or page address.
+The id keeps two posts with the same first words, or with no text (`post`), from asking for one
+name, so the browser does not add ` (1)` and a note always names its own post's files. Names
+from earlier releases have no id; nothing reads the id back out of a name, since the note's
+`files` list is what ties it to its files, so old and new folders read the same. Other pages give
+`<page title>-<file name>.<ext>`.
 
 A post saved with the Download button gets one sidecar for all its files, named after the post (the
 first file's name without `-1`). A single file gets its own.

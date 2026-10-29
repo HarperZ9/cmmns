@@ -100,7 +100,7 @@ that a display name alone never marks anyone.
 ## Counts and their sample size
 
 "45/50", "8 of 47", "62% of 1,200" and "n = 40" get a Wilson 95% interval, the same interval CMMNS
-Commons prints for its own figures. Two counts with the same denominator are read as two arms and
+prints for its own figures. Two counts with the same denominator are read as two arms and
 compared. A count under 30 says one more or one fewer moves the figure a lot. Fractions that look
 like dates or scores are left alone unless a count word follows ("replies", "people", "patients").
 Counts in an image are read too once the user has had CMMNS read that image.

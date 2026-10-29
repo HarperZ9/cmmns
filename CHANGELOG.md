@@ -47,8 +47,21 @@ were not published to a store.
 - One-click saves pass their folder (site, study or library) with each save instead of keeping it in
   shared page state, so a save that waits on the network and another save started meanwhile can no
   longer swap folders (`tests/library.browser.test.js` fails on the old code).
+- Saved files no longer share a name across posts. Two posts by one account on one day with the same
+  first words, or with no text at all (`post`), asked for the same file name, so the browser saved
+  `name (1).jpg`, `name (2).jpg` and a note could list another post's picture. Each one-click save,
+  study save and text note is now named `<handle>_<date>_<words>[-n]_<post id>.<ext>`: the id from the
+  post's address (X, Mastodon, Reddit, Bluesky, YouTube, Instagram, TikTok), else an 8-character hash
+  of the post, media or page address. A post's note is named the same way and lists the exact names
+  its files were saved under. Saving the same post again still gets ` (1)` names, and its note lists
+  those. Library captures keep the names they had. The daylight.sidecar/1 format is unchanged: no new
+  field, and older folders read as before (`tests/sidecar-collision.test.js` fails on the old code).
 
 ### Documentation
+- Leftover "CMMNS Commons" naming in the privacy policy, How it works and the transparency page now
+  reads "CMMNS". The data protection draft's network list is dated after release 3.9.1, where it said
+  3.8.0. `project-docs/SIDECAR-FORMAT.md` and `project-docs/MEDIA-LIBRARY.md` describe the new file
+  names.
 - Drafts of a legal and responsible-use pack (acceptable use, responsible use, legal notice, requests
   from people named or shown, data protection, platform capture, creators and IP) and a checklist for
   the lawyer who reviews them (`project-docs/LEGAL-REVIEW-CHECKLIST.md`). Each is marked as a draft

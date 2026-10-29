@@ -25,7 +25,7 @@ test("an X post's sidecar keeps the text exactly, the alt text, the thread and w
   assert.match(md, /Alt text: A bowl with a blue rim/);
   for (const line of ["- Post: https://x.com/marak/status/1957913446118285360", "- Posted (UTC): 2026-10-20T08:15:00.000Z", "- Saved (UTC): 2026-10-25T12:00:00.000Z", "- Hashtags: #ceramics", "- Links: https://ex.ample/guide"]) assert.ok(md.includes(line), line);
   assert.equal(JSON.parse(sidecarJson(xPost, "f.jpg")).author.handle, "marak");
-  assert.equal(metaName(xPost, "jpg"), "marak_2026-10-20_glazing-trick-thin-the-slip-1-3-then-fire-low.jpg");
+  assert.equal(metaName(xPost, "jpg"), "marak_2026-10-20_glazing-trick-thin-the-slip-1-3-then-fire-low_1957913446118285360.jpg");
   assert.equal(captionText(xPost), "Glazing trick: thin the slip 1:3.\nThen fire low. #ceramics https://ex.ample/guide.\n\n@marak https://x.com/marak/status/1957913446118285360");
 });
 
@@ -48,7 +48,7 @@ test("a Reddit gallery item names its place, its subreddit, title and self-text"
   assert.match(md, /\*\*Three ways to wedge clay\*\*/);
   assert.match(md, /> Spiral wedging works best for me\.\n>\n> Ram's head second\./);
   assert.match(md, /- Subreddit: r\/Pottery/);
-  assert.equal(metaName(r, "png"), "u-potter-j_2026-10-01_spiral-wedging-works-best-for-me-ram-s-head-2.png");
+  assert.equal(metaName(r, "png"), "u-potter-j_2026-10-01_spiral-wedging-works-best-for-me-ram-s-head-2_abc.png");
   assert.deepEqual(textTags("see #one and #two, #one again").hashtags, ["#one", "#two"]);
 });
 

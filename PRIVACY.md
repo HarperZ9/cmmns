@@ -115,7 +115,7 @@ and any hash of either stay in your browser, and the text lasts as long as that 
   anywhere. Both can be turned off in the settings.
 - The **Download control on pictures and videos** watches where the pointer rests, in that tab only,
   to know when to show; it reads and sends nothing until you click it. It runs on the sites CMMNS
-  Commons reads, and on every https site only after you turn on "Show it on every site", when your
+  reads, and on every https site only after you turn on "Show it on every site", when your
   browser asks you once. **Alt+Shift+D** reads the current tab once, on the key press. **Study**,
   **Save as note**, **Save selection** and **Save as card** keep text the page shows (and, for a card,
   a picture made on this device) in your Downloads folder; nothing is sent.
@@ -222,13 +222,13 @@ The carrier-safe profile awaits independent review.
 - **Save report:** writes a JSON file to your computer when you click it, with the thread report,
   account labels and flags and without reply text.
 - **Save feedback to a file** (options page): writes your marks to a JSON file on your computer when
-  you click it. You choose whether to share it, for example by attaching it to an issue on CMMNS
-  Commons' repository. "Clear feedback" deletes your marks.
+  you click it. You choose whether to share it, for example by attaching it to an issue on CMMNS'
+  repository. "Clear feedback" deletes your marks.
 - **Analyse a file:** reads a saved page, thread JSON, a platform data export or a media file you
   choose, on your device, and leaves the file where it is.
 - **Save signed bundle** (Analyse a file and the thread card page): writes a JSON file to your
-  computer when you click it. It holds post ids, the evidence with the matched words, CMMNS
-  Commons' version, a hash of its data tables, the time and your bundle key's public half. Tick the
+  computer when you click it. It holds post ids, the evidence with the matched words, CMMNS'
+  version, a hash of its data tables, the time and your bundle key's public half. Tick the
   box to include full post text. The file stays on your computer for you to share.
 - **Removing CMMNS** deletes everything it kept.
 
@@ -246,7 +246,7 @@ With source protection on, the list is empty: only the sites you open load their
 
 That is the whole list. Your data serves the features above and stays out of advertising and
 sale. Account labels show what each site discloses about an account, kept per site; CMMNS
-Commons leaves who runs an account, and anyone's age, gender, ethnicity, religion or politics,
+leaves who runs an account, and anyone's age, gender, ethnicity, religion or politics,
 unguessed.
 
 ## More detail

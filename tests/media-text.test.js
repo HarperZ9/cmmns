@@ -17,7 +17,7 @@ test("an X text post becomes a note with no file, its link cards, hashtags and p
   assert.ok(md.includes("## Poll\n\n- Leach 4321: 41%\n- Tenmoku: 59%\n\n312 votes, Final results"));
   assert.ok(md.includes("## Link cards\n\n- Ten glaze bases compared: https://ex.ample/bases"));
   assert.ok(md.includes('hashtags: ["#ceramics"]'));
-  assert.equal(metaName(m, "md"), "ana_2026-10-24_which-glaze-base-do-you-start-from-ceramics.md");
+  assert.equal(metaName(m, "md"), "ana_2026-10-24_which-glaze-base-do-you-start-from-ceramics_9.md");
 });
 
 test("a quote of a text post keeps both texts; a thread by one author is one note in order", () => {

@@ -73,7 +73,8 @@ minCodeSize)` are the two steps on their own. The output reads back through `dec
 |---|---|
 | `postMeta({ site, text, authorName, handle, postUrl, mediaUrl, postedAt, alt, quoted, parent, thread, subreddit, title, index, total })` | one record; the text keeps its line breaks; hashtags and links are read from it; X's placeholder alt text ("Image") is dropped |
 | `sidecarMarkdown(meta, fileName)`, `sidecarJson(meta, fileName)` | the `.md` file a person reads (the post's text first, quoted or parent post, the author's own continuation, alt text, addresses, times) and the `.json` for tools |
-| `metaName(meta, ext)` | `<handle>_<date>_<words-from-the-text>[-n].<ext>`, cut at a word boundary, so a folder sorts by person and day |
+| `metaName(meta, ext, tag)` | `<handle>_<date>_<words-from-the-text>[-n]_<post id>.<ext>`, cut at a word boundary, so a folder sorts by person and day; the id is `postTag(meta)` unless `tag` is given (a library passes its own) |
+| `postTag(meta)` | the post id from the post's address, else an 8-character hash of the post, media or page address; null with no address |
 | `captionText(meta, link)` | the post's words, the handle and the link, for "Copy with caption" |
 | `embedText(meta)` | one paragraph for inside the file |
 | `embedDescription(bytes, mime, { description, creator, source })` | the file with the description inside, or `null`: XMP for JPEG (APP1), PNG (iTXt) and WebP (VP8X and an XMP chunk), a comment, description and artist in MP4 (`moov/udta/meta/ilst`, every chunk offset moved), a comment block in GIF. Pixels and samples are untouched; a file with its own XMP or MP4 metadata is left alone |

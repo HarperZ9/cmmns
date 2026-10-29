@@ -32,8 +32,8 @@ the source the receipt names.
 
 ## Run it on us
 
-The recording on this page points the evidence lookup at a made-up post that links CMMNS
-Commons' own repository and site. The answers are live: GitHub's creation date for the repository,
+The recording on this page points the evidence lookup at a made-up post that links CMMNS'
+own repository and site. The answers are live: GitHub's creation date for the repository,
 and the Internet Archive's first capture of the site. The site sits on github.io, a shared host, so
 the lookup skips RDAP there. Its registration date would belong to GitHub.
 
