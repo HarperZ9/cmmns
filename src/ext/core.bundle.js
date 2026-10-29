@@ -12882,6 +12882,197 @@ function sidecarStem(fileNames) {
 return { SIDECAR_FORMAT, textTags, postMeta, postTag, metaName, sidecarMarkdown, savePath, saveFolder, sidecarJson, captionText, embedText, fileBase, sidecarStem };
 })();
 
+// ---- engagement-series.js
+const M_engagement_series = (() => {
+// Engagement over time for saved posts (project-docs/ENGAGEMENT-SERIES.md). A post the user saved
+// is tracked by its id. Whenever the page's own data (X's post data, YouTube's player data, Reddit's
+// post attributes) carries a tracked post, its counts are written down as one reading, at most one
+// per post per 6 hours. A schedule of target ages says which readings are due; the user opens each
+// due post, so every page load is the user's. An optional log keeps every post the page loaded.
+// Pure: no DOM, no storage, and no request of any kind.
+const { postTag, textTags } = M_media_meta;
+
+const HOUR = 3600000, DAY = 24 * HOUR;
+const SERIES_TARGET_DAYS = Object.freeze([1, 3, 7, 14, 30, 90]);
+const SERIES_GAP_MS = 6 * HOUR;
+const SERIES_MAX_TRACKED = 20000;
+const SERIES_MAX_READINGS = 240;
+const SEEN_DAYS_DEFAULT = 90;
+const SERIES_FORMAT = "cmmns.engagement-series/1";
+const SERIES_COUNT_KEYS = Object.freeze(["likes", "reposts", "quotes", "replies", "bookmarks", "views", "score", "comments"]);
+const SERIES_DOES_NOT_PROVE = "Each reading is what the platform's own page data said when you happened to load the post. Readings are irregular, platforms round, delay and recount, and a missed age stays missed.";
+const PLATFORMS = { x: "x", "twitter.com": "x", "x.com": "x", reddit: "reddit", "reddit.com": "reddit", youtube: "youtube", "youtube.com": "youtube", "m.youtube.com": "youtube" };
+
+const seriesKey = (platform, postId) => `${platform}:${postId}`;
+const isoOf = (t) => { const d = new Date(t); return Number.isFinite(d.getTime()) ? d.toISOString() : null; };
+const msOf = (t) => (t == null ? NaN : typeof t === "number" ? t : Date.parse(t));
+// A count only when the data gave a whole number (Reddit's attributes are digit strings).
+const count = (v) => (typeof v === "number" && Number.isFinite(v) ? v : typeof v === "string" && /^-?\d+$/.test(v.trim()) ? Number(v) : null);
+const countsOf = (o) => Object.fromEntries(SERIES_COUNT_KEYS.map((k) => [k, count(o && o[k])]).filter(([, v]) => v != null));
+
+// The tracked record for a saved post, from the sidecar record media-meta builds, or null when the
+// address holds no post id this feature can match (a page, a Reddit comment, another site).
+function trackEntry(meta, now = Date.now()) {
+  const platform = PLATFORMS[String((meta && meta.site) || "").replace(/^www\./, "")] || null;
+  const url = String((meta && meta.postUrl) || "");
+  if (!platform || !url) return null;
+  if (platform === "reddit" && /\/comments\/[a-z0-9]+\/[^/]*\/[a-z0-9]+/i.test(url)) return null;
+  const id = postTag({ postUrl: url });
+  if (!id || (platform === "x" && !/^\d+$/.test(id))) return null;
+  const handle = meta.author && meta.author.handle ? String(meta.author.handle).replace(/^@|^u\//, "") : meta.handle ? String(meta.handle).replace(/^@|^u\//, "") : null;
+  return { key: seriesKey(platform, id), platform, postId: id, handle, postedAt: isoOf(meta.postedAt), savedAt: isoOf(meta.savedAt) || isoOf(now), missed: [] };
+}
+
+// The reading taken at save time from the counts the save already read, or null with none.
+function saveReading(entry, meta, now = Date.now()) {
+  const c = countsOf(meta && meta.engagement);
+  return Object.keys(c).length ? readingOf({ platform: entry.platform, postId: entry.postId, counts: c }, entry, now, "save") : null;
+}
+
+// Where the user goes to take a reading.
+function seriesPostUrl(e) {
+  if (e.platform === "x") return `https://x.com/${e.handle || "i"}/status/${e.postId}`;
+  if (e.platform === "reddit") return `https://www.reddit.com/comments/${e.postId}/`;
+  if (e.platform === "youtube") return `https://www.youtube.com/watch?v=${e.postId}`;
+  return null;
+}
+
+const domainOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return null; } };
+
+// One sighting per post in X's post data (src/core/xdata.js tweetsIn).
+function sightingsFromTweets(tweets) {
+  return (tweets || []).filter((t) => t && t.id).map((t) => ({
+    platform: "x", postId: String(t.id), handle: t.author || null, postedAt: t.posted || null,
+    counts: countsOf(t), hashtags: textTags(t.text).hashtags, linkDomains: [...new Set((t.links || []).map(domainOf).filter(Boolean))],
+    mediaUrls: (t.media || []).map((m) => m.url).filter(Boolean),
+  }));
+}
+
+// The video in YouTube's player data (videoDetails, and the publish date in its microformat).
+function sightingFromYt(json) {
+  const d = json && json.videoDetails;
+  if (!d || !/^[\w-]{11}$/.test(String(d.videoId || ""))) return null;   // a video id is 11 characters
+  const mf = ((json.microformat || {}).playerMicroformatRenderer) || {};
+  return { platform: "youtube", postId: String(d.videoId), handle: d.channelId || null, postedAt: isoOf(mf.publishDate || mf.uploadDate),
+    counts: countsOf({ views: d.viewCount }), hashtags: [], linkDomains: [], mediaUrls: [] };
+}
+
+// A Reddit post from its shreddit-post element's attributes (id "t3_<id>", score, comment-count).
+function sightingFromReddit(a) {
+  const m = /^t3_([a-z0-9]+)$/i.exec(String((a && a.id) || ""));
+  if (!m) return null;
+  return { platform: "reddit", postId: m[1], handle: a.author || null, postedAt: isoOf(a["created-timestamp"] ? String(a["created-timestamp"]).replace(/(\.\d{3})\d+/, "$1").replace(/([+-]\d\d)(\d\d)$/, "$1:$2") : null),
+    counts: countsOf({ score: a.score, comments: a["comment-count"] }), hashtags: [], linkDomains: a.domain ? [String(a.domain)] : [], mediaUrls: [] };
+}
+
+const shouldRecord = (lastAt, now) => !Number.isFinite(lastAt) || now - lastAt >= SERIES_GAP_MS;
+
+// One reading: the counts, the time, and the post's age then (null when the post time is unknown).
+function readingOf(s, entry, now = Date.now(), source = "page") {
+  const posted = msOf((entry && entry.postedAt) || s.postedAt);
+  const age = Number.isFinite(posted) ? Math.round(((now - posted) / HOUR) * 100) / 100 : null;
+  return { id: `${seriesKey(s.platform, s.postId)}@${now}`, key: seriesKey(s.platform, s.postId), platform: s.platform, postId: s.postId,
+    at: new Date(now).toISOString(), ageHours: age, source, ...countsOf(s.counts) };
+}
+
+// What to write for a batch of sightings. tracked: { key: entry }; lastAt and seenLast: { key: ms }.
+function planSightings({ sightings = [], tracked = {}, lastAt = {}, seenLast = {}, settings = {}, now = Date.now() }) {
+  const out = { readings: [], seen: [], lastAt: {}, seenAt: {}, postedAt: {} };
+  for (const s of sightings) {
+    const key = seriesKey(s.platform, s.postId), e = tracked[key];
+    if (!Object.keys(countsOf(s.counts)).length) continue;
+    if (settings.trackSeries && e && !(key in out.lastAt) && shouldRecord(lastAt[key] != null ? lastAt[key] : msOf(e.lastAt), now)) {
+      out.readings.push(readingOf(s, e, now));
+      out.lastAt[key] = now;
+      if (!e.postedAt && s.postedAt) out.postedAt[key] = s.postedAt;
+    }
+    if (settings.seenLog && !(key in out.seenAt) && shouldRecord(seenLast[key], now)) { out.seen.push(seenRecord(s, now)); out.seenAt[key] = now; }
+  }
+  return out;
+}
+
+// A seen-log line: ids, handle, times, counts, hashtags and link domains. Media addresses are kept
+// only as their hashes (mediaHashes, filled by the store), and no post text is kept.
+function seenRecord(s, now = Date.now(), mediaHashes = []) {
+  const key = seriesKey(s.platform, s.postId);
+  return { id: `${key}@${now}`, key, platform: s.platform, postId: s.postId, handle: s.handle || null, postedAt: s.postedAt || null,
+    at: new Date(now).toISOString(), atMs: now, ...countsOf(s.counts), hashtags: s.hashtags || [], linkDomains: s.linkDomains || [], mediaHashes };
+}
+
+const windowOf = (posted, day) => { const start = posted + day * DAY; return { start, end: start + Math.max(DAY, day * DAY * 0.25) }; };
+const lastEnd = (posted) => windowOf(posted, SERIES_TARGET_DAYS[SERIES_TARGET_DAYS.length - 1]).end;
+const anchor = (e) => { const p = msOf(e.postedAt); return Number.isFinite(p) ? p : msOf(e.savedAt); };
+
+// Each target age: done (a reading in its window), due, missed, upcoming, or before-tracking (the
+// window closed before the post was saved).
+function seriesSchedule(entry, readings = [], now = Date.now()) {
+  const posted = anchor(entry), saved = msOf(entry.savedAt), at = readings.map((r) => msOf(r.at));
+  return SERIES_TARGET_DAYS.map((day) => {
+    const { start, end } = windowOf(posted, day);
+    const status = at.some((t) => t >= start && t < end) ? "done" : saved >= end ? "before-tracking" : now < start ? "upcoming" : now < end ? "due" : "missed";
+    return { day, start: new Date(start).toISOString(), end: new Date(end).toISOString(), status };
+  });
+}
+
+// The due readings across tracked posts, soonest window end first, and the ages missed.
+function dueReadings(entries, readingsByKey = {}, now = Date.now()) {
+  const due = [], missed = [];
+  for (const e of entries || []) {
+    for (const s of seriesSchedule(e, readingsByKey[e.key] || [], now)) {
+      if (s.status === "due") due.push({ key: e.key, day: s.day, end: s.end, url: seriesPostUrl(e), handle: e.handle, platform: e.platform });
+      if (s.status === "missed") missed.push({ key: e.key, day: s.day });
+    }
+  }
+  due.sort((a, b) => a.end.localeCompare(b.end) || a.key.localeCompare(b.key));
+  return { due, missed };
+}
+
+// At most `cap` tracked posts: posts whose schedule has finished go first, oldest save first, then
+// the oldest saves. Under the cap nothing is dropped.
+function pruneTracked(entries, now = Date.now(), cap = SERIES_MAX_TRACKED) {
+  const list = [...(entries || [])], over = list.length - cap;
+  if (over <= 0) return { keep: list, drop: [] };
+  const finished = (e) => now >= lastEnd(anchor(e));
+  const order = [...list].sort((a, b) => Number(finished(b)) - Number(finished(a)) || msOf(a.savedAt) - msOf(b.savedAt));
+  const drop = new Set(order.slice(0, over).map((e) => e.key));
+  return { keep: list.filter((e) => !drop.has(e.key)), drop: [...drop] };
+}
+
+// At most `max` readings for one post: the reading closest to the one before it goes first; the
+// first and the last readings always stay.
+function thinReadings(readings, max = SERIES_MAX_READINGS) {
+  const list = [...readings].sort((a, b) => a.at.localeCompare(b.at)), drop = [];
+  while (list.length > max && list.length > 2) {
+    let at = 1;
+    for (let i = 2; i < list.length - 1; i++) if (msOf(list[i].at) - msOf(list[i - 1].at) < msOf(list[at].at) - msOf(list[at - 1].at)) at = i;
+    drop.push(list.splice(at, 1)[0].id);
+  }
+  return { keep: list, drop };
+}
+
+const sortReadings = (list) => [...list].sort((a, b) => a.at.localeCompare(b.at) || a.key.localeCompare(b.key));
+const seriesJsonl = (list) => sortReadings(list).map((r) => JSON.stringify(r)).join("\n") + (list.length ? "\n" : "");
+const parseSeriesJsonl = (text) => String(text || "").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l));
+
+async function sha256Hex(text) {
+  const d = await crypto.subtle.digest("SHA-256", typeof text === "string" ? new TextEncoder().encode(text) : text);
+  return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// The manifest beside an export: what each file holds, its line count and its sha256.
+async function seriesManifest(files, { tracked = [], now = Date.now(), version = null } = {}) {
+  const rows = [];
+  for (const f of files) rows.push({ name: f.name, holds: f.holds, lines: parseSeriesJsonl(f.text).length, sha256: await sha256Hex(f.text) });
+  const missed = tracked.reduce((n, e) => n + (e.missed || []).length, 0);
+  return { format: SERIES_FORMAT, exported: new Date(now).toISOString(), tool: version ? `CMMNS ${version}` : "CMMNS", posts: tracked.length,
+    readings: rows[0] ? rows[0].lines : 0, missed, targetDays: [...SERIES_TARGET_DAYS], gapHours: SERIES_GAP_MS / HOUR, files: rows,
+    tracked: tracked.map((e) => ({ key: e.key, platform: e.platform, postId: e.postId, handle: e.handle, postedAt: e.postedAt, savedAt: e.savedAt, missed: e.missed || [] })),
+    doesNotProve: SERIES_DOES_NOT_PROVE };
+}
+
+return { SERIES_TARGET_DAYS, SERIES_GAP_MS, SERIES_MAX_TRACKED, SERIES_MAX_READINGS, SEEN_DAYS_DEFAULT, SERIES_FORMAT, SERIES_COUNT_KEYS, SERIES_DOES_NOT_PROVE, seriesKey, trackEntry, saveReading, seriesPostUrl, sightingsFromTweets, sightingFromYt, sightingFromReddit, shouldRecord, readingOf, planSightings, seenRecord, seriesSchedule, dueReadings, pruneTracked, thinReadings, sortReadings, seriesJsonl, parseSeriesJsonl, sha256Hex, seriesManifest };
+})();
+
 // ---- library.js
 const M_library = (() => {
 // Library capture (project-docs/LIBRARY-CAPTURE.md): a whole page's posts saved as one folder.
@@ -14791,7 +14982,7 @@ const AREA_IDS = ["place", "account", "posting", "coordination", "language", "so
 
 // Retention in days. The upper limits are what the logs keep at most (history.js keeps 60 days;
 // the connections and trail logs keep 30, so a longer history setting leaves those at 30).
-const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 } };
+const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 }, seenDays: { min: 1, max: 365 } };
 
 const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
@@ -14835,6 +15026,11 @@ const DEFAULTS = Object.freeze({
   // The hover Download control (src/ext/quick-hover.js): on by default; on every site once the user
   // allows that access; never on the sites listed in hoverOffSites.
   hoverDownload: true, hoverEverywhere: true, hoverOffSites: [],
+  // Engagement over time (src/core/engagement-series.js, project-docs/ENGAGEMENT-SERIES.md), none of
+  // which makes a request: re-reading saved posts from the page's own data, on by default; the
+  // reminder of due readings on the badge, off by default; the log of every post the page loaded,
+  // off by default and kept seenDays days.
+  trackSeries: true, trackRemind: false, seenLog: false, seenDays: 90,
 });
 
 // The save folder before the 2026-10-28 rename to CMMNS, and the release that renamed it. A browser
@@ -14904,6 +15100,8 @@ function normalizeSettings(raw) {
     mediaToRoot: bool(s.mediaToRoot, DEFAULTS.mediaToRoot),
     protection: bool(s.protection, DEFAULTS.protection),
     hoverDownload: bool(s.hoverDownload, DEFAULTS.hoverDownload), hoverEverywhere: bool(s.hoverEverywhere, DEFAULTS.hoverEverywhere), hoverOffSites: siteList(s.hoverOffSites),
+    trackSeries: bool(s.trackSeries, DEFAULTS.trackSeries), trackRemind: bool(s.trackRemind, DEFAULTS.trackRemind),
+    seenLog: bool(s.seenLog, DEFAULTS.seenLog), seenDays: days(s.seenDays, DEFAULTS.seenDays, RETENTION.seenDays),
   };
   return out.protection ? { ...out, ...PROTECTION_FORCES } : out;
 }
@@ -16861,5 +17059,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_library, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

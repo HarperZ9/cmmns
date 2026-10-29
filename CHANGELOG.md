@@ -6,6 +6,14 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- **Engagement over time for saved posts** (project-docs/ENGAGEMENT-SERIES.md). Each post saved on X,
+  Reddit or YouTube is tracked by id, and its counts are written down again whenever the page's own
+  data carries it, at most once per post per 6 hours, with the post's age. A daily alarm works out
+  which readings are due at 1, 3, 7, 14, 30 and 90 days and records the missed ones; with the
+  reminder on, the toolbar badge shows the count and the collections page lists the posts, with Next
+  opening the first in the same tab. An optional seen-post log (off by default, 90 days, no post
+  text) keeps every post the page loaded. "Export engagement series" writes JSONL and a manifest with
+  each file's SHA-256. No request is made for any of it; the new `alarms` permission only counts.
 - **Library capture** (project-docs/LIBRARY-CAPTURE.md). A **Save page as library** bar on X profile,
   list, search and hashtag pages and Reddit user and subreddit pages. Every post the page loads is saved
   once, by post id, with its media and its daylight.sidecar/1 note, into

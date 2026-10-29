@@ -37,6 +37,12 @@
     <p id="tags" class="tags" aria-label="Tags in this collection"></p>
     <p id="summary" class="muted" role="status" aria-live="polite"></p>
   </section>
+  <section aria-labelledby="h-due" id="due-box" hidden>
+    <h2 id="h-due">Readings due</h2>
+    <p id="due-line" class="muted" role="status" aria-live="polite"></p>
+    <ol id="due-list"></ol>
+    <button id="due-next" type="button">Next</button>
+  </section>
   <section aria-labelledby="h-items">
     <h2 id="h-items">Items</h2>
     <ul id="grid" class="media-grid board"></ul>
@@ -59,5 +65,7 @@
 <script src="collections-ui.js"></script>
 <script src="share-clean.js"></script>
 <script src="collections.js"></script>
+<script src="track-store.js"></script>
+<script src="collections-series.js"></script>
 </body>
 </html>

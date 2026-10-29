@@ -17,6 +17,11 @@ whether the most extreme replies come mostly from flagged accounts. X first.
   GitHub, RDAP and the Internet Archive, `src/core/evidence-fetch.js`, project-docs/EVIDENCE-LAYER.md). No aggregator, no server, no telemetry, no
   analytics. Read only what
   the platform shows the viewer. Account lookups are user-initiated and rate-limited.
+- Engagement over time (project-docs/ENGAGEMENT-SERIES.md, `src/core/engagement-series.js`) makes no
+  request and is not a third network feature. Readings come only from data the page already loaded for
+  the user, at most one per post per 6 hours. Nothing loads posts on a timer: the daily alarm only counts
+  due readings, and the user opens each one. The seen-post log is off by default, keeps no post text,
+  and is kept 90 days unless the user changes it. `tests/engagement-series.test.js` holds the line.
 - No IP addresses or other data the platform does not disclose.
 - Raw thread captures contain other people's posts. They stay in
   `project-docs/evidence/raw/` (git-ignored); only aggregate results are committed.
