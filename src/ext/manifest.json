@@ -136,6 +136,7 @@
         "definitions-view.js",
         "freshness.js",
         "card.js",
+        "thread-tools.js",
         "panel.js",
         "ui.js",
         "auto.js",

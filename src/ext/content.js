@@ -147,7 +147,7 @@
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
     // Reply times come from the page's datetime attributes, which give seconds (src/core/precision.js).
-    report.bursts = PB.timingBursts(replies, { precision: "second" });
+    report.bursts = PB.timingBursts(replies, { precision: "second" }); report.timeline = PB.replyTimeline(replies, report.bursts);
     report.flood = PB.floodSign(replies, tech.rateOf, { bursts: report.bursts });
     report.crossLang = tech.groups;
     report.lens = lens.patterns;
@@ -163,7 +163,7 @@
     if (root && report.campaign) for (const [, model] of models) if (model.postId === report.campaign.launchId) model.campaign = report.campaign;
     saveSnapshot(threadKey, site.name, report);
     lastSummary = { ...lastSummary, sentence: report.sentence, signs: (report.bursts || []).length + clusters.length + (report.state || []).length, state: report.state };
-    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, viewed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onCard: () => PBLogs.saveCard({ site, report, items, replies, rows, root, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
+    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, viewed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onSaveThread: (format) => PBThreadTools.save(format, { site, root, replies, rows, clusters, bursts: report.bursts }), onCard: () => PBLogs.saveCard({ site, report, items, replies, rows, root, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
   }
 
   // The swarming sign's marks (src/core/swarming.js): an account is new when it joined under

@@ -35,12 +35,14 @@
     ["BBC_Breaking_24", "Breaking: the minister has resigned, more soon.", { basedIn: "France", joinDate: "2026-09-30", nameChanges: 2 }, true],
   ];
   window.FIXTURE_ABOUT = Object.fromEntries(T.filter((t) => t[2]).map((t) => [t[0], t[2]]));
+  // Invented reply times, to the second: a reply every few minutes, and five within ten seconds.
+  const at = (i) => new Date(Date.UTC(2026, 9, 29, 12, 0, 0) + (i >= 4 && i <= 8 ? 1500 + (i - 4) * 2 : i * 263 + (i % 5) * 7) * 1000).toISOString();
   const box = document.getElementById("thread");
   T.forEach(([h, text], i) => {
     const a = document.createElement("article");
     a.setAttribute("data-testid", "tweet");
     a.tabIndex = 0;   // X's posts take keyboard focus
-    a.innerHTML = `<div data-testid="User-Name"><a href="/${h}">${h.replace(/_/g, " ")}</a> <span>@${h} · <a href="/${h}/status/10${i}"><time>2h</time></a></span></div><div data-testid="tweetText"></div>`;
+    a.innerHTML = `<div data-testid="User-Name"><a href="/${h}">${h.replace(/_/g, " ")}</a> <span>@${h} · <a href="/${h}/status/10${i}"><time datetime="${at(i)}">2h</time></a></span></div><div data-testid="tweetText"></div>`;
     a.querySelector('[data-testid="tweetText"]').textContent = text;
     // A synthetic image signed with test Content Credentials (tests/fixtures/c2pa), for the media rows.
     if (i === 1) { const img = document.createElement("img"); img.src = "c2pa/ai.jpg"; img.width = 240; img.height = 240; img.alt = "synthetic test image"; a.append(img); }
@@ -54,23 +56,54 @@
 <script src="chrome-stub.js"></script>
 <script src="../../src/ext/ocr.bundle.js"></script>
 <script src="../../src/ext/core.bundle.js"></script>
+<script src="../../src/ext/discourse.bundle.js"></script>
 <script src="../../src/ext/guard.js"></script>
 <script src="../../src/ext/settings.js"></script>
+<script src="../../src/ext/lens-inline.js"></script>
 <script src="../../src/ext/fonts.js"></script>
 <script src="../../src/ext/store.js"></script>
 <script src="../../src/ext/feedback.js"></script>
-<script>Promise.all(window.FIXTURE_PRELOAD.map((r) => PBStore.put(r))).then(() => { window.FIXTURE_READY = true; document.getElementById("thread").append(document.createElement("i")); });</script>
+<script src="../../src/ext/meta.js"></script>
 <script src="../../src/ext/about-page.js"></script>
+<script src="../../src/ext/platforms-reach.js"></script>
 <script src="../../src/ext/platforms.js"></script>
+<script src="../../src/ext/tour.js"></script>
+<script src="../../src/ext/side-bridge.js"></script>
 <script src="../../src/ext/pop.js"></script>
 <script src="../../src/ext/media.js"></script>
 <script src="../../src/ext/mediacard.js"></script>
+<script src="../../src/ext/linkcard.js"></script>
 <script src="../../src/ext/signals.js"></script>
+<script src="../../src/ext/discourse.js"></script>
+<script src="../../src/ext/definitions-view.js"></script>
+<script src="../../src/ext/freshness.js"></script>
 <script src="../../src/ext/card.js"></script>
+<script src="../../src/ext/thread-tools.js"></script>
 <script src="../../src/ext/panel.js"></script>
 <script src="../../src/ext/ui.js"></script>
+<script src="../../src/ext/auto.js"></script>
 <script src="../../src/ext/logs.js"></script>
+<script src="../../src/ext/reddit.js"></script>
 <script src="../../src/ext/health.js"></script>
+<script src="../../src/ext/campaign.js"></script>
+<script src="../../src/ext/evidence-view.js"></script>
+<script src="../../src/ext/quick-toast.js"></script>
+<script src="../../src/ext/quick-resolve.js"></script>
+<script src="../../src/ext/quick-sites.js"></script>
+<script src="../../src/ext/quick-stream.js"></script>
+<script src="../../src/ext/quick-gif.js"></script>
+<script src="../../src/ext/quick-saved.js"></script>
+<script src="../../src/ext/quick-save.js"></script>
+<script src="../../src/ext/quick-capture.js"></script>
+<script src="../../src/ext/quick-copy.js"></script>
+<script src="../../src/ext/quick-text.js"></script>
+<script src="../../src/ext/yt-reference.js"></script>
+<script src="../../src/ext/quick-inline.js"></script>
+<script src="../../src/ext/quick-hover-ui.js"></script>
+<script src="../../src/ext/quick-hover.js"></script>
+<script src="../../src/ext/library.js"></script>
+<script src="../../src/ext/library-scroll.js"></script>
+<script src="../../src/ext/library-ui.js"></script>
 <script src="../../src/ext/content.js"></script>
 </body>
 </html>

@@ -6,6 +6,16 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- **Reply timeline** in the thread report (`src/core/reply-timeline.js`, `src/ext/thread-tools.js`): a
+  strip of bars showing when the loaded replies arrived, with the stretches the timing-burst test
+  marked drawn in the sign colour and underlined. Never finer than the times behind it (times good
+  to the hour get hour bars). The strip carries one sentence as its accessible name, printed under
+  it too, and names no account. Nothing moves.
+- **Save thread** and **Save as JSONL** in the thread report (`src/core/thread-save.js`): the replies
+  the page has loaded, each with its author, time, text, badges (with what each does not prove) and
+  its same-text group or burst, as one Markdown note or as JSON Lines (`cmmns.thread/1`, the thread
+  first, then the post, then one line per reply). Written through the same save path as other
+  saves; nothing is sent. No extremity score or rhetoric marker is kept per reply.
 - **Library capture** (project-docs/LIBRARY-CAPTURE.md). A **Save page as library** bar on X profile,
   list, search and hashtag pages and Reddit user and subreddit pages. Every post the page loads is saved
   once, by post id, with its media and its daylight.sidecar/1 note, into

@@ -1,6 +1,7 @@
 // The thread panel: a small floating "CMMNS" button that opens into a summary of the thread. It
 // starts collapsed and remembers the user's choice for the session. Sections read top-down: what
-// it means, where accounts are based, signs of coordination, links and video, then actions.
+// it means, where accounts are based, signs of coordination and the reply timeline, links and video,
+// then actions.
 (() => {
   "use strict";
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -115,7 +116,7 @@
     p.append(s);
   }
 
-  // stats: { site, pending, scanning, paused, video, pushed, viewed, onExport, onCard, onClearHistory }
+  // stats: { site, pending, scanning, paused, video, pushed, viewed, onExport, onSaveThread, onCard, onClearHistory }
   function render(report, clusters, stats, onLookupAll) {
     let p = document.getElementById("pb-panel");
     if (!p) { p = el("aside", "pb-panel"); p.id = "pb-panel"; document.body.append(p); }
@@ -151,6 +152,8 @@
     campaign(p, report.campaign, () => render(report, clusters, stats, onLookupAll));
     section(p, "Coordination", coord);
     if (coord.some((t) => t && t.includes(" showed up in "))) p.lastChild.append(el("p", "pb-foot", PB.BASELINE_SOURCE));
+    const strip = globalThis.PBThreadTools && PBThreadTools.timeline(report.timeline);
+    if (strip) p.append(strip);
     // Persuasion techniques get their own line; they never count toward "flagged".
     section(p, "Persuasion", report.persuasion ? [report.persuasion.sentence] : []);
     // Reading-lens frames (src/core/reading.js): how many posts and authors here use each one.
@@ -165,6 +168,7 @@
     const acts = el("div", "pb-actions");
     if (!stats.scanning && !stats.paused && stats.pending) acts.append(button(`Read ${Math.min(stats.pending, 200)} accounts`, "Reads each account's profile and About page in one minimised window.", onLookupAll));
     if (stats.onExport) acts.append(button("Save report", "Saves the report and each account's flags to a JSON file on this computer.", stats.onExport));
+    if (stats.onSaveThread && report.replies) acts.append(button("Save thread", "Saves the replies loaded here, each with its time and badges, as one note on this computer.", () => stats.onSaveThread("note")), button("Save as JSONL", "Saves the same replies as JSON Lines, one record per line, for a study.", () => stats.onSaveThread("jsonl")));
     if (stats.onCard) acts.append(button("Save card", "Makes a card about this thread as a whole to read, then save or share as an image and a JSON file.", stats.onCard));
     if (stats.onClearHistory) acts.append(button("Clear history", "Forgets which accounts CMMNS has seen in which threads, in this browser.", stats.onClearHistory));
     p.append(acts);
