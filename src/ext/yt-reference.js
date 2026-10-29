@@ -40,8 +40,14 @@ globalThis.PBYouTube = globalThis.PBYouTube || (() => {
     return `https://www.youtube.com/watch?v=${id}${t ? `&t=${t}s` : ""}`;
   }
 
+  // YouTube swaps videos without reloading the page, and the previous video's chapter list can stay
+  // in it. Each chapter links to its own video, so keep only the ones that link to this video;
+  // markers with no link are read only when none carries one.
+  const markerVideo = (r) => { const a = r.querySelector("a[href*='v=']"); return (a && (/[?&]v=([\w-]{6,})/.exec(a.getAttribute("href") || "") || [])[1]) || null; };
   function chapters() {
-    return [...document.querySelectorAll("ytd-macro-markers-list-item-renderer")].map((r) => {
+    const id = videoId(), all = [...document.querySelectorAll("ytd-macro-markers-list-item-renderer")];
+    const mine = all.some(markerVideo) ? all.filter((r) => markerVideo(r) === id) : all;
+    return mine.map((r) => {
       const time = txt(r.querySelector("#time")), title = txt(r.querySelector("h4, #details h4, .macro-markers"));
       return time && title ? `${time} ${title}` : null;
     }).filter(Boolean).filter((x, i, all) => all.indexOf(x) === i);
@@ -84,5 +90,5 @@ globalThis.PBYouTube = globalThis.PBYouTube || (() => {
     catch (e) { PBQuickToast.show(`Not copied: ${e.message}`, { tone: "no" }); return { ok: false }; }
   }
 
-  return Object.freeze({ isYouTube, reference, saveReference, copyLink, linkAtTime, videoId });
+  return Object.freeze({ isYouTube, reference, saveReference, copyLink, linkAtTime, videoId, chapters });
 })();

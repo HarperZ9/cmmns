@@ -41,6 +41,9 @@ were not published to a store.
   dependency-free; the committed figures match the 2026-10-28 study exactly.
 
 ### Fixed
+- A YouTube reference no longer saves chapters from the video watched before. YouTube changes videos
+  without reloading the page and can leave the old chapter list in it; each chapter links to its own
+  video, so only this video's chapters are kept (`tests/yt-chapters.test.js` fails on the old code).
 - One-click saves pass their folder (site, study or library) with each save instead of keeping it in
   shared page state, so a save that waits on the network and another save started meanwhile can no
   longer swap folders (`tests/library.browser.test.js` fails on the old code).
