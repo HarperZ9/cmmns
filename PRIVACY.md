@@ -134,7 +134,9 @@ and any hash of either stay in your browser, and the text lasts as long as that 
 - **Source protection**, off until you turn it on (toolbar menu, Source protection), stops every
   request in this policy that CMMNS makes on its own: no About pages or Reddit account
   data read for you, no evidence lookups, no Other coverage, no Internet Archive copy, and no file
-  downloaded again from its host. Save to CMMNS keeps only what the page already holds in
+  downloaded again from its host. It also holds the seen-post log off, whatever its switch says,
+  so CMMNS keeps no record of the posts you were shown; entries from before stay until you delete them,
+  and the mode's page offers that delete. Save to CMMNS keeps only what the page already holds in
   memory. Download gives Share clean copies, and every evidence bundle is carrier-safe. The toolbar
   button shows a P while it is on. The sites you open still load their own pages and record what
   you do there; the mode's own page lists what it cannot protect against. It has not yet been
@@ -188,7 +190,7 @@ names it, in IndexedDB, in the browser profile you installed CMMNS in, on this d
 | Catalogue age (`pb.head.v1`) | After you check a signed head on the options page: its version, a hash of it, its signed time and expiry, the catalogue version and how many signatures it carried. Used to refuse an older head and to show how old the catalogue is | Until you remove CMMNS |
 | Data packs (`pb.packs.v1`, `pb.packkeys.v1`) | Pack files you imported on the options page, whether each is on, and the public keys you chose to trust. Packs arrive only as files you pick, and stay in this browser | Until you remove them |
 | Engagement series (IndexedDB `cmmns-track`) | While "Re-read posts you save" is on (the default): for each post you save on X, Reddit or YouTube, its id, the author's handle, when it was posted and saved, and the counts (likes, reposts, quotes, replies, bookmarks and views; Reddit's score and comments; YouTube's views) the page's own data showed each time you loaded it again, at most once every 6 hours, plus the target ages that passed with no reading. CMMNS makes no request for this | Until you delete it or clear CMMNS data; at most 20,000 posts and 240 readings per post |
-| Seen log (IndexedDB `cmmns-track`) | Off by default. With "Log every post the page loads" on: each post X, Reddit or YouTube loaded for you, by id, with the author's handle, its times and counts, its hashtags and link domains, and the SHA-256 of each media address. No post text and no pictures | 90 days by default; 1 to 365 days in options |
+| Seen log (IndexedDB `cmmns-track`) | Off by default, and always off while source protection is on. With "Log every post the page loads" on: each post X, Reddit or YouTube loaded for you, by id, with the author's handle, its times and counts, its hashtags and link domains, and the SHA-256 of each media address. No post text and no pictures | 90 days by default; 1 to 365 days in options |
 | X request shape (`pb.tpl`) | The shape of X's About request, so CMMNS can repeat it. The login token is read fresh from X's cookie each time | Until X changes it or you clear CMMNS' data |
 
 Post data from the page (views, posting app, media upload times) is held in memory for the tab and

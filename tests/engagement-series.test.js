@@ -168,3 +168,23 @@ test("YouTube and Reddit sightings: a real video id and a t3_ post id, with the 
   assert.equal(ES.trackEntry({ site: "reddit", postUrl: "https://www.reddit.com/r/a/comments/abc123/title/def456/" }), null, "a saved comment is not tracked as its post");
   assert.equal(ES.trackEntry({ site: "reddit", postUrl: "https://www.reddit.com/r/a/comments/abc123/title/" }).key, "reddit:abc123");
 });
+
+test("source protection: no seen-log writes, even with the switch on, and the switch is forced off", async () => {
+  const { normalizeSettings, PROTECTION_FORCES } = await import("../src/core/settings.js");
+  assert.equal(PROTECTION_FORCES.seenLog, false);
+  assert.equal(normalizeSettings({ seenLog: true, protection: true }).seenLog, false);
+  assert.equal(normalizeSettings({ seenLog: true }).seenLog, true);
+  const sightings = ES.sightingsFromTweets(tweetsIn(detail)), now = POSTED + DAY;
+  // The raw switch on with protection on (a settings object that skipped normalising): still nothing.
+  const raw = { ...ON, seenLog: true, protection: true };
+  assert.equal(ES.planSightings({ sightings, settings: raw, now }).seen.length, 0);
+  const store = loadStore();
+  await store.addTracked(savedMeta(), ON, now);
+  const r = await store.sightings(sightings, raw, now);
+  assert.equal(r.seen, 0);
+  assert.equal((await store.seen()).length, 0, "no seen-log entry is written");
+  assert.equal(r.readings, 1, "the readings of saved posts go on: protection holds off the log, not the series");
+  // The options page locks the switch and the protection page offers the delete.
+  assert.match(readFileSync(new URL("../src/ext/options-series.js", import.meta.url), "utf8"), /Locked off while source protection is on/);
+  assert.match(readFileSync(new URL("../src/ext/protection.html", import.meta.url), "utf8"), /No seen-post log/);
+});

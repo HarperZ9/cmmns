@@ -21,7 +21,7 @@ whether the most extreme replies come mostly from flagged accounts. X first.
   request and is not a third network feature. Readings come only from data the page already loaded for
   the user, at most one per post per 6 hours. Nothing loads posts on a timer: the daily alarm only counts
   due readings, and the user opens each one. The seen-post log is off by default, keeps no post text,
-  and is kept 90 days unless the user changes it. `tests/engagement-series.test.js` holds the line.
+  is kept 90 days unless the user changes it, and source protection forces it off (`PROTECTION_FORCES`). `tests/engagement-series.test.js` holds the line.
 - No IP addresses or other data the platform does not disclose.
 - Raw thread captures contain other people's posts. They stay in
   `project-docs/evidence/raw/` (git-ignored); only aggregate results are committed.

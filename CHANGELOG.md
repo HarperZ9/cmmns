@@ -14,6 +14,9 @@ were not published to a store.
   opening the first in the same tab. An optional seen-post log (off by default, 90 days, no post
   text) keeps every post the page loaded. "Export engagement series" writes JSONL and a manifest with
   each file's SHA-256. No request is made for any of it; the new `alarms` permission only counts.
+  Source protection forces the seen-post log off and writes no entry while on; the options page shows
+  the switch locked with the reason, and the protection page offers a two-step delete of entries
+  kept from before.
 - **Library capture** (project-docs/LIBRARY-CAPTURE.md). A **Save page as library** bar on X profile,
   list, search and hashtag pages and Reddit user and subreddit pages. Every post the page loads is saved
   once, by post id, with its media and its daylight.sidecar/1 note, into

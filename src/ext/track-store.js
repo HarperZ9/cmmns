@@ -46,10 +46,10 @@ globalThis.PBTrackStoreMake = function makeTrackStore(backend, PB) {
   // Posts the page's data carried. Resolves to how many readings and seen-log lines were written.
   async function sightings(list, settings, now = Date.now()) {
     const s = settings || {};
-    if (!s.trackSeries && !s.seenLog) return { readings: 0, seen: 0 };
+    if (!s.trackSeries && !(s.seenLog && !s.protection)) return { readings: 0, seen: 0 };
     const keys = uniq((list || []).map((x) => PB.seriesKey(x.platform, x.postId)));
     const tracked = s.trackSeries ? await lookup("tracked", keys) : {};
-    const last = s.seenLog ? await lookup("seenLast", keys) : {};
+    const last = s.seenLog && !s.protection ? await lookup("seenLast", keys) : {};
     const seenLast = Object.fromEntries(Object.entries(last).map(([k, v]) => [k, v.lastAt]));
     const plan = PB.planSightings({ sightings: list, tracked, seenLast, settings: s, now });
     if (plan.readings.length) {

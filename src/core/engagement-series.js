@@ -92,6 +92,7 @@ export function readingOf(s, entry, now = Date.now(), source = "page") {
 // What to write for a batch of sightings. tracked: { key: entry }; lastAt and seenLast: { key: ms }.
 export function planSightings({ sightings = [], tracked = {}, lastAt = {}, seenLast = {}, settings = {}, now = Date.now() }) {
   const out = { readings: [], seen: [], lastAt: {}, seenAt: {}, postedAt: {} };
+  const logSeen = !!settings.seenLog && !settings.protection;   // source protection keeps no seen log
   for (const s of sightings) {
     const key = seriesKey(s.platform, s.postId), e = tracked[key];
     if (!Object.keys(countsOf(s.counts)).length) continue;
@@ -100,7 +101,7 @@ export function planSightings({ sightings = [], tracked = {}, lastAt = {}, seenL
       out.lastAt[key] = now;
       if (!e.postedAt && s.postedAt) out.postedAt[key] = s.postedAt;
     }
-    if (settings.seenLog && !(key in out.seenAt) && shouldRecord(seenLast[key], now)) { out.seen.push(seenRecord(s, now)); out.seenAt[key] = now; }
+    if (logSeen && !(key in out.seenAt) && shouldRecord(seenLast[key], now)) { out.seen.push(seenRecord(s, now)); out.seenAt[key] = now; }
   }
   return out;
 }

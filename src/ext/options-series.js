@@ -11,7 +11,17 @@
   $("series").append(
     switchRow("Re-read posts you save", "On by default. Keeps, for each post you save, its id, the author's handle, when it was posted and saved, and the counts the page's own data shows whenever you load it again. Nothing is sent.", s.trackSeries, (on) => save({ trackSeries: on })),
     switchRow("Remind me of due readings", "Off by default. Once a day CMMNS counts the saved posts that have reached 1, 3, 7, 14, 30 or 90 days and shows the number on its toolbar button. The collections page lists them, and Next opens one. It keeps nothing more. Nothing is sent.", s.trackRemind, (on) => save({ trackRemind: on })),
-    switchRow("Log every post the page loads", "Off by default. Keeps, for every post X, Reddit or YouTube loads for you: its id, the author's handle, its times and counts, its hashtags and link domains, and a hash of each media address. No post text and no pictures. Kept for the days below. Nothing is sent.", s.seenLog, (on) => save({ seenLog: on })));
+    seenSwitch(s));
+  // Source protection holds the seen log off (PB.PROTECTION_FORCES): the switch shows it, locked, and says why.
+  function seenSwitch(now) {
+    const row = switchRow("Log every post the page loads", "Off by default. Keeps, for every post X, Reddit or YouTube loads for you: its id, the author's handle, its times and counts, its hashtags and link domains, and a hash of each media address. No post text and no pictures. Kept for the days below. Nothing is sent.", now.seenLog, (on) => save({ seenLog: on }));
+    if (now.protection) {
+      const box = row.querySelector("input");
+      box.checked = false; box.disabled = true;
+      row.querySelector(".hint").append(" Locked off while source protection is on: a log of every post you were shown would tell anyone holding this device what you read.");
+    }
+    return row;
+  }
   const days = $("seenDays");
   days.min = PB.RETENTION.seenDays.min; days.max = PB.RETENTION.seenDays.max; days.value = s.seenDays;
   days.addEventListener("change", () => save({ seenDays: days.value }).then((n) => { if (n) days.value = n.seenDays; }));

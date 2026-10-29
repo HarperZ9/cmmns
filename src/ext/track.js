@@ -8,7 +8,7 @@ globalThis.PBTrack = globalThis.PBTrack || (() => {
   const host = location.hostname.replace(/^www\./, "");
   const isX = /^(x|twitter)\.com$/.test(host), isYt = /(^|\.)youtube\.com$/.test(host), isReddit = /(^|\.)reddit\.com$/.test(host);
   const settings = () => (globalThis.PBSettings ? PBSettings.get() : {});
-  const wanted = () => { const s = settings(); return !s.paused && !!(s.trackSeries || s.seenLog); };
+  const wanted = () => { const s = settings(); return !s.paused && !!(s.trackSeries || (s.seenLog && !s.protection)); };
   function send(msg) {
     try { chrome.runtime.sendMessage(msg).catch((e) => console.warn("[cmmns] the engagement series did not get a message", e)); }
     catch (e) { console.warn("[cmmns] the engagement series could not send", e); }

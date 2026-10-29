@@ -12978,6 +12978,7 @@ function readingOf(s, entry, now = Date.now(), source = "page") {
 // What to write for a batch of sightings. tracked: { key: entry }; lastAt and seenLast: { key: ms }.
 function planSightings({ sightings = [], tracked = {}, lastAt = {}, seenLast = {}, settings = {}, now = Date.now() }) {
   const out = { readings: [], seen: [], lastAt: {}, seenAt: {}, postedAt: {} };
+  const logSeen = !!settings.seenLog && !settings.protection;   // source protection keeps no seen log
   for (const s of sightings) {
     const key = seriesKey(s.platform, s.postId), e = tracked[key];
     if (!Object.keys(countsOf(s.counts)).length) continue;
@@ -12986,7 +12987,7 @@ function planSightings({ sightings = [], tracked = {}, lastAt = {}, seenLast = {
       out.lastAt[key] = now;
       if (!e.postedAt && s.postedAt) out.postedAt[key] = s.postedAt;
     }
-    if (settings.seenLog && !(key in out.seenAt) && shouldRecord(seenLast[key], now)) { out.seen.push(seenRecord(s, now)); out.seenAt[key] = now; }
+    if (logSeen && !(key in out.seenAt) && shouldRecord(seenLast[key], now)) { out.seen.push(seenRecord(s, now)); out.seenAt[key] = now; }
   }
   return out;
 }
@@ -15058,9 +15059,10 @@ function legacyFolderPatch(raw, previousVersion) {
 
 // What source-protection mode holds off while it is on: evidence lookups (GitHub, RDAP, the Internet
 // Archive), Other coverage (outlets' feeds), reading About pages automatically, and one-click
-// downloads (which fetch the file again from its host). Turning the mode off leaves them off until
-// the user turns each one back on.
-const PROTECTION_FORCES = Object.freeze({ evidence: false, coverage: false, feedConsent: false, auto: false, mediaButtons: false });
+// downloads (which fetch the file again from its host), and the seen-post log (a record on this
+// device of every post the user was shown; the author's decision, 2026-10-29). Turning the mode off
+// leaves them off until the user turns each one back on.
+const PROTECTION_FORCES = Object.freeze({ evidence: false, coverage: false, feedConsent: false, auto: false, mediaButtons: false, seenLog: false });
 // A folder path inside Downloads: letters, digits, spaces, dots, hyphens, underscores and slashes,
 // no ".." part, at most 120 characters.
 const folder = (v, d) => (typeof v !== "string" ? d

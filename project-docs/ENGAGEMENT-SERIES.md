@@ -62,6 +62,15 @@ every post in the page's data is logged at most once per 6 hours. These are publ
 showed the user; handles appear only as authors of those posts. The log stays in this browser.
 "Delete seen log" in the options removes it, and entries older than the retention go daily.
 
+Source protection forces the seen-post log off (`PROTECTION_FORCES`, the author's decision of
+2026-10-29), and the series refuses seen-log writes while protection is on even when a settings
+object still says on (`planSightings`). The options page shows the switch locked off with the
+reason. Readings of saved posts go on, because they are the user's own saves. Turning protection
+on deletes nothing: protection mode holds features off and deletes nothing elsewhere, and it is a
+one-click, reversible switch, while a delete is not. So the protection page shows how many entries
+the log still holds and offers a two-step "Delete seen log". Turning protection off leaves the log
+off until the user turns it back on.
+
 ## Storage
 
 IndexedDB database `cmmns-track` under the extension's origin (`src/ext/track-store.js`):
