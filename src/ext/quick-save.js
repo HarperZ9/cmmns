@@ -175,6 +175,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   // Resolves to { line, names, meta }; with oneSidecar the caller writes one sidecar for the post.
   async function run(t, opts = {}) {
     const plan = PB.downloadPlan(t, { asGif: !!opts.asGif }), p = await prefs(), meta = metaOf(t, opts);
+    if (globalThis.PBTrack) PBTrack.saved(meta);   // engagement over time (track.js): the saved post is tracked
     const dest = destOf({ site: meta.site, study: opts.study, library: opts.library });
     const title = opts.title || t.title || document.title || location.hostname;
     const own = (u) => (/^https?:/i.test(String(u || "")) ? u : "");

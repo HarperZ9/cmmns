@@ -19,6 +19,7 @@
     "downloads",
     "clipboardWrite",
     "sidePanel",
+    "alarms",
     "offscreen"
   ],
   "host_permissions": [
@@ -56,6 +57,8 @@
       "card-bg.js",
       "media-bg.js",
       "adblock-bg.js",
+      "track-store.js",
+      "track-bg.js",
       "background.js"
     ]
   },
@@ -165,6 +168,7 @@
         "library.js",
         "library-scroll.js",
         "library-ui.js",
+        "track.js",
         "content.js"
       ],
       "css": [

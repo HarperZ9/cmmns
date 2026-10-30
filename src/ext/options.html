@@ -96,6 +96,20 @@
     <p class="muted" id="headCaveat"></p>
   </section>
 
+  <section aria-labelledby="h-series">
+    <h2 id="h-series">Engagement over time</h2>
+    <p class="muted">For posts you save on X, Reddit and YouTube, CMMNS writes down the counts the page's own data shows each time you load the post again, at most once every 6 hours. It makes no request for this: every reading comes from a page you opened. Everything stays in this browser until you export it.</p>
+    <div id="series" class="switches"></div>
+    <div class="field"><label for="seenDays">Seen log, in days</label><input id="seenDays" type="number" inputmode="numeric"></div>
+    <p class="status muted figure" id="seriesCount" aria-live="polite"></p>
+    <div class="row">
+      <button id="seriesExport" type="button">Export engagement series</button>
+      <button id="seriesClear" type="button" class="quiet">Delete engagement series</button>
+      <button id="seenClear" type="button" class="quiet">Delete seen log</button>
+      <span id="seriesStatus" role="status" aria-live="polite"></span>
+    </div>
+  </section>
+
   <section aria-labelledby="h-keep">
     <h2 id="h-keep">What CMMNS keeps</h2>
     <p class="muted">Everything stays in this browser profile. Older entries are deleted on the next start and whenever you change these numbers.</p>
@@ -155,5 +169,7 @@
 <script src="options-head.js"></script>
 <script src="options-adblock.js"></script>
 <script src="options-downloads.js"></script>
+<script src="track-store.js"></script>
+<script src="options-series.js"></script>
 </body>
 </html>

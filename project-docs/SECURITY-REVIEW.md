@@ -13,7 +13,7 @@ security contact (SECURITY.md); the coordinated-disclosure terms there apply.
 | Wayback opt-in | `case add` and `case run` make no Wayback save request unless `--archive` or the case's archive setting asks; `case watch` asks the Archive's availability API only with the setting on | `src/investigate/add.js`, `stages-gather.js`, `watch.js`, `bin/lib/case.mjs` | `tests/protection.test.js` records every request |
 | Protection, command line | With `cmmns protect on`, `DAYLIGHT_PROTECT=1` or `case settings protection on`, no case command makes a request: `case add <url>`, `--archive` and `case watch` are refused, `case run` blocks every capture, and a remote model endpoint is refused | `src/investigate/protection.js`, `bin/lib/case-protect.mjs`, `case-run.mjs` | the same test: the injected fetch is never called |
 | Protection, exports | Exports are Share clean, signed with a one-time key (carrier-safe), keep the day of every time only, pseudonymise every account unless `--keep-name`, and record the investigator as "investigator" in git with the day only | `src/investigate/export.js`, `export-clean.js`, `bin/lib/case-env.mjs` | `tests/protection.test.js` |
-| Protection, extension | While on, the extension makes no request of its own: no About lookups (worker window or the in-page request), no Reddit account reads, no evidence lookups, no Other coverage, no Archive copy, no download from a host (save page, one-click Download, the right-click Download menu) | `src/core/settings.js` (`PROTECTION_FORCES`), `src/ext/background.js`, `auto.js`, `reddit.js`, `media-fetch.js`, `quick-save-bg.js`, `save.js` | `scripts/qa/protect_check.py`: network capture during a save in protection mode |
+| Protection, extension | While on, the extension makes no request of its own: no About lookups (worker window or the in-page request), no Reddit account reads, no evidence lookups, no Other coverage, no Archive copy, no download from a host (save page, one-click Download, the right-click Download menu). It also writes no seen-post log entry (engagement series, Part 3), whatever that switch says | `src/core/settings.js` (`PROTECTION_FORCES`), `src/core/engagement-series.js` (`planSightings`), `src/ext/background.js`, `auto.js`, `reddit.js`, `media-fetch.js`, `quick-save-bg.js`, `save.js` | `scripts/qa/protect_check.py`: network capture during a save in protection mode |
 | Share clean | The copy carries none of the file's own metadata in JPEG, PNG, GIF, WebP, MP4/MOV/M4A, WebM/MKV, PDF, OOXML and ODF; pixels, frames and samples are byte-identical; a second pass finds nothing; a file it cannot read is refused | `src/core/clean*.js` | `tests/clean.test.js` (byte scan of planted markers, structural identity), `scripts/qa/clean_check.py` (decoded frames with Pillow and ffmpeg) |
 | Self-audit | Runs only on the user's own account: the page's own signed-in markers or the user's own export; no handle can be entered | `src/core/self-audit.js`, `src/ext/selfaudit*.js`, `bin/lib/protect.mjs` | `tests/self-audit.test.js` |
 
@@ -47,6 +47,9 @@ security contact (SECURITY.md); the coordinated-disclosure terms there apply.
 - PDF annotation authors, OOXML comment and tracked-change authors, and printer tracking dots are
   not removed by Share clean.
 - Turning protection off leaves the switched-off features off until the user turns each back on.
+- Protection mode deletes nothing by itself. Seen-post log entries written before it was turned on
+  stay on the device until the user deletes them; the protection page shows how many and offers a
+  two-step delete (decision of 2026-10-29: the mode is one click and reversible, a delete is not).
 
 ## Does not prove
 

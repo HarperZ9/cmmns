@@ -6,6 +6,17 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- **Engagement over time for saved posts** (project-docs/ENGAGEMENT-SERIES.md). Each post saved on X,
+  Reddit or YouTube is tracked by id, and its counts are written down again whenever the page's own
+  data carries it, at most once per post per 6 hours, with the post's age. A daily alarm works out
+  which readings are due at 1, 3, 7, 14, 30 and 90 days and records the missed ones; with the
+  reminder on, the toolbar badge shows the count and the collections page lists the posts, with Next
+  opening the first in the same tab. An optional seen-post log (off by default, 90 days, no post
+  text) keeps every post the page loaded. "Export engagement series" writes JSONL and a manifest with
+  each file's SHA-256. No request is made for any of it; the new `alarms` permission only counts.
+  Source protection forces the seen-post log off and writes no entry while on; the options page shows
+  the switch locked with the reason, and the protection page offers a two-step delete of entries
+  kept from before.
 - **Reply timeline** in the thread report (`src/core/reply-timeline.js`, `src/ext/thread-tools.js`): a
   strip of bars showing when the loaded replies arrived, with the stretches the timing-burst test
   marked drawn in the sign colour and underlined. Never finer than the times behind it (times good

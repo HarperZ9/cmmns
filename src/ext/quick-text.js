@@ -38,6 +38,7 @@ globalThis.PBQuickText = globalThis.PBQuickText || (() => {
   // Saves raw as a note (and, with card, as a picture too). opts: { study, card }.
   async function save(raw, { study = false, card = false } = {}) {
     const meta = PB.postMeta({ ...raw, study }), name = nameFor(meta, "md");
+    if (globalThis.PBTrack) PBTrack.saved(meta);   // engagement over time (track.js)
     await PBQuickSave.saveText(new TextEncoder().encode(PB.sidecarMarkdown(meta, [])), "text/markdown", name, meta.site, study);
     let line = `Saved ${study ? "for study" : "the text"}: ${name}`;
     if (card) {

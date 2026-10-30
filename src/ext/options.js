@@ -111,6 +111,7 @@
       try {
         const all = await chrome.storage.local.get(null);
         await chrome.storage.local.remove(PB.dataKeys(Object.keys(all)));
+        if (globalThis.PBTrackStore) await PBTrackStore.clearAll();   // the engagement series and seen log (IndexedDB)
         $("clearStatus").textContent = "Cleared. Your settings are kept.";
       } catch (e) { console.error("[cmmns] clear failed", e); $("clearStatus").textContent = "Could not clear: " + e.message; }
       disarm();

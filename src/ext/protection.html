@@ -19,12 +19,17 @@
     <div class="switches">
       <label class="switch"><span>Source protection<span class="hint">Not yet independently reviewed. A reviewer's checklist is in the project's SECURITY-REVIEW.md.</span></span><input type="checkbox" id="protection"></label>
     </div>
+    <div class="row" id="seen-box" hidden>
+      <p id="seen-line" class="muted" role="status" aria-live="polite"></p>
+      <button id="seen-clear" type="button" class="quiet">Delete seen log</button>
+    </div>
     <p class="muted">For one investigation folder on the command line: <code>cmmns case settings protection on</code>. For every case on a computer: <code>cmmns protect on</code>.</p>
   </section>
   <section aria-labelledby="h-does">
     <h2 id="h-does">While it is on</h2>
     <ul class="plain">
       <li><strong>No requests.</strong> No Internet Archive copy, no file downloaded again from its host, no evidence lookups (GitHub, RDAP, the Archive), no Other coverage feeds, no About pages read for you, no Reddit account reads. The toolbar button shows a P.</li>
+      <li><strong>No seen-post log.</strong> The engagement series' log of every post a page loaded is held off, whatever its switch says, and stays off when you turn protection off until you turn it back on. Entries it already holds stay until you delete them below or in the options.</li>
       <li><strong>Clean exports.</strong> Download in Collections gives a Share clean copy, and every evidence bundle is carrier-safe: a one-time key, the day only, no page address.</li>
       <li><strong>No name of yours.</strong> On the command line, case notes and history record you as "investigator", with the day only, and every account in an export is a pseudonym.</li>
       <li><strong>Your writing style can identify you.</strong> Word choice, spelling and punctuation can point to one person. Keep what you share short and plain, and have someone else reword it when it matters.</li>
@@ -45,6 +50,7 @@
 <script src="core.bundle.js"></script>
 <script src="guard.js"></script>
 <script src="settings.js"></script>
+<script src="track-store.js"></script>
 <script src="protection.js"></script>
 </body>
 </html>
