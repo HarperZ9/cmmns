@@ -49,8 +49,11 @@ svg { width: 16px; height: 16px; fill: currentColor; }
     for (const t of ["pointerdown", "pointerup", "mousedown", "mouseup", "click", "dblclick", "contextmenu", "touchstart", "touchend"]) el.addEventListener(t, (e) => e.stopPropagation());
   }
 
+  // A host the page removed takes its shadow root with it: the parts drawn there are dropped too,
+  // or a later show() would place a bar no one can see.
   function mount() {
     if (host && host.isConnected) return;
+    bar = null; menu = null; noteEl = null;
     host = document.createElement("daylight-hover");
     host.setAttribute("popover", "manual");
     root = host.attachShadow({ mode: "closed" });
@@ -63,6 +66,15 @@ svg { width: 16px; height: 16px; fill: currentColor; }
     document.documentElement.append(host);
     try { host.showPopover(); } catch { /* no top layer here: the fixed host with a high z-index stands in */ }
   }
+
+  // The top layer stacks in the order things entered it, so a site's fullscreen player or modal
+  // dialog opened after the host covers the control (seen live on YouTube, 2026-10-29: in fullscreen
+  // the control was shown and the video was the topmost thing at its centre). Showing again lifts
+  // the host back to the top.
+  function raise() {
+    try { if (host.matches(":popover-open")) host.hidePopover(); host.showPopover(); } catch { /* no top layer here */ }
+  }
+  document.addEventListener("fullscreenchange", () => { if (bar && !bar.hidden) raise(); });
 
   function closeMenu() { if (menu) { menu.remove(); menu = null; } }
 
@@ -92,6 +104,7 @@ svg { width: 16px; height: 16px; fill: currentColor; }
   // menu replaces the default menu items ([[action, label], null for a rule]).
   function show(rect, label, handler, menuItems = null) {
     mount();
+    raise();
     onAction = handler; items = menuItems || ITEMS;
     if (!bar) {
       bar = document.createElement("div");

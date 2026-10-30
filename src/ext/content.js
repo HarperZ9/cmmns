@@ -8,7 +8,7 @@
   let scanLeft = 0;
   const lookingUp = new Set();
   const failed = new Set();   // looked up this session, nothing readable came back
-  let timer = 0, lastPath = location.pathname, lastPending = [];
+  let lastPath = location.pathname, lastPending = [];
 
   // Flags for one reply from what the site offers: the account reading (X only) and clusters.
   function evidence(site, r, reading, c) {
@@ -86,7 +86,7 @@
     return { groups, rateOf, perPost };
   }
 
-  async function refresh() {
+  async function refresh(lap = () => {}) {
     const site = PBSites.current();
     // Feed mode (timelines, profiles, likes, search): badges on every post, no thread report and
     // nothing added to the connections log, because a feed is not a conversation.
@@ -102,6 +102,7 @@
     const threadKey = PB.threadKey(site.id, location.pathname, location.search);
     if (!feed && replies.length) recordNet(threadKey, replies, root);
     const cache = site.hasLocation ? await PBStore.all() : {};
+    lap();   // awaits done: only the time from here on counts against the budget
     if (site.want && settings.auto) site.want([...new Set(items.map((r) => r.author))], schedule);
     const clusters = feed ? [] : PB.duplicateClusters(replies, { root });
     const clusterOf = new Map();
@@ -146,7 +147,7 @@
     const auto = globalThis.PBAuto ? PBAuto.left() : 0;
     const report = PB.threadReport(rows);
     // Reply times come from the page's datetime attributes, which give seconds (src/core/precision.js).
-    report.bursts = PB.timingBursts(replies, { precision: "second" });
+    report.bursts = PB.timingBursts(replies, { precision: "second" }); report.timeline = PB.replyTimeline(replies, report.bursts);
     report.flood = PB.floodSign(replies, tech.rateOf, { bursts: report.bursts });
     report.crossLang = tech.groups;
     report.lens = lens.patterns;
@@ -162,7 +163,7 @@
     if (root && report.campaign) for (const [, model] of models) if (model.postId === report.campaign.launchId) model.campaign = report.campaign;
     saveSnapshot(threadKey, site.name, report);
     lastSummary = { ...lastSummary, sentence: report.sentence, signs: (report.bursts || []).length + clusters.length + (report.state || []).length, state: report.state };
-    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, viewed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onCard: () => PBLogs.saveCard({ site, report, items, replies, rows, root, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
+    PBUI.panel(report, clusters, { pending: auto ? 0 : pending.length, scanning: scanLeft || auto, paused: globalThis.PBAuto && PBAuto.paused(), site, video, pushed, viewed, onClearHistory: clearNet, onExport: (lastExport = () => exportReport(site, report, clusters, rows, video, pushed)), onSaveThread: (format) => PBThreadTools.save(format, { site, root, replies, rows, clusters, bursts: report.bursts }), onCard: () => PBLogs.saveCard({ site, report, items, replies, rows, root, clusters, media: globalThis.PBMedia ? items.flatMap((r) => PBMedia.resultsFor(r.node, tweets.get(r.id))) : null }) }, () => lookup(...pending.slice(0, SCAN_MAX)));
   }
 
   // The swarming sign's marks (src/core/swarming.js): an account is new when it joined under
@@ -287,8 +288,7 @@
     return false;
   });
 
-  const guarded = PBGuard.measured(refresh);
-  function schedule(ms = 250) { clearTimeout(timer); timer = setTimeout(guarded, PBGuard.nextWait(ms)); }
+  const guarded = PBGuard.measured(refresh), schedule = PBGuard.debounced(() => { guarded(); });   // a pass at least once a second
   let scrollFrame = 0;
   window.addEventListener("scroll", () => { if (!scrollFrame) scrollFrame = requestAnimationFrame(() => { scrollFrame = 0; drawVisible(); }); }, { passive: true });
 

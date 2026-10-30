@@ -70,7 +70,9 @@ cover the rest.
   Paid partnership labels and unlabelled look-alike quotes, and accounts seen on other launches you
   opened.
 - **Thread report:** whether the most extreme replies come mostly from flagged accounts, with 95%
-  intervals. It says "skewed" only when the intervals do not overlap.
+  intervals. It says "skewed" only when the intervals do not overlap. A reply timeline shows when
+  the replies arrived, with timing bursts marked, and **Save thread** keeps the loaded replies with
+  their times and badges as one note or as JSON Lines on your computer.
 - **History page:** the accounts and sites your threads keep leading back to.
 - **Pressure lens (off by default):** urgency, shrinking the ask, a newcomer vouching, crediting both
   sides to close a dispute, "check it yourself" and "that's just noise", in messages from anyone.

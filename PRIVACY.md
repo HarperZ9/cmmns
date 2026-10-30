@@ -1,6 +1,6 @@
 # CMMNS privacy policy
 
-Last updated: 2026-10-28.
+Last updated: 2026-10-29.
 
 CMMNS, formerly Daylight Commons and Radar before that, runs in your browser, and everything it reads or works out stays there. It talks
 to the site you are on, with that site's own session. Two features reach further, and both stay off
@@ -221,6 +221,10 @@ The carrier-safe profile awaits independent review.
 - **History page:** clear the history, connections and trails on their own.
 - **Save report:** writes a JSON file to your computer when you click it, with the thread report,
   account labels and flags and without reply text.
+- **Save thread** and **Save as JSONL** (thread report): write the replies the page has loaded to
+  your computer when you click one, through the same save path as CMMNS' other saves. Each reply
+  keeps its author, its time, its text and the badges CMMNS showed with what each does not prove.
+  These are other people's posts: the file stays on your computer, and nothing is sent anywhere.
 - **Save feedback to a file** (options page): writes your marks to a JSON file on your computer when
   you click it. You choose whether to share it, for example by attaching it to an issue on CMMNS'
   repository. "Clear feedback" deletes your marks.

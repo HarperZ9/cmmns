@@ -32,7 +32,7 @@
 <p class="role">What CMMNS reads, what it sends and to whom, what it keeps and for how long, and your controls.</p>
 </header>
 <nav class="dc-local" aria-label="CMMNS"><a href="how-it-works.html">How it works</a> <a href="install.html">Install</a> <a href="privacy.html" aria-current="page">Privacy</a> <a href="transparency.html">How it is measured</a> <a href="catalogue.html">Catalogue</a> <a href="https://github.com/HarperZ9/cmmns">Source</a></nav>
-<p class="dc-updated">Updated 2026-10-28.</p>
+<p class="dc-updated">Updated 2026-10-29.</p>
 <p>CMMNS, formerly Daylight Commons and Radar before that, runs in your browser, and everything it reads or works out stays there. It talks to the site you are on, with that site's own session. Two features reach further, and both stay off until you turn them on and click: Other coverage downloads the public news feeds of outlets you choose, and evidence lookups send the repository names and web domains a post links to GitHub, rdap.org and the Internet Archive. Saving media downloads a file from the host the page loaded it from, on your click. Your browser's extension details page lists every site CMMNS has access to.</p>
 <section aria-labelledby="what-cmmns-reads">
 <span id="what-daylight-commons-reads"></span>
@@ -126,6 +126,7 @@
 <ul><li><strong>Options page:</strong> switch CMMNS off per site or pause it everywhere, change how long it keeps data, and press &quot;Clear all CMMNS data&quot;, then confirm, to delete everything above except your choices: your settings, the Mastodon servers you turned on, your data packs and the keys you trust, and the tour's &quot;No more tips&quot;. The bundle signing key stays too, so bundles you already shared still check as yours.</li>
 <li><strong>History page:</strong> clear the history, connections and trails on their own.</li>
 <li><strong>Save report:</strong> writes a JSON file to your computer when you click it, with the thread report, account labels and flags and without reply text.</li>
+<li><strong>Save thread</strong> and <strong>Save as JSONL</strong> (thread report): write the replies the page has loaded to your computer when you click one, through the same save path as CMMNS' other saves. Each reply keeps its author, its time, its text and the badges CMMNS showed with what each does not prove. These are other people's posts: the file stays on your computer, and nothing is sent anywhere.</li>
 <li><strong>Save feedback to a file</strong> (options page): writes your marks to a JSON file on your computer when you click it. You choose whether to share it, for example by attaching it to an issue on CMMNS' repository. &quot;Clear feedback&quot; deletes your marks.</li>
 <li><strong>Analyse a file:</strong> reads a saved page, thread JSON, a platform data export or a media file you choose, on your device, and leaves the file where it is.</li>
 <li><strong>Save signed bundle</strong> (Analyse a file and the thread card page): writes a JSON file to your computer when you click it. It holds post ids, the evidence with the matched words, CMMNS' version, a hash of its data tables, the time and your bundle key's public half. Tick the box to include full post text. The file stays on your computer for you to share.</li>
