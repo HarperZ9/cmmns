@@ -18,7 +18,8 @@
     "declarativeNetRequest",
     "downloads",
     "clipboardWrite",
-    "sidePanel"
+    "sidePanel",
+    "offscreen"
   ],
   "host_permissions": [
     "https://x.com/*",
@@ -49,6 +50,7 @@
       "media-store.js",
       "quick-save-bg.js",
       "capture-bg.js",
+      "handoff-bg.js",
       "quick-hover-bg.js",
       "side-bg.js",
       "card-bg.js",
@@ -150,6 +152,7 @@
         "quick-stream.js",
         "quick-gif.js",
         "quick-saved.js",
+        "quick-handoff.js",
         "quick-save.js",
         "quick-capture.js",
         "quick-copy.js",

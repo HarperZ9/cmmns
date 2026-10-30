@@ -86,6 +86,11 @@ export function makeBrowser({ flavour = "chrome", files = new Map(), settings = 
   // The saved list moved to its own file in 3.9.1; a checkout from before keeps it inside quick-save.js.
   const saved = resolve(root, process.env.CMMNS_SIM_SRC || process.env.DAYLIGHT_SIM_SRC || ".", "src/ext/quick-saved.js");
   if (existsSync(saved)) vm.runInContext(readFileSync(saved, "utf8"), ctx);
+  // The piece-by-piece handoff arrived after 3.9.1; older checkouts have neither file.
+  for (const f of ["src/ext/handoff-bg.js", "src/ext/quick-handoff.js"]) {
+    const p = resolve(root, process.env.CMMNS_SIM_SRC || process.env.DAYLIGHT_SIM_SRC || ".", f);
+    if (existsSync(p)) vm.runInContext(readFileSync(p, "utf8"), ctx);
+  }
   vm.runInContext(src("src/ext/quick-save.js"), ctx);
   const md = (name) => new TextDecoder().decode(files.get(name));
   // Every download asked for has been written (Chrome names a file a moment after download() returns).
