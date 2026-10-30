@@ -26,8 +26,8 @@
       b.running_head = { left: $("title").value || current.moodboard.name, right: ($("lane").value || "moodboard").toUpperCase() };
       b.lane = $("lane").value || "moodboard"; b.keyword_line = words().length ? words() : current.board.keyword_line; b.layout = $("layout").value; b.head = $("head").value;
     } else {
-      const site = $("site").value, study = $("study").checked;
-      const entries = current.entries.filter((e) => (!site || e.sidecar.front.site === site) && (!study || e.sidecar.front.study));
+      const site = $("site").value, study = $("study").checked, f = { likes: $("likes").checked, liked: current.entries.liked, since: $("since").value, until: $("until").value };
+      const entries = current.entries.filter((e) => (!site || e.sidecar.front.site === site) && (!study || e.sidecar.front.study) && PB.savesFilter(e.sidecar.front, f));
       b = PB.boardFrom(entries, { title: $("title").value || "Study board", lane: $("lane").value || "research", keywords: words(), layout: $("layout").value, head: $("head").value });
     }
     return b;
@@ -73,7 +73,7 @@
   }));
   const asked = new URLSearchParams(location.search).get("mb");
   if (asked && boards.some((x) => x.id === asked)) { $("source").value = "mb:" + asked; $("source").dispatchEvent(new Event("change")); }
-  for (const id of ["title", "lane", "keywords", "layout", "head", "site", "study"]) $(id).addEventListener("change", draw);
+  for (const id of ["title", "lane", "keywords", "layout", "head", "site", "study", "likes", "since", "until"]) $(id).addEventListener("change", draw);
 
   $("print").addEventListener("click", () => { if ($("view").contentWindow) $("view").contentWindow.print(); });
 

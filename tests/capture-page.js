@@ -12,7 +12,7 @@ let opened = 0;
 const portFor = () => 14000 + ((process.pid * 53 + (opened++) * 197) % 4000);
 const EXT = join(import.meta.dirname, "..", "src", "ext");
 const SCRIPTS = ["core.bundle.js", "guard.js", "quick-toast.js", "quick-resolve.js", "quick-instagram.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-saved.js",
-  "quick-handoff.js", "quick-save.js", "quick-capture.js", "capture-sites.js", "full-capture.js", "quick-text.js"];
+  "quick-handoff.js", "quick-fetch.js", "quick-save.js", "quick-capture.js", "capture-sites.js", "full-capture.js", "quick-text.js"];
 // The smallest MP4 the type sniffer reads as one: an ftyp box and an empty mdat.
 export const MP4 = Buffer.concat([Buffer.from([0, 0, 0, 24]), Buffer.from("ftypisom"), Buffer.from([0, 0, 2, 0]), Buffer.from("isomiso2"), Buffer.from([0, 0, 0, 8]), Buffer.from("mdat")]);
 export const MEDIA_HOSTS = ["i.redd.it", "scontent.cdninstagram.com", "pbs.twimg.com"];

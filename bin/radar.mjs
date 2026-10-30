@@ -10,6 +10,7 @@
 // <file> for analyze: a saved page (.html), thread JSON, an X archive tweets.js, a Reddit export
 // CSV, a Mastodon outbox.json or a Bluesky repository .car. project-docs/INTEGRATION.md has more.
 import { readFileSync, writeFileSync, realpathSync } from "node:fs";
+import { likesCommand } from "./lib/likes.mjs";
 import { basename } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { analyzeThread, analyzeText, checkMedia, siteInfo } from "../src/core/api.js";
@@ -41,6 +42,8 @@ const USAGE = `Usage:
                [--bitrate 2M] [--audio-bitrate 96k] [--fps N] [--out file] [--json]
   cmmns media compress <file> [the same options]
   cmmns media fetch <page address> [--dir folder]       (needs a system yt-dlp)
+  cmmns likes fetch [<manifest folder>] [--jobs 8] [--watch]   (the files Save all likes listed, from X's media hosts)
+  cmmns likes missing --archive <like.js>               (the likes in your X archive nothing saved yet)
   cmmns sidecar check <folder> [--fix]                  (flags unproved threads and notes naming the wrong files)
   cmmns capture verify <folder>                         (checks evidence captures and their custody chain)
   cmmns board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--head grotesk|accession|mono] [--pdf]
@@ -118,6 +121,7 @@ async function verify(file, f) {
 }
 
 export async function main(argv) {
+  if (argv[0] === "likes") { print(await likesCommand(argv.slice(1))); return 0; }
   if (argv[0] === "case") { const r = await runCaseCommand(argv.slice(1)); print(r.out); return process.exitCode || r.code; }
   if (argv[0] === "protect" && argv[1] && !argv.includes("--help")) { print(protectCommand(argv[1])); return 0; }
   if (argv[0] === "self-audit" && !argv.includes("--help")) { const { _: files, flags } = parseArgs(argv.slice(1)); print(selfAuditCommand(files, flags)); return 0; }

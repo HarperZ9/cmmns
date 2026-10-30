@@ -13151,6 +13151,8 @@ function postMeta(m = {}, now = new Date().toISOString()) {
     // the counts the page showed, as it showed them, with the time they were read
     engagement: m.engagement && typeof m.engagement === "object" ? { ...Object.fromEntries(Object.entries(m.engagement).filter(([, v]) => v != null).map(([k, v]) => [k, typeof v === "number" ? v : String(v)])), at: iso(now) || now } : null,
     // Study: saved to study later; the optional line on what draws the person to it
+    // Where a bulk save found the post (Save all likes: "x-likes"), so saves can be filtered by it.
+    from: m.from ? String(m.from).slice(0, 40) : null,
     study: !!m.study, studyNote: m.studyNote ? String(m.studyNote).replace(/\s+/g, " ").trim().slice(0, 300) || null : null,
     // Further text the page showed, under its own heading (YouTube chapters and transcript).
     notes: (m.notes || []).filter((n) => n && n.label && n.text).map((n) => ({ label: String(n.label).slice(0, 80), text: clean(n.text) })),
@@ -13214,7 +13216,7 @@ function frontMatter(meta, files) {
     flair: meta.flair || null, selection: meta.selection ? true : null,
     thread_complete: meta.thread && meta.thread.length && meta.threadComplete === true ? true : meta.threadComplete === "unknown" ? "unknown" : null,
     engagement: meta.engagement || null,
-    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
+    text_complete: meta.textComplete === false ? false : null, from: meta.from || null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
     edited: meta.edited || null, location: meta.location || null, ...threadRows(meta) };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
 }
@@ -13640,6 +13642,149 @@ function libraryMarkdown(state) {
 }
 
 return { LIBRARY_FORMAT, LIBRARY_CAP, LIBRARY_SCOPE, libraryOf, SKIP, librarySkip, LIBRARY_KINDS, libraryState, libraryLine, libraryKinds, libraryIndex, libraryMarkdown };
+})();
+
+// ---- likes.js
+const M_likes = (() => {
+// Save all likes (project-docs/SAVE-ALL-LIKES.md): the kernels both halves of the pipeline share.
+// Discovery runs in the page (src/ext/likes.js) and reads only the responses X already sent it, or the
+// like.js file of X's own data archive. Fetching runs in the page or, faster, in the command line
+// (`cmmns likes fetch`, bin/lib/likes.mjs), which reads the manifest the page writes. Every stage is a
+// small pure function with one input and one output, in this order: parse, pick, dedupe, name, then
+// (outside this module, because they do I/O) fetch, hash, sidecar. STAGES names them for the timing
+// table both halves print, so the slowest stage is visible.
+const { tweetsIn } = M_xdata;
+const { postMeta, metaName } = M_media_meta;
+
+const LIKES_FORMAT = "cmmns.likes/1";
+const LIKES_SOURCE = "x-likes";
+const STAGES = Object.freeze(["parse", "pick", "dedupe", "name", "fetch", "hash", "sidecar"]);
+
+// Is this X's likes list? By address (x.com/i/history/likes since October 2026, x.com/<user>/likes
+// before), else by the page's structure: the History title with a selected Likes tab, so a future move
+// of the address does not break it. Returns { site, kind, user } or null.
+function likesRoute(href, page = {}) {
+  let u;
+  try { u = new URL(href); } catch { return null; }
+  if (!/^(x|twitter|mobile\.x|mobile\.twitter)\.com$/.test(u.hostname.replace(/^www\./, ""))) return null;
+  const parts = u.pathname.split("/").filter(Boolean);
+  if (parts[0] === "i" && parts[1] === "history" && parts[2] === "likes" && parts.length === 3) return { site: "x", kind: "likes", user: null };
+  if (parts.length === 2 && parts[1] === "likes" && /^[A-Za-z0-9_]{1,15}$/.test(parts[0]) && parts[0] !== "i") return { site: "x", kind: "likes", user: parts[0] };
+  const tab = String(page.selectedTab || "").trim().toLowerCase();
+  if (/^history\b/i.test(String(page.title || "")) && tab === "likes") return { site: "x", kind: "likes", user: null };
+  return null;
+}
+
+// parse: X's JSON -> posts. Only posts with an id; X's own fields, as tweetsIn reads them.
+function parseLikes(json) {
+  return tweetsIn(json).filter((t) => t.id && !t.repostOf).map((t) => ({ id: t.id, handle: t.author || null, posted: t.posted || null,
+    text: t.fullText || t.text || null, media: t.media || [], links: t.links || [], lang: t.lang || null }));
+}
+
+// pick: one media entry -> the file to fetch, in one pass. Pictures at name=orig (X's original),
+// videos and GIFs at the highest-bitrate MP4 X listed. A video X listed only as a stream has no
+// single file here: { kind: "video", url: null, hls } and the page's own saver puts it together.
+function pickLikeFile(m) {
+  if (!m) return null;
+  if (m.type === "photo") {
+    const x = /^(https:\/\/pbs\.twimg\.com\/media\/[\w-]+)(?:\.(\w+))?(?:\?(.*))?$/.exec(String(m.url || ""));
+    if (!x) return m.url ? { kind: "image", url: m.url, ext: "jpg" } : null;
+    const ext = (x[2] || new URLSearchParams(x[3] || "").get("format") || "jpg").toLowerCase();
+    return { kind: "image", url: `${x[1]}?format=${ext}&name=orig`, ext };
+  }
+  if (m.mp4) return { kind: m.type === "animated_gif" ? "gif" : "video", url: m.mp4, ext: "mp4" };
+  return m.hls ? { kind: "video", url: null, hls: m.hls, ext: "mp4" } : null;
+}
+
+// dedupe: the known set holds "x:<post id>" for every post already saved anywhere in the CMMNS folder
+// and "sha256:<hex>" for every file. One Set lookup, before any request.
+const postKey = (id) => `x:${id}`;
+const isKnown = (known, id) => known.has(postKey(id));
+
+// The post's sidecar record, the same one a one-click save writes, marked as coming from the likes.
+function likeMeta(post, i = 0, total = 1, now = new Date().toISOString()) {
+  return { ...postMeta({ site: "x", handle: post.handle, text: post.text, postedAt: post.posted, postUrl: post.handle ? `https://x.com/${post.handle}/status/${post.id}` : `https://x.com/i/status/${post.id}`,
+    links: post.links, index: i, total, kind: (post.media || post.files || []).length ? "media" : "text", from: LIKES_SOURCE }, now) };
+}
+
+// name: post + file -> the file name a library save would give it (src/ext/library.js), the post id
+// at the end, so the page and the command line write the same name for the same file.
+function fileName(post, file, i, total) { return metaName(likeMeta(post, i, total), file.ext, post.id); }
+const sidecarName = (post) => metaName({ ...likeMeta(post), item: null }, "md", post.id);
+
+// One manifest line for a post: what to fetch and what to call it. files whose url is null are
+// listed under streams for the page's saver.
+function manifestLine(post, seen = new Date().toISOString()) {
+  const picked = (post.media || []).map(pickLikeFile).filter(Boolean), total = picked.length;
+  const files = picked.map((f, i) => (f.url ? { url: f.url, kind: f.kind, name: fileName(post, f, i, total) } : null)).filter(Boolean);
+  const streams = picked.filter((f) => !f.url).map((f) => f.hls);
+  return { format: LIKES_FORMAT, id: String(post.id), handle: post.handle, posted: post.posted, text: post.text, links: post.links || [], files, sidecar: sidecarName(post),
+    ...(streams.length ? { streams } : {}), seen };
+}
+
+// The manifest, written whole (a browser cannot append to a file): one JSON line per post.
+const manifestText = (lines) => lines.map((l) => JSON.stringify(l)).join("\n") + (lines.length ? "\n" : "");
+function parseManifest(text) {
+  const out = [];
+  for (const l of String(text || "").split(/\r?\n/)) { if (!l.trim()) continue; try { const j = JSON.parse(l); if (j && j.id && Array.isArray(j.files)) out.push(j); } catch { /* a line still being written */ } }
+  return out;
+}
+
+// like.js from X's data archive ("window.YTD.like.part0 = [...]"): every liked post's id, in order,
+// with the text and address the archive gives. The checklist the run is measured against.
+function parseArchiveLikes(text) {
+  const s = String(text || ""), at = s.indexOf("[");
+  if (at < 0) throw new Error("This is not X's like.js: no list found in it.");
+  const list = JSON.parse(s.slice(at));
+  return list.map((x) => (x && x.like) || x).filter((x) => x && /^\d+$/.test(String(x.tweetId))).map((x) => ({ id: String(x.tweetId), text: x.fullText || null, url: x.expandedUrl || null }));
+}
+
+// What the checklist holds that nothing saved does: ids, in the checklist's order.
+const missingLikes = (checklist, captured) => checklist.map((x) => (typeof x === "string" ? x : x.id)).filter((id) => !captured.has(postKey(id)) && !captured.has(id));
+
+// The run's record, kept in this browser so a reload or a restart continues it.
+function likesState(kept = null, now = new Date().toISOString()) {
+  const base = kept && kept.format === LIKES_FORMAT ? kept : { format: LIKES_FORMAT, created: now, lines: [], counts: { found: 0, listed: 0, saved: 0, duplicate: 0, failed: 0 }, checkpoint: null, checklist: [], sessions: [] };
+  return { ...base, lines: [...base.lines], counts: { found: 0, listed: 0, saved: 0, duplicate: 0, failed: 0, ...base.counts }, checklist: [...(base.checklist || [])], sessions: [...(base.sessions || [])] };
+}
+
+// A checkpoint: the last post handled, how far down the page, and whether the run was going. A run
+// that was going when the tab closed is offered again on the next visit, never restarted unasked.
+function checkpoint(state, { lastId, scrollY, status }, now = new Date().toISOString()) {
+  return { ...state, checkpoint: { lastId: lastId != null ? String(lastId) : (state.checkpoint || {}).lastId || null, scrollY: Math.max(0, Math.round(Number(scrollY) || 0)), status, at: now } };
+}
+const resumable = (state) => !!(state && state.checkpoint && (state.checkpoint.status === "running" || state.checkpoint.status === "paused"));
+
+// One post through the browser half: dedupe, then the line. Returns { kind: "duplicate"|"new", line? }.
+function admit(known, lines, post) {
+  if (isKnown(known, post.id) || lines.has(String(post.id))) return { kind: "duplicate" };
+  return { kind: "new", line: manifestLine(post) };
+}
+
+// Per-stage timing: { add(stage, ms, items), table() } with ms per item, so the slowest stage shows.
+function stageClock() {
+  const t = Object.fromEntries(STAGES.map((s) => [s, { ms: 0, items: 0 }]));
+  return {
+    add(stage, ms, items = 1) { const r = t[stage] || (t[stage] = { ms: 0, items: 0 }); r.ms += ms; r.items += items; },
+    rows: () => Object.entries(t).filter(([, r]) => r.items).map(([stage, r]) => ({ stage, items: r.items, ms: Math.round(r.ms), perItem: +(r.ms / r.items).toFixed(3) })),
+    table() { return ["| stage | items | total ms | ms per item |", "|---|---:|---:|---:|", ...this.rows().map((r) => `| ${r.stage} | ${r.items} | ${r.ms} | ${r.perItem} |`)].join("\n"); },
+  };
+}
+
+// The study board's filters over saved notes (src/ext/boards.js): "From my likes only" keeps notes a
+// likes run wrote (from: "x-likes") and earlier saves of posts the likes manifest lists (liked: their
+// ids); since and until ("YYYY-MM-DD") keep posts from those days, inclusive, by the posted time.
+function savesFilter(front, { likes = false, liked = null, since = "", until = "" } = {}) {
+  if (likes) {
+    const id = (/\/status\/(\d+)/.exec(String(front.post || "")) || [])[1];
+    if (front.from !== LIKES_SOURCE && !(id && liked && liked.has(id))) return false;
+  }
+  const day = String(front.posted || "").slice(0, 10);
+  if ((since || until) && !/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
+  return !(since && day < since) && !(until && day > until);
+}
+
+return { LIKES_FORMAT, LIKES_SOURCE, STAGES, likesRoute, parseLikes, pickLikeFile, postKey, isKnown, likeMeta, fileName, sidecarName, manifestLine, manifestText, parseManifest, parseArchiveLikes, missingLikes, likesState, checkpoint, resumable, admit, stageClock, savesFilter };
 })();
 
 // ---- media-embed.js
@@ -17509,5 +17654,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

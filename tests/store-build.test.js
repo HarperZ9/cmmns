@@ -58,3 +58,23 @@ test("the unpacked and self-distributed builds keep auto-scroll beside the colle
   }
   assert.ok(filesFor(files, "firefox-self").some(([n]) => n === "library-scroll.js"));
 });
+
+// Save all likes follows the same split: the collector (likes.js) and its bar ship everywhere; the
+// auto-scroll that walks the whole likes list (likes-scroll.js) only in the unpacked and self-distributed builds.
+const LIKES_MARKS = ["PBLikesScroll = ", "Scroll through all likes", "stopped to protect the account"];
+
+test("the store packages carry no likes auto-scroll, but do carry the likes collector", () => {
+  for (const browser of ["chrome", "firefox"]) {
+    const shipped = filesFor(files, browser), m = browserManifest(manifest, browser);
+    assert.ok(!shipped.some(([n]) => n === "likes-scroll.js"), `${browser}: likes-scroll.js is in the package`);
+    assert.ok(!m.content_scripts.some((c) => c.js.includes("likes-scroll.js")), `${browser}: the manifest loads likes-scroll.js`);
+    assert.ok(m.content_scripts.some((c) => c.js.includes("likes.js") && c.js.includes("likes-ui.js")), `${browser}: the collector must ship`);
+    for (const [n, d] of shipped) {
+      if (!/\.(js|html|json)$/.test(n)) continue;
+      const text = d.toString("utf8");
+      for (const mark of LIKES_MARKS) assert.ok(!text.includes(mark), `${browser}: ${n} contains "${mark}"`);
+    }
+  }
+  const cs = manifest.content_scripts.find((c) => c.js.includes("likes-scroll.js"));
+  assert.ok(cs && cs.js.indexOf("likes.js") < cs.js.indexOf("likes-scroll.js") && cs.js.indexOf("likes-scroll.js") < cs.js.indexOf("likes-ui.js"), "the unpacked build loads it between the collector and its bar");
+});
