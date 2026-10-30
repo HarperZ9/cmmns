@@ -8,6 +8,12 @@ globalThis.PBQuickResolve = globalThis.PBQuickResolve || (() => {
   const STREAM = /\.(m3u8|mpd)(?:$|[?#])/i;
   let last = null;
   document.addEventListener("contextmenu", (e) => { last = { x: e.clientX, y: e.clientY, at: Date.now() }; }, true);
+  // Playlist addresses sniff.js saw the page ask for (X empties the resource timing list).
+  const heard = [];
+  window.addEventListener("message", (e) => {
+    if (e.source !== window || !e.data || e.data.source !== "radar-stream" || typeof e.data.url !== "string") return;
+    if (/^https:/i.test(e.data.url) && STREAM.test(e.data.url) && !heard.includes(e.data.url)) { heard.push(e.data.url); if (heard.length > 400) heard.shift(); }
+  });
 
   const abs = (u) => { try { return new URL(u, location.href).href; } catch { return null; } };
   // Closed shadow roots too: chrome.dom in Chrome, the element's own method in Firefox content scripts.
@@ -54,6 +60,7 @@ globalThis.PBQuickResolve = globalThis.PBQuickResolve || (() => {
   function loadedStreams(hint) {
     let names = [];
     try { names = performance.getEntriesByType("resource").map((e) => e.name).filter((u) => STREAM.test(u)); } catch { /* no timing here */ }
+    names = names.concat(heard);
     const ids = String(hint || "").match(/\d{8,}/g) || [];
     const list = [...new Set(names)].map((url) => ({ type: /\.m3u8/i.test(url) ? "hls" : "dash", url }));
     const mine = list.filter((s) => ids.some((id) => s.url.includes(id)));

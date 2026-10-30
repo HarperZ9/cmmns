@@ -12,7 +12,9 @@
 //   sniff.js 15 s); the background's lookups and feeds have their own (auto.js, feedfetch.js).
 // - Budget: refresh() measures itself; two slow passes in a row stretch the next wait by half (up
 //   to 2 s; the first pass on a page is slow while the browser compiles the rules) and a run of
-//   five failed passes pauses automatic refresh on this page until the next navigation.
+//   five failed passes pauses automatic refresh on this page until the next navigation. Only the
+//   time after the pass's awaits counts, and debounced() runs a pass at least once a second on a
+//   page that never stops changing.
 (() => {
   "use strict";
   const PREFIX = "[cmmns]";
@@ -50,15 +52,18 @@
 
 
   // The refresh budget: wait = 250 ms normally, stretched after two passes in a row over 200 ms.
+  // The pass is timed from its last lap: fn gets a lap() to call once its awaits are done, so time
+  // spent waiting on storage or the worker (which blocks nothing) never counts as a slow pass.
   const BUDGET_MS = 200, MAX_WAIT = 2000;
   let wait = 250, slow = 0;
   function measured(fn) {
     return async (...args) => {
       if (pausedAt && pausedAt === location.pathname) return undefined;
       pausedAt = "";
-      const t0 = performance.now();
+      let t0 = performance.now();
+      const lap = () => { t0 = performance.now(); };
       try {
-        const r = await fn(...args);
+        const r = await fn(...args, lap);
         failedRuns = 0;
         const ms = performance.now() - t0;
         slow = ms > BUDGET_MS ? slow + 1 : 0;
@@ -71,8 +76,29 @@
       }
     };
   }
-  const nextWait = (ms) => Math.max(ms, wait);
+  // A request for 0 ms (the panel opened, a reader asked again) is not stretched.
+  const nextWait = (ms) => (ms === 0 ? 0 : Math.max(ms, wait));
 
-  globalThis.PBGuard = { report, run, wrap, capMap, capSet, measured, nextWait,
+  // A debounce that cannot starve: each call pushes the run back by the wait, but never more than
+  // HOLD_MS (or the stretched wait, when slow passes stretched it past that) after the first call
+  // that is still waiting. A page that changes every few hundred milliseconds (a feed while
+  // scrolling, a playing video) still gets a pass that often, and a page whose passes are slow is
+  // not made to run them back to back. Measured live on a YouTube watch page with the page changing
+  // every 150 ms: the old debounce ran 2 passes in a minute and wired 0 of 60 comments; this one
+  // ran a pass about every 1.1 s and wired all 60 (project-docs/evidence/REFRESH-STARVATION.md).
+  const HOLD_MS = 1000;
+  function debounced(fn) {
+    let timer = 0, first = null;
+    const fire = () => { timer = 0; first = null; fn(); };
+    return (ms = 250) => {
+      const now = Date.now(), wanted = nextWait(ms);
+      if (first === null) first = now;
+      const due = Math.min(now + wanted, first + Math.max(HOLD_MS, wait));
+      clearTimeout(timer);
+      timer = setTimeout(fire, Math.max(0, due - now));
+    };
+  }
+
+  globalThis.PBGuard = { report, run, wrap, capMap, capSet, measured, nextWait, debounced, HOLD_MS,
     recent: () => ring.slice(), paused: () => !!pausedAt, BUDGET_MS };
 })();

@@ -5575,6 +5575,159 @@ function findBursts(rows, windowSec, minAccounts) {
 return { WINDOW_SEC, poissonTail, burstCheck, timingBursts };
 })();
 
+// ---- reply-timeline.js
+const M_reply_timeline = (() => {
+// The reply timeline: when a thread's replies arrived, as a row of counts, with the stretches the
+// timing-burst test marked (src/core/timing.js). Coordination often shows first as timing, and the
+// strip lets a reader see a burst against the thread's own rhythm instead of as a bare number.
+// A strip is never finer than the times behind it: replies whose times are good only to the hour
+// are never spread across minutes (src/core/precision.js). Counts only; no account is named here.
+
+const { timePrecision, PRECISION_MS, PRECISION_WORDS } = M_precision;
+
+const TIMELINE_BINS = 40;
+const TIMELINE_DOES_NOT_PROVE = "When replies arrived says nothing about who wrote them or why. A rush can follow a post being shared, a live event or a notification as easily as coordination.";
+
+const iso = (t) => new Date(t).toISOString();
+
+// replies: [{ posted, timePrecision? }]; bursts: [{ from, to }] from timingBursts().
+// opts: { bins, precision } (precision: the thread's declared timePrecision).
+// Returns null below two timed replies, else { from, to, timed, untimed, precision, binMs, peak,
+// bursts, bins: [{ from, to, n, burst }] }.
+function replyTimeline(replies, bursts = [], opts = {}) {
+  const list = replies || [];
+  const pts = list.map((r) => Date.parse(r && r.posted)).filter(Number.isFinite).sort((a, b) => a - b);
+  if (pts.length < 2) return null;
+  const P = timePrecision(list, opts.precision);
+  const unit = PRECISION_MS[P.precision] || 1000;
+  const from = pts[0], span = Math.max(pts[pts.length - 1] - from, unit);
+  const n = Math.max(1, Math.min(opts.bins || TIMELINE_BINS, Math.ceil(span / unit)));
+  const w = span / n;
+  const bins = Array.from({ length: n }, (_, i) => ({ a: from + i * w, b: from + (i + 1) * w, n: 0, burst: false }));
+  for (const t of pts) bins[Math.min(n - 1, Math.floor((t - from) / w))].n++;
+  const marks = (bursts || []).map((x) => [Date.parse(x.from), Date.parse(x.to)]).filter(([a, b]) => Number.isFinite(a) && Number.isFinite(b));
+  for (const bin of bins) bin.burst = marks.some(([a, b]) => a < bin.b && b >= bin.a);
+  return {
+    from: iso(from), to: iso(from + span), timed: pts.length, untimed: list.length - pts.length,
+    precision: P.precision, binMs: Math.round(w), peak: Math.max(...bins.map((x) => x.n)), bursts: marks.length,
+    bins: bins.map((x) => ({ from: iso(x.a), to: iso(x.b), n: x.n, burst: x.burst })),
+  };
+}
+
+// A length of time in words: "40 s", "12 min", "3 h 5 min", "2 days".
+function spanWords(ms) {
+  const s = Math.round(ms / 1000);
+  if (s < 90) return `${s} s`;
+  const m = Math.round(s / 60);
+  if (m < 90) return `${m} min`;
+  const h = Math.floor(m / 60), rest = m % 60;
+  if (h < 48) return rest ? `${h} h ${rest} min` : `${h} h`;
+  return `${Math.round(h / 24)} days`;
+}
+
+// What the strip shows, in one sentence, for screen readers and for the saved thread.
+function timelineSentence(t) {
+  if (!t) return null;
+  const span = Date.parse(t.to) - Date.parse(t.from);
+  const clock = (s) => s.slice(11, 16);
+  const sameDay = t.from.slice(0, 10) === t.to.slice(0, 10);
+  const when = sameDay ? `${t.from.slice(0, 10)}, ${clock(t.from)} to ${clock(t.to)} UTC` : `${t.from.slice(0, 10)} ${clock(t.from)} to ${t.to.slice(0, 10)} ${clock(t.to)} UTC`;
+  const parts = [
+    `${t.timed} repl${t.timed === 1 ? "y" : "ies"} over ${spanWords(span)} (${when})`,
+    `each bar is ${spanWords(t.binMs)}, the busiest holds ${t.peak}`,
+    t.bursts ? `${t.bursts} burst${t.bursts === 1 ? "" : "s"} marked` : "no burst marked",
+  ];
+  const tail = [t.untimed ? `${t.untimed} without a time` : null, t.precision ? `times ${PRECISION_WORDS[t.precision]}` : null].filter(Boolean).join("; ");
+  return `${parts.join("; ")}.${tail ? ` ${tail[0].toUpperCase()}${tail.slice(1)}.` : ""}`;
+}
+
+return { TIMELINE_BINS, TIMELINE_DOES_NOT_PROVE, replyTimeline, spanWords, timelineSentence };
+})();
+
+// ---- thread-save.js
+const M_thread_save = (() => {
+// Save the thread: a thread's replies as they were on screen, each with its time, its badges (the
+// flags CMMNS showed, each with its evidence and what it does not prove), and its place in a
+// same-text group or a timing burst. Two forms: one Markdown note to read, and JSON Lines for a
+// study (one record per line, the thread first). Built on the user's click and written only to
+// this computer, through the same save path as every other CMMNS save.
+// Stance-neutral by construction: no rhetoric markers and no extremity score per reply. Extremity
+// is a thread-level comparison only, and a saved file must not turn it into a label on a person.
+
+const { DOES_NOT_PROVE } = M_flags;
+const { replyTimeline, timelineSentence, TIMELINE_DOES_NOT_PROVE } = M_reply_timeline;
+
+const THREAD_SAVE_FORMAT = "cmmns.thread/1";
+const THREAD_SAVE_DOES_NOT_PROVE = "A badge is evidence to look at, not a finding about the person. These are the replies the page had loaded when this was saved, not the whole thread.";
+
+const badge = (f) => ({ id: f.id, evidence: f.evidence || null, doesNotProve: f.doesNotProve || DOES_NOT_PROVE[f.id] || null });
+
+function reply(r, flagsOf, clusterOf, burstOf) {
+  return {
+    type: "reply", id: String(r.id), author: r.author, display: r.display || null, posted: r.posted || null,
+    timePrecision: r.timePrecision || null, text: r.text || "", url: r.url || null, domains: r.domains || [],
+    badges: (flagsOf.get(r.id) || []).map(badge), sameTextGroup: clusterOf.get(r.id) ?? null, burst: burstOf(r) ?? null,
+  };
+}
+
+// input: { site, page, savedAt, tool, root, replies: [{ id, author, display, posted, text, url, domains }],
+// rows: [{ id, flags }], clusters: [{ ids }], bursts: [{ from, to, authors }] }.
+// Returns { head, root, replies }: the records both formats are written from.
+function threadRecords(input) {
+  const { site = "", page = "", savedAt = new Date().toISOString(), tool = "CMMNS", root = null, replies = [], rows = [], clusters = [], bursts = [] } = input || {};
+  const flagsOf = new Map(rows.map((r) => [r.id, r.flags || []]));
+  const clusterOf = new Map();
+  clusters.forEach((c, i) => { for (const id of c.ids || []) clusterOf.set(id, i + 1); });
+  const spans = bursts.map((b) => ({ a: Date.parse(b.from), b: Date.parse(b.to), who: new Set((b.authors || []).map((x) => String(x).toLowerCase())) }));
+  const burstOf = (r) => {
+    const t = Date.parse(r.posted), i = spans.findIndex((s) => t >= s.a && t <= s.b && s.who.has(String(r.author).toLowerCase()));
+    return i < 0 ? null : i + 1;
+  };
+  const timeline = replyTimeline(replies, bursts);
+  const head = {
+    type: "thread", format: THREAD_SAVE_FORMAT, tool, site, page, savedAt, replies: replies.length,
+    sameTextGroups: clusters.length, bursts: bursts.map((b, i) => ({ n: i + 1, from: b.from, to: b.to, accounts: (b.authors || []).length, p: b.p ?? null })),
+    timeline: timeline ? { sentence: timelineSentence(timeline), precision: timeline.precision, bins: timeline.bins.map((x) => x.n), binMs: timeline.binMs } : null,
+    doesNotProve: [THREAD_SAVE_DOES_NOT_PROVE, timeline ? TIMELINE_DOES_NOT_PROVE : null].filter(Boolean),
+  };
+  const post = root ? { type: "post", id: String(root.id), author: root.author, display: root.display || null, posted: root.posted || null, text: root.text || "", url: root.url || null } : null;
+  return { head, root: post, replies: replies.map((r) => reply(r, flagsOf, clusterOf, burstOf)) };
+}
+
+// One JSON object per line: the thread, the post replied to (when there is one), then each reply.
+function threadJsonl(input) {
+  const rec = threadRecords(input);
+  return [rec.head, rec.root, ...rec.replies].filter(Boolean).map((x) => JSON.stringify(x)).join("\n") + "\n";
+}
+
+const quote = (t) => String(t || "").split(/\r?\n/).map((l) => `> ${l}`).join("\n");
+const when = (t) => (t ? `${t.slice(0, 10)} ${t.slice(11, 19)} UTC` : "no time shown");
+
+function replyMarkdown(r) {
+  const tags = [r.sameTextGroup ? `same-text group ${r.sameTextGroup}` : null, r.burst ? `burst ${r.burst}` : null].filter(Boolean);
+  const lines = [`### @${r.author}${r.display ? ` (${r.display})` : ""} · ${when(r.posted)}`, "", quote(r.text), ""];
+  if (tags.length) lines.push(`In: ${tags.join(", ")}`, "");
+  for (const b of r.badges) lines.push(`- ${b.id}: ${b.evidence || "shown"}${b.doesNotProve ? `. Does not prove: ${b.doesNotProve}` : ""}`);
+  if (r.badges.length) lines.push("");
+  return lines.join("\n");
+}
+
+// One note to read: the thread, the timeline in words, each reply with its badges, then the limits.
+function threadMarkdown(input) {
+  const { head, root, replies } = threadRecords(input);
+  const out = [`# Thread on ${head.site || "a page"}`, "", `- Page: ${head.page}`, `- Saved: ${when(head.savedAt)} by ${head.tool}`, `- Replies loaded: ${head.replies}`];
+  if (head.timeline) out.push(`- Timeline: ${head.timeline.sentence}`);
+  for (const b of head.bursts) out.push(`- Burst ${b.n}: ${b.accounts} accounts between ${when(b.from)} and ${when(b.to)}`);
+  if (head.sameTextGroups) out.push(`- Same-text groups: ${head.sameTextGroups}`);
+  out.push("");
+  if (root) out.push(`## The post`, "", `@${root.author} · ${when(root.posted)}`, "", quote(root.text), "");
+  out.push(`## Replies`, "", ...replies.map(replyMarkdown), `## What this does not prove`, "", ...head.doesNotProve.map((t) => `- ${t}`), "");
+  return out.join("\n");
+}
+
+return { THREAD_SAVE_FORMAT, THREAD_SAVE_DOES_NOT_PROVE, threadRecords, threadJsonl, threadMarkdown };
+})();
+
 // ---- baselines-bins.js
 const M_baselines_bins = (() => {
 // The bins the organic baselines are kept in: thread size (replies loaded) for signs within one
@@ -17061,5 +17214,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

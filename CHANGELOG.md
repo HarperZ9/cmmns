@@ -17,6 +17,16 @@ were not published to a store.
   Source protection forces the seen-post log off and writes no entry while on; the options page shows
   the switch locked with the reason, and the protection page offers a two-step delete of entries
   kept from before.
+- **Reply timeline** in the thread report (`src/core/reply-timeline.js`, `src/ext/thread-tools.js`): a
+  strip of bars showing when the loaded replies arrived, with the stretches the timing-burst test
+  marked drawn in the sign colour and underlined. Never finer than the times behind it (times good
+  to the hour get hour bars). The strip carries one sentence as its accessible name, printed under
+  it too, and names no account. Nothing moves.
+- **Save thread** and **Save as JSONL** in the thread report (`src/core/thread-save.js`): the replies
+  the page has loaded, each with its author, time, text, badges (with what each does not prove) and
+  its same-text group or burst, as one Markdown note or as JSON Lines (`cmmns.thread/1`, the thread
+  first, then the post, then one line per reply). Written through the same save path as other
+  saves; nothing is sent. No extremity score or rhetoric marker is kept per reply.
 - **Library capture** (project-docs/LIBRARY-CAPTURE.md). A **Save page as library** bar on X profile,
   list, search and hashtag pages and Reddit user and subreddit pages. Every post the page loads is saved
   once, by post id, with its media and its daylight.sidecar/1 note, into
@@ -52,6 +62,18 @@ were not published to a store.
   dependency-free; the committed figures match the 2026-10-28 study exactly.
 
 ### Fixed
+- CMMNS' window on comments no longer goes missing on pages that never stop changing. Every page
+  change pushed the refresh pass back, so on a page changing more often than every 250 ms new
+  comments were never wired. A pass now runs at most 1 s after the first waiting change (or after
+  the stretched wait, when slow passes stretched it). Live on a YouTube watch page changing every
+  150 ms, the old scheduler ran 2 passes in a minute and wired 0 of 60 and 20 of 62 comments; the new
+  one ran a pass about every 1.05 s and wired all but one (project-docs/evidence/REFRESH-STARVATION.md,
+  `tests/guard-timing.test.js`).
+- The hover Download control no longer hides behind YouTube's fullscreen player. The player entered
+  the browser's top layer after the control, so the control was drawn underneath (seen live: the
+  video was the topmost thing at the control's centre). The control is lifted back on top each time
+  it shows and when the page enters fullscreen; a control whose host the page removed is redrawn in
+  a new host instead of in the removed one (`tests/hover-top-layer.test.js` fails on the old code).
 - A YouTube reference no longer saves chapters from the video watched before. YouTube changes videos
   without reloading the page and can leave the old chapter list in it; each chapter links to its own
   video, so only this video's chapters are kept (`tests/yt-chapters.test.js` fails on the old code).
