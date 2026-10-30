@@ -54,7 +54,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     try { r = await viaBrowser(url, name, o); }
     catch (e) {
       alive();
-      r = await msg({ type: "pb-qs-bytes", bytes: Array.from(bytes), mime, filename: name, ...destOf(o.dest), overwrite: !!o.overwrite });
+      r = await PBQuickHandoff.send(bytes, mime, { filename: name, ...destOf(o.dest), overwrite: !!o.overwrite });
       if (!r || r.error) throw new Error(r && r.error ? r.error : e.message);
     } finally { setTimeout(() => URL.revokeObjectURL(url), 120000); }
     return (r && r.filename) || name;

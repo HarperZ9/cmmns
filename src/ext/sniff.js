@@ -1,4 +1,4 @@
-// Runs in the page's own context on X (manifest: world MAIN, document_start). Two jobs:
+// Runs in the page's own context on X (manifest: world MAIN, document_start). Three jobs:
 // 1. Copies the JSON of GraphQL responses X's web app already requested and posts it to CMMNS'
 //    content script (account data for every reply, with no request of CMMNS' own).
 // 2. Learns the shape of X's own "About this account" request (AboutAccountQuery) the first time
@@ -25,11 +25,24 @@
     post({ source: "radar-template", template });
   }
 
+  // 3. Notes the HLS and DASH playlist addresses X's player asks for, so the download button can find
+  //    a video's stream. X empties the browser's resource timing list, which held them before.
+  const STREAM = /\.(m3u8|mpd)(?:$|[?#])/i;
+  const streams = [];
+  const stream = (url) => {
+    const u = String(url || "");
+    if (!/^https:/i.test(u) || !STREAM.test(u) || streams.includes(u)) return;
+    streams.push(u); if (streams.length > 400) streams.shift();
+    post({ source: "radar-stream", url: u });
+  };
+  try { new PerformanceObserver((l) => { for (const e of l.getEntries()) stream(e.name); }).observe({ type: "resource", buffered: true }); } catch (_) { /* no observer here */ }
+
   const origFetch = window.fetch;
   window.fetch = function (input, init) {
     const p = origFetch.apply(this, arguments);
     try {
       const url = typeof input === "string" ? input : input && input.url;
+      stream(url);
       if (isGraph(url)) {
         const hd = init && init.headers ? (init.headers instanceof Headers ? Object.fromEntries(init.headers) : init.headers) : {};
         learn(url, hd);
@@ -41,6 +54,7 @@
 
   const origOpen = XMLHttpRequest.prototype.open, origSet = XMLHttpRequest.prototype.setRequestHeader;
   XMLHttpRequest.prototype.open = function (method, url) {
+    try { stream(url); } catch (_) { /* ignore */ }
     this.__radar = isGraph(url) ? { url, headers: {} } : null;
     if (this.__radar) this.addEventListener("load", () => {
       try {
@@ -59,7 +73,7 @@
   window.addEventListener("message", async (e) => {
     if (e.source !== window || !e.data) return;
     if (e.data.source === "radar-template-set" && e.data.template && !template) template = e.data.template;
-    if (e.data.source === "radar-sniff-replay-ask") { for (const json of recent) post({ source: "radar-sniff-replay", json }); return; }
+    if (e.data.source === "radar-sniff-replay-ask") { for (const json of recent) post({ source: "radar-sniff-replay", json }); for (const url of streams) post({ source: "radar-stream", url }); return; }
     if (e.data.source !== "radar-ask-about") return;
     const handle = e.data.handle;
     if (!template) { post({ source: "radar-about-done", handle, status: "no-template" }); return; }
