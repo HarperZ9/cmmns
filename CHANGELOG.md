@@ -5,6 +5,16 @@ were not published to a store.
 
 ## Unreleased
 
+### Fixed
+- **What a thread file claims** (project-docs/SIDECAR-FORMAT.md, "The thread file"; format
+  `cmmns.capture-thread/2`). A thread with no comments no longer reads `complete: true`: it has its own
+  state, `"empty"`, and no longer tells you to open the post's page for comments that do not exist. X's
+  reply count covers only replies directly under the post, so "Captured 5 of 1" now reads "Captured 1 of
+  1 direct reply, and 4 more deeper in the thread", in separate fields. The same mix-up marked some short
+  captures complete and could stop the opening of more early; both now follow the direct count. The post
+  author's own continuation is labelled and counted apart from comments. `readCaptureThread` reads files
+  in the first format.
+
 ### Added
 - **Whole saves** (project-docs/SIDECAR-FORMAT.md, "The thread file"). A saved post brings its whole
   body and its parts. Its comments come with it as `<name>.thread.json`, a tree with each comment's

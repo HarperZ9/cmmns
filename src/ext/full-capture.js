@@ -18,7 +18,7 @@ globalThis.PBFullCapture = globalThis.PBFullCapture || (() => {
 
   // Opens more of the thread, one step at a time, until the cap, the end, three steps that added
   // nothing, or Stop. Returns the last reading and how many controls were opened.
-  async function expand(read, got, cap) {
+  async function expand(read, got, cap, site) {
     const clicked = new WeakSet(), y = scrollY;
     let expanded = 0, idle = 0, stop = false;
     for (let step = 0; step < 400 && !stop; step++) {
@@ -26,7 +26,7 @@ globalThis.PBFullCapture = globalThis.PBFullCapture || (() => {
       if (before >= cap) break;
       const stub = got.stubs.find((b) => !clicked.has(b));
       if (stub) { clicked.add(stub); stub.click(); expanded++; }
-      else if (got.scroll && (got.expected == null || before < Number(got.expected))) window.scrollBy({ top: Math.round(innerHeight * 0.8) });
+      else if (got.scroll && (got.expected == null || PB.countedTowardExpected(got.comments, site) < Number(got.expected))) window.scrollBy({ top: Math.round(innerHeight * 0.8) });
       else break;
       toast(`Loading more comments: ${before}${got.expected != null ? ` of ${got.expected}` : ""}, up to ${cap}`, { stay: 0, actions: [["Stop", () => { stop = true; }]] });
       await sleep(pace(step));
@@ -45,14 +45,14 @@ globalThis.PBFullCapture = globalThis.PBFullCapture || (() => {
     const cap = p.threadCap;
     let expanded = 0, reason = null;
     const can = got.own && p.threadExpand && cap > 0 && !p.protection;
-    if (can) { const r = await expand(read, got, cap); got = r.got; expanded = r.expanded; if (r.stopped) reason = "Stop was pressed"; }
+    if (can) { const r = await expand(read, got, cap, meta.site); got = r.got; expanded = r.expanded; if (r.stopped) reason = "Stop was pressed"; }
     else if (got.own && p.protection) reason = "source protection is on, so no more comments were loaded";
     else if (got.own && (!p.threadExpand || cap === 0)) reason = "loading more comments is off in the settings";
     else if (!got.own && !got.comments.length) reason = "the comments were not on this page; open the post's own page to save them";
     const n = got.comments.length, open = got.stubs.length + (got.away || 0);
     if (!n && got.expected == null && !open && !got.own) return null;
-    const capHit = can && n >= cap && (open > 0 || (got.expected != null && n < Number(got.expected)) || (got.scroll && got.expected == null));
-    return PB.captureThread({ site: meta.site, post: { url: meta.postUrl, id: PB.postTag(meta) }, comments: got.comments, expected: got.expected, cap, capHit, stubs: open, expanded, source: got.source, reason });
+    const capHit = can && n >= cap && (open > 0 || (got.expected != null && PB.countedTowardExpected(got.comments, meta.site) < Number(got.expected)) || (got.scroll && got.expected == null));
+    return PB.captureThread({ site: meta.site, post: { url: meta.postUrl, id: PB.postTag(meta), author: got.postAuthor || meta.handle || null }, comments: got.comments, expected: got.expected, cap, capHit, stubs: open, expanded, source: got.source, reason });
   }
 
   // One reading per post while it runs and for a few seconds after, so the files of one post saved

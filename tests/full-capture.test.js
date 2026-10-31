@@ -50,7 +50,7 @@ const pick = (c) => ({ expected: c.expected, captured: c.captured, missing: c.mi
 
 test("the thread record carries the tree, the count of every comment in it, and a readable form", () => {
   const t = captureThread({ site: "reddit", post: { url: "https://www.reddit.com/r/a/comments/x1/s/", id: "x1" }, comments: flat, expected: 7, cap: 200, stubs: 1, expanded: 2, source: "the rendered page" });
-  assert.equal(t.format, "cmmns.capture-thread/1");
+  assert.equal(t.format, "cmmns.capture-thread/2");
   assert.equal(t.completeness.captured, 5);
   assert.equal(t.completeness.missing, 2);
   assert.equal(t.completeness.complete, false);
@@ -59,7 +59,7 @@ test("the thread record carries the tree, the count of every comment in it, and 
   assert.match(md, /^- \*\*u\/ann\*\* \(12 points, 2026-10-20T21:04:00\.000Z\)\n  > Top\.$/m);
   assert.match(md, /^    - \*\*u\/cy\*\* \(1204 points\)\n      > Deeper\.$/m);
   assert.match(md, /^  - \*\*u\/bo\*\* \(3 points\)\n    > Reply\n    > with two lines\.$/m);
-  assert.deepEqual(threadSummary(t, "a.thread.json"), { file: "a.thread.json", expected: 7, captured: 5, complete: false, capHit: false, cap: 200, moreStubs: 1 });
+  assert.deepEqual(threadSummary(t, "a.thread.json"), { file: "a.thread.json", expected: 7, expectedCounts: "all", captured: 5, capturedDirect: 2, capturedNested: 3, continuations: null, complete: false, capHit: false, cap: 200, moreStubs: 1 });
 });
 
 test("the expansion waits at a person's pace", () => {

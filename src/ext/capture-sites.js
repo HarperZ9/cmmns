@@ -1,5 +1,5 @@
 // The comments of one saved post, read from what the page shows or received, per site. Each reader
-// returns { comments, expected, stubs, own, source, scroll } or null: comments a flat list for
+// returns { comments, expected, stubs, own, source, scroll, postAuthor } or null: comments a flat list for
 // PB.captureThread (src/core/capture-thread.js); expected the site's own count; stubs the "more
 // replies" controls still on the page; own true when the post is the page's main post (only then does
 // full-capture.js open more); scroll true where the site loads more as the reader scrolls. Commenters
@@ -50,7 +50,7 @@ globalThis.PBCaptureSites = globalThis.PBCaptureSites || (() => {
       .sort((a, b) => (a.id.length - b.id.length) || (a.id < b.id ? -1 : 1));   // X ids grow with time
     const own = new RegExp(`/status/${id}(?:[/?#]|$)`).test(location.pathname);
     const stubs = own ? stubsIn(document, '[data-testid="cellInnerDiv"] [role="button"], [data-testid="cellInnerDiv"] button') : [];
-    return { comments, expected: (data.get(id) || {}).replies ?? (meta.engagement && meta.engagement.replies), stubs, own, source: "the page's own data (X's answers to the page)", scroll: own };
+    return { comments, expected: (data.get(id) || {}).replies ?? (meta.engagement && meta.engagement.replies), stubs, own, source: "the page's own data (X's answers to the page)", scroll: own, postAuthor: (data.get(id) || {}).author || null };
   }
 
   // Instagram: the comments the page received for this post (quick-instagram.js).

@@ -83,8 +83,11 @@ hashtags: ["#space"]
 | `location` | Instagram, when tagged | the place name the post carries |
 | `thread_file` | when comments were read | the name of the thread file beside this sidecar (see "The thread file") |
 | `comments_expected` | with a thread file, when the site counts | the site's own comment count at save |
-| `comments_captured` | with a thread file | how many comments the thread file holds |
-| `comments_complete` | with a thread file | `true`, `false`, or `"unknown"` when the site gave no count |
+| `comments_expected_counts` | with a thread file | what the site's count covers: `"direct"` (X, replies directly under the post) or `"all"` |
+| `comments_captured` | with a thread file | how many comments the thread file holds, at every depth |
+| `comments_direct`, `comments_nested` | with a thread file | of those, how many sit directly under the post and how many deeper |
+| `comments_continuations` | with a thread file, when the post's author is known | of those, how many are the post author's own continuation |
+| `comments_complete` | with a thread file | `true`, `false`, `"empty"` when the site counted none and none were captured, or `"unknown"` when no count can check the capture |
 | `comments_cap_hit` | when true | the user's cap stopped the "load more" opening |
 | `analysis` | study saves from the discourse checks (a `<name>.parts.json` parts tree is saved beside the note) | the sign families whose analysis follows as `## Analysis: <label>` sections, such as `["quote-source", "doc-claim", "correction-replies"]` |
 
@@ -109,7 +112,7 @@ Off by default (setting "Also save a .json file for tools"). One object:
 `parent: { text, url, author } | null`, `thread[]`, `subreddit`, `item: { index, total } | null`,
 `files[]`. Unknown values are `null`. Within version 1 it also carries `items[]` (`{ index, kind, url,
 alt, width, height }`), `quotedMedia[]`, `edited`, `location`, and, when comments were read,
-`thread: { file, expected, captured, complete, capHit, cap, moreStubs, sentence }` in place of the
+`thread: { file, expected, expectedCounts, captured, capturedDirect, capturedNested, continuations, complete, capHit, cap, moreStubs, sentence }` in place of the
 comment tree, which the thread file holds.
 
 ## The thread file
@@ -119,19 +122,32 @@ comment tree, which the thread file holds.
 `src/core/capture-thread.js`; the page readers are in `src/ext/capture-sites.js`.
 
 ```
-{ "format": "cmmns.capture-thread/1", "site": "reddit", "post": { "url", "id" }, "savedAt", "source",
-  "completeness": { "expected": 6, "captured": 6, "missing": 0, "cap": 200, "capHit": false,
+{ "format": "cmmns.capture-thread/2", "site": "reddit", "post": { "url", "id", "author" }, "savedAt", "source",
+  "completeness": { "expected": 6, "expectedCounts": "all", "captured": 6, "capturedDirect": 2,
+                    "capturedNested": 4, "continuations": 0, "missing": 0, "cap": 200, "capHit": false,
                     "moreStubs": 0, "expanded": 1, "complete": true, "reason": null, "countNote": null },
   "comments": [ { "id", "parent", "depth", "author", "text", "score", "postedAt", "timeShown", "edited",
-                  "permalink", "flair", "deleted", "links": [], "replyCount", "replies": [ ... ] } ] }
+                  "permalink", "flair", "deleted", "continuation", "links": [], "replyCount", "replies": [ ... ] } ] }
 ```
 
 - `comments` is a tree: each comment under the one it answers. A comment whose parent was not on the
   page sits at the top with `parentMissing: true`; `siteDepth` keeps the site's own depth where it differs.
 - `expected` is the site's own count, which can include deleted, removed or hidden comments; `countNote`
-  says so when the capture is short of it. `complete` is `true` only when nothing is known to be
-  missing, `false` when something is (the cap, an unopened "more replies", a shortfall), and `"unknown"`
-  when the site gave no count.
+  says so when the capture is short of it. `expectedCounts` says what it covers. X counts the replies
+  directly under the post, the author's own included, so `expected` and `missing` compare with
+  `capturedDirect` there (`"direct"`). Other sites compare with `captured`, the whole tree (`"all"`).
+  `capturedDirect` and `capturedNested` add up to `captured`.
+- `complete` is `true` only when the capture reached a count above zero with nothing left to open,
+  `false` when something is known to be missing (the cap, an unopened "more replies", a shortfall),
+  `"empty"` when the site counted none, none were captured and nothing is left to open, and `"unknown"`
+  when no count can check the capture: the site gave none, or it said zero against comments that exist.
+  An empty thread has no `reason`, since there are no comments to go and find.
+- `continuation: true` marks the post author's own continuation: their replies to the post and to those
+  replies, unbroken. `continuations` counts them, and is `null` when the post's author is not known. The
+  author answering someone else is a comment, and so is someone else answering the chain.
+- The first format, `cmmns.capture-thread/1`, kept one `captured` total, no `post.author` and no
+  `continuation`. `readCaptureThread` reads it as the current format, working the counts out again from
+  its tree, and sets `upgradedFrom`. A file's bytes are never rewritten.
 - `expanded` counts the "more" controls opened. On the post's own page, CMMNS opens one at a time,
   1.2 to 3 s apart, up to `cap` (setting "Comments to open up to", 200 by default, 0 for none), with
   Stop on the notice. "Continue this thread" links lead to other pages and are counted in

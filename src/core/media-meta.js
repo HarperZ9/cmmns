@@ -129,7 +129,7 @@ function frontMatter(meta, files) {
 // The comment counts a library indexes, and the thread file's name (src/core/capture-thread.js).
 function threadRows(meta) {
   const t = threadSummary(meta.threadCapture, meta.threadFile || null);
-  return t ? { thread_file: t.file, comments_expected: t.expected, comments_captured: t.captured, comments_complete: t.complete, comments_cap_hit: t.capHit ? true : null } : {};
+  return t ? { thread_file: t.file, comments_expected: t.expected, comments_expected_counts: t.expectedCounts, comments_captured: t.captured, comments_direct: t.capturedDirect, comments_nested: t.capturedNested, comments_continuations: t.continuations, comments_complete: t.complete, comments_cap_hit: t.capHit ? true : null } : {};
 }
 
 // The post's files as the site listed them, each with its alt text, when there is more than one or any alt.
