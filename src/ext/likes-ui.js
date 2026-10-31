@@ -22,7 +22,7 @@
   }
 
   function counts(s) {
-    const parts = [`${s.found} found`, mode === "manifest" ? `${s.listed} listed for fetching` : `${s.saved} saved`, `${s.duplicate} already saved`, s.failed ? `${s.failed} failed` : null,
+    const parts = [`${s.found} found`, mode === "manifest" ? `${s.listed} listed for fetching` : `${s.saved} saved`, s.noVideo ? `${s.noVideo} without video` : null, `${s.duplicate} already saved`, s.failed ? `${s.failed} failed` : null,
       s.waiting ? `${s.waiting} waiting` : null, s.checklist ? `${s.missing} of ${s.checklist} in the archive still missing` : null].filter(Boolean);
     return `Likes: ${parts.join(", ")}`;
   }

@@ -13722,6 +13722,11 @@ function manifestLine(post, seen = new Date().toISOString()) {
     ...(streams.length ? { streams } : {}), seen };
 }
 
+// A video X listed only as a stream has no single file to fetch, so a post that has one is not saved
+// whole. streamsOf: the streams a manifest line still owes. noVideoNote: what its note says about them.
+const streamsOf = (line) => (line && Array.isArray(line.streams) ? line.streams : []);
+const noVideoNote = (line) => ({ label: "Not saved", text: `X listed this post's video only as a stream, so it is not saved here. Open the post and save it from there.\n${streamsOf(line).join("\n")}` });
+
 // The manifest, written whole (a browser cannot append to a file): one JSON line per post.
 const manifestText = (lines) => lines.map((l) => JSON.stringify(l)).join("\n") + (lines.length ? "\n" : "");
 function parseManifest(text) {
@@ -13740,12 +13745,13 @@ function parseArchiveLikes(text) {
 }
 
 // What the checklist holds that nothing saved does: ids, in the checklist's order.
-const missingLikes = (checklist, captured) => checklist.map((x) => (typeof x === "string" ? x : x.id)).filter((id) => !captured.has(postKey(id)) && !captured.has(id));
+// incomplete: ids that have a note but still lack their video; they stay on the list.
+const missingLikes = (checklist, captured, incomplete = null) => checklist.map((x) => (typeof x === "string" ? x : x.id)).filter((id) => (!captured.has(postKey(id)) && !captured.has(id)) || !!(incomplete && incomplete.has(id)));
 
 // The run's record, kept in this browser so a reload or a restart continues it.
 function likesState(kept = null, now = new Date().toISOString()) {
-  const base = kept && kept.format === LIKES_FORMAT ? kept : { format: LIKES_FORMAT, created: now, lines: [], counts: { found: 0, listed: 0, saved: 0, duplicate: 0, failed: 0 }, checkpoint: null, checklist: [], sessions: [] };
-  return { ...base, lines: [...base.lines], counts: { found: 0, listed: 0, saved: 0, duplicate: 0, failed: 0, ...base.counts }, checklist: [...(base.checklist || [])], sessions: [...(base.sessions || [])] };
+  const base = kept && kept.format === LIKES_FORMAT ? kept : { format: LIKES_FORMAT, created: now, lines: [], counts: { found: 0, listed: 0, saved: 0, noVideo: 0, duplicate: 0, failed: 0 }, checkpoint: null, checklist: [], sessions: [], noVideo: [] };
+  return { ...base, lines: [...base.lines], counts: { found: 0, listed: 0, saved: 0, noVideo: 0, duplicate: 0, failed: 0, ...base.counts }, noVideo: [...(base.noVideo || [])], checklist: [...(base.checklist || [])], sessions: [...(base.sessions || [])] };
 }
 
 // A checkpoint: the last post handled, how far down the page, and whether the run was going. A run
@@ -13784,7 +13790,7 @@ function savesFilter(front, { likes = false, liked = null, since = "", until = "
   return !(since && day < since) && !(until && day > until);
 }
 
-return { LIKES_FORMAT, LIKES_SOURCE, STAGES, likesRoute, parseLikes, pickLikeFile, postKey, isKnown, likeMeta, fileName, sidecarName, manifestLine, manifestText, parseManifest, parseArchiveLikes, missingLikes, likesState, checkpoint, resumable, admit, stageClock, savesFilter };
+return { LIKES_FORMAT, LIKES_SOURCE, STAGES, likesRoute, parseLikes, pickLikeFile, postKey, isKnown, likeMeta, fileName, sidecarName, manifestLine, streamsOf, noVideoNote, manifestText, parseManifest, parseArchiveLikes, missingLikes, likesState, checkpoint, resumable, admit, stageClock, savesFilter };
 })();
 
 // ---- media-embed.js

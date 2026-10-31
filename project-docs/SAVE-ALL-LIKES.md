@@ -161,3 +161,10 @@ likes the page never showed.
   each across a reload, 30 earlier saves skipped, 160 listed, the archive checklist, X's error state
   stopping the scroll.
 - `tests/store-build.test.js`: the store packages carry the collector and not the auto-scroll.
+
+## Videos listed only as a stream
+X sometimes lists a video only as a stream, with no single MP4. Neither half assembles streams, so such a post has no video file after a run. It never counts as saved:
+- The manifest line keeps the address under `streams`, and the note gets a "Not saved" entry naming it.
+- The bar shows "N without video", and the run's record keeps the ids in `noVideo`, so they survive a reload. The archive checklist counts them as still missing.
+- `cmmns likes fetch` counts them as saved without video and lists their addresses on every run, with no request. `cmmns likes missing` reports them separately.
+- On the command line a post stops counting once a video file carrying its id is in the CMMNS folder, for example after a one-click save on the post's own page. The browser's record does not clear itself this way yet.

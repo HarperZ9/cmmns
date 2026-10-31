@@ -86,3 +86,48 @@ test("fetch refuses in source-protection mode", async () => {
   await assert.rejects(fetchLikes(["fetch", "--dir", root], { env: { CMMNS_PROTECT: "1" }, log: () => {} }), /Source-protection mode is on/);
   assert.ok(!existsSync(join(root, "x")) || !readdirSync(join(root, "x")).length);
 });
+
+// A video X listed only as a stream: the command line has no file to fetch, so the post is not "saved".
+test("fetch: a post whose video is only a stream counts as saved without video on every run, until the video is there", { timeout: 60000 }, async () => {
+  const { server, hits, base } = await host();
+  try {
+    const root = mkdtempSync(join(tmpdir(), "cmmns-likes-s-")), dir = join(root, "x"), lib = join(root, "library", "x-likes");
+    mkdirSync(lib, { recursive: true });
+    const hls = "https://video.twimg.com/v/pl.m3u8";
+    const only = manifestLine(makePost("1800000000000000901", { media: [{ type: "video", hls }] }));
+    const mixed = manifestLine(makePost("1800000000000000902", { media: [{ type: "photo", url: `https://pbs.twimg.com/media/Lmix` }, { type: "video", hls }] }));
+    mixed.files = mixed.files.map((f) => ({ ...f, url: `${base}/media/Lmix` }));
+    const whole = manifestLine(makePost("1800000000000000903", { media: [{ type: "photo", url: `https://pbs.twimg.com/media/Lwhole` }] }));
+    whole.files = whole.files.map((f) => ({ ...f, url: `${base}/media/Lwhole` }));
+    writeFileSync(join(lib, "manifest-0001.jsonl"), manifestText([only, mixed, whole]));
+    const go = () => fetchLikes(["fetch", "--dir", root], { env: { CMMNS_PROTECT: "0" }, log: () => {} });
+
+    const r = await go();
+    assert.equal(r.counts.saved, 1, "only the post with every file");
+    assert.equal(r.counts.noVideo, 2);
+    assert.equal(r.counts.failed, 0);
+    assert.match(r.line, /2 saved without video/);
+    assert.match(r.line, new RegExp(`status/${only.id}`), "the run names them");
+    assert.match(readFileSync(join(dir, only.sidecar), "utf8"), /Not saved[\s\S]*pl\.m3u8/);
+    assert.match(readFileSync(join(dir, mixed.sidecar), "utf8"), /Not saved[\s\S]*pl\.m3u8/);
+
+    // Run again: nothing is fetched twice, and they are still reported, not passed over as already saved.
+    const before = hits.total, again = await go();
+    assert.equal(hits.total, before);
+    assert.equal(again.counts.noVideo, 2);
+    assert.equal(again.counts.duplicate, 1);
+
+    // The archive checklist does not call them saved.
+    const archive = join(root, "like.js");
+    writeFileSync(archive, `window.YTD.like.part0 = ${JSON.stringify([only, mixed, whole].map((l) => ({ like: { tweetId: l.id } })))}`);
+    const m = missingCommand(["missing", "--dir", root, "--archive", archive]);
+    assert.deepEqual(m.noVideo, [only.id, mixed.id]);
+    assert.match(m.line, /3 likes in the archive, 1 saved, 2 saved without video, 0 not saved yet/);
+
+    // The video saved later (one click on the post's own page) ends it: the post is whole.
+    writeFileSync(join(root, "x", `painter_2026-01-01_clip_${only.id}.mp4`), "video");
+    const third = await go();
+    assert.equal(third.counts.noVideo, 1);
+    assert.equal(third.counts.duplicate, 2);
+  } finally { server.close(); }
+});

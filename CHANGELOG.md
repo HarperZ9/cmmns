@@ -32,6 +32,8 @@ were not published to a store.
   the checklist; `cmmns likes missing` lists what is not saved yet. Auto-scroll, paced with jitter
   (careful by default) and stopping on X's first error or rate-limit message, ships only in the
   unpacked and self-distributed builds. The Boards page gains From my likes only and a posted-date range.
+  A post whose video X listed only as a stream counts as saved without video, on the bar, in the run's
+  record and in `cmmns likes fetch` and `missing`; its note names the stream, and on the command line it stops counting once the video is saved from the post's page.
 - **Faster saves.** A picture is asked for once, where it was asked for twice (one request, read on when
   the words go inside the file). A library saves four posts at once, keeps index.jsonl in the page's
   order, and writes its record every 10 posts. The saved list is written once for each batch of files.

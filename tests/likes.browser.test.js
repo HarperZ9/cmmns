@@ -119,3 +119,31 @@ test("X's error state stops the scroll with a clear message, and the run can be 
   await s.open();
   assert.equal(await s.js("PBLikes.status().status"), "resumable");
 }, { n: 40 }));
+
+// A video X listed only as a stream has no single file to fetch: the post must not count as saved whole.
+test("Save in the browser: a post whose video is only a stream counts as saved without video, and stays on the record", { skip: browserSkip, timeout: 120000 }, () => withLikes(async (s) => {
+  await s.open();
+  const stream = { id: id(800), handle: "painter", posted: "2026-05-01T10:00:00.000Z", text: "Stream only.", media: [{ type: "video", hls: "https://video.twimg.com/v/pl.m3u8" }], links: [] };
+  const words = { id: id(801), handle: "painter", posted: "2026-05-01T10:00:00.000Z", text: "Words only.", media: [], links: [] };
+  await s.js(`PBLikes.start("browser").then(() => true)`);
+  await s.js(`PBLikes.take(${JSON.stringify(stream)}), PBLikes.take(${JSON.stringify(words)}), true`);
+  await s.until("PBLikes.pending() === 0");
+  await s.js(`PBLikes.stop("checking", { resumable: true }).then(() => true)`);
+  const st = await s.js("PBLikes.status()");
+  assert.equal(st.saved, 1, "only the post with nothing left to fetch counts as saved");
+  assert.equal(st.noVideo, 1);
+  assert.equal(st.failed, st.found - 2, "the posts the page drew itself: no media host answers here, so they fail, and neither of these two does");
+  const dl = await s.js("__dl"), note = dl.find((d) => d.filename.endsWith(`_${stream.id}.md`));
+  assert.match(note.text, /Not saved/);
+  assert.match(note.text, /pl\.m3u8/, "the note names the stream");
+  const part = dl.filter((d) => /^manifest-/.test(d.filename)).at(-1).text;
+  assert.match(part, /"streams":\["https:\/\/video\.twimg\.com\/v\/pl\.m3u8"\]/, "the manifest keeps the stream for the command line");
+  // The record survives a reload, and the archive checklist still counts the post as missing.
+  await s.open();
+  assert.equal(await s.js("PBLikes.status().noVideo"), 1);
+  assert.match(await s.js("document.querySelector('.pb-likes .pb-lib-count').textContent"), /1 without video/);
+  const kept = await s.js(`chrome.storage.local.get("pb.likes.v1").then((g) => g["pb.likes.v1"])`);
+  assert.deepEqual(kept.noVideo, [stream.id]);
+  await s.js(`PBLikes.importArchive(${JSON.stringify(`window.YTD.like.part0 = ${JSON.stringify([{ like: { tweetId: stream.id } }, { like: { tweetId: words.id } }])}`)})`);
+  assert.equal(await s.js("PBLikes.status().missing"), 1);
+}));

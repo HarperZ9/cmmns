@@ -15,8 +15,8 @@ globalThis.PBLikes = globalThis.PBLikes || (() => {
   const route = () => PB.likesRoute(location.href, { title: document.title, selectedTab: (document.querySelector('[role="tab"][aria-selected="true"]') || {}).textContent });
   const changed = () => { for (const f of listeners) try { f(status()); } catch (e) { console.warn("[cmmns] likes view", e); } };
   function status() {
-    const c = (state && state.counts) || {}, missing = state && state.checklist.length ? PB.missingLikes(state.checklist, run ? run.known : new Set((state.ids || []).map(PB.postKey))).length : null;
-    return { status: run ? run.status : state && PB.resumable(state) ? "resumable" : "idle", mode: run ? run.mode : null, found: c.found || 0, listed: c.listed || 0, saved: c.saved || 0,
+    const c = (state && state.counts) || {}, missing = state && state.checklist.length ? PB.missingLikes(state.checklist, run ? run.known : new Set((state.ids || []).map(PB.postKey)), new Set(state.noVideo)).length : null;
+    return { status: run ? run.status : state && PB.resumable(state) ? "resumable" : "idle", mode: run ? run.mode : null, found: c.found || 0, listed: c.listed || 0, saved: c.saved || 0, noVideo: c.noVideo || 0,
       duplicate: c.duplicate || 0, failed: c.failed || 0, waiting: run ? run.queue.length + run.busy : 0, checklist: state ? state.checklist.length : 0, missing, why: run ? run.why : (state && state.why) || null };
   }
 
@@ -41,6 +41,9 @@ globalThis.PBLikes = globalThis.PBLikes || (() => {
     return known;
   }
 
+  // A post whose video is only a stream: on the record by id, so a later run or the command line can pick it up.
+  function noteNoVideo(id) { if (!state.noVideo.includes(id)) { state.noVideo.push(id); state.counts.noVideo++; } }
+
   // One post found: dedupe, then into the manifest part (and the save queue in browser mode).
   function take(post) {
     if (!run || run.status === "stopped" || run.seen.has(post.id)) return;
@@ -55,6 +58,7 @@ globalThis.PBLikes = globalThis.PBLikes || (() => {
     run.lines.add(post.id); run.known.add(PB.postKey(post.id)); state.ids.push(post.id); state.partLines.push(r.line); state.counts.listed++;
     state.checkpoint = { ...(state.checkpoint || {}), lastId: post.id };
     if (run.mode === "browser") { run.queue.push(r.line); pump(); }
+    else if (PB.streamsOf(r.line).length) noteNoVideo(r.line.id);
     if (state.partLines.length % FLUSH_LINES === 0) flush();
     changed();
   }
@@ -92,18 +96,20 @@ globalThis.PBLikes = globalThis.PBLikes || (() => {
     }
     // The note is written without holding a save slot: the next post's files start while the browser
     // names this one (about 130 ms a note in the timing run, the slowest stage while it held the slot).
-    const c = performance.now(), md = PB.sidecarMarkdown(PB.likeMeta(line), names), mine = run;
+    const c = performance.now(), streams = PB.streamsOf(line).length, record = PB.likeMeta(line), mine = run;
+    if (streams) record.notes = [...(record.notes || []), PB.noVideoNote(line)];
+    const md = PB.sidecarMarkdown(record, names);
     const note = PBQuickSave.saveText(new TextEncoder().encode(md), "text/markdown", line.sidecar, "x", false, { overwrite: true })
       .then(() => clock.add("sidecar", performance.now() - c), (e) => console.warn("[cmmns] likes: a note was not written", e))
       .finally(() => mine.notes.delete(note));
     mine.notes.add(note);
-    return names.length || !line.files.length;
+    return !names.length && line.files.length ? "failed" : streams ? "noVideo" : "saved";
   }
   async function pump() {
     while (run && run.status === "running" && run.queue.length && run.busy < WIDTH) {
       const line = run.queue.shift();
       run.busy++;
-      savePost(line).then((ok) => { state.counts[ok ? "saved" : "failed"]++; }, (e) => { state.counts.failed++; console.warn("[cmmns] likes: a post was not saved", e); })
+      savePost(line).then((how) => { if (how === "noVideo") noteNoVideo(line.id); else state.counts[how]++; }, (e) => { state.counts.failed++; console.warn("[cmmns] likes: a post was not saved", e); })
         .finally(() => { if (run) { run.busy--; changed(); pump(); } });
     }
   }
