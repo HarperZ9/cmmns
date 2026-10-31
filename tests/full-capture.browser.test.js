@@ -27,12 +27,12 @@ test("a Reddit save brings every comment as a tree, opening \"more replies\" at 
   assert.equal(r, true);
   await s.until("__dl.some((d) => /\\.thread\\.json$/.test(d.filename))");
   const thread = JSON.parse((await s.file("\\.thread\\.json$")).text), md = (await s.file("\\.md$")).text;
-  assert.equal(thread.format, "cmmns.capture-thread/1");
+  assert.equal(thread.format, "cmmns.capture-thread/2");
   assert.deepEqual(flatIds(thread.comments), ["t1_c1", "t1_c2", "t1_c3", "t1_c4", "t1_c5", "t1_c6"]);
   const c3 = thread.comments[0].replies[0].replies[0];
   assert.deepEqual([c3.author, c3.depth, c3.score, c3.postedAt, c3.permalink], ["u/cy", 2, 4, "2026-10-22T10:00:00.000Z", "https://www.reddit.com/r/ColorTheory/comments/abc123/ochre/c3/"]);
   assert.deepEqual(c3.links, ["https://example.org/why"]);
-  assert.deepEqual({ ...thread.completeness, countNote: undefined, reason: undefined }, { expected: 6, captured: 6, missing: 0, cap: 200, capHit: false, moreStubs: 0, expanded: 1, complete: true, countNote: undefined, reason: undefined });
+  assert.deepEqual({ ...thread.completeness, countNote: undefined, reason: undefined }, { expected: 6, expectedCounts: "all", captured: 6, capturedDirect: thread.comments.length, capturedNested: 6 - thread.comments.length, continuations: thread.completeness.continuations, missing: 0, cap: 200, capHit: false, moreStubs: 0, expanded: 1, complete: true, countNote: undefined, reason: undefined });
   assert.match(md, /^thread_file: ".+\.thread\.json"$/m);
   assert.match(md, /^comments_captured: 6$/m);
   assert.match(md, /Captured 6 of 6 comments; after opening 1 "more" control\./);
@@ -106,7 +106,17 @@ test("an X save brings the replies as a tree, the quote with its picture's alt t
   assert.doesNotMatch(md, /t\.co\//);
   assert.match(md, /Quoting @quoted \(https:\/\/x\.com\/quoted\/status\/50\):\n\n> The older one\.\n\n- Quoted image: https:\/\/pbs\.twimg\.com\/media\/Q\?format=jpg&name=orig \(Alt text: A swatch card\)/);
   assert.deepEqual(thread.comments.map((c) => [c.id, c.author, c.replies.map((r) => r.id)]), [["101", "@ann", ["102"]], ["103", "@bo", ["104"]]]);
-  assert.deepEqual([thread.completeness.expected, thread.completeness.captured, thread.completeness.expanded, thread.completeness.complete], [4, 4, 1, true]);
+  assert.deepEqual([thread.completeness.expected, thread.completeness.expectedCounts, thread.completeness.capturedDirect, thread.completeness.capturedNested, thread.completeness.continuations, thread.completeness.expanded, thread.completeness.complete], [2, "direct", 2, 2, 0, 1, true]);
+  assert.match(md, /Captured 2 of 2 direct replies, and 2 more deeper in the thread; after opening 1 "more" control\./);
+  // The author answering a commenter is a comment, not a continuation.
+  assert.equal(thread.comments[0].replies[0].continuation, undefined);
+  // A reply elsewhere on the page with no replies of its own: an empty thread, with no advice to go and find comments.
+  const empty = await s.js("PBFullCapture.capture({ site: 'x', postUrl: 'https://x.com/painter/status/102' }, PB.normalizeSettings(null))");
+  assert.deepEqual([empty.completeness.expected, empty.completeness.captured, empty.completeness.complete, empty.completeness.reason], [0, 0, "empty", null]);
+  // A post with a reply count whose replies never reached this page keeps the advice.
+  const elsewhere = await s.js("PBFullCapture.capture({ site: 'x', postUrl: 'https://x.com/quoted/status/51', engagement: { replies: 3 } }, PB.normalizeSettings(null))");
+  assert.deepEqual([elsewhere.completeness.expected, elsewhere.completeness.complete], [3, false]);
+  assert.match(elsewhere.completeness.reason, /open the post's own page/);
   assert.equal(thread.comments[0].score, 7);
   onlyOwn(s.requests, "https://x.com", []);
 }));

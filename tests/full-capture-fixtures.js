@@ -28,7 +28,7 @@ const tweet = (id, author, text, extra = {}, legacy = {}) => ({ __typename: "Twe
   legacy: { full_text: text, created_at: "Tue Oct 20 12:00:00 +0000 2026", reply_count: 0, favorite_count: 1, ...legacy }, ...extra });
 export const X_ROOT = tweet("100", "painter", "Ochre study https://t.co/abc", { quoted_status_result: { result: tweet("50", "quoted", "The older one.", {}, {
   extended_entities: { media: [{ id_str: "5", type: "photo", media_url_https: "https://pbs.twimg.com/media/Q.jpg", ext_alt_text: "A swatch card" }] } }) } },
-{ reply_count: 4, quoted_status_id_str: "50", entities: { urls: [{ url: "https://t.co/abc", expanded_url: "https://example.org/ochre" }] } });
+{ reply_count: 2, quoted_status_id_str: "50", entities: { urls: [{ url: "https://t.co/abc", expanded_url: "https://example.org/ochre" }] } });
 export const X_REPLIES = [
   tweet("101", "ann", "Lovely.", {}, { in_reply_to_status_id_str: "100", in_reply_to_screen_name: "painter", favorite_count: 7 }),
   tweet("102", "painter", "Thank you!", {}, { in_reply_to_status_id_str: "101", in_reply_to_screen_name: "ann" }),

@@ -6,7 +6,8 @@
 // No DOM and no request here; src/ext/capture-sites.js reads the page and src/ext/full-capture.js
 // expands it at a person's pace.
 
-export const CAPTURE_THREAD_FORMAT = "cmmns.capture-thread/1";
+export const CAPTURE_THREAD_FORMAT = "cmmns.capture-thread/2";
+export const CAPTURE_THREAD_FORMAT_V1 = "cmmns.capture-thread/1";
 export const THREAD_CAP_DEFAULT = 200;
 export const THREAD_CAP_MAX = 5000;
 export const THREAD_COUNT_NOTE = "The site's own count can include deleted, removed or hidden comments that no page shows, so a capture can be short of it with nothing lost from the page.";
@@ -66,23 +67,67 @@ function isAncestor(a, b, nodes) {
 }
 export const countTree = (list) => list.reduce((n, c) => n + 1 + countTree(c.replies || []), 0);
 
-// expected: the site's count (null when it gave none); captured: comments in the tree; cap: the user's
-// cap on expansion; capHit: expansion stopped at the cap; stubs: "more replies" controls still unopened.
-// complete is true only when nothing is known to be missing, false when something is, and "unknown"
-// when the site gave no count to check against.
-export function completeness({ expected = null, captured = 0, cap = THREAD_CAP_DEFAULT, capHit = false, stubs = 0, expanded = 0, reason = null } = {}) {
-  const exp = whole(expected), open = Math.max(0, Number(stubs) || 0);
-  const complete = exp != null ? captured >= exp && !capHit && !open : capHit || open ? false : "unknown";
-  return { expected: exp, captured, missing: exp != null ? Math.max(0, exp - captured) : null, cap, capHit: !!capHit, moreStubs: open, expanded: Math.max(0, Number(expanded) || 0), complete,
-    reason: str(reason, 300), countNote: exp != null && captured < exp ? THREAD_COUNT_NOTE : null };
+// What the site's own count counts. X's reply count is of the replies directly under the post, the
+// author's own included; it leaves out replies to replies. The other sites' counts are taken to cover
+// the whole conversation.
+export const expectedCountsFor = (site) => (site === "x" ? "direct" : "all");
+// The part of a flat reading that compares with the site's count, for deciding when to stop opening more.
+export const countedTowardExpected = (flat = [], site = null) => (expectedCountsFor(site) === "direct" ? flat.filter((c) => !c.parent).length : flat.length);
+
+// True of a comment that answers the post itself, not one whose parent is missing from the page.
+const isDirect = (n) => !n.parent;
+const handleKey = (h) => (h ? String(h).trim().replace(/^(@|\/?u\/)/i, "").toLowerCase() || null : null);
+// The post author's own continuation: their replies to the post, and to those replies, unbroken. Their
+// answer to someone else is a comment like any other, and so is someone else's answer to the chain.
+// Marks the nodes and returns how many, or null when the post's author is not known.
+function markContinuations(roots, author) {
+  const key = handleKey(author);
+  if (!key) return null;
+  let n = 0;
+  const walk = (list) => { for (const c of list) if (handleKey(c.author) === key) { c.continuation = true; n++; walk(c.replies || []); } };
+  walk(roots.filter(isDirect));
+  return n;
 }
 
-// The thread file's record. post: { url, id }; source: where the comments were read ("the rendered
+// expected: the site's count (null when it gave none); expectedCounts: what that count covers ("direct"
+// or "all"); captured: every comment in the tree; capturedDirect and capturedNested: those directly under
+// the post and those deeper, which add up to captured; continuations: how many of captured are the post
+// author's own continuation (null when the author is not known); cap: the user's cap on expansion; capHit:
+// expansion stopped at the cap; stubs: "more replies" controls still unopened.
+// complete is true only when the capture reached a count above zero with nothing left to open, false when
+// something is known to be missing, "empty" when the site counted none, none were captured and nothing is
+// left to open, and "unknown" when no count can check the capture. An empty thread has no comments to go
+// and find, so it carries no reason.
+export function completeness({ expected = null, expectedCounts = "all", captured = 0, capturedDirect = null, continuations = null, cap = THREAD_CAP_DEFAULT, capHit = false, stubs = 0, expanded = 0, reason = null } = {}) {
+  const exp = whole(expected), open = Math.max(0, Number(stubs) || 0), blocked = !!capHit || open > 0;
+  const counted = expectedCounts === "direct" && capturedDirect != null ? capturedDirect : captured;
+  const complete = blocked && (exp == null || exp === 0) ? false : exp == null ? "unknown" : exp === 0 ? (captured === 0 ? "empty" : "unknown") : counted >= exp && !blocked;
+  return { expected: exp, expectedCounts, captured, capturedDirect, capturedNested: capturedDirect != null ? captured - capturedDirect : null, continuations,
+    missing: exp != null ? Math.max(0, exp - counted) : null, cap, capHit: !!capHit, moreStubs: open, expanded: Math.max(0, Number(expanded) || 0), complete,
+    reason: complete === "empty" ? null : str(reason, 300), countNote: exp != null && counted < exp ? THREAD_COUNT_NOTE : null };
+}
+const countAll = (tree, block) => ({ captured: countTree(tree), capturedDirect: tree.filter(isDirect).length, ...block });
+
+// The thread file's record. post: { url, id, author }; source: where the comments were read ("the rendered
 // page", "the page's own data"). savedAt is the time of the save.
 export function captureThread({ site = null, post = {}, comments = [], expected = null, cap = THREAD_CAP_DEFAULT, capHit = false, stubs = 0, expanded = 0, source = null, reason = null, savedAt = new Date().toISOString() } = {}) {
-  const tree = commentTree(comments), captured = countTree(tree);
-  return { format: CAPTURE_THREAD_FORMAT, site, post: { url: str(post.url, 2000), id: str(post.id, 120) }, savedAt: iso(savedAt) || savedAt, source: str(source, 120),
-    completeness: completeness({ expected, captured, cap, capHit, stubs, expanded, reason }), comments: tree };
+  const tree = commentTree(comments), continuations = markContinuations(tree, post.author);
+  return { format: CAPTURE_THREAD_FORMAT, site, post: { url: str(post.url, 2000), id: str(post.id, 120), author: str(post.author, 120) }, savedAt: iso(savedAt) || savedAt, source: str(source, 120),
+    completeness: completeness(countAll(tree, { expected, expectedCounts: expectedCountsFor(site), continuations, cap, capHit, stubs, expanded, reason })), comments: tree };
+}
+
+// A thread file of any format this build knows, as the current format. A first-format file kept one
+// captured total and no post author: the counts are worked out again from its tree, and the author comes
+// from the post's address where that names one. The object passed in is left as it was.
+export function readCaptureThread(record) {
+  if (!record || typeof record !== "object") throw new Error("not a thread file: expected an object with a format");
+  if (record.format === CAPTURE_THREAD_FORMAT) return record;
+  if (record.format !== CAPTURE_THREAD_FORMAT_V1) throw new Error(`thread file format ${record.format} is not one this build reads`);
+  const tree = structuredClone(record.comments || []), old = record.completeness || {};
+  const author = (record.post && record.post.author) || (record.site === "x" && (/\/\/(?:www\.)?(?:x|twitter)\.com\/(?!i\/)([^/]+)\/status\//.exec((record.post || {}).url || "") || [])[1]) || null;
+  const continuations = markContinuations(tree, author);
+  const block = countAll(tree, { expected: old.expected, expectedCounts: expectedCountsFor(record.site), continuations, cap: old.cap, capHit: old.capHit, stubs: old.moreStubs, expanded: old.expanded, reason: old.reason });
+  return { ...record, format: CAPTURE_THREAD_FORMAT, upgradedFrom: CAPTURE_THREAD_FORMAT_V1, post: { ...record.post, author }, completeness: completeness(block), comments: tree };
 }
 
 export const threadFileJson = (capture) => JSON.stringify(capture, null, 2) + "\n";
@@ -91,13 +136,23 @@ export const threadFileJson = (capture) => JSON.stringify(capture, null, 2) + "\
 export function threadSummary(capture, file = null) {
   if (!capture) return null;
   const c = capture.completeness;
-  return { file, expected: c.expected, captured: c.captured, complete: c.complete, capHit: c.capHit, cap: c.cap, moreStubs: c.moreStubs };
+  return { file, expected: c.expected, expectedCounts: c.expectedCounts, captured: c.captured, capturedDirect: c.capturedDirect, capturedNested: c.capturedNested, continuations: c.continuations, complete: c.complete, capHit: c.capHit, cap: c.cap, moreStubs: c.moreStubs };
 }
 
+// The opening of the sentence, in the units the site's count is in.
+function capturedLine(c) {
+  const plain = (n) => `${n} comment${n === 1 ? "" : "s"}`;
+  if (c.expected == null || c.expected === 0) return `Captured ${plain(c.captured)}`;
+  if (c.expectedCounts !== "direct" || c.capturedDirect == null) return `Captured ${c.captured} of ${plain(c.expected)}`;
+  const nested = c.capturedNested ? `, and ${c.capturedNested} more deeper in the thread` : "";
+  return `Captured ${c.capturedDirect} of ${c.expected} direct repl${c.expected === 1 ? "y" : "ies"}${nested}`;
+}
 // The sentence a person reads first: "Captured 12 of 40 comments; the cap of 10 stopped loading more."
 export function completenessSentence(c) {
-  const of = c.expected != null ? `${c.captured} of ${c.expected}` : `${c.captured}`;
-  const parts = [`Captured ${of} comment${(c.expected ?? c.captured) === 1 ? "" : "s"}`];
+  if (c.complete === "empty") return "No comments: the site counted none on this post.";
+  const parts = [capturedLine(c)];
+  if (c.expected === 0 && c.captured) parts.push("the site counted none");
+  if (c.continuations) parts.push(`${c.continuations} of ${c.captured} ${c.continuations === 1 ? "is" : "are"} the post author's own continuation`);
   if (c.expanded) parts.push(`after opening ${c.expanded} "more" control${c.expanded === 1 ? "" : "s"}`);
   if (c.capHit) parts.push(`the cap of ${c.cap} stopped loading more`);
   if (c.moreStubs) parts.push(`${c.moreStubs} "more replies" control${c.moreStubs === 1 ? " was" : "s were"} left unopened`);
@@ -117,7 +172,7 @@ export function commentsMarkdown(capture, max = 1000) {
     for (const x of list) {
       if (n++ >= max) return;
       const pad = "  ".repeat(Math.min(x.depth || 0, 12));
-      const facts = [x.score != null ? score(x.score) : null, x.postedAt || x.timeShown, x.edited ? "edited" : null, x.deleted ? "deleted" : null, x.flair ? `flair: ${x.flair}` : null].filter(Boolean);
+      const facts = [x.continuation ? "the post author's continuation" : null, x.score != null ? score(x.score) : null, x.postedAt || x.timeShown, x.edited ? "edited" : null, x.deleted ? "deleted" : null, x.flair ? `flair: ${x.flair}` : null].filter(Boolean);
       out.push(`${pad}- **${x.author || "unknown"}**${facts.length ? ` (${facts.join(", ")})` : ""}${x.permalink ? ` ${x.permalink}` : ""}`);
       for (const line of String(x.text || "").split("\n")) out.push(`${pad}  ${line ? "> " + line : ">"}`);
       walk(x.replies || []);
