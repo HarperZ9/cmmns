@@ -1,0 +1,20 @@
+{
+ "note": "Verbatim copies of units validated on 2026-10-29. Never edit these files; tests/test_latent.py checks every hash, and checks it against the source when LATENT_SOURCE_ROOT points at the private research folder these sources are relative to.",
+ "units": {
+  "twolines.py": {"finding": "F49", "role": "two-lines test for an interior optimum (Simonsohn 2018)",
+                  "source": "2026-10-29-goldilocks/twolines.py",
+                  "sha256": "9875b29f5108f6209ba0d8cf2acd8805cf7d64b4b2f09a4b10befd5b0f1c61e5"},
+  "ls_spectra.py": {"finding": "F74", "role": "welch_beta spectral exponent, phase_randomize, synth",
+                    "source": "2026-10-29-lens-spectrum/ls_spectra.py",
+                    "sha256": "76ac5fecd57ddb4842a7a5d0ab9f8e6f744572aa8a664691edd0496c740fe080"},
+  "fc_core.py": {"finding": "F76", "role": "spectral flatness (rule dj) as a one-step linear predictability ceiling",
+                 "source": "2026-10-29-flatness-ceiling/fc_core.py",
+                 "sha256": "ac2c2b430b04890d19d231ab7c0a49bbceb22577c5feaa1894062da6a5a279d6"},
+  "s2_units.py": {"finding": "F55", "role": "parallel analysis, participation ratio, held-out PPCA, held-out CCA, Benjamini-Hochberg",
+                  "source": "2026-10-29-reciprocity-dimensions/s2-body-mind/s2_units.py",
+                  "sha256": "64e6bc376c71b8fe9a9f706709f21e45b71223ef5c3d71f903d475e5e4dc8961"},
+  "pixel.py": {"finding": "F61 (pixel test)", "role": "neighbour-difference compression ratio against a shuffle",
+               "source": "2026-10-29-hypothesis-tournament/pixel/pixel.py",
+               "sha256": "a1aac655b6ce91cfab76dd2c8b0cada60bad2b7e37d333a96a2b26d42684bc49"}
+ }
+}
