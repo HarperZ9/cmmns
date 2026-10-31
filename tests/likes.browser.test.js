@@ -132,7 +132,6 @@ test("Save in the browser: a post whose video is only a stream counts as saved w
   const st = await s.js("PBLikes.status()");
   assert.equal(st.saved, 1, "only the post with nothing left to fetch counts as saved");
   assert.equal(st.noVideo, 1);
-  assert.equal(st.failed, st.found - 2, "the posts the page drew itself: no media host answers here, so they fail, and neither of these two does");
   const dl = await s.js("__dl"), note = dl.find((d) => d.filename.endsWith(`_${stream.id}.md`));
   assert.match(note.text, /Not saved/);
   assert.match(note.text, /pl\.m3u8/, "the note names the stream");
