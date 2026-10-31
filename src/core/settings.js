@@ -20,7 +20,7 @@ export const AREA_IDS = ["place", "account", "posting", "coordination", "languag
 
 // Retention in days. The upper limits are what the logs keep at most (history.js keeps 60 days;
 // the connections and trail logs keep 30, so a longer history setting leaves those at 30).
-export const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 }, seenDays: { min: 1, max: 365 } };
+export const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 }, seenDays: { min: 1, max: 365 }, threadCap: { min: 0, max: 5000 } };
 
 export const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
@@ -69,6 +69,11 @@ export const DEFAULTS = Object.freeze({
   // reminder of due readings on the badge, off by default; the log of every post the page loaded,
   // off by default and kept seenDays days.
   trackSeries: true, trackRemind: false, seenLog: false, seenDays: 90,
+  // Whole saves (src/ext/full-capture.js, src/core/capture-thread.js): a saved post's comments come
+  // with it as a thread file, on by default; "load more" opened at a person's pace up to threadCap
+  // comments, on by default (0 keeps only what the page shows). Source protection holds the opening
+  // off, since each "more" asks the site for the next comments.
+  threadCapture: true, threadExpand: true, threadCap: 200,
 });
 
 // The save folder before the 2026-10-28 rename to CMMNS, and the release that renamed it. A browser
@@ -97,9 +102,10 @@ export function legacyFolderPatch(raw, previousVersion) {
 // What source-protection mode holds off while it is on: evidence lookups (GitHub, RDAP, the Internet
 // Archive), Other coverage (outlets' feeds), reading About pages automatically, and one-click
 // downloads (which fetch the file again from its host), and the seen-post log (a record on this
-// device of every post the user was shown; the author's decision, 2026-10-29). Turning the mode off
+// device of every post the user was shown; the author's decision, 2026-10-29), and opening "more replies" while
+// saving a post's comments (each asks the site for more). Turning the mode off
 // leaves them off until the user turns each one back on.
-export const PROTECTION_FORCES = Object.freeze({ evidence: false, coverage: false, feedConsent: false, auto: false, mediaButtons: false, seenLog: false });
+export const PROTECTION_FORCES = Object.freeze({ evidence: false, coverage: false, feedConsent: false, auto: false, mediaButtons: false, seenLog: false, threadExpand: false });
 // A folder path inside Downloads: letters, digits, spaces, dots, hyphens, underscores and slashes,
 // no ".." part, at most 120 characters.
 const folder = (v, d) => (typeof v !== "string" ? d
@@ -141,6 +147,7 @@ export function normalizeSettings(raw) {
     hoverDownload: bool(s.hoverDownload, DEFAULTS.hoverDownload), hoverEverywhere: bool(s.hoverEverywhere, DEFAULTS.hoverEverywhere), hoverOffSites: siteList(s.hoverOffSites),
     trackSeries: bool(s.trackSeries, DEFAULTS.trackSeries), trackRemind: bool(s.trackRemind, DEFAULTS.trackRemind),
     seenLog: bool(s.seenLog, DEFAULTS.seenLog), seenDays: days(s.seenDays, DEFAULTS.seenDays, RETENTION.seenDays),
+    threadCapture: bool(s.threadCapture, DEFAULTS.threadCapture), threadExpand: bool(s.threadExpand, DEFAULTS.threadExpand), threadCap: days(s.threadCap, DEFAULTS.threadCap, RETENTION.threadCap),
   };
   return out.protection ? { ...out, ...PROTECTION_FORCES } : out;
 }

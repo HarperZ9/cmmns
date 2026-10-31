@@ -87,10 +87,14 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
     meta = { ...(meta || PBQuickSave.metaOf({ meta: { ...ref.meta, kind: items.length ? "media" : "text" } }, {})), item: null };
     meta.notes = [...(meta.notes || []), ...(ref.repostBy ? [{ label: "Reposted", text: `Reposted by @${ref.repostBy}; the post above is @${ref.handle}'s.` }] : []),
       ...(ref.kind === "comment" ? [{ label: "Comment", text: `A comment in ${ref.meta.subreddit || "a subreddit"} on post ${ref.meta.parentPost || "unknown"}.` }] : []), ...labelNotes(ref.meta.fields || {})];
-    const names = col.files.map((f) => f.name);
-    const side = PB.metaName(meta, "md", ref.id), bytes = new TextEncoder().encode(PB.sidecarMarkdown(meta, names));
-    await PBQuickSave.saveText(bytes, "text/markdown", side, meta.site, false, { library: run.state.folder, overwrite: true });
-    const files = [...col.files, { name: side, sha256: await PB.mediaSha256(bytes) }];
+    const names = col.files.map((f) => f.name), side = PB.metaName(meta, "md", ref.id), to = { library: run.state.folder, overwrite: true };
+    // The post's comments where the page has them, as "<note>.thread.json" (full-capture.js), hashed too.
+    if (globalThis.PBFullCapture) meta = PBFullCapture.withFile(await PBFullCapture.complete(meta), side.replace(/\.md$/, ""));
+    const thread = meta.threadCapture ? PBFullCapture.threadBytes(meta) : null;
+    if (thread) await PBQuickSave.saveText(thread, "application/json", meta.threadFile, meta.site, false, to);
+    const bytes = new TextEncoder().encode(PB.sidecarMarkdown(meta, names));
+    await PBQuickSave.saveText(bytes, "text/markdown", side, meta.site, false, to);
+    const files = [...col.files, ...(thread ? [{ name: meta.threadFile, sha256: await PB.mediaSha256(thread) }] : []), { name: side, sha256: await PB.mediaSha256(bytes) }];
     return PB.libraryLine({ id: ref.id, url: ref.url, handle: ref.handle, posted: meta.postedAt, saved: new Date().toISOString(), kind: ref.kind, content: items.length ? "media" : "text", files, missing, fields: ref.meta.fields,
       repostBy: ref.repostBy, parentPost: ref.meta.parentPost, subreddit: ref.meta.subreddit });
   }

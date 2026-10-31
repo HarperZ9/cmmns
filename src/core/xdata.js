@@ -133,6 +133,8 @@ export function tweetsIn(json) {
         replyTo: L.in_reply_to_status_id_str || null,
         replyToHandle: L.in_reply_to_screen_name || null,
         links: ((L.entities || {}).urls || []).map((u) => u.expanded_url).filter((u) => u && !/^https?:\/\/(x|twitter)\.com\//.test(u)),
+        // each short t.co address in the text with the address it stands for, so a save can write the final one
+        urls: ((L.entities || {}).urls || []).filter((u) => u && /^https:\/\/t\.co\//.test(u.url || "") && u.expanded_url).map((u) => ({ short: u.url, expanded: u.expanded_url })),
         quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count), bookmarks: n(L.bookmark_count),
         // X's own Paid partnership mark, as X records it in the response. It is X's claim about the
         // post, recorded and checked like any other, never ground truth (RADAR-VISION, independence).
@@ -203,6 +205,7 @@ function mediaOf(L) {
   const out = list.filter((m) => m && m.id_str).map((m) => ({
     type: m.type || "photo", url: m.media_url_https || null, uploaded: snowflakeTime(m.id_str),
     fromPost: m.source_status_id_str || null, fromPostTime: m.source_status_id_str ? snowflakeTime(m.source_status_id_str) : null,
+    ...(m.ext_alt_text ? { alt: String(m.ext_alt_text) } : {}),
     ...videoOf(m),
   }));
   return out.length ? out : null;

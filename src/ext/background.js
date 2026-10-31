@@ -6,7 +6,7 @@
 //   profiles. The window closes itself when the queue has been empty for IDLE_CLOSE_MS.
 // Chrome runs this file as a service worker and loads the core bundle and the housekeeping here;
 // Firefox lists them before this file in the manifest's background scripts.
-if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js", "instances.js", "packs-bg.js", "sources-bg.js", "evidence-bg.js", "head-bg.js", "ocr.bundle.js", "ocr-bg.js", "discourse.bundle.js", "discourse-bg.js", "media-store.js", "quick-save-bg.js", "capture-bg.js", "handoff-bg.js", "quick-hover-bg.js", "side-bg.js", "card-bg.js", "media-bg.js", "adblock-bg.js", "track-store.js", "track-bg.js");
+if (typeof importScripts === "function" && !globalThis.PB) importScripts("core.bundle.js", "lifecycle.js", "instances.js", "packs-bg.js", "sources-bg.js", "evidence-bg.js", "head-bg.js", "ocr.bundle.js", "ocr-bg.js", "discourse.bundle.js", "discourse-bg.js", "media-store.js", "quick-save-bg.js", "capture-bg.js", "capture-open-bg.js", "handoff-bg.js", "quick-hover-bg.js", "side-bg.js", "card-bg.js", "media-bg.js", "adblock-bg.js", "track-store.js", "track-bg.js");
 const GAP_MS = 2500, TIMEOUT_MS = 12000, IDLE_CLOSE_MS = 15000;
 const queue = [];
 let busy = false, lastAt = 0, current = null, worker = null, idleTimer = 0, timeoutTimer = 0;
@@ -75,6 +75,8 @@ PBPacks.onChange(() => { claimsReady = null; opsReady = null; });
 
 const cards = {};   // fallback where storage.session is missing
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  // A thumbnail's post opened in a background tab and saved there whole (capture-open-bg.js).
+  if (msg && msg.type === "pb-cap-open" && sender.tab) { PBCaptureOpen.open(msg).then(sendResponse); return true; }
   if (msg && msg.type === "pb-fonts") { fontBytes().then(sendResponse); return true; }
   if (msg && msg.type === "pb-freshness") { PBHead.view().then(sendResponse, (e) => { console.error("[cmmns] freshness failed", e); sendResponse(null); }); return true; }
   if (msg && msg.type === "pb-claims") {

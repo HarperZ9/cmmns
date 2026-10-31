@@ -97,9 +97,13 @@ globalThis.PBQuickSites = globalThis.PBQuickSites || (() => {
     // incomplete when X cut it short behind "Show more".
     const full = t.fullText || (t.text && t.text.length < 2000 ? t.text : null), shown = txt(langs[0]);
     const more = own(article, '[data-testid="tweet-text-show-more-link"]').length > 0 || own(article, "button, a, span[role=button]").some((e) => /^show more$/i.test(e.textContent.trim()));
-    return { site: "x", text: full || (shown && t.text && t.text.length > shown.length ? t.text : shown || t.text || null), textComplete: !!full || !more, authorName: name, handle: ref.handle, postUrl: xUrl(ref.handle, ref.id),
-      postedAt: t.posted || (time && time.dateTime) || PB.snowflakeTime(ref.id), quoted, parent, thread: xThread(article, ref, t), threadComplete: xThreadOf(article, ref, t).complete, engagement: xEngagement(article, t), ...xExtras(article),
-      links: t.links || [], fields: xFields(t) };
+    // t.co addresses become the addresses they stand for, from X's own data (urls), in the text and cards.
+    const ex = (str) => (str ? (t.urls || []).reduce((s, u) => s.split(u.short).join(u.expanded), str) : str), extras = xExtras(article);
+    return { site: "x", text: ex(full || (shown && t.text && t.text.length > shown.length ? t.text : shown || t.text || null)), textComplete: !!full || !more, authorName: name, handle: ref.handle, postUrl: xUrl(ref.handle, ref.id),
+      postedAt: t.posted || (time && time.dateTime) || PB.snowflakeTime(ref.id), quoted: quoted && { ...quoted, text: ex(quoted.text) }, parent, thread: xThread(article, ref, t).map(ex), threadComplete: xThreadOf(article, ref, t).complete, engagement: xEngagement(article, t),
+      ...extras, cards: extras.cards.map((c) => ({ ...c, url: ex(c.url) })), links: t.links || [], fields: xFields(t), edited: t.edits ? true : null,
+      items: (t.media || []).map((m, i) => ({ index: i + 1, kind: m.type === "photo" ? "image" : m.type === "animated_gif" ? "gif" : "video", url: m.type === "photo" ? PB.fullSizeUrl(m.url) : m.mp4 || m.url, alt: m.alt || null, width: m.width, height: m.height })),
+      quotedMedia: ((q && q.media) || []).map((m) => ({ kind: m.type === "photo" ? "image" : "video", url: m.type === "photo" ? PB.fullSizeUrl(m.url) : m.mp4 || m.url, alt: m.alt || null })) };
   }
   // What X's own post data says beyond the words, as X records it: language, posting app, how many
   // earlier versions, a Community Note, X's paid-partnership mark, a repost's original. Kept by a
@@ -207,9 +211,10 @@ globalThis.PBQuickSites = globalThis.PBQuickSites || (() => {
   function redditMeta(post) {
     const a = (k) => post.getAttribute(k) || null, link = a("permalink");
     const flair = post.querySelector("shreddit-post-flair, flair-tag, [slot='post-flair']");
-    return { site: "reddit", title: a("post-title"), text: txt(post.querySelector('[slot="text-body"]')), handle: a("author") ? "u/" + a("author") : null,
+    const body = post.querySelector('[slot="text-body"]'), hrefs = body ? [...body.querySelectorAll("a[href]")].map((x) => x.href).filter((u) => /^https?:/.test(u)) : [];
+    return { site: "reddit", title: a("post-title"), text: txt(body), handle: a("author") ? "u/" + a("author") : null,
       subreddit: a("subreddit-prefixed-name"), postUrl: link ? new URL(link, location.href).href : location.href, postedAt: a("created-timestamp"),
-      flair: flair ? txt(flair) : null, links: redditLink(post), fields: redditFields(post),
+      flair: flair ? txt(flair) : null, links: [...redditLink(post), ...hrefs], fields: redditFields(post), edited: post.hasAttribute("edited-timestamp") || null,
       engagement: (() => { const e = {}; for (const [k, at] of [["score", "score"], ["comments", "comment-count"]]) if (a(at) != null) e[k] = a(at); return Object.keys(e).length ? e : null; })() };
   }
 
@@ -239,7 +244,9 @@ globalThis.PBQuickSites = globalThis.PBQuickSites || (() => {
     const gallery = post.querySelector("gallery-carousel");
     const imgs = gallery ? [...gallery.querySelectorAll("li img, figure img")] : [...post.querySelectorAll('[slot="post-media-container"] img, img.media-lightbox-img, img[src*="i.redd.it"], img[src*="preview.redd.it"]')];
     const seen = new Set();
-    const items = imgs.map((i) => withMeta(redditImg(i), meta, i.alt)).filter((t) => t && !seen.has(t.url) && seen.add(t.url));
+    const found = imgs.map((i) => [redditImg(i), i.alt]).filter(([t]) => t && !seen.has(t.url) && seen.add(t.url));
+    meta.items = found.map(([t, alt], i) => ({ index: i + 1, kind: t.kind, url: t.url, alt: alt || null }));
+    const items = found.map(([t, alt]) => withMeta(t, meta, alt));
     return { title, items, gallery: !!gallery };
   }
 
@@ -260,10 +267,12 @@ globalThis.PBQuickSites = globalThis.PBQuickSites || (() => {
       engagement: a("score") != null ? { score: a("score") } : null, fields: {} };
   }
 
+  // Instagram reads its own page data (quick-instagram.js).
+  const ig = () => globalThis.PBQuickInstagram || null;
   return Object.freeze({
-    isX, isReddit, COMMENT,
+    isX, isReddit, COMMENT, xData: () => xPosts, xUrl,
     commentMetaOf: (node) => (isReddit ? redditCommentMeta(node) : null),
-    targetFor: (el) => (isX ? xTargetTitled(el) : isReddit ? redditTarget(el) : null),
+    targetFor: (el) => (isX ? xTargetTitled(el) : isReddit ? redditTarget(el) : ig() ? ig().targetFor(el) : null),
     postMedia: (node) => (isX ? xPost(node) : isReddit ? redditPost(node) : { title: document.title, items: [] }),
     // The post an element sits in, and that post's words, for a note of a text post.
     postOf: (el) => (el ? closestAcross(el, isX ? "article" : isReddit ? "shreddit-post" : "article") : null),

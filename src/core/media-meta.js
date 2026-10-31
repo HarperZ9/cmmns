@@ -3,6 +3,8 @@
 // parent post, the author's own continuation of the thread, and the item's place in a gallery.
 // Built only from what the page already shows; nothing here makes a request.
 
+import { threadSummary, commentsMarkdown, completenessSentence } from "./capture-thread.js";
+
 // UTC ISO time from a date, a number or text such as Reddit's "2026-10-20T21:04:00.000000+0000".
 const iso = (t) => {
   if (t == null || t === "") return null;
@@ -59,6 +61,13 @@ export function postMeta(m = {}, now = new Date().toISOString()) {
     notes: (m.notes || []).filter((n) => n && n.label && n.text).map((n) => ({ label: String(n.label).slice(0, 80), text: clean(n.text) })),
     // The analyses a study save carries as notes (src/core/discourse/cards.js studyNotes), by sign family.
     analysis: (m.analysis || []).filter((a) => typeof a === "string" && /^[a-z][a-z0-9-]{1,40}$/.test(a)).slice(0, 20),
+    // Every file of the post as the site listed it, at full size, each with its own alt text (a
+    // carousel's items, a gallery's pictures), whether or not each was downloaded.
+    items: (m.items || []).filter((i) => i && i.url).slice(0, 60).map((i, n) => ({ index: Number(i.index) || n + 1, kind: i.kind === "video" ? "video" : i.kind === "gif" ? "gif" : "image",
+      url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null, width: Number(i.width) || null, height: Number(i.height) || null })),
+    edited: m.edited === true ? true : null, location: m.location ? String(m.location).slice(0, 200) : null,
+    // The quoted post's own pictures and their alt text, as the site listed them (not downloaded).
+    quotedMedia: (m.quotedMedia || []).filter((i) => i && i.url).slice(0, 10).map((i) => ({ kind: i.kind || "image", url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null })),
   };
 }
 
@@ -110,8 +119,22 @@ function frontMatter(meta, files) {
     flair: meta.flair || null, selection: meta.selection ? true : null,
     thread_complete: meta.thread && meta.thread.length && meta.threadComplete === true ? true : meta.threadComplete === "unknown" ? "unknown" : null,
     engagement: meta.engagement || null,
-    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null };
+    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
+    edited: meta.edited || null, location: meta.location || null, ...threadRows(meta) };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
+}
+
+// The comment counts a library indexes, and the thread file's name (src/core/capture-thread.js).
+function threadRows(meta) {
+  const t = threadSummary(meta.threadCapture, meta.threadFile || null);
+  return t ? { thread_file: t.file, comments_expected: t.expected, comments_captured: t.captured, comments_complete: t.complete, comments_cap_hit: t.capHit ? true : null } : {};
+}
+
+// The post's files as the site listed them, each with its alt text, when there is more than one or any alt.
+function itemLines(m) {
+  const list = m.items || [];
+  if (!list.length || (list.length === 1 && !list[0].alt)) return [];
+  return ["## Media", "", ...list.map((i) => `${i.index}. ${i.kind}${i.width && i.height ? ` ${i.width}x${i.height}` : ""}: ${i.url}${i.alt ? `\n   Alt text: ${i.alt}` : ""}`), ""];
 }
 
 // The sidecar a person reads: front matter, then the post's text first. fileNames: one name, or
@@ -126,7 +149,9 @@ export function sidecarMarkdown(meta, fileNames = null) {
   if (m.textComplete === false) out.push("The page showed only the start of this text, and no fuller copy was loaded.", "");
   if (m.studyNote) out.push(`What draws me to this: ${m.studyNote}`, "");
   for (const t of m.thread) out.push("Continued by the author:", "", quoteBlock(t), "");
+  if (m.edited) out.push("The site marks this post as edited.", "");
   if (m.alt) out.push(`Alt text: ${m.alt}`, "");
+  out.push(...itemLines(m));
   for (const n of m.notes || []) out.push(`## ${n.label}`, "", n.text, "");
   if (m.poll) out.push("## Poll", "", ...m.poll.options.map((o) => `- ${o.label}${o.result ? `: ${o.result}` : ""}`), ...(m.poll.total || m.poll.status ? ["", [m.poll.total, m.poll.status].filter(Boolean).join(", ")] : []), "");
   if ((m.cards || []).length) out.push("## Link cards", "", ...m.cards.map((c) => `- ${c.title ? c.title + ": " : ""}${c.url}`), "");
@@ -134,9 +159,12 @@ export function sidecarMarkdown(meta, fileNames = null) {
     if (!p) continue;
     out.push(`${label}${p.author ? " " + at(String(p.author).replace(/^@/, "")) : ""}${p.url ? ` (${p.url})` : ""}:`, "");
     if (p.text) out.push(quoteBlock(p.text), "");
+    if (p === m.quoted) for (const q of m.quotedMedia || []) out.push(`- Quoted ${q.kind}: ${q.url}${q.alt ? ` (Alt text: ${q.alt})` : ""}`);
+    if (p === m.quoted && (m.quotedMedia || []).length) out.push("");
   }
+  out.push(...commentsMarkdown(m.threadCapture));
   const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
-    ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Flair", m.flair], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
+    ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Flair", m.flair], ["Location", m.location], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
     ["Engagement at save", m.engagement ? Object.entries(m.engagement).filter(([k]) => k !== "at").map(([k, v]) => `${k} ${v}`).join(", ") : null], ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
   out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by CMMNS from what the page showed.", "");
   return out.join("\n");
@@ -162,7 +190,13 @@ export function saveFolder(folder, site) {
   return s ? `${root}/${s}/` : `${root}/`;
 }
 
-export const sidecarJson = (meta, fileNames = null) => JSON.stringify({ ...meta, files: [].concat(fileNames || []).filter(Boolean) }, null, 2) + "\n";
+// The .json sidecar: the record, with the thread's counts and file name in place of the whole tree,
+// which the thread file holds.
+export function sidecarJson(meta, fileNames = null) {
+  const { threadCapture, threadFile, ...rest } = meta;
+  const thread = threadSummary(threadCapture, threadFile || null);
+  return JSON.stringify({ ...rest, ...(thread ? { thread: { ...thread, sentence: completenessSentence(threadCapture.completeness) } } : {}), files: [].concat(fileNames || []).filter(Boolean) }, null, 2) + "\n";
+}
 
 // The text for "Copy with caption": the post's words, who said them, and the link.
 export function captionText(meta, link = null) {

@@ -6,6 +6,21 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- **Whole saves** (project-docs/SIDECAR-FORMAT.md, "The thread file"). A saved post brings its whole
+  body and its parts. Its comments come with it as `<name>.thread.json`, a tree with each comment's
+  handle, words, score, time, depth and link, and a completeness block: the site's count, how many
+  were captured, and whether the cap stopped the opening. On the post's own page CMMNS opens "more
+  replies" one at a time, 1.2 to 3 s apart, up to a cap you set (200 by default), with Stop on the
+  notice; source protection holds that off. Reddit reads the rendered comment tree (never the
+  `.json` view); X reads the replies X sent the page and writes t.co links as the addresses they
+  stand for, with the quoted post's pictures and alt text; YouTube references carry the comments the
+  page drew. **Instagram** saves read the post data Instagram's own app received: every carousel item
+  at full size, videos, alt text, caption, time, counts, location and comments. A likes-page
+  thumbnail, whose page holds only a 240 px picture, opens its post in a background tab and is saved
+  from there; if that fails, the thumbnail is saved with a "Not the whole post" note saying why, and
+  the profile's page description is no longer taken for the post's words. Sidecars list every file
+  of a post with its own alt text under `## Media`. Instagram saves now land in `<save folder>/instagram/`,
+  beside `x` and `reddit`.
 - **Engagement over time for saved posts** (project-docs/ENGAGEMENT-SERIES.md). Each post saved on X,
   Reddit or YouTube is tracked by id, and its counts are written down again whenever the page's own
   data carries it, at most once per post per 6 hours, with the post's age. A daily alarm works out

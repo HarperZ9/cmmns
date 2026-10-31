@@ -5,7 +5,7 @@
 // "Always ask where to save" is on. Protected media references are kept in the collections store.
 globalThis.PBQuickBg = (() => {
   "use strict";
-  const PAGE = ["quick-toast.js", "quick-resolve.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-saved.js", "quick-handoff.js", "quick-save.js", "quick-capture.js", "quick-copy.js", "quick-text.js"];
+  const PAGE = ["quick-toast.js", "quick-resolve.js", "quick-instagram.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-saved.js", "quick-handoff.js", "quick-save.js", "quick-capture.js", "capture-sites.js", "full-capture.js", "quick-copy.js", "quick-text.js"];
   const ITEMS = [
     ["pb-dl", "Download", ["image", "video", "audio"]],
     ["pb-dl-here", "Download media here", ["page", "link", "frame"]],
