@@ -40,12 +40,8 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     return r;
   }
 
-  // Bytes made in the page: handed to the browser's downloads as a blob address; where the
-  // browser cannot read the page's blob address, a download link in the page saves it instead.
-  // Bytes made in the page go to the browser's downloads as a blob address, so they land in
-  // <save folder>/<site>/. Where the browser cannot read the page's blob address, the bytes go to the
-  // worker, which hands over its own. Never a download link in the page: that saves into the
-  // Downloads root, which is how 3.6.1 lost the folder after an update (pages kept the old script).
+  // Bytes made in the page go to the downloads as a blob address (into <save folder>/<site>/), else to
+  // the worker. Never a page download link: it saves into the Downloads root (how 3.6.1 lost the folder).
   // Resolves to the name the browser wrote, which differs from `name` when that one was taken.
   async function saveBytes(bytes, mime, name, o = {}) {
     alive();
@@ -117,8 +113,11 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   // The sidecar beside the file: the same name with .md, and .json when that setting is on.
   // For a whole gallery: one sidecar named after the post (the first file's name without "-1").
   // fileNames are the names the browser wrote. Resolves to the .md name written (o.stem rewrites it).
-  async function sidecars(meta, fileNames, p, o = {}) {
+  // The post's comments come too, as "<stem>.thread.json" beside it (full-capture.js).
+  async function sidecars(meta0, fileNames, p, o = {}) {
     const list = [].concat(fileNames), stem = o.stem || PB.sidecarStem(list);
+    const meta = globalThis.PBFullCapture && (p.mediaSidecar || meta0.study || p.mediaSidecarJson) ? PBFullCapture.withFile(await PBFullCapture.complete(meta0), stem) : meta0;
+    if (meta.threadCapture) await saveBytes(PBFullCapture.threadBytes(meta), "application/json", meta.threadFile, o);
     const md = p.mediaSidecar || meta.study ? await saveBytes(new TextEncoder().encode(PB.sidecarMarkdown(meta, list)), "text/markdown", stem + ".md", o) : null;
     if (p.mediaSidecarJson) await saveBytes(new TextEncoder().encode(PB.sidecarJson(meta, list)), "application/json", stem + ".json", o);
     return md;
@@ -153,7 +152,6 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     catch (e) { throw new Error(e && e.name === "SecurityError" ? "The site drew this picture from another site without letting pages read it back, so it cannot be saved." : e.message); }
     return new Uint8Array(await blob.arrayBuffer());
   }
-
   async function makeGif(t, plan, progress) {
     if (plan.from === "stream") {
       const got = await PBQuickStream.assemble(plan.stream, (d, n) => progress(`Fetching part ${d} of ${n}`), t.streams || []);
@@ -170,7 +168,6 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   // Files already saved (quick-saved.js), so a library of thousands keeps one copy of each. The
   // save does not wait for the list to be written.
   const { savedAs, remember, Already } = PBQuickSaved;
-
   // Downloads one target with its words. opts: { asGif, title, index, total, quiet, again, oneSidecar }.
   // Resolves to { line, names, meta }; with oneSidecar the caller writes one sidecar for the post.
   async function run(t, opts = {}) {
@@ -244,6 +241,9 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   // The entry point for a click: runs, then says what happened. Returns the outcome for tests.
   async function start(t, opts = {}) {
     if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) { toast(RELOAD, { tone: "no", stay: 9000 }); return { ok: false, line: RELOAD }; }
+    // A whole post at once (an Instagram carousel), or a tile whose post must be opened first.
+    if (globalThis.PBFullCapture && opts.total == null && !opts.asGif && t.post && t.post.items.length > 1) return PBFullCapture.saveWhole(t.post, opts);
+    if (globalThis.PBFullCapture && t.open && !opts.asGif) return PBFullCapture.openAndSave(t, opts);
     toast(opts.asGif ? "Making a GIF" : "Downloading", { stay: 0 });
     try {
       const r = await run(t, opts);
@@ -284,7 +284,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     return start(t, { asGif: info.asGif, study: !!info.study, capture: !!info.capture });
   }
 
-  // A note or card made in the page (quick-text.js), saved to the site's folder or the study folder.
+  // A note or card made in the page (quick-text.js), to the site's folder or the study folder.
   async function saveText(bytes, mime, name, toSite, toStudy, o = {}) {
     return saveBytes(bytes, mime, name, { ...o, dest: destOf({ site: toSite, study: toStudy, library: o.library }) });
   }

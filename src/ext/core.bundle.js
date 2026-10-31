@@ -5065,6 +5065,8 @@ function tweetsIn(json) {
         replyTo: L.in_reply_to_status_id_str || null,
         replyToHandle: L.in_reply_to_screen_name || null,
         links: ((L.entities || {}).urls || []).map((u) => u.expanded_url).filter((u) => u && !/^https?:\/\/(x|twitter)\.com\//.test(u)),
+        // each short t.co address in the text with the address it stands for, so a save can write the final one
+        urls: ((L.entities || {}).urls || []).filter((u) => u && /^https:\/\/t\.co\//.test(u.url || "") && u.expanded_url).map((u) => ({ short: u.url, expanded: u.expanded_url })),
         quotes: n(L.quote_count), reposts: n(L.retweet_count), likes: n(L.favorite_count), replies: n(L.reply_count), bookmarks: n(L.bookmark_count),
         // X's own Paid partnership mark, as X records it in the response. It is X's claim about the
         // post, recorded and checked like any other, never ground truth (RADAR-VISION, independence).
@@ -5135,6 +5137,7 @@ function mediaOf(L) {
   const out = list.filter((m) => m && m.id_str).map((m) => ({
     type: m.type || "photo", url: m.media_url_https || null, uploaded: snowflakeTime(m.id_str),
     fromPost: m.source_status_id_str || null, fromPostTime: m.source_status_id_str ? snowflakeTime(m.source_status_id_str) : null,
+    ...(m.ext_alt_text ? { alt: String(m.ext_alt_text) } : {}),
     ...videoOf(m),
   }));
   return out.length ? out : null;
@@ -12837,12 +12840,265 @@ async function assembleStream(stream, { get, onProgress } = {}) {
 return { MediaProtected, combineParts, assembleStream };
 })();
 
+// ---- capture-thread.js
+const M_capture_thread = (() => {
+// A post's conversation as the page showed it: every comment the page rendered or received, as a tree,
+// with a completeness block that says how many comments the site counted, how many were captured, and
+// whether the user's cap stopped the "load more" expansion. Written beside the post's sidecar as
+// "<stem>.thread.json" (project-docs/SIDECAR-FORMAT.md, "Thread file"). Commenters are other people:
+// a record keeps the public handle and the words exactly as shown, and nothing the page did not show.
+// No DOM and no request here; src/ext/capture-sites.js reads the page and src/ext/full-capture.js
+// expands it at a person's pace.
+
+const CAPTURE_THREAD_FORMAT = "cmmns.capture-thread/1";
+const THREAD_CAP_DEFAULT = 200;
+const THREAD_CAP_MAX = 5000;
+const THREAD_COUNT_NOTE = "The site's own count can include deleted, removed or hidden comments that no page shows, so a capture can be short of it with nothing lost from the page.";
+
+const iso = (t) => {
+  if (t == null || t === "") return null;
+  const s = typeof t === "number" && t < 1e11 ? t * 1000 : typeof t === "string" ? t.replace(/(\.\d{3})\d+/, "$1").replace(/([+-]\d\d)(\d\d)$/, "$1:$2") : t;
+  const d = new Date(s);
+  return Number.isFinite(d.getTime()) ? d.toISOString() : null;
+};
+const str = (v, max = 100000) => (v == null || v === "" ? null : String(v).replace(/\r\n?/g, "\n").slice(0, max));
+// A count as the site gave it: a number where it is one ("1,204" reads 1204), else its own words ("1.2K").
+function countOf(v) {
+  if (v == null || v === "") return null;
+  if (typeof v === "number") return Number.isFinite(v) ? v : null;
+  const s = String(v).trim(), plain = s.replace(/[,\s]/g, "");
+  return /^\d+$/.test(plain) ? Number(plain) : s.slice(0, 40) || null;
+}
+const whole = (v) => { const n = countOf(v); return typeof n === "number" ? n : null; };
+
+// One comment, as kept. c: { id, parent, depth, author, text, score, postedAt, timeShown, edited,
+// permalink, flair, deleted, links, replies (the site's own reply count) }.
+function commentRecord(c = {}) {
+  return {
+    id: str(c.id, 120), parent: str(c.parent, 120), depth: Number.isFinite(Number(c.depth)) && c.depth !== null && c.depth !== "" ? Number(c.depth) : null,
+    author: str(c.author, 120), text: str(c.text), score: countOf(c.score), postedAt: iso(c.postedAt), timeShown: str(c.timeShown, 80),
+    edited: c.edited === true ? true : null, permalink: str(c.permalink, 2000), flair: str(c.flair, 120), deleted: c.deleted === true ? true : null,
+    links: [...new Set((c.links || []).filter((u) => /^https?:\/\//i.test(String(u))).map(String))].slice(0, 50), replyCount: whole(c.replies),
+  };
+}
+
+// The flat list as a tree: each comment under its parent when the parent was captured, else at the top
+// with parentMissing set (its parent was not on the page). Depth is the place in the tree; the site's
+// own depth is kept where it differs. A comment seen twice keeps the later reading of it.
+function commentTree(flat = []) {
+  const byId = new Map(), order = [];
+  for (const raw of flat) {
+    const c = commentRecord(raw);
+    const key = c.id || `anon-${order.length}`;
+    if (!byId.has(key)) order.push(key);
+    byId.set(key, { ...(byId.get(key) || {}), ...Object.fromEntries(Object.entries(c).filter(([, v]) => v != null)), id: c.id });
+  }
+  const nodes = new Map(order.map((k) => [k, { ...byId.get(k), replies: [] }])), roots = [];
+  for (const k of order) {
+    const n = nodes.get(k), p = n.parent && nodes.get(n.parent);
+    if (p && p !== n && !isAncestor(n, p, nodes)) p.replies.push(n);
+    else { if (n.parent && !p) n.parentMissing = true; roots.push(n); }
+  }
+  const place = (list, d) => { for (const n of list) { if (n.depth != null && n.depth !== d) n.siteDepth = n.depth; n.depth = d; place(n.replies, d + 1); } };
+  place(roots, 0);
+  return roots;
+}
+// True when a is above b already (a cycle in what the page gave would otherwise loop).
+function isAncestor(a, b, nodes) {
+  for (let cur = b, i = 0; cur && i < 10000; i++) { if (cur === a) return true; cur = cur.parent ? nodes.get(cur.parent) : null; }
+  return false;
+}
+const countTree = (list) => list.reduce((n, c) => n + 1 + countTree(c.replies || []), 0);
+
+// expected: the site's count (null when it gave none); captured: comments in the tree; cap: the user's
+// cap on expansion; capHit: expansion stopped at the cap; stubs: "more replies" controls still unopened.
+// complete is true only when nothing is known to be missing, false when something is, and "unknown"
+// when the site gave no count to check against.
+function completeness({ expected = null, captured = 0, cap = THREAD_CAP_DEFAULT, capHit = false, stubs = 0, expanded = 0, reason = null } = {}) {
+  const exp = whole(expected), open = Math.max(0, Number(stubs) || 0);
+  const complete = exp != null ? captured >= exp && !capHit && !open : capHit || open ? false : "unknown";
+  return { expected: exp, captured, missing: exp != null ? Math.max(0, exp - captured) : null, cap, capHit: !!capHit, moreStubs: open, expanded: Math.max(0, Number(expanded) || 0), complete,
+    reason: str(reason, 300), countNote: exp != null && captured < exp ? THREAD_COUNT_NOTE : null };
+}
+
+// The thread file's record. post: { url, id }; source: where the comments were read ("the rendered
+// page", "the page's own data"). savedAt is the time of the save.
+function captureThread({ site = null, post = {}, comments = [], expected = null, cap = THREAD_CAP_DEFAULT, capHit = false, stubs = 0, expanded = 0, source = null, reason = null, savedAt = new Date().toISOString() } = {}) {
+  const tree = commentTree(comments), captured = countTree(tree);
+  return { format: CAPTURE_THREAD_FORMAT, site, post: { url: str(post.url, 2000), id: str(post.id, 120) }, savedAt: iso(savedAt) || savedAt, source: str(source, 120),
+    completeness: completeness({ expected, captured, cap, capHit, stubs, expanded, reason }), comments: tree };
+}
+
+const threadFileJson = (capture) => JSON.stringify(capture, null, 2) + "\n";
+
+// The block a sidecar's front matter and .json carry instead of the whole tree.
+function threadSummary(capture, file = null) {
+  if (!capture) return null;
+  const c = capture.completeness;
+  return { file, expected: c.expected, captured: c.captured, complete: c.complete, capHit: c.capHit, cap: c.cap, moreStubs: c.moreStubs };
+}
+
+// The sentence a person reads first: "Captured 12 of 40 comments; the cap of 10 stopped loading more."
+function completenessSentence(c) {
+  const of = c.expected != null ? `${c.captured} of ${c.expected}` : `${c.captured}`;
+  const parts = [`Captured ${of} comment${(c.expected ?? c.captured) === 1 ? "" : "s"}`];
+  if (c.expanded) parts.push(`after opening ${c.expanded} "more" control${c.expanded === 1 ? "" : "s"}`);
+  if (c.capHit) parts.push(`the cap of ${c.cap} stopped loading more`);
+  if (c.moreStubs) parts.push(`${c.moreStubs} "more replies" control${c.moreStubs === 1 ? " was" : "s were"} left unopened`);
+  if (c.reason) parts.push(c.reason);
+  return parts.join("; ") + ".";
+}
+
+// The comments as a person reads them, nested by reply, each with its author, score and time.
+// At most max comments are written out; the thread file always holds all of them.
+function commentsMarkdown(capture, max = 1000) {
+  if (!capture) return [];
+  const c = capture.completeness, out = ["## Comments", "", completenessSentence(c), ...(c.countNote ? ["", c.countNote] : []), ""];
+  let n = 0;
+  // Reddit counts points; X, Instagram and YouTube count likes.
+  const unit = capture.site === "reddit" ? "point" : "like", score = (v) => (v === 1 ? `1 ${unit}` : `${v} ${unit}s`);
+  const walk = (list) => {
+    for (const x of list) {
+      if (n++ >= max) return;
+      const pad = "  ".repeat(Math.min(x.depth || 0, 12));
+      const facts = [x.score != null ? score(x.score) : null, x.postedAt || x.timeShown, x.edited ? "edited" : null, x.deleted ? "deleted" : null, x.flair ? `flair: ${x.flair}` : null].filter(Boolean);
+      out.push(`${pad}- **${x.author || "unknown"}**${facts.length ? ` (${facts.join(", ")})` : ""}${x.permalink ? ` ${x.permalink}` : ""}`);
+      for (const line of String(x.text || "").split("\n")) out.push(`${pad}  ${line ? "> " + line : ">"}`);
+      walk(x.replies || []);
+    }
+  };
+  walk(capture.comments);
+  if (n > max) out.push("", `${n - max} more comment${n - max === 1 ? " is" : "s are"} in the thread file only.`);
+  out.push("");
+  return out;
+}
+
+// The wait between two "load more" steps, at a person's pace: 1.2 to 3.0 s, longer now and then.
+function expandPace(rnd = Math.random, n = 0) {
+  const pause = n > 0 && n % 8 === 0 ? 2000 + rnd() * 3000 : 0;
+  return Math.round(1200 + rnd() * 1800 + pause);
+}
+
+return { CAPTURE_THREAD_FORMAT, THREAD_CAP_DEFAULT, THREAD_CAP_MAX, THREAD_COUNT_NOTE, countOf, commentRecord, commentTree, countTree, completeness, captureThread, threadFileJson, threadSummary, completenessSentence, commentsMarkdown, expandPace };
+})();
+
+// ---- instagram-data.js
+const M_instagram_data = (() => {
+// Instagram's own record of a post, from the data the page already received: the JSON Instagram embeds
+// in its pages (script type="application/json") and the answers to the page's own requests, which
+// src/ext/igsniff.js passes on. A post (media item) carries its caption, its time, every carousel item
+// at each size Instagram offers, its videos, the alt text Instagram wrote or the author gave, and its
+// counts; comments arrive in their own answers. Read as Instagram sends it; nothing here makes a request.
+// The shapes are the ones Instagram's web app used when this was written; a field it stops sending
+// leaves that part empty, never guessed.
+
+const iso = (sec) => (Number.isFinite(Number(sec)) && Number(sec) > 0 ? new Date(Number(sec) * (Number(sec) < 1e11 ? 1000 : 1)).toISOString() : null);
+const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+const name = (u) => (u && typeof u === "object" && typeof u.username === "string" ? u.username : null);
+
+// The largest of a list of { url, width, height }.
+function igBest(list) {
+  const ok = (list || []).filter((c) => c && typeof c.url === "string" && /^https:/.test(c.url));
+  return ok.sort((a, b) => (b.width || 0) * (b.height || 0) - (a.width || 0) * (a.height || 0))[0] || null;
+}
+
+function mediaOf(m) {
+  const pic = igBest(((m.image_versions2 || {}).candidates) || []), vid = igBest(m.video_versions || []);
+  const alt = typeof m.accessibility_caption === "string" && m.accessibility_caption.trim() ? m.accessibility_caption : null;
+  const base = { id: m.pk != null ? String(m.pk) : m.id ? String(m.id) : null, alt, width: num((vid || pic || {}).width) || num(m.original_width), height: num((vid || pic || {}).height) || num(m.original_height) };
+  return vid ? { ...base, kind: "video", url: vid.url, poster: pic ? pic.url : null } : pic ? { ...base, kind: "image", url: pic.url, poster: null } : null;
+}
+
+const isItem = (v) => v && typeof v.code === "string" && /^[\w-]{5,40}$/.test(v.code) && (v.image_versions2 || v.carousel_media || v.video_versions) && (v.taken_at != null || v.user || v.owner);
+
+// One post's record. media: every item in order (a carousel's children, else the post itself).
+function igItem(v) {
+  const user = v.user || v.owner || {}, cap = v.caption && typeof v.caption === "object" ? v.caption : null;
+  const kids = Array.isArray(v.carousel_media) && v.carousel_media.length ? v.carousel_media : [v];
+  const reel = v.product_type === "clips" || (v.media_type === 2 && v.product_type !== "feed");
+  return {
+    shortcode: v.code, id: v.pk != null ? String(v.pk) : v.id ? String(v.id).split("_")[0] : null,
+    url: `https://www.instagram.com/${reel ? "reel" : "p"}/${v.code}/`,
+    handle: name(user), authorName: typeof user.full_name === "string" && user.full_name ? user.full_name : null,
+    caption: cap && typeof cap.text === "string" ? cap.text : typeof v.caption === "string" ? v.caption : null,
+    edited: v.caption_is_edited === true || (cap && cap.is_edited === true) ? true : null,
+    postedAt: iso(v.taken_at), likes: num(v.like_count), comments: num(v.comment_count), plays: num(v.play_count ?? v.ig_play_count ?? v.view_count),
+    location: v.location && typeof v.location.name === "string" ? v.location.name : null,
+    coauthors: (v.coauthor_producers || []).map(name).filter(Boolean), tagged: (((v.usertags || {}).in) || []).map((t) => name(t && t.user)).filter(Boolean),
+    productType: typeof v.product_type === "string" ? v.product_type : null, media: kids.map(mediaOf).filter(Boolean),
+  };
+}
+
+// Every post in one answer, by shortcode. A post seen in pieces keeps each piece's fields.
+function igItemsIn(json, max = 200000) {
+  const out = new Map(), stack = [json];
+  for (let n = 0; stack.length && n < max; n++) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    if (!Array.isArray(v) && isItem(v)) {
+      const it = igItem(v), had = out.get(it.shortcode);
+      out.set(it.shortcode, had ? { ...had, ...Object.fromEntries(Object.entries(it).filter(([, x]) => x != null && !(Array.isArray(x) && !x.length))) } : it);
+      continue;   // a post's own comments are read by igCommentsIn
+    }
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+  return [...out.values()];
+}
+
+const isComment = (v) => v && typeof v.text === "string" && name(v.user) && (v.pk != null || v.id != null) && (v.created_at != null || v.created_at_utc != null);
+
+// Every comment in one answer: objects with words, an author and a time, found under a key that
+// names comments (comments, preview_comments, child_comments, a comments connection's edges). A
+// reply's parent is its parent_comment_id, else the comment it sits under. mediaId when Instagram
+// says which post it belongs to.
+function igCommentsIn(json, max = 200000) {
+  const out = new Map(), stack = [[json, false, null, null]];
+  for (let n = 0; stack.length && n < max; n++) {
+    const [v, under, parent, media] = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    let here = parent, mid = media;
+    if (!Array.isArray(v) && v.media_id != null && !isComment(v)) mid = String(v.media_id);
+    if (!Array.isArray(v) && under && isComment(v)) {
+      const id = String(v.pk ?? v.id);
+      out.set(id, { id, parent: v.parent_comment_id != null ? String(v.parent_comment_id) : parent, author: v.user.username, text: v.text,
+        score: num(v.comment_like_count), postedAt: iso(v.created_at ?? v.created_at_utc), replies: num(v.child_comment_count), mediaId: v.media_id != null ? String(v.media_id) : mid });
+      here = id;
+    }
+    // Pushed last key first, so comments come out in the order Instagram listed them.
+    for (const k of Object.keys(v).reverse()) {
+      if (!v[k] || typeof v[k] !== "object") continue;
+      const c = under || (/comment/i.test(k) && !/count|disabled|enabled|setting/i.test(k));
+      // Inside a comment, only its replies are other comments; its user and such are not.
+      if (here !== parent && !/child_comments|replies|comments/i.test(k)) continue;
+      stack.push([v[k], c, here, mid]);
+    }
+  }
+  return [...out.values()];
+}
+
+// The raw record postMeta (src/core/media-meta.js) reads, for one post.
+function igPostMeta(it) {
+  const fields = Object.fromEntries(Object.entries({ product_type: it.productType, location: it.location, coauthors: it.coauthors.length ? it.coauthors : null, tagged: it.tagged.length ? it.tagged : null, edited: it.edited })
+    .filter(([, v]) => v != null));
+  const engagement = Object.fromEntries(Object.entries({ likes: it.likes, comments: it.comments, plays: it.plays }).filter(([, v]) => v != null));
+  return { site: "instagram", text: it.caption, handle: it.handle, authorName: it.authorName, postUrl: it.url, postedAt: it.postedAt, edited: it.edited, location: it.location,
+    engagement: Object.keys(engagement).length ? engagement : null, fields, items: it.media.map((m, i) => ({ index: i + 1, kind: m.kind, url: m.url, alt: m.alt, width: m.width, height: m.height })) };
+}
+
+// The shortcode in an Instagram address ("/p/<code>/", "/reel/<code>/", "/tv/<code>/").
+const igShortcode = (path) => (/\/(?:p|reel|reels|tv)\/([\w-]{5,40})(?:[/?#]|$)/.exec(String(path || "")) || [])[1] || null;
+
+return { igBest, igItem, igItemsIn, igCommentsIn, igPostMeta, igShortcode };
+})();
+
 // ---- media-meta.js
 const M_media_meta = (() => {
 // What a post said about the media it carried, kept beside the file: the post's text exactly as
 // written, who posted it and when, where it lives, the alt text, hashtags and links, the quoted or
 // parent post, the author's own continuation of the thread, and the item's place in a gallery.
 // Built only from what the page already shows; nothing here makes a request.
+
+const { threadSummary, commentsMarkdown, completenessSentence } = M_capture_thread;
 
 // UTC ISO time from a date, a number or text such as Reddit's "2026-10-20T21:04:00.000000+0000".
 const iso = (t) => {
@@ -12900,6 +13156,13 @@ function postMeta(m = {}, now = new Date().toISOString()) {
     notes: (m.notes || []).filter((n) => n && n.label && n.text).map((n) => ({ label: String(n.label).slice(0, 80), text: clean(n.text) })),
     // The analyses a study save carries as notes (src/core/discourse/cards.js studyNotes), by sign family.
     analysis: (m.analysis || []).filter((a) => typeof a === "string" && /^[a-z][a-z0-9-]{1,40}$/.test(a)).slice(0, 20),
+    // Every file of the post as the site listed it, at full size, each with its own alt text (a
+    // carousel's items, a gallery's pictures), whether or not each was downloaded.
+    items: (m.items || []).filter((i) => i && i.url).slice(0, 60).map((i, n) => ({ index: Number(i.index) || n + 1, kind: i.kind === "video" ? "video" : i.kind === "gif" ? "gif" : "image",
+      url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null, width: Number(i.width) || null, height: Number(i.height) || null })),
+    edited: m.edited === true ? true : null, location: m.location ? String(m.location).slice(0, 200) : null,
+    // The quoted post's own pictures and their alt text, as the site listed them (not downloaded).
+    quotedMedia: (m.quotedMedia || []).filter((i) => i && i.url).slice(0, 10).map((i) => ({ kind: i.kind || "image", url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null })),
   };
 }
 
@@ -12951,8 +13214,22 @@ function frontMatter(meta, files) {
     flair: meta.flair || null, selection: meta.selection ? true : null,
     thread_complete: meta.thread && meta.thread.length && meta.threadComplete === true ? true : meta.threadComplete === "unknown" ? "unknown" : null,
     engagement: meta.engagement || null,
-    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null };
+    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
+    edited: meta.edited || null, location: meta.location || null, ...threadRows(meta) };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
+}
+
+// The comment counts a library indexes, and the thread file's name (src/core/capture-thread.js).
+function threadRows(meta) {
+  const t = threadSummary(meta.threadCapture, meta.threadFile || null);
+  return t ? { thread_file: t.file, comments_expected: t.expected, comments_captured: t.captured, comments_complete: t.complete, comments_cap_hit: t.capHit ? true : null } : {};
+}
+
+// The post's files as the site listed them, each with its alt text, when there is more than one or any alt.
+function itemLines(m) {
+  const list = m.items || [];
+  if (!list.length || (list.length === 1 && !list[0].alt)) return [];
+  return ["## Media", "", ...list.map((i) => `${i.index}. ${i.kind}${i.width && i.height ? ` ${i.width}x${i.height}` : ""}: ${i.url}${i.alt ? `\n   Alt text: ${i.alt}` : ""}`), ""];
 }
 
 // The sidecar a person reads: front matter, then the post's text first. fileNames: one name, or
@@ -12967,7 +13244,9 @@ function sidecarMarkdown(meta, fileNames = null) {
   if (m.textComplete === false) out.push("The page showed only the start of this text, and no fuller copy was loaded.", "");
   if (m.studyNote) out.push(`What draws me to this: ${m.studyNote}`, "");
   for (const t of m.thread) out.push("Continued by the author:", "", quoteBlock(t), "");
+  if (m.edited) out.push("The site marks this post as edited.", "");
   if (m.alt) out.push(`Alt text: ${m.alt}`, "");
+  out.push(...itemLines(m));
   for (const n of m.notes || []) out.push(`## ${n.label}`, "", n.text, "");
   if (m.poll) out.push("## Poll", "", ...m.poll.options.map((o) => `- ${o.label}${o.result ? `: ${o.result}` : ""}`), ...(m.poll.total || m.poll.status ? ["", [m.poll.total, m.poll.status].filter(Boolean).join(", ")] : []), "");
   if ((m.cards || []).length) out.push("## Link cards", "", ...m.cards.map((c) => `- ${c.title ? c.title + ": " : ""}${c.url}`), "");
@@ -12975,9 +13254,12 @@ function sidecarMarkdown(meta, fileNames = null) {
     if (!p) continue;
     out.push(`${label}${p.author ? " " + at(String(p.author).replace(/^@/, "")) : ""}${p.url ? ` (${p.url})` : ""}:`, "");
     if (p.text) out.push(quoteBlock(p.text), "");
+    if (p === m.quoted) for (const q of m.quotedMedia || []) out.push(`- Quoted ${q.kind}: ${q.url}${q.alt ? ` (Alt text: ${q.alt})` : ""}`);
+    if (p === m.quoted && (m.quotedMedia || []).length) out.push("");
   }
+  out.push(...commentsMarkdown(m.threadCapture));
   const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
-    ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Flair", m.flair], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
+    ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Flair", m.flair], ["Location", m.location], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
     ["Engagement at save", m.engagement ? Object.entries(m.engagement).filter(([k]) => k !== "at").map(([k, v]) => `${k} ${v}`).join(", ") : null], ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
   out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by CMMNS from what the page showed.", "");
   return out.join("\n");
@@ -13003,7 +13285,13 @@ function saveFolder(folder, site) {
   return s ? `${root}/${s}/` : `${root}/`;
 }
 
-const sidecarJson = (meta, fileNames = null) => JSON.stringify({ ...meta, files: [].concat(fileNames || []).filter(Boolean) }, null, 2) + "\n";
+// The .json sidecar: the record, with the thread's counts and file name in place of the whole tree,
+// which the thread file holds.
+function sidecarJson(meta, fileNames = null) {
+  const { threadCapture, threadFile, ...rest } = meta;
+  const thread = threadSummary(threadCapture, threadFile || null);
+  return JSON.stringify({ ...rest, ...(thread ? { thread: { ...thread, sentence: completenessSentence(threadCapture.completeness) } } : {}), files: [].concat(fileNames || []).filter(Boolean) }, null, 2) + "\n";
+}
 
 // The text for "Copy with caption": the post's words, who said them, and the link.
 function captionText(meta, link = null) {
@@ -15136,7 +15424,7 @@ const AREA_IDS = ["place", "account", "posting", "coordination", "language", "so
 
 // Retention in days. The upper limits are what the logs keep at most (history.js keeps 60 days;
 // the connections and trail logs keep 30, so a longer history setting leaves those at 30).
-const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 }, seenDays: { min: 1, max: 365 } };
+const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 }, seenDays: { min: 1, max: 365 }, threadCap: { min: 0, max: 5000 } };
 
 const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
@@ -15185,6 +15473,11 @@ const DEFAULTS = Object.freeze({
   // reminder of due readings on the badge, off by default; the log of every post the page loaded,
   // off by default and kept seenDays days.
   trackSeries: true, trackRemind: false, seenLog: false, seenDays: 90,
+  // Whole saves (src/ext/full-capture.js, src/core/capture-thread.js): a saved post's comments come
+  // with it as a thread file, on by default; "load more" opened at a person's pace up to threadCap
+  // comments, on by default (0 keeps only what the page shows). Source protection holds the opening
+  // off, since each "more" asks the site for the next comments.
+  threadCapture: true, threadExpand: true, threadCap: 200,
 });
 
 // The save folder before the 2026-10-28 rename to CMMNS, and the release that renamed it. A browser
@@ -15213,9 +15506,10 @@ function legacyFolderPatch(raw, previousVersion) {
 // What source-protection mode holds off while it is on: evidence lookups (GitHub, RDAP, the Internet
 // Archive), Other coverage (outlets' feeds), reading About pages automatically, and one-click
 // downloads (which fetch the file again from its host), and the seen-post log (a record on this
-// device of every post the user was shown; the author's decision, 2026-10-29). Turning the mode off
+// device of every post the user was shown; the author's decision, 2026-10-29), and opening "more replies" while
+// saving a post's comments (each asks the site for more). Turning the mode off
 // leaves them off until the user turns each one back on.
-const PROTECTION_FORCES = Object.freeze({ evidence: false, coverage: false, feedConsent: false, auto: false, mediaButtons: false, seenLog: false });
+const PROTECTION_FORCES = Object.freeze({ evidence: false, coverage: false, feedConsent: false, auto: false, mediaButtons: false, seenLog: false, threadExpand: false });
 // A folder path inside Downloads: letters, digits, spaces, dots, hyphens, underscores and slashes,
 // no ".." part, at most 120 characters.
 const folder = (v, d) => (typeof v !== "string" ? d
@@ -15257,6 +15551,7 @@ function normalizeSettings(raw) {
     hoverDownload: bool(s.hoverDownload, DEFAULTS.hoverDownload), hoverEverywhere: bool(s.hoverEverywhere, DEFAULTS.hoverEverywhere), hoverOffSites: siteList(s.hoverOffSites),
     trackSeries: bool(s.trackSeries, DEFAULTS.trackSeries), trackRemind: bool(s.trackRemind, DEFAULTS.trackRemind),
     seenLog: bool(s.seenLog, DEFAULTS.seenLog), seenDays: days(s.seenDays, DEFAULTS.seenDays, RETENTION.seenDays),
+    threadCapture: bool(s.threadCapture, DEFAULTS.threadCapture), threadExpand: bool(s.threadExpand, DEFAULTS.threadExpand), threadCap: days(s.threadCap, DEFAULTS.threadCap, RETENTION.threadCap),
   };
   return out.protection ? { ...out, ...PROTECTION_FORCES } : out;
 }
@@ -17214,5 +17509,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

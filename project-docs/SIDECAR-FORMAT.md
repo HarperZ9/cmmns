@@ -79,11 +79,21 @@ hashtags: ["#space"]
 | `text_complete` | when false | `false` when the page showed only the start of the text and no fuller copy was loaded |
 | `study` | study saves | `true`; the file and note are in `<save folder>/study/<site>/` |
 | `note` | study saves with a note | the one line on what draws the person to it |
+| `edited` | when the site says so | `true` when the site marks the post as edited |
+| `location` | Instagram, when tagged | the place name the post carries |
+| `thread_file` | when comments were read | the name of the thread file beside this sidecar (see "The thread file") |
+| `comments_expected` | with a thread file, when the site counts | the site's own comment count at save |
+| `comments_captured` | with a thread file | how many comments the thread file holds |
+| `comments_complete` | with a thread file | `true`, `false`, or `"unknown"` when the site gave no count |
+| `comments_cap_hit` | when true | the user's cap stopped the "load more" opening |
 | `analysis` | study saves from the discourse checks (a `<name>.parts.json` parts tree is saved beside the note) | the sign families whose analysis follows as `## Analysis: <label>` sections, such as `["quote-source", "doc-claim", "correction-replies"]` |
 
 Fields added within version 1 are optional and only ever added. Readers should ignore fields they do
-not know. Sections after the front matter may include `## Poll`, `## Link cards`, `## Chapters` and
-`## Transcript (as the page showed it)`.
+not know. Sections after the front matter may include `## Media` (every file of the post as the site
+listed it, at full size, each with its alt text), `## Poll`, `## Link cards`, `## Chapters`,
+`## Transcript (as the page showed it)`, `## Comments` (the thread as a person reads it, nested by
+reply, opening with how many of the site's count were captured) and `## Not the whole post` (a save
+that could only take what a thumbnail page showed, and why).
 
 After the front matter, for people: a heading with the author, the post's text exactly as written
 (as a quote, line breaks kept), the author's own continuation of the thread where the page had
@@ -97,7 +107,41 @@ Off by default (setting "Also save a .json file for tools"). One object:
 `format`, `site`, `title`, `text`, `author: { name, handle }`, `postUrl`, `mediaUrl`, `pageUrl`,
 `postedAt`, `savedAt`, `alt`, `hashtags[]`, `links[]`, `quoted: { text, url, author } | null`,
 `parent: { text, url, author } | null`, `thread[]`, `subreddit`, `item: { index, total } | null`,
-`files[]`. Unknown values are `null`.
+`files[]`. Unknown values are `null`. Within version 1 it also carries `items[]` (`{ index, kind, url,
+alt, width, height }`), `quotedMedia[]`, `edited`, `location`, and, when comments were read,
+`thread: { file, expected, captured, complete, capHit, cap, moreStubs, sentence }` in place of the
+comment tree, which the thread file holds.
+
+## The thread file
+
+`<sidecar name>.thread.json`, beside the sidecar, whenever the post's comments were read (setting
+"Save the post's comments with it", on by default). Written by `captureThread` in
+`src/core/capture-thread.js`; the page readers are in `src/ext/capture-sites.js`.
+
+```
+{ "format": "cmmns.capture-thread/1", "site": "reddit", "post": { "url", "id" }, "savedAt", "source",
+  "completeness": { "expected": 6, "captured": 6, "missing": 0, "cap": 200, "capHit": false,
+                    "moreStubs": 0, "expanded": 1, "complete": true, "reason": null, "countNote": null },
+  "comments": [ { "id", "parent", "depth", "author", "text", "score", "postedAt", "timeShown", "edited",
+                  "permalink", "flair", "deleted", "links": [], "replyCount", "replies": [ ... ] } ] }
+```
+
+- `comments` is a tree: each comment under the one it answers. A comment whose parent was not on the
+  page sits at the top with `parentMissing: true`; `siteDepth` keeps the site's own depth where it differs.
+- `expected` is the site's own count, which can include deleted, removed or hidden comments; `countNote`
+  says so when the capture is short of it. `complete` is `true` only when nothing is known to be
+  missing, `false` when something is (the cap, an unopened "more replies", a shortfall), and `"unknown"`
+  when the site gave no count.
+- `expanded` counts the "more" controls opened. On the post's own page, CMMNS opens one at a time,
+  1.2 to 3 s apart, up to `cap` (setting "Comments to open up to", 200 by default, 0 for none), with
+  Stop on the notice. "Continue this thread" links lead to other pages and are counted in
+  `moreStubs`, never followed. Source protection holds the opening off.
+- Commenters are other people: each record keeps the public handle and the words exactly as the page
+  showed them, and nothing else about them.
+
+Where the comments come from, per site: Reddit, the rendered `shreddit-comment` tree; X, the posts X
+sent the page, joined by what each answers; Instagram, the comments in the page's own data; YouTube,
+the comment threads the watch page drew (YouTube shows relative times, kept as `timeShown`).
 
 ## Inside the file
 
