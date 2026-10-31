@@ -56,6 +56,8 @@ export function postMeta(m = {}, now = new Date().toISOString()) {
     // the counts the page showed, as it showed them, with the time they were read
     engagement: m.engagement && typeof m.engagement === "object" ? { ...Object.fromEntries(Object.entries(m.engagement).filter(([, v]) => v != null).map(([k, v]) => [k, typeof v === "number" ? v : String(v)])), at: iso(now) || now } : null,
     // Study: saved to study later; the optional line on what draws the person to it
+    // Where a bulk save found the post (Save all likes: "x-likes"), so saves can be filtered by it.
+    from: m.from ? String(m.from).slice(0, 40) : null,
     study: !!m.study, studyNote: m.studyNote ? String(m.studyNote).replace(/\s+/g, " ").trim().slice(0, 300) || null : null,
     // Further text the page showed, under its own heading (YouTube chapters and transcript).
     notes: (m.notes || []).filter((n) => n && n.label && n.text).map((n) => ({ label: String(n.label).slice(0, 80), text: clean(n.text) })),
@@ -119,7 +121,7 @@ function frontMatter(meta, files) {
     flair: meta.flair || null, selection: meta.selection ? true : null,
     thread_complete: meta.thread && meta.thread.length && meta.threadComplete === true ? true : meta.threadComplete === "unknown" ? "unknown" : null,
     engagement: meta.engagement || null,
-    text_complete: meta.textComplete === false ? false : null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
+    text_complete: meta.textComplete === false ? false : null, from: meta.from || null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
     edited: meta.edited || null, location: meta.location || null, ...threadRows(meta) };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
 }

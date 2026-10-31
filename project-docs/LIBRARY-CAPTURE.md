@@ -81,7 +81,7 @@ access control is worked around.
 
 The browser cannot add to a file, so index.jsonl and LIBRARY.md are written whole every 10 posts and
 on Stop. The library's record is kept in this browser (`chrome.storage.local`, key
-`pb.library.v1.<library>`); a tab closed before Stop loses nothing, and the next Stop writes it.
+`pb.library.v1.<library>`); the record is written every 10 posts and two seconds after the last one, so a tab closed before Stop loses at most the posts of those two seconds (saved again, under the same names, on the next run), and the next Stop writes it. Four posts are saved at once; index.jsonl keeps the order the page showed them in.
 
 ## Hand-off to a case
 

@@ -9,21 +9,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   const size = (n) => PB.sizeText(n);
   const msg = (m) => chrome.runtime.sendMessage(m);
 
-  // The first 64 KB of a file (Range), for its type and an encryption check; null when the host
-  // does not allow the page to read it, in which case the address and the browser decide the type.
-  async function probe(url) {
-    try {
-      const res = await fetch(url, { headers: { Range: "bytes=0-65535" }, credentials: "omit", mode: "cors", signal: AbortSignal.timeout(10000) });
-      if (!res.ok) return { missing: res.status };
-      const reader = res.body.getReader(), parts = [];
-      let n = 0;
-      while (n < 65536) { const { done, value } = await reader.read(); if (done) break; parts.push(value); n += value.length; }
-      reader.cancel().catch(() => {});
-      // The whole file's size: "bytes 0-65535/TOTAL" when the host answered the range, else its length.
-      const total = Number((/\/(\d+)$/.exec(res.headers.get("content-range") || "") || [])[1] || (res.status === 200 && res.headers.get("content-length")) || 0);
-      return { bytes: PB.concatBytes(parts).subarray(0, 65536), type: res.headers.get("content-type") || "", total };
-    } catch { return null; }
-  }
+  const { open, bytesOf } = PBQuickFetch;   // one request per file (quick-fetch.js)
 
   // Where one save goes: { site, study, library }. The site folder, a study save (CMMNS/study/<site>/),
   // or a library (CMMNS/library/<library>/). Passed with every save, never kept between saves, so
@@ -61,11 +47,17 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     // does not let the page look first gets the first address.
     let plan = plan0, head = null;
     for (const url of [plan0.url, ...(plan0.alternatives || [])]) {
-      head = await probe(url);
+      if (head && head.cancel) head.cancel();
+      head = await open(url);
       plan = { ...plan0, url };
       if (!head || !head.missing) break;
     }
     if (head && head.missing) throw new Error(`The site answered ${head.missing} for this file.`);
+    try { return await fromHead(t, plan, head, c); } finally { if (head && head.cancel) head.cancel(); }
+  }
+
+  // The rest of a plain file's save, once its first 64 KB are in (head, or null when unreadable).
+  async function fromHead(t, plan, head, c) {
     if (head && t.kind === "video") { const why = PB.fileProtection(head.bytes); if (why) throw new PBQuickStream.Protected(why); }
     const type = PB.chooseType({ bytes: head && head.bytes, contentType: head && head.type, url: plan.url });
     if (type.mime === "text/html") throw new Error("The address answers with a web page, not a file. The site may need you to open the post first.");
@@ -77,12 +69,12 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const mismatch = type.from === "bytes" && said && said !== "bin" && said !== type.ext;
     // A file over EMBED_READ_MAX (a long video) is not read into the page to write the words inside it:
     // the browser downloads it at once, with its own progress, and the words stay in the sidecar. The
-    // size comes from the probe, else from the full answer's length before its body is read. A capture
+    // size comes from the answer's length before its body is read on. A capture
     // and a mislabelled type always read the bytes.
     const must = c.capture || mismatch, limit = must ? 0 : EMBED_READ_MAX;
     if (must || (head && c.p.mediaEmbed && EMBED.has(type.mime) && !(head.total > limit))) {
       try {
-        const b = await bytesOf(plan.url, c.progress, limit);
+        const b = head ? await head.rest(c.progress, limit) : await bytesOf(plan.url, c.progress, limit);
         if (b && (b.bytes.length <= EMBED_MAX || must)) {
           const out = withWords(b.bytes, type.mime, c.meta, c.p);
           const written = await saveBytes(out, type.mime, name, { overwrite: c.overwrite, dest: c.dest });
@@ -126,25 +118,6 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   const pageMeta = (t) => ({ site: location.hostname.replace(/^www\./, ""), title: document.title || null, pageUrl: location.href, alt: (t.el && t.el.alt) || t.alt || null,
     text: (document.querySelector('meta[property="og:description"], meta[name="description"]') || {}).content || null });
   const metaOf = (t, opts) => PB.postMeta({ ...(t.meta || pageMeta(t)), pageUrl: location.href, mediaUrl: t.url || null, index: opts.index || 0, total: opts.total || 1, study: !!opts.study });
-
-  // A file's bytes. With onProgress, a file over 2 MB reports "Reading 3.1 MB of 12.0 MB" as it comes.
-  // With a limit, a file whose length is over it is not read: resolves to null.
-  async function bytesOf(url, onProgress = null, limit = 0) {
-    const res = await fetch(url, { credentials: /^(data|blob):/.test(url) || new URL(url).origin === location.origin ? "include" : "omit" });
-    if (!res.ok) throw new Error(`${new URL(url).host} answered ${res.status}`);
-    const type = res.headers.get("content-type") || "", total = Number(res.headers.get("content-length") || 0);
-    if (limit && total > limit) { if (res.body) res.body.cancel().catch(() => {}); return null; }
-    if (!onProgress || !res.body || total < 2097152) return { bytes: new Uint8Array(await res.arrayBuffer()), type };
-    const reader = res.body.getReader(), parts = [];
-    let n = 0, shown = 0;
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      parts.push(value); n += value.length;
-      if (Date.now() - shown > 250) { shown = Date.now(); onProgress(`Reading ${size(n)} of ${size(total)}`); }
-    }
-    return { bytes: PB.concatBytes(parts), type };
-  }
 
   async function canvasPng(el) {
     let blob;

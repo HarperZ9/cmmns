@@ -76,7 +76,7 @@ export function makeBrowser({ flavour = "chrome", files = new Map(), settings = 
     return new Response(body, { headers: { "content-type": types[url] || "image/jpeg", "content-length": String(sizes[url] || body.length) } });
   };
   class Protected extends Error { constructor(r) { super(r); this.reason = r; } }
-  const ctx = vm.createContext({ chrome, fetch, Response, Blob, URL, TextEncoder, TextDecoder, AbortSignal, crypto, atob, btoa, console, clearTimeout,
+  const ctx = vm.createContext({ chrome, fetch, Response, Blob, URL, TextEncoder, TextDecoder, AbortSignal, AbortController, crypto, atob, btoa, console, clearTimeout,
     // The scripts keep long timers (a pending name for 10 minutes); unref lets the test process end.
     setTimeout: (f, ms) => { const t = setTimeout(f, ms); if (ms > 1000) t.unref(); return t; },
     location: { hostname: "x.com", href: "https://x.com/home" }, document: { title: "Home / X", querySelector: () => null },
@@ -87,7 +87,8 @@ export function makeBrowser({ flavour = "chrome", files = new Map(), settings = 
   const saved = resolve(root, process.env.CMMNS_SIM_SRC || process.env.DAYLIGHT_SIM_SRC || ".", "src/ext/quick-saved.js");
   if (existsSync(saved)) vm.runInContext(readFileSync(saved, "utf8"), ctx);
   // The piece-by-piece handoff arrived after 3.9.1; older checkouts have neither file.
-  for (const f of ["src/ext/handoff-bg.js", "src/ext/quick-handoff.js"]) {
+  // The piece-by-piece handoff arrived after 3.9.1, and the one-request reader (quick-fetch.js) after it.
+  for (const f of ["src/ext/handoff-bg.js", "src/ext/quick-handoff.js", "src/ext/quick-fetch.js"]) {
     const p = resolve(root, process.env.CMMNS_SIM_SRC || process.env.DAYLIGHT_SIM_SRC || ".", f);
     if (existsSync(p)) vm.runInContext(readFileSync(p, "utf8"), ctx);
   }

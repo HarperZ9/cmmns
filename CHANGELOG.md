@@ -21,6 +21,24 @@ were not published to a store.
   the profile's page description is no longer taken for the post's words. Sidecars list every file
   of a post with its own alt text under `## Media`. Instagram saves now land in `<save folder>/instagram/`,
   beside `x` and `reddit`.
+- **Save all likes** on X (project-docs/SAVE-ALL-LIKES.md). On your likes list a bar collects every
+  liked post from the responses X already sent the page and lists each one once in a manifest
+  (`Downloads/CMMNS/library/x-likes/`). `cmmns likes fetch --watch` fetches the files from X's media
+  hosts over reused HTTP/2 connections, 8 at once, with retries, 429 handling and resumable ranges, into
+  `CMMNS/x/` beside your earlier saves, each post with its note (`from: "x-likes"`). Save in the
+  browser does the same through the page. Posts already saved are skipped before any request, by post
+  id, and a file whose SHA-256 matches one already saved is not kept twice. The run survives a reload
+  or a restart and offers Resume; Pause and Stop keep the record. Import like.js from your X archive as
+  the checklist; `cmmns likes missing` lists what is not saved yet. Auto-scroll, paced with jitter
+  (careful by default) and stopping on X's first error or rate-limit message, ships only in the
+  unpacked and self-distributed builds. The Boards page gains From my likes only and a posted-date range.
+  A post whose video X listed only as a stream counts as saved without video, on the bar, in the run's
+  record and in `cmmns likes fetch` and `missing`; its note names the stream, and on the command line it stops counting once the video is saved from the post's page.
+- **Faster saves.** A picture is asked for once, where it was asked for twice (one request, read on when
+  the words go inside the file). A library saves four posts at once, keeps index.jsonl in the page's
+  order, and writes its record every 10 posts. The saved list is written once for each batch of files.
+  Measured in Chromium against a local host with a 60 ms delay: one picture 352 to 275 ms, a four-file
+  gallery 481 to 370 ms, a 20-post library 5.1 to 2.1 s, 200 posts 41 s to 18 s.
 - **Engagement over time for saved posts** (project-docs/ENGAGEMENT-SERIES.md). Each post saved on X,
   Reddit or YouTube is tracked by id, and its counts are written down again whenever the page's own
   data carries it, at most once per post per 6 hours, with the post's age. A daily alarm works out

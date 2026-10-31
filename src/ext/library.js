@@ -63,7 +63,7 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
       const why = PB.librarySkip(run.lib, ref);
       if (why) { skip(why, ref.id); continue; }
       run.queued.add(ref.id);
-      run.queue.push([node, ref]);
+      run.queue.push([node, ref, run.seq++]);
     }
     changed();
     pump();
@@ -105,26 +105,39 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
       f.edits ? { label: "Edited", text: `X lists ${f.edits} earlier version${f.edits === 1 ? "" : "s"} of this post.` } : null].filter(Boolean);
   }
 
-  async function pump() {
-    if (!run || run.busy) return;
-    run.busy = true;
+  // Up to WIDTH posts at once (their files go to the browser side by side; one post at a time spent
+  // most of each post waiting on the host). The record is written every FLUSH_EVERY posts and on Stop,
+  // not after every post: each write is the whole record, so writing it per post grew with the library.
+  const WIDTH = 4;
+  function pump() {
+    while (run && !run.stopped && run.queue.length && run.busy < WIDTH) {
+      const [node, ref, seq] = run.queue.shift(), mine = run;
+      mine.busy++;
+      one(mine, node, ref, seq).finally(() => { mine.busy--; changed(); pump(); });
+    }
+  }
+  // Posts finish out of order; index.jsonl keeps the page's order, each line placed once all before it are done.
+  function place(mine, seq, line) {
+    mine.done.set(seq, line);
+    while (mine.done.has(mine.next)) { const l = mine.done.get(mine.next); mine.done.delete(mine.next++); if (l) mine.state.items.push(l); }
+  }
+  async function one(mine, node, ref, seq) {
+    let line = null;
     try {
-      while (run && !run.stopped && run.queue.length) {
-        const [node, ref] = run.queue.shift();
-        try {
-          const line = await savePost(node, ref);
-          run.state.items.push(line); run.ids.add(ref.id); run.session.saved++;
-          if (run.session.saved % FLUSH_EVERY === 0) await flush();
-          await persist();
-        } catch (e) {
-          console.warn("[cmmns] library: a post was not saved", e);
-          skip(`not saved: ${String(e.message).slice(0, 160)}`, ref.id);
-          if (/updated\. Reload this page/.test(e.message)) { await stop("CMMNS was updated; reload the page to continue"); break; }
-        } finally { run && run.queued.delete(ref.id); changed(); }
-      }
-    } finally { if (run) run.busy = false; }
+      line = await savePost(node, ref);
+      mine.ids.add(ref.id); mine.session.saved++;
+      place(mine, seq, line);
+      if (mine.session.saved % FLUSH_EVERY === 0) { await persist(); await flush(); } else persistSoon();
+    } catch (e) {
+      console.warn("[cmmns] library: a post was not saved", e);
+      skip(`not saved: ${String(e.message).slice(0, 160)}`, ref.id);
+      if (/updated. Reload this page/.test(e.message)) stop("CMMNS was updated; reload the page to continue");   // not awaited: stop waits for this post
+    } finally { if (!line) place(mine, seq, null); mine.queued.delete(ref.id); }
   }
 
+  // A tab closed between flushes keeps all but the last two seconds of the record.
+  let soon = null;
+  const persistSoon = () => { if (!soon) soon = setTimeout(() => { soon = null; if (run) persist(); }, 2000); };
   async function persist() {
     const st = run.state;
     st.skippedIds = [...run.skippedIds].slice(-SKIPPED_IDS_MAX);
@@ -152,7 +165,7 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
     const session = { started: new Date().toISOString(), stopped: null, saved: 0, mode, why: null };
     state.sessions.push(session);
     run = { lib, state, session, ids: new Set(state.items.map((l) => l.id)), skippedIds: new Set(state.skippedIds || []), counted: new Set(), queued: new Set(),
-      seen: new WeakSet(), queue: [], busy: false, stopped: false, skippedNow: 0, already: 0 };
+      seen: new WeakSet(), queue: [], busy: 0, seq: 0, next: 0, done: new Map(), stopped: false, skippedNow: 0, already: 0 };
     await persist();
     observer = new MutationObserver(later);
     observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
@@ -178,5 +191,5 @@ globalThis.PBLibrary = globalThis.PBLibrary || (() => {
   // Source protection turned on while a library runs: it stops, and says why.
   if (globalThis.PBSettings) PBSettings.onChange((s) => { if (s.protection && run && !run.stopped) stop("source protection was turned on"); });
 
-  return Object.freeze({ start, stop, status, scan, onChange: (f) => listeners.push(f), pending: () => (run ? run.queue.length + (run.busy ? 1 : 0) : 0) });
+  return Object.freeze({ start, stop, status, scan, onChange: (f) => listeners.push(f), pending: () => (run ? run.queue.length + run.busy : 0) });
 })();

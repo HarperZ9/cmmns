@@ -29,8 +29,10 @@ globalThis.PBBoardsRead = (() => {
 
   // The saves under a picked folder: [{ sidecar, sidecarName, files: [names], file: { name -> File } }].
   async function fromFolder(handle) {
-    const out = [];
+    const out = [], liked = new Set();
     for await (const { name, h, dir } of walk(handle)) {
+      // A likes manifest (Save all likes): the ids of every liked post, so earlier saves of them count as liked.
+      if (/^manifest(-\d+)?\.jsonl$/.test(name)) { for (const l of PB.parseManifest(await (await h.getFile()).text())) liked.add(l.id); continue; }
       if (!name.endsWith(".md")) continue;
       const text = await (await h.getFile()).text();
       const sc = PB.parseSidecar(text);
@@ -41,7 +43,9 @@ globalThis.PBBoardsRead = (() => {
       }
       out.push({ sidecar: sc, sidecarName: name, files: Object.keys(files), file: files, text });
     }
-    return out.sort((a, b) => String(a.sidecar.front.posted || "").localeCompare(String(b.sidecar.front.posted || "")));
+    const sorted = out.sort((a, b) => String(a.sidecar.front.posted || "").localeCompare(String(b.sidecar.front.posted || "")));
+    sorted.liked = liked;
+    return sorted;
   }
 
   return Object.freeze({ fromMoodboard, fromFolder });

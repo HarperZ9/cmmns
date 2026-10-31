@@ -32,7 +32,7 @@ test("a video over 32 MB goes straight to the browser, never read into the page 
   const r = await b.save.start(video(), { quiet: true });
   assert.equal(r.ok, true, r.line);
   assert.equal(b.started[0], VIDEO, "the browser downloads the address itself");
-  assert.deepEqual(b.requests.filter((q) => q.url === VIDEO && !q.range), [], "no full read of the video in the page");
+  assert.equal(b.requests.filter((q) => q.url === VIDEO).length, 1, "the page asks once, reads its first 64 KB and stops");
 });
 
 test("control: a 4 MB video is still read so the post's words go inside it", async () => {
@@ -40,6 +40,13 @@ test("control: a 4 MB video is still read so the post's words go inside it", asy
   const r = await b.save.start(video(), { quiet: true });
   assert.equal(r.ok, true, r.line);
   assert.match(b.started[0], /^blob:/, "the bytes with the words are handed over");
+});
+
+test("a picture with the post's words written in is asked for once, not looked at first and fetched again", async () => {
+  const b = makeBrowser({ settings: { mediaEmbed: true } });
+  const r = await b.save.start(post("1"), { quiet: true });
+  assert.equal(r.ok, true, r.line);
+  assert.equal(b.requests.filter((q) => q.url === PIC).length, 1, "one request per file");
 });
 
 test("the save does not wait for the saved list to be written", async () => {

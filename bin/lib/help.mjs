@@ -84,7 +84,7 @@ export const CASE_HELP = {
 };
 
 export function helpText([what, usage, example, note], name) {
-  return `${name}: ${what}\n\nUsage:\n  ${usage}\n\nExample:\n  ${example}\n${note ? `\n${note}\n` : ""}\nEvery command works on local files; only add, run, watch and media fetch go online.\n`;
+  return `${name}: ${what}\n\nUsage:\n  ${usage}\n\nExample:\n  ${example}\n${note ? `\n${note}\n` : ""}\nEvery command works on local files; only add, run, watch, media fetch and likes fetch go online.\n`;
 }
 
 // An error, said as what happened and what to do.

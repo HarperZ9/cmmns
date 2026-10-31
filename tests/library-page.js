@@ -13,7 +13,7 @@ const portFor = () => 10000 + ((process.pid * 37 + (opened++) * 211) % 4000);
 const openChrome = () => launch(portFor(), { chrome: CHROME, args: process.platform === "linux" ? ["--no-sandbox"] : [], waitMs: 45000 });
 
 const EXT = join(import.meta.dirname, "..", "src", "ext");
-const SCRIPTS = ["core.bundle.js", "guard.js", "quick-toast.js", "quick-resolve.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-saved.js", "quick-save.js", "quick-capture.js", "library.js", "library-scroll.js", "library-ui.js"];
+const SCRIPTS = ["core.bundle.js", "guard.js", "quick-toast.js", "quick-resolve.js", "quick-instagram.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-saved.js", "quick-handoff.js", "quick-fetch.js", "quick-save.js", "quick-capture.js", "capture-sites.js", "full-capture.js", "library.js", "library-scroll.js", "library-ui.js"];
 export const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
 
 // A recorder for chrome.*: each download keeps its folder (site, study, library) and, for text, its
