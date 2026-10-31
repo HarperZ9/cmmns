@@ -4,7 +4,8 @@
 //   node scripts/ci.mjs c2pa   the Content Credentials reference stage (fetches pinned fixtures)
 //   node scripts/ci.mjs dco    every commit in a range is signed off (DCO_BASE..DCO_HEAD, default origin/main..HEAD)
 //   node scripts/ci.mjs decisions  each challenge issue against catalogue/DECISIONS.md (needs gh)
-//   node scripts/ci.mjs all    the test and c2pa stages
+//   node scripts/ci.mjs analysis  the Python analysis packages (pinned in analysis/requirements.txt)
+//   node scripts/ci.mjs all    the test, c2pa and analysis stages
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -14,6 +15,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 export const C2PA_REPO = "https://github.com/contentauth/c2pa-rs.git";
 export const C2PA_COMMIT = "60f7cbdc69ab7a2554fcc87eb4df77050814b2cf";
 const C2PA_DIR = join(ROOT, ".cache", "c2pa-rs");
+const PYTHON = process.env.PYTHON || "python";
 
 // [label, command, args, options]. The commands are what a person would type.
 export const STAGES = {
@@ -26,6 +28,12 @@ export const STAGES = {
     ["discourse data matches a fresh build (skipped without the cached sources)", process.execPath, ["scripts/discourse-data.mjs", "check"]],
     ["fresh catalogue page", process.execPath, ["scripts/catalogue-page.mjs"]],
     ["catalogue page matches a fresh build", "git", ["diff", "--exit-code", "--ignore-cr-at-eol", "--", "docs/catalogue.html"]],
+  ],
+  // The Python analysis packages (formulas, latent) and the shared stats vectors. PYTHON names the
+  // interpreter when "python" is not the one to use.
+  analysis: [
+    ["install the pinned analysis dependencies", PYTHON, ["-m", "pip", "install", "-q", "-r", "analysis/requirements.txt"]],
+    ["analysis tests", PYTHON, ["-m", "pytest", "-q", "-p", "no:cacheprovider", "analysis"]],
   ],
   dco: [
     ["every commit in the pull request is signed off by its author", process.execPath, ["scripts/dco-check.mjs"]],
@@ -65,7 +73,7 @@ export function run(names) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const want = process.argv[2] || "test";
-  const names = want === "all" ? ["test", "c2pa"] : [want];
-  if (!names.every((n) => STAGES[n])) { console.error(`unknown stage ${want}; use test, c2pa, dco, decisions or all`); process.exit(2); }
+  const names = want === "all" ? ["test", "c2pa", "analysis"] : [want];
+  if (!names.every((n) => STAGES[n])) { console.error(`unknown stage ${want}; use test, c2pa, analysis, dco, decisions or all`); process.exit(2); }
   try { run(names); } catch (e) { console.error(`\nfailed: ${e.message.split("\n")[0]}`); process.exit(1); }
 }

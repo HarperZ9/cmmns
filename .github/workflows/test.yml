@@ -22,6 +22,18 @@ jobs:
         with:
           node-version: 22
       - run: node scripts/ci.mjs test
+  analysis:
+    # The Python analysis packages (analysis/formulas, analysis/latent) and the shared CC0 stats vectors.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: node scripts/ci.mjs analysis
   c2pa-reference:
     # CMMNS' Content Credentials verdicts must never be more favourable than c2patool's on the
     # c2pa-rs test fixtures (MIT/Apache-2.0), fetched at a pinned commit and never committed here.

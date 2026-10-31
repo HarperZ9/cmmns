@@ -10,3 +10,6 @@
 data/snapshots/** -text
 # Files the v3.8.0 release wrote, kept byte for byte so their hashes and signatures still check.
 tests/fixtures/v3.8.0/** -text
+# A vendored unit pinned by the sha256 of its bytes as validated, CRLF included (analysis/latent/latent/units/PROVENANCE.json).
+analysis/latent/latent/units/ls_spectra.py -text
+analysis/latent/latent/units/s2_units.py -text

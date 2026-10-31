@@ -1,0 +1,5 @@
+# Pinned for CI (node scripts/ci.mjs analysis). The JavaScript extension needs none of these.
+numpy==2.4.5
+scipy==1.17.1
+scikit-learn==1.9.1
+pytest==8.4.2

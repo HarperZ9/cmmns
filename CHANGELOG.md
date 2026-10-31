@@ -6,6 +6,14 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- **Python analysis layer** (`analysis/`). `analysis/formulas` (exact binomial bound with family
+  correction, two-lines guard, shareability) and `analysis/latent` (hidden-variable instrument with
+  planted and pure-noise controls) move in from the author's workstation tools. A CC0 statistics
+  vector file, `analysis/vectors/stats_vectors.json`, is the one contract for Holm, Bonferroni,
+  Benjamini-Hochberg, the binomial upper tail and the Wilson interval; Python and
+  `src/core/discourse/stats.js` are both tested against it. `node scripts/ci.mjs analysis` runs it,
+  and CI has a new analysis job. `captureCanonical` is now tested against the canonical-record/1
+  vectors from Flywheel (RFC 8785); it agrees on every valid case.
 - **Whole saves** (project-docs/SIDECAR-FORMAT.md, "The thread file"). A saved post brings its whole
   body and its parts. Its comments come with it as `<name>.thread.json`, a tree with each comment's
   handle, words, score, time, depth and link, and a completeness block: the site's count, how many
