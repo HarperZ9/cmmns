@@ -3,5 +3,5 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-for pkg in ("formulas", "latent"):
+for pkg in ("formulas", "latent", "signalchain"):
     sys.path.insert(0, str(HERE / pkg))

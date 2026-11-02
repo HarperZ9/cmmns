@@ -5,6 +5,12 @@ were not published to a store.
 
 ## Unreleased
 
+### Added
+- **`analysis/signalchain`**: one measurement API for a signal and a transform (`measure(x, medium)`,
+  `through(x, y)`): spectrum, entropy, signal-to-noise, envelope, resonance, decay, gain and loss, plus
+  non-stationary measures. Each measure passed a 40-seed recovery gate against a seed-shuffled null, and
+  four false-success controls must fail it. numpy only.
+
 ### Fixed
 - **What a thread file claims** (project-docs/SIDECAR-FORMAT.md, "The thread file"; format
   `cmmns.capture-thread/2`). A thread with no comments no longer reads `complete: true`: it has its own
