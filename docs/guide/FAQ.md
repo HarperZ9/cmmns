@@ -50,6 +50,13 @@ Each release is signed. `node scripts/verify-release.mjs <folder>` checks the si
 file, or open `verify-offline.html` from the release with no network. Compare the key id with one
 you got another way.
 
+**What does the Content Credentials line on a file mean?**
+It is the strongest statement CMMNS can make from the file's C2PA credentials, and no more. A valid
+signature shows who signed and that the file has not changed since; it says nothing about whether
+the picture shows what happened. The extension does not check revocation, so the line says so, and
+a missing AI-origin field is named as missing. [CONTENT-CREDENTIALS.md](CONTENT-CREDENTIALS.md)
+explains each line.
+
 **Is it free?**
 Yes. The code is AGPL-3.0, and the data and docs are CC BY 4.0.
 

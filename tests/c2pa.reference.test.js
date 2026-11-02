@@ -7,6 +7,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { readCredentials, credentialState } from "../src/core/c2pa.js";
 import { outcomeOf } from "../src/core/survival.js";
+import { c2paReport } from "../src/core/c2pa-report.js";
 
 const ref = JSON.parse(readFileSync(new URL("./fixtures/c2pa-reference.json", import.meta.url), "utf8"));
 const dir = process.env.C2PA_FIXTURES;
@@ -48,4 +49,21 @@ test("the survival count agrees with c2patool on which fixtures still carry cred
   assert.deepEqual(misses, ["nested_moov_1000.mp4"]);
   // Measured on the pinned fixtures, 2026-10-21: 13 intact, 3 partly checked, 5 changed, 3 online, 19 none.
   assert.deepEqual(table, { none: 19, intact: 13, changed: 5, remote: 3, partial: 3 });
+});
+
+// The validation report (src/core/c2pa-report.js) on the same files: it builds on every one, finds
+// credentials exactly where the reader does, never names a signer as "signed by" without a trust
+// list, and never shows a changed file below the flag level.
+test("the validation report builds on every c2pa-rs fixture and keeps the reader's verdicts", { skip: dir ? false : "set C2PA_FIXTURES to the c2pa-rs sdk/tests/fixtures folder" }, async () => {
+  const wrong = [];
+  for (const name of Object.keys(ref.files)) {
+    const bytes = new Uint8Array(readFileSync(join(dir, name)));
+    const reading = await readCredentials(bytes), state = credentialState(reading);
+    const r = await c2paReport(bytes, { now: "2026-11-02T00:00:00Z" });
+    if (r.found !== !!reading.found) wrong.push(`${name}: report found ${r.found}, reader ${reading.found}`);
+    if (/^signed by/.test(r.badge.text)) wrong.push(`${name}: "signed by" with no trust list`);
+    if (state === "changed" && r.badge.level !== "flag") wrong.push(`${name}: changed, badge ${r.badge.level}`);
+    if (state === "unchanged" && r.badge.level === "flag" && r.revocation.now.status !== "revoked") wrong.push(`${name}: unchanged, badge flag: ${r.badge.text}`);
+  }
+  assert.deepEqual(wrong, []);
 });

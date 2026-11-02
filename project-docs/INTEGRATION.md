@@ -49,6 +49,7 @@ published to npm; use it from a clone or a release archive.
 | `analyzeThread(input, { now })` | `{ site, root, replies }` | envelope, kind `thread` |
 | `analyzeText(text, { id, links })` | a string | envelope, kind `text` |
 | `checkMedia(bytes)` | the whole file as `Uint8Array` or `ArrayBuffer` | a promise of an envelope, kind `media` |
+| `credentialReport(bytes, { now, trustAnchors, crls, ocsp })` | the whole file; DER certificates, CRLs and OCSP responses the caller fetched | a promise of the C2PA validation report, `cmmns.c2pa-report/1` (project-docs/C2PA-REPORT.md) |
 | `siteInfo(domain)` | `"example.com"` or a URL | envelope, kind `site`, or `null` |
 | `useData(tables)` | `{ sites, owners, state, claims, claimParts }` | row counts loaded |
 
@@ -106,7 +107,7 @@ from disk; the extension from its own package.
 ```json
 {
   "schema": "urn:radar:evidence:v2",
-  "api": "2.0.0",
+  "api": "2.1.0",
   "kind": "thread",
   "site": "X",
   "posts": { "n": 15, "accounts": 14, "ids": ["1", "100", "..."], "timePrecision": { "value": "second", "basis": "declared" } },
@@ -191,6 +192,8 @@ version.
 - **Major** (3.0.0): removing or renaming a field or kind, changing a field's type or meaning, or
   changing how a bundle is signed. The schema id changes to `urn:radar:evidence:v3`, and CMMNS
   keeps verifying earlier bundles.
+
+API 2.1.0 adds `credentialReport`, the Content Credentials validation report; envelopes are unchanged.
 
 API 2.0.0 (2026-10-23) is the first major release. It renames the item field `doesNotProve` to
 `context`, moves the schema id to `urn:radar:evidence:v2` and writes bundles as version 2. The old
