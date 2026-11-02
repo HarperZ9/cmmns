@@ -1,0 +1,309 @@
+{
+ "comment": "every file this change adds or edits, its source and sha256 (text hashed with LF line endings)",
+ "snapshot": "HarperZ9/workstation-tools@d82f57f",
+ "base": "839b06f75ea14c161077f6b0eb65a84fcd2c1a4d",
+ "sourcesHashedOn": "2026-11-02",
+ "files": [
+  {
+   "path": ".gitattributes",
+   "sha256": "9f970dc689865fd8d6940482481290b91d8754aab10f763bb6236439654dead3",
+   "source": "new in this change"
+  },
+  {
+   "path": ".github/workflows/test.yml",
+   "sha256": "490f398474aec6b8a7cc3e98bbfde89c441d1804393bb24fb648e6151bb1542e",
+   "source": "new in this change"
+  },
+  {
+   "path": "CHANGELOG.md",
+   "sha256": "6d1e690ed6adce2099274ba9518ec00ede094ab3e178e3ae7d7e9af751064d60",
+   "source": "new in this change"
+  },
+  {
+   "path": "LICENSES/CC0-1.0.txt",
+   "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+   "source": "new in this change"
+  },
+  {
+   "path": "REUSE.toml",
+   "sha256": "8c6c3187359d1837fcbc6c951354594cab85ab004877a7997fc5ace575ba7d98",
+   "source": "new in this change"
+  },
+  {
+   "path": "analysis/README.md",
+   "sha256": "2013051dc6dc7f349237e83e088511e6efd983f821ff70a7a94b04befe7c963f",
+   "source": "new in this change"
+  },
+  {
+   "path": "analysis/conftest.py",
+   "sha256": "1f97acf01e94d70bf9ab7042d414b6945a1c55202b6ce14bbae926d77b84e96e",
+   "source": "new in this change"
+  },
+  {
+   "path": "analysis/formulas/README.md",
+   "sha256": "d12643142a1e1739746e9cbfffbe5b30fd22e10011222711a320426f5e8fc36e",
+   "source": "workstation-tools@d82f57f:formulas/README.md",
+   "sourceSha256": "d12612af8722e56b934db7c0116e4510d605da5f8df6d96bf02641af173dd868",
+   "identical": false
+  },
+  {
+   "path": "analysis/formulas/formulas/__init__.py",
+   "sha256": "c815e0f1fefd4b3a6a6a6c698dad2681363fb73558b1be079510858abb6a9326",
+   "source": "workstation-tools@d82f57f:formulas/formulas/__init__.py",
+   "sourceSha256": "c815e0f1fefd4b3a6a6a6c698dad2681363fb73558b1be079510858abb6a9326",
+   "identical": true
+  },
+  {
+   "path": "analysis/formulas/formulas/bounds.py",
+   "sha256": "0ea9417259386867624f809c96d4497f9ebf814fa1307ef67c93f4d6feba7f64",
+   "source": "workstation-tools@d82f57f:formulas/formulas/bounds.py",
+   "sourceSha256": "0ea9417259386867624f809c96d4497f9ebf814fa1307ef67c93f4d6feba7f64",
+   "identical": true
+  },
+  {
+   "path": "analysis/formulas/formulas/shareability.py",
+   "sha256": "328abc2420c5fd4f51333f4aadf4434fc3e8cf7d83b7022210a7cb671ed12a9a",
+   "source": "workstation-tools@d82f57f:formulas/formulas/shareability.py",
+   "sourceSha256": "328abc2420c5fd4f51333f4aadf4434fc3e8cf7d83b7022210a7cb671ed12a9a",
+   "identical": true
+  },
+  {
+   "path": "analysis/formulas/formulas/twolines_guard.py",
+   "sha256": "a5b4d31f04a6e4453f74edea1f30331b5d97e6c61dc6b366e1628020068236b4",
+   "source": "workstation-tools@d82f57f:formulas/formulas/twolines_guard.py",
+   "sourceSha256": "a5b4d31f04a6e4453f74edea1f30331b5d97e6c61dc6b366e1628020068236b4",
+   "identical": true
+  },
+  {
+   "path": "analysis/formulas/formulas/units/__init__.py",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "source": "workstation-tools@d82f57f:formulas/formulas/units/__init__.py",
+   "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "identical": true
+  },
+  {
+   "path": "analysis/formulas/formulas/units/twolines.py",
+   "sha256": "9875b29f5108f6209ba0d8cf2acd8805cf7d64b4b2f09a4b10befd5b0f1c61e5",
+   "source": "workstation-tools@d82f57f:formulas/formulas/units/twolines.py",
+   "sourceSha256": "9875b29f5108f6209ba0d8cf2acd8805cf7d64b4b2f09a4b10befd5b0f1c61e5",
+   "identical": true
+  },
+  {
+   "path": "analysis/formulas/tests/test_bounds.py",
+   "sha256": "46a4928d8177ac51381c35b9ac8b982336c4082f1a62451bcc0fd2f7a66b7716",
+   "source": "workstation-tools@d82f57f:formulas/tests/test_bounds.py",
+   "sourceSha256": "1295d1d7f01e05c415e2f93185068cc41005ef84c4d152441df754eaaa47a700",
+   "identical": false
+  },
+  {
+   "path": "analysis/formulas/tests/test_shareability.py",
+   "sha256": "7fb165536664138b2794169ca6a52dc371ef40caef19c385a18cb9ce716ac542",
+   "source": "workstation-tools@d82f57f:formulas/tests/test_shareability.py",
+   "sourceSha256": "88fab45b05582c9b6e17db4be38575420f1bd14e3520d34352f839f9990072d3",
+   "identical": false
+  },
+  {
+   "path": "analysis/formulas/tests/test_twolines_guard.py",
+   "sha256": "1afd9fc53d9db2db70bd1a7e09a89015d2f3286eb0b38d0ad522ced617b113dc",
+   "source": "workstation-tools@d82f57f:formulas/tests/test_twolines_guard.py",
+   "sourceSha256": "85acef3e6eebae4b001437138b5fd9010f67f8e22130825415a57197b40af07a",
+   "identical": false
+  },
+  {
+   "path": "analysis/latent/README.md",
+   "sha256": "edf5454650d1906496e4da8af309fb4955cd48bdce57b3c3714b3b9b6c5978d3",
+   "source": "workstation-tools@d82f57f:latent/README.md",
+   "sourceSha256": "bc78aac9344de8c5da7e1a2d19e2a059e11aa495263f34821b243c62f82d7549",
+   "identical": false
+  },
+  {
+   "path": "analysis/latent/latent/__init__.py",
+   "sha256": "e1ce65a9e26e301059c56d40852ccafbd60f01eb58e41a66b4531f7355e42d3b",
+   "source": "workstation-tools@d82f57f:latent/latent/__init__.py",
+   "sourceSha256": "e1ce65a9e26e301059c56d40852ccafbd60f01eb58e41a66b4531f7355e42d3b",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/__main__.py",
+   "sha256": "dc00ca911ca1d7c57abea972285809fdd4b7c69e70c65fd6f22069bd582c8631",
+   "source": "workstation-tools@d82f57f:latent/latent/__main__.py",
+   "sourceSha256": "dc00ca911ca1d7c57abea972285809fdd4b7c69e70c65fd6f22069bd582c8631",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/controls.py",
+   "sha256": "178f8397a40285ff82c20aa5662375627b7c53864f50159b2952128c9ab58d14",
+   "source": "workstation-tools@d82f57f:latent/latent/controls.py",
+   "sourceSha256": "178f8397a40285ff82c20aa5662375627b7c53864f50159b2952128c9ab58d14",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/heldout.py",
+   "sha256": "bf71fa2edac090e63e4b848c84fd98ec8ba84e2451739b626b2922de171a905c",
+   "source": "workstation-tools@d82f57f:latent/latent/heldout.py",
+   "sourceSha256": "bf71fa2edac090e63e4b848c84fd98ec8ba84e2451739b626b2922de171a905c",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/io.py",
+   "sha256": "0f7059b5e8f869cab2d1b1cdef966cca7ffc9b5a07a885fcab58f8be0f22a294",
+   "source": "workstation-tools@d82f57f:latent/latent/io.py",
+   "sourceSha256": "0f7059b5e8f869cab2d1b1cdef966cca7ffc9b5a07a885fcab58f8be0f22a294",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/lenses.py",
+   "sha256": "9af9a5a71bab5ebccdbce01cbbadf285f8059b837985681f637dbdcb6d7ff8cc",
+   "source": "workstation-tools@d82f57f:latent/latent/lenses.py",
+   "sourceSha256": "9af9a5a71bab5ebccdbce01cbbadf285f8059b837985681f637dbdcb6d7ff8cc",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/order.py",
+   "sha256": "6519854ae682c4b49391ff50f0bf560dcda3cd31d7437370a4f4d565a1fea551",
+   "source": "workstation-tools@d82f57f:latent/latent/order.py",
+   "sourceSha256": "6519854ae682c4b49391ff50f0bf560dcda3cd31d7437370a4f4d565a1fea551",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/pipeline.py",
+   "sha256": "58e2958d4174200072e803168396c5191c473669b9b6a7cce7a7bdbb44574b6a",
+   "source": "workstation-tools@d82f57f:latent/latent/pipeline.py",
+   "sourceSha256": "58e2958d4174200072e803168396c5191c473669b9b6a7cce7a7bdbb44574b6a",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/report_html.py",
+   "sha256": "01a2e090bd0689ece08504e86d0086a8239965ecf8772e1e28e789da09e2e651",
+   "source": "workstation-tools@d82f57f:latent/latent/report_html.py",
+   "sourceSha256": "b26218c7ad800d85ecfe87f2d10f738c01f738cdef6c19aa3dbf6ae3f306bfd0",
+   "identical": false
+  },
+  {
+   "path": "analysis/latent/latent/run.py",
+   "sha256": "57a35716d55b5e585ba88f7f78172c91225b657b56f8f39c4c3f219b3182b8ca",
+   "source": "workstation-tools@d82f57f:latent/latent/run.py",
+   "sourceSha256": "57a35716d55b5e585ba88f7f78172c91225b657b56f8f39c4c3f219b3182b8ca",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/select.py",
+   "sha256": "1b64af3f03779cc948ff79afb2edae68d9d932cd72ff8ba9665f2b52a7972c56",
+   "source": "workstation-tools@d82f57f:latent/latent/select.py",
+   "sourceSha256": "1b64af3f03779cc948ff79afb2edae68d9d932cd72ff8ba9665f2b52a7972c56",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/stability.py",
+   "sha256": "711f27d3a54c1671e5b7831f845c6983b71d83ec3798b233250f5c96ec673da1",
+   "source": "workstation-tools@d82f57f:latent/latent/stability.py",
+   "sourceSha256": "711f27d3a54c1671e5b7831f845c6983b71d83ec3798b233250f5c96ec673da1",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/svg.py",
+   "sha256": "332d0f4ef19b1d356c3f031c342475092c52aac7b7acf4678e9b760ff770bd32",
+   "source": "workstation-tools@d82f57f:latent/latent/svg.py",
+   "sourceSha256": "332d0f4ef19b1d356c3f031c342475092c52aac7b7acf4678e9b760ff770bd32",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/twolines_guard.py",
+   "sha256": "15d34f4a080a9d19f2a76a4aebd76e1e3b46872eb25d69850f1f5250007ebcec",
+   "source": "workstation-tools@d82f57f:latent/latent/twolines_guard.py",
+   "sourceSha256": "282eeca5a837923d86c415d7add6dd58f7f309997c3f94bef0fca26f6d815f1a",
+   "identical": false
+  },
+  {
+   "path": "analysis/latent/latent/units/PROVENANCE.json",
+   "sha256": "08118e7ff60fcdb63b532413f68682b4c1172d8b930eb8a8725ce185b595b354",
+   "source": "workstation-tools@d82f57f:latent/latent/units/PROVENANCE.json",
+   "sourceSha256": "42f796c836961d1ab0d456e50b2822aea3df4fd0abcca5e416910789c3513fd7",
+   "identical": false
+  },
+  {
+   "path": "analysis/latent/latent/units/__init__.py",
+   "sha256": "677281593f744c201d9f4d018b4b8514d346b324a368b81437695fc651e5d119",
+   "source": "workstation-tools@d82f57f:latent/latent/units/__init__.py",
+   "sourceSha256": "677281593f744c201d9f4d018b4b8514d346b324a368b81437695fc651e5d119",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/units/fc_core.py",
+   "sha256": "ac2c2b430b04890d19d231ab7c0a49bbceb22577c5feaa1894062da6a5a279d6",
+   "source": "workstation-tools@d82f57f:latent/latent/units/fc_core.py",
+   "sourceSha256": "ac2c2b430b04890d19d231ab7c0a49bbceb22577c5feaa1894062da6a5a279d6",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/units/ls_spectra.py",
+   "sha256": "0caf364f080fa1f83b9be0834fbefad13a31e4e9cdbbb3dea94d897faef5683b",
+   "source": "workstation-tools@d82f57f:latent/latent/units/ls_spectra.py",
+   "sourceSha256": "0caf364f080fa1f83b9be0834fbefad13a31e4e9cdbbb3dea94d897faef5683b",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/units/pixel.py",
+   "sha256": "a1aac655b6ce91cfab76dd2c8b0cada60bad2b7e37d333a96a2b26d42684bc49",
+   "source": "workstation-tools@d82f57f:latent/latent/units/pixel.py",
+   "sourceSha256": "a1aac655b6ce91cfab76dd2c8b0cada60bad2b7e37d333a96a2b26d42684bc49",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/units/s2_units.py",
+   "sha256": "48c2e7e606a9225d79d85c32edf2b98cb1298613a6eba1eb931808b1a3e917fd",
+   "source": "workstation-tools@d82f57f:latent/latent/units/s2_units.py",
+   "sourceSha256": "48c2e7e606a9225d79d85c32edf2b98cb1298613a6eba1eb931808b1a3e917fd",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/latent/units/twolines.py",
+   "sha256": "9875b29f5108f6209ba0d8cf2acd8805cf7d64b4b2f09a4b10befd5b0f1c61e5",
+   "source": "workstation-tools@d82f57f:latent/latent/units/twolines.py",
+   "sourceSha256": "9875b29f5108f6209ba0d8cf2acd8805cf7d64b4b2f09a4b10befd5b0f1c61e5",
+   "identical": true
+  },
+  {
+   "path": "analysis/latent/tests/test_latent.py",
+   "sha256": "a147c93026545271dbc1e7e3455425ac167bab7570131c2bf38d00ad760cb2ff",
+   "source": "workstation-tools@d82f57f:latent/tests/test_latent.py",
+   "sourceSha256": "f6a87eaac7ac4cde1dc45f467bb5c9abeea74332dfbae69c837dfe04f774014b",
+   "identical": false
+  },
+  {
+   "path": "analysis/requirements.txt",
+   "sha256": "fee638a72514af1605683c85249dafdaabebc7746b38da9cb3f4abcd4c214b2d",
+   "source": "new in this change"
+  },
+  {
+   "path": "analysis/tests/test_stats_vectors.py",
+   "sha256": "8ef7a8da9d7e63ddc54239554e18cc707b2d76dfc4e57e320e0c987810d41e19",
+   "source": "new in this change"
+  },
+  {
+   "path": "analysis/vectors/stats_vectors.json",
+   "sha256": "2d1416cd7e0ca4894476cd7db3b820be3a340fae0b800044a4ae0ec8b30240d7",
+   "source": "new in this change"
+  },
+  {
+   "path": "scripts/ci.mjs",
+   "sha256": "af8f89fe2b7285d6708c18d894e19fa3ba810bca9d8cc93df108f2c80f61a3cf",
+   "source": "new in this change"
+  },
+  {
+   "path": "tests/canonical-vectors.test.js",
+   "sha256": "87ad3e08cd00d843730d95b1c70dc9edd44a9257836091fe853ae193a7a96465",
+   "source": "new in this change"
+  },
+  {
+   "path": "tests/fixtures/canonical_vectors.json",
+   "sha256": "5e7c3b8d66108ff06f353c21b72faa2429964b91a7d8d6710eaf23b0de31cc2e",
+   "source": "new in this change"
+  },
+  {
+   "path": "tests/stats-vectors.test.js",
+   "sha256": "a970496a55f196c8d12b43578b25bf21fc9464dd0d992ae0b30a1c99968a665d",
+   "source": "new in this change"
+  }
+ ]
+}
