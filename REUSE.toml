@@ -61,3 +61,10 @@ SPDX-License-Identifier = "OFL-1.1"
 path = ["src/ext/rules/easylist.json", "src/ext/rules/easyprivacy.json"]
 SPDX-FileCopyrightText = "The EasyList authors <https://easylist.to/>"
 SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# The shared statistics vectors and the canonical-record vectors are public-domain data, so a
+# repository under any licence can test its own code against them.
+[[annotations]]
+path = ["analysis/vectors/stats_vectors.json", "tests/fixtures/canonical_vectors.json"]
+SPDX-FileCopyrightText = "2026 Zain Dana Harper and the CMMNS contributors"
+SPDX-License-Identifier = "CC0-1.0"
