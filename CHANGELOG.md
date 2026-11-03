@@ -17,6 +17,9 @@ were not published to a store.
   tracks and both transcripts, chapters and metadata, up to `--comments N` comments with replies (600 by
   default, sorted by top), the note, SOURCE.txt and SHA256SUMS, in a folder of its own. `--name <stem>`
   saves a plain fetch beside an extension save. The media file is a local research copy, never uploaded.
+- `cmmns media fetch --full` without ffmpeg keeps the best video and the best audio as two files, both
+  hashed, where it asked yt-dlp to merge them before. YouTube no longer offers a file that holds both. The
+  bundle folder is named after the video's title, not the first words of its description.
 
 ### Fixed
 - **What a thread file claims** (project-docs/SIDECAR-FORMAT.md, "The thread file"; format

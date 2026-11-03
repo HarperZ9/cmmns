@@ -193,3 +193,18 @@ test("a pinned comment from the channel keeps both marks", () => {
   const [c] = ytDlpComments({ id: "v", comments: [{ id: "P", parent: "root", text: "ours", is_pinned: true, author_is_uploader: true }] });
   assert.equal(c.flair, "pinned, channel owner");
 });
+
+test("without ffmpeg the video and the audio are kept as two files, both in the hashes", () => {
+  const p = fullPlan("https://www.youtube.com/watch?v=abc", {}, "/home/a", false);
+  assert.equal(p.args[p.args.indexOf("-f") + 1], "b/bv*,ba");
+  assert.ok(!p.args.includes("--merge-output-format"));
+  assert.ok(p.args[p.args.indexOf("-o") + 1].endsWith("%(id)s.%(format_id)s.%(ext)s"));
+  const dir = stage(false);
+  writeFileSync(join(dir, `${INFO.id}.399.mp4`), "v");
+  writeFileSync(join(dir, `${INFO.id}.251.webm`), "a");
+  const r = writeBundle(dir, INFO, INFO.webpage_url, { savedAt: "2026-11-03T00:00:00Z" });
+  assert.equal(r.media, `${INFO.id}.251.webm, ${INFO.id}.399.mp4`);
+  const sums = readFileSync(join(dir, "SHA256SUMS"), "utf8");
+  assert.ok(sums.includes(`*${INFO.id}.399.mp4`) && sums.includes(`*${INFO.id}.251.webm`));
+  assert.match(readFileSync(join(dir, `${INFO.id}.md`), "utf8"), /files: \["abc123def45.251.webm","abc123def45.399.mp4"\]/);
+});
