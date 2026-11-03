@@ -50,8 +50,8 @@ export const MEDIA_HELP = {
     "cmmns media compress <file> [--to format] [--quality 0-1] [--max-side N] [--max-height N] [--bitrate 1M] [--audio-bitrate 64k] [--fps N] [--out file] [--force] [--json]",
     "cmmns media compress interview.mp4 --max-height 720", "Writes <name>.small.<ext> beside the original, with its lineage file."],
   fetch: ["Save a video from its page address with yt-dlp on this computer, into Downloads/CMMNS/<site>/ (Downloads/Daylight/<site>/ when only that folder exists), with the same note beside it as the extension writes.",
-    "cmmns media fetch <page address> [--dir folder] [--json] [--keep-info]",
-    "cmmns media fetch \"https://www.youtube.com/watch?v=...\"", "Needs yt-dlp on the PATH, or YTDLP set to its path. Protected (DRM) video is refused. Only save what you have the right to keep."],
+    "cmmns media fetch <page address> [--dir folder] [--json] [--keep-info] [--full [--no-video] [--comments N] [--langs en,en-orig]]",
+    "cmmns media fetch \"https://www.youtube.com/watch?v=...\" --full", "Needs yt-dlp on the PATH, or YTDLP set to its path. Protected (DRM) video is refused. Only save what you have the right to keep.\n--full saves one bundle folder: the media file (left out with --no-video), the captions as WebVTT and as a timestamped and a plain transcript, chapters and metadata (<id>.video.json), up to N comments with their replies and likes (<id>.thread.json, 600 by default, sorted by top), the note, SOURCE.txt and SHA256SUMS. The media file is a local research copy: CMMNS never uploads, shares or publishes it."],
 };
 
 export const CASE_HELP = {

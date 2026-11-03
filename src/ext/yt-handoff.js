@@ -7,9 +7,10 @@ globalThis.PBYtHandoff = globalThis.PBYtHandoff || (() => {
   "use strict";
   const quote = (s) => `"${String(s).replace(/["\\$`]/g, "")}"`;
 
-  async function copyCommand() {
+  // stem: the name of a "Save video in full" bundle (yt-full.js), so the file lands beside it.
+  async function copyCommand(stem = null) {
     const url = globalThis.PBYouTube ? PBYouTube.linkAtTime().replace(/&t=\d+s$/, "") : location.href;
-    const cmd = `cmmns media fetch ${quote(url)}`;
+    const cmd = `cmmns media fetch ${quote(url)}${typeof stem === "string" && stem ? ` --name ${quote(stem)}` : ""}`;
     try {
       await navigator.clipboard.writeText(cmd);
       PBQuickToast.show(`Copied: ${cmd}. Paste it in a terminal; it needs yt-dlp installed.`, { tone: "ok", stay: 9000 });
@@ -20,5 +21,5 @@ globalThis.PBYtHandoff = globalThis.PBYtHandoff || (() => {
   // The hover control's menu item for this (quick-hover.js shows it only when this file is here).
   const MENU = ["ytcli", "Download video with the command line"];
 
-  return Object.freeze({ run: copyCommand, MENU });
+  return Object.freeze({ run: () => copyCommand(), runFor: (stem) => copyCommand(stem), MENU });
 })();
