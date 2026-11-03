@@ -28,6 +28,7 @@ import { TOP_HELP, MEDIA_HELP, SIDECAR_HELP, BOARD_HELP, CAPTURE_HELP, helpText,
 import { runMedia } from "./lib/media.mjs";
 import { cleanCommand, protectCommand, selfAuditCommand, PROTECT_USAGE } from "./lib/protect.mjs";
 import { runFetch } from "./lib/media-fetch.mjs";
+import { runFull } from "./lib/video-full.mjs";
 import { checkSidecars, checkLines } from "./lib/sidecar-check.mjs";
 import { checkFiles, fileLines } from "./lib/sidecar-files.mjs";
 import { makeBoard, renderSpec } from "./lib/board.mjs";
@@ -42,6 +43,7 @@ const USAGE = `Usage:
                [--bitrate 2M] [--audio-bitrate 96k] [--fps N] [--out file] [--json]
   cmmns media compress <file> [the same options]
   cmmns media fetch <page address> [--dir folder]       (needs a system yt-dlp)
+  cmmns media fetch <page address> --full [--no-video] [--comments N]   (the whole video as one bundle)
   cmmns likes fetch [<manifest folder>] [--jobs 8] [--watch]   (the files Save all likes listed, from X's media hosts)
   cmmns likes missing --archive <like.js>               (the likes in your X archive nothing saved yet)
   cmmns sidecar check <folder> [--fix]                  (flags unproved threads and notes naming the wrong files)
@@ -70,7 +72,7 @@ export function parseArgs(argv) {
     const a = argv[i];
     if (!a.startsWith("--")) { out._.push(a); continue; }
     const [k, v] = a.slice(2).split("=");
-    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate", "title", "lane", "keywords", "layout", "head", "site", "since", "until", "case", "dir"].includes(k) ? argv[++i] : true;
+    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate", "title", "lane", "keywords", "layout", "head", "site", "since", "until", "case", "dir", "comments", "langs", "name"].includes(k) ? argv[++i] : true;
   }
   return out;
 }
@@ -154,7 +156,7 @@ export async function main(argv) {
   if (argv[0] === "media" && argv[1] === "fetch") {
     const { _: [url], flags } = parseArgs(argv.slice(2));
     if (flags.help || !url) { print(helpText(MEDIA_HELP.fetch, "cmmns media fetch")); return url || flags.help ? 0 : 2; }
-    print(runFetch(url, flags).line);
+    print((flags.full ? runFull(url, flags) : runFetch(url, flags)).line);
     return 0;
   }
   if (argv[0] === "media" && (argv[1] === "convert" || argv[1] === "compress")) {

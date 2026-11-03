@@ -13037,6 +13037,217 @@ function expandPace(rnd = Math.random, n = 0) {
 return { CAPTURE_THREAD_FORMAT, CAPTURE_THREAD_FORMAT_V1, THREAD_CAP_DEFAULT, THREAD_CAP_MAX, THREAD_COUNT_NOTE, countOf, commentRecord, commentTree, countTree, expectedCountsFor, countedTowardExpected, completeness, captureThread, readCaptureThread, threadFileJson, threadSummary, completenessSentence, commentsMarkdown, expandPace };
 })();
 
+// ---- video-transcript.js
+const M_video_transcript = (() => {
+// A video's transcript in two forms: timestamped lines ("[00:01:23] words") and plain paragraphs.
+// The segments come from a WebVTT caption file (yt-dlp on the command line), from the transcript
+// panel the watch page drew, or from the panel's own data the page received (get_transcript).
+// Pure: no DOM and no request.
+
+const pad = (n) => String(n).padStart(2, "0");
+// Seconds as "HH:MM:SS".
+function clockOf(sec) {
+  const s = Math.max(0, Math.floor(Number(sec) || 0));
+  return `${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
+}
+// "1:02:03", "02:03" or "2:03.500" as seconds; null when it is not a time.
+function secondsOf(t) {
+  const m = /^\s*(?:(\d+):)?(\d{1,2}):(\d{2})(?:[.,](\d{1,3}))?\s*$/.exec(String(t || ""));
+  if (!m) return null;
+  return Number(m[1] || 0) * 3600 + Number(m[2]) * 60 + Number(m[3]) + (m[4] ? Number(m[4].padEnd(3, "0")) / 1000 : 0);
+}
+
+const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", "#39": "'" };
+const unescape = (s) => s.replace(/&(#\d+|#x[0-9a-f]+|[a-z]+|#39);/gi, (all, e) => {
+  if (ENTITIES[e.toLowerCase()] != null) return ENTITIES[e.toLowerCase()];
+  if (/^#x/i.test(e)) return String.fromCodePoint(parseInt(e.slice(2), 16));
+  if (/^#\d+$/.test(e)) return String.fromCodePoint(Number(e.slice(1)));
+  return all;
+});
+const words = (s) => unescape(String(s || "").replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
+
+// WebVTT cues as segments { start, end, text }, in seconds. Machine captions repeat the line before
+// on every cue and grow a line across cues; a line already said is dropped, and a line that only
+// extends the one before replaces it, so each spoken line is kept once.
+function vttSegments(vtt) {
+  const out = [], said = [];
+  const blocks = String(vtt || "").replace(/\r\n?/g, "\n").split(/\n{2,}/);
+  for (const block of blocks) {
+    const lines = block.split("\n");
+    const at = lines.findIndex((l) => l.includes("-->"));
+    if (at < 0) continue;
+    const [a, b] = lines[at].split("-->").map((x) => secondsOf(x.trim().split(/\s+/)[0]));
+    if (a == null) continue;
+    for (const raw of lines.slice(at + 1)) {
+      const text = words(raw);
+      if (!text || said.includes(text)) continue;
+      const last = out[out.length - 1];
+      if (last && text.startsWith(last.text)) { last.text = text; last.end = b ?? last.end; said[said.length - 1] = text; continue; }
+      out.push({ start: a, end: b ?? a, text });
+      said.push(text);
+      if (said.length > 4) said.shift();
+    }
+  }
+  return out;
+}
+
+// The transcript panel as the page drew it: lines of "1:23 words" (yt-reference.js transcript()).
+function panelSegments(lines) {
+  return (lines || []).map((l) => {
+    const m = /^\s*((?:\d+:)?\d{1,2}:\d{2})\s+([\s\S]+)$/.exec(String(l || ""));
+    return m ? { start: secondsOf(m[1]), end: null, text: words(m[2]) } : null;
+  }).filter((s) => s && s.text);
+}
+
+// The panel's own data (YouTube's get_transcript answer): transcriptSegmentRenderer { startMs, endMs, snippet }.
+function dataSegments(json) {
+  const out = [], stack = [json];
+  for (let n = 0; stack.length && n < 400000; n++) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    const s = v.transcriptSegmentRenderer;
+    if (s && s.startMs != null) {
+      const snip = s.snippet || {}, text = words(snip.simpleText || (snip.runs || []).map((r) => r.text).join(""));
+      if (text) out.push({ start: Number(s.startMs) / 1000, end: s.endMs != null ? Number(s.endMs) / 1000 : null, text });
+      continue;
+    }
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+  return out.sort((a, b) => a.start - b.start);
+}
+
+// "[00:01:23] words", one segment a line.
+const timedTranscript = (segs) => (segs || []).map((s) => `[${clockOf(s.start)}] ${s.text}`).join("\n") + ((segs || []).length ? "\n" : "");
+
+// The words alone, as paragraphs: a new one after a pause of 3 s or more, or after about 120 words.
+function plainTranscript(segs) {
+  const paras = [];
+  let cur = [], count = 0, prevEnd = null;
+  for (const s of segs || []) {
+    const gap = prevEnd != null && s.start != null ? s.start - prevEnd : 0;
+    if (cur.length && (gap >= 3 || count >= 120)) { paras.push(cur.join(" ")); cur = []; count = 0; }
+    cur.push(s.text); count += s.text.split(" ").length; prevEnd = s.end ?? s.start;
+  }
+  if (cur.length) paras.push(cur.join(" "));
+  return paras.length ? paras.join("\n\n") + "\n" : "";
+}
+
+return { clockOf, secondsOf, vttSegments, panelSegments, dataSegments, timedTranscript, plainTranscript };
+})();
+
+// ---- video-bundle.js
+const M_video_bundle = (() => {
+// A whole video save, as one bundle: the media file when the user chose it, the transcript in two
+// forms, the chapters and metadata as one record ("<stem>.video.json", cmmns.video/1), the comment
+// tree with replies and like counts ("<stem>.thread.json", src/core/capture-thread.js), and the
+// bundle's SOURCE.txt and SHA256SUMS. The same bundle comes from the extension (from what the watch
+// page loaded) and from `cmmns media fetch --full` (from yt-dlp). Pure: no DOM and no request.
+// The media file is a local research copy: CMMNS never uploads, shares or publishes it.
+
+const { clockOf } = M_video_transcript;
+
+const VIDEO_FORMAT = "cmmns.video/1";
+const MEDIA_COPY_NOTE = "The media file is a local research copy kept on this computer. CMMNS does not upload, share or publish it.";
+
+const txt = (v) => (!v ? null : typeof v === "string" ? v : v.simpleText || v.content || (Array.isArray(v.runs) ? v.runs.map((r) => r.text).join("") : null));
+const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+
+function walk(json, visit, limit = 400000) {
+  const stack = [json];
+  for (let n = 0; stack.length && n < limit; n++) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    visit(v);
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+}
+
+// Chapters from the page's own data: macro markers (the description's chapter list) or the player's
+// chapter bar. [{ start, title }] in seconds, by start, each once.
+function dataChapters(json) {
+  const out = [];
+  walk(json, (v) => {
+    const m = v.macroMarkersListItemRenderer;
+    if (m) {
+      const s = num((((m.onTap || {}).watchEndpoint) || {}).startTimeSeconds);
+      const title = txt(m.title);
+      if (s != null && title) out.push({ start: s, title });
+    }
+    const c = v.chapterRenderer;
+    if (c && c.timeRangeStartMillis != null && txt(c.title)) out.push({ start: Number(c.timeRangeStartMillis) / 1000, title: txt(c.title) });
+  });
+  const seen = new Set();
+  return out.sort((a, b) => a.start - b.start).filter((c) => { const k = `${c.start} ${c.title}`; if (seen.has(k)) return false; seen.add(k); return true; });
+}
+
+// YouTube writes a reply's id as "<parent id>.<reply id>".
+const parentOf = (id) => (/^[\w-]+\.[\w-]+$/.test(String(id || "")) ? String(id).split(".")[0] : null);
+
+// Comments from the page's own data (commentEntityPayload, and the older commentRenderer), as the
+// flat records src/core/capture-thread.js turns into a tree. Each keeps its likes and reply count
+// as the page showed them, and its parent, so a reply stays under the comment it answers.
+function pageComments(json, videoId = null) {
+  const out = [];
+  const link = (id) => (videoId ? `https://www.youtube.com/watch?v=${videoId}&lc=${id}` : null);
+  walk(json, (v) => {
+    const e = v.commentEntityPayload;
+    if (e && e.properties && e.properties.commentId) {
+      const p = e.properties, a = e.author || {}, t = e.toolbar || {}, pub = String(p.publishedTime || "");
+      out.push({ id: p.commentId, parent: parentOf(p.commentId), author: a.displayName || null, text: txt(p.content), score: t.likeCountNotliked || t.likeCountA11y || null,
+        timeShown: pub.replace(/\s*\(edited\)/, "") || null, edited: /\(edited\)/.test(pub), replies: t.replyCount || null, permalink: link(p.commentId) });
+    }
+    const c = v.commentRenderer;
+    if (c && c.commentId) {
+      const pub = String(txt(c.publishedTimeText) || "");
+      out.push({ id: c.commentId, parent: parentOf(c.commentId), author: txt(c.authorText), text: txt(c.contentText), score: txt(c.voteCount),
+        timeShown: pub.replace(/\s*\(edited\)/, "") || null, edited: /\(edited\)/.test(pub), replies: c.replyCount ?? null, permalink: link(c.commentId) });
+    }
+  });
+  return out;
+}
+
+// Comments from yt-dlp's info (--write-comments), in the same flat shape. "root" is yt-dlp's word
+// for a top comment.
+function ytDlpComments(info) {
+  const vid = info && info.id;
+  return ((info && info.comments) || []).map((c) => ({ id: c.id, parent: c.parent && c.parent !== "root" ? c.parent : null, author: c.author || null, text: c.text || "",
+    score: c.like_count ?? null, postedAt: c.timestamp ?? null, timeShown: c._time_text || null, edited: c.is_edited === true,
+    permalink: vid && c.id ? `https://www.youtube.com/watch?v=${vid}&lc=${c.id}` : null, flair: c.is_pinned ? "pinned" : c.author_is_uploader ? "channel owner" : null }));
+}
+
+// The record a reader indexes: what the video is, who posted it, its chapters and captions, and
+// which files the bundle holds. m: { id, url, title, channel, channelUrl, handle, published,
+// duration, views, likes, comments, description, chapters, captions: { lang, kind, from },
+// segments, media, source, tool, savedAt, info (src/core/ytdata.js ytVideoInfo) }.
+function videoRecord(m = {}) {
+  return {
+    format: VIDEO_FORMAT, site: m.site || "youtube", id: m.id || null, url: m.url || null, title: m.title || null,
+    channel: m.channel || null, channelUrl: m.channelUrl || null, handle: m.handle || null, published: m.published || null,
+    duration: num(m.duration), views: num(m.views), likes: num(m.likes), commentsCounted: num(m.comments),
+    description: m.description || null, tags: (m.tags || []).slice(0, 100),
+    chapters: (m.chapters || []).map((c) => ({ start: num(c.start) ?? 0, at: clockOf(c.start), title: String(c.title || "") })),
+    captions: m.captions ? { lang: m.captions.lang || null, kind: m.captions.kind || null, from: m.captions.from || null, segments: num(m.segments) } : null,
+    page: m.info || null, media: m.media ? { file: m.media, note: MEDIA_COPY_NOTE } : null,
+    source: m.source || null, tool: m.tool || "CMMNS", savedAt: m.savedAt || new Date().toISOString(),
+  };
+}
+
+// The chapters as lines for the sidecar note ("00:01:35 Silica").
+const chapterLines = (chapters) => (chapters || []).map((c) => `${clockOf(c.start)} ${c.title}`);
+
+// SOURCE.txt: where the bundle came from, how it was read, and what it holds.
+function sourceText({ url, title = null, channel = null, savedAt = new Date().toISOString(), how, files = [], media = null } = {}) {
+  const lines = [`Source: ${url}${title || channel ? ` (${[channel, title].filter(Boolean).join(", ")})` : ""}`, `Saved: ${savedAt}`, `How: ${how}`,
+    `Media file: ${media ? `${media}. ${MEDIA_COPY_NOTE}` : "not saved (the user's choice for this save, or none was available)"}`, "Files:", ...files.map((f) => `- ${f}`)];
+  return lines.join("\n") + "\n";
+}
+
+// SHA256SUMS in the sha256sum form ("<hex> *<name>"), in the order given. entries: [{ name, sha256 }].
+const sha256Sums = (entries) => entries.filter((e) => e && e.name && /^[0-9a-f]{64}$/.test(e.sha256 || "")).map((e) => `${e.sha256} *${e.name}`).join("\n") + "\n";
+
+return { VIDEO_FORMAT, MEDIA_COPY_NOTE, dataChapters, pageComments, ytDlpComments, videoRecord, chapterLines, sourceText, sha256Sums };
+})();
+
 // ---- instagram-data.js
 const M_instagram_data = (() => {
 // Instagram's own record of a post, from the data the page already received: the JSON Instagram embeds
@@ -17715,5 +17926,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

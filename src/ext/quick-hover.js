@@ -40,7 +40,7 @@ globalThis.PBHover = globalThis.PBHover || (() => {
 
   // YouTube: references and links only; video download only where the build carries the command
   // line hand-off (yt-handoff.js, left out of store packages).
-  const YT_MENU = () => [["study", "Study"], ["ytlink", "Copy link at this time"], ["caption", "Copy with caption"], ...(globalThis.PBYtHandoff ? [PBYtHandoff.MENU] : []),
+  const YT_MENU = () => [...(globalThis.PBYtFull ? [PBYtFull.MENU] : []), ["study", "Study"], ["ytlink", "Copy link at this time"], ["caption", "Copy with caption"], ...(globalThis.PBYtHandoff ? [PBYtHandoff.MENU] : []),
     null, ["never", "Never on this site"], ["off", "Turn off hover download"]];
 
   // The X and Reddit button already covers posts there.
