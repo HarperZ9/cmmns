@@ -175,12 +175,12 @@ reader that knows only the note and thread file reads a bundle as before.
 | `<stem>.transcript.plain.txt` | the words alone, as paragraphs (a new one after a pause of 3 s or about 120 words) |
 | `<stem>.video.json` | `cmmns.video/1`: id, address, title, channel, date, duration, counts, description, chapters, where the captions came from, and the media file's name when there is one |
 | `<stem>.<lang>.vtt` | the caption tracks yt-dlp wrote (command line only) |
-| `<stem>.mp4` | the media file, only when the user chose it for this save |
+| `<stem>.mp4` | the media file, only when the user chose it for this save. Without ffmpeg on the command line, a file holding both video and audio when the site offers one, else the best video and the best audio as two files, `<id>.<format>.<ext>` |
 | `SOURCE.txt` | where the bundle came from, how it was read, the media choice, and its files (`<stem>.SOURCE.txt` from the extension, which saves into the shared site folder) |
 | `SHA256SUMS` | `sha256sum` lines for the files (`<stem>.SHA256SUMS` from the extension, which can hash only the files it made in the page; a file the browser downloaded straight from its address is listed in SOURCE.txt and not hashed) |
 
 The command line writes the bundle into its own folder, `<save root>/<site>/<handle>_<date>_<words>_<id>/`,
-and names the files by the video's id. yt-dlp's raw info file is deleted unless `--keep-info` is given:
+and names the folder after the video's title and the files by its id. yt-dlp's raw info file is deleted unless `--keep-info` is given:
 it holds signed stream addresses that carry the viewer's IP address.
 
 **The media file is a local research copy.** CMMNS never uploads, shares or publishes it. In the

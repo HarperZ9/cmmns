@@ -15,17 +15,22 @@ import { vttSegments, timedTranscript, plainTranscript } from "../../src/core/vi
 import { videoRecord, ytDlpComments, sourceText, sha256Sums } from "../../src/core/video-bundle.js";
 import { findYtDlp, fetchPlan, metaFromInfo } from "./media-fetch.mjs";
 import { globalProtection } from "./case-protect.mjs";
+import { findFfmpeg } from "./media.mjs";
 
 export const FULL_COMMENTS_DEFAULT = 600;
 
 // The yt-dlp arguments for one bundle, into a staging folder. Pure, so it is tested offline.
-export function fullPlan(url, flags = {}, home = homedir()) {
+// merge: ffmpeg is there to join the best video and audio into one MP4. Without it, a file that
+// holds both is taken when the site offers one, else the best video and the best audio are kept
+// as two files ("<id>.<format>.<ext>"), never re-encoded.
+export function fullPlan(url, flags = {}, home = homedir(), merge = true) {
   const base = fetchPlan(url, flags, home);
   const max = Math.min(THREAD_CAP_MAX, Math.max(0, Number(flags.comments ?? FULL_COMMENTS_DEFAULT) || 0));
   const stage = join(base.dir, `.cmmns-partial-${Date.now().toString(36)}`);
   const args = ["--ignore-config", "--no-playlist", "--no-overwrites", "--write-info-json", "--write-subs", "--write-auto-subs", "--sub-langs", flags.langs || "en,en-orig", "--sub-format", "vtt",
     ...(max ? ["--write-comments", "--extractor-args", `youtube:max_comments=${max},all,all,all;comment_sort=top`] : []),
-    ...(flags["no-video"] ? ["--skip-download"] : ["--merge-output-format", "mp4"]), "-o", join(stage, "%(id)s.%(ext)s"), "--", url];
+    ...(flags["no-video"] ? ["--skip-download"] : merge ? ["-f", "bv*+ba/b", "--merge-output-format", "mp4"] : ["-f", "b/bv*,ba"]),
+    "-o", join(stage, merge || flags["no-video"] ? "%(id)s.%(ext)s" : "%(id)s.%(format_id)s.%(ext)s"), "--", url];
   return { ...base, stage, args, max, video: !flags["no-video"] };
 }
 
@@ -60,7 +65,9 @@ export function fileSha256(path) {
 // the network: the tests run it on a folder they made.
 export function writeBundle(dir, info, url, { savedAt = new Date().toISOString(), keepInfo = false, version = "" } = {}) {
   const id = String(info.id || "video"), files = readdirSync(dir);
-  const media = files.find((f) => f.startsWith(id + ".") && !/\.(vtt|json|part|ytdl)$/.test(f)) || null;
+  // Every media file of the save: one merged file, or the video and the audio when nothing could merge them.
+  const parts = files.filter((f) => f.startsWith(id + ".") && /\.(mp4|webm|mkv|m4a|mp3|opus|mov)$/i.test(f)).sort();
+  const media = parts.length ? parts.join(", ") : null;
   const caps = pickCaptions(files, info, id);
   const segs = caps ? vttSegments(readFileSync(join(dir, caps.file), "utf8")) : [];
   const put = (name, text) => { writeFileSync(join(dir, name), text); return name; };
@@ -71,7 +78,7 @@ export function writeBundle(dir, info, url, { savedAt = new Date().toISOString()
   written.push(put(`${id}.thread.json`, threadFileJson(thread)));
   written.push(put(`${id}.video.json`, JSON.stringify(recordOf(info, url, caps, segs.length, media, savedAt), null, 2) + "\n"));
   const meta = { ...metaFromInfo(info, url, savedAt), threadCapture: thread, threadFile: `${id}.thread.json` };
-  written.push(put(`${id}.md`, sidecarMarkdown(meta, media || `${id}.video.json`)));
+  written.push(put(`${id}.md`, sidecarMarkdown(meta, parts.length ? parts : `${id}.video.json`)));
   if (!keepInfo) for (const f of readdirSync(dir)) if (f.endsWith(".info.json")) rmSync(join(dir, f));
   const listed = readdirSync(dir).filter((f) => f !== "SOURCE.txt" && f !== "SHA256SUMS").sort();
   put("SOURCE.txt", sourceText({ url: info.webpage_url || url, title: info.title, channel: info.channel || info.uploader, savedAt,
@@ -82,7 +89,7 @@ export function writeBundle(dir, info, url, { savedAt = new Date().toISOString()
 
 // Runs one full fetch. Returns { dir, line }. Throws with what to do next.
 export function runFull(url, flags = {}, env = process.env) {
-  const plan = fullPlan(url, flags);
+  const plan = fullPlan(url, flags, homedir(), !!findFfmpeg(env));
   if (globalProtection(env)) throw new Error("Source-protection mode is on (cmmns protect status), so nothing is downloaded: the request would tell the host.");
   const y = findYtDlp(env);
   if (!y) throw new Error("yt-dlp was not found. Install it (github.com/yt-dlp/yt-dlp) or set YTDLP to its path, then run this again.");
@@ -92,7 +99,8 @@ export function runFull(url, flags = {}, env = process.env) {
   if (r.status !== 0 || !infoFile) throw new Error(`yt-dlp could not read this video. Its message is above; the partial files are in ${plan.stage}.`);
   const info = JSON.parse(readFileSync(join(plan.stage, infoFile), "utf8"));
   const done = writeBundle(plan.stage, info, url, { keepInfo: !!flags["keep-info"], version: y.version });
-  const name = metaName(metaFromInfo(info, url), "x").replace(/\.x$/, "");
+  // The folder is named after the title, not the description's first words.
+  const name = metaName({ ...metaFromInfo(info, url), text: info.title || null }, "x").replace(/\.x$/, "");
   const dir = join(dirname(plan.stage), name);
   if (existsSync(dir)) throw new Error(`${dir} already exists; the new bundle is in ${plan.stage}.`);
   renameSync(plan.stage, dir);
