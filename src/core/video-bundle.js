@@ -73,7 +73,7 @@ export function ytDlpComments(info) {
   const vid = info && info.id;
   return ((info && info.comments) || []).map((c) => ({ id: c.id, parent: c.parent && c.parent !== "root" ? c.parent : null, author: c.author || null, text: c.text || "",
     score: c.like_count ?? null, postedAt: c.timestamp ?? null, timeShown: c._time_text || null, edited: c.is_edited === true,
-    permalink: vid && c.id ? `https://www.youtube.com/watch?v=${vid}&lc=${c.id}` : null, flair: c.is_pinned ? "pinned" : c.author_is_uploader ? "channel owner" : null }));
+    permalink: vid && c.id ? `https://www.youtube.com/watch?v=${vid}&lc=${c.id}` : null, flair: [c.is_pinned ? "pinned" : null, c.author_is_uploader ? "channel owner" : null].filter(Boolean).join(", ") || null }));
 }
 
 // The record a reader indexes: what the video is, who posted it, its chapters and captions, and

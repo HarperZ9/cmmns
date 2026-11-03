@@ -188,3 +188,8 @@ test("comments the page received for one video are not saved with the next", asy
   assert.deepEqual(Array.from(ctx.PBYtFull.pageComments("BBBBBBBBBBB"), (c) => c.id), ["UgNew"]);
   assert.deepEqual(Array.from(ctx.PBYtFull.pageComments("AAAAAAAAAAA"), (c) => c.id), ["UgOld"]);
 });
+
+test("a pinned comment from the channel keeps both marks", () => {
+  const [c] = ytDlpComments({ id: "v", comments: [{ id: "P", parent: "root", text: "ours", is_pinned: true, author_is_uploader: true }] });
+  assert.equal(c.flair, "pinned, channel owner");
+});
