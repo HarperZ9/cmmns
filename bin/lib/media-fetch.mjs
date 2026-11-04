@@ -33,7 +33,9 @@ const siteOf = (url) => {
 export function fetchPlan(url, flags = {}, home = homedir()) {
   if (!/^https?:\/\//i.test(String(url || ""))) throw new Error("Give the page's address, starting with https://.");
   const dir = typeof flags.dir === "string" ? flags.dir : join(home, "Downloads", saveFolder(saveRoot(home), siteOf(url)));
-  const out = join(dir, "%(uploader_id,channel_id,uploader)s_%(upload_date>%Y-%m-%d)s_%(title).60B.%(ext)s");
+  // --name: the stem the extension gave a save of the same video, so the media file lands beside it.
+  const stem = typeof flags.name === "string" ? flags.name.replace(/[\\/:*?"<>|]+/g, "-").replace(/^\.+/, "").slice(0, 180) : "";
+  const out = join(dir, stem ? `${stem}.%(ext)s` : "%(uploader_id,channel_id,uploader)s_%(upload_date>%Y-%m-%d)s_%(title).60B.%(ext)s");
   const args = ["--no-playlist", "--no-overwrites", "--write-info-json", "--restrict-filenames", "--merge-output-format", "mp4", "-o", out, "--print", "after_move:filepath", url];
   return { dir, args, site: siteOf(url) };
 }
@@ -59,7 +61,8 @@ export function runFetch(url, flags = {}, env = process.env) {
   const infoPath = file.replace(/\.[^.]+$/, ".info.json");
   const info = existsSync(infoPath) ? JSON.parse(readFileSync(infoPath, "utf8")) : {};
   const meta = metaFromInfo(info, url), stem = file.replace(/\.[^.]+$/, "");
-  writeFileSync(stem + ".md", sidecarMarkdown(meta, basename(file)));
+  // A note the extension already wrote for this save is kept as it is.
+  if (!(flags.name && existsSync(stem + ".md"))) writeFileSync(stem + ".md", sidecarMarkdown(meta, basename(file)));
   if (flags.json) writeFileSync(stem + ".json", sidecarJson(meta, basename(file)));
   if (!flags["keep-info"] && existsSync(infoPath)) rmSync(infoPath);
   return { file, sidecar: stem + ".md", line: `Saved ${file}\nNote beside it: ${basename(stem)}.md (made with yt-dlp ${y.version})\n` };

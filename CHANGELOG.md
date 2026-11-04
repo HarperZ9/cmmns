@@ -6,6 +6,20 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- **Save video in full** (project-docs/SIDECAR-FORMAT.md, "A video saved in full"). On YouTube the hover
+  control saves the reference with the transcript as timestamped lines and as plain paragraphs, the
+  chapters and metadata (`<stem>.video.json`, `cmmns.video/1`), the comment tree with replies and like
+  counts, and `<stem>.SOURCE.txt` and `<stem>.SHA256SUMS`. The comment tree now joins what the watch page
+  drew with the comments in the page's own data, filed per video so a save never carries the previous
+  video's comments. The media file is asked on each save; builds with the command line hand-off copy the
+  command that saves it beside the bundle. Store builds still do not save YouTube video files.
+- **`cmmns media fetch <url> --full`** writes the same bundle with yt-dlp: media (or `--no-video`), caption
+  tracks and both transcripts, chapters and metadata, up to `--comments N` comments with replies (600 by
+  default, sorted by top), the note, SOURCE.txt and SHA256SUMS, in a folder of its own. `--name <stem>`
+  saves a plain fetch beside an extension save. The media file is a local research copy, never uploaded.
+- `cmmns media fetch --full` without ffmpeg keeps the best video and the best audio as two files, both
+  hashed, where it asked yt-dlp to merge them before. YouTube no longer offers a file that holds both. The
+  bundle folder is named after the video's title, not the first words of its description.
 - **`analysis/signalchain`**: one measurement API for a signal and a transform (`measure(x, medium)`,
   `through(x, y)`): spectrum, entropy, signal-to-noise, envelope, resonance, decay, gain and loss, plus
   non-stationary measures. Each measure passed a 40-seed recovery gate against a seed-shuffled null, and

@@ -157,7 +157,40 @@ comment tree, which the thread file holds.
 
 Where the comments come from, per site: Reddit, the rendered `shreddit-comment` tree; X, the posts X
 sent the page, joined by what each answers; Instagram, the comments in the page's own data; YouTube,
-the comment threads the watch page drew (YouTube shows relative times, kept as `timeShown`).
+the comment threads the watch page drew, joined with the comments in the page's own data (likes and
+reply counts as the page showed them; a reply's id is `<parent id>.<reply id>`, so it stays under the
+comment it answers). YouTube shows relative times, kept as `timeShown`.
+
+## A video saved in full
+
+"Save video in full" (the hover control on YouTube) and `cmmns media fetch <url> --full` write one
+bundle per video. The sidecar format stays `daylight.sidecar/1`; the bundle adds files beside it, so a
+reader that knows only the note and thread file reads a bundle as before.
+
+| File | What it holds |
+| --- | --- |
+| `<stem>.md` | the note, as above, with the chapters and the comments |
+| `<stem>.thread.json` | every comment the page loaded or yt-dlp read, with replies under their parents and like counts |
+| `<stem>.transcript.txt` | one line per caption segment: `[HH:MM:SS] words` |
+| `<stem>.transcript.plain.txt` | the words alone, as paragraphs (a new one after a pause of 3 s or about 120 words) |
+| `<stem>.video.json` | `cmmns.video/1`: id, address, title, channel, date, duration, counts, description, chapters, where the captions came from, and the media file's name when there is one |
+| `<stem>.<lang>.vtt` | the caption tracks yt-dlp wrote (command line only) |
+| `<stem>.mp4` | the media file, only when the user chose it for this save. Without ffmpeg on the command line, a file holding both video and audio when the site offers one, else the best video and the best audio as two files, `<id>.<format>.<ext>` |
+| `SOURCE.txt` | where the bundle came from, how it was read, the media choice, and its files (`<stem>.SOURCE.txt` from the extension, which saves into the shared site folder) |
+| `SHA256SUMS` | `sha256sum` lines for the files (`<stem>.SHA256SUMS` from the extension, which can hash only the files it made in the page; a file the browser downloaded straight from its address is listed in SOURCE.txt and not hashed) |
+
+The command line writes the bundle into its own folder, `<save root>/<site>/<handle>_<date>_<words>_<id>/`,
+and names the folder after the video's title and the files by its id. yt-dlp's raw info file is deleted unless `--keep-info` is given:
+it holds signed stream addresses that carry the viewer's IP address.
+
+**The media file is a local research copy.** CMMNS never uploads, shares or publishes it. In the
+extension it is a choice on every save: builds that carry the command line hand-off copy
+`cmmns media fetch "<url>" --name "<stem>"`, which saves the file beside the bundle in the default save
+folder; store builds do not save YouTube video files.
+
+**The transcript** comes from the transcript data the page received, else the transcript panel the page
+drew. When neither is there, the page's own "Show transcript" control is pressed once, as a person
+would; source protection holds that off.
 
 ## Inside the file
 
