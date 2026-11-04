@@ -1,0 +1,175 @@
+{
+ "comment": "every file this change adds or edits, its source and sha256 (text hashed with LF line endings)",
+ "snapshot": "HarperZ9/workstation-tools@d82f57f",
+ "base": "24411d3db1d27f53ec1d81efd64aafb5bae04167",
+ "sourcesHashedOn": "2026-11-02",
+ "files": [
+  {
+   "path": "CHANGELOG.md",
+   "sha256": "e07797d329c600945115c5577d6d29880c019d0481462977c45e1144faf62bd4",
+   "source": "new in this change"
+  },
+  {
+   "path": "analysis/README.md",
+   "sha256": "f984ed3e24a1f381f4470fa7be546fdd31de9878691292a0a3a32d3dc953770f",
+   "source": "new in this change"
+  },
+  {
+   "path": "analysis/conftest.py",
+   "sha256": "9bd921f08b684b592c935eed7f6276ee516e98867464a8db59cbcdf678c6d000",
+   "source": "new in this change"
+  },
+  {
+   "path": "analysis/signalchain/README.md",
+   "sha256": "86863be1f2ac8cace750478ba7183a2bebbb6799cc5f22dd4cdf16841eb9cd74",
+   "source": "new in this change"
+  },
+  {
+   "path": "analysis/signalchain/signalchain/__init__.py",
+   "sha256": "2dfe665179f5377e2564e9eaa2dd669b13ed62679087677939de3607c3ec45ca",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/__init__.py",
+   "sourceSha256": "ad9cf18b3b47887e8cab37d9424b6fbe6dbbf8be5772e1db86c2de64050d4d96",
+   "identical": false
+  },
+  {
+   "path": "analysis/signalchain/signalchain/cases.py",
+   "sha256": "e468c2a857da418b511a2ac941d70e241bf60ed3c49147919c2bcb9051c276f0",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/cases.py",
+   "sourceSha256": "e468c2a857da418b511a2ac941d70e241bf60ed3c49147919c2bcb9051c276f0",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/changepoint.py",
+   "sha256": "1daedd7d8e99e840e64714893275340f758e9e822a64ce2ae19915bafef67f87",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/changepoint.py",
+   "sourceSha256": "1daedd7d8e99e840e64714893275340f758e9e822a64ce2ae19915bafef67f87",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/core.py",
+   "sha256": "e423b9eb0212bc7e904ac531630c90a765ac3d34dbb957894eca4b990c937653",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/core.py",
+   "sourceSha256": "e423b9eb0212bc7e904ac531630c90a765ac3d34dbb957894eca4b990c937653",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/entropy.py",
+   "sha256": "11bcdbd3c6bcf81b1b62785a61493ce992e53542a7d820d82c109a43597ae63e",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/entropy.py",
+   "sourceSha256": "11bcdbd3c6bcf81b1b62785a61493ce992e53542a7d820d82c109a43597ae63e",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/envelope.py",
+   "sha256": "1d005c4d1e1f276a1084ce48ff33138564645e41220b7e2b160565b1f020c7d3",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/envelope.py",
+   "sourceSha256": "1d005c4d1e1f276a1084ce48ff33138564645e41220b7e2b160565b1f020c7d3",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/gainloss.py",
+   "sha256": "fe56924998340a3650f2425a0121a6c16604d388faaec5b839aa098c01818d4f",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/gainloss.py",
+   "sourceSha256": "fe56924998340a3650f2425a0121a6c16604d388faaec5b839aa098c01818d4f",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/modes.py",
+   "sha256": "8be4b0bb5fee5dde4848dce537589e5edeab724a26fb9076b0486342db2e8516",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/modes.py",
+   "sourceSha256": "8be4b0bb5fee5dde4848dce537589e5edeab724a26fb9076b0486342db2e8516",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/ns_cases.py",
+   "sha256": "69d842e6ec4e9440b1434831d61e38ebeeeba1f799697ca36025dbafd2a15fcb",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/ns_cases.py",
+   "sourceSha256": "69d842e6ec4e9440b1434831d61e38ebeeeba1f799697ca36025dbafd2a15fcb",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/ns_cases_ts.py",
+   "sha256": "dd8df6b969c19a5d7c2ac48c964a1cd6caefd267b10ed1dc44991402dfae9dbf",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/ns_cases_ts.py",
+   "sourceSha256": "dd8df6b969c19a5d7c2ac48c964a1cd6caefd267b10ed1dc44991402dfae9dbf",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/recovery.py",
+   "sha256": "d7cd835daad1b3c620f1fb71fa3103353ba94f5bf5baaa22067d273bbb2a80f2",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/recovery.py",
+   "sourceSha256": "d7cd835daad1b3c620f1fb71fa3103353ba94f5bf5baaa22067d273bbb2a80f2",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/regime.py",
+   "sha256": "40affc743c9c3cc35b81847057d080654c63c1cc70eb14be4f9634c7d73eed23",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/regime.py",
+   "sourceSha256": "40affc743c9c3cc35b81847057d080654c63c1cc70eb14be4f9634c7d73eed23",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/resdecay.py",
+   "sha256": "b83315e08e6d6d0ebf2c538fb6a91d0c5a8ddcf7deb4ddb13ff30ecae6887ad8",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/resdecay.py",
+   "sourceSha256": "b83315e08e6d6d0ebf2c538fb6a91d0c5a8ddcf7deb4ddb13ff30ecae6887ad8",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/snr.py",
+   "sha256": "c547ef53e84d5bcb098531a25af46f602e73c3df7f8bae6e57290ff27f943345",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/snr.py",
+   "sourceSha256": "c547ef53e84d5bcb098531a25af46f602e73c3df7f8bae6e57290ff27f943345",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/spectrum.py",
+   "sha256": "f0fcd8394173a87401729c331fc91152a0d9e3cf642ed088c4b58888ad383e8c",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/spectrum.py",
+   "sourceSha256": "f0fcd8394173a87401729c331fc91152a0d9e3cf642ed088c4b58888ad383e8c",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/synth.py",
+   "sha256": "93bc63fec02cd12d8b4845e6ccd6da72b4c218a4bc2e0d8627206f42b0bdb49a",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/synth.py",
+   "sourceSha256": "93bc63fec02cd12d8b4845e6ccd6da72b4c218a4bc2e0d8627206f42b0bdb49a",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/timefreq.py",
+   "sha256": "f7500430694b2a276a3983180d6b993d4ff935e2f84b2020d40ee2933a6170a4",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/timefreq.py",
+   "sourceSha256": "f7500430694b2a276a3983180d6b993d4ff935e2f84b2020d40ee2933a6170a4",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/timescale.py",
+   "sha256": "4ffda64cde86d68d7361533a738286cdfe34e6ad8c3b303118917a509d5f4be6",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/timescale.py",
+   "sourceSha256": "4ffda64cde86d68d7361533a738286cdfe34e6ad8c3b303118917a509d5f4be6",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/signalchain/tvar.py",
+   "sha256": "f717625999d88e541865ce6c8dfd2df3454289b0f4871c47a30be0724f386a30",
+   "source": "private workspace, 2026-10-29-signal-chain/signalchain/tvar.py",
+   "sourceSha256": "f717625999d88e541865ce6c8dfd2df3454289b0f4871c47a30be0724f386a30",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/tests/test_nonstationary.py",
+   "sha256": "3116ca93585656e4db2b1501b8a106eb49368f2f63432dfe5061457156c547cc",
+   "source": "private workspace, 2026-10-29-signal-chain/tests/test_nonstationary.py",
+   "sourceSha256": "3116ca93585656e4db2b1501b8a106eb49368f2f63432dfe5061457156c547cc",
+   "identical": true
+  },
+  {
+   "path": "analysis/signalchain/tests/test_recovery.py",
+   "sha256": "67f36ae5f916b5991b2fbb3a69ff7542fad29ae06a3207183f98f102c3d27b2a",
+   "source": "private workspace, 2026-10-29-signal-chain/tests/test_recovery.py",
+   "sourceSha256": "ada9c5258d9d35c947ae86605340ba2d40018c27ada6d8d98b255ef70d4d8382",
+   "identical": false
+  }
+ ]
+}

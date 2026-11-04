@@ -20,6 +20,10 @@ were not published to a store.
 - `cmmns media fetch --full` without ffmpeg keeps the best video and the best audio as two files, both
   hashed, where it asked yt-dlp to merge them before. YouTube no longer offers a file that holds both. The
   bundle folder is named after the video's title, not the first words of its description.
+- **`analysis/signalchain`**: one measurement API for a signal and a transform (`measure(x, medium)`,
+  `through(x, y)`): spectrum, entropy, signal-to-noise, envelope, resonance, decay, gain and loss, plus
+  non-stationary measures. Each measure passed a 40-seed recovery gate against a seed-shuffled null, and
+  four false-success controls must fail it. numpy only.
 
 ### Added (Content Credentials)
 - **Validation report and badge** (`src/core/c2pa-report.js`, project-docs/C2PA-REPORT.md, schema
