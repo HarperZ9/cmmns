@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:radar:c2pa-report:v1",
+  "title": "CMMNS Content Credentials validation report",
+  "description": "One field per check on a file's C2PA manifest, from src/core/c2pa-report.js. Documented in project-docs/C2PA-REPORT.md. A file without credentials carries only the top fields, weaknesses (empty) and badge.",
+  "type": "object",
+  "required": ["schema", "spec", "checkedAt", "found", "format", "weaknesses", "badge"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "cmmns.c2pa-report/1" },
+    "spec": { "type": "string", "description": "The specification version the weakness list cites." },
+    "checkedAt": { "type": "string", "format": "date-time" },
+    "found": { "type": "boolean" },
+    "format": { "type": ["string", "null"], "enum": ["jpeg", "png", "webp", "bmff", "gif", null] },
+    "remote": { "type": ["string", "null"], "description": "Present when found is false: the address of credentials stored online, which CMMNS did not fetch." },
+    "broken": { "type": "string", "description": "Present when the credentials are there but unreadable." },
+    "manifests": { "type": "integer", "minimum": 1 },
+    "signature": { "$ref": "#/$defs/check" },
+    "assertions": { "$ref": "#/$defs/check" },
+    "signer": {
+      "type": ["object", "null"],
+      "required": ["subject", "issuer", "serial", "notBefore", "notAfter", "revocationPointers"],
+      "properties": {
+        "subject": { "$ref": "#/$defs/name" },
+        "issuer": { "$ref": "#/$defs/name" },
+        "serial": { "type": "string", "description": "Lower-case hex, leading zeros removed." },
+        "notBefore": { "type": ["string", "null"] },
+        "notAfter": { "type": ["string", "null"] },
+        "selfIssued": { "type": "boolean" },
+        "revocationPointers": {
+          "type": "object",
+          "properties": { "ocsp": { "type": "array", "items": { "type": "string" } }, "crl": { "type": "array", "items": { "type": "string" } } }
+        }
+      }
+    },
+    "chain": {
+      "type": "object",
+      "required": ["trusted", "at", "length", "text"],
+      "properties": {
+        "trusted": { "type": ["boolean", "null"], "description": "true: reaches a trust anchor the caller supplied. false: broken, out of date, or reaches none of them. null: not checked (no anchors, or an algorithm CMMNS cannot check)." },
+        "at": { "type": "string", "format": "date-time" },
+        "timeSource": { "type": "string" },
+        "length": { "type": "integer" },
+        "anchor": { "oneOf": [{ "$ref": "#/$defs/name" }, { "type": "null" }] },
+        "problems": { "type": "array", "items": { "type": "string" } },
+        "text": { "type": "string" }
+      }
+    },
+    "revocation": {
+      "type": "object",
+      "required": ["atSigning", "now"],
+      "properties": {
+        "atSigning": { "$ref": "#/$defs/revocation", "description": "From OCSP responses stapled in the manifest. status may also be not-stapled." },
+        "now": { "$ref": "#/$defs/revocation", "description": "From CRLs or OCSP responses the caller supplied. unknown when none was given or none could be relied on." }
+      }
+    },
+    "timestamp": {
+      "type": "object",
+      "properties": { "present": { "type": "boolean" }, "checked": { "const": false } }
+    },
+    "fields": {
+      "type": "object",
+      "required": ["aiOrigin", "actions", "assertions"],
+      "properties": {
+        "title": { "type": ["string", "null"] },
+        "claimGenerator": { "type": ["string", "null"] },
+        "claimVersion": { "type": "integer" },
+        "actions": {
+          "type": "array",
+          "items": { "type": "object", "properties": { "action": { "type": ["string", "null"] }, "digitalSourceType": { "type": ["string", "null"] }, "softwareAgent": { "type": ["string", "null"] } } }
+        },
+        "firstAction": { "type": ["string", "null"] },
+        "digitalSourceType": {
+          "type": ["object", "null"],
+          "properties": { "code": { "type": "string" }, "says": { "type": "string" }, "kind": { "type": "string" } }
+        },
+        "softwareAgent": { "type": ["string", "null"] },
+        "aiOrigin": { "enum": ["declared-ai", "earlier-ai", "declared-not-ai", "absent"] },
+        "aiDisclosureAssertion": { "type": "boolean" },
+        "assertions": { "type": "array", "items": { "type": "string" } },
+        "earlierManifests": { "type": "array" }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "properties": {
+        "hard": {
+          "type": "object",
+          "properties": {
+            "type": { "type": ["string", "null"] },
+            "valid": { "type": ["boolean", "null"] },
+            "text": { "type": "string" },
+            "exclusions": {
+              "type": "array",
+              "items": { "type": "object", "properties": { "start": { "type": "integer" }, "length": { "type": "integer" }, "onlyCredentials": { "type": "boolean" } } }
+            }
+          }
+        },
+        "soft": {
+          "type": "object",
+          "properties": { "present": { "type": "boolean" }, "algorithms": { "type": "array" }, "checked": { "const": false } }
+        }
+      }
+    },
+    "formatNote": { "type": ["string", "null"] },
+    "weaknesses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "detail", "spec", "source"],
+        "properties": {
+          "id": { "enum": ["revocation-optional", "revoked-after-signing", "no-revocation-pointer", "timestamp-unbound", "expiry-unverifiable", "ai-origin-optional", "exclusion-range", "soft-binding-not-cryptographic", "validators-disagree"] },
+          "title": { "type": "string" },
+          "detail": { "type": "string" },
+          "spec": { "type": ["string", "null"] },
+          "source": { "type": "string" }
+        }
+      }
+    },
+    "badge": {
+      "type": "object",
+      "required": ["level", "text", "parts"],
+      "properties": {
+        "level": { "enum": ["info", "warn", "flag"] },
+        "text": { "type": "string" },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "text"],
+            "properties": {
+              "id": { "enum": ["none", "remote", "broken", "signature-fails", "assertions-changed", "signature-unchecked", "signer", "changed", "revoked", "untrusted", "ai-declared", "source-declared", "ai-absent", "unchecked"] },
+              "text": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "check": {
+      "type": "object",
+      "required": ["valid", "text"],
+      "properties": { "valid": { "type": ["boolean", "null"] }, "alg": { "type": ["string", "null"] }, "text": { "type": "string" } }
+    },
+    "name": {
+      "type": "object",
+      "properties": { "CN": { "type": "string" }, "O": { "type": "string" }, "OU": { "type": "string" }, "C": { "type": "string" }, "L": { "type": "string" }, "ST": { "type": "string" }, "email": { "type": "string" } }
+    },
+    "revocation": {
+      "type": "object",
+      "required": ["status", "method", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["good", "revoked", "unknown", "not-stapled"] },
+        "method": { "enum": ["crl", "ocsp", "ocsp-stapled", null] },
+        "checkedAt": { "type": "string", "format": "date-time" },
+        "authorityTime": { "type": ["string", "null"], "description": "When the issuer vouched: the CRL's thisUpdate or the OCSP response's producedAt." },
+        "nextUpdate": { "type": ["string", "null"] },
+        "revokedAt": { "type": ["string", "null"] },
+        "reason": { "type": ["string", "null"] },
+        "text": { "type": "string" }
+      }
+    }
+  }
+}

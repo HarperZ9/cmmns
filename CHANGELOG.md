@@ -25,6 +25,17 @@ were not published to a store.
   non-stationary measures. Each measure passed a 40-seed recovery gate against a seed-shuffled null, and
   four false-success controls must fail it. numpy only.
 
+### Added (Content Credentials)
+- **Validation report and badge** (`src/core/c2pa-report.js`, project-docs/C2PA-REPORT.md, schema
+  `schema/c2pa-report.v1.json`). A checked file now gets one field per check: signature, the chain
+  against trust anchors you supply, revocation at signing (stapled OCSP) and now (CRLs or OCSP
+  responses you supply, else "unknown"), the manifest fields present or absent with the AI-origin
+  and generator fields named, the hard and soft binding, and the C2PA 2.5 weaknesses that apply,
+  each with its clause. The window's first row is the badge: the strongest statement the checks
+  support, such as "certificate revoked since 2026-06-01" or "AI-origin field absent, which the spec
+  does not require". The API adds `credentialReport` (API 2.1.0). Nothing new is sent anywhere.
+  User page: docs/guide/CONTENT-CREDENTIALS.md.
+
 ### Fixed
 - **What a thread file claims** (project-docs/SIDECAR-FORMAT.md, "The thread file"; format
   `cmmns.capture-thread/2`). A thread with no comments no longer reads `complete: true`: it has its own
