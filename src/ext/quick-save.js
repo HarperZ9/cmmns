@@ -78,6 +78,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
         if (b && (b.bytes.length <= EMBED_MAX || must)) {
           const out = withWords(b.bytes, type.mime, c.meta, c.p);
           const written = await saveBytes(out, type.mime, name, { overwrite: c.overwrite, dest: c.dest });
+          if (c.collect) c.collect.push({ name: written, bytes: out });
           if (c.capture) await c.capture.add(written, b.bytes, out, type.mime);
           return { name: written, line: `Saved ${written}, ${size(out.length)}.` };
         }
@@ -109,8 +110,11 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   async function sidecars(meta0, fileNames, p, o = {}) {
     const list = [].concat(fileNames), stem = o.stem || PB.sidecarStem(list);
     const meta = globalThis.PBFullCapture && (p.mediaSidecar || meta0.study || p.mediaSidecarJson) ? PBFullCapture.withFile(await PBFullCapture.complete(meta0), stem) : meta0;
-    if (meta.threadCapture) await saveBytes(PBFullCapture.threadBytes(meta), "application/json", meta.threadFile, o);
-    const md = p.mediaSidecar || meta.study ? await saveBytes(new TextEncoder().encode(PB.sidecarMarkdown(meta, list)), "text/markdown", stem + ".md", o) : null;
+    // o.collect gathers each file's name and bytes, for a bundle's SHA256SUMS (yt-full.js).
+    const keep = (name, bytes) => { if (o.collect) o.collect.push({ name, bytes }); return name; };
+    if (meta.threadCapture) { const b = PBFullCapture.threadBytes(meta); keep(await saveBytes(b, "application/json", meta.threadFile, o), b); }
+    const mdBytes = new TextEncoder().encode(PB.sidecarMarkdown(meta, list));
+    const md = p.mediaSidecar || meta.study ? keep(await saveBytes(mdBytes, "text/markdown", stem + ".md", o), mdBytes) : null;
     if (p.mediaSidecarJson) await saveBytes(new TextEncoder().encode(PB.sidecarJson(meta, list)), "application/json", stem + ".json", o);
     return md;
   }
@@ -155,7 +159,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const ow = { overwrite: !!opts.library, dest };
     const progress = (line) => toast(line, { stay: 0 });
     // Every file this save wrote, under the names the browser gave them.
-    const side = (names) => (opts.oneSidecar ? null : sidecars(meta, names, p, { dest }));
+    const side = (names) => (opts.oneSidecar ? null : sidecars(meta, names, p, { dest, collect: opts.collect }));
     // Evidence capture: each file's hash before and after its words are written in (quick-capture.js).
     // A library passes its own collector (library.js), which keeps a file it could not hash.
     const capture = opts.capture ? PBQuickCapture.collector() : opts.collector || null;
@@ -166,7 +170,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const key = (opts.asGif ? "gif:" : "") + (plan.url || (plan.stream && plan.stream.url) || "");
     const before = !opts.again && !opts.study && !capture && (await savedAs([key, opts.asGif ? null : own(t.url)]));
     if (before) throw new Already(before);
-    if (plan.action === "url") { const r = await plainFile(t, plan, { name, meta, p, capture, overwrite: ow.overwrite, dest, progress: opts.quiet ? null : progress }); const sidecar = await side([r.name]); remember([key, own(t.url)], r.name); return { line: r.line, names: [r.name], meta, sidecar, files: capture && capture.files }; }
+    if (plan.action === "url") { const r = await plainFile(t, plan, { name, meta, p, capture, overwrite: ow.overwrite, dest, collect: opts.collect, progress: opts.quiet ? null : progress }); const sidecar = await side([r.name]); remember([key, own(t.url)], r.name); return { line: r.line, names: [r.name], meta, sidecar, files: capture && capture.files }; }
     let bytes, note = "", mime;
     if (plan.action === "bytes") { const b = await bytesOf(plan.url); bytes = b.bytes; mime = PB.chooseType({ bytes, contentType: b.type }).mime; }
     else if (plan.action === "canvas") { bytes = await canvasPng(t.el); mime = "image/png"; }

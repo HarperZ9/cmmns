@@ -38,6 +38,7 @@ globalThis.PBHoverBg = (() => {
     const [r] = await chrome.scripting.executeScript({ target, args: [args], func: (a) => {
       const at = a.at || undefined;
       if (a.action === "ytlink") return PBYouTube.copyLink();
+      if (a.action === "ytfull") return globalThis.PBYtFull ? PBYtFull.save() : null;
       if (/^text-/.test(a.action)) return PBQuickText.run(a.action.slice(5), { selection: a.selection });
       if (a.action === "ytcli") return globalThis.PBYtHandoff ? PBYtHandoff.run() : null;
       if (a.action === "copy" || a.action === "link" || a.action === "caption") return PBQuickCopy.copy(PBQuickResolve.resolve({ at }), { link: a.action === "link", caption: a.action === "caption" });

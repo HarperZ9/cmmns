@@ -4,7 +4,7 @@
 // of its own. Errors are swallowed so YouTube itself never breaks.
 (() => {
   "use strict";
-  const want = (url) => /\/youtubei\/v1\/(next|player|browse)\b/.test(String(url || ""));
+  const want = (url) => /\/youtubei\/v1\/(next|player|browse|get_transcript)\b/.test(String(url || ""));
   const post = (json) => { try { if (json) window.postMessage({ source: "radar-yt", json }, location.origin); } catch (_) { /* ignore */ } };
 
   const origFetch = window.fetch;

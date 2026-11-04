@@ -83,7 +83,11 @@ globalThis.PBCaptureSites = globalThis.PBCaptureSites || (() => {
     }
     const count = txt(document.querySelector("ytd-comments-header-renderer #count, ytd-comments-header-renderer .count-text"));
     const stubs = stubsIn(document, "ytd-comment-replies-renderer #more-replies button, ytd-comment-replies-renderer button");
-    return { comments, expected: count ? (/([\d,.]+)/.exec(count) || [])[1] : null, stubs, own: true, source: "the rendered page", scroll: true };
+    // The comments the page received for this video (yt-full.js), its likes and reply counts among
+    // them, go first; the rendered reading of the same comment is read after them and wins where both say.
+    const data = globalThis.PBYtFull ? PBYtFull.pageComments(vid) : [];
+    return { comments: [...data, ...comments], expected: count ? (/([\d,.]+)/.exec(count) || [])[1] : null, stubs, own: true,
+      source: data.length ? "the rendered page and the page's own data" : "the rendered page", scroll: true };
   }
   // YouTube sends outside links through its /redirect page; the address it stands for is its q.
   function ytLink(u) { try { const p = new URL(u); return p.pathname === "/redirect" && p.searchParams.get("q") ? p.searchParams.get("q") : u; } catch { return u; } }

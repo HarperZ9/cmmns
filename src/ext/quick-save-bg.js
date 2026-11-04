@@ -180,7 +180,7 @@ globalThis.PBQuickBg = (() => {
   // After an install or update, pages that were already open keep the old scripts, which can no
   // longer reach the extension. The download parts are loaded into them again, so their buttons
   // and the hover control work at once and save into the right folder without a page reload.
-  const FRESH = ["core.bundle.js", "guard.js", "settings.js", ...PAGE, "yt-reference.js", "quick-inline.js", "quick-hover-ui.js", "quick-hover.js", "library-ui.js", "library.js", "likes.js", "likes-ui.js"];
+  const FRESH = ["core.bundle.js", "guard.js", "settings.js", ...PAGE, "yt-reference.js", "yt-full.js", "quick-inline.js", "quick-hover-ui.js", "quick-hover.js", "library-ui.js", "library.js", "likes.js", "likes-ui.js"];
   async function refreshOpenTabs() {
     const sites = (chrome.runtime.getManifest().content_scripts || []).filter((c) => c.js.includes("quick-inline.js")).flatMap((c) => c.matches);
     const tabs = await chrome.tabs.query({ url: sites }).catch(() => []);
