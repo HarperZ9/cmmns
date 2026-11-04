@@ -8477,7 +8477,10 @@ function readCertificate(der) {
   return out;
 }
 
-return { readCertificate };
+// The readers above, for the validation report's chain and revocation checks (src/core/c2pa-pki.js).
+const DER = Object.freeze({ tlv, kids, oid, name, time });
+
+return { readCertificate, DER };
 })();
 
 // ---- aimeta.js
@@ -8885,6 +8888,575 @@ function credentialState(r) {
 return { OLDER_FORMAT, readCredentials, credentialState };
 })();
 
+// ---- c2pa-pki.js
+const M_c2pa_pki = (() => {
+// X.509 for the Content Credentials validation report: the signed part of a certificate, its serial,
+// its raw names, the extensions that matter here, signature checks with WebCrypto, and the chain
+// from the signer to a trust anchor the caller supplies. CMMNS ships no trust list and makes no
+// network call, so with no anchors the chain is reported as unchecked, never as trusted.
+
+const { DER, readCertificate } = M_der;
+
+const { tlv, kids, oid } = DER;
+const subtle = () => (globalThis.crypto && globalThis.crypto.subtle) || null;
+const pkiHex = (b) => [...b].map((x) => x.toString(16).padStart(2, "0")).join("");
+const pkiSame = (a, b) => !!a && !!b && a.length === b.length && a.every((x, i) => x === b[i]);
+
+// Signature algorithm OIDs in certificates, CRLs and OCSP responses, as WebCrypto parameters.
+const SIG = {
+  "1.2.840.10045.4.3.2": ["ECDSA", "SHA-256"], "1.2.840.10045.4.3.3": ["ECDSA", "SHA-384"], "1.2.840.10045.4.3.4": ["ECDSA", "SHA-512"],
+  "1.2.840.113549.1.1.11": ["RSASSA-PKCS1-v1_5", "SHA-256"], "1.2.840.113549.1.1.12": ["RSASSA-PKCS1-v1_5", "SHA-384"], "1.2.840.113549.1.1.13": ["RSASSA-PKCS1-v1_5", "SHA-512"],
+  "1.3.101.112": ["Ed25519"],
+};
+const EXT = { basic: "2.5.29.19", eku: "2.5.29.37", crl: "2.5.29.31", aia: "1.3.6.1.5.5.7.1.1" };
+const EKU_OCSP = "1.3.6.1.5.5.7.3.9";
+
+const bitString = (b, n) => b.subarray(n.cs + 1, n.end);
+const algOf = (b, n) => oid(b, kids(b, n)[0]);
+
+// Every URI (GeneralName tag [6]) inside a node, for the CRL and OCSP addresses a certificate names.
+function uris(b, n, out = [], depth = 0) {
+  if (n.tag === 0x86) out.push(new TextDecoder().decode(b.subarray(n.cs, n.end)));
+  else if ((n.tag & 0x20) && depth < 8) for (const k of kids(b, n)) uris(b, k, out, depth + 1);
+  return out;
+}
+
+function extensions(b, node) {
+  const out = { ca: false, eku: [], crl: [], ocsp: [] };
+  if (!node) return out;
+  for (const e of kids(b, kids(b, node)[0])) {
+    const parts = kids(b, e), id = oid(b, parts[0]), val = parts[parts.length - 1];
+    const inner = tlv(b, val.cs);
+    if (id === EXT.basic) { const k = kids(b, inner); out.ca = !!(k[0] && k[0].tag === 0x01 && b[k[0].cs]); }
+    if (id === EXT.eku) out.eku = kids(b, inner).map((k) => oid(b, k));
+    if (id === EXT.crl) out.crl = uris(b, inner);
+    if (id === EXT.aia) for (const ad of kids(b, inner)) { const [m, loc] = kids(b, ad); if (oid(b, m) === "1.3.6.1.5.5.7.48.1") out.ocsp.push(...uris(b, loc)); }
+  }
+  return out;
+}
+
+// { der, tbs, sigAlg, sig, serial, issuerRaw, subjectRaw, keyBits, ext, info } from DER bytes.
+function parseCertificate(der) {
+  const b = der instanceof Uint8Array ? der : new Uint8Array(der);
+  const cert = tlv(b, 0), [tbsN, algN, sigN] = kids(b, cert);
+  let f = kids(b, tbsN);
+  if (f[0].tag === 0xa0) f = f.slice(1);
+  const [serialN, , issuerN, , subjectN, spkiN] = f;
+  const keyBits = bitString(b, kids(b, spkiN)[1]);
+  return {
+    der: b, tbs: b.subarray(tbsN.start, tbsN.end), sigAlg: algOf(b, algN), sig: bitString(b, sigN),
+    serial: pkiHex(b.subarray(serialN.cs, serialN.end)).replace(/^(00)+(?=.)/, ""),
+    issuerRaw: b.subarray(issuerN.start, issuerN.end), subjectRaw: b.subarray(subjectN.start, subjectN.end),
+    keyBits, ext: extensions(b, f.find((x) => x.tag === 0xa3)), info: readCertificate(b),
+  };
+}
+
+// An ECDSA signature in DER (SEQUENCE of r and s) as the fixed-width r||s WebCrypto expects.
+function ecdsaRaw(sig, curve) {
+  const size = { "P-256": 32, "P-384": 48, "P-521": 66 }[curve];
+  if (!size) return null;
+  const seq = tlv(sig, 0), out = new Uint8Array(size * 2);
+  kids(sig, seq).forEach((n, i) => {
+    let v = sig.subarray(n.cs, n.end);
+    while (v.length > size && v[0] === 0) v = v.subarray(1);
+    if (v.length > size) throw new Error("ecdsa: integer too long");
+    out.set(v, i * size + size - v.length);
+  });
+  return out;
+}
+
+// Whether signer's key made sig over data with the named algorithm: true, false, or null when
+// this browser or this module cannot check that algorithm.
+async function verifyWithCert(signer, sigAlg, sig, data) {
+  const alg = SIG[sigAlg], info = signer.info;
+  if (!alg || !subtle()) return null;
+  const [name, hash] = alg;
+  try {
+    const params = name === "ECDSA" ? { name, namedCurve: info.curve } : name === "Ed25519" ? { name } : { name, hash };
+    const key = await subtle().importKey("spki", info.spki, params, false, ["verify"]);
+    const raw = name === "ECDSA" ? ecdsaRaw(sig, info.curve) : sig;
+    if (!raw) return null;
+    return await subtle().verify(name === "ECDSA" ? { name, hash } : { name }, key, raw, data);
+  } catch (e) {
+    if (/ecdsa:|der:/.test(String(e && e.message))) return false;
+    return null;
+  }
+}
+
+const within = (c, at) => !!c.info.notBefore && !!c.info.notAfter && at >= new Date(c.info.notBefore) && at <= new Date(c.info.notAfter);
+const label = (c) => c.info.subject.CN || c.info.subject.O || "an unnamed certificate";
+// true, false, or null when the signature algorithm cannot be checked here.
+async function issuedBy(child, parent) {
+  if (!pkiSame(child.issuerRaw, parent.subjectRaw)) return false;
+  return verifyWithCert(parent, child.sigAlg, child.sig, child.tbs);
+}
+
+// Each certificate in the chain is signed by the next and valid at the time used. Links whose
+// signature algorithm CMMNS cannot check are listed apart, so they never read as broken.
+async function linkProblems(certs, at) {
+  const problems = [], unchecked = [];
+  for (const [i, c] of certs.entries()) {
+    if (!within(c, at)) problems.push(`${label(c)} is outside its validity dates at ${at.toISOString().slice(0, 10)}`);
+    const next = certs[i + 1];
+    if (!next) continue;
+    if (!next.ext.ca) problems.push(`${label(next)} is not marked as a certificate authority`);
+    const ok = await issuedBy(c, next);
+    if (ok === false) problems.push(`${label(c)} is not signed by ${label(next)}, the next certificate in the chain`);
+    if (ok === null) unchecked.push(`CMMNS cannot check the signature algorithm on ${label(c)}`);
+  }
+  return { problems, unchecked };
+}
+
+// The chain the signature carries, checked against anchors (DER) at time at.
+// { trusted: true | false | null, at, length, anchor, problems, text }.
+async function chainStatus(chainDer, { at, anchors = [] } = {}) {
+  const when = at instanceof Date ? at : new Date(at || Date.now());
+  let certs;
+  try { certs = chainDer.map(parseCertificate); } catch { return { trusted: false, at: when.toISOString(), length: chainDer.length, anchor: null, problems: ["a certificate in the chain cannot be read"], text: "a certificate in the chain cannot be read" }; }
+  const base = { at: when.toISOString(), length: certs.length, anchor: null };
+  const { problems, unchecked } = await linkProblems(certs, when);
+  if (problems.length) return { ...base, trusted: false, problems, text: problems[0] };
+  if (unchecked.length) return { ...base, trusted: null, problems: [], text: unchecked[0] };
+  if (!anchors.length) return { ...base, trusted: null, problems: [], text: "no trust list was loaded, so CMMNS did not check who issued the certificate" };
+  const top = certs[certs.length - 1];
+  for (const a of anchors.map(parseCertificate)) {
+    if (!within(a, when)) continue;
+    if (pkiSame(a.der, top.der) || (await issuedBy(top, a)) === true) return { ...base, anchor: a.info.subject, trusted: true, problems: [], text: `the chain reaches ${label(a)}, a trust anchor CMMNS was given` };
+  }
+  return { ...base, trusted: false, problems: ["the chain reaches no trust anchor CMMNS was given"], text: "the chain reaches no trust anchor CMMNS was given" };
+}
+
+return { pkiHex, pkiSame, EKU_OCSP, bitString, algOf, parseCertificate, verifyWithCert, chainStatus };
+})();
+
+// ---- c2pa-revocation.js
+const M_c2pa_revocation = (() => {
+// Certificate revocation for the Content Credentials validation report, offline. CMMNS reads
+// revocation evidence it is handed: OCSP responses stapled in the manifest (the status at signing,
+// C2PA 2.5 section 13.5.2), and CRLs or OCSP responses a caller fetched itself (the status now).
+// Every list must be signed by the certificate's issuer and be current at the time given; anything
+// less is "unknown", never "good". With nothing to read, the status now is "unknown".
+
+const { DER } = M_der;
+const { parseCertificate, verifyWithCert, bitString, algOf, pkiHex, pkiSame, EKU_OCSP } = M_c2pa_pki;
+
+const { tlv, kids, oid, time } = DER;
+const isTime = (n) => n && (n.tag === 0x17 || n.tag === 0x18);
+const intHex = (b, n) => pkiHex(b.subarray(n.cs, n.end)).replace(/^(00)+(?=.)/, "");
+const day = (iso) => (iso ? iso.slice(0, 10) : null);
+// RFC 5280 reason codes, for the report's words.
+const REASONS = ["unspecified", "keyCompromise", "cACompromise", "affiliationChanged", "superseded", "cessationOfOperation", "certificateHold", null, "removeFromCRL", "privilegeWithdrawn", "aACompromise"];
+const unknown = (method, text, extra = {}) => ({ status: "unknown", method, text, ...extra });
+
+function entryReason(b, extsN) {
+  if (!extsN) return null;
+  for (const e of kids(b, extsN)) {
+    const p = kids(b, e);
+    if (oid(b, p[0]) === "2.5.29.21") { const en = tlv(b, p[p.length - 1].cs); return REASONS[b[en.cs]] || "unspecified"; }
+  }
+  return null;
+}
+
+// { tbs, sigAlg, sig, issuerRaw, thisUpdate, nextUpdate, revoked: Map(serial -> { at, reason }) }.
+function parseCrl(der) {
+  const b = der instanceof Uint8Array ? der : new Uint8Array(der);
+  const [tbsN, algN, sigN] = kids(b, tlv(b, 0));
+  let f = kids(b, tbsN);
+  if (f[0].tag === 0x02) f = f.slice(1);
+  const [, issuerN, thisN, ...rest] = f;
+  const nextN = isTime(rest[0]) ? rest.shift() : null;
+  const listN = rest[0] && rest[0].tag === 0x30 ? rest[0] : null;
+  const revoked = new Map();
+  for (const r of listN ? kids(b, listN) : []) {
+    const [s, t, x] = kids(b, r);
+    revoked.set(intHex(b, s), { at: time(b, t), reason: entryReason(b, x) });
+  }
+  return { tbs: b.subarray(tbsN.start, tbsN.end), sigAlg: algOf(b, algN), sig: bitString(b, sigN), issuerRaw: b.subarray(issuerN.start, issuerN.end), thisUpdate: time(b, thisN), nextUpdate: nextN ? time(b, nextN) : null, revoked };
+}
+
+// The status of leaf at time now from one CRL, which issuer must have signed.
+async function crlStatus(leaf, issuer, der, now) {
+  let crl;
+  try { crl = parseCrl(der); } catch { return unknown("crl", "the CRL cannot be read"); }
+  const times = { authorityTime: crl.thisUpdate, nextUpdate: crl.nextUpdate };
+  if (!issuer) return unknown("crl", "the issuer's certificate is missing, so the CRL's signature cannot be checked", times);
+  if (!pkiSame(crl.issuerRaw, leaf.issuerRaw)) return unknown("crl", "the CRL is from another issuer", times);
+  if ((await verifyWithCert(issuer, crl.sigAlg, crl.sig, crl.tbs)) !== true) return unknown("crl", "the CRL is not signed by the certificate's issuer", times);
+  if (now < new Date(crl.thisUpdate)) return unknown("crl", `the CRL is dated ${day(crl.thisUpdate)}, after the time checked`, times);
+  if (crl.nextUpdate && now > new Date(crl.nextUpdate)) return unknown("crl", `the CRL expired on ${day(crl.nextUpdate)}; a newer one is needed`, times);
+  const hit = crl.revoked.get(leaf.serial);
+  if (hit && hit.reason !== "removeFromCRL") return { status: "revoked", method: "crl", revokedAt: hit.at, reason: hit.reason, text: `the issuer's CRL of ${day(crl.thisUpdate)} lists the certificate as revoked since ${day(hit.at)}`, ...times };
+  return { status: "good", method: "crl", text: `the issuer's CRL of ${day(crl.thisUpdate)} does not list the certificate`, ...times };
+}
+
+function singleResponse(b, n) {
+  const [certId, st, thisN, ...rest] = kids(b, n);
+  const [hashAlg, nameHash, keyHash, serial] = kids(b, certId);
+  const out = { hashAlg: algOf(b, hashAlg), nameHash: b.subarray(nameHash.cs, nameHash.end), keyHash: b.subarray(keyHash.cs, keyHash.end), serial: intHex(b, serial), thisUpdate: time(b, thisN), nextUpdate: null };
+  const nx = rest.find((x) => x.tag === 0xa0);
+  if (nx) out.nextUpdate = time(b, kids(b, nx)[0]);
+  if (st.tag === 0x80) out.status = "good";
+  else if (st.tag === 0xa1) {
+    const [rt, rr] = kids(b, st);
+    out.status = "revoked"; out.revokedAt = time(b, rt);
+    out.reason = rr ? REASONS[b[kids(b, rr)[0].cs]] || "unspecified" : null;
+  } else out.status = "unknown";
+  return out;
+}
+
+// { tbs, sigAlg, sig, responder: { name } | { keyHash }, producedAt, responses, certs } or null.
+function parseOcsp(der) {
+  const b = der instanceof Uint8Array ? der : new Uint8Array(der);
+  const [statusN, bytesN] = kids(b, tlv(b, 0));
+  if (b[statusN.cs] !== 0 || !bytesN) return null;
+  const [typeN, octN] = kids(b, kids(b, bytesN)[0]);
+  if (oid(b, typeN) !== "1.3.6.1.5.5.7.48.1.1") return null;
+  const basic = b.subarray(octN.cs, octN.end);
+  const [tbsN, algN, sigN, certsN] = kids(basic, tlv(basic, 0));
+  let f = kids(basic, tbsN);
+  if (f[0].tag === 0xa0) f = f.slice(1);
+  const [ridN, prodN, respN] = f, rid = kids(basic, ridN)[0];
+  return {
+    tbs: basic.subarray(tbsN.start, tbsN.end), sigAlg: algOf(basic, algN), sig: bitString(basic, sigN),
+    responder: ridN.tag === 0xa1 ? { name: basic.subarray(rid.start, rid.end) } : { keyHash: basic.subarray(rid.cs, rid.end) },
+    producedAt: time(basic, prodN), responses: kids(basic, respN).map((n) => singleResponse(basic, n)),
+    certs: certsN ? kids(basic, kids(basic, certsN)[0]).map((n) => basic.slice(n.start, n.end)) : [],
+  };
+}
+
+const HASHES = { "1.3.14.3.2.26": "SHA-1", "2.16.840.1.101.3.4.2.1": "SHA-256" };
+const digest = async (alg, bytes) => new Uint8Array(await globalThis.crypto.subtle.digest(alg, bytes));
+
+async function matches(r, leaf, issuer) {
+  const alg = HASHES[r.hashAlg];
+  if (!alg || r.serial !== leaf.serial) return false;
+  return pkiSame(r.nameHash, await digest(alg, leaf.issuerRaw)) && pkiSame(r.keyHash, await digest(alg, issuer.keyBits));
+}
+
+const names = async (who, c) => (who.name ? pkiSame(who.name, c.subjectRaw) : pkiSame(who.keyHash, await digest("SHA-1", c.keyBits)));
+
+// The certificate that signed the response: the issuer itself, or a responder the issuer
+// authorised for OCSP signing (RFC 6960 section 4.2.2.2).
+async function responder(o, issuer) {
+  if (await names(o.responder, issuer)) return issuer;
+  for (const der of o.certs) {
+    let c; try { c = parseCertificate(der); } catch { continue; }
+    if (!(await names(o.responder, c)) || !c.ext.eku.includes(EKU_OCSP) || !pkiSame(c.issuerRaw, issuer.subjectRaw)) continue;
+    if ((await verifyWithCert(issuer, c.sigAlg, c.sig, c.tbs)) === true) return c;
+  }
+  return null;
+}
+
+// The status of leaf from one OCSP response. now: the time it must be current at, or null to read
+// the response as of the moment it was produced (a stapled response records the status at signing).
+async function ocspStatus(leaf, issuer, der, now, method = "ocsp") {
+  let o;
+  try { o = parseOcsp(der); } catch { o = null; }
+  if (!o) return unknown(method, "the OCSP response cannot be read or reports an error");
+  if (!issuer) return unknown(method, "the issuer's certificate is missing, so the response's signature cannot be checked", { authorityTime: o.producedAt });
+  const signer = await responder(o, issuer);
+  if (!signer || (await verifyWithCert(signer, o.sigAlg, o.sig, o.tbs)) !== true) return unknown(method, "the OCSP response is not signed by the issuer or a responder it authorised", { authorityTime: o.producedAt });
+  let r = null;
+  for (const x of o.responses) if (await matches(x, leaf, issuer)) { r = x; break; }
+  const times = { authorityTime: o.producedAt, nextUpdate: r ? r.nextUpdate : null };
+  if (!r) return unknown(method, "the OCSP response is about another certificate", times);
+  if (now && (now < new Date(r.thisUpdate) || (r.nextUpdate && now > new Date(r.nextUpdate)))) return unknown(method, `the OCSP response is not current at ${now.toISOString().slice(0, 10)}`, times);
+  if (r.status === "revoked" && r.reason !== "removeFromCRL") return { status: "revoked", method, revokedAt: r.revokedAt, reason: r.reason, text: `the issuer's OCSP response of ${day(o.producedAt)} says revoked since ${day(r.revokedAt)}`, ...times };
+  if (r.status === "unknown") return unknown(method, "the OCSP responder does not know the certificate", times);
+  return { status: "good", method, text: `the issuer's OCSP response of ${day(o.producedAt)} says not revoked`, ...times };
+}
+
+// The status now from what the caller supplied: { crls: [DER], ocsp: [DER] }. A verified
+// "revoked" from any source wins over a "good" from another.
+async function revocationNow(leaf, issuer, { crls = [], ocsp = [] } = {}, now = new Date()) {
+  const checkedAt = now.toISOString();
+  if (!crls.length && !ocsp.length) return { status: "unknown", method: null, checkedAt, text: "not checked: CMMNS works offline and was given no CRL or OCSP response for this certificate" };
+  const results = [];
+  for (const d of ocsp) results.push(await ocspStatus(leaf, issuer, d, now));
+  for (const d of crls) results.push(await crlStatus(leaf, issuer, d, now));
+  const pick = results.find((x) => x.status === "revoked") || results.find((x) => x.status === "good");
+  if (pick) return { ...pick, checkedAt };
+  return { status: "unknown", method: results[0].method, checkedAt, text: results.map((x) => x.text).join("; ") };
+}
+
+// The status at signing from OCSP responses stapled in the manifest (rVals).
+async function revocationAtSigning(leaf, issuer, stapled = []) {
+  if (!stapled.length) return { status: "not-stapled", method: null, text: "the manifest carries no OCSP response from signing time" };
+  const results = [];
+  for (const d of stapled) results.push(await ocspStatus(leaf, issuer, d, null, "ocsp-stapled"));
+  return results.find((x) => x.status === "revoked") || results.find((x) => x.status === "good") || results[0];
+}
+
+return { parseCrl, crlStatus, parseOcsp, ocspStatus, revocationNow, revocationAtSigning };
+})();
+
+// ---- c2pa-weaknesses.js
+const M_c2pa_weaknesses = (() => {
+// Known weaknesses of the C2PA specification itself, each tied to the clause that allows it, and the
+// test of whether it applies to one file's validation report. Sections cite C2PA 2.5 (October 2026);
+// the same text is in 2.3 (January 2026). Sources: Golaszewski et al. 2026, "Verifying Provenance of
+// Digital Media: Why the C2PA Specifications Fall Short", arXiv:2604.24890 (versions 2.2 to 2.4), and
+// Nemecek et al. 2026, "Authenticated Contradictions from Desynchronized Provenance and
+// Watermarking", arXiv:2603.02378.
+
+const GOLASZEWSKI = "arXiv:2604.24890";
+const NEMECEK = "arXiv:2603.02378";
+
+const C2PA_WEAKNESSES = Object.freeze([
+  {
+    id: "revocation-optional", spec: "C2PA 2.5 sections 13.3.5 and 14.9.2", source: GOLASZEWSKI,
+    title: "Revocation checking is optional",
+    detail: "A validator may skip the online revocation check and still call the manifest valid; skipping only adds an informational code. Other tools can show this file as valid without ever asking whether its certificate was revoked.",
+    applies: (r) => r.signature.valid === true,
+  },
+  {
+    id: "revoked-after-signing", spec: "C2PA 2.5 sections 14.9.1 and 14.9.2", source: GOLASZEWSKI,
+    title: "A later revocation does not undo earlier signatures",
+    detail: "The spec judges revocation at the time of signing. A file time-stamped before the revocation date still counts as not revoked, including one signed between a key's compromise and its revocation. A validator that finds an OCSP response stapled at signing time, with a time stamp, may accept it and never ask again (section 14.9.1).",
+    applies: (r) => r.revocation.now.status === "revoked",
+  },
+  {
+    id: "no-revocation-pointer", spec: "C2PA 2.5 section 14.9", source: GOLASZEWSKI,
+    title: "No way to ask whether the certificate was revoked",
+    detail: "The certificate names no OCSP or CRL address, and the spec tells validators to treat such a certificate as not revoked.",
+    applies: (r) => !!r.signer && !r.signer.revocationPointers.ocsp.length && !r.signer.revocationPointers.crl.length,
+  },
+  {
+    id: "timestamp-unbound", spec: "C2PA 2.5 sections 10.3.2.5.4 and 14.8.2", source: GOLASZEWSKI,
+    title: "The time stamp sits outside the signed data",
+    detail: "The time stamp is stored in an unprotected header, so it can be removed or replaced without breaking the signature, and a failed time stamp is ignored rather than rejected. The spec also leaves the time-stamp authority's own revocation unchecked. CMMNS does not check time-stamp tokens.",
+    applies: (r) => r.timestamp.present,
+  },
+  {
+    id: "expiry-unverifiable", spec: "C2PA 2.5 section 14.8.2", source: GOLASZEWSKI,
+    title: "Without a time stamp, the file stops validating when its certificate expires",
+    detail: "With no trusted time stamp, validators check the certificate against the current time, so once it expires the same unchanged file fails validation.",
+    applies: (r) => r.signature.valid === true && !r.timestamp.present,
+  },
+  {
+    id: "ai-origin-optional", spec: "C2PA 2.5 sections 16.4.1.2 and 14.10.1.2", source: NEMECEK,
+    title: "The AI-origin field is not required",
+    detail: "A digital source type is required only with a c2pa.created action, never with c2pa.opened, and no validator step checks for it. A manifest that leaves out the AI-origin field passes validation, whatever made the pixels.",
+    applies: (r) => r.signature.valid === true && r.fields.aiOrigin === "absent",
+  },
+  {
+    id: "exclusion-range", spec: "C2PA 2.5 section 16.3.1.1", source: GOLASZEWSKI,
+    title: "Some bytes of the file are not covered by the hash",
+    detail: "The data hash excludes byte ranges beyond the credentials themselves. The spec allows those ranges to hold metadata such as EXIF or IPTC, which can then change without breaking the binding.",
+    applies: (r) => (r.binding.hard.exclusions || []).some((e) => !e.onlyCredentials),
+  },
+  {
+    id: "soft-binding-not-cryptographic", spec: "C2PA 2.5 section 2.3.14", source: GOLASZEWSKI,
+    title: "A soft binding is a fingerprint or watermark, not a hash",
+    detail: "Soft bindings are not statistically unique and can match other content. CMMNS does not check them.",
+    applies: (r) => r.binding.soft.present,
+  },
+  {
+    id: "validators-disagree", spec: null, source: GOLASZEWSKI,
+    title: "Conforming validators can disagree",
+    detail: "Certification rests largely on self-reported compliance, and the same file has been shown valid by one conforming tool and invalid by another.",
+    applies: (r) => r.signature.valid === true,
+  },
+]);
+
+// The weaknesses that apply to report r, without their tests, ready for JSON.
+function applicableWeaknesses(r) {
+  return C2PA_WEAKNESSES.filter((w) => w.applies(r)).map(({ id, title, detail, spec, source }) => ({ id, title, detail, spec, source }));
+}
+
+return { C2PA_WEAKNESSES, applicableWeaknesses };
+})();
+
+// ---- c2pa-badge.js
+const M_c2pa_badge = (() => {
+// One line for a file's Content Credentials: the strongest statement the validation report supports,
+// and nothing stronger. A name on a certificate is only "signed by" when the chain reaches a trust
+// anchor the caller supplied; otherwise it is the certificate's own claim. Revocation that was not
+// checked is said to be unchecked, never "not revoked". An absent AI-origin field is named as absent.
+
+const quote = (s) => `"${s}"`;
+const signerName = (r) => (r.signer && (r.signer.subject.CN || r.signer.subject.O)) || "an unnamed signer";
+
+function identity(r) {
+  const who = signerName(r);
+  if (r.chain.trusted === true) return { id: "signer", text: `signed by ${who}` };
+  return { id: "signer", text: `valid signature from a certificate naming ${quote(who)}` };
+}
+
+function origin(r) {
+  const f = r.fields;
+  if (f.aiOrigin === "declared-ai") return { id: "ai-declared", text: `says it was made with generative AI${f.softwareAgent ? ` (${f.softwareAgent})` : ""}` };
+  if (f.aiOrigin === "earlier-ai") return { id: "ai-declared", text: "says an earlier version was made with generative AI" };
+  if (f.aiOrigin === "declared-not-ai") return { id: "source-declared", text: `declares its source: ${f.digitalSourceType.says} (${f.digitalSourceType.code})` };
+  return { id: "ai-absent", text: "AI-origin field absent, which the spec does not require" };
+}
+
+function unchecked(r) {
+  const open = [];
+  if (r.chain.trusted === null) open.push("trust list");
+  if (r.revocation.now.status === "unknown") open.push("revocation");
+  if (r.binding.hard.valid === null) open.push("file bytes");
+  if (r.formatNote) open.push("older manifest format");
+  return open.length ? { id: "unchecked", text: `not checked: ${open.join(", ")}` } : null;
+}
+
+function early(r) {
+  if (!r.found) return r.remote ? { level: "info", parts: [{ id: "remote", text: "credentials stored online; CMMNS did not fetch them" }] } : { level: "info", parts: [{ id: "none", text: "no Content Credentials found" }] };
+  if (r.broken) return { level: "flag", parts: [{ id: "broken", text: `Content Credentials found but unreadable: ${r.broken}` }] };
+  if (r.signature.valid === false) return { level: "flag", parts: [{ id: "signature-fails", text: "the signature does not match the claim: the credentials changed after signing, or another key signed them" }] };
+  if (r.assertions.valid === false) return { level: "flag", parts: [{ id: "assertions-changed", text: `the claim is signed, but ${r.assertions.text}` }] };
+  if (r.signature.valid === null) return { level: "info", parts: [{ id: "signature-unchecked", text: `signature not checked: ${r.signature.text}` }] };
+  return null;
+}
+
+// { level: "info" | "warn" | "flag", text, parts: [{ id, text }] } for report r.
+function c2paBadge(r) {
+  const stop = early(r);
+  if (stop) return { ...stop, text: stop.parts.map((p) => p.text).join("; ") };
+  const parts = [identity(r)];
+  let level = "info";
+  if (r.binding.hard.valid === false) { parts.push({ id: "changed", text: "the file changed after signing" }); level = "flag"; }
+  const now = r.revocation.now;
+  if (now.status === "revoked") { parts.push({ id: "revoked", text: `certificate revoked since ${(now.revokedAt || "").slice(0, 10)}` }); level = "flag"; }
+  if (r.chain.trusted === false) { parts.push({ id: "untrusted", text: `the certificate does not chain to a trusted issuer (${r.chain.text})` }); if (level === "info") level = "warn"; }
+  const o = origin(r);
+  parts.push(o);
+  if (o.id === "ai-declared" && level === "info") level = "warn";
+  const u = unchecked(r);
+  if (u) parts.push(u);
+  return { level, text: parts.map((p) => p.text).join("; "), parts };
+}
+
+return { c2paBadge };
+})();
+
+// ---- c2pa-report.js
+const M_c2pa_report = (() => {
+// The Content Credentials validation report: each check CMMNS can make on a file's C2PA manifest,
+// in its own field, so a valid signature is never read as more than it is. Fields: the signature,
+// the certificate chain against trust anchors the caller supplies, revocation at signing (stapled
+// OCSP) and now (CRLs or OCSP responses the caller supplies, else "unknown"), the manifest fields
+// present or absent, the binding to the file, and the spec-level weaknesses that apply.
+// The JSON shape is documented in project-docs/C2PA-REPORT.md and schema/c2pa-report.v1.json.
+
+const { cborDecode } = M_cbor;
+const { findManifestStore, parseStore, childByLabel } = M_jumbf;
+const { readCredentials } = M_c2pa;
+const { parseCertificate, chainStatus } = M_c2pa_pki;
+const { revocationNow, revocationAtSigning } = M_c2pa_revocation;
+const { applicableWeaknesses } = M_c2pa_weaknesses;
+const { c2paBadge } = M_c2pa_badge;
+
+const C2PA_REPORT_SCHEMA = "cmmns.c2pa-report/1";
+const base = (label) => String(label || "").replace(/__\d+$/, "");
+const first = (box) => (box && box.content && box.content[0]) || null;
+const decode = (box) => { const c = first(box); if (!c) return null; try { return c.type === "json" ? JSON.parse(new TextDecoder().decode(c.data)) : cborDecode(c.data); } catch { return null; } };
+const bytesList = (v) => (Array.isArray(v) ? v : v ? [v] : []).filter((x) => x instanceof Uint8Array);
+
+// The raw pieces the reader does not keep: certificate chain, stapled OCSP, time stamp headers,
+// assertion labels, hash exclusions and soft bindings of the active manifest.
+function material(file) {
+  const found = findManifestStore(file), store = parseStore(found.store);
+  const m = store.manifests[store.manifests.length - 1];
+  const assertions = (childByLabel(m, "c2pa.assertions") || {}).content || [];
+  let prot = {}, unprot = {};
+  try {
+    const s = cborDecode(first(childByLabel(m, "c2pa.signature")).data), arr = s && s.tag === 18 ? s.value : s;
+    prot = arr[0] && arr[0].length ? cborDecode(arr[0]) : {}; unprot = arr[1] || {};
+  } catch { /* the reader reports an unreadable signature */ }
+  const labels = assertions.map((a) => a.label);
+  const hash = decode(assertions.find((a) => base(a.label) === "c2pa.hash.data")) || null;
+  const soft = assertions.filter((a) => /^c2pa\.soft-binding/.test(base(a.label))).map((a) => (decode(a) || {}).alg || null);
+  return {
+    chain: bytesList(prot["33"] || unprot["33"]), stapled: bytesList(unprot.rVals && unprot.rVals.ocspVals),
+    timestamp: !!(unprot.sigTst || unprot.sigTst2), labels, hash, hardLabel: labels.map(base).find((l) => /^c2pa\.hash\./.test(l)) || null,
+    soft, ranges: found.ranges || [],
+  };
+}
+
+function aiOrigin(r) {
+  const withSource = r.active.actions.find((a) => a.source);
+  if (r.active.ai) return "declared-ai";
+  if (r.aiAnywhere) return "earlier-ai";
+  return withSource ? "declared-not-ai" : "absent";
+}
+
+function fields(r, mat) {
+  const src = (r.active.actions.find((a) => a.source && a.source.kind === "ai") || r.active.actions.find((a) => a.source) || {});
+  return {
+    title: r.active.title || null, claimGenerator: r.active.generator || null, claimVersion: r.active.claimVersion,
+    actions: r.active.actions.map((a) => ({ action: a.action || null, digitalSourceType: a.source ? a.source.code : null, softwareAgent: a.agent || null })),
+    firstAction: (r.active.actions[0] || {}).action || null,
+    digitalSourceType: src.source ? { code: src.source.code, says: src.source.says, kind: src.source.kind } : null,
+    softwareAgent: src.agent || null, aiOrigin: aiOrigin(r),
+    aiDisclosureAssertion: mat.labels.some((l) => /^c2pa\.ai-disclosure/.test(base(l))),
+    assertions: mat.labels, earlierManifests: (r.earlier || []).map((e) => ({ title: e.title || null, generator: e.generator || null, ai: !!e.ai, signatureValid: e.signature ? e.signature.ok : null })),
+  };
+}
+
+function binding(r, mat) {
+  const inside = (e) => mat.ranges.some(([s, t]) => e.start >= s && e.start + e.length <= t);
+  const span = mat.ranges.length ? [mat.ranges[0][0], mat.ranges[mat.ranges.length - 1][1]] : null;
+  const exclusions = ((mat.hash && mat.hash.exclusions) || []).map((e) => ({ start: e.start, length: e.length, onlyCredentials: inside(e) || (!!span && e.start >= span[0] && e.start + e.length <= span[1]) }));
+  return {
+    hard: { type: mat.hardLabel, valid: r.checks.binding.ok, text: r.checks.binding.text, exclusions },
+    soft: { present: mat.soft.length > 0, algorithms: mat.soft.filter(Boolean), checked: false },
+  };
+}
+
+function signer(leaf) {
+  if (!leaf) return null;
+  const i = leaf.info;
+  return { subject: i.subject, issuer: i.issuer, serial: leaf.serial, notBefore: i.notBefore, notAfter: i.notAfter, selfIssued: i.selfIssued, revocationPointers: { ocsp: leaf.ext.ocsp, crl: leaf.ext.crl } };
+}
+
+// The issuer of leaf: the next certificate in the chain, or an anchor whose name matches.
+function issuerOf(certs, anchors) {
+  if (certs[1]) return certs[1];
+  for (const d of anchors) { try { const a = parseCertificate(d); if (certs[0] && a.subjectRaw.join() === certs[0].issuerRaw.join()) return a; } catch { /* skip an unreadable anchor */ } }
+  return null;
+}
+
+async function pki(mat, opts, now) {
+  let certs = [];
+  try { certs = mat.chain.map(parseCertificate); } catch { certs = []; }
+  const leaf = certs[0] || null, issuer = issuerOf(certs, opts.trustAnchors || []);
+  const chain = mat.chain.length ? await chainStatus(mat.chain, { at: now, anchors: opts.trustAnchors || [] }) : { trusted: null, at: now.toISOString(), length: 0, anchor: null, problems: [], text: "the signature carries no certificate" };
+  chain.timeSource = "validation time: CMMNS does not check time-stamp tokens, and without a trusted one the spec checks the certificate at the current time";
+  const revocation = leaf
+    ? { atSigning: await revocationAtSigning(leaf, issuer, mat.stapled), now: await revocationNow(leaf, issuer, { crls: opts.crls || [], ocsp: opts.ocsp || [] }, now) }
+    : { atSigning: { status: "not-stapled", method: null, text: "no certificate to check" }, now: { status: "unknown", method: null, checkedAt: now.toISOString(), text: "no certificate to check" } };
+  const s = revocation.atSigning;
+  if (!mat.timestamp && (s.status === "good" || s.status === "revoked")) s.text += "; the spec counts a stapled response only alongside a trusted time stamp, and this manifest has none";
+  return { leaf, chain, revocation };
+}
+
+const finish = (rep) => { rep.weaknesses = rep.found && !rep.broken ? applicableWeaknesses(rep) : []; rep.badge = c2paBadge(rep); return rep; };
+
+// bytes: the whole file. opts: { now, trustAnchors: [DER], crls: [DER], ocsp: [DER], complete }.
+// Resolves to plain JSON (no byte arrays), so it can be stored, sent or rendered as is.
+async function c2paReport(bytes, opts = {}) {
+  const file = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const now = opts.now ? new Date(opts.now) : new Date();
+  const r = await readCredentials(file, { complete: opts.complete !== false });
+  const rep = { schema: C2PA_REPORT_SCHEMA, spec: "C2PA 2.5", checkedAt: now.toISOString(), found: !!r.found, format: r.format || null };
+  if (!r.found) return finish({ ...rep, remote: r.remote || null });
+  if (r.broken) return finish({ ...rep, broken: r.broken });
+  const mat = material(file), { leaf, chain, revocation } = await pki(mat, opts, now);
+  return finish({
+    ...rep, manifests: r.manifests,
+    signature: { valid: r.checks.signature.ok, alg: r.active.alg || null, text: r.checks.signature.text },
+    assertions: { valid: r.checks.assertions.ok, text: r.checks.assertions.text },
+    signer: signer(leaf), chain, revocation,
+    timestamp: { present: mat.timestamp, checked: false },
+    fields: fields(r, mat), binding: binding(r, mat),
+    formatNote: r.checks.format ? r.checks.format.text : null,
+  });
+}
+
+return { C2PA_REPORT_SCHEMA, c2paReport };
+})();
+
 // ---- mediacheck.js
 const M_mediacheck = (() => {
 // Words for a media check: the rows the window shows for one file, and the signals it raises.
@@ -8914,6 +9486,7 @@ function credentialRows(r) {
   if (!r) return [];
   if (r.error) return [["Content Credentials", r.error]];
   const rows = [], state = credentialState(r);
+  if (r.report && r.report.found && r.report.badge) rows.push(["What CMMNS can say", r.report.badge.text]);
   if (state === "none") rows.push(["Content Credentials", NO_CREDENTIALS]);
   else if (state === "remote") rows.push(["Content Credentials", `the file points to credentials stored online at ${host(r.remote)}, which CMMNS leaves unfetched.`]);
   else if (r.broken) rows.push(["Content Credentials", `found, but ${r.broken}`]);
@@ -16848,6 +17421,7 @@ const M_api = (() => {
 //   analyzeThread({ site, root, replies })   evidence about a thread
 //   analyzeText(text)                        evidence about one piece of text
 //   checkMedia(bytes)                        Content Credentials and AI metadata of a file
+//   credentialReport(bytes, opts)            the C2PA validation report, one field per check
 //   siteInfo(domain)                         what CMMNS' tables hold about a site
 //   useData({ sites, owners, state, claims, claimParts })   load the tables (optional)
 //
@@ -16858,11 +17432,12 @@ const { postEvidence } = M_api_post;
 const { threadItems, flagsOf } = M_api_thread;
 const { siteEvidence, siteSummary, cleanDomain } = M_api_site;
 const { mediaReading } = M_api_media;
+const { c2paReport } = M_c2pa_report;
 const { useData, claimIndex, dataLoaded } = M_api_data;
 const { REPORT_DOES_NOT_PROVE } = M_report;
 const { THREAD_LIMIT, TEXT_LIMIT } = M_api_words;
 
-const API_VERSION = "2.0.0";
+const API_VERSION = "2.1.0";
 const EVIDENCE_SCHEMA = "urn:radar:evidence:v2";
 
 
@@ -16933,6 +17508,12 @@ async function checkMedia(bytes) {
   return envelope("media", { media: { state: M.state, ai: M.ai, format: M.format }, evidence: number(M.items), limits: ["CMMNS read this file on this device. Credentials and metadata describe how the file says it was made."] });
 }
 
+// bytes: the whole file. opts: { now, trustAnchors, crls, ocsp } (DER bytes; CMMNS fetches nothing).
+// Resolves to the validation report, schema cmmns.c2pa-report/1 (project-docs/C2PA-REPORT.md).
+async function credentialReport(bytes, opts = {}) {
+  return c2paReport(bytes, opts);
+}
+
 // domain: "example.com" or a URL. Returns the evidence envelope, or null for an empty domain.
 function siteInfo(domain) {
   const d = cleanDomain(domain);
@@ -16943,7 +17524,7 @@ function siteInfo(domain) {
   return envelope("site", { site: siteSummary(d), evidence: number(siteEvidence(d, [])), limits });
 }
 
-return { API_VERSION, EVIDENCE_SCHEMA, analyzeText, analyzeThread, checkMedia, siteInfo };
+return { API_VERSION, EVIDENCE_SCHEMA, analyzeText, analyzeThread, checkMedia, credentialReport, siteInfo };
 })();
 
 // ---- bundle-verify.js
@@ -17926,5 +18507,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_c2pa_pki, ...M_c2pa_revocation, ...M_c2pa_weaknesses, ...M_c2pa_badge, ...M_c2pa_report, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

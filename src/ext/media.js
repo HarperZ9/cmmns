@@ -68,6 +68,8 @@
     try {
       const { bytes, complete } = await readBytes(url);
       const result = await PB.readCredentials(bytes, { complete });
+      // The validation report (src/core/c2pa-report.js): offline, so revocation reads "not checked".
+      try { if (result.found) result.report = await PB.c2paReport(bytes, { complete }); } catch (e) { PBGuard.report("could not build the Content Credentials report", e); }
       checks.set(url, { state: "done", result });
       remember(url, result);
     } catch (e) {
