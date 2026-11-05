@@ -37,6 +37,16 @@ were not published to a store.
   User page: docs/guide/CONTENT-CREDENTIALS.md.
 
 ### Fixed
+- **Addresses without share tracking** (`src/core/url-clean.js`, project-docs/SIDECAR-FORMAT.md,
+  "Addresses without share tracking"). A sidecar's post and page addresses, its link list, its link
+  cards and the quoted or parent post's address lose share and campaign parameters: `utm_*` and click
+  ids on any host, and the short names only where a host uses them for tracking (YouTube `si`, X `s` and
+  `t`, Instagram `igsh`). These parameters can name the person who shared the link. A redd.it media
+  signature (`s=`), a YouTube time (`t=`), the media address and the post's own text stay as they were.
+  Video bundles store the watch address and SOURCE.txt line the same way.
+- **YouTube thumbnails saved off a watch page** keep their video. A thumbnail saved from the home
+  page, a channel or a search page recorded only `page: "https://www.youtube.com/"`; the sidecar now
+  takes `post` from the thumbnail's address (`i.ytimg.com/vi/<id>/`).
 - **What a thread file claims** (project-docs/SIDECAR-FORMAT.md, "The thread file"; format
   `cmmns.capture-thread/2`). A thread with no comments no longer reads `complete: true`: it has its own
   state, `"empty"`, and no longer tells you to open the post's page for comments that do not exist. X's

@@ -13610,6 +13610,77 @@ function expandPace(rnd = Math.random, n = 0) {
 return { CAPTURE_THREAD_FORMAT, CAPTURE_THREAD_FORMAT_V1, THREAD_CAP_DEFAULT, THREAD_CAP_MAX, THREAD_COUNT_NOTE, countOf, commentRecord, commentTree, countTree, expectedCountsFor, countedTowardExpected, completeness, captureThread, readCaptureThread, threadFileJson, threadSummary, completenessSentence, commentsMarkdown, expandPace };
 })();
 
+// ---- url-clean.js
+const M_url_clean = (() => {
+// Share and campaign parameters taken out of an address before a sidecar stores it
+// (project-docs/SIDECAR-FORMAT.md, "Addresses without share tracking"). A share link carries who
+// shared it or which campaign sent it: YouTube's si, X's s and t, Instagram's igsh. The address
+// still opens the same page without them.
+//
+// Host rules matter. On redd.it media, s= is the signature that makes the address work, and on
+// YouTube t= is the time in the video. So the short names are taken out only on the hosts whose
+// share links use them for tracking, and a media address (the file's own origin) is never touched.
+
+// Taken out on every host: campaign tags and click ids.
+const ANY_HOST = /^(utm_[a-z_]+|fbclid|gclid|gbraid|wbraid|dclid|msclkid|yclid|twclid|ttclid|mc_cid|mc_eid|_hsenc|_hsmi|igsh|igshid|ref_src|ref_url)$/i;
+
+// Taken out only on the named host and its subdomains.
+const BY_HOST = [
+  [["x.com", "twitter.com"], ["s", "t"]],
+  [["youtube.com", "youtu.be"], ["si", "pp", "feature"]],
+  [["music.youtube.com"], ["si"]],
+  [["open.spotify.com"], ["si"]],
+  [["instagram.com"], ["igsh", "igshid", "img_index_share"]],
+  [["reddit.com"], ["share_id", "rdt", "ref", "ref_source", "context_share"]],
+  [["tiktok.com"], ["_r", "_t", "is_from_webapp", "sender_device", "is_copy_url", "share_app_id"]],
+  [["linkedin.com"], ["trk", "trackingId", "lipi", "rcm"]],
+  [["facebook.com"], ["mibextid", "sfnsn"]],
+  [["threads.net", "threads.com"], ["xmt", "slof"]],
+];
+
+const onHost = (host, names) => names.some((h) => host === h || host.endsWith("." + h));
+
+// The parameter names a host's share links use for tracking, beyond ANY_HOST.
+function hostTrackers(host) {
+  const h = String(host || "").toLowerCase();
+  const out = new Set();
+  for (const [hosts, keys] of BY_HOST) if (onHost(h, hosts)) for (const k of keys) out.add(k);
+  return out;
+}
+
+// The address without share and campaign parameters. Anything that is not an http(s) address
+// comes back as given, as does an address with nothing to take out (byte for byte, so a stored
+// address changes only when a parameter was removed). The fragment stays.
+function stripTracking(url) {
+  if (url == null || url === "") return url;
+  const s = String(url);
+  let u;
+  try { u = new URL(s); } catch { return s; }
+  if (!/^https?:$/.test(u.protocol)) return s;
+  const host = hostTrackers(u.hostname);
+  const drop = [...u.searchParams.keys()].filter((k) => ANY_HOST.test(k) || host.has(k));
+  if (!drop.length) return s;
+  for (const k of new Set(drop)) u.searchParams.delete(k);
+  if (![...u.searchParams.keys()].length) u.search = "";
+  return u.toString();
+}
+
+// A YouTube thumbnail address names its video: i.ytimg.com/vi/<id>/hqdefault.jpg. A thumbnail
+// saved from a YouTube page that is not a watch page (the home page, a channel, search) has no post
+// address, so the sidecar takes the watch address from the thumbnail. Null for anything else.
+const YT_THUMB = /^\/(?:vi|vi_webp|an_webp)\/([\w-]{11})\//;
+function watchFromThumb(mediaUrl, pageUrl) {
+  let m, p;
+  try { m = new URL(String(mediaUrl || "")); p = new URL(String(pageUrl || "")); } catch { return null; }
+  if (!/^i\d?\.ytimg\.com$/.test(m.hostname)) return null;
+  if (!(p.hostname === "youtube.com" || p.hostname.endsWith(".youtube.com"))) return null;
+  const id = YT_THUMB.exec(m.pathname);
+  return id ? `https://www.youtube.com/watch?v=${id[1]}` : null;
+}
+
+return { hostTrackers, stripTracking, watchFromThumb };
+})();
+
 // ---- video-transcript.js
 const M_video_transcript = (() => {
 // A video's transcript in two forms: timestamped lines ("[00:01:23] words") and plain paragraphs.
@@ -13718,6 +13789,7 @@ const M_video_bundle = (() => {
 // The media file is a local research copy: CMMNS never uploads, shares or publishes it.
 
 const { clockOf } = M_video_transcript;
+const { stripTracking } = M_url_clean;
 
 const VIDEO_FORMAT = "cmmns.video/1";
 const MEDIA_COPY_NOTE = "The media file is a local research copy kept on this computer. CMMNS does not upload, share or publish it.";
@@ -13794,7 +13866,7 @@ function ytDlpComments(info) {
 // segments, media, source, tool, savedAt, info (src/core/ytdata.js ytVideoInfo) }.
 function videoRecord(m = {}) {
   return {
-    format: VIDEO_FORMAT, site: m.site || "youtube", id: m.id || null, url: m.url || null, title: m.title || null,
+    format: VIDEO_FORMAT, site: m.site || "youtube", id: m.id || null, url: stripTracking(m.url) || null, title: m.title || null,
     channel: m.channel || null, channelUrl: m.channelUrl || null, handle: m.handle || null, published: m.published || null,
     duration: num(m.duration), views: num(m.views), likes: num(m.likes), commentsCounted: num(m.comments),
     description: m.description || null, tags: (m.tags || []).slice(0, 100),
@@ -13810,7 +13882,7 @@ const chapterLines = (chapters) => (chapters || []).map((c) => `${clockOf(c.star
 
 // SOURCE.txt: where the bundle came from, how it was read, and what it holds.
 function sourceText({ url, title = null, channel = null, savedAt = new Date().toISOString(), how, files = [], media = null } = {}) {
-  const lines = [`Source: ${url}${title || channel ? ` (${[channel, title].filter(Boolean).join(", ")})` : ""}`, `Saved: ${savedAt}`, `How: ${how}`,
+  const lines = [`Source: ${stripTracking(url)}${title || channel ? ` (${[channel, title].filter(Boolean).join(", ")})` : ""}`, `Saved: ${savedAt}`, `How: ${how}`,
     `Media file: ${media ? `${media}. ${MEDIA_COPY_NOTE}` : "not saved (the user's choice for this save, or none was available)"}`, "Files:", ...files.map((f) => `- ${f}`)];
   return lines.join("\n") + "\n";
 }
@@ -13938,6 +14010,7 @@ const M_media_meta = (() => {
 // Built only from what the page already shows; nothing here makes a request.
 
 const { threadSummary, commentsMarkdown, completenessSentence } = M_capture_thread;
+const { stripTracking, watchFromThumb } = M_url_clean;
 
 // UTC ISO time from a date, a number or text such as Reddit's "2026-10-20T21:04:00.000000+0000".
 const iso = (t) => {
@@ -13964,22 +14037,25 @@ function textTags(text) {
 function postMeta(m = {}, now = new Date().toISOString()) {
   const text = clean(m.text);
   const tags = textTags([text, ...(m.thread || [])].join("\n"));
-  const sub = (p) => (p && (p.text || p.url) ? { text: clean(p.text), url: p.url || null, author: p.author || null } : null);
+  const sub = (p) => (p && (p.text || p.url) ? { text: clean(p.text), url: stripTracking(p.url) || null, author: p.author || null } : null);
   return {
     format: SIDECAR_FORMAT,
     site: m.site || null, title: m.title ? String(m.title) : null, text,
     author: { name: m.authorName || null, handle: m.handle ? String(m.handle).replace(/^@/, "") : null },
-    postUrl: m.postUrl || null, mediaUrl: m.mediaUrl || null, pageUrl: m.pageUrl || null,
+    // Share and campaign parameters come out of the addresses (url-clean.js); the text keeps the
+    // links as written, and the media address is the file's origin, so it stays as it was. A YouTube
+    // thumbnail saved off a watch page gets its video's watch address as the post.
+    postUrl: stripTracking(m.postUrl) || watchFromThumb(m.mediaUrl, m.pageUrl) || null, mediaUrl: m.mediaUrl || null, pageUrl: stripTracking(m.pageUrl) || null,
     postedAt: iso(m.postedAt), savedAt: iso(now) || now,
     alt: m.alt && !/^(image|video|gif|embedded video)$/i.test(String(m.alt).trim()) ? String(m.alt) : null,
-    hashtags: [...new Set([...tags.hashtags, ...(m.hashtags || [])])], links: [...new Set([...(m.links || []), ...tags.links])],
+    hashtags: [...new Set([...tags.hashtags, ...(m.hashtags || [])])], links: [...new Set([...(m.links || []), ...tags.links].map(stripTracking))],
     quoted: sub(m.quoted), parent: sub(m.parent), thread: (m.thread || []).map(clean).filter(Boolean),
     subreddit: m.subreddit || null, flair: m.flair ? String(m.flair).slice(0, 120) : null,
     item: m.total > 1 ? { index: (m.index || 0) + 1, total: m.total } : null,
     // "text" for a post or a selection saved on its own, as a note with no file; else "media"
     kind: m.kind === "text" ? "text" : "media", selection: !!m.selection,
     // link cards as the page showed them, and a poll's options and results
-    cards: (m.cards || []).filter((c) => c && c.url).map((c) => ({ url: String(c.url), title: c.title ? String(c.title).slice(0, 300) : null })).slice(0, 20),
+    cards: (m.cards || []).filter((c) => c && c.url).map((c) => ({ url: stripTracking(String(c.url)), title: c.title ? String(c.title).slice(0, 300) : null })).slice(0, 20),
     poll: m.poll && (m.poll.options || []).length ? { options: m.poll.options.map((o) => ({ label: String(o.label || "").slice(0, 200), result: o.result != null ? String(o.result) : null })),
       total: m.poll.total != null ? String(m.poll.total) : null, status: m.poll.status ? String(m.poll.status) : null } : null,
     // false when the page showed only the start of the text ("Show more") and no fuller copy was loaded
@@ -18507,5 +18583,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_c2pa_pki, ...M_c2pa_revocation, ...M_c2pa_weaknesses, ...M_c2pa_badge, ...M_c2pa_report, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_c2pa_pki, ...M_c2pa_revocation, ...M_c2pa_weaknesses, ...M_c2pa_badge, ...M_c2pa_report, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_url_clean, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();
