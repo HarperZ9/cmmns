@@ -6,6 +6,7 @@
 // The media file is a local research copy: CMMNS never uploads, shares or publishes it.
 
 import { clockOf } from "./video-transcript.js";
+import { stripTracking } from "./url-clean.js";
 
 export const VIDEO_FORMAT = "cmmns.video/1";
 export const MEDIA_COPY_NOTE = "The media file is a local research copy kept on this computer. CMMNS does not upload, share or publish it.";
@@ -82,7 +83,7 @@ export function ytDlpComments(info) {
 // segments, media, source, tool, savedAt, info (src/core/ytdata.js ytVideoInfo) }.
 export function videoRecord(m = {}) {
   return {
-    format: VIDEO_FORMAT, site: m.site || "youtube", id: m.id || null, url: m.url || null, title: m.title || null,
+    format: VIDEO_FORMAT, site: m.site || "youtube", id: m.id || null, url: stripTracking(m.url) || null, title: m.title || null,
     channel: m.channel || null, channelUrl: m.channelUrl || null, handle: m.handle || null, published: m.published || null,
     duration: num(m.duration), views: num(m.views), likes: num(m.likes), commentsCounted: num(m.comments),
     description: m.description || null, tags: (m.tags || []).slice(0, 100),
@@ -98,7 +99,7 @@ export const chapterLines = (chapters) => (chapters || []).map((c) => `${clockOf
 
 // SOURCE.txt: where the bundle came from, how it was read, and what it holds.
 export function sourceText({ url, title = null, channel = null, savedAt = new Date().toISOString(), how, files = [], media = null } = {}) {
-  const lines = [`Source: ${url}${title || channel ? ` (${[channel, title].filter(Boolean).join(", ")})` : ""}`, `Saved: ${savedAt}`, `How: ${how}`,
+  const lines = [`Source: ${stripTracking(url)}${title || channel ? ` (${[channel, title].filter(Boolean).join(", ")})` : ""}`, `Saved: ${savedAt}`, `How: ${how}`,
     `Media file: ${media ? `${media}. ${MEDIA_COPY_NOTE}` : "not saved (the user's choice for this save, or none was available)"}`, "Files:", ...files.map((f) => `- ${f}`)];
   return lines.join("\n") + "\n";
 }

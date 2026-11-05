@@ -4,6 +4,7 @@
 // Built only from what the page already shows; nothing here makes a request.
 
 import { threadSummary, commentsMarkdown, completenessSentence } from "./capture-thread.js";
+import { stripTracking, watchFromThumb } from "./url-clean.js";
 
 // UTC ISO time from a date, a number or text such as Reddit's "2026-10-20T21:04:00.000000+0000".
 const iso = (t) => {
@@ -30,22 +31,25 @@ export function textTags(text) {
 export function postMeta(m = {}, now = new Date().toISOString()) {
   const text = clean(m.text);
   const tags = textTags([text, ...(m.thread || [])].join("\n"));
-  const sub = (p) => (p && (p.text || p.url) ? { text: clean(p.text), url: p.url || null, author: p.author || null } : null);
+  const sub = (p) => (p && (p.text || p.url) ? { text: clean(p.text), url: stripTracking(p.url) || null, author: p.author || null } : null);
   return {
     format: SIDECAR_FORMAT,
     site: m.site || null, title: m.title ? String(m.title) : null, text,
     author: { name: m.authorName || null, handle: m.handle ? String(m.handle).replace(/^@/, "") : null },
-    postUrl: m.postUrl || null, mediaUrl: m.mediaUrl || null, pageUrl: m.pageUrl || null,
+    // Share and campaign parameters come out of the addresses (url-clean.js); the text keeps the
+    // links as written, and the media address is the file's origin, so it stays as it was. A YouTube
+    // thumbnail saved off a watch page gets its video's watch address as the post.
+    postUrl: stripTracking(m.postUrl) || watchFromThumb(m.mediaUrl, m.pageUrl) || null, mediaUrl: m.mediaUrl || null, pageUrl: stripTracking(m.pageUrl) || null,
     postedAt: iso(m.postedAt), savedAt: iso(now) || now,
     alt: m.alt && !/^(image|video|gif|embedded video)$/i.test(String(m.alt).trim()) ? String(m.alt) : null,
-    hashtags: [...new Set([...tags.hashtags, ...(m.hashtags || [])])], links: [...new Set([...(m.links || []), ...tags.links])],
+    hashtags: [...new Set([...tags.hashtags, ...(m.hashtags || [])])], links: [...new Set([...(m.links || []), ...tags.links].map(stripTracking))],
     quoted: sub(m.quoted), parent: sub(m.parent), thread: (m.thread || []).map(clean).filter(Boolean),
     subreddit: m.subreddit || null, flair: m.flair ? String(m.flair).slice(0, 120) : null,
     item: m.total > 1 ? { index: (m.index || 0) + 1, total: m.total } : null,
     // "text" for a post or a selection saved on its own, as a note with no file; else "media"
     kind: m.kind === "text" ? "text" : "media", selection: !!m.selection,
     // link cards as the page showed them, and a poll's options and results
-    cards: (m.cards || []).filter((c) => c && c.url).map((c) => ({ url: String(c.url), title: c.title ? String(c.title).slice(0, 300) : null })).slice(0, 20),
+    cards: (m.cards || []).filter((c) => c && c.url).map((c) => ({ url: stripTracking(String(c.url)), title: c.title ? String(c.title).slice(0, 300) : null })).slice(0, 20),
     poll: m.poll && (m.poll.options || []).length ? { options: m.poll.options.map((o) => ({ label: String(o.label || "").slice(0, 200), result: o.result != null ? String(o.result) : null })),
       total: m.poll.total != null ? String(m.poll.total) : null, status: m.poll.status ? String(m.poll.status) : null } : null,
     // false when the page showed only the start of the text ("Show more") and no fuller copy was loaded

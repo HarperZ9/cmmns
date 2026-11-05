@@ -204,6 +204,26 @@ file metadata. The `.md` sidecar stays on your disk unless you choose to send it
 copy keeps the description. `tests/clean.test.js` embeds a description in each of the five formats
 and checks that none of it survives cleaning.
 
+## Addresses without share tracking
+
+Before a sidecar stores an address, `stripTracking` in `src/core/url-clean.js` takes out share and
+campaign parameters, which can name the person who shared a link or the campaign that sent it. It
+applies to `post`, `page`, `links`, the link cards, and the quoted and parent post addresses, and to a
+video bundle's `url` and SOURCE.txt line.
+
+- On every host: `utm_*`, `fbclid`, `gclid`, `msclkid` and the other click ids, `igsh`, `ref_src`.
+- Only on the host whose share links use them: YouTube `si`, `pp` and `feature`; X `s` and `t`;
+  Instagram `igsh`; Reddit `share_id`; TikTok, LinkedIn, Facebook, Threads and Spotify share tags.
+- Never changed: the post's text (kept exactly as written, links included), the `media` address
+  (the file's origin; on redd.it its `s=` is the signature that makes it work), a YouTube `t=` time,
+  and any address with nothing to take out, which is stored byte for byte.
+
+A YouTube thumbnail saved from a page other than a watch page (the home page, a channel, search) has
+no post address of its own. Its `post` is the watch address named in the thumbnail's address,
+`https://i.ytimg.com/vi/<id>/...` giving `https://www.youtube.com/watch?v=<id>`.
+
+Notes saved before this change keep the addresses they were written with.
+
 ## What it never holds
 
 Only what the page showed: nothing is fetched to fill a sidecar, and nothing about the person saving
