@@ -1,0 +1,31 @@
+{
+ "schema": "flywheel.publish-metadata-baseline/1",
+ "patterns": "generic only (check_publish_metadata GENERIC)",
+ "total": 21,
+ "files": {
+  "project-docs/RENAME-CHECKLIST.md": {
+   "local-path": 4
+  },
+  "scripts/eval-reading.mjs": {
+   "local-path": 1
+  },
+  "tests/fixtures/c2pa/sd-params.png": {
+   "image-metadata": 2
+  },
+  "tests/fixtures/c2pa/xmp-ai.jpg": {
+   "image-metadata": 1
+  },
+  "tests/fixtures/clean/doc.pdf": {
+   "pdf-metadata": 3
+  },
+  "tests/fixtures/clean/letter.docx": {
+   "office-metadata": 2
+  },
+  "tests/fixtures/clean/photo.jpg": {
+   "image-metadata": 3
+  },
+  "tests/fixtures/clean/picture.png": {
+   "image-metadata": 5
+  }
+ }
+}
