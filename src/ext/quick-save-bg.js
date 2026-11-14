@@ -5,10 +5,11 @@
 // "Always ask where to save" is on. Protected media references are kept in the collections store.
 globalThis.PBQuickBg = (() => {
   "use strict";
-  const PAGE = ["quick-toast.js", "quick-resolve.js", "quick-instagram.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-saved.js", "quick-handoff.js", "quick-fetch.js", "quick-save.js", "quick-capture.js", "capture-sites.js", "full-capture.js", "quick-copy.js", "quick-text.js"];
+  const PAGE = ["quick-toast.js", "quick-resolve.js", "quick-instagram.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-saved.js", "quick-handoff.js", "quick-fetch.js", "quick-save.js", "quick-capture.js", "capture-sites.js", "full-capture.js", "quick-copy.js", "page-capture.js", "quick-text.js"];
   const ITEMS = [
     ["pb-dl", "Download", ["image", "video", "audio"]],
     ["pb-dl-here", "Download media here", ["page", "link", "frame"]],
+    ["pb-page", "Save page", ["page", "link", "frame", "selection"]],
     ["pb-capture", "Capture as evidence", ["image", "video", "audio", "page", "link", "frame"]],
     ["pb-study", "Study", ["image", "video", "audio", "page", "link", "frame", "selection"]],
     ["pb-note", "Save as note", ["page", "link", "frame", "selection"]],
@@ -37,11 +38,11 @@ globalThis.PBQuickBg = (() => {
     const id = info.menuItemId;
     if (!tab || !ITEMS.some(([x]) => x === id)) return;
     // Source-protection mode: no download from a host. The page is told why, never left silent.
-    if (!/copy-(link|caption)$|^pb-(note|card)$/.test(id) && !(id === "pb-study" && info.selectionText) && (await settings()).protection) { chrome.scripting.executeScript({ target: { tabId: tab.id }, args: [PROTECTED_SAVE], func: (t) => alert(t) }).catch(() => {}); return; }
+    if (!/copy-(link|caption)$|^pb-(note|card|page)$/.test(id) && !(id === "pb-study" && info.selectionText) && (await settings()).protection) { chrome.scripting.executeScript({ target: { tabId: tab.id }, args: [PROTECTED_SAVE], func: (t) => alert(t) }).catch(() => {}); return; }
     try {
       const target = await inject(tab.id, info.frameId);
       const args = { srcUrl: info.srcUrl || null, linkUrl: info.linkUrl || null, asGif: id === "pb-dl-gif", study: id === "pb-study", capture: id === "pb-capture", copy: id === "pb-copy", link: id === "pb-copy-link", caption: id === "pb-copy-caption",
-        selection: info.selectionText || null, text: id === "pb-note" ? "note" : id === "pb-card" ? "card" : null };
+        selection: info.selectionText || null, text: id === "pb-note" ? "note" : id === "pb-card" ? "card" : id === "pb-page" ? "page" : null };
       await chrome.scripting.executeScript({ target, args: [args], func: (a) => {
         // Text: a selection, a note or card of the post under the pointer, or a caption with no media.
         if (a.text) return PBQuickText.run(a.text, a).then(() => true);

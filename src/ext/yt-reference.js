@@ -18,14 +18,31 @@ globalThis.PBYouTube = globalThis.PBYouTube || (() => {
       const v = stack.pop();
       if (!v || typeof v !== "object") continue;
       const d = v.videoDetails;
-      if (d && d.videoId) { details.set(d.videoId, { title: d.title || null, author: d.author || null, description: d.shortDescription || null }); while (details.size > 20) details.delete(details.keys().next().value); }
+      if (d && d.videoId) {
+        const micro = (v.microformat && v.microformat.playerMicroformatRenderer) || {}, was = details.get(d.videoId) || {};
+        const tracks = v.captions ? PB.captionTracks(v.captions) : [];
+        details.delete(d.videoId);
+        details.set(d.videoId, { title: d.title || was.title || null, author: d.author || was.author || null, description: d.shortDescription || was.description || null,
+          published: micro.publishDate || micro.uploadDate || was.published || null, captions: tracks.length ? tracks : was.captions || [], captionsRead: !!v.captions || !!was.captionsRead });
+        while (details.size > 20) details.delete(details.keys().next().value);
+      }
       for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
     }
   }
   if (isYouTube) {
     window.addEventListener("message", (e) => { if (e.source === window && e.data && e.data.source === "radar-yt") { try { remember(e.data.json); } catch { /* the page's own data, read as it is */ } } });
-    window.postMessage({ source: "radar-yt-ask" }, location.origin);
+    // Asked at the start, and again each time YouTube swaps the video without a reload (its own
+    // navigation events, and the player loading new media), so the record is the current video's.
+    const ask = () => window.postMessage({ source: "radar-yt-ask" }, location.origin);
+    ask();
+    const on = (ev, fn, capture) => { if (document.addEventListener) document.addEventListener(ev, fn, capture); };
+    for (const ev of ["yt-navigate-finish", "yt-page-data-updated"]) on(ev, () => setTimeout(ask, 50), false);
+    on("loadeddata", ask, true);
   }
+
+  // The description as the page draws it ends with its own "more" control when it is cut short.
+  const MORE = /(?:\.\.\.|…)\s*more\s*$/i;
+  const MEDIA_FILE = "not saved (YouTube plays this video as a segmented stream, with no plain file address; this reference keeps the thumbnail, the description, the chapters and the caption list)";
 
   function videoId() {
     try { const u = new URL(location.href); return u.searchParams.get("v") || (/^\/(shorts|live)\/([\w-]{6,})/.exec(u.pathname) || [])[2] || null; } catch { return null; }
@@ -66,15 +83,20 @@ globalThis.PBYouTube = globalThis.PBYouTube || (() => {
     const handle = owner ? (/\/(@[\w.-]+)/.exec(owner.getAttribute("href") || "") || [])[1] || null : null;
     const known = id ? details.get(id) : null;
     const shown = txt(q("ytd-watch-metadata #description-inline-expander, #description-inline-expander, ytd-text-inline-expander #snippet"));
-    const desc = (known && known.description) || shown;
-    const date = (q('meta[itemprop="datePublished"], meta[itemprop="uploadDate"]') || {}).content || null;
+    const desc = (known && known.description) || (shown ? shown.replace(MORE, "…").trim() : shown);
+    // The page's date tags are written once, for the video the page first loaded: used only for that video.
+    const tagged = (q('meta[itemprop="identifier"], meta[itemprop="videoId"]') || {}).content || null;
+    const date = (known && known.published) || (tagged === id ? (q('meta[itemprop="datePublished"], meta[itemprop="uploadDate"]') || {}).content || null : null);
+    const tracks = (known && known.captions) || [];
     const notes = [];
     const ch = chapters(), tr = transcript();
     if (ch.length) notes.push({ label: "Chapters", text: ch.join("\n") });
     if (tr.length) notes.push({ label: "Transcript (as the page showed it)", text: tr.join("\n") });
+    if (tracks.length) notes.push({ label: "Caption tracks the page lists", text: PB.captionTrackLines(tracks).join("\n") });
+    else if (known && known.captionsRead === false) notes.push({ label: "Caption tracks the page lists", text: "The page's data lists no caption track for this video." });
     const title = txt(q("ytd-watch-metadata h1, h1.ytd-video-primary-info-renderer")) || document.title.replace(/ - YouTube$/, "");
     const meta = { site: "youtube", title: (known && known.title) || title, text: desc, authorName: (known && known.author) || (owner ? txt(owner) : null), handle: handle ? handle.slice(1) : null,
-      postUrl: linkAtTime(), postedAt: date, notes, textComplete: !!(known && known.description) || !/\.\.\.more$|…more$/.test(shown || "") };
+      postUrl: linkAtTime(), postedAt: date, notes, textComplete: !!(known && known.description) || !MORE.test(shown || ""), mediaFile: MEDIA_FILE };
     const thumb = id ? `https://i.ytimg.com/vi/${id}/maxresdefault.jpg` : null;
     return { kind: "image", url: thumb, alternatives: id ? [`https://i.ytimg.com/vi/${id}/hqdefault.jpg`] : [], meta, title };
   }

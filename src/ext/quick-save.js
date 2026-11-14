@@ -257,6 +257,8 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     const t = PBQuickResolve.resolve(info);
     // No picture or video here: a study keeps the text post (or selection) instead.
     if (!t && info.study && globalThis.PBQuickText) return PBQuickText.run("study", info);
+    // No media under the pointer: the text post there, or the page itself (quick-text.js, page-capture.js).
+    if (!t && !info.asGif && !info.capture && globalThis.PBQuickText) return PBQuickText.run("page", info);
     if (!t) { toast("No picture, GIF or video was found under the pointer.", { tone: "no" }); return Promise.resolve({ ok: false, line: "nothing found" }); }
     return start(t, { asGif: info.asGif, study: !!info.study, capture: !!info.capture });
   }
@@ -273,5 +275,5 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     } } });
   }
 
-  return Object.freeze({ start, run, fromMenu, keepReference, saveBytes, metaOf, postSidecar, saveText, noteAfterText });
+  return Object.freeze({ start, run, fromMenu, keepReference, saveBytes, metaOf, postSidecar, saveText, noteAfterText, prefs });
 })();

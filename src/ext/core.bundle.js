@@ -14002,6 +14002,147 @@ const igShortcode = (path) => (/\/(?:p|reel|reels|tv)\/([\w-]{5,40})(?:[/?#]|$)/
 return { igBest, igItem, igItemsIn, igCommentsIn, igPostMeta, igShortcode };
 })();
 
+// ---- page-capture.js
+const M_page_capture = (() => {
+// The generic save: what any page says about itself, for a page CMMNS has no site reader for.
+// The page side (src/ext/page-capture.js) hands over plain values it read from the page: the meta
+// tags, the JSON-LD blocks, the canonical link, the text of the selection or the main block, and
+// the media elements inside it. This file turns them into the raw record postMeta takes
+// (src/core/media-meta.js), with the adapter that produced it, and into the sidecar's lines.
+// Nothing here makes a request, and nothing here reads beyond what the page stated.
+
+// Site readers that write their own record. Every other save is "article" or "generic".
+const SITE_ADAPTERS = Object.freeze(["x", "reddit", "youtube", "instagram"]);
+const adapterOf = (site, adapter = null) => (adapter ? String(adapter).slice(0, 40) : SITE_ADAPTERS.includes(site) ? site : "generic");
+
+const ARTICLE_TYPES = /^(Article|NewsArticle|BlogPosting|ScholarlyArticle|Report|TechArticle|OpinionNewsArticle|ReportageNewsArticle|AnalysisNewsArticle|LiveBlogPosting|SocialMediaPosting)$/;
+const cut = (s, n) => (s == null || s === "" ? null : String(s).replace(/\s+/g, " ").trim().slice(0, n) || null);
+const list = (v) => (v == null ? [] : Array.isArray(v) ? v : [v]);
+const nameOf = (v) => (typeof v === "string" ? cut(v, 200) : v && typeof v === "object" ? cut(v.name || v.alternateName, 200) : null);
+
+// One JSON-LD node as the few fields a library indexes. Unknown fields are left in the page.
+function ldNode(n) {
+  const type = list(n["@type"]).map(String)[0] || null;
+  if (!type) return null;
+  const out = { type, name: cut(n.headline || n.name, 400), author: list(n.author).map(nameOf).filter(Boolean).slice(0, 20), published: cut(n.datePublished || n.uploadDate || n.dateCreated, 40),
+    modified: cut(n.dateModified, 40), publisher: nameOf(n.publisher), description: cut(n.description, 600), url: cut(n.url || (n.mainEntityOfPage && n.mainEntityOfPage["@id"]) || n["@id"], 600),
+    duration: cut(n.duration, 40), language: cut(n.inLanguage, 20) };
+  return Object.fromEntries(Object.entries(out).filter(([, v]) => v != null && !(Array.isArray(v) && !v.length)));
+}
+
+// Every node of the page's JSON-LD blocks (a block may hold one node, a list, or an @graph).
+function jsonLdNodes(blocks) {
+  const out = [];
+  const walk = (v, depth) => {
+    if (!v || typeof v !== "object" || depth > 4 || out.length >= 20) return;
+    if (Array.isArray(v)) { for (const x of v) walk(x, depth + 1); return; }
+    if (Array.isArray(v["@graph"])) walk(v["@graph"], depth + 1);
+    const n = ldNode(v);
+    if (n) out.push(n);
+  };
+  for (const b of blocks || []) { try { walk(typeof b === "string" ? JSON.parse(b) : b, 0); } catch { /* a block the page wrote wrongly is skipped */ } }
+  return out;
+}
+
+// The page's meta tags by family. metas: [{ key, content }] where key is the property, name or
+// itemprop as the page wrote it. citation_* tags may repeat (authors), so each is a list.
+function pageMetadata({ metas = [], jsonld = [], canonical = null, lang = null } = {}) {
+  const og = {}, twitter = {}, citation = {}, article = {}, other = {};
+  for (const m of (metas || []).slice(0, 400)) {
+    const key = String((m && m.key) || "").trim().toLowerCase(), content = cut(m && m.content, 1000);
+    if (!key || !content) continue;
+    if (key.startsWith("og:")) { if (!(key.slice(3) in og)) og[key.slice(3)] = content; }
+    else if (key.startsWith("twitter:")) { if (!(key.slice(8) in twitter)) twitter[key.slice(8)] = content; }
+    else if (key.startsWith("article:")) { if (!(key.slice(8) in article)) article[key.slice(8)] = content; }
+    else if (/^(citation_|dc\.|dcterms\.)/.test(key)) (citation[key] = citation[key] || []).push(content);
+    else if (/^(author|description|date|datepublished|keywords|publisher)$/.test(key) && !(key in other)) other[key] = content;
+  }
+  const keep = (o) => (Object.keys(o).length ? o : null);
+  return { canonical: cut(canonical, 1000), lang: /^[a-z]{2,3}(-[a-z0-9]{2,8})*$/i.test(String(lang || "")) ? String(lang) : null,
+    openGraph: keep(og), twitter: keep(twitter), article: keep(article), citation: keep(citation), meta: keep(other), jsonLd: jsonLdNodes(jsonld) };
+}
+
+// The title, author and date the page states, most specific source first: citation tags, then
+// JSON-LD for an article, then Open Graph and article tags, then the plain meta tags.
+function pagePicks(meta) {
+  const c = meta.citation || {}, og = meta.openGraph || {}, art = meta.article || {}, o = meta.meta || {}, first = (k) => (c[k] || [])[0] || null;
+  const ld = (meta.jsonLd || []).find((n) => ARTICLE_TYPES.test(n.type)) || (meta.jsonLd || []).find((n) => n.name && (n.published || (n.author || []).length)) || {};
+  const authors = (c.citation_author || []).length ? c.citation_author : (ld.author || []).length ? ld.author : [/^https?:/i.test(art.author || "") ? null : art.author, o.author, first("dc.creator")].filter(Boolean).slice(0, 1);
+  return { title: first("citation_title") || ld.name || og.title || first("dc.title") || null,
+    author: authors.length ? authors.slice(0, 8).join(", ") : null,
+    published: first("citation_publication_date") || first("citation_date") || first("citation_online_date") || ld.published || art.published_time || o.datepublished || o.date || first("dc.date") || null,
+    description: og.description || o.description || ld.description || null,
+    isArticle: !!((c.citation_title || []).length || ARTICLE_TYPES.test(ld.type || "") || /^article$/i.test(og.type || "")) };
+}
+
+// Why a media element's file was or was not saved, by what the page offered for it. A plain file
+// address (http or https, not a playlist) can be saved; a stream, a player's in-memory source or
+// protected media cannot be saved as a plain file, and the record says which.
+function mediaOffer(m = {}) {
+  const url = String(m.url || "");
+  if (m.protected) return { plain: false, reason: "the page plays it through Encrypted Media Extensions (DRM)" };
+  if (/\.(m3u8|mpd)(?:$|[?#])/i.test(url) || m.stream) return { plain: false, reason: "the page delivers it as a segmented stream, with no plain file address" };
+  if (/^blob:/i.test(url) || m.noUrl || (!url && m.kind !== "image")) return { plain: false, reason: "the page plays it from memory, with no plain file address" };
+  if (!/^https?:/i.test(url)) return { plain: false, reason: "the page gives no file address for it" };
+  return { plain: true, reason: null };
+}
+
+// The sidecar's media_file value for a save: "saved", or "not saved (reason)".
+function mediaFileLine(items) {
+  const xs = (items || []).filter(Boolean);
+  if (!xs.length) return null;
+  const saved = xs.filter((i) => i.file && !/^not saved/.test(i.file)).length;
+  if (saved === xs.length) return "saved";
+  const why = [...new Set(xs.filter((i) => /^not saved \(/.test(i.file || "")).map((i) => i.file.slice(11, -1)))];
+  return saved ? `${saved} of ${xs.length} saved; ${xs.length - saved} not saved (${why.join("; ") || "not asked for"})` : `not saved (${why.join("; ") || "not asked for"})`;
+}
+
+// The raw record for postMeta from what the page side read. s: { url, host, title, text, textFrom,
+// selection, metas, jsonld, canonical, lang, media: [{ kind, url, alt, width, height, file }], links }.
+function pageRaw(s = {}) {
+  const page = pageMetadata(s), pick = pagePicks(page);
+  const site = String(s.host || "").replace(/^www\./, "") || null;
+  const article = pick.isArticle || s.textFrom === "article";
+  return { site, kind: "text", adapter: article ? "article" : "generic", selection: !!s.selection,
+    title: pick.title || cut(s.title, 400), text: s.text || pick.description || null, textComplete: s.textCut ? false : true,
+    authorName: pick.author, postedAt: pick.published, pageUrl: s.url || null, links: (s.links || []).slice(0, 200),
+    items: (s.media || []).slice(0, 60), page: { ...page, textFrom: s.textFrom || null }, mediaFile: mediaFileLine(s.media) };
+}
+
+// The "Page metadata" lines of the .md sidecar: what the page said about itself, by family.
+function pageLines(page) {
+  if (!page) return [];
+  const rows = [["Canonical address", page.canonical], ["Language", page.lang], ["Text read from", page.textFrom ? `the page's ${page.textFrom}` : null]];
+  for (const [label, o] of [["Open Graph", page.openGraph], ["Article", page.article], ["Citation", page.citation], ["Meta", page.meta]]) {
+    for (const [k, v] of Object.entries(o || {}).slice(0, 30)) rows.push([`${label} ${k}`, Array.isArray(v) ? v.join("; ") : v]);
+  }
+  for (const n of page.jsonLd || []) rows.push([`JSON-LD ${n.type}`, [n.name, (n.author || []).join(", "), n.published, n.publisher, n.url].filter(Boolean).join(" | ") || null]);
+  const out = rows.filter(([, v]) => v).map(([k, v]) => `- ${k}: ${v}`);
+  return out.length ? ["## Page metadata", "", ...out, ""] : [];
+}
+
+// The caption tracks a YouTube player response lists (the page's own data): language, name and
+// whether YouTube made it by speech recognition. A list of what exists, never the captions' text.
+function captionTracks(json) {
+  const found = [], seen = new Set(), stack = [json];
+  for (let n = 0; stack.length && n < 50000; n++) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    if (Array.isArray(v.captionTracks)) for (const t of v.captionTracks) {
+      const lang = t && t.languageCode ? String(t.languageCode) : null, key = `${lang}|${t && t.kind}`;
+      if (!lang || seen.has(key)) continue;
+      seen.add(key);
+      found.push({ lang, name: cut((t.name && (t.name.simpleText || ((t.name.runs || [])[0] || {}).text)) || null, 80), auto: t.kind === "asr" });
+    }
+    for (const k in v) if (v[k] && typeof v[k] === "object") stack.push(v[k]);
+  }
+  return found;
+}
+const captionTrackLines = (tracks) => (tracks || []).map((t) => `${t.lang}${t.name ? ` (${t.name})` : ""}${t.auto ? ", made by speech recognition" : ""}`);
+
+return { SITE_ADAPTERS, adapterOf, jsonLdNodes, pageMetadata, pagePicks, mediaOffer, mediaFileLine, pageRaw, pageLines, captionTracks, captionTrackLines };
+})();
+
 // ---- media-meta.js
 const M_media_meta = (() => {
 // What a post said about the media it carried, kept beside the file: the post's text exactly as
@@ -14011,6 +14152,7 @@ const M_media_meta = (() => {
 
 const { threadSummary, commentsMarkdown, completenessSentence } = M_capture_thread;
 const { stripTracking, watchFromThumb } = M_url_clean;
+const { adapterOf, pageLines } = M_page_capture;
 
 // UTC ISO time from a date, a number or text such as Reddit's "2026-10-20T21:04:00.000000+0000".
 const iso = (t) => {
@@ -14041,6 +14183,13 @@ function postMeta(m = {}, now = new Date().toISOString()) {
   return {
     format: SIDECAR_FORMAT,
     site: m.site || null, title: m.title ? String(m.title) : null, text,
+    // Which reader made this record: a site's own ("x", "reddit", "youtube", "instagram"), or the
+    // generic one ("article", "generic") working from what the page says about itself.
+    adapter: adapterOf(m.site || null, m.adapter),
+    // "saved", or "not saved (reason)" where the page offered no plain file; null when not recorded.
+    mediaFile: m.mediaFile ? String(m.mediaFile).slice(0, 400) : null,
+    // The page's own metadata (Open Graph, JSON-LD, citation tags), from page-capture.js.
+    page: m.page && typeof m.page === "object" ? m.page : null,
     author: { name: m.authorName || null, handle: m.handle ? String(m.handle).replace(/^@/, "") : null },
     // Share and campaign parameters come out of the addresses (url-clean.js); the text keeps the
     // links as written, and the media address is the file's origin, so it stays as it was. A YouTube
@@ -14075,8 +14224,8 @@ function postMeta(m = {}, now = new Date().toISOString()) {
     analysis: (m.analysis || []).filter((a) => typeof a === "string" && /^[a-z][a-z0-9-]{1,40}$/.test(a)).slice(0, 20),
     // Every file of the post as the site listed it, at full size, each with its own alt text (a
     // carousel's items, a gallery's pictures), whether or not each was downloaded.
-    items: (m.items || []).filter((i) => i && i.url).slice(0, 60).map((i, n) => ({ index: Number(i.index) || n + 1, kind: i.kind === "video" ? "video" : i.kind === "gif" ? "gif" : "image",
-      url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null, width: Number(i.width) || null, height: Number(i.height) || null })),
+    items: (m.items || []).filter((i) => i && i.url).slice(0, 60).map((i, n) => ({ index: Number(i.index) || n + 1, kind: ["video", "gif", "audio", "file"].includes(i.kind) ? i.kind : "image",
+      url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null, width: Number(i.width) || null, height: Number(i.height) || null, ...(i.file ? { file: String(i.file).slice(0, 300) } : {}) })),
     edited: m.edited === true ? true : null, location: m.location ? String(m.location).slice(0, 200) : null,
     // The quoted post's own pictures and their alt text, as the site listed them (not downloaded).
     quotedMedia: (m.quotedMedia || []).filter((i) => i && i.url).slice(0, 10).map((i) => ({ kind: i.kind || "image", url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null })),
@@ -14125,14 +14274,15 @@ const quoteBlock = (t) => String(t).split("\n").map((l) => (l ? "> " + l : ">"))
 // The front matter that opens every .md sidecar: the fields a library indexes, one JSON value per
 // line (YAML reads them as they are), so a reader needs no Markdown parser.
 function frontMatter(meta, files) {
-  const rows = { format: SIDECAR_FORMAT, files, kind: meta.kind || "media", site: meta.site, handle: meta.author.handle, author: meta.author.name, posted: meta.postedAt, saved: meta.savedAt,
+  const rows = { format: SIDECAR_FORMAT, files, kind: meta.kind || "media", site: meta.site, adapter: meta.adapter || null, handle: meta.author.handle, author: meta.author.name, posted: meta.postedAt, saved: meta.savedAt,
     post: meta.postUrl, media: meta.mediaUrl, page: meta.postUrl ? null : meta.pageUrl, subreddit: meta.subreddit, hashtags: meta.hashtags,
     item: meta.item ? `${meta.item.index} of ${meta.item.total}` : null,
     flair: meta.flair || null, selection: meta.selection ? true : null,
     thread_complete: meta.thread && meta.thread.length && meta.threadComplete === true ? true : meta.threadComplete === "unknown" ? "unknown" : null,
     engagement: meta.engagement || null,
     text_complete: meta.textComplete === false ? false : null, from: meta.from || null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
-    edited: meta.edited || null, location: meta.location || null, ...threadRows(meta) };
+    edited: meta.edited || null, location: meta.location || null, media_file: meta.mediaFile || null,
+    canonical: (meta.page && meta.page.canonical) || null, lang: (meta.page && meta.page.lang) || null, ...threadRows(meta) };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
 }
 
@@ -14145,8 +14295,9 @@ function threadRows(meta) {
 // The post's files as the site listed them, each with its alt text, when there is more than one or any alt.
 function itemLines(m) {
   const list = m.items || [];
-  if (!list.length || (list.length === 1 && !list[0].alt)) return [];
-  return ["## Media", "", ...list.map((i) => `${i.index}. ${i.kind}${i.width && i.height ? ` ${i.width}x${i.height}` : ""}: ${i.url}${i.alt ? `\n   Alt text: ${i.alt}` : ""}`), ""];
+  if (!list.length || (list.length === 1 && !list[0].alt && !list[0].file)) return [];
+  return ["## Media", "", ...list.map((i) => `${i.index}. ${i.kind}${i.width && i.height ? ` ${i.width}x${i.height}` : ""}: ${i.url}${i.alt ? `\n   Alt text: ${i.alt}` : ""}${i.file ? `
+   File: ${i.file}` : ""}`), ""];
 }
 
 // The sidecar a person reads: front matter, then the post's text first. fileNames: one name, or
@@ -14156,7 +14307,7 @@ function sidecarMarkdown(meta, fileNames = null) {
   const m = files.length > 1 ? { ...meta, item: null } : meta;
   const who = [m.author.name, m.author.handle ? at(m.author.handle) : null].filter(Boolean).join(" ");
   const out = [...frontMatter(m, files), `# ${who || m.title || (m.kind === "text" ? "Saved text" : "Saved media")}${m.item ? ` (item ${m.item.index} of ${m.item.total})` : ""}`, ""];
-  if (m.title && (m.site === "reddit" || m.site === "youtube" || m.selection)) out.push(`**${m.title}**`, "");
+  if (m.title && (m.site === "reddit" || m.site === "youtube" || m.selection || (m.page && who))) out.push(`**${m.title}**`, "");
   if (m.text) out.push(quoteBlock(m.text), "");
   if (m.textComplete === false) out.push("The page showed only the start of this text, and no fuller copy was loaded.", "");
   if (m.studyNote) out.push(`What draws me to this: ${m.studyNote}`, "");
@@ -14174,10 +14325,11 @@ function sidecarMarkdown(meta, fileNames = null) {
     if (p === m.quoted) for (const q of m.quotedMedia || []) out.push(`- Quoted ${q.kind}: ${q.url}${q.alt ? ` (Alt text: ${q.alt})` : ""}`);
     if (p === m.quoted && (m.quotedMedia || []).length) out.push("");
   }
-  out.push(...commentsMarkdown(m.threadCapture));
+  out.push(...pageLines(m.page), ...commentsMarkdown(m.threadCapture));
   const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
     ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Flair", m.flair], ["Location", m.location], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
-    ["Engagement at save", m.engagement ? Object.entries(m.engagement).filter(([k]) => k !== "at").map(([k, v]) => `${k} ${v}`).join(", ") : null], ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
+    ["Engagement at save", m.engagement ? Object.entries(m.engagement).filter(([k]) => k !== "at").map(([k, v]) => `${k} ${v}`).join(", ") : null], ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null],
+    ["Media file", m.mediaFile], ["Read by", m.adapter ? `the ${m.adapter} reader` : null]].filter(([, v]) => v);
   out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by CMMNS from what the page showed.", "");
   return out.join("\n");
 }
@@ -18583,5 +18735,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_c2pa_pki, ...M_c2pa_revocation, ...M_c2pa_weaknesses, ...M_c2pa_badge, ...M_c2pa_report, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_url_clean, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_c2pa_pki, ...M_c2pa_revocation, ...M_c2pa_weaknesses, ...M_c2pa_badge, ...M_c2pa_report, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_url_clean, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_page_capture, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

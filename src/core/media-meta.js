@@ -5,6 +5,7 @@
 
 import { threadSummary, commentsMarkdown, completenessSentence } from "./capture-thread.js";
 import { stripTracking, watchFromThumb } from "./url-clean.js";
+import { adapterOf, pageLines } from "./page-capture.js";
 
 // UTC ISO time from a date, a number or text such as Reddit's "2026-10-20T21:04:00.000000+0000".
 const iso = (t) => {
@@ -35,6 +36,13 @@ export function postMeta(m = {}, now = new Date().toISOString()) {
   return {
     format: SIDECAR_FORMAT,
     site: m.site || null, title: m.title ? String(m.title) : null, text,
+    // Which reader made this record: a site's own ("x", "reddit", "youtube", "instagram"), or the
+    // generic one ("article", "generic") working from what the page says about itself.
+    adapter: adapterOf(m.site || null, m.adapter),
+    // "saved", or "not saved (reason)" where the page offered no plain file; null when not recorded.
+    mediaFile: m.mediaFile ? String(m.mediaFile).slice(0, 400) : null,
+    // The page's own metadata (Open Graph, JSON-LD, citation tags), from page-capture.js.
+    page: m.page && typeof m.page === "object" ? m.page : null,
     author: { name: m.authorName || null, handle: m.handle ? String(m.handle).replace(/^@/, "") : null },
     // Share and campaign parameters come out of the addresses (url-clean.js); the text keeps the
     // links as written, and the media address is the file's origin, so it stays as it was. A YouTube
@@ -69,8 +77,8 @@ export function postMeta(m = {}, now = new Date().toISOString()) {
     analysis: (m.analysis || []).filter((a) => typeof a === "string" && /^[a-z][a-z0-9-]{1,40}$/.test(a)).slice(0, 20),
     // Every file of the post as the site listed it, at full size, each with its own alt text (a
     // carousel's items, a gallery's pictures), whether or not each was downloaded.
-    items: (m.items || []).filter((i) => i && i.url).slice(0, 60).map((i, n) => ({ index: Number(i.index) || n + 1, kind: i.kind === "video" ? "video" : i.kind === "gif" ? "gif" : "image",
-      url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null, width: Number(i.width) || null, height: Number(i.height) || null })),
+    items: (m.items || []).filter((i) => i && i.url).slice(0, 60).map((i, n) => ({ index: Number(i.index) || n + 1, kind: ["video", "gif", "audio", "file"].includes(i.kind) ? i.kind : "image",
+      url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null, width: Number(i.width) || null, height: Number(i.height) || null, ...(i.file ? { file: String(i.file).slice(0, 300) } : {}) })),
     edited: m.edited === true ? true : null, location: m.location ? String(m.location).slice(0, 200) : null,
     // The quoted post's own pictures and their alt text, as the site listed them (not downloaded).
     quotedMedia: (m.quotedMedia || []).filter((i) => i && i.url).slice(0, 10).map((i) => ({ kind: i.kind || "image", url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null })),
@@ -119,14 +127,15 @@ const quoteBlock = (t) => String(t).split("\n").map((l) => (l ? "> " + l : ">"))
 // The front matter that opens every .md sidecar: the fields a library indexes, one JSON value per
 // line (YAML reads them as they are), so a reader needs no Markdown parser.
 function frontMatter(meta, files) {
-  const rows = { format: SIDECAR_FORMAT, files, kind: meta.kind || "media", site: meta.site, handle: meta.author.handle, author: meta.author.name, posted: meta.postedAt, saved: meta.savedAt,
+  const rows = { format: SIDECAR_FORMAT, files, kind: meta.kind || "media", site: meta.site, adapter: meta.adapter || null, handle: meta.author.handle, author: meta.author.name, posted: meta.postedAt, saved: meta.savedAt,
     post: meta.postUrl, media: meta.mediaUrl, page: meta.postUrl ? null : meta.pageUrl, subreddit: meta.subreddit, hashtags: meta.hashtags,
     item: meta.item ? `${meta.item.index} of ${meta.item.total}` : null,
     flair: meta.flair || null, selection: meta.selection ? true : null,
     thread_complete: meta.thread && meta.thread.length && meta.threadComplete === true ? true : meta.threadComplete === "unknown" ? "unknown" : null,
     engagement: meta.engagement || null,
     text_complete: meta.textComplete === false ? false : null, from: meta.from || null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
-    edited: meta.edited || null, location: meta.location || null, ...threadRows(meta) };
+    edited: meta.edited || null, location: meta.location || null, media_file: meta.mediaFile || null,
+    canonical: (meta.page && meta.page.canonical) || null, lang: (meta.page && meta.page.lang) || null, ...threadRows(meta) };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
 }
 
@@ -139,8 +148,9 @@ function threadRows(meta) {
 // The post's files as the site listed them, each with its alt text, when there is more than one or any alt.
 function itemLines(m) {
   const list = m.items || [];
-  if (!list.length || (list.length === 1 && !list[0].alt)) return [];
-  return ["## Media", "", ...list.map((i) => `${i.index}. ${i.kind}${i.width && i.height ? ` ${i.width}x${i.height}` : ""}: ${i.url}${i.alt ? `\n   Alt text: ${i.alt}` : ""}`), ""];
+  if (!list.length || (list.length === 1 && !list[0].alt && !list[0].file)) return [];
+  return ["## Media", "", ...list.map((i) => `${i.index}. ${i.kind}${i.width && i.height ? ` ${i.width}x${i.height}` : ""}: ${i.url}${i.alt ? `\n   Alt text: ${i.alt}` : ""}${i.file ? `
+   File: ${i.file}` : ""}`), ""];
 }
 
 // The sidecar a person reads: front matter, then the post's text first. fileNames: one name, or
@@ -150,7 +160,7 @@ export function sidecarMarkdown(meta, fileNames = null) {
   const m = files.length > 1 ? { ...meta, item: null } : meta;
   const who = [m.author.name, m.author.handle ? at(m.author.handle) : null].filter(Boolean).join(" ");
   const out = [...frontMatter(m, files), `# ${who || m.title || (m.kind === "text" ? "Saved text" : "Saved media")}${m.item ? ` (item ${m.item.index} of ${m.item.total})` : ""}`, ""];
-  if (m.title && (m.site === "reddit" || m.site === "youtube" || m.selection)) out.push(`**${m.title}**`, "");
+  if (m.title && (m.site === "reddit" || m.site === "youtube" || m.selection || (m.page && who))) out.push(`**${m.title}**`, "");
   if (m.text) out.push(quoteBlock(m.text), "");
   if (m.textComplete === false) out.push("The page showed only the start of this text, and no fuller copy was loaded.", "");
   if (m.studyNote) out.push(`What draws me to this: ${m.studyNote}`, "");
@@ -168,10 +178,11 @@ export function sidecarMarkdown(meta, fileNames = null) {
     if (p === m.quoted) for (const q of m.quotedMedia || []) out.push(`- Quoted ${q.kind}: ${q.url}${q.alt ? ` (Alt text: ${q.alt})` : ""}`);
     if (p === m.quoted && (m.quotedMedia || []).length) out.push("");
   }
-  out.push(...commentsMarkdown(m.threadCapture));
+  out.push(...pageLines(m.page), ...commentsMarkdown(m.threadCapture));
   const rows = [[files.length > 1 ? "Files" : "File", files.length > 1 ? files.map((f, i) => `${i + 1}. ${f}`).join(", ") : files[0]], ["Post", m.postUrl], ["Media", files.length > 1 ? null : m.mediaUrl],
     ["Page", m.postUrl ? null : m.pageUrl], ["Subreddit", m.subreddit], ["Flair", m.flair], ["Location", m.location], ["Posted (UTC)", m.postedAt], ["Saved (UTC)", m.savedAt],
-    ["Engagement at save", m.engagement ? Object.entries(m.engagement).filter(([k]) => k !== "at").map(([k, v]) => `${k} ${v}`).join(", ") : null], ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null]].filter(([, v]) => v);
+    ["Engagement at save", m.engagement ? Object.entries(m.engagement).filter(([k]) => k !== "at").map(([k, v]) => `${k} ${v}`).join(", ") : null], ["Hashtags", m.hashtags.join(" ") || null], ["Links", m.links.join(" ") || null],
+    ["Media file", m.mediaFile], ["Read by", m.adapter ? `the ${m.adapter} reader` : null]].filter(([, v]) => v);
   out.push(...rows.map(([k, v]) => `- ${k}: ${v}`), "", "Saved by CMMNS from what the page showed.", "");
   return out.join("\n");
 }
