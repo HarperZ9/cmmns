@@ -63,6 +63,10 @@ hashtags: ["#space"]
 | `format` | yes | `daylight.sidecar/1` |
 | `files` | yes | the saved files this sidecar describes, in order |
 | `site` | yes | `x`, `reddit` or the page's host name |
+| `adapter` | yes (from the release after 3.9.1) | which reader made the record: a site's own (`"x"`, `"reddit"`, `"youtube"`, `"instagram"`), or the generic one, `"article"` when the page declares an article and `"generic"` otherwise. Notes from earlier releases have no `adapter` |
+| `media_file` | when recorded | `"saved"`, or `"not saved (reason)"` where the page offered no plain file for the media, or a count of both for a page save |
+| `canonical` | page saves, when the page gives one | the page's canonical address |
+| `lang` | page saves, when the page gives one | the page's language tag |
 | `handle` | when known | `NASA` on X, `u/name` on Reddit |
 | `author` | when known | the display name |
 | `posted` | when known | the post's time, UTC, ISO 8601 |
@@ -114,6 +118,31 @@ Off by default (setting "Also save a .json file for tools"). One object:
 alt, width, height }`), `quotedMedia[]`, `edited`, `location`, and, when comments were read,
 `thread: { file, expected, expectedCounts, captured, capturedDirect, capturedNested, continuations, complete, capHit, cap, moreStubs, sentence }` in place of the
 comment tree, which the thread file holds.
+
+## A page save
+
+"Save page" works on any page, with no site reader (`src/core/page-capture.js`,
+`src/ext/page-capture.js`). It writes a note with `kind: "text"` and `adapter: "article"` or
+`"generic"`, and always the `.json` record beside it. The note holds:
+
+- the title, author and date the page states, taken from its citation tags first, then JSON-LD for an
+  article, then Open Graph and article tags, then plain meta tags;
+- the visible text of the selection, of the block under the pointer, or of the page's article or
+  main block, without navigation, asides, forms and footers;
+- `## Media`: each picture, video, sound and file link inside that block, with its address and a
+  `File:` line that is the saved file's name or `not saved (reason)`;
+- `## Page metadata`: the canonical address, the language, and the Open Graph, article, citation and
+  JSON-LD values as the page wrote them. The `.json` record holds them in full under `page`.
+
+A file is saved only when the page offers it as a plain address: an element's own source or a
+download link. A segmented stream, a player's in-memory source and protected media are never
+saved by a page save; the note lists them with the reason. One page save takes at most 24 files.
+"Save as note" on such a page writes the same note and asks for no file. A selection keeps the
+selected words and the addresses of the media inside it.
+
+On YouTube the reference note carries `media_file: "not saved (...)"`, the caption tracks the
+page's own data lists (language, name, and whether YouTube made the track by speech recognition)
+under `## Caption tracks the page lists`, and the video's date from the player's own record.
 
 ## The thread file
 

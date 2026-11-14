@@ -6,6 +6,18 @@ were not published to a store.
 ## Unreleased
 
 ### Added
+- **Save page, on any site** (project-docs/SIDECAR-FORMAT.md, "A page save"). A right-click entry, and
+  what Download, the hover control's shortcut and "Download media here" now do when no picture or video is
+  under the pointer. On a page with no site reader it saves the text of the selection, of the block under
+  the pointer or of the article, the title, author and date the page states, the canonical address, the
+  page's Open Graph, JSON-LD and citation tags, and each media element's address, as a note and a `.json`
+  record with `adapter: "article"` or `"generic"`. Files the page offers as a plain address are saved
+  beside it, 24 at most; a stream, a player's in-memory source and protected media are listed with
+  `not saved (reason)` and never fetched. With source protection on, no file is asked for.
+- Every note names the reader that made it (`adapter`), and says `media_file: "saved"` or
+  `"not saved (reason)"` where that is recorded. A YouTube reference lists the caption tracks the page's
+  own data names.
+
 - **Save video in full** (project-docs/SIDECAR-FORMAT.md, "A video saved in full"). On YouTube the hover
   control saves the reference with the transcript as timestamped lines and as plain paragraphs, the
   chapters and metadata (`<stem>.video.json`, `cmmns.video/1`), the comment tree with replies and like
@@ -24,6 +36,19 @@ were not published to a store.
   `through(x, y)`): spectrum, entropy, signal-to-noise, envelope, resonance, decay, gain and loss, plus
   non-stationary measures. Each measure passed a 40-seed recovery gate against a seed-shuffled null, and
   four false-success controls must fail it. numpy only.
+
+### Fixed
+- **Download on a text post or a text page saved nothing.** "Download media here" and the keyboard
+  shortcut answered "No picture, GIF or video was found under the pointer" on a text-only post. They now
+  save the post as a note, or the page.
+- **A note on a site without a reader was refused** ("Select some text, or point at a post") unless text
+  was selected. It now reads the article or main block.
+- **YouTube references after the site's own navigation.** The description was the page's cut-off text
+  ending in its "more" control, not marked as incomplete, and the date was missing or was the date of the
+  first video the tab loaded. The reference now reads the player's own record of the current video for
+  the whole description, the date and the caption list, uses the page's date tags only for the video they
+  were written for, and marks a cut description `text_complete: false`.
+- A text note now writes its `.json` record when that setting is on.
 
 ### Added (Content Credentials)
 - **Validation report and badge** (`src/core/c2pa-report.js`, project-docs/C2PA-REPORT.md, schema

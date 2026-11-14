@@ -38,7 +38,7 @@ do, and what stays your responsibility under each site's own terms.
 | Bluesky | the page, the join date and the labels Bluesky's moderation service applied | media the page delivered | no location is shown by Bluesky, so none is read |
 | Threads, TikTok | the page and the lists the site's own app already loaded | media the page delivered | TikTok comments are not checked live yet |
 | Mastodon servers | only on a server you turn on, after your browser asks you to allow that one server | media the page delivered | Options lists the servers and takes access back |
-| Any https site | the "Download" control on media, after you turn on "Show it on every site" | the file the page loaded | protected media is never saved |
+| Any https site | the "Download" control on media, after you turn on "Show it on every site"; on your right-click, the page's own text, meta tags and media addresses | the file the page loaded; with "Save page", the page's text, what the page states about itself, and the files it offers as plain addresses | protected media is never saved; a page save never fetches a stream or a player's in-memory source, and lists it as not saved with the reason |
 
 ## Library capture and auto-scroll
 

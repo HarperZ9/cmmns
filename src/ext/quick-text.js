@@ -27,23 +27,26 @@ globalThis.PBQuickText = globalThis.PBQuickText || (() => {
   // What a text action works on: the selection when there is one, else the post under the point.
   function source({ at = null, selection = null } = {}) {
     const sel = String(selection || (getSelection && getSelection().toString()) || "").trim();
-    if (sel.length >= 3) return selectionMeta(sel);
+    if (sel.length >= 3) return (globalThis.PBPageCapture && PBPageCapture.raw({ selection: sel })) || selectionMeta(sel);
     const p = at || (globalThis.PBHover && PBHover.lastPoint());
     const el = p ? (PBQuickResolve.stackAt(p.x, p.y)[0] || null) : document.activeElement;
-    return postMeta(el);
+    // A site's own post first; on any other page, what the page says about itself (page-capture.js).
+    return postMeta(el) || (globalThis.PBPageCapture ? PBPageCapture.raw({ at: p, el }) : null);
   }
 
-  const nameFor = (meta, ext) => (meta.author.handle ? PB.metaName(meta, ext) : PB.downloadName({ title: meta.selection ? `${meta.title || meta.site} selection` : meta.title || meta.site, ext }));
+  const nameFor = (meta, ext) => (meta.author.handle || (meta.page && !meta.selection) ? PB.metaName(meta, ext) : PB.downloadName({ title: meta.selection ? `${meta.title || meta.site} selection` : meta.title || meta.site, ext }));
 
   // Saves raw as a note (and, with card, as a picture too). opts: { study, card }.
-  async function save(raw, { study = false, card = false } = {}) {
+  async function save(raw, { study = false, card = false, files = [] } = {}) {
     let meta = PB.postMeta({ ...raw, study });
     const name = nameFor(meta, "md");
     if (globalThis.PBTrack) PBTrack.saved(meta);   // engagement over time (track.js)
     // The post's comments, beside the note as "<name>.thread.json" (full-capture.js).
     if (globalThis.PBFullCapture) meta = PBFullCapture.withFile(await PBFullCapture.complete(meta), name.replace(/\.md$/, ""));
     if (meta.threadCapture) await PBQuickSave.saveText(PBFullCapture.threadBytes(meta), "application/json", meta.threadFile, meta.site, study);
-    await PBQuickSave.saveText(new TextEncoder().encode(PB.sidecarMarkdown(meta, [])), "text/markdown", name, meta.site, study);
+    await PBQuickSave.saveText(new TextEncoder().encode(PB.sidecarMarkdown(meta, files)), "text/markdown", name, meta.site, study);
+    // The .json record too when that setting is on, and always for a page save: it holds the page's own metadata in full.
+    if (meta.page || (await PBQuickSave.prefs()).mediaSidecarJson) await PBQuickSave.saveText(new TextEncoder().encode(PB.sidecarJson(meta, files)), "application/json", name.replace(/\.md$/, ".json"), meta.site, study);
     let line = `Saved ${study ? "for study" : "the text"}: ${name}`;
     if (card) {
       const png = nameFor(meta, "png");
@@ -64,13 +67,26 @@ globalThis.PBQuickText = globalThis.PBQuickText || (() => {
     return { ok: true, text };
   }
 
-  // From the right-click menu, the hover control and the post buttons. action: note | study | card | caption.
+  // "Save page": a site's own post under the pointer is saved as its note; any other page is saved
+  // whole (page-capture.js): its text, its own metadata, and the files it offers as plain addresses.
+  const pagePost = (info) => { const p = info.at || (globalThis.PBHover && PBHover.lastPoint()); return info.selection ? null : postMeta(p ? PBQuickResolve.stackAt(p.x, p.y)[0] || null : null); };
+  async function page(info, post) {
+    if (post) return save(post);
+    if (globalThis.PBYouTube && PBYouTube.isYouTube && PBYouTube.videoId()) return PBYouTube.saveReference();
+    toast("Saving the page", { stay: 0 });
+    const got = globalThis.PBPageCapture ? await PBPageCapture.save(info) : null;
+    if (!got) { toast("This page shows no text or media to save.", { tone: "no" }); return { ok: false, line: "nothing to save" }; }
+    return save(got.raw, { files: got.names });
+  }
+
+  // From the right-click menu, the hover control and the post buttons. action: note | study | card | caption | page.
   async function run(action, info = {}) {
     if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) { toast("CMMNS was updated. Reload this page, then save again.", { tone: "no", stay: 9000 }); return { ok: false }; }
-    const raw = info.raw || source(info);
-    if (!raw) { toast("Select some text, or point at a post, then try again.", { tone: "no" }); return { ok: false }; }
+    const raw = info.raw || (action === "page" ? pagePost(info) : source(info));
+    if (!raw && action !== "page") { toast("Select some text, or point at a post, then try again.", { tone: "no" }); return { ok: false }; }
     try {
       if (action === "caption") return await caption(raw);
+      if (action === "page") return await page(info, raw);
       return await save(raw, { study: action === "study", card: action === "card" });
     } catch (e) {
       console.warn("[cmmns] could not save the text", e);
