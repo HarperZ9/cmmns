@@ -10,7 +10,7 @@ page and `src/ext/quick-save-bg.js` in the background; the pure parts are the me
 (`project-docs/MEDIA-LIBRARY.md`); the `.md` file beside each save follows
 `project-docs/SIDECAR-FORMAT.md`.
 
-- **Where it starts.** Right-click: **Download**, **Download media here** (for media under a clear
+- **Where it starts.** Right-click: **Download**, **Save page** (the page's text, its own metadata and the files it offers as plain addresses, on any site), **Download media here** (for media under a clear
   layer), **Download as GIF**, **Copy**, **Copy link**, **Copy with caption**. On X and Reddit posts, a
   Download button saves every file of the post. The panel beside a post has Download and Copy link
   per item. X keeps its own right-click menu on videos; the button, or Shift and right-click, reaches

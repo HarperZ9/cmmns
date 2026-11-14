@@ -26,7 +26,10 @@
   };
 
   // The first page load arrives inline, not through a request.
-  const initial = () => { post(window.ytInitialData); post(window.ytInitialPlayerResponse); };
+  // The player's own record of the video it is playing now: after YouTube swaps videos without a
+  // reload, the inline data above still describes the first video, and this one the current.
+  const current = () => { try { const p = document.querySelector("#movie_player"); return p && typeof p.getPlayerResponse === "function" ? p.getPlayerResponse() : null; } catch (_) { return null; } };
+  const initial = () => { post(window.ytInitialData); post(window.ytInitialPlayerResponse); post(current()); };
   document.addEventListener("DOMContentLoaded", initial);
   // Content script asks again after it starts, in case it missed the first post.
   window.addEventListener("message", (e) => { if (e.source === window && e.data && e.data.source === "radar-yt-ask") initial(); });
