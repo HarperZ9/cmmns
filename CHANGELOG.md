@@ -5,6 +5,12 @@ were not published to a store.
 
 ## Unreleased
 
+## 3.10.0 (2026-11-14)
+
+Any page can be saved from the right-click menu, a YouTube video can be saved in full with its
+transcript and comments, Content Credentials get a validation report, and a Python analysis layer
+ships beside the extension. No store build saves YouTube video files.
+
 ### Added
 - **Save page, on any site** (project-docs/SIDECAR-FORMAT.md, "A page save"). A right-click entry, and
   what Download, the hover control's shortcut and "Download media here" now do when no picture or video is
