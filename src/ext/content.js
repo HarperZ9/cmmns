@@ -148,7 +148,6 @@
     report.upstream = PB.upstream(items, tweets, PBLogs.trail());
     const pushed = PB.pushedLinks(PBLogs.net(), items.flatMap((r) => r.domains || []));
     const video = currentVideo(site);
-    if (video && video.channelId) PBLogs.ensureChannel(video.channelId);
     report.groups = PB.returningGroups(PBLogs.net(), threadKey, replies.map((r) => r.author));
     report.context = PB.threadContext(items, { noteOf, claimsOf: PBLogs.claimsOf });
     saveSnapshot(threadKey, site.name, report);
@@ -180,7 +179,10 @@
 
   function currentVideo(site) {
     if (site.id !== "youtube") return null;
-    return ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null;
+    const v = ytVideos.get(new URLSearchParams(location.search).get("v") || location.pathname.split("/shorts/")[1]) || null;
+    // The channel's documented backing, asked once; the panel redraws when it arrives.
+    if (v && v.channelId) PBLogs.ensureChannel(v.channelId).then((got) => { if (got) schedule(); });
+    return v;
   }
 
   // A video with no comments (or comments turned off) still has its own context: the channel,

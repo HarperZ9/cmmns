@@ -27,7 +27,7 @@
     "id": "knowles-wilks-investor",
     "kind": "investor",
     "who": "Farris Wilks",
-    "summary": "NewsGuard and Slate report that the Daily Wire was founded in 2015 with investment from Farris Wilks; the Daily Wire's own About page also credits Wilks with the initial investment.",
+    "summary": "NewsGuard and Slate report that the Daily Wire was founded in 2015 with investment from Farris Wilks.",
     "period": "since 2015",
     "status": "reported",
     "sources": [
@@ -86,26 +86,6 @@
      }
     ],
     "doesNotProve": "Corporate ownership does not show that the parent company directs this host's content."
-   },
-   {
-    "id": "fox-corp-owner",
-    "kind": "outlet owner",
-    "who": "FOX Corporation",
-    "summary": "Fox Corporation's careers site says FOX News Media, the unit that airs Gutfeld's shows, is owned by FOX Corporation.",
-    "period": "current",
-    "status": "documented",
-    "sources": [
-     {
-      "publisher": "FOX Careers (Fox Corporation)",
-      "title": "FOX News Channel – Our Brands",
-      "url": "https://foxcareers.com/OurBrands/FoxNewsChannel",
-      "date": null,
-      "read": "2026-10-21",
-      "kind": "company",
-      "quote": "Owned by FOX Corporation, FOX News Media reaches 200 million people each month."
-     }
-    ],
-    "doesNotProve": "Shows corporate ownership of the network. It does not show the owner's direct involvement in Gutfeld's content."
    }
   ]
  },
@@ -173,6 +153,15 @@
       "read": "2026-10-21",
       "kind": "filing",
       "quote": "...CNN, CBS Sports, TNT Sports, Nickelodeon, Cartoon Network, MTV, Food Network, BET, HGTV, and Comedy Central."
+     },
+     {
+      "publisher": "US SEC (Skydance Corporation Form 8-K, Exhibit 99.1)",
+      "title": "Skydance completes acquisition of Warner Bros. Discovery",
+      "url": "https://www.sec.gov/Archives/edgar/data/0002041610/000110465926113913/tm2626659d7_ex99-1.htm",
+      "date": "2026-10-06",
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "...today announced the completion of its acquisition of Warner Bros. Discovery, Inc. (NASDAQ: WBD) (“WBD”), creating a combined company, named “Skydance.”"
      }
     ],
     "doesNotProve": "Corporate ownership of CNN does not show that the owner directs Tapper's coverage."
@@ -208,6 +197,15 @@
       "read": "2026-10-21",
       "kind": "press",
       "quote": "The deal, which is one of the biggest mergers of all time, brings together two major streaming platforms, Paramount+ and HBO Max..."
+     },
+     {
+      "publisher": "US SEC (Skydance Corporation Form 8-K, Exhibit 99.1)",
+      "title": "Skydance completes acquisition of Warner Bros. Discovery",
+      "url": "https://www.sec.gov/Archives/edgar/data/0002041610/000110465926113913/tm2626659d7_ex99-1.htm",
+      "date": "2026-10-06",
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "The company brings together two major film studios, two global streaming services, a premier television portfolio including CBS, HBO, and Paramount’s and WBD’s cable networks..."
      }
     ],
     "doesNotProve": "Neither report names Real Time or says the new owner changed the show's terms or content. AP also reports FCC approval for large indirect, non-voting Gulf state investment in Skydance; that is a fact about the parent company, not about Maher."
@@ -234,6 +232,15 @@
       "read": "2026-10-21",
       "kind": "filing",
       "quote": "...CNN, CBS Sports, TNT Sports, Nickelodeon, Cartoon Network, MTV, Food Network, BET, HGTV, and Comedy Central."
+     },
+     {
+      "publisher": "US SEC (Skydance Corporation Form 8-K, Exhibit 99.1)",
+      "title": "Skydance completes acquisition of Warner Bros. Discovery",
+      "url": "https://www.sec.gov/Archives/edgar/data/0002041610/000110465926113913/tm2626659d7_ex99-1.htm",
+      "date": "2026-10-06",
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "...today announced the completion of its acquisition of Warner Bros. Discovery, Inc. (NASDAQ: WBD) (“WBD”), creating a combined company, named “Skydance.”"
      }
     ],
     "doesNotProve": "Corporate ownership does not show the owner controls the show's content."
@@ -257,9 +264,9 @@
       "title": "Al Jazeera condemns AJ+ FARA registration order in US",
       "url": "https://www.aljazeera.com/news/2020/09/17/al-jazeera-condemns-aj-fara-registration-order-in-us/",
       "date": "2020-09-17",
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "press",
-      "quote": "...the Qatari government provides Al Jazeera’s funding and appoints its board of directors."
+      "quote": "...Jay I Bratt, the DOJ’s counterintelligence chief, said in the letter the Qatari government provides Al Jazeera’s funding and appoints its board of directors."
      },
      {
       "publisher": "Mother Jones",
@@ -452,7 +459,7 @@
     "id": "independent-news-service-owner",
     "kind": "outlet owner",
     "who": "Independent News Service",
-    "summary": "Media Ownership Monitor India says India TV is owned and managed by Independent News Service, a company Sharma co-founded.",
+    "summary": "Media Ownership Monitor India says India TV is owned by Independent News Service, the company Sharma formed in 1997.",
     "period": "current",
     "status": "reported",
     "sources": [
@@ -464,6 +471,15 @@
       "read": "2026-10-21",
       "kind": "researcher",
       "quote": "India TV is owned and managed by Independent News Service which holds 100% control of the channel."
+     },
+     {
+      "publisher": "Media Ownership Monitor India (RSF / Global Media Registry)",
+      "title": "India TV",
+      "url": "https://india.mom-gmr.org/en/media/detail/outlet/india-tv/",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "researcher",
+      "quote": "In 1997, he quit Zee Group and formed the Independent News Service, INS– the company that owns the channel - India TV."
      }
     ],
     "doesNotProve": "The monitor's data may be dated; no company filing was read, and the current shareholder list is not confirmed."
@@ -493,6 +509,35 @@
      }
     ],
     "doesNotProve": "A copyright notice is an ambiguous ownership signal; it does not show shareholding, and the TV channels he anchors on are run by a listed company (TV Today Network) whose shareholders were not read."
+   },
+   {
+    "id": "living-media-india-owner",
+    "kind": "outlet owner",
+    "who": "Living Media India Limited (main promoter of TV Today Network)",
+    "summary": "Newslaundry (2022) and RSF's Media Ownership Monitor India report that Living Media India Limited is the main promoter and parent of TV Today Network, the India Today Group's listed broadcaster.",
+    "period": "as reported 2019 to 2022",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Newslaundry",
+      "title": "Who Owns Your Media: The highs and lows of the India Today Group",
+      "url": "https://www.newslaundry.com/2022/07/18/who-owns-your-media-the-highs-and-lows-of-the-india-today-group",
+      "date": "2022-07-18",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Living Media is also the main promoter of ITG’s publicly listed company – TV Today Network, with 56.9 percent shareholding."
+     },
+     {
+      "publisher": "Media Ownership Monitor India (RSF)",
+      "title": "Aaj Tak",
+      "url": "https://india.mom-rsf.org/en/media/detail/outlet/aaj-tak/",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "researcher",
+      "quote": "...TV Today Network Ltd (Listed in National Stock Exchange and Bombay Stock Exchange) which is a subsidiary of Living Media India Ltd."
+     }
+    ],
+    "doesNotProve": "Neither page names Sardesai; it shows who owns the group he is documented as working for, not that the owner directs his reporting. The shareholding figures date from 2019 to 2022 and may have changed."
    }
   ]
  },
@@ -626,7 +671,7 @@
     "id": "rt-state-funded",
     "kind": "state funding",
     "who": "Government of Russia",
-    "summary": "The SDNY indictment, as summarized by the US Attorney's Office, alleges RT is funded and directed by the Government of Russia, and Treasury calls RT state-funded.",
+    "summary": "The US Treasury calls RT state-funded, and the Justice Department's press release on the 2024 indictment says, citing court documents, that RT is funded and directed by the Government of Russia.",
     "period": null,
     "status": "documented",
     "sources": [
@@ -638,6 +683,15 @@
       "read": "2026-10-21",
       "kind": "government",
       "quote": "Beginning in early 2024, executives at RT - Russia’s state-funded news media outlet - began an even more nefarious effort..."
+     },
+     {
+      "publisher": "U.S. Department of Justice (read in a Wayback copy)",
+      "title": "Two RT employees indicted for covertly funding and directing U.S. company",
+      "url": "https://web.archive.org/web/20250206153638/https://www.justice.gov/opa/pr/two-rt-employees-indicted-covertly-funding-and-directing-us-company-published-thousands",
+      "date": "2024-09-04",
+      "read": "2026-10-22",
+      "kind": "government",
+      "quote": "According to the court documents, RT, formerly known as Russia Today, is a state-controlled media outlet funded and directed by the Government of Russia."
      }
     ],
     "doesNotProve": "These are US government statements; they do not name RT's legal owner entity or detail its budget."
@@ -666,14 +720,13 @@
       "quote": "Journalist of the state-owned TV Rossiya-1, leading a political talk-show"
      },
      {
-      "publisher": "Official Journal of the European Union",
+      "publisher": "Official Journal of the European Union (EU Publications Office)",
       "title": "Council Implementing Regulation (EU) 2022/336",
-      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0336",
+      "url": "https://publications.europa.eu/resource/cellar/14ad6d79-98c2-11ec-8d29-01aa75ed71a1.0006.03/DOC_1",
       "date": "2022-02-28",
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "government",
-      "quote": "Ms. Olga Skabeyeva is a journalist of the state-owned TV station Rossiya-1.",
-      "readBy": "browser"
+      "quote": "Ms. Olga Skabeyeva is a journalist of the state-owned TV station Rossiya-1."
      }
     ],
     "doesNotProve": "Ownership is not the same as directing a programme's words. The EU describes ownership; it does not quote a corporate filing."
@@ -735,6 +788,15 @@
       "read": "2026-10-21",
       "kind": "company",
       "quote": "Real America’s Voice is a wholly owned subsidiary of Performance One Media LLC."
+     },
+     {
+      "publisher": "Real America's Voice",
+      "title": "About",
+      "url": "https://americasvoice.news/about",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "Robert Sigg Chairman"
      }
     ],
     "doesNotProve": "This is the network's ownership, not Bannon's own production company; it does not show any payment to Bannon."
@@ -764,6 +826,32 @@
      }
     ],
     "doesNotProve": "The announcement does not name Posobiec or say whether Human Events Daily continues under the new owner."
+   }
+  ]
+ },
+ {
+  "id": "guardian",
+  "name": "The Guardian",
+  "backing": [
+   {
+    "id": "hasan-guardian-owner-scott-trust",
+    "kind": "outlet owner",
+    "who": "The Scott Trust (sole shareholder of Guardian Media Group)",
+    "summary": "The Guardian's About page says The Scott Trust is the sole shareholder of Guardian Media Group.",
+    "period": "current",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "The Guardian",
+      "title": "About us",
+      "url": "https://www.theguardian.com/about",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "The Scott Trust , the sole shareholder of Guardian Media Group."
+     }
+    ],
+    "doesNotProve": "Ownership of the outlet he writes for. It does not show that the owner directs his columns."
    }
   ]
  }

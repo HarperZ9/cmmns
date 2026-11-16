@@ -3,14 +3,15 @@
 // fetches the page (GET, no cookies, no referrer, no personal data; a plain browser user agent with a
 // Radar token), turns HTML or PDF into text, and looks for each part of the quote between "...". A
 // page that refuses is tried once through the Internet Archive's raw capture.
-//   node scripts/personalities-quotecheck.mjs [files...] [--out <file>]
+//   node scripts/personalities-quotecheck.mjs [files...] [--out <file>] [--retry]
 // With no files it reads data/personalities-sources/people-*.json and outlets.json. The result goes
 // to project-docs/evidence/personalities-quotecheck.json; scripts/personalities-build.mjs copies
 // each source's result into the shipped table.
-import { readFileSync, writeFileSync, readdirSync, mkdtempSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, mkdtempSync, rmSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
+import { createInterface } from "node:readline";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -65,6 +66,23 @@ function pdfText(buf) {
   } catch (e) { console.error(`[quotecheck] pdftotext failed: ${e.message.split("\n")[0]}`); return ""; } finally { rmSync(dir, { recursive: true, force: true }); }
 }
 
+// A zip (the FEC's bulk files are 50 to 70 MB) is kept on disk for this run and searched line by line.
+const ZIPS = mkdtempSync(join(tmpdir(), "radar-qc-zip-"));
+let zipN = 0;
+function keepZip(buf) { const p = join(ZIPS, `${zipN++}.zip`); writeFileSync(p, buf); return p; }
+// The quote's longest part between "..." must appear in one line of the zip's text files.
+export function zipHas(path, quote) {
+  const part = norm(String(quote).split(/\.\.\.|…/).map((x) => x.trim()).sort((a, b) => b.length - a.length)[0] || "");
+  if (part.length < 8) return Promise.resolve(false);
+  return new Promise((done) => {
+    const p = spawn("unzip", ["-p", path]), lines = createInterface({ input: p.stdout });
+    let found = false;
+    lines.on("line", (l) => { if (!found && norm(l).includes(part)) { found = true; p.kill(); } });
+    lines.on("close", () => done(found));
+    p.on("error", (e) => { console.error(`[quotecheck] unzip failed: ${e.message}`); done(false); });
+  });
+}
+
 async function grab(url) {
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 120000);
   try {
@@ -73,6 +91,7 @@ async function grab(url) {
     // 202 is what bot walls answer with a challenge page; it is not the document.
     if (!r.ok || r.status === 202) return { status: r.status, text: "" };
     if (/pdf/i.test(type) || buf.subarray(0, 5).toString() === "%PDF-") return { status: r.status, text: pdfText(buf) };
+    if (buf.subarray(0, 2).toString() === "PK") return { status: r.status, text: "", zip: keepZip(buf) };
     return { status: r.status, text: htmlText(buf.toString("utf8")) };
   } catch (e) { return { status: e.name === "AbortError" ? "timeout" : "error", text: "" }; } finally { clearTimeout(timer); }
 }
@@ -81,6 +100,7 @@ async function grab(url) {
 export async function checkSource(s, cache = new Map()) {
   const get = (u) => (cache.has(u) ? cache.get(u) : cache.set(u, grab(u)).get(u));
   const direct = await get(s.url);
+  if (direct.zip) return { url: s.url, result: (await zipHas(direct.zip, s.quote)) ? "exact" : "not-found", via: "direct", status: direct.status };
   let hit = direct.text ? findQuote(s.quote, direct.text) : null;
   if (hit) return { url: s.url, result: hit, via: "direct", status: direct.status };
   if (/web\.archive\.org/.test(s.url)) return { url: s.url, result: direct.text ? "not-found" : "unreadable", via: "direct", status: direct.status };
@@ -108,11 +128,19 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const args = process.argv.slice(2), oi = args.indexOf("--out");
   const out = oi >= 0 ? args.splice(oi, 2)[1] : join(ROOT, "project-docs/evidence/personalities-quotecheck.json");
   const dir = join(ROOT, "data/personalities-sources");
-  const files = args.length ? args : readdirSync(dir).filter((f) => /^(people-.*|outlets)\.json$/.test(f)).map((f) => join(dir, f));
+  const files = args.filter((a) => !a.startsWith("--")).length ? args.filter((a) => !a.startsWith("--")) : readdirSync(dir).filter((f) => /^(people-.*|outlets)\.json$/.test(f)).map((f) => join(dir, f));
   const jobs = files.flatMap((f) => sourceJobs(JSON.parse(readFileSync(f, "utf8"))));
   const cache = new Map();
-  const res = await pool(jobs, 5, async (j) => ({ key: j.key, ...(await checkSource(j.s, cache)) }));
+  // --retry: recheck only the sources a previous run could not read, one at a time and 20 s apart
+  // (the Internet Archive answers 429 to bursts), keeping every other result.
+  const retry = args.includes("--retry") && existsSync(out) ? JSON.parse(readFileSync(out, "utf8")).results : null;
+  const prev = new Map((retry || []).map((r) => [r.key, r]));
+  const todo = retry ? jobs.filter((j) => !prev.has(j.key) || prev.get(j.key).result === "unreadable") : jobs;
+  const done = await pool(todo, retry ? 1 : 5, async (j) => { if (retry) await new Promise((ok) => setTimeout(ok, 20000)); return { key: j.key, ...(await checkSource(j.s, cache)) }; });
+  const fresh = new Map(done.map((r) => [r.key, r]));
+  const res = jobs.map((j) => fresh.get(j.key) || prev.get(j.key));
   const tally = res.reduce((a, r) => ((a[r.result] = (a[r.result] || 0) + 1), a), {});
   writeFileSync(out, JSON.stringify({ checked: new Date().toISOString().slice(0, 10), tally, results: res }, null, 1) + "\n");
+  rmSync(ZIPS, { recursive: true, force: true });
   console.log(`${res.length} quotes: ${Object.entries(tally).map(([k, v]) => `${k} ${v}`).join(", ")} -> ${out}`);
 }

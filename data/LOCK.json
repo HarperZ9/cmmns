@@ -222,36 +222,40 @@
   },
   "personalities-sources": {
    "source": "hand-kept in this repository; every row cites its own documents with a quote and the date read (data/personalities.README.md). Wikidata statements fetched from https://query.wikidata.org/sparql; quote checks by scripts/personalities-quotecheck.mjs",
-   "retrieved": "2026-10-21",
+   "retrieved": "2026-10-22",
    "licence": "FSL-1.1-MIT (the records); Wikidata statements CC0 1.0; each cited document keeps its own terms",
    "snapshot": {
     "committed": true,
     "files": {
      "data/personalities-sources/people-audience.json": {
-      "sha256": "12679b1fb8f2f7d90c6e2d34d9953407176982871b060c5e4ef963983d020da2",
-      "bytes": 221461
+      "sha256": "26db6566f4695b4cff11eae41fff279e9a13eb77f27b723c90b17ad9b95a4cc5",
+      "bytes": 331464
      },
      "data/personalities-sources/people-records.json": {
-      "sha256": "198c4b1f397e1dc4816533b26572bfdbf306461014b88660024fc240f6dd361f",
-      "bytes": 61443
+      "sha256": "672aea4eb57d5deab29126f0bea3164b6d3f8e3f0f6176d007fab76429e8e5a9",
+      "bytes": 72963
      },
      "data/personalities-sources/outlets.json": {
-      "sha256": "ae393cfa8f18439bada0d734ebbc2eb845911f131f80e4ab7466ee367efe5573",
-      "bytes": 31588
+      "sha256": "95cd505806bdc0067e0d504b9e0f1f19a0f9b6380317c5c7128184e6ac69ad93",
+      "bytes": 36096
      },
      "data/personalities-sources/wikidata.json": {
       "sha256": "4dd91de69e0bf3ae61d2efef73cb59751bc4a95d784c94ee254c08c8d13cc503",
       "bytes": 31842
      },
      "project-docs/evidence/personalities-quotecheck.json": {
-      "sha256": "7f4cfcaf305030b11a11185c142d374051ec0cb52904e140bdc4b20672cff26d",
-      "bytes": 58553
+      "sha256": "baa968b8b0ae61df6976b38ecac361b9dc57675834847361c601e4115d1d07d7",
+      "bytes": 70653
+     },
+     "data/personalities-sources/people-round2.json": {
+      "sha256": "ed5a9fd86d2d7181831d5a84a1a3681f4e34d0eb20c26badb47f482c21bc75fe",
+      "bytes": 53764
      }
     }
    },
    "rows": {
-    "count": 90,
-    "unit": "people researched (78 with at least one shipped record)"
+    "count": 103,
+    "unit": "people researched (87 with at least one shipped record)"
    }
   }
  },
@@ -401,7 +405,7 @@
    "id": "personalities",
    "script": "scripts/personalities-build.mjs",
    "args": [],
-   "built": "2026-10-21",
+   "built": "2026-10-22",
    "inputs": [
     "personalities-sources",
     "owner-corrections"
@@ -425,6 +429,6 @@
   "project-docs/evidence/framing-results.json": "7f91f25fece092caf2510df0dc1f27f8f54aa2d96bb5db03a687783c10c7c67b",
   "src/ext/owners.json": "bac5475d6aaa8aa21c33e4fe2e97335a7696a7471bdf8172694eb0ceb810ecab",
   "src/ext/state.json": "6c28778e5e46b31cd2a01c91915110818fd433d0544e450f1f366beb0883621d",
-  "src/ext/personalities.json": "b6c4840d7f50059be62901c57d6073898b46e8f7f412dead09a7882206ad7cd6"
+  "src/ext/personalities.json": "7530bf1fdff29a619d70d893d71c93121bcec3729e589af34ff08118b7c5cd35"
  }
 }

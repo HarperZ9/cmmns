@@ -26,7 +26,7 @@
     "id": "tenet-media-contributor",
     "kind": "employer",
     "who": "Tenet Media (U.S. Company-1 in the indictment)",
-    "summary": "Tenet Media's own website listed Lauren Southern under 'Meet the talent', and NBC News, Washingtonian and Southern's own November 2024 testimony to a Canadian House of Commons committee say she made videos for Tenet.",
+    "summary": "NBC News, Washingtonian and Southern's own November 2024 testimony to a Canadian House of Commons committee say she made videos for Tenet.",
     "period": "2023 to 2024",
     "status": "documented",
     "sources": [
@@ -214,6 +214,15 @@
       "read": "2026-10-21",
       "kind": "press",
       "quote": "...according to Tenet Media field reporter Tayler Hansen."
+     },
+     {
+      "publisher": "Tenet Media (archived by the Wayback Machine)",
+      "title": "TENET MEDIA | Fearless Voices Live Here",
+      "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "Tayler Hansen is a Field Reporter for TENET Media."
      }
     ],
     "doesNotProve": "Being listed as Tenet talent does not show that Tayler Hansen knew who funded Tenet. Tenet shut down in September 2024, so this role has ended."
@@ -294,7 +303,7 @@
     "id": "tenet-media-contributor",
     "kind": "employer",
     "who": "Tenet Media (U.S. Company-1 in the indictment)",
-    "summary": "Tenet Media's own website listed Matt Christiansen under 'Meet the talent', and NBC News and Washingtonian report his statements about his videos for Tenet.",
+    "summary": "NBC News and Washingtonian report his statements about his videos for Tenet.",
     "period": "2023 to 2024",
     "status": "documented",
     "sources": [
@@ -371,6 +380,15 @@
       "read": "2026-10-21",
       "kind": "court",
       "quote": "with an initial lineup of six content creators"
+     },
+     {
+      "publisher": "NBC News",
+      "title": "Russian money was funneled to right-wing creators through a pro-Trump media outlet, prosecutors say",
+      "url": "https://www.nbcnews.com/news/amp/rcna169611",
+      "date": "2024-09-04",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Tenet has partnered with six commentators: Lauren Southern, Tim Pool, Tayler Hansen, Matt Christiansen, Dave Rubin and Benny Johnson."
      }
     ],
     "doesNotProve": "The indictment does not name Matt Christiansen and charges no commentator; it says two unnamed commentators (Commentator-1 and Commentator-2) were deceived about the funding and does not say what the other commentators knew. It does not show that RT controlled Matt Christiansen's own content, and the allegations are unproven.",
@@ -473,14 +491,13 @@
       "quote": "Editor-in-chief of the English language television news network RT (Russia Today)"
      },
      {
-      "publisher": "Official Journal of the European Union",
+      "publisher": "Official Journal of the European Union (EU Publications Office)",
       "title": "Council Implementing Regulation (EU) 2022/260",
-      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0260",
+      "url": "https://publications.europa.eu/resource/cellar/bf95344b-9563-11ec-b4e4-01aa75ed71a1.0006.03/DOC_1",
       "date": "2022-02-23",
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "government",
-      "quote": "...She is also editor-in-chief of the English language television news network RT (Russia Today).",
-      "readBy": "browser"
+      "quote": "...She is also editor-in-chief of the English language television news network RT (Russia Today)."
      }
     ],
     "doesNotProve": "A sanctions listing is a government's decision about a person's role, not a court finding. It does not show what any particular broadcast said."
@@ -556,14 +573,13 @@
     "current": true,
     "sources": [
      {
-      "publisher": "Official Journal of the European Union",
+      "publisher": "Official Journal of the European Union (EU Publications Office)",
       "title": "Council Implementing Regulation (EU) 2022/260",
-      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0260",
+      "url": "https://publications.europa.eu/resource/cellar/bf95344b-9563-11ec-b4e4-01aa75ed71a1.0006.03/DOC_1",
       "date": "2022-02-23",
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "government",
-      "quote": "...Presenter of the Russia-1 channel and Rossia 24.",
-      "readBy": "browser"
+      "quote": "...Presenter of the Russia-1 channel and Rossia 24."
      }
     ],
     "doesNotProve": "The listing dates from 2022; it does not show his role today."
@@ -586,14 +602,13 @@
       "quote": "Vladimir Solovyev"
      },
      {
-      "publisher": "Official Journal of the European Union",
+      "publisher": "Official Journal of the European Union (EU Publications Office)",
       "title": "Council Implementing Regulation (EU) 2022/260",
-      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0260",
+      "url": "https://publications.europa.eu/resource/cellar/bf95344b-9563-11ec-b4e4-01aa75ed71a1.0006.03/DOC_1",
       "date": "2022-02-23",
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "government",
-      "quote": "...Presenter of the Russia-1 channel and Rossia 24.",
-      "readBy": "browser"
+      "quote": "...Presenter of the Russia-1 channel and Rossia 24."
      }
     ],
     "doesNotProve": "A sanctions listing is a government's decision about a person's role, not a court finding. It does not show what any particular broadcast said."
@@ -644,14 +659,13 @@
       "quote": "Journalist of the state-owned TV Rossiya-1, leading a political talk-show"
      },
      {
-      "publisher": "Official Journal of the European Union",
+      "publisher": "Official Journal of the European Union (EU Publications Office)",
       "title": "Council Implementing Regulation (EU) 2022/336",
-      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0336",
+      "url": "https://publications.europa.eu/resource/cellar/14ad6d79-98c2-11ec-8d29-01aa75ed71a1.0006.03/DOC_1",
       "date": "2022-02-28",
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "government",
-      "quote": "Ms. Olga Skabeyeva is a journalist of the state-owned TV station Rossiya-1.",
-      "readBy": "browser"
+      "quote": "Ms. Olga Skabeyeva is a journalist of the state-owned TV station Rossiya-1."
      }
     ],
     "doesNotProve": "The listing dates from 2022; it does not show her role today."
@@ -736,6 +750,55 @@
     "doesNotProve": "Press reports of his own announcement; the commentator role is reported by one outlet and may not be current.",
     "outlet": "global-times",
     "current": true
+   },
+   {
+    "id": "hu-twitter-state-affiliated-label",
+    "kind": "platform label",
+    "who": "Twitter (now X): 'China state-affiliated media' label",
+    "summary": "The China Media Project reports Twitter's state-affiliated media label went on Hu's account in August 2020; the Washington Examiner reports Hu asked in October 2022 that Musk's Twitter remove 'the label'.",
+    "period": "2020-08 to at least 2022-10",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "China Media Project",
+      "title": "China’s Telling Twitter Story",
+      "url": "https://chinamediaproject.org/2021/01/18/chinas-telling-twitter-story/",
+      "date": "2021-01-18",
+      "read": "2026-10-22",
+      "kind": "researcher",
+      "quote": "...certain individual employees at Chinese state media also received this label. Prominent among them was Hu Xijin (胡锡进), the Global Times editor-in-chief..."
+     },
+     {
+      "publisher": "Denver Gazette (Washington Examiner)",
+      "title": "Chinese propagandists want Musk to remove state media labels from Twitter accounts",
+      "url": "https://www.denvergazette.com/2022/10/28/chinese-propagandists-want-musk-to-remove-state-media-labels-from-twitter-accounts-c0657c55-7e68-5916-a294-731743a513e6/",
+      "date": "2022-10-28",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "“I hope Twitter, with Musk as its chief, will remove the label that does not match my status after my retirement..."
+     }
+    ],
+    "doesNotProve": "Reports, not the platform page or an archived capture. The label reflects Twitter's judgement about his employer, not a funding record, and nothing read shows it still applies in 2026."
+   },
+   {
+    "id": "global-times-foreign-mission",
+    "kind": "government label",
+    "who": "US Department of State (Foreign Missions Act designation of the Global Times)",
+    "summary": "A State Department press statement of 22 June 2020 says it designated the US operations of the Global Times, which Hu then edited, as a foreign mission.",
+    "period": "since 2020-06-22",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "US Department of State",
+      "title": "Designation of Additional Chinese Media Entities as Foreign Missions",
+      "url": "https://2017-2021.state.gov/designation-of-additional-chinese-media-entities-as-foreign-missions/",
+      "date": "2020-06-22",
+      "read": "2026-10-22",
+      "kind": "government",
+      "quote": "...designates the U.S. operations of China Central Television, China News Service, the People’s Daily, and the Global Times as foreign missions."
+     }
+    ],
+    "doesNotProve": "The designation covers the outlet's US operations, not Hu personally, and he left the editor post in December 2021. It is a government determination, not a court finding."
    }
   ],
   "leads": [
@@ -758,9 +821,56 @@
     "claim": "US State Department designated Global Times a foreign mission in June 2020.",
     "searched": "Reference seen in Wikipedia wikitext (NPR, NYT links); pages not fetched.",
     "result": "Unverified in this session."
+   },
+   {
+    "claim": "X handle HuXijin_GT",
+    "searched": "Embedded tweets in the China Media Project and Denver Gazette pages link twitter.com/HuXijin_GT.",
+    "result": "Seen only in press embeds, not the platform page; not added to accounts."
+   },
+   {
+    "claim": "Hu told the Guardian the English edition received government funding",
+    "searched": "Not re-searched.",
+    "result": "Single outlet; still a lead."
    }
   ],
-  "batch": "b9"
+  "batch": "b9",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name (Xijin; Global Times not in the FARA files). No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname (Xijin; Global Times not in the FARA files). No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Twitter label and State Department designation (see backing).",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "Not applicable.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "li-jingjing",
@@ -793,9 +903,56 @@
     "claim": "X or YouTube state-affiliated labels on her accounts.",
     "searched": "No platform page confirmed as hers.",
     "result": "Unverified."
+   },
+   {
+    "claim": "Employer: CGTN",
+    "searched": "Three web searches; read the Wikipedia disambiguation page ('Li Jingjing, CGTN reporter and YouTuber', uncited), her Substack profile ('A Chinese journalist.'), Doug Rooney's 2025 interview (no employer named) and Press Gazette 2019 (about a different CGTN journalist). A search summary cited a Renmin University page calling her an opinion leader of CGTN New Media; that page returns 404 and has no archive capture.",
+    "result": "Employer still not documented from a page read; no CGTN rows attached."
+   },
+   {
+    "claim": "State Department designated CGTN a foreign mission (February 2020)",
+    "searched": "The State Department's 22 June 2020 statement refers to 'the February 18 designation of Xinhua News Agency, China Global Television Network...'.",
+    "result": "Usable for her only once her CGTN employment is documented."
    }
   ],
-  "batch": "b9"
+  "batch": "b9",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name (Jingjing); CGTN appears in FARA only as a 2021 foreign principal of Potomac Radio Group. No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname (Jingjing); CGTN appears in FARA only as a 2021 foreign principal of Potomac Radio Group. No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Not checked; no account handle confirmed.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "Not applicable.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "steve-bannon",
@@ -829,6 +986,35 @@
      }
     ],
     "doesNotProve": "Carriage on a network does not show who pays for the show's production or whether the network directs its content."
+   },
+   {
+    "id": "warroom-hchk-trustee-complaint",
+    "kind": "court record",
+    "who": "HCHK Technologies, Inc. (alleged alter ego of Ho Wan Kwok, also known as Guo Wengui)",
+    "summary": "A February 2024 complaint by Guo's Chapter 11 trustee alleges Guo, through HCHK Technologies, transferred funds to Warroom Broadcasting & Media Communications, LLC; Mother Jones reports these as payments that helped fund Bannon's War Room.",
+    "period": "before 2022-02-15 (Mother Jones: 2021 and 2022)",
+    "status": "alleged",
+    "sources": [
+     {
+      "publisher": "US Bankruptcy Court, District of Connecticut (via CourtListener RECAP)",
+      "title": "Despins v. Warroom Broadcasting & Media Communications LLC, Adv. No. 24-05025, Complaint (Doc. 1)",
+      "url": "https://storage.courtlistener.com/recap/gov.uscourts.ctb.312597/gov.uscourts.ctb.312597.1.0.pdf",
+      "date": "2024-02-09",
+      "read": "2026-10-22",
+      "kind": "court",
+      "quote": "The Debtor, through his alter ego shell companies, HCHK Technologies, Inc. (\"HCHK Technologies\"), transferred funds in the amount of $270,000.00 prior to the Petition Date"
+     },
+     {
+      "publisher": "Mother Jones",
+      "title": "Steve Bannon Isn’t On Trial. But He Keeps Coming Up in a MAGA Mogul’s Fraud Case.",
+      "url": "https://www.motherjones.com/politics/2024/05/steve-bannon-isnt-on-trial-but-he-keeps-coming-up-in-a-maga-moguls-fraud-case/",
+      "date": "2024-05-31",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "A Guo company has also helped to fund Bannon’s War Room broadcast, paying at least $270,000 to the show in 2021 and 2022..."
+     }
+    ],
+    "doesNotProve": "The complaint is an unproven fraudulent-transfer allegation and its outcome was not checked; it does not name Bannon or say the money paid for programming. The link between the defendant company and Bannon's show comes from Mother Jones, which attributes the filing to the 'US Trustee' although the Chapter 11 trustee filed it."
    }
   ],
   "leads": [
@@ -846,9 +1032,66 @@
     "claim": "Washington Post (2022-01-24) on RAV owner Robert Sigg keeping Bannon on air.",
     "searched": "Fetch attempted; it did not complete.",
     "result": "Not read."
+   },
+   {
+    "claim": "Transfer from Golden Spring and Saraca Media Group (Guo entities) to Bannon Strategic Advisors, Inc.",
+    "searched": "Read the trustee's amended complaint, Despins v. Bannon Strategic Advisors, Inc., Adv. No. 24-05021 (Doc. 3, filed 2024-02-15), via CourtListener; the transfer schedule is filed under seal.",
+    "result": "The complaint does not say what the money paid for, so it is not tied to his media work; unproven allegation."
+   },
+   {
+    "claim": "Prosecutors in the Guo criminal case named Bannon a co-conspirator and cited a transfer to a company associated with him",
+    "searched": "Mother Jones (April and May 2024) on the DOJ filing and trial testimony.",
+    "result": "Bannon was not charged; the filing does not tie the money to War Room. Kept as a lead."
+   },
+   {
+    "claim": "War Room producer",
+    "searched": "Search on War Room's producer; results (Washington Post via ADN, Wikipedia, Raw Story citing NBC News) describe RAV as distributor and network, not producer.",
+    "result": "No producer entity documented."
+   },
+   {
+    "claim": "FEC disbursements to Warroom, Bannon Strategic Advisors, Real America's Voice or Performance One Media",
+    "searched": "api.open.fec.gov schedule_b with DEMO_KEY returned HTTP 429 on four tries (after waits of 30, 60 and 120 s).",
+    "result": "Unavailable; gave up as the brief directs."
    }
   ],
-  "batch": "b9"
+  "batch": "b9",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name (Bannon; only unrelated 1980s to 1990s short-form registrants Brian A. Bannon and Dona O'Bannon). No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "api.open.fec.gov schedule_b recipient_name WARROOM, BANNON STRATEGIC, REAL AMERICA'S VOICE, PERFORMANCE ONE MEDIA: HTTP 429 on four tries; gave up.",
+    "result": "unavailable"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname (Bannon; only unrelated 1980s to 1990s short-form registrants Brian A. Bannon and Dona O'Bannon). No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "RAV owner (see backing).",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "CourtListener RECAP search of the Guo bankruptcy adversary cases (see backing and leads).",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "alex-jones",
@@ -889,35 +1132,6 @@
      }
     ],
     "doesNotProve": "These reports do not show current ownership after the bankruptcy and auction proceedings."
-   },
-   {
-    "id": "store-revenue-court-records",
-    "kind": "court record",
-    "who": "Infowars online store (product sales)",
-    "summary": "AP reports court records show the Infowars store, which sells supplements and survival gear, brought in large revenue from 2015 to 2018; NPR reports the supplement store was listed among Free Speech Systems assets in the bankruptcy auction.",
-    "period": "2015 to 2018 (AP); bankruptcy 2022 to 2025",
-    "status": "alleged",
-    "sources": [
-     {
-      "publisher": "Associated Press",
-      "title": "EXPLAINER: What does Infowars’ bankruptcy filing mean?",
-      "url": "https://apnews.com/article/alex-jones-infowars-bankruptcy-filing-1a3b51946cb06c5f90c341d3118947cf",
-      "date": "2022-04-18",
-      "read": "2026-10-21",
-      "kind": "press",
-      "quote": "Court records show that Jones’ Infowars store, which sells nutritional supplements and survival gear, made more than $165 million between 2015 and 2018."
-     },
-     {
-      "publisher": "NPR",
-      "title": "Judge denies deal for a new auction of Alex Jones' Infowars",
-      "url": "https://www.npr.org/2025/02/05/g-s1-46738/infowars-alex-jones-onion-bankruptcy-judge-sandy-hook",
-      "date": "2025-02-05",
-      "read": "2026-10-21",
-      "kind": "press",
-      "quote": "...listed for sale in the first bankruptcy auction, such as Infowars' recording equipment, domain names and its vitamin and supplement online store."
-     }
-    ],
-    "doesNotProve": "Shows the company sold its own products; it does not show an outside backer, and the court filings themselves were not read in this session."
    }
   ],
   "leads": [
@@ -930,6 +1144,11 @@
     "claim": "Free Speech Systems bankruptcy monthly operating reports listing revenue by source.",
     "searched": "Filings not fetched; Reuters page did not load (401).",
     "result": "Primary filings not read."
+   },
+   {
+    "claim": "AP reports court records show the Infowars store, which sells supplements and survival gear, brought in large revenue from 2015 to 2018; NPR reports the supplement store was listed among Free Speech Systems assets in the bankruptcy auction.",
+    "searched": "research pass of 2026-10-21 and the support review of 2026-10-22",
+    "result": "The AP report behind the core claim refuses automated reading, and store sales are the company's own revenue, not third-party backing. Held. UNVERIFIED."
    }
   ],
   "batch": "b9"

@@ -102,9 +102,9 @@
       "title": "Ben Shapiro (author page)",
       "url": "https://www.dailywire.com/author/ben-shapiro",
       "date": null,
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "company",
-      "quote": "...founding editor-in-chief and editor emeritus of The Daily Wire..."
+      "quote": "Ben Shapiro is founding editor-in-chief and editor emeritus of The Daily Wire and host of “The Ben Shapiro Show,” the top conservative podcast in the nation."
      }
     ],
     "doesNotProve": "The page does not state his ownership share or who controls the company today.",
@@ -311,9 +311,51 @@
     "claim": "Employer or outlet owner",
     "searched": "Wikipedia result summary and searches",
     "result": "He publishes independently on his own channels; no employer found."
+   },
+   {
+    "claim": "Indian government blocking orders on his videos",
+    "searched": "Web search on government notices and funding FIRs; results: Bar & Bench and Deccan Herald (2026) report Google told the Delhi High Court it withheld one video in India after a Grievance Appellate Committee order; The Quint (2022) reports one of his videos among 45 the I&B ministry had blocked.",
+    "result": "Content takedown orders, not a label about who funds him; out of scope as backing. No foreign-funding FIR found."
    }
   ],
-  "batch": "b1"
+  "batch": "b1",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name. No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname. No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Government blocking orders (see leads); no YouTube funding panel or state label known.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "The existing record covers AI Fiesta; no new search.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "The Delhi High Court takedown case (see leads) concerns content, not funding.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "hamid-mir",
@@ -1355,6 +1397,15 @@
       "read": "2026-10-21",
       "kind": "press",
       "quote": "Russia’s Ministry of Justice has added Pavel Chikov, lawyer, and Ilya Varlamov, journalist, to its list"
+     },
+     {
+      "publisher": "Meduza",
+      "title": "Russia’s Justice Ministry names blogger Ilya Varlamov and lawyer Pavel Chikov ‘foreign agents’",
+      "url": "https://meduza.io/en/news/2023/03/23/russia-s-justice-ministry-names-blogger-ilya-varlamov-and-lawyer-pavel-chikov-foreign-agents",
+      "date": "2023-03-23",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Varlamov and Chikov disseminated “inaccurate information about decisions made and policies adopted by the public authorities,” according to the ministry’s website."
      }
     ],
     "doesNotProve": "The register entry is a Russian government designation; it names no foreign funder and is not evidence that any foreign party pays or directs his work. Varlamov disputes the law. The ministry's register page itself was not read."
@@ -1647,6 +1698,15 @@
     "status": "alleged",
     "sources": [
      {
+      "publisher": "U.S. District Court, Southern District of New York (via justice.gov)",
+      "title": "United States v. Kalashnikov and Afanasyeva, Indictment",
+      "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
+      "date": "2024-09-04",
+      "read": "2026-10-22",
+      "kind": "court",
+      "quote": "...also worked together to deceive two U.S. online commentators..."
+     },
+     {
       "publisher": "CBS News",
       "title": "U.S. says Russia funded media company that paid right-wing influencers millions for videos",
       "url": "https://www.cbsnews.com/news/russia-tenet-media-right-wing-influencers-justice-department/",
@@ -1727,6 +1787,15 @@
       "read": "2026-10-21",
       "kind": "press",
       "quote": "Johnson, the Chief Creative Officer of Charlie Kirk’s Turning Point USA, rose to prominence as a writer at BuzzFeed..."
+     },
+     {
+      "publisher": "YouTube (Benny Johnson channel description)",
+      "title": "Benny Johnson - YouTube",
+      "url": "https://www.youtube.com/@bennyjohnson/about",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "self",
+      "quote": "Contributor - TPUSA"
      }
     ],
     "doesNotProve": "A contributor or staff role shows an organisational tie, not who funds TPUSA or whether the role is paid; the current title and dates were not confirmed from TPUSA's own pages."
@@ -1835,9 +1904,51 @@
     "claim": "FARA, sanctions, platform labels, campaign-finance payments",
     "searched": "Nothing surfaced in pages read.",
     "result": "Nothing to report."
+   },
+   {
+    "claim": "Current exchange filing for TV Today Network shareholding",
+    "searched": "Web search results pointed to MarketsMojo and Finology summaries of the 2025 to 2026 shareholding pattern; not fetched.",
+    "result": "Not read from a BSE or NSE filing, so no current percentage is recorded."
    }
   ],
-  "batch": "b3"
+  "batch": "b3",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name. No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname. No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "No platform or government label seen in pages read; not separately searched.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "Searched TV Today Network shareholding; read the Newslaundry 2022 and MOM India Aaj Tak pages.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "Not checked beyond the pages named in leads.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "cuneyt-ozdemir",
@@ -1882,9 +1993,61 @@
     "claim": "Funding, sanctions, RTÜK licensing or platform labels",
     "searched": "The web-search budget ran out before Turkish-language searches could run.",
     "result": "Not searched in full; nothing documented."
+   },
+   {
+    "claim": "Employer: 5N1K on CNN Türk",
+    "searched": "Turkish-language search for a 2025 channel or programme ('Cüneyt Özdemir yeni program kanal 2025'); results gave English Wikipedia, a 2015 CNN Türk season page and a Cumhuriyet profile saying he now comments on YouTube.",
+    "result": "No page from 2020 or later shows a current employer; the CNN Türk role is not documented as current."
+   },
+   {
+    "claim": "Sezgin Baran Korkmaz (SBK) offered him a news-channel project",
+    "searched": "Read Hilal Kaplan's Sabah column of 2022-08-05, which says Özdemir stated in June 2021 that SBK approached him about a news-channel project and that he refused.",
+    "result": "By the column's own account Özdemir refused; one opinion column, no money shown. Not backing."
+   },
+   {
+    "claim": "RTÜK licensing or fines on his YouTube channel",
+    "searched": "Turkish search 'Cüneyt Özdemir YouTube kanalı RTÜK lisans cezası'; results covered RTÜK's general move to license YouTube news channels (Duvar English, MLSA, Bianet), naming his channel as one that would fall under it.",
+    "result": "No RTÜK decision naming his channel found."
    }
   ],
-  "batch": "b3"
+  "batch": "b3",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name (Ozdemir and Özdemir). No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname (Ozdemir and Özdemir). No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Turkish-language RTÜK search (see leads); no platform label seen.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "Searched the SBK news-channel offer (see leads); no investor documented.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "patrick-bet-david",
@@ -2113,6 +2276,36 @@
      }
     ],
     "doesNotProve": "One outlet read; it shows a role that ended in 2024, and the new owner never employed him as chair."
+   },
+   {
+    "id": "gb-news-shareholders-2021",
+    "kind": "outlet owner",
+    "who": "Discovery Inc., Legatum and Sir Paul Marshall (GB News shareholders)",
+    "summary": "City A.M. and the Society of Editors report that in January 2021, while Neil chaired GB News, the channel said Legatum and Sir Paul Marshall would join Discovery as major shareholders.",
+    "period": "2021 (during Neil's 2020 to 2021 chairmanship)",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "City A.M.",
+      "title": "GB News promises ‘boldly different’ TV channel as it secures £60m funding",
+      "url": "https://www.cityam.com/gb-news-promises-boldly-different-tv-channel-as-it-secures-60m-funding/",
+      "date": "2021-01-06",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "...today said it had secured backing from Dubai-based investment firm Legatum and hedge fund manager Sir Paul Marshall."
+     },
+     {
+      "publisher": "Society of Editors",
+      "title": "“Boldly different” GB News to recruit 120 journalists as it confirms £60m funding",
+      "url": "https://www.societyofeditors.org/soe_news/boldly-different-gb-news-to-recruit-120-journalists-as-it-confirms-60m-funding/",
+      "date": "2021-01-06",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "...Sir Paul Marshall, and Dubai-based investment group Legatum would become major shareholders in the company in addition to US broadcasting firm Discovery Inc."
+     }
+    ],
+    "doesNotProve": "Shows who owned the channel he chaired, not that the shareholders directed his broadcasts. Neil left GB News in 2021. Both items may rest on the same company announcement.",
+    "pastOutlet": true
    }
   ],
   "leads": [
@@ -2125,9 +2318,56 @@
     "claim": "Channel 4 show (2022 to 2023) and Daily Mail column",
     "searched": "Wikipedia only; primary pages not read.",
     "result": "Unverified."
+   },
+   {
+    "claim": "Daily Mail column in 2025 or 2026",
+    "searched": "Web search for a current Daily Mail column; Press Gazette's 2026 item naming him among the paper's best-known voices returned 403; a guessed Daily Mail columnist URL served the homepage.",
+    "result": "No Daily Mail author page or dated column read; unverified."
+   },
+   {
+    "claim": "Channel 4 show (2022 to 2023)",
+    "searched": "Not searched in this round.",
+    "result": "Not checked."
    }
   ],
-  "batch": "b3"
+  "batch": "b3",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name. No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname. No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Not checked; no label seen.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "Searched the GB News 2021 funding round; read City A.M., Society of Editors and Global Venturing (which attributes its figures to Sky News).",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "dmitry-gordon",
@@ -2203,9 +2443,38 @@
       "read": "2026-10-21",
       "kind": "self",
       "quote": "...а 2 вересня – до реєстру \"іноземних агентів\""
+     },
+     {
+      "publisher": "Radio Free Europe/Radio Liberty",
+      "title": "Russia designates Makarevich, Zhdanov, Zimin and others as foreign agents",
+      "url": "https://www.rferl.org/a/russia-makarevich-zhdanov-zimin-foreign-agents-ukraine/32016826.html",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Russian authorities has designated rock musician Andrei Makarevich and five others as “foreign agents,” accusing them of unspecified political activities while allegedly receiving funding from Ukraine."
      }
     ],
     "doesNotProve": "The label is a designation by the Russian government against a Ukrainian journalist who is not a Russian citizen; it is an accusation by a party to the war, not evidence of foreign funding. The Ministry of Justice register itself was not read."
+   },
+   {
+    "id": "gordon-founder-gordonua",
+    "kind": "outlet owner",
+    "who": "Dmytro Gordon (founder of the online outlet GORDON)",
+    "summary": "GORDON's own editorial page lists Gordon as journalist and founder of the online publication GORDON.",
+    "period": "current as read",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "GORDON (gordonua.com)",
+      "title": "Редакція сайту ГОРДОН – хто ми, контакти, журналісти",
+      "url": "https://gordonua.com/ukr/about.html",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "self",
+      "quote": "Журналіст, засновник інтернет-видання \"ГОРДОН\""
+     }
+    ],
+    "doesNotProve": "Founding an outlet is not proof he owns it today; no company registry record of GORDON's owner was read, and nothing here shows outside money behind it."
    }
   ],
   "leads": [
@@ -2218,9 +2487,56 @@
     "claim": "Advertising or investors behind GORDON and his YouTube channels",
     "searched": "The YouTube channel description gives an advertising contact; no investor named in pages read.",
     "result": "Nothing documented."
+   },
+   {
+    "claim": "Registered owner and funding of gordonua.com",
+    "searched": "Web search on GORDON ownership; read the AidData Ukraine media-ownership profile (it records Gordon's 100 percent ownership of the newspaper Bulvar Gordona, which closed in 2019, not the website) and GORDON's about page.",
+    "result": "No registry or filing names the website's legal owner or funders."
+   },
+   {
+    "claim": "Moscow military court sentenced Gordon in absentia to 14 years (2024)",
+    "searched": "Search results from The Moscow Times, Novaya Gazeta Europe and RSF.",
+    "result": "A criminal case over a video's content, not over who funds his media; out of scope."
    }
   ],
-  "batch": "b3"
+  "batch": "b3",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name (Gordon with Dmitr or Dmyt, ГОРДОН). No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname (Gordon with Dmitr or Dmyt, ГОРДОН). No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "The existing record holds the Russian 'foreign agents' entry; minjust.gov.ru did not answer from here.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "See leads.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "See leads.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "john-oliver",
@@ -2257,9 +2573,9 @@
       "title": "Last Week Tonight with John Oliver",
       "url": "https://www.hbomax.com/show/f7ebcd02-6641-4ec5-a392-07e58196808f",
       "date": null,
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "company",
-      "quote": "A satirical, insightful, and meticulously researched look at current events in the U.S. and around the globe..."
+      "quote": "John Oliver hosts this comedy series that takes a satirical look at the week in news, politics and more."
      },
      {
       "publisher": "HBO Max",
@@ -2587,6 +2903,15 @@
       "read": "2026-10-21",
       "kind": "press",
       "quote": "Sudhir Chaudhary has been announced to join Aaj Tak as consulting editor."
+     },
+     {
+      "publisher": "Newslaundry",
+      "title": "Sudhir Chaudhary inks deal for DD News show",
+      "url": "https://www.newslaundry.com/2025/03/12/sudhir-chaudhary-inks-deal-for-dd-news-show",
+      "date": "2025-03-12",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Prasar Bharati has signed a deal with Aaj Tak consulting editor Sudhir Chaudhary for a show on DD News"
      }
     ],
     "doesNotProve": "The exact end date of the Aaj Tak role was not confirmed from a fetched page; both sources are one outlet.",
@@ -2883,6 +3208,46 @@
      }
     ],
     "doesNotProve": "This is a publisher's author bio, not ITV's own page; ITV pages timed out, so the role being current in 2026 is not confirmed from the employer."
+   },
+   {
+    "id": "peston-goalhanger-rest-is-money",
+    "kind": "employer",
+    "who": "Goalhanger (The Rest Is Money)",
+    "summary": "Goalhanger's own shows page lists The Rest Is Money and says Robert Peston and Steph McGovern present it.",
+    "period": "current as read",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Goalhanger",
+      "title": "Podcast Shows & Series | Goalhanger",
+      "url": "https://goalhanger.com/shows",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "Robert Peston and Steph McGovern make sense of the money shaping the modern world."
+     }
+    ],
+    "doesNotProve": "Shows he co-hosts a Goalhanger podcast; it does not show the terms, or that Goalhanger's owners shape his ITV work."
+   },
+   {
+    "id": "peston-goalhanger-psc",
+    "kind": "outlet owner",
+    "who": "Goalhanger Podcasts Ltd persons with significant control (Gordon General Holdings Limited, Gary Winston Lineker, Pastor Shannon Limited)",
+    "summary": "Companies House lists three active persons with significant control of Goalhanger Podcasts Ltd, the company behind the network that carries his podcast.",
+    "period": "current as read",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Companies House",
+      "title": "GOALHANGER PODCASTS LTD persons with significant control",
+      "url": "https://find-and-update.company-information.service.gov.uk/company/13846551/persons-with-significant-control",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "government",
+      "quote": "Persons with significant control: 3 active persons with significant control / 0 active statements"
+     }
+    ],
+    "doesNotProve": "No page read ties The Rest Is Money to this legal entity rather than another Goalhanger company. Control of the podcast company says nothing about his ITV role."
    }
   ],
   "leads": [
@@ -2900,9 +3265,51 @@
     "claim": "Other kinds (sponsors, FARA, sanctions, grants, platform labels)",
     "searched": "Not completed before the shared search limit was reached",
     "result": "Nothing documented."
+   },
+   {
+    "claim": "Second source for the ITV News political editor role",
+    "searched": "ITV pages (itv.com news topic and press centre) reset the connection or returned 404, including the archived copy. Prolific North (2015-10-05): 'Robert Peston has reportedly left the BBC to join ITV as its new political editor.'",
+    "result": "A 2015 trade report of the move; ITV's own page still not read, so current status rests on the publisher bio in the existing row."
    }
   ],
-  "batch": "b4"
+  "batch": "b4",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name. No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname. No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Not checked; no label seen.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "Goalhanger ownership via Companies House (see backing); The Chernin Group investment is in the Lineker record.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "kseniya-sobchak",
@@ -2976,9 +3383,56 @@
     "claim": "Meduza reports Sobchak's commercial director was jailed in 2022 on charges of trying to extort money from Rostec's head for burying negative coverage on a Telegram channel; The Moscow Times reports three men were convicted in 2024, and reported via TASS that Sobchak was a suspect.",
     "searched": "research pass of 2026-10-21",
     "result": "Concerns charges against a former associate over a Telegram channel's coverage, not who funds Sobchak's media work; Sobchak was not charged. Out of scope. UNVERIFIED."
+   },
+   {
+    "claim": "Russian 'foreign agent' register entry",
+    "searched": "minjust.gov.ru did not answer; web search found no report of a designation (Wikipedia's list of foreign agents in Russia does not name her; Meduza and BEAR register updates; an EADaily 2025 item citing her Telegram channel). One Russian-language search was blocked by a local hook and not rerun.",
+    "result": "No designation found; the register itself was not read, so status is unknown."
+   },
+   {
+    "claim": "Telegram channel 'Bloody Lady'",
+    "searched": "EADaily (2025) refers to her telegram channel 'Bloody Lady'.",
+    "result": "Single press mention; no handle confirmed, so no account added."
    }
   ],
-  "batch": "b4"
+  "batch": "b4",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name (Sobchak and СОБЧАК). No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname (Sobchak and СОБЧАК). No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Russian foreign-agent register (see leads).",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "Not checked beyond the existing Ostorozhno Media row.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "The existing record covers the 2022 to 2024 extortion case against a former associate (out of scope).",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "jake-tapper",
@@ -3598,9 +4052,9 @@
       "title": "36 periodistas recibieron 1,081 mdp con Peña, según lista del gobierno de AMLO",
       "url": "https://politica.expansion.mx/mexico/2019/05/23/36-periodistas-recibieron-1-081-mdp-con-pena-segun-lista-del-gobierno-de-amlo",
       "date": "2019-05-23",
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "press",
-      "quote": "El gobierno de Andrés Manuel López Obrador difundió una lista de los periodistas y las empresas de medios..."
+      "quote": "El documento muestra que entre quienes recibieron más dinero por contratos de publicidad y otros servicios están López-Dóriga..."
      },
      {
       "publisher": "Forbes México",
@@ -3685,6 +4139,15 @@
       "read": "2026-10-21",
       "kind": "press",
       "quote": "...which was co-founded by former BBC presenter Gary Lineker..."
+     },
+     {
+      "publisher": "UK Companies House",
+      "title": "Goalhanger Podcasts Ltd: persons with significant control",
+      "url": "https://find-and-update.company-information.service.gov.uk/company/13846551/persons-with-significant-control",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "government",
+      "quote": "Mr Gary Winston Lineker"
      }
     ],
     "doesNotProve": "The register shows control bands, not the exact split, and it may not yet reflect the 2026 Chernin Group minority stake; the corporate holders' own owners were not checked."
@@ -3734,6 +4197,15 @@
       "read": "2026-10-21",
       "kind": "press",
       "quote": "...which was co-founded by former BBC presenter Gary Lineker..."
+     },
+     {
+      "publisher": "STV News (PA / ITV News)",
+      "title": "Gary Lineker to present last Match Of The Day as he exits BBC",
+      "url": "https://news.stv.tv/world/gary-lineker-to-present-last-match-of-the-day-as-he-exits-bbc",
+      "date": "2025-05-25",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Sports pundit Gary Lineker will present his last Match Of The Day as he makes an early exit from the BBC."
      }
     ],
     "doesNotProve": "bbc.co.uk could not be fetched, so the BBC's own statement was not read; the role has ended.",
@@ -3751,9 +4223,51 @@
     "claim": "Funding, FARA, sanctions or political paid placements tied to Lineker",
     "searched": "Search budget ran out before a dedicated search; Goalhanger site and Companies House read",
     "result": "Not searched in full; nothing found in pages read."
+   },
+   {
+    "claim": "Political paid placements or sponsorship",
+    "searched": "No new web search; sanctions and FARA lists checked.",
+    "result": "Nothing found."
    }
   ],
-  "batch": "b5"
+  "batch": "b5",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name. No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname. No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Not checked; no label seen.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "The existing record covers the Goalhanger PSC entries and The Chernin Group; no new search.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "jon-stewart",
@@ -3839,9 +4353,51 @@
     "claim": "Funding, FARA, sanctions or political paid placements tied to Stewart",
     "searched": "Search budget ran out before a dedicated search; Wikipedia and company pages read",
     "result": "Not searched in full; nothing found in pages read."
+   },
+   {
+    "claim": "Comedy Central agreed in 2005 to finance Stewart's company Busboy Productions with a first-look deal",
+    "searched": "Web search; Wikipedia's Busboy Productions article (not fetched); Variety and The Hollywood Reporter cover the 2024 Weekly Show podcast with Paramount Audio.",
+    "result": "A 2005 arrangement with the existing employer that adds no new backer. No row."
    }
   ],
-  "batch": "b5"
+  "batch": "b5",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: one short-form registrant 'Stewart, Jon Wayland' (Jordan Tourism Information Service, 1964), a different person; no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (JjI3TM__A5o) from the YouTube channel titled 'The Daily Show': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=jon+stewart: no results."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Web search on Busboy Productions funding and podcast sponsors: no outside investor named."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of his media work surfaced."
+   }
+  }
  },
  {
   "id": "lawrence-odonnell",
@@ -3893,9 +4449,51 @@
     "claim": "Other funding, sponsorship, FARA, sanctions, campaign-finance payments or platform labels",
     "searched": "Web search on the host and the show; read the MS NOW show page and Versant spin-off coverage. The Versant investor release and Business Wire copy returned HTTP 403.",
     "result": "No other backing found in the pages read; the session's web-search budget ran out before FEC/FARA databases were queried for this name."
+   },
+   {
+    "claim": "K.I.N.D. (Kids in Need of Desks) fund promoted on The Last Word",
+    "searched": "Web search; NBC News pages on the K.I.N.D. fund.",
+    "result": "A charity his show raises money for, not funding of his media work. No row."
    }
   ],
-  "batch": "b6"
+  "batch": "b6",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed. Web search found no payment to O'Donnell."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (SPGxj0mhTBU) from the YouTube channel titled 'MS NOW (network channel)': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=lawrence+o'donnell: no results."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Not applicable: no company of his own found in search."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of his media work surfaced."
+   }
+  }
  },
  {
   "id": "mark-levin",
@@ -3986,9 +4584,56 @@
     "claim": "RadioInsight and Adweek report that Levin's CRTV (the LevinTV network) merged with TheBlaze in December 2018 to form Blaze Media; RadioInsight says Levin holds no management stake. A 2024 Cumulus release says his Fox program also airs on LevinTV and TheBlaze.",
     "searched": "research pass of 2026-10-21",
     "result": "Describes a 2018 merger in which Levin holds no management stake; not backing. UNVERIFIED."
+   },
+   {
+    "claim": "Landmark Legal Foundation (EIN 51-0203802) lists Mark R Levin as Director/chairman on its Form 990 filings",
+    "searched": "ProPublica Nonprofit Explorer page for Landmark Legal Foundation (read 2026-10-22).",
+    "result": "A legal nonprofit he chairs is not funding of his media work, and the 990 figures for him are compensation, which the brief excludes. No row."
+   },
+   {
+    "claim": "Current shareholders of Blaze Media and whether Levin holds equity after the 2018 CRTV merger (carried from round 1)",
+    "searched": "Web search; RadioInsight, O'Dwyer's and TheWrap cover the merger; Puck covers a Beck and DeVos deal (not fetched).",
+    "result": "No source read names Blaze Media's shareholders or a Levin stake."
    }
   ],
-  "batch": "b6"
+  "batch": "b6",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match; 'Levin Public Relations & Marketing, Inc.' (1997 to 2002) is an unrelated firm."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (mQ2sYip1yE4) from the YouTube channel titled 'The Mark Levin Show': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=landmark+legal+foundation: Landmark Legal Foundation found, see leads; q=mark+levin returned unrelated family foundations."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Web search on Blaze Media investors: none named."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of his media work surfaced."
+   }
+  }
  },
  {
   "id": "chris-hayes",
@@ -4016,7 +4661,7 @@
     "id": "ms-now-employer",
     "kind": "employer",
     "who": "MS NOW",
-    "summary": "Wikipedia says Hayes hosts \"All In with Chris Hayes\" on MS NOW, and MS NOW's own site lists the show in its weeknight lineup.",
+    "summary": "MS NOW's own site lists All In with Chris Hayes in its weeknight lineup, and The Nation's author page says Hayes hosts it on MSNBC, the network's former name.",
     "period": "since 2013 (network renamed MS NOW in November 2025)",
     "status": "documented",
     "sources": [
@@ -4028,6 +4673,15 @@
       "read": "2026-10-21",
       "kind": "company",
       "quote": "All In with Chris Hayes"
+     },
+     {
+      "publisher": "The Nation",
+      "title": "Chris Hayes (author page)",
+      "url": "https://www.thenation.com/authors/chris-hayes/",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "Chris Hayes is the Editor-at-Large of The Nation and host of “All In with Chris Hayes” on MSNBC."
      }
     ],
     "doesNotProve": "Employment does not show that the network dictates the host's opinions. The MS NOW page lists the show but has no host bio sentence.",
@@ -4067,7 +4721,44 @@
     "result": "Nothing found in pages read; the session's web-search budget ran out before FEC/FARA databases were queried for this name."
    }
   ],
-  "batch": "b6"
+  "batch": "b6",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: short-form registrants named Chris or Christopher Hayes at Daniel J. Edelman, Inc. (1996 to 2017) and Conover + Gould (2017) are PR staff with nothing tying them to the MS NOW host; treated as no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed. Web search on paid political content in his podcast found none."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (SPGxj0mhTBU) from the YouTube channel titled 'MS NOW (network channel)': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=chris+hayes: no organisation he runs."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Not applicable: no company of his own found in search."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of his media work surfaced."
+   }
+  }
  },
  {
   "id": "bill-oreilly",
@@ -4188,9 +4879,51 @@
     "claim": "Owner of NewsNation; FEC, FARA, sanctions or platform labels",
     "searched": "Not reached",
     "result": "No ownership page read; the session's web-search budget ran out before FEC/FARA databases were queried for this name."
+   },
+   {
+    "claim": "Investors in The First TV and Red Seat Ventures; Fox Corporation agreed to buy Red Seat Ventures in 2025",
+    "searched": "Web search; Bloomberg (2025-02-10) and a Fox Corporation page report Fox buying Red Seat Ventures (not fetched); CB Insights lists an unverified funding figure.",
+    "result": "Red Seat Ventures is a producer working with O'Reilly, not his own company; the acquisition needs a fetched Fox press release before it can become an outlet-owner row. No investor named for The First."
    }
   ],
-  "batch": "b6"
+  "batch": "b6",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: one short-form registrant 'O'Reilly, William F.B.' (November Team LLC, 2018 to 2019), a different person; no match for Bill O'Reilly."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed. Web search found no FEC line item naming O'Reilly or No Spin News."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "YouTube handle @BillOReilly redirected (303) and was not resolved; no channel checked. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=o'reilly: no results."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Web search: no investors named in a company he owns."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of his media work surfaced."
+   }
+  }
  },
  {
   "id": "mubashir-lucman",
@@ -4230,9 +4963,56 @@
     "claim": "Funding, regulator or platform labels, FARA, sanctions",
     "searched": "Web search and Wikipedia; the 2014 PEMRA ban concerns his speech, not funding",
     "result": "No funding record found in pages read; the session's web-search budget ran out before FEC/FARA databases were queried for this name."
+   },
+   {
+    "claim": "PEMRA or court bans on appearing on air",
+    "searched": "Web search 'Mubasher Lucman 2024 OR 2025 channel anchor program PEMRA'; results (Journalism Pakistan, VOJ, Newsweek Pakistan, ARY News pages) concern the 2017 to 2018 Lahore High Court and PEMRA orders and an Islamabad High Court bar.",
+    "result": "Regulator actions about content, before 2020 or undated; they say nothing about who funds his media. Out of scope."
+   },
+   {
+    "claim": "Current television employer",
+    "searched": "Same search; no 2024 to 2026 programme or channel found.",
+    "result": "Unverified; his own YouTube channel remains the only current outlet in the record."
    }
   ],
-  "batch": "b6"
+  "batch": "b6",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name (Lucman and Luqman; the Luqman hits are unrelated listed persons). No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname (Lucman and Luqman; the Luqman hits are unrelated listed persons). No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "PEMRA actions (see leads); no platform label seen.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "See leads.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "andrew-tate",
@@ -4307,9 +5087,56 @@
     "claim": "Investors or funders of his own media ventures",
     "searched": "Web search on Tate media company and Rumble",
     "result": "No filing or press release naming investors was found. His criminal cases are out of scope and were not reviewed."
+   },
+   {
+    "claim": "Romanian prosecutors charged Tate with human trafficking and forming an organised crime group",
+    "searched": "Web search; FindLaw, LBC and AOL results (mostly 2023).",
+    "result": "The charges concern alleged sexual exploitation, not who paid or directed his media work; out of scope under the brief. No row."
+   },
+   {
+    "claim": "Investors in Hustlers University / The Real World",
+    "searched": "Web search on Tate, Rumble and The Real World funding.",
+    "result": "No investor named; CNN's report on the Rumble deal is covered by the existing row."
    }
   ],
-  "batch": "b6"
+  "batch": "b6",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match. ('Tate' with Andrew or Emory nearby: no match in any list.)"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "No YouTube channel checked (none confirmed). X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=andrew+tate: one unrelated match (Andre Tate Foundation, California)."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Web search: no investors named."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "See leads: the Romanian criminal case is out of scope."
+   }
+  }
  },
  {
   "id": "denise-dresser",
@@ -4352,6 +5179,26 @@
      }
     ],
     "doesNotProve": "The pages are bios, not the outlets' own staff pages; they do not state payment or whether the columns are still running today."
+   },
+   {
+    "id": "dresser-latinus-videocolumn",
+    "kind": "employer",
+    "who": "Latinus (LatinUS)",
+    "summary": "Latinus's own author page lists a regular Denise Dresser video column, the newest dated 20 October 2026.",
+    "period": "current as read",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Latinus",
+      "title": "Denise Dresser - LatinUS",
+      "url": "https://latinus.us/autor/denise-dreeser.html",
+      "date": "2026-10-20",
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "DENISE DRESSER VIDEOCOLUMNA En opinión de Denise Dresser: El desabasto más preocupante es la falta de empatía del gobierno 20/10/2026"
+     }
+    ],
+    "doesNotProve": "Shows she publishes a video column on Latinus; it does not show payment terms, or that Latinus's backers shape her views."
    }
   ],
   "leads": [
@@ -4364,9 +5211,56 @@
     "claim": "Owners of Reforma, Proceso or Latinus; funding claims",
     "searched": "Not reached; the Proceso author URL tried returned HTTP 404",
     "result": "The session's web-search budget ran out before ownership records were read."
+   },
+   {
+    "claim": "Latinus's financing and owners",
+    "searched": "Read Expansión Política (2021-03-30: Roberto Madrazo said relatives promote the platform and that he neither owns nor finances it), El Imparcial (2024-07-08) and Rest of World (2021: backing 'purposefully hidden behind the Latinus Media Group, an LLC incorporated in Delaware').",
+    "result": "Reports concern the outlet and name private individuals through a politician's statement; no filing read. Not attached to Dresser as backing."
+   },
+   {
+    "claim": "Owners of Reforma and Proceso",
+    "searched": "Proceso and Reforma pages returned 404 or a login wall.",
+    "result": "Unverified."
    }
   ],
-  "batch": "b6"
+  "batch": "b6",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name. No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname. No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Not checked; no label seen.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "See leads (Latinus).",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "matt-walsh",
@@ -4429,7 +5323,44 @@
     "result": "Nothing found in pages read; the session's web-search budget ran out before FEC/FARA databases were queried for this name."
    }
   ],
-  "batch": "b6"
+  "batch": "b6",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed. Web search found no FEC filing or paid political partnership naming Walsh or The Daily Wire."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (I5Y5wrxrenw) from the YouTube channel titled 'Matt Walsh': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=matt+walsh: no results."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Not applicable beyond the employer: his show is produced by The Daily Wire (existing row); no company of his own found."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of his media work surfaced."
+   }
+  }
  },
  {
   "id": "joe-scarborough",
@@ -4481,9 +5412,51 @@
     "claim": "FEC, FARA, sanctions, platform labels or other funding",
     "searched": "Read the MS NOW show page and Versant spin-off coverage",
     "result": "Nothing found in pages read; the session's web-search budget ran out before FEC/FARA databases were queried for this name."
+   },
+   {
+    "claim": "PAC contributions to Friends of Joe Scarborough",
+    "searched": "Web search; ProPublica Itemizer pages for his congressional committee (1990s and 2000s).",
+    "result": "Contributions to his own former campaign are not payments for media work. No row."
    }
   ],
-  "batch": "b6"
+  "batch": "b6",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match; 'Nelson Mullins Riley & Scarborough, LLP' is an unrelated law firm."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed. Web search found no payment to Scarborough for media work."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (SPGxj0mhTBU) from the YouTube channel titled 'MS NOW (network channel)': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=scarborough: 225 matches, place-name organisations; none his."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Not applicable: no company of his own found in search."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of his media work surfaced."
+   }
+  }
  },
  {
   "id": "jack-posobiec",
@@ -4580,9 +5553,51 @@
     "claim": "FARA filing, sanctions listing or platform state-affiliation label naming Posobiec",
     "searched": "Search budget for this run ran out before dedicated FARA eFile, OFAC, EU and platform-label lookups could be made",
     "result": "Not checked; unknown. No such record was seen on any page read."
+   },
+   {
+    "claim": "FEC matter MUR 7401 (Citizens for Trump and related groups)",
+    "searched": "FEC letter in the MUR 7401 file (https://www.fec.gov/files/legal/murs/7401/7401_44.pdf), text extracted and read in full.",
+    "result": "The letter says \"You are not the subject of the Commission's investigation and the Commission does not consider you a respondent in this matter, but rather a witness only.\" A witness letter is not a payment to him. No row."
    }
   ],
-  "batch": "b7"
+  "batch": "b7",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed. Web search found no FEC line item paying Posobiec."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (6MWSmAMravE) from the YouTube channel titled 'Jack Posobiec': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=posobiec: no results; q=human+events: no results."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Web search on Human Events funding: none named."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "Web search: no court record about funding of his media work; only the MUR 7401 witness letter (see leads)."
+   }
+  }
  },
  {
   "id": "joy-reid",
@@ -4643,12 +5658,12 @@
     "sources": [
      {
       "publisher": "TheWrap",
-      "title": "Joy Reid to Launch YouTube Podcast as First Move Post-MSNBC",
+      "title": "Joy Reid YouTube show after MSNBC",
       "url": "https://www.thewrap.com/joy-reid-youtube-podcast-after-msnbc",
-      "date": "2025-05-30",
-      "read": "2026-10-21",
+      "date": null,
+      "read": "2026-10-22",
       "kind": "press",
-      "quote": "The show will be produced by Image Lab Media Group..."
+      "quote": "The show will be produced by Image Lab Media Group, the production company Reid launched..."
      },
      {
       "publisher": "Revolt",
@@ -4678,9 +5693,51 @@
     "claim": "FARA filing, sanctions listing or platform state-affiliation label naming Reid",
     "searched": "Search budget for this run ran out before dedicated FARA eFile, OFAC, EU and platform-label lookups could be made",
     "result": "Not checked; unknown. No such record was seen on any page read."
+   },
+   {
+    "claim": "Outside investors or funding partners for Image Lab Media Group or The Joy Reid Show",
+    "searched": "Two web searches; TheWrap, Revolt, Essence and The Hollywood Reporter results; joyannreid.com about page snippet.",
+    "result": "Sources name Image Lab as producer and describe it as co-owned by Reid and a family member; no investor or sponsor named."
    }
   ],
-  "batch": "b7"
+  "batch": "b7",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (4YVQ2tR_gyc) from the YouTube channel titled 'The Joy Reid Show': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=joy+reid: no results."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Web search: no investors named."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of her media work surfaced."
+   }
+  }
  },
  {
   "id": "dave-rubin",
@@ -4733,6 +5790,15 @@
     "period": "to 2024",
     "status": "alleged",
     "sources": [
+     {
+      "publisher": "U.S. District Court, Southern District of New York (via justice.gov)",
+      "title": "United States v. Kalashnikov and Afanasyeva, Indictment",
+      "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
+      "date": "2024-09-04",
+      "read": "2026-10-22",
+      "kind": "court",
+      "quote": "...also worked together to deceive two U.S. online commentators..."
+     },
      {
       "publisher": "CBS News",
       "title": "U.S. says Russia funded media company that paid right-wing influencers millions for videos",
@@ -4862,9 +5928,56 @@
     "claim": "FARA filing, sanctions listing or platform state-affiliation label naming Rubin",
     "searched": "Search budget for this run ran out before dedicated FARA eFile, OFAC, EU and platform-label lookups could be made",
     "result": "Not checked; unknown. No such record was seen on any page read."
+   },
+   {
+    "claim": "Craft Ventures led a $3.8 million round in Locals in April 2021",
+    "searched": "Web search (Wikipedia mirrors only); SEC EDGAR Form D for Locals Technology Inc. (CIK 1809815, filed 2021-03-29) read: related persons LEV, ASSAF (Executive Officer, Director), RUBIN, DAVID (Director), CONRU, ANDREW (Director); 12 investors; date of first sale 2021-03-26.",
+    "result": "The Form D shows outside investors but does not name them; Craft Ventures is named only by Wikipedia. Needs a Locals or Craft Ventures announcement or two independent outlets."
+   },
+   {
+    "claim": "Seed round of about $1 million from 10 Rule 506(b) investors in 2020",
+    "searched": "Wikipedia's Rumble article cites SEC Form D/A filings of April 2020 and an AlleyWatch funding report; EDGAR submissions list Form D (2020-04-17) and two D/A filings.",
+    "result": "Investors are not named in the filings. No row."
    }
   ],
-  "batch": "b7"
+  "batch": "b7",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (45fA6Sry7_Y) from the YouTube channel titled 'The Rubin Report': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=rubin+report: no results."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "SEC Form D for Locals Technology Inc. read; see leads."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "Tenet Media indictment row already exists; no further court record searched."
+   }
+  }
  },
  {
   "id": "sam-seder",
@@ -4901,9 +6014,65 @@
     "platform": "web",
     "handle": "majorityreportradio.com",
     "url": "https://majorityreportradio.com/"
+   },
+   {
+    "platform": "youtube",
+    "handle": "TheMajorityReport",
+    "channelId": "UC-3jIAlnQmbbVMV6gR7K8aQ",
+    "url": "https://www.youtube.com/@TheMajorityReport"
+   },
+   {
+    "platform": "instagram",
+    "handle": "sam.seder",
+    "url": "https://www.instagram.com/sam.seder"
+   },
+   {
+    "platform": "instagram",
+    "handle": "majorityreport.fm",
+    "url": "https://www.instagram.com/majorityreport.fm"
+   },
+   {
+    "platform": "tiktok",
+    "handle": "majorityreportfm",
+    "url": "https://www.tiktok.com/@majorityreportfm"
+   },
+   {
+    "platform": "podcast",
+    "handle": "The Majority Report with Sam Seder",
+    "url": "https://open.spotify.com/show/54XamSLDhv579AvZJzK6Bd"
    }
   ],
-  "backing": [],
+  "backing": [
+   {
+    "id": "seder-majority-report-founder",
+    "kind": "employer",
+    "who": "The Majority Report (his own show)",
+    "summary": "The Majority Report's own About page lists Seder as host and founder of the show, and its home page says members fund it.",
+    "period": null,
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "The Majority Report",
+      "title": "The Majority Report: About (Wayback Machine capture 2026-09-21; live site returned HTTP 503)",
+      "url": "https://web.archive.org/web/20260921202806/https://majorityreportradio.com/about",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "self",
+      "quote": "Sam Seder The Host, Founder Sam Seder is the host of the Majority Report."
+     },
+     {
+      "publisher": "The Majority Report",
+      "title": "The Majority Report home page (Wayback Machine capture 2026-09-22)",
+      "url": "https://web.archive.org/web/20260922225641/https://majorityreportradio.com/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "self",
+      "quote": "Majority Report members provide the funds needed to keep our 5x award-winning show going."
+     }
+    ],
+    "doesNotProve": "Shows his own role as founder and host. The pages name no company, owner share, investor or outside funder."
+   }
+  ],
   "leads": [
    {
     "claim": "Audience funding of The Majority Report",
@@ -4934,9 +6103,29 @@
     "claim": "FARA filing, sanctions listing or platform state-affiliation label naming Seder",
     "searched": "Search budget for this run ran out before dedicated FARA eFile, OFAC, EU and platform-label lookups could be made",
     "result": "Not checked; unknown. No such record was seen on any page read."
+   },
+   {
+    "claim": "A network, distribution or ownership deal for The Majority Report since 2020 (Wikipedia says the TYT partnership ended in 2020)",
+    "searched": "Web search \"Sam Seder Majority Report company owner network deal 2025\"; archived About, Sponsors and FAQ pages",
+    "result": "No press release, filing or two-outlet report of a current network, owner or investor found. The Sponsors page lists only consumer advertisers (CBD, supplements, bedding), which are out of scope."
+   },
+   {
+    "claim": "Current MSNBC / MS NOW contributor role",
+    "searched": "Web search \"Sam Seder MS NOW OR MSNBC contributor 2025 OR 2026\"",
+    "result": "Results date from 2017 to 2018. No 2020-or-later source for the role, so it stays outside the employer window."
    }
   ],
-  "batch": "b7"
+  "batch": "b7",
+  "searched": {
+   "FARA": "Downloaded the DOJ FARA eFile registrant lists (efile.fara.gov/api/v1/Registrants/json/Active, 539 rows, and .../Terminated, 6,556 rows) on 2026-10-21 and matched registrant names for 'Seder' and 'Majority Report'. No match. The lists cover registrants, not short-form registrants (individual employees), so a short-form filing would not appear. Only an unrelated registrant with a similar surname matched.",
+   "campaign_finance": "The OpenFEC API (DEMO_KEY) returned 429 OVER_RATE_LIMIT on every try (30/60/120/240 s backoff), so the FEC bulk operating-expenditure files (oppexp22/24/26.zip, last modified 2026-10-18) and committee masters (cm22/24/26.zip) were downloaded and payee names matched for 'SEDER' (word match) and 'MAJORITY REPORT'. 0 line items for either name, 2021 to 2026.",
+   "lobbying": "Queried the Senate lobbying disclosure API (lda.gov/api/v1) on 2026-10-22: lobbyist surname Seder: one unrelated lobbyist with a similar surname. The registrant and client search for \"Majority Report\" hit the 429 limit.",
+   "sanctions": "Downloaded the OFAC SDN list (treasury.gov sdn.csv), the UK consolidated list (ConList.csv) and the EU consolidated financial sanctions list (CSV) on 2026-10-21 and searched for 'Seder' and 'Majority Report'. No match.",
+   "platform_labels": "Fetched one current YouTube watch page for The Majority Report w/ Sam Seder (UC-3jIAlnQmbbVMV6gR7K8aQ) on 2026-10-22 and checked for an information panel (infoPanelContentRenderer); none present. Control: a DW News watch page fetched the same way carried its 'German public broadcast service' panel, so the method detects panels. X state-affiliation labels not checked (X pages need login and JavaScript).",
+   "grants": "ProPublica Nonprofit Explorer API search (projects.propublica.org/nonprofits/api/v2/search.json) for 'Majority Report' and 'Sam Seder' on 2026-10-21: 0 organizations.",
+   "investors": "Web search for a company owner or deal (see leads); no named investor found.",
+   "court_records": "No court record about funding of his media work surfaced in the searches and pages read. No dedicated court-docket search (PACER needs a login)."
+  }
  },
  {
   "id": "michael-knowles",
@@ -5023,9 +6212,29 @@
     "claim": "FARA filing, sanctions listing or platform state-affiliation label naming Knowles",
     "searched": "Search budget for this run ran out before dedicated FARA eFile, OFAC, EU and platform-label lookups could be made",
     "result": "Not checked; unknown. No such record was seen on any page read."
+   },
+   {
+    "claim": "FEC payments from campaigns and party committees to The Daily Wire (his employer)",
+    "searched": "FEC bulk operating expenditures 2021 to 2026, payee \"DAILY WIRE\" or \"BENTKEY\": 58 line items (for example NRCC \"LIST RENTAL\" 2023, Dan Crenshaw for Congress \"ADVERTISING\" 2023, RNC \"DUES AND SUBSCRIPTIONS\" 2025)",
+    "result": "These are payments to the outlet, mostly subscriptions, ads and list rentals, not to Knowles or a company of his. They belong on the daily-wire outlet record if anywhere."
+   },
+   {
+    "claim": "Paid political sponsorship or disclosed paid placement",
+    "searched": "Web search \"Michael Knowles paid OR sponsored OR funded campaign disclosure OR investigation\"",
+    "result": "Nothing found. His cigar business (Mayflower Cigars, per a bio in the results) is a consumer venture, out of scope."
    }
   ],
-  "batch": "b7"
+  "batch": "b7",
+  "searched": {
+   "FARA": "Downloaded the DOJ FARA eFile registrant lists (efile.fara.gov/api/v1/Registrants/json/Active, 539 rows, and .../Terminated, 6,556 rows) on 2026-10-21 and matched registrant names for 'Knowles' and 'Daily Wire'. No match. The lists cover registrants, not short-form registrants (individual employees), so a short-form filing would not appear.",
+   "campaign_finance": "The OpenFEC API (DEMO_KEY) returned 429 OVER_RATE_LIMIT on every try (30/60/120/240 s backoff), so the FEC bulk operating-expenditure files (oppexp22/24/26.zip, last modified 2026-10-18) and committee masters (cm22/24/26.zip) were downloaded and payee names matched for 'KNOWLES, MICHAEL', 'MICHAEL KNOWLES', 'MAYFLOWER CIGAR', 'DAILY WIRE' and 'BENTKEY'. 0 for Knowles or his cigar company; 58 for the Daily Wire (see leads).",
+   "lobbying": "Queried the Senate lobbying disclosure API (lda.gov/api/v1) on 2026-10-22: lobbyist surname Knowles: 12 lobbyists, none named Michael Knowles. The registrant and client search for \"Daily Wire\" hit the 429 limit.",
+   "sanctions": "Downloaded the OFAC SDN list (treasury.gov sdn.csv), the UK consolidated list (ConList.csv) and the EU consolidated financial sanctions list (CSV) on 2026-10-21 and searched for 'Knowles'. No match. One unrelated SDN entry with a different first name.",
+   "platform_labels": "Fetched one current YouTube watch page for Michael Knowles (UCr4kgAUTFkGIwlWSodg43QA) on 2026-10-22 and checked for an information panel (infoPanelContentRenderer); none present. Control: a DW News watch page fetched the same way carried its 'German public broadcast service' panel, so the method detects panels. X state-affiliation labels not checked (X pages need login and JavaScript).",
+   "grants": "ProPublica Nonprofit Explorer API search (projects.propublica.org/nonprofits/api/v2/search.json) for 'Daily Wire' and 'Michael Knowles' on 2026-10-21: 0 organizations.",
+   "investors": "Daily Wire owner and investor rows exist on the daily-wire outlet record; nothing new for Knowles personally.",
+   "court_records": "No court record about funding of his media work surfaced. No dedicated court-docket search."
+  }
  },
  {
   "id": "pedro-ferriz-de-con",
@@ -5053,7 +6262,37 @@
     "url": "https://www.facebook.com/PedroFerrizC"
    }
   ],
-  "backing": [],
+  "backing": [
+   {
+    "id": "ferriz-central-fm-equilibrio",
+    "kind": "employer",
+    "who": "Central FM Equilibrio S.A. de C.V. (carried on Grupo Siete's XFM 92.1 until February 2020)",
+    "summary": "Merca2.0 quotes a Grupo Siete statement that his Central FM programme would leave XFM 92.1 over contract breaches by Central FM Equilibrio S.A. de C.V.; El Economista, via DPL News, calls Central FM Equilibrio his concept.",
+    "period": "2019 to 2020 on XFM 92.1; later status unknown",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Merca2.0",
+      "title": "Pedro Ferriz de Con y Eduardo Torreblanca salen de la radio",
+      "url": "https://www.merca20.com/pedro-ferriz-de-con-y-eduardo-torreblanca-salen-de-la-radio/",
+      "date": "2020-01-31",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "...“del incumplimiento a las obligaciones contractuales asumidas por Central FM Equilibrio S.A. de C.V. para la transmisión de los programas”."
+     },
+     {
+      "publisher": "DPL News (El Economista)",
+      "title": "Pedro Ferriz maniobra para volver a la radio de la CDMX con Central FM",
+      "url": "https://dplnews.com/pedro-ferriz-maniobra-para-volver-a-la-radio-de-la-cdmx-con-central-fm/",
+      "date": "2020-04-03",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "...Centroamérica y Colombia e Internet con su concepto “Central FM Equilibrio”, prevé entrar a la antena de la 105.3 FM..."
+     }
+    ],
+    "doesNotProve": "Neither source names the shareholders of Central FM Equilibrio or says Ferriz owns it. The April 2020 report describes negotiations, not a signed move, and nothing read shows the show's status after 2020."
+   }
+  ],
   "leads": [
    {
     "claim": "Host of Central FM (Central FM Equilibrio) since November 2018",
@@ -5079,9 +6318,56 @@
     "claim": "FARA filing, sanctions listing or platform state-affiliation label naming Ferriz de Con",
     "searched": "Search budget for this run ran out before dedicated FARA eFile, OFAC, EU and platform-label lookups could be made",
     "result": "Not checked; unknown. No such record was seen on any page read."
+   },
+   {
+    "claim": "Move to 105.3 FM (XHINFO) in 2020 and current programme",
+    "searched": "Web search for a 2025 programme or Excélsior column; read DPL News (2019 and 2020) and Merca2.0 (2020).",
+    "result": "No page after 2020 read; current outlet unknown."
+   },
+   {
+    "claim": "Federal government advertising payments to his outlets",
+    "searched": "Not searched.",
+    "result": "Not checked."
    }
   ],
-  "batch": "b7"
+  "batch": "b7",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name. No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname. No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Not checked; no label seen.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "Owner of Central FM Equilibrio not found.",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "Not checked.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "alexandre-garcia",
@@ -5134,6 +6420,55 @@
      }
     ],
     "doesNotProve": "A columnist page does not show whether he is staff or a paid contributor, or since when."
+   },
+   {
+    "id": "garcia-jovem-pan",
+    "kind": "employer",
+    "who": "Jovem Pan (TV Jovem Pan News)",
+    "summary": "Jovem Pan's own November 2021 announcement says TV Jovem Pan News hired Garcia; Revista Oeste's author page lists Jovem Pan among his past roles.",
+    "period": "November 2021 to an unknown end date before 2026",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Jovem Pan",
+      "title": "Alexandre Garcia estreia na TV Jovem Pan News nesta sexta",
+      "url": "https://jovempan.com.br/jpnews/alexandre-garcia-estreia-na-tv-jovem-pan-news-nesta-sexta/",
+      "date": "2021-11-09",
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "A TV Jovem Pan News anuncia a contratação do jornalista Alexandre Garcia, que já atua como comentarista político..."
+     },
+     {
+      "publisher": "Revista Oeste",
+      "title": "Alexandre Garcia, Colunista em Revista Oeste",
+      "url": "https://revistaoeste.com/colunista/alexandre-garcia/",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "Com passagens pelo Grupo Globo, pela TV Manchete e pela Jovem Pan."
+     }
+    ],
+    "doesNotProve": "The end date of the Jovem Pan role is not stated. Employment does not show the network directed his commentary."
+   },
+   {
+    "id": "garcia-revista-oeste",
+    "kind": "employer",
+    "who": "Revista Oeste",
+    "summary": "Revista Oeste's author page describes Garcia as a columnist for Revista Oeste and Gazeta do Povo.",
+    "period": "current as read",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Revista Oeste",
+      "title": "Alexandre Garcia, Colunista em Revista Oeste",
+      "url": "https://revistaoeste.com/colunista/alexandre-garcia/",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "Colunista da Revista Oeste e da Gazeta do Povo."
+     }
+    ],
+    "doesNotProve": "Shows a columnist role; it does not show who owns Revista Oeste or that the owner directs his columns."
    }
   ],
   "leads": [
@@ -5166,9 +6501,56 @@
     "claim": "FARA filing, sanctions listing or platform state-affiliation label naming Garcia",
     "searched": "Search budget for this run ran out before dedicated FARA eFile, OFAC, EU and platform-label lookups could be made",
     "result": "Not checked; unknown. No such record was seen on any page read."
+   },
+   {
+    "claim": "TSE or STF orders demonetizing his channels",
+    "searched": "Portuguese search 'Alexandre Garcia TSE OR STF desmonetização canal YouTube decisão'; results covered 2022 TSE orders on other channels (Brasil Paralelo), Revista Oeste's own channel, and his columns criticising the STF.",
+    "result": "No order naming his channel found."
+   },
+   {
+    "claim": "Owner of Revista Oeste",
+    "searched": "The Revista Oeste page shows CNPJ 19.608.677/0001-35; the registry entry was not read.",
+    "result": "Unverified."
    }
   ],
-  "batch": "b7"
+  "batch": "b7",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "Downloaded efile.fara.gov bulk CSVs (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals, files dated 2026-10-21) and searched for the name. No match.",
+    "result": "none found"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "Not checked; not a US figure and no US campaign-finance link surfaced.",
+    "result": "not checked"
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "Downloaded the EU consolidated list CSV (file dated 15/10/2026), OFAC SDN.CSV and ALT.CSV, and the UK Sanctions List CSV (report date 16-Oct-2026) and searched them for the surname. No match.",
+    "result": "none found"
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "Not checked; no label seen.",
+    "result": "see backing and leads"
+   },
+   "4": {
+    "kind": "grants",
+    "query": "Not checked; no organisation of theirs with a Form 990 was identified.",
+    "result": "not checked"
+   },
+   "5": {
+    "kind": "investors",
+    "query": "See leads (Revista Oeste owner).",
+    "result": "see backing and leads"
+   },
+   "6": {
+    "kind": "court records",
+    "query": "See leads.",
+    "result": "see backing and leads"
+   }
+  }
  },
  {
   "id": "krystal-ball",
@@ -5233,6 +6615,15 @@
       "read": "2026-10-21",
       "kind": "press",
       "quote": "The pair hosted a morning show for The Hill called Rising."
+     },
+     {
+      "publisher": "Podcast Business Journal",
+      "title": "New: Breaking Points with Krystal and Saagar",
+      "url": "https://podcastbusinessjournal.com/new-breaking-points-with-krystal-and-saagar/",
+      "date": "2021-06-03",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "...the official announcement of their new venture Breaking Points with the first full episode launching on June 7th..."
      }
     ],
     "doesNotProve": "The pages do not state the ownership split or rule out outside investors; \"zero corporate sponsors\" refers to the premium feed, while Wikipedia reports some ad revenue on YouTube and podcasts."
@@ -5253,9 +6644,56 @@
     "claim": "FARA filing, sanctions listing or platform state-affiliation label naming Ball",
     "searched": "Search budget for this run ran out before dedicated FARA eFile, OFAC, EU and platform-label lookups could be made",
     "result": "Not checked; unknown. No such record was seen on any page read."
+   },
+   {
+    "claim": "FEC filings exist for political committees Ball ran (her 2010 House campaign; a Wikipedia snippet refers to money she raised for a group)",
+    "searched": "Web search on Ball, FEC and PAC payments; ProPublica Itemizer lists PAC contributions to Krystal Ball for Congress (2010).",
+    "result": "A candidate committee or a PAC she ran is not funding of her media work, and salary figures are excluded by the brief. No row."
+   },
+   {
+    "claim": "Outside investors in Breaking Points",
+    "searched": "Web search on Breaking Points investors and ownership.",
+    "result": "No investor named in any result; the show describes itself as subscriber-funded (existing row)."
    }
   ],
-  "batch": "b7"
+  "batch": "b7",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed. Web search found no payment to Ball or Breaking Points for media work."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (kwv-pnxquSI) from the YouTube channel titled 'Breaking Points': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=krystal+ball and breaking+points: no organisation she runs."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Web search: no investors named."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of her media work surfaced."
+   }
+  }
  },
  {
   "id": "kyle-kulinski",
@@ -5281,9 +6719,49 @@
     "platform": "youtube",
     "handle": "SecularTalk",
     "url": "https://www.youtube.com/@SecularTalk"
+   },
+   {
+    "platform": "podcast",
+    "handle": "krystalkyleandfriends",
+    "url": "https://krystalkyleandfriends.substack.com"
+   },
+   {
+    "platform": "web",
+    "handle": "patreon.com/seculartalk",
+    "url": "https://www.patreon.com/seculartalk"
    }
   ],
-  "backing": [],
+  "backing": [
+   {
+    "id": "kulinski-kkf-cohost",
+    "kind": "employer",
+    "who": "Krystal Kyle & Friends (Substack publication he co-hosts with Krystal Ball)",
+    "summary": "The Krystal Kyle & Friends Substack About page says the podcast is ad free and funded by its subscribers, and that Kulinski hosts Secular Talk on YouTube.",
+    "period": "since 2021",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Krystal Kyle & Friends (Substack)",
+      "title": "About - Krystal Kyle & Friends",
+      "url": "https://krystalkyleandfriends.substack.com/about",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "self",
+      "quote": "We are 100% ad free and will always be that way. So we are 100% funded by you."
+     },
+     {
+      "publisher": "Krystal Kyle & Friends (Substack)",
+      "title": "About - Krystal Kyle & Friends",
+      "url": "https://krystalkyleandfriends.substack.com/about",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "self",
+      "quote": "Krystal is co-host of Breaking Points. Kyle is host of Secular Talk on YouTube."
+     }
+    ],
+    "doesNotProve": "Shows his own shows and their stated subscriber funding. It names no owner share, no payment from Substack and no outside funder. No company page for Secular Talk was found."
+   }
+  ],
   "leads": [
    {
     "claim": "Network affiliation of Secular Talk (for example TYT Network)",
@@ -5304,9 +6782,34 @@
     "claim": "FARA filing, sanctions listing or platform state-affiliation label naming Kulinski",
     "searched": "Search budget for this run ran out before dedicated FARA eFile, OFAC, EU and platform-label lookups could be made",
     "result": "Not checked; unknown. No such record was seen on any page read."
+   },
+   {
+    "claim": "A network, Substack or other distribution deal for Secular Talk or Krystal Kyle & Friends",
+    "searched": "Web searches \"Kyle Kulinski Secular Talk network company owner podcast deal\" and \"Kulinski Substack deal OR advance OR Substack Pro OR network contract\"; Wikipedia article; KK&F About page",
+    "result": "No press release, filing or two-outlet report of a deal found."
+   },
+   {
+    "claim": "Audience funding through Patreon",
+    "searched": "YouTube channel page links (patreon.com/seculartalk); InfluenceWatch profile (search summary only, not fetched)",
+    "result": "Audience support fits no backing kind. The reported donor and income figures are excluded under the brief."
+   },
+   {
+    "claim": "Site at secular-talk.com",
+    "searched": "Fetched https://secular-talk.com/",
+    "result": "The page is a third party's blog unrelated to Kulinski. Not used."
    }
   ],
-  "batch": "b7"
+  "batch": "b7",
+  "searched": {
+   "FARA": "Downloaded the DOJ FARA eFile registrant lists (efile.fara.gov/api/v1/Registrants/json/Active, 539 rows, and .../Terminated, 6,556 rows) on 2026-10-21 and matched registrant names for 'Kulinski' and 'Secular Talk'. No match. The lists cover registrants, not short-form registrants (individual employees), so a short-form filing would not appear.",
+   "campaign_finance": "The OpenFEC API (DEMO_KEY) returned 429 OVER_RATE_LIMIT on every try (30/60/120/240 s backoff), so the FEC bulk operating-expenditure files (oppexp22/24/26.zip, last modified 2026-10-18) and committee masters (cm22/24/26.zip) were downloaded and payee names matched for 'KULINSKI' and 'SECULAR TALK'. 0 line items.",
+   "lobbying": "Queried the Senate lobbying disclosure API (lda.gov/api/v1) on 2026-10-22: lobbyist surname Kulinski: 0 lobbyists.",
+   "sanctions": "Downloaded the OFAC SDN list (treasury.gov sdn.csv), the UK consolidated list (ConList.csv) and the EU consolidated financial sanctions list (CSV) on 2026-10-21 and searched for 'Kulinski' and 'Secular Talk'. No match.",
+   "platform_labels": "Fetched one current YouTube watch page for Secular Talk (UCldfgbzNILYZA4dmDt4Cd6A) on 2026-10-22 and checked for an information panel (infoPanelContentRenderer); none present. Control: a DW News watch page fetched the same way carried its 'German public broadcast service' panel, so the method detects panels. X state-affiliation labels not checked (X pages need login and JavaScript).",
+   "grants": "ProPublica Nonprofit Explorer API search (projects.propublica.org/nonprofits/api/v2/search.json) for 'Secular Talk' and 'Kulinski' on 2026-10-21: 0 organizations.",
+   "investors": "Two web searches for a company owner, network or Substack deal (see leads); no named investor.",
+   "court_records": "No court record about funding of his media work surfaced in the searches and pages read. No dedicated court-docket search."
+  }
  },
  {
   "id": "greg-gutfeld",
@@ -5358,9 +6861,24 @@
     "claim": "Political sponsorship, FARA, sanctions, funding court records, or campaign-finance payments to Gutfeld or a company of his",
     "searched": "Fox News host page; Wikipedia article text for leads. The FEC API (api.open.fec.gov, public DEMO_KEY) hit its shared hourly rate limit during this session, so the payee search for this name could not be run.",
     "result": "Nothing found beyond the Fox employment and ownership rows. The FEC search is incomplete."
+   },
+   {
+    "claim": "A production company of Gutfeld's paid for political work, or political sponsorship",
+    "searched": "Web search \"Greg Gutfeld company production paid OR sponsored OR funded political campaign OR PAC\"",
+    "result": "Only net-worth spam sites and an unrelated committee nicknamed 'GREG PAC' surfaced. Nothing documented."
    }
   ],
-  "batch": "b8"
+  "batch": "b8",
+  "searched": {
+   "FARA": "Downloaded the DOJ FARA eFile registrant lists (efile.fara.gov/api/v1/Registrants/json/Active, 539 rows, and .../Terminated, 6,556 rows) on 2026-10-21 and matched registrant names for 'Gutfeld'. No match. The lists cover registrants, not short-form registrants (individual employees), so a short-form filing would not appear.",
+   "campaign_finance": "The OpenFEC API (DEMO_KEY) returned 429 OVER_RATE_LIMIT on every try (30/60/120/240 s backoff), so the FEC bulk operating-expenditure files (oppexp22/24/26.zip, last modified 2026-10-18) and committee masters (cm22/24/26.zip) were downloaded and payee names matched for 'GUTFELD'. 0 line items.",
+   "lobbying": "Queried the Senate lobbying disclosure API (lda.gov/api/v1) on 2026-10-22: lobbyist surname Gutfeld: 0.",
+   "sanctions": "Downloaded the OFAC SDN list (treasury.gov sdn.csv), the UK consolidated list (ConList.csv) and the EU consolidated financial sanctions list (CSV) on 2026-10-21 and searched for 'Gutfeld'. No match.",
+   "platform_labels": "Fetched one current YouTube watch page for Fox News (UCXIJgqnII2ZOINSWNOGFThA); no own YouTube channel for Gutfeld confirmed on 2026-10-22 and checked for an information panel (infoPanelContentRenderer); none present. Control: a DW News watch page fetched the same way carried its 'German public broadcast service' panel, so the method detects panels. X state-affiliation labels not checked (X pages need login and JavaScript).",
+   "grants": "ProPublica Nonprofit Explorer API search (projects.propublica.org/nonprofits/api/v2/search.json) for 'Gutfeld' on 2026-10-21: 0 organizations.",
+   "investors": "No company of his found that has investors; Fox ownership is on the fox-news outlet record.",
+   "court_records": "No court record about funding of his media work surfaced. No dedicated court-docket search."
+  }
  },
  {
   "id": "glenn-greenwald",
@@ -5398,8 +6916,8 @@
     "id": "rumble-system-update",
     "kind": "licensing deal",
     "who": "Rumble",
-    "summary": "Rumble's December 2022 press release, read in a syndicated GlobeNewswire copy, says Greenwald's live show SYSTEM UPDATE airs exclusively on Rumble. His Rumble channel was still posting in October 2026.",
-    "period": "since 2022-12",
+    "summary": "Rumble's December 2022 press release, read in a syndicated GlobeNewswire copy, says Greenwald's live show SYSTEM UPDATE airs exclusively on Rumble.",
+    "period": "since 2022-12; current status not confirmed",
     "status": "documented",
     "sources": [
      {
@@ -5447,9 +6965,51 @@
     "claim": "Substack or Locals payments, sponsors, FARA, sanctions, campaign finance",
     "searched": "Rumble channel page, Substack about page and archive API. The FEC API (api.open.fec.gov, public DEMO_KEY) hit its shared hourly rate limit during this session, so the payee search for this name could not be run.",
     "result": "Nothing documented. Reader subscriptions are not a named backer."
+   },
+   {
+    "claim": "Rumble paid Greenwald a sum in the six-figure range in 2021 for exclusive-first videos",
+    "searched": "Web search; Tubefilter (2021-08-16) summarises a Washington Post report quoting Greenwald (not fetched).",
+    "result": "Already covered by the existing Rumble licensing-deal row; deal sizes are excluded by the brief. No new row."
    }
   ],
-  "batch": "b8"
+  "batch": "b8",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match. (Greenwald surname hits are Ronald, Joshua, John D., Gerald B., Robert and Curtis H., other people, 1947 to 2011.)"
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (hdccCEIeDOk) from the YouTube channel titled 'Glenn Greenwald': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=greenwald: 2,886 name matches, none shown as an organisation he runs; not narrowed further."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Web search on System Update sponsors and investors: none named for his own show or company."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "No court record about funding of his media work surfaced in the funding search; not searched separately."
+   }
+  }
  },
  {
   "id": "tomi-lahren",
@@ -5516,9 +7076,56 @@
     "claim": "Payments from PACs or campaigns to Lahren or her company",
     "searched": "Wikipedia article text for leads. The FEC API (api.open.fec.gov, public DEMO_KEY) hit its shared hourly rate limit during this session, so the payee search for this name could not be run.",
     "result": "Not documented in this session. Any role that ended before 2020 also falls outside the period rule."
+   },
+   {
+    "claim": "Great America Alliance, a pro-Trump political group, hired Lahren as senior adviser for communications in May 2017",
+    "searched": "Web search on Great America PAC/Alliance and Lahren; results include The Daily Beast, Salon and AOL reports from May 2017 (not fetched); FEC disbursement search not possible (API rate limit).",
+    "result": "Press reports describe a 2017 role, but no FEC line item to Lahren or a company was read and the end date is unknown; the brief excludes employer roles that ended before 2020. Needs an FEC schedule B check."
+   },
+   {
+    "claim": "Payments from PACs or campaigns to Lahren or her company (carried from round 1)",
+    "searched": "FEC API (rate-limited); web search for Great America PAC disbursements returned 2016 FEC PDFs whose snippets show no payee named Lahren.",
+    "result": "Not documented."
    }
   ],
-  "batch": "b8"
+  "batch": "b8",
+  "searched": {
+   "0": {
+    "kind": "FARA",
+    "query": "bulk CSV name match",
+    "result": "FARA bulk files from efile.fara.gov (FARA_All_ShortForms, FARA_All_Registrants, FARA_All_ForeignPrincipals CSV, downloaded earlier in this session) matched on last name plus first name: no match."
+   },
+   "1": {
+    "kind": "campaign finance",
+    "query": "FEC API, OpenSecrets, web search",
+    "result": "FEC API (api.open.fec.gov schedule_b, recipient_name, api_key=DEMO_KEY) returned 429 OVER_RATE_LIMIT on the first call (Retry-After 61650 s); retried after 30 s, 60 s and 120 s, all 429; gave up after four tries. OpenSecrets vendor search returned a Cloudflare challenge (403), not bypassed. Web search found no FEC line item naming Lahren."
+   },
+   "2": {
+    "kind": "sanctions",
+    "query": "OFAC, UK, EU list files",
+    "result": "OFAC SDN and ALT CSV, UK sanctions list CSV (report date 16-Oct-2026) and EU consolidated financial sanctions CSV, downloaded earlier in this session, searched for the surname with the first name nearby: no match."
+   },
+   "3": {
+    "kind": "platform labels",
+    "query": "YouTube watch page info panel; X",
+    "result": "Fetched a recent video page (ycdF58ao1_k) from the YouTube channel titled 'Tomi Lahren': no information panel (funding or public-broadcaster text). Control: a BBC News video page carried the 'public broadcast service' panel. Channel ownership was not separately confirmed. X profile pages need a login and were not read, so X labels were not checked."
+   },
+   "4": {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer API search",
+    "result": "ProPublica Nonprofit Explorer search q=lahren: no organisation tied to her (39 unrelated name matches)."
+   },
+   "5": {
+    "kind": "investors",
+    "query": "web search and filings",
+    "result": "Web search for investors in a Lahren company: none found."
+   },
+   "6": {
+    "kind": "court records",
+    "query": "web search",
+    "result": "Web search: only the 2017 TheBlaze settlement (CBS News), an employment dispute, not funding of her media work; out of scope."
+   }
+  }
  },
  {
   "id": "jimmy-dore",
@@ -5545,9 +7152,54 @@
     "handle": "thejimmydoreshow",
     "channelId": "UC3M7l8ved_rYQ45AVzS0RGA",
     "url": "https://www.youtube.com/@thejimmydoreshow"
+   },
+   {
+    "platform": "instagram",
+    "handle": "thejimmydoreshow",
+    "url": "https://www.instagram.com/thejimmydoreshow/"
+   },
+   {
+    "platform": "facebook",
+    "handle": "JimmyDoreShow",
+    "url": "https://www.facebook.com/JimmyDoreShow/"
+   },
+   {
+    "platform": "web",
+    "handle": "jimmydore.com",
+    "url": "https://jimmydore.com/"
    }
   ],
-  "backing": [],
+  "backing": [
+   {
+    "id": "dore-4-dore-productions",
+    "kind": "outlet owner",
+    "who": "4 Dore Productions, Inc.",
+    "summary": "The privacy policy on jimmydore.com, the home of The Jimmy Dore Show, says the site is owned by 4 Dore Productions, Inc.",
+    "period": "policy effective 2024-01-01",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Jimmy Dore (jimmydore.com)",
+      "title": "Privacy Policy",
+      "url": "https://jimmydore.com/privacy-policy/",
+      "date": "2024-01-01",
+      "read": "2026-10-21",
+      "kind": "self",
+      "quote": "The Platform is owned by 4 Dore Productions, Inc."
+     },
+     {
+      "publisher": "Jimmy Dore (jimmydore.com)",
+      "title": "Jimmy Dore's Official Website - Home of The Jimmy Dore Show",
+      "url": "https://jimmydore.com/",
+      "date": null,
+      "read": "2026-10-21",
+      "kind": "self",
+      "quote": "Want to help support The Jimmy Dore Show? Consider making a DONATION ."
+     }
+    ],
+    "doesNotProve": "Names the company that owns the website. It does not show who owns the company or any outside funder."
+   }
+  ],
   "leads": [
    {
     "claim": "Distribution deals with Rumble or Rokfin for The Jimmy Dore Show",
@@ -5568,9 +7220,34 @@
     "claim": "Sponsors, FARA, sanctions, campaign finance",
     "searched": "FEC payee search for 'JIMMY DORE' returned 0 records",
     "result": "Nothing documented."
+   },
+   {
+    "claim": "A paid distribution deal with Rumble or Rokfin",
+    "searched": "Web search \"Jimmy Dore Rumble OR Rokfin deal signed exclusive\"; jimmydore.com Sponsors page",
+    "result": "No report of a Dore deal found. The Sponsors page lists Rumble Premium and Rumble Wallet promo codes next to consumer products; these are ad reads, not a documented deal."
+   },
+   {
+    "claim": "Payments from Peter Allard tied to coverage",
+    "searched": "Web search \"Jimmy Dore funded OR funding OR paid by investigation report 2024 OR 2025\"; the claim appears only in a comment thread on counterspin.substack.com (search summary; page not fetched)",
+    "result": "One comment thread, disputed by other commenters. Unverified."
+   },
+   {
+    "claim": "4 Dore Productions, Inc. as an FEC payee",
+    "searched": "FEC bulk operating expenditures 2021 to 2026 for \"DORE PRODUCTIONS\" and \"JIMMY DORE\"",
+    "result": "0 line items."
    }
   ],
-  "batch": "b8"
+  "batch": "b8",
+  "searched": {
+   "FARA": "Downloaded the DOJ FARA eFile registrant lists (efile.fara.gov/api/v1/Registrants/json/Active, 539 rows, and .../Terminated, 6,556 rows) on 2026-10-21 and matched registrant names for 'Dore' (word match) and '4 Dore Productions'. No match. The lists cover registrants, not short-form registrants (individual employees), so a short-form filing would not appear.",
+   "campaign_finance": "The OpenFEC API (DEMO_KEY) returned 429 OVER_RATE_LIMIT on every try (30/60/120/240 s backoff), so the FEC bulk operating-expenditure files (oppexp22/24/26.zip, last modified 2026-10-18) and committee masters (cm22/24/26.zip) were downloaded and payee names matched for 'JIMMY DORE', 'DORE PRODUCTIONS' and 'DORE, JIM'. 0 line items.",
+   "lobbying": "Queried the Senate lobbying disclosure API (lda.gov/api/v1) on 2026-10-22: lobbyist surname Dore: 19 lobbyists, none named Jimmy or James Dore.",
+   "sanctions": "Downloaded the OFAC SDN list (treasury.gov sdn.csv), the UK consolidated list (ConList.csv) and the EU consolidated financial sanctions list (CSV) on 2026-10-21 and searched for 'Dore' with first name Jimmy or James. No match.",
+   "platform_labels": "Fetched one current YouTube watch page for The Jimmy Dore Show (UC3M7l8ved_rYQ45AVzS0RGA) on 2026-10-22 and checked for an information panel (infoPanelContentRenderer); none present. Control: a DW News watch page fetched the same way carried its 'German public broadcast service' panel, so the method detects panels. X state-affiliation labels not checked (X pages need login and JavaScript).",
+   "grants": "ProPublica Nonprofit Explorer API search (projects.propublica.org/nonprofits/api/v2/search.json) for 'Jimmy Dore' and 'Dore Productions' on 2026-10-21: 0 organizations.",
+   "investors": "Web searches for Rumble or Rokfin deals and funding reports (see leads); no named investor.",
+   "court_records": "No court record about funding of his media work surfaced in the searches and pages read. No dedicated court-docket search."
+  }
  },
  {
   "id": "tim-pool",
@@ -5620,6 +7297,15 @@
     "status": "alleged",
     "sources": [
      {
+      "publisher": "U.S. District Court, Southern District of New York (via justice.gov)",
+      "title": "United States v. Kalashnikov and Afanasyeva, Indictment",
+      "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
+      "date": "2024-09-04",
+      "read": "2026-10-22",
+      "kind": "court",
+      "quote": "...also worked together to deceive two U.S. online commentators..."
+     },
+     {
       "publisher": "U.S. District Court, S.D.N.Y. (indictment published by DOJ, read in a Wayback copy)",
       "title": "United States v. Kalashnikov and Afanasyeva, 24 Cr. 519",
       "url": "https://web.archive.org/web/20261001125251id_/https://www.justice.gov/opa/media/1366266/dl",
@@ -5627,15 +7313,6 @@
       "read": "2026-10-21",
       "kind": "court",
       "quote": "KALASHNIKOV, AFANASYEVA, Founder-I , and Founder-2 also worked together to deceive two U.S. online commentators"
-     },
-     {
-      "publisher": "U.S. Department of Justice (read in a Wayback copy)",
-      "title": "Two RT Employees Indicted for Covertly Funding and Directing U.S. Company that Published Thousands of Videos",
-      "url": "https://web.archive.org/web/20250206153638/https://www.justice.gov/opa/pr/two-rt-employees-indicted-covertly-funding-and-directing-us-company-published-thousands",
-      "date": "2024-09-04",
-      "read": "2026-10-21",
-      "kind": "government",
-      "quote": "U.S. Company-1 never disclosed to its viewers that it was funded and directed by RT."
      },
      {
       "publisher": "NBC New York (Associated Press)",
@@ -5735,33 +7412,118 @@
     "doesNotProve": "Shows his role at the company. It does not show ownership shares or outside investors."
    },
    {
-    "id": "vsa-fec-payments",
+    "id": "crooked-soros-investor",
+    "kind": "investor",
+    "who": "Soros Fund Management",
+    "summary": "SoCalTech (2022) and Inside Radio (2026) report that Soros Fund Management invested in Crooked Media in 2022 and holds a minority stake; SoCalTech says the founders keep majority ownership and Soros gained a board seat.",
+    "period": "since 2022",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "SoCalTech",
+      "title": "Crooked Media Finds Funding From Soros",
+      "url": "https://socaltech.com/crooked_media_finds_funding_from_soros/s-0082935.html",
+      "date": "2022-10-03",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Soros Fund Management gains a spot on the board of Crooked Media with the investment."
+     },
+     {
+      "publisher": "SoCalTech",
+      "title": "Crooked Media Finds Funding From Soros",
+      "url": "https://socaltech.com/crooked_media_finds_funding_from_soros/s-0082935.html",
+      "date": "2022-10-03",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Crooked Media was founded by Jon Lovett, Jon Favreau and Tommy Vietor. who retain majority ownership of the company."
+     },
+     {
+      "publisher": "Inside Radio",
+      "title": "After Audacy Investment, Soros Fund Expands Audio Holdings With MeidasTouch Stake",
+      "url": "https://www.insideradio.com/free/after-audacy-investment-soros-fund-expands-audio-holdings-with-meidastouch-stake/article_0e6b1646-dcff-4834-9342-59af56221c41.html",
+      "date": "2026-04-09",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Since 2022, it has held a minority stake in Crooked Media, a fellow progressive media company..."
+     }
+    ],
+    "doesNotProve": "Press reports of a minority stake whose size was not announced; no filing or company statement was read. A board seat and a minority stake do not show control of episode content."
+   },
+   {
+    "id": "vsa-fec-payments-2023-2025",
     "kind": "campaign finance",
-    "who": "Vote Save America (PAC)",
-    "summary": "FEC disbursement records list 2026 payments from the Vote Save America PAC to Crooked Media, Inc., described as podcast advertising, newsletter advertising, service fees and administrative consulting. VSA's own page says it was born at Crooked Media and is now a separate PAC.",
-    "period": "2026-01 to 2026-06 (records read)",
+    "who": "Vote Save America (PAC, C00835587)",
+    "summary": "FEC bulk filings list 79 Vote Save America operating-expenditure line items to Crooked Media from 2023-04 to 2026-06, with purposes including 'STAFF TIME', 'CONSULTING SERVICES', 'PLATFORM AND TRADEMARK FEES' and 'ADMINISTRATIVE CONSULTING'.",
+    "period": "2023-04 to 2026-06",
     "status": "documented",
     "sources": [
      {
-      "publisher": "Federal Election Commission (OpenFEC API, Schedule B)",
-      "title": "Disbursements to recipient 'CROOKED MEDIA'",
-      "url": "https://api.open.fec.gov/v1/schedules/schedule_b/?recipient_name=CROOKED%20MEDIA&sort=-disbursement_date&api_key=DEMO_KEY",
+      "publisher": "Federal Election Commission",
+      "title": "Bulk operating expenditures 2023-2024 (oppexp24.zip)",
+      "url": "https://www.fec.gov/files/bulk-downloads/2024/oppexp24.zip",
       "date": null,
-      "read": "2026-10-21",
+      "read": "2026-10-22",
       "kind": "filing",
-      "quote": "PODCAST ADVERTISING"
+      "quote": "C00835587|N|2024|Q3|202410159689071107|21B|F3X|SB|CROOKED MEDIA, INC.|LOS ANGELES|CA|900382588|07/16/2024|34617.6||STAFF TIME|"
      },
      {
-      "publisher": "Vote Save America",
-      "title": "OUR STORY | Vote Save America",
-      "url": "https://votesaveamerica.com/about/",
+      "publisher": "Federal Election Commission",
+      "title": "Bulk operating expenditures 2025-2026 (oppexp26.zip)",
+      "url": "https://www.fec.gov/files/bulk-downloads/2026/oppexp26.zip",
       "date": null,
-      "read": "2026-10-21",
-      "kind": "company",
-      "quote": "While the initiative of Vote Save America was born at Crooked Media, it is no longer a project of Crooked Media."
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "C00835587|N|2025|MY|202507319779681298|21B|F3X|SB|CROOKED MEDIA, INC.|LOS ANGELES|CA|900382588|04/18/2025|60098.15||PLATFORM AND TRADEMARK FEES|"
+     },
+     {
+      "publisher": "Federal Election Commission",
+      "title": "Committee master 2025-2026 (cm26.zip)",
+      "url": "https://www.fec.gov/files/bulk-downloads/2026/cm26.zip",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "C00835587|VOTE SAVE AMERICA|"
      }
     ],
-    "doesNotProve": "Shows payments from a political committee to Favreau's company for advertising and services. It does not show what content the payments bought or that they shaped particular episodes. Payments to the company are not payments to Favreau personally."
+    "doesNotProve": "Extends the existing vsa-fec-payments row to earlier years. Shows payments for services, fees and staff time to Favreau's company, not to him personally, and not what content they bought. The bulk file covers operating expenditures only; the 'PODCAST ADVERTISING' items in the existing row did not appear in it."
+   },
+   {
+    "id": "crooked-other-committees-fec",
+    "kind": "campaign finance",
+    "who": "Leaders We Deserve (C00843110); National Democratic Training Committee (C00603084)",
+    "summary": "FEC filings list a Leaders We Deserve payment to Crooked Media, Inc. described as 'EVENT SPONSORSHIP' (filing states 5000, 2025-12-18) and an NDTC payment described as 'EVENT EXPENSE' (filing states 2500, 2025-11-06).",
+    "period": "2025-11 to 2025-12",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Federal Election Commission",
+      "title": "Bulk operating expenditures 2025-2026 (oppexp26.zip)",
+      "url": "https://www.fec.gov/files/bulk-downloads/2026/oppexp26.zip",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "C00843110|N|2025|YE|202601309794792308|21B|F3X|SB|CROOKED MEDIA, INC.|LOS ANGELES|CA|900382588|12/18/2025|5000||EVENT SPONSORSHIP|"
+     },
+     {
+      "publisher": "Federal Election Commission",
+      "title": "Bulk operating expenditures 2025-2026 (oppexp26.zip)",
+      "url": "https://www.fec.gov/files/bulk-downloads/2026/oppexp26.zip",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "C00603084|N|2025|M12|202512119793490955|21B|F3X|SB|CROOKED MEDIA, INC.||||11/06/2025|2500||EVENT EXPENSE|"
+     },
+     {
+      "publisher": "Federal Election Commission",
+      "title": "Committee master 2025-2026 (cm26.zip)",
+      "url": "https://www.fec.gov/files/bulk-downloads/2026/cm26.zip",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "C00843110|LEADERS WE DESERVE|"
+     }
+    ],
+    "doesNotProve": "Payments by political committees to Crooked Media for an event sponsorship and an event expense. They do not show which event, what content, or any payment to Favreau personally."
    }
   ],
   "leads": [
@@ -5774,9 +7536,34 @@
     "claim": "Earlier FEC payments (2017 to 2025) from Vote Save America or other committees to Crooked Media",
     "searched": "Only the 20 most recent of 158 FEC records were read before the shared API rate limit hit",
     "result": "The full history is not read."
+   },
+   {
+    "claim": "FEC API line item for Crooked Media (task retry)",
+    "searched": "https://api.open.fec.gov/v1/schedules/schedule_b/?recipient_name=CROOKED%20MEDIA&sort=-disbursement_date&per_page=20&api_key=DEMO_KEY, tried at 23:53 with 30, 60, 120 and 240 s backoff, and once more at 00:12 (local time)",
+    "result": "Every try returned HTTP 429 OVER_RATE_LIMIT (DEMO_KEY allows 40 calls an hour, shared). No raw API response exists to save; the 83 matching FEC bulk-file lines are saved instead."
+   },
+   {
+    "claim": "Small purchases by WomenCount PAC (\"CONFERENCE FEES\", 2026) and End Citizens United (\"STAFF DEVELOPMENT\", 2025) from Crooked Media",
+    "searched": "FEC bulk oppexp26.zip",
+    "result": "Filings state 169.99 and 199.99; these read as ticket or subscription purchases, not backing."
+   },
+   {
+    "claim": "Vote Save America Action (501(c)(4), EIN 92-2979246) payments to Crooked Media",
+    "searched": "ProPublica Nonprofit Explorer API lists one 2024 Form 990-EO; the PDF download returned HTTP 403",
+    "result": "Not read. Unknown."
    }
   ],
-  "batch": "b8"
+  "batch": "b8",
+  "searched": {
+   "FARA": "Downloaded the DOJ FARA eFile registrant lists (efile.fara.gov/api/v1/Registrants/json/Active, 539 rows, and .../Terminated, 6,556 rows) on 2026-10-21 and matched registrant names for 'Favreau', 'Crooked Media' and 'Vote Save America'. No match. The lists cover registrants, not short-form registrants (individual employees), so a short-form filing would not appear.",
+   "campaign_finance": "The OpenFEC API (DEMO_KEY) returned 429 OVER_RATE_LIMIT on every try (30/60/120/240 s backoff), so the FEC bulk operating-expenditure files (oppexp22/24/26.zip, last modified 2026-10-18) and committee masters (cm22/24/26.zip) were downloaded and payee names matched for 'CROOKED MEDIA' and 'FAVREAU'. 83 Crooked Media line items (79 from Vote Save America, 4 from other committees); the 17 FAVREAU items belong to an unrelated candidate's own campaign.",
+   "lobbying": "Queried the Senate lobbying disclosure API (lda.gov/api/v1) on 2026-10-22: lobbyist surname Favreau: 0; registrant and client search \"Crooked Media\": 0.",
+   "sanctions": "Downloaded the OFAC SDN list (treasury.gov sdn.csv), the UK consolidated list (ConList.csv) and the EU consolidated financial sanctions list (CSV) on 2026-10-21 and searched for 'Favreau' and 'Crooked Media'. No match.",
+   "platform_labels": "Fetched one current YouTube watch page for Crooked Media (UCFm6mAVRDB-HoyIzfn7jbWQ) on 2026-10-22 and checked for an information panel (infoPanelContentRenderer); none present. Control: a DW News watch page fetched the same way carried its 'German public broadcast service' panel, so the method detects panels. X state-affiliation labels not checked (X pages need login and JavaScript).",
+   "grants": "ProPublica Nonprofit Explorer API search (projects.propublica.org/nonprofits/api/v2/search.json) for 'Crooked Media', 'Vote Save America' and 'Favreau' on 2026-10-21: Vote Save America Action found (990 PDF refused, see leads); nothing for Crooked Media.",
+   "investors": "Web search \"Crooked Media investors stake ownership raised funding\"; Soros Fund Management row added.",
+   "court_records": "No court record about funding of his media work surfaced. No dedicated court-docket search."
+  }
  },
  {
   "id": "mehdi-hasan",
@@ -5855,6 +7642,50 @@
     "doesNotProve": "A past role. The exact end date was not read from a primary MSNBC source in this session.",
     "outlet": "ms-now",
     "current": false
+   },
+   {
+    "id": "hasan-guardian-us-columnist",
+    "kind": "employer",
+    "who": "The Guardian (Guardian US)",
+    "summary": "The Guardian's author page for Hasan says he is a Guardian US columnist and the editor-in-chief of Zeteo.",
+    "period": "current (profile read 2026-10-22)",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "The Guardian",
+      "title": "Mehdi Hasan | The Guardian",
+      "url": "https://www.theguardian.com/profile/mehdihasan",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "Mehdi Hasan is a broadcaster and author, and a former host on MSNBC. He is also a Guardian US columnist and the editor-in-chief of Zeteo"
+     }
+    ],
+    "doesNotProve": "Shows a columnist role. It does not show contract terms or that the Guardian directs his work at Zeteo or elsewhere.",
+    "current": true,
+    "outlet": "guardian"
+   },
+   {
+    "id": "hasan-al-jazeera-head-to-head",
+    "kind": "employer",
+    "who": "Al Jazeera English (Head to Head)",
+    "summary": "Al Jazeera's Head to Head show page names Hasan as presenter, and its latest listed episode concerns the 2026 US midterms.",
+    "period": "current (page read 2026-10-22)",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Al Jazeera",
+      "title": "Head to Head",
+      "url": "https://www.aljazeera.com/video/head-to-head",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "Interviews with attitude, tackling the big issues of our time with Mehdi Hasan."
+     }
+    ],
+    "doesNotProve": "Shows a presenting role. It does not show contract terms. Al Jazeera's funding is recorded on the al-jazeera outlet record and does not by itself show direction of his content.",
+    "outlet": "al-jazeera",
+    "current": true
    }
   ],
   "leads": [
@@ -5867,9 +7698,29 @@
     "claim": "FARA, sanctions, campaign finance",
     "searched": "The FEC API (api.open.fec.gov, public DEMO_KEY) hit its shared hourly rate limit during this session, so the payee search for this name could not be run.",
     "result": "Not checked to completion."
+   },
+   {
+    "claim": "Named investors or large funders of Zeteo",
+    "searched": "Web search \"Zeteo Mehdi Hasan investors funding raised backers Substack\"; Wikipedia article on Zeteo",
+    "result": "No named investor found. Wikipedia reports Hasan said launch cost about $4 million but names no funder. A CB Insights listing for 'Zeteo Tech' is a different company."
+   },
+   {
+    "claim": "Start dates of the Guardian US and Head to Head roles",
+    "searched": "Web search for 2024 to 2025 roles (search summary gives February 2024 and June 2024)",
+    "result": "The primary pages read show both roles as current but give no start dates."
    }
   ],
-  "batch": "b8"
+  "batch": "b8",
+  "searched": {
+   "FARA": "Downloaded the DOJ FARA eFile registrant lists (efile.fara.gov/api/v1/Registrants/json/Active, 539 rows, and .../Terminated, 6,556 rows) on 2026-10-21 and matched registrant names for 'Hasan' and 'Zeteo'. No match. The lists cover registrants, not short-form registrants (individual employees), so a short-form filing would not appear. One unrelated registrant with a different given name.",
+   "campaign_finance": "The OpenFEC API (DEMO_KEY) returned 429 OVER_RATE_LIMIT on every try (30/60/120/240 s backoff), so the FEC bulk operating-expenditure files (oppexp22/24/26.zip, last modified 2026-10-18) and committee masters (cm22/24/26.zip) were downloaded and payee names matched for 'HASAN, MEHDI', 'MEHDI HASAN' and 'ZETEO'. 0 line items.",
+   "lobbying": "Queried the Senate lobbying disclosure API (lda.gov/api/v1) on 2026-10-22: lobbyist surname Hasan: 11 lobbyists, none named Mehdi Hasan; registrant search \"Zeteo\": 0.",
+   "sanctions": "Downloaded the OFAC SDN list (treasury.gov sdn.csv), the UK consolidated list (ConList.csv) and the EU consolidated financial sanctions list (CSV) on 2026-10-21 and searched for 'Mehdi' with 'Hasan'. No match.",
+   "platform_labels": "No Zeteo YouTube handle confirmed (@zeteo_news returned 404), so no YouTube panel check. X labels not checked.",
+   "grants": "ProPublica Nonprofit Explorer API search (projects.propublica.org/nonprofits/api/v2/search.json) for 'Zeteo' and 'Mehdi Hasan' on 2026-10-21: three unrelated church or community groups named Zeteo; nothing tied to his company. Zeteo's donation page says it is not a 501(c)(3).",
+   "investors": "Web search for Zeteo investors (see leads); none named.",
+   "court_records": "No court record about funding of his media work surfaced. No dedicated court-docket search."
+  }
  },
  {
   "id": "laura-loomer",
@@ -5903,7 +7754,93 @@
     "url": "https://rumble.com/c/LauraLoomer"
    }
   ],
-  "backing": [],
+  "backing": [
+   {
+    "id": "loomer-alf-fec-2023",
+    "kind": "campaign finance",
+    "who": "American Liberty Fund (federal PAC, C00623421)",
+    "summary": "American Liberty Fund's 2023 FEC reports list two payments to Loomer, one to payee 'LOOMER CONSULTANT, LAURA', each described as 'POLITICAL ADVERTISING NON ELECTION'; the filings state 1500 (2023-01-24) and 12000 (2023-07-21).",
+    "period": "2023-01 to 2023-07",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Federal Election Commission",
+      "title": "Bulk operating expenditures 2023-2024 (oppexp24.zip), Schedule B line 21B",
+      "url": "https://www.fec.gov/files/bulk-downloads/2024/oppexp24.zip",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "C00623421|A|2023|YE|202402059619677759|21B|F3X|SB|LOOMER CONSULTANT, LAURA|"
+     },
+     {
+      "publisher": "Federal Election Commission",
+      "title": "Bulk operating expenditures 2023-2024 (oppexp24.zip), Schedule B line 21B",
+      "url": "https://www.fec.gov/files/bulk-downloads/2024/oppexp24.zip",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "07/21/2023|12000||POLITICAL ADVERTISING NON ELECTION|||||IND|4022420241826591540"
+     },
+     {
+      "publisher": "Federal Election Commission",
+      "title": "Bulk operating expenditures 2023-2024 (oppexp24.zip), Schedule B line 21B",
+      "url": "https://www.fec.gov/files/bulk-downloads/2024/oppexp24.zip",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "C00623421|N|2023|MY|202307319584226103|21B|F3X|SB|LOOMER, LAURA|"
+     },
+     {
+      "publisher": "Federal Election Commission",
+      "title": "Committee master 2023-2024 (cm24.zip)",
+      "url": "https://www.fec.gov/files/bulk-downloads/2024/cm24.zip",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "C00623421|AMERICAN LIBERTY FUND|"
+     }
+    ],
+    "doesNotProve": "Shows two payments the committee itself described as political advertising. It does not show what she produced, whether it ran on her channels, or any payment after 2023. The filing images (202307319584226103, 202402059619677759) are on docquery.fec.gov, which refused automated fetches."
+   },
+   {
+    "id": "loomer-shillman-reported",
+    "kind": "investigative reporting",
+    "who": "Robert Shillman",
+    "summary": "The New Yorker (2025) and Raw Story (2025) each say Loomer has been funded or 'bankrolled' by businessman Robert Shillman, and Moment says she was named a 'Shillman Fellow' in 2017. Shillman declined to comment to The New Yorker.",
+    "period": null,
+    "status": "alleged",
+    "sources": [
+     {
+      "publisher": "The New Yorker",
+      "title": "Laura Loomer's Endless Payback",
+      "url": "https://www.newyorker.com/magazine/2025/11/17/laura-loomers-endless-payback",
+      "date": "2025-11-10",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "She has been funded by Robert Shillman, the billionaire founder of Cognex Corporation, an industrial-automation company."
+     },
+     {
+      "publisher": "Raw Story",
+      "title": "Article on Roger Stone and Laura Loomer",
+      "url": "https://www.rawstory.com/maga-2674379781/",
+      "date": "2025-12-08",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "She has been bankrolled by American businessman Robert Shillman, a major donor to pro-Israel causes..."
+     },
+     {
+      "publisher": "Moment",
+      "title": "Who Is Laura Loomer?",
+      "url": "https://momentmag.com/who-is-laura-loomer/",
+      "date": "2025-04-04",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "In 2017, Laura Loomer was one of multiple anti-muslim activists appointed as “Shillman Fellows,” named for Trump activist and Cognex CEO Robert J. Shillman."
+     }
+    ],
+    "doesNotProve": "Press reports only; no filing or statement from Shillman or Loomer was read. The instances The New Yorker gives (a conference trip, Project Veritas work) and the 2017 fellowship may predate 2020, so the reports do not show current funding or control of her content."
+   }
+  ],
   "leads": [
    {
     "claim": "Funding from Robert Shillman",
@@ -5934,8 +7871,38 @@
     "claim": "Branded promotions (gold investing, Rumble's Pawsitive pet food)",
     "searched": "The New Yorker; The Independent (2024-09-20)",
     "result": "Consumer ad reads. Out of scope."
+   },
+   {
+    "claim": "Nevada County Republican Party payment to \"LAURA LOOMER ENTERPRISES\"",
+    "searched": "FEC bulk oppexp24.zip: line item dated 10/02/2024, purpose \"FUNDRAISING\", filing states 625",
+    "result": "The purpose does not say media or promotion work (it may be an event fee), so it is not recorded as backing."
+   },
+   {
+    "claim": "Paid \"shadow lobbyist\" work for corporate interests",
+    "searched": "Web search \"Laura Loomer paid lobbying OR foreign agent OR FARA OR client 2025\" (UnHerd segment, search summary only); lda.gov lobbyist search \"Loomer\": 0",
+    "result": "Anonymous-source allegation in one outlet and no lobbying registration. Unverified."
+   },
+   {
+    "claim": "Loomered Strategies pitched a vetting contract to the Presidential Personnel Office",
+    "searched": "Same web search (Politico report via Yahoo, search summary only; page not fetched)",
+    "result": "A pitch is not a payment; no contract award found."
+   },
+   {
+    "claim": "Payments from her own campaign committee to her",
+    "searched": "FEC bulk files: Laura Loomer for Congress Inc lists storage, mileage and expense reimbursements to her (2022 to 2023)",
+    "result": "Reimbursements from her own campaign are not backing of her media work."
    }
   ],
-  "batch": "b8"
+  "batch": "b8",
+  "searched": {
+   "FARA": "Downloaded the DOJ FARA eFile registrant lists (efile.fara.gov/api/v1/Registrants/json/Active, 539 rows, and .../Terminated, 6,556 rows) on 2026-10-21 and matched registrant names for 'Loomer', 'Loomered' and 'Illuminated Agency'. No match. The lists cover registrants, not short-form registrants (individual employees), so a short-form filing would not appear.",
+   "campaign_finance": "The OpenFEC API (DEMO_KEY) returned 429 OVER_RATE_LIMIT on every try (30/60/120/240 s backoff), so the FEC bulk operating-expenditure files (oppexp22/24/26.zip, last modified 2026-10-18) and committee masters (cm22/24/26.zip) were downloaded and payee names matched for 'LOOMER' (word match, which covers Loomered Strategies and Laura Loomer Enterprises) and 'ILLUMINATED AGENCY'. Found the American Liberty Fund and Nevada County Republican Party items and her own campaign's reimbursements; 0 for Illuminated Agency.",
+   "lobbying": "Queried the Senate lobbying disclosure API (lda.gov/api/v1) on 2026-10-22: lobbyist surname Loomer: 0; registrant and client searches for \"Loomered\" and \"Illuminated Agency\": 0.",
+   "sanctions": "Downloaded the OFAC SDN list (treasury.gov sdn.csv), the UK consolidated list (ConList.csv) and the EU consolidated financial sanctions list (CSV) on 2026-10-21 and searched for 'Loomer'. No match.",
+   "platform_labels": "Fetched one current YouTube watch page for Laura Loomer (UCsWnDtLWKEMJHKYCc9647yQ) on 2026-10-22 and checked for an information panel (infoPanelContentRenderer); none present. Control: a DW News watch page fetched the same way carried its 'German public broadcast service' panel, so the method detects panels. X state-affiliation labels not checked (X pages need login and JavaScript).",
+   "grants": "ProPublica Nonprofit Explorer API search (projects.propublica.org/nonprofits/api/v2/search.json) for 'Loomer' and 'Loomered' on 2026-10-21: 0 organizations.",
+   "investors": "No investor in her companies named on any page read; the Shillman reports are recorded as investigative reporting.",
+   "court_records": "No court record about funding of her media work surfaced in the searches and pages read. No dedicated court-docket search."
+  }
  }
 ]

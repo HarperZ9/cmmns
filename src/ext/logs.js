@@ -21,12 +21,13 @@
     const site = globalThis.PBSites && PBSites.current();
     const accounts = site ? handles.map((h) => [site.id, h]).filter(([s, h]) => !askedBacking.has(s + ":" + h)) : [];
     const ch = channels.filter((c) => c && !askedBacking.has("channel:" + c));
-    if (!accounts.length && !ch.length) return;
+    if (!accounts.length && !ch.length) return false;
     accounts.forEach(([s, h]) => askedBacking.add(s + ":" + h)); ch.forEach((c) => askedBacking.add("channel:" + c));
     const got = await chrome.runtime.sendMessage({ type: "pb-backing", accounts, channels: ch });
-    if (!got || !got.people || !got.people.length) return;
+    if (!got || !got.people || !got.people.length) return false;
     for (const p of got.people) backingParts.set(p.id, p);
     PB.setBackingTable({ people: [...backingParts.values()] });
+    return true;
   }
   // Websites, bio domains and bio @handles of the accounts Radar has read, asked once each.
   async function ensureProfiles(readings) {
@@ -174,6 +175,7 @@
     chrome.runtime.sendMessage({ type: "pb-card-open", built }).catch((e) => console.error("[radar] could not open the card page", e));
   }
 
-  const ensureChannel = (id) => askBacking([], [id]).catch((e) => console.error("[radar] channel backing lookup failed", e));
+  // Resolves true when the channel had records not yet known, so the caller redraws once.
+  const ensureChannel = (id) => askBacking([], [id]).catch((e) => { console.error("[radar] channel backing lookup failed", e); return false; });
   globalThis.PBLogs = Object.freeze({ ensureOwners, ensureChannel, ensureProfiles, ensureClaims, claimsOf, recordNet, recordTrail, recordFeed, saveCard, saveSnapshot, exportReport, clearAll, net: () => netLog, trail: () => trailLog });
 })();

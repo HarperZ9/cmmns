@@ -1,6 +1,6 @@
 {
  "about": "Build-time only, never shipped and never read by the extension or by the build's rules. The maintainer's coarse reading of each person's usual position, kept only to report the balance of the dataset and its findings (data/personalities.README.md). It is a judgement, not a measurement. 'not classified' covers people whose politics do not map onto the US and UK left-right frame, and people with no political profile. tests/personalities.symmetry.test.js checks that no shipped field or rule depends on it.",
- "read": "2026-10-21",
+ "read": "2026-10-22",
  "lean": {
   "ben-shapiro": "right",
   "glenn-beck": "right",
@@ -91,6 +91,19 @@
   "anna-sitar": "not classified",
   "jessica-long": "not classified",
   "ryan-dubs": "not classified",
-  "crystal-kung-minkoff": "not classified"
+  "crystal-kung-minkoff": "not classified",
+  "nick-shirley": "right",
+  "nate-friedman": "right",
+  "clavicular": "not classified",
+  "masih-alinejad": "state media",
+  "farida-kurbangaleeva": "state media",
+  "michael-barbaro": "centre",
+  "ben-meiselas": "left",
+  "tim-miller": "centre",
+  "alex-pearlman-pearlmania500": "left",
+  "maclen-stanley-the-law-says-what": "not classified",
+  "joey-contino": "not classified",
+  "john-walsh-itsjohnwalsh": "left",
+  "stella-stellamagz": "left"
  }
 }

@@ -15,7 +15,7 @@ export const STATUSES = ["documented", "reported", "alleged"];
 export const SOURCE_KINDS = ["self", "company", "court", "government", "filing", "platform", "press", "researcher"];
 export const PRIMARY = new Set(["self", "company", "court", "government", "filing", "platform"]);
 export const PLATFORMS = ["x", "youtube", "tiktok", "instagram", "facebook", "bluesky", "threads", "podcast", "tv", "web"];
-export const SELECTIONS = ["audience", "named in a primary record", "named in two independent reports"];
+export const SELECTIONS = ["audience", "named in a primary record", "named in two independent reports", "named by the author as a lead"];
 export const TOPICS = ["politics and current affairs", "lifestyle with political content"];
 export const MAX_QUOTE_WORDS = 30;
 export const MATCHED = new Set(["exact", "loose"]);
@@ -110,8 +110,13 @@ export function confidenceOf(row, checks) {
 // confirmed by at least one source of that kind whose quote was found. A row whose filing could not
 // be read is held back, even when a press report about it could.
 const RECORD_KINDS = new Set(["court", "filing", "government", "platform"]);
+// A funding claim (an investor, a sponsor, a grant) that no primary source carries ships only when
+// two different outlets' quotes were found.
+const FUNDING = new Set(["investor", "sponsor", "paid promotion", "grant", "nonprofit funding", "investigative reporting"]);
 export function shippable(row, checks) {
-  if (!row.sources.some((s, i) => MATCHED.has(checks[i]))) return false;
+  const ok = row.sources.filter((s, i) => MATCHED.has(checks[i]));
+  if (!ok.length) return false;
+  if (FUNDING.has(row.kind) && !ok.some((s) => PRIMARY.has(s.kind)) && new Set(ok.map((s) => host(s.url))).size < 2) return false;
   const cited = new Set(row.sources.filter((s) => RECORD_KINDS.has(s.kind)).map((s) => s.kind));
   return [...cited].every((k) => row.sources.some((s, i) => s.kind === k && MATCHED.has(checks[i])));
 }

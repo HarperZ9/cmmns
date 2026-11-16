@@ -1,9 +1,10 @@
 {
  "checked": "2026-10-22",
  "tally": {
-  "exact": 253,
-  "loose": 15,
-  "unreadable": 12
+  "exact": 304,
+  "loose": 18,
+  "unreadable": 15,
+  "not-found": 1
  },
  "results": [
   {
@@ -42,13 +43,6 @@
    "status": 200
   },
   {
-   "key": "fox-news/fox-corp-owner/0",
-   "url": "https://foxcareers.com/OurBrands/FoxNewsChannel",
-   "result": "exact",
-   "via": "archive",
-   "status": 200
-  },
-  {
    "key": "ms-now/ms-now-owner-versant/0",
    "url": "https://www.ms.now/the-last-word",
    "result": "exact",
@@ -77,6 +71,13 @@
    "status": 200
   },
   {
+   "key": "cnn/tapper-cnn-owner-skydance/1",
+   "url": "https://www.sec.gov/Archives/edgar/data/0002041610/000110465926113913/tm2626659d7_ex99-1.htm",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "hbo/hbo-owner-skydance/0",
    "url": "https://www.ksat.com/news/politics/2026/10/06/paramount-closes-on-81-billion-takeover-of-warner-bros-discovery-joining-two-of-americas-oldest-hollywood-studios/",
    "result": "exact",
@@ -91,7 +92,21 @@
    "status": 200
   },
   {
+   "key": "hbo/hbo-owner-skydance/2",
+   "url": "https://www.sec.gov/Archives/edgar/data/0002041610/000110465926113913/tm2626659d7_ex99-1.htm",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "comedy-central/stewart-comedy-central-owner-skydance/0",
+   "url": "https://www.sec.gov/Archives/edgar/data/0002041610/000110465926113913/tm2626659d7_ex99-1.htm",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "comedy-central/stewart-comedy-central-owner-skydance/1",
    "url": "https://www.sec.gov/Archives/edgar/data/0002041610/000110465926113913/tm2626659d7_ex99-1.htm",
    "result": "exact",
    "via": "direct",
@@ -189,8 +204,29 @@
    "status": 200
   },
   {
+   "key": "india-tv/independent-news-service-owner/1",
+   "url": "https://india.mom-gmr.org/en/media/detail/outlet/india-tv/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "india-today/living-media-india/0",
    "url": "https://www.indiatodaygroup.com/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "india-today/living-media-india-owner/0",
+   "url": "https://www.newslaundry.com/2022/07/18/who-owns-your-media-the-highs-and-lows-of-the-india-today-group",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "india-today/living-media-india-owner/1",
+   "url": "https://india.mom-rsf.org/en/media/detail/outlet/aaj-tak/",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -245,6 +281,13 @@
    "status": 200
   },
   {
+   "key": "rt/rt-state-funded/1",
+   "url": "https://web.archive.org/web/20250206153638/https://www.justice.gov/opa/pr/two-rt-employees-indicted-covertly-funding-and-directing-us-company-published-thousands",
+   "result": "unreadable",
+   "via": "direct",
+   "status": 429
+  },
+  {
    "key": "russia-1/rossiya-1-state-owned/0",
    "url": "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
    "result": "exact",
@@ -253,10 +296,10 @@
   },
   {
    "key": "russia-1/rossiya-1-state-owned/1",
-   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0336",
-   "result": "unreadable",
-   "via": "none",
-   "status": 202
+   "url": "https://publications.europa.eu/resource/cellar/14ad6d79-98c2-11ec-8d29-01aa75ed71a1.0006.03/DOC_1",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
   },
   {
    "key": "global-times/global-times-owner/0",
@@ -280,9 +323,23 @@
    "status": 200
   },
   {
+   "key": "real-americas-voice/rav-owner/1",
+   "url": "https://americasvoice.news/about",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "human-events/posobiec-jtn-owns-human-events/0",
    "url": "https://justthenews.com/accountability/media/jtn-network-acquires-post-millennial-human-events",
    "result": "loose",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "guardian/hasan-guardian-owner-scott-trust/0",
+   "url": "https://www.theguardian.com/about",
+   "result": "exact",
    "via": "direct",
    "status": 200
   },
@@ -296,27 +353,6 @@
   {
    "key": "rachel-maddow/maddow-ms-now-employer/1",
    "url": "https://www.penguinrandomhouse.com/authors/95708/rachel-maddow",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "rachel-maddow/maddow-versant-owner/0",
-   "url": "https://www.versantmedia.com/",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "rachel-maddow/maddow-versant-owner/1",
-   "url": "https://thedesk.net/2026/01/comcast-completes-spin-out-of-cable-networks-into-versant/",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "rachel-maddow/maddow-versant-owner/2",
-   "url": "https://www.inquirer.com/news/philadelphia/rachel-maddow-msnow-philadelphia-live-events-20260626.html",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -427,13 +463,6 @@
    "status": 200
   },
   {
-   "key": "anderson-cooper/cnn-owner-paramount-skydance/0",
-   "url": "https://www.cbsnews.com/news/paramount-warner-bros-discovery-deal-skydance",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
    "key": "tucker-carlson/fox-news-employer/0",
    "url": "https://abc7.com/tucker-carlson-leaving-fox-news-out-leaves-dominion-lawsuit/13180147/",
    "result": "exact",
@@ -499,9 +528,9 @@
   {
    "key": "fatih-portakal/sozcu-tv-employer/1",
    "url": "https://www.haber7.com/medya/haber/3538606-fatih-portakal-sozcu-tvden-ayrildi",
-   "result": "exact",
-   "via": "archive",
-   "status": 200
+   "result": "unreadable",
+   "via": "none",
+   "status": 429
   },
   {
    "key": "fatih-portakal/sozcu-tv-owner-beme/0",
@@ -553,15 +582,15 @@
    "status": 200
   },
   {
-   "key": "bill-maher/hbo-real-time/0",
-   "url": "https://press.wbd.com/us/media-release/real-time-bill-maher-renewed-through-2028-season-24-debuting-january-23",
+   "key": "ilya-varlamov/russia-foreign-agent-register/2",
+   "url": "https://meduza.io/en/news/2023/03/23/russia-s-justice-ministry-names-blogger-ilya-varlamov-and-lawyer-pavel-chikov-foreign-agents",
    "result": "exact",
    "via": "direct",
    "status": 200
   },
   {
-   "key": "bill-maher/hbo-owner-wbd/0",
-   "url": "https://www.sec.gov/Archives/edgar/data/1437107/000143710726000075/wbd-20260630.htm",
+   "key": "bill-maher/hbo-real-time/0",
+   "url": "https://press.wbd.com/us/media-release/real-time-bill-maher-renewed-through-2028-season-24-debuting-january-23",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -582,14 +611,14 @@
   },
   {
    "key": "benny-johnson/tenet-media-rt/0",
-   "url": "https://www.cbsnews.com/news/russia-tenet-media-right-wing-influencers-justice-department/",
+   "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
    "result": "exact",
    "via": "direct",
    "status": 200
   },
   {
    "key": "benny-johnson/tenet-media-rt/1",
-   "url": "https://www.npr.org/2024/09/05/nx-s1-5100829/russia-election-influencers-youtube",
+   "url": "https://www.cbsnews.com/news/russia-tenet-media-right-wing-influencers-justice-department/",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -610,13 +639,20 @@
   },
   {
    "key": "benny-johnson/tenet-media-rt/4",
-   "url": "https://www.wired.com/story/right-wing-influencer-network-tenet-media-allegedly-spread-russian-disinformation/",
+   "url": "https://www.npr.org/2024/09/05/nx-s1-5100829/russia-election-influencers-youtube",
    "result": "exact",
    "via": "direct",
    "status": 200
   },
   {
    "key": "benny-johnson/tenet-media-rt/5",
+   "url": "https://www.wired.com/story/right-wing-influencer-network-tenet-media-allegedly-spread-russian-disinformation/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "benny-johnson/tenet-media-rt/6",
    "url": "https://www.cbsnews.com/news/russia-tenet-media-right-wing-influencers-justice-department/",
    "result": "exact",
    "via": "direct",
@@ -625,6 +661,13 @@
   {
    "key": "benny-johnson/tpusa/0",
    "url": "https://barrettmedia.com/2023/05/03/newsmax-no-longer-carrying-benny-johnsons-weekend-show/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "benny-johnson/tpusa/1",
+   "url": "https://www.youtube.com/@bennyjohnson/about",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -700,6 +743,20 @@
    "status": 200
   },
   {
+   "key": "andrew-neil/gb-news-shareholders-2021/0",
+   "url": "https://www.cityam.com/gb-news-promises-boldly-different-tv-channel-as-it-secures-60m-funding/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "andrew-neil/gb-news-shareholders-2021/1",
+   "url": "https://www.societyofeditors.org/soe_news/boldly-different-gb-news-to-recruit-120-journalists-as-it-confirms-60m-funding/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "dmitry-gordon/russia-foreign-agent-register/0",
    "url": "https://www.rferl.org/a/russia-makarevich-zhdanov-zimin-foreign-agents-ukraine/32016826.html",
    "result": "exact",
@@ -714,6 +771,20 @@
    "status": 200
   },
   {
+   "key": "dmitry-gordon/russia-foreign-agent-register/2",
+   "url": "https://www.rferl.org/a/russia-makarevich-zhdanov-zimin-foreign-agents-ukraine/32016826.html",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "dmitry-gordon/gordon-founder-gordonua/0",
+   "url": "https://gordonua.com/ukr/about.html",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "john-oliver/hbo-last-week-tonight/0",
    "url": "https://www.hbomax.com/show/f7ebcd02-6641-4ec5-a392-07e58196808f",
    "result": "exact",
@@ -723,20 +794,6 @@
   {
    "key": "john-oliver/hbo-last-week-tonight/1",
    "url": "https://www.hbomax.com/show/f7ebcd02-6641-4ec5-a392-07e58196808f",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "john-oliver/skydance-owns-hbo/0",
-   "url": "https://www.ms.now/news/paramount-closes-warner-bros-discovery-merger-skydance",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "john-oliver/skydance-owns-hbo/1",
-   "url": "https://www.malaymail.com/news/money/2026/10/07/paramountwarner-bros-deal-closes-bringing-hbo-cnn-cbs-and-more-under-one-roof/237985",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -791,13 +848,6 @@
    "status": 200
   },
   {
-   "key": "laura-ingraham/fox-corporation-owner/0",
-   "url": "https://www.sec.gov/Archives/edgar/data/1754301/000162828024036123/fox-20240630.htm",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
    "key": "sudhir-chaudhary/prasar-bharati-dd-news/0",
    "url": "https://www.newslaundry.com/2025/03/12/sudhir-chaudhary-inks-deal-for-dd-news-show",
    "result": "exact",
@@ -814,6 +864,13 @@
   {
    "key": "sudhir-chaudhary/aaj-tak-india-today/0",
    "url": "https://www.newslaundry.com/2022/07/11/the-natural-home-for-a-household-name-sudhir-chaudhary-to-join-aaj-tak-as-consulting-editor",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "sudhir-chaudhary/aaj-tak-india-today/1",
+   "url": "https://www.newslaundry.com/2025/03/12/sudhir-chaudhary-inks-deal-for-dd-news-show",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -857,6 +914,20 @@
    "key": "robert-peston/itv-political-editor/0",
    "url": "https://www.hachette.co.nz/robert-peston",
    "result": "loose",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "robert-peston/peston-goalhanger-rest-is-money/0",
+   "url": "https://goalhanger.com/shows",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "robert-peston/peston-goalhanger-psc/0",
+   "url": "https://find-and-update.company-information.service.gov.uk/company/13846551/persons-with-significant-control",
+   "result": "exact",
    "via": "direct",
    "status": 200
   },
@@ -982,9 +1053,9 @@
   {
    "key": "theo-von/von-the-roost-network/0",
    "url": "https://tubefilter.com/2024/04/09/night-media-acquires-the-roost-rooster-teeth-podcast-network/",
-   "result": "loose",
-   "via": "archive",
-   "status": 200
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
   },
   {
    "key": "theo-von/von-the-roost-network/1",
@@ -1043,6 +1114,13 @@
    "status": 200
   },
   {
+   "key": "gary-lineker/lineker-goalhanger-psc/2",
+   "url": "https://find-and-update.company-information.service.gov.uk/company/13846551/persons-with-significant-control",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "gary-lineker/lineker-goalhanger-chernin/0",
    "url": "https://www.tcg.co/portfolio/",
    "result": "exact",
@@ -1059,6 +1137,13 @@
   {
    "key": "gary-lineker/lineker-bbc/0",
    "url": "https://www.cityam.com/the-rest-is-investing-gary-lineker-backed-goalhanger-launches-venture-capital-arm/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "gary-lineker/lineker-bbc/1",
+   "url": "https://news.stv.tv/world/gary-lineker-to-present-last-match-of-the-day-as-he-exits-bbc",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -1120,22 +1205,8 @@
    "status": 200
   },
   {
-   "key": "chris-hayes/ms-now-owner-versant/0",
-   "url": "https://www.ms.now/all-in",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "chris-hayes/ms-now-owner-versant/1",
-   "url": "https://thedesk.net/2026/01/comcast-completes-spin-out-of-cable-networks-into-versant/",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "chris-hayes/ms-now-owner-versant/2",
-   "url": "https://thedesk.net/2026/01/comcast-completes-spin-out-of-cable-networks-into-versant/",
+   "key": "chris-hayes/ms-now-employer/1",
+   "url": "https://www.thenation.com/authors/chris-hayes/",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -1218,6 +1289,13 @@
    "status": 200
   },
   {
+   "key": "denise-dresser/dresser-latinus-videocolumn/0",
+   "url": "https://latinus.us/autor/denise-dreeser.html",
+   "result": "not-found",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "matt-walsh/daily-wire-employer/0",
    "url": "https://www.dailywire.com/about",
    "result": "exact",
@@ -1234,27 +1312,6 @@
   {
    "key": "joe-scarborough/ms-now-employer/0",
    "url": "https://www.ms.now/morning-joe",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "joe-scarborough/ms-now-owner-versant/0",
-   "url": "https://www.ms.now/morning-joe",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "joe-scarborough/ms-now-owner-versant/1",
-   "url": "https://thedesk.net/2026/01/comcast-completes-spin-out-of-cable-networks-into-versant/",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "joe-scarborough/ms-now-owner-versant/2",
-   "url": "https://thedesk.net/2026/01/comcast-completes-spin-out-of-cable-networks-into-versant/",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -1296,7 +1353,7 @@
   },
   {
    "key": "dave-rubin/rubin-tenet-media-rt/0",
-   "url": "https://cbsnews.com/amp/news/russia-tenet-media-right-wing-influencers-justice-department",
+   "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -1310,13 +1367,20 @@
   },
   {
    "key": "dave-rubin/rubin-tenet-media-rt/2",
-   "url": "https://www.motherjones.com/politics/2024/09/tenet-media-russia/",
+   "url": "https://cbsnews.com/amp/news/russia-tenet-media-right-wing-influencers-justice-department",
    "result": "exact",
    "via": "direct",
    "status": 200
   },
   {
    "key": "dave-rubin/rubin-tenet-media-rt/3",
+   "url": "https://www.motherjones.com/politics/2024/09/tenet-media-russia/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "dave-rubin/rubin-tenet-media-rt/4",
    "url": "https://www.motherjones.com/politics/2024/09/tenet-media-russia/",
    "result": "exact",
    "via": "direct",
@@ -1351,6 +1415,20 @@
    "status": 200
   },
   {
+   "key": "sam-seder/seder-majority-report-founder/0",
+   "url": "https://web.archive.org/web/20260921202806/https://majorityreportradio.com/about",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "sam-seder/seder-majority-report-founder/1",
+   "url": "https://web.archive.org/web/20260922225641/https://majorityreportradio.com/",
+   "result": "unreadable",
+   "via": "direct",
+   "status": 429
+  },
+  {
    "key": "michael-knowles/knowles-daily-wire/0",
    "url": "https://www.dailywire.com/show/the-michael-knowles-show",
    "result": "exact",
@@ -1365,11 +1443,46 @@
    "status": 200
   },
   {
+   "key": "pedro-ferriz-de-con/ferriz-central-fm-equilibrio/0",
+   "url": "https://www.merca20.com/pedro-ferriz-de-con-y-eduardo-torreblanca-salen-de-la-radio/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "pedro-ferriz-de-con/ferriz-central-fm-equilibrio/1",
+   "url": "https://dplnews.com/pedro-ferriz-maniobra-para-volver-a-la-radio-de-la-cdmx-con-central-fm/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "alexandre-garcia/garcia-gazeta-do-povo/0",
    "url": "https://www.gazetadopovo.com.br/vozes/alexandre-garcia/",
    "result": "exact",
    "via": "direct",
    "status": 200
+  },
+  {
+   "key": "alexandre-garcia/garcia-jovem-pan/0",
+   "url": "https://jovempan.com.br/jpnews/alexandre-garcia-estreia-na-tv-jovem-pan-news-nesta-sexta/",
+   "result": "loose",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "alexandre-garcia/garcia-jovem-pan/1",
+   "url": "https://revistaoeste.com/colunista/alexandre-garcia/",
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
+  },
+  {
+   "key": "alexandre-garcia/garcia-revista-oeste/0",
+   "url": "https://revistaoeste.com/colunista/alexandre-garcia/",
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
   },
   {
    "key": "krystal-ball/ball-breaking-points/0",
@@ -1382,6 +1495,27 @@
    "key": "krystal-ball/ball-breaking-points/1",
    "url": "https://podcastbusinessjournal.com/new-breaking-points-with-krystal-and-saagar/",
    "result": "loose",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "krystal-ball/ball-breaking-points/2",
+   "url": "https://podcastbusinessjournal.com/new-breaking-points-with-krystal-and-saagar/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "kyle-kulinski/kulinski-kkf-cohost/0",
+   "url": "https://krystalkyleandfriends.substack.com/about",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "kyle-kulinski/kulinski-kkf-cohost/1",
+   "url": "https://krystalkyleandfriends.substack.com/about",
+   "result": "exact",
    "via": "direct",
    "status": 200
   },
@@ -1421,39 +1555,32 @@
    "status": 200
   },
   {
-   "key": "tomi-lahren/fox-corp-owner/0",
-   "url": "https://radioinsight.com/headlines/207802/fox-acquires-clay-travis-outkick-media/",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
+   "key": "jimmy-dore/dore-4-dore-productions/0",
+   "url": "https://jimmydore.com/privacy-policy/",
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
   },
   {
-   "key": "tomi-lahren/fox-corp-owner/1",
-   "url": "https://www.sportico.com/business/media/2021/fox-buys-clay-travis-outkick-sports-news-site-1234629133/",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "tomi-lahren/fox-corp-owner/2",
-   "url": "https://foxcareers.com/OurBrands/FoxNewsChannel",
-   "result": "exact",
-   "via": "archive",
-   "status": 200
+   "key": "jimmy-dore/dore-4-dore-productions/1",
+   "url": "https://jimmydore.com/",
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
   },
   {
    "key": "tim-pool/tenet-rt-indictment/0",
-   "url": "https://web.archive.org/web/20261001125251id_/https://www.justice.gov/opa/media/1366266/dl",
+   "url": "https://www.justice.gov/usao-sdny/media/1366251/dl",
    "result": "exact",
    "via": "direct",
    "status": 200
   },
   {
    "key": "tim-pool/tenet-rt-indictment/1",
-   "url": "https://web.archive.org/web/20250206153638/https://www.justice.gov/opa/pr/two-rt-employees-indicted-covertly-funding-and-directing-us-company-published-thousands",
-   "result": "exact",
+   "url": "https://web.archive.org/web/20261001125251id_/https://www.justice.gov/opa/media/1366266/dl",
+   "result": "unreadable",
    "via": "direct",
-   "status": 200
+   "status": 429
   },
   {
    "key": "tim-pool/tenet-rt-indictment/2",
@@ -1477,15 +1604,64 @@
    "status": 200
   },
   {
-   "key": "jon-favreau-pod-save-america/vsa-fec-payments/0",
-   "url": "https://api.open.fec.gov/v1/schedules/schedule_b/?recipient_name=CROOKED%20MEDIA&sort=-disbursement_date&api_key=DEMO_KEY",
+   "key": "jon-favreau-pod-save-america/crooked-soros-investor/0",
+   "url": "https://socaltech.com/crooked_media_finds_funding_from_soros/s-0082935.html",
    "result": "unreadable",
    "via": "none",
-   "status": 429
+   "status": 403
   },
   {
-   "key": "jon-favreau-pod-save-america/vsa-fec-payments/1",
-   "url": "https://votesaveamerica.com/about/",
+   "key": "jon-favreau-pod-save-america/crooked-soros-investor/1",
+   "url": "https://socaltech.com/crooked_media_finds_funding_from_soros/s-0082935.html",
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
+  },
+  {
+   "key": "jon-favreau-pod-save-america/crooked-soros-investor/2",
+   "url": "https://www.insideradio.com/free/after-audacy-investment-soros-fund-expands-audio-holdings-with-meidastouch-stake/article_0e6b1646-dcff-4834-9342-59af56221c41.html",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "jon-favreau-pod-save-america/vsa-fec-payments-2023-2025/0",
+   "url": "https://www.fec.gov/files/bulk-downloads/2024/oppexp24.zip",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "jon-favreau-pod-save-america/vsa-fec-payments-2023-2025/1",
+   "url": "https://www.fec.gov/files/bulk-downloads/2026/oppexp26.zip",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "jon-favreau-pod-save-america/vsa-fec-payments-2023-2025/2",
+   "url": "https://www.fec.gov/files/bulk-downloads/2026/cm26.zip",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "jon-favreau-pod-save-america/crooked-other-committees-fec/0",
+   "url": "https://www.fec.gov/files/bulk-downloads/2026/oppexp26.zip",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "jon-favreau-pod-save-america/crooked-other-committees-fec/1",
+   "url": "https://www.fec.gov/files/bulk-downloads/2026/oppexp26.zip",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "jon-favreau-pod-save-america/crooked-other-committees-fec/2",
+   "url": "https://www.fec.gov/files/bulk-downloads/2026/cm26.zip",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -1512,11 +1688,74 @@
    "status": 200
   },
   {
+   "key": "mehdi-hasan/hasan-guardian-us-columnist/0",
+   "url": "https://www.theguardian.com/profile/mehdihasan",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "mehdi-hasan/hasan-al-jazeera-head-to-head/0",
+   "url": "https://www.aljazeera.com/video/head-to-head",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "laura-loomer/loomer-alf-fec-2023/0",
+   "url": "https://www.fec.gov/files/bulk-downloads/2024/oppexp24.zip",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "laura-loomer/loomer-alf-fec-2023/1",
+   "url": "https://www.fec.gov/files/bulk-downloads/2024/oppexp24.zip",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "laura-loomer/loomer-alf-fec-2023/2",
+   "url": "https://www.fec.gov/files/bulk-downloads/2024/oppexp24.zip",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "laura-loomer/loomer-alf-fec-2023/3",
+   "url": "https://www.fec.gov/files/bulk-downloads/2024/cm24.zip",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "laura-loomer/loomer-shillman-reported/0",
+   "url": "https://www.newyorker.com/magazine/2025/11/17/laura-loomers-endless-payback",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "laura-loomer/loomer-shillman-reported/1",
+   "url": "https://www.rawstory.com/maga-2674379781/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "laura-loomer/loomer-shillman-reported/2",
+   "url": "https://momentmag.com/who-is-laura-loomer/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "lauren-southern/tenet-media-contributor/0",
    "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
-   "result": "unreadable",
+   "result": "exact",
    "via": "direct",
-   "status": 429
+   "status": 200
   },
   {
    "key": "lauren-southern/tenet-media-contributor/1",
@@ -1570,16 +1809,16 @@
   {
    "key": "tayler-hansen/tenet-media-contributor/0",
    "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
-   "result": "unreadable",
+   "result": "exact",
    "via": "direct",
-   "status": 429
+   "status": 200
   },
   {
    "key": "tayler-hansen/tenet-media-contributor/1",
    "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
-   "result": "unreadable",
+   "result": "exact",
    "via": "direct",
-   "status": 429
+   "status": 200
   },
   {
    "key": "tayler-hansen/tenet-media-contributor/2",
@@ -1598,6 +1837,13 @@
   {
    "key": "tayler-hansen/tenet-media-contributor/4",
    "url": "https://newrepublic.com/post/185686/donald-trump-tenet-media-russia-scheme",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "tayler-hansen/tenet-media-contributor/5",
+   "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -1626,16 +1872,16 @@
   {
    "key": "matt-christiansen/tenet-media-contributor/0",
    "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
-   "result": "unreadable",
+   "result": "exact",
    "via": "direct",
-   "status": 429
+   "status": 200
   },
   {
    "key": "matt-christiansen/tenet-media-contributor/1",
    "url": "https://web.archive.org/web/20240904182410/https://www.tenetmedia.com/",
-   "result": "unreadable",
+   "result": "exact",
    "via": "direct",
-   "status": 429
+   "status": 200
   },
   {
    "key": "matt-christiansen/tenet-media-contributor/2",
@@ -1673,6 +1919,13 @@
    "status": 200
   },
   {
+   "key": "matt-christiansen/tenet-rt-indictment/2",
+   "url": "https://www.nbcnews.com/news/amp/rcna169611",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "margarita-simonyan/rt-editor-in-chief/0",
    "url": "https://webgate.ec.europa.eu/fsd/fsf/public/files/csvFullSanctionsList_1_1/content?token=dG9rZW4tMjAxNw",
    "result": "exact",
@@ -1695,10 +1948,10 @@
   },
   {
    "key": "margarita-simonyan/eu-sanction-2022/1",
-   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0260",
-   "result": "unreadable",
-   "via": "none",
-   "status": 202
+   "url": "https://publications.europa.eu/resource/cellar/bf95344b-9563-11ec-b4e4-01aa75ed71a1.0006.03/DOC_1",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
   },
   {
    "key": "margarita-simonyan/ofac-designation-2024/0",
@@ -1716,10 +1969,10 @@
   },
   {
    "key": "vladimir-solovyov/russia-1-presenter/0",
-   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0260",
-   "result": "unreadable",
-   "via": "none",
-   "status": 202
+   "url": "https://publications.europa.eu/resource/cellar/bf95344b-9563-11ec-b4e4-01aa75ed71a1.0006.03/DOC_1",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
   },
   {
    "key": "vladimir-solovyov/eu-sanction-2022/0",
@@ -1730,10 +1983,10 @@
   },
   {
    "key": "vladimir-solovyov/eu-sanction-2022/1",
-   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0260",
-   "result": "unreadable",
-   "via": "none",
-   "status": 202
+   "url": "https://publications.europa.eu/resource/cellar/bf95344b-9563-11ec-b4e4-01aa75ed71a1.0006.03/DOC_1",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
   },
   {
    "key": "olga-skabeeva/rossiya-1-host/0",
@@ -1744,10 +1997,10 @@
   },
   {
    "key": "olga-skabeeva/rossiya-1-host/1",
-   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R0336",
-   "result": "unreadable",
-   "via": "none",
-   "status": 202
+   "url": "https://publications.europa.eu/resource/cellar/14ad6d79-98c2-11ec-8d29-01aa75ed71a1.0006.03/DOC_1",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
   },
   {
    "key": "olga-skabeeva/eu-sanction-2022/0",
@@ -1778,8 +2031,43 @@
    "status": 200
   },
   {
+   "key": "hu-xijin/hu-twitter-state-affiliated-label/0",
+   "url": "https://chinamediaproject.org/2021/01/18/chinas-telling-twitter-story/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "hu-xijin/hu-twitter-state-affiliated-label/1",
+   "url": "https://www.denvergazette.com/2022/10/28/chinese-propagandists-want-musk-to-remove-state-media-labels-from-twitter-accounts-c0657c55-7e68-5916-a294-731743a513e6/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "hu-xijin/global-times-foreign-mission/0",
+   "url": "https://2017-2021.state.gov/designation-of-additional-chinese-media-entities-as-foreign-missions/",
+   "result": "loose",
+   "via": "direct",
+   "status": 200
+  },
+  {
    "key": "steve-bannon/rav-war-room/0",
    "url": "https://americasvoice.news/shows",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "steve-bannon/warroom-hchk-trustee-complaint/0",
+   "url": "https://storage.courtlistener.com/recap/gov.uscourts.ctb.312597/gov.uscourts.ctb.312597.1.0.pdf",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "steve-bannon/warroom-hchk-trustee-complaint/1",
+   "url": "https://www.motherjones.com/politics/2024/05/steve-bannon-isnt-on-trial-but-he-keeps-coming-up-in-a-maga-moguls-fraud-case/",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -1794,20 +2082,6 @@
   {
    "key": "alex-jones/fss-owner/1",
    "url": "https://www.texastribune.org/2022/12/02/alex-jones-bankruptcy/",
-   "result": "exact",
-   "via": "direct",
-   "status": 200
-  },
-  {
-   "key": "alex-jones/store-revenue-court-records/0",
-   "url": "https://apnews.com/article/alex-jones-infowars-bankruptcy-filing-1a3b51946cb06c5f90c341d3118947cf",
-   "result": "unreadable",
-   "via": "none",
-   "status": 403
-  },
-  {
-   "key": "alex-jones/store-revenue-court-records/1",
-   "url": "https://www.npr.org/2025/02/05/g-s1-46738/infowars-alex-jones-onion-bankruptcy-judge-sandy-hook",
    "result": "exact",
    "via": "direct",
    "status": 200
@@ -1836,16 +2110,16 @@
   {
    "key": "anna-sitar/vippi-fara-olympics-2022/3",
    "url": "https://www.axios.com/2022/04/08/inside-chinas-olympic-influencer-campaign",
-   "result": "exact",
-   "via": "archive",
-   "status": 200
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
   },
   {
    "key": "anna-sitar/vippi-fara-olympics-2022/4",
    "url": "https://www.axios.com/2022/04/08/inside-chinas-olympic-influencer-campaign",
-   "result": "exact",
-   "via": "archive",
-   "status": 200
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
   },
   {
    "key": "jessica-long/vippi-fara-olympics-2022/0",
@@ -1885,9 +2159,9 @@
   {
    "key": "jessica-long/vippi-fara-olympics-2022/5",
    "url": "https://www.axios.com/2022/04/08/inside-chinas-olympic-influencer-campaign",
-   "result": "exact",
-   "via": "archive",
-   "status": 200
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
   },
   {
    "key": "ryan-dubs/vippi-fara-olympics-2022/0",
@@ -1962,8 +2236,141 @@
   {
    "key": "crystal-kung-minkoff/vippi-fara-olympics-2022/5",
    "url": "https://www.axios.com/2022/04/08/inside-chinas-olympic-influencer-campaign",
+   "result": "unreadable",
+   "via": "none",
+   "status": 403
+  },
+  {
+   "key": "masih-alinejad/usagm-talent-contract/0",
+   "url": "https://api.usaspending.gov/api/v2/awards/CONT_AWD_95170024P0062_9568_-NONE-_-NONE-/",
    "result": "exact",
-   "via": "archive",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "masih-alinejad/usagm-talent-contract/1",
+   "url": "https://www.usagm.gov/?p=22565",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "masih-alinejad/usagm-talent-contract/2",
+   "url": "https://www.clickorlando.com/news/world/2024/11/09/iranian-american-human-rights-activists-expresses-defiance-over-iranian-plots-to-kill-her-and-trump/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "masih-alinejad/usagm-federal-funding/0",
+   "url": "https://www.usagm.gov/who-we-are/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "farida-kurbangaleeva/current-time-presenter/0",
+   "url": "https://www.currenttime.tv/a/32999769.html",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "farida-kurbangaleeva/current-time-presenter/1",
+   "url": "https://ovd.info/en/ino/farida-kurbangaleeva",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "farida-kurbangaleeva/rferl-usagm-grant/0",
+   "url": "https://www.currenttime.tv/p/6018.html",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "farida-kurbangaleeva/rferl-usagm-grant/1",
+   "url": "https://pressroom.rferl.org/about-us",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "farida-kurbangaleeva/russia-foreign-agent-register/0",
+   "url": "https://ipi.media/alerts/farida-kurbangaleeva-arrested-in-absentia-for-fake-news-and-terrorism/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "farida-kurbangaleeva/russia-foreign-agent-register/1",
+   "url": "https://ovd.info/en/ino/farida-kurbangaleeva",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "michael-barbaro/nyt-the-daily/0",
+   "url": "https://podcasts.apple.com/us/podcast/the-daily/id1200361736",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "michael-barbaro/nyt-ochs-sulzberger-trust/0",
+   "url": "https://www.sec.gov/Archives/edgar/data/71691/000007169126000011/nyt-20251231.htm",
+   "result": "loose",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "ben-meiselas/meidastouch-network/0",
+   "url": "https://podcasts.apple.com/us/podcast/the-meidastouch-podcast/id1510240831",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "ben-meiselas/meidastouch-network/1",
+   "url": "https://www.insideradio.com/free/after-audacy-investment-soros-fund-expands-audio-holdings-with-meidastouch-stake/article_0e6b1646-dcff-4834-9342-59af56221c41.html",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "ben-meiselas/soros-fund-management-round/0",
+   "url": "https://barrettmedia.com/2026/04/09/meidastouch-network-completes-round-of-funding-led-by-soros-management-fund/",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "ben-meiselas/soros-fund-management-round/1",
+   "url": "https://www.insideradio.com/free/after-audacy-investment-soros-fund-expands-audio-holdings-with-meidastouch-stake/article_0e6b1646-dcff-4834-9342-59af56221c41.html",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "tim-miller/the-bulwark/0",
+   "url": "https://podcasts.apple.com/us/podcast/the-bulwark-podcast/id1447684472",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "tim-miller/the-bulwark/1",
+   "url": "https://www.thebulwark.com/about",
+   "result": "exact",
+   "via": "direct",
+   "status": 200
+  },
+  {
+   "key": "tim-miller/center-enterprises/0",
+   "url": "https://www.thebulwark.com/about",
+   "result": "loose",
+   "via": "direct",
    "status": 200
   }
  ]

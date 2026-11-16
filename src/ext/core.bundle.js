@@ -4862,7 +4862,8 @@ function backingRows(p) {
   for (const r of p.rows) {
     rows.push([r.kind[0].toUpperCase() + r.kind.slice(1), `${r.who}${r.via ? ` (as owner or backer of ${r.via})` : ""}${r.period ? `, ${r.period}` : ""}. ${r.summary} Status: ${STATUS_WORDS[r.status]}; confidence ${r.confidence}.`]);
     rows.push(["Sources say", r.sources.slice(0, 3).map(quoteLine).join(" ")]);
-    rows.push(["Read it", { links: r.sources.slice(0, 3).map((s) => [String(s.url).replace(/^https?:\/\//, "").slice(0, 48), s.url]) }]);
+    // Links are labelled by publisher and date, never by the address, whose words are the publisher's.
+    rows.push(["Read it", { links: r.sources.slice(0, 3).map((s) => [`${s.publisher}${s.date ? ` (${s.date})` : ""}`, s.url]) }]);
     if (r.campaign) rows.push(["Documented campaign", `${r.campaign.name}: ${r.campaign.contentType}${r.campaign.dates ? `, ${r.campaign.dates}` : ""}.${(r.campaign.techniques || []).length ? ` Techniques the source supports: ${r.campaign.techniques.join("; ")}.` : ""}`]);
     rows.push(["This does not prove", r.doesNotProve]);
   }

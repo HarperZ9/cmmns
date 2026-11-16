@@ -1,0 +1,1174 @@
+[
+ {
+  "id": "nick-shirley",
+  "name": "Nick Shirley",
+  "qid": "Q136465392",
+  "role": "YouTuber and self-described independent journalist",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named by the author as a lead",
+  "audience": null,
+  "accounts": [
+   {
+    "platform": "youtube",
+    "handle": "NickShirley",
+    "channelId": "UC2Uioh1tYQkNuHLSBpzdfCg",
+    "url": "https://www.youtube.com/@NickShirley"
+   },
+   {
+    "platform": "x",
+    "handle": "nickshirleyy",
+    "url": "https://x.com/nickshirleyy"
+   }
+  ],
+  "backing": [],
+  "leads": [
+   {
+    "claim": "Polymarket's chief marketing officer paid Nick Shirley before Polymarket appeared in his content (undisclosed paid promotion).",
+    "searched": "Read the Business Insider copy of the joint POLITICO investigation (Beeferman, Kaufman, Blaeser, Harty, 2026-06-05, https://www.businessinsider.com/how-paid-influencers-hype-polymarkets-odds-prediction-markets-2026-6). Exact sentence: \"The first post came after Shirley began receiving money from Polymarket's chief marketing officer, Matthew Modabber.\" It also says the creators posted \"at least 490 times on the social media platform X without clearly disclosing a paid partnership.\" politico.com refused to load (Cloudflare challenge, also via web.archive.org). One search found only rewrites of the POLITICO story (cryptobriefing, runtimewire, bitcoin.com).",
+    "result": "One investigation, published by POLITICO and Business Insider under the same bylines (same owner), so it is a single outlet under the brief's rule. Every other hit cites POLITICO. No second independent outlet, no FTC or platform record found. Stays unverified until a second independent report or a primary record appears. The article does not record a response from Shirley. Payment amounts are left out on purpose."
+   },
+   {
+    "claim": "Republican lawmakers 'worked with' Shirley on the Minnesota video.",
+    "searched": "Wikipedia article on Nick Shirley (raw wikitext, read 2026-10-21).",
+    "result": "Information sharing and an invitation to the State of the Union are association, not funding. No payment record found."
+   },
+   {
+    "claim": "Audience crowdfunding for security costs.",
+    "searched": "One web search (Sinclair syndicated story 'Nick Shirley requests money from supporters for security after death threats').",
+    "result": "Small-donor audience funding, not a named backer. Not recorded."
+   }
+  ],
+  "searched": {
+   "FARA": "efile.fara.gov API Registrants Active and Terminated lists downloaded 2026-10-21 and searched for 'Shirley': no registrant by this name.",
+   "campaign finance": "FEC api.open.fec.gov schedule_b recipient_name query with DEMO_KEY returned OVER_RATE_LIMIT (429); waited 30 s, 60 s, 120 s; gave up after four tries (2026-10-21). Not completed.",
+   "sanctions": "OFAC SDN.CSV (sanctionslistservice.ofac.treas.gov) and EU consolidated sanctions CSV downloaded 2026-10-21 and searched for 'Shirley': no match.",
+   "platform labels": "YouTube channel page fetched with curl: no funding or state-affiliation panel in the page HTML. X account not checked (login wall).",
+   "grants": "ProPublica Nonprofit Explorer API search for 'Nick Shirley': 0 organizations.",
+   "investors": "No company, outlet or investor found in Wikipedia or in search results; Wikipedia says he describes himself as an independent journalist.",
+   "court records": "No court record about funding of his media work found in Wikipedia or search results. Not checked in PACER (paid)."
+  },
+  "batch": "named"
+ },
+ {
+  "id": "nate-friedman",
+  "name": "Nate Friedman",
+  "qid": null,
+  "role": "YouTuber and self-described independent investigative journalist (The Nate Friedman Show)",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "named by the author as a lead",
+  "audience": null,
+  "accounts": [
+   {
+    "platform": "youtube",
+    "handle": "NateFriedman",
+    "channelId": "UCkZPmCUf37R_DZgKYH3duPg",
+    "url": "https://www.youtube.com/@NateFriedman"
+   },
+   {
+    "platform": "x",
+    "handle": "NateFriedman97",
+    "url": "https://x.com/NateFriedman97"
+   },
+   {
+    "platform": "instagram",
+    "handle": "natefriedman_",
+    "url": "https://instagram.com/natefriedman_"
+   },
+   {
+    "platform": "web",
+    "handle": "natefriedmanshow.com",
+    "url": "https://natefriedmanshow.com/"
+   }
+  ],
+  "backing": [],
+  "leads": [
+   {
+    "claim": "Who funds Nate Friedman's videos.",
+    "searched": "Own site natefriedmanshow.com (read 2026-10-21) asks for audience donations: \"Every dollar directly funds the security for my investigations.\" The YouTube description links a buymeacoffee page. One web search for funders, sponsors or backers found only coverage of his claims about protest funding (Jewish Journal, AOL/Fox, ZeroHedge, LGBTQ Nation).",
+    "result": "Only audience donations and a paid 'Friedman Files' subscription, both self-described. No named sponsor, investor, employer or funder found. Nothing recorded as backing."
+   }
+  ],
+  "searched": {
+   "FARA": "efile.fara.gov API Registrants Active and Terminated lists downloaded 2026-10-21 and searched for 'Friedman': no registrant by this name. (Hits were unrelated law firms and other people named Friedman.)",
+   "campaign finance": "FEC api.open.fec.gov schedule_b recipient_name query with DEMO_KEY returned OVER_RATE_LIMIT (429); waited 30 s, 60 s, 120 s; gave up after four tries (2026-10-21). Not completed. (Script stopped after the first name kept hitting the hourly limit.)",
+   "sanctions": "OFAC SDN.CSV (sanctionslistservice.ofac.treas.gov) and EU consolidated sanctions CSV downloaded 2026-10-21 and searched for 'Nate Friedman': no match.",
+   "platform labels": "YouTube channel page fetched with curl: no funding or state-affiliation panel in the page HTML. X and Instagram not checked (login wall).",
+   "grants": "ProPublica Nonprofit Explorer API search for 'Nate Friedman': 0 organizations. Also 'Friedman Show': one unrelated hit.",
+   "investors": "No company or investor found on his own site or in search results.",
+   "court records": "No court record about funding of his media work found. Not checked in PACER (paid)."
+  },
+  "batch": "named"
+ },
+ {
+  "id": "clavicular",
+  "name": "Clavicular",
+  "qid": "Q138026713",
+  "role": "livestreamer and looksmaxxing influencer",
+  "country": "United States",
+  "topic": "lifestyle with political content",
+  "selection": "named by the author as a lead",
+  "audience": null,
+  "accounts": [
+   {
+    "platform": "web",
+    "handle": "clavicular",
+    "url": "https://kick.com/clavicular"
+   },
+   {
+    "platform": "tiktok",
+    "handle": "clavicular",
+    "url": "https://www.tiktok.com/@clavicular"
+   },
+   {
+    "platform": "instagram",
+    "handle": "Clavicular",
+    "url": "https://www.instagram.com/Clavicular"
+   }
+  ],
+  "backing": [],
+  "leads": [
+   {
+    "claim": "Clavicular is funded by Peter Thiel (author's lead, 2026-10-18 and 2026-10-21).",
+    "searched": "Read Queerty (Alex Reimer, 2026-02-13, archived at https://web.archive.org/web/20260214212649/https://www.queerty.com/is-peter-thiel-the-mysterious-sugar-daddy-helping-to-bankroll-notorious-looksmaxxer-clavicular-20260213/; live page refused, Cloudflare). Exact: \"Is Peter Thiel fundmaxxing the nation’s most influential, incel-adjacent influencer? We don’t know.\" and \"Again, we don’t know, so we can’t confirm one way or the other.\" Queerty bases the idea on a party invitation Clavicular described and on a top donor he calls 'P'. Read EarlyGame (Nora Weirich, 2026-04-27, https://earlygame.com/news/entertainment/clavicular-is-funded-by-peter-thiel) about a Channel 5 clip. Exact: \"If these rumors are true or not remains unclear for now as Channel 5 gives no evidence or sources.\" One search for confirmation or denial found nothing more. FEC, FARA, ProPublica and sanctions checks found nothing linking Thiel to him.",
+    "result": "Not documented. No filing, no court record, and no two independent outlets show Thiel funding. Both outlets say they cannot confirm it. A party invitation is association. A modeling job for a designer some outlets tie to Thiel's circle is association. Neither is funding. Not recorded as backing."
+   },
+   {
+    "claim": "An anonymous top donor called 'P' sent him large sums on stream.",
+    "searched": "Queerty (above) attributes the claim to Clavicular and to X posts.",
+    "result": "The only source is his own on-stream claim, reported second-hand. The donor is unnamed. Not recorded."
+   },
+   {
+    "claim": "Online casino Duel sponsors his streams; Stake (owner of Kick) had a deal with him.",
+    "searched": "Read FairGambling (2026-08-10, https://www.fairgambling.com/streamers/news/clavicular-dumps-stake-for-duel-after-reported-deal-cut). Exact: \"Since then, Clavicular has been heavily pushing Duel, sharing his affiliate code and running giveaways for people that use his code.\" It also says \"The exact terms of the reported deal change have not been confirmed publicly.\" A second source (Tribuna) refused to load.",
+    "result": "Commercial gambling sponsorship and affiliate promotion. This is consumer advertising, out of scope under the brief, and only one trade outlet supports it. Kick Partner Program payouts are platform revenue, not backing. Not recorded."
+   }
+  ],
+  "searched": {
+   "FARA": "efile.fara.gov API Registrants Active and Terminated lists downloaded 2026-10-21 and searched for 'Peters / Clavicular': no registrant by this name.",
+   "campaign finance": "FEC api.open.fec.gov schedule_b recipient_name query with DEMO_KEY returned OVER_RATE_LIMIT (429); waited 30 s, 60 s, 120 s; gave up after four tries (2026-10-21). Not completed. (Not run for 'Braden Peters' or 'Clavicular' because the hourly limit was exhausted.)",
+   "sanctions": "OFAC SDN.CSV (sanctionslistservice.ofac.treas.gov) and EU consolidated sanctions CSV downloaded 2026-10-21 and searched for 'Clavicular / Braden Peters': no match.",
+   "platform labels": "Kick API: channel verified, not banned, no funding or state label field. YouTube: ban reported by Wikipedia and LA Times, which is not a funding label. X and TikTok not checked (login wall or empty page).",
+   "grants": "ProPublica Nonprofit Explorer API search for 'Clavicular': 0 organizations. 'Braden Peters' gave two unrelated hits.",
+   "investors": "No investor in his media work found. Wikipedia reports he invested in a nightclub and later sued over it; that concerns his own investment, not funding of his media work, so it is out of scope.",
+   "court records": "Arrests and dropped charges reported in Wikipedia do not concern funding of his media work, so they are out of scope. No funding-related court record found. Not checked in PACER (paid)."
+  },
+  "batch": "named"
+ },
+ {
+  "id": "masih-alinejad",
+  "name": "Masih Alinejad",
+  "qid": "Q6783266",
+  "role": "VOA Persian television host and contractor",
+  "country": "United States (broadcasting to Iran)",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Wikidata P8687 social media followers (X account, user id 947924373029171200), largest among Wikidata people with a USAGM-network employer (P108) who host or present",
+   "url": "https://www.wikidata.org/wiki/Q6783266",
+   "figure": 598618,
+   "asOf": "2022-11-01"
+  },
+  "accounts": [
+   {
+    "platform": "youtube",
+    "handle": "MasihAlinejad1",
+    "channelId": "UCRAyI6Ofz89qJa80MofaluA",
+    "url": "https://www.youtube.com/@MasihAlinejad1"
+   }
+  ],
+  "backing": [
+   {
+    "id": "usagm-talent-contract",
+    "kind": "employer",
+    "who": "U.S. Agency for Global Media (Voice of America Persian Service)",
+    "summary": "Federal award records on USAspending.gov show USAGM contracts with Masih Alinejad for talent services as an anchor, writer and reporter for VOA Persian, the latest running to 28 February 2025.",
+    "period": "2013 to 2025-02 (contract records)",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "USAspending.gov (U.S. Treasury)",
+      "title": "Contract award 95170024P0062, recipient MASIH ALINEJAD, awarding agency U.S. Agency for Global Media",
+      "url": "https://api.usaspending.gov/api/v2/awards/CONT_AWD_95170024P0062_9568_-NONE-_-NONE-/",
+      "date": "2024-12-16",
+      "read": "2026-10-22",
+      "kind": "government",
+      "quote": "CONTRACTOR TO PERFORM NON-PERSONAL TALENT SERVICES AS ANCHOR, WRITER, REPORTER FOR VOA PERSIAN SERVICE IN NEW YORK CITY, NY AND SURROUNDING AREAS PER ATTACHED SOW."
+     },
+     {
+      "publisher": "USAGM",
+      "title": "New VOA Persian Show Targets Young Viewers in Iran",
+      "url": "https://www.usagm.gov/?p=22565",
+      "date": "2015-08-24",
+      "read": "2026-10-22",
+      "kind": "government",
+      "quote": "The 15-minute prime-time show with a youthful, energetic vibe is hosted by Masih Alinejad, an investigative journalist..."
+     },
+     {
+      "publisher": "Associated Press (via WKMG ClickOrlando)",
+      "title": "Iranian American human rights activist expresses defiance over Iranian plots to kill her and Trump",
+      "url": "https://www.clickorlando.com/news/world/2024/11/09/iranian-american-human-rights-activists-expresses-defiance-over-iranian-plots-to-kill-her-and-trump/",
+      "date": "2024-11-09",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "...she has worked as a contractor for U.S.-funded Voice of America’s Farsi-language network since 2015."
+     }
+    ],
+    "doesNotProve": "The award records show a paid talent contract with a federal broadcaster; they do not show that the US government directs her personal social media, and no record after February 2025 was found, so the contract may not be current."
+   },
+   {
+    "id": "usagm-federal-funding",
+    "kind": "state funding",
+    "who": "U.S. Agency for Global Media (federal agency)",
+    "summary": "USAGM's own site says it is a federal agency whose budget request is part of the President's Budget, and the VOA Persian award records name USAGM as the awarding agency.",
+    "period": "ongoing",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "USAGM",
+      "title": "Who we are",
+      "url": "https://www.usagm.gov/who-we-are/",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "government",
+      "quote": "As a federal agency, USAGM’s budget request is part of the President’s Budget request to the Congress."
+     }
+    ],
+    "doesNotProve": "Federal funding of the network does not by itself show government control of a given program's editorial content; USAGM describes a statutory firewall, which this row does not test."
+   }
+  ],
+  "leads": [
+   {
+    "claim": "Responsible Statecraft (2020) reported her VOA contract totals and criticised outlets for not disclosing the tie when quoting her.",
+    "searched": "Read responsiblestatecraft.org 2020-01-06 article; read USAspending award records directly.",
+    "result": "Superseded by the primary USAspending record; contract amounts are left out under the brief's rule on contract amounts."
+   }
+  ],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "Alinejad",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for Alinejad: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "ALINEJAD",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'ALINEJAD': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "Alinejad",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for Alinejad: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "YouTube channel page @MasihAlinejad1 (curl) for a 'funded in whole or in part' panel; X profile not fetchable without login",
+    "result": "No YouTube funding panel in the channel page HTML; X label unchecked (login wall)."
+   },
+   {
+    "kind": "grants",
+    "query": "ProPublica Nonprofit Explorer not applicable: VOA is a federal entity, not a 501(c)(3)",
+    "result": "Not applicable; federal contract records used instead."
+   },
+   {
+    "kind": "investors",
+    "query": "Searched for named investors in a personal company",
+    "result": "None found; not applicable to a contractor role."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records about funding of her media work",
+    "result": "Found only US prosecutions of plots against her (for example the 2024 AP report); those concern threats, not who pays for her work, so they are out of scope."
+   }
+  ],
+  "batch": "b14"
+ },
+ {
+  "id": "farida-kurbangaleeva",
+  "name": "Farida Kurbangaleeva",
+  "qid": "Q4247859",
+  "role": "former Current Time news presenter, YouTube host",
+  "country": "Czech Republic (Russian-language media)",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Wikidata P8687 social media followers (YouTube channel UC-_IGJxbUXm-9Jj5xFc9qdg); the platform page read 2026-10-21 showed 55.8K subscribers",
+   "url": "https://www.wikidata.org/wiki/Q4247859",
+   "figure": 57200,
+   "asOf": "2025-04-14"
+  },
+  "accounts": [
+   {
+    "platform": "youtube",
+    "handle": "farida38173",
+    "channelId": "UC-_IGJxbUXm-9Jj5xFc9qdg",
+    "url": "https://www.youtube.com/@farida38173"
+   }
+  ],
+  "backing": [
+   {
+    "id": "current-time-presenter",
+    "kind": "employer",
+    "who": "Current Time (Nastoyashchee Vremya), RFE/RL",
+    "summary": "Current Time's own news report and OVD-Info's register entry both say she presented news on Current Time from 2018 to 2021.",
+    "period": "2018 to 2021",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Current Time (Настоящее Время)",
+      "title": "Росфинмониторинг внес в реестр \"террористов и экстремистов\" бывшую журналистку Настоящего Времени Фариду Курбангалееву",
+      "url": "https://www.currenttime.tv/a/32999769.html",
+      "date": "2024-06-19",
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "С 2018 по 2021 годы Курбангалеева вела новостные эфиры на телеканале Настоящее Время."
+     },
+     {
+      "publisher": "OVD-Info",
+      "title": "Farida Kurbangaleeva | list of foreign agents and undesirable organizations",
+      "url": "https://ovd.info/en/ino/farida-kurbangaleeva",
+      "date": "2025-03-25",
+      "read": "2026-10-22",
+      "kind": "researcher",
+      "quote": "From 2018 to 2021, she worked on the Current Time channel produced by the Radio Liberty."
+     }
+    ],
+    "doesNotProve": "The role ended in 2021; it does not show any current tie to RFE/RL or US funding of her own YouTube channel."
+   },
+   {
+    "id": "rferl-usagm-grant",
+    "kind": "grant",
+    "who": "U.S. Agency for Global Media (federal grant to RFE/RL, which runs Current Time)",
+    "summary": "Current Time's About page says the network is part of RFE/RL, and RFE/RL's press room says RFE/RL is funded by Congress through a USAGM federal grant.",
+    "period": "during her 2018 to 2021 tenure; ongoing for the network",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Current Time",
+      "title": "Current Time TV – About",
+      "url": "https://www.currenttime.tv/p/6018.html",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "The Current Time network, a part of Radio Free Europe/Radio Liberty (RFE/RL), provides Russian speakers worldwide with an alternative to Kremlin-controlled media..."
+     },
+     {
+      "publisher": "RFE/RL Pressroom",
+      "title": "About Us",
+      "url": "https://pressroom.rferl.org/about-us",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "RFE/RL is a private 501(c)(3) non-profit corporation funded by the U.S. Congress through a federal grant from the U.S. Agency for Global Media (USAGM)."
+     }
+    ],
+    "doesNotProve": "Grant funding of the network does not show that USAGM directed her broadcasts, and it says nothing about her work after 2021."
+   },
+   {
+    "id": "russia-foreign-agent-register",
+    "kind": "government label",
+    "who": "Ministry of Justice of the Russian Federation (foreign agents register)",
+    "summary": "IPI and OVD-Info report that Russia's Ministry of Justice added her to its \"foreign agents\" register on 28 June 2024.",
+    "period": "since 2024-06-28",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "International Press Institute",
+      "title": "Farida Kurbangaleeva arrested in absentia for fake news and terrorism",
+      "url": "https://ipi.media/alerts/farida-kurbangaleeva-arrested-in-absentia-for-fake-news-and-terrorism/",
+      "date": "2024-06-26",
+      "read": "2026-10-22",
+      "kind": "researcher",
+      "quote": "UPDATE: On 28 June 2024, Russia’s Ministry of Justice designated Kurbangaleeva as a “foreign agent”."
+     },
+     {
+      "publisher": "OVD-Info",
+      "title": "Farida Kurbangaleeva | list of foreign agents and undesirable organizations",
+      "url": "https://ovd.info/en/ino/farida-kurbangaleeva",
+      "date": "2025-03-25",
+      "read": "2026-10-22",
+      "kind": "researcher",
+      "quote": "Addition to the list: Foreign agent"
+     }
+    ],
+    "doesNotProve": "The designation is a Russian government accusation, read here through IPI and OVD-Info because the Ministry's own register page returned 404; it does not show that any foreign party funds her current work."
+   }
+  ],
+  "leads": [],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "Kurbangaleeva / Курбангалеева",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for Kurbangaleeva / Курбангалеева: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "KURBANGALEEVA",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'KURBANGALEEVA': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "Kurbangaleeva / Курбангалеева",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for Kurbangaleeva / Курбангалеева: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "YouTube channel page (curl) for a funding panel; Russian MoJ register (minjust.gov.ru/ru/documents/7755/ returned 404)",
+    "result": "No YouTube funding panel; Russian foreign-agent entry found via IPI and OVD-Info (row above)."
+   },
+   {
+    "kind": "grants",
+    "query": "RFE/RL as grantee checked through its press room page",
+    "result": "RFE/RL federal grant recorded above; no grant to her own channel found."
+   },
+   {
+    "kind": "investors",
+    "query": "Investors in her YouTube channel",
+    "result": "None found."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records",
+    "result": "A Moscow court arrest in absentia and a Rosfinmonitoring 'terrorists and extremists' listing (Current Time 2024-06-19, IPI) concern charges over her statements, not who funds her media work, so they are out of scope."
+   }
+  ],
+  "batch": "b14"
+ },
+ {
+  "id": "michael-barbaro",
+  "name": "Michael Barbaro",
+  "qid": null,
+  "role": "podcast host (The Daily)",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Edison Research at SSRS, Top 50 Podcasts in the U.S., Q2 2026 (Edison Podcast Metrics, weekly reach, ages 13+); The Daily ranked 3",
+   "url": "https://podnews.net/press-release/edison-top-50-podcasts-us-q226",
+   "figure": "rank 3",
+   "asOf": "2026-Q2 (published 2026-07-20)"
+  },
+  "accounts": [
+   {
+    "platform": "podcast",
+    "handle": "The Daily",
+    "url": "https://podcasts.apple.com/us/podcast/the-daily/id1200361736"
+   }
+  ],
+  "backing": [
+   {
+    "id": "nyt-the-daily",
+    "kind": "employer",
+    "who": "The New York Times",
+    "summary": "The show's Apple Podcasts page, published by The New York Times, lists Michael Barbaro first among the hosts of The Daily.",
+    "period": "current",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Apple Podcasts (provider: The New York Times)",
+      "title": "The Daily",
+      "url": "https://podcasts.apple.com/us/podcast/the-daily/id1200361736",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "platform",
+      "quote": "Hosted by Michael Barbaro, Rachel Abrams and Natalie Kitroeff."
+     }
+    ],
+    "doesNotProve": "Hosting a New York Times show does not show any political sponsor; it shows only the employer."
+   },
+   {
+    "id": "nyt-ochs-sulzberger-trust",
+    "kind": "outlet owner",
+    "who": "The New York Times Company (Class B stock held mainly by the Ochs-Sulzberger Family Trust)",
+    "summary": "The New York Times Company's 2025 annual report on Form 10-K says the Ochs-Sulzberger Family Trust holds about 95% of the Class B stock, which elects most of the board.",
+    "period": "current",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "The New York Times Company (SEC EDGAR)",
+      "title": "Form 10-K for fiscal year 2025",
+      "url": "https://www.sec.gov/Archives/edgar/data/71691/000007169126000011/nyt-20251231.htm",
+      "date": "2026-02-27",
+      "read": "2026-10-22",
+      "kind": "filing",
+      "quote": "The Ochs-Sulzberger Family Trust holds approximately 95% of the Class B Common Stock and, as a result, has the ability to elect..."
+     }
+    ],
+    "doesNotProve": "Control of a publicly traded company's board does not show editorial direction of any single episode."
+   }
+  ],
+  "leads": [],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "Barbaro",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for Barbaro: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "BARBARO",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'BARBARO': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "Barbaro",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for Barbaro: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "Apple Podcasts show page; YouTube @TheDailyNYT returned 404",
+    "result": "No platform funding label found."
+   },
+   {
+    "kind": "grants",
+    "query": "Not applicable: for-profit public company",
+    "result": "No grants searched beyond confirming for-profit status in the 10-K."
+   },
+   {
+    "kind": "investors",
+    "query": "NYT Company 10-K ownership section",
+    "result": "Ownership row above; no other investor in the show."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records about funding of his media work",
+    "result": "None found; not searched beyond the 10-K."
+   }
+  ],
+  "batch": "b14"
+ },
+ {
+  "id": "ben-meiselas",
+  "name": "Ben Meiselas",
+  "qid": null,
+  "role": "podcast and YouTube host, MeidasTouch cofounder",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Edison Research at SSRS, Top 50 Podcasts in the U.S., Q2 2026; The MeidasTouch Podcast ranked 12",
+   "url": "https://podnews.net/press-release/edison-top-50-podcasts-us-q226",
+   "figure": "rank 12",
+   "asOf": "2026-Q2 (published 2026-07-20)"
+  },
+  "accounts": [
+   {
+    "platform": "podcast",
+    "handle": "The MeidasTouch Podcast",
+    "url": "https://podcasts.apple.com/us/podcast/the-meidastouch-podcast/id1510240831"
+   },
+   {
+    "platform": "youtube",
+    "handle": "MeidasTouch",
+    "channelId": "UC9r9HYFxEQOBXSopFS61ZWg",
+    "url": "https://www.youtube.com/@MeidasTouch"
+   }
+  ],
+  "backing": [
+   {
+    "id": "meidastouch-network",
+    "kind": "employer",
+    "who": "MeidasTouch Network",
+    "summary": "The MeidasTouch Network's Apple Podcasts page describes him as the MeidasTouch host, and Inside Radio quotes him as cofounder.",
+    "period": "since 2020",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Apple Podcasts (provider: MeidasTouch Network)",
+      "title": "The MeidasTouch Podcast",
+      "url": "https://podcasts.apple.com/us/podcast/the-meidastouch-podcast/id1510240831",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "platform",
+      "quote": "MeidasTouch host Ben Meiselas reports on breaking news from the day."
+     },
+     {
+      "publisher": "Inside Radio",
+      "title": "After Audacy Investment, Soros Fund Expands Audio Holdings With MeidasTouch Stake.",
+      "url": "https://www.insideradio.com/free/after-audacy-investment-soros-fund-expands-audio-holdings-with-meidastouch-stake/article_0e6b1646-dcff-4834-9342-59af56221c41.html",
+      "date": "2026-04-09",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "“This is a defining moment for MeidasTouch,” cofounder Ben Meiselas says in..."
+     }
+    ],
+    "doesNotProve": "It shows his role at a company he cofounded; it does not show ownership shares."
+   },
+   {
+    "id": "soros-fund-management-round",
+    "kind": "investor",
+    "who": "Soros Fund Management (lead), plus unnamed U.S.-based investors",
+    "summary": "Barrett Media and Inside Radio report MeidasTouch's April 2026 announcement that Soros Fund Management led its first outside funding round; the company says it keeps full editorial control.",
+    "period": "since 2026-04",
+    "status": "reported",
+    "sources": [
+     {
+      "publisher": "Barrett Media",
+      "title": "MeidasTouch Network Completes Round of Funding Led by Soros Management Fund",
+      "url": "https://barrettmedia.com/2026/04/09/meidastouch-network-completes-round-of-funding-led-by-soros-management-fund/",
+      "date": "2026-04-09",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "The outlet shared that the investment round was led by Soros Fund Management, as well as a group of other U.S.-based investors."
+     },
+     {
+      "publisher": "Inside Radio",
+      "title": "After Audacy Investment, Soros Fund Expands Audio Holdings With MeidasTouch Stake.",
+      "url": "https://www.insideradio.com/free/after-audacy-investment-soros-fund-expands-audio-holdings-with-meidastouch-stake/article_0e6b1646-dcff-4834-9342-59af56221c41.html",
+      "date": "2026-04-09",
+      "read": "2026-10-22",
+      "kind": "press",
+      "quote": "Soros Fund Management, now the largest shareholder in Audacy, is expanding further into audio by backing the MeidasTouch Network."
+     }
+    ],
+    "doesNotProve": "The size and terms were not disclosed; an investment does not show that the investor directs content, and the company states the opposite."
+   }
+  ],
+  "leads": [
+   {
+    "claim": "The MeidasTouch brand began as a 2020 PAC whose donation link split proceeds with the Biden campaign.",
+    "searched": "Read CJR Q&A with Brett Meiselas (cjr.org/?p=101759); FEC schedule_b query for MEIDASTOUCH and MEISELAS.",
+    "result": "CJR quotes Brett Meiselas saying the PAC ended in August 2023 and passed to Democracy Defense Action; a PAC run by the brothers is their own committee, not a payment to them for media work, so it is not a backing row."
+   },
+   {
+    "claim": "Commentary (Current Affairs) describes White House meetings between the Meiselas brothers and Kamala Harris.",
+    "searched": "Read currentaffairs.org article on progressive influencers.",
+    "result": "A meeting is association, not funding (rule 3)."
+   }
+  ],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "Meiselas / MeidasTouch",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for Meiselas / MeidasTouch: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "MEIDASTOUCH, MEISELAS",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'MEIDASTOUCH': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked; 'MEISELAS': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "Meiselas / MeidasTouch",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for Meiselas / MeidasTouch: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "YouTube @MeidasTouch channel page (curl); Apple Podcasts",
+    "result": "No YouTube funding panel in the channel page HTML."
+   },
+   {
+    "kind": "grants",
+    "query": "ProPublica not applicable: for-profit network",
+    "result": "No grant found."
+   },
+   {
+    "kind": "investors",
+    "query": "Searched 'MeidasTouch network owned by Meiselas brothers investors funding ownership'",
+    "result": "Soros-led round recorded above; other investors unnamed."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records about funding of the network",
+    "result": "None found."
+   }
+  ],
+  "batch": "b14"
+ },
+ {
+  "id": "tim-miller",
+  "name": "Tim Miller",
+  "qid": null,
+  "role": "podcast host (The Bulwark Podcast)",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Edison Research at SSRS, Top 50 Podcasts in the U.S., Q2 2026; The Bulwark Podcast ranked 47 (new entry)",
+   "url": "https://podnews.net/press-release/edison-top-50-podcasts-us-q226",
+   "figure": "rank 47",
+   "asOf": "2026-Q2 (published 2026-07-20)"
+  },
+  "accounts": [
+   {
+    "platform": "podcast",
+    "handle": "The Bulwark Daily",
+    "url": "https://podcasts.apple.com/us/podcast/the-bulwark-podcast/id1447684472"
+   }
+  ],
+  "backing": [
+   {
+    "id": "the-bulwark",
+    "kind": "employer",
+    "who": "The Bulwark",
+    "summary": "The Bulwark's Apple Podcasts page says Tim Miller hosts its flagship podcast, and The Bulwark's About page lists him among its people.",
+    "period": "current",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "Apple Podcasts (provider: The Bulwark)",
+      "title": "The Bulwark Daily",
+      "url": "https://podcasts.apple.com/us/podcast/the-bulwark-podcast/id1447684472",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "platform",
+      "quote": "Tim Miller and guests discuss the latest political news for the flagship podcast of the Never Trump movement and the reality-based community."
+     },
+     {
+      "publisher": "The Bulwark",
+      "title": "About",
+      "url": "https://www.thebulwark.com/about",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "This is the home of Sarah Longwell, Tim Miller, Bill Kristol, JVL, Sam Stein, Catherine Rampell, and more."
+     }
+    ],
+    "doesNotProve": "It shows his employer, not a political sponsor."
+   },
+   {
+    "id": "center-enterprises",
+    "kind": "outlet owner",
+    "who": "Center Enterprises, Inc.",
+    "summary": "The Bulwark's own site footer names Center Enterprises, Inc. as the copyright holder, which marks the operating company.",
+    "period": "current",
+    "status": "documented",
+    "sources": [
+     {
+      "publisher": "The Bulwark",
+      "title": "About (site footer)",
+      "url": "https://www.thebulwark.com/about",
+      "date": null,
+      "read": "2026-10-22",
+      "kind": "company",
+      "quote": "© 2026 Center Enterprises, Inc. All Rights Reserved."
+     }
+    ],
+    "doesNotProve": "A copyright line names the operating company but not its shareholders."
+   }
+  ],
+  "leads": [
+   {
+    "claim": "InfluenceWatch says the Defending Democracy Together Institute (Republic Affairs) sold The Bulwark to Center Enterprises in 2021 and that publisher Sarah Longwell owns more than 35 percent, citing the nonprofit's 2021 IRS filing.",
+    "searched": "ProPublica Nonprofit Explorer for EIN 83-1567380 (filings list read); the 2021 PDF download returned an HTML challenge and the full-text pages loaded no 990 content.",
+    "result": "Primary 990 not read; one researcher source only, so the sale and the stake stay unverified."
+   }
+  ],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "Miller, Tim / Bulwark / Center Enterprises",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for Miller, Tim / Bulwark / Center Enterprises: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "BULWARK, CENTER ENTERPRISES, MILLER, TIM",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'BULWARK': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked; 'CENTER ENTERPRISES': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked; 'MILLER, TIM': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "Miller, Tim / Bulwark / Center Enterprises",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for Miller, Tim / Bulwark / Center Enterprises: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "Apple Podcasts; YouTube @TheBulwark resolved to an unrelated 32-subscriber channel, so no YouTube account recorded",
+    "result": "No platform label found."
+   },
+   {
+    "kind": "grants",
+    "query": "ProPublica: Defending Democracy Together Institute (EIN 83-1567380) filings list",
+    "result": "990 text not readable this session; see lead."
+   },
+   {
+    "kind": "investors",
+    "query": "Searched 'The Bulwark ownership independent company ...'",
+    "result": "Only the InfluenceWatch claim above; no investor named."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records about funding of The Bulwark",
+    "result": "None found."
+   }
+  ],
+  "batch": "b14"
+ },
+ {
+  "id": "alex-pearlman-pearlmania500",
+  "name": "Alex Pearlman (Pearlmania500)",
+  "qid": null,
+  "role": "TikTok political commentator",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Pew Research Center, America's News Influencers (2024-11-18), Appendix A, accounts sampled from TikTok; follower figure from the TikTok profile page",
+   "url": "https://www.pewresearch.org/wp-content/uploads/sites/20/2024/11/PJ_2024.11.18_news-influencers_report.pdf",
+   "figure": 3700000,
+   "asOf": "2026-10-21"
+  },
+  "accounts": [
+   {
+    "platform": "tiktok",
+    "handle": "pearlmania500",
+    "url": "https://www.tiktok.com/@pearlmania500"
+   },
+   {
+    "platform": "youtube",
+    "handle": "Pearlmania500",
+    "channelId": "UCVUvs4qD77ptpumsm9akPfA",
+    "url": "https://www.youtube.com/@Pearlmania500"
+   },
+   {
+    "platform": "instagram",
+    "handle": "pearlmania500",
+    "url": "https://instagram.com/pearlmania500"
+   }
+  ],
+  "backing": [],
+  "leads": [
+   {
+    "claim": "The Philadelphia Inquirer reports that an advocacy group called Trending Up paid his flight and hotel for the 2024 Democratic National Convention, where he was a credentialed creator.",
+    "searched": "Read inquirer.com 2024-08-22 ('What Pearlmania500 and other Philly-area influencers are doing at the DNC'), quote: 'Pearlman’s flight and hotel were paid for by an advocacy group called Trending Up.'; searched for a second outlet.",
+    "result": "One outlet only; no second independent outlet or FEC record found, so it stays unverified."
+   },
+   {
+    "claim": "Invitations to press events by Gov. Josh Shapiro and President Biden (Inquirer 2023-06-19).",
+    "searched": "Read inquirer.com 2023-06-19.",
+    "result": "An invitation is access, not funding (rule 3)."
+   }
+  ],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "Pearlman, Alex / Pearlmania",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for Pearlman, Alex / Pearlmania: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "PEARLMAN, ALEX, PEARLMANIA",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'PEARLMAN, ALEX': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked; 'PEARLMANIA': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "Pearlman, Alex / Pearlmania",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for Pearlman, Alex / Pearlmania: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "TikTok profile page JSON (curl): no state-media label field; only TikTok's generic label help text",
+    "result": "No platform label."
+   },
+   {
+    "kind": "grants",
+    "query": "No organisation of their own found to check on ProPublica",
+    "result": "Not applicable."
+   },
+   {
+    "kind": "investors",
+    "query": "Searched 'Pearlmania500 TikTok creator paid political campaign PAC sponsored'",
+    "result": "Only the DNC travel report (lead); no investor."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records about funding of their media work",
+    "result": "None found."
+   }
+  ],
+  "batch": "b14"
+ },
+ {
+  "id": "maclen-stanley-the-law-says-what",
+  "name": "Maclen Stanley (The Law Says What)",
+  "qid": null,
+  "role": "TikTok legal-news explainer (co-run account)",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Pew Research Center, America's News Influencers (2024-11-18), Appendix A, accounts sampled from TikTok; follower figure from the TikTok profile page",
+   "url": "https://www.pewresearch.org/wp-content/uploads/sites/20/2024/11/PJ_2024.11.18_news-influencers_report.pdf",
+   "figure": 1200000,
+   "asOf": "2026-10-21"
+  },
+  "accounts": [
+   {
+    "platform": "tiktok",
+    "handle": "the.law.says.what",
+    "url": "https://www.tiktok.com/@the.law.says.what"
+   },
+   {
+    "platform": "youtube",
+    "handle": "TheLawSaysWhat",
+    "channelId": "UCAUT6w_cx_unIpMu4fw4N2Q",
+    "url": "https://www.youtube.com/c/TheLawSaysWhat"
+   },
+   {
+    "platform": "instagram",
+    "handle": "the.law.says.what",
+    "url": "https://www.instagram.com/the.law.says.what/"
+   }
+  ],
+  "backing": [],
+  "leads": [],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "Stanley, Maclen",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for Stanley, Maclen: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "STANLEY, MACLEN",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'STANLEY, MACLEN': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "Stanley, Maclen",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for Stanley, Maclen: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "TikTok profile page JSON (curl): no state-media label field; only TikTok's generic label help text",
+    "result": "No platform label."
+   },
+   {
+    "kind": "grants",
+    "query": "No organisation of their own found to check on ProPublica",
+    "result": "Not applicable."
+   },
+   {
+    "kind": "investors",
+    "query": "Searched '\"The Law Says What\" Maclen Stanley TikTok lawyer paid campaign sponsored political'; read Harvard Law School 2022-03-02 profile",
+    "result": "The HLS profile says the account began to promote his book; no sponsor or investor found."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records about funding of their media work",
+    "result": "None found."
+   }
+  ],
+  "batch": "b14"
+ },
+ {
+  "id": "joey-contino",
+  "name": "Joey Contino",
+  "qid": null,
+  "role": "TikTok world-news commentator",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Pew Research Center, America's News Influencers (2024-11-18), Appendix A, accounts sampled from TikTok; follower figure from the TikTok profile page",
+   "url": "https://www.pewresearch.org/wp-content/uploads/sites/20/2024/11/PJ_2024.11.18_news-influencers_report.pdf",
+   "figure": 1100000,
+   "asOf": "2026-10-21"
+  },
+  "accounts": [
+   {
+    "platform": "tiktok",
+    "handle": "joeycontino2",
+    "url": "https://www.tiktok.com/@joeycontino2"
+   },
+   {
+    "platform": "youtube",
+    "handle": "JoeyContino2",
+    "channelId": "UC3xFT9TE6ZBzzpm2I9B-uHw",
+    "url": "https://www.youtube.com/@JoeyContino2"
+   },
+   {
+    "platform": "youtube",
+    "handle": "joeycontinonews",
+    "channelId": "UC23qwusCUTdZVER_lpWn4Xw",
+    "url": "https://www.youtube.com/@joeycontinonews"
+   },
+   {
+    "platform": "instagram",
+    "handle": "joeycontinonews",
+    "url": "https://www.instagram.com/joeycontinonews"
+   },
+   {
+    "platform": "facebook",
+    "handle": "JoeyContinoVideos",
+    "url": "https://www.facebook.com/JoeyContinoVideos"
+   }
+  ],
+  "backing": [],
+  "leads": [],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "Contino",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for Contino: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "CONTINO",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'CONTINO': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "Contino",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for Contino: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "TikTok profile page JSON (curl): no state-media label field; only TikTok's generic label help text",
+    "result": "No platform label."
+   },
+   {
+    "kind": "grants",
+    "query": "No organisation of their own found to check on ProPublica",
+    "result": "Not applicable."
+   },
+   {
+    "kind": "investors",
+    "query": "Searched 'Joey Contino TikTok news creator Ukraine funded OR paid OR sponsored'",
+    "result": "No result names him."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records about funding of their media work",
+    "result": "None found."
+   }
+  ],
+  "batch": "b14"
+ },
+ {
+  "id": "john-walsh-itsjohnwalsh",
+  "name": "John Walsh (itsjohnwalsh)",
+  "qid": null,
+  "role": "TikTok political comedian",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Pew Research Center, America's News Influencers (2024-11-18), Appendix A, accounts sampled from TikTok; follower figure from the TikTok profile page",
+   "url": "https://www.pewresearch.org/wp-content/uploads/sites/20/2024/11/PJ_2024.11.18_news-influencers_report.pdf",
+   "figure": 1100000,
+   "asOf": "2026-10-21"
+  },
+  "accounts": [
+   {
+    "platform": "tiktok",
+    "handle": "itsjohnwalsh",
+    "url": "https://www.tiktok.com/@itsjohnwalsh"
+   }
+  ],
+  "backing": [],
+  "leads": [
+   {
+    "claim": "His TikTok bio links to a Global Citizen campaign page ('The People's Bill of Rights 250').",
+    "searched": "TikTok profile JSON bioLink; searched 'itsjohnwalsh TikTok John Walsh political comedian Global Citizen paid partnership'.",
+    "result": "A bio link is not evidence of payment; no disclosure, filing or report of a paid partnership found."
+   }
+  ],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "Walsh, John",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for Walsh, John: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "WALSH, JOHN",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'WALSH, JOHN': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "Walsh, John",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for Walsh, John: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "TikTok profile page JSON (curl): no state-media label field; only TikTok's generic label help text",
+    "result": "No platform label."
+   },
+   {
+    "kind": "grants",
+    "query": "No organisation of their own found to check on ProPublica",
+    "result": "Not applicable."
+   },
+   {
+    "kind": "investors",
+    "query": "Same search; read News 12 New Jersey interview confirming the @itsjohnwalsh account and his political parody work",
+    "result": "No investor or sponsor found. Note: 'WALSH, JOHN' is a common name; any FEC rows need identity checks before use."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records about funding of their media work",
+    "result": "None found."
+   }
+  ],
+  "batch": "b14"
+ },
+ {
+  "id": "stella-stellamagz",
+  "name": "Stella (stellamagz)",
+  "qid": null,
+  "role": "TikTok political commentator",
+  "country": "United States",
+  "topic": "politics and current affairs",
+  "selection": "audience",
+  "audience": {
+   "source": "Pew Research Center, America's News Influencers (2024-11-18), Appendix A, accounts sampled from TikTok; follower figure from the TikTok profile page",
+   "url": "https://www.pewresearch.org/wp-content/uploads/sites/20/2024/11/PJ_2024.11.18_news-influencers_report.pdf",
+   "figure": 926200,
+   "asOf": "2026-10-21"
+  },
+  "accounts": [
+   {
+    "platform": "tiktok",
+    "handle": "stellamagz",
+    "url": "https://www.tiktok.com/@stellamagz"
+   },
+   {
+    "platform": "youtube",
+    "handle": "stellamagz",
+    "channelId": "UCVsXZkuN4FiP90_ahaLHHkA",
+    "url": "https://www.youtube.com/@stellamagz"
+   }
+  ],
+  "backing": [],
+  "leads": [],
+  "searched": [
+   {
+    "kind": "FARA",
+    "query": "stellamagz",
+    "result": "efile.fara.gov bulk FARA_All_ShortForms, FARA_All_Registrants and FARA_All_ForeignPrincipals CSVs (downloaded 2026-10-22), searched for stellamagz: no match"
+   },
+   {
+    "kind": "campaign finance",
+    "query": "STELLAMAGZ",
+    "result": "api.open.fec.gov schedule_b recipient_name with DEMO_KEY, 'STELLAMAGZ': no answer (every request this session returned HTTP 429 with 30/60/120 s backoff, shared DEMO_KEY exhausted; job stopped on the lead session's request before this name finished). Not checked"
+   },
+   {
+    "kind": "sanctions",
+    "query": "stellamagz",
+    "result": "OFAC sdn.csv and alt.csv, UK OFSI ConList.csv, EU FSF consolidated CSV (downloaded 2026-10-22), searched for stellamagz: no match"
+   },
+   {
+    "kind": "platform labels",
+    "query": "TikTok profile page JSON (curl): no state-media label field; only TikTok's generic label help text",
+    "result": "No platform label."
+   },
+   {
+    "kind": "grants",
+    "query": "No organisation of their own found to check on ProPublica",
+    "result": "Not applicable."
+   },
+   {
+    "kind": "investors",
+    "query": "Searched 'stellamagz TikTok Stella political creator paid campaign sponsored'",
+    "result": "An IZEA influencer-marketing profile of a creator named Stella does not tie to this handle or show payment; nothing found."
+   },
+   {
+    "kind": "court records",
+    "query": "Court records about funding of their media work",
+    "result": "None found."
+   }
+  ],
+  "batch": "b14"
+ }
+]

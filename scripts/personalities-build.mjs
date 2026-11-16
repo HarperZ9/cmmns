@@ -29,8 +29,8 @@ export function inputProblems({ people, outlets }) {
   const ids = new Set(outlets.map((o) => o.id));
   for (const p of people) for (const r of p.backing) if (r.outlet && !ids.has(r.outlet)) out.push(`${p.id}/${r.id}: no outlet record ${r.outlet}`);
   // An outlet's owner is recorded once, on the outlet, so everyone there gets the same rows; a person's
-  // own company is the exception.
-  for (const p of people) if (p.backing.some((r) => r.outlet && r.current)) for (const r of p.backing) if (r.kind === "outlet owner" && !r.ownCompany) out.push(`${p.id}/${r.id}: an owner row belongs on the outlet record`);
+  // own company, or a past employer's owner while the person worked there, is the exception.
+  for (const p of people) if (p.backing.some((r) => r.outlet && r.current)) for (const r of p.backing) if (r.kind === "outlet owner" && !r.ownCompany && !r.pastOutlet) out.push(`${p.id}/${r.id}: an owner row belongs on the outlet record`);
   const seen = new Set();
   for (const p of people) { if (seen.has(p.id)) out.push(`${p.id}: listed twice`); seen.add(p.id); }
   return out;
