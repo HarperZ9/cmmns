@@ -4,15 +4,27 @@
 // Media addresses on pbs.twimg.com and video.twimg.com need no sign-in, so nothing here carries a
 // cookie or touches the account. Node's standard library only.
 import { connect } from "node:http2";
+import { getCACertificates } from "node:tls";
 import { createHash } from "node:crypto";
 import { createReadStream, createWriteStream, existsSync, statSync, renameSync, rmSync } from "node:fs";
 
 const sessions = new Map();
+// Origins whose certificate chain failed against the system store (NODE_USE_SYSTEM_CA or
+// --use-system-ca): they are opened again with Node's bundled roots. Seen 2026-11-17 on Windows, where
+// the system store broke the chain to Let's Encrypt's new roots for pbs.twimg.com while the bundled
+// roots verified it.
+const bundledRoots = new Set();
+const CHAIN = new Set(["UNABLE_TO_GET_ISSUER_CERT", "UNABLE_TO_GET_ISSUER_CERT_LOCALLY", "SELF_SIGNED_CERT_IN_CHAIN", "UNABLE_TO_VERIFY_LEAF_SIGNATURE"]);
+export function chainError(e) {
+  for (let x = e, i = 0; x && i < 4; x = x.cause, i++) if (CHAIN.has(x.code) || /issuer certificate|self.signed certificate in certificate chain|verify the first certificate/i.test(x.message || "")) return true;
+  return false;
+}
 // One session per origin, opened once and reused; a closed or failed one is opened again.
 function session(origin, opts) {
   const s = sessions.get(origin);
   if (s && !s.closed && !s.destroyed) return s;
-  const n = connect(origin, opts.tls || {});
+  const base = opts.tls || {};
+  const n = connect(origin, bundledRoots.has(origin) && !base.ca ? { ...base, ca: getCACertificates("bundled") } : base);
   n.on("error", () => sessions.delete(origin));
   n.on("close", () => sessions.delete(origin));
   n.setTimeout(60000, () => n.close());
@@ -71,6 +83,11 @@ export async function getWithRetry(url, dest, opts = {}, onLimit = () => {}) {
   for (let n = 0; ; n++) {
     try { return await getFile(url, dest, opts); }
     catch (e) {
+      const origin = new URL(url).origin;
+      if (chainError(e) && !bundledRoots.has(origin) && !(opts.tls && opts.tls.ca)) {
+        bundledRoots.add(origin); const s = sessions.get(origin); if (s) s.destroy(); sessions.delete(origin);
+        n--; continue;
+      }
       const final = e instanceof HttpError && !RETRY.has(e.status);
       if (final || n + 1 >= tries) { if (final) rmSync(dest + ".part", { force: true }); throw e; }
       if (e instanceof HttpError && e.status === 429) { onLimit(e); await sleep(e.retryAfter ?? 30000); }

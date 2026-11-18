@@ -131,3 +131,11 @@ test("fetch: a post whose video is only a stream counts as saved without video o
     assert.equal(third.counts.duplicate, 2);
   } finally { server.close(); }
 });
+
+test("chainError: a chain failure is recognised through the stream's cause, and other errors are not", async () => {
+  const { chainError } = await import("../bin/lib/likes-net.mjs");
+  const inner = Object.assign(new Error("unable to get issuer certificate"), { code: "UNABLE_TO_GET_ISSUER_CERT" });
+  assert.equal(chainError(Object.assign(new Error("The pending stream has been canceled"), { cause: inner })), true);
+  assert.equal(chainError(new Error("the host answered 404")), false);
+  assert.equal(chainError(Object.assign(new Error("connect ECONNREFUSED"), { code: "ECONNREFUSED" })), false);
+});
