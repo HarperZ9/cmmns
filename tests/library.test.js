@@ -27,6 +27,10 @@ test("profile, list and search pages on X, and user and subreddit pages on Reddi
   assert.equal(f("https://www.reddit.com/r/Art/"), "reddit-r-art");
   assert.equal(f("https://www.reddit.com/r/Art/top/?t=all"), "reddit-r-art");
   assert.equal(f("https://www.reddit.com/user/someone/submitted/"), "reddit-u-someone");
+  assert.equal(f("https://www.reddit.com/user/someone/upvoted/"), "reddit-u-someone-upvoted");
+  assert.equal(f("https://www.reddit.com/user/someone/saved/"), "reddit-u-someone-saved");
+  assert.equal(libraryOf("https://www.reddit.com/user/someone/upvoted/").author, null);
+  assert.equal(libraryOf("https://www.reddit.com/user/someone/saved/").author, null);
   assert.equal(libraryOf("https://x.com/MeditInColor").author, "MeditInColor");
   assert.equal(libraryOf("https://www.reddit.com/r/Art/").author, null);
   for (const no of ["https://x.com/home", "https://x.com/a/status/1", "https://x.com/settings/account", "https://x.com/a/likes", "https://x.com/search",

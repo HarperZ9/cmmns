@@ -9,7 +9,7 @@
   if (!globalThis.PBLikes) return;
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const PACE_KEY = "pb.likes.pace";
-  let bar = null, pace = "careful", scrolling = false, mode = globalThis.PBLikesScroll ? "manifest" : "browser";
+  let bar = null, pace = "careful", scrolling = false, mode = "browser";
   try { chrome.storage.local.get(PACE_KEY).then((g) => { if (g[PACE_KEY] && PBLikesScroll && PBLikesScroll.PACES[g[PACE_KEY]]) pace = g[PACE_KEY]; }).catch(() => {}); } catch { /* storage unavailable */ }
   const on = () => !globalThis.PBSettings || PBSettings.get().mediaButtons !== false;
   const FETCH = "cmmns likes fetch --watch";
