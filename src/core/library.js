@@ -37,6 +37,7 @@ function redditLibrary(parts) {
   const [first = "", name = "", tab = "", ...rest] = parts;
   if (!/^[A-Za-z0-9_-]{2,30}$/.test(name) || rest.length) return null;
   if (first === "r" && ["", "hot", "new", "top", "rising", "controversial"].includes(tab)) return { site: "reddit", kind: "subreddit", name: `r-${name.toLowerCase()}`, label: `r/${name} on Reddit`, author: null };
+  if ((first === "user" || first === "u") && ["upvoted", "saved"].includes(tab)) return { site: "reddit", kind: "likes", name: `u-${name.toLowerCase()}-${tab}`, label: `u/${name} ${tab} on Reddit`, author: null };
   if ((first === "user" || first === "u") && ["", "submitted", "posts", "overview"].includes(tab)) return { site: "reddit", kind: "user", name: `u-${name.toLowerCase()}`, label: `u/${name} on Reddit`, author: `u/${name}` };
   return null;
 }
