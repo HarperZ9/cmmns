@@ -3,10 +3,10 @@
 // cannot import ES modules, so each file becomes a function scope that returns its exports,
 // imports become reads from the modules built before it, and everything lands on one global
 // (PB for core, PBOCR for the text recogniser).
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, realpathSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, dirname } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ORDER = ["precision.js", "places.js", "confusables-data.js", "confusables.js", "lookalike-outlets.js", "lookalike.js", "brands.js", "similarity.js", "mismatch.js", "reddit.js", "pattern.js", "flags.js", "lexicon.js", "rhetoric-util.js", "lexicon-fr.js", "rhetoric-fr.js", "lexicon-es.js", "rhetoric-es.js", "lexicon-de.js", "rhetoric-de.js", "lexicon-pt.js", "rhetoric-pt.js", "lexicon-it.js", "rhetoric-it.js", "rhetoric-mention.js", "lexicon-ar.js", "rhetoric-ar.js", "lexicon-ru.js", "rhetoric-ru.js", "lexicon-uk.js", "rhetoric-uk.js", "lexicon-zh.js", "rhetoric-zh.js", "lexicon-hi.js", "rhetoric-hi.js", "lexicon-derived.js", "rhetoric-derived.js", "theories-coercion.js", "theories.js", "rhetoric-groups.js", "rhetoric.js", "measured.js", "measured-langs.js", "persuasion-cues.js", "persuasion.js", "reading-lists.js", "reading-pressure.js", "reading-cues.js", "reading-weights.js", "reading-inflection.js", "reading-measured.js", "reading.js", "framing.js", "report.js", "about.js", "meta.js", "bsky.js", "fedi.js", "owners.js", "xdata.js", "machine.js", "threadkey.js", "network.js", "ytdata.js", "timing.js", "reply-timeline.js", "thread-save.js", "baselines-bins.js", "baselines-data.js", "techniques-data.js", "baselines.js", "pace.js", "langs.js", "state.js", "ops.js", "backing.js", "cloned.js", "trail.js", "crosslang.js", "flooding.js", "swarming.js", "campaign-baselines-data.js", "campaign-text.js", "campaign-shape.js", "campaign-sample.js", "campaign-quotes.js", "campaign-overlap.js", "campaign-platforms.js", "campaign.js", "receipt.js", "evidence-github.js", "evidence-domain.js", "evidence-ads.js", "evidence-ledger.js", "evidence-fetch.js", "evidence-seal.js", "chain.js", "history.js", "claims.js", "cbor.js", "jumbf.js", "der.js", "aimeta.js", "c2pa-verify.js", "c2pa.js", "c2pa-pki.js", "c2pa-revocation.js", "c2pa-weaknesses.js", "c2pa-badge.js", "c2pa-report.js", "mediacheck.js", "survival.js", "keyframes.js", "graph.js", "feed.js", "sig.js", "evidence.js", "hosts.js", "packs.js", "packs-content.js", "pack-keys.js", "sites.js", "outlets.js", "feeds.js", "feedfetch.js", "coverage.js", "health.js", "generic.js", "media-bytes.js", "media-webm.js", "media-ogg.js", "media-mp4-boxes.js", "media-mp4.js", "media-gif-lzw.js", "media-gif.js", "media-read.js", "media-xml.js", "media-hls.js", "media-dash.js", "media-protect.js", "media-collect.js", "media-name.js", "media-pick.js", "media-gif-encode.js", "media-demux.js", "media-assemble.js", "capture-thread.js", "url-clean.js", "video-transcript.js", "video-bundle.js", "instagram-data.js", "page-capture.js", "media-meta.js", "sidecar-receipt.js", "engagement-series.js", "library.js", "likes.js", "media-embed.js", "media-card.js", "media-thread.js", "claim-checks.js", "capture.js", "discourse/sheets.js", "board.js", "board-html.js", "clean-util.js", "clean-icc.js", "clean-image.js", "clean-av.js", "clean-pdf.js", "clean-zip.js", "clean.js", "adblock.js"];
@@ -58,7 +58,8 @@ export function checkBundles(base = root) {
   return { ok: results.every((r) => r.ok), results };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+const real = (p) => { try { return realpathSync(p); } catch { return p; } };
+if (process.argv[1] && real(process.argv[1]) === real(fileURLToPath(import.meta.url))) {
   if (process.argv.includes("--check")) {
     const r = checkBundles(root);
     for (const b of r.results) {
