@@ -13,6 +13,7 @@ export { fileProtection, mediaProtection, PROTECTED_LINE } from "./media-protect
 export { parseM3u8, hlsProtection, pickVariant } from "./media-hls.js";
 export { parseMpd, dashProtection, pickRepresentation } from "./media-dash.js";
 export { postMeta, sidecarMarkdown, sidecarJson, metaName, postTag, captionText, embedText, textTags } from "./media-meta.js";
+export { COMMONS_DIGEST_FORMAT, ENGINE_RECEIPT_SCHEMA, IN_TOTO_STATEMENT, ENGINE_RECEIPT_PREDICATE, COMMONS_DIGEST_DOES_NOT_PROVE, canonicalJson, sha256Prefixed, hmacSha256Prefixed, sidecarDigest, sidecarEngineReceipt, verifySidecarDigest, verifySidecarEngineReceipt, sidecarReceiptSidecars } from "./sidecar-receipt.js";
 export { embedDescription, readDescription, xmpPacket } from "./media-embed.js";
 export { saveFolder, savePath, SIDECAR_FORMAT, sidecarStem, fileBase } from "./media-meta.js";
 export { wrapLines, cardPlan, CARD, CARD_FOOT } from "./media-card.js";

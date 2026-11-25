@@ -14392,6 +14392,220 @@ function sidecarStem(fileNames) {
 return { SIDECAR_FORMAT, textTags, postMeta, postTag, metaName, sidecarMarkdown, savePath, saveFolder, sidecarJson, captionText, embedText, fileBase, sidecarStem };
 })();
 
+// ---- sidecar-receipt.js
+const M_sidecar_receipt = (() => {
+// Deterministic SHA-256 capture receipts for daylight.sidecar/1 exports:
+//   - commons-digest/1: portable CMMNS sidecar digest covering the note and attached files.
+//   - engine-receipt/1: canonical Flywheel verification envelope (in-toto Statement/v1),
+//     fail-closed (UNVERIFIABLE without a passing exit-0 oracle, MATCH only with one).
+// Pure Web Crypto (Node 22 and MV3 browsers); no DOM, no network, no filesystem access.
+
+const { SIDECAR_FORMAT, sidecarMarkdown, sidecarJson, sidecarStem } = M_media_meta;
+
+const COMMONS_DIGEST_FORMAT = "commons-digest/1";
+const ENGINE_RECEIPT_SCHEMA = "engine-receipt/1";
+const IN_TOTO_STATEMENT = "https://in-toto.io/Statement/v1";
+const ENGINE_RECEIPT_PREDICATE = "https://flywheel.dev/EngineReceipt/v1";
+const COMMONS_DIGEST_DOES_NOT_PROVE = "This receipt proves these sidecar and artifact bytes have not changed since they were hashed; it does not prove the source page or author was accurate.";
+
+const enc = (s) => new TextEncoder().encode(String(s));
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+const escapeAscii = (s) => s.replace(/[\u007f-\uffff]/g, (c) => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"));
+
+// Compact, key-sorted, ASCII-escaped JSON matching Python json.dumps(..., sort_keys=True, separators=(",", ":"), ensure_ascii=True).
+function canonicalJson(v) {
+  if (Array.isArray(v)) return `[${v.map(canonicalJson).join(",")}]`;
+  if (v && typeof v === "object") {
+    const keys = Object.keys(v).sort().filter((k) => v[k] !== undefined);
+    return `{${keys.map((k) => `${escapeAscii(JSON.stringify(k))}:${canonicalJson(v[k])}`).join(",")}}`;
+  }
+  return escapeAscii(JSON.stringify(v === undefined ? null : v));
+}
+
+function toBytes(data) {
+  if (data instanceof Uint8Array) return data;
+  if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  if (data instanceof ArrayBuffer) return new Uint8Array(data);
+  return enc(data == null ? "" : data);
+}
+
+async function sha256Prefixed(data) {
+  return "sha256:" + hex(await globalThis.crypto.subtle.digest("SHA-256", toBytes(data)));
+}
+
+async function hmacSha256Prefixed(key, data) {
+  const k = await globalThis.crypto.subtle.importKey("raw", enc(key), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return "hmac-sha256:" + hex(await globalThis.crypto.subtle.sign("HMAC", k, toBytes(data)));
+}
+
+function captureSummary(meta = {}) {
+  return {
+    site: meta.site || null,
+    adapter: meta.adapter || null,
+    kind: meta.kind || "media",
+    handle: (meta.author && meta.author.handle) || null,
+    post_url: meta.postUrl || null,
+    page_url: meta.postUrl ? null : (meta.pageUrl || null),
+    posted_at: meta.postedAt || null,
+    saved_at: meta.savedAt || null,
+  };
+}
+
+async function normaliseArtifacts(entries = []) {
+  const byPath = new Map();
+  for (const item of entries) {
+    if (!item) continue;
+    const rel = String(item.rel_path || item.name || "").replace(/\\/g, "/");
+    if (!rel) continue;
+    if (typeof item.sha256 === "string" && typeof item.bytes === "number" && item.data === undefined) {
+      byPath.set(rel, { rel_path: rel, sha256: item.sha256, bytes: item.bytes });
+      continue;
+    }
+    const raw = toBytes(item.data !== undefined ? item.data : item.content);
+    byPath.set(rel, { rel_path: rel, sha256: await sha256Prefixed(raw), bytes: raw.byteLength });
+  }
+  return [...byPath.values()].sort((a, b) => (a.rel_path < b.rel_path ? -1 : a.rel_path > b.rel_path ? 1 : 0));
+}
+
+function deriveReceiptScope(engine, oracle, artifacts) {
+  const lines = [
+    `engine=${engine}; fail-closed receipt bridge between engine verification and Flywheel`,
+    `hashed ${artifacts.length} artifact file(s) with SHA-256 at emission time`,
+  ];
+  if (!oracle) lines.push("no oracle command executed: standing remains UNVERIFIABLE until an oracle runs");
+  else if (oracle.exit_code === 0) lines.push(`oracle exited 0 with ${oracle.pass_lines} pass marker(s) and ${oracle.fail_lines} fail marker(s); proves the named command passed on this commit and artifacts, not unexecuted surfaces`);
+  else lines.push(`oracle exited ${oracle.exit_code}: standing is DRIFT`);
+  return lines;
+}
+
+function defaultSidecarName(fileNames, sidecarName) {
+  if (sidecarName) return sidecarName;
+  const stem = sidecarStem(fileNames);
+  return stem ? `${stem}.md` : "sidecar.md";
+}
+
+function buildEntryList(meta, opts = {}) {
+  const entries = [];
+  if (opts.includeSidecar !== false) {
+    const mdName = defaultSidecarName(opts.fileNames, opts.sidecarName);
+    const md = opts.sidecarMd != null ? opts.sidecarMd : sidecarMarkdown(meta, opts.fileNames);
+    entries.push({ rel_path: mdName, data: md });
+    if (opts.sidecarJsonText != null) entries.push({ rel_path: mdName.replace(/\.md$/, ".json"), data: opts.sidecarJsonText });
+  }
+  for (const f of opts.files || []) entries.push(f);
+  return entries;
+}
+
+async function sealDigests(kindKey, kindVal, subject, claim, hmacKey) {
+  const subject_sha256 = await sha256Prefixed(canonicalJson(subject));
+  const claim_sha256 = await sha256Prefixed(canonicalJson(claim));
+  const payload = { [kindKey]: kindVal, subject_sha256, claim_sha256 };
+  const envelope_sha256 = await sha256Prefixed(canonicalJson(payload));
+  const signature = hmacKey ? await hmacSha256Prefixed(hmacKey, canonicalJson(payload)) : null;
+  return { subject_sha256, claim_sha256, envelope_sha256, signature };
+}
+
+// Deterministic commons-digest/1 capture receipt for a daylight.sidecar/1 export.
+async function sidecarDigest(meta = {}, opts = {}) {
+  const tool = opts.tool || "CMMNS";
+  const emitted_at = opts.emittedAt || meta.savedAt || new Date().toISOString();
+  const artifacts = await normaliseArtifacts(buildEntryList(meta, opts));
+  const subject = { sidecar_format: SIDECAR_FORMAT, capture: captureSummary(meta), artifacts };
+  const claim = { format: COMMONS_DIGEST_FORMAT, sidecar_format: SIDECAR_FORMAT, tool, subject, dnp: COMMONS_DIGEST_DOES_NOT_PROVE };
+  const digests = await sealDigests("format", COMMONS_DIGEST_FORMAT, subject, claim, opts.hmacKey || null);
+  return { format: COMMONS_DIGEST_FORMAT, sidecar_format: SIDECAR_FORMAT, emitted_at, tool, subject, dnp: COMMONS_DIGEST_DOES_NOT_PROVE, digests };
+}
+
+// Canonical engine-receipt/1 envelope for a daylight.sidecar/1 export (fail-closed).
+async function sidecarEngineReceipt(meta = {}, opts = {}) {
+  const engine = opts.engine || "cmmns";
+  const flagship = opts.flagship || "cmmns";
+  const task_id = opts.taskId || "daylight-sidecar-export";
+  const emitted_at = opts.emittedAt || meta.savedAt || new Date().toISOString();
+  const artifacts = await normaliseArtifacts(buildEntryList(meta, opts));
+  const oracle = opts.oracle || null;
+  const verdict = !oracle ? "UNVERIFIABLE" : oracle.exit_code === 0 && (oracle.fail_lines || 0) === 0 ? "MATCH" : "DRIFT";
+  const subject = { engine, flagship, task_id, sidecar_format: SIDECAR_FORMAT, capture: captureSummary(meta), artifacts, oracle_command: oracle ? (oracle.command || []) : [] };
+  const oracleClaim = oracle ? { exit_code: oracle.exit_code, stdout_sha256: oracle.stdout_sha256, stderr_sha256: oracle.stderr_sha256, pass_lines: oracle.pass_lines || 0, fail_lines: oracle.fail_lines || 0 } : null;
+  const scope = deriveReceiptScope(engine, oracle, artifacts);
+  const claim = { subject, verdict, oracle: oracleClaim, scope };
+  const digests = await sealDigests("schema", ENGINE_RECEIPT_SCHEMA, subject, claim, opts.hmacKey || null);
+  return { schema: ENGINE_RECEIPT_SCHEMA, in_toto_statement_type: IN_TOTO_STATEMENT, predicate_type: ENGINE_RECEIPT_PREDICATE, emitted_at, subject, verdict, oracle, scope, digests };
+}
+
+async function checkFiles(artifacts, files, errors) {
+  if (!files) return;
+  const lookup = files instanceof Map ? (k) => (files.has(k) ? files.get(k) : undefined) : (k) => (Object.prototype.hasOwnProperty.call(files, k) ? files[k] : undefined);
+  for (const art of artifacts || []) {
+    const raw = lookup(art.rel_path);
+    if (raw === undefined) { errors.push(`missing artifact file: ${art.rel_path}`); continue; }
+    const bytes = toBytes(raw);
+    if (bytes.byteLength !== art.bytes) errors.push(`artifact byte length drift on ${art.rel_path}: live=${bytes.byteLength} receipt=${art.bytes}`);
+    const liveSha = await sha256Prefixed(bytes);
+    if (liveSha !== art.sha256) errors.push(`artifact SHA-256 drift on ${art.rel_path}: live=${liveSha} receipt=${art.sha256}`);
+  }
+}
+
+function checkDigests(stored, expected, hmacKey, errors) {
+  for (const k of ["subject_sha256", "claim_sha256", "envelope_sha256"]) {
+    if (!stored || stored[k] !== expected[k]) errors.push(`digest mismatch on ${k}`);
+  }
+  if (hmacKey && (!stored || stored.signature !== expected.signature)) errors.push("HMAC-SHA256 signature mismatch");
+}
+
+async function verifySidecarDigest(digest, { files = null, hmacKey = null } = {}) {
+  const errors = [];
+  if (!digest || typeof digest !== "object") return { ok: false, errors: ["digest is not an object"] };
+  if (digest.format !== COMMONS_DIGEST_FORMAT) errors.push(`unexpected format: ${digest.format}`);
+  if (digest.sidecar_format !== SIDECAR_FORMAT) errors.push(`unexpected sidecar_format: ${digest.sidecar_format}`);
+  const subject = digest.subject || {};
+  const claim = { format: digest.format, sidecar_format: digest.sidecar_format, tool: digest.tool, subject, dnp: digest.dnp };
+  const expected = await sealDigests("format", COMMONS_DIGEST_FORMAT, subject, claim, hmacKey);
+  checkDigests(digest.digests, expected, hmacKey, errors);
+  await checkFiles(subject.artifacts, files, errors);
+  return { ok: errors.length === 0, errors };
+}
+
+async function verifySidecarEngineReceipt(receipt, { files = null, hmacKey = null } = {}) {
+  const errors = [];
+  if (!receipt || typeof receipt !== "object") return { ok: false, verdict: null, errors: ["receipt is not an object"] };
+  if (receipt.schema !== ENGINE_RECEIPT_SCHEMA) errors.push(`unexpected schema: ${receipt.schema}`);
+  const subject = receipt.subject || {};
+  const oracle = receipt.oracle && typeof receipt.oracle === "object" ? receipt.oracle : null;
+  const oracleClaim = oracle ? { exit_code: oracle.exit_code, stdout_sha256: oracle.stdout_sha256, stderr_sha256: oracle.stderr_sha256, pass_lines: oracle.pass_lines || 0, fail_lines: oracle.fail_lines || 0 } : null;
+  const verdict = receipt.verdict;
+  if (verdict === "MATCH" && (!oracleClaim || oracleClaim.exit_code !== 0 || oracleClaim.fail_lines !== 0)) errors.push("fail-closed violation: MATCH verdict without passing exit-0 oracle");
+  const expectedScope = deriveReceiptScope(subject.engine || "", oracle, subject.artifacts || []);
+  if (canonicalJson(receipt.scope) !== canonicalJson(expectedScope)) errors.push("scope mismatch: derived scope does not match stored scope");
+  const claim = { subject, verdict, oracle: oracleClaim, scope: expectedScope };
+  const expected = await sealDigests("schema", ENGINE_RECEIPT_SCHEMA, subject, claim, hmacKey);
+  checkDigests(receipt.digests, expected, hmacKey, errors);
+  await checkFiles(subject.artifacts, files, errors);
+  return { ok: errors.length === 0, verdict, errors };
+}
+
+// One-call Daylight sidecar + receipt sidecar emitter: returns markdown, optional json,
+// commons-digest/1, engine-receipt/1, and a filename -> UTF-8 string map ready to write.
+async function sidecarReceiptSidecars(meta, opts = {}) {
+  const mdName = defaultSidecarName(opts.fileNames, opts.sidecarName);
+  const stem = mdName.replace(/\.md$/, "");
+  const sidecarMd = opts.sidecarMd != null ? opts.sidecarMd : sidecarMarkdown(meta, opts.fileNames);
+  const sidecarJsonText = opts.includeJson ? sidecarJson(meta, opts.fileNames) : null;
+  const common = { ...opts, sidecarName: mdName, sidecarMd, sidecarJsonText };
+  const digest = await sidecarDigest(meta, common);
+  const engineReceipt = await sidecarEngineReceipt(meta, common);
+  const files = {
+    [mdName]: sidecarMd,
+    ...(sidecarJsonText != null ? { [`${stem}.json`]: sidecarJsonText } : {}),
+    [`${stem}.digest.json`]: JSON.stringify(digest, null, 2) + "\n",
+    [`${stem}.receipt.json`]: JSON.stringify(engineReceipt, null, 2) + "\n",
+  };
+  return { stem, sidecarMd, sidecarJson: sidecarJsonText, digest, engineReceipt, files };
+}
+
+return { COMMONS_DIGEST_FORMAT, ENGINE_RECEIPT_SCHEMA, IN_TOTO_STATEMENT, ENGINE_RECEIPT_PREDICATE, COMMONS_DIGEST_DOES_NOT_PROVE, canonicalJson, toBytes, sha256Prefixed, hmacSha256Prefixed, sidecarDigest, sidecarEngineReceipt, verifySidecarDigest, verifySidecarEngineReceipt, sidecarReceiptSidecars };
+})();
+
 // ---- engagement-series.js
 const M_engagement_series = (() => {
 // Engagement over time for saved posts (project-docs/ENGAGEMENT-SERIES.md). A post the user saved
@@ -18736,5 +18950,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_c2pa_pki, ...M_c2pa_revocation, ...M_c2pa_weaknesses, ...M_c2pa_badge, ...M_c2pa_report, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_url_clean, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_page_capture, ...M_media_meta, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_c2pa_pki, ...M_c2pa_revocation, ...M_c2pa_weaknesses, ...M_c2pa_badge, ...M_c2pa_report, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_url_clean, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_page_capture, ...M_media_meta, ...M_sidecar_receipt, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

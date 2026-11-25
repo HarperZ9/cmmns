@@ -257,3 +257,19 @@ Notes saved before this change keep the addresses they were written with.
 
 Only what the page showed: nothing is fetched to fill a sidecar, and nothing about the person saving
 (no account, no browser, no location).
+
+## Capture receipts (`commons-digest/1` and `engine-receipt/1`)
+
+`src/core/sidecar-receipt.js` attaches deterministic SHA-256 capture receipts to `daylight.sidecar/1`
+exports without changing the sidecar format itself:
+
+- `<stem>.digest.json` (`commons-digest/1`): canonical sorted-key SHA-256 digests over the sidecar
+  Markdown, optional JSON sidecar, and any attached media or thread artifacts, with optional
+  HMAC-SHA256 signing.
+- `<stem>.receipt.json` (`engine-receipt/1`): canonical in-toto Statement/v1 verification envelope
+  matching Flywheel's fail-closed `engine-receipt/1` contract (`UNVERIFIABLE` without a passing
+  exit-0 oracle; `MATCH` only with one).
+
+`cmmns export ... --receipt` writes `commons-digest.json` and `engine-receipt.json` beside the
+exported profile files, and `cmmns verify <receipt.json>` verifies the envelope and every sibling
+artifact byte-for-byte.

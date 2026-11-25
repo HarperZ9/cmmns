@@ -31,6 +31,7 @@ export async function runExport(file, f) {
     replies: typeof f.reply === "string" ? readJson(f.reply, "right-of-reply log") : [],
     corrections: typeof f.corrections === "string" ? readJson(f.corrections, "corrections") : [],
     seed: typeof f.seed === "string" ? f.seed : undefined,
+    receipt: !!f.receipt,
   });
   if (!r.ok) throw new Error(`export refused: ${r.reason}`);
   mkdirSync(out, { recursive: true });
