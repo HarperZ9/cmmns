@@ -20,6 +20,7 @@ import { chainChecks, EXPORT_FORMAT } from "../src/core/evidence-seal.js";
 import { loadTables, dataLock, radarVersion, ROOT } from "./lib/data.mjs";
 import { loadOrMakeKey, DEFAULT_KEY } from "./lib/keys.mjs";
 import { readable, verdictLines, chainLines } from "./lib/report.mjs";
+import { isSidecarReceipt, verifySidecarReceiptFile, receiptLines } from "./lib/receipt-verify.mjs";
 import { validate } from "./lib/jsonschema.mjs";
 import { runExport } from "./lib/export.mjs";
 import { runCaseCommand } from "./lib/case.mjs";
@@ -109,6 +110,11 @@ async function writeBundle(result, imp, f) {
 
 async function verify(file, f) {
   const bundle = JSON.parse(readFileSync(file, "utf8"));
+  if (isSidecarReceipt(bundle)) {
+    const r = await verifySidecarReceiptFile(file, bundle, { hmacKey: process.env.FLYWHEEL_RECEIPT_HMAC_KEY || null });
+    print(f.json ? asJson(r) : receiptLines(file, r));
+    return r.ok ? 0 : 1;
+  }
   if (bundle && bundle.format === EXPORT_FORMAT) {
     const c = await chainChecks(bundle);
     print(f.json ? asJson(c) : chainLines(file, c));

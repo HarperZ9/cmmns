@@ -8,6 +8,7 @@
 //   opts: { at, tool, definitions: { "id@version": entry }, replies: [..], corrections: [..], seed }
 
 import { chainChecks, SEAL_DOES_NOT_PROVE } from "./evidence-seal.js";
+import { sidecarDigest, sidecarEngineReceipt } from "./sidecar-receipt.js";
 import { legalFiles, journalisticFiles } from "./export-writeup.js";
 import { technicalFiles } from "./export-prov.js";
 import { researchFiles } from "./export-research.js";
@@ -52,6 +53,13 @@ export async function exportProfile(chain, profile, opts = {}) {
     seed: opts.seed || "daylight-export-1", dnp: EXPORT_DOES_NOT_PROVE, sealDnp: SEAL_DOES_NOT_PROVE };
   const files = await BUILDERS[profile](ctx);
   files["evidence-chain.json"] = JSON.stringify(chain, null, 2) + "\n";
+  if (opts.receipt) {
+    const entries = Object.entries(files).map(([rel_path, data]) => ({ rel_path, data }));
+    const meta = { site: "cmmns", adapter: `export-${profile}`, kind: "text", savedAt: ctx.at };
+    const ro = { includeSidecar: false, files: entries, emittedAt: ctx.at, tool: ctx.tool, taskId: `export-${profile}`, hmacKey: opts.hmacKey || null };
+    files["commons-digest.json"] = JSON.stringify(await sidecarDigest(meta, ro), null, 2) + "\n";
+    files["engine-receipt.json"] = JSON.stringify(await sidecarEngineReceipt(meta, ro), null, 2) + "\n";
+  }
   return { ok: true, profile, files };
 }
 
