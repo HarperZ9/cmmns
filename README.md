@@ -1,11 +1,6 @@
 # CMMNS
 
-A browser extension that shows where social media replies come from. Rest the pointer on a reply on
-X, YouTube, Reddit, Facebook, Instagram, Bluesky, Threads, TikTok or a Mastodon server you turn it
-on for, and a window opens beside it: where the platform places the account, signs of coordination,
-how the account posts, how the reply argues, and whether a fact-checker has reviewed the claim. On a
-phone, tap the post's CMMNS button. CMMNS, spoken "commons", was formerly CMMNS, and Radar
-before that. Releases from 3.9.0 name their files `cmmns-*`; earlier ones keep `radar-*`.
+Site-agnostic browser extension and archival tool (`v3.10.0`). On social platforms (X, YouTube, Reddit, Facebook, Instagram, Bluesky, Threads, TikTok, and Mastodon servers you turn it on for), hovering a reply opens an evidence panel beside it: where the platform places the account, signs of coordination, posting cadence, argument structure, and fact-checker matches. On any other webpage, the universal page adapter captures structured metadata (`cmmns.page/1`, Schema.org, RSS/Atom, JSON data islands) and media into collision-free `daylight.sidecar/1` and `manifest-*.jsonl` records with SHA-256 capture receipts. On a phone, tap the post's CMMNS button. CMMNS, spoken "commons", was formerly Daylight Commons, and Radar before that. Releases from 3.9.0 name their files `cmmns-*`; earlier ones keep `radar-*`.
 
 ![CMMNS installed, a synthetic thread, a reply's window and its evidence, a lookup's receipts, and the saved chain checked offline](docs/demo/demo-install-to-verify.gif)
 
@@ -132,13 +127,16 @@ the page showed, the time, and what the capture kept and lost, part by part. Eac
 line to a hash chain in your browser; `cmmns capture verify <folder>` checks them all. Details:
 [project-docs/EVIDENCE-CAPTURE.md](project-docs/EVIDENCE-CAPTURE.md).
 
-**Save page as library** keeps a whole X profile, list or search, or a Reddit user or subreddit, as
-one folder: each post the page loads is saved once with its files and its note, and `index.jsonl`
+**Save page as library** keeps a whole X profile, likes timeline, list or search, a Reddit user or
+subreddit, or any webpage via the universal page adapter (`cmmns.page/1`, Schema.org, RSS/Atom, and
+JSON data islands) as one folder: each item is saved with its files and `daylight.sidecar/1` note,
+collision-free `manifest-*.jsonl` exports track bulk saves with configurable limits, and `index.jsonl`
 lists every file's SHA-256. Come back later and it carries on where it stopped. In the unpacked build,
 **Scroll to the end** fills it for you, up to a cap. `cmmns case add-library <folder>` adds every post
 to a case with its hashes checked. When the subject is a person, the tools show measured and quoted
 evidence with links and never label the person. Details:
-[project-docs/LIBRARY-CAPTURE.md](project-docs/LIBRARY-CAPTURE.md).
+[project-docs/LIBRARY-CAPTURE.md](project-docs/LIBRARY-CAPTURE.md) and
+[project-docs/SIDECAR-FORMAT.md](project-docs/SIDECAR-FORMAT.md).
 
 **Study boards** turn a moodboard or a folder of saves into numbered plates with their source,
 author, time and link: a book with running heads and captions, a grid, or a timeline in posted order.
@@ -192,7 +190,7 @@ node bin/radar.mjs analyze thread.json --bundle out.json
 node bin/radar.mjs analyze thread.json --bundle out.json --carrier-safe   # one-time key, day only
 node bin/radar.mjs verify out.json                  # check a signed bundle offline
 node bin/radar.mjs verify evidence-chain.json       # or an evidence chain saved in the extension
-node bin/radar.mjs export evidence-chain.json --profile legal --out dossier
+node bin/radar.mjs export evidence-chain.json --profile legal --out dossier --receipt
 node bin/radar.mjs media convert photo.png --to webp   # with ffmpeg; writes photo.webp.lineage.json
 ```
 
@@ -200,9 +198,10 @@ node bin/radar.mjs media convert photo.png --to webp   # with ffmpeg; writes pho
 exhibits, a chain-of-custody log, cited definitions and verifier steps, as Markdown), `technical`
 (W3C PROV and the raw observations), `journalistic` (a write-up with a sourcing note per line, plus
 `--reply replies.json` and `--corrections corrections.json`) and `research` (JSON lines with fixed
-train, dev and test splits, Croissant metadata and a datasheet). Exports hold identifiers, hashes
-and extracted features, with private accounts as pseudonyms. A chain that fails its check is
-refused.
+train, dev and test splits, Croissant metadata and a datasheet). Passing `--receipt` also attaches
+deterministic Web Crypto `commons-digest/1` and fail-closed `engine-receipt/1` capture receipts
+verified offline by `verify`. Exports hold identifiers, hashes and extracted features, with private
+accounts as pseudonyms. A chain that fails its check is refused.
 
 In the extension, the toolbar popup's **Analyse a file** does the same. Code can import
 `src/core/api.js`: `analyzeThread`, `analyzeText`, `checkMedia` and `siteInfo` return evidence that
@@ -245,6 +244,7 @@ The format, pipeline and a test against a hand-built case are in
 ```
 npm test                 # every test
 npm run build            # rebuild src/ext/core.bundle.js from src/core
+npm run build:check      # verify double-build SHA-256 bundle reproducibility
 npm run ci               # exactly what GitHub Actions runs
 npm run package          # dist/cmmns-chrome-<v>.zip, the two Firefox xpis, dist/SHA256SUMS
 npm run release          # a signed release folder with a git bundle (key kept outside the repo)
