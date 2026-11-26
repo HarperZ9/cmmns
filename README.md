@@ -1,6 +1,15 @@
 # CMMNS
 
-Site-agnostic browser extension and archival tool (`v3.10.0`). On social platforms (X, YouTube, Reddit, Facebook, Instagram, Bluesky, Threads, TikTok, and Mastodon servers you turn it on for), hovering a reply opens an evidence panel beside it: where the platform places the account, signs of coordination, posting cadence, argument structure, and fact-checker matches. On any other webpage, the universal page adapter captures structured metadata (`cmmns.page/1`, Schema.org, RSS/Atom, JSON data islands) and media into collision-free `daylight.sidecar/1` and `manifest-*.jsonl` records with SHA-256 capture receipts. On a phone, tap the post's CMMNS button. CMMNS, spoken "commons", was formerly Daylight Commons, and Radar before that. Releases from 3.9.0 name their files `cmmns-*`; earlier ones keep `radar-*`.
+Site-agnostic browser extension and archival tool (`v3.10.0`, `AGPL-3.0-only` code / `CC-BY-4.0` data and docs). On social platforms (X, YouTube, Reddit, Facebook, Instagram, Bluesky, Threads, TikTok, and Mastodon servers you turn it on for), hovering a reply opens an evidence panel beside it: where the platform places the account, signs of coordination, posting cadence, argument structure, and fact-checker matches. On any other webpage, the universal page adapter captures structured metadata (`cmmns.page/1`, Schema.org, RSS/Atom, JSON data islands) and media into collision-free `daylight.sidecar/1` and `manifest-*.jsonl` records with SHA-256 capture receipts, and the offline CLI verifies Web and AI provenance surfaces (`agent-card.json`, `llms.txt`, JSON-LD, prompt-injection scan, and `engine-receipt/1`). On a phone, tap the post's CMMNS button. CMMNS, spoken "commons", was formerly Daylight Commons, and Radar before that. Releases from 3.9.0 name their files `cmmns-*`; earlier ones keep `radar-*`.
+
+[Overview](https://harperz9.github.io/cmmns.html) ·
+[Install guide](https://harperz9.github.io/cmmns/install.html) ·
+[How it works](https://harperz9.github.io/cmmns/how-it-works.html) ·
+[Transparency](https://harperz9.github.io/cmmns/transparency.html) ·
+[Privacy](https://harperz9.github.io/cmmns/privacy.html) ·
+[Store packaging checklist](docs/store/PACKAGING-CHECKLIST.md) ·
+[llms.txt](llms.txt) ·
+[CITATION.cff](CITATION.cff)
 
 ![CMMNS installed, a synthetic thread, a reply's window and its evidence, a lookup's receipts, and the saved chain checked offline](docs/demo/demo-install-to-verify.gif)
 
@@ -16,6 +25,12 @@ irm https://raw.githubusercontent.com/HarperZ9/cmmns/main/install.ps1 | iex
 Linux / macOS:
 ```sh
 curl -fsSL https://raw.githubusercontent.com/HarperZ9/cmmns/main/install.sh | sh
+```
+
+Verify any site's AI and Web provenance surface offline (`agent-card.json`, `llms.txt`, Schema.org JSON-LD, hidden prompt-injection scan, and `engine-receipt/1` hashes):
+
+```sh
+node bin/radar.mjs provenance verify <site-dir> --origin https://harperz9.github.io/ --json
 ```
 
 Then open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and select the printed `ext` folder (`%LOCALAPPDATA%\CMMNS\ext` on Windows, `~/.cmmns/ext` on Linux/macOS).
@@ -129,7 +144,7 @@ real GIF from the MP4 that sites send in place of GIFs. **Copy** and **Copy link
 Other tools can use the same code: `import { assembleStream, encodeGif } from "cmmns/media"`
 ([project-docs/MEDIA-LIBRARY.md](project-docs/MEDIA-LIBRARY.md)).
 
-To keep a file as evidence instead, right-click any image, GIF, video or audio and choose **Save to CMMNS**, or use **Save media from
+To keep a file as evidence, right-click any image, GIF, video or audio and choose **Save to CMMNS**, or use **Save media from
 this page** in the toolbar menu. A video the page streams is put together from its HLS or DASH
 segments. Each file goes into an investigation case, with its SHA-256, address, page and time and an
 optional Internet Archive copy, or into a moodboard with tags and notes. **Collections** shows them as

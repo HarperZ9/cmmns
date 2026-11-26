@@ -14,6 +14,11 @@ SPDX-License-Identifier = "AGPL-3.0-only"
 [[annotations]]
 path = [
   "*.md",
+  "CITATION.cff",
+  "codemeta.json",
+  "llms.txt",
+  "funding.json",
+  ".well-known/**",
   "project-docs/**",
   "data/**",
   "catalogue/**",
@@ -21,6 +26,7 @@ path = [
   "schema/**",
   "docs/*.html",
   "docs/art/**",
+  "docs/store/**",
   "docs/release-key.json",
   "src/ext/*.json",
   "src/ext/discourse/*.json",

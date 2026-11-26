@@ -15,6 +15,7 @@ submit are the author's steps; nothing here has been submitted.
 | Firefox reviewer source package | `amo-source-<version>.zip` (made by `node scripts/amo-source.mjs`) | AMO "Source code" |
 | Packages | `cmmns-chrome-<version>.zip`, `cmmns-firefox-<version>.xpi` from the GitHub release | CWS; AMO |
 | Step-by-step submission | `LISTING.md`, "Submission steps for the author" | |
+| Packaging & pre-flight checklist | `PACKAGING-CHECKLIST.md` | Pre-upload verification for CWS and AMO |
 
 `tests/store-listing.test.js` keeps the copy within each store's limits, the summary identical to the
 manifest, and the permission table complete for every permission the manifest asks for.

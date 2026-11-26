@@ -1,0 +1,37 @@
+# CMMNS (The Commons)
+
+> Site-agnostic browser extension (Chrome, Edge, Brave, Firefox 128+) and offline Node 22+ archival CLI (`v3.10.0`) for reply provenance, universal webpage capture (`cmmns.page/1`), case dossiers, and Web and AI provenance verification (`cmmns provenance verify`).
+
+- License: `AGPL-3.0-only` (code), `CC-BY-4.0` (data tables, catalogue, schemas, docs; full mapping in `REUSE.toml`)
+- Homepage: https://harperz9.github.io/cmmns.html
+- Install guide: https://harperz9.github.io/cmmns/install.html
+- How it works: https://harperz9.github.io/cmmns/how-it-works.html
+- Transparency & measured precision: https://harperz9.github.io/cmmns/transparency.html
+- Privacy policy: https://harperz9.github.io/cmmns/privacy.html
+- Repository: https://github.com/HarperZ9/cmmns
+
+## One-Command Install (Fail-Closed SHA256SUMS)
+
+- Windows PowerShell: `irm https://raw.githubusercontent.com/HarperZ9/cmmns/main/install.ps1 | iex`
+- Linux / macOS: `curl -fsSL https://raw.githubusercontent.com/HarperZ9/cmmns/main/install.sh | sh`
+
+## Key CLI Commands (Node 22+, Zero External Dependencies)
+
+- Analyze a saved thread or export: `node bin/radar.mjs analyze saved-thread.html`
+- Verify a signed bundle or evidence chain offline: `node bin/radar.mjs verify evidence-chain.json`
+- Verify a website's AI/Web provenance surface (`agent-card.json`, `llms.txt`, Schema.org JSON-LD, prompt-injection scan, `engine-receipt/1`): `node bin/radar.mjs provenance verify <dir> --origin https://example.org/ --json`
+- Export an evidence chain with deterministic receipts: `node bin/radar.mjs export evidence-chain.json --profile legal --out dossier --receipt`
+- Manage a git-backed investigation case folder: `node bin/radar.mjs case init "Title"`
+- Verify deterministic bundle reproducibility: `npm run build:check`
+
+## Core Schemas & Documentation
+
+- [README.md](README.md): Overview, install, extension panels, CLI, case folders, legal drafts, and licensing
+- [CITATION.cff](CITATION.cff): Academic citation metadata (`AGPL-3.0-only`, ORCID)
+- [codemeta.json](codemeta.json): Schema.org `SoftwareSourceCode` metadata
+- [PRIVACY.md](PRIVACY.md): Exact network request inventory and retention defaults
+- [docs/store/README.md](docs/store/README.md): Chrome Web Store and Firefox AMO store kit
+- [docs/store/PACKAGING-CHECKLIST.md](docs/store/PACKAGING-CHECKLIST.md): Release and store packaging verification checklist
+- [project-docs/INTEGRATION.md](project-docs/INTEGRATION.md): JS API (`src/core/api.js`) and `schema/evidence.v2.json`
+- [project-docs/SIDECAR-FORMAT.md](project-docs/SIDECAR-FORMAT.md): `daylight.sidecar/1` and `cmmns.page/1` capture records
+- [project-docs/EVALUATION.md](project-docs/EVALUATION.md): Held-out precision and recall evaluations (honest intervals, no composite score)

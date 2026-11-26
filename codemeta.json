@@ -1,0 +1,60 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "CMMNS",
+  "alternateName": [
+    "The Commons",
+    "Daylight Commons",
+    "Radar"
+  ],
+  "version": "3.10.0",
+  "description": "Site-agnostic browser extension (MV3) and offline CLI for social provenance, universal webpage archival (cmmns.page/1), case dossiers, and Web and AI provenance verification (agent-card.json, llms.txt, Schema.org JSON-LD, C2PA, and engine-receipt/1).",
+  "license": "https://spdx.org/licenses/AGPL-3.0-only.html",
+  "codeRepository": "https://github.com/HarperZ9/cmmns",
+  "issueTracker": "https://github.com/HarperZ9/cmmns/issues",
+  "url": "https://harperz9.github.io/cmmns.html",
+  "softwareHelp": "https://harperz9.github.io/cmmns/how-it-works.html",
+  "downloadUrl": "https://github.com/HarperZ9/cmmns/releases/latest",
+  "programmingLanguage": [
+    "JavaScript",
+    "HTML",
+    "CSS"
+  ],
+  "runtimePlatform": [
+    "Chrome",
+    "Edge",
+    "Brave",
+    "Firefox 128+",
+    "Node.js 22+"
+  ],
+  "operatingSystem": [
+    "Windows",
+    "macOS",
+    "Linux"
+  ],
+  "applicationCategory": "BrowserExtension",
+  "author": [
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0009-0001-7175-5393",
+      "givenName": "Zain Dana",
+      "familyName": "Harper",
+      "url": "https://harperz9.github.io/"
+    }
+  ],
+  "datePublished": "2026-11-14",
+  "dateModified": "2026-11-26",
+  "keywords": [
+    "browser-extension",
+    "provenance",
+    "c2pa",
+    "osint",
+    "web-archiving",
+    "fact-checking",
+    "media-literacy",
+    "llms-txt",
+    "agent-card",
+    "engine-receipt",
+    "agpl-3.0-only"
+  ]
+}
