@@ -91,14 +91,14 @@ install_from_stage() {
     done
   fi
   [ -n "$ext_zip" ] || { echo "Refusing install: no CMMNS extension zip found." >&2; return 1; }
-  verify_checksum "$ext_zip" "$(basename "$ext_zip")" "$sums"
+  verify_checksum "$ext_zip" "$(basename "$ext_zip")" "$sums" || return 1
 
   cli_zip=""
   for cand in "$stage"/cmmns-cli-*.zip; do
     if [ -f "$cand" ]; then cli_zip="$cand"; break; fi
   done
   if [ -n "$cli_zip" ]; then
-    verify_checksum "$cli_zip" "$(basename "$cli_zip")" "$sums"
+    verify_checksum "$cli_zip" "$(basename "$cli_zip")" "$sums" || return 1
   fi
 
   ext_dir="$target/ext"

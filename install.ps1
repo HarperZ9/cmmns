@@ -8,9 +8,21 @@ param(
 
 $ErrorActionPreference = "Stop"
 $Repo = "HarperZ9/cmmns"
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 function Get-Sha256Hex([string]$Path) {
-  return (Get-FileHash -Algorithm SHA256 -Path $Path).Hash.ToLowerInvariant()
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $stream = [System.IO.File]::OpenRead($Path)
+    try { return ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace("-", "").ToLowerInvariant() }
+    finally { $stream.Dispose() }
+  } finally { $sha.Dispose() }
+}
+
+function Expand-ZipClean([string]$ZipPath, [string]$DestDir) {
+  if (Test-Path $DestDir) { Remove-Item -Path $DestDir -Recurse -Force }
+  New-Item -ItemType Directory -Force -Path $DestDir | Out-Null
+  [System.IO.Compression.ZipFile]::ExtractToDirectory($ZipPath, $DestDir)
 }
 
 function Parse-Sums([string]$SumsPath) {
@@ -77,14 +89,11 @@ function Install-FromStage([string]$StageDir, [string]$TargetDir, [bool]$SkipPat
   $extDir = Join-Path $TargetDir "ext"
   $cliDir = Join-Path $TargetDir "cli"
   $binDir = Join-Path $TargetDir "bin"
-  New-Item -ItemType Directory -Force -Path $extDir, $binDir | Out-Null
-  Get-ChildItem -Path $extDir -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force
-  Expand-Archive -Path $extAsset.FullName -DestinationPath $extDir -Force
+  New-Item -ItemType Directory -Force -Path $binDir | Out-Null
+  Expand-ZipClean $extAsset.FullName $extDir
 
   if ($cliAsset) {
-    New-Item -ItemType Directory -Force -Path $cliDir | Out-Null
-    Get-ChildItem -Path $cliDir -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force
-    Expand-Archive -Path $cliAsset.FullName -DestinationPath $cliDir -Force
+    Expand-ZipClean $cliAsset.FullName $cliDir
     $entry = Get-ChildItem -Path $cliDir -Recurse -Filter "radar.mjs" | Select-Object -First 1
     if ($entry) {
       $shim = "@echo off`r`nnode `"$($entry.FullName)`" %*`r`n"
@@ -112,8 +121,8 @@ function Invoke-SelfTest {
     Set-Content -Path (Join-Path $cliPayload "bin\radar.mjs") -Value 'console.log("cmmns selftest ok");' -Encoding UTF8
     $extZip = Join-Path $stage "cmmns-ext.zip"
     $cliZip = Join-Path $stage "cmmns-cli-3.10.0.zip"
-    Compress-Archive -Path (Join-Path $payload "*") -DestinationPath $extZip -Force
-    Compress-Archive -Path (Join-Path $cliPayload "*") -DestinationPath $cliZip -Force
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($payload, $extZip)
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($cliPayload, $cliZip)
 
     $sumsText = "$(Get-Sha256Hex $extZip)  cmmns-ext.zip`n$(Get-Sha256Hex $cliZip)  cmmns-cli-3.10.0.zip`n"
     Set-Content -Path (Join-Path $stage "SHA256SUMS") -Value $sumsText -NoNewline -Encoding UTF8
