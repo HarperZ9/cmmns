@@ -6,7 +6,21 @@ Site-agnostic browser extension and archival tool (`v3.10.0`). On social platfor
 
 ## Install
 
-**Chrome, Edge or Brave**
+**One-command install (downloads the release archive, verifies `SHA256SUMS` fail-closed, unpacks the extension, and installs the `cmmns` CLI):**
+
+Windows (PowerShell):
+```powershell
+irm https://raw.githubusercontent.com/HarperZ9/cmmns/main/install.ps1 | iex
+```
+
+Linux / macOS:
+```sh
+curl -fsSL https://raw.githubusercontent.com/HarperZ9/cmmns/main/install.sh | sh
+```
+
+Then open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and select the printed `ext` folder (`%LOCALAPPDATA%\CMMNS\ext` on Windows, `~/.cmmns/ext` on Linux/macOS).
+
+**Manual Chrome, Edge or Brave install**
 1. Download `cmmns-chrome-<version>.zip` from the latest release and unzip it.
 2. Open `chrome://extensions` (Edge: `edge://extensions`) and turn on **Developer mode**.
 3. Click **Load unpacked** and choose the unzipped folder.
