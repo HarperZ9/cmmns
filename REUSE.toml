@@ -1,4 +1,4 @@
-version = 1
+﻿version = 1
 SPDX-PackageName = "CMMNS"
 SPDX-PackageDownloadLocation = "https://github.com/HarperZ9/cmmns"
 
@@ -20,6 +20,7 @@ path = [
   "src/core/catalogue-data.js",
   "schema/**",
   "docs/*.html",
+  "docs/art/**",
   "docs/release-key.json",
   "src/ext/*.json",
   "src/ext/discourse/*.json",
