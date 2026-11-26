@@ -135,16 +135,17 @@ async function waitWhilePaused(shouldPause, shouldStop, sleep) {
 }
 
 // Automatically paginates every X Likes timeline page until exhaustion, stop, challenge, or rate-limit cap.
+// maxPages = 0 (default) paginates until timeline exhaustion with no arbitrary client-side page ceiling.
 export async function paginateLikes({
   fetchPage,
   dedupIndex = createDedupIndex(),
   skipDuplicates = true,
   includeDuplicates = false,
   startCursor = null,
-  maxPages = 500,
+  maxPages = 0,
   initialBackoffMs = 1500,
   maxBackoffMs = 60000,
-  maxRateLimitRetries = 3,
+  maxRateLimitRetries = 6,
   onProgress = null,
   onItem = null,
   shouldPause = () => false,
@@ -153,6 +154,7 @@ export async function paginateLikes({
   now = () => Date.now(),
 } = {}) {
   const items = [], visitedCursors = new Set();
+  const pageCap = Number(maxPages) > 0 ? Math.floor(Number(maxPages)) : Infinity;
   let cursor = startCursor, pagesFetched = 0, saved = 0, skippedDuplicates = 0, totalSeen = 0, stoppedReason = "exhausted", rateRetries = 0;
   const report = () => {
     const snap = { saved, skippedDuplicates, totalSeen, pagesFetched, nextCursor: cursor, stoppedReason };
@@ -162,7 +164,7 @@ export async function paginateLikes({
   for (;;) {
     await waitWhilePaused(shouldPause, shouldStop, sleep);
     if (shouldStop()) { stoppedReason = "stopped"; break; }
-    if (pagesFetched >= maxPages) { stoppedReason = "max_pages"; break; }
+    if (pagesFetched >= pageCap) { stoppedReason = "max_pages"; break; }
     const res = await fetchPage(cursor);
     if (!res) { stoppedReason = "error"; break; }
     if (isChallengeResponse(res)) { stoppedReason = "challenge_required"; break; }

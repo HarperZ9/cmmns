@@ -14016,6 +14016,9 @@ const SITE_ADAPTERS = Object.freeze(["x", "reddit", "youtube", "instagram"]);
 const adapterOf = (site, adapter = null) => (adapter ? String(adapter).slice(0, 40) : SITE_ADAPTERS.includes(site) ? site : "generic");
 
 const ARTICLE_TYPES = /^(Article|NewsArticle|BlogPosting|ScholarlyArticle|Report|TechArticle|OpinionNewsArticle|ReportageNewsArticle|AnalysisNewsArticle|LiveBlogPosting|SocialMediaPosting)$/;
+const STRUCTURED_TYPES = /^(Dataset|VideoObject|AudioObject|SoftwareSourceCode|CreativeWork|WebPage)$/;
+const FEED_TYPES = /^application\/(rss\+xml|atom\+xml|feed\+json)$/i;
+const DOC_LINK_RE = /(\.(pdf|csv|tsv|json|jsonl|zip|parquet|tar\.gz)(?:$|[?#])|\/\/(?:www\.)?arxiv\.org\/(?:abs|pdf|html)\/|\/\/(?:www\.)?github\.com\/[^/]+\/[^/?#]+|\/\/(?:dx\.)?doi\.org\/10\.)/i;
 const cut = (s, n) => (s == null || s === "" ? null : String(s).replace(/\s+/g, " ").trim().slice(0, n) || null);
 const list = (v) => (v == null ? [] : Array.isArray(v) ? v : [v]);
 const nameOf = (v) => (typeof v === "string" ? cut(v, 200) : v && typeof v === "object" ? cut(v.name || v.alternateName, 200) : null);
@@ -14024,10 +14027,62 @@ const nameOf = (v) => (typeof v === "string" ? cut(v, 200) : v && typeof v === "
 function ldNode(n) {
   const type = list(n["@type"]).map(String)[0] || null;
   if (!type) return null;
-  const out = { type, name: cut(n.headline || n.name, 400), author: list(n.author).map(nameOf).filter(Boolean).slice(0, 20), published: cut(n.datePublished || n.uploadDate || n.dateCreated, 40),
+  const distUrls = list(n.distribution).map((d) => (d && typeof d === "object" ? cut(d.contentUrl || d.url, 600) : null)).filter(Boolean).slice(0, 10);
+  const out = { type, name: cut(n.headline || n.name, 400), author: list(n.author || n.creator).map(nameOf).filter(Boolean).slice(0, 20), published: cut(n.datePublished || n.uploadDate || n.dateCreated, 40),
     modified: cut(n.dateModified, 40), publisher: nameOf(n.publisher), description: cut(n.description, 600), url: cut(n.url || (n.mainEntityOfPage && n.mainEntityOfPage["@id"]) || n["@id"], 600),
+    contentUrl: cut(n.contentUrl, 600), embedUrl: cut(n.embedUrl, 600), codeRepository: cut(n.codeRepository, 600),
+    identifier: typeof n.identifier === "string" ? cut(n.identifier, 200) : null, distribution: distUrls,
     duration: cut(n.duration, 40), language: cut(n.inLanguage, 20) };
   return Object.fromEntries(Object.entries(out).filter(([, v]) => v != null && !(Array.isArray(v) && !v.length)));
+}
+
+// Normalizes <link rel="alternate"> RSS/Atom/JSON feed discoveries.
+function normalizeFeeds(feeds) {
+  const seen = new Set(), out = [];
+  for (const f of (feeds || []).slice(0, 40)) {
+    const href = cut(f && (f.href || f.url), 1000), type = cut(f && f.type, 80);
+    if (!href || !/^https?:/i.test(href) || (type && !FEED_TYPES.test(type)) || seen.has(href)) continue;
+    seen.add(href);
+    out.push({ href, type: (type || "application/rss+xml").toLowerCase(), ...(cut(f && f.title, 200) ? { title: cut(f.title, 200) } : {}) });
+  }
+  return out;
+}
+
+// Read-only safe JSON.parse extraction of structured JSON data islands (#__NEXT_DATA__,
+// <script type="application/json">). Never executes page scripts.
+function extractDataIslands(islands) {
+  const out = [];
+  for (const raw of (islands || []).slice(0, 8)) {
+    const src = typeof raw === "string" ? { id: null, text: raw } : raw;
+    if (!src || typeof src.text !== "string" || !src.text.trim()) continue;
+    let parsed;
+    try { parsed = JSON.parse(src.text); } catch { continue; }
+    const hit = { id: cut(src.id, 80) || "json-island", title: null, description: null, author: null, published: null, url: null, mediaUrls: [] };
+    const seenUrls = new Set(), stack = [parsed];
+    for (let n = 0; stack.length && n < 2000; n++) {
+      const v = stack.pop();
+      if (!v || typeof v !== "object") continue;
+      if (Array.isArray(v)) { for (const x of v.slice(0, 60)) if (x && typeof x === "object") stack.push(x); continue; }
+      if (!hit.title && typeof (v.headline || v.title) === "string") hit.title = cut(v.headline || v.title, 400);
+      if (!hit.description && typeof (v.description || v.summary) === "string") hit.description = cut(v.description || v.summary, 600);
+      if (!hit.author && (typeof v.author === "string" || (v.author && typeof v.author.name === "string"))) hit.author = nameOf(v.author);
+      if (!hit.published && typeof (v.datePublished || v.publishedAt || v.createdAt) === "string") hit.published = cut(v.datePublished || v.publishedAt || v.createdAt, 40);
+      if (!hit.url && typeof (v.canonicalUrl || v.canonical || v.permalink) === "string" && /^https?:/i.test(v.canonicalUrl || v.canonical || v.permalink)) hit.url = cut(v.canonicalUrl || v.canonical || v.permalink, 1000);
+      for (const k of Object.keys(v)) {
+        const val = v[k];
+        if (typeof val === "string" && /^https?:\/\/.+\.(?:jpg|jpeg|png|webp|gif|mp4|webm|mp3|wav|pdf|csv|json|zip)(?:$|[?#])/i.test(val) && !seenUrls.has(val) && hit.mediaUrls.length < 30) {
+          seenUrls.add(val); hit.mediaUrls.push(val);
+        } else if (val && typeof val === "object") stack.push(val);
+      }
+    }
+    if (hit.title || hit.description || hit.author || hit.published || hit.url || hit.mediaUrls.length) out.push(hit);
+  }
+  return out;
+}
+
+// Extracts document, dataset, paper, and code-repository links (PDF/CSV/JSON/ZIP/arXiv/GitHub/DOI).
+function extractDocumentLinks(links) {
+  return [...new Set((links || []).filter((u) => typeof u === "string" && /^https?:/i.test(u) && DOC_LINK_RE.test(u)))].slice(0, 200);
 }
 
 // Every node of the page's JSON-LD blocks (a block may hold one node, a list, or an @graph).
@@ -14046,7 +14101,7 @@ function jsonLdNodes(blocks) {
 
 // The page's meta tags by family. metas: [{ key, content }] where key is the property, name or
 // itemprop as the page wrote it. citation_* tags may repeat (authors), so each is a list.
-function pageMetadata({ metas = [], jsonld = [], canonical = null, lang = null } = {}) {
+function pageMetadata({ metas = [], jsonld = [], canonical = null, lang = null, feeds = [], dataIslands = [] } = {}) {
   const og = {}, twitter = {}, citation = {}, article = {}, other = {};
   for (const m of (metas || []).slice(0, 400)) {
     const key = String((m && m.key) || "").trim().toLowerCase(), content = cut(m && m.content, 1000);
@@ -14058,20 +14113,24 @@ function pageMetadata({ metas = [], jsonld = [], canonical = null, lang = null }
     else if (/^(author|description|date|datepublished|keywords|publisher)$/.test(key) && !(key in other)) other[key] = content;
   }
   const keep = (o) => (Object.keys(o).length ? o : null);
-  return { canonical: cut(canonical, 1000), lang: /^[a-z]{2,3}(-[a-z0-9]{2,8})*$/i.test(String(lang || "")) ? String(lang) : null,
-    openGraph: keep(og), twitter: keep(twitter), article: keep(article), citation: keep(citation), meta: keep(other), jsonLd: jsonLdNodes(jsonld) };
+  const normFeeds = normalizeFeeds(feeds), islands = extractDataIslands(dataIslands);
+  return { canonical: cut(canonical, 1000) || (islands[0] && islands[0].url) || null,
+    lang: /^[a-z]{2,3}(-[a-z0-9]{2,8})*$/i.test(String(lang || "")) ? String(lang) : null,
+    openGraph: keep(og), twitter: keep(twitter), article: keep(article), citation: keep(citation), meta: keep(other),
+    jsonLd: jsonLdNodes(jsonld), ...(normFeeds.length ? { feeds: normFeeds } : {}), ...(islands.length ? { dataIslands: islands } : {}) };
 }
 
 // The title, author and date the page states, most specific source first: citation tags, then
-// JSON-LD for an article, then Open Graph and article tags, then the plain meta tags.
+// JSON-LD for an article/structured work, then Open Graph/Twitter/article tags, then plain meta and JSON islands.
 function pagePicks(meta) {
-  const c = meta.citation || {}, og = meta.openGraph || {}, art = meta.article || {}, o = meta.meta || {}, first = (k) => (c[k] || [])[0] || null;
-  const ld = (meta.jsonLd || []).find((n) => ARTICLE_TYPES.test(n.type)) || (meta.jsonLd || []).find((n) => n.name && (n.published || (n.author || []).length)) || {};
-  const authors = (c.citation_author || []).length ? c.citation_author : (ld.author || []).length ? ld.author : [/^https?:/i.test(art.author || "") ? null : art.author, o.author, first("dc.creator")].filter(Boolean).slice(0, 1);
-  return { title: first("citation_title") || ld.name || og.title || first("dc.title") || null,
+  const c = meta.citation || {}, og = meta.openGraph || {}, tw = meta.twitter || {}, art = meta.article || {}, o = meta.meta || {}, first = (k) => (c[k] || [])[0] || null;
+  const ld = (meta.jsonLd || []).find((n) => ARTICLE_TYPES.test(n.type)) || (meta.jsonLd || []).find((n) => STRUCTURED_TYPES.test(n.type) && n.name) || (meta.jsonLd || []).find((n) => n.name && (n.published || (n.author || []).length)) || {};
+  const isl = (meta.dataIslands || [])[0] || {};
+  const authors = (c.citation_author || []).length ? c.citation_author : (ld.author || []).length ? ld.author : [/^https?:/i.test(art.author || "") ? null : art.author, o.author, first("dc.creator"), isl.author].filter(Boolean).slice(0, 1);
+  return { title: first("citation_title") || ld.name || og.title || tw.title || first("dc.title") || isl.title || null,
     author: authors.length ? authors.slice(0, 8).join(", ") : null,
-    published: first("citation_publication_date") || first("citation_date") || first("citation_online_date") || ld.published || art.published_time || o.datepublished || o.date || first("dc.date") || null,
-    description: og.description || o.description || ld.description || null,
+    published: first("citation_publication_date") || first("citation_date") || first("citation_online_date") || ld.published || art.published_time || o.datepublished || o.date || first("dc.date") || isl.published || null,
+    description: og.description || tw.description || o.description || ld.description || isl.description || null,
     isArticle: !!((c.citation_title || []).length || ARTICLE_TYPES.test(ld.type || "") || /^article$/i.test(og.type || "")) };
 }
 
@@ -14103,10 +14162,32 @@ function pageRaw(s = {}) {
   const page = pageMetadata(s), pick = pagePicks(page);
   const site = String(s.host || "").replace(/^www\./, "") || null;
   const article = pick.isArticle || s.textFrom === "article";
+  const links = (s.links || []).slice(0, 1000);
+  const documents = extractDocumentLinks([...links, ...(s.media || []).map((m) => m && m.url), ...(page.jsonLd || []).flatMap((n) => [n.contentUrl, n.codeRepository, ...(n.distribution || [])])]);
+  const structure = s.structure && typeof s.structure === "object" ? s.structure : null;
   return { site, kind: "text", adapter: article ? "article" : "generic", selection: !!s.selection,
     title: pick.title || cut(s.title, 400), text: s.text || pick.description || null, textComplete: s.textCut ? false : true,
-    authorName: pick.author, postedAt: pick.published, pageUrl: s.url || null, links: (s.links || []).slice(0, 200),
-    items: (s.media || []).slice(0, 60), page: { ...page, textFrom: s.textFrom || null }, mediaFile: mediaFileLine(s.media) };
+    authorName: pick.author, postedAt: pick.published, pageUrl: s.url || null, links,
+    items: (s.media || []).slice(0, 500),
+    page: { ...page, textFrom: s.textFrom || null, ...(documents.length ? { documents } : {}), ...(structure ? { structure } : {}) },
+    mediaFile: mediaFileLine(s.media) };
+}
+
+// Universal site-agnostic manifest-*.jsonl record from any webpage's pageRaw summary.
+// Compatible with parseManifest/readManifest and bulk_intake_pipeline.py.
+function hashId(text) {
+  let h = 0x811c9dc5;
+  for (const c of new TextEncoder().encode(String(text || ""))) h = Math.imul(h ^ c, 0x01000193) >>> 0;
+  return h.toString(16).padStart(8, "0");
+}
+function pageManifestLine(raw, { seen = new Date().toISOString() } = {}) {
+  const r = raw && raw.page ? raw : pageRaw(raw || {});
+  const url = (r.page && r.page.canonical) || r.pageUrl || "";
+  const files = (r.items || []).filter((i) => i && mediaOffer(i).plain).map((i, idx) => ({ url: i.url, kind: i.kind || "file", name: `item-${idx + 1}` }));
+  return { format: "cmmns.page/1", id: `page-${hashId(url || r.title || seen)}`, site: r.site || "generic", adapter: r.adapter || "generic",
+    url: r.pageUrl || null, canonical: (r.page && r.page.canonical) || null, title: r.title || null, author: r.authorName || null,
+    posted: r.postedAt || null, text: r.text || null, files, documents: (r.page && r.page.documents) || [],
+    feeds: (r.page && r.page.feeds) || [], links: r.links || [], seen };
 }
 
 // The "Page metadata" lines of the .md sidecar: what the page said about itself, by family.
@@ -14117,6 +14198,8 @@ function pageLines(page) {
     for (const [k, v] of Object.entries(o || {}).slice(0, 30)) rows.push([`${label} ${k}`, Array.isArray(v) ? v.join("; ") : v]);
   }
   for (const n of page.jsonLd || []) rows.push([`JSON-LD ${n.type}`, [n.name, (n.author || []).join(", "), n.published, n.publisher, n.url].filter(Boolean).join(" | ") || null]);
+  for (const f of page.feeds || []) rows.push([`Feed (${f.type})`, f.title ? `${f.title}: ${f.href}` : f.href]);
+  for (const d of (page.documents || []).slice(0, 20)) rows.push(["Document link", d]);
   const out = rows.filter(([, v]) => v).map(([k, v]) => `- ${k}: ${v}`);
   return out.length ? ["## Page metadata", "", ...out, ""] : [];
 }
@@ -14140,7 +14223,7 @@ function captionTracks(json) {
 }
 const captionTrackLines = (tracks) => (tracks || []).map((t) => `${t.lang}${t.name ? ` (${t.name})` : ""}${t.auto ? ", made by speech recognition" : ""}`);
 
-return { SITE_ADAPTERS, adapterOf, jsonLdNodes, pageMetadata, pagePicks, mediaOffer, mediaFileLine, pageRaw, pageLines, captionTracks, captionTrackLines };
+return { SITE_ADAPTERS, adapterOf, normalizeFeeds, extractDataIslands, extractDocumentLinks, jsonLdNodes, pageMetadata, pagePicks, mediaOffer, mediaFileLine, pageRaw, pageManifestLine, pageLines, captionTracks, captionTrackLines };
 })();
 
 // ---- media-meta.js
@@ -15132,7 +15215,39 @@ const { postMeta, metaName } = M_media_meta;
 
 const LIKES_FORMAT = "cmmns.likes/1";
 const LIKES_SOURCE = "x-likes";
+const MANIFEST_SEQ_KEY = "pb.likes.manifestSeq.v1";
+const MANIFEST_FILE_RE = /^manifest(?:-[A-Za-z0-9_-]+)?\.jsonl$/i;
 const STAGES = Object.freeze(["parse", "pick", "dedupe", "name", "fetch", "hash", "sidecar"]);
+
+// Compact UTC stamp YYYYMMDDTHHMMSSZ for collision-free, lexicographically sortable manifest names.
+function utcStamp(now = new Date()) {
+  const d = now instanceof Date ? now : new Date(now);
+  const iso = Number.isFinite(d.getTime()) ? d.toISOString() : new Date().toISOString();
+  return iso.replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+}
+
+// Extracts the trailing numeric sequence index from any manifest-*.jsonl filename (or path).
+function parseManifestSeq(filename) {
+  const base = String(filename || "").split(/[\\/]/).pop() || "";
+  const m = /^manifest(?:-\d{8}T\d{6}Z)?-(\d+)(?: \(\d+\))?\.jsonl$/i.exec(base);
+  return m ? Math.max(0, Number.parseInt(m[1], 10) || 0) : 0;
+}
+
+// Guaranteed collision-free manifest filename compatible with manifest-*.jsonl globs and readers.
+function manifestFilename(seq, now = new Date()) {
+  const n = Math.max(1, Math.floor(Number(seq) || 1));
+  return `manifest-${utcStamp(now)}-${String(n).padStart(4, "0")}.jsonl`;
+}
+
+// Next monotonic manifest sequence number above stored storage state and existing download filenames.
+function nextManifestSeq(storedSeq = 0, existingNames = []) {
+  let max = Math.max(0, Math.floor(Number(storedSeq) || 0));
+  for (const name of existingNames || []) {
+    const n = parseManifestSeq(name);
+    if (n > max) max = n;
+  }
+  return max + 1;
+}
 
 // Is this X's likes list? By address (x.com/i/history/likes since October 2026, x.com/<user>/likes
 // before), else by the page's structure: the History title with a selected Likes tab, so a future move
@@ -15264,7 +15379,7 @@ function savesFilter(front, { likes = false, liked = null, since = "", until = "
   return !(since && day < since) && !(until && day > until);
 }
 
-return { LIKES_FORMAT, LIKES_SOURCE, STAGES, likesRoute, parseLikes, pickLikeFile, postKey, isKnown, likeMeta, fileName, sidecarName, manifestLine, streamsOf, noVideoNote, manifestText, parseManifest, parseArchiveLikes, missingLikes, likesState, checkpoint, resumable, admit, stageClock, savesFilter };
+return { LIKES_FORMAT, LIKES_SOURCE, MANIFEST_SEQ_KEY, MANIFEST_FILE_RE, STAGES, parseManifestSeq, manifestFilename, nextManifestSeq, likesRoute, parseLikes, pickLikeFile, postKey, isKnown, likeMeta, fileName, sidecarName, manifestLine, streamsOf, noVideoNote, manifestText, parseManifest, parseArchiveLikes, missingLikes, likesState, checkpoint, resumable, admit, stageClock, savesFilter };
 })();
 
 // ---- likes-sync.js
@@ -15406,16 +15521,17 @@ async function waitWhilePaused(shouldPause, shouldStop, sleep) {
 }
 
 // Automatically paginates every X Likes timeline page until exhaustion, stop, challenge, or rate-limit cap.
+// maxPages = 0 (default) paginates until timeline exhaustion with no arbitrary client-side page ceiling.
 async function paginateLikes({
   fetchPage,
   dedupIndex = createDedupIndex(),
   skipDuplicates = true,
   includeDuplicates = false,
   startCursor = null,
-  maxPages = 500,
+  maxPages = 0,
   initialBackoffMs = 1500,
   maxBackoffMs = 60000,
-  maxRateLimitRetries = 3,
+  maxRateLimitRetries = 6,
   onProgress = null,
   onItem = null,
   shouldPause = () => false,
@@ -15424,6 +15540,7 @@ async function paginateLikes({
   now = () => Date.now(),
 } = {}) {
   const items = [], visitedCursors = new Set();
+  const pageCap = Number(maxPages) > 0 ? Math.floor(Number(maxPages)) : Infinity;
   let cursor = startCursor, pagesFetched = 0, saved = 0, skippedDuplicates = 0, totalSeen = 0, stoppedReason = "exhausted", rateRetries = 0;
   const report = () => {
     const snap = { saved, skippedDuplicates, totalSeen, pagesFetched, nextCursor: cursor, stoppedReason };
@@ -15433,7 +15550,7 @@ async function paginateLikes({
   for (;;) {
     await waitWhilePaused(shouldPause, shouldStop, sleep);
     if (shouldStop()) { stoppedReason = "stopped"; break; }
-    if (pagesFetched >= maxPages) { stoppedReason = "max_pages"; break; }
+    if (pagesFetched >= pageCap) { stoppedReason = "max_pages"; break; }
     const res = await fetchPage(cursor);
     if (!res) { stoppedReason = "error"; break; }
     if (isChallengeResponse(res)) { stoppedReason = "challenge_required"; break; }
@@ -17257,7 +17374,10 @@ const AREA_IDS = ["place", "account", "posting", "coordination", "language", "so
 
 // Retention in days. The upper limits are what the logs keep at most (history.js keeps 60 days;
 // the connections and trail logs keep 30, so a longer history setting leaves those at 30).
-const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 }, seenDays: { min: 1, max: 365 }, threadCap: { min: 0, max: 5000 } };
+const RETENTION = {
+  historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 }, seenDays: { min: 1, max: 365 }, threadCap: { min: 0, max: 5000 },
+  likesManifestChunk: { min: 10, max: 50000 }, likesMaxPages: { min: 0, max: 50000 }, pageMaxFiles: { min: 0, max: 10000 },
+};
 
 const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
@@ -17294,7 +17414,9 @@ const DEFAULTS = Object.freeze({
   // Organize downloads into <site>/<posts|papers|audio|video|images>/ subfolders, off by default.
   mediaOrganizeByType: false,
   // Save all likes skips duplicates by default; users can opt in to re-saving duplicates.
-  likesSkipDuplicates: true,
+  // Bulk limits are configurable: likesManifestChunk rows per part, likesMaxPages (0 = unlimited),
+  // and pageMaxFiles for Save page (0 = unlimited).
+  likesSkipDuplicates: true, likesManifestChunk: 500, likesMaxPages: 0, pageMaxFiles: 100,
   // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
   mediaFolder: "CMMNS",
   // Saving straight into Downloads, with no folders, is its own switch, never an empty folder name.
@@ -17384,6 +17506,9 @@ function normalizeSettings(raw) {
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
     mediaSidecarReceipt: bool(s.mediaSidecarReceipt, DEFAULTS.mediaSidecarReceipt), mediaOrganizeByType: bool(s.mediaOrganizeByType, DEFAULTS.mediaOrganizeByType),
     likesSkipDuplicates: bool(s.likesSkipDuplicates, DEFAULTS.likesSkipDuplicates),
+    likesManifestChunk: days(s.likesManifestChunk, DEFAULTS.likesManifestChunk, RETENTION.likesManifestChunk),
+    likesMaxPages: days(s.likesMaxPages, DEFAULTS.likesMaxPages, RETENTION.likesMaxPages),
+    pageMaxFiles: days(s.pageMaxFiles, DEFAULTS.pageMaxFiles, RETENTION.pageMaxFiles),
     mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder) || DEFAULTS.mediaFolder,
     mediaToRoot: bool(s.mediaToRoot, DEFAULTS.mediaToRoot),
     protection: bool(s.protection, DEFAULTS.protection),

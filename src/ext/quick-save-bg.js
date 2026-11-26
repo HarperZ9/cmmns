@@ -68,14 +68,14 @@ globalThis.PBQuickBg = (() => {
 
   // Starts a browser download. { url, filename, site, fixExt } -> { id }. The file goes to
   // "<save folder>/<site>/<name>" inside Downloads, so thousands of saves stay in one tree.
-  async function download({ url, filename: name, site, fixExt, study = false, overwrite = false, library = null, subfolder = null }) {
+  async function download({ url, filename: name, site, fixExt, study = false, overwrite = false, library = null, subfolder = null, noSaveAs = false }) {
     if (!chrome.downloads) throw new Error("This browser did not give CMMNS the downloads permission.");
     const s = await settings();
     if (s.protection && /^https?:/i.test(url)) throw new Error(PROTECTED_SAVE);
     // Study saves go to "<save folder>/study/<site>/"; the reference library reads them first.
     const conflict = overwrite ? "overwrite" : "uniquify";
     const filename = name ? PB.savePath(s, site, study, library, subfolder) + name.replace(/[\\/]/g, "-") : null;
-    const opts = { url, saveAs: !!s.mediaAskWhere && !overwrite, conflictAction: conflict, ...(filename ? { filename } : {}) };
+    const opts = { url, saveAs: noSaveAs ? false : !!s.mediaAskWhere && !overwrite, conflictAction: conflict, ...(filename ? { filename } : {}) };
     pending.set(url, { fixExt: !!fixExt, filename, conflict });
     const id = await chrome.downloads.download(opts);
     if (id === undefined) throw new Error((chrome.runtime.lastError && chrome.runtime.lastError.message) || "The browser refused the download.");
@@ -138,7 +138,7 @@ globalThis.PBQuickBg = (() => {
 
   // Bytes the page made, saved through the worker's own address: a blob address where the worker has
   // one (Firefox's background page), else a data: address (Chrome's service worker; under 2 MB).
-  async function fromBytes({ bytes, mime, filename, site, study, overwrite, library, subfolder = null }) {
+  async function fromBytes({ bytes, mime, filename, site, study, overwrite, library, subfolder = null, noSaveAs = false }) {
     const b = Uint8Array.from(bytes || []);
     let url;
     if (typeof URL.createObjectURL === "function") url = URL.createObjectURL(new Blob([b], { type: mime }));
@@ -147,7 +147,21 @@ globalThis.PBQuickBg = (() => {
       let s = ""; for (let i = 0; i < b.length; i += 32768) s += String.fromCharCode(...b.subarray(i, i + 32768));
       url = `data:${mime || "application/octet-stream"};base64,${btoa(s)}`;
     }
-    return download({ url, filename, site, study, overwrite, library, subfolder });
+    return download({ url, filename, site, study, overwrite, library, subfolder, noSaveAs });
+  }
+
+  // Highest numeric sequence index among previously downloaded manifest-*.jsonl files.
+  async function maxManifestSeq() {
+    if (!chrome.downloads || !chrome.downloads.search) return { maxSeq: 0 };
+    try {
+      const items = await Promise.resolve(chrome.downloads.search({ filenameRegex: "manifest.*\\.jsonl$" }));
+      let maxSeq = 0;
+      for (const it of items || []) {
+        const n = PB.parseManifestSeq ? PB.parseManifestSeq(it && it.filename) : 0;
+        if (n > maxSeq) maxSeq = n;
+      }
+      return { maxSeq };
+    } catch { return { maxSeq: 0 }; }
   }
 
   // A protected item's reference: kept on the "Protected references" moodboard with its label.
@@ -174,6 +188,7 @@ globalThis.PBQuickBg = (() => {
     if (!msg || !sender.tab) return false;
     if (msg.type === "pb-qs-bytes") { fromBytes(msg).then(sendResponse, (e) => sendResponse({ error: e.message })); return true; }
     if (msg.type === "pb-qs-download") { download(msg).then(sendResponse, (e) => sendResponse({ error: e.message })); return true; }
+    if (msg.type === "pb-qs-max-manifest-seq") { maxManifestSeq().then(sendResponse, () => sendResponse({ maxSeq: 0 })); return true; }
     if (msg.type === "pb-qs-reference") { reference(msg.ref, msg.thumbs || []).then(sendResponse, (e) => sendResponse({ error: e.message })); return true; }
     return false;
   }

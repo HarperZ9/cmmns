@@ -21,7 +21,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   function alive() { if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) throw new Error(RELOAD); }
   async function viaBrowser(url, name, opts) {
     const { site, study, library, subfolder } = destOf(opts.dest);
-    const r = await msg({ type: "pb-qs-download", url, filename: name, site, study, library, subfolder, overwrite: !!opts.overwrite, fixExt: opts.fixExt || false });
+    const r = await msg({ type: "pb-qs-download", url, filename: name, site, study, library, subfolder, overwrite: !!opts.overwrite, noSaveAs: !!opts.noSaveAs, fixExt: opts.fixExt || false });
     if (!r || r.error) throw new Error(r && r.error ? r.error : "The browser did not start the download.");
     return r;
   }
@@ -36,7 +36,7 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
     try { r = await viaBrowser(url, name, o); }
     catch (e) {
       alive();
-      r = await PBQuickHandoff.send(bytes, mime, { filename: name, ...destOf(o.dest), overwrite: !!o.overwrite });
+      r = await PBQuickHandoff.send(bytes, mime, { filename: name, ...destOf(o.dest), overwrite: !!o.overwrite, noSaveAs: !!o.noSaveAs });
       if (!r || r.error) throw new Error(r && r.error ? r.error : e.message);
     } finally { setTimeout(() => URL.revokeObjectURL(url), 120000); }
     return (r && r.filename) || name;

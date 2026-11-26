@@ -6,10 +6,12 @@
 globalThis.PBLikes = globalThis.PBLikes || (() => {
   "use strict";
   if (!globalThis.PBQuickSites || !PBQuickSites.isX) return null;
-  const KEY = "pb.likes.v1", PART = 500, FLUSH_LINES = 25, FLUSH_MS = 10000, WIDTH = 4, FOLDER = "x-likes";
+  const KEY = "pb.likes.v1", FLUSH_LINES = 25, FLUSH_MS = 10000, WIDTH = 4, FOLDER = "x-likes";
   const listeners = [], pendingReqs = new Map();
-  let run = null, state = null, flushTimer = null, hasLikesTemplate = false, reqSeq = 0;
+  let run = null, state = null, flushTimer = null, flushChain = Promise.resolve(), hasLikesTemplate = false, reqSeq = 0;
   const clock = PB.stageClock();
+  const manifestChunkSize = () => (globalThis.PBSettings ? PBSettings.get().likesManifestChunk : 500) || 500;
+  const maxPagesSetting = () => (globalThis.PBSettings ? PBSettings.get().likesMaxPages : 0) || 0;
 
   const route = () => PB.likesRoute(location.href, { title: document.title, selectedTab: (document.querySelector('[role="tab"][aria-selected="true"]') || {}).textContent });
   const changed = () => { for (const f of listeners) try { f(status()); } catch (e) { console.warn("[cmmns] likes view", e); } };
@@ -23,11 +25,22 @@ globalThis.PBLikes = globalThis.PBLikes || (() => {
       includeDuplicates: run ? !!run.includeDuplicates : false, canAutoPaginate: hasLikesTemplate };
   }
 
+  async function maxDownloadManifestSeq() {
+    try {
+      if (!(globalThis.chrome && chrome.runtime && chrome.runtime.sendMessage)) return 0;
+      const r = await chrome.runtime.sendMessage({ type: "pb-qs-max-manifest-seq" });
+      return r && Number.isFinite(Number(r.maxSeq)) ? Math.max(0, Math.floor(Number(r.maxSeq))) : 0;
+    } catch { return 0; }
+  }
+
   async function load() {
     if (state) return state;
     const kept = (await chrome.storage.local.get(KEY))[KEY];
     const dedup = (await chrome.storage.local.get(PB.LIKES_DEDUP_KEY))[PB.LIKES_DEDUP_KEY];
-    state = { ...PB.likesState(kept), ids: [...((kept && kept.ids) || [])], part: (kept && kept.part) || 1,
+    const storedSeq = (await chrome.storage.local.get(PB.MANIFEST_SEQ_KEY))[PB.MANIFEST_SEQ_KEY];
+    const dlSeq = await maxDownloadManifestSeq();
+    const manifestSeq = Math.max(0, Number(storedSeq) || 0, Number(kept && kept.manifestSeq) || 0, Number(kept && kept.part > 1 ? kept.part - 1 : 0) || 0, dlSeq);
+    state = { ...PB.likesState(kept), ids: [...((kept && kept.ids) || [])], part: manifestSeq + 1, manifestSeq,
       partLines: [...((kept && kept.partLines) || [])], dedup: PB.createDedupIndex(dedup || { ids: (kept && kept.ids) || [] }),
       stoppedReason: (kept && kept.stoppedReason) || null };
     return state;
@@ -35,7 +48,7 @@ globalThis.PBLikes = globalThis.PBLikes || (() => {
   async function persist() {
     try {
       const { dedup, ...rest } = state;
-      await chrome.storage.local.set({ [KEY]: { ...rest, lines: [] }, [PB.LIKES_DEDUP_KEY]: dedup.serialize() });
+      await chrome.storage.local.set({ [KEY]: { ...rest, lines: [] }, [PB.LIKES_DEDUP_KEY]: dedup.serialize(), [PB.MANIFEST_SEQ_KEY]: state.manifestSeq || 0 });
     } catch (e) { console.warn("[cmmns] likes: the record could not be kept in this browser", e); }
   }
 
@@ -103,14 +116,29 @@ globalThis.PBLikes = globalThis.PBLikes || (() => {
   window.addEventListener("message", onMessage);
   window.postMessage({ source: "radar-likes-template-ask" }, location.origin);
 
-  async function flush() {
+  async function flushOnce() {
     if (!state || !state.partLines.length) return;
-    const name = `manifest-${String(state.part).padStart(4, "0")}.jsonl`, bytes = new TextEncoder().encode(PB.manifestText(state.partLines));
-    try { await PBQuickSave.saveText(bytes, "application/x-ndjson", name, "x", false, { library: FOLDER, overwrite: true }); }
-    catch (e) { console.warn("[cmmns] likes: the manifest was not written", e); if (run) run.why = `the manifest was not written: ${e.message}`; }
-    if (state.partLines.length >= PART) { state.part++; state.partLines = []; }
+    const chunk = Math.max(1, manifestChunkSize());
+    while (state.partLines.length) {
+      const batch = state.partLines.splice(0, chunk);
+      const seq = (state.manifestSeq = (Number(state.manifestSeq) || 0) + 1);
+      state.part = seq + 1;
+      try { await chrome.storage.local.set({ [PB.MANIFEST_SEQ_KEY]: seq }); } catch { /* best effort before write */ }
+      const name = PB.manifestFilename(seq), bytes = new TextEncoder().encode(PB.manifestText(batch));
+      try { await PBQuickSave.saveText(bytes, "application/x-ndjson", name, "x", false, { library: FOLDER, overwrite: false, noSaveAs: true }); }
+      catch (e) {
+        state.partLines.unshift(...batch);
+        console.warn("[cmmns] likes: the manifest was not written", e);
+        if (run) run.why = `the manifest was not written: ${e.message}`;
+        break;
+      }
+    }
     state.checkpoint = { ...(state.checkpoint || {}), scrollY: Math.round(scrollY), status: run ? run.status : "stopped", at: new Date().toISOString() };
     await persist();
+  }
+  function flush() {
+    flushChain = flushChain.then(flushOnce, flushOnce);
+    return flushChain;
   }
 
   async function savePost(line) {
@@ -153,11 +181,14 @@ globalThis.PBLikes = globalThis.PBLikes || (() => {
 
   async function paginate(opts = {}) {
     if (!run || !hasLikesTemplate) return null;
+    const savedCursor = opts.startCursor !== undefined ? opts.startCursor : (state && state.checkpoint && state.checkpoint.cursor) || null;
     const res = await PB.paginateLikes({
       fetchPage: askLikesPage,
       dedupIndex: state.dedup,
       skipDuplicates: !run.includeDuplicates,
       includeDuplicates: run.includeDuplicates,
+      startCursor: savedCursor,
+      maxPages: opts.maxPages ?? maxPagesSetting(),
       initialBackoffMs: opts.initialBackoffMs ?? 1500,
       maxBackoffMs: opts.maxBackoffMs ?? 60000,
       shouldPause: () => !run || run.status === "paused" || (run.queue.length + run.busy > 12),
@@ -173,7 +204,12 @@ globalThis.PBLikes = globalThis.PBLikes || (() => {
         if (state.partLines.length % FLUSH_LINES === 0) flush();
         changed();
       },
-      onProgress: (snap) => { if (run) { run.stoppedReason = snap.stoppedReason; state.stoppedReason = snap.stoppedReason; } changed(); },
+      onProgress: (snap) => {
+        if (run) { run.stoppedReason = snap.stoppedReason; state.stoppedReason = snap.stoppedReason; }
+        state.checkpoint = { ...(state.checkpoint || {}), cursor: snap.nextCursor || null };
+        persist();
+        changed();
+      },
     });
     if (run && run.status !== "stopped") {
       run.stoppedReason = res.stoppedReason; state.stoppedReason = res.stoppedReason;

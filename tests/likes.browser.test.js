@@ -14,11 +14,13 @@ import { makePost, likesPageHtml, timelineAnswer } from "./likes-fixture.js";
 
 const EXT = join(import.meta.dirname, "..", "src", "ext");
 const SCRIPTS = ["core.bundle.js", "guard.js", "quick-toast.js", "quick-resolve.js", "quick-instagram.js", "quick-sites.js", "quick-stream.js", "quick-gif.js", "quick-saved.js", "quick-handoff.js", "quick-fetch.js", "quick-save.js", "quick-capture.js", "capture-sites.js", "full-capture.js", "likes.js", "likes-scroll.js", "likes-ui.js"];
-const STUB = `globalThis.__dl = [];
+const STUB = `globalThis.__dl = JSON.parse(localStorage.getItem("__dl") || "[]");
 globalThis.chrome = { runtime: { id: "test", sendMessage: async (m) => {
+  if (m.type === "pb-qs-max-manifest-seq") return { maxSeq: 0 };
   if (m.type !== "pb-qs-download") return { error: "unexpected " + m.type };
   const bytes = new Uint8Array(await (await fetch(m.url)).arrayBuffer());
-  __dl.push({ filename: m.filename, site: m.site, library: m.library || null, overwrite: !!m.overwrite, text: new TextDecoder().decode(bytes) });
+  __dl.push({ filename: m.filename, site: m.site, library: m.library || null, overwrite: !!m.overwrite, noSaveAs: !!m.noSaveAs, text: new TextDecoder().decode(bytes) });
+  localStorage.setItem("__dl", JSON.stringify(__dl));
   return { id: __dl.length }; } },
   storage: { local: {
     get: async (k) => { const all = JSON.parse(localStorage.getItem("__store") || "{}"); return k == null ? all : { [k]: all[k] }; },
@@ -65,7 +67,7 @@ async function withLikes(fn, failAfter = { n: Infinity }) {
   } finally { stop.done = true; await server; cdp.close(); }
 }
 
-const lines = (dl) => dl.filter((d) => /^manifest-\d+\.jsonl$/.test(d.filename)).reduce((m, d) => m.set(d.filename, d.text), new Map());
+const lines = (dl) => dl.filter((d) => /^manifest(?:-[A-Za-z0-9_-]+)?\.jsonl$/i.test(d.filename)).reduce((m, d) => m.set(d.filename, d.text), new Map());
 
 test("Save all likes: 200 entries, duplicates and earlier saves skipped, the manifest written, a reload resumes", { skip: browserSkip, timeout: 180000 }, () => withLikes(async (s) => {
   await s.open();
@@ -92,10 +94,12 @@ test("Save all likes: 200 entries, duplicates and earlier saves skipped, the man
   assert.equal(st.duplicate, 30);
   assert.equal(st.found, 190, "each post counted once, across the reload and the ten drawn again");
   const dl = await s.js("__dl"), parts = lines(dl);
+  const manifestDls = dl.filter((d) => /^manifest(?:-[A-Za-z0-9_-]+)?\.jsonl$/i.test(d.filename));
+  assert.equal(new Set(manifestDls.map((d) => d.filename)).size, manifestDls.length, "every flushed manifest file has a strictly unique filename");
   const listed = [...parts.values()].flatMap((t) => t.trim().split("\n").map((l) => JSON.parse(l)));
   assert.equal(listed.length, 160);
   assert.equal(new Set(listed.map((l) => l.id)).size, 160, "no post listed twice across the reload");
-  assert.ok(dl.every((d) => d.library === "x-likes" && d.overwrite), "the manifest goes to the x-likes library folder");
+  assert.ok(dl.every((d) => d.library === "x-likes" && !d.overwrite && d.noSaveAs), "the manifest goes to x-likes with conflictAction uniquify and saveAs false");
   assert.match(listed[0].files[0].url, /^https:\/\/pbs\.twimg\.com\/media\/L\d+\?format=jpg&name=orig$/);
   assert.ok(!listed.some((l) => UNIQUE.slice(150, 180).some((p) => p.id === l.id)), "earlier saves are not listed");
 
