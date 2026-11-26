@@ -20,7 +20,10 @@ export const AREA_IDS = ["place", "account", "posting", "coordination", "languag
 
 // Retention in days. The upper limits are what the logs keep at most (history.js keeps 60 days;
 // the connections and trail logs keep 30, so a longer history setting leaves those at 30).
-export const RETENTION = { historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 }, seenDays: { min: 1, max: 365 }, threadCap: { min: 0, max: 5000 } };
+export const RETENTION = {
+  historyDays: { min: 1, max: 60 }, aboutDays: { min: 1, max: 30 }, seenDays: { min: 1, max: 365 }, threadCap: { min: 0, max: 5000 },
+  likesManifestChunk: { min: 10, max: 50000 }, likesMaxPages: { min: 0, max: 50000 }, pageMaxFiles: { min: 0, max: 10000 },
+};
 
 export const DEFAULTS = Object.freeze({
   paused: false, feeds: true, auto: true, sites: {}, areas: {},
@@ -57,7 +60,9 @@ export const DEFAULTS = Object.freeze({
   // Organize downloads into <site>/<posts|papers|audio|video|images>/ subfolders, off by default.
   mediaOrganizeByType: false,
   // Save all likes skips duplicates by default; users can opt in to re-saving duplicates.
-  likesSkipDuplicates: true,
+  // Bulk limits are configurable: likesManifestChunk rows per part, likesMaxPages (0 = unlimited),
+  // and pageMaxFiles for Save page (0 = unlimited).
+  likesSkipDuplicates: true, likesManifestChunk: 500, likesMaxPages: 0, pageMaxFiles: 100,
   // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
   mediaFolder: "CMMNS",
   // Saving straight into Downloads, with no folders, is its own switch, never an empty folder name.
@@ -147,6 +152,9 @@ export function normalizeSettings(raw) {
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
     mediaSidecarReceipt: bool(s.mediaSidecarReceipt, DEFAULTS.mediaSidecarReceipt), mediaOrganizeByType: bool(s.mediaOrganizeByType, DEFAULTS.mediaOrganizeByType),
     likesSkipDuplicates: bool(s.likesSkipDuplicates, DEFAULTS.likesSkipDuplicates),
+    likesManifestChunk: days(s.likesManifestChunk, DEFAULTS.likesManifestChunk, RETENTION.likesManifestChunk),
+    likesMaxPages: days(s.likesMaxPages, DEFAULTS.likesMaxPages, RETENTION.likesMaxPages),
+    pageMaxFiles: days(s.pageMaxFiles, DEFAULTS.pageMaxFiles, RETENTION.pageMaxFiles),
     mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder) || DEFAULTS.mediaFolder,
     mediaToRoot: bool(s.mediaToRoot, DEFAULTS.mediaToRoot),
     protection: bool(s.protection, DEFAULTS.protection),

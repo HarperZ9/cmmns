@@ -51,7 +51,7 @@ globalThis.PBHandoffBg = (() => {
     }
     const revoke = () => (local ? URL.revokeObjectURL(url) : chrome.runtime.sendMessage({ target: "pb-offscreen", type: "revoke", url }).catch(() => {}));
     try {
-      const r = await PBQuickBg.download({ url, filename: msg.filename, site: msg.site, study: msg.study, overwrite: msg.overwrite, library: msg.library });
+      const r = await PBQuickBg.download({ url, filename: msg.filename, site: msg.site, study: msg.study, overwrite: msg.overwrite, library: msg.library, subfolder: msg.subfolder, noSaveAs: !!msg.noSaveAs });
       finished(r.id).then(revoke);
       return r;
     } catch (e) { revoke(); throw e; }

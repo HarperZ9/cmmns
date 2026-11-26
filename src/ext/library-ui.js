@@ -9,7 +9,7 @@
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const CAP_KEY = "pb.library.cap";
   let bar = null, here = location.href, auto = false, cap = PB.LIBRARY_CAP;
-  try { chrome.storage.local.get(CAP_KEY).then((g) => { if (Number(g[CAP_KEY]) > 0) cap = Number(g[CAP_KEY]); }).catch(() => {}); } catch { /* storage unavailable */ }
+  try { chrome.storage.local.get(CAP_KEY).then((g) => { if (g[CAP_KEY] !== undefined && Number(g[CAP_KEY]) >= 0) cap = Number(g[CAP_KEY]); }).catch(() => {}); } catch { /* storage unavailable */ }
   const on = () => !globalThis.PBSettings || PBSettings.get().mediaButtons !== false;
 
   function button(label, title, fn) {
@@ -29,8 +29,12 @@
   function autoControls(row, s) {
     if (!globalThis.PBLibraryScroll || !s.running) return;
     const input = el("input", "pb-lib-cap");
-    input.type = "number"; input.min = "1"; input.value = String(cap); input.title = "Stop after this many posts are saved"; input.disabled = auto;
-    input.addEventListener("change", () => { cap = Math.max(1, Number(input.value) || PB.LIBRARY_CAP); try { chrome.storage.local.set({ [CAP_KEY]: cap }); } catch { /* kept for this page */ } });
+    input.type = "number"; input.min = "0"; input.value = String(cap); input.title = "Stop after this many posts are saved (0 means no cap)"; input.disabled = auto;
+    input.addEventListener("change", () => {
+      const n = Number(input.value);
+      cap = Number.isFinite(n) && n >= 0 ? Math.floor(n) : PB.LIBRARY_CAP;
+      try { chrome.storage.local.set({ [CAP_KEY]: cap }); } catch { /* kept for this page */ }
+    });
     const go = button(auto ? "Scrolling" : PBLibraryScroll.LABEL, "Scrolls the page at a reading pace until the end of the feed, the cap, or Stop", () => scroll());
     go.disabled = auto;
     row.append(el("span", "pb-lib-up", "up to"), input, go);

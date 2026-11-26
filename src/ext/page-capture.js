@@ -11,8 +11,8 @@ globalThis.PBPageCapture = globalThis.PBPageCapture || (() => {
   const SKIP = "nav, header, footer, aside, form, script, style, noscript, template, [role=navigation], [role=banner], [role=contentinfo], [aria-hidden=true], daylight-toast, .dc-dl";
   const ARTICLE = 'article, [itemprop="articleBody"], [role="article"]', MAIN = 'main, [role="main"]';
   const BLOCK = "p, div, li, h1, h2, h3, h4, h5, h6, blockquote, pre, td, th, figcaption, section, article, dt, dd, summary";
-  const FILE_LINK = /\.(pdf|mp3|m4a|wav|flac|ogg|oga|opus|mp4|m4v|webm|mov|gif|png|jpe?g|webp|avif|svg|csv|json|zip)(?:$|[?#])/i;
-  const TEXT_MAX = 200000, MAX_FILES = 24;
+  const FILE_LINK = /\.(pdf|mp3|m4a|wav|flac|ogg|oga|opus|mp4|m4v|webm|mov|gif|png|jpe?g|webp|avif|svg|csv|tsv|json|jsonl|zip|parquet)(?:$|[?#])/i;
+  const TEXT_MAX = 500000, DEFAULT_MAX_FILES = 100;
   const abs = (u) => { try { return new URL(u, location.href).href; } catch { return null; } };
 
   function metas() {
@@ -20,6 +20,30 @@ globalThis.PBPageCapture = globalThis.PBPageCapture || (() => {
       .map((m) => ({ key: m.getAttribute("property") || m.getAttribute("name") || m.getAttribute("itemprop"), content: m.getAttribute("content") }));
   }
   const jsonld = () => [...document.querySelectorAll('script[type="application/ld+json"]')].slice(0, 12).map((s) => (s.textContent || "").slice(0, 200000));
+  function feeds() {
+    return [...document.querySelectorAll('link[rel~="alternate"][type]')].slice(0, 30)
+      .map((l) => ({ href: abs(l.getAttribute("href")), type: l.getAttribute("type"), title: l.getAttribute("title") || null }))
+      .filter((f) => f.href && /rss|atom|feed\+json/i.test(String(f.type || "")));
+  }
+  function dataIslands() {
+    return [...document.querySelectorAll('script#__NEXT_DATA__, script[type="application/json"]')].slice(0, 8)
+      .map((s) => ({ id: s.id || s.getAttribute("data-island") || null, text: (s.textContent || "").slice(0, 200000) }))
+      .filter((x) => x.text.trim().startsWith("{") || x.text.trim().startsWith("["));
+  }
+  function structureOf(root) {
+    const clean = (s) => String(s || "").replace(/\s+/g, " ").trim();
+    const headings = [...root.querySelectorAll("h1, h2, h3, h4, h5, h6")].filter((h) => !h.closest(SKIP)).slice(0, 100)
+      .map((h) => ({ level: Number(h.tagName.slice(1)), text: clean(h.textContent).slice(0, 300) })).filter((h) => h.text);
+    const codeBlocks = [...root.querySelectorAll("pre")].filter((p) => !p.closest(SKIP)).slice(0, 60)
+      .map((p) => { const c = p.querySelector("code"); const m = /language-([a-z0-9_+-]+)/i.exec((c && c.className) || p.className || ""); return { lang: m ? m[1] : null, text: String(p.textContent || "").trim().slice(0, 8000) }; })
+      .filter((b) => b.text);
+    const tables = [...root.querySelectorAll("table")].filter((t) => !t.closest(SKIP)).slice(0, 20).map((t) => {
+      const headers = [...t.querySelectorAll("thead th, tr:first-child th")].slice(0, 30).map((th) => clean(th.textContent).slice(0, 120));
+      const rows = [...t.querySelectorAll("tbody tr, tr")].slice(0, 100).map((tr) => [...tr.querySelectorAll("td")].slice(0, 30).map((td) => clean(td.textContent).slice(0, 200))).filter((r) => r.length);
+      return { headers, rows };
+    }).filter((t) => t.headers.length || t.rows.length);
+    return headings.length || codeBlocks.length || tables.length ? { headings, codeBlocks, tables } : null;
+  }
 
   // The block a save reads: the one the pointer or selection sits in, else the page's longest
   // article, else its main block, else the body. Returns [element, "article" | "main" | "body"].
@@ -68,10 +92,10 @@ globalThis.PBPageCapture = globalThis.PBPageCapture || (() => {
       if (!url || !/^https?:/i.test(url) || a.closest(SKIP) || (within && !within(a)) || !(a.hasAttribute("download") || FILE_LINK.test(url))) continue;
       add({ kind: PB.mediaKindOf("", url) || "file", url, link: true }, (a.textContent || "").trim().slice(0, 200), null, null);
     }
-    return out.slice(0, 60);
+    return out.slice(0, 500);
   }
 
-  const linksOf = (root) => [...new Set([...root.querySelectorAll("a[href]")].filter((a) => !a.closest(SKIP)).map((a) => abs(a.getAttribute("href"))).filter((u) => u && /^https?:/i.test(u)))].slice(0, 200);
+  const linksOf = (root) => [...new Set([...root.querySelectorAll("a[href]")].filter((a) => !a.closest(SKIP)).map((a) => abs(a.getAttribute("href"))).filter((u) => u && /^https?:/i.test(u)))].slice(0, 1000);
 
   // What the page side read, for PB.pageRaw. { at, selection, el }: the point, the selected words.
   function read({ at = null, selection = null, el = null } = {}) {
@@ -83,7 +107,8 @@ globalThis.PBPageCapture = globalThis.PBPageCapture || (() => {
     const body = sel ? { text: sel, cut: false } : textOf(root), found = sel && !range ? [] : mediaOf(root, range ? (n) => range.intersectsNode(n) : null);
     const canon = document.querySelector('link[rel="canonical"]');
     return { targets: found.map((f) => f.target), summary: { url: location.href, host: location.hostname, title: document.title || null, text: body.text, textCut: body.cut, textFrom: sel ? "selection" : from, selection: !!sel,
-      metas: metas(), jsonld: jsonld(), canonical: canon ? abs(canon.getAttribute("href")) : null, lang: document.documentElement.getAttribute("lang"), media: found.map((f) => f.item), links: linksOf(root) } };
+      metas: metas(), jsonld: jsonld(), feeds: feeds(), dataIslands: dataIslands(), structure: sel ? null : structureOf(root),
+      canonical: canon ? abs(canon.getAttribute("href")) : null, lang: document.documentElement.getAttribute("lang"), media: found.map((f) => f.item), links: linksOf(root) } };
   }
 
   // The raw record alone (a note: the text, the page's metadata and the media's addresses).
@@ -97,12 +122,13 @@ globalThis.PBPageCapture = globalThis.PBPageCapture || (() => {
   // "Save page": each plain file first, then one note that lists every file and what became of it.
   async function files(r, p) {
     const base = PB.pageRaw(r.summary), names = [];
+    const maxFiles = p && p.pageMaxFiles === 0 ? Infinity : (p && Number(p.pageMaxFiles)) || DEFAULT_MAX_FILES;
     let n = 0;
     for (const [i, t] of r.targets.entries()) {
       const item = r.summary.media[i], offer = PB.mediaOffer(item);
       if (!offer.plain) { item.file = `not saved (${offer.reason})`; continue; }
       if (p.protection) { item.file = "not saved (source protection is on, so no file was asked for)"; continue; }
-      if (++n > MAX_FILES) { item.file = `not saved (over the ${MAX_FILES} files one page save takes)`; continue; }
+      if (++n > maxFiles) { item.file = `not saved (over the ${maxFiles} files one page save takes)`; continue; }
       PBQuickToast.show(`Saving the page's files: ${n}`, { stay: 0 });
       const got = await PBQuickSave.start({ ...t, meta: { ...base, kind: "media", alt: item.alt } }, { quiet: true, oneSidecar: true, title: base.title, index: i, total: r.targets.length });
       const name = (got.names || [])[0] || (got.already && (/as (.+?)\.?$/.exec(got.line || "") || [])[1]) || null;
@@ -122,5 +148,16 @@ globalThis.PBPageCapture = globalThis.PBPageCapture || (() => {
     return record.text || record.items.length ? { raw: record, names } : null;
   }
 
-  return Object.freeze({ read, raw, save, blockOf, textOf, mediaOf });
+  // Exports any page's structured record as a collision-free manifest-*.jsonl file (saveAs: false, uniquify).
+  async function exportManifest(info = {}, { library = "web-pages" } = {}) {
+    const r = read(info), line = PB.pageManifestLine(PB.pageRaw(r.summary));
+    const stored = (await chrome.storage.local.get(PB.MANIFEST_SEQ_KEY))[PB.MANIFEST_SEQ_KEY] || 0;
+    const seq = Math.max(0, Number(stored) || 0) + 1;
+    await chrome.storage.local.set({ [PB.MANIFEST_SEQ_KEY]: seq });
+    const name = PB.manifestFilename(seq), bytes = new TextEncoder().encode(JSON.stringify(line) + "\n");
+    const written = await PBQuickSave.saveText(bytes, "application/x-ndjson", name, line.site, false, { library, overwrite: false, noSaveAs: true });
+    return { filename: written || name, seq, line };
+  }
+
+  return Object.freeze({ read, raw, save, exportManifest, blockOf, textOf, mediaOf, feeds, dataIslands, structureOf });
 })();

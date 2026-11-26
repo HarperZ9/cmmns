@@ -33,13 +33,19 @@
   }
   PBSettings.onChange(sites);
   sites();
-  // How many comments a save opens up to; 0 keeps only those the page shows.
-  const capLabel = el("label", { class: "switch" }), capText = el("span", {}, "Comments to open up to");
-  capText.append(el("span", { class: "hint" }, "200 by default, at most 5000. 0 saves only the comments the page already shows."));
-  const cap = el("input", { type: "number", min: String(PB.RETENTION.threadCap.min), max: String(PB.RETENTION.threadCap.max) });
-  cap.value = s.threadCap;
-  cap.addEventListener("change", () => save({ threadCap: cap.value }).then((n) => { if (n) cap.value = n.threadCap; }));
-  capLabel.append(capText, cap);
+  // Configurable bulk limits: thread comments, page files, and likes manifest part size.
+  const numRow = (title, hint, key, range, val) => {
+    const l = el("label", { class: "switch" }), t = el("span", {}, title);
+    t.append(el("span", { class: "hint" }, hint));
+    const inp = el("input", { type: "number", min: String(range.min), max: String(range.max) });
+    inp.value = val;
+    inp.addEventListener("change", () => save({ [key]: inp.value }).then((n) => { if (n) inp.value = n[key]; }));
+    l.append(t, inp);
+    return l;
+  };
+  const capLabel = numRow("Comments to open up to", "200 by default, at most 5000. 0 saves only the comments the page already shows.", "threadCap", PB.RETENTION.threadCap, s.threadCap);
+  const pageFilesLabel = numRow("Files saved per page", "100 by default, at most 10000. 0 saves every plain file offered by the page.", "pageMaxFiles", PB.RETENTION.pageMaxFiles, s.pageMaxFiles);
+  const manifestChunkLabel = numRow("Likes per manifest part", "500 by default, at most 50000. Each part gets a unique manifest-*.jsonl filename.", "likesManifestChunk", PB.RETENTION.likesManifestChunk, s.likesManifestChunk);
   document.getElementById("downloads").append(label,
     switchRow("Save straight into Downloads", "Off by default. On, files go into Downloads itself, with no folder for CMMNS or for each site.", s.mediaToRoot, (on) => save({ mediaToRoot: on })),
     switchRow("Download control on pictures and videos", "On by default. Rest the pointer on a picture, GIF or video for a moment and a Download button shows in its corner, even where the site blocks right-click.", s.hoverDownload, (on) => save({ hoverDownload: on })),
@@ -54,5 +60,5 @@
     switchRow("Skip duplicate likes by default", "On by default: Save all likes skips posts and files already saved unless you opt in.", s.likesSkipDuplicates, (on) => save({ likesSkipDuplicates: on })),
     switchRow("Save the post's comments with it", "On by default: every comment the page shows, as a .thread.json file beside the note, with how many the site counted and how many were saved.", s.threadCapture, (on) => save({ threadCapture: on })),
     switchRow("Open more comments while saving", "On by default, on the post's own page: one \"more replies\" at a time, a second or two apart, with Stop on the notice. Source protection holds it off.", s.threadExpand, (on) => save({ threadExpand: on })),
-    capLabel);
+    capLabel, pageFilesLabel, manifestChunkLabel);
 })().catch((e) => console.error("[cmmns] download options failed", e));

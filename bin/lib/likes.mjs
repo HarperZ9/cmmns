@@ -7,7 +7,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, relative } from "node:path";
-import { parseManifest, parseArchiveLikes, missingLikes, likeMeta, postKey, stageClock, streamsOf, noVideoNote } from "../../src/core/likes.js";
+import { parseManifest, parseArchiveLikes, missingLikes, likeMeta, postKey, stageClock, streamsOf, noVideoNote, MANIFEST_FILE_RE } from "../../src/core/likes.js";
 import { sidecarMarkdown } from "../../src/core/media-meta.js";
 import { sidecarRoutingMeta } from "../../src/core/download-route.js";
 import { sidecarReceiptSidecars } from "../../src/core/sidecar-receipt.js";
@@ -110,15 +110,15 @@ async function savePost(line, ctx) {
   if (streamsOf(line).length) { ctx.counts.noVideo++; ctx.noVideo.push(line.id); } else ctx.counts.saved++;
 }
 
-// A manifest file, or the folder of manifest-NNNN.jsonl parts the page writes.
+// A manifest file, or the folder of manifest-*.jsonl parts the page writes.
 export function readManifest(path) {
   if (!statSync(path).isDirectory()) return parseManifest(readFileSync(path, "utf8"));
-  return readdirSync(path).filter((n) => /^manifest(-\d+)?\.jsonl$/.test(n)).sort().flatMap((n) => parseManifest(readFileSync(join(path, n), "utf8")));
+  return readdirSync(path).filter((n) => MANIFEST_FILE_RE.test(n)).sort().flatMap((n) => parseManifest(readFileSync(join(path, n), "utf8")));
 }
 
 const flagOf = (argv, k, d = null) => { const i = argv.indexOf(`--${k}`); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[i + 1] : d; };
 // The one argument that is not a flag or a flag's value (argv[0] is "fetch" or "missing").
-const positional = (argv) => argv.find((a, i) => i > 0 && !a.startsWith("--") && !/^--(dir|jobs|archive)$/.test(argv[i - 1] || ""));
+const positional = (argv) => argv.find((a, i) => i > 0 && !a.startsWith("--") && !/^--(dir|jobs|archive|idle-seconds)$/.test(argv[i - 1] || ""));
 const rootOf = (argv) => flagOf(argv, "dir") || join(homedir(), "Downloads", saveRoot());
 
 // The posts saved without their video, by address: each is saved whole from its own page.
@@ -138,6 +138,8 @@ export async function fetchLikes(argv, { env = process.env, log = (s) => process
     counts: { posts: 0, saved: 0, noVideo: 0, duplicate: 0, failed: 0, files: 0, sameBytes: 0, failedFiles: 0 } };
   ctx.clock.add("index", performance.now() - t0, Math.max(1, index.known.size));
   const done = new Set(), watch = argv.includes("--watch");
+  const idleRaw = flagOf(argv, "idle-seconds");
+  const idleLimit = idleRaw === null ? 300 : Number(idleRaw) > 0 ? Math.ceil(Number(idleRaw) / 2) : Infinity;
   let idle = 0;
   try {
     for (;;) {
@@ -148,7 +150,7 @@ export async function fetchLikes(argv, { env = process.env, log = (s) => process
       log(`\r${ctx.counts.saved} saved, ${ctx.counts.noVideo} saved without video, ${ctx.counts.duplicate} already saved, ${ctx.counts.failed} failed, ${(ctx.bytes / 1048576).toFixed(1)} MB   `);
       if (!watch) break;
       idle = lines.length ? 0 : idle + 1;
-      if (idle > 300) break;   // ten minutes with nothing new
+      if (idle > idleLimit) break;
       await new Promise((r) => setTimeout(r, 2000));
     }
   } finally { closeAll(); try { writeFileSync(index.cachePath, JSON.stringify(index.cache)); } catch (e) { log(`\nthe hash cache was not written: ${e.message}\n`); } }

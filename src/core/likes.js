@@ -10,7 +10,39 @@ import { postMeta, metaName } from "./media-meta.js";
 
 export const LIKES_FORMAT = "cmmns.likes/1";
 export const LIKES_SOURCE = "x-likes";
+export const MANIFEST_SEQ_KEY = "pb.likes.manifestSeq.v1";
+export const MANIFEST_FILE_RE = /^manifest(?:-[A-Za-z0-9_-]+)?\.jsonl$/i;
 export const STAGES = Object.freeze(["parse", "pick", "dedupe", "name", "fetch", "hash", "sidecar"]);
+
+// Compact UTC stamp YYYYMMDDTHHMMSSZ for collision-free, lexicographically sortable manifest names.
+function utcStamp(now = new Date()) {
+  const d = now instanceof Date ? now : new Date(now);
+  const iso = Number.isFinite(d.getTime()) ? d.toISOString() : new Date().toISOString();
+  return iso.replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+}
+
+// Extracts the trailing numeric sequence index from any manifest-*.jsonl filename (or path).
+export function parseManifestSeq(filename) {
+  const base = String(filename || "").split(/[\\/]/).pop() || "";
+  const m = /^manifest(?:-\d{8}T\d{6}Z)?-(\d+)(?: \(\d+\))?\.jsonl$/i.exec(base);
+  return m ? Math.max(0, Number.parseInt(m[1], 10) || 0) : 0;
+}
+
+// Guaranteed collision-free manifest filename compatible with manifest-*.jsonl globs and readers.
+export function manifestFilename(seq, now = new Date()) {
+  const n = Math.max(1, Math.floor(Number(seq) || 1));
+  return `manifest-${utcStamp(now)}-${String(n).padStart(4, "0")}.jsonl`;
+}
+
+// Next monotonic manifest sequence number above stored storage state and existing download filenames.
+export function nextManifestSeq(storedSeq = 0, existingNames = []) {
+  let max = Math.max(0, Math.floor(Number(storedSeq) || 0));
+  for (const name of existingNames || []) {
+    const n = parseManifestSeq(name);
+    if (n > max) max = n;
+  }
+  return max + 1;
+}
 
 // Is this X's likes list? By address (x.com/i/history/likes since October 2026, x.com/<user>/likes
 // before), else by the page's structure: the History title with a selected Likes tab, so a future move
