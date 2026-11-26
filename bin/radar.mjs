@@ -25,6 +25,7 @@ import { validate } from "./lib/jsonschema.mjs";
 import { runExport } from "./lib/export.mjs";
 import { runCaseCommand } from "./lib/case.mjs";
 import { verifyCaptures, verifyLines } from "./lib/capture-verify.mjs";
+import { verifyProvenanceDir, provenanceLines } from "./lib/web-ai-verify.mjs";
 import { TOP_HELP, MEDIA_HELP, SIDECAR_HELP, BOARD_HELP, CAPTURE_HELP, helpText, friendly } from "./lib/help.mjs";
 import { runMedia } from "./lib/media.mjs";
 import { cleanCommand, protectCommand, selfAuditCommand, PROTECT_USAGE } from "./lib/protect.mjs";
@@ -49,6 +50,7 @@ const USAGE = `Usage:
   cmmns likes missing --archive <like.js>               (the likes in your X archive nothing saved yet)
   cmmns sidecar check <folder> [--fix]                  (flags unproved threads and notes naming the wrong files)
   cmmns capture verify <folder>                         (checks evidence captures and their custody chain)
+  cmmns provenance verify <folder> [--origin <url>]     (checks agent-card.json, llms.txt, JSON-LD, prompt-injection, and engine-receipt/1)
   cmmns board make <folder> --title <name> [--layout book|grid|timeline|evidence] [--head grotesk|accession|mono] [--pdf]
   cmmns export <evidence-chain.json> --profile legal|technical|journalistic|research [--out dir]
                [--reply replies.json] [--corrections corrections.json] [--seed text]
@@ -73,7 +75,7 @@ export function parseArgs(argv) {
     const a = argv[i];
     if (!a.startsWith("--")) { out._.push(a); continue; }
     const [k, v] = a.slice(2).split("=");
-    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate", "title", "lane", "keywords", "layout", "head", "site", "since", "until", "case", "dir", "comments", "langs", "name"].includes(k) ? argv[++i] : true;
+    out.flags[k] = v !== undefined ? v : ["bundle", "key", "key-id", "profile", "out", "reply", "corrections", "seed", "page", "to", "quality", "max-side", "max-height", "fps", "bitrate", "audio-bitrate", "title", "lane", "keywords", "layout", "head", "site", "since", "until", "case", "dir", "comments", "langs", "name", "origin"].includes(k) ? argv[++i] : true;
   }
   return out;
 }
@@ -151,6 +153,13 @@ export async function main(argv) {
     const r = await verifyCaptures(dir);
     print(flags.json ? asJson(r) : verifyLines(r));
     return r.chain.ok ? 0 : 1;
+  }
+  if (argv[0] === "provenance" && argv[1] === "verify") {
+    const { _: [dir], flags } = parseArgs(argv.slice(2));
+    if (flags.help || !dir) { print("Usage: cmmns provenance verify <folder> [--origin <url>] [--json]\n"); return flags.help ? 0 : 2; }
+    const r = await verifyProvenanceDir(dir, { origin: typeof flags.origin === "string" ? flags.origin : null, hmacKey: process.env.FLYWHEEL_RECEIPT_HMAC_KEY || null });
+    print(flags.json ? asJson(r) : provenanceLines(dir, r));
+    return r.ok ? 0 : 1;
   }
   if (argv[0] === "sidecar" && argv[1] === "check") {
     const { _: [dir], flags } = parseArgs(argv.slice(2));
