@@ -5,7 +5,7 @@
     "type": "individual",
     "role": "owner",
     "name": "Zain Dana Harper",
-    "email": "zaindharper@gmail.com",
+    "email": "17142659+HarperZ9@users.noreply.github.com",
     "description": "Independent researcher and toolmaker operating as a sole proprietor in Kent, Washington. Builds verifiable local-first compilers, AI evaluation harnesses, rendering engines, and open archival tools, publishing methods, data, and null results openly.",
     "webpageUrl": {
       "url": "https://harperz9.github.io/",
@@ -52,7 +52,7 @@
       {
         "guid": "direct-grant",
         "type": "bank",
-        "address": "US wire or ACH grant transfer via zaindharper@gmail.com (sole proprietor, Kent, WA)",
+        "address": "US wire or ACH grant transfer (sole proprietor, Kent, WA; contact via https://harperz9.github.io/hire.html)",
         "description": "Direct bank transfer for institutional open-source and public-interest archival grants (such as FLOSS/fund). Account details provided directly on award."
       }
     ],
