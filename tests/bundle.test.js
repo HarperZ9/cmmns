@@ -71,6 +71,8 @@ test("the bundles expose the functions the content scripts call", async () => {
     "feedDashboard", "addFeedPosts", "threadContext", "coGraph", "forceLayout", "threadUrl", "evidenceCard", "sealCard", "cardLines",
     "FEED_DOES_NOT_SHOW", "GRAPH_DOES_NOT_PROVE",
     "sidecarDigest", "verifySidecarDigest", "sidecarEngineReceipt", "verifySidecarEngineReceipt", "sidecarReceiptSidecars",
+    "classifySite", "classifyMediaKind", "sidecarRoutingMeta", "planStreamlinedDownload",
+    "extractLikesCursor", "createDedupIndex", "admitWithPolicy", "paginateLikes",
   ]) {
     assert.ok(name in globalThis.PB, name);
   }

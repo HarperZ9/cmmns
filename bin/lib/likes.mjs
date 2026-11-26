@@ -9,17 +9,21 @@ import { homedir } from "node:os";
 import { join, relative } from "node:path";
 import { parseManifest, parseArchiveLikes, missingLikes, likeMeta, postKey, stageClock, streamsOf, noVideoNote } from "../../src/core/likes.js";
 import { sidecarMarkdown } from "../../src/core/media-meta.js";
+import { sidecarRoutingMeta } from "../../src/core/download-route.js";
+import { sidecarReceiptSidecars } from "../../src/core/sidecar-receipt.js";
 import { saveRoot } from "./media-fetch.mjs";
 import { globalProtection } from "./case-protect.mjs";
 import { getWithRetry, hashFile, pool, closeAll } from "./likes-net.mjs";
 
-export const LIKES_HELP = `cmmns likes fetch [<manifest folder or file>] [--dir <CMMNS folder>] [--jobs 8] [--watch]
+export const LIKES_HELP = `cmmns likes fetch [<manifest folder or file>] [--dir <CMMNS folder>] [--jobs 8] [--watch] [--include-duplicates] [--receipt]
 cmmns likes missing [<manifest folder>] --archive <like.js> [--dir <CMMNS folder>]
 
 fetch    Saves every file the manifest lists into <CMMNS folder>/x/, with a note per post.
-         Posts already saved under the CMMNS folder are skipped before any request.
-         --jobs   files at once (default 8; a host's 429 halves it)
-         --watch  keeps reading the manifest as the page adds to it; Ctrl+C to end
+         Posts already saved under the CMMNS folder are skipped before any request unless --include-duplicates is given.
+         --jobs                files at once (default 8; a host's 429 halves it)
+         --watch               keeps reading the manifest as the page adds to it; Ctrl+C to end
+         --include-duplicates  re-save posts and files already in the folder
+         --receipt             write commons-digest/1 and engine-receipt/1 sidecars beside each note
          A video X listed only as a stream is not fetched: the post counts as saved without video.
 missing  Lists the liked posts in X's archive (like.js) that nothing under the CMMNS folder holds.`;
 
@@ -72,29 +76,36 @@ async function sameBytes(index, path, size, sha) {
 // One post: its files through the pool, then its sidecar naming the files written. Records each stage.
 async function savePost(line, ctx) {
   const t0 = performance.now();
-  if (ctx.index.known.has(postKey(line.id))) { if (lacksVideo(line, ctx.index)) { ctx.counts.noVideo++; ctx.noVideo.push(line.id); } else ctx.counts.duplicate++; ctx.clock.add("dedupe", performance.now() - t0); return; }
+  if (!ctx.includeDuplicates && ctx.index.known.has(postKey(line.id))) { if (lacksVideo(line, ctx.index)) { ctx.counts.noVideo++; ctx.noVideo.push(line.id); } else ctx.counts.duplicate++; ctx.clock.add("dedupe", performance.now() - t0); return; }
   ctx.clock.add("dedupe", performance.now() - t0);
   ctx.index.known.add(postKey(line.id));
-  const written = [], missing = [];
+  const written = [], missing = [], hashed = [];
   await Promise.all(line.files.map((f) => ctx.pool.run(async () => {
     const dest = join(ctx.dir, f.name), a = performance.now();
     try {
       const r = await getWithRetry(f.url, dest, ctx.net, () => ctx.pool.slow());
       ctx.clock.add("fetch", performance.now() - a); ctx.bytes += r.bytes;
-      const b = performance.now(), dup = await sameBytes(ctx.index, dest, r.bytes, r.sha256);
+      const b = performance.now(), dup = ctx.includeDuplicates ? null : await sameBytes(ctx.index, dest, r.bytes, r.sha256);
       ctx.clock.add("hash", performance.now() - b);
       if (dup) { rmSync(dest, { force: true }); ctx.counts.sameBytes++; written.push(relative(ctx.dir, dup).replace(/\\/g, "/")); return; }
       if (!ctx.index.bySize.has(r.bytes)) ctx.index.bySize.set(r.bytes, []);
       ctx.index.bySize.get(r.bytes).push(dest);
-      written.push(f.name); ctx.counts.files++;
+      written.push(f.name); hashed.push({ rel_path: f.name, sha256: `sha256:${r.sha256}`, bytes: r.bytes }); ctx.counts.files++;
     } catch (e) { missing.push(`${f.name}: ${e.message}`); ctx.counts.failedFiles++; }
   })));
   // Every file failed: no note, so the post is not known by its id and the next run tries it again.
   if (line.files.length && !written.length) { ctx.index.known.delete(postKey(line.id)); ctx.counts.failed++; return; }
-  const c = performance.now(), meta = likeMeta(line, 0, 1);
+  const c = performance.now(), base = likeMeta(line, 0, 1);
+  const firstFile = line.files[0] || null;
+  const meta = { ...base, ...sidecarRoutingMeta(base, { url: (firstFile && firstFile.url) || "", kind: (firstFile && firstFile.kind) || "" }) };
   if (missing.length) meta.notes = [...(meta.notes || []), { label: "Not saved", text: missing.join("\n") }];
   if (streamsOf(line).length) meta.notes = [...(meta.notes || []), noVideoNote(line)];
-  writeFileSync(join(ctx.dir, line.sidecar), sidecarMarkdown(meta, written));
+  const md = sidecarMarkdown(meta, written);
+  writeFileSync(join(ctx.dir, line.sidecar), md);
+  if (ctx.receipt) {
+    const rc = await sidecarReceiptSidecars(meta, { fileNames: written, sidecarName: line.sidecar, sidecarMd: md, files: hashed });
+    for (const [k, v] of Object.entries(rc.files)) if (k !== line.sidecar) writeFileSync(join(ctx.dir, k), v);
+  }
   ctx.clock.add("sidecar", performance.now() - c);
   if (streamsOf(line).length) { ctx.counts.noVideo++; ctx.noVideo.push(line.id); } else ctx.counts.saved++;
 }
@@ -122,7 +133,9 @@ export async function fetchLikes(argv, { env = process.env, log = (s) => process
   const root = rootOf(argv), dir = join(root, "x"), jobs = Math.max(1, Math.min(32, Number(flagOf(argv, "jobs", 8)) || 8));
   mkdirSync(dir, { recursive: true });
   const t0 = performance.now(), index = folderIndex(root);
-  const ctx = { dir, index, net: tls ? { tls } : {}, pool: pool(jobs), clock: stageClock(), bytes: 0, noVideo: [], counts: { posts: 0, saved: 0, noVideo: 0, duplicate: 0, failed: 0, files: 0, sameBytes: 0, failedFiles: 0 } };
+  const ctx = { dir, index, net: tls ? { tls } : {}, pool: pool(jobs), clock: stageClock(), bytes: 0, noVideo: [],
+    includeDuplicates: argv.includes("--include-duplicates"), receipt: argv.includes("--receipt"),
+    counts: { posts: 0, saved: 0, noVideo: 0, duplicate: 0, failed: 0, files: 0, sameBytes: 0, failedFiles: 0 } };
   ctx.clock.add("index", performance.now() - t0, Math.max(1, index.known.size));
   const done = new Set(), watch = argv.includes("--watch");
   let idle = 0;

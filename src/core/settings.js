@@ -52,8 +52,12 @@ export const DEFAULTS = Object.freeze({
   // default; "always ask where to save" off, so files go straight to the Downloads folder.
   mediaButtons: true, mediaAskWhere: false,
   // The post's words with each download: a .md sidecar and the description inside the file, on by
-  // default; a .json sidecar for tools, off by default.
-  mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
+  // default; a .json sidecar for tools and SHA-256 capture receipts, off by default.
+  mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false, mediaSidecarReceipt: false,
+  // Organize downloads into <site>/<posts|papers|audio|video|images>/ subfolders, off by default.
+  mediaOrganizeByType: false,
+  // Save all likes skips duplicates by default; users can opt in to re-saving duplicates.
+  likesSkipDuplicates: true,
   // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
   mediaFolder: "CMMNS",
   // Saving straight into Downloads, with no folders, is its own switch, never an empty folder name.
@@ -141,6 +145,8 @@ export function normalizeSettings(raw) {
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
+    mediaSidecarReceipt: bool(s.mediaSidecarReceipt, DEFAULTS.mediaSidecarReceipt), mediaOrganizeByType: bool(s.mediaOrganizeByType, DEFAULTS.mediaOrganizeByType),
+    likesSkipDuplicates: bool(s.likesSkipDuplicates, DEFAULTS.likesSkipDuplicates),
     mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder) || DEFAULTS.mediaFolder,
     mediaToRoot: bool(s.mediaToRoot, DEFAULTS.mediaToRoot),
     protection: bool(s.protection, DEFAULTS.protection),

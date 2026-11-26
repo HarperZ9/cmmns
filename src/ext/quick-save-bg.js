@@ -68,13 +68,13 @@ globalThis.PBQuickBg = (() => {
 
   // Starts a browser download. { url, filename, site, fixExt } -> { id }. The file goes to
   // "<save folder>/<site>/<name>" inside Downloads, so thousands of saves stay in one tree.
-  async function download({ url, filename: name, site, fixExt, study = false, overwrite = false, library = null }) {
+  async function download({ url, filename: name, site, fixExt, study = false, overwrite = false, library = null, subfolder = null }) {
     if (!chrome.downloads) throw new Error("This browser did not give CMMNS the downloads permission.");
     const s = await settings();
     if (s.protection && /^https?:/i.test(url)) throw new Error(PROTECTED_SAVE);
     // Study saves go to "<save folder>/study/<site>/"; the reference library reads them first.
     const conflict = overwrite ? "overwrite" : "uniquify";
-    const filename = name ? PB.savePath(s, site, study, library) + name.replace(/[\\/]/g, "-") : null;
+    const filename = name ? PB.savePath(s, site, study, library, subfolder) + name.replace(/[\\/]/g, "-") : null;
     const opts = { url, saveAs: !!s.mediaAskWhere && !overwrite, conflictAction: conflict, ...(filename ? { filename } : {}) };
     pending.set(url, { fixExt: !!fixExt, filename, conflict });
     const id = await chrome.downloads.download(opts);
@@ -138,7 +138,7 @@ globalThis.PBQuickBg = (() => {
 
   // Bytes the page made, saved through the worker's own address: a blob address where the worker has
   // one (Firefox's background page), else a data: address (Chrome's service worker; under 2 MB).
-  async function fromBytes({ bytes, mime, filename, site, study, overwrite, library }) {
+  async function fromBytes({ bytes, mime, filename, site, study, overwrite, library, subfolder = null }) {
     const b = Uint8Array.from(bytes || []);
     let url;
     if (typeof URL.createObjectURL === "function") url = URL.createObjectURL(new Blob([b], { type: mime }));
@@ -147,7 +147,7 @@ globalThis.PBQuickBg = (() => {
       let s = ""; for (let i = 0; i < b.length; i += 32768) s += String.fromCharCode(...b.subarray(i, i + 32768));
       url = `data:${mime || "application/octet-stream"};base64,${btoa(s)}`;
     }
-    return download({ url, filename, site, study, overwrite, library });
+    return download({ url, filename, site, study, overwrite, library, subfolder });
   }
 
   // A protected item's reference: kept on the "Protected references" moodboard with its label.

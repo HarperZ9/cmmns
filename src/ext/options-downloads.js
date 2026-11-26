@@ -49,6 +49,9 @@
     switchRow("Save the post's words beside each file", "On by default: a .md file with the same name holds the post's text, author, time, alt text and links.", s.mediaSidecar, (on) => save({ mediaSidecar: on })),
     switchRow("Write the description into the file", "On by default, for JPEG, PNG, WebP, GIF and MP4. The picture and sound are not changed.", s.mediaEmbed, (on) => save({ mediaEmbed: on })),
     switchRow("Also save a .json file for tools", "Off by default.", s.mediaSidecarJson, (on) => save({ mediaSidecarJson: on })),
+    switchRow("Save SHA-256 capture receipts (.digest.json and .receipt.json)", "Off by default: emits deterministic commons-digest/1 and engine-receipt/1 sidecars beside each save.", s.mediaSidecarReceipt, (on) => save({ mediaSidecarReceipt: on })),
+    switchRow("Organize saves into type folders", "Off by default: groups saves under posts, papers, audio, video, and images subfolders inside each site folder.", s.mediaOrganizeByType, (on) => save({ mediaOrganizeByType: on })),
+    switchRow("Skip duplicate likes by default", "On by default: Save all likes skips posts and files already saved unless you opt in.", s.likesSkipDuplicates, (on) => save({ likesSkipDuplicates: on })),
     switchRow("Save the post's comments with it", "On by default: every comment the page shows, as a .thread.json file beside the note, with how many the site counted and how many were saved.", s.threadCapture, (on) => save({ threadCapture: on })),
     switchRow("Open more comments while saving", "On by default, on the post's own page: one \"more replies\" at a time, a second or two apart, with Stop on the notice. Source protection holds it off.", s.threadExpand, (on) => save({ threadExpand: on })),
     capLabel);

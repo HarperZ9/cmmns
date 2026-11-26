@@ -14,14 +14,14 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   // Where one save goes: { site, study, library }. The site folder, a study save (CMMNS/study/<site>/),
   // or a library (CMMNS/library/<library>/). Passed with every save, never kept between saves, so
   // a library filling in the background and a click on a post's own button cannot swap folders.
-  const destOf = (o = {}) => ({ site: o.site || location.hostname, study: !!o.study, library: o.library || null });
+  const destOf = (o = {}) => ({ site: o.site || location.hostname, study: !!o.study, library: o.library || null, subfolder: o.subfolder || null });
   // After CMMNS is updated or reloaded, a page opened before keeps the old script, which
   // can no longer reach the extension. It says so instead of saving somewhere unexpected.
   const RELOAD = "CMMNS was updated. Reload this page, then save again.";
   function alive() { if (!(globalThis.chrome && chrome.runtime && chrome.runtime.id)) throw new Error(RELOAD); }
   async function viaBrowser(url, name, opts) {
-    const { site, study, library } = destOf(opts.dest);
-    const r = await msg({ type: "pb-qs-download", url, filename: name, site, study, library, overwrite: !!opts.overwrite, fixExt: opts.fixExt || false });
+    const { site, study, library, subfolder } = destOf(opts.dest);
+    const r = await msg({ type: "pb-qs-download", url, filename: name, site, study, library, subfolder, overwrite: !!opts.overwrite, fixExt: opts.fixExt || false });
     if (!r || r.error) throw new Error(r && r.error ? r.error : "The browser did not start the download.");
     return r;
   }
@@ -109,13 +109,20 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   // The post's comments come too, as "<stem>.thread.json" beside it (full-capture.js).
   async function sidecars(meta0, fileNames, p, o = {}) {
     const list = [].concat(fileNames), stem = o.stem || PB.sidecarStem(list);
-    const meta = globalThis.PBFullCapture && (p.mediaSidecar || meta0.study || p.mediaSidecarJson) ? PBFullCapture.withFile(await PBFullCapture.complete(meta0), stem) : meta0;
+    const rawMeta = globalThis.PBFullCapture && (p.mediaSidecar || meta0.study || p.mediaSidecarJson) ? PBFullCapture.withFile(await PBFullCapture.complete(meta0), stem) : meta0;
+    const meta = PB.sidecarRoutingMeta ? { ...rawMeta, ...PB.sidecarRoutingMeta(rawMeta) } : rawMeta;
     // o.collect gathers each file's name and bytes, for a bundle's SHA256SUMS (yt-full.js).
     const keep = (name, bytes) => { if (o.collect) o.collect.push({ name, bytes }); return name; };
     if (meta.threadCapture) { const b = PBFullCapture.threadBytes(meta); keep(await saveBytes(b, "application/json", meta.threadFile, o), b); }
-    const mdBytes = new TextEncoder().encode(PB.sidecarMarkdown(meta, list));
+    const mdText = PB.sidecarMarkdown(meta, list), mdBytes = new TextEncoder().encode(mdText);
     const md = p.mediaSidecar || meta.study ? keep(await saveBytes(mdBytes, "text/markdown", stem + ".md", o), mdBytes) : null;
-    if (p.mediaSidecarJson) await saveBytes(new TextEncoder().encode(PB.sidecarJson(meta, list)), "application/json", stem + ".json", o);
+    const jsonText = p.mediaSidecarJson ? PB.sidecarJson(meta, list) : null;
+    if (jsonText) await saveBytes(new TextEncoder().encode(jsonText), "application/json", stem + ".json", o);
+    if (p.mediaSidecarReceipt && PB.sidecarReceiptSidecars) {
+      const r = await PB.sidecarReceiptSidecars(meta, { fileNames: list, sidecarName: stem + ".md", sidecarMd: mdText, sidecarJsonText: jsonText });
+      await saveBytes(new TextEncoder().encode(r.files[`${stem}.digest.json`]), "application/json", `${stem}.digest.json`, o);
+      await saveBytes(new TextEncoder().encode(r.files[`${stem}.receipt.json`]), "application/json", `${stem}.receipt.json`, o);
+    }
     return md;
   }
   // What the page says about media outside X and Reddit: its title, its description, the alt text.
@@ -150,7 +157,9 @@ globalThis.PBQuickSave = globalThis.PBQuickSave || (() => {
   async function run(t, opts = {}) {
     const plan = PB.downloadPlan(t, { asGif: !!opts.asGif }), p = await prefs(), meta = metaOf(t, opts);
     if (globalThis.PBTrack) PBTrack.saved(meta);   // engagement over time (track.js): the saved post is tracked
-    const dest = destOf({ site: meta.site, study: opts.study, library: opts.library });
+    const routing = PB.sidecarRoutingMeta ? PB.sidecarRoutingMeta(meta, { url: t.url || "", kind: t.kind || "" }) : null;
+    const subfolder = p.mediaOrganizeByType && routing && PB.subfolderForKind ? PB.subfolderForKind(routing.media_kind) : null;
+    const dest = destOf({ site: (routing && routing.source_site) || meta.site, study: opts.study, library: opts.library, subfolder });
     const title = opts.title || t.title || document.title || location.hostname;
     const own = (u) => (/^https?:/i.test(String(u || "")) ? u : "");
     // A name carries the post id (PB.postTag, or a library's own tag), so two posts never share one.

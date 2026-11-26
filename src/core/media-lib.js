@@ -14,6 +14,8 @@ export { parseM3u8, hlsProtection, pickVariant } from "./media-hls.js";
 export { parseMpd, dashProtection, pickRepresentation } from "./media-dash.js";
 export { postMeta, sidecarMarkdown, sidecarJson, metaName, postTag, captionText, embedText, textTags } from "./media-meta.js";
 export { COMMONS_DIGEST_FORMAT, ENGINE_RECEIPT_SCHEMA, IN_TOTO_STATEMENT, ENGINE_RECEIPT_PREDICATE, COMMONS_DIGEST_DOES_NOT_PROVE, canonicalJson, sha256Prefixed, hmacSha256Prefixed, sidecarDigest, sidecarEngineReceipt, verifySidecarDigest, verifySidecarEngineReceipt, sidecarReceiptSidecars } from "./sidecar-receipt.js";
+export { SUPPORTED_SITES, MEDIA_KINDS, TYPE_SUBFOLDERS, WORKFLOW_HINTS, classifySite, classifyMediaKind, subfolderForKind, dedupKeyOf, deriveWorkflowHints, sidecarRoutingMeta, sanitizeFilename, planStreamlinedDownload } from "./download-route.js";
+export { LIKES_DEDUP_KEY, LIKES_DEDUP_FORMAT, extractLikesCursor, buildNextLikesUrl, isChallengeResponse, createDedupIndex, admitWithPolicy, paginateLikes } from "./likes-sync.js";
 export { embedDescription, readDescription, xmpPacket } from "./media-embed.js";
 export { saveFolder, savePath, SIDECAR_FORMAT, sidecarStem, fileBase } from "./media-meta.js";
 export { wrapLines, cardPlan, CARD, CARD_FOOT } from "./media-card.js";
