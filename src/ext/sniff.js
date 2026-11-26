@@ -9,20 +9,24 @@
   "use strict";
   const isGraph = (url) => /\/i\/api\/graphql\//.test(String(url || ""));
   const isAbout = (url) => /\/AboutAccountQuery\b/.test(String(url || ""));
+  const isLikes = (url) => /\/Likes(?:\b|\?|$)/.test(String(url || ""));
   const post = (msg) => { try { window.postMessage(msg, location.origin); } catch (_) { /* ignore */ } };
-  let template = null;   // { url, headers } of X's own AboutAccountQuery, csrf removed
+  let template = null, likesTemplate = null;   // learned GraphQL templates, csrf removed
   // The last few responses, kept in this tab only, for the download button (quick-sites.js), which
   // starts after X has already loaded the post it shows. Sent again only when that script asks.
   const recent = [];
   const sniffed = (json) => { recent.push(json); if (recent.length > 8) recent.shift(); post({ source: "radar-sniff", json }); };
 
-  function learn(url, headers) {
-    if (!isAbout(url)) return;
+  function cleanHeaders(headers) {
     const h = {};
     for (const [k, v] of Object.entries(headers || {})) if (!/^x-csrf-token$|^cookie$/i.test(k)) h[k.toLowerCase()] = v;
-    if (!h.authorization) return;
-    template = { url: String(url), headers: h };
-    post({ source: "radar-template", template });
+    return h;
+  }
+
+  function learn(url, headers) {
+    const h = cleanHeaders(headers);
+    if (isAbout(url) && h.authorization) { template = { url: String(url), headers: h }; post({ source: "radar-template", template }); }
+    if (isLikes(url)) { likesTemplate = { url: String(url), headers: h }; post({ source: "radar-likes-template", available: true }); }
   }
 
   // 3. Notes the HLS and DASH playlist addresses X's player asks for, so the download button can find
@@ -69,10 +73,35 @@
     return origSet.apply(this, arguments);
   };
 
+  function nextLikesUrl(baseUrl, cursor) {
+    const u = new URL(baseUrl, location.origin);
+    const rawVars = u.searchParams.get("variables");
+    if (rawVars) {
+      try { const v = JSON.parse(rawVars); if (cursor) v.cursor = String(cursor); else delete v.cursor; u.searchParams.set("variables", JSON.stringify(v)); return u.toString(); } catch (_) { /* fall through */ }
+    }
+    if (cursor) u.searchParams.set("cursor", String(cursor)); else u.searchParams.delete("cursor");
+    return u.toString();
+  }
+
+  async function askLikesPage(reqId, cursor) {
+    if (!likesTemplate) { post({ source: "radar-likes-page", reqId, status: 0, error: "no-template" }); return; }
+    try {
+      const csrf = (document.cookie.match(/(?:^|;\s*)ct0=([^;]+)/) || [])[1];
+      const res = await origFetch.call(window, nextLikesUrl(likesTemplate.url, cursor), { credentials: "include", headers: { ...likesTemplate.headers, ...(csrf ? { "x-csrf-token": csrf } : {}) }, signal: AbortSignal.timeout(15000) });
+      let json = null, bodyText = "";
+      try { bodyText = await res.text(); json = JSON.parse(bodyText); } catch (_) { /* non-json body */ }
+      const num = (h) => { const v = res.headers.get(h); return v == null ? undefined : Number(v); };
+      post({ source: "radar-likes-page", reqId, status: res.status, json, bodyText: json ? "" : bodyText.slice(0, 400),
+        remaining: num("x-rate-limit-remaining"), resetEpochSec: num("x-rate-limit-reset"), retryAfterSec: num("retry-after") });
+    } catch (_) { post({ source: "radar-likes-page", reqId, status: 0, error: "network" }); }
+  }
+
   // Requests from the content script.
   window.addEventListener("message", async (e) => {
     if (e.source !== window || !e.data) return;
     if (e.data.source === "radar-template-set" && e.data.template && !template) template = e.data.template;
+    if (e.data.source === "radar-likes-template-ask") { post({ source: "radar-likes-template", available: !!likesTemplate }); return; }
+    if (e.data.source === "radar-ask-likes-page") { await askLikesPage(e.data.reqId, e.data.cursor || null); return; }
     if (e.data.source === "radar-sniff-replay-ask") { for (const json of recent) post({ source: "radar-sniff-replay", json }); for (const url of streams) post({ source: "radar-stream", url }); return; }
     if (e.data.source !== "radar-ask-about") return;
     const handle = e.data.handle;

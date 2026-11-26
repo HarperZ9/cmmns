@@ -9,7 +9,7 @@
   if (!globalThis.PBLikes) return;
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
   const PACE_KEY = "pb.likes.pace";
-  let bar = null, pace = "careful", scrolling = false, mode = "browser";
+  let bar = null, pace = "careful", scrolling = false, mode = "browser", includeDuplicates = false;
   try { chrome.storage.local.get(PACE_KEY).then((g) => { if (g[PACE_KEY] && PBLikesScroll && PBLikesScroll.PACES[g[PACE_KEY]]) pace = g[PACE_KEY]; }).catch(() => {}); } catch { /* storage unavailable */ }
   const on = () => !globalThis.PBSettings || PBSettings.get().mediaButtons !== false;
   const FETCH = "cmmns likes fetch --watch";
@@ -39,9 +39,9 @@
   }
 
   async function begin(resume) {
-    await PBLikes.start(mode);
+    await PBLikes.start(mode, { includeDuplicates, autoPaginate: true });
     if (resume && PBLikes.resumeY) PBQuickToast.show("Continuing: posts already done are counted, not saved again.", { stay: 5000 });
-    if (globalThis.PBLikesScroll) scroll(); else render();
+    if (!PBLikes.canAutoPaginate() && globalThis.PBLikesScroll) scroll(); else render();
   }
 
   function importButton() {
@@ -68,7 +68,12 @@
       sel.title = "Fetch with the command line (fastest: it reads the manifest this page writes and saves the files itself), or save each file from this page";
       for (const [v, t] of [["manifest", "Command line fetch"], ["browser", "Save in the browser"]]) { const o = el("option", null, t); o.value = v; sel.append(o); }
       sel.value = mode; sel.addEventListener("change", () => { mode = sel.value; });
-      bar.append(sel, button(s.status === "resumable" ? "Resume saving likes" : "Save all likes", "Collects every liked post this page loads, once each; posts already saved are skipped", () => begin(s.status === "resumable")));
+      const dupLabel = el("label", "pb-lib-cap");
+      dupLabel.title = "Checked by default: posts and media already saved are skipped. Uncheck to re-save duplicates.";
+      const dupBox = el("input"); dupBox.type = "checkbox"; dupBox.checked = !includeDuplicates;
+      dupBox.addEventListener("change", () => { includeDuplicates = !dupBox.checked; });
+      dupLabel.append(dupBox, " Skip duplicates");
+      bar.append(sel, dupLabel, button(s.status === "resumable" ? "Resume saving likes" : "Save all likes", "Collects every liked post automatically; duplicates are skipped unless unchecked", () => begin(s.status === "resumable")));
     }
     if (globalThis.PBLikesScroll && !scrolling) {
       const p = el("select", "pb-lib-cap");

@@ -82,6 +82,13 @@ export function postMeta(m = {}, now = new Date().toISOString()) {
     edited: m.edited === true ? true : null, location: m.location ? String(m.location).slice(0, 200) : null,
     // The quoted post's own pictures and their alt text, as the site listed them (not downloaded).
     quotedMedia: (m.quotedMedia || []).filter((i) => i && i.url).slice(0, 10).map((i) => ({ kind: i.kind || "image", url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null })),
+    // Optional sister-tool routing metadata (download-route.js): media_kind, source_site, dedup_key,
+    // workflow_hints, and deconstruct_ready for gather/distill/crucible/DS-05 handoff.
+    mediaKind: m.mediaKind || m.media_kind || null,
+    sourceSite: m.sourceSite || m.source_site || null,
+    dedupKey: m.dedupKey || m.dedup_key || null,
+    workflowHints: Array.isArray(m.workflowHints || m.workflow_hints) ? [...new Set((m.workflowHints || m.workflow_hints).map(String).filter(Boolean))].sort() : null,
+    deconstructReady: m.deconstructReady === true || m.deconstruct_ready === true ? true : null,
   };
 }
 
@@ -135,7 +142,10 @@ function frontMatter(meta, files) {
     engagement: meta.engagement || null,
     text_complete: meta.textComplete === false ? false : null, from: meta.from || null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
     edited: meta.edited || null, location: meta.location || null, media_file: meta.mediaFile || null,
-    canonical: (meta.page && meta.page.canonical) || null, lang: (meta.page && meta.page.lang) || null, ...threadRows(meta) };
+    canonical: (meta.page && meta.page.canonical) || null, lang: (meta.page && meta.page.lang) || null, ...threadRows(meta),
+    media_kind: meta.mediaKind || meta.media_kind || null, source_site: meta.sourceSite || meta.source_site || null, dedup_key: meta.dedupKey || meta.dedup_key || null,
+    workflow_hints: (meta.workflowHints || meta.workflow_hints || []).length ? (meta.workflowHints || meta.workflow_hints) : null,
+    deconstruct_ready: meta.deconstructReady === true || meta.deconstruct_ready === true ? true : null };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
 }
 
@@ -190,11 +200,13 @@ export function sidecarMarkdown(meta, fileNames = null) {
 // The folder for one save from the settings: "<folder>/<site>/", "<folder>/study/<site>/" for
 // Study, "<folder>/library/<library>/" for a library capture (src/core/library.js), or "" only
 // when the user turned on saving straight into Downloads (a library still keeps its own folder).
-export function savePath(settings, site, study = false, library = null) {
+export function savePath(settings, site, study = false, library = null, subfolder = null) {
   const s = settings || {}, base = String(s.mediaFolder || "").trim() || "CMMNS";
+  const sub = subfolder ? String(subfolder).replace(/[^a-z0-9_-]/gi, "").toLowerCase() : "";
+  const withSub = (p) => (p && sub ? `${p}${sub}/` : p);
   if (library) return saveFolder(s.mediaToRoot ? "library" : `${base}/library`, library);
-  if (s.mediaToRoot) return study ? saveFolder("study", site) : "";
-  return saveFolder(study ? `${base}/study` : base, site);
+  if (s.mediaToRoot) return study ? withSub(saveFolder("study", site)) : sub ? `${sub}/` : "";
+  return withSub(saveFolder(study ? `${base}/study` : base, site));
 }
 
 // The folder a save goes to, inside Downloads: "<folder>/<site>/", each part safe on every system.

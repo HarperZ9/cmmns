@@ -14229,6 +14229,13 @@ function postMeta(m = {}, now = new Date().toISOString()) {
     edited: m.edited === true ? true : null, location: m.location ? String(m.location).slice(0, 200) : null,
     // The quoted post's own pictures and their alt text, as the site listed them (not downloaded).
     quotedMedia: (m.quotedMedia || []).filter((i) => i && i.url).slice(0, 10).map((i) => ({ kind: i.kind || "image", url: String(i.url), alt: i.alt ? String(i.alt).slice(0, 2000) : null })),
+    // Optional sister-tool routing metadata (download-route.js): media_kind, source_site, dedup_key,
+    // workflow_hints, and deconstruct_ready for gather/distill/crucible/DS-05 handoff.
+    mediaKind: m.mediaKind || m.media_kind || null,
+    sourceSite: m.sourceSite || m.source_site || null,
+    dedupKey: m.dedupKey || m.dedup_key || null,
+    workflowHints: Array.isArray(m.workflowHints || m.workflow_hints) ? [...new Set((m.workflowHints || m.workflow_hints).map(String).filter(Boolean))].sort() : null,
+    deconstructReady: m.deconstructReady === true || m.deconstruct_ready === true ? true : null,
   };
 }
 
@@ -14282,7 +14289,10 @@ function frontMatter(meta, files) {
     engagement: meta.engagement || null,
     text_complete: meta.textComplete === false ? false : null, from: meta.from || null, study: meta.study ? true : null, note: meta.studyNote || null, analysis: meta.analysis || null,
     edited: meta.edited || null, location: meta.location || null, media_file: meta.mediaFile || null,
-    canonical: (meta.page && meta.page.canonical) || null, lang: (meta.page && meta.page.lang) || null, ...threadRows(meta) };
+    canonical: (meta.page && meta.page.canonical) || null, lang: (meta.page && meta.page.lang) || null, ...threadRows(meta),
+    media_kind: meta.mediaKind || meta.media_kind || null, source_site: meta.sourceSite || meta.source_site || null, dedup_key: meta.dedupKey || meta.dedup_key || null,
+    workflow_hints: (meta.workflowHints || meta.workflow_hints || []).length ? (meta.workflowHints || meta.workflow_hints) : null,
+    deconstruct_ready: meta.deconstructReady === true || meta.deconstruct_ready === true ? true : null };
   return ["---", ...Object.entries(rows).filter(([k, v]) => k === "files" || (v != null && !(Array.isArray(v) && !v.length))).map(([k, v]) => `${k}: ${JSON.stringify(v)}`), "---", ""];
 }
 
@@ -14337,11 +14347,13 @@ function sidecarMarkdown(meta, fileNames = null) {
 // The folder for one save from the settings: "<folder>/<site>/", "<folder>/study/<site>/" for
 // Study, "<folder>/library/<library>/" for a library capture (src/core/library.js), or "" only
 // when the user turned on saving straight into Downloads (a library still keeps its own folder).
-function savePath(settings, site, study = false, library = null) {
+function savePath(settings, site, study = false, library = null, subfolder = null) {
   const s = settings || {}, base = String(s.mediaFolder || "").trim() || "CMMNS";
+  const sub = subfolder ? String(subfolder).replace(/[^a-z0-9_-]/gi, "").toLowerCase() : "";
+  const withSub = (p) => (p && sub ? `${p}${sub}/` : p);
   if (library) return saveFolder(s.mediaToRoot ? "library" : `${base}/library`, library);
-  if (s.mediaToRoot) return study ? saveFolder("study", site) : "";
-  return saveFolder(study ? `${base}/study` : base, site);
+  if (s.mediaToRoot) return study ? withSub(saveFolder("study", site)) : sub ? `${sub}/` : "";
+  return withSub(saveFolder(study ? `${base}/study` : base, site));
 }
 
 // The folder a save goes to, inside Downloads: "<folder>/<site>/", each part safe on every system.
@@ -14439,7 +14451,7 @@ async function hmacSha256Prefixed(key, data) {
 }
 
 function captureSummary(meta = {}) {
-  return {
+  const base = {
     site: meta.site || null,
     adapter: meta.adapter || null,
     kind: meta.kind || "media",
@@ -14449,6 +14461,13 @@ function captureSummary(meta = {}) {
     posted_at: meta.postedAt || null,
     saved_at: meta.savedAt || null,
   };
+  const mk = meta.mediaKind || meta.media_kind, ss = meta.sourceSite || meta.source_site, dk = meta.dedupKey || meta.dedup_key, wh = meta.workflowHints || meta.workflow_hints;
+  if (mk) base.media_kind = mk;
+  if (ss) base.source_site = ss;
+  if (dk) base.dedup_key = dk;
+  if (wh && wh.length) base.workflow_hints = wh;
+  if (meta.deconstructReady === true || meta.deconstruct_ready === true) base.deconstruct_ready = true;
+  return base;
 }
 
 async function normaliseArtifacts(entries = []) {
@@ -14604,6 +14623,179 @@ async function sidecarReceiptSidecars(meta, opts = {}) {
 }
 
 return { COMMONS_DIGEST_FORMAT, ENGINE_RECEIPT_SCHEMA, IN_TOTO_STATEMENT, ENGINE_RECEIPT_PREDICATE, COMMONS_DIGEST_DOES_NOT_PROVE, canonicalJson, toBytes, sha256Prefixed, hmacSha256Prefixed, sidecarDigest, sidecarEngineReceipt, verifySidecarDigest, verifySidecarEngineReceipt, sidecarReceiptSidecars };
+})();
+
+// ---- download-route.js
+const M_download_route = (() => {
+// Unified multi-site download classification, filename sanitization, subfolder organization,
+// canonical deduplication keys, and sister-tool workflow routing hints (gather, distill, crucible,
+// DS-05). Pure ES module: no DOM, no network, no filesystem access.
+
+const { stripTracking } = M_url_clean;
+const { downloadName, slug } = M_media_name;
+const { metaName, postTag, savePath } = M_media_meta;
+
+const SUPPORTED_SITES = Object.freeze([
+  "x", "reddit", "youtube", "bluesky", "hackernews", "arxiv", "github",
+  "instagram", "mastodon", "threads", "tiktok", "facebook",
+]);
+const MEDIA_KINDS = Object.freeze(["whitepaper", "audio", "video", "image", "post"]);
+const TYPE_SUBFOLDERS = Object.freeze({
+  whitepaper: "papers", audio: "audio", video: "video", image: "images", post: "posts",
+});
+const WORKFLOW_HINTS = Object.freeze(["civic_audit", "distill_media", "research_verify"]);
+
+const SITE_RULES = [
+  ["x", /(^|\.)(x|twitter|twimg)\.com$/i],
+  ["reddit", /(^|\.)(reddit\.com|redd\.it)$/i],
+  ["youtube", /(^|\.)(youtube\.com|youtu\.be|ytimg\.com)$/i],
+  ["bluesky", /(^|\.)bsky\.(app|social)$/i],
+  ["hackernews", /^news\.ycombinator\.com$/i],
+  ["arxiv", /(^|\.)(arxiv\.org|ar5iv\.labs\.arxiv\.org)$/i],
+  ["github", /(^|\.)(github\.com|githubusercontent\.com)$/i],
+  ["instagram", /(^|\.)(instagram\.com|cdninstagram\.com)$/i],
+  ["threads", /(^|\.)threads\.(net|com)$/i],
+  ["tiktok", /(^|\.)(tiktok\.com|tiktokcdn\.com)$/i],
+  ["facebook", /(^|\.)(facebook\.com|fb\.com|fbcdn\.net)$/i],
+  ["mastodon", /(^|\.)(mastodon\.\w+|hachyderm\.io|fosstodon\.org|infosec\.exchange)$/i],
+];
+
+const PAPER_HOSTS = /(^|\.)(arxiv\.org|ar5iv\.labs\.arxiv\.org|biorxiv\.org|medrxiv\.org|openreview\.net|aclanthology\.org|zenodo\.org|doi\.org|semanticscholar\.org)$/i;
+const CIVIC_SITES = new Set(["x", "reddit", "youtube", "bluesky", "hackernews", "instagram", "mastodon", "threads", "tiktok", "facebook"]);
+const AUDIO_EXT = /^(wav|flac|mp3|m4a|ogg|oga|opus|aac|weba)$/i;
+const VIDEO_EXT = /^(mp4|m4v|webm|mov|mkv|ts|avi|ogv)$/i;
+const IMAGE_EXT = /^(jpg|jpeg|jfif|png|webp|gif|avif|heic|heif|svg|bmp|tif|tiff|jxl|ico)$/i;
+
+function hostOf(urlOrHost) {
+  const s = String(urlOrHost || "").trim();
+  if (!s) return "";
+  if (/^https?:\/\//i.test(s)) {
+    try { return new URL(s).hostname.toLowerCase().replace(/^www\./, ""); } catch { return ""; }
+  }
+  return s.toLowerCase().replace(/^www\./, "").replace(/\/.*$/, "");
+}
+
+function classifySite(urlOrHost) {
+  const h = hostOf(urlOrHost);
+  if (!h) return "generic";
+  if (SUPPORTED_SITES.includes(h)) return h;
+  for (const [id, re] of SITE_RULES) if (re.test(h)) return id;
+  return h;
+}
+
+function extFromUrl(url) {
+  try {
+    const m = /[.@]([a-z0-9]{2,5})$/i.exec(new URL(url).pathname);
+    return m ? m[1].toLowerCase() : "";
+  } catch { return ""; }
+}
+
+function isPaperSignal(url, host, mime, ext, page) {
+  if (mime === "application/pdf" || ext === "pdf") return true;
+  if (PAPER_HOSTS.test(host)) return true;
+  if (/\/(pdf|abs)\/\d{4}\.\d{4,5}/i.test(String(url || ""))) return true;
+  if (page && page.citation && (page.citation.citation_title || page.citation.citation_pdf_url || page.citation.citation_doi)) return true;
+  if (page && Array.isArray(page.jsonLd) && page.jsonLd.some((n) => n && n.type === "ScholarlyArticle")) return true;
+  return false;
+}
+
+function classifyMediaKind({ url = "", mime = "", ext = "", kind = "", site = "", page = null } = {}) {
+  const m = String(mime || "").toLowerCase().split(";")[0].trim();
+  const e = String(ext || "").replace(/^\./, "").toLowerCase() || extFromUrl(url);
+  const k = String(kind || "").toLowerCase();
+  const h = hostOf(url) || hostOf(site);
+  if (k === "whitepaper" || k === "paper" || isPaperSignal(url, h, m, e, page)) return "whitepaper";
+  if (k === "audio" || m.startsWith("audio/") || AUDIO_EXT.test(e)) return "audio";
+  if (k === "video" || m.startsWith("video/") || VIDEO_EXT.test(e) || classifySite(url || site) === "youtube") return "video";
+  if (k === "image" || k === "gif" || m.startsWith("image/") || IMAGE_EXT.test(e)) return "image";
+  return "post";
+}
+
+const subfolderForKind = (mediaKind) => TYPE_SUBFOLDERS[mediaKind] || TYPE_SUBFOLDERS.post;
+
+function extractSiteId(site, url) {
+  const u = String(url || "");
+  if (!u) return null;
+  if (site === "arxiv") {
+    const m = /\/(?:abs|pdf|html)\/(\d{4}\.\d{4,5}(?:v\d+)?|[a-z-]+\/\d{7})/i.exec(u);
+    if (m) return `arxiv:${m[1].replace(/\.pdf$/i, "")}`;
+  }
+  if (site === "hackernews") {
+    const m = /[?&]id=(\d+)/.exec(u);
+    if (m) return `hackernews:${m[1]}`;
+  }
+  if (site === "bluesky") {
+    const m = /\/profile\/([^/]+)\/post\/([a-z0-9]+)/i.exec(u);
+    if (m) return `bluesky:${m[1]}:${m[2]}`;
+  }
+  const tag = postTag({ postUrl: u });
+  return tag ? `${site}:${tag}` : null;
+}
+
+function dedupKeyOf(meta = {}, { sha256 = null, mediaUrl = null } = {}) {
+  const targetUrl = meta.postUrl || meta.pageUrl || mediaUrl || meta.mediaUrl || "";
+  const site = classifySite(meta.site || targetUrl);
+  const siteId = extractSiteId(site, meta.postUrl || meta.pageUrl || "");
+  if (siteId) return siteId;
+  if (sha256) return sha256.startsWith("sha256:") ? sha256 : `sha256:${sha256}`;
+  const clean = stripTracking(mediaUrl || meta.mediaUrl || targetUrl);
+  return clean ? `url:${clean}` : `${site}:unknown`;
+}
+
+function deriveWorkflowHints({ mediaKind = "post", sourceSite = "generic", meta = {}, links = [] } = {}) {
+  const hints = new Set();
+  if (mediaKind === "audio" || mediaKind === "video" || mediaKind === "image") hints.add("distill_media");
+  const allLinks = [meta.postUrl, meta.pageUrl, meta.mediaUrl, ...(meta.links || []), ...(links || [])].filter(Boolean).map(String);
+  const hasResearchLink = allLinks.some((u) => PAPER_HOSTS.test(hostOf(u)) || /(^|\.)github\.com$/i.test(hostOf(u)));
+  if (mediaKind === "whitepaper" || sourceSite === "arxiv" || sourceSite === "github" || hasResearchLink) hints.add("research_verify");
+  if (mediaKind === "post" || CIVIC_SITES.has(sourceSite)) hints.add("civic_audit");
+  return [...hints].sort();
+}
+
+function sidecarRoutingMeta(meta = {}, { url = "", mime = "", ext = "", kind = "", sha256 = null } = {}) {
+  const probeUrl = url || meta.mediaUrl || meta.postUrl || meta.pageUrl || "";
+  const source_site = classifySite(meta.site || probeUrl);
+  const media_kind = classifyMediaKind({ url: probeUrl, mime, ext, kind: kind || (meta.kind === "text" ? "post" : meta.kind), site: source_site, page: meta.page });
+  const dedup_key = dedupKeyOf({ ...meta, site: source_site }, { sha256, mediaUrl: url || meta.mediaUrl });
+  const workflow_hints = deriveWorkflowHints({ mediaKind: media_kind, sourceSite: source_site, meta });
+  return { media_kind, source_site, dedup_key, workflow_hints, deconstruct_ready: true };
+}
+
+function sanitizeFilename(name) {
+  const raw = String(name || "media.bin").split(/[\\/]/).pop() || "media.bin";
+  const m = /^(.*?)(\.[a-z0-9]{1,8})?$/i.exec(raw);
+  const base = (slug((m && m[1]) || "media", 100) || "media").toLowerCase();
+  const ext = ((m && m[2]) || "").replace(/[^.a-z0-9]/gi, "").toLowerCase();
+  return `${base}${ext}`;
+}
+
+function planStreamlinedDownload({
+  meta = {}, url = "", mime = "", ext = "", kind = "", settings = null, sha256 = null,
+  index = 0, total = 1, nameTag = undefined, study = false, library = null, organizeByType = null,
+} = {}) {
+  const routing = sidecarRoutingMeta(meta, { url, mime, ext, kind, sha256 });
+  const subfolder = subfolderForKind(routing.media_kind);
+  const useSub = organizeByType === null ? !!(settings && settings.mediaOrganizeByType) : !!organizeByType;
+  const folder = savePath(settings, routing.source_site, study, library, useSub ? subfolder : null);
+  const chosenExt = String(ext || extFromUrl(url) || (routing.media_kind === "whitepaper" ? "pdf" : routing.media_kind === "post" ? "md" : "bin")).replace(/^\./, "");
+  const rawName = meta.author && meta.author.handle
+    ? metaName({ ...meta, site: routing.source_site }, chosenExt, nameTag)
+    : downloadName({ title: meta.title || meta.text || routing.source_site, url, index, total, ext: chosenExt });
+  const filename = sanitizeFilename(rawName);
+  return {
+    sourceSite: routing.source_site,
+    mediaKind: routing.media_kind,
+    subfolder,
+    folder,
+    filename,
+    path: `${folder}${filename}`,
+    dedupKey: routing.dedup_key,
+    workflowHints: routing.workflow_hints,
+    deconstructReady: true,
+  };
+}
+
+return { SUPPORTED_SITES, MEDIA_KINDS, TYPE_SUBFOLDERS, WORKFLOW_HINTS, classifySite, classifyMediaKind, subfolderForKind, dedupKeyOf, deriveWorkflowHints, sidecarRoutingMeta, sanitizeFilename, planStreamlinedDownload };
 })();
 
 // ---- engagement-series.js
@@ -15073,6 +15265,214 @@ function savesFilter(front, { likes = false, liked = null, since = "", until = "
 }
 
 return { LIKES_FORMAT, LIKES_SOURCE, STAGES, likesRoute, parseLikes, pickLikeFile, postKey, isKnown, likeMeta, fileName, sidecarName, manifestLine, streamsOf, noVideoNote, manifestText, parseManifest, parseArchiveLikes, missingLikes, likesState, checkpoint, resumable, admit, stageClock, savesFilter };
+})();
+
+// ---- likes-sync.js
+const M_likes_sync = (() => {
+// Automated X Likes pagination, canonical deduplication index (seenIds + media/content SHA-256),
+// rate-limit-safe backoff, pause/stop control, and fail-closed CAPTCHA/challenge halt.
+// Pure ES module: no DOM, no network I/O (caller supplies fetchPage and sleep).
+
+const { parseLikes, manifestLine, postKey } = M_likes;
+const { sidecarRoutingMeta } = M_download_route;
+
+const LIKES_DEDUP_KEY = "pb.likes.dedup.v1";
+const LIKES_DEDUP_FORMAT = "cmmns.likes-dedup/1";
+const CHALLENGE_RE = /captcha|arkose|verify\s+your\s+identity|human\s+verification|challenge_required|are\s+you\s+a\s+robot/i;
+
+function walkTimeline(root, visit, limit = 20000) {
+  const stack = [root];
+  for (let n = 0; stack.length && n < limit; n++) {
+    const v = stack.pop();
+    if (!v || typeof v !== "object") continue;
+    visit(v);
+    if (Array.isArray(v)) { for (const x of v) if (x && typeof x === "object") stack.push(x); }
+    else { for (const k of Object.keys(v)) if (v[k] && typeof v[k] === "object") stack.push(v[k]); }
+  }
+}
+
+// Extracts the bottom/top pagination cursors from X's Likes GraphQL response.
+function extractLikesCursor(json) {
+  let bottomCursor = null, topCursor = null;
+  if (!json || typeof json !== "object") return { bottomCursor, topCursor };
+  if (typeof json.cursor === "string" && json.cursor) bottomCursor = json.cursor;
+  walkTimeline(json, (node) => {
+    const entryId = String(node.entryId || "");
+    const c = node.content && typeof node.content === "object" ? node.content : node;
+    const type = String(c.cursorType || c.cursor_type || "");
+    const val = typeof c.value === "string" && c.value.trim() ? c.value.trim() : null;
+    if (!val) return;
+    if (!bottomCursor && (type === "Bottom" || entryId.startsWith("cursor-bottom"))) bottomCursor = val;
+    if (!topCursor && (type === "Top" || entryId.startsWith("cursor-top"))) topCursor = val;
+  });
+  return { bottomCursor, topCursor };
+}
+
+// Rewrites the cursor parameter in a learned X Likes GraphQL URL (or simple ?cursor= URL).
+function buildNextLikesUrl(templateUrl, cursor) {
+  const u = new URL(templateUrl, "https://x.com");
+  const rawVars = u.searchParams.get("variables");
+  if (rawVars) {
+    try {
+      const vars = JSON.parse(rawVars);
+      if (cursor != null && cursor !== "") vars.cursor = String(cursor);
+      else delete vars.cursor;
+      u.searchParams.set("variables", JSON.stringify(vars));
+      return u.toString();
+    } catch { /* fall through to query param */ }
+  }
+  if (cursor != null && cursor !== "") u.searchParams.set("cursor", String(cursor));
+  else u.searchParams.delete("cursor");
+  return u.toString();
+}
+
+// Fail-closed check for CAPTCHA or anti-bot challenges. Never attempts to bypass.
+function isChallengeResponse({ status = 200, json = null, bodyText = "" } = {}) {
+  const text = `${bodyText || ""} ${json ? JSON.stringify(json) : ""}`;
+  if (CHALLENGE_RE.test(text)) return true;
+  if (status === 403 && /challenge|locked|suspended|verify/i.test(text)) return true;
+  return false;
+}
+
+// Canonical deduplication index across post IDs, media/content SHA-256 hashes, and direct URLs.
+function createDedupIndex(initial = null) {
+  const seenIds = new Set();
+  const contentHashes = new Set();
+  const mediaUrls = new Set();
+  const addId = (id) => {
+    if (id == null || id === "") return;
+    const raw = String(id).replace(/^x:/, "");
+    seenIds.add(postKey(raw));
+  };
+  const addHash = (h) => {
+    if (!h) return;
+    const norm = String(h).toLowerCase();
+    contentHashes.add(norm.startsWith("sha256:") ? norm : `sha256:${norm}`);
+  };
+  const addUrl = (u) => { if (u) mediaUrls.add(String(u)); };
+  if (initial) {
+    for (const id of initial.seenIds || initial.ids || []) addId(id);
+    for (const h of initial.contentHashes || initial.hashes || []) addHash(h);
+    for (const u of initial.mediaUrls || initial.urls || []) addUrl(u);
+  }
+  return {
+    seenIds, contentHashes, mediaUrls,
+    has({ id = null, sha256 = null, urls = [] } = {}) {
+      if (id != null && seenIds.has(postKey(String(id).replace(/^x:/, "")))) return true;
+      if (sha256) {
+        const norm = String(sha256).toLowerCase();
+        if (contentHashes.has(norm.startsWith("sha256:") ? norm : `sha256:${norm}`)) return true;
+      }
+      const list = (urls || []).filter(Boolean);
+      return list.length > 0 && list.every((u) => mediaUrls.has(String(u)));
+    },
+    add({ id = null, sha256 = null, urls = [] } = {}) {
+      addId(id);
+      addHash(sha256);
+      for (const u of urls || []) addUrl(u);
+    },
+    size: () => ({ ids: seenIds.size, hashes: contentHashes.size, urls: mediaUrls.size }),
+    serialize(now = new Date().toISOString()) {
+      return { format: LIKES_DEDUP_FORMAT, updatedAt: now, seenIds: [...seenIds].sort(), contentHashes: [...contentHashes].sort(), mediaUrls: [...mediaUrls].sort() };
+    },
+  };
+}
+
+// Applies skip-duplicates policy (default skipDuplicates=true; user can opt in via includeDuplicates=true).
+function admitWithPolicy(dedupIndex, post, { skipDuplicates = true, includeDuplicates = false, sha256 = null, seen = undefined } = {}) {
+  const shouldSkip = includeDuplicates ? false : skipDuplicates !== false;
+  const line = manifestLine(post, seen);
+  const urls = line.files.map((f) => f.url);
+  const duplicate = dedupIndex.has({ id: post.id, sha256, urls });
+  const routing = sidecarRoutingMeta({ site: "x", postUrl: `https://x.com/${post.handle || "i"}/status/${post.id}`, links: post.links || [], kind: line.files.length ? line.files[0].kind : "text" }, { url: urls[0] || "", sha256 });
+  if (duplicate && shouldSkip) return { action: "skip", duplicate: true, dedupKey: routing.dedup_key };
+  dedupIndex.add({ id: post.id, sha256, urls });
+  return { action: "save", duplicate, dedupKey: routing.dedup_key, line: { ...line, ...routing } };
+}
+
+function backoffDelay(res, attempt, initialMs, maxMs, nowMs) {
+  if (res && Number.isFinite(Number(res.retryAfterSec)) && Number(res.retryAfterSec) >= 0) {
+    return Math.min(maxMs, Math.max(initialMs, Math.round(Number(res.retryAfterSec) * 1000)));
+  }
+  if (res && Number.isFinite(Number(res.resetEpochSec))) {
+    const delta = Math.round(Number(res.resetEpochSec) * 1000 - nowMs);
+    if (delta > 0) return Math.min(maxMs, Math.max(initialMs, delta));
+  }
+  return Math.min(maxMs, initialMs * Math.pow(2, attempt));
+}
+
+async function waitWhilePaused(shouldPause, shouldStop, sleep) {
+  while (!shouldStop() && shouldPause()) await sleep(200);
+}
+
+// Automatically paginates every X Likes timeline page until exhaustion, stop, challenge, or rate-limit cap.
+async function paginateLikes({
+  fetchPage,
+  dedupIndex = createDedupIndex(),
+  skipDuplicates = true,
+  includeDuplicates = false,
+  startCursor = null,
+  maxPages = 500,
+  initialBackoffMs = 1500,
+  maxBackoffMs = 60000,
+  maxRateLimitRetries = 3,
+  onProgress = null,
+  onItem = null,
+  shouldPause = () => false,
+  shouldStop = () => false,
+  sleep = (ms) => new Promise((r) => setTimeout(r, ms)),
+  now = () => Date.now(),
+} = {}) {
+  const items = [], visitedCursors = new Set();
+  let cursor = startCursor, pagesFetched = 0, saved = 0, skippedDuplicates = 0, totalSeen = 0, stoppedReason = "exhausted", rateRetries = 0;
+  const report = () => {
+    const snap = { saved, skippedDuplicates, totalSeen, pagesFetched, nextCursor: cursor, stoppedReason };
+    if (onProgress) onProgress(snap);
+    return snap;
+  };
+  for (;;) {
+    await waitWhilePaused(shouldPause, shouldStop, sleep);
+    if (shouldStop()) { stoppedReason = "stopped"; break; }
+    if (pagesFetched >= maxPages) { stoppedReason = "max_pages"; break; }
+    const res = await fetchPage(cursor);
+    if (!res) { stoppedReason = "error"; break; }
+    if (isChallengeResponse(res)) { stoppedReason = "challenge_required"; break; }
+    if (res.status === 429 || res.remaining === 0) {
+      if (rateRetries >= maxRateLimitRetries) { stoppedReason = "rate_limited"; break; }
+      const wait = backoffDelay(res, rateRetries++, initialBackoffMs, maxBackoffMs, now());
+      await sleep(wait);
+      continue;
+    }
+    if (res.status && res.status >= 400) { stoppedReason = "error"; break; }
+    rateRetries = 0;
+    pagesFetched++;
+    const posts = parseLikes(res.json);
+    for (const p of posts) {
+      if (shouldStop()) { stoppedReason = "stopped"; break; }
+      if (!p.media.length && !p.text) continue;
+      totalSeen++;
+      const resAdmit = admitWithPolicy(dedupIndex, p, { skipDuplicates, includeDuplicates });
+      if (resAdmit.action === "skip") skippedDuplicates++;
+      else { saved++; items.push(resAdmit.line); if (onItem) await onItem(resAdmit.line, p); }
+      if (shouldStop()) { stoppedReason = "stopped"; break; }
+    }
+    if (shouldStop()) { stoppedReason = "stopped"; report(); break; }
+    const { bottomCursor } = extractLikesCursor(res.json);
+    if (!posts.length || !bottomCursor || bottomCursor === cursor || visitedCursors.has(bottomCursor)) {
+      cursor = null;
+      stoppedReason = "exhausted";
+      report();
+      break;
+    }
+    visitedCursors.add(bottomCursor);
+    cursor = bottomCursor;
+    report();
+    if (initialBackoffMs > 0) await sleep(initialBackoffMs);
+  }
+  return { ...report(), items };
+}
+
+return { LIKES_DEDUP_KEY, LIKES_DEDUP_FORMAT, extractLikesCursor, buildNextLikesUrl, isChallengeResponse, createDedupIndex, admitWithPolicy, paginateLikes };
 })();
 
 // ---- media-embed.js
@@ -16889,8 +17289,12 @@ const DEFAULTS = Object.freeze({
   // default; "always ask where to save" off, so files go straight to the Downloads folder.
   mediaButtons: true, mediaAskWhere: false,
   // The post's words with each download: a .md sidecar and the description inside the file, on by
-  // default; a .json sidecar for tools, off by default.
-  mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false,
+  // default; a .json sidecar for tools and SHA-256 capture receipts, off by default.
+  mediaSidecar: true, mediaEmbed: true, mediaSidecarJson: false, mediaSidecarReceipt: false,
+  // Organize downloads into <site>/<posts|papers|audio|video|images>/ subfolders, off by default.
+  mediaOrganizeByType: false,
+  // Save all likes skips duplicates by default; users can opt in to re-saving duplicates.
+  likesSkipDuplicates: true,
   // Where saves land inside Downloads: "<mediaFolder>/<site>/". Empty saves straight into Downloads.
   mediaFolder: "CMMNS",
   // Saving straight into Downloads, with no folders, is its own switch, never an empty folder name.
@@ -16978,6 +17382,8 @@ function normalizeSettings(raw) {
     adblock: bool(s.adblock, DEFAULTS.adblock), adblockAllow: siteList(s.adblockAllow),
     mediaButtons: bool(s.mediaButtons, DEFAULTS.mediaButtons), mediaAskWhere: bool(s.mediaAskWhere, DEFAULTS.mediaAskWhere),
     mediaSidecar: bool(s.mediaSidecar, DEFAULTS.mediaSidecar), mediaEmbed: bool(s.mediaEmbed, DEFAULTS.mediaEmbed), mediaSidecarJson: bool(s.mediaSidecarJson, DEFAULTS.mediaSidecarJson),
+    mediaSidecarReceipt: bool(s.mediaSidecarReceipt, DEFAULTS.mediaSidecarReceipt), mediaOrganizeByType: bool(s.mediaOrganizeByType, DEFAULTS.mediaOrganizeByType),
+    likesSkipDuplicates: bool(s.likesSkipDuplicates, DEFAULTS.likesSkipDuplicates),
     mediaFolder: folder(s.mediaFolder, DEFAULTS.mediaFolder) || DEFAULTS.mediaFolder,
     mediaToRoot: bool(s.mediaToRoot, DEFAULTS.mediaToRoot),
     protection: bool(s.protection, DEFAULTS.protection),
@@ -18950,5 +19356,5 @@ function exportAuditInput(files = []) {
 return { SELF_AUDIT_NOT_CHECKED, SELF_AUDIT_REFUSED, ownedProfile, postingClock, selfAudit, exportAuditInput };
 })();
 
-globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_c2pa_pki, ...M_c2pa_revocation, ...M_c2pa_weaknesses, ...M_c2pa_badge, ...M_c2pa_report, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_url_clean, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_page_capture, ...M_media_meta, ...M_sidecar_receipt, ...M_engagement_series, ...M_library, ...M_likes, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
+globalThis.PB = Object.freeze({ ...M_precision, ...M_places, ...M_confusables_data, ...M_confusables, ...M_lookalike_outlets, ...M_lookalike, ...M_brands, ...M_similarity, ...M_mismatch, ...M_reddit, ...M_pattern, ...M_flags, ...M_lexicon, ...M_rhetoric_util, ...M_lexicon_fr, ...M_rhetoric_fr, ...M_lexicon_es, ...M_rhetoric_es, ...M_lexicon_de, ...M_rhetoric_de, ...M_lexicon_pt, ...M_rhetoric_pt, ...M_lexicon_it, ...M_rhetoric_it, ...M_rhetoric_mention, ...M_lexicon_ar, ...M_rhetoric_ar, ...M_lexicon_ru, ...M_rhetoric_ru, ...M_lexicon_uk, ...M_rhetoric_uk, ...M_lexicon_zh, ...M_rhetoric_zh, ...M_lexicon_hi, ...M_rhetoric_hi, ...M_lexicon_derived, ...M_rhetoric_derived, ...M_theories_coercion, ...M_theories, ...M_rhetoric_groups, ...M_rhetoric, ...M_measured, ...M_measured_langs, ...M_persuasion_cues, ...M_persuasion, ...M_reading_lists, ...M_reading_pressure, ...M_reading_cues, ...M_reading_weights, ...M_reading_inflection, ...M_reading_measured, ...M_reading, ...M_framing, ...M_report, ...M_about, ...M_meta, ...M_bsky, ...M_fedi, ...M_owners, ...M_xdata, ...M_machine, ...M_threadkey, ...M_network, ...M_ytdata, ...M_timing, ...M_reply_timeline, ...M_thread_save, ...M_baselines_bins, ...M_baselines_data, ...M_techniques_data, ...M_baselines, ...M_pace, ...M_langs, ...M_state, ...M_ops, ...M_backing, ...M_cloned, ...M_trail, ...M_crosslang, ...M_flooding, ...M_swarming, ...M_campaign_baselines_data, ...M_campaign_text, ...M_campaign_shape, ...M_campaign_sample, ...M_campaign_quotes, ...M_campaign_overlap, ...M_campaign_platforms, ...M_campaign, ...M_receipt, ...M_evidence_github, ...M_evidence_domain, ...M_evidence_ads, ...M_evidence_ledger, ...M_evidence_fetch, ...M_evidence_seal, ...M_chain, ...M_history, ...M_claims, ...M_cbor, ...M_jumbf, ...M_der, ...M_aimeta, ...M_c2pa_verify, ...M_c2pa, ...M_c2pa_pki, ...M_c2pa_revocation, ...M_c2pa_weaknesses, ...M_c2pa_badge, ...M_c2pa_report, ...M_mediacheck, ...M_survival, ...M_keyframes, ...M_graph, ...M_feed, ...M_sig, ...M_evidence, ...M_hosts, ...M_packs, ...M_packs_content, ...M_pack_keys, ...M_sites, ...M_outlets, ...M_feeds, ...M_feedfetch, ...M_coverage, ...M_health, ...M_generic, ...M_media_bytes, ...M_media_webm, ...M_media_ogg, ...M_media_mp4_boxes, ...M_media_mp4, ...M_media_gif_lzw, ...M_media_gif, ...M_media_read, ...M_media_xml, ...M_media_hls, ...M_media_dash, ...M_media_protect, ...M_media_collect, ...M_media_name, ...M_media_pick, ...M_media_gif_encode, ...M_media_demux, ...M_media_assemble, ...M_capture_thread, ...M_url_clean, ...M_video_transcript, ...M_video_bundle, ...M_instagram_data, ...M_page_capture, ...M_media_meta, ...M_sidecar_receipt, ...M_download_route, ...M_engagement_series, ...M_library, ...M_likes, ...M_likes_sync, ...M_media_embed, ...M_media_card, ...M_media_thread, ...M_claim_checks, ...M_capture, ...M_discourse_sheets, ...M_board, ...M_board_html, ...M_clean_util, ...M_clean_icc, ...M_clean_image, ...M_clean_av, ...M_clean_pdf, ...M_clean_zip, ...M_clean, ...M_adblock, ...M_catalogue_data, ...M_catalogue_links, ...M_definitions, ...M_settings, ...M_families, ...M_feedback, ...M_claims_parts, ...M_learn, ...M_imagetext, ...M_api_words, ...M_api_data, ...M_api_site, ...M_api_post, ...M_api_thread, ...M_api_media, ...M_api, ...M_bundle_verify, ...M_evidence_bundle, ...M_signing, ...M_head, ...M_import_html, ...M_import_exports, ...M_import_json, ...M_import_car, ...M_imports, ...M_self_audit });
 })();

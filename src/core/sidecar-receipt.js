@@ -43,7 +43,7 @@ export async function hmacSha256Prefixed(key, data) {
 }
 
 function captureSummary(meta = {}) {
-  return {
+  const base = {
     site: meta.site || null,
     adapter: meta.adapter || null,
     kind: meta.kind || "media",
@@ -53,6 +53,13 @@ function captureSummary(meta = {}) {
     posted_at: meta.postedAt || null,
     saved_at: meta.savedAt || null,
   };
+  const mk = meta.mediaKind || meta.media_kind, ss = meta.sourceSite || meta.source_site, dk = meta.dedupKey || meta.dedup_key, wh = meta.workflowHints || meta.workflow_hints;
+  if (mk) base.media_kind = mk;
+  if (ss) base.source_site = ss;
+  if (dk) base.dedup_key = dk;
+  if (wh && wh.length) base.workflow_hints = wh;
+  if (meta.deconstructReady === true || meta.deconstruct_ready === true) base.deconstruct_ready = true;
+  return base;
 }
 
 async function normaliseArtifacts(entries = []) {
