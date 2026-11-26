@@ -2,21 +2,27 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it using these metadata."
 type: software
 title: "CMMNS"
-abstract: "CMMNS (formerly Daylight Commons, and Radar before that) is a browser extension that shows where social media replies come from, signs of coordination, how replies argue, and whether a fact-checker has reviewed the claim. Install it in Chrome, Edge, Brave or Firefox."
+abstract: "CMMNS (formerly Daylight Commons, and Radar before that) is a site-agnostic browser extension and local archival CLI for Chrome, Edge, Brave, and Firefox. It surfaces account provenance, coordination signals, rhetoric and argument structure, fact-checker matches, universal webpage capture (cmmns.page/1), and offline Web and AI provenance verification (agent-card.json, llms.txt, Schema.org JSON-LD, and engine-receipt/1 SHA-256 digests)."
 version: "3.10.0"
-date-released: "2026-11-14"
+date-released: "2026-11-26"
 authors:
   - family-names: "Harper"
     given-names: "Zain Dana"
     orcid: "https://orcid.org/0009-0001-7175-5393"
 repository-code: "https://github.com/HarperZ9/cmmns"
-url: "https://harperz9.github.io/cmmns/install.html"
+url: "https://harperz9.github.io/cmmns.html"
 license: AGPL-3.0-only
 keywords:
   - browser-extension
-  - disinformation
+  - provenance
+  - c2pa
+  - web-archiving
+  - osint
   - fact-checking
   - media-literacy
+  - disinformation
   - misinformation
+  - llms-txt
+  - agent-card
   - agpl
   - daylight-commons
