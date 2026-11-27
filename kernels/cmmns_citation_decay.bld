@@ -1,0 +1,113 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 95D (Formula STA-073, Author Ideas F1/N43/N28):
+//   Source-Link Rot and Multi-Mirror Archival Survival Probability Calculator.
+//   Models independent origin, Wayback/IA, IPFS pin, and local encrypted vault mirrors
+//   under exponential link decay with correlation penalty rho in [0, 1], rejecting
+//   single-point-of-failure (-601), invalid decay params (-602), and correlated-host
+//   redundancy collapse (-603) fail-closed.
+
+struct DecayRes {
+    rc: i32,
+    survival_prob: f64,
+    loss_prob: f64,
+    effective_mirrors: f64,
+}
+
+// Evaluate multi-mirror archival survival over horizon_yr with host correlation rho in [0, 1]:
+// 0=ARCHIVAL_GRADE, -601=SINGLE_POINT_OF_FAILURE, -602=INVALID_DECAY_PARAMS,
+// -603=CORRELATED_HOST_COLLAPSE
+fn eval_mirror_survival(
+    lambdas: &Vec<f64>,
+    horizon_yr: f64,
+    rho: f64,
+    min_survival: f64,
+) -> DecayRes {
+    let k: usize = lambdas.len();
+    if k == 0 || horizon_yr <= 0.0 || rho < 0.0 || rho > 1.0 || min_survival <= 0.0 || min_survival >= 1.0 {
+        return DecayRes { rc: -602, survival_prob: 0.0, loss_prob: 1.0, effective_mirrors: 0.0 };
+    }
+    let mut prod_fail: f64 = 1.0;
+    let mut min_fail: f64 = 1.0;
+    let mut i: usize = 0;
+    while i < k {
+        let lam: f64 = lambdas[i];
+        if lam <= 0.0 {
+            return DecayRes { rc: -602, survival_prob: 0.0, loss_prob: 1.0, effective_mirrors: 0.0 };
+        }
+        let s_i: f64 = exp(-lam * horizon_yr);
+        let f_i: f64 = 1.0 - s_i;
+        prod_fail = prod_fail * f_i;
+        if f_i < min_fail {
+            min_fail = f_i;
+        }
+        i = i + 1;
+    }
+
+    let eff_k: f64 = 1.0 + (1.0 - rho) * ((k as f64) - 1.0);
+    let f_sys: f64 = (1.0 - rho) * prod_fail + rho * min_fail;
+    let s_sys: f64 = 1.0 - f_sys;
+
+    if k < 2 {
+        return DecayRes { rc: -601, survival_prob: s_sys, loss_prob: f_sys, effective_mirrors: eff_k };
+    }
+    if eff_k < 2.0 || rho >= 0.90 {
+        return DecayRes { rc: -603, survival_prob: s_sys, loss_prob: f_sys, effective_mirrors: eff_k };
+    }
+    if s_sys < min_survival {
+        return DecayRes { rc: -601, survival_prob: s_sys, loss_prob: f_sys, effective_mirrors: eff_k };
+    }
+    DecayRes { rc: 0, survival_prob: s_sys, loss_prob: f_sys, effective_mirrors: eff_k }
+}
+
+fn main() ~ Clock + Console {
+    let t0: i64 = clock_ns();
+    let horizon: f64 = 10.0;
+    let min_surv: f64 = 0.99;
+
+    // 1. Single primary origin only (lambda=0.20/yr -> 10-yr survival 13.53%, SPOF)
+    let single_lams: Vec<f64> = vec![0.20];
+    let r_spof: DecayRes = eval_mirror_survival(&single_lams, horizon, 0.0, min_surv);
+
+    // 2. 4 independent mirrors: Origin(0.20), Wayback(0.04), IPFS(0.03), Local Vault(0.005)
+    let four_lams: Vec<f64> = vec![0.20, 0.04, 0.03, 0.005];
+    let r_quad: DecayRes = eval_mirror_survival(&four_lams, horizon, 0.0, min_surv);
+    let loss_reduction_x: f64 = r_spof.loss_prob / r_quad.loss_prob;
+
+    // Planted control 2: invalid negative hazard rate -> -602
+    let bad_lams: Vec<f64> = vec![0.20, -0.05];
+    let r_inv: DecayRes = eval_mirror_survival(&bad_lams, horizon, 0.0, min_surv);
+
+    // Planted control 3: correlated shared-host mirrors (rho=1.0 collapses redundancy) -> -603
+    let r_corr: DecayRes = eval_mirror_survival(&four_lams, horizon, 1.0, min_surv);
+
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1.0e6;
+
+    let mut failures: i32 = 0;
+    if r_quad.rc != 0 || r_quad.survival_prob < 0.996 || loss_reduction_x < 200.0 {
+        failures = failures + 1;
+    }
+    if r_spof.rc != -601 || r_spof.survival_prob > 0.14 {
+        failures = failures + 1;
+    }
+    if r_inv.rc != -602 || r_corr.rc != -603 {
+        failures = failures + 1;
+    }
+
+    let p1: String = format!(
+        "CITATION_DECAY status={} failures={} elapsed_ms={:.4} s_spof={:.9} s_quad={:.9} loss_cut_x={:.2}",
+        if failures == 0 { "PASS" } else { "FAIL" },
+        failures,
+        elapsed_ms,
+        r_spof.survival_prob,
+        r_quad.survival_prob,
+        loss_reduction_x
+    );
+    let p2: String = format!(
+        "rc_quad={} rc_spof={} rc_inv={} rc_corr={}",
+        r_quad.rc, r_spof.rc, r_inv.rc, r_corr.rc
+    );
+    println!("{} {}", p1, p2);
+}
