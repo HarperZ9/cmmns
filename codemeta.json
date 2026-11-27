@@ -7,7 +7,7 @@
     "Daylight Commons",
     "Radar"
   ],
-  "version": "3.10.0",
+  "version": "3.11.0",
   "description": "Site-agnostic browser extension (MV3) and offline CLI for social provenance, universal webpage archival (cmmns.page/1), case dossiers, and Web and AI provenance verification (agent-card.json, llms.txt, Schema.org JSON-LD, C2PA, and engine-receipt/1).",
   "license": "https://spdx.org/licenses/AGPL-3.0-only.html",
   "codeRepository": "https://github.com/HarperZ9/cmmns",
