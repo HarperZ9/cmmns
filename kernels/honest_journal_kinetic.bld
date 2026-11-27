@@ -1,0 +1,348 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 58D Kernel 1 (Author Idea A22, Formula SIG-117):
+//   Honest Journaling Potential-to-Kinetic Commitment Tracker.
+//   Computes FIPS 180-4 SHA-256 tamper-evident hash-chained timestamped entries,
+//   open-commitment half-life decay, and kinetic action-completion ratio, catching
+//   planted backdated timestamps and retroactive edits fail-closed.
+
+fn rotr32(x: u64, n: u64) -> u64 {
+    let m: u64 = 4294967295;
+    let v: u64 = x & m;
+    ((v >> n) | ((v << (32 - n)) & m)) & m
+}
+
+fn sha256_k() -> Vec<u64> {
+    let mut k: Vec<u64> = Vec::new();
+    k.push(1116352408); k.push(1899447441); k.push(3049323471); k.push(3921009573);
+    k.push(961987163);  k.push(1508970993); k.push(2453635748); k.push(2870763221);
+    k.push(3624381080); k.push(310598401);  k.push(607225278);  k.push(1426881987);
+    k.push(1925078388); k.push(2162078206); k.push(2614888103); k.push(3248222580);
+    k.push(3835390401); k.push(4022224774); k.push(264347078);  k.push(604807628);
+    k.push(770255983);  k.push(1249150122); k.push(1555081692); k.push(1996064986);
+    k.push(2554220882); k.push(2821834349); k.push(2952996808); k.push(3210313671);
+    k.push(3336571891); k.push(3584528711); k.push(113926993);  k.push(338241895);
+    k.push(666307205);  k.push(773529912);  k.push(1294757372); k.push(1396182291);
+    k.push(1695183700); k.push(1986661051); k.push(2177026350); k.push(2456956037);
+    k.push(2730485921); k.push(2820302411); k.push(3259730800); k.push(3345764771);
+    k.push(3516065817); k.push(3600352804); k.push(4094571909); k.push(275423344);
+    k.push(430227734);  k.push(506948616);  k.push(659060556);  k.push(883997877);
+    k.push(958139571);  k.push(1322822218); k.push(1537002063); k.push(1747873779);
+    k.push(1955562222); k.push(2024104815); k.push(2227730452); k.push(2361852424);
+    k.push(2428436474); k.push(2756734187); k.push(3204031479); k.push(3329325298);
+    k
+}
+
+fn sha256_bytes(msg: &Vec<u64>, k_tbl: &Vec<u64>) -> Vec<u64> {
+    let m32: u64 = 4294967295;
+    let mut padded: Vec<u64> = Vec::new();
+    let n: usize = msg.len();
+    let mut i: usize = 0;
+    while i < n {
+        padded.push(msg[i] & 255);
+        i = i + 1;
+    }
+    padded.push(128);
+    while (padded.len() % 64) != 56 {
+        padded.push(0);
+    }
+    let bit_len: u64 = (n as u64) * 8;
+    let mut sh: i32 = 56;
+    while sh >= 0 {
+        padded.push((bit_len >> (sh as u64)) & 255);
+        sh = sh - 8;
+    }
+
+    let mut h0: u64 = 1779033703; let mut h1: u64 = 3144134277;
+    let mut h2: u64 = 1013904242; let mut h3: u64 = 2773480762;
+    let mut h4: u64 = 1359893119; let mut h5: u64 = 2600822924;
+    let mut h6: u64 = 528734635;  let mut h7: u64 = 1541459225;
+
+    let mut w: Vec<u64> = Vec::new();
+    let mut wi: usize = 0;
+    while wi < 64 {
+        w.push(0);
+        wi = wi + 1;
+    }
+
+    let mut blk: usize = 0;
+    while blk < padded.len() {
+        let mut j: usize = 0;
+        while j < 16 {
+            let o: usize = blk + j * 4;
+            w[j] = (padded[o] << 24) | (padded[o + 1] << 16)
+                | (padded[o + 2] << 8) | padded[o + 3];
+            j = j + 1;
+        }
+        j = 16;
+        while j < 64 {
+            let s0: u64 = rotr32(w[j - 15], 7) ^ rotr32(w[j - 15], 18) ^ (w[j - 15] >> 3);
+            let s1: u64 = rotr32(w[j - 2], 17) ^ rotr32(w[j - 2], 19) ^ (w[j - 2] >> 10);
+            w[j] = (w[j - 16] + s0 + w[j - 7] + s1) & m32;
+            j = j + 1;
+        }
+
+        let mut a: u64 = h0; let mut b: u64 = h1; let mut c: u64 = h2; let mut d: u64 = h3;
+        let mut e: u64 = h4; let mut f: u64 = h5; let mut g: u64 = h6; let mut hh: u64 = h7;
+
+        j = 0;
+        while j < 64 {
+            let s1: u64 = rotr32(e, 6) ^ rotr32(e, 11) ^ rotr32(e, 25);
+            let ch: u64 = (e & f) ^ (((e ^ m32) & m32) & g);
+            let t1: u64 = (hh + s1 + ch + k_tbl[j] + w[j]) & m32;
+            let s0: u64 = rotr32(a, 2) ^ rotr32(a, 13) ^ rotr32(a, 22);
+            let maj: u64 = (a & b) ^ (a & c) ^ (b & c);
+            let t2: u64 = (s0 + maj) & m32;
+            hh = g; g = f; f = e; e = (d + t1) & m32;
+            d = c; c = b; b = a; a = (t1 + t2) & m32;
+            j = j + 1;
+        }
+        h0 = (h0 + a) & m32; h1 = (h1 + b) & m32; h2 = (h2 + c) & m32; h3 = (h3 + d) & m32;
+        h4 = (h4 + e) & m32; h5 = (h5 + f) & m32; h6 = (h6 + g) & m32; h7 = (h7 + hh) & m32;
+        blk = blk + 64;
+    }
+
+    let mut out: Vec<u64> = Vec::new();
+    let mut ws: Vec<u64> = Vec::new();
+    ws.push(h0); ws.push(h1); ws.push(h2); ws.push(h3);
+    ws.push(h4); ws.push(h5); ws.push(h6); ws.push(h7);
+    let mut idx: usize = 0;
+    while idx < 8 {
+        out.push((ws[idx] >> 24) & 255);
+        out.push((ws[idx] >> 16) & 255);
+        out.push((ws[idx] >> 8) & 255);
+        out.push(ws[idx] & 255);
+        idx = idx + 1;
+    }
+    out
+}
+
+fn exp_neg_f64(x: f64) -> f64 {
+    if x <= 0.0 {
+        return 1.0;
+    }
+    // Range reduction: exp(-x) = (exp(-x / 2^k))^(2^k), keep u <= 0.0625
+    let mut u: f64 = x;
+    let mut k: i32 = 0;
+    while u > 0.0625 {
+        u = u * 0.5;
+        k = k + 1;
+    }
+    let neg_u: f64 = -u;
+    let mut term: f64 = 1.0;
+    let mut sum: f64 = 1.0;
+    let mut n: i32 = 1;
+    while n <= 12 {
+        term = term * neg_u / (n as f64);
+        sum = sum + term;
+        n = n + 1;
+    }
+    let mut res: f64 = sum;
+    let mut j: i32 = 0;
+    while j < k {
+        res = res * res;
+        j = j + 1;
+    }
+    res
+}
+
+fn push_u32_be(buf: &mut Vec<u64>, v: u64) {
+    buf.push((v >> 24) & 255);
+    buf.push((v >> 16) & 255);
+    buf.push((v >> 8) & 255);
+    buf.push(v & 255);
+}
+
+fn push_u64_be(buf: &mut Vec<u64>, v: u64) {
+    let mut sh: i32 = 56;
+    while sh >= 0 {
+        buf.push((v >> (sh as u64)) & 255);
+        sh = sh - 8;
+    }
+}
+
+fn ct_eq32(a: &Vec<u64>, b: &Vec<u64>) -> i32 {
+    if a.len() != 32 || b.len() != 32 {
+        return 0;
+    }
+    let mut diff: u64 = 0;
+    let mut i: usize = 0;
+    while i < 32 {
+        diff = diff | (a[i] ^ b[i]);
+        i = i + 1;
+    }
+    if diff == 0 { 1 } else { 0 }
+}
+
+fn word_at(d: &Vec<u64>, o: usize) -> u64 {
+    (d[o] << 24) | (d[o + 1] << 16) | (d[o + 2] << 8) | d[o + 3]
+}
+
+fn chain_entries(
+    ts: &Vec<u64>,
+    ids: &Vec<u64>,
+    kin: &Vec<u64>,
+    w100: &Vec<u64>,
+    k_tbl: &Vec<u64>,
+) -> Vec<u64> {
+    let mut gen_msg: Vec<u64> = Vec::new();
+    // "A22-GENESIS"
+    gen_msg.push(65); gen_msg.push(50); gen_msg.push(50); gen_msg.push(45);
+    gen_msg.push(71); gen_msg.push(69); gen_msg.push(78); gen_msg.push(69);
+    gen_msg.push(83); gen_msg.push(73); gen_msg.push(83);
+    let mut cur: Vec<u64> = sha256_bytes(&gen_msg, k_tbl);
+
+    let mut i: usize = 0;
+    while i < ts.len() {
+        let mut buf: Vec<u64> = Vec::new();
+        let mut b: usize = 0;
+        while b < 32 {
+            buf.push(cur[b]);
+            b = b + 1;
+        }
+        push_u64_be(&mut buf, ts[i]);
+        push_u32_be(&mut buf, ids[i]);
+        buf.push(kin[i] & 255);
+        push_u32_be(&mut buf, w100[i]);
+        cur = sha256_bytes(&buf, k_tbl);
+        i = i + 1;
+    }
+    cur
+}
+
+fn check_monotonic_ts(ts: &Vec<u64>) -> i32 {
+    let mut i: usize = 1;
+    while i < ts.len() {
+        if ts[i] <= ts[i - 1] {
+            return 0;
+        }
+        i = i + 1;
+    }
+    1
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+    let k_tbl: Vec<u64> = sha256_k();
+
+    // 8 journal commitments across 14 days (base epoch 1795651200)
+    let mut ts: Vec<u64> = Vec::new();
+    let mut ids: Vec<u64> = Vec::new();
+    let mut kin: Vec<u64> = Vec::new();
+    let mut w100: Vec<u64> = Vec::new();
+
+    let base_ts: u64 = 1795651200;
+    ts.push(base_ts);           ids.push(1); kin.push(1); w100.push(150);
+    ts.push(base_ts + 86400);   ids.push(2); kin.push(0); w100.push(200);
+    ts.push(base_ts + 259200);  ids.push(3); kin.push(1); w100.push(180);
+    ts.push(base_ts + 432000);  ids.push(4); kin.push(1); w100.push(120);
+    ts.push(base_ts + 604800);  ids.push(5); kin.push(0); w100.push(250);
+    ts.push(base_ts + 864000);  ids.push(6); kin.push(1); w100.push(160);
+    ts.push(base_ts + 1036800); ids.push(7); kin.push(0); w100.push(140);
+    ts.push(base_ts + 1209600); ids.push(8); kin.push(1); w100.push(190);
+
+    let sealed_tip: Vec<u64> = chain_entries(&ts, &ids, &kin, &w100, &k_tbl);
+    let mono_ok: i32 = check_monotonic_ts(&ts);
+
+    let now_ts: u64 = base_ts + 1296000; // day 15
+    let half_life_s: f64 = 604800.0; // 7 days
+    let ln2: f64 = 0.6931471805599453;
+
+    let mut kin_sum: f64 = 0.0;
+    let mut raw_pot: f64 = 0.0;
+    let mut dec_pot: f64 = 0.0;
+    let mut i: usize = 0;
+    while i < ts.len() {
+        let w: f64 = (w100[i] as f64) / 100.0;
+        if kin[i] == 1 {
+            kin_sum = kin_sum + w;
+        } else {
+            let age_s: f64 = (now_ts - ts[i]) as f64;
+            let decay: f64 = exp_neg_f64((ln2 * age_s) / half_life_s);
+            raw_pot = raw_pot + w;
+            dec_pot = dec_pot + (w * decay);
+        }
+        i = i + 1;
+    }
+    let raw_ratio: f64 = kin_sum / (kin_sum + raw_pot);
+    let eff_ratio: f64 = kin_sum / (kin_sum + dec_pot);
+
+    if mono_ok == 1 && raw_ratio > 0.5 && eff_ratio > raw_ratio {
+        println!(
+            "[PASS] a22_clean_journal_chain mono=1 raw_ratio={:.6} eff_ratio={:.6}",
+            raw_ratio, eff_ratio
+        );
+    } else {
+        println!("[FAIL] a22_clean_journal_chain");
+        failures = failures + 1;
+    }
+
+    // Planted control 1: Backdated entry (ts[4] < ts[3]) -> fail-closed
+    let mut ts_bad: Vec<u64> = Vec::new();
+    i = 0;
+    while i < ts.len() {
+        ts_bad.push(ts[i]);
+        i = i + 1;
+    }
+    ts_bad[4] = ts_bad[3] - 3600;
+    let backdate_ok: i32 = check_monotonic_ts(&ts_bad);
+    if backdate_ok == 0 {
+        println!("[PASS] a22_planted_backdate rejected=1");
+    } else {
+        println!("[FAIL] a22_planted_backdate");
+        failures = failures + 1;
+    }
+
+    // Planted control 2: Retroactive edit on entry 2 weight (+1) -> chain tip mismatch
+    let mut w_bad: Vec<u64> = Vec::new();
+    i = 0;
+    while i < w100.len() {
+        w_bad.push(w100[i]);
+        i = i + 1;
+    }
+    w_bad[2] = w_bad[2] + 1;
+    let edited_tip: Vec<u64> = chain_entries(&ts, &ids, &kin, &w_bad, &k_tbl);
+    let edit_match: i32 = ct_eq32(&sealed_tip, &edited_tip);
+    if edit_match == 0 {
+        println!("[PASS] a22_planted_retroactive_edit rejected=1");
+    } else {
+        println!("[FAIL] a22_planted_retroactive_edit");
+        failures = failures + 1;
+    }
+
+    // Throughput benchmark: 500 full 8-entry SHA-256 chain verifications
+    let n_runs: usize = 500;
+    let t0: i64 = clock_ns();
+    let mut ok_cnt: i64 = 0;
+    let mut r: usize = 0;
+    while r < n_runs {
+        let tip: Vec<u64> = chain_entries(&ts, &ids, &kin, &w100, &k_tbl);
+        ok_cnt = ok_cnt + (ct_eq32(&sealed_tip, &tip) as i64);
+        r = r + 1;
+    }
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1000000.0;
+    let chains_per_s: f64 = if elapsed_ms > 0.0 {
+        ((n_runs as f64) * 1000.0) / elapsed_ms
+    } else {
+        0.0
+    };
+
+    let tip_w0: u64 = word_at(&sealed_tip, 0);
+    let tip_w7: u64 = word_at(&sealed_tip, 28);
+    println!(
+        "[METRICS] a22 tip_w0={} tip_w7={} kin_sum={:.6} raw_pot={:.6} dec_pot={:.6}",
+        tip_w0, tip_w7, kin_sum, raw_pot, dec_pot
+    );
+    println!(
+        "[METRICS] a22 raw_ratio={:.6} eff_ratio={:.6} ok_cnt={} chains_per_s={:.2} elapsed_ms={:.4}",
+        raw_ratio, eff_ratio, ok_cnt, chains_per_s, elapsed_ms
+    );
+
+    if failures == 0 && ok_cnt == 500 {
+        println!("[OK] honest_journal_kinetic ALL CHECKS PASSED (failures=0)");
+    } else {
+        println!("[ERR] honest_journal_kinetic failures={}", failures);
+    }
+}
