@@ -1,0 +1,169 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 59C (Author Idea I1): Day-One First-Principles Curriculum DAG Solver (first_principles_dag.bld)
+// - Topological mastery order (Kahn's algorithm) from 4 base axioms to 16 derived theorems (20 nodes)
+// - Computes minimum derivation depth and verifies zero circular prerequisites and full axiom grounding
+// - Planted failing controls: cyclic dependency and ungrounded theorem leap rejected fail-closed
+
+struct DagOut {
+    visited: i32,
+    max_depth: i32,
+    depth_sum: i32,
+    order_hash: i64,
+    status: i32,
+}
+
+fn eval_curriculum_dag(
+    n_nodes: usize,
+    n_axioms: usize,
+    src_u: &Vec<usize>,
+    dst_v: &Vec<usize>
+) -> DagOut {
+    let mut indeg: Vec<i32> = Vec::new();
+    let mut depth: Vec<i32> = Vec::new();
+    let mut done: Vec<i32> = Vec::new();
+    let mut i: usize = 0;
+    while i < n_nodes {
+        indeg.push(0);
+        depth.push(0);
+        done.push(0);
+        i = i + 1;
+    }
+
+    let n_edges: usize = src_u.len();
+    let mut e: usize = 0;
+    while e < n_edges {
+        let v: usize = dst_v[e];
+        indeg[v] = indeg[v] + 1;
+        e = e + 1;
+    }
+
+    // Fail-closed grounding check: every derived theorem (node >= n_axioms) must have >= 1 prerequisite
+    i = n_axioms;
+    while i < n_nodes {
+        if indeg[i] == 0 {
+            return DagOut { visited: 0, max_depth: 0, depth_sum: 0, order_hash: 0, status: -2 };
+        }
+        i = i + 1;
+    }
+
+    // Deterministic Kahn topological traversal (lowest ready index first)
+    let mut visited: i32 = 0;
+    let mut h: i64 = 2166136261;
+    let mask: i64 = 4294967295;
+    let mut progress: i32 = 1;
+    while progress == 1 {
+        progress = 0;
+        let mut pick: usize = n_nodes;
+        i = 0;
+        while i < n_nodes {
+            if done[i] == 0 && indeg[i] == 0 {
+                pick = i;
+                break;
+            }
+            i = i + 1;
+        }
+        if pick < n_nodes {
+            done[pick] = 1;
+            visited = visited + 1;
+            progress = 1;
+            h = (((h ^ ((pick as i64) + 1)) & mask) * 16777619) & mask;
+            e = 0;
+            while e < n_edges {
+                if src_u[e] == pick {
+                    let v: usize = dst_v[e];
+                    let cand_d: i32 = depth[pick] + 1;
+                    if cand_d > depth[v] { depth[v] = cand_d; }
+                    indeg[v] = indeg[v] - 1;
+                }
+                e = e + 1;
+            }
+        }
+    }
+
+    if (visited as usize) < n_nodes {
+        return DagOut { visited: visited, max_depth: 0, depth_sum: 0, order_hash: h, status: -1 };
+    }
+
+    let mut max_d: i32 = 0;
+    let mut sum_d: i32 = 0;
+    i = 0;
+    while i < n_nodes {
+        if depth[i] > max_d { max_d = depth[i]; }
+        sum_d = sum_d + depth[i];
+        i = i + 1;
+    }
+    DagOut { visited: visited, max_depth: max_d, depth_sum: sum_d, order_hash: h, status: 1 }
+}
+
+fn push_edge(u: &mut Vec<usize>, v: &mut Vec<usize>, a: usize, b: usize) {
+    u.push(a);
+    v.push(b);
+}
+
+fn main() ~ Clock + Console {
+    let t0: i64 = clock_ns();
+
+    // 4 base axioms (0=counting, 1=symmetry, 2=conservation, 3=ratio) -> 16 derived theorems (4..19)
+    let mut u: Vec<usize> = Vec::new();
+    let mut v: Vec<usize> = Vec::new();
+    // Layer 1 (4..7)
+    push_edge(&mut u, &mut v, 0, 4); push_edge(&mut u, &mut v, 3, 4);
+    push_edge(&mut u, &mut v, 0, 5); push_edge(&mut u, &mut v, 1, 5);
+    push_edge(&mut u, &mut v, 1, 6); push_edge(&mut u, &mut v, 2, 6);
+    push_edge(&mut u, &mut v, 2, 7); push_edge(&mut u, &mut v, 3, 7);
+    // Layer 2 (8..11)
+    push_edge(&mut u, &mut v, 4, 8); push_edge(&mut u, &mut v, 5, 8);
+    push_edge(&mut u, &mut v, 5, 9); push_edge(&mut u, &mut v, 6, 9);
+    push_edge(&mut u, &mut v, 6, 10); push_edge(&mut u, &mut v, 7, 10);
+    push_edge(&mut u, &mut v, 4, 11); push_edge(&mut u, &mut v, 7, 11);
+    // Layer 3 (12..15)
+    push_edge(&mut u, &mut v, 8, 12); push_edge(&mut u, &mut v, 9, 12);
+    push_edge(&mut u, &mut v, 9, 13); push_edge(&mut u, &mut v, 10, 13);
+    push_edge(&mut u, &mut v, 10, 14); push_edge(&mut u, &mut v, 11, 14);
+    push_edge(&mut u, &mut v, 8, 15); push_edge(&mut u, &mut v, 11, 15);
+    // Layer 4 (16..19)
+    push_edge(&mut u, &mut v, 12, 16); push_edge(&mut u, &mut v, 13, 16);
+    push_edge(&mut u, &mut v, 13, 17); push_edge(&mut u, &mut v, 14, 17);
+    push_edge(&mut u, &mut v, 14, 18); push_edge(&mut u, &mut v, 15, 18);
+    push_edge(&mut u, &mut v, 12, 19); push_edge(&mut u, &mut v, 15, 19);
+
+    let clean: DagOut = eval_curriculum_dag(20, 4, &u, &v);
+
+    // Planted control 1: cyclic prerequisite (16 -> 4)
+    push_edge(&mut u, &mut v, 16, 4);
+    let cyc: DagOut = eval_curriculum_dag(20, 4, &u, &v);
+
+    // Planted control 2: ungrounded theorem leap (node 20 with zero prerequisites)
+    let mut u2: Vec<usize> = Vec::new();
+    let mut v2: Vec<usize> = Vec::new();
+    push_edge(&mut u2, &mut v2, 0, 4);
+    let ungrounded: DagOut = eval_curriculum_dag(6, 4, &u2, &v2);
+
+    let traps_caught: i32 = if cyc.status == -1 && ungrounded.status == -2 { 1 } else { 0 };
+
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1.0e6;
+
+    println!("I1_VISITED={}", clean.visited);
+    println!("I1_MAX_DEPTH={}", clean.max_depth);
+    println!("I1_DEPTH_SUM={}", clean.depth_sum);
+    println!("I1_ORDER_HASH={}", clean.order_hash);
+    println!("I1_CYC_VISITED={}", cyc.visited);
+    println!("I1_TRAPS_CAUGHT={}", traps_caught);
+    println!("I1_ELAPSED_MS={:.4}", elapsed_ms);
+
+    let ok: bool = clean.status == 1
+        && clean.visited == 20
+        && clean.max_depth == 4
+        && clean.depth_sum == 40
+        && traps_caught == 1;
+    if ok {
+        println!(
+            "[PASS] I1_FIRST_PRINCIPLES_DAG visited=20/20 max_depth=4 sum=40 traps_caught=1"
+        );
+    } else {
+        println!("[FAIL] I1_FIRST_PRINCIPLES_DAG visited={} traps={}", clean.visited, traps_caught);
+    }
+}

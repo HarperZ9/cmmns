@@ -1,0 +1,156 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 98D (Formula STA-074, Author Ideas F1/N32/N43):
+//   Independent Multi-Source Bayesian Corroboration and Circular-Citation Detector.
+//   Computes log-odds Bayesian posterior across independent sources while running
+//   explicit cycle detection and root-ancestor counting over the citation graph.
+//   Rejects circular-citation echo loops (-701), single-source syndication echo
+//   chambers (-702), and invalid Bayesian bounds (-703) fail-closed.
+
+struct CorrobRes {
+    rc: i32,
+    posterior: f64,
+    independent_roots: i32,
+    has_cycle: i32,
+}
+
+// Evaluate multi-source corroboration over n_sources with directed citation edges (src_u -> dst_v):
+// 0=INDEPENDENT_CORROBORATED, -701=CIRCULAR_CITATION_LOOP,
+// -702=SINGLE_SOURCE_ECHO_CHAMBER, -703=INVALID_BAYESIAN_PARAMS
+fn eval_corroboration(
+    n_sources: usize,
+    prior: f64,
+    tpr: f64,
+    fpr: f64,
+    cite_u: &Vec<usize>,
+    cite_v: &Vec<usize>,
+) -> CorrobRes {
+    if n_sources < 2 || prior <= 0.0 || prior >= 1.0 || tpr <= fpr || fpr <= 0.0 || tpr >= 1.0 {
+        return CorrobRes { rc: -703, posterior: 0.0, independent_roots: 0, has_cycle: 0 };
+    }
+    let n_edges: usize = cite_u.len();
+    if cite_v.len() != n_edges {
+        return CorrobRes { rc: -703, posterior: 0.0, independent_roots: 0, has_cycle: 0 };
+    }
+
+    // Kahn cycle detection on citation graph (edge u -> v means u cites v)
+    let mut indeg: Vec<i32> = Vec::new();
+    let mut outdeg: Vec<i32> = Vec::new();
+    let mut done: Vec<i32> = Vec::new();
+    let mut i: usize = 0;
+    while i < n_sources {
+        indeg.push(0);
+        outdeg.push(0);
+        done.push(0);
+        i = i + 1;
+    }
+    let mut e: usize = 0;
+    while e < n_edges {
+        let u: usize = cite_u[e];
+        let v: usize = cite_v[e];
+        if u >= n_sources || v >= n_sources || u == v {
+            return CorrobRes { rc: -701, posterior: 0.0, independent_roots: 0, has_cycle: 1 };
+        }
+        outdeg[u] = outdeg[u] + 1;
+        indeg[v] = indeg[v] + 1;
+        e = e + 1;
+    }
+
+    let mut visited: usize = 0;
+    let mut progress: i32 = 1;
+    while progress == 1 {
+        progress = 0;
+        i = 0;
+        while i < n_sources {
+            if done[i] == 0 && indeg[i] == 0 {
+                done[i] = 1;
+                visited = visited + 1;
+                progress = 1;
+                e = 0;
+                while e < n_edges {
+                    if cite_u[e] == i {
+                        let v: usize = cite_v[e];
+                        indeg[v] = indeg[v] - 1;
+                    }
+                    e = e + 1;
+                }
+            }
+            i = i + 1;
+        }
+    }
+
+    if visited < n_sources {
+        return CorrobRes { rc: -701, posterior: 0.0, independent_roots: 0, has_cycle: 1 };
+    }
+
+    // Independent primary roots are sources with outdeg == 0 (cite no other source in set)
+    let mut roots: i32 = 0;
+    i = 0;
+    while i < n_sources {
+        if outdeg[i] == 0 {
+            roots = roots + 1;
+        }
+        i = i + 1;
+    }
+    if roots < 2 {
+        return CorrobRes { rc: -702, posterior: prior, independent_roots: roots, has_cycle: 0 };
+    }
+
+    // Exact log-odds Bayesian update weighted strictly by independent root count
+    let log_prior: f64 = ln(prior / (1.0 - prior));
+    let log_lr: f64 = ln(tpr / fpr);
+    let log_post: f64 = log_prior + (roots as f64) * log_lr;
+    let post: f64 = 1.0 / (1.0 + exp(-log_post));
+    CorrobRes { rc: 0, posterior: post, independent_roots: roots, has_cycle: 0 }
+}
+
+fn main() ~ Clock + Console {
+    let t0: i64 = clock_ns();
+    let prior: f64 = 0.20;
+    let tpr: f64 = 0.85;
+    let fpr: f64 = 0.15;
+
+    // 1. Clean: 4 independent primary sources (zero shared citation edges)
+    let empty_u: Vec<usize> = Vec::new();
+    let empty_v: Vec<usize> = Vec::new();
+    let r_clean: CorrobRes = eval_corroboration(4, prior, tpr, fpr, &empty_u, &empty_v);
+
+    // 2. Planted control 1: Circular-citation echo loop (0 -> 1 -> 2 -> 0) -> -701
+    let cyc_u: Vec<usize> = vec![0, 1, 2];
+    let cyc_v: Vec<usize> = vec![1, 2, 0];
+    let r_cyc: CorrobRes = eval_corroboration(4, prior, tpr, fpr, &cyc_u, &cyc_v);
+
+    // 3. Planted control 2: Single-source syndication echo chamber (1->0, 2->0, 3->0) -> -702
+    let echo_u: Vec<usize> = vec![1, 2, 3];
+    let echo_v: Vec<usize> = vec![0, 0, 0];
+    let r_echo: CorrobRes = eval_corroboration(4, prior, tpr, fpr, &echo_u, &echo_v);
+
+    // 4. Planted control 3: Invalid Bayesian params (tpr <= fpr) -> -703
+    let r_inv: CorrobRes = eval_corroboration(4, prior, 0.10, 0.25, &empty_u, &empty_v);
+
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1.0e6;
+
+    let mut failures: i32 = 0;
+    if r_clean.rc != 0 || r_clean.independent_roots != 4 || r_clean.posterior < 0.996 {
+        failures = failures + 1;
+    }
+    if r_cyc.rc != -701 || r_cyc.has_cycle != 1 || r_echo.rc != -702 || r_inv.rc != -703 {
+        failures = failures + 1;
+    }
+
+    let p1: String = format!(
+        "SOURCE_CORROBORATION status={} failures={} elapsed_ms={:.4} roots={} post={:.9}",
+        if failures == 0 { "PASS" } else { "FAIL" },
+        failures,
+        elapsed_ms,
+        r_clean.independent_roots,
+        r_clean.posterior
+    );
+    let p2: String = format!(
+        "rc_clean={} rc_cyc={} rc_echo={} rc_inv={}",
+        r_clean.rc, r_cyc.rc, r_echo.rc, r_inv.rc
+    );
+    println!("{} {}", p1, p2);
+}

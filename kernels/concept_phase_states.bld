@@ -1,0 +1,141 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 57D (Author Idea D11): Landau-Ginzburg Concept & Matter Phase States (concept_phase_states.bld)
+// - Solves Landau-Ginzburg free energy F(psi, T) = 0.5*a0*(T-Tc)*psi^2 + 0.25*b*psi^4 across 4 states
+// - Verifies Solid/Liquid/Gas/Plasma transitions with explicit latent-heat hysteresis loop (16 K width)
+// - Planted failing controls: negative Kelvin T <= 0 and zero-barrier instability b <= 0 caught fail-closed
+
+fn abs_f64(x: f64) -> f64 {
+    if x < 0.0 { return -x; }
+    x
+}
+
+struct LgRes {
+    psi_eq: f64,
+    free_e: f64,
+    barrier: f64,
+    valid: i32,
+}
+
+// Fail-closed Landau-Ginzburg free-energy solver
+fn solve_landau(temp_k: f64, tc_k: f64, a0: f64, b: f64, hyst_k: f64) -> LgRes {
+    if temp_k <= 0.0 || tc_k <= 0.0 {
+        return LgRes { psi_eq: 0.0, free_e: 0.0, barrier: 0.0, valid: -1 };
+    }
+    if a0 <= 0.0 || b <= 0.0 || hyst_k <= 0.0 {
+        return LgRes { psi_eq: 0.0, free_e: 0.0, barrier: 0.0, valid: -2 };
+    }
+    if temp_k < tc_k {
+        let psi: f64 = sqrt(a0 * (tc_k - temp_k) / b);
+        let fe: f64 = 0.5 * a0 * (temp_k - tc_k) * psi * psi + 0.25 * b * psi * psi * psi * psi;
+        return LgRes { psi_eq: psi, free_e: fe, barrier: -fe, valid: 1 };
+    }
+    LgRes { psi_eq: 0.0, free_e: 0.0, barrier: 0.0, valid: 1 }
+}
+
+// Classify Solid(0)/Liquid(1)/Gas(2)/Plasma(3) with explicit latent-heat hysteresis around T_melt
+// dir = +1 heating, dir = -1 cooling
+fn classify_state(temp_k: f64, prev_state: i32, dir: i32, hyst_k: f64) -> i32 {
+    if temp_k <= 0.0 || hyst_k <= 0.0 { return -1; }
+    let t_melt: f64 = 273.15;
+    let t_boil: f64 = 373.15;
+    let t_ion: f64 = 4000.0;
+    if temp_k >= t_ion { return 3; }
+    if temp_k >= t_boil { return 2; }
+    if prev_state == 0 && dir > 0 {
+        if temp_k < t_melt + hyst_k { return 0; }
+        return 1;
+    }
+    if prev_state == 1 && dir < 0 {
+        if temp_k > t_melt - hyst_k { return 1; }
+        return 0;
+    }
+    if temp_k < t_melt { return 0; }
+    1
+}
+
+fn main() ~ Clock + Console {
+    let t0: i64 = clock_ns();
+
+    let a0: f64 = 0.02;
+    let b: f64 = 1.0;
+    let tc: f64 = 273.15;
+    let hyst: f64 = 8.0;
+
+    // Landau-Ginzburg order parameter & barrier at T = 250 K (< Tc) vs T = 300 K (> Tc)
+    let lg_ord: LgRes = solve_landau(250.0, tc, a0, b, hyst);
+    let lg_dis: LgRes = solve_landau(300.0, tc, a0, b, hyst);
+    // Analytic identity: F_eq = -a0^2 * (Tc - T)^2 / (4*b)
+    let dt: f64 = tc - 250.0;
+    let fe_analytic: f64 = -(a0 * a0 * dt * dt) / (4.0 * b);
+    let fe_err: f64 = abs_f64(lg_ord.free_e - fe_analytic);
+
+    // Heating sweep from 240 K to 4200 K: record melt flip temperature
+    let mut st: i32 = 0;
+    let mut t_melt_up: f64 = 0.0;
+    let mut saw_solid: i32 = 0;
+    let mut saw_liquid: i32 = 0;
+    let mut saw_gas: i32 = 0;
+    let mut saw_plasma: i32 = 0;
+
+    let mut step: i32 = 0;
+    while step <= 100 {
+        let tk: f64 = 240.0 + (step as f64) * 1.0;
+        let nxt: i32 = classify_state(tk, st, 1, hyst);
+        if st == 0 && nxt == 1 && t_melt_up == 0.0 { t_melt_up = tk; }
+        st = nxt;
+        if st == 0 { saw_solid = 1; }
+        if st == 1 { saw_liquid = 1; }
+        step = step + 1;
+    }
+    if classify_state(450.0, 1, 1, hyst) == 2 { saw_gas = 1; }
+    if classify_state(4500.0, 2, 1, hyst) == 3 { saw_plasma = 1; }
+
+    // Cooling sweep from 300 K down to 240 K: record freeze flip temperature
+    st = 1;
+    let mut t_freeze_dn: f64 = 0.0;
+    step = 0;
+    while step <= 60 {
+        let tk: f64 = 300.0 - (step as f64) * 1.0;
+        let nxt: i32 = classify_state(tk, st, -1, hyst);
+        if st == 1 && nxt == 0 && t_freeze_dn == 0.0 { t_freeze_dn = tk; }
+        st = nxt;
+        step = step + 1;
+    }
+    let hyst_loop_k: f64 = t_melt_up - t_freeze_dn;
+
+    // Planted failing controls: negative Kelvin T = -15 K and zero-barrier b = 0 / hyst = 0
+    let bad_t: LgRes = solve_landau(-15.0, tc, a0, b, hyst);
+    let bad_b: LgRes = solve_landau(250.0, tc, a0, 0.0, 0.0);
+    let traps_caught: i32 = if bad_t.valid == -1 && bad_b.valid == -2 { 1 } else { 0 };
+
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1.0e6;
+
+    println!("D11_ORD_PSI={:.12}", lg_ord.psi_eq);
+    println!("D11_ORD_FREE_E={:.12}", lg_ord.free_e);
+    println!("D11_FE_ERR={:.15}", fe_err);
+    println!("D11_DIS_PSI={:.12}", lg_dis.psi_eq);
+    println!("D11_T_MELT_UP={:.4}", t_melt_up);
+    println!("D11_T_FREEZE_DN={:.4}", t_freeze_dn);
+    println!("D11_HYST_LOOP_K={:.4}", hyst_loop_k);
+    println!("D11_STATES_SEEN={}", saw_solid + saw_liquid + saw_gas + saw_plasma);
+    println!("D11_TRAPS_CAUGHT={}", traps_caught);
+    println!("D11_ELAPSED_MS={:.4}", elapsed_ms);
+
+    let ok: bool = fe_err < 1.0e-14
+        && lg_ord.barrier > 0.0
+        && lg_dis.psi_eq == 0.0
+        && (saw_solid + saw_liquid + saw_gas + saw_plasma) == 4
+        && hyst_loop_k >= 15.0
+        && traps_caught == 1;
+    if ok {
+        println!(
+            "[PASS] D11_PHASE_STATES 4/4_states hyst={:.1}K psi={:.4} traps_caught=1",
+            hyst_loop_k, lg_ord.psi_eq
+        );
+    } else {
+        println!("[FAIL] D11_PHASE_STATES hyst={:.1}K traps={}", hyst_loop_k, traps_caught);
+    }
+}

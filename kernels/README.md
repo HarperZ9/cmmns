@@ -3,7 +3,7 @@
 SPDX-FileCopyrightText: 2026 Zain Dana Harper and the CMMNS contributors
 SPDX-License-Identifier: MIT
 
-This directory holds seventeen standalone, zero-dependency BuildLang verification kernels graduated into `HarperZ9/cmmns` under the MIT license. Each kernel encodes a fail-closed commons, provenance, erasure-coding, accessibility, discourse, resilience, civic economics, archival stewardship, or anti-Sybil invariant and ships with deterministic reference tests in `tests/buildlang-kernels.test.js`.
+This directory holds forty standalone, zero-dependency BuildLang verification kernels graduated into `HarperZ9/cmmns` under the MIT license (`17` Batches 1 to 4 below, `4` Batch 5 in `kernels/BATCH5.md`, and `19` Batches 6 to 10 in `kernels/BATCHES_6_TO_10.md`). Each kernel encodes a fail-closed commons, provenance, erasure-coding, accessibility, discourse, resilience, civic economics, archival stewardship, or anti-Sybil invariant and ships with deterministic reference tests in `tests/buildlang-kernels.test.js`, `tests/buildlang-kernels-batch5.test.js`, and `tests/buildlang-kernels-batches-6-to-10.test.js`.
 
 ## Kernel Inventory
 
@@ -35,7 +35,7 @@ Standard repository test suite (runs on Ubuntu, Windows, and macOS without requi
 npm test
 ```
 
-When `buildc` (`1.15.0+`) is installed on `PATH`, `tests/buildlang-kernels.test.js` automatically runs `buildc check`, `buildc lint`, and release superoptimized execution on all seventeen kernels and asserts exact parity with the JavaScript reference oracles. Set `CMMNS_REQUIRE_BUILDC=1` to fail closed if `buildc` is unavailable:
+When `buildc` (`1.15.0+`) is installed on `PATH`, the kernel test suites automatically run `buildc check`, `buildc lint`, and release superoptimized execution on all forty kernels and assert exact parity with the JavaScript reference oracles. Set `CMMNS_REQUIRE_BUILDC=1` to fail closed if `buildc` is unavailable:
 
 ```sh
 CMMNS_REQUIRE_BUILDC=1 npm test

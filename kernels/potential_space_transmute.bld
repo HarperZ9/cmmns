@@ -1,0 +1,102 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 59C (Author Ideas A8 + C12): Potential-Space Constraint Transmutation (potential_space_transmute.bld)
+// - Models structured friction transmutation E_order(s) = (s/s_opt)*exp(1-s/s_opt)/(1+0.05*s^2)
+// - Enforces zero telemetry emission during Reverie Mode (A8) and bounded 5-step decay-to-bloom (C12)
+// - Planted failing controls: zero-constraint flat entropy and unconstrained noise blowup rejected fail-closed
+
+fn abs_f64(x: f64) -> f64 {
+    if x < 0.0 { return -x; }
+    x
+}
+
+struct TransmuteRes {
+    order_score: f64,
+    noise_energy: f64,
+    telemetry_events: i32,
+    valid: i32,
+}
+
+// mode=0: Reverie Mode (0 telemetry events emitted); mode=1: Measured Lab
+fn eval_transmute(stress: f64, s_opt: f64, noise_cap: f64, mode: i32) -> TransmuteRes {
+    if stress < 0.0 || s_opt <= 0.0 {
+        return TransmuteRes { order_score: 0.0, noise_energy: 0.0, telemetry_events: 0, valid: -2 };
+    }
+    let noise_e: f64 = 0.05 * stress * stress;
+    if noise_e > noise_cap {
+        return TransmuteRes { order_score: 0.0, noise_energy: noise_e, telemetry_events: 0, valid: -2 };
+    }
+    let u: f64 = stress / s_opt;
+    let order: f64 = (u * exp(1.0 - u)) / (1.0 + noise_e);
+    let telem: i32 = if mode == 0 { 0 } else { 1 };
+    if stress == 0.0 || order <= 1.0e-12 {
+        return TransmuteRes { order_score: order, noise_energy: noise_e, telemetry_events: telem, valid: -1 };
+    }
+    TransmuteRes { order_score: order, noise_energy: noise_e, telemetry_events: telem, valid: 1 }
+}
+
+fn main() ~ Clock + Console {
+    let t0: i64 = clock_ns();
+
+    let s_opt: f64 = 1.0;
+    let noise_cap: f64 = 2.0;
+
+    // A8: Reverie Mode emits strictly zero telemetry events across structured exploration
+    let rev: TransmuteRes = eval_transmute(1.0, s_opt, noise_cap, 0);
+
+    // C12: 5-step decay-to-bloom transmutation curve across stress levels [0.25, 0.5, 1.0, 2.0, 4.0]
+    let s1: TransmuteRes = eval_transmute(0.25, s_opt, noise_cap, 1);
+    let s2: TransmuteRes = eval_transmute(0.50, s_opt, noise_cap, 1);
+    let s3: TransmuteRes = eval_transmute(1.00, s_opt, noise_cap, 1);
+    let s4: TransmuteRes = eval_transmute(2.00, s_opt, noise_cap, 1);
+    let s5: TransmuteRes = eval_transmute(4.00, s_opt, noise_cap, 1);
+
+    let peak_ok: i32 = if s3.order_score > s1.order_score
+        && s3.order_score > s2.order_score
+        && s3.order_score > s4.order_score
+        && s4.order_score > s5.order_score
+        && s3.order_score > 0.90 {
+        1
+    } else {
+        0
+    };
+    let all_valid: i32 = if s1.valid == 1 && s2.valid == 1 && s3.valid == 1 && s4.valid == 1 && s5.valid == 1 {
+        1
+    } else {
+        0
+    };
+    let curve_sum: f64 = s1.order_score + s2.order_score + s3.order_score + s4.order_score + s5.order_score;
+    let nan_free: i32 = if curve_sum == curve_sum && abs_f64(curve_sum) < 10.0 { 1 } else { 0 };
+
+    // Planted control 1: zero-constraint flat entropy (s = 0.0 -> valid = -1)
+    let bad_zero: TransmuteRes = eval_transmute(0.0, s_opt, noise_cap, 1);
+    // Planted control 2: unconstrained runaway noise blowup (s = 10.0 -> noise_e = 5.0 > 2.0 -> valid = -2)
+    let bad_blowup: TransmuteRes = eval_transmute(10.0, s_opt, noise_cap, 1);
+    let traps_caught: i32 = if bad_zero.valid == -1 && bad_blowup.valid == -2 { 1 } else { 0 };
+
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1.0e6;
+
+    println!("A8C12_REVERIE_TELEM={}", rev.telemetry_events);
+    println!("A8C12_PEAK_ORDER={:.12}", s3.order_score);
+    println!("A8C12_LOW_ORDER={:.12}", s1.order_score);
+    println!("A8C12_HIGH_ORDER={:.12}", s5.order_score);
+    println!("A8C12_CURVE_SUM={:.12}", curve_sum);
+    println!("A8C12_TRAPS_CAUGHT={}", traps_caught);
+    println!("A8C12_ELAPSED_MS={:.4}", elapsed_ms);
+
+    let ok: bool = rev.telemetry_events == 0
+        && peak_ok == 1
+        && all_valid == 1
+        && nan_free == 1
+        && traps_caught == 1;
+    if ok {
+        println!(
+            "[PASS] A8C12_POTENTIAL_TRANSMUTE reverie_telem=0 peak={:.4} sum={:.4} traps_caught=1",
+            s3.order_score, curve_sum
+        );
+    } else {
+        println!("[FAIL] A8C12_POTENTIAL_TRANSMUTE peak_ok={} traps={}", peak_ok, traps_caught);
+    }
+}

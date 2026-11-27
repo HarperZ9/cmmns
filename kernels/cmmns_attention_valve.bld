@@ -1,0 +1,93 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 98D (Formula SIG-158, Author Ideas F1/I10):
+//   Non-Extractive Session-Budget and Dark-Pattern Urgency Attention Valve.
+//   Enforces voluntary stop-ramps at user-chosen session budgets and scores
+//   dark-pattern manipulation (artificial countdown urgency, autoplay scroll,
+//   hidden exit friction), rejecting dark patterns (-901), suppressed stop-ramps
+//   (-902), and invalid session budgets (-903) fail-closed.
+
+struct ValveRes {
+    rc: i32,
+    dark_score: i32,
+    stop_ramp_active: i32,
+    remaining_min: i32,
+}
+
+// Audit a browser/commons session UI state against non-extractive I10 invariants:
+// 0=NON_EXTRACTIVE_OK, -901=DARK_PATTERN_DETECTED,
+// -902=STOP_RAMP_SUPPRESSED, -903=INVALID_SESSION_BUDGET
+fn audit_attention_valve(
+    elapsed_min: i32,
+    budget_min: i32,
+    stop_ramp_shown: bool,
+    has_countdown: bool,
+    has_autoplay: bool,
+    has_hidden_exit: bool,
+) -> ValveRes {
+    if budget_min <= 0 || elapsed_min < 0 {
+        return ValveRes { rc: -903, dark_score: 0, stop_ramp_active: 0, remaining_min: 0 };
+    }
+    let mut score: i32 = 0;
+    if has_countdown { score = score + 3; }
+    if has_autoplay { score = score + 2; }
+    if has_hidden_exit { score = score + 4; }
+
+    let rem: i32 = if budget_min > elapsed_min { budget_min - elapsed_min } else { 0 };
+    let over_budget: bool = elapsed_min >= budget_min;
+
+    if score > 0 {
+        return ValveRes { rc: -901, dark_score: score, stop_ramp_active: 0, remaining_min: rem };
+    }
+    if over_budget && !stop_ramp_shown {
+        return ValveRes { rc: -902, dark_score: 0, stop_ramp_active: 0, remaining_min: 0 };
+    }
+    let ramp: i32 = if over_budget && stop_ramp_shown { 1 } else { 0 };
+    ValveRes { rc: 0, dark_score: 0, stop_ramp_active: ramp, remaining_min: rem }
+}
+
+fn main() ~ Clock + Console {
+    let t0: i64 = clock_ns();
+
+    // 1. Clean active session within user budget (20 / 30 min, zero dark patterns)
+    let r_active: ValveRes = audit_attention_valve(20, 30, false, false, false, false);
+
+    // 2. Clean voluntary stop-ramp triggered at budget (30 / 30 min, zero dark patterns)
+    let r_ramp: ValveRes = audit_attention_valve(30, 30, true, false, false, false);
+
+    // 3. Planted control 1: Dark-pattern countdown + autoplay + hidden exit -> -901 (score=9)
+    let r_dark: ValveRes = audit_attention_valve(12, 30, false, true, true, true);
+
+    // 4. Planted control 2: Suppressed voluntary stop-ramp past budget (45 > 30) -> -902
+    let r_supp: ValveRes = audit_attention_valve(45, 30, false, false, false, false);
+
+    // 5. Planted control 3: Invalid zero/negative session budget -> -903
+    let r_inv: ValveRes = audit_attention_valve(10, 0, false, false, false, false);
+
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1.0e6;
+
+    let mut failures: i32 = 0;
+    if r_active.rc != 0 || r_active.remaining_min != 10 || r_ramp.rc != 0 || r_ramp.stop_ramp_active != 1 {
+        failures = failures + 1;
+    }
+    if r_dark.rc != -901 || r_dark.dark_score != 9 || r_supp.rc != -902 || r_inv.rc != -903 {
+        failures = failures + 1;
+    }
+
+    let p1: String = format!(
+        "ATTENTION_VALVE status={} failures={} elapsed_ms={:.4} rem_active={} ramp_active={} dark_score={}",
+        if failures == 0 { "PASS" } else { "FAIL" },
+        failures,
+        elapsed_ms,
+        r_active.remaining_min,
+        r_ramp.stop_ramp_active,
+        r_dark.dark_score
+    );
+    let p2: String = format!(
+        "rc_active={} rc_ramp={} rc_dark={} rc_supp={} rc_inv={}",
+        r_active.rc, r_ramp.rc, r_dark.rc, r_supp.rc, r_inv.rc
+    );
+    println!("{} {}", p1, p2);
+}

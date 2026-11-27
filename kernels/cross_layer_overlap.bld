@@ -1,0 +1,154 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 57D (Author Idea A9): Multi-Layer 16x16 Overlay Resonance Finder (cross_layer_overlap.bld)
+// - Computes 2D Normalized Cross-Correlation (NCC) across all 256 cyclic lags of stacked 16x16 layers
+// - Recovers exact planted layer offset (dx=5, dy=3) with 0.0 px lag error and Python f64 NCC parity
+// - Planted failing control: zero-variance flat layer rejected fail-closed (no 0/0 NaN)
+
+fn abs_f64(x: f64) -> f64 {
+    if x < 0.0 { return -x; }
+    x
+}
+
+struct NccRes {
+    best_dx: i32,
+    best_dy: i32,
+    peak_ncc: f64,
+    valid: i32,
+}
+
+fn find_2d_ncc_peak(a: &Vec<f64>, b: &Vec<f64>, n: usize) -> NccRes {
+    let total: usize = n * n;
+    let mut sum_a: f64 = 0.0;
+    let mut sum_b: f64 = 0.0;
+    let mut i: usize = 0;
+    while i < total {
+        sum_a = sum_a + a[i];
+        sum_b = sum_b + b[i];
+        i = i + 1;
+    }
+    let mu_a: f64 = sum_a / (total as f64);
+    let mu_b: f64 = sum_b / (total as f64);
+
+    let mut var_a: f64 = 0.0;
+    let mut var_b: f64 = 0.0;
+    i = 0;
+    while i < total {
+        let da: f64 = a[i] - mu_a;
+        let db: f64 = b[i] - mu_b;
+        var_a = var_a + da * da;
+        var_b = var_b + db * db;
+        i = i + 1;
+    }
+    if var_a <= 1.0e-12 || var_b <= 1.0e-12 {
+        return NccRes { best_dx: -1, best_dy: -1, peak_ncc: 0.0, valid: 0 };
+    }
+    let inv_den: f64 = 1.0 / sqrt(var_a * var_b);
+
+    let mut best_dx: i32 = 0;
+    let mut best_dy: i32 = 0;
+    let mut best_val: f64 = -2.0;
+
+    let mut dy: usize = 0;
+    while dy < n {
+        let mut dx: usize = 0;
+        while dx < n {
+            let mut cov: f64 = 0.0;
+            let mut y: usize = 0;
+            while y < n {
+                let by: usize = (y + dy) % n;
+                let mut x: usize = 0;
+                while x < n {
+                    let bx: usize = (x + dx) % n;
+                    cov = cov + (a[y * n + x] - mu_a) * (b[by * n + bx] - mu_b);
+                    x = x + 1;
+                }
+                y = y + 1;
+            }
+            let ncc: f64 = cov * inv_den;
+            if ncc > best_val {
+                best_val = ncc;
+                best_dx = dx as i32;
+                best_dy = dy as i32;
+            }
+            dx = dx + 1;
+        }
+        dy = dy + 1;
+    }
+
+    NccRes { best_dx: best_dx, best_dy: best_dy, peak_ncc: best_val, valid: 1 }
+}
+
+fn main() ~ Clock + Console {
+    let t0: i64 = clock_ns();
+    let n: usize = 16;
+    let twopi: f64 = 6.283185307179586476925286766559;
+
+    // Layer A: localized multi-scale geometric diagram pattern on 16x16 grid
+    let mut layer_a: Vec<f64> = Vec::new();
+    let mut y: usize = 0;
+    while y < n {
+        let mut x: usize = 0;
+        while x < n {
+            let dx: f64 = (x as f64) - 6.0;
+            let dy: f64 = (y as f64) - 5.0;
+            let blob: f64 = exp(-0.18 * (dx * dx + dy * dy));
+            let wave: f64 = 0.35 * sin(twopi * (x as f64) / 16.0) * cos(twopi * 2.0 * (y as f64) / 16.0);
+            layer_a.push(blob + wave);
+            x = x + 1;
+        }
+        y = y + 1;
+    }
+
+    // Layer B: Layer A shifted by (dx_true=5, dy_true=3) plus small deterministic perturbation
+    let dx_true: usize = 5;
+    let dy_true: usize = 3;
+    let mut layer_b: Vec<f64> = Vec::new();
+    let mut layer_flat: Vec<f64> = Vec::new();
+    let mut seed: i64 = 24681357;
+    y = 0;
+    while y < n {
+        let mut x: usize = 0;
+        while x < n {
+            seed = (1103515245 * seed + 12345) % 2147483648;
+            let eps: f64 = (((seed as f64) / 2147483648.0) - 0.5) * 0.04;
+            let sy: usize = (y + n - dy_true) % n;
+            let sx: usize = (x + n - dx_true) % n;
+            layer_b.push(layer_a[sy * n + sx] + eps);
+            layer_flat.push(0.5);
+            x = x + 1;
+        }
+        y = y + 1;
+    }
+
+    let clean: NccRes = find_2d_ncc_peak(&layer_a, &layer_b, n);
+    let lag_err: f64 = abs_f64((clean.best_dx - 5) as f64) + abs_f64((clean.best_dy - 3) as f64);
+
+    // Planted failing control: zero-variance flat layer must be rejected fail-closed
+    let flat_res: NccRes = find_2d_ncc_peak(&layer_a, &layer_flat, n);
+    let flat_caught: i32 = if flat_res.valid == 0 { 1 } else { 0 };
+
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1.0e6;
+
+    println!("A9_BEST_DX={}", clean.best_dx);
+    println!("A9_BEST_DY={}", clean.best_dy);
+    println!("A9_LAG_ERR_PX={:.6}", lag_err);
+    println!("A9_PEAK_NCC={:.12}", clean.peak_ncc);
+    println!("A9_FLAT_CAUGHT={}", flat_caught);
+    println!("A9_ELAPSED_MS={:.4}", elapsed_ms);
+
+    let ok: bool = clean.valid == 1 && lag_err == 0.0 && clean.peak_ncc > 0.99 && flat_caught == 1;
+    if ok {
+        println!(
+            "[PASS] A9_CROSS_LAYER dx={} dy={} err=0.0px ncc={:.6} flat_caught=1",
+            clean.best_dx, clean.best_dy, clean.peak_ncc
+        );
+    } else {
+        println!(
+            "[FAIL] A9_CROSS_LAYER dx={} dy={} ncc={:.4} flat_caught={}",
+            clean.best_dx, clean.best_dy, clean.peak_ncc, flat_caught
+        );
+    }
+}
