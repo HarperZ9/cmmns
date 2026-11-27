@@ -1,0 +1,136 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 88E (Author Idea D6, SIG-097): Zero-Heap WASM Zero-Loss Isomorphism
+// Conditional-Entropy Prover over a 256-symbol channel (zero math/heap imports).
+// Proves H(M|R) == 0.0 bits and 256/256 exact roundtrip for bijective affine-XOR
+// and rejects 4-bit truncation (4.0 bits) and 2-to-1 collisions (0.0078125 bits).
+
+fn i2f(n: i32) -> f64 {
+    let mut f: f64 = 0.0;
+    let mut i: i32 = 0;
+    while i < n {
+        f = f + 1.0;
+        i = i + 1;
+    }
+    f
+}
+
+fn w_log2(x: f64) -> f64 {
+    if x <= 0.0 { return -1.0e300; }
+    let mut m: f64 = x;
+    let mut k: f64 = 0.0;
+    while m >= 2.0 {
+        m = m * 0.5;
+        k = k + 1.0;
+    }
+    while m < 1.0 {
+        m = m * 2.0;
+        k = k - 1.0;
+    }
+    // Now m in [1.0, 2.0); ln(m) = 2 * sum_{j=0..8} y^(2j+1)/(2j+1), y=(m-1)/(m+1)
+    let y: f64 = (m - 1.0) / (m + 1.0);
+    let y2: f64 = y * y;
+    let mut p: f64 = y;
+    let mut sum: f64 = y;
+    let mut denom: f64 = 1.0;
+    let mut j: i32 = 1;
+    while j <= 9 {
+        p = p * y2;
+        denom = denom + 2.0;
+        sum = sum + p / denom;
+        j = j + 1;
+    }
+    let ln2: f64 = 0.69314718055994530942;
+    k + (2.0 * sum) / ln2
+}
+
+pub fn encode_bijective(m: i32) -> i32 {
+    (((17 * m + 59) & 255) ^ 165)
+}
+
+pub fn decode_bijective(r: i32) -> i32 {
+    let x: i32 = r ^ 165;
+    ((241 * (x - 59 + 256)) & 255)
+}
+
+fn encode_mode(mode: i32, m: i32) -> i32 {
+    if mode == 0 {
+        return encode_bijective(m);
+    }
+    if mode == 1 {
+        return m >> 4;
+    }
+    if m == 1 { 0 } else { m }
+}
+
+// Compute exact Shannon conditional entropy H(M|R) for mode:
+// 0 = bijective affine-XOR, 1 = 4-bit truncation, 2 = single 2-to-1 collision
+pub fn channel_h_cond(mode: i32) -> f64 {
+    let mut h_r: f64 = 0.0;
+    let mut r: i32 = 0;
+    while r < 256 {
+        let mut c: i32 = 0;
+        let mut m: i32 = 0;
+        while m < 256 {
+            if encode_mode(mode, m) == r {
+                c = c + 1;
+            }
+            m = m + 1;
+        }
+        if c > 0 {
+            let pr: f64 = i2f(c) / 256.0;
+            h_r = h_r - pr * w_log2(pr);
+        }
+        r = r + 1;
+    }
+    let h_cond: f64 = 8.0 - h_r;
+    if h_cond < 1.0e-12 && h_cond > -1.0e-12 {
+        return 0.0;
+    }
+    h_cond
+}
+
+pub fn channel_roundtrip_exact(mode: i32) -> i32 {
+    let mut exact: i32 = 0;
+    if mode == 0 {
+        let mut m: i32 = 0;
+        while m < 256 {
+            if decode_bijective(encode_bijective(m)) == m {
+                exact = exact + 1;
+            }
+            m = m + 1;
+        }
+        return exact;
+    }
+    let mut r: i32 = 0;
+    while r < 256 {
+        let mut seen: i32 = 0;
+        let mut m: i32 = 0;
+        while m < 256 {
+            if encode_mode(mode, m) == r {
+                seen = 1;
+            }
+            m = m + 1;
+        }
+        if seen == 1 {
+            exact = exact + 1;
+        }
+        r = r + 1;
+    }
+    exact
+}
+
+// Fail-closed zero-loss isomorphism gate: 0=LOSSLESS, -401=LOSSY_CHANNEL
+pub fn check_isomorphism_mode(mode: i32) -> i32 {
+    let h_cond: f64 = channel_h_cond(mode);
+    let rt: i32 = channel_roundtrip_exact(mode);
+    if h_cond <= 1.0e-12 && rt == 256 {
+        return 0;
+    }
+    -401
+}
+
+fn main() -> i32 {
+    0
+}
