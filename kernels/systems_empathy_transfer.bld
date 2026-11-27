@@ -1,0 +1,152 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 57F (C13 / SIG-111): Systems-Based Empathy Signal-Transfer Estimator.
+// Models mutual information I(S_sender; S_receiver) in bits and calibration
+// RMSE between two coupled adaptive agents with different internal clocks
+// (1.35x ratio) and noise floors. Catches planted projection-bias (zero
+// receiver feedback) fail-closed.
+
+struct TransferMetrics {
+    mi_bits: f64,
+    cal_rmse: f64,
+    verdict_rc: i64,
+}
+
+fn log2_pos(x: f64) -> f64 {
+    return x.ln() / 0.6931471805599453;
+}
+
+fn clamp_state(v: f64) -> i64 {
+    if v < -0.5 {
+        return 0;
+    }
+    if v < 0.0 {
+        return 1;
+    }
+    if v < 0.5 {
+        return 2;
+    }
+    return 3;
+}
+
+// Deterministic pseudo-noise in [-1, 1] via irrational trigonometric mixing
+fn det_noise(t: i64, seed: f64) -> f64 {
+    let a: f64 = (t as f64) * 1.61803398875 + seed;
+    let b: f64 = (t as f64) * 2.71828182846 + 1.7 * seed;
+    return 0.6 * a.sin() + 0.4 * b.cos();
+}
+
+fn simulate_coupling(steps: i64, fb_gain: f64) -> TransferMetrics {
+    let mut joint: Vec<f64> = Vec::new();
+    let mut i: i64 = 0;
+    while i < 16 {
+        joint.push(0.0);
+        i = i + 1;
+    }
+
+    let mut est: f64 = 0.0;
+    let mut err_sq: f64 = 0.0;
+    let mut t: i64 = 0;
+    while t < steps {
+        let tf: f64 = t as f64;
+        // Sender internal oscillator (clock 1.0) + noise floor 0.12
+        let s_sender: f64 = 0.85 * (0.17 * tf).sin() + 0.12 * det_noise(t, 0.31);
+        // Receiver has shifted internal clock (1.35x) + higher noise floor 0.22
+        let s_self_prior: f64 = 0.85 * (0.17 * 1.35 * tf).sin();
+        let obs_channel: f64 = s_sender + 0.22 * det_noise(t, 1.97);
+
+        // Adaptive receiver blends observation via feedback gain vs pure self-projection
+        est = (1.0 - fb_gain) * s_self_prior + fb_gain * (0.65 * obs_channel + 0.35 * est);
+
+        let diff: f64 = est - s_sender;
+        err_sq = err_sq + diff * diff;
+
+        let bs: i64 = clamp_state(s_sender);
+        let br: i64 = clamp_state(est);
+        let idx: usize = (bs * 4 + br) as usize;
+        joint[idx] = joint[idx] + 1.0;
+        t = t + 1;
+    }
+
+    let nf: f64 = steps as f64;
+    let mut px: Vec<f64> = Vec::new();
+    let mut py: Vec<f64> = Vec::new();
+    i = 0;
+    while i < 4 {
+        px.push(0.0);
+        py.push(0.0);
+        i = i + 1;
+    }
+    let mut r: i64 = 0;
+    while r < 4 {
+        let mut c: i64 = 0;
+        while c < 4 {
+            let p: f64 = joint[(r * 4 + c) as usize] / nf;
+            px[r as usize] = px[r as usize] + p;
+            py[c as usize] = py[c as usize] + p;
+            c = c + 1;
+        }
+        r = r + 1;
+    }
+
+    let mut mi: f64 = 0.0;
+    r = 0;
+    while r < 4 {
+        let mut c: i64 = 0;
+        while c < 4 {
+            let pxy: f64 = joint[(r * 4 + c) as usize] / nf;
+            if pxy > 1e-12 {
+                let denom: f64 = px[r as usize] * py[c as usize];
+                if denom > 1e-12 {
+                    mi = mi + pxy * log2_pos(pxy / denom);
+                }
+            }
+            c = c + 1;
+        }
+        r = r + 1;
+    }
+
+    let rmse: f64 = (err_sq / nf).sqrt();
+    let rc: i64 = if mi < 0.60 || rmse > 0.45 { -401 } else { 0 };
+    return TransferMetrics {
+        mi_bits: mi,
+        cal_rmse: rmse,
+        verdict_rc: rc,
+    };
+}
+
+fn main() -> i64 ~ Console {
+    let steps: i64 = 800;
+    // Calibrated adaptive empathy (strong receiver feedback gain = 0.90)
+    let coupled: TransferMetrics = simulate_coupling(steps, 0.90);
+    // Planted control: pure projection bias (fb_gain = 0.0, ignores receiver feedback)
+    let proj_bias: TransferMetrics = simulate_coupling(steps, 0.0);
+
+    println!(
+        "COUPLED_EMPATHY mi_bits={:.6} cal_rmse={:.6} rc={}",
+        coupled.mi_bits, coupled.cal_rmse, coupled.verdict_rc
+    );
+    println!(
+        "PLANTED_PROJECTION_BIAS mi_bits={:.6} cal_rmse={:.6} rc={}",
+        proj_bias.mi_bits, proj_bias.cal_rmse, proj_bias.verdict_rc
+    );
+
+    let rmse_gain: f64 = proj_bias.cal_rmse / coupled.cal_rmse;
+    let coupled_ok: i64 = if coupled.verdict_rc == 0 && coupled.mi_bits > 1.0 { 1 } else { 0 };
+    let planted_caught: i64 = if proj_bias.verdict_rc == -401 && proj_bias.mi_bits < 0.30 {
+        1
+    } else {
+        0
+    };
+
+    if coupled_ok == 1 && planted_caught == 1 && rmse_gain > 2.5 {
+        println!(
+            "[PASS] C13_SYSTEMS_EMPATHY mi={:.4} proj_mi={:.4} rmse_gain={:.2}x planted=1",
+            coupled.mi_bits, proj_bias.mi_bits, rmse_gain
+        );
+        return 0;
+    }
+    println!("[FAIL] C13_SYSTEMS_EMPATHY cok={} pc={} rg={:.2}", coupled_ok, planted_caught, rmse_gain);
+    return 1;
+}

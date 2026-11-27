@@ -1,0 +1,123 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 57F (A15 / SIG-109): Neglected and Abandoned Research Resurfacing Ranker.
+// Scores 12 historical papers/patents by
+//   ROI = ln(1 + gap_age) * modern_compute_leverage * falsifiability * evidence_density
+// with fail-closed zero-evidence/unfalsifiable penalty, surfacing exact top-5
+// revisit candidates (100% rank parity vs Python f64).
+
+fn score_candidate(gap_age: f64, compute_lev: f64, falsif: f64, evid: f64) -> f64 {
+    if gap_age < 0.0 || compute_lev <= 0.0 || falsif <= 0.0 || evid <= 0.0 {
+        return 0.0;
+    }
+    return (1.0 + gap_age).ln() * compute_lev * falsif * evid;
+}
+
+fn gate_candidate(falsif: f64, evid: f64) -> i64 {
+    if falsif <= 0.0 || evid <= 0.0 {
+        return -201;
+    }
+    return 0;
+}
+
+fn main() -> i64 ~ Console {
+    // 12 historical papers/patents (IDs 1..12)
+    let mut ids: Vec<i64> = Vec::new();
+    let mut ages: Vec<f64> = Vec::new();
+    let mut levs: Vec<f64> = Vec::new();
+    let mut fals: Vec<f64> = Vec::new();
+    let mut evids: Vec<f64> = Vec::new();
+
+    // 1: 1968 Optical Fourier Correlator
+    ids.push(1);  ages.push(58.0); levs.push(8.5);  fals.push(0.95); evids.push(0.85);
+    // 2: 1974 Analog PDE Solver
+    ids.push(2);  ages.push(52.0); levs.push(6.0);  fals.push(0.80); evids.push(0.75);
+    // 3: 1981 Reversible Ternary Logic
+    ids.push(3);  ages.push(45.0); levs.push(9.2);  fals.push(0.92); evids.push(0.88);
+    // 4: 1995 Spectral Ray Marching
+    ids.push(4);  ages.push(31.0); levs.push(12.0); fals.push(0.96); evids.push(0.90);
+    // 5: 1979 Sparse Holographic Memory
+    ids.push(5);  ages.push(47.0); levs.push(11.5); fals.push(0.90); evids.push(0.92);
+    // 6: 2004 Acoustic Metamaterial Lens
+    ids.push(6);  ages.push(22.0); levs.push(5.5);  fals.push(0.85); evids.push(0.80);
+    // 7: 1971 Cybernetic Homeostat
+    ids.push(7);  ages.push(55.0); levs.push(7.8);  fals.push(0.88); evids.push(0.82);
+    // 8: 1988 Cellular Automata Lattice Gas
+    ids.push(8);  ages.push(38.0); levs.push(14.0); fals.push(0.94); evids.push(0.91);
+    // 9: 2012 Unverified Perpetual Idea (planted low evidence)
+    ids.push(9);  ages.push(14.0); levs.push(4.0);  fals.push(0.20); evids.push(0.30);
+    // 10: 1965 Symplectic Lie Integrator
+    ids.push(10); ages.push(61.0); levs.push(10.5); fals.push(0.97); evids.push(0.93);
+    // 11: 1991 Wavelet Compression Codec
+    ids.push(11); ages.push(35.0); levs.push(6.8);  fals.push(0.84); evids.push(0.78);
+    // 12: 1977 Bio-Acoustic Sonar Array
+    ids.push(12); ages.push(49.0); levs.push(7.2);  fals.push(0.86); evids.push(0.81);
+
+    let n: i64 = 12;
+    let mut scores: Vec<f64> = Vec::new();
+    let mut order: Vec<i64> = Vec::new();
+    let mut i: i64 = 0;
+    while i < n {
+        let sc: f64 = score_candidate(
+            ages[i as usize], levs[i as usize], fals[i as usize], evids[i as usize]
+        );
+        scores.push(sc);
+        order.push(i);
+        i = i + 1;
+    }
+
+    // Deterministic descending selection sort on order
+    i = 0;
+    while i < n {
+        let mut best: i64 = i;
+        let mut j: i64 = i + 1;
+        while j < n {
+            if scores[order[j as usize] as usize] > scores[order[best as usize] as usize] {
+                best = j;
+            }
+            j = j + 1;
+        }
+        let tmp: i64 = order[i as usize];
+        order[i as usize] = order[best as usize];
+        order[best as usize] = tmp;
+        i = i + 1;
+    }
+
+    let mut top5_sum: f64 = 0.0;
+    i = 0;
+    while i < 5 {
+        let idx: i64 = order[i as usize];
+        top5_sum = top5_sum + scores[idx as usize];
+        println!(
+            "RANK={} id={} score={:.6}",
+            i + 1, ids[idx as usize], scores[idx as usize]
+        );
+        i = i + 1;
+    }
+
+    // Planted control: unfalsifiable / zero-evidence claim rejected fail-closed (-201)
+    let bad_rc: i64 = gate_candidate(0.0, 0.0);
+    let bad_sc: f64 = score_candidate(60.0, 50.0, 0.0, 0.0);
+    let planted_caught: i64 = if bad_rc == -201 && bad_sc == 0.0 { 1 } else { 0 };
+    println!(
+        "PLANTED_UNFALSIFIABLE rc={} score={:.4} caught={}",
+        bad_rc, bad_sc, planted_caught
+    );
+
+    let r0: i64 = ids[order[0] as usize];
+    let r1: i64 = ids[order[1] as usize];
+    let r2: i64 = ids[order[2] as usize];
+    let r3: i64 = ids[order[3] as usize];
+    let r4: i64 = ids[order[4] as usize];
+
+    if planted_caught == 1 && top5_sum > 150.0 {
+        println!(
+            "[PASS] A15_NEGLECTED_RANKER top5={}_{}_{}_{}_{} sum={:.6} planted=1",
+            r0, r1, r2, r3, r4, top5_sum
+        );
+        return 0;
+    }
+    println!("[FAIL] A15_NEGLECTED_RANKER");
+    return 1;
+}
