@@ -5,6 +5,10 @@ were not published to a store.
 
 ## Unreleased
 
+## 3.11.0 (2026-11-27)
+
+- Graduated Browser/V8 WebAssembly Bridge V5 through V8 (`#143..#146`), shipping `32` pure-OSI MIT `.wasm` verification modules (`600.72 KB` total) including Zero-C BuildOS-2.0/2.1/2.2, BFT consensus, Pedersen and Schnorr ZK proofs, Shamir threshold HSM, and Reed-Solomon RAID-6 storage verification directly inside V8 and browser runtimes.
+
 ## 3.10.0 (2026-11-14)
 
 Any page can be saved from the right-click menu, a YouTube video can be saved in full with its
