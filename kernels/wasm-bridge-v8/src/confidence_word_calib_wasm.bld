@@ -1,0 +1,51 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 61A (N30): Pure-BuildLang WASM Playground Kernel for Interactive
+// Explainer Confidence-Word Calibration.
+
+pub fn confidence_band(p_val: f64, ci_width: f64, control_pass: i32) -> i32 {
+    if p_val < 0.0 || p_val > 1.0 || ci_width < 0.0 {
+        return -403;
+    }
+    if control_pass == 0 {
+        return 0;
+    }
+    if p_val <= 0.01 && ci_width <= 0.05 {
+        return 3;
+    }
+    if p_val <= 0.05 && ci_width <= 0.10 {
+        return 2;
+    }
+    if p_val <= 0.15 && ci_width <= 0.25 {
+        return 1;
+    }
+    0
+}
+
+pub fn audit_claim(
+    p_val: f64,
+    ci_width: f64,
+    control_pass: i32,
+    claimed_band: i32,
+    has_overclaim: i32
+) -> i32 {
+    let band: i32 = confidence_band(p_val, ci_width, control_pass);
+    if band < 0 {
+        return -403;
+    }
+    if claimed_band > 0 && control_pass == 0 {
+        return -402;
+    }
+    if claimed_band > band {
+        return -401;
+    }
+    if has_overclaim != 0 && (ci_width > 0.10 || band < 3) {
+        return -401;
+    }
+    0
+}
+
+fn main() -> i32 {
+    0
+}
