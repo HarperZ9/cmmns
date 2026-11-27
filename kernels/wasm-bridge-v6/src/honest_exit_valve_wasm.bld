@@ -1,0 +1,76 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 64C (N25): Pure-BuildLang WASM Playground Kernel for Three-Arm
+// Honest-Exit Reseating-Valve Agent Simulator (zero heap, zero math imports).
+
+fn i2f(n: i32) -> f64 {
+    let mut f: f64 = 0.0;
+    let mut i: i32 = 0;
+    while i < n { f = f + 1.0; i = i + 1; }
+    f
+}
+
+fn w_exp(x: f64) -> f64 {
+    if x < -700.0 { return 0.0; }
+    if x > 700.0 { return 1.0e300; }
+    let ln2: f64 = 0.69314718055994530942;
+    let mut r: f64 = x;
+    let mut scale: f64 = 1.0;
+    while r > 0.5 * ln2 { r = r - ln2; scale = scale * 2.0; }
+    while r < -0.5 * ln2 { r = r + ln2; scale = scale * 0.5; }
+    let mut term: f64 = 1.0;
+    let mut sum: f64 = 1.0;
+    let mut n: i32 = 1;
+    while n <= 22 {
+        term = term * r / i2f(n);
+        sum = sum + term;
+        n = n + 1;
+    }
+    sum * scale
+}
+
+// Analytical expected-value and stochastic policy simulator per arm:
+// arm_mode: 0=Arm A (green-only), 1=Arm B (honest-exit), 2=Arm C (reseating valve),
+// 3=Planted broken Arm C (audit & valve disabled).
+// metric: 0=hack_rate, 1=solve_rate, 2=ev_hack, 3=ev_exit, 4=p_hack_policy
+pub fn arm_metric(arm_mode: i32, metric: i32) -> f64 {
+    let r_solve: f64 = 1.0;
+    let r_exit: f64 = if arm_mode == 1 || arm_mode == 2 { 0.5 } else { 0.0 };
+    let pen_fail: f64 = if arm_mode == 0 || arm_mode == 3 { -1.0 } else { 0.0 };
+    let p_audit: f64 = if arm_mode == 1 || arm_mode == 2 { 0.85 } else { 0.05 };
+    let pen_caught: f64 = if arm_mode == 1 || arm_mode == 2 { -2.5 } else { -0.5 };
+
+    let ev_hack: f64 = (1.0 - p_audit) * r_solve + p_audit * pen_caught;
+    let ev_exit: f64 = r_exit + pen_fail;
+    if metric == 2 { return ev_hack; }
+    if metric == 3 { return ev_exit; }
+    if metric == 1 { return 1.0; }
+
+    let gap: f64 = ev_hack - ev_exit;
+    let p_hack: f64 = if arm_mode == 2 {
+        if ev_hack > ev_exit { 1.0 } else { 0.0 }
+    } else {
+        if ev_hack > ev_exit { 1.0 / (1.0 + w_exp(-2.0 * gap)) } else { 0.0 }
+    };
+    if metric == 4 { return p_hack; }
+    p_hack
+}
+
+pub fn arm_reseats(arm_mode: i32, n_tasks: i32) -> i32 {
+    if arm_mode != 2 { return 0; }
+    let ev_hack: f64 = arm_metric(arm_mode, 2);
+    let ev_exit: f64 = arm_metric(arm_mode, 3);
+    if ev_hack > ev_exit { return 0; }
+    n_tasks / 2
+}
+
+pub fn audit_arm_safety(arm_mode: i32) -> i32 {
+    let hr: f64 = arm_metric(arm_mode, 0);
+    if hr > 0.05 { return -101; }
+    0
+}
+
+fn main() -> i32 {
+    0
+}

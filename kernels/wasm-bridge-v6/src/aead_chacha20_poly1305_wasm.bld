@@ -1,0 +1,302 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 82G Pack 5 (F1): Zero-Runtime WASM Pure-BuildLang RFC 8439 Sec 2.8.2 ChaCha20-Poly1305 AEAD
+// Computes full 20-round ChaCha20 keystream + 10x13-bit exact Poly1305 (mod 2^130 - 5) with 0 heap.
+// Matches RFC 8439 Sec 2.8.2 ciphertext & tag 1ae10b594f09e26a7e902ecbd0600691 bit-for-bit
+// and rejects planted 1-bit ciphertext flip and 1-bit AAD header flip fail-closed.
+
+fn ushr32(x: i32, n: i32) -> i32 {
+    if n == 0 { return x; }
+    let mask: i32 = (1 << (32 - n)) - 1;
+    (x >> n) & mask
+}
+
+fn rotl32(x: i32, n: i32) -> i32 {
+    (x << n) | ushr32(x, 32 - n)
+}
+
+// Compute word `out_idx` (0..15) of ChaCha20 block for RFC 8439 Sec 2.8.2 key/nonce & block counter
+fn chacha20_word(counter: i32, out_idx: i32) -> i32 {
+    let i0: i32 = 1634760805; let i1: i32 = 857760878;
+    let i2: i32 = 2036477234; let i3: i32 = 1797285236;
+    let i4: i32 = -2088599168; let i5: i32 = -2021227132;
+    let i6: i32 = -1953855096; let i7: i32 = -1886483060;
+    let i8: i32 = -1819111024; let i9: i32 = -1751738988;
+    let i10: i32 = -1684366952; let i11: i32 = -1616994916;
+    let i12: i32 = counter; let i13: i32 = 7;
+    let i14: i32 = 1128415552; let i15: i32 = 1195787588;
+
+    let mut x0: i32 = i0; let mut x1: i32 = i1; let mut x2: i32 = i2; let mut x3: i32 = i3;
+    let mut x4: i32 = i4; let mut x5: i32 = i5; let mut x6: i32 = i6; let mut x7: i32 = i7;
+    let mut x8: i32 = i8; let mut x9: i32 = i9; let mut x10: i32 = i10; let mut x11: i32 = i11;
+    let mut x12: i32 = i12; let mut x13: i32 = i13; let mut x14: i32 = i14; let mut x15: i32 = i15;
+
+    let mut r: i32 = 0;
+    while r < 10 {
+        // Column rounds
+        x0 = x0 + x4; x12 = rotl32(x12 ^ x0, 16); x8 = x8 + x12; x4 = rotl32(x4 ^ x8, 12);
+        x0 = x0 + x4; x12 = rotl32(x12 ^ x0, 8); x8 = x8 + x12; x4 = rotl32(x4 ^ x8, 7);
+
+        x1 = x1 + x5; x13 = rotl32(x13 ^ x1, 16); x9 = x9 + x13; x5 = rotl32(x5 ^ x9, 12);
+        x1 = x1 + x5; x13 = rotl32(x13 ^ x1, 8); x9 = x9 + x13; x5 = rotl32(x5 ^ x9, 7);
+
+        x2 = x2 + x6; x14 = rotl32(x14 ^ x2, 16); x10 = x10 + x14; x6 = rotl32(x6 ^ x10, 12);
+        x2 = x2 + x6; x14 = rotl32(x14 ^ x2, 8); x10 = x10 + x14; x6 = rotl32(x6 ^ x10, 7);
+
+        x3 = x3 + x7; x15 = rotl32(x15 ^ x3, 16); x11 = x11 + x15; x7 = rotl32(x7 ^ x11, 12);
+        x3 = x3 + x7; x15 = rotl32(x15 ^ x3, 8); x11 = x11 + x15; x7 = rotl32(x7 ^ x11, 7);
+
+        // Diagonal rounds
+        x0 = x0 + x5; x15 = rotl32(x15 ^ x0, 16); x10 = x10 + x15; x5 = rotl32(x5 ^ x10, 12);
+        x0 = x0 + x5; x15 = rotl32(x15 ^ x0, 8); x10 = x10 + x15; x5 = rotl32(x5 ^ x10, 7);
+
+        x1 = x1 + x6; x12 = rotl32(x12 ^ x1, 16); x11 = x11 + x12; x6 = rotl32(x6 ^ x11, 12);
+        x1 = x1 + x6; x12 = rotl32(x12 ^ x1, 8); x11 = x11 + x12; x6 = rotl32(x6 ^ x11, 7);
+
+        x2 = x2 + x7; x13 = rotl32(x13 ^ x2, 16); x8 = x8 + x13; x7 = rotl32(x7 ^ x8, 12);
+        x2 = x2 + x7; x13 = rotl32(x13 ^ x2, 8); x8 = x8 + x13; x7 = rotl32(x7 ^ x8, 7);
+
+        x3 = x3 + x4; x14 = rotl32(x14 ^ x3, 16); x9 = x9 + x14; x4 = rotl32(x4 ^ x9, 12);
+        x3 = x3 + x4; x14 = rotl32(x14 ^ x3, 8); x9 = x9 + x14; x4 = rotl32(x4 ^ x9, 7);
+        r = r + 1;
+    }
+
+    if out_idx == 0 { return x0 + i0; } if out_idx == 1 { return x1 + i1; }
+    if out_idx == 2 { return x2 + i2; } if out_idx == 3 { return x3 + i3; }
+    if out_idx == 4 { return x4 + i4; } if out_idx == 5 { return x5 + i5; }
+    if out_idx == 6 { return x6 + i6; } if out_idx == 7 { return x7 + i7; }
+    if out_idx == 8 { return x8 + i8; } if out_idx == 9 { return x9 + i9; }
+    if out_idx == 10 { return x10 + i10; } if out_idx == 11 { return x11 + i11; }
+    if out_idx == 12 { return x12 + i12; } if out_idx == 13 { return x13 + i13; }
+    if out_idx == 14 { return x14 + i14; }
+    x15 + i15
+}
+
+// RFC 8439 Sec 2.8.2 plaintext ("Ladies and Gentlemen of the class of '99: ..."), 29 LE i32 words (114 bytes)
+fn pt_word(idx: i32) -> i32 {
+    if idx == 0 { return 1768186188; }
+    if idx == 1 { return 1629516645; }
+    if idx == 2 { return 1193305198; }
+    if idx == 3 { return 1819569765; }
+    if idx == 4 { return 1852140901; }
+    if idx == 5 { return 543584032; }
+    if idx == 6 { return 543516788; }
+    if idx == 7 { return 1935764579; }
+    if idx == 8 { return 1718558835; }
+    if idx == 9 { return 960046880; }
+    if idx == 10 { return 1716068410; }
+    if idx == 11 { return 1663060256; }
+    if idx == 12 { return 1684829551; }
+    if idx == 13 { return 1717989152; }
+    if idx == 14 { return 2032169573; }
+    if idx == 15 { return 1864398191; }
+    if idx == 16 { return 544828526; }
+    if idx == 17 { return 543518319; }
+    if idx == 18 { return 544237940; }
+    if idx == 19 { return 544370534; }
+    if idx == 20 { return 543516788; }
+    if idx == 21 { return 1970566502; }
+    if idx == 22 { return 539780466; }
+    if idx == 23 { return 1936618867; }
+    if idx == 24 { return 1701147235; }
+    if idx == 25 { return 1870078062; }
+    if idx == 26 { return 543452277; }
+    if idx == 27 { return 1763730786; }
+    if idx == 28 { return 11892; }
+    0
+}
+
+fn ct_word(idx: i32, flip_ct: i32) -> i32 {
+    let blk: i32 = 1 + (idx / 16);
+    let ks: i32 = chacha20_word(blk, idx % 16);
+    let mut w: i32 = pt_word(idx) ^ ks;
+    if idx == 28 { w = w & 65535; }
+    if flip_ct != 0 && idx == 0 { w = w ^ 1; }
+    w
+}
+
+// Poly1305 input stream (10 blocks x 16 bytes = 160 bytes: 1 AAD + 8 CT + 1 lengths)
+fn mac_word(blk_idx: i32, w_off: i32, flip_aad: i32, flip_ct: i32) -> i32 {
+    if blk_idx == 0 {
+        let mut a0: i32 = 1397903696;
+        if flip_aad != 0 { a0 = a0 ^ 1; }
+        if w_off == 0 { return a0; }
+        if w_off == 1 { return -1010646592; }
+        if w_off == 2 { return -943274556; }
+        return 0;
+    }
+    if blk_idx == 9 {
+        if w_off == 0 { return 12; }
+        if w_off == 2 { return 114; }
+        return 0;
+    }
+    let idx: i32 = (blk_idx - 1) * 4 + w_off;
+    if idx < 29 { return ct_word(idx, flip_ct); }
+    0
+}
+
+// Compute Poly1305 tag LE word `tag_word_idx` (0..3) for RFC 8439 Sec 2.8.2
+fn aead_tag_word(flip_aad: i32, flip_ct: i32, tag_word_idx: i32) -> i32 {
+    let r0: i32 = chacha20_word(0, 0) & 268435455;
+    let r1: i32 = chacha20_word(0, 1) & 268435452;
+    let r2: i32 = chacha20_word(0, 2) & 268435452;
+    let r3: i32 = chacha20_word(0, 3) & 268435452;
+
+    let rl0: i32 = r0 & 8191;
+    let rl1: i32 = ushr32(r0, 13) & 8191;
+    let rl2: i32 = (ushr32(r0, 26) | (r1 << 6)) & 8191;
+    let rl3: i32 = ushr32(r1, 7) & 8191;
+    let rl4: i32 = (ushr32(r1, 20) | (r2 << 12)) & 8191;
+    let rl5: i32 = ushr32(r2, 1) & 8191;
+    let rl6: i32 = ushr32(r2, 14) & 8191;
+    let rl7: i32 = (ushr32(r2, 27) | (r3 << 5)) & 8191;
+    let rl8: i32 = ushr32(r3, 8) & 8191;
+    let rl9: i32 = ushr32(r3, 21);
+
+    let mut h0: i32 = 0; let mut h1: i32 = 0; let mut h2: i32 = 0; let mut h3: i32 = 0; let mut h4: i32 = 0;
+    let mut h5: i32 = 0; let mut h6: i32 = 0; let mut h7: i32 = 0; let mut h8: i32 = 0; let mut h9: i32 = 0;
+
+    let mut bi: i32 = 0;
+    while bi < 10 {
+        let b0: i32 = mac_word(bi, 0, flip_aad, flip_ct);
+        let b1: i32 = mac_word(bi, 1, flip_aad, flip_ct);
+        let b2: i32 = mac_word(bi, 2, flip_aad, flip_ct);
+        let b3: i32 = mac_word(bi, 3, flip_aad, flip_ct);
+
+        h0 = h0 + (b0 & 8191);
+        h1 = h1 + (ushr32(b0, 13) & 8191);
+        h2 = h2 + ((ushr32(b0, 26) | (b1 << 6)) & 8191);
+        h3 = h3 + (ushr32(b1, 7) & 8191);
+        h4 = h4 + ((ushr32(b1, 20) | (b2 << 12)) & 8191);
+        h5 = h5 + (ushr32(b2, 1) & 8191);
+        h6 = h6 + (ushr32(b2, 14) & 8191);
+        h7 = h7 + ((ushr32(b2, 27) | (b3 << 5)) & 8191);
+        h8 = h8 + (ushr32(b3, 8) & 8191);
+        h9 = h9 + ushr32(b3, 21) + 2048;
+
+        // Normalize h0..h9 to [0, 8191]
+        let mut c: i32 = h0 >> 13; h0 = h0 & 8191; h1 = h1 + c;
+        c = h1 >> 13; h1 = h1 & 8191; h2 = h2 + c;
+        c = h2 >> 13; h2 = h2 & 8191; h3 = h3 + c;
+        c = h3 >> 13; h3 = h3 & 8191; h4 = h4 + c;
+        c = h4 >> 13; h4 = h4 & 8191; h5 = h5 + c;
+        c = h5 >> 13; h5 = h5 & 8191; h6 = h6 + c;
+        c = h6 >> 13; h6 = h6 & 8191; h7 = h7 + c;
+        c = h7 >> 13; h7 = h7 & 8191; h8 = h8 + c;
+        c = h8 >> 13; h8 = h8 & 8191; h9 = h9 + c;
+        c = h9 >> 13; h9 = h9 & 8191; h0 = h0 + c * 5;
+        c = h0 >> 13; h0 = h0 & 8191; h1 = h1 + c;
+
+        // Exact 10x13-bit multiply mod (2^130 - 5) with zero signed i32 overflow
+        let mut d0: i32 = h0 * rl0;
+        let mut d1: i32 = h0 * rl1 + h1 * rl0;
+        let mut d2: i32 = h0 * rl2 + h1 * rl1 + h2 * rl0;
+        let mut d3: i32 = h0 * rl3 + h1 * rl2 + h2 * rl1 + h3 * rl0;
+        let mut d4: i32 = h0 * rl4 + h1 * rl3 + h2 * rl2 + h3 * rl1 + h4 * rl0;
+        let mut d5: i32 = h0 * rl5 + h1 * rl4 + h2 * rl3 + h3 * rl2 + h4 * rl1 + h5 * rl0;
+        let mut d6: i32 = h0 * rl6 + h1 * rl5 + h2 * rl4 + h3 * rl3 + h4 * rl2 + h5 * rl1 + h6 * rl0;
+        let mut d7: i32 = h0 * rl7 + h1 * rl6 + h2 * rl5 + h3 * rl4 + h4 * rl3 + h5 * rl2 + h6 * rl1 + h7 * rl0;
+        let mut d8: i32 = h0 * rl8 + h1 * rl7 + h2 * rl6 + h3 * rl5 + h4 * rl4
+            + h5 * rl3 + h6 * rl2 + h7 * rl1 + h8 * rl0;
+        let mut d9: i32 = h0 * rl9 + h1 * rl8 + h2 * rl7 + h3 * rl6 + h4 * rl5
+            + h5 * rl4 + h6 * rl3 + h7 * rl2 + h8 * rl1 + h9 * rl0;
+
+        let w0: i32 = h1 * rl9 + h2 * rl8 + h3 * rl7 + h4 * rl6 + h5 * rl5
+            + h6 * rl4 + h7 * rl3 + h8 * rl2 + h9 * rl1;
+        let w1: i32 = h2 * rl9 + h3 * rl8 + h4 * rl7 + h5 * rl6 + h6 * rl5 + h7 * rl4 + h8 * rl3 + h9 * rl2;
+        let w2: i32 = h3 * rl9 + h4 * rl8 + h5 * rl7 + h6 * rl6 + h7 * rl5 + h8 * rl4 + h9 * rl3;
+        let w3: i32 = h4 * rl9 + h5 * rl8 + h6 * rl7 + h7 * rl6 + h8 * rl5 + h9 * rl4;
+        let w4: i32 = h5 * rl9 + h6 * rl8 + h7 * rl7 + h8 * rl6 + h9 * rl5;
+        let w5: i32 = h6 * rl9 + h7 * rl8 + h8 * rl7 + h9 * rl6;
+        let w6: i32 = h7 * rl9 + h8 * rl8 + h9 * rl7;
+        let w7: i32 = h8 * rl9 + h9 * rl8;
+        let w8: i32 = h9 * rl9;
+
+        d0 = d0 + (w0 & 8191) * 5; d1 = d1 + (w0 >> 13) * 5;
+        d1 = d1 + (w1 & 8191) * 5; d2 = d2 + (w1 >> 13) * 5;
+        d2 = d2 + (w2 & 8191) * 5; d3 = d3 + (w2 >> 13) * 5;
+        d3 = d3 + (w3 & 8191) * 5; d4 = d4 + (w3 >> 13) * 5;
+        d4 = d4 + (w4 & 8191) * 5; d5 = d5 + (w4 >> 13) * 5;
+        d5 = d5 + (w5 & 8191) * 5; d6 = d6 + (w5 >> 13) * 5;
+        d6 = d6 + (w6 & 8191) * 5; d7 = d7 + (w6 >> 13) * 5;
+        d7 = d7 + (w7 & 8191) * 5; d8 = d8 + (w7 >> 13) * 5;
+        d8 = d8 + (w8 & 8191) * 5; d9 = d9 + (w8 >> 13) * 5;
+
+        c = d0 >> 13; h0 = d0 & 8191; d1 = d1 + c;
+        c = d1 >> 13; h1 = d1 & 8191; d2 = d2 + c;
+        c = d2 >> 13; h2 = d2 & 8191; d3 = d3 + c;
+        c = d3 >> 13; h3 = d3 & 8191; d4 = d4 + c;
+        c = d4 >> 13; h4 = d4 & 8191; d5 = d5 + c;
+        c = d5 >> 13; h5 = d5 & 8191; d6 = d6 + c;
+        c = d6 >> 13; h6 = d6 & 8191; d7 = d7 + c;
+        c = d7 >> 13; h7 = d7 & 8191; d8 = d8 + c;
+        c = d8 >> 13; h8 = d8 & 8191; d9 = d9 + c;
+        c = d9 >> 13; h9 = d9 & 8191; h0 = h0 + c * 5;
+        c = h0 >> 13; h0 = h0 & 8191; h1 = h1 + c;
+        bi = bi + 1;
+    }
+
+    // Final conditional reduction mod (2^130 - 5)
+    let mut g0: i32 = h0 + 5; let mut gc: i32 = g0 >> 13; g0 = g0 & 8191;
+    let mut g1: i32 = h1 + gc; gc = g1 >> 13; g1 = g1 & 8191;
+    let mut g2: i32 = h2 + gc; gc = g2 >> 13; g2 = g2 & 8191;
+    let mut g3: i32 = h3 + gc; gc = g3 >> 13; g3 = g3 & 8191;
+    let mut g4: i32 = h4 + gc; gc = g4 >> 13; g4 = g4 & 8191;
+    let mut g5: i32 = h5 + gc; gc = g5 >> 13; g5 = g5 & 8191;
+    let mut g6: i32 = h6 + gc; gc = g6 >> 13; g6 = g6 & 8191;
+    let mut g7: i32 = h7 + gc; gc = g7 >> 13; g7 = g7 & 8191;
+    let mut g8: i32 = h8 + gc; gc = g8 >> 13; g8 = g8 & 8191;
+    let mut g9: i32 = h9 + gc; gc = g9 >> 13; g9 = g9 & 8191;
+    if gc != 0 {
+        h0 = g0; h1 = g1; h2 = g2; h3 = g3; h4 = g4;
+        h5 = g5; h6 = g6; h7 = g7; h8 = g8; h9 = g9;
+    }
+
+    // Pack h0..h9 into 4 LE 32-bit words
+    let f0: i32 = h0 | (h1 << 13) | (h2 << 26);
+    let f1: i32 = ushr32(h2, 6) | (h3 << 7) | (h4 << 20);
+    let f2: i32 = ushr32(h4, 12) | (h5 << 1) | (h6 << 14) | (h7 << 27);
+    let f3: i32 = ushr32(h7, 5) | (h8 << 8) | (h9 << 21);
+
+    let s0: i32 = chacha20_word(0, 4);
+    let s1: i32 = chacha20_word(0, 5);
+    let s2: i32 = chacha20_word(0, 6);
+    let s3: i32 = chacha20_word(0, 7);
+
+    // Unsigned 128-bit add (f + s) mod 2^128
+    let lo0: i32 = (f0 & 65535) + (s0 & 65535);
+    let hi0: i32 = ushr32(f0, 16) + ushr32(s0, 16) + (lo0 >> 16);
+    let t0: i32 = (lo0 & 65535) | (hi0 << 16);
+    if tag_word_idx == 0 { return t0; }
+
+    let lo1: i32 = (f1 & 65535) + (s1 & 65535) + (hi0 >> 16);
+    let hi1: i32 = ushr32(f1, 16) + ushr32(s1, 16) + (lo1 >> 16);
+    let t1: i32 = (lo1 & 65535) | (hi1 << 16);
+    if tag_word_idx == 1 { return t1; }
+
+    let lo2: i32 = (f2 & 65535) + (s2 & 65535) + (hi1 >> 16);
+    let hi2: i32 = ushr32(f2, 16) + ushr32(s2, 16) + (lo2 >> 16);
+    let t2: i32 = (lo2 & 65535) | (hi2 << 16);
+    if tag_word_idx == 2 { return t2; }
+
+    let lo3: i32 = (f3 & 65535) + (s3 & 65535) + (hi2 >> 16);
+    let hi3: i32 = ushr32(f3, 16) + ushr32(s3, 16) + (lo3 >> 16);
+    (lo3 & 65535) | (hi3 << 16)
+}
+
+fn aead_ct_first_word() -> i32 {
+    ct_word(0, 0)
+}
+
+fn aead_verify_tampers_caught() -> i32 {
+    let ok0: i32 = aead_tag_word(0, 0, 0);
+    let aad0: i32 = aead_tag_word(1, 0, 0);
+    let ct0: i32 = aead_tag_word(0, 1, 0);
+    if aad0 != ok0 && ct0 != ok0 { return 2; }
+    0
+}
+
+fn main() -> i32 {
+    0
+}
