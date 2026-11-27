@@ -3,7 +3,7 @@
 SPDX-FileCopyrightText: 2026 Zain Dana Harper and the CMMNS contributors
 SPDX-License-Identifier: MIT
 
-This directory holds thirteen standalone, zero-dependency BuildLang verification kernels graduated into `HarperZ9/cmmns` under the MIT license. Each kernel encodes a fail-closed commons, provenance, erasure-coding, accessibility, discourse, resilience, game-theory, or anti-Sybil invariant and ships with deterministic reference tests in `tests/buildlang-kernels.test.js`.
+This directory holds seventeen standalone, zero-dependency BuildLang verification kernels graduated into `HarperZ9/cmmns` under the MIT license. Each kernel encodes a fail-closed commons, provenance, erasure-coding, accessibility, discourse, resilience, civic economics, archival stewardship, or anti-Sybil invariant and ships with deterministic reference tests in `tests/buildlang-kernels.test.js`.
 
 ## Kernel Inventory
 
@@ -22,6 +22,10 @@ This directory holds thirteen standalone, zero-dependency BuildLang verification
 | `anti_softness_critic.bld` | `N68` | `SIG-099` | Adversarial dialogue critic scoring sycophancy, premature hedging, and tidy-redemption tropes against direct falsification markers (`soft == 0` and `direct >= 3`). | Pure sycophancy (`ratio=1.0`), tidy redemption (`ratio=1.0`), and mixed hedging (`ratio=0.75`) rejected. |
 | `cook_seam_register.bld` | `N37` | `STA-056` | Multi-fault seam-register incident graph analyzer enumerating exact minimal 1-cut SPOFs (`4`) and 2-cut pairs (`4`) with SPOF centrality (`8.00`). | Hidden common-mode dependency collapsing redundant DB nodes via `ClockA` (`one_cuts: 4 -> 5`, `rc=-201`) caught. |
 | `community_homeostasis.bld` | `N59` | `STA-057` | Delayed PI feedback stability simulator comparing localized (`tau=1`, `ISE=86.37`) vs centralized (`tau=10`, `ISE=203,068.27`, `2,351x`) control latency. | Runaway gain instability (`peak=1286.21 > 1000`, `rc=-301`) caught fail-closed. |
+| `catastrophe_surge_sim.bld` | `N26` | `STA-055` | Acute supply-shock reallocation curve simulator comparing surge pricing vs priority rationing across `30%`, `50%`, and `70%` shocks on unmet essentials, welfare, and Gini. | `+5.0` unit supply-conservation leak rejected fail-closed (`rc = -101`). |
+| `non_extractive_attention.bld` | `I10` | `SIG-110` | Non-extractive time-return platform scorer auditing task throughput, clean exit-ramp latency (`<= 1` click), and zero infinite-scroll or variable-reward dark patterns. | All 3 planted extractive dark-pattern platforms rejected fail-closed (`rc = -301`, `dmean = 0.2617` vs `0.9579`). |
+| `steward_queue.bld` | `C9` | `SIG-090` | Non-destructive archive integrity and bit-rot curation scanner over 500 records flagging corrupted checksums and orphans for human sign-off (`deleted = 0`). | All 5 planted defects (`3` bit-rot flips + `2` orphans) flagged with `0` false positives and `0` auto-deletes. |
+| `silhouette_def.bld` | `A16` | `SIG-089` | Silhouette definition validator requiring non-empty etymology root, positive inclusion boundary, distinct negative counterexample, and non-tautology. | Missing etymology (`1`), missing inclusion (`2`), missing counterexample (`3`), and tautology (`4`) rejected. |
 
 ## Running Verification
 
@@ -31,7 +35,7 @@ Standard repository test suite (runs on Ubuntu, Windows, and macOS without requi
 npm test
 ```
 
-When `buildc` (`1.15.0+`) is installed on `PATH`, `tests/buildlang-kernels.test.js` automatically runs `buildc check`, `buildc lint`, and release superoptimized execution on all thirteen kernels and asserts exact parity with the JavaScript reference oracles. Set `CMMNS_REQUIRE_BUILDC=1` to fail closed if `buildc` is unavailable:
+When `buildc` (`1.15.0+`) is installed on `PATH`, `tests/buildlang-kernels.test.js` automatically runs `buildc check`, `buildc lint`, and release superoptimized execution on all seventeen kernels and asserts exact parity with the JavaScript reference oracles. Set `CMMNS_REQUIRE_BUILDC=1` to fail closed if `buildc` is unavailable:
 
 ```sh
 CMMNS_REQUIRE_BUILDC=1 npm test

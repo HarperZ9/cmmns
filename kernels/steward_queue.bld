@@ -1,0 +1,89 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 55J Kernel 2 (Author Idea C9):
+//   Steward Archive Integrity & Bit-Rot Curation Queue over 500 Archive Records.
+//   Flags 5/5 (100% recall) planted bit-rot and orphaned records for human sign-off
+//   with 0 false positives and 0 false deletes.
+
+fn fnv1a_32_u64(h: u64, v: u64) -> u64 {
+    let mut cur: u64 = h & 4294967295;
+    let mut k: i32 = 0;
+    let mut x: u64 = v;
+    while k < 4 {
+        cur = ((cur ^ (x & 255)) * 16777619) & 4294967295;
+        x = x >> 8;
+        k = k + 1;
+    }
+    cur
+}
+
+fn record_checksum(rec_id: u64, payload: u64) -> u64 {
+    let h1: u64 = fnv1a_32_u64(2166136261, rec_id);
+    fnv1a_32_u64(h1, payload)
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+    let n: usize = 500;
+    let mut payloads: Vec<u64> = Vec::new();
+    let mut stored_crc: Vec<u64> = Vec::new();
+    let mut parents: Vec<i32> = Vec::new();
+
+    let mut i: usize = 0;
+    while i < n {
+        let pl: u64 = ((i as u64) * 2654435761 + 1013904223) & 4294967295;
+        let crc: u64 = record_checksum(i as u64, pl);
+        payloads.push(pl);
+        stored_crc.push(crc);
+        parents.push(if i == 0 { 0 } else { (i as i32) - 1 });
+        i = i + 1;
+    }
+
+    // Plant 5 defective records: 3 bit-rot flips (42, 199, 387) + 2 orphans (111, 450)
+    payloads[42] = payloads[42] ^ 1;
+    payloads[199] = payloads[199] ^ 16;
+    payloads[387] = payloads[387] ^ 128;
+    parents[111] = -1;
+    parents[450] = -1;
+
+    // Non-destructive steward curation scan (auto_deleted strictly 0)
+    let t0: i64 = clock_ns();
+    let mut bitrot_cnt: i32 = 0;
+    let mut orphan_cnt: i32 = 0;
+    let mut auto_deleted: i32 = 0;
+    let mut queue_hash: u64 = 2166136261;
+
+    i = 0;
+    while i < n {
+        let live_crc: u64 = record_checksum(i as u64, payloads[i]);
+        let is_rot: i32 = if live_crc != stored_crc[i] { 1 } else { 0 };
+        let is_orphan: i32 = if parents[i] < 0 || (parents[i] as usize) >= n { 1 } else { 0 };
+        if is_rot == 1 {
+            bitrot_cnt = bitrot_cnt + 1;
+            queue_hash = fnv1a_32_u64(queue_hash, (i as u64) * 10 + 1);
+        } else if is_orphan == 1 {
+            orphan_cnt = orphan_cnt + 1;
+            queue_hash = fnv1a_32_u64(queue_hash, (i as u64) * 10 + 2);
+        }
+        i = i + 1;
+    }
+    let t1: i64 = clock_ns();
+
+    let total_flagged: i32 = bitrot_cnt + orphan_cnt;
+    if total_flagged == 5 && bitrot_cnt == 3 && orphan_cnt == 2 && auto_deleted == 0 {
+        println!(
+            "[PASS] c9_steward_queue scanned=500 flagged={} bitrot={} orphan={} deleted={} qhash={} elapsed_ns={}",
+            total_flagged, bitrot_cnt, orphan_cnt, auto_deleted, queue_hash, t1 - t0
+        );
+    } else {
+        println!("[FAIL] c9_steward_queue flagged={} rot={} orph={}", total_flagged, bitrot_cnt, orphan_cnt);
+        failures = failures + 1;
+    }
+
+    if failures == 0 {
+        println!("[PASS] wave55j_steward_queue summary failures=0");
+    } else {
+        println!("[FAIL] wave55j_steward_queue summary failures={}", failures);
+    }
+}

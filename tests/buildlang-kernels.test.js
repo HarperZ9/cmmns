@@ -1,14 +1,16 @@
 // SPDX-FileCopyrightText: 2026 Zain Dana Harper and the CMMNS contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 //
-// Deterministic verification tests for all 13 graduated pure-OSI MIT BuildLang kernels
+// Deterministic verification tests for all 17 graduated pure-OSI MIT BuildLang kernels
 // under kernels/:
 //   Batch 1 (#134): I2 (commons_pipe_mirror), N70 (boring_bridge_verifier),
 //                   I7 (accessible_surface_gate), I14 (reach_gradient), I9 (merit_ledger)
 //   Batch 2 (#135): N58 (blackout_commons_sync), A22 (honest_journal_kinetic),
 //                   E20 (bulletin_feed_ranker), N71 (disclosure_penalty_game)
-//   Batch 3:        N34 (quote_provenance_lint), N68 (anti_softness_critic),
+//   Batch 3 (#136): N34 (quote_provenance_lint), N68 (anti_softness_critic),
 //                   N37 (cook_seam_register), N59 (community_homeostasis)
+//   Batch 4:        N26 (catastrophe_surge_sim), I10 (non_extractive_attention),
+//                   C9 (steward_queue), A16 (silhouette_def)
 //
 // Runs on every CI platform via Node reference oracles and source invariant checks,
 // and executes live buildc check/lint/run --release --superopt whenever buildc is on PATH
@@ -38,6 +40,10 @@ const KERNELS = [
   { id: "N68", formula: "SIG-099", file: "anti_softness_critic.bld" },
   { id: "N37", formula: "STA-056", file: "cook_seam_register.bld" },
   { id: "N59", formula: "STA-057", file: "community_homeostasis.bld" },
+  { id: "N26", formula: "STA-055", file: "catastrophe_surge_sim.bld" },
+  { id: "I10", formula: "SIG-110", file: "non_extractive_attention.bld" },
+  { id: "C9", formula: "SIG-090", file: "steward_queue.bld" },
+  { id: "A16", formula: "SIG-089", file: "silhouette_def.bld" },
 ];
 
 function sha256(buf) {
@@ -553,9 +559,127 @@ function oracleN59() {
   return { s1, s10, ise_ratio: s10.ise / s1.ise, runaway_unstable: run.unstable };
 }
 
+// ---------------- Batch 4 Reference Oracles ----------------
+
+function oracleN26() {
+  const n = 100;
+  const inc = (i) => Math.exp((3.2188758248682006 * i) / (n - 1));
+  const dem = (y, p) => Math.min(1 + y / (2 * p), y / p);
+  const totDem = (p) => {
+    let s = 0;
+    for (let i = 0; i < n; i++) s += dem(inc(i), p);
+    return s;
+  };
+  const evalAlloc = (q, supply, price) => {
+    let tot = 0;
+    let unmet = 0;
+    let welf = 0;
+    for (const qi of q) {
+      tot += qi;
+      if (qi < 1) unmet += 1 - qi;
+      welf += Math.log(1 + 4 * Math.min(qi, 1) + 0.5 * Math.max(qi - 1, 0));
+    }
+    const mean = tot / n;
+    let ds = 0;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) ds += Math.abs(q[i] - q[j]);
+    return { price, unmet, welf, gini: ds / (2 * n * n * mean), cerr: Math.abs(tot - supply) };
+  };
+  const incSum = Array.from({ length: n }, (_, i) => inc(i)).reduce((a, b) => a + b, 0);
+  let checksum = 0;
+  let allBetter = true;
+  for (const frac of [0.3, 0.5, 0.7]) {
+    const supply = 150 * (1 - frac);
+    let lo = 0.01;
+    let hi = 200;
+    for (let k = 0; k < 80; k++) {
+      const mid = 0.5 * (lo + hi);
+      if (totDem(mid) > supply) lo = mid;
+      else hi = mid;
+    }
+    const p = 0.5 * (lo + hi);
+    const surge = evalAlloc(Array.from({ length: n }, (_, i) => dem(inc(i), p)), supply, p);
+    const base = Math.min(1, supply / n);
+    const rem = supply - base * n;
+    const ration = evalAlloc(Array.from({ length: n }, (_, i) => base + (rem > 0 ? rem * (inc(i) / incSum) : 0)), supply, 1);
+    if (!(ration.unmet < surge.unmet && ration.welf > surge.welf && ration.gini < surge.gini)) allBetter = false;
+    checksum += surge.price + surge.welf + ration.welf + surge.gini + ration.gini;
+  }
+  const leakErr = Math.abs(n * 0.8 - 75);
+  return { allBetter, checksum, leakCaught: leakErr > 1e-6 };
+}
+
+function oracleI10() {
+  const audit = (tpm, prod, tot, clicks, inf, varR, auto) => {
+    const hits = (clicks > 1 ? 1 : 0) + (inf ? 1 : 0) + (varR ? 1 : 0) + (auto ? 1 : 0);
+    const raw = 0.45 * (prod / tot) + 0.35 * Math.min(1, tpm / 2) + 0.2 * (clicks <= 1 ? 1 : 1 / clicks);
+    const score = Math.max(0, raw - 0.25 * hits);
+    return { score, rc: hits > 0 || score < 0.75 ? -301 : 0 };
+  };
+  const clean = [audit(2.4, 18.5, 20, 1, 0, 0, 0), audit(1.9, 14, 15, 1, 0, 0, 0), audit(2.2, 27, 30, 0, 0, 0, 0)];
+  const dark = [audit(0.3, 4, 45, 5, 1, 1, 1), audit(1.8, 12, 15, 1, 0, 1, 0), audit(1.6, 11, 15, 4, 1, 0, 0)];
+  return {
+    cleanOk: clean.every((x) => x.rc === 0),
+    darkCaught: dark.every((x) => x.rc === -301),
+    cmean: clean.reduce((s, x) => s + x.score, 0) / 3,
+    dmean: dark.reduce((s, x) => s + x.score, 0) / 3,
+  };
+}
+
+function oracleC9() {
+  const fnv4 = (h, v) => {
+    let cur = BigInt(h) & 0xffffffffn;
+    let x = BigInt(v);
+    for (let k = 0; k < 4; k++) {
+      cur = ((cur ^ (x & 0xffn)) * 16777619n) & 0xffffffffn;
+      x >>= 8n;
+    }
+    return Number(cur);
+  };
+  const crc = (id, pl) => fnv4(fnv4(2166136261, id), pl);
+  const pl = Array.from({ length: 500 }, (_, i) => Number((BigInt(i) * 2654435761n + 1013904223n) & 0xffffffffn));
+  const stored = pl.map((v, i) => crc(i, v));
+  const par = Array.from({ length: 500 }, (_, i) => (i === 0 ? 0 : i - 1));
+  pl[42] ^= 1;
+  pl[199] ^= 16;
+  pl[387] ^= 128;
+  par[111] = -1;
+  par[450] = -1;
+  let rot = 0;
+  let orph = 0;
+  let qh = 2166136261;
+  for (let i = 0; i < 500; i++) {
+    if (crc(i, pl[i]) !== stored[i]) {
+      rot++;
+      qh = fnv4(qh, i * 10 + 1);
+    } else if (par[i] < 0 || par[i] >= 500) {
+      orph++;
+      qh = fnv4(qh, i * 10 + 2);
+    }
+  }
+  return { flagged: rot + orph, bitrot: rot, orphan: orph, qhash: qh };
+}
+
+function oracleA16() {
+  const val = (t, e, p, n) => {
+    const [tt, ee, pp, nn] = [t.trim(), e.trim(), p.trim(), n.trim()];
+    if (tt.length === 0 || ee.length < 4) return 1;
+    if (pp.length < 8) return 2;
+    if (nn.length < 8) return 3;
+    if (pp.toLowerCase() === nn.toLowerCase()) return 4;
+    return 0;
+  };
+  return {
+    valid: val("isomorphism", "Greek isos + morphe", "bijective map preserving structure", "lossy one-way hash digest"),
+    etym: val("entropy", "", "measure of microstate multiplicity", "deterministic crystal at 0 K"),
+    pos: val("merit", "Latin meritum", "", "unverified Sybil upvote ring"),
+    neg: val("steward", "Old English stigweard", "custodian verifying archive integrity", ""),
+    taut: val("vague", "Latin vagus", "exact same clause copied twice", "exact same clause copied twice"),
+  };
+}
+
 // ---------------- Tests ----------------
 
-test("all 13 graduated MIT BuildLang kernels satisfy source hygiene, SPDX, and REUSE invariants", () => {
+test("all 17 graduated MIT BuildLang kernels satisfy source hygiene, SPDX, and REUSE invariants", () => {
   const readme = readFileSync(join(KERNELS_DIR, "README.md"), "utf8");
   assert.match(readme, /SPDX-License-Identifier:\s*MIT/);
   assert.doesNotMatch(readme, /[\u2013\u2014]/);
@@ -684,7 +808,26 @@ test("N34 quote_provenance, N68 anti_softness, N37 cook_seam_register, and N59 c
   assert.equal(n59.runaway_unstable, 1);
 });
 
-test("live buildc check, lint, and superopt execution match reference oracles for all 13 kernels when buildc is installed", (t) => {
+test("N26 catastrophe_surge, I10 non_extractive_attention, C9 steward_queue, and A16 silhouette_def oracles pass", () => {
+  const n26 = oracleN26();
+  assert.equal(n26.allBetter, true);
+  assert.ok(Math.abs(n26.checksum - 761.748654) < 1e-4);
+  assert.equal(n26.leakCaught, true);
+
+  const i10 = oracleI10();
+  assert.equal(i10.cleanOk, true);
+  assert.equal(i10.darkCaught, true);
+  assert.ok(Math.abs(i10.cmean - 0.9579) < 1e-3);
+  assert.ok(Math.abs(i10.dmean - 0.2617) < 1e-3);
+
+  const c9 = oracleC9();
+  assert.deepEqual(c9, { flagged: 5, bitrot: 3, orphan: 2, qhash: 2760921890 });
+
+  const a16 = oracleA16();
+  assert.deepEqual(a16, { valid: 0, etym: 1, pos: 2, neg: 3, taut: 4 });
+});
+
+test("live buildc check, lint, and superopt execution match reference oracles for all 17 kernels when buildc is installed", (t) => {
   const required = process.env.CMMNS_REQUIRE_BUILDC === "1";
   if (!hasBuildc()) {
     if (required) assert.fail("CMMNS_REQUIRE_BUILDC=1 set but buildc is not on PATH");
@@ -773,6 +916,15 @@ test("live buildc check, lint, and superopt execution match reference oracles fo
       assert.match(runOut, /\[PASS\] N37_COOK_SEAM_REGISTER one_cuts=4 two_cuts=4 cm_one_cuts=5 planted_caught=1/);
     } else if (k.id === "N59") {
       assert.match(runOut, /\[PASS\] N59_COMMUNITY_HOMEOSTASIS ise_ratio=2351\.15x settle_1=43 settle_10=164 planted=1/);
+    } else if (k.id === "N26") {
+      assert.match(runOut, /\[PASS\] N26_CATASTROPHE_SURGE_SIM shocks=3\/3 planted_caught=1 checksum=761\.748654/);
+    } else if (k.id === "I10") {
+      assert.match(runOut, /\[PASS\] I10_NON_EXTRACTIVE clean=3\/3 dark_caught=3\/3 cmean=0\.9579 dmean=0\.2617/);
+    } else if (k.id === "C9") {
+      assert.match(runOut, /\[PASS\] c9_steward_queue scanned=500 flagged=5 bitrot=3 orphan=2 deleted=0 qhash=2760921890/);
+    } else if (k.id === "A16") {
+      assert.match(runOut, /\[PASS\] a16_valid_definitions passed=3/);
+      assert.match(runOut, /\[PASS\] a16_planted_rejections etym=1 pos=2 neg=3 taut=4/);
     }
   }
 });

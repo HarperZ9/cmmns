@@ -1,0 +1,111 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 55J Kernel 1 (Author Idea A16):
+//   Silhouette Definition Boundary-Predicate & Etymology Validator.
+//   Rejects any concept record missing an etymology root, a positive inclusion boundary,
+//   or a negative exclusion counterexample fail-closed (safe String ops only).
+
+// Return codes: 0=PASS, 1=MISSING_ETYM, 2=MISSING_POS, 3=MISSING_NEG, 4=TAUTOLOGY.
+fn validate_silhouette(
+    term: &String,
+    etymology: &String,
+    pos_boundary: &String,
+    neg_counterexample: &String,
+) -> i32 {
+    let t: String = term.trim();
+    let e: String = etymology.trim();
+    let p: String = pos_boundary.trim();
+    let n: String = neg_counterexample.trim();
+    if t.len() == 0 || e.len() < 4 {
+        return 1;
+    }
+    if p.len() < 8 {
+        return 2;
+    }
+    if n.len() < 8 {
+        return 3;
+    }
+    if p.to_lowercase() == n.to_lowercase() {
+        return 4;
+    }
+    0
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+
+    let t0: i64 = clock_ns();
+    // 3 valid silhouette definitions
+    let r1: i32 = validate_silhouette(
+        &String::from("isomorphism"),
+        &String::from("Greek isos (equal) + morphe (form)"),
+        &String::from("bijective map preserving algebraic structure both ways"),
+        &String::from("lossy one-way hash digest that discards input structure"),
+    );
+    let r2: i32 = validate_silhouette(
+        &String::from("reseating_valve"),
+        &String::from("Latin valva (folding door) + re-seat"),
+        &String::from("relief channel opening under overpressure and closing cleanly"),
+        &String::from("irreversible rupture disc that stays broken after tripping"),
+    );
+    let r3: i32 = validate_silhouette(
+        &String::from("silhouette_definition"),
+        &String::from("French silhouette (outline shadow) + Latin definire"),
+        &String::from("concept bounded by inclusion rule and explicit counterexample"),
+        &String::from("circular dictionary gloss with zero falsifiable exclusion"),
+    );
+
+    // 4 planted invalid concept records (must all fail closed)
+    let bad_etym: i32 = validate_silhouette(
+        &String::from("entropy"),
+        &String::from(""),
+        &String::from("measure of microstate multiplicity"),
+        &String::from("deterministic single-state crystal at 0 K"),
+    );
+    let bad_pos: i32 = validate_silhouette(
+        &String::from("merit"),
+        &String::from("Latin meritum (earned reward)"),
+        &String::from(""),
+        &String::from("unverified Sybil upvote ring"),
+    );
+    let bad_neg: i32 = validate_silhouette(
+        &String::from("steward"),
+        &String::from("Old English stigweard (hall keeper)"),
+        &String::from("custodian verifying archive integrity without auto-delete"),
+        &String::from(""),
+    );
+    let bad_taut: i32 = validate_silhouette(
+        &String::from("vague"),
+        &String::from("Latin vagus (wandering)"),
+        &String::from("exact same clause copied twice"),
+        &String::from("exact same clause copied twice"),
+    );
+    let t1: i64 = clock_ns();
+
+    if r1 == 0 && r2 == 0 && r3 == 0 {
+        println!("[PASS] a16_valid_definitions passed=3 elapsed_ns={}", t1 - t0);
+    } else {
+        println!("[FAIL] a16_valid_definitions rcs={} {} {}", r1, r2, r3);
+        failures = failures + 1;
+    }
+
+    if bad_etym == 1 && bad_pos == 2 && bad_neg == 3 && bad_taut == 4 {
+        println!(
+            "[PASS] a16_planted_rejections etym={} pos={} neg={} taut={}",
+            bad_etym, bad_pos, bad_neg, bad_taut
+        );
+    } else {
+        println!(
+            "[FAIL] a16_planted_rejections {} {} {} {}",
+            bad_etym, bad_pos, bad_neg, bad_taut
+        );
+        failures = failures + 1;
+    }
+
+    if failures == 0 {
+        println!("[PASS] wave55j_silhouette_def summary failures=0");
+    } else {
+        println!("[FAIL] wave55j_silhouette_def summary failures={}", failures);
+    }
+}
