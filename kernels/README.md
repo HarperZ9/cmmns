@@ -3,7 +3,7 @@
 SPDX-FileCopyrightText: 2026 Zain Dana Harper and the CMMNS contributors
 SPDX-License-Identifier: MIT
 
-This directory holds nine standalone, zero-dependency BuildLang verification kernels graduated into `HarperZ9/cmmns` under the MIT license. Each kernel encodes a fail-closed commons, provenance, erasure-coding, accessibility, game-theory, or anti-Sybil invariant and ships with deterministic reference tests in `tests/buildlang-kernels.test.js`.
+This directory holds thirteen standalone, zero-dependency BuildLang verification kernels graduated into `HarperZ9/cmmns` under the MIT license. Each kernel encodes a fail-closed commons, provenance, erasure-coding, accessibility, discourse, resilience, game-theory, or anti-Sybil invariant and ships with deterministic reference tests in `tests/buildlang-kernels.test.js`.
 
 ## Kernel Inventory
 
@@ -18,6 +18,10 @@ This directory holds nine standalone, zero-dependency BuildLang verification ker
 | `honest_journal_kinetic.bld` | `A22` | `SIG-117` | Pure FIPS 180-4 SHA-256 tamper-evident hash-chained journal commitments with 7-day open-commitment half-life decay and kinetic action-completion ratio. | 1-hour backdated entry and retroactive weight edit both rejected fail-closed. |
 | `bulletin_feed_ranker.bld` | `E20` | `SIG-118` | Shared human+model feed deduplicator (32-bit Hamming `<= 2`) and receipt-weighted novelty-over-age ranker. | 3-copy duplicate flood and 2 unverified hype spam posts dropped fail-closed. |
 | `disclosure_penalty_game.bld` | `N71` | `SIG-101` | 100-seed Bayesian Nash and replicator-dynamics simulator proving punitive stigma collapses honest disclosure (`p=0.0`) while zero-penalty audit verification restores full honesty (`p=1.0`). | Zero-audit collapse (`p_zero < 0.02`) and out-of-simplex probability (`p = 1.25`) verified fail-closed. |
+| `quote_provenance_lint.bld` | `N34` | `SIG-098` | Standing-rule verbatim quotation provenance linter verifying ISO `YYYY-MM-DD` date, distinct 32-bit FNV-1a ruling digest, and exact verbatim substring match. | Subtle paraphrase (`mask=4`), bad date (`mask=1`), hash tamper (`mask=2`), and stub quote (`mask=8`) rejected. |
+| `anti_softness_critic.bld` | `N68` | `SIG-099` | Adversarial dialogue critic scoring sycophancy, premature hedging, and tidy-redemption tropes against direct falsification markers (`soft == 0` and `direct >= 3`). | Pure sycophancy (`ratio=1.0`), tidy redemption (`ratio=1.0`), and mixed hedging (`ratio=0.75`) rejected. |
+| `cook_seam_register.bld` | `N37` | `STA-056` | Multi-fault seam-register incident graph analyzer enumerating exact minimal 1-cut SPOFs (`4`) and 2-cut pairs (`4`) with SPOF centrality (`8.00`). | Hidden common-mode dependency collapsing redundant DB nodes via `ClockA` (`one_cuts: 4 -> 5`, `rc=-201`) caught. |
+| `community_homeostasis.bld` | `N59` | `STA-057` | Delayed PI feedback stability simulator comparing localized (`tau=1`, `ISE=86.37`) vs centralized (`tau=10`, `ISE=203,068.27`, `2,351x`) control latency. | Runaway gain instability (`peak=1286.21 > 1000`, `rc=-301`) caught fail-closed. |
 
 ## Running Verification
 
@@ -27,7 +31,7 @@ Standard repository test suite (runs on Ubuntu, Windows, and macOS without requi
 npm test
 ```
 
-When `buildc` (`1.15.0+`) is installed on `PATH`, `tests/buildlang-kernels.test.js` automatically runs `buildc check`, `buildc lint`, and release superoptimized execution on all nine kernels and asserts exact parity with the JavaScript reference oracles. Set `CMMNS_REQUIRE_BUILDC=1` to fail closed if `buildc` is unavailable:
+When `buildc` (`1.15.0+`) is installed on `PATH`, `tests/buildlang-kernels.test.js` automatically runs `buildc check`, `buildc lint`, and release superoptimized execution on all thirteen kernels and asserts exact parity with the JavaScript reference oracles. Set `CMMNS_REQUIRE_BUILDC=1` to fail closed if `buildc` is unavailable:
 
 ```sh
 CMMNS_REQUIRE_BUILDC=1 npm test

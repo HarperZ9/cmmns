@@ -1,12 +1,14 @@
 // SPDX-FileCopyrightText: 2026 Zain Dana Harper and the CMMNS contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 //
-// Deterministic verification tests for all 9 graduated pure-OSI MIT BuildLang kernels
+// Deterministic verification tests for all 13 graduated pure-OSI MIT BuildLang kernels
 // under kernels/:
 //   Batch 1 (#134): I2 (commons_pipe_mirror), N70 (boring_bridge_verifier),
 //                   I7 (accessible_surface_gate), I14 (reach_gradient), I9 (merit_ledger)
-//   Batch 2:        N58 (blackout_commons_sync), A22 (honest_journal_kinetic),
+//   Batch 2 (#135): N58 (blackout_commons_sync), A22 (honest_journal_kinetic),
 //                   E20 (bulletin_feed_ranker), N71 (disclosure_penalty_game)
+//   Batch 3:        N34 (quote_provenance_lint), N68 (anti_softness_critic),
+//                   N37 (cook_seam_register), N59 (community_homeostasis)
 //
 // Runs on every CI platform via Node reference oracles and source invariant checks,
 // and executes live buildc check/lint/run --release --superopt whenever buildc is on PATH
@@ -32,6 +34,10 @@ const KERNELS = [
   { id: "A22", formula: "SIG-117", file: "honest_journal_kinetic.bld" },
   { id: "E20", formula: "SIG-118", file: "bulletin_feed_ranker.bld" },
   { id: "N71", formula: "SIG-101", file: "disclosure_penalty_game.bld" },
+  { id: "N34", formula: "SIG-098", file: "quote_provenance_lint.bld" },
+  { id: "N68", formula: "SIG-099", file: "anti_softness_critic.bld" },
+  { id: "N37", formula: "STA-056", file: "cook_seam_register.bld" },
+  { id: "N59", formula: "STA-057", file: "community_homeostasis.bld" },
 ];
 
 function sha256(buf) {
@@ -423,9 +429,133 @@ function oracleN71() {
   };
 }
 
+// ---------------- Batch 3 Reference Oracles ----------------
+
+function oracleN34() {
+  const fnv1a32 = (bs) => {
+    let h = 2166136261n;
+    for (const b of bs) {
+      h = (h ^ BigInt(b & 0xff)) & 0xffffffffn;
+      h = (h * 16777619n) & 0xffffffffn;
+    }
+    return Number(h);
+  };
+  const ruleBytes = (id) => Array.from({ length: 32 }, (_, i) => ((65 + id * 19 + i * 31 + id * 7) % 90) + 33);
+  const hs = [1, 2, 3, 4].map((id) => fnv1a32(ruleBytes(id)));
+  return {
+    h1: hs[0],
+    h2: hs[1],
+    h3: hs[2],
+    h4: hs[3],
+    digest_xor: Number((BigInt(hs[0]) ^ BigInt(hs[1]) ^ BigInt(hs[2]) ^ BigInt(hs[3])) & 0xffffffffn),
+  };
+}
+
+function oracleN68() {
+  const sycLex = ["you are absolutely right", "what a great point", "i completely agree", "brilliant insight", "spot on"];
+  const hedLex = ["perhaps maybe", "it might possibly", "i suppose we could", "one could arguably"];
+  const tidLex = ["i see the error of my ways", "all is forgiven", "we can both agree", "everything worked out cleanly"];
+  const dirLex = ["false", "contradicts", "measured", "rejected", "fails", "mismatch", "drift"];
+  const cnt = (s, lex) => lex.reduce((acc, p) => acc + (s.split(p).length - 1), 0);
+  const score = (txt) => {
+    const low = txt.toLowerCase();
+    const syc = cnt(low, sycLex);
+    const hed = cnt(low, hedLex);
+    const tid = cnt(low, tidLex);
+    const dir = cnt(low, dirLex);
+    const soft = syc + hed + tid;
+    const total = soft + dir;
+    return {
+      direct: dir,
+      ratio: soft / (total > 0 ? total : 1),
+      penalty: Math.max(0, 2 * syc + hed + 1.5 * tid - 0.5 * dir),
+    };
+  };
+  const a1 = score("Claim A is false: measured drift contradicts baseline and fails parity.");
+  const a2 = score("Receipt check rejected due to hash mismatch; measured error fails gate.");
+  const a3 = score("Hypothesis contradicts measured log, rejected as false on drift audit.");
+  const ps = score("You are absolutely right! What a great point, I completely agree, brilliant insight.");
+  const pt = score("I see the error of my ways, all is forgiven, we can both agree everything worked out cleanly.");
+  const pm = score("You are absolutely right, perhaps maybe it might possibly differ from measured data.");
+  return {
+    auth_direct: a1.direct + a2.direct + a3.direct,
+    planted_mean_ratio: (ps.ratio + pt.ratio + pm.ratio) / 3,
+    syc_pen: ps.penalty,
+    tidy_pen: pt.penalty,
+    mix_pen: pm.penalty,
+  };
+}
+
+function oracleN37() {
+  const off = (mask, node) => ((mask >> node) & 1) !== 0;
+  const op = (mask, cm) => {
+    if ((off(mask, 0) && off(mask, 1)) || off(mask, 2)) return 0;
+    if (off(mask, 3) && off(mask, 4)) return 0;
+    let p = off(mask, 5) ? 0 : 1;
+    let r = off(mask, 6) ? 0 : 1;
+    if (cm === 1 && off(mask, 3)) {
+      p = 0;
+      r = 0;
+    }
+    if ((p === 0 && r === 0) || off(mask, 7)) return 0;
+    if ((off(mask, 8) && off(mask, 9)) || off(mask, 10) || off(mask, 11)) return 0;
+    return 1;
+  };
+  const analyze = (cm) => {
+    const spof = Array.from({ length: 12 }, (_, i) => (op(1 << i, cm) === 0 ? 1 : 0));
+    let two = 0;
+    for (let i = 0; i < 12; i++) {
+      if (spof[i]) continue;
+      for (let j = i + 1; j < 12; j++) {
+        if (!spof[j] && op((1 << i) | (1 << j), cm) === 0) two++;
+      }
+    }
+    return { one: spof.reduce((a, b) => a + b, 0), two, clockASpof: spof[3] };
+  };
+  const clean = analyze(0);
+  const cm = analyze(1);
+  return { one_clean: clean.one, two_clean: clean.two, one_cm: cm.one, clockA_spof: cm.clockASpof };
+}
+
+function oracleN59() {
+  const sim = (tau, kp, ki, steps) => {
+    const xh = new Array(steps).fill(0);
+    const ih = new Array(steps).fill(0);
+    let x = 0;
+    let integ = 0;
+    let peak = 0;
+    let ise = 0;
+    let unstable = 0;
+    let lastExceed = 15;
+    for (let t = 0; t < steps; t++) {
+      xh[t] = x;
+      ih[t] = integ;
+      const obs = t >= tau ? t - tau : 0;
+      const u = -kp * xh[obs] - ki * ih[obs];
+      const dist = t >= 5 && t < 15 ? 1.0 : 0.0;
+      const xn = 0.9 * x + u + dist;
+      integ += x;
+      const ax = Math.abs(xn);
+      if (ax > peak) peak = ax;
+      if (ax > 1000) {
+        unstable = 1;
+        break;
+      }
+      ise += xn * xn;
+      if (t >= 15 && ax >= 0.15) lastExceed = t;
+      x = xn;
+    }
+    return { peak, ise, settle: unstable ? steps : lastExceed - 15, unstable };
+  };
+  const s1 = sim(1, 0.22, 0.015, 180);
+  const s10 = sim(10, 0.22, 0.015, 180);
+  const run = sim(10, 0.95, 0.12, 180);
+  return { s1, s10, ise_ratio: s10.ise / s1.ise, runaway_unstable: run.unstable };
+}
+
 // ---------------- Tests ----------------
 
-test("all 9 graduated MIT BuildLang kernels satisfy source hygiene, SPDX, and REUSE invariants", () => {
+test("all 13 graduated MIT BuildLang kernels satisfy source hygiene, SPDX, and REUSE invariants", () => {
   const readme = readFileSync(join(KERNELS_DIR, "README.md"), "utf8");
   assert.match(readme, /SPDX-License-Identifier:\s*MIT/);
   assert.doesNotMatch(readme, /[\u2013\u2014]/);
@@ -525,7 +655,36 @@ test("A22 honest_journal_kinetic, E20 bulletin_feed_ranker, and N71 disclosure_p
   assert.ok(n.p_zero < 0.02);
 });
 
-test("live buildc check, lint, and superopt execution match reference oracles for all 9 kernels when buildc is installed", (t) => {
+test("N34 quote_provenance, N68 anti_softness, N37 cook_seam_register, and N59 community_homeostasis oracles pass", () => {
+  const n34 = oracleN34();
+  assert.equal(n34.h1, 2714538113);
+  assert.equal(n34.h2, 764524841);
+  assert.equal(n34.h3, 1670236073);
+  assert.equal(n34.h4, 3624390679);
+  assert.equal(n34.digest_xor, 936853014);
+
+  const n68 = oracleN68();
+  assert.equal(n68.auth_direct, 14);
+  assert.ok(Math.abs(n68.planted_mean_ratio - 0.916667) < 1e-5);
+  assert.equal(n68.syc_pen, 8.0);
+  assert.equal(n68.tidy_pen, 6.0);
+  assert.equal(n68.mix_pen, 3.5);
+
+  const n37 = oracleN37();
+  assert.equal(n37.one_clean, 4);
+  assert.equal(n37.two_clean, 4);
+  assert.equal(n37.one_cm, 5);
+  assert.equal(n37.clockA_spof, 1);
+
+  const n59 = oracleN59();
+  assert.ok(n59.s1.peak < n59.s10.peak);
+  assert.ok(n59.ise_ratio > 2350 && n59.ise_ratio < 2352);
+  assert.equal(n59.s1.settle, 43);
+  assert.equal(n59.s10.settle, 164);
+  assert.equal(n59.runaway_unstable, 1);
+});
+
+test("live buildc check, lint, and superopt execution match reference oracles for all 13 kernels when buildc is installed", (t) => {
   const required = process.env.CMMNS_REQUIRE_BUILDC === "1";
   if (!hasBuildc()) {
     if (required) assert.fail("CMMNS_REQUIRE_BUILDC=1 set but buildc is not on PATH");
@@ -594,6 +753,26 @@ test("live buildc check, lint, and superopt execution match reference oracles fo
       assert.ok(Math.abs(Number(m.p_aud) - ref.p_aud) < 1e-5);
       assert.ok(Math.abs(Number(m.p_mix) - ref.p_mix) < 1e-5);
       assert.ok(Math.abs(Number(m.p_zero) - ref.p_zero) < 1e-5);
+    } else if (k.id === "N34") {
+      const m = parseMetrics(runOut, "n34");
+      const ref = oracleN34();
+      assert.equal(Number(m.h1), ref.h1);
+      assert.equal(Number(m.h2), ref.h2);
+      assert.equal(Number(m.h3), ref.h3);
+      assert.equal(Number(m.h4), ref.h4);
+      assert.equal(Number(m.digest_xor), ref.digest_xor);
+    } else if (k.id === "N68") {
+      const m = parseMetrics(runOut, "n68");
+      const ref = oracleN68();
+      assert.equal(Number(m.auth_direct), ref.auth_direct);
+      assert.ok(Math.abs(Number(m.planted_mean_ratio) - ref.planted_mean_ratio) < 1e-5);
+      assert.equal(Number(m.syc_pen), ref.syc_pen);
+      assert.equal(Number(m.tidy_pen), ref.tidy_pen);
+      assert.equal(Number(m.mix_pen), ref.mix_pen);
+    } else if (k.id === "N37") {
+      assert.match(runOut, /\[PASS\] N37_COOK_SEAM_REGISTER one_cuts=4 two_cuts=4 cm_one_cuts=5 planted_caught=1/);
+    } else if (k.id === "N59") {
+      assert.match(runOut, /\[PASS\] N59_COMMUNITY_HOMEOSTASIS ise_ratio=2351\.15x settle_1=43 settle_10=164 planted=1/);
     }
   }
 });

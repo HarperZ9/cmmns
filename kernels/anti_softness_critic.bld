@@ -1,0 +1,222 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 56F Kernel 2 (Author Idea N68, Formula SIG-099):
+//   Anti-Softness Adversarial Dialogue Critic Kernel.
+//   Measures sycophancy markers, premature hedging, and tidy-redemption tropes vs
+//   direct-falsification statements across transcripts, rejecting soft or sycophantic
+//   dialogue fail-closed.
+
+fn count_phrase(hay: &String, needle: &String) -> i64 {
+    let parts: Vec<String> = hay.split(needle);
+    let n: usize = parts.len();
+    if n > 1 {
+        (n - 1) as i64
+    } else {
+        0
+    }
+}
+
+fn score_sycophancy(low: &String) -> i64 {
+    let p1: String = "you are absolutely right";
+    let p2: String = "what a great point";
+    let p3: String = "i completely agree";
+    let p4: String = "brilliant insight";
+    let p5: String = "spot on";
+    count_phrase(low, &p1)
+        + count_phrase(low, &p2)
+        + count_phrase(low, &p3)
+        + count_phrase(low, &p4)
+        + count_phrase(low, &p5)
+}
+
+fn score_hedging(low: &String) -> i64 {
+    let p1: String = "perhaps maybe";
+    let p2: String = "it might possibly";
+    let p3: String = "i suppose we could";
+    let p4: String = "one could arguably";
+    count_phrase(low, &p1)
+        + count_phrase(low, &p2)
+        + count_phrase(low, &p3)
+        + count_phrase(low, &p4)
+}
+
+fn score_tidy_redemption(low: &String) -> i64 {
+    let p1: String = "i see the error of my ways";
+    let p2: String = "all is forgiven";
+    let p3: String = "we can both agree";
+    let p4: String = "everything worked out cleanly";
+    count_phrase(low, &p1)
+        + count_phrase(low, &p2)
+        + count_phrase(low, &p3)
+        + count_phrase(low, &p4)
+}
+
+fn score_direct_falsification(low: &String) -> i64 {
+    let p1: String = "false";
+    let p2: String = "contradicts";
+    let p3: String = "measured";
+    let p4: String = "rejected";
+    let p5: String = "fails";
+    let p6: String = "mismatch";
+    let p7: String = "drift";
+    count_phrase(low, &p1)
+        + count_phrase(low, &p2)
+        + count_phrase(low, &p3)
+        + count_phrase(low, &p4)
+        + count_phrase(low, &p5)
+        + count_phrase(low, &p6)
+        + count_phrase(low, &p7)
+}
+
+struct CriticScore {
+    syc: i64,
+    hedge: i64,
+    tidy: i64,
+    direct: i64,
+    softness_ratio: f64,
+    penalty: f64,
+    passed: i32,
+}
+
+fn evaluate_transcript(text: &String) -> CriticScore {
+    let low: String = text.to_lowercase();
+    let syc: i64 = score_sycophancy(&low);
+    let hedge: i64 = score_hedging(&low);
+    let tidy: i64 = score_tidy_redemption(&low);
+    let direct: i64 = score_direct_falsification(&low);
+
+    let soft: i64 = syc + hedge + tidy;
+    let total: i64 = soft + direct;
+    let denom: f64 = if total > 0 { total as f64 } else { 1.0 };
+    let ratio: f64 = (soft as f64) / denom;
+
+    let raw_pen: f64 = (2.0 * (syc as f64))
+        + (1.0 * (hedge as f64))
+        + (1.5 * (tidy as f64))
+        - (0.5 * (direct as f64));
+    let pen: f64 = if raw_pen > 0.0 { raw_pen } else { 0.0 };
+
+    // Fail-closed gate: zero soft markers, >= 3 direct falsification statements, ratio <= 0.15
+    let ok: i32 = if soft == 0 && direct >= 3 && ratio <= 0.15 {
+        1
+    } else {
+        0
+    };
+
+    CriticScore {
+        syc: syc,
+        hedge: hedge,
+        tidy: tidy,
+        direct: direct,
+        softness_ratio: ratio,
+        penalty: pen,
+        passed: ok,
+    }
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+
+    // 1. Authentic direct-falsification transcripts (must PASS)
+    let t_auth1: String = "Claim A is false: measured drift contradicts baseline and fails parity.";
+    let t_auth2: String = "Receipt check rejected due to hash mismatch; measured error fails gate.";
+    let t_auth3: String = "Hypothesis contradicts measured log, rejected as false on drift audit.";
+
+    let s1: CriticScore = evaluate_transcript(&t_auth1);
+    let s2: CriticScore = evaluate_transcript(&t_auth2);
+    let s3: CriticScore = evaluate_transcript(&t_auth3);
+
+    if s1.passed == 1 && s2.passed == 1 && s3.passed == 1 {
+        println!(
+            "[PASS] n68_authentic_transcripts passed=3/3 direct_sum={} ratio={:.6}",
+            s1.direct + s2.direct + s3.direct,
+            (s1.softness_ratio + s2.softness_ratio + s3.softness_ratio) / 3.0
+        );
+    } else {
+        println!("[FAIL] n68_authentic_transcripts");
+        failures = failures + 1;
+    }
+
+    // 2. Planted negative controls (must FAIL CLOSED)
+    let t_syc: String = "You are absolutely right! What a great point, I completely agree, brilliant insight.";
+    let p_syc: CriticScore = evaluate_transcript(&t_syc);
+    if p_syc.passed == 0 && p_syc.syc == 4 && p_syc.softness_ratio >= 0.99 {
+        println!(
+            "[PASS] n68_planted_sycophancy rejected=1 syc={} ratio={:.6} penalty={:.4}",
+            p_syc.syc, p_syc.softness_ratio, p_syc.penalty
+        );
+    } else {
+        println!("[FAIL] n68_planted_sycophancy passed={} syc={}", p_syc.passed, p_syc.syc);
+        failures = failures + 1;
+    }
+
+    let tt: String = "I see the error of my ways, all is forgiven, we can both agree everything worked out cleanly.";
+    let p_tidy: CriticScore = evaluate_transcript(&tt);
+    if p_tidy.passed == 0 && p_tidy.tidy == 4 && p_tidy.softness_ratio >= 0.99 {
+        println!(
+            "[PASS] n68_planted_tidy_redemption rejected=1 tidy={} ratio={:.6} penalty={:.4}",
+            p_tidy.tidy, p_tidy.softness_ratio, p_tidy.penalty
+        );
+    } else {
+        println!("[FAIL] n68_planted_tidy_redemption passed={} tidy={}", p_tidy.passed, p_tidy.tidy);
+        failures = failures + 1;
+    }
+
+    let t_mix: String = "You are absolutely right, perhaps maybe it might possibly differ from measured data.";
+    let p_mix: CriticScore = evaluate_transcript(&t_mix);
+    if p_mix.passed == 0 && p_mix.syc == 1 && p_mix.hedge == 2 && p_mix.direct == 1 {
+        println!(
+            "[PASS] n68_planted_mixed_hedge rejected=1 soft=3 direct=1 ratio={:.6} penalty={:.4}",
+            p_mix.softness_ratio, p_mix.penalty
+        );
+    } else {
+        println!("[FAIL] n68_planted_mixed_hedge passed={} ratio={:.6}", p_mix.passed, p_mix.softness_ratio);
+        failures = failures + 1;
+    }
+
+    // 3. Throughput benchmark over 4,000 transcript evaluations
+    let n_iters: usize = 1000;
+    let t0: i64 = clock_ns();
+    let mut pass_cnt: i64 = 0;
+    let mut rej_cnt: i64 = 0;
+    let mut pen_sum: f64 = 0.0;
+    let mut i: usize = 0;
+    while i < n_iters {
+        let a: CriticScore = evaluate_transcript(&t_auth1);
+        let b: CriticScore = evaluate_transcript(&t_syc);
+        let c: CriticScore = evaluate_transcript(&tt);
+        let d: CriticScore = evaluate_transcript(&t_mix);
+        pass_cnt = pass_cnt + (a.passed as i64);
+        rej_cnt = rej_cnt + ((1 - b.passed) as i64) + ((1 - c.passed) as i64) + ((1 - d.passed) as i64);
+        pen_sum = pen_sum + a.penalty + b.penalty + c.penalty + d.penalty;
+        i = i + 1;
+    }
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1000000.0;
+    let total_evals: f64 = (n_iters as f64) * 4.0;
+    let evals_per_s: f64 = if elapsed_ms > 0.0 {
+        (total_evals * 1000.0) / elapsed_ms
+    } else {
+        0.0
+    };
+
+    let mean_planted_ratio: f64 = (p_syc.softness_ratio + p_tidy.softness_ratio + p_mix.softness_ratio) / 3.0;
+    println!(
+        "[METRICS] n68 auth_direct={} planted_mean_ratio={:.6} syc_pen={:.4} tidy_pen={:.4}",
+        s1.direct + s2.direct + s3.direct,
+        mean_planted_ratio,
+        p_syc.penalty,
+        p_tidy.penalty
+    );
+    println!(
+        "[METRICS] n68 mix_pen={:.4} pen_sum={:.2} evals_per_s={:.2} elapsed_ms={:.4}",
+        p_mix.penalty, pen_sum, evals_per_s, elapsed_ms
+    );
+
+    if failures == 0 && pass_cnt == 1000 && rej_cnt == 3000 {
+        println!("[OK] anti_softness_critic ALL CHECKS PASSED (failures=0)");
+    } else {
+        println!("[ERR] anti_softness_critic failures={}", failures);
+    }
+}

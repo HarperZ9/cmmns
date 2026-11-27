@@ -1,0 +1,180 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 56D (N37 / STA-056): Cook Seam-Register Multi-Fault Incident Graph
+// Analyzer. Enumerates exact minimal 1-cut SPOFs and 2-cut failure pairs
+// across layered infrastructure seams, computes SPOF centrality, and catches
+// planted hidden common-mode dependency collapses fail-closed.
+
+fn is_disabled(mask: i64, node: i64) -> i64 {
+    let bit: i64 = 1 << node;
+    if (mask & bit) != 0 {
+        return 1;
+    }
+    return 0;
+}
+
+// 12-node layered infrastructure graph:
+// Layer 0 (Power):   0=GridPower, 1=BackupGen (OR-redundant) -> 2=UPSBus (serial)
+// Layer 1 (Control): 3=ClockA, 4=ClockB (OR-redundant)
+// Layer 2 (Storage): 5=PrimaryDB, 6=ReplicaDB (OR-redundant) -> 7=StorageSAN (serial)
+// Layer 3 (Edge):    8=GatewayA, 9=GatewayB (OR-redundant) -> 10=IngressLB (serial)
+// Layer 4 (Service): 11=ClientService (serial)
+// If common_mode == 1, planted hidden fault ties both 5 and 6 to hidden cert node 3!
+fn system_operational(fail_mask: i64, common_mode: i64) -> i64 {
+    let power_src: i64 = if is_disabled(fail_mask, 0) == 0 || is_disabled(fail_mask, 1) == 0 {
+        1
+    } else {
+        0
+    };
+    let ups_ok: i64 = if power_src == 1 && is_disabled(fail_mask, 2) == 0 { 1 } else { 0 };
+    if ups_ok == 0 {
+        return 0;
+    }
+
+    let clock_ok: i64 = if is_disabled(fail_mask, 3) == 0 || is_disabled(fail_mask, 4) == 0 {
+        1
+    } else {
+        0
+    };
+    if clock_ok == 0 {
+        return 0;
+    }
+
+    let mut db_primary: i64 = if is_disabled(fail_mask, 5) == 0 { 1 } else { 0 };
+    let mut db_replica: i64 = if is_disabled(fail_mask, 6) == 0 { 1 } else { 0 };
+    if common_mode == 1 && is_disabled(fail_mask, 3) == 1 {
+        // Hidden common-mode cert dependency collapses both DB nodes when node 3 fails
+        db_primary = 0;
+        db_replica = 0;
+    }
+    let db_ok: i64 = if db_primary == 1 || db_replica == 1 { 1 } else { 0 };
+    let san_ok: i64 = if db_ok == 1 && is_disabled(fail_mask, 7) == 0 { 1 } else { 0 };
+    if san_ok == 0 {
+        return 0;
+    }
+
+    let gw_ok: i64 = if is_disabled(fail_mask, 8) == 0 || is_disabled(fail_mask, 9) == 0 {
+        1
+    } else {
+        0
+    };
+    let lb_ok: i64 = if gw_ok == 1 && is_disabled(fail_mask, 10) == 0 { 1 } else { 0 };
+    let svc_ok: i64 = if lb_ok == 1 && is_disabled(fail_mask, 11) == 0 { 1 } else { 0 };
+    return svc_ok;
+}
+
+fn count_one_cuts(n: i64, common_mode: i64, out_spof: &mut Vec<i64>) -> i64 {
+    let mut cnt: i64 = 0;
+    let mut i: i64 = 0;
+    while i < n {
+        let mask: i64 = 1 << i;
+        if system_operational(mask, common_mode) == 0 {
+            out_spof.push(1);
+            cnt = cnt + 1;
+        } else {
+            out_spof.push(0);
+        }
+        i = i + 1;
+    }
+    return cnt;
+}
+
+fn count_minimal_two_cuts(
+    n: i64,
+    common_mode: i64,
+    is_one_cut: &Vec<i64>,
+    out_pair_deg: &mut Vec<i64>
+) -> i64 {
+    let mut i: i64 = 0;
+    while i < n {
+        out_pair_deg.push(0);
+        i = i + 1;
+    }
+    let mut cnt: i64 = 0;
+    i = 0;
+    while i < n {
+        if is_one_cut[i as usize] == 0 {
+            let mut j: i64 = i + 1;
+            while j < n {
+                if is_one_cut[j as usize] == 0 {
+                    let mask: i64 = (1 << i) | (1 << j);
+                    if system_operational(mask, common_mode) == 0 {
+                        cnt = cnt + 1;
+                        out_pair_deg[i as usize] = out_pair_deg[i as usize] + 1;
+                        out_pair_deg[j as usize] = out_pair_deg[j as usize] + 1;
+                    }
+                }
+                j = j + 1;
+            }
+        }
+        i = i + 1;
+    }
+    return cnt;
+}
+
+fn audit_hidden_common_mode(base_one_cuts: i64, observed_one_cuts: i64) -> i64 {
+    if observed_one_cuts > base_one_cuts {
+        return -201;
+    }
+    return 0;
+}
+
+fn main() -> i64 ~ Console {
+    let n: i64 = 12;
+    let base_ok: i64 = system_operational(0, 0);
+
+    let mut spof_clean: Vec<i64> = Vec::new();
+    let one_clean: i64 = count_one_cuts(n, 0, &mut spof_clean);
+    let mut pdeg_clean: Vec<i64> = Vec::new();
+    let two_clean: i64 = count_minimal_two_cuts(n, 0, &spof_clean, &mut pdeg_clean);
+
+    // Compute exact SPOF centrality sum: 1.0 per 1-cut node, 0.5 per minimal 2-cut degree
+    let mut centrality_sum: f64 = 0.0;
+    let mut i: i64 = 0;
+    while i < n {
+        let c: f64 = if spof_clean[i as usize] == 1 {
+            1.0
+        } else {
+            0.5 * (pdeg_clean[i as usize] as f64)
+        };
+        centrality_sum = centrality_sum + c;
+        i = i + 1;
+    }
+
+    println!(
+        "CLEAN_GRAPH healthy={} one_cuts={} two_cuts={} centrality_sum={:.2}",
+        base_ok, one_clean, two_clean, centrality_sum
+    );
+    println!(
+        "SPOF_NODES ups={} san={} lb={} svc={} clockA={}",
+        spof_clean[2], spof_clean[7], spof_clean[10], spof_clean[11], spof_clean[3]
+    );
+
+    // Planted control: hidden common-mode fault turns node 3 into a new 1-cut SPOF
+    let mut spof_cm: Vec<i64> = Vec::new();
+    let one_cm: i64 = count_one_cuts(n, 1, &mut spof_cm);
+    let mut pdeg_cm: Vec<i64> = Vec::new();
+    let two_cm: i64 = count_minimal_two_cuts(n, 1, &spof_cm, &mut pdeg_cm);
+    let cm_rc: i64 = audit_hidden_common_mode(one_clean, one_cm);
+    let planted_caught: i64 = if cm_rc == -201 && spof_cm[3] == 1 { 1 } else { 0 };
+
+    println!(
+        "PLANTED_COMMON_MODE one_cuts={} two_cuts={} clockA_spof={} rc={} caught={}",
+        one_cm, two_cm, spof_cm[3], cm_rc, planted_caught
+    );
+
+    // Expected exact graph cuts: 4 one-cuts (nodes 2,7,10,11) and 4 two-cuts
+    // ({0,1}, {3,4}, {5,6}, {8,9}), centrality_sum = 4*1.0 + 8*0.5 = 8.0
+    let clean_exact: i64 = if base_ok == 1 && one_clean == 4 && two_clean == 4 { 1 } else { 0 };
+    let cent_ok: i64 = if (centrality_sum - 8.0).abs() < 1e-9 { 1 } else { 0 };
+    if clean_exact == 1 && cent_ok == 1 && planted_caught == 1 {
+        println!(
+            "[PASS] N37_COOK_SEAM_REGISTER one_cuts=4 two_cuts=4 cm_one_cuts={} planted_caught=1",
+            one_cm
+        );
+        return 0;
+    }
+    println!("[FAIL] N37_COOK_SEAM_REGISTER clean={} cent={} planted={}", clean_exact, cent_ok, planted_caught);
+    return 1;
+}

@@ -1,0 +1,214 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 56F Kernel 1 (Author Idea N34, Formula SIG-098):
+//   Standing-Rule Verbatim Quotation Provenance Linter.
+//   Verifies every standing-rule citation carries (date_iso, source_hash, exact_substring_match)
+//   against canonical ruling text, rejecting misquoted, undated, empty, or hash-mismatched
+//   citations fail-closed.
+
+fn fnv1a_u32(bytes: &Vec<u64>) -> u64 {
+    let m32: u64 = 4294967295;
+    let mut h: u64 = 2166136261;
+    let mut i: usize = 0;
+    while i < bytes.len() {
+        h = (h ^ (bytes[i] & 255)) & m32;
+        h = (h * 16777619) & m32;
+        i = i + 1;
+    }
+    h
+}
+
+fn make_rule_bytes(rule_id: u64) -> Vec<u64> {
+    // Canonical deterministic ASCII byte tags for the 4 standing rules (no String::as_bytes)
+    let mut b: Vec<u64> = Vec::new();
+    let seed: u64 = 65 + (rule_id * 19);
+    let mut i: u64 = 0;
+    while i < 32 {
+        let v: u64 = ((seed + i * 31 + rule_id * 7) % 90) + 33;
+        b.push(v);
+        i = i + 1;
+    }
+    b
+}
+
+fn is_valid_iso_date(d: &String) -> i32 {
+    if d.len() != 10 {
+        return 0;
+    }
+    let parts: Vec<String> = d.split("-");
+    if parts.len() != 3 {
+        return 0;
+    }
+    if parts[0].len() != 4 || parts[1].len() != 2 || parts[2].len() != 2 {
+        return 0;
+    }
+    if !parts[0].starts_with("202") {
+        return 0;
+    }
+    1
+}
+
+fn exact_substring_match(canonical: &String, quote: &String) -> i32 {
+    if quote.len() < 8 {
+        return 0;
+    }
+    let parts: Vec<String> = canonical.split(quote);
+    if parts.len() > 1 {
+        1
+    } else {
+        0
+    }
+}
+
+// Returns bitmask of provenance violations (0 = PASS):
+//   bit 1: invalid or missing ISO date (YYYY-MM-DD)
+//   bit 2: source hash mismatch against canonical ruling digest
+//   bit 4: non-verbatim quote / paraphrase not found verbatim in canonical ruling
+//   bit 8: empty or too-short quote (< 8 chars)
+fn lint_citation(
+    canon_text: &String,
+    canon_hash: u64,
+    date_iso: &String,
+    cited_hash: u64,
+    quote: &String,
+) -> i32 {
+    let mut mask: i32 = 0;
+    if is_valid_iso_date(date_iso) == 0 {
+        mask = mask | 1;
+    }
+    if cited_hash != canon_hash {
+        mask = mask | 2;
+    }
+    if quote.len() < 8 {
+        mask = mask | 8;
+    } else if exact_substring_match(canon_text, quote) == 0 {
+        mask = mask | 4;
+    }
+    mask
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+
+    // Canonical standing-rule corpus (4 rules + deterministic FNV-1a hashes)
+    let r1_text: String = "Standing Rule 1: Zero em dashes or en dashes in published prose.";
+    let r2_text: String = "Standing Rule 2: Never fabricate metrics or skip verification tests.";
+    let r3_text: String = "Standing Rule 3: Seal canonical engine-receipt artifacts and verify files.";
+    let r4_text: String = "Standing Rule 4: Keep local workstation paths out of public reports.";
+
+    let r1_bytes: Vec<u64> = make_rule_bytes(1);
+    let r2_bytes: Vec<u64> = make_rule_bytes(2);
+    let r3_bytes: Vec<u64> = make_rule_bytes(3);
+    let r4_bytes: Vec<u64> = make_rule_bytes(4);
+
+    let h1: u64 = fnv1a_u32(&r1_bytes);
+    let h2: u64 = fnv1a_u32(&r2_bytes);
+    let h3: u64 = fnv1a_u32(&r3_bytes);
+    let h4: u64 = fnv1a_u32(&r4_bytes);
+    if h1 == h2 || h1 == h3 || h1 == h4 || h2 == h3 || h2 == h4 || h3 == h4 {
+        println!("[FAIL] n34_distinct_rule_hashes");
+        failures = failures + 1;
+    }
+
+    let d1: String = "2026-11-24";
+    let d2: String = "2026-11-25";
+    let d3: String = "2026-11-26";
+    let d4: String = "2026-11-27";
+
+    // 1. Clean verbatim dated citations (all 4 must PASS with mask == 0)
+    let q1: String = "Zero em dashes or en dashes in published prose.";
+    let q2: String = "Never fabricate metrics or skip verification tests.";
+    let q3: String = "Seal canonical engine-receipt artifacts and verify files.";
+    let q4: String = "Keep local workstation paths out of public reports.";
+
+    let m1: i32 = lint_citation(&r1_text, h1, &d1, h1, &q1);
+    let m2: i32 = lint_citation(&r2_text, h2, &d2, h2, &q2);
+    let m3: i32 = lint_citation(&r3_text, h3, &d3, h3, &q3);
+    let m4: i32 = lint_citation(&r4_text, h4, &d4, h4, &q4);
+    let clean_sum: i32 = m1 + m2 + m3 + m4;
+    if clean_sum == 0 {
+        println!("[PASS] n34_clean_citations passed=4/4 mask_sum=0");
+    } else {
+        println!("[FAIL] n34_clean_citations mask_sum={}", clean_sum);
+        failures = failures + 1;
+    }
+
+    // 2. Planted negative controls (all 4 must FAIL CLOSED with exact bitmasks)
+    let bad_q_para: String = "Never invent metrics or bypass verification tests.";
+    let c_para: i32 = lint_citation(&r2_text, h2, &d2, h2, &bad_q_para);
+    if c_para == 4 {
+        println!("[PASS] n34_planted_paraphrase rejected=1 mask={}", c_para);
+    } else {
+        println!("[FAIL] n34_planted_paraphrase mask={}", c_para);
+        failures = failures + 1;
+    }
+
+    let bad_date: String = "Nov 25 2026";
+    let c_date: i32 = lint_citation(&r1_text, h1, &bad_date, h1, &q1);
+    if c_date == 1 {
+        println!("[PASS] n34_planted_bad_date rejected=1 mask={}", c_date);
+    } else {
+        println!("[FAIL] n34_planted_bad_date mask={}", c_date);
+        failures = failures + 1;
+    }
+
+    let c_hash: i32 = lint_citation(&r3_text, h3, &d3, h3 ^ 1, &q3);
+    if c_hash == 2 {
+        println!("[PASS] n34_planted_hash_tamper rejected=1 mask={}", c_hash);
+    } else {
+        println!("[FAIL] n34_planted_hash_tamper mask={}", c_hash);
+        failures = failures + 1;
+    }
+
+    let empty_q: String = "short";
+    let c_empty: i32 = lint_citation(&r4_text, h4, &d4, h4, &empty_q);
+    if c_empty == 8 {
+        println!("[PASS] n34_planted_empty_quote rejected=1 mask={}", c_empty);
+    } else {
+        println!("[FAIL] n34_planted_empty_quote mask={}", c_empty);
+        failures = failures + 1;
+    }
+
+    // 3. Throughput benchmark + algebraic superopt checksum over 20,000 citations
+    let n_iters: usize = 5000;
+    let t0: i64 = clock_ns();
+    let mut acc_pass: u64 = 0;
+    let mut acc_fail: u64 = 0;
+    let mut i: usize = 0;
+    while i < n_iters {
+        let a: i32 = lint_citation(&r1_text, h1, &d1, h1, &q1);
+        let b: i32 = lint_citation(&r2_text, h2, &d2, h2, &bad_q_para);
+        let c: i32 = lint_citation(&r3_text, h3, &d3, h3, &q3);
+        let d: i32 = lint_citation(&r4_text, h4, &d4, h4 ^ 1, &q4);
+        if a == 0 { acc_pass = acc_pass + 1; }
+        if c == 0 { acc_pass = acc_pass + 1; }
+        if b != 0 { acc_fail = acc_fail + 1; }
+        if d != 0 { acc_fail = acc_fail + 1; }
+        i = i + 1;
+    }
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1000000.0;
+    let total_checks: f64 = (n_iters as f64) * 4.0;
+    let rate_per_s: f64 = if elapsed_ms > 0.0 {
+        (total_checks * 1000.0) / elapsed_ms
+    } else {
+        0.0
+    };
+
+    let digest_xor: u64 = (h1 ^ h2 ^ h3 ^ h4) & 4294967295;
+    println!(
+        "[METRICS] n34 h1={} h2={} h3={} h4={} digest_xor={}",
+        h1, h2, h3, h4, digest_xor
+    );
+    println!(
+        "[METRICS] n34 acc_pass={} acc_fail={} checks_per_s={:.2} elapsed_ms={:.4}",
+        acc_pass, acc_fail, rate_per_s, elapsed_ms
+    );
+
+    if failures == 0 && acc_pass == 10000 && acc_fail == 10000 {
+        println!("[OK] quote_provenance_lint ALL CHECKS PASSED (failures=0)");
+    } else {
+        println!("[ERR] quote_provenance_lint failures={}", failures);
+    }
+}
