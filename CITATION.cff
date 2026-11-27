@@ -3,8 +3,8 @@ message: "If you use this software, please cite it using these metadata."
 type: software
 title: "CMMNS"
 abstract: "CMMNS (formerly Daylight Commons, and Radar before that) is a site-agnostic browser extension and local archival CLI for Chrome, Edge, Brave, and Firefox. It surfaces account provenance, coordination signals, rhetoric and argument structure, fact-checker matches, universal webpage capture (cmmns.page/1), and offline Web and AI provenance verification (agent-card.json, llms.txt, Schema.org JSON-LD, and engine-receipt/1 SHA-256 digests)."
-version: "3.10.0"
-date-released: "2026-11-26"
+version: "3.11.0"
+date-released: "2026-11-27"
 authors:
   - family-names: "Harper"
     given-names: "Zain Dana"
