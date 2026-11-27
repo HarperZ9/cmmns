@@ -1,0 +1,190 @@
+{
+  "schema": "cmmns-wasm-bridge-manifest/4",
+  "license": "MIT",
+  "date": "2026-11-27",
+  "module_count": 16,
+  "total_bytes": 114411,
+  "budget_bytes": 128000,
+  "modules": [
+    {
+      "slug": "merkle_rfc6962",
+      "category": "merkle",
+      "idea_id": "N49",
+      "formula_id": "SIG-147",
+      "wasm_path": "wasm/merkle_rfc6962.wasm",
+      "source_path": "src/merkle_rfc6962_wasm.bld",
+      "bytes": 8662,
+      "kb": 8.46,
+      "sha256": "b64214e9e067c85ff41d2a5d00d8b73316d91287cb443403f35c03b37d441628",
+      "license": "MIT"
+    },
+    {
+      "slug": "honest_exit_valve",
+      "category": "governance",
+      "idea_id": "N25",
+      "formula_id": "SIG-094",
+      "wasm_path": "wasm/honest_exit_valve.wasm",
+      "source_path": "src/honest_exit_valve_wasm.bld",
+      "bytes": 2688,
+      "kb": 2.62,
+      "sha256": "55d0c0fcb5528e645d629874666ed001e6a09ad4dc62bde7006f5b6fad87f60f",
+      "license": "MIT"
+    },
+    {
+      "slug": "isomorphism_entropy",
+      "category": "epistemic",
+      "idea_id": "D6",
+      "formula_id": "SIG-097",
+      "wasm_path": "wasm/isomorphism_entropy.wasm",
+      "source_path": "src/isomorphism_entropy_wasm.bld",
+      "bytes": 2974,
+      "kb": 2.9,
+      "sha256": "a6c6f1ec84b3b60601c2c2a84c3456da4527bedade320349b4f04f9945ae1df2",
+      "license": "MIT"
+    },
+    {
+      "slug": "confidence_word_calib",
+      "category": "epistemic",
+      "idea_id": "N30",
+      "formula_id": "SIG-129",
+      "wasm_path": "wasm/confidence_word_calib.wasm",
+      "source_path": "src/confidence_word_calib_wasm.bld",
+      "bytes": 1582,
+      "kb": 1.54,
+      "sha256": "81e4c0422c5e46bbd4f7d1690826de59f6e6d9c440633d99057dc57c353b2648",
+      "license": "MIT"
+    },
+    {
+      "slug": "sha256_zeroc",
+      "category": "crypto_triad",
+      "idea_id": "F1",
+      "formula_id": "SIG-146",
+      "wasm_path": "wasm/sha256_zeroc.wasm",
+      "source_path": "src/sha256_zeroc_wasm.bld",
+      "bytes": 7681,
+      "kb": 7.5,
+      "sha256": "c5754cae0eb87aa8dfa68562df5e29df0af1d3f750f31e1875f055fca267b3be",
+      "license": "MIT"
+    },
+    {
+      "slug": "aead_chacha20_poly1305",
+      "category": "crypto_triad",
+      "idea_id": "F1",
+      "formula_id": "RFC-8439",
+      "wasm_path": "wasm/aead_chacha20_poly1305.wasm",
+      "source_path": "src/aead_chacha20_poly1305_wasm.bld",
+      "bytes": 14298,
+      "kb": 13.96,
+      "sha256": "e43ab1f0cc36e6f24bc15e914cb3d4b3d7c0128176fc74222924879195c61470",
+      "license": "MIT"
+    },
+    {
+      "slug": "x25519_curve25519_zeroc",
+      "category": "crypto_triad",
+      "idea_id": "F1",
+      "formula_id": "RFC-7748",
+      "wasm_path": "wasm/x25519_curve25519_zeroc.wasm",
+      "source_path": "src/x25519_curve25519_zeroc.bld",
+      "bytes": 4392,
+      "kb": 4.29,
+      "sha256": "85f5feeba8623f58dc26496941d5698634f314a5265d13208d04d5467a81bf91",
+      "license": "MIT"
+    },
+    {
+      "slug": "three_control_negatives",
+      "category": "governance",
+      "idea_id": "N28",
+      "formula_id": "SIG-095",
+      "wasm_path": "wasm/three_control_negatives.wasm",
+      "source_path": "src/three_control_negatives_wasm.bld",
+      "bytes": 3915,
+      "kb": 3.82,
+      "sha256": "26a293500b7df0057343931a5f4efd3acf69eb520a147547b808aca9d7c9517a",
+      "license": "MIT"
+    },
+    {
+      "slug": "tls_mini_handshake_zeroc",
+      "category": "tls_handshake",
+      "idea_id": "F1",
+      "formula_id": "SIG-150",
+      "wasm_path": "wasm/tls_mini_handshake_zeroc.wasm",
+      "source_path": "src/tls_mini_handshake_zeroc.bld",
+      "bytes": 11829,
+      "kb": 11.55,
+      "sha256": "8f8529a64e8cf084bfa42e71bf03f8e7ba90ac290e20a0f5dfe556320e675eb6",
+      "license": "MIT"
+    },
+    {
+      "slug": "cmmns_evidence_quorum",
+      "category": "bft_quorum",
+      "idea_id": "N32",
+      "formula_id": "SIG-156",
+      "wasm_path": "wasm/cmmns_evidence_quorum.wasm",
+      "source_path": "src/cmmns_evidence_quorum_wasm.bld",
+      "bytes": 9227,
+      "kb": 9.01,
+      "sha256": "874f55e08187065d692c854b824393a4c7fcdbccd1217b2d696a54612a31f435",
+      "license": "MIT"
+    },
+    {
+      "slug": "cmmns_citation_decay",
+      "category": "archival",
+      "idea_id": "N28",
+      "formula_id": "STA-073",
+      "wasm_path": "wasm/cmmns_citation_decay.wasm",
+      "source_path": "src/cmmns_citation_decay_wasm.bld",
+      "bytes": 2461,
+      "kb": 2.4,
+      "sha256": "708576ebb77c3b97dfe3b96114045fd15ce5957f979f64b2e1a2df5c0996ae2d",
+      "license": "MIT"
+    },
+    {
+      "slug": "cmmns_attention_valve",
+      "category": "governance",
+      "idea_id": "I10",
+      "formula_id": "SIG-158",
+      "wasm_path": "wasm/cmmns_attention_valve.wasm",
+      "source_path": "src/cmmns_attention_valve_wasm.bld",
+      "bytes": 1414,
+      "kb": 1.38,
+      "sha256": "0548f39d64868c977a66c2732c68714ac330ecc32dda0b51b9dccdc242c8d8ba",
+      "license": "MIT"
+    },
+    {
+      "slug": "buildos_e2e_triad_zeroc",
+      "category": "BuildOS Triad",
+      "idea": "F1",
+      "wasm_path": "wasm/buildos_e2e_triad_zeroc.wasm",
+      "src_path": "src/buildos_e2e_triad_zeroc.bld",
+      "bytes": 21867,
+      "sha256": "12aaf82cf6f0dc96a5e42a7ec917bb403bd713012b3f579db27ddce2205a3f2d"
+    },
+    {
+      "slug": "buildos_compositor_zeroc",
+      "category": "BuildOS Display",
+      "idea": "N49",
+      "wasm_path": "wasm/buildos_compositor_zeroc.wasm",
+      "src_path": "src/buildos_compositor_zeroc.bld",
+      "bytes": 7976,
+      "sha256": "4bb0d135bc048fc7235e409a59d50cd54d3fd511105890d1a4db7637677356d2"
+    },
+    {
+      "slug": "buildos_input_audio_zeroc",
+      "category": "BuildOS Input/Audio",
+      "idea": "N53",
+      "wasm_path": "wasm/buildos_input_audio_zeroc.wasm",
+      "src_path": "src/buildos_input_audio_zeroc.bld",
+      "bytes": 7369,
+      "sha256": "3343275725b9037a9a1dd2dc8ed9eeed2f17dd4396e12df127a2642540e6f1f5"
+    },
+    {
+      "slug": "cs024_posterior_rare_tail_audit",
+      "category": "Tail Audit",
+      "idea": "N28",
+      "wasm_path": "wasm/cs024_posterior_rare_tail_audit.wasm",
+      "src_path": "src/cs024_posterior_rare_tail_audit_wasm.bld",
+      "bytes": 6076,
+      "sha256": "74f46fa9136c64dc98a7c8aa872215658a5dd0191fb1dcb6a5f2db518b5dc21e"
+    }
+  ]
+}
