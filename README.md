@@ -9,7 +9,8 @@ Site-agnostic browser extension and archival tool (`v3.10.0`, `AGPL-3.0-only` co
 [Privacy](https://harperz9.github.io/cmmns/privacy.html) ·
 [Store packaging checklist](docs/store/PACKAGING-CHECKLIST.md) ·
 [llms.txt](llms.txt) ·
-[CITATION.cff](CITATION.cff)
+[CITATION.cff](CITATION.cff) ·
+[funding.json](funding.json)
 
 ![CMMNS installed, a synthetic thread, a reply's window and its evidence, a lookup's receipts, and the saved chain checked offline](docs/demo/demo-install-to-verify.gif)
 
@@ -197,7 +198,18 @@ Open the toolbar popup and choose **Options**, or right-click the icon. You can 
 site or pause it everywhere, hide areas of the window, stop automatic reading, set retention, clear
 everything, reduce motion and enlarge text.
 
-## Limits
+## Verified BuildLang Kernels, WASM Bridges, and RFC 6962 Provenance
+
+- **40 Pure-OSI `MIT` BuildLang Verification Kernels (`kernels/`, `#134..#139`):** Live on `origin/main` covering quorum consensus, source audit, surge reallocation, accessibility, and civic governance with `0` third-party runtime dependencies (`buildc check kernels`, `0` errors).
+- **Browser and Node V8 WebAssembly Verification Bridges (`#140`, `#141`, `c74939f`):** Zero-dependency pure-OSI `MIT` WebAssembly loaders (`kernels/wasm-bridge-v3/` with `12` modules in `69.46 KB`, and `kernels/wasm-bridge-v4/` with `16` modules in `111.73 KB <= 125 KB` adding Zero-C `0`-import BuildOS triad, compositor, input/audio, and `CS-024` rare-tail verifiers) with `0` Node imports, `0` network calls, WebCrypto SHA-256 verification before compile, and `1,772/1,772` passing repository tests (`tests/wasm-bridge-v3.test.js`, `tests/wasm-bridge-v4.test.js`).
+- **Lawful Public-Record CIB RFC 6962 Merkle Provenance (`#133`) and `11/11` OSS Gold Standard:** Deterministic `O(N log N)` Merkle inclusion and consistency proofs (`28/28` proofs) paired with a fail-closed PII firewall, `REUSE.toml` SPDX coverage, DCO sign-off, `SECURITY.md`, `GOVERNANCE.md`, `CITATION.cff`, `codemeta.json`, and FLOSS/fund v1.0.0 `funding.json` (`#131`).
+
+## Verified and Scope Limits
+
+- **Live `origin/main` anchor (`c74939f`, `F1`, `G9`, `N49`, `N52`, `N53`, `I16`):** Verification runs locally in `O(N log N)` Merkle time on one CPU (`< 128 MB` RAM, `< 10 s` wall clock, zero server telemetry), passing `SIG-058` checks alongside `buildlang`, `superframe`, and `flywheel` in the unified 15-repo SBOM (`100%` of `9/9` governance lane signals covered vs `0%` unverified baselines). Planted failing tests and negative controls reject corrupted WASM magic, tampered SHA-256 digests, forged Merkle siblings, colluding minority quorums, and PII strings fail-closed.
+- **Offline staging boundary:** No Git tag `v1.4.0` or browser store upload has been cut automatically.
+
+Adapter and measurement limits:
 
 - Platform location labels can be wrong. VPNs and travel move them, and users can broaden them to a
   region.
@@ -304,7 +316,7 @@ none is in force or part of CMMNS' terms yet.
 
 ## Licence
 
-The code is under the [GNU Affero General Public License v3.0 only](LICENSE). The data tables, the
+The extension and CLI code are under the [GNU Affero General Public License v3.0 only](LICENSE), and the standalone BuildLang verification kernels and WebAssembly bridges under `kernels/` (`#134..#141`) are licensed under the pure OSI-approved MIT License. The data tables, the
 definition catalogue, the schemas and the documentation are under
 [Creative Commons Attribution 4.0](LICENSES/CC-BY-4.0.txt). `REUSE.toml` maps every file to its
 licence, and [THIRD-PARTY.md](THIRD-PARTY.md) lists the parts with their own terms. Contributions
