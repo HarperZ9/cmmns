@@ -1,0 +1,179 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 56F Kernel 4 (Author Idea N71, Formula SIG-101):
+//   Asymmetric Disclosure Penalty Game-Theory Simulator.
+//   Computes Bayesian Nash equilibrium and 100-seed replicator dynamics between honest AI
+//   disclosure vs concealed use under punitive-disclosure vs zero-penalty audit-verified
+//   regimes, verifying planted zero-audit collapse and probability conservation fail-closed.
+
+fn lcg_next(state: u64) -> u64 {
+    (state * 48271) % 2147483647
+}
+
+fn lcg_unit(state: u64) -> f64 {
+    (state as f64) / 2147483647.0
+}
+
+fn critical_audit_prob(p_stigma: f64, b_verify: f64, c_hide: f64, f_caught: f64) -> f64 {
+    if f_caught <= 0.0 {
+        return 1.0;
+    }
+    let num: f64 = p_stigma - b_verify - c_hide;
+    if num <= 0.0 {
+        0.0
+    } else {
+        let q: f64 = num / f_caught;
+        if q > 1.0 { 1.0 } else { q }
+    }
+}
+
+fn check_prob_bounds(p: f64) -> i32 {
+    if p >= 0.0 && p <= 1.0 {
+        let q: f64 = 1.0 - p;
+        let err: f64 = (p + q) - 1.0;
+        let abs_e: f64 = if err < 0.0 { -err } else { err };
+        if abs_e <= 1e-12 { 1 } else { 0 }
+    } else {
+        0
+    }
+}
+
+fn simulate_regime(
+    u0: f64,
+    p_stigma: f64,
+    b_verify: f64,
+    q_audit: f64,
+    f_caught: f64,
+    c_hide: f64,
+    n_seeds: usize,
+    n_steps: usize,
+) -> f64 {
+    let eta: f64 = 0.25;
+    let mut sum_p: f64 = 0.0;
+    let mut s_idx: usize = 0;
+    while s_idx < n_seeds {
+        let mut rng: u64 = 12345 + ((s_idx as u64) * 7919);
+        rng = lcg_next(rng);
+        let p0: f64 = 0.20 + (0.60 * lcg_unit(rng));
+        rng = lcg_next(rng);
+        let eps: f64 = (lcg_unit(rng) - 0.5) * 0.08;
+
+        let u_disc: f64 = u0 - (p_stigma + eps) + b_verify;
+        let u_conc: f64 = u0 - (q_audit * f_caught) - c_hide;
+        let delta_u: f64 = u_disc - u_conc;
+
+        let mut p: f64 = p0;
+        let mut t: usize = 0;
+        while t < n_steps {
+            let dp: f64 = eta * p * (1.0 - p) * delta_u;
+            p = p + dp;
+            if p < 1e-9 { p = 1e-9; }
+            if p > 1.0 - 1e-9 { p = 1.0 - 1e-9; }
+            t = t + 1;
+        }
+        sum_p = sum_p + p;
+        s_idx = s_idx + 1;
+    }
+    sum_p / (n_seeds as f64)
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+    let u0: f64 = 1.0;
+    let c_hide: f64 = 0.02;
+    let n_seeds: usize = 100;
+    let n_steps: usize = 200;
+
+    let t0: i64 = clock_ns();
+
+    // Regime A: Punitive disclosure / low audit (stigma=0.45, q=0.05, F=1.0)
+    let p_punitive: f64 = simulate_regime(u0, 0.45, 0.0, 0.05, 1.0, c_hide, n_seeds, n_steps);
+    let q_crit_pun: f64 = critical_audit_prob(0.45, 0.0, c_hide, 1.0);
+    let du_pun: f64 = (u0 - 0.45) - (u0 - 0.05 * 1.0 - c_hide);
+
+    // Regime B: Zero-penalty audit-verified (stigma=0.0, B_verify=0.15, q=0.35, F=1.2)
+    let p_audit: f64 = simulate_regime(u0, 0.0, 0.15, 0.35, 1.2, c_hide, n_seeds, n_steps);
+    let q_crit_aud: f64 = critical_audit_prob(0.0, 0.15, c_hide, 1.2);
+    let du_aud: f64 = (u0 + 0.15) - (u0 - 0.35 * 1.2 - c_hide);
+
+    // Regime C: Moderate stigma offset by audit above threshold (stigma=0.30, B=0.05, q=0.35, F=1.0)
+    let p_mixed: f64 = simulate_regime(u0, 0.30, 0.05, 0.35, 1.0, c_hide, n_seeds, n_steps);
+    let q_crit_mix: f64 = critical_audit_prob(0.30, 0.05, c_hide, 1.0);
+
+    // Planted control 1: Zero-audit collapse (q=0.0, stigma=0.25, B=0.0) -> honesty collapses
+    let p_zero_audit: f64 = simulate_regime(u0, 0.25, 0.0, 0.0, 1.0, c_hide, n_seeds, n_steps);
+
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1000000.0;
+
+    let gain: f64 = p_audit - p_punitive;
+    if p_punitive < 0.01 && p_audit > 0.99 && gain > 0.98 {
+        println!(
+            "[PASS] n71_regime_inversion punitive={:.6} audit={:.6} gain={:.6}",
+            p_punitive, p_audit, gain
+        );
+    } else {
+        println!(
+            "[FAIL] n71_regime_inversion punitive={:.6} audit={:.6} gain={:.6}",
+            p_punitive, p_audit, gain
+        );
+        failures = failures + 1;
+    }
+
+    if p_mixed > 0.95 && q_crit_mix < 0.35 {
+        println!(
+            "[PASS] n71_threshold_crossing mixed={:.6} q_crit={:.6}",
+            p_mixed, q_crit_mix
+        );
+    } else {
+        println!("[FAIL] n71_threshold_crossing mixed={:.6}", p_mixed);
+        failures = failures + 1;
+    }
+
+    if p_zero_audit < 0.02 {
+        println!(
+            "[PASS] n71_planted_zero_audit_collapse collapsed=1 p_zero_audit={:.6}",
+            p_zero_audit
+        );
+    } else {
+        println!("[FAIL] n71_planted_zero_audit_collapse p_zero_audit={:.6}", p_zero_audit);
+        failures = failures + 1;
+    }
+
+    // Planted control 2: Probability conservation guard rejects out-of-simplex state
+    let ok_valid: i32 = check_prob_bounds(p_audit);
+    let ok_corrupt: i32 = check_prob_bounds(1.25);
+    if ok_valid == 1 && ok_corrupt == 0 {
+        println!("[PASS] n71_planted_simplex_guard rejected_corrupt=1");
+    } else {
+        println!("[FAIL] n71_planted_simplex_guard valid={} corrupt={}", ok_valid, ok_corrupt);
+        failures = failures + 1;
+    }
+
+    let total_steps: f64 = (4 * n_seeds * n_steps) as f64;
+    let steps_per_s: f64 = if elapsed_ms > 0.0 {
+        (total_steps * 1000.0) / elapsed_ms
+    } else {
+        0.0
+    };
+
+    println!(
+        "[METRICS] n71 p_pun={:.6} p_aud={:.6} p_mix={:.6} p_zero={:.6} q_crit_pun={:.6}",
+        p_punitive, p_audit, p_mixed, p_zero_audit, q_crit_pun
+    );
+    println!(
+        "[METRICS] n71 q_crit_aud={:.6} q_crit_mix={:.6} du_pun={:.6} du_aud={:.6}",
+        q_crit_aud, q_crit_mix, du_pun, du_aud
+    );
+    println!(
+        "[METRICS] n71 steps_per_s={:.2} elapsed_ms={:.4}",
+        steps_per_s, elapsed_ms
+    );
+
+    if failures == 0 {
+        println!("[OK] disclosure_penalty_game ALL CHECKS PASSED (failures=0)");
+    } else {
+        println!("[ERR] disclosure_penalty_game failures={}", failures);
+    }
+}

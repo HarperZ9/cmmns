@@ -1,9 +1,12 @@
 // SPDX-FileCopyrightText: 2026 Zain Dana Harper and the CMMNS contributors
 // SPDX-License-Identifier: AGPL-3.0-only
 //
-// Deterministic verification tests for the 5 graduated pure-OSI MIT BuildLang kernels
-// under kernels/: I2 (commons_pipe_mirror), N70 (boring_bridge_verifier),
-// I7 (accessible_surface_gate), I14 (reach_gradient), and I9 (merit_ledger).
+// Deterministic verification tests for all 9 graduated pure-OSI MIT BuildLang kernels
+// under kernels/:
+//   Batch 1 (#134): I2 (commons_pipe_mirror), N70 (boring_bridge_verifier),
+//                   I7 (accessible_surface_gate), I14 (reach_gradient), I9 (merit_ledger)
+//   Batch 2:        N58 (blackout_commons_sync), A22 (honest_journal_kinetic),
+//                   E20 (bulletin_feed_ranker), N71 (disclosure_penalty_game)
 //
 // Runs on every CI platform via Node reference oracles and source invariant checks,
 // and executes live buildc check/lint/run --release --superopt whenever buildc is on PATH
@@ -25,6 +28,10 @@ const KERNELS = [
   { id: "I7", formula: "SIG-120", file: "accessible_surface_gate.bld" },
   { id: "I14", formula: "SIG-092", file: "reach_gradient.bld" },
   { id: "I9", formula: "SIG-091", file: "merit_ledger.bld" },
+  { id: "N58", formula: "SIG-126", file: "blackout_commons_sync.bld" },
+  { id: "A22", formula: "SIG-117", file: "honest_journal_kinetic.bld" },
+  { id: "E20", formula: "SIG-118", file: "bulletin_feed_ranker.bld" },
+  { id: "N71", formula: "SIG-101", file: "disclosure_penalty_game.bld" },
 ];
 
 function sha256(buf) {
@@ -57,7 +64,17 @@ function parseMetrics(stdout, tag) {
   return out;
 }
 
-// ---------------- Reference Oracles ----------------
+function popcount32(x) {
+  let v = x >>> 0;
+  let c = 0;
+  while (v > 0) {
+    c += v & 1;
+    v >>>= 1;
+  }
+  return c;
+}
+
+// ---------------- Batch 1 Reference Oracles ----------------
 
 function oracleI2() {
   const chunk = Buffer.alloc(128);
@@ -198,9 +215,217 @@ function oracleI9() {
   return { legit, sybilOracle, sybilNaive, selfVerify };
 }
 
+// ---------------- Batch 2 Reference Oracles ----------------
+
+function oracleN58() {
+  const gfMul = (a0, b0) => {
+    let a = a0 & 0xff;
+    let b = b0 & 0xff;
+    let p = 0;
+    for (let i = 0; i < 8; i++) {
+      if (b & 1) p ^= a;
+      const hi = a & 0x80;
+      a = (a << 1) & 0xff;
+      if (hi) a ^= 29;
+      b >>>= 1;
+    }
+    return p & 0xff;
+  };
+  const gfInv = (a) => {
+    if ((a & 0xff) === 0) return 0;
+    let res = 1;
+    let base = a & 0xff;
+    let exp = 254;
+    while (exp > 0) {
+      if (exp & 1) res = gfMul(res, base);
+      base = gfMul(base, base);
+      exp >>>= 1;
+    }
+    return res;
+  };
+  const inv4x4 = (mIn) => {
+    const a = mIn.slice();
+    const inv = Array.from({ length: 16 }, (_, i) => (Math.floor(i / 4) === i % 4 ? 1 : 0));
+    for (let col = 0; col < 4; col++) {
+      let piv = col;
+      while (piv < 4 && a[piv * 4 + col] === 0) piv++;
+      if (piv !== col) {
+        for (let k = 0; k < 4; k++) {
+          [a[col * 4 + k], a[piv * 4 + k]] = [a[piv * 4 + k], a[col * 4 + k]];
+          [inv[col * 4 + k], inv[piv * 4 + k]] = [inv[piv * 4 + k], inv[col * 4 + k]];
+        }
+      }
+      const invP = gfInv(a[col * 4 + col]);
+      for (let k = 0; k < 4; k++) {
+        a[col * 4 + k] = gfMul(a[col * 4 + k], invP);
+        inv[col * 4 + k] = gfMul(inv[col * 4 + k], invP);
+      }
+      for (let r = 0; r < 4; r++) {
+        if (r === col) continue;
+        const fac = a[r * 4 + col];
+        if (!fac) continue;
+        for (let c = 0; c < 4; c++) {
+          a[r * 4 + c] ^= gfMul(fac, a[col * 4 + c]);
+          inv[r * 4 + c] ^= gfMul(fac, inv[col * 4 + c]);
+        }
+      }
+    }
+    return inv;
+  };
+
+  const payload = Buffer.alloc(64);
+  for (let i = 0; i < 64; i++) payload[i] = ((i * 37 + 19) ^ 90) & 0xff;
+  const origSha = sha256(payload).toString("hex");
+
+  const g = [];
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) g.push(r === c ? 1 : 0);
+  for (let p = 0; p < 2; p++) for (let c = 0; c < 4; c++) g.push(gfInv((4 + p) ^ c));
+
+  const shards = [];
+  for (let s = 0; s < 6; s++) {
+    for (let j = 0; j < 16; j++) {
+      let val = 0;
+      for (let c = 0; c < 4; c++) val ^= gfMul(g[s * 4 + c], payload[c * 16 + j]);
+      shards.push(val);
+    }
+  }
+
+  let recovered = 0;
+  for (let e1 = 0; e1 < 6; e1++) {
+    for (let e2 = e1 + 1; e2 < 6; e2++) {
+      const keep = [0, 1, 2, 3, 4, 5].filter((idx) => idx !== e1 && idx !== e2);
+      const subG = [];
+      for (const sr of keep) for (let c = 0; c < 4; c++) subG.push(g[sr * 4 + c]);
+      const invG = inv4x4(subG);
+      const rec = Buffer.alloc(64);
+      for (let r = 0; r < 4; r++) {
+        for (let j = 0; j < 16; j++) {
+          let v = 0;
+          for (let c = 0; c < 4; c++) v ^= gfMul(invG[r * 4 + c], shards[keep[c] * 16 + j]);
+          rec[r * 16 + j] = v;
+        }
+      }
+      if (sha256(rec).toString("hex") === origSha) recovered++;
+    }
+  }
+  const rc3Loss = 3 < 4 ? -101 : 0;
+  return { origSha, recovered, rc3Loss };
+}
+
+function oracleA22() {
+  const baseTs = 1795651200n;
+  const entries = [
+    [baseTs, 1, 1, 150],
+    [baseTs + 86400n, 2, 0, 200],
+    [baseTs + 259200n, 3, 1, 180],
+    [baseTs + 432000n, 4, 1, 120],
+    [baseTs + 604800n, 5, 0, 250],
+    [baseTs + 864000n, 6, 1, 160],
+    [baseTs + 1036800n, 7, 0, 140],
+    [baseTs + 1209600n, 8, 1, 190],
+  ];
+  const chainHash = (rows) => {
+    let cur = sha256(Buffer.from("A22-GENESIS"));
+    for (const [ts, id, kin, w100] of rows) {
+      const blk = Buffer.alloc(49);
+      cur.copy(blk, 0);
+      blk.writeBigUInt64BE(ts, 32);
+      blk.writeUInt32BE(id, 40);
+      blk.writeUInt8(kin, 44);
+      blk.writeUInt32BE(w100, 45);
+      cur = sha256(blk);
+    }
+    return cur;
+  };
+  const tip = chainHash(entries);
+  const edited = entries.map((e, i) => (i === 2 ? [e[0], e[1], e[2], e[3] + 1] : e));
+  const nowTs = Number(baseTs + 1296000n);
+  let kinSum = 0;
+  let rawPot = 0;
+  let decPot = 0;
+  for (const [ts, , kin, w100] of entries) {
+    const w = w100 / 100;
+    if (kin === 1) kinSum += w;
+    else {
+      rawPot += w;
+      decPot += w * Math.exp((-Math.LN2 * (nowTs - Number(ts))) / 604800.0);
+    }
+  }
+  return {
+    tip_w0: wordAt(tip, 0),
+    tip_w7: wordAt(tip, 28),
+    raw_ratio: kinSum / (kinSum + rawPot),
+    eff_ratio: kinSum / (kinSum + decPot),
+    edit_rejected: !tip.equals(chainHash(edited)),
+  };
+}
+
+function oracleE20() {
+  const posts = [
+    [101, 2863311530, 1, 1.8, 0.85, 2.0],
+    [102, 858993459, 1, 2.4, 0.92, 1.0],
+    [103, 4042322160, 1, 1.5, 0.7, 6.0],
+    [104, 252645135, 1, 2.0, 0.95, 3.0],
+    [105, 3435973836, 1, 1.2, 0.6, 0.5],
+    [201, 858993459, 1, 2.4, 0.92, 0.1],
+    [202, 858993459 ^ 1, 1, 2.4, 0.92, 0.1],
+    [203, 858993459 ^ 5, 1, 2.4, 0.92, 0.1],
+    [301, 16711935, 0, 5.0, 99.0, 0.01],
+    [302, 4278255360, 0, 9.0, 50.0, 0.05],
+  ];
+  const accepted = [];
+  const hashes = [];
+  let dup = 0;
+  let unv = 0;
+  for (const [id, h, v, w, nov, age] of posts) {
+    if (v === 0 || w <= 0) unv++;
+    else if (hashes.some((ah) => popcount32(h ^ ah) <= 2)) dup++;
+    else {
+      accepted.push({ id, score: (w * nov) / (1.0 + 0.15 * age) });
+      hashes.push(h);
+    }
+  }
+  accepted.sort((a, b) => b.score - a.score);
+  return {
+    acc: accepted.length,
+    dup,
+    unv,
+    order: accepted.slice(0, 4).map((x) => x.id),
+    top1_score: accepted[0].score,
+    score_sum: accepted.reduce((s, x) => s + x.score, 0),
+  };
+}
+
+function oracleN71() {
+  const sim = (pStigma, bVerify, qAudit, fCaught) => {
+    const u0 = 1.0;
+    const cHide = 0.02;
+    let sumP = 0;
+    for (let s = 0; s < 100; s++) {
+      let rng = BigInt(12345 + s * 7919);
+      rng = (rng * 48271n) % 2147483647n;
+      let p = 0.2 + 0.6 * (Number(rng) / 2147483647.0);
+      rng = (rng * 48271n) % 2147483647n;
+      const eps = (Number(rng) / 2147483647.0 - 0.5) * 0.08;
+      const du = u0 - (pStigma + eps) + bVerify - (u0 - qAudit * fCaught - cHide);
+      for (let t = 0; t < 200; t++) {
+        p = Math.min(1 - 1e-9, Math.max(1e-9, p + 0.25 * p * (1 - p) * du));
+      }
+      sumP += p;
+    }
+    return sumP / 100;
+  };
+  return {
+    p_pun: sim(0.45, 0.0, 0.05, 1.0),
+    p_aud: sim(0.0, 0.15, 0.35, 1.2),
+    p_mix: sim(0.3, 0.05, 0.35, 1.0),
+    p_zero: sim(0.25, 0.0, 0.0, 1.0),
+  };
+}
+
 // ---------------- Tests ----------------
 
-test("graduated MIT BuildLang kernels satisfy source hygiene, SPDX, and REUSE invariants", () => {
+test("all 9 graduated MIT BuildLang kernels satisfy source hygiene, SPDX, and REUSE invariants", () => {
   const readme = readFileSync(join(KERNELS_DIR, "README.md"), "utf8");
   assert.match(readme, /SPDX-License-Identifier:\s*MIT/);
   assert.doesNotMatch(readme, /[\u2013\u2014]/);
@@ -271,7 +496,36 @@ test("I14 reach_gradient and I9 merit_ledger reference oracles enforce fail-clos
   assert.equal(m.selfVerify, 0);
 });
 
-test("live buildc check, lint, and superopt execution match reference oracles when buildc is installed", (t) => {
+test("N58 blackout_commons_sync reference oracle recovers 15/15 two-shard erasures and rejects 3-shard loss", () => {
+  const r = oracleN58();
+  assert.equal(r.recovered, 15);
+  assert.equal(r.rc3Loss, -101);
+  assert.equal(r.origSha, "cce38eca54ef2fc0893778bed8fa181046d258b4df4763b59c3f50b8f98662c8");
+});
+
+test("A22 honest_journal_kinetic, E20 bulletin_feed_ranker, and N71 disclosure_penalty_game reference oracles pass", () => {
+  const a = oracleA22();
+  assert.equal(a.tip_w0, 616225250);
+  assert.equal(a.tip_w7, 1639327047);
+  assert.ok(Math.abs(a.raw_ratio - 0.57554) < 1e-5);
+  assert.ok(Math.abs(a.eff_ratio - 0.749601) < 1e-5);
+  assert.equal(a.edit_rejected, true);
+
+  const e = oracleE20();
+  assert.equal(e.acc, 5);
+  assert.equal(e.dup, 3);
+  assert.equal(e.unv, 2);
+  assert.deepEqual(e.order, [102, 104, 101, 105]);
+  assert.ok(Math.abs(e.top1_score - 1.92) < 1e-6);
+
+  const n = oracleN71();
+  assert.ok(n.p_pun < 0.01);
+  assert.ok(n.p_aud > 0.99);
+  assert.ok(n.p_mix > 0.95);
+  assert.ok(n.p_zero < 0.02);
+});
+
+test("live buildc check, lint, and superopt execution match reference oracles for all 9 kernels when buildc is installed", (t) => {
   const required = process.env.CMMNS_REQUIRE_BUILDC === "1";
   if (!hasBuildc()) {
     if (required) assert.fail("CMMNS_REQUIRE_BUILDC=1 set but buildc is not on PATH");
@@ -315,6 +569,31 @@ test("live buildc check, lint, and superopt execution match reference oracles wh
       assert.match(runOut, /\[PASS\] i14_reach_gradient local_traces=0 leak_rc=-1 nosig_rc=-2 badsig_rc=-2 pub_rc=2/);
     } else if (k.id === "I9") {
       assert.match(runOut, /\[PASS\] i9_merit_ledger legit=30\.000000 sybil_oracle=0\.000000 sybil_naive=10\.000000 self_v=0\.000000/);
+    } else if (k.id === "N58") {
+      const ref = oracleN58();
+      assert.match(runOut, new RegExp(`BLACKOUT_SYNC status=PASS failures=0 .* recovered=15/15 rc_3loss=-101 sha=${ref.origSha}`));
+    } else if (k.id === "A22") {
+      const m = parseMetrics(runOut, "a22");
+      const ref = oracleA22();
+      assert.equal(Number(m.tip_w0), ref.tip_w0);
+      assert.equal(Number(m.tip_w7), ref.tip_w7);
+      assert.ok(Math.abs(Number(m.raw_ratio) - ref.raw_ratio) < 1e-5);
+      assert.ok(Math.abs(Number(m.eff_ratio) - ref.eff_ratio) < 1e-5);
+    } else if (k.id === "E20") {
+      const m = parseMetrics(runOut, "e20");
+      const ref = oracleE20();
+      assert.equal(Number(m.acc), ref.acc);
+      assert.equal(Number(m.dup), ref.dup);
+      assert.equal(Number(m.unv), ref.unv);
+      assert.deepEqual([Number(m.top1), Number(m.top2), Number(m.top3), Number(m.top4)], ref.order);
+      assert.ok(Math.abs(Number(m.top1_score) - ref.top1_score) < 1e-5);
+    } else if (k.id === "N71") {
+      const m = parseMetrics(runOut, "n71");
+      const ref = oracleN71();
+      assert.ok(Math.abs(Number(m.p_pun) - ref.p_pun) < 1e-5);
+      assert.ok(Math.abs(Number(m.p_aud) - ref.p_aud) < 1e-5);
+      assert.ok(Math.abs(Number(m.p_mix) - ref.p_mix) < 1e-5);
+      assert.ok(Math.abs(Number(m.p_zero) - ref.p_zero) < 1e-5);
     }
   }
 });
