@@ -3,7 +3,7 @@
 SPDX-FileCopyrightText: 2026 Zain Dana Harper and the CMMNS contributors
 SPDX-License-Identifier: MIT
 
-This directory holds forty standalone, zero-dependency BuildLang verification kernels graduated into `HarperZ9/cmmns` under the MIT license (`17` Batches 1 to 4 below, `4` Batch 5 in `kernels/BATCH5.md`, and `19` Batches 6 to 10 in `kernels/BATCHES_6_TO_10.md`). Each kernel encodes a fail-closed commons, provenance, erasure-coding, accessibility, discourse, resilience, civic economics, archival stewardship, or anti-Sybil invariant and ships with deterministic reference tests in `tests/buildlang-kernels.test.js`, `tests/buildlang-kernels-batch5.test.js`, and `tests/buildlang-kernels-batches-6-to-10.test.js`.
+This directory holds forty standalone, zero-dependency BuildLang verification kernels graduated into `HarperZ9/cmmns` under the MIT license (`17` Batches 1 to 4 below, `4` Batch 5 in `kernels/BATCH5.md`, and `19` Batches 6 to 10 in `kernels/BATCHES_6_TO_10.md`), together with the zero-dependency Browser and V8 WebAssembly Verification Bridge V3 in `kernels/wasm-bridge-v3/` (`12` compiled MIT `.wasm` modules totaling `69.46 KB`, `0` network calls, `0` Node imports in the bridge runtime). Each kernel encodes a fail-closed commons, provenance, erasure-coding, accessibility, discourse, resilience, civic economics, archival stewardship, or anti-Sybil invariant and ships with deterministic reference tests in `tests/buildlang-kernels.test.js`, `tests/buildlang-kernels-batch5.test.js`, `tests/buildlang-kernels-batches-6-to-10.test.js`, and `tests/wasm-bridge-v3.test.js`.
 
 ## Kernel Inventory
 
