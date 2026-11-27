@@ -1,0 +1,147 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 56D (N59 / STA-057): Localized Community Homeostasis vs Centralized
+// Bureaucracy Latency/Perturbation Simulator. Compares overshoot, settling
+// time, and integrated squared error (ISE) under delayed PI feedback loops
+// across communication delays tau in {1, 4, 8, 10}, plus planted runaway-gain
+// instability caught fail-closed.
+
+struct LoopStats {
+    tau: i64,
+    peak_abs: f64,
+    ise: f64,
+    iae: f64,
+    settle_tick: i64,
+    unstable: i64,
+}
+
+fn simulate_feedback(tau: i64, kp: f64, ki: f64, steps: i64) -> LoopStats {
+    let mut x_hist: Vec<f64> = Vec::new();
+    let mut i_hist: Vec<f64> = Vec::new();
+    let mut t: i64 = 0;
+    while t < steps {
+        x_hist.push(0.0);
+        i_hist.push(0.0);
+        t = t + 1;
+    }
+
+    let a: f64 = 0.90;
+    let mut x: f64 = 0.0;
+    let mut integ: f64 = 0.0;
+    let mut peak: f64 = 0.0;
+    let mut ise: f64 = 0.0;
+    let mut iae: f64 = 0.0;
+    let mut unstable: i64 = 0;
+    let mut last_exceed: i64 = 15;
+
+    t = 0;
+    while t < steps {
+        x_hist[t as usize] = x;
+        i_hist[t as usize] = integ;
+
+        let obs_idx: i64 = if t >= tau { t - tau } else { 0 };
+        let x_obs: f64 = x_hist[obs_idx as usize];
+        let i_obs: f64 = i_hist[obs_idx as usize];
+        let u: f64 = -kp * x_obs - ki * i_obs;
+
+        let dist: f64 = if t >= 5 && t < 15 { 1.0 } else { 0.0 };
+        let x_next: f64 = a * x + u + dist;
+        integ = integ + x;
+
+        let ax: f64 = x_next.abs();
+        if ax > peak {
+            peak = ax;
+        }
+        if ax > 1000.0 {
+            unstable = 1;
+            break;
+        }
+        ise = ise + x_next * x_next;
+        iae = iae + ax;
+        if t >= 15 && ax >= 0.15 {
+            last_exceed = t;
+        }
+        x = x_next;
+        t = t + 1;
+    }
+
+    let settle: i64 = if unstable == 1 { steps } else { last_exceed - 15 };
+    return LoopStats {
+        tau: tau,
+        peak_abs: peak,
+        ise: ise,
+        iae: iae,
+        settle_tick: settle,
+        unstable: unstable,
+    };
+}
+
+fn check_stability(st: &LoopStats) -> i64 {
+    if st.unstable == 1 || st.peak_abs > 1000.0 {
+        return -301;
+    }
+    return 0;
+}
+
+fn main() -> i64 ~ Console {
+    let steps: i64 = 180;
+    let kp: f64 = 0.22;
+    let ki: f64 = 0.015;
+
+    let s1: LoopStats = simulate_feedback(1, kp, ki, steps);
+    let s4: LoopStats = simulate_feedback(4, kp, ki, steps);
+    let s8: LoopStats = simulate_feedback(8, kp, ki, steps);
+    let s10: LoopStats = simulate_feedback(10, kp, ki, steps);
+
+    println!(
+        "TAU=1  peak={:.4} ise={:.4} iae={:.4} settle={} unstable={}",
+        s1.peak_abs, s1.ise, s1.iae, s1.settle_tick, s1.unstable
+    );
+    println!(
+        "TAU=4  peak={:.4} ise={:.4} iae={:.4} settle={} unstable={}",
+        s4.peak_abs, s4.ise, s4.iae, s4.settle_tick, s4.unstable
+    );
+    println!(
+        "TAU=8  peak={:.4} ise={:.4} iae={:.4} settle={} unstable={}",
+        s8.peak_abs, s8.ise, s8.iae, s8.settle_tick, s8.unstable
+    );
+    println!(
+        "TAU=10 peak={:.4} ise={:.4} iae={:.4} settle={} unstable={}",
+        s10.peak_abs, s10.ise, s10.iae, s10.settle_tick, s10.unstable
+    );
+
+    // Planted control: runaway gain under centralized latency must fail closed (-301)
+    let runaway: LoopStats = simulate_feedback(10, 0.95, 0.12, steps);
+    let run_rc: i64 = check_stability(&runaway);
+    let planted_caught: i64 = if run_rc == -301 { 1 } else { 0 };
+    println!(
+        "PLANTED_RUNAWAY_GAIN peak={:.2} unstable={} rc={} caught={}",
+        runaway.peak_abs, runaway.unstable, run_rc, planted_caught
+    );
+
+    let mono_peak: i64 = if s1.peak_abs < s4.peak_abs && s4.peak_abs < s8.peak_abs
+        && s8.peak_abs < s10.peak_abs { 1 } else { 0 };
+    let mono_ise: i64 = if s1.ise < s4.ise && s4.ise < s8.ise && s8.ise < s10.ise { 1 } else { 0 };
+    let faster_settle: i64 = if s1.settle_tick < s10.settle_tick { 1 } else { 0 };
+    let clean_stable: i64 = if check_stability(&s1) == 0 && check_stability(&s10) == 0 {
+        1
+    } else {
+        0
+    };
+
+    if mono_peak == 1 && mono_ise == 1 && faster_settle == 1
+        && clean_stable == 1 && planted_caught == 1 {
+        let ise_ratio: f64 = s10.ise / s1.ise;
+        println!(
+            "[PASS] N59_COMMUNITY_HOMEOSTASIS ise_ratio={:.2}x settle_1={} settle_10={} planted=1",
+            ise_ratio, s1.settle_tick, s10.settle_tick
+        );
+        return 0;
+    }
+    println!(
+        "[FAIL] N59_COMMUNITY_HOMEOSTASIS mp={} mi={} fs={} cs={} pl={}",
+        mono_peak, mono_ise, faster_settle, clean_stable, planted_caught
+    );
+    return 1;
+}
