@@ -1,0 +1,217 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 56D (N26 / STA-055): Catastrophe Surge-Price vs Rationed-Queue
+// Reallocation Curve Simulator. Compares concave social welfare, unmet
+// essential demand, and consumption Gini across 30%, 50%, and 70% acute
+// supply shocks, with planted supply-conservation violation caught fail-closed.
+
+struct AllocMetrics {
+    price: f64,
+    total_alloc: f64,
+    unmet_essential: f64,
+    welfare: f64,
+    gini: f64,
+    conservation_err: f64,
+}
+
+fn household_income(i: i64, n: i64) -> f64 {
+    let u: f64 = (i as f64) / ((n - 1) as f64);
+    // Log-spaced income distribution from 1.0 to 25.0
+    return (3.2188758248682006 * u).exp();
+}
+
+fn household_demand(income: f64, price: f64) -> f64 {
+    let desired: f64 = 1.0 + income / (2.0 * price);
+    let max_afford: f64 = income / price;
+    if desired < max_afford {
+        return desired;
+    }
+    return max_afford;
+}
+
+fn total_demand(n: i64, price: f64) -> f64 {
+    let mut s: f64 = 0.0;
+    let mut i: i64 = 0;
+    while i < n {
+        s = s + household_demand(household_income(i, n), price);
+        i = i + 1;
+    }
+    return s;
+}
+
+fn solve_clearing_price(n: i64, supply: f64) -> f64 {
+    let mut lo: f64 = 0.01;
+    let mut hi: f64 = 200.0;
+    let mut iter: i64 = 0;
+    while iter < 80 {
+        let mid: f64 = 0.5 * (lo + hi);
+        if total_demand(n, mid) > supply {
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+        iter = iter + 1;
+    }
+    return 0.5 * (lo + hi);
+}
+
+fn compute_gini(q: &Vec<f64>) -> f64 {
+    let n: i64 = q.len() as i64;
+    let mut mean: f64 = 0.0;
+    let mut i: i64 = 0;
+    while i < n {
+        mean = mean + q[i as usize];
+        i = i + 1;
+    }
+    mean = mean / (n as f64);
+    if mean <= 1e-12 {
+        return 0.0;
+    }
+    let mut diff_sum: f64 = 0.0;
+    i = 0;
+    while i < n {
+        let mut j: i64 = 0;
+        while j < n {
+            diff_sum = diff_sum + (q[i as usize] - q[j as usize]).abs();
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return diff_sum / (2.0 * (n as f64) * (n as f64) * mean);
+}
+
+fn evaluate_allocation(q: &Vec<f64>, supply: f64, price: f64) -> AllocMetrics {
+    let n: i64 = q.len() as i64;
+    let mut tot: f64 = 0.0;
+    let mut unmet: f64 = 0.0;
+    let mut welf: f64 = 0.0;
+    let mut i: i64 = 0;
+    while i < n {
+        let qi: f64 = q[i as usize];
+        tot = tot + qi;
+        if qi < 1.0 {
+            unmet = unmet + (1.0 - qi);
+        }
+        let ess: f64 = if qi < 1.0 { qi } else { 1.0 };
+        let lux: f64 = if qi > 1.0 { qi - 1.0 } else { 0.0 };
+        welf = welf + (1.0 + 4.0 * ess + 0.5 * lux).ln();
+        i = i + 1;
+    }
+    let cerr: f64 = (tot - supply).abs();
+    return AllocMetrics {
+        price: price,
+        total_alloc: tot,
+        unmet_essential: unmet,
+        welfare: welf,
+        gini: compute_gini(q),
+        conservation_err: cerr,
+    };
+}
+
+fn simulate_surge(n: i64, supply: f64) -> AllocMetrics {
+    let p: f64 = solve_clearing_price(n, supply);
+    let mut q: Vec<f64> = Vec::new();
+    let mut i: i64 = 0;
+    while i < n {
+        q.push(household_demand(household_income(i, n), p));
+        i = i + 1;
+    }
+    return evaluate_allocation(&q, supply, p);
+}
+
+fn simulate_ration(n: i64, supply: f64) -> AllocMetrics {
+    let nf: f64 = n as f64;
+    let base: f64 = if supply < nf { supply / nf } else { 1.0 };
+    let rem: f64 = supply - base * nf;
+    let mut inc_sum: f64 = 0.0;
+    let mut i: i64 = 0;
+    while i < n {
+        inc_sum = inc_sum + household_income(i, n);
+        i = i + 1;
+    }
+    let mut q: Vec<f64> = Vec::new();
+    i = 0;
+    while i < n {
+        let share: f64 = if rem > 0.0 {
+            rem * (household_income(i, n) / inc_sum)
+        } else {
+            0.0
+        };
+        q.push(base + share);
+        i = i + 1;
+    }
+    return evaluate_allocation(&q, supply, 1.0);
+}
+
+fn verify_conservation(m: &AllocMetrics) -> i64 {
+    if m.conservation_err > 1e-6 {
+        return -101;
+    }
+    return 0;
+}
+
+fn main() -> i64 ~ Console {
+    let n: i64 = 100;
+    let baseline_supply: f64 = 150.0;
+    let mut shocks: Vec<f64> = Vec::new();
+    shocks.push(0.30);
+    shocks.push(0.50);
+    shocks.push(0.70);
+
+    let mut all_ok: i64 = 1;
+    let mut checksum: f64 = 0.0;
+    let mut sidx: i64 = 0;
+    while sidx < 3 {
+        let frac: f64 = shocks[sidx as usize];
+        let supply: f64 = baseline_supply * (1.0 - frac);
+        let surge: AllocMetrics = simulate_surge(n, supply);
+        let ration: AllocMetrics = simulate_ration(n, supply);
+
+        let c_s: i64 = verify_conservation(&surge);
+        let c_r: i64 = verify_conservation(&ration);
+        let better_unmet: i64 = if ration.unmet_essential < surge.unmet_essential { 1 } else { 0 };
+        let better_welf: i64 = if ration.welfare > surge.welfare { 1 } else { 0 };
+        let better_gini: i64 = if ration.gini < surge.gini { 1 } else { 0 };
+
+        println!(
+            "SHOCK={:.2} supply={:.1} surge_p={:.4} surge_unmet={:.4} rat_unmet={:.4}",
+            frac, supply, surge.price, surge.unmet_essential, ration.unmet_essential
+        );
+        println!(
+            "  surge_welf={:.4} rat_welf={:.4} surge_gini={:.4} rat_gini={:.4}",
+            surge.welfare, ration.welfare, surge.gini, ration.gini
+        );
+
+        if c_s != 0 || c_r != 0 || better_unmet == 0 || better_welf == 0 || better_gini == 0 {
+            all_ok = 0;
+        }
+        checksum = checksum + surge.price + surge.welfare + ration.welfare + surge.gini + ration.gini;
+        sidx = sidx + 1;
+    }
+
+    // Planted control: +5.0 unit supply-conservation leak must fail closed (-101)
+    let mut leaked_q: Vec<f64> = Vec::new();
+    let mut k: i64 = 0;
+    while k < n {
+        leaked_q.push(0.80);
+        k = k + 1;
+    }
+    let leaked_m: AllocMetrics = evaluate_allocation(&leaked_q, 75.0, 1.0);
+    let leak_rc: i64 = verify_conservation(&leaked_m);
+    let planted_caught: i64 = if leak_rc == -101 { 1 } else { 0 };
+    println!(
+        "PLANTED_CONSERVATION_LEAK rc={} err={:.4} caught={}",
+        leak_rc, leaked_m.conservation_err, planted_caught
+    );
+
+    if all_ok == 1 && planted_caught == 1 {
+        println!(
+            "[PASS] N26_CATASTROPHE_SURGE_SIM shocks=3/3 planted_caught=1 checksum={:.6}",
+            checksum
+        );
+        return 0;
+    }
+    println!("[FAIL] N26_CATASTROPHE_SURGE_SIM all_ok={} planted={}", all_ok, planted_caught);
+    return 1;
+}

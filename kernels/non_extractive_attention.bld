@@ -1,0 +1,93 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 57F (I10 / SIG-110): Non-Extractive Time-Return Platform Scorer.
+// Audits platform telemetry for task-completion-per-minute, zero infinite
+// scroll or dark-pattern hooks, and clean exit-ramp latency (<= 1 click).
+// Flags planted manipulative variable-reward / hard-exit dark patterns fail-closed.
+
+struct PlatformAudit {
+    score: f64,
+    verdict_rc: i64,
+    dark_hits: i64,
+}
+
+fn audit_platform(
+    tasks_per_min: f64,
+    prod_min: f64,
+    total_min: f64,
+    exit_clicks: i64,
+    inf_scroll: i64,
+    var_reward: i64,
+    autoplay: i64
+) -> PlatformAudit {
+    let mut hits: i64 = 0;
+    if exit_clicks > 1 {
+        hits = hits + 1;
+    }
+    if inf_scroll != 0 {
+        hits = hits + 1;
+    }
+    if var_reward != 0 {
+        hits = hits + 1;
+    }
+    if autoplay != 0 {
+        hits = hits + 1;
+    }
+
+    let time_ret: f64 = if total_min > 0.0 { prod_min / total_min } else { 0.0 };
+    let tpm_norm: f64 = if tasks_per_min >= 2.0 { 1.0 } else { tasks_per_min / 2.0 };
+    let exit_bonus: f64 = if exit_clicks <= 1 { 1.0 } else { 1.0 / (exit_clicks as f64) };
+    let raw: f64 = 0.45 * time_ret + 0.35 * tpm_norm + 0.20 * exit_bonus;
+    let penalty: f64 = 0.25 * (hits as f64);
+    let score: f64 = if raw > penalty { raw - penalty } else { 0.0 };
+    let rc: i64 = if hits > 0 || score < 0.75 { -301 } else { 0 };
+    return PlatformAudit {
+        score: score,
+        verdict_rc: rc,
+        dark_hits: hits,
+    };
+}
+
+fn main() -> i64 ~ Console {
+    // 3 clean non-extractive tools
+    let p1: PlatformAudit = audit_platform(2.4, 18.5, 20.0, 1, 0, 0, 0);
+    let p2: PlatformAudit = audit_platform(1.9, 14.0, 15.0, 1, 0, 0, 0);
+    let p3: PlatformAudit = audit_platform(2.2, 27.0, 30.0, 0, 0, 0, 0);
+
+    // 3 planted extractive dark-pattern platforms
+    let d1: PlatformAudit = audit_platform(0.3, 4.0, 45.0, 5, 1, 1, 1);
+    let d2: PlatformAudit = audit_platform(1.8, 12.0, 15.0, 1, 0, 1, 0);
+    let d3: PlatformAudit = audit_platform(1.6, 11.0, 15.0, 4, 1, 0, 0);
+
+    println!(
+        "CLEAN_TOOLS s1={:.4}(rc={}) s2={:.4}(rc={}) s3={:.4}(rc={})",
+        p1.score, p1.verdict_rc, p2.score, p2.verdict_rc, p3.score, p3.verdict_rc
+    );
+    println!(
+        "DARK_PATTERNS d1={:.4}(rc={},h={}) d2={:.4}(rc={},h={}) d3={:.4}(rc={},h={})",
+        d1.score, d1.verdict_rc, d1.dark_hits,
+        d2.score, d2.verdict_rc, d2.dark_hits,
+        d3.score, d3.verdict_rc, d3.dark_hits
+    );
+
+    let clean_pass: i64 = if p1.verdict_rc == 0 && p2.verdict_rc == 0 && p3.verdict_rc == 0 {
+        1
+    } else {
+        0
+    };
+    let dark_caught: i64 = if d1.verdict_rc == -301 && d2.verdict_rc == -301
+        && d3.verdict_rc == -301 { 1 } else { 0 };
+    let clean_mean: f64 = (p1.score + p2.score + p3.score) / 3.0;
+    let dark_mean: f64 = (d1.score + d2.score + d3.score) / 3.0;
+
+    if clean_pass == 1 && dark_caught == 1 && clean_mean > 0.90 && dark_mean < 0.65 {
+        println!(
+            "[PASS] I10_NON_EXTRACTIVE clean=3/3 dark_caught=3/3 cmean={:.4} dmean={:.4}",
+            clean_mean, dark_mean
+        );
+        return 0;
+    }
+    println!("[FAIL] I10_NON_EXTRACTIVE cp={} dc={}", clean_pass, dark_caught);
+    return 1;
+}
