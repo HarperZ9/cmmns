@@ -1,0 +1,370 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 56F Kernel 3 (Author Idea N70, Formula SIG-100):
+//   Boring-Bridge Zero-Dependency Offline Drop-In Receipt Verifier.
+//   Validates canonical engine-receipt/1 SHA-256 digests and RFC 6962 Merkle inclusion
+//   proofs purely offline with zero network calls or external libraries, rejecting 1-bit
+//   payload tampers, 1-bit sibling proof tampers, and leaf-index spoofing fail-closed.
+
+fn rotr32(x: u64, n: u64) -> u64 {
+    let m: u64 = 4294967295;
+    let v: u64 = x & m;
+    ((v >> n) | ((v << (32 - n)) & m)) & m
+}
+
+fn sha256_k() -> Vec<u64> {
+    let mut k: Vec<u64> = Vec::new();
+    k.push(1116352408); k.push(1899447441); k.push(3049323471); k.push(3921009573);
+    k.push(961987163);  k.push(1508970993); k.push(2453635748); k.push(2870763221);
+    k.push(3624381080); k.push(310598401);  k.push(607225278);  k.push(1426881987);
+    k.push(1925078388); k.push(2162078206); k.push(2614888103); k.push(3248222580);
+    k.push(3835390401); k.push(4022224774); k.push(264347078);  k.push(604807628);
+    k.push(770255983);  k.push(1249150122); k.push(1555081692); k.push(1996064986);
+    k.push(2554220882); k.push(2821834349); k.push(2952996808); k.push(3210313671);
+    k.push(3336571891); k.push(3584528711); k.push(113926993);  k.push(338241895);
+    k.push(666307205);  k.push(773529912);  k.push(1294757372); k.push(1396182291);
+    k.push(1695183700); k.push(1986661051); k.push(2177026350); k.push(2456956037);
+    k.push(2730485921); k.push(2820302411); k.push(3259730800); k.push(3345764771);
+    k.push(3516065817); k.push(3600352804); k.push(4094571909); k.push(275423344);
+    k.push(430227734);  k.push(506948616);  k.push(659060556);  k.push(883997877);
+    k.push(958139571);  k.push(1322822218); k.push(1537002063); k.push(1747873779);
+    k.push(1955562222); k.push(2024104815); k.push(2227730452); k.push(2361852424);
+    k.push(2428436474); k.push(2756734187); k.push(3204031479); k.push(3329325298);
+    k
+}
+
+fn sha256_bytes(msg: &Vec<u64>, k_tbl: &Vec<u64>) -> Vec<u64> {
+    let m32: u64 = 4294967295;
+    let mut padded: Vec<u64> = Vec::new();
+    let n: usize = msg.len();
+    let mut i: usize = 0;
+    while i < n {
+        padded.push(msg[i] & 255);
+        i = i + 1;
+    }
+    padded.push(128);
+    while (padded.len() % 64) != 56 {
+        padded.push(0);
+    }
+    let bit_len: u64 = (n as u64) * 8;
+    let mut sh: i32 = 56;
+    while sh >= 0 {
+        padded.push((bit_len >> (sh as u64)) & 255);
+        sh = sh - 8;
+    }
+
+    let mut h0: u64 = 1779033703;
+    let mut h1: u64 = 3144134277;
+    let mut h2: u64 = 1013904242;
+    let mut h3: u64 = 2773480762;
+    let mut h4: u64 = 1359893119;
+    let mut h5: u64 = 2600822924;
+    let mut h6: u64 = 528734635;
+    let mut h7: u64 = 1541459225;
+
+    let mut w: Vec<u64> = Vec::new();
+    let mut wi: usize = 0;
+    while wi < 64 {
+        w.push(0);
+        wi = wi + 1;
+    }
+
+    let mut blk: usize = 0;
+    while blk < padded.len() {
+        let mut j: usize = 0;
+        while j < 16 {
+            let o: usize = blk + j * 4;
+            w[j] = (padded[o] << 24) | (padded[o + 1] << 16)
+                | (padded[o + 2] << 8) | padded[o + 3];
+            j = j + 1;
+        }
+        j = 16;
+        while j < 64 {
+            let s0: u64 = rotr32(w[j - 15], 7) ^ rotr32(w[j - 15], 18) ^ (w[j - 15] >> 3);
+            let s1: u64 = rotr32(w[j - 2], 17) ^ rotr32(w[j - 2], 19) ^ (w[j - 2] >> 10);
+            w[j] = (w[j - 16] + s0 + w[j - 7] + s1) & m32;
+            j = j + 1;
+        }
+
+        let mut a: u64 = h0; let mut b: u64 = h1; let mut c: u64 = h2; let mut d: u64 = h3;
+        let mut e: u64 = h4; let mut f: u64 = h5; let mut g: u64 = h6; let mut hh: u64 = h7;
+
+        j = 0;
+        while j < 64 {
+            let s1: u64 = rotr32(e, 6) ^ rotr32(e, 11) ^ rotr32(e, 25);
+            let ch: u64 = (e & f) ^ (((e ^ m32) & m32) & g);
+            let t1: u64 = (hh + s1 + ch + k_tbl[j] + w[j]) & m32;
+            let s0: u64 = rotr32(a, 2) ^ rotr32(a, 13) ^ rotr32(a, 22);
+            let maj: u64 = (a & b) ^ (a & c) ^ (b & c);
+            let t2: u64 = (s0 + maj) & m32;
+            hh = g; g = f; f = e; e = (d + t1) & m32;
+            d = c; c = b; b = a; a = (t1 + t2) & m32;
+            j = j + 1;
+        }
+        h0 = (h0 + a) & m32; h1 = (h1 + b) & m32; h2 = (h2 + c) & m32; h3 = (h3 + d) & m32;
+        h4 = (h4 + e) & m32; h5 = (h5 + f) & m32; h6 = (h6 + g) & m32; h7 = (h7 + hh) & m32;
+        blk = blk + 64;
+    }
+
+    let mut out: Vec<u64> = Vec::new();
+    let mut ws: Vec<u64> = Vec::new();
+    ws.push(h0); ws.push(h1); ws.push(h2); ws.push(h3);
+    ws.push(h4); ws.push(h5); ws.push(h6); ws.push(h7);
+    let mut idx: usize = 0;
+    while idx < 8 {
+        out.push((ws[idx] >> 24) & 255);
+        out.push((ws[idx] >> 16) & 255);
+        out.push((ws[idx] >> 8) & 255);
+        out.push(ws[idx] & 255);
+        idx = idx + 1;
+    }
+    out
+}
+
+fn make_receipt_payload(entry_id: u64) -> Vec<u64> {
+    // Canonical 64-byte engine-receipt/1 payload representation (deterministic offline bytes)
+    let mut p: Vec<u64> = Vec::new();
+    let mut i: u64 = 0;
+    while i < 64 {
+        let b: u64 = (entry_id * 53 + i * 29 + 17) & 255;
+        p.push(b);
+        i = i + 1;
+    }
+    p
+}
+
+fn hash_rfc6962_leaf(payload: &Vec<u64>, k_tbl: &Vec<u64>) -> Vec<u64> {
+    let mut buf: Vec<u64> = Vec::new();
+    buf.push(0); // RFC 6962 leaf prefix 0x00
+    let mut i: usize = 0;
+    while i < payload.len() {
+        buf.push(payload[i] & 255);
+        i = i + 1;
+    }
+    sha256_bytes(&buf, k_tbl)
+}
+
+fn hash_rfc6962_node(left: &Vec<u64>, right: &Vec<u64>, k_tbl: &Vec<u64>) -> Vec<u64> {
+    let mut buf: Vec<u64> = Vec::new();
+    buf.push(1); // RFC 6962 internal node prefix 0x01
+    let mut i: usize = 0;
+    while i < 32 {
+        buf.push(left[i]);
+        i = i + 1;
+    }
+    i = 0;
+    while i < 32 {
+        buf.push(right[i]);
+        i = i + 1;
+    }
+    sha256_bytes(&buf, k_tbl)
+}
+
+fn ct_digest_equal(a: &Vec<u64>, b: &Vec<u64>) -> i32 {
+    if a.len() != 32 || b.len() != 32 {
+        return 0;
+    }
+    let mut diff: u64 = 0;
+    let mut i: usize = 0;
+    while i < 32 {
+        diff = diff | (a[i] ^ b[i]);
+        i = i + 1;
+    }
+    if diff == 0 { 1 } else { 0 }
+}
+
+fn word_at(d: &Vec<u64>, offset: usize) -> u64 {
+    (d[offset] << 24) | (d[offset + 1] << 16) | (d[offset + 2] << 8) | d[offset + 3]
+}
+
+fn extract_node(tree: &Vec<u64>, node_idx: usize) -> Vec<u64> {
+    let mut out: Vec<u64> = Vec::new();
+    let base: usize = node_idx * 32;
+    let mut i: usize = 0;
+    while i < 32 {
+        out.push(tree[base + i]);
+        i = i + 1;
+    }
+    out
+}
+
+fn store_node(tree: &mut Vec<u64>, node_idx: usize, dig: &Vec<u64>) {
+    let base: usize = node_idx * 32;
+    let mut i: usize = 0;
+    while i < 32 {
+        tree[base + i] = dig[i];
+        i = i + 1;
+    }
+}
+
+// Verify 3-step Merkle inclusion proof offline for leaf_idx in [0, 7]
+fn verify_inclusion_proof(
+    payload: &Vec<u64>,
+    expected_payload_sha: &Vec<u64>,
+    leaf_idx: usize,
+    sib0: &Vec<u64>,
+    sib1: &Vec<u64>,
+    sib2: &Vec<u64>,
+    expected_root: &Vec<u64>,
+    k_tbl: &Vec<u64>,
+) -> i32 {
+    let payload_sha: Vec<u64> = sha256_bytes(payload, k_tbl);
+    if ct_digest_equal(&payload_sha, expected_payload_sha) == 0 {
+        return 0;
+    }
+    let mut cur: Vec<u64> = hash_rfc6962_leaf(payload, k_tbl);
+    let mut idx: usize = leaf_idx;
+
+    if (idx & 1) == 0 {
+        cur = hash_rfc6962_node(&cur, sib0, k_tbl);
+    } else {
+        cur = hash_rfc6962_node(sib0, &cur, k_tbl);
+    }
+    idx = idx >> 1;
+
+    if (idx & 1) == 0 {
+        cur = hash_rfc6962_node(&cur, sib1, k_tbl);
+    } else {
+        cur = hash_rfc6962_node(sib1, &cur, k_tbl);
+    }
+    idx = idx >> 1;
+
+    if (idx & 1) == 0 {
+        cur = hash_rfc6962_node(&cur, sib2, k_tbl);
+    } else {
+        cur = hash_rfc6962_node(sib2, &cur, k_tbl);
+    }
+
+    ct_digest_equal(&cur, expected_root)
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+    let k_tbl: Vec<u64> = sha256_k();
+
+    // 1. FIPS 180-4 SHA-256("abc") KAT
+    let mut abc: Vec<u64> = Vec::new();
+    abc.push(97); abc.push(98); abc.push(99);
+    let d_abc: Vec<u64> = sha256_bytes(&abc, &k_tbl);
+    let abc_w0: u64 = word_at(&d_abc, 0);
+    let abc_w7: u64 = word_at(&d_abc, 28);
+    if abc_w0 == 3128432319 && abc_w7 == 4060091821 {
+        println!("[PASS] n70_sha256_abc_kat w0={} w7={}", abc_w0, abc_w7);
+    } else {
+        println!("[FAIL] n70_sha256_abc_kat w0={} w7={}", abc_w0, abc_w7);
+        failures = failures + 1;
+    }
+
+    // 2. Build 1-indexed 8-leaf RFC 6962 Merkle tree (nodes 1..15, leaves 8..15)
+    let mut tree: Vec<u64> = Vec::new();
+    let mut z: usize = 0;
+    while z < 16 * 32 {
+        tree.push(0);
+        z = z + 1;
+    }
+    let mut lf: usize = 0;
+    while lf < 8 {
+        let p: Vec<u64> = make_receipt_payload(lf as u64);
+        let ld: Vec<u64> = hash_rfc6962_leaf(&p, &k_tbl);
+        store_node(&mut tree, 8 + lf, &ld);
+        lf = lf + 1;
+    }
+    let mut node: usize = 7;
+    while node >= 1 {
+        let lc: Vec<u64> = extract_node(&tree, node * 2);
+        let rc: Vec<u64> = extract_node(&tree, node * 2 + 1);
+        let pd: Vec<u64> = hash_rfc6962_node(&lc, &rc, &k_tbl);
+        store_node(&mut tree, node, &pd);
+        node = node - 1;
+    }
+
+    // Target receipt: leaf_idx = 5 (tree node 13 -> siblings: node 12, node 7, node 2)
+    let target_payload: Vec<u64> = make_receipt_payload(5);
+    let target_sha: Vec<u64> = sha256_bytes(&target_payload, &k_tbl);
+    let root: Vec<u64> = extract_node(&tree, 1);
+    let sib0: Vec<u64> = extract_node(&tree, 12);
+    let sib1: Vec<u64> = extract_node(&tree, 7);
+    let sib2: Vec<u64> = extract_node(&tree, 2);
+
+    let ok_clean: i32 = verify_inclusion_proof(
+        &target_payload, &target_sha, 5, &sib0, &sib1, &sib2, &root, &k_tbl
+    );
+    if ok_clean == 1 {
+        println!("[PASS] n70_clean_offline_receipt verified=1 leaf_idx=5");
+    } else {
+        println!("[FAIL] n70_clean_offline_receipt");
+        failures = failures + 1;
+    }
+
+    // 3. Planted 1-bit payload tamper (flip LSB on byte 19) -> must FAIL CLOSED
+    let mut bad_payload: Vec<u64> = make_receipt_payload(5);
+    bad_payload[19] = bad_payload[19] ^ 1;
+    let ok_p_tamper: i32 = verify_inclusion_proof(
+        &bad_payload, &target_sha, 5, &sib0, &sib1, &sib2, &root, &k_tbl
+    );
+    if ok_p_tamper == 0 {
+        println!("[PASS] n70_planted_1bit_payload_tamper rejected=1");
+    } else {
+        println!("[FAIL] n70_planted_1bit_payload_tamper");
+        failures = failures + 1;
+    }
+
+    // 4. Planted 1-bit Merkle sibling proof tamper -> must FAIL CLOSED
+    let mut bad_sib1: Vec<u64> = extract_node(&tree, 7);
+    bad_sib1[11] = bad_sib1[11] ^ 1;
+    let ok_s_tamper: i32 = verify_inclusion_proof(
+        &target_payload, &target_sha, 5, &sib0, &bad_sib1, &sib2, &root, &k_tbl
+    );
+    if ok_s_tamper == 0 {
+        println!("[PASS] n70_planted_1bit_proof_tamper rejected=1");
+    } else {
+        println!("[FAIL] n70_planted_1bit_proof_tamper");
+        failures = failures + 1;
+    }
+
+    // 5. Planted leaf-index spoofing (leaf_idx=4 with leaf 5 siblings) -> must FAIL CLOSED
+    let ok_idx_spoof: i32 = verify_inclusion_proof(
+        &target_payload, &target_sha, 4, &sib0, &sib1, &sib2, &root, &k_tbl
+    );
+    if ok_idx_spoof == 0 {
+        println!("[PASS] n70_planted_index_spoof rejected=1");
+    } else {
+        println!("[FAIL] n70_planted_index_spoof");
+        failures = failures + 1;
+    }
+
+    // 6. Throughput benchmark: 1,000 full offline receipt + 3-step Merkle verifications
+    let n_runs: usize = 1000;
+    let t0: i64 = clock_ns();
+    let mut v_ok: i64 = 0;
+    let mut r: usize = 0;
+    while r < n_runs {
+        v_ok = v_ok + (verify_inclusion_proof(
+            &target_payload, &target_sha, 5, &sib0, &sib1, &sib2, &root, &k_tbl
+        ) as i64);
+        r = r + 1;
+    }
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1000000.0;
+    let rate_per_s: f64 = if elapsed_ms > 0.0 {
+        ((n_runs as f64) * 1000.0) / elapsed_ms
+    } else {
+        0.0
+    };
+
+    let pay_w0: u64 = word_at(&target_sha, 0);
+    let pay_w7: u64 = word_at(&target_sha, 28);
+    let root_w0: u64 = word_at(&root, 0);
+    let root_w7: u64 = word_at(&root, 28);
+    println!(
+        "[METRICS] n70 pay_w0={} pay_w7={} root_w0={} root_w7={} v_ok={} verifs_per_s={:.2} elapsed_ms={:.4}",
+        pay_w0, pay_w7, root_w0, root_w7, v_ok, rate_per_s, elapsed_ms
+    );
+
+    if failures == 0 && v_ok == 1000 {
+        println!("[OK] boring_bridge_verifier ALL CHECKS PASSED (failures=0)");
+    } else {
+        println!("[ERR] boring_bridge_verifier failures={}", failures);
+    }
+}

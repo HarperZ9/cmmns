@@ -1,0 +1,82 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 55J Kernel 4 (Author Idea I14):
+//   Reach-Scaled Privacy-to-Accountability Disclosure Policy Engine.
+//   Local personal queries (reach == 0) emit 0 external traces (blocking telemetry leaks),
+//   while high-reach public releases (reach > 50) block fail-closed without a signed SHA-256 receipt.
+
+struct PolicyDecision {
+    allow: i32,
+    code: i32,
+    external_traces: i32,
+}
+
+// Evaluate reach-scaled disclosure policy:
+//   code 0=ALLOW_LOCAL_SEALED, 1=ALLOW_SCOPED_SHARE, 2=ALLOW_PUBLIC_VERIFIED,
+//       -1=BLOCK_LOCAL_TELEMETRY_LEAK, -2=BLOCK_MISSING_SIGNED_RECEIPT.
+fn eval_reach_policy(
+    reach: i32,
+    egress_requested: i32,
+    receipt_digest: &String,
+    sig_valid: i32,
+) -> PolicyDecision {
+    if reach <= 0 {
+        // Personal local tier: strictly zero external traces
+        if egress_requested != 0 {
+            return PolicyDecision { allow: 0, code: -1, external_traces: 0 };
+        }
+        return PolicyDecision { allow: 1, code: 0, external_traces: 0 };
+    }
+    if reach <= 50 {
+        // Scoped small-group tier
+        return PolicyDecision { allow: 1, code: 1, external_traces: 1 };
+    }
+    // High-reach public accountability tier (reach > 50): signed sha256 receipt mandatory
+    let valid_sha: bool = receipt_digest.starts_with("sha256:") && receipt_digest.len() == 71;
+    if !valid_sha || sig_valid != 1 {
+        return PolicyDecision { allow: 0, code: -2, external_traces: 0 };
+    }
+    PolicyDecision { allow: 1, code: 2, external_traces: 1 }
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+    let empty_r: String = String::from("");
+    let valid_r: String = String::from(
+        "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    );
+
+    let t0: i64 = clock_ns();
+    // 1. Local personal query: allowed with strictly 0 external traces
+    let d_local: PolicyDecision = eval_reach_policy(0, 0, &empty_r, 0);
+    // 2. Planted Control 1: local query requesting external telemetry blocked fail-closed (-1)
+    let d_leak: PolicyDecision = eval_reach_policy(0, 1, &empty_r, 0);
+    // 3. Planted Control 2: high-reach public release missing signed receipt blocked fail-closed (-2)
+    let d_nosig: PolicyDecision = eval_reach_policy(50000, 1, &empty_r, 0);
+    let d_badsig: PolicyDecision = eval_reach_policy(50000, 1, &valid_r, 0);
+    // 4. High-reach public release WITH signed SHA-256 receipt allowed (code=2)
+    let d_pub: PolicyDecision = eval_reach_policy(50000, 1, &valid_r, 1);
+    let t1: i64 = clock_ns();
+
+    if d_local.allow == 1 && d_local.code == 0 && d_local.external_traces == 0
+        && d_pub.allow == 1 && d_pub.code == 2
+        && d_leak.allow == 0 && d_leak.code == -1
+        && d_nosig.allow == 0 && d_nosig.code == -2
+        && d_badsig.allow == 0 && d_badsig.code == -2
+    {
+        println!(
+            "[PASS] i14_reach_gradient local_traces={} leak_rc={} nosig_rc={} badsig_rc={} pub_rc={} elapsed_ns={}",
+            d_local.external_traces, d_leak.code, d_nosig.code, d_badsig.code, d_pub.code, t1 - t0
+        );
+    } else {
+        println!("[FAIL] i14_reach_gradient codes={} {} {}", d_local.code, d_leak.code, d_nosig.code);
+        failures = failures + 1;
+    }
+
+    if failures == 0 {
+        println!("[PASS] wave55j_reach_gradient summary failures=0");
+    } else {
+        println!("[FAIL] wave55j_reach_gradient summary failures={}", failures);
+    }
+}

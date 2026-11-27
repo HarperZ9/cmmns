@@ -75,3 +75,10 @@ SPDX-License-Identifier = "GPL-3.0-or-later"
 path = ["analysis/vectors/stats_vectors.json", "tests/fixtures/canonical_vectors.json"]
 SPDX-FileCopyrightText = "2026 Zain Dana Harper and the CMMNS contributors"
 SPDX-License-Identifier = "CC0-1.0"
+
+# Portable BuildLang verification kernels graduated into CMMNS under the MIT licence so any
+# downstream commons mirror, auditor, or browser verifier can embed or re-verify them directly.
+[[annotations]]
+path = ["kernels/**"]
+SPDX-FileCopyrightText = "2026 Zain Dana Harper and the CMMNS contributors"
+SPDX-License-Identifier = "MIT"
