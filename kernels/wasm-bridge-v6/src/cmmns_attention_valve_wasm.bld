@@ -1,0 +1,51 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 105A (Formula SIG-158, Author Ideas F1/I10): Zero-Heap WASM
+// Non-Extractive Session-Budget and Dark-Pattern Urgency Attention Valve.
+
+// Audit UI session state:
+// 0=NON_EXTRACTIVE_OK, -901=DARK_PATTERN_DETECTED,
+// -902=STOP_RAMP_SUPPRESSED, -903=INVALID_SESSION_BUDGET
+pub fn audit_attention_valve(
+    elapsed_min: i32,
+    budget_min: i32,
+    stop_ramp_shown: i32,
+    has_countdown: i32,
+    has_autoplay: i32,
+    has_hidden_exit: i32,
+) -> i32 {
+    if budget_min <= 0 || elapsed_min < 0 {
+        return -903;
+    }
+    let mut score: i32 = 0;
+    if has_countdown != 0 { score = score + 3; }
+    if has_autoplay != 0 { score = score + 2; }
+    if has_hidden_exit != 0 { score = score + 4; }
+    if score > 0 {
+        return -901;
+    }
+    if elapsed_min >= budget_min && stop_ramp_shown == 0 {
+        return -902;
+    }
+    0
+}
+
+pub fn dark_pattern_score(has_countdown: i32, has_autoplay: i32, has_hidden_exit: i32) -> i32 {
+    let mut score: i32 = 0;
+    if has_countdown != 0 { score = score + 3; }
+    if has_autoplay != 0 { score = score + 2; }
+    if has_hidden_exit != 0 { score = score + 4; }
+    score
+}
+
+pub fn stop_ramp_active(elapsed_min: i32, budget_min: i32, stop_ramp_shown: i32) -> i32 {
+    if budget_min > 0 && elapsed_min >= budget_min && stop_ramp_shown != 0 {
+        return 1;
+    }
+    0
+}
+
+fn main() -> i32 {
+    0
+}
