@@ -1,0 +1,161 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 112E Pack 11 (CS-024, A7, F1, N49, N53, I16):
+//   WASM PosteriorBench Rare-Behavior Auditing & BehaviorBox via Pharos Tail Fuzzing.
+//   6-turn agentic policy chain (V=8 actions/turn) with 10 planted rare failure modes
+//   (all p_true <= 1e-3), comparing Pharos exponentially-tilted importance sampling (beta=1.0)
+//   vs untiled Monte Carlo baseline across 2,000 rollouts. Rejects unnormalized proposals (-241)
+//   and martingale violations (-242) fail-closed.
+
+fn abs_f(x: f64) -> f64 { if x < 0.0 { return 0.0 - x; } x }
+
+fn u32_to_f64(u: u64) -> f64 {
+    let mut r: f64 = 0.0;
+    let mut bit: f64 = 1.0;
+    let mut v: u64 = u;
+    let mut k: i32 = 0;
+    while k < 24 {
+        if (v & 1u64) != 0u64 { r = r + bit; }
+        v = v >> 1u64;
+        bit = bit * 2.0;
+        k = k + 1;
+    }
+    r
+}
+
+fn w_exp(x_in: f64) -> f64 {
+    let ln2: f64 = 0.693147180559945309417232121458176568;
+    let mut probe: f64 = x_in;
+    let mut k: i32 = 0;
+    let mut kf: f64 = 0.0;
+    while probe > 0.34657359027997264 { probe = probe - ln2; k = k + 1; kf = kf + 1.0; }
+    let r: f64 = x_in - kf * ln2;
+    let mut term: f64 = 1.0;
+    let mut sum: f64 = 1.0;
+    let mut nf: f64 = 1.0;
+    let mut n: i32 = 1;
+    while n <= 18 {
+        term = term * r / nf;
+        sum = sum + term;
+        nf = nf + 1.0;
+        n = n + 1;
+    }
+    let mut scale: f64 = 1.0;
+    let mut i: i32 = 0;
+    while i < k { scale = scale * 2.0; i = i + 1; }
+    sum * scale
+}
+
+fn lcg_next(s: u64) -> u64 { (s * 1664525u64 + 1013904223u64) & 4294967295u64 }
+
+pub fn validate_prob_sum(s: f64) -> i32 {
+    if !(s == s) || abs_f(s - 1.0) > 1.0e-9 { return -241; }
+    0
+}
+
+pub fn validate_martingale(mean_w: f64) -> i32 {
+    if !(mean_w == mean_w) || abs_f(mean_w - 1.0) > 0.15 { return -242; }
+    0
+}
+
+fn base_prob(turn: i32, a: i32) -> f64 {
+    let row: u64 = if turn < 4 { 567283134860u64 } else if turn == 4 { 107893735952u64 } else { 178484726489u64 };
+    u32_to_f64((row >> ((a * 5) as u64)) & 31u64) * 0.01
+}
+
+fn tilt_fac(turn: i32, a: i32, e135: f64, e255: f64, e280: f64, e115: f64) -> f64 {
+    if turn < 4 { if a >= 6 { return e135; } return 1.0; }
+    if turn == 4 { if a == 6 { return e255; } if a == 7 { return e280; } return 1.0; }
+    if a >= 3 { return e115; }
+    1.0
+}
+
+fn run_audit(beta: f64, drop_lr: i32, out_idx: i32) -> f64 {
+    let e135: f64 = w_exp(beta * 1.35);
+    let e255: f64 = w_exp(beta * 2.55);
+    let e280: f64 = w_exp(beta * 2.80);
+    let e115: f64 = w_exp(beta * 1.15);
+    let iz03: f64 = 1.0 / (0.68 + 0.32 * e135);
+    let iz4: f64 = 1.0 / (0.93 + 0.04 * e255 + 0.03 * e280);
+    let iz5: f64 = 1.0 / (0.65 + 0.35 * e115);
+
+    let mut hit_mask: i32 = 0;
+    let mut rng: u64 = 24001u64;
+    let mut sum_w: f64 = 0.0;
+    let mut sum_w2: f64 = 0.0;
+    let mut sum_y: f64 = 0.0;
+    let mut sum_y2: f64 = 0.0;
+
+    let mut r_idx: i32 = 0;
+    while r_idx < 2000 {
+        let mut w_lr: f64 = 1.0;
+        let mut prefix_risky: bool = true;
+        let mut esc_branch: i32 = -1;
+        let mut payload_idx: i32 = -1;
+        let mut t: i32 = 0;
+        while t < 6 {
+            let iz: f64 = if t < 4 { iz03 } else if t == 4 { iz4 } else { iz5 };
+            rng = lcg_next(rng);
+            let u: f64 = u32_to_f64(rng >> 8u64) / 16777216.0;
+            let mut cdf: f64 = 0.0;
+            let mut act: i32 = 7;
+            let mut i: i32 = 0;
+            while i < 7 {
+                cdf = cdf + base_prob(t, i) * tilt_fac(t, i, e135, e255, e280, e115) * iz;
+                if u < cdf { act = i; i = 7; } else { i = i + 1; }
+            }
+            if drop_lr == 0 {
+                w_lr = w_lr / (tilt_fac(t, act, e135, e255, e280, e115) * iz);
+            }
+            if t < 4 { if act < 6 { prefix_risky = false; } }
+            else if t == 4 { if act == 6 { esc_branch = 0; } if act == 7 { esc_branch = 1; } }
+            else { if act >= 3 { payload_idx = act - 3; } }
+            t = t + 1;
+        }
+        sum_w = sum_w + w_lr;
+        sum_w2 = sum_w2 + w_lr * w_lr;
+        let mut y_val: f64 = 0.0;
+        if prefix_risky && esc_branch >= 0 && payload_idx >= 0 {
+            hit_mask = hit_mask | (1 << (esc_branch * 5 + payload_idx));
+            y_val = w_lr;
+        }
+        sum_y = sum_y + y_val;
+        sum_y2 = sum_y2 + y_val * y_val;
+        r_idx = r_idx + 1;
+    }
+
+    let inv_n: f64 = 0.0005;
+    let mut caught: i32 = 0;
+    let mut m: i32 = 0;
+    while m < 10 { if ((hit_mask >> m) & 1) != 0 { caught = caught + 1; } m = m + 1; }
+    let p_hat: f64 = sum_y * inv_n;
+    if out_idx == 0 { return p_hat; }
+    if out_idx == 1 { return (sum_y2 * inv_n - p_hat * p_hat) * inv_n; }
+    if out_idx == 2 { return sum_w * inv_n; }
+    if out_idx == 3 { return (sum_w * sum_w) / (sum_w2 + 1.0e-15); }
+    u32_to_f64(caught as u64) * 0.1
+}
+
+// metric:
+//   0 = p_true_total, 1 = max_mode_p, 2 = p_hat_is, 3 = rel_err_is,
+//   4 = mean_w_is, 5 = ess_is, 6 = recall_is, 7 = recall_mc,
+//   8 = p_hat_mc, 9 = var_reduction, 10 = nolr_rel_err
+pub fn cs024_metric(metric: i32) -> f64 {
+    let p_prefix: f64 = 0.32 * 0.32 * 0.32 * 0.32;
+    let p_true: f64 = p_prefix * 0.07 * 0.35;
+    if metric == 0 { return p_true; }
+    if metric == 1 { return p_prefix * 0.04 * 0.09; }
+    let beta: f64 = if metric == 7 || metric == 8 { 0.0 } else { 1.0 };
+    let drop: i32 = if metric == 10 { 1 } else { 0 };
+    let oi: i32 = if metric == 9 { 1 } else if metric == 4 { 2 } else if metric == 5 { 3 }
+        else if metric == 6 || metric == 7 { 4 } else { 0 };
+    let val: f64 = run_audit(beta, drop, oi);
+    if metric == 3 || metric == 10 { return abs_f(val - p_true) / p_true; }
+    if metric == 9 { return (p_true * (1.0 - p_true) * 0.0005) / (val + 1.0e-18); }
+    val
+}
+
+fn main() -> i32 {
+    0
+}
