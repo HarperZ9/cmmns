@@ -1,0 +1,82 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 55J Kernel 3 (Author Idea I9):
+//   Sybil-Resistant Verified-Information Merit Economy Ledger.
+//   Proves a 10-account Sybil/collusion voting ring achieves 0.0 merit inflation when
+//   independent oracle re-derivation is required (while unverified upvote baseline inflates 10x)
+//   and rejects self-verification fail-closed.
+
+struct MeritAudit {
+    oracle_verified_merit: f64,
+    sybil_merit_oracle: f64,
+    sybil_merit_naive: f64,
+    self_verify_merit: f64,
+    sybil_naive_inflation_x: f64,
+}
+
+// Compute oracle-gated merit for one claim: requires oracle_ok==1 and verifier != author.
+fn score_claim_oracle(author_id: i32, verifier_id: i32, oracle_ok: i32, bounty: f64) -> f64 {
+    if oracle_ok != 1 || verifier_id == author_id || verifier_id < 0 {
+        return 0.0;
+    }
+    bounty
+}
+
+fn run_merit_economy() -> MeritAudit {
+    // 3 legitimate claims independently reproduced by distinct oracle verifiers (bounty = 10.0 each)
+    let mut legit_total: f64 = 0.0;
+    legit_total = legit_total + score_claim_oracle(1, 101, 1, 10.0);
+    legit_total = legit_total + score_claim_oracle(2, 102, 1, 10.0);
+    legit_total = legit_total + score_claim_oracle(3, 103, 1, 10.0);
+
+    // Planted Attack 1: 10-account Sybil/collusion ring upvoting an unverified claim (oracle_ok = 0)
+    let mut sybil_oracle: f64 = 0.0;
+    let mut sybil_naive: f64 = 0.0;
+    let mut acct: i32 = 0;
+    while acct < 10 {
+        sybil_oracle = sybil_oracle + score_claim_oracle(50, 200 + acct, 0, 1.0);
+        sybil_naive = sybil_naive + 1.0;
+        acct = acct + 1;
+    }
+
+    // Planted Attack 2: Self-verification attempt (verifier_id == author_id) rejected fail-closed
+    let self_v: f64 = score_claim_oracle(77, 77, 1, 10.0);
+
+    MeritAudit {
+        oracle_verified_merit: legit_total,
+        sybil_merit_oracle: sybil_oracle,
+        sybil_merit_naive: sybil_naive,
+        self_verify_merit: self_v,
+        sybil_naive_inflation_x: sybil_naive / 1.0,
+    }
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+
+    let t0: i64 = clock_ns();
+    let ma: MeritAudit = run_merit_economy();
+    let t1: i64 = clock_ns();
+
+    if ma.oracle_verified_merit == 30.0
+        && ma.sybil_merit_oracle == 0.0
+        && ma.sybil_merit_naive == 10.0
+        && ma.self_verify_merit == 0.0
+    {
+        println!(
+            "[PASS] i9_merit_ledger legit={:.6} sybil_oracle={:.6} sybil_naive={:.6} self_v={:.6} elapsed_ns={}",
+            ma.oracle_verified_merit, ma.sybil_merit_oracle, ma.sybil_merit_naive,
+            ma.self_verify_merit, t1 - t0
+        );
+    } else {
+        println!("[FAIL] i9_merit_ledger sybil_oracle={}", ma.sybil_merit_oracle);
+        failures = failures + 1;
+    }
+
+    if failures == 0 {
+        println!("[PASS] wave55j_merit_ledger summary failures=0");
+    } else {
+        println!("[FAIL] wave55j_merit_ledger summary failures={}", failures);
+    }
+}

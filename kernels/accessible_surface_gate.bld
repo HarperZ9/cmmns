@@ -1,0 +1,259 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 58D Kernel 4 (Author Idea I7, Formula SIG-120):
+//   Universal Human+Screen-Reader+Model Accessibility Auditor.
+//   Computes WCAG 2.1 relative luminance and contrast ratio (>= 7.0 AAA / >= 4.5 AA),
+//   APCA W3 (0.0.98G-4g) perceptual lightness contrast Lc, reduced-motion compliance,
+//   and semantic heading depth monotonicity, catching planted violations fail-closed.
+
+fn ln_f64(x: f64) -> f64 {
+    let mut m: f64 = x;
+    let mut k: i32 = 0;
+    while m > 1.4142135623730951 {
+        m = m * 0.5;
+        k = k + 1;
+    }
+    while m < 0.7071067811865476 {
+        m = m * 2.0;
+        k = k - 1;
+    }
+    let u: f64 = (m - 1.0) / (m + 1.0);
+    let u2: f64 = u * u;
+    let mut pow_u: f64 = u;
+    let mut sum: f64 = 0.0;
+    let mut denom: f64 = 1.0;
+    let mut i: i32 = 0;
+    while i < 9 {
+        sum = sum + (pow_u / denom);
+        pow_u = pow_u * u2;
+        denom = denom + 2.0;
+        i = i + 1;
+    }
+    (2.0 * sum) + ((k as f64) * 0.6931471805599453)
+}
+
+fn exp_f64(x: f64) -> f64 {
+    let ln2: f64 = 0.6931471805599453;
+    let k_f: f64 = if x >= 0.0 {
+        ((x / ln2) + 0.5) as i64 as f64
+    } else {
+        ((x / ln2) - 0.5) as i64 as f64
+    };
+    let k: i64 = k_f as i64;
+    let r: f64 = x - (k_f * ln2);
+
+    let mut term: f64 = 1.0;
+    let mut sum: f64 = 1.0;
+    let mut n: i32 = 1;
+    while n <= 14 {
+        term = (term * r) / (n as f64);
+        sum = sum + term;
+        n = n + 1;
+    }
+
+    let mut res: f64 = sum;
+    if k > 0 {
+        let mut i: i64 = 0;
+        while i < k {
+            res = res * 2.0;
+            i = i + 1;
+        }
+    } else if k < 0 {
+        let mut i: i64 = 0;
+        let lim: i64 = -k;
+        while i < lim {
+            res = res * 0.5;
+            i = i + 1;
+        }
+    }
+    res
+}
+
+fn pow_f64(base: f64, exp: f64) -> f64 {
+    if base <= 0.0 {
+        0.0
+    } else {
+        exp_f64(exp * ln_f64(base))
+    }
+}
+
+fn srgb_to_lin(c8: f64) -> f64 {
+    let c: f64 = c8 / 255.0;
+    if c <= 0.04045 {
+        c / 12.92
+    } else {
+        pow_f64((c + 0.055) / 1.055, 2.4)
+    }
+}
+
+fn wcag_luminance(r: f64, g: f64, b: f64) -> f64 {
+    (0.2126 * srgb_to_lin(r)) + (0.7152 * srgb_to_lin(g)) + (0.0722 * srgb_to_lin(b))
+}
+
+fn wcag_contrast(rf: f64, gf: f64, bf: f64, rb: f64, gb: f64, bb: f64) -> f64 {
+    let lf: f64 = wcag_luminance(rf, gf, bf);
+    let lb: f64 = wcag_luminance(rb, gb, bb);
+    let hi: f64 = if lf > lb { lf } else { lb };
+    let lo: f64 = if lf < lb { lf } else { lb };
+    (hi + 0.05) / (lo + 0.05)
+}
+
+fn apca_y(r: f64, g: f64, b: f64) -> f64 {
+    let y: f64 = (0.2126729 * pow_f64(r / 255.0, 2.4))
+        + (0.7151522 * pow_f64(g / 255.0, 2.4))
+        + (0.0721750 * pow_f64(b / 255.0, 2.4));
+    if y < 0.022 {
+        y + pow_f64(0.022 - y, 1.414)
+    } else {
+        y
+    }
+}
+
+// APCA W3 0.0.98G-4g perceptual lightness contrast Lc
+fn apca_lc(rf: f64, gf: f64, bf: f64, rb: f64, gb: f64, bb: f64) -> f64 {
+    let yt: f64 = apca_y(rf, gf, bf);
+    let yb: f64 = apca_y(rb, gb, bb);
+    let delta_y: f64 = if yb > yt { yb - yt } else { yt - yb };
+    if delta_y < 0.0005 {
+        return 0.0;
+    }
+    if yb > yt {
+        let sapc: f64 = (pow_f64(yb, 0.56) - pow_f64(yt, 0.57)) * 1.14;
+        if sapc < 0.1 { 0.0 } else { (sapc - 0.027) * 100.0 }
+    } else {
+        let sapc: f64 = (pow_f64(yb, 0.65) - pow_f64(yt, 0.62)) * 1.14;
+        if sapc > -0.1 { 0.0 } else { (sapc + 0.027) * 100.0 }
+    }
+}
+
+fn check_headings_monotonic(levels: &Vec<i32>) -> i32 {
+    if levels.len() == 0 || levels[0] != 1 {
+        return 0;
+    }
+    let mut i: usize = 0;
+    while i < levels.len() {
+        let h: i32 = levels[i];
+        if h < 1 || h > 6 {
+            return 0;
+        }
+        if i > 0 && h > levels[i - 1] + 1 {
+            return 0;
+        }
+        i = i + 1;
+    }
+    1
+}
+
+fn check_reduced_motion(prefers_reduced: i32, anim_ms: i32, parallax: i32) -> i32 {
+    if prefers_reduced == 1 && (anim_ms > 0 || parallax != 0) {
+        0
+    } else {
+        1
+    }
+}
+
+fn abs_f64(x: f64) -> f64 {
+    if x < 0.0 { -x } else { x }
+}
+
+fn main() ~ Console + Clock {
+    let mut failures: i32 = 0;
+
+    // 1. Clean AAA surfaces: Light (#111111 on #FAFAFA) and Dark (#F4F4F5 on #0B0F14)
+    let cr_light: f64 = wcag_contrast(17.0, 17.0, 17.0, 250.0, 250.0, 250.0);
+    let lc_light: f64 = apca_lc(17.0, 17.0, 17.0, 250.0, 250.0, 250.0);
+
+    let cr_dark: f64 = wcag_contrast(244.0, 244.0, 245.0, 11.0, 15.0, 20.0);
+    let lc_dark: f64 = apca_lc(244.0, 244.0, 245.0, 11.0, 15.0, 20.0);
+
+    let mut clean_h: Vec<i32> = Vec::new();
+    clean_h.push(1); clean_h.push(2); clean_h.push(3);
+    clean_h.push(2); clean_h.push(3); clean_h.push(4);
+    let h_clean_ok: i32 = check_headings_monotonic(&clean_h);
+    let m_clean_ok: i32 = check_reduced_motion(1, 0, 0);
+
+    if cr_light >= 7.0 && abs_f64(lc_light) >= 75.0
+        && cr_dark >= 7.0 && abs_f64(lc_dark) >= 75.0
+        && h_clean_ok == 1 && m_clean_ok == 1
+    {
+        println!(
+            "[PASS] i7_clean_aaa_surfaces cr_light={:.4} lc_light={:.4} cr_dark={:.4} lc_dark={:.4}",
+            cr_light, lc_light, cr_dark, lc_dark
+        );
+    } else {
+        println!("[FAIL] i7_clean_aaa_surfaces");
+        failures = failures + 1;
+    }
+
+    // 2. Planted control 1: Low-contrast surface (#777777 on #BBBBBB ~ 2.13:1 < 4.5 AA)
+    let cr_low: f64 = wcag_contrast(119.0, 119.0, 119.0, 187.0, 187.0, 187.0);
+    let lc_low: f64 = apca_lc(119.0, 119.0, 119.0, 187.0, 187.0, 187.0);
+    if cr_low < 4.5 && abs_f64(lc_low) < 45.0 {
+        println!(
+            "[PASS] i7_planted_low_contrast rejected=1 cr={:.4} lc={:.4}",
+            cr_low, lc_low
+        );
+    } else {
+        println!("[FAIL] i7_planted_low_contrast cr={:.4}", cr_low);
+        failures = failures + 1;
+    }
+
+    // 3. Planted control 2: Skipped heading depth (h1 -> h4)
+    let mut bad_h: Vec<i32> = Vec::new();
+    bad_h.push(1); bad_h.push(4); bad_h.push(2);
+    let h_bad_ok: i32 = check_headings_monotonic(&bad_h);
+    if h_bad_ok == 0 {
+        println!("[PASS] i7_planted_skipped_heading rejected=1");
+    } else {
+        println!("[FAIL] i7_planted_skipped_heading");
+        failures = failures + 1;
+    }
+
+    // 4. Planted control 3: Reduced-motion violation (prefers_reduced=1, anim_ms=450)
+    let m_bad_ok: i32 = check_reduced_motion(1, 450, 1);
+    if m_bad_ok == 0 {
+        println!("[PASS] i7_planted_motion_violation rejected=1");
+    } else {
+        println!("[FAIL] i7_planted_motion_violation");
+        failures = failures + 1;
+    }
+
+    // Throughput benchmark: 20,000 full surface accessibility audits
+    let n_iters: usize = 20000;
+    let t0: i64 = clock_ns();
+    let mut acc: f64 = 0.0;
+    let mut it: usize = 0;
+    while it < n_iters {
+        let cr: f64 = wcag_contrast(17.0, 17.0, 17.0, 250.0, 250.0, 250.0);
+        let lc: f64 = apca_lc(17.0, 17.0, 17.0, 250.0, 250.0, 250.0);
+        let hk: i32 = check_headings_monotonic(&clean_h);
+        let mk: i32 = check_reduced_motion(1, 0, 0);
+        if cr >= 7.0 && abs_f64(lc) >= 75.0 && hk == 1 && mk == 1 {
+            acc = acc + 1.0;
+        }
+        it = it + 1;
+    }
+    let t1: i64 = clock_ns();
+    let elapsed_ms: f64 = ((t1 - t0) as f64) / 1000000.0;
+    let audits_per_s: f64 = if elapsed_ms > 0.0 {
+        ((n_iters as f64) * 1000.0) / elapsed_ms
+    } else {
+        0.0
+    };
+
+    println!(
+        "[METRICS] i7 cr_light={:.6} lc_light={:.6} cr_dark={:.6} lc_dark={:.6}",
+        cr_light, lc_light, cr_dark, lc_dark
+    );
+    println!(
+        "[METRICS] i7 cr_low={:.6} lc_low={:.6} audits_per_s={:.2} elapsed_ms={:.4}",
+        cr_low, lc_low, audits_per_s, elapsed_ms
+    );
+
+    if failures == 0 && acc == 20000.0 {
+        println!("[OK] accessible_surface_gate ALL CHECKS PASSED (failures=0)");
+    } else {
+        println!("[ERR] accessible_surface_gate failures={}", failures);
+    }
+}
