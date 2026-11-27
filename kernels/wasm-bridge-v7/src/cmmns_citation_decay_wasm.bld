@@ -1,0 +1,72 @@
+// SPDX-FileCopyrightText: 2026 Zain Dana Harper
+// SPDX-License-Identifier: MIT
+//
+// Wave 105A (Formula STA-073, Author Ideas F1/N43/N28): Zero-Heap WASM
+// Source-Link Rot and Multi-Mirror Archival Survival Probability Calculator.
+
+fn i2f(n: i32) -> f64 {
+    let mut f: f64 = 0.0;
+    let mut i: i32 = 0;
+    while i < n { f = f + 1.0; i = i + 1; }
+    f
+}
+
+fn w_exp(x: f64) -> f64 {
+    if x < -700.0 { return 0.0; }
+    if x > 700.0 { return 1.0e300; }
+    let ln2: f64 = 0.69314718055994530942;
+    let mut r: f64 = x;
+    let mut scale: f64 = 1.0;
+    while r > 0.5 * ln2 { r = r - ln2; scale = scale * 2.0; }
+    while r < -0.5 * ln2 { r = r + ln2; scale = scale * 0.5; }
+    let mut term: f64 = 1.0;
+    let mut sum: f64 = 1.0;
+    let mut n: i32 = 1;
+    while n <= 24 {
+        term = term * r / i2f(n);
+        sum = sum + term;
+        n = n + 1;
+    }
+    sum * scale
+}
+
+pub fn quad_survival(horizon_yr: f64, rho: f64) -> f64 {
+    let f0: f64 = 1.0 - w_exp(-0.20 * horizon_yr);
+    let f1: f64 = 1.0 - w_exp(-0.04 * horizon_yr);
+    let f2: f64 = 1.0 - w_exp(-0.03 * horizon_yr);
+    let f3: f64 = 1.0 - w_exp(-0.005 * horizon_yr);
+    let prod_f: f64 = f0 * f1 * f2 * f3;
+    let mut min_f: f64 = f0;
+    if f1 < min_f { min_f = f1; }
+    if f2 < min_f { min_f = f2; }
+    if f3 < min_f { min_f = f3; }
+    1.0 - ((1.0 - rho) * prod_f + rho * min_f)
+}
+
+pub fn spof_survival(horizon_yr: f64) -> f64 {
+    w_exp(-0.20 * horizon_yr)
+}
+
+// Fail-closed archival gate:
+// 0=ARCHIVAL_GRADE, -601=SPOF, -602=INVALID_PARAMS, -603=CORRELATED_HOST_COLLAPSE
+pub fn check_archival_policy(k_mirrors: i32, lam_min: f64, horizon_yr: f64, rho: f64) -> i32 {
+    if k_mirrors <= 0 || lam_min <= 0.0 || horizon_yr <= 0.0 || rho < 0.0 || rho > 1.0 {
+        return -602;
+    }
+    if k_mirrors < 2 {
+        return -601;
+    }
+    let eff_k: f64 = 1.0 + (1.0 - rho) * i2f(k_mirrors - 1);
+    if eff_k < 2.0 || rho >= 0.90 {
+        return -603;
+    }
+    let s: f64 = quad_survival(horizon_yr, rho);
+    if s < 0.99 {
+        return -601;
+    }
+    0
+}
+
+fn main() -> i32 {
+    0
+}
