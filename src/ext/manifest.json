@@ -59,6 +59,7 @@
       "adblock-bg.js",
       "track-store.js",
       "track-bg.js",
+      "workstation-relay-client.js",
       "background.js"
     ]
   },
