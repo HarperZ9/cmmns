@@ -9,8 +9,10 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  MCP_DISPATCH_SCHEMA,
   ROUTING_SCHEMA,
   STUDY_SCHEMA,
+  dissectArtifactReadOnly,
   processBundle,
   verifyBundleSeals,
   verifyStudyReceipt,
@@ -38,6 +40,22 @@ function makeSampleBundle() {
     "utf8",
   );
   writeFileSync(path.join(dir, "clip.wav"), Buffer.from("RIFF0000WAVEfmt ", "ascii"));
+  // Read-only Layer-0 binary headers (never executed): WASM, ELF64, PE/MZ, PNG, PDF, glTF GLB
+  writeFileSync(path.join(dir, "kernel.wasm"), Buffer.from([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]));
+  const elf = Buffer.alloc(24);
+  elf.set([0x7f, 0x45, 0x4c, 0x46, 0x02, 0x01], 0);
+  elf.writeUInt16LE(0x3e, 18);
+  writeFileSync(path.join(dir, "sample.elf"), elf);
+  const png = Buffer.alloc(24);
+  png.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a], 0);
+  png.writeUInt32BE(640, 16);
+  png.writeUInt32BE(480, 20);
+  writeFileSync(path.join(dir, "frame.png"), png);
+  const glb = Buffer.alloc(12);
+  glb.write("glTF", 0, "ascii");
+  glb.writeUInt32LE(2, 4);
+  glb.writeUInt32LE(12, 8);
+  writeFileSync(path.join(dir, "asset.glb"), glb);
   return dir;
 }
 
@@ -64,12 +82,34 @@ test("end-to-end bundle ingestion seals SOURCE.txt + SHA256SUMS, generates Study
     assert.equal(r1.verdict, "SEALED");
     assert.equal(r1.study.schema, STUDY_SCHEMA);
     assert.equal(r1.routing.schema, ROUTING_SCHEMA);
-    assert.equal(r1.study.seal.file_count, 3);
+    assert.equal(r1.study.seal.file_count, 7);
     assert.ok(r1.study.claims.length >= 2);
     assert.ok(r1.study.citations.includes("arXiv:2611.30634"));
     assert.ok(r1.study.equations.length >= 1);
-    assert.equal(r1.study.bounds.verified.sealed_files, 3);
+    assert.equal(r1.study.bounds.verified.sealed_files, 7);
     assert.ok(r1.study.bounds.unverified.external_citations.length >= 2);
+
+    // Multi-modal Layer-0 read-only dissection verified (never executed)
+    const byRel = Object.fromEntries(r1.study.media_inventory.map((m) => [m.rel, m]));
+    assert.equal(byRel["kernel.wasm"].layer0.format, "wasm");
+    assert.equal(byRel["kernel.wasm"].layer0.executed, false);
+    assert.equal(byRel["sample.elf"].layer0.format, "elf");
+    assert.equal(byRel["sample.elf"].layer0.header.bits, 64);
+    assert.equal(byRel["frame.png"].layer0.format, "png");
+    assert.equal(byRel["frame.png"].layer0.header.width, 640);
+    assert.equal(byRel["asset.glb"].layer0.format, "gltf_glb");
+    assert.equal(dissectArtifactReadOnly(Buffer.from("MZ\x00\x00"), ".exe").format, "pe_mz");
+    assert.equal(dissectArtifactReadOnly(Buffer.from("%PDF-1.7\n"), ".pdf").format, "pdf");
+
+    // MCP dispatch plan covers all 6 targets across the 5 flagship repos
+    assert.equal(r1.mcpDispatch.schema, MCP_DISPATCH_SCHEMA);
+    assert.equal(r1.mcpDispatch.execute_untrusted_binaries, false);
+    assert.deepEqual(
+      r1.mcpDispatch.targets.map((t) => t.server),
+      ["gather", "index", "library", "flywheel", "superframe", "buildlang"],
+    );
+    assert.ok(r1.mcpDispatch.targets.every((t) => t.enabled === true && t.read_only === true));
+    assert.equal(r1.mcpDispatch.dispatch_sha256, r2.mcpDispatch.dispatch_sha256);
 
     // Cross-domain routing covers all 4 lanes
     assert.deepEqual(r1.routing.active_lanes, ["buildlang", "flywheel", "playground", "superframe"]);

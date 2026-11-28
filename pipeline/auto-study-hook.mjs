@@ -25,6 +25,7 @@ import { fileURLToPath } from "node:url";
 
 export const STUDY_SCHEMA = "cmmns-auto-study/1";
 export const ROUTING_SCHEMA = "cmmns-cross-domain-routing/1";
+export const MCP_DISPATCH_SCHEMA = "cmmns-mcp-dispatch-plan/1";
 
 const GENERATED_NAMES = new Set([
   "SOURCE.txt",
@@ -32,12 +33,16 @@ const GENERATED_NAMES = new Set([
   "study.md",
   "study.json",
   "routing_manifest.json",
+  "mcp_dispatch_plan.json",
 ]);
 
 const TEXT_EXTS = new Set([".md", ".txt", ".json", ".jsonl", ".csv", ".tsv", ".tex", ".bib", ".yml", ".yaml"]);
+const SOURCE_EXTS = new Set([".bld", ".rs", ".js", ".mjs", ".ts", ".py", ".c", ".cpp", ".h", ".wgsl", ".hlsl", ".glsl", ".msl"]);
+const DOC_EXTS = new Set([".pdf", ".epub", ".docx", ".rtf"]);
 const AUDIO_EXTS = new Set([".wav", ".mp3", ".ogg", ".flac", ".m4a", ".opus"]);
-const VIDEO_EXTS = new Set([".mp4", ".webm", ".mkv", ".mov"]);
+const VIDEO_EXTS = new Set([".mp4", ".webm", ".mkv", ".mov", ".avi"]);
 const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif"]);
+const BINARY_EXTS = new Set([".wasm", ".elf", ".exe", ".dll", ".so", ".dylib", ".bin", ".glb", ".pak", ".zip"]);
 
 const REFUSED_POLICY_RULES = [
   { reason: "personal_surveillance_refused", re: /\b(personal[-_ ]surveillance|stalkerware|covert[-_ ]tracking|doxxing|private[-_ ]person[-_ ]dossier)\b/i },
@@ -111,10 +116,90 @@ function collectBundleFiles(rootDir) {
 
 function classifyMediaKind(ext) {
   if (TEXT_EXTS.has(ext)) return "text";
+  if (SOURCE_EXTS.has(ext)) return "source";
+  if (DOC_EXTS.has(ext)) return "document";
   if (AUDIO_EXTS.has(ext)) return "audio";
   if (VIDEO_EXTS.has(ext)) return "video";
   if (IMAGE_EXTS.has(ext)) return "image";
+  if (BINARY_EXTS.has(ext)) return "binary";
   return "binary";
+}
+
+export function dissectArtifactReadOnly(raw, ext = "") {
+  const buf = Buffer.isBuffer(raw) ? raw : Buffer.from(raw);
+  const base = {
+    read_only_dissection: true,
+    executed: false,
+    bytes: buf.length,
+    magic_hex: buf.subarray(0, Math.min(8, buf.length)).toString("hex"),
+    format: "unknown",
+    header: {},
+  };
+  if (buf.length >= 8 && buf[0] === 0x00 && buf[1] === 0x61 && buf[2] === 0x73 && buf[3] === 0x6d) {
+    return { ...base, format: "wasm", header: { version: buf.readUInt32LE(4) } };
+  }
+  if (buf.length >= 20 && buf[0] === 0x7f && buf[1] === 0x45 && buf[2] === 0x4c && buf[3] === 0x46) {
+    const bits = buf[4] === 2 ? 64 : buf[4] === 1 ? 32 : 0;
+    const endian = buf[5] === 1 ? "little" : buf[5] === 2 ? "big" : "unknown";
+    const machine = endian === "little" ? buf.readUInt16LE(18) : buf.readUInt16BE(18);
+    return { ...base, format: "elf", header: { bits, endian, e_machine: machine } };
+  }
+  if (buf.length >= 2 && buf[0] === 0x4d && buf[1] === 0x5a) {
+    let peOk = false;
+    let machine = null;
+    if (buf.length >= 64) {
+      const peOff = buf.readUInt32LE(60);
+      if (peOff + 6 <= buf.length && buf.toString("ascii", peOff, peOff + 4) === "PE\0\0") {
+        peOk = true;
+        machine = buf.readUInt16LE(peOff + 4);
+      }
+    }
+    return { ...base, format: "pe_mz", header: { pe_signature: peOk, coff_machine: machine } };
+  }
+  if (buf.length >= 12 && buf.toString("ascii", 0, 4) === "glTF") {
+    return { ...base, format: "gltf_glb", header: { version: buf.readUInt32LE(4), declared_bytes: buf.readUInt32LE(8) } };
+  }
+  if (buf.length >= 4 && buf[0] === 0x50 && buf[1] === 0x4b && buf[2] === 0x03 && buf[3] === 0x04) {
+    return { ...base, format: "zip_container", header: { pk_local_header: true } };
+  }
+  if (buf.length >= 24 && buf[0] === 0x89 && buf.toString("ascii", 1, 4) === "PNG") {
+    return { ...base, format: "png", header: { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) } };
+  }
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) {
+    return { ...base, format: "jpeg", header: { soi: true } };
+  }
+  if (buf.length >= 10 && (buf.toString("ascii", 0, 6) === "GIF89a" || buf.toString("ascii", 0, 6) === "GIF87a")) {
+    return { ...base, format: "gif", header: { width: buf.readUInt16LE(6), height: buf.readUInt16LE(8) } };
+  }
+  if (buf.length >= 12 && buf.toString("ascii", 0, 4) === "RIFF") {
+    const sub = buf.toString("ascii", 8, 12);
+    if (sub === "WAVE") {
+      const hdr = { riff_type: "WAVE" };
+      if (buf.length >= 36 && buf.toString("ascii", 12, 16) === "fmt ") {
+        hdr.channels = buf.readUInt16LE(22);
+        hdr.sample_rate = buf.readUInt32LE(24);
+        hdr.bits_per_sample = buf.readUInt16LE(34);
+      }
+      return { ...base, format: "wav", header: hdr };
+    }
+    return { ...base, format: `riff_${sub.trim().toLowerCase()}`, header: { riff_type: sub.trim() } };
+  }
+  if (buf.length >= 4 && buf.toString("ascii", 0, 4) === "fLaC") return { ...base, format: "flac", header: {} };
+  if (buf.length >= 4 && buf.toString("ascii", 0, 4) === "OggS") return { ...base, format: "ogg", header: {} };
+  if (buf.length >= 3 && buf.toString("ascii", 0, 3) === "ID3") return { ...base, format: "mp3_id3", header: {} };
+  if (buf.length >= 12 && buf.toString("ascii", 4, 8) === "ftyp") {
+    return { ...base, format: "isobmff_mp4", header: { major_brand: buf.toString("ascii", 8, 12).trim() } };
+  }
+  if (buf.length >= 4 && buf[0] === 0x1a && buf[1] === 0x45 && buf[2] === 0xdf && buf[3] === 0xa3) {
+    return { ...base, format: "ebml_webm_mkv", header: {} };
+  }
+  if (buf.length >= 8 && buf.toString("ascii", 0, 5) === "%PDF-") {
+    return { ...base, format: "pdf", header: { pdf_version: buf.toString("ascii", 5, 8).trim() } };
+  }
+  if (TEXT_EXTS.has(ext) || SOURCE_EXTS.has(ext)) {
+    return { ...base, format: ext.replace(/^\./, "") || "text", header: { text_or_source: true } };
+  }
+  return base;
 }
 
 export function sealBundle(bundleDir, meta = {}) {
@@ -192,9 +277,11 @@ export function decomposeBundle(bundleDir, sealedFiles) {
 
   for (const f of sealedFiles) {
     const full = path.join(bundleDir, f.rel);
-    const meta = { rel: f.rel, kind: f.kind, ext: f.ext, bytes: f.bytes, sha256: f.sha256 };
-    if (f.kind === "text") {
-      const text = readFileSync(full, "utf8");
+    const raw = readFileSync(full);
+    const layer0 = dissectArtifactReadOnly(raw, f.ext);
+    const meta = { rel: f.rel, kind: f.kind, ext: f.ext, bytes: f.bytes, sha256: f.sha256, layer0 };
+    if (f.kind === "text" || f.kind === "source") {
+      const text = raw.toString("utf8");
       corpusText += `\n${text}`;
       const lines = text.split(/\r?\n/);
       meta.lines = lines.length;
@@ -257,6 +344,74 @@ export function buildRoutingManifest(title, decomposition, studySha256) {
     equation_count: decomposition.equations.length,
   };
   return { ...payload, routing_sha256: sha256Hex(canonicalJson(payload)) };
+}
+
+export function buildMcpDispatchPlan(title, decomposition, routing, studySha256, seal) {
+  const modalities = Array.from(new Set(decomposition.media_inventory.map((m) => m.kind))).sort();
+  const formats = Array.from(new Set(decomposition.media_inventory.map((m) => m.layer0?.format || "unknown"))).sort();
+  const hasMediaOrGame = modalities.some((m) => ["audio", "video", "image"].includes(m))
+    || formats.some((f) => ["gltf_glb", "png", "wav", "isobmff_mp4"].includes(f))
+    || routing.lanes.superframe.score > 0;
+  const hasBinaryOrCode = modalities.some((m) => ["binary", "source"].includes(m))
+    || formats.some((f) => ["wasm", "elf", "pe_mz", "bld"].includes(f))
+    || routing.lanes.buildlang.score > 0;
+
+  const targets = [
+    {
+      server: "gather",
+      tool: "gather_seal_bundle",
+      read_only: true,
+      enabled: true,
+      args: { title, file_count: seal.files.length, sha256sums_digest: seal.sha256sums_digest },
+    },
+    {
+      server: "index",
+      tool: "index_upsert_study",
+      read_only: true,
+      enabled: true,
+      args: { study_receipt_sha256: studySha256, claims: decomposition.claims.length, citations: decomposition.citations.length },
+    },
+    {
+      server: "library",
+      tool: "library_catalog_media",
+      read_only: true,
+      enabled: true,
+      args: { modalities, formats, artifacts: decomposition.media_inventory.length },
+    },
+    {
+      server: "flywheel",
+      tool: "flywheel_verify_receipt",
+      read_only: true,
+      enabled: true,
+      args: { study_receipt_sha256: studySha256, routing_sha256: routing.routing_sha256 },
+    },
+    {
+      server: "superframe",
+      tool: "superframe_ingest_multimodal_study",
+      read_only: true,
+      enabled: hasMediaOrGame,
+      args: { modalities, formats, study_receipt_sha256: studySha256 },
+    },
+    {
+      server: "buildlang",
+      tool: "buildlang_ingest_binary_or_kernel_study",
+      read_only: true,
+      enabled: hasBinaryOrCode,
+      args: { formats, study_receipt_sha256: studySha256, execute_untrusted_binaries: false },
+    },
+  ];
+
+  const payload = {
+    schema: MCP_DISPATCH_SCHEMA,
+    execution_mode: "read_only_plan_only",
+    execute_untrusted_binaries: false,
+    title,
+    study_receipt_sha256: studySha256,
+    modalities,
+    formats,
+    targets,
+  };
+  return { ...payload, dispatch_sha256: sha256Hex(canonicalJson(payload)) };
 }
 
 export function verifyStudyReceipt(studyObj) {
@@ -337,6 +492,7 @@ export function processBundle(bundleDir, options = {}) {
   const receipt_sha256 = sha256Hex(canonicalJson(studyPayload));
   const study = { ...studyPayload, receipt_sha256 };
   const routing = buildRoutingManifest(meta.title, preDecomp, receipt_sha256);
+  const mcpDispatch = buildMcpDispatchPlan(meta.title, preDecomp, routing, receipt_sha256, seal);
 
   const mdLines = [
     `# Study: ${meta.title}`,
@@ -382,8 +538,9 @@ export function processBundle(bundleDir, options = {}) {
   writeFileSync(path.join(outDir, "study.json"), `${JSON.stringify(study, null, 2)}\n`, "utf8");
   writeFileSync(path.join(outDir, "study.md"), mdLines.join("\n"), "utf8");
   writeFileSync(path.join(outDir, "routing_manifest.json"), `${JSON.stringify(routing, null, 2)}\n`, "utf8");
+  writeFileSync(path.join(outDir, "mcp_dispatch_plan.json"), `${JSON.stringify(mcpDispatch, null, 2)}\n`, "utf8");
 
-  return { ok: true, verdict: "SEALED", study, routing, seal };
+  return { ok: true, verdict: "SEALED", study, routing, mcpDispatch, seal };
 }
 
 export function watchIntakeDir(rootDir, options = {}) {
