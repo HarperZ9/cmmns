@@ -4,7 +4,8 @@
 // Offline tests for official Discord Bot + JSON-RPC 2.0 MCP Server (mcp/discord-cmmns-mcp.mjs).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -15,6 +16,7 @@ import {
   validateBotToken,
   verifyDiscordReceipt,
 } from "../mcp/discord-cmmns-mcp.mjs";
+import { verifyBundleSeals } from "../pipeline/auto-study-hook.mjs";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const SRC = readFileSync(path.join(ROOT, "..", "mcp", "discord-cmmns-mcp.mjs"), "utf8");
@@ -31,15 +33,24 @@ function makeMockFetch() {
     if (url.includes("/guilds/guild-ok/channels")) {
       return { ok: true, status: 200, json: async () => [{ id: "ch-1", name: "research-intake" }] };
     }
+    if (url.includes("/guilds/guild-ok/threads/active")) {
+      return { ok: true, status: 200, json: async () => ({ threads: [{ id: "th-1", name: "gpu-kernels" }] }) };
+    }
     if (url.includes("/channels/ch-1/messages") && init.method === "GET") {
+      if (url.includes("before=m-2")) {
+        return { ok: true, status: 200, json: async () => [{ id: "m-0", content: "Finding: BuildLang WGSL shader passed 560/560 certs." }] };
+      }
       return {
         ok: true,
         status: 200,
         json: async () => [
-          { id: "m-1", content: "Claim: LoomFormer arXiv:2611.30634 boosts active heads from 22.9% to 74.4%." },
+          { id: "m-1", content: "Claim: LoomFormer arXiv:2611.30634 boosts active heads from 22.9% to 74.4%.", attachments: [{ filename: "diagram.png", url: "https://cdn.example/diagram.png", size: 1024, content_type: "image/png" }] },
           { id: "m-2", content: "Unrelated chat message" },
         ],
       };
+    }
+    if (url.includes("/channels/th-1/messages") && init.method === "GET") {
+      return { ok: true, status: 200, json: async () => [{ id: "t-1", content: "Result: Superframe 3DGS ran in 10s (arXiv:2611.27962)." }] };
     }
     if (url.includes("/channels/ch-1/messages") && init.method === "POST") {
       return { ok: true, status: 200, json: async () => ({ id: "m-posted-1", ok: true }) };
@@ -85,6 +96,7 @@ test("JSON-RPC MCP tools, rate-limit backoff, guild allowlist, slash commands, a
       "discord_read_channel_messages",
       "discord_run_cmmns_study",
       "discord_post_study_summary",
+      "discord_archive_authorized_guild",
     ],
   );
 
@@ -160,4 +172,36 @@ test("JSON-RPC MCP tools, rate-limit backoff, guild allowlist, slash commands, a
 
   const tampered = { ...studyCmd.receipt, guild_id: "guild-forged" };
   assert.equal(verifyDiscordReceipt(tampered).ok, false);
+
+  // 6. discord_archive_authorized_guild with bounded pagination, threads, attachments, and Study sealing
+  const outDir = mkdtempSync(path.join(os.tmpdir(), "cmmns-discord-archive-"));
+  try {
+    const deniedArchive = await server.callTool("discord_archive_authorized_guild", { guild_id: "guild-evil", out_dir: outDir });
+    assert.equal(deniedArchive.ok, false);
+    assert.equal(deniedArchive.reason, "guild_not_allowlisted");
+
+    const arch = await server.callTool("discord_archive_authorized_guild", {
+      guild_id: "guild-ok",
+      out_dir: outDir,
+      page_size: 2,
+      max_pages_per_channel: 3,
+      intakeIso: "2026-11-27T17:40:00Z",
+    });
+    assert.equal(arch.ok, true);
+    assert.equal(arch.verdict, "ALLOW");
+    assert.equal(arch.result.channels_count, 1);
+    assert.equal(arch.result.threads_count, 1);
+    assert.equal(arch.result.total_messages, 4);
+    assert.equal(arch.result.attachments_count, 1);
+    assert.ok(calls.some((c) => c.url.includes("before=m-2")), "Pagination must use before=<message_id>");
+    assert.equal(existsSync(path.join(outDir, "SOURCE.txt")), true);
+    assert.equal(existsSync(path.join(outDir, "SHA256SUMS")), true);
+    assert.equal(existsSync(path.join(outDir, "study.md")), true);
+    assert.equal(existsSync(path.join(outDir, "study.json")), true);
+    assert.equal(existsSync(path.join(outDir, "mcp_dispatch_plan.json")), true);
+    assert.equal(verifyBundleSeals(outDir).ok, true);
+    assert.equal(verifyDiscordReceipt(arch.receipt).ok, true);
+  } finally {
+    rmSync(outDir, { recursive: true, force: true });
+  }
 });

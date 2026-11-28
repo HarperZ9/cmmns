@@ -8,6 +8,8 @@
 // explicit guild allowlist, rate-limit backoff, public-research-only policy gate, read-only Layer-0
 // artifact dissection via pipeline/auto-study-hook.mjs, and deterministic SHA-256 receipts.
 
+import { mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import { createInterface } from "node:readline";
 import { fileURLToPath } from "node:url";
 import {
@@ -16,6 +18,7 @@ import {
   canonicalJson,
   checkPublicResearchPolicy,
   dissectArtifactReadOnly,
+  processBundle,
   sha256Hex,
   verifyStudyReceipt,
 } from "../pipeline/auto-study-hook.mjs";
@@ -35,6 +38,7 @@ export const MCP_TOOLS = Object.freeze([
   { name: "discord_read_channel_messages", description: "Read recent messages from an allowlisted Discord guild channel" },
   { name: "discord_run_cmmns_study", description: "Run public-research CMMNS Study decomposition + Layer-0 read-only dissection on channel content" },
   { name: "discord_post_study_summary", description: "Post a verified Study summary with SHA-256 receipt to an allowlisted Discord channel" },
+  { name: "discord_archive_authorized_guild", description: "Archive an allowlisted Discord guild's channels, messages, threads, and attachments into a sealed CMMNS Study bundle" },
 ]);
 
 export function validateBotToken(token) {
@@ -137,11 +141,87 @@ export function createDiscordBotClient(options = {}) {
   return {
     getAuthorizationHeader: () => authHeader,
     listGuildChannels: (guildId) => request("GET", `/guilds/${encodeURIComponent(guildId)}/channels`),
-    readChannelMessages: (channelId, limit = 25) => {
+    listActiveThreads: async (guildId) => {
+      try {
+        const res = await request("GET", `/guilds/${encodeURIComponent(guildId)}/threads/active`);
+        return Array.isArray(res && res.threads) ? res.threads : [];
+      } catch {
+        return [];
+      }
+    },
+    readChannelMessages: (channelId, limit = 25, before = null) => {
       const lim = Math.max(1, Math.min(100, Number(limit) || 25));
-      return request("GET", `/channels/${encodeURIComponent(channelId)}/messages?limit=${lim}`);
+      const qs = before ? `limit=${lim}&before=${encodeURIComponent(String(before))}` : `limit=${lim}`;
+      return request("GET", `/channels/${encodeURIComponent(channelId)}/messages?${qs}`);
     },
     postChannelMessage: (channelId, content) => request("POST", `/channels/${encodeURIComponent(channelId)}/messages`, { content: String(content || "").slice(0, 1900) }),
+  };
+}
+
+export async function archiveAuthorizedGuild(botClient, opts = {}) {
+  const guildId = String(opts.guild_id || "");
+  const outDir = String(opts.out_dir || "");
+  if (!outDir) throw new Error("missing_out_dir");
+  const maxPages = Math.max(1, Math.min(20, Number(opts.max_pages_per_channel) || 3));
+  const pageSize = Math.max(1, Math.min(100, Number(opts.page_size) || 50));
+
+  const channels = await botClient.listGuildChannels(guildId);
+  const threads = typeof botClient.listActiveThreads === "function" ? await botClient.listActiveThreads(guildId) : [];
+  const targets = [...(Array.isArray(channels) ? channels : []), ...(Array.isArray(threads) ? threads : [])];
+
+  mkdirSync(path.join(outDir, "channels"), { recursive: true });
+  const attachments = [];
+  const digestLines = [`# Discord Guild Archive (${guildId})`, ""];
+  let totalMessages = 0;
+
+  for (const ch of targets) {
+    const chId = String(ch.id || "");
+    if (!chId) continue;
+    const collected = [];
+    let before = null;
+    for (let page = 0; page < maxPages; page++) {
+      const batch = await botClient.readChannelMessages(chId, pageSize, before);
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      collected.push(...batch);
+      if (batch.length < pageSize) break;
+      before = batch[batch.length - 1].id;
+      if (!before) break;
+    }
+    totalMessages += collected.length;
+    writeFileSync(path.join(outDir, "channels", `${chId}.json`), `${JSON.stringify({ channel: ch, messages: collected }, null, 2)}\n`, "utf8");
+    digestLines.push(`## Channel ${ch.name || chId} (${chId})`);
+    for (const m of collected) {
+      if (m.content) digestLines.push(`- ${m.content}`);
+      if (Array.isArray(m.attachments)) {
+        for (const a of m.attachments) {
+          attachments.push({ channel_id: chId, message_id: m.id, filename: a.filename || "", url: a.url || "", size: Number(a.size) || 0, content_type: a.content_type || "" });
+        }
+      }
+    }
+    digestLines.push("");
+  }
+
+  writeFileSync(path.join(outDir, "guild_manifest.json"), `${JSON.stringify({ guild_id: guildId, channels_count: channels.length, threads_count: threads.length, total_messages: totalMessages }, null, 2)}\n`, "utf8");
+  writeFileSync(path.join(outDir, "attachments_manifest.json"), `${JSON.stringify({ count: attachments.length, attachments }, null, 2)}\n`, "utf8");
+  writeFileSync(path.join(outDir, "archive_digest.md"), `${digestLines.join("\n")}\n`, "utf8");
+
+  const bundleRes = processBundle(outDir, {
+    title: opts.title || `Discord Guild Archive ${guildId}`,
+    sourceUrl: `https://discord.com/channels/${guildId}`,
+    license: "public-research",
+    intakeIso: opts.intakeIso || "2026-11-27T00:00:00Z",
+  });
+  return {
+    ok: bundleRes.ok,
+    verdict: bundleRes.verdict,
+    reason: bundleRes.reason,
+    guild_id: guildId,
+    channels_count: channels.length,
+    threads_count: threads.length,
+    total_messages: totalMessages,
+    attachments_count: attachments.length,
+    study: bundleRes.study,
+    mcp_dispatch: bundleRes.mcpDispatch,
   };
 }
 
@@ -279,6 +359,30 @@ export function createDiscordCmmnsMcpServer(options = {}) {
         guild_id: guildId, channel_id: channelId, input: { channel_id: channelId, summary_sha256: sha256Hex(summary) }, output: { message_id: posted.id || "" }, timestamp_ms: ts,
       });
       return { ok: true, verdict: "ALLOW", result: posted, receipt };
+    }
+
+    if (name === "discord_archive_authorized_guild") {
+      if (!args.out_dir) return refuse("missing_out_dir", "out_dir is required");
+      const archived = await archiveAuthorizedGuild(botClient, { ...args, guild_id: guildId });
+      if (!archived.ok) return refuse(archived.reason || "archive_refused", "Archive blocked by public-research policy");
+      const receipt = buildDiscordReceipt({
+        verdict: "ALLOW",
+        reason: "guild_archived_and_sealed",
+        surface: "mcp",
+        operation: name,
+        guild_id: guildId,
+        channel_id: "",
+        input: { guild_id: guildId, max_pages_per_channel: args.max_pages_per_channel || 3 },
+        output: {
+          channels_count: archived.channels_count,
+          threads_count: archived.threads_count,
+          total_messages: archived.total_messages,
+          study_receipt_sha256: archived.study.receipt_sha256,
+          mcp_dispatch_sha256: archived.mcp_dispatch.dispatch_sha256,
+        },
+        timestamp_ms: ts,
+      });
+      return { ok: true, verdict: "ALLOW", result: archived, receipt };
     }
 
     return refuse("unknown_tool", `Unknown MCP tool: ${name}`);
